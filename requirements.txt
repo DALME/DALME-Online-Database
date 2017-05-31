@@ -3,3 +3,4 @@ Django==1.10.4
 gunicorn==19.6.0
 psycopg2==2.6.2
 whitenoise==3.2
+mysqlclient==1.3.10
