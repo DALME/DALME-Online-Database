@@ -10,5 +10,13 @@ class PlatonicConceptAdmin(admin.ModelAdmin):
         obj.modification_username = request.user.username
         obj.save()
 
+class RelationshipAdmin(admin.ModelAdmin):
+    fields = ('source','relationship','target')
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.creation_username = request.user.username
+        obj.modification_username = request.user.username
+        obj.save()
+
 admin.site.register(PlatonicConcept, PlatonicConceptAdmin)
-admin.site.register(Relationship)
+admin.site.register(Relationship, RelationshipAdmin)

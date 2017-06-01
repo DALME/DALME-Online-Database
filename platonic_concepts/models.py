@@ -34,6 +34,10 @@ class Relationship(models.Model):
     source = models.ForeignKey(PlatonicConcept, related_name='source')
     target = models.ForeignKey(PlatonicConcept, related_name='target')
     relationship = models.CharField(max_length=36)
+    creation_username = models.CharField(max_length=255, null=True, blank=True)
+    creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    modification_username = models.CharField(max_length=255, null=True, blank=True)
+    modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
     def __str__(self):
         representation = "{} - {} -> {}".format(self.source,self.relationship,self.target)
         return representation
