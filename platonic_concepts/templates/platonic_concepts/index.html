@@ -1,0 +1,34 @@
+{% load admin_urls %}
+
+{% include 'platonic_concepts/head.html' %}
+{% include 'platonic_concepts/navbar.html' %}
+
+<div class="container">
+  <div class="platonic-concepts">
+    <h1>Platonic Concepts</h1>
+    {% if concepts %}
+      <h2>Recently Changed Concepts</h2>
+      {% for c in concepts %}
+        <div class="concept">
+          <h3><a href="{% url 'admin:platonic_concepts_platonicconcept_change' c.pk %}">{{ c }}</a></h3>
+          <p><em>Modified: {{ c.modification_timestamp }} by {{ c.modification_username }}</em></p>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <a href="{% url 'admin:platonic_concepts_platonicconcept_add' %}" class="btn btn-lg btn-primary">Add New Concept</a>
+  </div>
+  <div class="relationships">
+    <h1>Relationships</h1>
+    {% if relationships %}
+      {% for rel in relationships %}
+        <div class="relationship">
+          <h3><a href="{% url 'admin:platonic_concepts_relationship_change' rel.pk %}">{{ rel }}</a></h3>
+          <p><em>Modified: {{ rel.modification_timestamp }} by {{ rel.modification_username }}</em></p>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <a href="{% url 'admin:platonic_concepts_relationship_add' %}" class="btn btn-lg btn-primary">Add a New Relationship</a>
+  </div>
+</div>
+
+{% include 'platonic_concepts/foot.html' %}
