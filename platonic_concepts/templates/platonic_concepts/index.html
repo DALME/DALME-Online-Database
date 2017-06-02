@@ -15,18 +15,23 @@
           <p><em>Modified: {{ c.modification_timestamp }} by {{ c.modification_username }}</em></p>
         </div>
       {% endfor %}
+    {% else %}
+      <h2>There are currently no Platonic Concepts</h2>
     {% endif %}
     <a href="{% url 'admin:platonic_concepts_platonicconcept_add' %}" class="btn btn-lg btn-primary">Add New Concept</a>
   </div>
   <div class="relationships">
     <h1>Relationships</h1>
     {% if relationships %}
+      <h2>Recently Changed Relationships</h2>
       {% for rel in relationships %}
         <div class="relationship">
           <h3><a href="{% url 'admin:platonic_concepts_relationship_change' rel.pk %}">{{ rel }}</a></h3>
           <p><em>Modified: {{ rel.modification_timestamp }} by {{ rel.modification_username }}</em></p>
         </div>
       {% endfor %}
+    {% else %}
+      <h2>There are currently no Relationships between Platonic Concepts</h2>
     {% endif %}
     <a href="{% url 'admin:platonic_concepts_relationship_add' %}" class="btn btn-lg btn-primary">Add a New Relationship</a>
   </div>
