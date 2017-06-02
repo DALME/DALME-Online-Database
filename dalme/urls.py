@@ -19,7 +19,6 @@ from django.contrib import admin
 from platonic_concepts import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='main_index'),
-    url(r'^concept/', include('platonic_concepts.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^', include('platonic_concepts.urls')),
 ]
