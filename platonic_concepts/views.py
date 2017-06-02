@@ -16,10 +16,11 @@ def index(request):
 def concept_detail(request, concept_id):
     getty_term = request.GET.get('set_getty_to', '')
     concept = get_object_or_404(PlatonicConcept, pk=concept_id)
-    context = {'concept': concept}
+    context = {'concept': concept, 'authenticated': request.user.is_authenticated}
     if getty_term != '':
-        concept.getty_term = getty_term
-        concept.save()
+        if request.user.is_authenticated:
+            concept.getty_term = getty_term
+            concept.save()
         return HttpResponseRedirect(reverse('concept_detail', kwargs={'concept_id': concept_id}))
     else:
         if hasattr(concept, 'getty_term') and concept.getty_term != None:

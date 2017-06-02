@@ -37,7 +37,13 @@
 {% verbatim %}
 <script id="getty-entry" type="text/x-handlebars-template">
   <div class="getty-entry">
-    <h3><a class="btn btn-sm btn-primary" href=".?set_getty_to={{subject}}" title='Set Getty AAT equivalent to "{{term}}"'><span class="glyphicon glyphicon-plus"></span></a>&nbsp;<a href="{{ subject }}">{{ term }}</a></h3>
+    <h3>
+      {% endverbatim %}
+      {% if authenticated %}
+      <a class="btn btn-sm btn-primary" href=".?set_getty_to={{subject}}" title='Set Getty AAT equivalent to "{{term}}"'><span class="glyphicon glyphicon-plus"></span></a>&nbsp;
+      {% endif %}
+      {% verbatim %}
+      <a href="{{ subject }}">{{ term }}</a></h3>
     {{#if scopeNote}}
     <p>{{ scopeNote }}</p>
     {{/if}}
