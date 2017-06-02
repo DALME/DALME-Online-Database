@@ -1,4 +1,5 @@
 {% load admin_urls %}
+{% load static %}
 
 {% include 'platonic_concepts/head.html' %}
 {% include 'platonic_concepts/navbar.html' %}
@@ -8,32 +9,32 @@
   <div id="getty-search">
     <h2>Getty Terms</h2>
     <input type="text" name="getty-search" value="{{ concept }}">
-    <button class="btn btn-xs btn-primary" type="button" name="getty-search-button"><span class="glyphicon glyphicon-search"></span></button>
+    <button id="search-button" class="btn btn-xs btn-primary" type="button" name="getty-search-button"><span class="glyphicon glyphicon-search"></span></button>
   </div>
   <div id="getty-results"></div>
 </div>
 
+<script src="{% static 'platonic_concepts/javascripts/handlebars.js' %}" charset="utf-8"></script>
+
+{% verbatim %}
+<script id="getty-entry" type="text/x-handlebars-template">
+  <div class="getty-entry">
+    <h3><a href="{{ subject }}">{{ term }}</a></h3>
+    {{#if scopeNote}}
+    <p>{{ scopeNote }}</p>
+    {{/if}}
+  </div>
+</script>
+{% endverbatim %}
+
+<script src="{% static 'platonic_concepts/javascripts/getty-search.js' %}" charset="utf-8"></script>
+
 <script type="text/javascript">
-  var searchTerm = $("#getty-search input").val();
-  var query = "select ?Subject ?Term ?Parents ?ScopeNote {\
-    ?Subject a skos:Concept; luc:term  \"" + searchTerm + "\"; skos:inScheme aat: ;\
-       gvp:prefLabelGVP [xl:literalForm ?Term].\
-    optional {?Subject gvp:parentStringAbbrev ?Parents}\
-    optional {?Subject skos:scopeNote [dct:language gvp_lang:en; rdf:value ?ScopeNote]}\
-  } order by asc(lcase(str(?Term)))";
-  queryUrl = "http://vocab.getty.edu/sparql.json?query=" + query + "&toc=Case-insensitive_Full_Text_Search_Query&implicit=true&equivalent=false&_form=/queriesF";
-  htmlQueryUrl = "http://vocab.getty.edu/sparql?query=" + query + "&toc=Case-insensitive_Full_Text_Search_Query&implicit=true&equivalent=false&_form=/queriesF";
-  var gettyResults = $("#getty-results");
-  $.getJSON(queryUrl, function( data ) {
-    gettyResults.append("<a href='" + htmlQueryUrl + "'>View original search</a>");
-    $.each( data['results']['bindings'], function( i, result ) {
-      console.log(result);
-      resultText = "<h3><a href='" + result['Subject']['value'] + "'>" + result['Term']['value'] + "</a></h3>";
-      if ('ScopeNote' in result) {
-        resultText += "<p>" + result['ScopeNote']['value'] + "</p>";
-      }
-      gettyResults.append(resultText);
-    });
+  var searchTerm = $('#getty-search input').val();
+  gettySearch(searchTerm,'getty-entry','getty-results');
+  $("#search-button").on("click", function() {
+    var searchTerm = $('#getty-search input').val();
+    gettySearch(searchTerm,'getty-entry','getty-results');
   });
 </script>
 
