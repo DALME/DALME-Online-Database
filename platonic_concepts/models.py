@@ -15,6 +15,7 @@ class PlatonicConcept(models.Model):
         unique=True
     )
     term = models.CharField(max_length=255, null=True, blank=True)
+    getty_term = models.CharField(max_length=255, null=True, blank=True)
     comments = models.TextField(null=True, blank=True)
     creation_username = models.CharField(max_length=255, null=True, blank=True)
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)

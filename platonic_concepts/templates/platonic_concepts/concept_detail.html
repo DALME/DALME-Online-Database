@@ -6,6 +6,24 @@
 
 <div class="container">
   <h1>{{ concept }}</h1>
+  {% if concept.getty_term %}
+  <p>Getty thesaurus equivalent: <a href="{{ concept.getty_term }}">{{ concept.getty_term }}</a></p>
+    {% if getty_info %}
+      <h2>Term information from Getty AAT</h2>
+      <table>
+        <tr>
+          <th>Term</th>
+          <th>Language</th>
+        </tr>
+      {% for term in getty_info %}
+        <tr>
+          <td>{{ term.lab.value }}</td>
+          <td>{{ term.lang.value }}</td>
+        </tr>
+      {% endfor %}
+      </table>
+    {% endif %}
+  {% endif %}
   <div id="getty-search">
     <h2>Getty Terms</h2>
     <input type="text" name="getty-search" value="{{ concept }}">
@@ -19,7 +37,7 @@
 {% verbatim %}
 <script id="getty-entry" type="text/x-handlebars-template">
   <div class="getty-entry">
-    <h3><a href="{{ subject }}">{{ term }}</a></h3>
+    <h3><a class="btn btn-sm btn-primary" href=".?set_getty_to={{subject}}" title='Set Getty AAT equivalent to "{{term}}"'><span class="glyphicon glyphicon-plus"></span></a>&nbsp;<a href="{{ subject }}">{{ term }}</a></h3>
     {{#if scopeNote}}
     <p>{{ scopeNote }}</p>
     {{/if}}
@@ -29,9 +47,14 @@
 
 <script src="{% static 'platonic_concepts/javascripts/getty-search.js' %}" charset="utf-8"></script>
 
+{% if not concept.getty_term %}
 <script type="text/javascript">
   var searchTerm = $('#getty-search input').val();
   gettySearch(searchTerm,'getty-entry','getty-results');
+</script>
+{% endif %}
+
+<script type="text/javascript">
   $("#search-button").on("click", function() {
     var searchTerm = $('#getty-search input').val();
     gettySearch(searchTerm,'getty-entry','getty-results');
