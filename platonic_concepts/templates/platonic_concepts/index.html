@@ -11,7 +11,9 @@
       {% for c in concepts %}
         <div class="concept">
           <h3><a href="{% url 'concept_detail' c.pk %}">{{ c }}</a></h3>
+          {% if authenticated %}
           <span class="edit"><a href="{% url 'admin:platonic_concepts_platonicconcept_change' c.pk %}">(edit)</a></span>
+          {% endif %}
           <p><em>Modified: {{ c.modification_timestamp }} by {{ c.modification_username }}</em></p>
         </div>
       {% endfor %}
