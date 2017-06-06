@@ -16,7 +16,7 @@ def index(request):
         'relationships': relationships,
         'authenticated': request.user.is_authenticated
     }
-    return render(request, 'platonic_concepts/index.html', context)
+    return render(request, 'dalme_app/index.html', context)
 
 def concept_detail(request, concept_id):
     getty_term = request.GET.get('set_getty_to', '')
@@ -60,4 +60,4 @@ def concept_detail(request, concept_id):
             R.encoding = 'utf=8'
             getty_info = R.json()['results']['bindings']
             context['getty_info'] = getty_info
-        return render(request, 'platonic_concepts/concept_detail.html', context)
+        return render(request, 'dalme_app/concept_detail.html', context)

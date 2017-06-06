@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('platonic_concepts', '0006_auto_20170601_1433'),
+        ('dalme_app', '0006_auto_20170601_1433'),
     ]
 
     operations = [

@@ -16,9 +16,9 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from platonic_concepts import views
+from dalme_app import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('platonic_concepts.urls')),
+    url(r'^', include('dalme_app.urls')),
 ]

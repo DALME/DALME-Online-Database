@@ -29,7 +29,7 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
-    'platonic_concepts.apps.PlatonicConceptsConfig',
+    'dalme_app.apps.DalmeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

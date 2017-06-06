@@ -3,13 +3,13 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import platonic_concepts.models
+import dalme_app.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('platonic_concepts', '0001_initial'),
+        ('dalme_app', '0001_initial'),
     ]
 
     operations = [
@@ -20,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='platonicconcept',
             name='_id',
-            field=models.CharField(db_column='id', default=platonic_concepts.models.make_uuid, max_length=36, primary_key=True, serialize=False, unique=True),
+            field=models.CharField(db_column='id', default=dalme_app.models.make_uuid, max_length=36, primary_key=True, serialize=False, unique=True),
         ),
     ]

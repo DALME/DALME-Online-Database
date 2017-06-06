@@ -1,5 +1,5 @@
-{% include 'platonic_concepts/head.html' %}
-{% include 'platonic_concepts/navbar.html' %}
+{% include 'dalme_app/head.html' %}
+{% include 'dalme_app/navbar.html' %}
 
 <div class="container">
   <div class="platonic-concepts">
@@ -10,7 +10,7 @@
         <div class="concept">
           <h3><a href="{% url 'concept_detail' c.pk %}">{{ c }}</a></h3>
           {% if authenticated %}
-          <span class="edit"><a href="{% url 'admin:platonic_concepts_platonicconcept_change' c.pk %}">(edit)</a></span>
+          <span class="edit"><a href="{% url 'admin:dalme_app_platonicconcept_change' c.pk %}">(edit)</a></span>
           {% endif %}
           <p><em>Modified: {{ c.modification_timestamp }} by {{ c.modification_username }}</em></p>
         </div>
@@ -18,7 +18,7 @@
     {% else %}
       <h2>There are currently no Platonic Concepts</h2>
     {% endif %}
-    <a href="{% url 'admin:platonic_concepts_platonicconcept_add' %}" class="btn btn-lg btn-primary">Add New Concept</a>
+    <a href="{% url 'admin:dalme_app_platonicconcept_add' %}" class="btn btn-lg btn-primary">Add New Concept</a>
   </div>
   <div class="relationships">
     <h1>Relationships</h1>
@@ -26,15 +26,15 @@
       <h2>Recently Changed Relationships</h2>
       {% for rel in relationships %}
         <div class="relationship">
-          <h3><a href="{% url 'admin:platonic_concepts_relationship_change' rel.pk %}">{{ rel }}</a></h3>
+          <h3><a href="{% url 'admin:dalme_app_relationship_change' rel.pk %}">{{ rel }}</a></h3>
           <p><em>Modified: {{ rel.modification_timestamp }} by {{ rel.modification_username }}</em></p>
         </div>
       {% endfor %}
     {% else %}
       <h2>There are currently no Relationships between Platonic Concepts</h2>
     {% endif %}
-    <a href="{% url 'admin:platonic_concepts_relationship_add' %}" class="btn btn-lg btn-primary">Add a New Relationship</a>
+    <a href="{% url 'admin:dalme_app_relationship_add' %}" class="btn btn-lg btn-primary">Add a New Relationship</a>
   </div>
 </div>
 
-{% include 'platonic_concepts/foot.html' %}
+{% include 'dalme_app/foot.html' %}
