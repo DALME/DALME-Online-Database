@@ -28,7 +28,7 @@ def concept_detail(request, concept_id):
             concept.save()
         return HttpResponseRedirect(reverse('concept_detail', kwargs={'concept_id': concept_id}))
     else:
-        if hasattr(concept, 'getty_term') and concept.getty_term != None:
+        if hasattr(concept, 'getty_term') and concept.getty_term != None and concept.getty_term != "":
             url = 'http://vocab.getty.edu/sparql.json'
             Q = {
                 '_implicit': 'false',
