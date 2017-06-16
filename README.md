@@ -12,6 +12,10 @@ The software required is listed below, along with commands for installation on O
   - `brew install python3`
 - Virtualenv
   - `pip install virtualenv`
+- Postgres
+    - `brew install postgresql`
+- MySQL
+    - `brew install mysql`
 
 ### Setup
 
@@ -23,6 +27,11 @@ The software required is listed below, along with commands for installation on O
     - `source ~/virtualenvs/dalme/bin/activate`
 3. Install the dependencies
     - (in the directory for this repository) `pip install -r requirements.txt`
+    - Some installations may fail, try installing command line tools:
+        - `xcode-select --install`
+    - Also try installing `psycopg` and/or `mysqlclient` with the following pip commands:
+        - `env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip --no-cache install psycopg2`
+        - `env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip --no-cache install mysqlclient`
 4. Get a copy of db.cnf from someone else in the project to use the database connection, then place it in the root of the repository's directory
 5. Test the local development setup
     - `python manage.py runserver`
