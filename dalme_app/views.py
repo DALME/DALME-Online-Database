@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 
-from .models import PlatonicConcept, Relationship, Sources
+from .models import PlatonicConcept, Relationship, Source
 
 import requests
 import re
@@ -63,7 +63,7 @@ def concept_detail(request, concept_id):
         return render(request, 'dalme_app/concept_detail.html', context)
 
 def dropdown_test(request):
-    dropdown_items = Sources.objects.order_by('dropdown_content')[:60]
+    dropdown_items = Source.objects.order_by('dropdown_content')[:60]
     context = {
         'page_title':'DALME | Dropdown Test',
         'menu': dropdown_items,
