@@ -61,3 +61,12 @@ def concept_detail(request, concept_id):
             getty_info = R.json()['results']['bindings']
             context['getty_info'] = getty_info
         return render(request, 'dalme_app/concept_detail.html', context)
+
+def dropdown_test(request):
+    dropdown_items = Source.objects.order_by('dropdown_content')[:60]
+    context = {
+        'page_title':'DALME | Dropdown Test',
+        'menu': dropdown_items,
+        'authenticated': request.user.is_authenticated
+    }
+    return render(request, 'dalme_app/dropdown_test.html', context)

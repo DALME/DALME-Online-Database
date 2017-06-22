@@ -1,0 +1,24 @@
+{% include 'dalme_app/head.html' %}
+{% include 'dalme_app/navbar.html' %}
+
+<div class="container">
+  <div class="dropdown_test">
+    <h1>Dropdown Test</h1>
+    {% if menu %}
+      <h2>Single Dropdown Menu</h2>
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example<span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    {% for c in menu %}
+                        <li><a href="#">{{ c }}</a></li>
+                    {% endfor %}
+                </ul>
+        </div>
+    {% else %}
+      <h2>There are currently no menu items to list</h2>
+    {% endif %}
+    <a href="{% url 'admin:dalme_app_source_add' %}" class="btn btn-lg btn-primary">Add New Source</a>
+  </div>
+</div>
+
+{% include 'dalme_app/foot.html' %}
