@@ -9,6 +9,7 @@ def make_uuid():
     return the_id
 
 class external_lemmata(DalmeBaseModel):
+    temp = models.CharField(max_length=255)
 
 
 class external_lemma_attributes(DalmeBaseModel):
@@ -41,6 +42,7 @@ class sources(DalmeBaseModel):
 
 
 class superlemmata(DalmeBaseModel):
+    temp = models.CharField(max_length=255)
 
 
 class superlemma_components(DalmeBaseModel):
@@ -53,6 +55,7 @@ class superlemma_components(DalmeBaseModel):
 
 
 class concepts(DalmeBaseModel):
+    temp = models.CharField(max_length=255)
 
 
 class concept_components(DalmeBaseModel):
@@ -65,6 +68,7 @@ class concept_components(DalmeBaseModel):
 
 
 class inventories(DalmeBaseModel):
+    temp = models.CharField(max_length=255)
 
 
 class inventory_versions(DalmeBaseModel):
@@ -72,6 +76,7 @@ class inventory_versions(DalmeBaseModel):
 
 
 class leaves(DalmeBaseModel):
+    temp = models.CharField(max_length=255)
 
 
 class leaf_images(DalmeBaseModel):
@@ -96,6 +101,7 @@ class phrase_parts(DalmeBaseModel):
 
 
 class inventory_attributes(DalmeBaseModel):
+    temp = models.CharField(max_length=255)
 
 
 class predicates(DalmeBaseModel):
@@ -106,7 +112,7 @@ class predicates(DalmeBaseModel):
 
 class predicate_labels(DalmeBaseModel):
     predicate = models.ForeignKey('predicates', related_name='predicate')
-    language = models.AutoField()
+    language = models.CharField(max_length=36)
     label = models.CharField(max_length=255)
     def __str__(self):
         representation = "@{}:{}".format(self.language,self.label)
@@ -116,11 +122,12 @@ class predicate_labels(DalmeBaseModel):
 class references(DalmeBaseModel):
     foreign_id = models.CharField(max_length=36)
     _type = models.CharField(max_length=36)
-    sources_id = models.CharField(max_length=36)
+    source_id = models.CharField(max_length=36)
     comments = models.TextField(null=True, blank=True)
 
 
 class repository(DalmeBaseModel):
+    temp = models.CharField(max_length=255)
 
 
 class reference_attributes(DalmeBaseModel):
