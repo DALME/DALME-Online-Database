@@ -8,12 +8,12 @@ import requests
 import re
 
 def index(request):
-    latest_sources = PlatonicConcept.objects.order_by('-modification_timestamp')[:5]
-    tokens = tokens.objects.order_by('-modification_timestamp')[:5]
+    latest_sources = sources.objects.order_by('-modification_timestamp')[:5]
+    the_tokens = tokens.objects.order_by('-modification_timestamp')[:5]
     context = {
         'page_title':'DALME | Home',
         'sources': latest_sources,
-        'tokens': tokens,
+        'tokens': the_tokens,
         'authenticated': request.user.is_authenticated
     }
     return render(request, 'dalme_app/index.html', context)

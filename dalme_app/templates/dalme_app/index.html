@@ -1,16 +1,15 @@
 {% include 'dalme_app/head.html' %}
 {% include 'dalme_app/navbar.html' %}
 
-<div class="container">
+<!--div class="container">
   <div class="platonic-concepts">
-    <h1>Platonic Concepts</h1>
-    {% if concepts %}
-      <h2>Recently Changed Concepts</h2>
+    <h1>Sources</h1>
+    {% if sources %}
+      <h2>Recently Added Sources</h2>
       {% for c in concepts %}
         <div class="concept">
           <h3><a href="{% url 'concept_detail' c.pk %}">{{ c }}</a></h3>
           {% if authenticated %}
-          <span class="edit"><a href="{% url 'admin:dalme_app_platonicconcept_change' c.pk %}">(edit)</a></span>
           {% endif %}
           <p><em>Modified: {{ c.modification_timestamp }} by {{ c.modification_username }}</em></p>
         </div>
@@ -18,7 +17,6 @@
     {% else %}
       <h2>There are currently no Platonic Concepts</h2>
     {% endif %}
-    <a href="{% url 'admin:dalme_app_platonicconcept_add' %}" class="btn btn-lg btn-primary">Add New Concept</a>
   </div>
   <div class="relationships">
     <h1>Relationships</h1>
@@ -26,16 +24,15 @@
       <h2>Recently Changed Relationships</h2>
       {% for rel in relationships %}
         <div class="relationship">
-          <h3><a href="{% url 'admin:dalme_app_relationship_change' rel.pk %}">{{ rel }}</a></h3>
           <p><em>Modified: {{ rel.modification_timestamp }} by {{ rel.modification_username }}</em></p>
         </div>
       {% endfor %}
     {% else %}
       <h2>There are currently no Relationships between Platonic Concepts</h2>
     {% endif %}
-    <a href="{% url 'admin:dalme_app_relationship_add' %}" class="btn btn-lg btn-primary">Add a New Relationship</a>
   </div>
-  <div><a href="{% url 'dropdown_test' %}" class="btn btn-lg btn-primary">Dropdown Test</a></div>
-</div>
+</div-->
+
+<div>Something coming soon!</div>
 
 {% include 'dalme_app/foot.html' %}
