@@ -13,7 +13,7 @@ class external_lemmata(DalmeBaseModel):
 
 
 class external_lemma_attributes(DalmeBaseModel):
-    subject = models.ForeignKey('external_lemmata', related_name='subject')
+    subject = models.ForeignKey('external_lemmata', related_name='external_lemma_subject')
     predicate = models.CharField(max_length=32)
     _object = models.CharField(max_length=255)
     def __str__(self):
@@ -46,7 +46,7 @@ class superlemmata(DalmeBaseModel):
 
 
 class superlemma_components(DalmeBaseModel):
-    subject = models.ForeignKey('superlemmata', related_name='subject')
+    subject = models.ForeignKey('superlemmata', related_name='superlemma_component_subject')
     predicate = models.CharField(max_length=32)
     _object = models.CharField(max_length=255)
     def __str__(self):
@@ -59,7 +59,7 @@ class concepts(DalmeBaseModel):
 
 
 class concept_components(DalmeBaseModel):
-    subject = models.ForeignKey('concepts', related_name='subject')
+    subject = models.ForeignKey('concepts', related_name='concept_component_subject')
     predicate = models.CharField(max_length=32)
     _object = models.CharField(max_length=255)
     def __str__(self):
@@ -80,24 +80,24 @@ class leaves(DalmeBaseModel):
 
 
 class leaf_images(DalmeBaseModel):
-    leaf = models.ForeignKey('leaves', related_name='leaf')
+    leaf = models.ForeignKey('leaves', related_name='image_leaf')
 
 
 class lines(DalmeBaseModel):
-    leaf = models.ForeignKey('leaves', related_name='leaf')
+    leaf = models.ForeignKey('leaves', related_name='line_leaf')
     inventory_version = models.ForeignKey('inventory_versions', related_name='inventory_version')
 
 
 class tokens(DalmeBaseModel):
     token = models.CharField(max_length=255)
-    line = models.ForeignKey('lines', related_name='line')
+    line = models.ForeignKey('lines', related_name='token_line')
     def __str__(self):
         return self.token
 
 
 class phrase_parts(DalmeBaseModel):
-    token = models.ForeignKey('tokens', related_name='token')
-    phrase = models.ForeignKey('phrases', related_name='phrase')
+    token = models.ForeignKey('tokens', related_name='phrase_part_token')
+    phrase = models.ForeignKey('phrases', related_name='phrase_part_phrase')
 
 
 class inventory_attributes(DalmeBaseModel):
@@ -111,7 +111,7 @@ class predicates(DalmeBaseModel):
 
 
 class predicate_labels(DalmeBaseModel):
-    predicate = models.ForeignKey('predicates', related_name='predicate')
+    predicate = models.ForeignKey('predicates', related_name='label_predicate')
     language = models.CharField(max_length=36)
     label = models.CharField(max_length=255)
     def __str__(self):
@@ -131,7 +131,7 @@ class repository(DalmeBaseModel):
 
 
 class reference_attributes(DalmeBaseModel):
-    subject = models.ForeignKey('references', related_name='subject')
+    subject = models.ForeignKey('references', related_name='reference_attribute_subject')
     predicate = models.CharField(max_length=32)
     _object = models.CharField(max_length=32)
     def __str__(self):
@@ -140,7 +140,7 @@ class reference_attributes(DalmeBaseModel):
 
 
 class repository_attributes(DalmeBaseModel):
-    subject = models.ForeignKey('references', related_name='subject')
+    subject = models.ForeignKey('references', related_name='repository_attribute_subject')
     predicate = models.CharField(max_length=32)
     _object = models.CharField(max_length=32)
     def __str__(self):
