@@ -1,6 +1,14 @@
-{% extends "todo/base.html" %}
+{% extends "admin/base_site.html" %}
+{% load i18n %}
 
-{% block title %}Search results{% endblock %}
+{% block breadcrumbs %}
+	<div class="breadcrumbs">
+		<a href="{% url 'admin:index' %}">Home</a>
+		&rsaquo; <a href="{% url 'todo-lists' %}">Task Manager</a> &rsaquo; Search Results
+	</div>
+{% endblock %}
+{% block page_heading %}{% endblock %}
+{% block title %}DALME Task Manager: Search Results{% endblock %}
 
 {% block content_title %}
     <h2 class="page_title">Search</h2>

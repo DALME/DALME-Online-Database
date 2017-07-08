@@ -1,6 +1,13 @@
-{% extends "todo/base.html" %}
+{% extends "admin/base_site.html" %}
+{% load i18n %}
 
-{% block title %}Todo List: {{ list.name }}{% endblock %}
+{% block breadcrumbs %}
+	<div class="breadcrumbs">
+		<a href="{% url 'admin:index' %}">Home</a>
+		&rsaquo; <a href="{% url 'todo-lists' %}">Task Manager</a> &rsaquo; View List
+	</div>
+{% endblock %}
+{% block title %}DALME Task Manager{% endblock %}
 
 {% block content %}
     <script type="text/javascript">
@@ -56,7 +63,7 @@
             	       </tr>
             	       <tr>
             	           <td><label for="id_title">Task:</label> {{ form.title }}</td>
-            	           <td><label for="id_due_date">Due date:</label> {{ form.due_date }}</td>
+            	           <td data-provide="datepicker"><label for="id_due_date">Due date:</label> {{ form.due_date }}</td>
             	           <td><label for="id_assigned">Assign to:</label> {{ form.assigned_to }}</td>
             	           <td><label for="id_notify">Notify*:</label> <input type="checkbox" checked="checked" name="notify" value="1" id="notify"></td>
              	       </tr>

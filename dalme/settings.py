@@ -143,3 +143,7 @@ STATICFILES_DIRS = [
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SITE_ID = 1
+
+#Settings for Task Manager
+
+TODO_STAFF_ONLY = True

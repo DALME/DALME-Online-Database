@@ -19,8 +19,8 @@ from django.contrib import admin
 from dalme_app import views
 
 urlpatterns = [
+    url(r'^todo/', include('todo.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^todo/', include('todo.urls')),
     url(r'^', include('dalme_app.urls')),
 ]

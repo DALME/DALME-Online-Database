@@ -1,10 +1,17 @@
-{% extends "todo/base.html" %}
+{% extends "admin/base_site.html" %}
+{% load i18n %}
 
-{% block title %}{{ list_title }} Todo Lists{% endblock %}
+{% block breadcrumbs %}
+	<div class="breadcrumbs">
+		<a href="{% url 'admin:index' %}">Home</a>
+		&rsaquo; Task Manager
+	</div>
+{% endblock %}
+{% block title %}DALME Task Manager{% endblock %}
 
 {% block content %}
 
-   <h1>Todo Lists</h1>
+   <h1>Task Manager - Lists</h1>
 
    <p>{{ item_count }} items in {{ list_count }} lists</p>
 
