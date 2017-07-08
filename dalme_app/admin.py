@@ -9,8 +9,6 @@ class DalmeBaseAdmin(admin.ModelAdmin):
         obj.modification_username = request.user.username
         obj.save()
 
-
-
 class external_lemma_attributesAdmin(DalmeBaseAdmin):
 	fields = ('subject','predicate','object')
 

@@ -3,7 +3,13 @@
 {% block title %}{{ title }} | {{ site_title|default:_('DALME site admin') }}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">DALME administration</a></h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">DALME Administration</a></h1>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+
+{% block userlinks %}
+    <a href="{% url 'todo-lists' %}"> To-do Lists /</a>
+    <a href="{% url 'todo-mine' %}"> My Tasks /</a>
+    {{ block.super }}
+{% endblock %}

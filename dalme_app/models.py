@@ -9,6 +9,11 @@ def make_uuid():
     return the_id
 
 class external_lemmata(DalmeBaseModel):
+    """ External Lemmata
+        This is the model definition for external lemmata,
+        currently it only contains fields for id, add/modify tracking, and a temp field I added so that the migrate tool would stop complaining.
+        This is a dummy docstring to test the documentation system.
+    """
     temp = models.CharField(max_length=255)
 
 
