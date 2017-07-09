@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-
-from dalme_app import views
+from django.conf import settings
+from django.conf.urls.static import static
+#from dalme_app import views
 
 urlpatterns = [
     url(r'^todo/', include('todo.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('dalme_app.urls')),
-]
+#   url(r'^', include('dalme_app.urls')),
+    url(r'^', include('cms.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

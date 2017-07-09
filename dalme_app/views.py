@@ -1,22 +1,22 @@
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.http import HttpResponseRedirect
+#from django.shortcuts import get_object_or_404, render
+#from django.urls import reverse
+#from django.http import HttpResponseRedirect
 
-from .models import predicates, tokens, sources, predicate_labels, source_attributes
+#from .models import predicates, tokens, sources, predicate_labels, source_attributes
 
-import requests
-import re
+#import requests
+#import re
 
-def index(request):
-    latest_sources = sources.objects.order_by('-modification_timestamp')[:5]
-    the_tokens = tokens.objects.order_by('-modification_timestamp')[:5]
-    context = {
-        'page_title':'DALME | Home',
-        'sources': latest_sources,
-        'tokens': the_tokens,
-        'authenticated': request.user.is_authenticated
-    }
-    return render(request, 'dalme_app/index.html', context)
+#def index(request):
+#    latest_sources = sources.objects.order_by('-modification_timestamp')[:5]
+#    the_tokens = tokens.objects.order_by('-modification_timestamp')[:5]
+#    context = {
+#        'page_title':'DALME | Home',
+#        'sources': latest_sources,
+#        'tokens': the_tokens,
+#        'authenticated': request.user.is_authenticated
+#    }
+#    return render(request, 'dalme_app/index.html', context)
 
 #def source_detail(request, source_id):
 #    getty_term = request.GET.get('set_getty_to', '')
