@@ -1,5 +1,15 @@
 dj-database-url==0.4.1
 Django==1.10.4
+django-cms==3.4.4
+django-filer==1.2.7
+django-todo==1.6.2
+djangocms-column==1.7.0
+djangocms-file==2.0.2
+djangocms-link==2.1.2
+djangocms-picture==2.0.5
+djangocms-snippet==1.9.2
+djangocms-style==2.0.2
+djangocms-text-ckeditor==3.5.0
 gunicorn==19.6.0
 psycopg2==2.7.1
 whitenoise==3.2
