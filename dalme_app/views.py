@@ -1,11 +1,59 @@
-#from django.shortcuts import get_object_or_404, render
-#from django.urls import reverse
-#from django.http import HttpResponseRedirect
-
+from django.shortcuts import get_object_or_404, render
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 #from .models import predicates, tokens, sources, predicate_labels, source_attributes
-
-#import requests
+import requests
 #import re
+
+def index(request):
+    context = {
+            'page_title':'DALME Dashboard',
+            'authenticated': request.user.is_authenticated
+        }
+    return render(request, 'index.html', context)
+
+
+def uiref(request, module):
+    context = {
+            'page_title':'DALME Dashboard Demo',
+            'authenticated': request.user.is_authenticated
+        }
+
+    if module == 'dash_demo':
+        _url = 'UI_reference/dash_demo.html'
+
+    elif module == 'panels-wells':
+        _url = 'UI_reference/panels-wells.html'
+
+    elif module == 'buttons':
+        _url = 'UI_reference/buttons.html'
+
+    elif module == 'notifications':
+        _url = 'UI_reference/notifications.html'
+
+    elif module == 'typography':
+        _url = 'UI_reference/typography.html'
+
+    elif module == 'icons':
+        _url = 'UI_reference/icons.html'
+
+    elif module == 'grid':
+        _url = 'UI_reference/grid.html'
+
+    elif module == 'tables':
+        _url = 'UI_reference/tables.html'
+
+    elif module == 'flot':
+        _url = 'UI_reference/flot.html'
+
+    elif module == 'morris':
+        _url = 'UI_reference/morris.html'
+
+    elif module == 'forms':
+        _url = 'UI_reference/forms.html'
+
+
+    return render(request, _url, context)
 
 #def index(request):
 #    latest_sources = sources.objects.order_by('-modification_timestamp')[:5]
