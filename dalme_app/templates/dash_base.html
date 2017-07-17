@@ -9,8 +9,8 @@
 
     <title>{{ page_title }}</title>
 
-    <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <!-- MetisMenu CSS -->
     <link href="{% static 'vendor/metisMenu/metisMenu.min.css' %}" rel="stylesheet">
     <!-- Custom CSS -->
@@ -19,10 +19,24 @@
     <link href="{% static 'vendor/morrisjs/morris.css' %}" rel="stylesheet">
     <!-- Custom Fonts -->
     <link href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    {% block extra_head %}{% endblock %}
 
 </head>
 <body>
     <div id="wrapper">
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.DEBUG %}<div class="alert alert-info alert-dismissable">{% endif %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}<div class="alert alert-info alert-dismissable">{% endif %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<div class="alert alert-success alert-dismissable">{% endif %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}<div class="alert alert-warning alert-dismissable">{% endif %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}<div class="alert alert-danger alert-dismissable">{% endif %}
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        {{ message }}</div>
+    {% endfor %}
+{% endif %}
+
 {% block topbar %}
         <!-- Navigation -->
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
@@ -73,6 +87,12 @@
                                 </span>
                             </div>
                         </li>
+
+                        {% for item in sidebar %}
+
+                        {{ item|safe }}
+
+                        {% endfor %}
 
                         {% block extra_sidebar %}{% endblock %}
 

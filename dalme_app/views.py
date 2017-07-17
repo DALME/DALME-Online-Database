@@ -1,22 +1,29 @@
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.utils.safestring import mark_safe
+from django.contrib import messages
 #from .models import predicates, tokens, sources, predicate_labels, source_attributes
 import requests
+from .menus import sidebar_menu
+from .forms import upload_inventory
 #import re
 
 def index(request):
     context = {
             'page_title':'DALME Dashboard',
-            'authenticated': request.user.is_authenticated
+            'authenticated': request.user.is_authenticated,
+            'sidebar': sidebar_menu()
         }
+
     return render(request, 'index.html', context)
 
 
 def uiref(request, module):
     context = {
             'page_title':'DALME Dashboard Demo',
-            'authenticated': request.user.is_authenticated
+            'authenticated': request.user.is_authenticated,
+            'sidebar': sidebar_menu()
         }
 
     if module == 'dash_demo':
@@ -52,6 +59,34 @@ def uiref(request, module):
     elif module == 'forms':
         _url = 'UI_reference/forms.html'
 
+    #messages.add_message(request, messages.INFO, 'Currently in DEMO mode.')
+
+    return render(request, _url, context)
+
+def upload(request, item):
+    _url = 'upload.html'
+    if item == 'inventory':
+        _title = 'DALME Dashboard | Upload Inventory'
+        _heading = 'Data Upload'
+        if request.method == 'POST':
+            form = upload_inventory(request.POST)
+
+            if form.is_valid():
+                # process the data in form.cleaned_data as required
+                # ...
+                # redirect to a new URL:
+                return HttpResponseRedirect('/thanks/')
+        else:
+            form = upload_inventory()
+
+    context = {
+            'page_title': _title,
+            'authenticated': request.user.is_authenticated,
+            'item': item.title(),
+            'heading': _heading,
+            'sidebar': sidebar_menu(),
+            'form': form
+        }
 
     return render(request, _url, context)
 
