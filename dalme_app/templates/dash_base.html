@@ -120,7 +120,12 @@
 <!-- Custom Theme JavaScript -->
 <script src="{% static 'js/sb-admin-2.js' %}"></script>
 
-{% block extra_scripts %}{% endblock %}
+{% block extra_scripts %}
+<!-- Morris Charts JavaScript -->
+<script src="{% static 'vendor/raphael/raphael.min.js' %}"></script>
+<script src="{% static 'vendor/morrisjs/morris.min.js' %}"></script>
+<script src="{% static 'js/morris-data.js' %}"></script>
+{% endblock %}
 
 </body>
 </html>

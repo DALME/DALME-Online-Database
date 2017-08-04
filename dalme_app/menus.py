@@ -13,6 +13,8 @@ def sidebar_menu():
         #['1', 'Top Level Test 2', '#', 'fa-money', 'No', ''],
         #]
     menu = [
+            ['1', 'Wiki', 'http://dighist.fas.harvard.edu/projects/DALME/wiki', 'fa-book', 'No', ''],
+            ['1', 'DAM', 'http://dighist.fas.harvard.edu/projects/DALME/dam', 'fa-image', 'No', ''],
             ['1', 'Development', '#', 'fa-gear', 'Yes', ''],
                 ['2', 'Testing', '#', 'fa-warning', 'Yes', 'Last'],
                     ['3', 'Inventory Ingestion', '/dashboard/upload_inventory', '', 'No', 'Last'],

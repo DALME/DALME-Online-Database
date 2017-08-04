@@ -4,6 +4,8 @@ from django.contrib.staticfiles.templatetags.staticfiles import static as _stati
 #input_file_name = 'AM_FF_501.txt'
 input_file_name = _static + 'dev_test/test_data.txt'
 
+#CAPITALS? maybe preserve, add a 'normalised' version of token on top of 'clean'
+
 def ingest_inventory(_file):
 
     #check the file's format:
@@ -291,7 +293,9 @@ def tokenise(line, t_type):
                 #first check for simple cases of flags that enclose words
                 if tags_pattern_start.search(token) and tags_pattern_end.search(token):
                     m = tags_pattern.search(token)
-                    flag = m.group(1)
+                    flags = []
+                    flags.append(m.group(1))
+                    tokens_list.append(tokens_dict)
                     _span = str(m.start()) + '-' + str(m.end())
                     clean_token = tags_pattern.sub('', token)
                     tokens_dict = {}
@@ -299,19 +303,20 @@ def tokenise(line, t_type):
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
                     tokens_dict['token_type'] = token_type
-                    tokens_dict['flag'] = flag
+                    tokens_dict['flags'] = flags
                     tokens_dict['span'] = _span
 
                 #then words that break at the end of a line, we'll just flag them here and rejoin them later
                 elif tags_pattern_hyphen.search(token):
-                    flag = '_'
+                    flags = []
+                    flags.append('_')
                     clean_token = tags_pattern_hyphen.sub('', token)
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
                     tokens_dict['token_type'] = token_type
-                    tokens_dict['flag'] = flag
+                    tokens_dict['flags'] = flags
 
                 #eliminate words, like numbers, that have periods enclosing them
                 elif tags_pattern_period_enc.search(token):
@@ -325,20 +330,22 @@ def tokenise(line, t_type):
 
                 #then check for full stops, i.e. flag tokens that mark end-of-sentence
                 elif tags_pattern_period.search(token):
-                    flag = 'eos'
+                    flags = []
+                    flags.append('eos')
                     clean_token = tags_pattern_period.sub('', token)
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
                     tokens_dict['token_type'] = token_type
-                    tokens_dict['flag'] = flag
+                    tokens_dict['flags'] = flags
 
                 #check for tags enclosing only part of the word
                 elif tags_pattern_partial.search(token):
                      m = tags_pattern_partial.search(token)
                      t = tags_pattern.search(token)
-                     flag = t.group(1)
+                     flags = []
+                     flags.append(t.group(1))
                      clean_token = m.group(1) + m.group(3) + m.group(5)
                      _span = str(m.start()) + '-' + str(m.end())
                      tokens_dict = {}
@@ -346,7 +353,7 @@ def tokenise(line, t_type):
                      tokens_dict['raw_token'] = token
                      tokens_dict['clean_token'] = clean_token
                      tokens_dict['token_type'] = token_type
-                     tokens_dict['flag'] = flag
+                     tokens_dict['flags'] = flags
                      tokens_dict['span'] = _span
 
                 else:
