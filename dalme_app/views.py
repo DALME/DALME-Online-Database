@@ -7,6 +7,7 @@ from django.contrib import messages
 import requests
 from .menus import sidebar_menu
 from .forms import upload_inventory
+from dalme_app import functions
 #import re
 
 def index(request):
@@ -69,13 +70,20 @@ def upload(request, item):
         _title = 'DALME Dashboard | Upload Inventory'
         _heading = 'Data Upload'
         if request.method == 'POST':
-            form = upload_inventory(request.POST)
+            form = upload_inventory(request.POST, request.FILES)
 
             if form.is_valid():
                 # process the data in form.cleaned_data as required
-                # ...
+                result_status = functions.ingest_inventory(request.FILES['inv_file'])
+                for i in result_status['messages']:
+                    m = i[0]
+                    _level = functions.get_error_level(i[1])
+                    messages.add_message(request, _level, m)
+
                 # redirect to a new URL:
-                return HttpResponseRedirect('/thanks/')
+                return HttpResponseRedirect('/dashboard/')
+            else:
+                messages.add_message(request, messages.ERROR, 'Problem!' + str(form.errors))
         else:
             form = upload_inventory()
 

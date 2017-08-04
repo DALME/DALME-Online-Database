@@ -1,15 +1,14 @@
 import re
-from django.contrib.staticfiles.templatetags.staticfiles import static as _static
+#from django.contrib.staticfiles.templatetags.staticfiles import static as _static
 #local files for testing
 #input_file_name = 'AM_FF_501.txt'
-input_file_name = _static + 'dev_test/test_data.txt'
+#input_file_name = _static + 'dev_test/test_data.txt'
 
-#CAPITALS? maybe preserve, add a 'normalised' version of token on top of 'clean'
 
 def ingest_inventory(_file):
 
     #check the file's format:
-    results = {}
+    results = { 'messages':[] }
     status = inventory_check(_file)
 
     if status['has_metadata'] == 0:
@@ -39,37 +38,35 @@ def ingest_inventory(_file):
             #get the starting lines for the sections present and the file's last line
             metadata_tag = '*METADATA*'
             transcription_tag = '*TRANSCRIPTION*'
+            f = status['text']
+            lines = f.split('\n')
+            last_line = len(lines)
 
-            with open(_file, 'r') as f:
-                lines = f.readlines()
-                last_line = len(lines)
-                f.seek(0)
+            for num, line in enumerate(lines, 1):
+                if metadata_tag in line:
+                    metadata_start = num
 
-                for num, line in enumerate(f, 1):
-                    if metadata_tag in line:
-                        metadata_start = num
-
-                    elif transcription_tag in line:
-                        transcription_start = num
+                elif transcription_tag in line:
+                    transcription_start = num
 
             #process each section
             transcription_end = last_line
             _metadata_end = transcription_start - 1
-            _metadata_results = parse_metadata(_file, metadata_start, _metadata_end)
-            transcription_results = parse_transcription(_file, transcription_start, transcription_end)
+            _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
+            transcription_results = parse_transcription(f, transcription_start, transcription_end)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
-                results['messages'].append('The inventory was successfully processed.','SUCCESS')
+                results['messages'].append(('The inventory was successfully processed.','SUCCESS'))
 
             else:
                 results['result'] = 'Failure'
                 if _metadata_results['result'] != 'OK':
-                    results['messages'].append('There were problems processing the metadata section of the file.','ERROR')
+                    results['messages'].append(('There were problems processing the metadata section of the file.','ERROR'))
                     results['metadata_errors'] = _metadata_results['metadata_output']
 
                 if transcription_results['result'] != 'OK':
-                    results['messages'].append('There were problems processing the transcription section of the file.','ERROR')
+                    results['messages'].append(('There were problems processing the transcription section of the file.','ERROR'))
                     results['transcription_errors'] = transcription_results['transcription_output']
 
 
@@ -78,51 +75,50 @@ def ingest_inventory(_file):
             metadata_tag = '*METADATA*'
             assets_tag = '*ASSETS*'
             transcription_tag = '*TRANSCRIPTION*'
+            f = status['text']
+            lines = f.split('\n')
+            last_line = len(lines)
 
-            with open(_file, 'r') as f:
-                lines = f.readlines()
-                last_line = len(lines)
-                f.seek(0)
+            for num, line in enumerate(lines, 1):
+                if assets_tag in line:
+                    assets_start = num
 
-                for num, line in enumerate(f, 1):
-                    if assets_tag in line:
-                        assets_start = num
+                elif metadata_tag in line:
+                    metadata_start = num
 
-                    elif metadata_tag in line:
-                        metadata_start = num
-
-                    elif transcription_tag in line:
-                        transcription_start = num
+                elif transcription_tag in line:
+                    transcription_start = num
 
             #process each section
             transcription_end = last_line
             assets_end = transcription_start - 1
             _metadata_end = assets_start - 1
-            _metadata_results = parse_metadata(_file, metadata_start, _metadata_end)
-            assets_results = parse_assets(_file, assets_start, assets_end)
-            transcription_results = parse_transcription(_file, transcription_start, transcription_end)
+            _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
+            assets_results = parse_assets(f, assets_start, assets_end)
+            transcription_results = parse_transcription(f, transcription_start, transcription_end)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
                 if assets_results['result'] == 'OK':
-                    results['messages'].append('The inventory was successfully processed.','SUCCESS')
+                    results['messages'].append(('The inventory was successfully processed.','SUCCESS'))
+                    results['messages'].append(('The inventory is a test.','INFO'))
 
                 else:
-                    results['messages'].append('There were problems with the list of assets, but the rest of the inventory was processed successfully.','WARNING')
+                    results['messages'].append(('There were problems with the list of assets, but the rest of the inventory was processed successfully.','WARNING'))
                     results['assets_errors'] = assets_results['assets_output']
 
             else:
                 results['result'] = 'Failure'
                 if _metadata_results['result'] != 'OK':
-                    results['messages'].append('There were problems processing the metadata section of the file.','ERROR')
+                    results['messages'].append(('There were problems processing the metadata section of the file.','ERROR'))
                     results['metadata_errors'] = _metadata_results['metadata_output']
 
                 if transcription_results['result'] != 'OK':
-                    results['messages'].append('There were problems processing the transcription section of the file.','ERROR')
+                    results['messages'].append(('There were problems processing the transcription section of the file.','ERROR'))
                     results['transcription_errors'] = transcription_results['transcription_output']
 
                 if assets_results['result'] != 'OK':
-                    results['messages'].append('There were problems with the list of assets.','WARNING')
+                    results['messages'].append(('There were problems with the list of assets.','WARNING'))
                     results['assets_errors'] = assets_results['assets_output']
 
     return results
@@ -133,8 +129,9 @@ def inventory_check(_file):
 
     status = {}
 
-    with open(_file, 'r') as f:
+    with _file as f:
         text = f.read()
+        text = text.decode("utf-8")
 
         #check that the metadata section is there
         if '*METADATA*' in text:
@@ -157,99 +154,102 @@ def inventory_check(_file):
     #remove blank lines
     empty_pattern = re.compile(r'^\n', re.MULTILINE)
     text = empty_pattern.sub('', text)
-    with open(_file, 'w') as f:
-        f.write(text)
+    status['text'] = text
 
     return status
 
 
-def parse_metadata(_file, start_line, end_line):
+def parse_metadata(f, start_line, end_line):
     """Parses the metadata section"""
 
-    with open(_file, 'r') as f:
-        _data = f.readlines()
-        lines = _data[start_line:end_line]
-        label_pattern = re.compile(r'^([\w ]+):', re.IGNORECASE)
-        line_pattern = re.compile(r'([\w ]+): (.+)', re.IGNORECASE)
-        full_pattern = re.compile(r'(.+)', re.IGNORECASE)
-        meta_dict = {}
+    _data = f.split('\n')
+    lines = _data[start_line:end_line]
+    label_pattern = re.compile(r'^([\w ]+):', re.IGNORECASE)
+    line_pattern = re.compile(r'([\w ]+): (.+)', re.IGNORECASE)
+    full_pattern = re.compile(r'(.+)', re.IGNORECASE)
+    meta_dict = {}
 
-        for line in lines:
-            if label_pattern.match(line) != None:
-                m = line_pattern.match(line)
-                label = m.group(1)
-                content = m.group(2)
-                meta_dict[label] = content.rstrip()
+    for line in lines:
+        if label_pattern.match(line) != None:
+            m = line_pattern.match(line)
+            label = m.group(1)
+            content = m.group(2)
+            meta_dict[label] = content.rstrip()
 
-            else:
-                new_content = line.rstrip()
-                old_content = meta_dict[label]
-                meta_dict[label] = old_content + '\n' + new_content
+        else:
+            new_content = line.rstrip()
+            old_content = meta_dict[label]
+            meta_dict[label] = old_content + '\n' + new_content
 
-        _out_list = str(list(meta_dict.items()))
-        results = ''.join(_out_list)
+
+    results = {
+        'result': 'OK',
+        'output': meta_dict,
+    }
 
     return results
 
 
-def parse_assets(_file, start_line, end_line):
+def parse_assets(f, start_line, end_line):
     """Parses the assets section"""
 
-    with open(_file, 'r') as f:
-        _data = f.readlines()
-        lines = _data[start_line:end_line]
-        line_pattern = re.compile(r'([\w.]+),(.+)\n', re.IGNORECASE)
-        assets_dict = {}
+    _data = f.split('\n')
+    lines = _data[start_line:end_line]
+    line_pattern = re.compile(r'([\w.]+),(.+)', re.IGNORECASE)
+    assets_dict = {}
 
-        for line in lines:
-                m = line_pattern.match(line)
-                _filename = m.group(1)
-                _folio = m.group(2)
-                assets_dict[_filename] = _folio
+    for line in lines:
+            m = line_pattern.match(line)
+            _filename = m.group(1)
+            _folio = m.group(2)
+            assets_dict[_filename] = _folio
 
-        results = {
-            'result': 'OK',
-        }
+    results = {
+        'result': 'OK',
+    }
 
     return results
 
 
-def parse_transcription(_file, start_line, end_line):
+def parse_transcription(f, start_line, end_line):
     """Parses the transcription"""
 
-    with open(_file, 'r') as f:
-        _data = f.read().splitlines()
-        lines = _data[start_line:end_line]
+    _data = f.split('\n')
+    lines = _data[start_line:end_line]
 
-        #get each line and its atributes
-        folio_pattern = re.compile(r'^FOLIO ([0-9]+(v|r)):')
-        current_folio = '00'
-        line_num = 0
-        headers = ['line_no','folio','tokens']
-        lines_list = [headers]
-        token_type = 'UNDEFINED'
+    #get each line and its atributes
+    folio_pattern = re.compile(r'^FOLIO ([0-9]+(v|r)):')
+    current_folio = '00'
+    line_num = 0
+    headers = ['line_no','folio','tokens']
+    lines_list = [headers]
+    token_type = 'UNDEFINED'
 
-        for line in lines:
-            if folio_pattern.match(line):
-                m = folio_pattern.match(line)
-                current_folio = m.group(1)
+    for line in lines:
+        if folio_pattern.match(line):
+            m = folio_pattern.match(line)
+            current_folio = m.group(1)
 
-            else:
-                tokenised = tokenise(line, token_type)
-                token_type = tokenised[0]
-                tokens_list = tokenised[1]
-                line_num = line_num + 1
-                list_entry = [line_num,current_folio,tokens_list]
-                lines_list.append(list_entry)
+        else:
+            tokenised = tokenise(line, token_type)
+            token_type = tokenised[0]
+            tokens_list = tokenised[1]
+            line_num = line_num + 1
+            list_entry = [line_num,current_folio,tokens_list]
+            lines_list.append(list_entry)
 
-            #add code to rejoin tokens split at the end of a line
+        #add code to rejoin tokens split at the end of a line
 
-    results = ''.join(str(lines_list))
+    results = {
+        'result': 'OK',
+        'output': lines_list,
+    }
+
     return results
 
 def tokenise(line, t_type):
     """takes a line and returns a list of dictionaries, one for each token, with all the pertinent attributes"""
-
+    #CAPITALS? maybe preserve, add a 'normalised' version of token on top of 'clean'
     #create the tokens
     tokens = line.split(' ')
     keyword_substract = 0
@@ -298,10 +298,12 @@ def tokenise(line, t_type):
                     tokens_list.append(tokens_dict)
                     _span = str(m.start()) + '-' + str(m.end())
                     clean_token = tags_pattern.sub('', token)
+                    norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
+                    tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
                     tokens_dict['span'] = _span
@@ -309,70 +311,114 @@ def tokenise(line, t_type):
                 #then words that break at the end of a line, we'll just flag them here and rejoin them later
                 elif tags_pattern_hyphen.search(token):
                     flags = []
+                    _span = ''
                     flags.append('_')
                     clean_token = tags_pattern_hyphen.sub('', token)
+                    norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
+                    tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
+                    tokens_dict['span'] = _span
 
                 #eliminate words, like numbers, that have periods enclosing them
                 elif tags_pattern_period_enc.search(token):
+                    flags = []
+                    _span = ''
                     m = tags_pattern_period_enc.search(token)
                     clean_token = m.group(1)
+                    norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
+                    tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
+                    tokens_dict['flags'] = flags
+                    tokens_dict['span'] = _span
 
                 #then check for full stops, i.e. flag tokens that mark end-of-sentence
                 elif tags_pattern_period.search(token):
                     flags = []
+                    _span = ''
                     flags.append('eos')
                     clean_token = tags_pattern_period.sub('', token)
+                    norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
+                    tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
+                    tokens_dict['span'] = _span
 
                 #check for tags enclosing only part of the word
                 elif tags_pattern_partial.search(token):
                      m = tags_pattern_partial.search(token)
                      t = tags_pattern.search(token)
                      flags = []
+                     _span = ''
                      flags.append(t.group(1))
                      clean_token = m.group(1) + m.group(3) + m.group(5)
+                     norm_token = clean_token.lower()
                      _span = str(m.start()) + '-' + str(m.end())
                      tokens_dict = {}
                      tokens_dict['position'] = num - keyword_substract
                      tokens_dict['raw_token'] = token
                      tokens_dict['clean_token'] = clean_token
+                     tokens_dict['norm_token'] = norm_token
                      tokens_dict['token_type'] = token_type
                      tokens_dict['flags'] = flags
                      tokens_dict['span'] = _span
 
                 else:
+                    flags = []
+                    _span = ''
                     clean_token = token
+                    norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
                     tokens_dict['raw_token'] = token
                     tokens_dict['clean_token'] = clean_token
+                    tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
+                    tokens_dict['flags'] = flags
+                    tokens_dict['span'] = _span
 
             else:
+                flags = []
+                _span = ''
                 clean_token = token
+                norm_token = clean_token.lower()
                 tokens_dict = {}
                 tokens_dict['position'] = num - keyword_substract
                 tokens_dict['raw_token'] = token
                 tokens_dict['clean_token'] = clean_token
+                tokens_dict['norm_token'] = norm_token
                 tokens_dict['token_type'] = token_type
+                tokens_dict['flags'] = flags
+                tokens_dict['span'] = _span
 
             tokens_list.append(tokens_dict)
             results = [token_type, tokens_list]
 
     return results
+
+def get_error_level(word):
+
+    if word == 'DEBUG':
+        code = 10
+    elif word == 'INFO':
+        code = 20
+    elif word == 'SUCCESS':
+        code = 25
+    elif word == 'WARNING':
+        code = 30
+    elif word == 'ERROR':
+        code = 40
+
+    return code

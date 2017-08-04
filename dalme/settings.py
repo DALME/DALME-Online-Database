@@ -162,7 +162,7 @@ STATIC_URL = '/static/'
 
 # Media files location
 
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'mediafiles')
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = '/media/'
 
 # Extra places for collectstatic to find static files.

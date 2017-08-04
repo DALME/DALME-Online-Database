@@ -151,3 +151,28 @@ class repository_attributes(DalmeBaseModel):
     def __str__(self):
         representation = "{} -> {} -> {}".format(self.subject,self.predicate,self._object)
         return representation
+
+class par_inventories(DalmeBaseModel):
+    title = models.CharField(max_length=255)
+    source = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    series = models.CharField(max_length=16)
+    shelf = models.CharField(max_length=32)
+    transcriber = models.CharField(max_length=32)
+
+class par_folios(DalmeBaseModel):
+    inv_id = models.ForeignKey('par_inventories', to_field='_id')
+    folio_no = models.CharField(max_length=32)
+    dam_id = models.IntegerField()
+
+class par_tokens(DalmeBaseModel):
+    folio_id = models.ForeignKey('par_folios', to_field='_id')
+    line_no = models.IntegerField()
+    position = models.IntegerField()
+    raw_token = models.CharField(max_length=64)
+    clean_token = models.CharField(max_length=64)
+    norm_token = models.CharField(max_length=64)
+    token_type = models.CharField(max_length=32)
+    flags = models.CharField(max_length=16)
+    span_start = models.IntegerField()
+    span_start = models.IntegerField()
