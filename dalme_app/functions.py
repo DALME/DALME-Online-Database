@@ -1,4 +1,5 @@
 import re
+from .models import par_inventories, par_folios, par_tokens
 #from django.contrib.staticfiles.templatetags.staticfiles import static as _static
 #local files for testing
 #input_file_name = 'AM_FF_501.txt'
@@ -53,7 +54,8 @@ def ingest_inventory(_file):
             transcription_end = last_line
             _metadata_end = transcription_start - 1
             _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
-            transcription_results = parse_transcription(f, transcription_start, transcription_end)
+            inv_id = _metadata_results['inv_id']
+            transcription_results = parse_transcription(f, inv_id, transcription_start, transcription_end)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
@@ -94,8 +96,9 @@ def ingest_inventory(_file):
             assets_end = transcription_start - 1
             _metadata_end = assets_start - 1
             _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
-            assets_results = parse_assets(f, assets_start, assets_end)
-            transcription_results = parse_transcription(f, transcription_start, transcription_end)
+            c_inv_id = _metadata_results['inv_id']
+            assets_results = parse_assets(f, c_inv_id, assets_start, assets_end)
+            transcription_results = parse_transcription(f, c_inv_id, transcription_start, transcription_end)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
@@ -181,28 +184,43 @@ def parse_metadata(f, start_line, end_line):
             old_content = meta_dict[label]
             meta_dict[label] = old_content + '\n' + new_content
 
+    #create inventory record in database
+    data = [
+        meta_dict['Title'],
+        meta_dict['Archival source'],
+        meta_dict['Country'],
+        meta_dict['Series'],
+        meta_dict['Shelf'],
+        meta_dict['Transcriber']
+        ]
+
+    inv_id = par_inventories.create_new(data)
 
     results = {
         'result': 'OK',
-        'output': meta_dict,
+        'inv_id': inv_id
     }
 
     return results
 
 
-def parse_assets(f, start_line, end_line):
+def parse_assets(f, c_inv_id, start_line, end_line):
     """Parses the assets section"""
 
     _data = f.split('\n')
     lines = _data[start_line:end_line]
-    line_pattern = re.compile(r'([\w.]+),(.+)', re.IGNORECASE)
-    assets_dict = {}
+    line_pattern = re.compile(r'([\w.]+),([0-9]+)', re.IGNORECASE)
 
     for line in lines:
             m = line_pattern.match(line)
-            _filename = m.group(1)
-            _folio = m.group(2)
-            assets_dict[_filename] = _folio
+            _folio = m.group(1)
+            dam_id = m.group(2)
+            fol = par_folios(
+                inv_id = c_inv_id,
+                folio_no =_folio,
+                dam_id = dam_id
+                )
+            fol.save()
 
     results = {
         'result': 'OK',
@@ -211,7 +229,7 @@ def parse_assets(f, start_line, end_line):
     return results
 
 
-def parse_transcription(f, start_line, end_line):
+def parse_transcription(f, c_inv_id, start_line, end_line):
     """Parses the transcription"""
 
     _data = f.split('\n')
