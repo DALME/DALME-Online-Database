@@ -160,32 +160,19 @@ class par_inventories(DalmeBaseModel):
     shelf = models.CharField(max_length=32)
     transcriber = models.CharField(max_length=32)
 
-    #@classmethod
-    def create_new(self, data):
-        inv = self(
-            title=data[0],
-            source=data[1],
-            location=data[2],
-            series=data[3],
-            shelf=data[4],
-            transcriber=data[5]
-            )
-        inv.save()
-        return self.id
-
 class par_folios(DalmeBaseModel):
-    inv_id = models.ForeignKey('par_inventories', to_field='id')
+    inv_id = models.ForeignKey('par_inventories', on_delete=models.CASCADE)
     folio_no = models.CharField(max_length=32)
     dam_id = models.IntegerField()
 
 class par_tokens(DalmeBaseModel):
-    folio_id = models.ForeignKey('par_folios', to_field='id')
+    folio_id = models.ForeignKey('par_folios', on_delete=models.CASCADE)
     line_no = models.IntegerField()
     position = models.IntegerField()
     raw_token = models.CharField(max_length=64)
     clean_token = models.CharField(max_length=64)
     norm_token = models.CharField(max_length=64)
     token_type = models.CharField(max_length=32)
-    flags = models.CharField(max_length=16)
-    span_start = models.IntegerField()
-    span_start = models.IntegerField()
+    flags = models.CharField(max_length=16, null=True, blank=True)
+    span_start = models.IntegerField(null=True, blank=True)
+    span_end = models.IntegerField(null=True, blank=True)

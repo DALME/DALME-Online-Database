@@ -8,6 +8,9 @@ import requests
 from .menus import sidebar_menu
 from .forms import upload_inventory
 from dalme_app import functions
+from .models import par_inventories, par_folios, par_tokens
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 #import re
 
 def index(request):
@@ -94,6 +97,73 @@ def upload(request, item):
             'heading': _heading,
             'sidebar': sidebar_menu(),
             'form': form
+        }
+
+    return render(request, _url, context)
+
+
+def list(request, item):
+    _url = 'list.html'
+    if item == 'inventories':
+        _title = 'DALME Dashboard | List Inventories'
+        _heading = 'Inventories'
+        headers = ['Title', 'Source', 'Location', 'Series', 'Shelf', 'Transcriber']
+        inventories = par_inventories.objects.all()
+        rows = []
+        for i in inventories:
+            row = [
+                '<td><a href="/dashboard/show/inventory/' + i._id + '">' + i.title + '</a></td>',
+                '<td>' + i.source + '</td>',
+                '<td>' + i.location + '</td>',
+                '<td>' + i.series + '</td>',
+                '<td>' + i.shelf + '</td>',
+                '<td>' + i.transcriber + '</td>'
+            ]
+            rows.append(row)
+
+    context = {
+            'page_title': _title,
+            'authenticated': request.user.is_authenticated,
+            'item': item.title(),
+            'heading': _heading,
+            'sidebar': sidebar_menu(),
+            'headers': headers,
+            'rows': rows
+        }
+
+    return render(request, _url, context)
+
+def show(request, item, _id):
+
+    if item == 'inventory':
+        inv = par_inventories.objects.get(pk=_id)
+        _title = 'DALME Dashboard | Inventory ' + inv.title
+        _heading = inv.title
+        _url = 'show_inventory.html'
+        inventory = functions.get_inventory(inv, 'full')
+        page = request.GET.get('page', 1)
+        pages = Paginator(inventory, 1)
+
+        try:
+
+            folios = pages.page(page)
+
+        except PageNotAnInteger:
+
+            folios = pages.page(1)
+
+        except EmptyPage:
+
+            folios = pages.page(paginator.num_pages)
+
+        context = {
+            'page_title': _title,
+            'authenticated': request.user.is_authenticated,
+            'item': item.title(),
+            'heading': _heading,
+            'sidebar': sidebar_menu(),
+            'inventory': inventory,
+            'folios': folios,
         }
 
     return render(request, _url, context)

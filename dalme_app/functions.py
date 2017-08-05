@@ -54,8 +54,8 @@ def ingest_inventory(_file):
             transcription_end = last_line
             _metadata_end = transcription_start - 1
             _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
-            inv_id = _metadata_results['inv_id']
-            transcription_results = parse_transcription(f, inv_id, transcription_start, transcription_end)
+            inv = _metadata_results['inv']
+            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
@@ -96,15 +96,14 @@ def ingest_inventory(_file):
             assets_end = transcription_start - 1
             _metadata_end = assets_start - 1
             _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
-            c_inv_id = _metadata_results['inv_id']
-            assets_results = parse_assets(f, c_inv_id, assets_start, assets_end)
-            transcription_results = parse_transcription(f, c_inv_id, transcription_start, transcription_end)
+            inv = _metadata_results['inv']
+            assets_results = parse_assets(f, inv, assets_start, assets_end)
+            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
                 if assets_results['result'] == 'OK':
                     results['messages'].append(('The inventory was successfully processed.','SUCCESS'))
-                    results['messages'].append(('The inventory is a test.','INFO'))
 
                 else:
                     results['messages'].append(('There were problems with the list of assets, but the rest of the inventory was processed successfully.','WARNING'))
@@ -155,7 +154,7 @@ def inventory_check(_file):
             status['has_transcription'] = 0
 
     #remove blank lines
-    empty_pattern = re.compile(r'^\n', re.MULTILINE)
+    empty_pattern = re.compile(r'\n$', re.MULTILINE)
     text = empty_pattern.sub('', text)
     status['text'] = text
 
@@ -185,26 +184,25 @@ def parse_metadata(f, start_line, end_line):
             meta_dict[label] = old_content + '\n' + new_content
 
     #create inventory record in database
-    data = [
-        meta_dict['Title'],
-        meta_dict['Archival source'],
-        meta_dict['Country'],
-        meta_dict['Series'],
-        meta_dict['Shelf'],
-        meta_dict['Transcriber']
-        ]
-
-    inv_id = par_inventories.create_new(data)
+    inv = par_inventories(
+        title=meta_dict['Title'],
+        source=meta_dict['Archival source'],
+        location=meta_dict['Country'],
+        series=meta_dict['Series'],
+        shelf=meta_dict['Shelf'],
+        transcriber=meta_dict['Transcriber']
+        )
+    inv.save()
 
     results = {
         'result': 'OK',
-        'inv_id': inv_id
+        'inv': inv
     }
 
     return results
 
 
-def parse_assets(f, c_inv_id, start_line, end_line):
+def parse_assets(f, inv, start_line, end_line):
     """Parses the assets section"""
 
     _data = f.split('\n')
@@ -216,7 +214,7 @@ def parse_assets(f, c_inv_id, start_line, end_line):
             _folio = m.group(1)
             dam_id = m.group(2)
             fol = par_folios(
-                inv_id = c_inv_id,
+                inv_id = inv,
                 folio_no =_folio,
                 dam_id = dam_id
                 )
@@ -229,7 +227,7 @@ def parse_assets(f, c_inv_id, start_line, end_line):
     return results
 
 
-def parse_transcription(f, c_inv_id, start_line, end_line):
+def parse_transcription(f, inv, start_line, end_line):
     """Parses the transcription"""
 
     _data = f.split('\n')
@@ -239,8 +237,7 @@ def parse_transcription(f, c_inv_id, start_line, end_line):
     folio_pattern = re.compile(r'^FOLIO ([0-9]+(v|r)):')
     current_folio = '00'
     line_num = 0
-    headers = ['line_no','folio','tokens']
-    lines_list = [headers]
+    lines_list = []
     token_type = 'UNDEFINED'
 
     for line in lines:
@@ -258,16 +255,34 @@ def parse_transcription(f, c_inv_id, start_line, end_line):
 
         #add code to rejoin tokens split at the end of a line
 
+    #create tokens in database
+    for line, folio, tokens in lines_list:
+        fol = par_folios.objects.get(inv_id=inv, folio_no=folio)
+        #add logic to deal with folio not existing
+        for i, token in enumerate(tokens):
+            the_token = par_tokens(
+                folio_id=fol,
+                line_no=line,
+                position=token['position'],
+                raw_token=token['raw_token'],
+                clean_token=token['clean_token'],
+                norm_token=token['norm_token'],
+                token_type=token['token_type'],
+                flags=token['flags'],
+                span_start=token['span_start'],
+                span_end=token['span_end']
+                )
+            the_token.save()
+
     results = {
         'result': 'OK',
-        'output': lines_list,
     }
 
     return results
 
 def tokenise(line, t_type):
     """takes a line and returns a list of dictionaries, one for each token, with all the pertinent attributes"""
-    #CAPITALS? maybe preserve, add a 'normalised' version of token on top of 'clean'
+
     #create the tokens
     tokens = line.split(' ')
     keyword_substract = 0
@@ -314,7 +329,8 @@ def tokenise(line, t_type):
                     flags = []
                     flags.append(m.group(1))
                     tokens_list.append(tokens_dict)
-                    _span = str(m.start()) + '-' + str(m.end())
+                    span_start = str(m.start())
+                    span_end = str(m.end())
                     clean_token = tags_pattern.sub('', token)
                     norm_token = clean_token.lower()
                     tokens_dict = {}
@@ -324,12 +340,12 @@ def tokenise(line, t_type):
                     tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
-                    tokens_dict['span'] = _span
+                    tokens_dict['span_start'] = span_start
+                    tokens_dict['span_end'] = span_end
 
                 #then words that break at the end of a line, we'll just flag them here and rejoin them later
                 elif tags_pattern_hyphen.search(token):
                     flags = []
-                    _span = ''
                     flags.append('_')
                     clean_token = tags_pattern_hyphen.sub('', token)
                     norm_token = clean_token.lower()
@@ -340,12 +356,12 @@ def tokenise(line, t_type):
                     tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
-                    tokens_dict['span'] = _span
+                    tokens_dict['span_start'] = None
+                    tokens_dict['span_end'] = None
 
                 #eliminate words, like numbers, that have periods enclosing them
                 elif tags_pattern_period_enc.search(token):
                     flags = []
-                    _span = ''
                     m = tags_pattern_period_enc.search(token)
                     clean_token = m.group(1)
                     norm_token = clean_token.lower()
@@ -356,12 +372,12 @@ def tokenise(line, t_type):
                     tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
-                    tokens_dict['span'] = _span
+                    tokens_dict['span_start'] = None
+                    tokens_dict['span_end'] = None
 
                 #then check for full stops, i.e. flag tokens that mark end-of-sentence
                 elif tags_pattern_period.search(token):
                     flags = []
-                    _span = ''
                     flags.append('eos')
                     clean_token = tags_pattern_period.sub('', token)
                     norm_token = clean_token.lower()
@@ -372,18 +388,19 @@ def tokenise(line, t_type):
                     tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
-                    tokens_dict['span'] = _span
+                    tokens_dict['span_start'] = None
+                    tokens_dict['span_end'] = None
 
                 #check for tags enclosing only part of the word
                 elif tags_pattern_partial.search(token):
                      m = tags_pattern_partial.search(token)
                      t = tags_pattern.search(token)
                      flags = []
-                     _span = ''
                      flags.append(t.group(1))
                      clean_token = m.group(1) + m.group(3) + m.group(5)
                      norm_token = clean_token.lower()
-                     _span = str(m.start()) + '-' + str(m.end())
+                     span_start = str(m.start())
+                     span_end = str(m.end())
                      tokens_dict = {}
                      tokens_dict['position'] = num - keyword_substract
                      tokens_dict['raw_token'] = token
@@ -391,11 +408,11 @@ def tokenise(line, t_type):
                      tokens_dict['norm_token'] = norm_token
                      tokens_dict['token_type'] = token_type
                      tokens_dict['flags'] = flags
-                     tokens_dict['span'] = _span
+                     tokens_dict['span_start'] = span_start
+                     tokens_dict['span_end'] = span_end
 
                 else:
                     flags = []
-                    _span = ''
                     clean_token = token
                     norm_token = clean_token.lower()
                     tokens_dict = {}
@@ -405,11 +422,11 @@ def tokenise(line, t_type):
                     tokens_dict['norm_token'] = norm_token
                     tokens_dict['token_type'] = token_type
                     tokens_dict['flags'] = flags
-                    tokens_dict['span'] = _span
+                    tokens_dict['span_start'] = None
+                    tokens_dict['span_end'] = None
 
             else:
                 flags = []
-                _span = ''
                 clean_token = token
                 norm_token = clean_token.lower()
                 tokens_dict = {}
@@ -419,7 +436,8 @@ def tokenise(line, t_type):
                 tokens_dict['norm_token'] = norm_token
                 tokens_dict['token_type'] = token_type
                 tokens_dict['flags'] = flags
-                tokens_dict['span'] = _span
+                tokens_dict['span_start'] = None
+                tokens_dict['span_end'] = None
 
             tokens_list.append(tokens_dict)
             results = [token_type, tokens_list]
@@ -427,6 +445,7 @@ def tokenise(line, t_type):
     return results
 
 def get_error_level(word):
+    """ converts keywords to integer error codes """
 
     if word == 'DEBUG':
         code = 10
@@ -440,3 +459,26 @@ def get_error_level(word):
         code = 40
 
     return code
+
+def get_inventory(inv, output_type):
+    """ returns information associated with an inventory in the specified format """
+
+    if output_type == 'full':
+        folios = inv.par_folios_set.all()
+
+
+    result = [
+            ['78v', 7334, [
+                                [1, ['this','is','a','sample']],
+                                [2, ['sentence','divided','into','two','lines']]
+                          ]
+            ],
+            ['79r', 7335, [
+                                [1, ['this','is','another','example']],
+                                [2, ['sentence','divided','into']],
+                                [3, ['three','lines']]
+                          ]
+            ],
+        ]
+
+    return result

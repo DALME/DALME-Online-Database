@@ -1,0 +1,109 @@
+{% extends "dash_base.html" %}
+{% load staticfiles i18n %}
+
+{% block extra_dropdowns %}{% endblock %}
+
+{% block content %}
+
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">{{ heading }}</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default panel-full-height">
+                <div class="panel-heading">
+                    <i class="fa fa-list-alt fa-fw"></i> Inventory Viewer
+                        {% if folios.has_other_pages %}
+                            <div class="pull-right">Folios:
+                                {% if folios.has_previous %}
+                                    <a href="?page={{ folios.previous_page_number }}" class="btn btn-default btn-xs">
+                                        <i class="fa fa-arrow-left"></i>
+                                    </a>
+                                {% else %}
+                                    <button type="button" class="btn btn-default btn-xs disabled">
+                                        <i class="fa fa-arrow-left"></i>
+                                    </button>
+                                {% endif %}
+                                <div class="btn btn-default btn-xs">{{ folios.0.0 }}</div>
+                                {% if folios.has_next %}
+                                    <a href="?page={{ folios.next_page_number }}" class="btn btn-default btn-xs">
+                                        <i class="fa fa-arrow-right"></i>
+                                    </a>
+                                {% else %}
+                                    <button type="button" class="btn btn-default btn-xs disabled">
+                                        <i class="fa fa-arrow-right"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                </div>
+                <div class="panel-body-partitioned">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="partition">
+                                <div class="partition-body">
+                                    <iframe src="http://dighist.fas.harvard.edu/projects/DALME/dam/pages/preview.php?ref=7330" height="500"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="partition-left">
+                                <div class="partition-heading">
+                                    Transcription
+                                    <div class="pull-right">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                Actions
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu pull-right" role="menu">
+                                                <li><a href="#">Action</a>
+                                                </li>
+                                                <li><a href="#">Another action</a>
+                                                </li>
+                                                <li><a href="#">Something else here</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li><a href="#">Separated link</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="partition-body">
+                                    {% for i in folios.0.2 %}
+                                        <div class="row trans-line">
+                                            <div class="col-lg-1 trans-line-no">{{ i.0 }}</div>
+                                            <div class="col-lg-11">
+                                            {% for token in i.1 %}
+                                            <div class="btn btn-info btn-xs">{{ token | safe }}</div>
+                                            {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="partition-footer">
+                                    Anything here?
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+<!-- /#page-wrapper -->
+</div>
+<!-- /#wrapper -->
+
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
