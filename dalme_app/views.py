@@ -6,9 +6,9 @@ from django.contrib import messages
 #from .models import predicates, tokens, sources, predicate_labels, source_attributes
 import requests
 from .menus import sidebar_menu
-from .forms import upload_inventory
+from .forms import upload_inventory, new_error
 from dalme_app import functions
-from .models import par_inventories, par_folios, par_tokens
+from .models import par_inventories, par_folios, par_tokens, error_messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 #import re
@@ -67,46 +67,48 @@ def uiref(request, module):
 
     return render(request, _url, context)
 
-def upload(request, item):
-    _url = 'upload.html'
-    if item == 'inventory':
-        _title = 'DALME Dashboard | Upload Inventory'
-        _heading = 'Data Upload'
+def list(request, item):
+    _url = 'list.html'
+    context = {}
+    if item == 'inventories':
+        _title = 'DALME Dashboard | List Inventories'
+        _heading = 'Inventories'
+        panel_title = 'List of inventories'
+        panel_icon = 'fa-list'
+        context['has_actions'] = 1
+        context['actions'] = (
+            ('href="#import" data-toggle="modal" data-target="#import"', 'Import Inventory'),
+            ('divider', ' '),
+            ('href="#"', 'Action 2'),
+            ('href="#"', 'Action 3'),
+        )
+        context['has_modals'] = 1
+        context['modals'] = [
+            ('import', [
+                'Import Inventory',
+                'form',
+                'Submit',
+                'type="submit" form="import-form"'
+            ]),
+        ]
+
         if request.method == 'POST':
             form = upload_inventory(request.POST, request.FILES)
 
             if form.is_valid():
                 # process the data in form.cleaned_data as required
                 result_status = functions.ingest_inventory(request.FILES['inv_file'])
-                for i in result_status['messages']:
-                    m = i[0]
-                    _level = functions.get_error_level(i[1])
-                    messages.add_message(request, _level, m)
-
+                #for i in result_status:
+                    #functions.notification(request, i)
+                messages.add_message(request, messages.SUCCESS, 'Everything peachy')
                 # redirect to a new URL:
-                return HttpResponseRedirect('/dashboard/')
+                return HttpResponseRedirect('/dashboard/list/inventories')
             else:
                 messages.add_message(request, messages.ERROR, 'Problem!' + str(form.errors))
         else:
             form = upload_inventory()
 
-    context = {
-            'page_title': _title,
-            'authenticated': request.user.is_authenticated,
-            'item': item.title(),
-            'heading': _heading,
-            'sidebar': sidebar_menu(),
-            'form': form
-        }
-
-    return render(request, _url, context)
-
-
-def list(request, item):
-    _url = 'list.html'
-    if item == 'inventories':
-        _title = 'DALME Dashboard | List Inventories'
-        _heading = 'Inventories'
+        context['form'] = form
         headers = ['Title', 'Source', 'Location', 'Series', 'Shelf', 'Transcriber']
         inventories = par_inventories.objects.all()
         rows = []
@@ -121,15 +123,86 @@ def list(request, item):
             ]
             rows.append(row)
 
-    context = {
-            'page_title': _title,
-            'authenticated': request.user.is_authenticated,
-            'item': item.title(),
-            'heading': _heading,
-            'sidebar': sidebar_menu(),
-            'headers': headers,
-            'rows': rows
-        }
+    elif item == 'errors':
+        _title = 'DALME Dashboard | Errors and Notifications'
+        _heading = 'Errors and Notifications'
+        panel_title = 'List of error and notification codes'
+        panel_icon = 'fa-medkit'
+        context['has_actions'] = 1
+        context['actions'] = (
+            ('href="#addNew" data-toggle="modal" data-target="#addNew"', 'Add New'),
+            ('divider', ' '),
+            ('title', 'Filter by level:'),
+            ('href="#"', 'Debug'),
+            ('href="#"', 'Info'),
+            ('href="#"', 'Success'),
+            ('href="#"', 'Warning'),
+            ('href="#"', 'Error'),
+        )
+        context['has_modals'] = 1
+        context['modals'] = [
+            ('addNew', [
+                'Add New Code',
+                'form',
+                'Submit',
+                'type="submit" form="addNew-form"'
+            ]),
+        ]
+
+        if request.method == 'POST':
+            form = new_error(request.POST)
+
+            if form.is_valid():
+                # process the data in form.cleaned_data as required
+                e_level = form.cleaned_data['e_level']
+                e_type = form.cleaned_data['e_type']
+                e_text = form.cleaned_data['e_text']
+                e_code = functions.get_new_error(e_level)
+
+                message = error_messages(
+                    e_code = e_code,
+                    e_level = e_level,
+                    e_type = e_type,
+                    e_text = e_text
+                    )
+                message.save()
+
+                messages.add_message(request, messages.INFO, 'Message added. The new error code is ' + str(e_code)) + '.'
+                # redirect to a new URL:
+                return HttpResponseRedirect('/dashboard/list/errors')
+            else:
+                messages.add_message(request, messages.ERROR, form.errors)
+        else:
+            form = new_error()
+
+        context['form'] = form
+        headers = ['Code', 'Level', 'Type', 'Text']
+        errors = error_messages.objects.all()
+        rows = []
+
+        for i in errors:
+            d_code = str(i.e_code)
+            d_level = i.get_e_level_display()
+            d_type = i.get_e_type_display()
+            d_text = i.e_text
+
+            row = [
+                '<td>' + d_code + '</td>',
+                '<td>' + d_level + '</td>',
+                '<td>' + d_type + '</td>',
+                '<td>' + d_text + '</td>'
+            ]
+            rows.append(row)
+
+    context['page_title'] = _title
+    context['authenticated'] = request.user.is_authenticated
+    context['item'] = item.title()
+    context['heading'] = _heading
+    context['sidebar'] = sidebar_menu()
+    context['headers'] = headers
+    context['rows'] = rows
+    context['panel_title'] = panel_title
+    context['panel_icon'] = panel_icon
 
     return render(request, _url, context)
 

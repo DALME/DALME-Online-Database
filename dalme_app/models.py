@@ -176,3 +176,20 @@ class par_tokens(DalmeBaseModel):
     flags = models.CharField(max_length=16, null=True, blank=True)
     span_start = models.IntegerField(null=True, blank=True)
     span_end = models.IntegerField(null=True, blank=True)
+
+class error_messages(models.Model):
+    LEVELS = (
+        (10, 'DEBUG'),
+        (20, 'INFO'),
+        (25, 'SUCCESS'),
+        (30, 'WARNING'),
+        (40, 'ERROR')
+    )
+    TYPES = (
+        (1, 'MODAL'),
+        (2, 'NOTIFICATION')
+    )
+    e_code = models.IntegerField(primary_key=True, unique=True)
+    e_level = models.IntegerField(choices=LEVELS)
+    e_text = models.TextField()
+    e_type = models.IntegerField(choices=TYPES)

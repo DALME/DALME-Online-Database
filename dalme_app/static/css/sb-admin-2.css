@@ -6,6 +6,10 @@
 
 /* List of changes from GHP */
 
+.panel-full-height {
+    min-height: calc(100vh - 147px);
+}
+
 .alert {
     border-radius: 0px !important;
     margin-bottom: 0 !important;
@@ -47,7 +51,14 @@
 
 .partition-body {
     padding: 15px;
-    height: 100%;
+}
+
+.pbody-full-height-header {
+    min-height: calc(100vh - 229px);
+}
+
+.pbody-full-height-header-footer {
+    min-height: calc(100vh - 270px);
 }
 
 .partition-heading {
@@ -68,19 +79,47 @@
     padding: 0;
 }
 
-.panel-full-height {
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.panel-full-height > div {
-  flex: 1 !important;
-}
-
 iframe {
     display:block;
     width:100%;
 }
+
+.sidebar-section {
+  border-bottom: 1px solid #e7e7e7;
+  padding: 10px 15px;
+  margin-top: 41px;
+  background-color: #ebebeb;
+  font-weight: bold;
+  color: #6c6c6c;
+}
+
+.sidebar-section-first {
+  border-bottom: 1px solid #e7e7e7;
+  padding: 10px 15px;
+  background-color: #ebebeb;
+  font-weight: bold;
+  color: #6c6c6c;
+}
+
+.dataTables_filter {
+    float: right;
+}
+
+.dataTables_filter input {
+    margin-left: 5px;
+}
+
+.dataTables_paginate {
+    float: right;
+}
+
+.dropdown-menu .title {
+    padding: 5px 20px;
+    font-weight: bold;
+    color: #8c8c8c;
+    font-size: 9pt;
+}
+
 
 /* Original stuff */
 

@@ -1,5 +1,5 @@
 import re
-from .models import par_inventories, par_folios, par_tokens
+from .models import par_inventories, par_folios, par_tokens, error_messages
 #from django.contrib.staticfiles.templatetags.staticfiles import static as _static
 #local files for testing
 #input_file_name = 'AM_FF_501.txt'
@@ -290,7 +290,7 @@ def tokenise(line, t_type):
     token_type = t_type
     tokens_dict = {}
     tokens_list = []
-
+    
     for num, token in enumerate(tokens, 1):
         if type_pattern.match(token):
             m = type_pattern.match(token)
@@ -444,27 +444,51 @@ def tokenise(line, t_type):
 
     return results
 
-def get_error_level(word):
-    """ converts keywords to integer error codes """
-
-    if word == 'DEBUG':
-        code = 10
-    elif word == 'INFO':
-        code = 20
-    elif word == 'SUCCESS':
-        code = 25
-    elif word == 'WARNING':
-        code = 30
-    elif word == 'ERROR':
-        code = 40
-
-    return code
-
 def get_inventory(inv, output_type):
     """ returns information associated with an inventory in the specified format """
 
     if output_type == 'full':
+        results = []
         folios = inv.par_folios_set.all()
+        for i in folios:
+            folio_no = i.folio_no
+            image = i.dam_id
+            folio_list = [folio_no,image]
+            tokens = i.par_tokens_set.all()
+            tokens = tokens.order_by('line_no', 'position')
+            all_lines = []
+            line = 1
+            line_list = [line]
+            line_tokens = []
+            no_tokens = len(tokens)
+            for num, token in enumerate(tokens):
+                if token.line_no == line:
+                    if num + 1 == no_tokens:
+                        line_list.append(line_tokens)
+                        all_lines.append(line_list)
+                        line = line + 1
+                        line_list = [line]
+                        line_tokens = []
+                        line_tokens.append(token.clean_token)
+
+                    else:
+                        line_tokens.append(token.clean_token)
+
+                else:
+                    line_list.append(line_tokens)
+                    all_lines.append(line_list)
+                    line = line + 1
+                    line_list = [line]
+                    line_tokens = []
+                    line_tokens.append(token.clean_token)
+
+            folio_list.append(all_lines)
+            results.append(folio_list)
+
+            #generate list of tokens for each line (a)
+            #then a list of tokens (b) is line_no and tokens list (a)
+            #then the folio list is folio_no, image, and list of tokens (b)
+
 
 
     result = [
@@ -480,5 +504,38 @@ def get_inventory(inv, output_type):
                           ]
             ],
         ]
+    #open(ddd)
+    return results
 
-    return result
+def get_new_error(level):
+    errors = error_messages.objects.filter(e_level=level)
+    no = errors.count()
+
+    if no == None:
+        if level == 10:
+            new = 1000
+        elif level == 20:
+            new = 2000
+        elif level == 25:
+            new = 2500
+        elif level == 30:
+            new = 3000
+        elif level == 40:
+            new = 4000
+    else:
+        if level == 10:
+            new = 1001 + no
+        elif level == 20:
+            new = 2001 + no
+        elif level == 25:
+            new = 2501 + no
+        elif level == 30:
+            new = 3001 + no
+        elif level == 40:
+            new = 4001 + no
+
+    return new
+
+def notification(request, code):
+    message = error_messages.objects.get(pk=code)
+    messages.add_message(request, message.e_level, message.e_text)

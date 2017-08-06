@@ -5,7 +5,6 @@ from . import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^UIref/([a-z_-]+)$', views.uiref),
-    url(r'^upload/([a-z_-]+)$', views.upload),
     url(r'^list/([a-z_-]+)$', views.list),
     url(r'^show/([a-z_-]+)/([a-z0-9]+)$', views.show),
     url(r'^$', views.index, name='dashboard')
