@@ -49,8 +49,8 @@
                 </div>
                 <div class="panel-body-partitioned">
                     <div class="row">
-                        <div class="col-lg-6">
-                            <div class="partition">
+                        <div class="col-lg-6 no-padding-right">
+                            <div class="partition-right">
                                 <div class="partition-body">
                                     <div id="image-view">
                                         <div class="image-container">
@@ -60,29 +60,31 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="partition-left">
+                        <div class="col-lg-6 no-padding-left">
+                            <div class="partition">
                                 <div class="partition-heading">
                                     Transcription
-                                    <div class="pull-right">
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                                Actions
-                                                <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu pull-right" role="menu">
-                                                <li><a href="#">Action</a>
-                                                </li>
-                                                <li><a href="#">Another action</a>
-                                                </li>
-                                                <li><a href="#">Something else here</a>
-                                                </li>
-                                                <li class="divider"></li>
-                                                <li><a href="#">Separated link</a>
-                                                </li>
-                                            </ul>
+                                    {% if has_actions %}
+                                        <div class="pull-right">
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                    Actions
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu pull-right" role="menu">
+                                                    {% for para, name in actions %}
+                                                        {% if para == 'divider' %}
+                                                            <li class="divider"></li>
+                                                        {% elif para == 'title' %}
+                                                            <li class="title">{{ name }}</li>
+                                                        {% else %}
+                                                            <li><a {{ para | safe }}>{{ name }}</a></li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
                                         </div>
-                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="partition-body pbody-full-height-header-footer">
                                     {% for i in folios.0.2 %}
@@ -90,14 +92,15 @@
                                             <div class="col-lg-1 trans-line-no">{{ i.0 }}</div>
                                             <div class="col-lg-11">
                                             {% for token in i.1 %}
-                                            <div class="btn btn-info btn-xs">{{ token | safe }}</div>
+                                                {% if tokenise %}
+                                                    <div class="btn btn-info btn-xs">{{ token.0 | safe }}</div>
+                                                {% else %}
+                                                    <span class="{{ token.1 }}">{{ token.0 | safe }}</span>
+                                                {% endif %}
                                             {% endfor %}
                                             </div>
                                         </div>
                                     {% endfor %}
-                                </div>
-                                <div class="partition-footer">
-                                    Anything here?
                                 </div>
                             </div>
                         </div>

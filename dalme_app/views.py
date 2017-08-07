@@ -17,6 +17,7 @@ def index(request):
     context = {
             'page_title':'DALME Dashboard',
             'authenticated': request.user.is_authenticated,
+            'username': request.user.username,
             'sidebar': sidebar_menu()
         }
 
@@ -27,6 +28,7 @@ def uiref(request, module):
     context = {
             'page_title':'DALME Dashboard Demo',
             'authenticated': request.user.is_authenticated,
+            'username': request.user.username,
             'sidebar': sidebar_menu()
         }
 
@@ -69,6 +71,7 @@ def uiref(request, module):
 
 def list(request, item):
     _url = 'list.html'
+    username = request.user.username
     context = {}
     if item == 'inventories':
         _title = 'DALME Dashboard | List Inventories'
@@ -97,7 +100,7 @@ def list(request, item):
 
             if form.is_valid():
                 # process the data in form.cleaned_data as required
-                result_status = functions.ingest_inventory(form.cleaned_data['inv_file'])
+                result_status = functions.ingest_inventory(form.cleaned_data['inv_file'], username)
                 #for i in result_status:
                     #functions.notification(request, i)
                 messages.add_message(request, messages.SUCCESS, 'Everything peachy')
@@ -167,7 +170,7 @@ def list(request, item):
                     )
                 message.save()
 
-                messages.add_message(request, messages.INFO, 'Message added. The new error code is ' + str(e_code)) + '.'
+                messages.add_message(request, messages.INFO, 'Message added. The new error code is ' + str(e_code) + '.')
                 # redirect to a new URL:
                 return HttpResponseRedirect('/dashboard/list/errors')
             else:
@@ -196,6 +199,7 @@ def list(request, item):
 
     context['page_title'] = _title
     context['authenticated'] = request.user.is_authenticated
+    context['username'] = username
     context['item'] = item.title()
     context['heading'] = _heading
     context['sidebar'] = sidebar_menu()
@@ -207,37 +211,46 @@ def list(request, item):
     return render(request, _url, context)
 
 def show(request, item, _id):
-
+    username = request.user.username
+    context = {}
     if item == 'inventory':
         inv = par_inventories.objects.get(pk=_id)
-        _title = 'DALME Dashboard | Inventory ' + inv.title
-        _heading = inv.title
-        _url = 'show_inventory.html'
-        inventory = functions.get_inventory(inv, 'full')
-        page = request.GET.get('page', 1)
-        pages = Paginator(inventory, 1)
+        folios = inv.par_folios_set.all()
 
-        try:
+        if not folios:
+            functions.notification(request, 4001)
+            return HttpResponseRedirect('/dashboard/list/inventories')
 
-            folios = pages.page(page)
+        else:
+            context['page_title'] = 'DALME Dashboard | Inventory ' + inv.title
+            context['heading'] = inv.title
+            context['has_actions'] = 1
+            context['actions'] = (
+                ('href="#addNew" data-toggle="modal" data-target="#addNew"', 'Tokenise'),
+                ('divider', ' '),
+                ('href="#"', 'Do something else'),
+                ('href="#"', 'Yay!'),
+            )
+            _url = 'show_inventory.html'
+            inventory = functions.get_inventory(inv, 'full')
+            page = request.GET.get('page', 1)
+            pages = Paginator(inventory, 1)
 
-        except PageNotAnInteger:
+            try:
+                folios = pages.page(page)
 
-            folios = pages.page(1)
+            except PageNotAnInteger:
+                folios = pages.page(1)
 
-        except EmptyPage:
+            except EmptyPage:
+                folios = pages.page(paginator.num_pages)
 
-            folios = pages.page(paginator.num_pages)
-
-        context = {
-            'page_title': _title,
-            'authenticated': request.user.is_authenticated,
-            'item': item.title(),
-            'heading': _heading,
-            'sidebar': sidebar_menu(),
-            'inventory': inventory,
-            'folios': folios,
-        }
+            context['authenticated'] = request.user.is_authenticated
+            context['username'] = request.user.username
+            context['item'] = item.title()
+            context['sidebar'] = sidebar_menu()
+            context['inventory'] = inventory
+            context['folios'] = folios
 
     return render(request, _url, context)
 

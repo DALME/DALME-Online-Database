@@ -1,4 +1,5 @@
 import re
+from django.contrib import messages
 from .models import par_inventories, par_folios, par_tokens, error_messages
 #from django.contrib.staticfiles.templatetags.staticfiles import static as _static
 #local files for testing
@@ -6,7 +7,7 @@ from .models import par_inventories, par_folios, par_tokens, error_messages
 #input_file_name = _static + 'dev_test/test_data.txt'
 
 
-def ingest_inventory(_file):
+def ingest_inventory(_file, username):
 
     #check the file's format:
     results = { 'messages':[] }
@@ -53,9 +54,9 @@ def ingest_inventory(_file):
             #process each section
             transcription_end = last_line
             _metadata_end = transcription_start - 1
-            _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
+            _metadata_results = parse_metadata(f, metadata_start, _metadata_end, username)
             inv = _metadata_results['inv']
-            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end)
+            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end, username)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
@@ -95,10 +96,10 @@ def ingest_inventory(_file):
             transcription_end = last_line
             assets_end = transcription_start - 1
             _metadata_end = assets_start - 1
-            _metadata_results = parse_metadata(f, metadata_start, _metadata_end)
+            _metadata_results = parse_metadata(f, metadata_start, _metadata_end, username)
             inv = _metadata_results['inv']
-            assets_results = parse_assets(f, inv, assets_start, assets_end)
-            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end)
+            assets_results = parse_assets(f, inv, assets_start, assets_end, username)
+            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end, username)
 
             if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
                 results['result'] = 'OK'
@@ -161,7 +162,7 @@ def inventory_check(_file):
     return status
 
 
-def parse_metadata(f, start_line, end_line):
+def parse_metadata(f, start_line, end_line, username):
     """Parses the metadata section"""
 
     _data = f.split('\n')
@@ -190,7 +191,9 @@ def parse_metadata(f, start_line, end_line):
         location=meta_dict['Country'],
         series=meta_dict['Series'],
         shelf=meta_dict['Shelf'],
-        transcriber=meta_dict['Transcriber']
+        transcriber=meta_dict['Transcriber'],
+        creation_username=username,
+        modification_username=username
         )
     inv.save()
 
@@ -202,7 +205,7 @@ def parse_metadata(f, start_line, end_line):
     return results
 
 
-def parse_assets(f, inv, start_line, end_line):
+def parse_assets(f, inv, start_line, end_line, username):
     """Parses the assets section"""
 
     _data = f.split('\n')
@@ -216,7 +219,9 @@ def parse_assets(f, inv, start_line, end_line):
             fol = par_folios(
                 inv_id = inv,
                 folio_no =_folio,
-                dam_id = dam_id
+                dam_id = dam_id,
+                creation_username=username,
+                modification_username=username
                 )
             fol.save()
 
@@ -227,7 +232,7 @@ def parse_assets(f, inv, start_line, end_line):
     return results
 
 
-def parse_transcription(f, inv, start_line, end_line):
+def parse_transcription(f, inv, start_line, end_line, username):
     """Parses the transcription"""
 
     _data = f.split('\n')
@@ -270,7 +275,9 @@ def parse_transcription(f, inv, start_line, end_line):
                 token_type=token['token_type'],
                 flags=token['flags'],
                 span_start=token['span_start'],
-                span_end=token['span_end']
+                span_end=token['span_end'],
+                creation_username=username,
+                modification_username=username
                 )
             the_token.save()
 
@@ -314,40 +321,18 @@ def tokenise(line, t_type):
             #and tokens should be lower-case, but track uppercase for determining sentences+proper names?
 
             tags_pattern = re.compile(r'(-|\?|\^|\[|\]|\.)')
-            tags_pattern_start = re.compile(r'^(-|\?|\^|\[)')
-            tags_pattern_end = re.compile(r'(-|\?|\^|\])$')
+            tags_pattern_enc = re.compile(r'^(-|\?|\^|\[|\.)([a-z]+)(-|\?|\^|\]|\.)$', re.IGNORECASE)
             tags_pattern_hyphen = re.compile(r'(_|\[_\])$')
             tags_pattern_period = re.compile(r'\.$')
-            tags_pattern_period_enc = re.compile(r'\.([a-z]+)\.', re.IGNORECASE)
             tags_pattern_partial = re.compile(r'([a-z]+)(-|\?|\^|\[|\]|\{|\()([a-z]+)(-|\?|\^|\[|\]|\{|\()(-|\?|\^|\[|\]|\{|\(|([a-z]*))', re.IGNORECASE)
 
             if tags_pattern.search(token):
 
                 #first check for simple cases of flags that enclose words
-                if tags_pattern_start.search(token) and tags_pattern_end.search(token):
-                    m = tags_pattern.search(token)
-                    flags = []
-                    flags.append(m.group(1))
-                    tokens_list.append(tokens_dict)
-                    span_start = str(m.start())
-                    span_end = str(m.end())
-                    clean_token = tags_pattern.sub('', token)
-                    norm_token = clean_token.lower()
-                    tokens_dict = {}
-                    tokens_dict['position'] = num - keyword_substract
-                    tokens_dict['raw_token'] = token
-                    tokens_dict['clean_token'] = clean_token
-                    tokens_dict['norm_token'] = norm_token
-                    tokens_dict['token_type'] = token_type
-                    tokens_dict['flags'] = flags
-                    tokens_dict['span_start'] = span_start
-                    tokens_dict['span_end'] = span_end
-
-                #then words that break at the end of a line, we'll just flag them here and rejoin them later
-                elif tags_pattern_hyphen.search(token):
-                    flags = []
-                    flags.append('_')
-                    clean_token = tags_pattern_hyphen.sub('', token)
+                if tags_pattern_enc.search(token):
+                    m = tags_pattern_enc.search(token)
+                    flags = m.group(1)
+                    clean_token = m.group(2)
                     norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
@@ -359,11 +344,10 @@ def tokenise(line, t_type):
                     tokens_dict['span_start'] = None
                     tokens_dict['span_end'] = None
 
-                #eliminate words, like numbers, that have periods enclosing them
-                elif tags_pattern_period_enc.search(token):
-                    flags = []
-                    m = tags_pattern_period_enc.search(token)
-                    clean_token = m.group(1)
+                #then words that break at the end of a line, we'll just flag them here and rejoin them later
+                elif tags_pattern_hyphen.search(token):
+                    flags = '_'
+                    clean_token = tags_pattern_hyphen.sub('', token)
                     norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
@@ -377,8 +361,7 @@ def tokenise(line, t_type):
 
                 #then check for full stops, i.e. flag tokens that mark end-of-sentence
                 elif tags_pattern_period.search(token):
-                    flags = []
-                    flags.append('eos')
+                    flags = 'eos'
                     clean_token = tags_pattern_period.sub('', token)
                     norm_token = clean_token.lower()
                     tokens_dict = {}
@@ -395,8 +378,7 @@ def tokenise(line, t_type):
                 elif tags_pattern_partial.search(token):
                      m = tags_pattern_partial.search(token)
                      t = tags_pattern.search(token)
-                     flags = []
-                     flags.append(t.group(1))
+                     flags = t.group(1)
                      clean_token = m.group(1) + m.group(3) + m.group(5)
                      norm_token = clean_token.lower()
                      span_start = str(m.start())
@@ -412,8 +394,8 @@ def tokenise(line, t_type):
                      tokens_dict['span_end'] = span_end
 
                 else:
-                    flags = []
-                    clean_token = token
+                    flags = ''
+                    clean_token = 'FUCK'
                     norm_token = clean_token.lower()
                     tokens_dict = {}
                     tokens_dict['position'] = num - keyword_substract
@@ -424,9 +406,8 @@ def tokenise(line, t_type):
                     tokens_dict['flags'] = flags
                     tokens_dict['span_start'] = None
                     tokens_dict['span_end'] = None
-
             else:
-                flags = []
+                flags = ''
                 clean_token = token
                 norm_token = clean_token.lower()
                 tokens_dict = {}
@@ -440,7 +421,8 @@ def tokenise(line, t_type):
                 tokens_dict['span_end'] = None
 
             tokens_list.append(tokens_dict)
-            results = [token_type, tokens_list]
+
+    results = [token_type, tokens_list]
 
     return results
 
@@ -462,51 +444,67 @@ def get_inventory(inv, output_type):
             line_list = [line]
             line_tokens = []
             no_tokens = len(tokens)
-            for num, token in enumerate(tokens):
-                if token.line_no == line:
-                    if num + 1 == no_tokens:
-                        line_list.append(line_tokens)
-                        all_lines.append(line_list)
-                        line = line + 1
-                        line_list = [line]
-                        line_tokens = []
-                        line_tokens.append(token.clean_token)
-
-                    else:
-                        line_tokens.append(token.clean_token)
-
-                else:
+            for num, token in enumerate(tokens, 1):
+                if num == no_tokens:
+                    out_token = token.clean_token
+                    out_class = get_display_token_class(token.flags)
+                    line_tokens.append((out_token, out_class))
                     line_list.append(line_tokens)
                     all_lines.append(line_list)
                     line = line + 1
                     line_list = [line]
                     line_tokens = []
-                    line_tokens.append(token.clean_token)
+
+                else:
+                    if token.line_no != line:
+                        line_list.append(line_tokens)
+                        all_lines.append(line_list)
+                        line = line + 1
+                        line_list = [line]
+                        line_tokens = []
+                        out_token = token.clean_token
+                        out_class = get_display_token_class(token.flags)
+                        line_tokens.append((out_token, out_class))
+
+                    else:
+                        out_token = token.clean_token
+                        out_class = get_display_token_class(token.flags)
+                        line_tokens.append((out_token, out_class))
 
             folio_list.append(all_lines)
             results.append(folio_list)
 
-            #generate list of tokens for each line (a)
-            #then a list of tokens (b) is line_no and tokens list (a)
-            #then the folio list is folio_no, image, and list of tokens (b)
-
-
-
-    result = [
-            ['78v', 7334, [
-                                [1, ['this','is','a','sample']],
-                                [2, ['sentence','divided','into','two','lines']]
-                          ]
-            ],
-            ['79r', 7335, [
-                                [1, ['this','is','another','example']],
-                                [2, ['sentence','divided','into']],
-                                [3, ['three','lines']]
-                          ]
-            ],
-        ]
-    #open(ddd)
     return results
+
+def get_display_token_class(flag):
+    if flag == '-':
+        token_class = 'token_strikeout'
+
+    elif flag == '^':
+        token_class = 'token_superscript'
+
+    elif flag == '?':
+        token_class = 'token_uncertain'
+
+    elif flag == '[':
+        token_class = 'token_supplied'
+
+    elif flag == '{':
+        token_class = 'token_imputed'
+
+    elif flag == '':
+        token_class = 'token_clean'
+
+    elif flag == '.':
+        token_class = 'token_periods'
+
+    elif flag == 'eos':
+        token_class = 'token_eos'
+
+    else:
+        token_class = 'token_flag_error'
+
+    return token_class
 
 def get_new_error(level):
     errors = error_messages.objects.filter(e_level=level)
