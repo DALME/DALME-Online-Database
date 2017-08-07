@@ -1,6 +1,11 @@
 {% extends "dash_base.html" %}
 {% load staticfiles i18n %}
 
+{% block extra_head %}
+<link href="{% static 'ImageViewer/imageviewer.css' %}" rel="stylesheet" type="text/css" />
+<script src="{% static 'ImageViewer/imageviewer.js' %}"></script>
+{% endblock %}
+
 {% block extra_dropdowns %}{% endblock %}
 
 {% block content %}
@@ -47,7 +52,11 @@
                         <div class="col-lg-6">
                             <div class="partition">
                                 <div class="partition-body">
-                                    <iframe src="http://dighist.fas.harvard.edu/projects/DALME/dam/pages/preview.php?ref=7330" height="500"></iframe>
+                                    <div id="image-view">
+                                        <div class="image-container">
+                                            <img src="{% static '7330_t.JPG' %}" data-high-res-src="{% static '7330.JPG' %}" alt="" class="pannable-image">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -101,9 +110,12 @@
 </div>
 <!-- /#wrapper -->
 
-
-
 {% endblock %}
 
 {% block extra_scripts %}
+<script>
+    $(function () {
+        $('.pannable-image').ImageViewer({ zoomValue : 50 });
+    });
+</script>
 {% endblock %}

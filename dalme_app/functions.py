@@ -290,7 +290,7 @@ def tokenise(line, t_type):
     token_type = t_type
     tokens_dict = {}
     tokens_list = []
-    
+
     for num, token in enumerate(tokens, 1):
         if type_pattern.match(token):
             m = type_pattern.match(token)
@@ -450,6 +450,8 @@ def get_inventory(inv, output_type):
     if output_type == 'full':
         results = []
         folios = inv.par_folios_set.all()
+        folios = folios.order_by('folio_no')
+        line = 1
         for i in folios:
             folio_no = i.folio_no
             image = i.dam_id
@@ -457,7 +459,6 @@ def get_inventory(inv, output_type):
             tokens = i.par_tokens_set.all()
             tokens = tokens.order_by('line_no', 'position')
             all_lines = []
-            line = 1
             line_list = [line]
             line_tokens = []
             no_tokens = len(tokens)

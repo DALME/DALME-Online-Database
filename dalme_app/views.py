@@ -97,7 +97,7 @@ def list(request, item):
 
             if form.is_valid():
                 # process the data in form.cleaned_data as required
-                result_status = functions.ingest_inventory(request.FILES['inv_file'])
+                result_status = functions.ingest_inventory(form.cleaned_data['inv_file'])
                 #for i in result_status:
                     #functions.notification(request, i)
                 messages.add_message(request, messages.SUCCESS, 'Everything peachy')
