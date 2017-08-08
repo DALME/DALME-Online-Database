@@ -193,3 +193,11 @@ class error_messages(models.Model):
     e_level = models.IntegerField(choices=LEVELS)
     e_text = models.TextField()
     e_type = models.IntegerField(choices=TYPES)
+
+class par_objects(models.Model):
+    obj_id = models.IntegerField(primary_key=True, unique=True)
+    ont_class = models.CharField(max_length=64)
+    name = models.CharField(max_length=64)
+    terms = models.CharField(max_length=255)
+    material = models.CharField(max_length=64)
+    room = models.CharField(max_length=64)

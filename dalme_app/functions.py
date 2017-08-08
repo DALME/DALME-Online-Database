@@ -1,6 +1,6 @@
-import re
+import re, json, requests, hashlib
 from django.contrib import messages
-from .models import par_inventories, par_folios, par_tokens, error_messages
+from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
 #from django.contrib.staticfiles.templatetags.staticfiles import static as _static
 #local files for testing
 #input_file_name = 'AM_FF_501.txt'
@@ -436,8 +436,8 @@ def get_inventory(inv, output_type):
         line = 1
         for i in folios:
             folio_no = i.folio_no
-            image = i.dam_id
-            folio_list = [folio_no,image]
+            image_url = get_dam_preview(i.dam_id)
+            folio_list = [folio_no,image_url]
             tokens = i.par_tokens_set.all()
             tokens = tokens.order_by('line_no', 'position')
             all_lines = []
@@ -538,3 +538,65 @@ def get_new_error(level):
 def notification(request, code):
     message = error_messages.objects.get(pk=code)
     messages.add_message(request, message.e_level, message.e_text)
+
+def bar_chart():
+    results = []
+    materials = par_objects.objects.order_by().values_list('material', flat=True).distinct()
+
+    for i in materials:
+        count = par_objects.objects.filter(material=i).count()
+        entry = (i, count)
+        results.append(entry)
+
+    return results
+
+def get_count(item):
+    if item == 'inventories':
+        counter = par_inventories.objects.count()
+
+    elif item == 'objects':
+        counter = par_objects.objects.count()
+
+    elif item == 'wiki-articles':
+        wiki_user = 'api_bot'
+        wiki_pass = 'ouvyq9b'
+        base_url = 'http://dighist.fas.harvard.edu/projects/DALME/wiki/'
+        params = '?action=login&lgname=%s&lgpassword=%s&format=json'% (wiki_user,wiki_pass)
+        # Login request
+        r1 = requests.post(base_url+'api.php'+params)
+        token = r1.json()['login']['token']
+        params2 = params+'&lgtoken=%s'% token
+        r2 = requests.post(base_url+'api.php'+params2,cookies=r1.cookies)
+        r3 = requests.get(base_url+'api.php?action=query&meta=siteinfo&siprop=statistics&format=json',cookies=r2.cookies)
+        json_data = str(r3.json())
+        json_data = json_data.replace('\'', '\"')
+        stats = json.loads(json_data)
+        counter = stats['query']['statistics']['articles']
+
+    elif item == 'assets':
+
+        counter = 7342
+
+    else:
+        counter = None
+
+    return counter
+
+def get_dam_preview(resource):
+    #private_key = '98d63d2457fee21dd6100d109422b890'
+    auth_key = 'eGV8SXt6bW97Lyx2eyF2JXxwLSYrISgnKiUiLi5xLXd7dCpwLHEgICAsLyIvJHskLncgJnwmKnB6cntyKSYlJX0neiArIysh'
+    #dam_user = 'api_bot'
+    #query = 'user=' + dam_user + '&function=do_search&param1=florence'
+    #sign = hashlib.sha256(private_key.encode('utf-8')+query.encode('utf-8'))
+    #req = 'http://dighist.fas.harvard.edu/projects/DALME/dam/plugins/api_core/?' + query + '&sign=' + sign.hexdigest()
+    base_url = 'http://dighist.fas.harvard.edu/projects/DALME/dam/plugins/api_search/?key='
+    query = auth_key + '&search=' + str(resource) + '&previewsize=scr'
+    req = base_url + query
+    r1 = requests.get(req)
+    json_data = str(r1.json())
+    json_data = json_data.replace('\'', '\"')
+    res = json.loads(json_data)
+
+    results = 'http://dighist.fas.harvard.edu' + res[0]['preview']
+
+    return results

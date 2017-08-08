@@ -6,8 +6,39 @@
 
 /* List of changes from GHP */
 
+.menu-counter {
+    display: inline;
+    float: right;
+    font-size: 9pt;
+    padding-top: 3px;
+}
+
+.dalme-logo {
+    display: inline;
+    float: left;
+    margin-top: 6px;
+    margin-left: 15px;
+}
+
+.navbar-brand {
+    padding-left: 10px !important;
+    font-family: serif !important;
+    font-size: 16pt !important;
+    color: black !important;
+    font-weight: bold !important;
+}
+
+.dropdown-section {
+    padding: 3px 20px;
+}
+
+.dropdown-sub a {
+    padding-left: 20px;
+}
+
 .token_strikeout {
     text-decoration: line-through;
+    text-decoration:
 }
 
 .token_superscript {

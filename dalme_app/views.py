@@ -5,20 +5,30 @@ from django.utils.safestring import mark_safe
 from django.contrib import messages
 #from .models import predicates, tokens, sources, predicate_labels, source_attributes
 import requests
-from .menus import sidebar_menu
+from .menus import sidebar_menu, dropdowns
 from .forms import upload_inventory, new_error
 from dalme_app import functions
-from .models import par_inventories, par_folios, par_tokens, error_messages
+from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 #import re
 
 def index(request):
+    inv_counter = str(functions.get_count('inventories'))
+    obj_counter = str(functions.get_count('objects'))
+    wiki_counter = str(functions.get_count('wiki-articles'))
+    dam_counter = str(functions.get_count('assets'))
     context = {
             'page_title':'DALME Dashboard',
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
-            'sidebar': sidebar_menu()
+            'sidebar': sidebar_menu(),
+            'dropdowns': dropdowns(),
+            'chart_data': functions.bar_chart(),
+            'inv_counter': inv_counter,
+            'obj_counter': obj_counter,
+            'wiki_counter': wiki_counter,
+            'dam_counter': dam_counter,
         }
 
     return render(request, 'index.html', context)
@@ -29,7 +39,8 @@ def uiref(request, module):
             'page_title':'DALME Dashboard Demo',
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
-            'sidebar': sidebar_menu()
+            'sidebar': sidebar_menu(),
+            'dropdowns': dropdowns()
         }
 
     if module == 'dash_demo':
@@ -197,12 +208,37 @@ def list(request, item):
             ]
             rows.append(row)
 
+    elif item == 'objects':
+        _title = 'DALME Dashboard | List Objects'
+        _heading = 'Objects'
+        panel_title = 'List of Objects'
+        panel_icon = 'fa-beer'
+        context['has_actions'] = 1
+        context['actions'] = (
+            ('href="#"', 'Action 2'),
+            ('href="#"', 'Action 3'),
+        )
+        headers = ['Object ID', 'Name', 'Class', 'Material', 'Room', 'Terms']
+        objects = par_objects.objects.all()
+        rows = []
+        for i in objects:
+            row = [
+                '<td>' + str(i.obj_id) + '</td>',
+                '<td>' + i.name + '</td>',
+                '<td>' + i.ont_class + '</td>',
+                '<td>' + i.material + '</td>',
+                '<td>' + i.room + '</td>',
+                '<td>' + i.terms + '</td>'
+            ]
+            rows.append(row)
+
     context['page_title'] = _title
     context['authenticated'] = request.user.is_authenticated
     context['username'] = username
     context['item'] = item.title()
     context['heading'] = _heading
     context['sidebar'] = sidebar_menu()
+    context['dropdowns'] = dropdowns()
     context['headers'] = headers
     context['rows'] = rows
     context['panel_title'] = panel_title
@@ -249,8 +285,13 @@ def show(request, item, _id):
             context['username'] = request.user.username
             context['item'] = item.title()
             context['sidebar'] = sidebar_menu()
+            context['dropdowns'] = dropdowns()
             context['inventory'] = inventory
             context['folios'] = folios
+
+
+
+            test = functions.get_dam_preview(7330)
 
     return render(request, _url, context)
 
