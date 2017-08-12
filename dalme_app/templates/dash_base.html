@@ -34,7 +34,7 @@
         {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}<div class="alert alert-warning alert-dismissable">{% endif %}
         {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}<div class="alert alert-danger alert-dismissable">{% endif %}
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        {{ message }}</div>
+        {{ message | safe }}</div>
     {% endfor %}
 {% endif %}
 

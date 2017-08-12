@@ -61,8 +61,8 @@
                         </thead>
                         <tbody>
                             {% for i in rows %}
-                                <tr class="{% cycle 'odd gradeX' 'even gradeC' %}">
-                                    {% for e in i %}
+                                <tr class="{% cycle 'odd gradeX' 'even gradeC' %} {{ i.0 }}">
+                                    {% for e in i.1 %}
                                         {{ e | safe }}
                                     {% endfor %}
                                 </tr>
@@ -111,7 +111,7 @@
     <script>
     $(document).ready(function() {
         $('#dataTables-list').DataTable({
-            responsive: true
+            responsive: true, {{ table_options }}
         });
     });
     </script>

@@ -27,6 +27,7 @@ def sidebar_menu():
             ['1', 'Admin', '#', 'fa-group', 'Yes', ''],
                 ['2', 'Users', '#', 'fa-user', 'No', ''],
                 ['2', 'Website', '#', 'fa-globe', 'No', 'Last'],
+            ['1', 'Background Tasks', '/dashboard/list/tasks', 'fa-tasks', 'No', ''],    
             ]
 
 

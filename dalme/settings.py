@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'djangocms_snippet',
     'djangocms_style',
     'djangocms_column',
+    'django_celery_results'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -74,6 +75,7 @@ MIDDLEWARE_CLASSES = [
     'cms.middleware.toolbar.ToolbarMiddleware',
     'cms.middleware.language.LanguageCookieMiddleware',
     'cms.middleware.utils.ApphookReloadMiddleware',
+    'async_messages.middleware.AsyncMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'
@@ -198,3 +200,12 @@ THUMBNAIL_PROCESSORS = (
     'filer.thumbnail_processors.scale_and_crop_with_subject_location',
     'easy_thumbnails.processors.filters'
 )
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
+    }
+}
