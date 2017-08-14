@@ -1,4 +1,5 @@
 from dalme_app import functions
+from django.core.urlresolvers import reverse
 
 def sidebar_menu():
     """ creates the sidebar menu """
@@ -27,7 +28,7 @@ def sidebar_menu():
             ['1', 'Admin', '#', 'fa-group', 'Yes', ''],
                 ['2', 'Users', '#', 'fa-user', 'No', ''],
                 ['2', 'Website', '#', 'fa-globe', 'No', 'Last'],
-            ['1', 'Background Tasks', '/dashboard/list/tasks', 'fa-tasks', 'No', ''],    
+            ['1', 'Background Tasks', '/dashboard/list/tasks', 'fa-tasks', 'No', ''],
             ]
 
 
@@ -78,25 +79,39 @@ def sidebar_menu():
 
     return results
 
-def dropdowns():
+def dropdowns(username):
     """ creates the top right dropdowns """
-
+    logout = 'Logout ' + username
     dropdowns = [
-        ['fa-gears', [
+        ['fa-tasks', 'dropdown-tasks2', [
+                ['1', reverse('todo-lists'), 'fa-check-circle', 'General Tasks'],
+                ['1', reverse('todo-mine'), 'fa-check-square-o', 'My Tasks'],
+
+            ]
+
+        ],
+        ['fa-gears', 'dropdown-dev', [
                 ['1', '/dashboard/list/errors', 'fa-medkit', 'Error codes'],
                 ['divider'],
                 ['0', '#', 'fa-list-alt', 'UI Reference:'],
-                ['2', '/dashboard/UIref/dash_demo', '', 'Dashboard Content'],
-                ['2', '/dashboard/UIref/panels-wells', '', 'Panels and Wells'],
-                ['2', '/dashboard/UIref/buttons', '', 'Buttons'],
-                ['2', '/dashboard/UIref/notifications', '', 'Notifications'],
-                ['2', '/dashboard/UIref/typography', '', 'Typography'],
-                ['2', '/dashboard/UIref/icons', '', 'Icons'],
-                ['2', '/dashboard/UIref/grid', '', 'Grid'],
-                ['2', '/dashboard/UIref/tables', '', 'Tables'],
-                ['2', '/dashboard/UIref/flot', '', 'Flot Charts'],
-                ['2', '/dashboard/UIref/morris', '', 'Morris.js Charts'],
-                ['2', '/dashboard/UIref/forms', '', 'Forms'],
+                ['1', '/dashboard/UIref/dash_demo', 'fa-play-circle-o', 'Dashboard Content'],
+                ['1', '/dashboard/UIref/panels-wells', 'fa-play-circle-o', 'Panels and Wells'],
+                ['1', '/dashboard/UIref/buttons', 'fa-play-circle-o', 'Buttons'],
+                ['1', '/dashboard/UIref/notifications', 'fa-play-circle-o', 'Notifications'],
+                ['1', '/dashboard/UIref/typography', 'fa-play-circle-o', 'Typography'],
+                ['1', '/dashboard/UIref/icons', 'fa-play-circle-o', 'Icons'],
+                ['1', '/dashboard/UIref/grid', 'fa-play-circle-o', 'Grid'],
+                ['1', '/dashboard/UIref/tables', 'fa-play-circle-o', 'Tables'],
+                ['1', '/dashboard/UIref/flot', 'fa-play-circle-o', 'Flot Charts'],
+                ['1', '/dashboard/UIref/morris', 'fa-play-circle-o', 'Morris.js Charts'],
+                ['1', '/dashboard/UIref/forms', 'fa-play-circle-o', 'Forms'],
+            ]
+        ],
+        ['fa-user', 'dropdown-user', [
+                ['1', '#', 'fa-user', 'Profile'],
+                ['1', '#', 'fa-gear', 'Settings'],
+                ['divider'],
+                ['1', '/logout/', 'fa-sign-out', logout],
             ]
         ],
     ]
@@ -105,8 +120,8 @@ def dropdowns():
     _output = ''
 
     for item in dropdowns:
-        _output = '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa ' + item[0] + ' fa-fw"></i> <i class="fa fa-caret-down"></i></a><ul class="dropdown-menu dropdown-user">'
-        for menu in item[1]:
+        _output = '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa ' + item[0] + ' fa-fw"></i> <i class="fa fa-caret-down"></i></a><ul class="dropdown-menu ' + item[1] + '">'
+        for menu in item[2]:
             if menu[0] == 'divider':
                 _output = _output + '<li class="divider"></li>'
 
@@ -116,11 +131,8 @@ def dropdowns():
             elif menu[0] == '1':
                 _output = _output + '<li><a href="' + menu[1] + '"><i class="fa ' + menu[2] + ' fa-fw"></i> ' + menu[3] + '</a></li>'
 
-            elif menu[0] == '2':
-                _output = _output + '<li class="dropdown-sub"><a href="' + menu[1] + '">' + menu[3] + '</a></li>'
 
         _output = _output + '</ul></li>'
-
-    results.append(_output)
+        results.append(_output)
 
     return results

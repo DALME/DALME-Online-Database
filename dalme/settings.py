@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'djangocms_snippet',
     'djangocms_style',
     'djangocms_column',
-    'django_celery_results'
+    'django_celery_results',
+    'postman'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -93,6 +94,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'sekizai.context_processors.sekizai',
                 'cms.context_processors.cms_settings',
+                'postman.context_processors.inbox',
             ],
             'debug': DEBUG,
         },
@@ -209,3 +211,7 @@ CACHES = {
         'LOCATION': 'cache_table',
     }
 }
+
+POSTMAN_DISALLOW_ANONYMOUS = True
+POSTMAN_DISABLE_USER_EMAILING = True
+POSTMAN_AUTO_MODERATE_AS = True

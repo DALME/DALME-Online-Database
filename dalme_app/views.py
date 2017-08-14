@@ -12,6 +12,7 @@ from .models import par_inventories, par_folios, par_tokens, error_messages, par
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dalme_app.tasks import parse_inventory
 from django_celery_results.models import TaskResult
+from postman.views import InboxView, SentView, ArchivesView, TrashView, WriteView, ReplyView, MessageView, ConversationView, ArchiveView, DeleteView, UndeleteView, MarkReadView, MarkUnreadView
 
 #import re
 
@@ -25,7 +26,7 @@ def index(request):
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
             'sidebar': sidebar_menu(),
-            'dropdowns': dropdowns(),
+            'dropdowns': dropdowns(request.user.username),
             'chart_data': functions.bar_chart(),
             'inv_counter': inv_counter,
             'obj_counter': obj_counter,
@@ -42,7 +43,7 @@ def uiref(request, module):
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
             'sidebar': sidebar_menu(),
-            'dropdowns': dropdowns()
+            'dropdowns': dropdowns(request.user.username)
         }
 
     if module == 'dash_demo':
@@ -293,7 +294,7 @@ def list(request, item):
     context['item'] = item.title()
     context['heading'] = _heading
     context['sidebar'] = sidebar_menu()
-    context['dropdowns'] = dropdowns()
+    context['dropdowns'] = dropdowns(request.user.username)
     context['headers'] = headers
     context['rows'] = rows
     context['panel_title'] = panel_title
@@ -341,7 +342,7 @@ def show(request, item, _id):
             context['username'] = request.user.username
             context['item'] = item.title()
             context['sidebar'] = sidebar_menu()
-            context['dropdowns'] = dropdowns()
+            context['dropdowns'] = dropdowns(request.user.username)
             context['inventory'] = inventory
             context['folios'] = folios
 
@@ -402,11 +403,29 @@ def form(request, item):
     context['username'] = username
     context['heading'] = _heading
     context['sidebar'] = sidebar_menu()
-    context['dropdowns'] = dropdowns()
+    context['dropdowns'] = dropdowns(request.user.username)
     context['panel_title'] = panel_title
     context['panel_icon'] = panel_icon
     context['form'] = form
     context['req_text'] = req_text
+
+    return render(request, _url, context)
+
+def messaging(request, *args, **kwargs):
+    _url = 'postman/inbox.html'
+    item = kwargs['item']
+    if item == 'inbox':
+            InboxView.as_view()
+
+    context = {
+            'page_title':'DALME Dashboard Demo',
+            'authenticated': request.user.is_authenticated,
+            'username': request.user.username,
+            'sidebar': sidebar_menu(),
+            'dropdowns': dropdowns(request.user.username)
+        }
+
+
 
     return render(request, _url, context)
 
