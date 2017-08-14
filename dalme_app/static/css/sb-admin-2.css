@@ -30,6 +30,7 @@
 
 .dropdown-section {
     padding: 3px 20px;
+    font-weight: bold;
 }
 
 .dropdown-sub a {
@@ -38,40 +39,45 @@
 
 .token_strikeout {
     text-decoration: line-through;
-    text-decoration:
+    display: inline;
 }
 
 .token_superscript {
     vertical-align: super;
+    display: inline;
 }
 
 .token_uncertain {
     color: #ccc;
+    display: inline;
 }
 
 .token_supplied {
     font-family: serif;
+    display: inline;
 }
 
 .token_imputed {
     background-color: yellow;
+    display: inline;
 }
 
 .token_periods {
-
+    display: inline;
 }
 
 .token_eos {
-
+    display: inline;
 }
 
 .token_clean {
-
+    display: inline;
 }
 
 .token_flag_error {
     color: red;
     font-weight: bold;
+    display: inline;
 }
 
 

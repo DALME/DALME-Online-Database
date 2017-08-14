@@ -25,8 +25,10 @@
                             {{ item }} Information
                         </div>
                         <div class="panel-body">
+                            {{ req_text }}
                             <form role="form" method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
+                                {{ form.as_p }}
                                 <!--div class="row">
                                     <div class="col-lg-12">
                                         <div class="form-group">
@@ -92,7 +94,7 @@
                                             <textarea class="form-control" id="{{ form.inv_notes.id_for_label }}" name="{{ form.inv_notes.html_name}}" rows="8"></textarea>
                                         </div>
                                     </div>
-                                </div-->
+                                </div>
                                 <div class="row">
                                         <div class="col-lg-12">
                                             <div class="form-group">
@@ -101,7 +103,8 @@
                                             </div>
                                             <button type="submit" class="btn btn-primary">Submit</button>
                                         </div>
-                                </div>
+                                </div-->
+                                <button type="submit" class="btn btn-primary">Submit</button>
                             </form>
                         </div>
                     </div>

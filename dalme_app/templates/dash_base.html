@@ -34,7 +34,7 @@
         {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}<div class="alert alert-warning alert-dismissable">{% endif %}
         {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}<div class="alert alert-danger alert-dismissable">{% endif %}
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        {{ message }}</div>
+        {{ message | safe }}</div>
     {% endfor %}
 {% endif %}
 
@@ -58,28 +58,8 @@
             <ul class="nav navbar-top-links navbar-right">
                 {% block extra_dropdowns %}{% endblock %}
                 {% for item in dropdowns %}
-
-                {{ item|safe }}
-
+                    {{ item|safe }}
                 {% endfor %}
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#"><i class="fa fa-user fa-fw"></i> Profile</a>
-                        </li>
-                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                        </li>
-                        <li class="divider"></li>
-                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i> Logout {{ user.username }}</a>
-                        </li>
-                    </ul>
-                    <!-- /.dropdown-user -->
-                </li>
-
-
-
             </ul>
             <!-- /.navbar-top-links -->
 {% endblock %}

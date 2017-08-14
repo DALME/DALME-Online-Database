@@ -92,11 +92,9 @@
                                             <div class="col-lg-1 trans-line-no">{{ i.0 }}</div>
                                             <div class="col-lg-11">
                                             {% for token in i.1 %}
-                                                {% if tokenise %}
-                                                    <div class="btn btn-info btn-xs">{{ token.0 | safe }}</div>
-                                                {% else %}
-                                                    <span class="{{ token.1 }}">{{ token.0 | safe }}</span>
-                                                {% endif %}
+
+                                                    <div id="token" class="{{ token.1 }}">{{ token.0 | safe }}</div>
+
                                             {% endfor %}
                                             </div>
                                         </div>
@@ -120,5 +118,16 @@
     $(function () {
         $('.pannable-image').ImageViewer({ zoomValue : 50 });
     });
+
+    function change_autorefreshdiv(){
+        jQuery('#token').addClass('btn btn-info btn-xs');
+    };
+
 </script>
+
+<!--    var NAME = document.getElementById("token");
+    var currentClass = NAME.className;
+    NAME.className = "btn btn-info btn-xs"; -->
+
+
 {% endblock %}

@@ -23,9 +23,9 @@ from django.http import HttpResponse
 
 
 urlpatterns = [
+    #(r'^messages/(?P<item>[a-z_-]+)/(?:(?P<option>m)/)?$'
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
-    url(r'^todo/', include('todo.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dashboard/', include('dalme_app.urls')),

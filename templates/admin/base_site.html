@@ -24,14 +24,8 @@
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
-<!--GHP: the following use of the 'with' statement is a bloody appalling hack. I'm leaving it here only until I figure out how to use permissions properly-->
 {% block usertools %}
-{% with has_permission=1 site_url='http://127.0.0.1:8000/' %}
-{{ block.super }}
-{% endwith %}
 {% endblock %}
 
 {% block userlinks %}
-    <a href="{% url 'todo-lists' %}"> Task Manager </a> /
-    {{ block.super }}
 {% endblock %}

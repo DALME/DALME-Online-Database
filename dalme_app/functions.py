@@ -1,134 +1,18 @@
 import re, json, requests, hashlib
 from django.contrib import messages
 from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
+from django.contrib.auth.models import User
+from async_messages import message_user
 #from django.contrib.staticfiles.templatetags.staticfiles import static as _static
 #local files for testing
 #input_file_name = 'AM_FF_501.txt'
 #input_file_name = _static + 'dev_test/test_data.txt'
 
 
-def ingest_inventory(_file, username):
-
-    #check the file's format:
-    results = { 'messages':[] }
-    status = inventory_check(_file)
-
-    if status['has_metadata'] == 0:
-
-        results = {
-            'result': 'Failure',
-            'messages': [
-                ('The uploaded file is missing the metadata section and cannot be processed.','ERROR')
-                ]
-            }
-
-    elif status['has_transcription'] == 0:
-
-        results = {
-            'result': 'Question',
-            'issue': 'transcription missing'
-            }
-
-    else:
-        if status['has_assets'] == 0:
-            results = {
-                    'messages': [
-                        ('The uploaded file did not contain an assets section.','INFO')
-                    ]
-                }
-
-            #get the starting lines for the sections present and the file's last line
-            metadata_tag = '*METADATA*'
-            transcription_tag = '*TRANSCRIPTION*'
-            f = status['text']
-            lines = f.split('\n')
-            last_line = len(lines)
-
-            for num, line in enumerate(lines, 1):
-                if metadata_tag in line:
-                    metadata_start = num
-
-                elif transcription_tag in line:
-                    transcription_start = num
-
-            #process each section
-            transcription_end = last_line
-            _metadata_end = transcription_start - 1
-            _metadata_results = parse_metadata(f, metadata_start, _metadata_end, username)
-            inv = _metadata_results['inv']
-            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end, username)
-
-            if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
-                results['result'] = 'OK'
-                results['messages'].append(('The inventory was successfully processed.','SUCCESS'))
-
-            else:
-                results['result'] = 'Failure'
-                if _metadata_results['result'] != 'OK':
-                    results['messages'].append(('There were problems processing the metadata section of the file.','ERROR'))
-                    results['metadata_errors'] = _metadata_results['metadata_output']
-
-                if transcription_results['result'] != 'OK':
-                    results['messages'].append(('There were problems processing the transcription section of the file.','ERROR'))
-                    results['transcription_errors'] = transcription_results['transcription_output']
-
-
-        else:
-            #get the starting lines for all the sections and the file's last line
-            metadata_tag = '*METADATA*'
-            assets_tag = '*ASSETS*'
-            transcription_tag = '*TRANSCRIPTION*'
-            f = status['text']
-            lines = f.split('\n')
-            last_line = len(lines)
-
-            for num, line in enumerate(lines, 1):
-                if assets_tag in line:
-                    assets_start = num
-
-                elif metadata_tag in line:
-                    metadata_start = num
-
-                elif transcription_tag in line:
-                    transcription_start = num
-
-            #process each section
-            transcription_end = last_line
-            assets_end = transcription_start - 1
-            _metadata_end = assets_start - 1
-            _metadata_results = parse_metadata(f, metadata_start, _metadata_end, username)
-            inv = _metadata_results['inv']
-            assets_results = parse_assets(f, inv, assets_start, assets_end, username)
-            transcription_results = parse_transcription(f, inv, transcription_start, transcription_end, username)
-
-            if transcription_results['result'] == 'OK' and _metadata_results['result'] == 'OK':
-                results['result'] = 'OK'
-                if assets_results['result'] == 'OK':
-                    results['messages'].append(('The inventory was successfully processed.','SUCCESS'))
-
-                else:
-                    results['messages'].append(('There were problems with the list of assets, but the rest of the inventory was processed successfully.','WARNING'))
-                    results['assets_errors'] = assets_results['assets_output']
-
-            else:
-                results['result'] = 'Failure'
-                if _metadata_results['result'] != 'OK':
-                    results['messages'].append(('There were problems processing the metadata section of the file.','ERROR'))
-                    results['metadata_errors'] = _metadata_results['metadata_output']
-
-                if transcription_results['result'] != 'OK':
-                    results['messages'].append(('There were problems processing the transcription section of the file.','ERROR'))
-                    results['transcription_errors'] = transcription_results['transcription_output']
-
-                if assets_results['result'] != 'OK':
-                    results['messages'].append(('There were problems with the list of assets.','WARNING'))
-                    results['assets_errors'] = assets_results['assets_output']
-
-    return results
-
-
 def inventory_check(_file):
     """Takes the data from a DALME Inventory Package and makes sure it's properly formatted"""
+
+    #ALSO NEEDS TO CHECK IF INVENTORY ALREADY EXISTS
 
     status = {}
 
@@ -136,156 +20,98 @@ def inventory_check(_file):
         text = f.read()
         text = text.decode("utf-8")
 
-        #check that the metadata section is there
-        if '*METADATA*' in text:
-            status['has_metadata'] = 1
-        else:
-            status['has_metadata'] = 0
+    #check that the metadata section is there
+    if '*METADATA*' in text:
+        status['has_metadata'] = 1
+    else:
+        status['has_metadata'] = 0
 
-        #check if the file has an ASSETS section
-        if '*ASSETS*' in text:
-            status['has_assets'] = 1
-        else:
-            status['has_assets'] = 0
+    #check if the file has a STRUCTURE section
+    if '*STRUCTURE*' in text:
+        status['has_structure'] = 1
+    else:
+        status['has_structure'] = 0
 
-        #check if the file has a TRANSCRIPTION section
-        if '*TRANSCRIPTION*' in text:
-            status['has_transcription'] = 1
-        else:
-            status['has_transcription'] = 0
+    #check if the file has a TRANSCRIPTION section
+    if '*TRANSCRIPTION*' in text:
+        status['has_transcription'] = 1
+    else:
+        status['has_transcription'] = 0
 
-    #remove blank lines
-    empty_pattern = re.compile(r'\n$', re.MULTILINE)
-    text = empty_pattern.sub('', text)
-    status['text'] = text
+    #if the STRUCTURE section is missing, just stop and send the report back
+    if status['has_structure'] == 0:
+        return status
+
+    else:
+        #remove blank lines
+        empty_pattern = re.compile(r'\n$', re.MULTILINE)
+        text = empty_pattern.sub('', text)
+        status['text'] = text
+
+        #determine the boundaries of each section
+        metadata_tag = '*METADATA*'
+        structure_tag = '*STRUCTURE*'
+        transcription_tag = '*TRANSCRIPTION*'
+        lines = text.split('\n')
+        #get the starting lines for all the sections and the file's last line
+        last_line = len(lines)
+        for num, line in enumerate(lines, 1):
+            if metadata_tag in line:
+                status['metadata_start'] = num
+
+            elif structure_tag in line:
+                status['structure_start'] = num
+
+            elif transcription_tag in line:
+                status['transcription_start'] = num
+
+        #assign the outer boundaries of each section
+        #if it has a METADATA section, assign outer boundary and parse it
+        if status['has_metadata'] == 1:
+            status['metadata_end'] = status['structure_start'] - 1
+            meta_lines = lines[status['metadata_start']:status['metadata_end']]
+            label_pattern = re.compile(r'^([\w ]+):', re.IGNORECASE)
+            line_pattern = re.compile(r'([\w ]+): (.+)', re.IGNORECASE)
+            full_pattern = re.compile(r'(.+)', re.IGNORECASE)
+            #get metadata
+            meta_dict = {}
+            for line in meta_lines:
+                if label_pattern.match(line) != None:
+                    m = line_pattern.match(line)
+                    label = m.group(1)
+                    content = m.group(2)
+                    meta_dict[label] = content.rstrip()
+
+                else:
+                    new_content = line.rstrip()
+                    old_content = meta_dict[label]
+                    meta_dict[label] = old_content + '\n' + new_content
+
+            status['metadata'] = meta_dict
+
+            #see which fields are included and whether all the required ones are present
+            required_fields = ['Title', 'Archival source', 'Country', 'Series', 'Shelf', 'Transcriber']
+            required = 1
+            fields = []
+            for i in required_fields:
+                if i in meta_dict:
+                    present = 1
+                else:
+                    present = 0
+                    required = 0
+                fields.append((i,present))
+
+            status['fields'] = fields
+            status['required'] = required
+
+        if status['has_transcription'] == 1:
+            status['structure_end'] = status['transcription_start'] - 1
+            status['transcription_end'] = last_line
+        else:
+            status['structure_end'] = last_line
 
     return status
 
-
-def parse_metadata(f, start_line, end_line, username):
-    """Parses the metadata section"""
-
-    _data = f.split('\n')
-    lines = _data[start_line:end_line]
-    label_pattern = re.compile(r'^([\w ]+):', re.IGNORECASE)
-    line_pattern = re.compile(r'([\w ]+): (.+)', re.IGNORECASE)
-    full_pattern = re.compile(r'(.+)', re.IGNORECASE)
-    meta_dict = {}
-
-    for line in lines:
-        if label_pattern.match(line) != None:
-            m = line_pattern.match(line)
-            label = m.group(1)
-            content = m.group(2)
-            meta_dict[label] = content.rstrip()
-
-        else:
-            new_content = line.rstrip()
-            old_content = meta_dict[label]
-            meta_dict[label] = old_content + '\n' + new_content
-
-    #create inventory record in database
-    inv = par_inventories(
-        title=meta_dict['Title'],
-        source=meta_dict['Archival source'],
-        location=meta_dict['Country'],
-        series=meta_dict['Series'],
-        shelf=meta_dict['Shelf'],
-        transcriber=meta_dict['Transcriber'],
-        creation_username=username,
-        modification_username=username
-        )
-    inv.save()
-
-    results = {
-        'result': 'OK',
-        'inv': inv
-    }
-
-    return results
-
-
-def parse_assets(f, inv, start_line, end_line, username):
-    """Parses the assets section"""
-
-    _data = f.split('\n')
-    lines = _data[start_line:end_line]
-    line_pattern = re.compile(r'([\w.]+),([0-9]+)', re.IGNORECASE)
-
-    for line in lines:
-            m = line_pattern.match(line)
-            _folio = m.group(1)
-            dam_id = m.group(2)
-            fol = par_folios(
-                inv_id = inv,
-                folio_no =_folio,
-                dam_id = dam_id,
-                creation_username=username,
-                modification_username=username
-                )
-            fol.save()
-
-    results = {
-        'result': 'OK',
-    }
-
-    return results
-
-
-def parse_transcription(f, inv, start_line, end_line, username):
-    """Parses the transcription"""
-
-    _data = f.split('\n')
-    lines = _data[start_line:end_line]
-
-    #get each line and its atributes
-    folio_pattern = re.compile(r'^FOLIO ([0-9]+(v|r)):')
-    current_folio = '00'
-    line_num = 0
-    lines_list = []
-    token_type = 'UNDEFINED'
-
-    for line in lines:
-        if folio_pattern.match(line):
-            m = folio_pattern.match(line)
-            current_folio = m.group(1)
-
-        else:
-            tokenised = tokenise(line, token_type)
-            token_type = tokenised[0]
-            tokens_list = tokenised[1]
-            line_num = line_num + 1
-            list_entry = [line_num,current_folio,tokens_list]
-            lines_list.append(list_entry)
-
-        #add code to rejoin tokens split at the end of a line
-
-    #create tokens in database
-    for line, folio, tokens in lines_list:
-        fol = par_folios.objects.get(inv_id=inv, folio_no=folio)
-        #add logic to deal with folio not existing
-        for i, token in enumerate(tokens):
-            the_token = par_tokens(
-                folio_id=fol,
-                line_no=line,
-                position=token['position'],
-                raw_token=token['raw_token'],
-                clean_token=token['clean_token'],
-                norm_token=token['norm_token'],
-                token_type=token['token_type'],
-                flags=token['flags'],
-                span_start=token['span_start'],
-                span_end=token['span_end'],
-                creation_username=username,
-                modification_username=username
-                )
-            the_token.save()
-
-    results = {
-        'result': 'OK',
-    }
-
-    return results
 
 def tokenise(line, t_type):
     """takes a line and returns a list of dictionaries, one for each token, with all the pertinent attributes"""
@@ -535,9 +361,29 @@ def get_new_error(level):
 
     return new
 
-def notification(request, code):
-    message = error_messages.objects.get(pk=code)
-    messages.add_message(request, message.e_level, message.e_text)
+def notification(request, code, **kwargs):
+    base_message = error_messages.objects.get(pk=code)
+    msg_text = base_message.e_text
+    msg_level = base_message.e_level
+
+    if 'para' in kwargs:
+        para = kwargs['para']
+        msg_output = msg_text.format(**para)
+
+    elif 'data' in kwargs:
+        data = kwargs['data']
+        msg_output = msg_text + '<p>' + str(data) + '</p>'
+
+    else:
+        msg_output = msg_text
+
+    if 'user' in kwargs:
+        user = kwargs['user']
+        the_user = User.objects.get(username=user)
+        message_user(the_user, msg_output, msg_level)
+
+    else:
+        messages.add_message(request, msg_level, msg_output)
 
 def bar_chart():
     results = []
