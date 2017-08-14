@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 #from .models import predicates, tokens, sources, predicate_labels, source_attributes
 import requests
@@ -16,6 +17,7 @@ from postman.views import InboxView, SentView, ArchivesView, TrashView, WriteVie
 
 #import re
 
+@login_required
 def index(request):
     inv_counter = str(functions.get_count('inventories'))
     obj_counter = str(functions.get_count('objects'))
@@ -36,7 +38,7 @@ def index(request):
 
     return render(request, 'index.html', context)
 
-
+@login_required
 def uiref(request, module):
     context = {
             'page_title':'DALME Dashboard Demo',
@@ -81,6 +83,7 @@ def uiref(request, module):
 
     return render(request, _url, context)
 
+@login_required
 def list(request, item):
     _url = 'list.html'
     table_options = ''
@@ -303,6 +306,7 @@ def list(request, item):
 
     return render(request, _url, context)
 
+@login_required
 def show(request, item, _id):
     username = request.user.username
     context = {}
@@ -348,6 +352,7 @@ def show(request, item, _id):
 
     return render(request, _url, context)
 
+@login_required
 def form(request, item):
     username = request.user.username
     context = {}
@@ -411,6 +416,7 @@ def form(request, item):
 
     return render(request, _url, context)
 
+@login_required
 def messaging(request, *args, **kwargs):
     _url = 'postman/inbox.html'
     item = kwargs['item']

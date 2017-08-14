@@ -22,6 +22,7 @@ from dalme_app import views
 
 
 urlpatterns = [
+    #(r'^messages/(?P<item>[a-z_-]+)/(?:(?P<option>m)/)?$'
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

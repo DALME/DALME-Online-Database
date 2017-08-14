@@ -181,7 +181,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 SITE_ID = 1
 
 #authentication settings
-
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'dashboard'
 
 #Settings for Task Manager

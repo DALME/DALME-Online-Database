@@ -16,4 +16,5 @@ urlpatterns = [
     #url(r'^messages/', include(postman_patterns, namespace='postman', app_name='postman')),
     #url(r'^messages/(?P<item>[a-z_-]+)/(?:(?P<option>m)/)?$', views.messaging, namespace='postman', app_name='postman'),
     url(r'^$', views.index, name='dashboard')
+
 ]
