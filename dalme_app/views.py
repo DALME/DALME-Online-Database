@@ -23,6 +23,7 @@ def index(request):
     obj_counter = str(functions.get_count('objects'))
     wiki_counter = str(functions.get_count('wiki-articles'))
     dam_counter = str(functions.get_count('assets'))
+
     context = {
             'page_title':'DALME Dashboard',
             'authenticated': request.user.is_authenticated,

@@ -1,5 +1,9 @@
 from dalme_app import functions
 from django.core.urlresolvers import reverse
+from todo.models import Item, List, Comment
+from django.contrib.auth.models import User
+
+
 
 def sidebar_menu():
     """ creates the sidebar menu """
@@ -82,57 +86,91 @@ def sidebar_menu():
 def dropdowns(username):
     """ creates the top right dropdowns """
     logout = 'Logout ' + username
+
     dropdowns = [
-        ['fa-tasks', 'dropdown-tasks2', [
-                ['1', reverse('todo-lists'), 'fa-check-circle', 'General Tasks'],
-                ['1', reverse('todo-mine'), 'fa-check-square-o', 'My Tasks'],
-
+        ['fa fa-tasks', 'dropdown-task-list', [
+                ['1', reverse('todo-lists'), 'fa fa-plus-circle', 'Add New Task'],
+                ['divider'],
+                ['1', reverse('todo-lists'), 'fa fa-info-circle', 'Manage Task Lists'],
+                ['1', reverse('todo-lists'), 'fa fa-check-circle', 'View Tasks Log'],
+                ['divider'],
+                ['0', '#', 'fa fa-star', 'My Tasks:'],
             ]
 
         ],
-        ['fa-gears', 'dropdown-dev', [
-                ['1', '/dashboard/list/errors', 'fa-medkit', 'Error codes'],
+        ['fa fa-gears', 'dropdown-dev', [
+                ['1', '/dashboard/list/errors', 'fa fa-medkit', 'Error codes'],
                 ['divider'],
-                ['0', '#', 'fa-list-alt', 'UI Reference:'],
-                ['1', '/dashboard/UIref/dash_demo', 'fa-play-circle-o', 'Dashboard Content'],
-                ['1', '/dashboard/UIref/panels-wells', 'fa-play-circle-o', 'Panels and Wells'],
-                ['1', '/dashboard/UIref/buttons', 'fa-play-circle-o', 'Buttons'],
-                ['1', '/dashboard/UIref/notifications', 'fa-play-circle-o', 'Notifications'],
-                ['1', '/dashboard/UIref/typography', 'fa-play-circle-o', 'Typography'],
-                ['1', '/dashboard/UIref/icons', 'fa-play-circle-o', 'Icons'],
-                ['1', '/dashboard/UIref/grid', 'fa-play-circle-o', 'Grid'],
-                ['1', '/dashboard/UIref/tables', 'fa-play-circle-o', 'Tables'],
-                ['1', '/dashboard/UIref/flot', 'fa-play-circle-o', 'Flot Charts'],
-                ['1', '/dashboard/UIref/morris', 'fa-play-circle-o', 'Morris.js Charts'],
-                ['1', '/dashboard/UIref/forms', 'fa-play-circle-o', 'Forms'],
+                ['0', '#', 'fa fa-list-alt', 'UI Reference:'],
+                ['1', '/dashboard/UIref/dash_demo', 'fa fa-dot-circle-o', 'Dashboard Content'],
+                ['1', '/dashboard/UIref/panels-wells', 'fa fa-dot-circle-o', 'Panels and Wells'],
+                ['1', '/dashboard/UIref/buttons', 'fa fa-dot-circle-o', 'Buttons'],
+                ['1', '/dashboard/UIref/notifications', 'fa fa-dot-circle-o', 'Notifications'],
+                ['1', '/dashboard/UIref/typography', 'fa fa-dot-circle-o', 'Typography'],
+                ['1', '/dashboard/UIref/icons', 'fa fa-dot-circle-o', 'Icons'],
+                ['1', '/dashboard/UIref/grid', 'fa fa-dot-circle-o', 'Grid'],
+                ['1', '/dashboard/UIref/tables', 'fa fa-dot-circle-o', 'Tables'],
+                ['1', '/dashboard/UIref/flot', 'fa fa-dot-circle-o', 'Flot Charts'],
+                ['1', '/dashboard/UIref/morris', 'fa fa-dot-circle-o', 'Morris.js Charts'],
+                ['1', '/dashboard/UIref/forms', 'fa fa-dot-circle-o', 'Forms'],
             ]
         ],
-        ['fa-user', 'dropdown-user', [
-                ['1', '#', 'fa-user', 'Profile'],
-                ['1', '#', 'fa-gear', 'Settings'],
+        ['fa fa-user', 'dropdown-user', [
+                ['1', '#', 'fa fa-user', 'Profile'],
+                ['1', '#', 'fa fa-gear', 'Settings'],
                 ['divider'],
-                ['1', '/logout/', 'fa-sign-out', logout],
+                ['1', '/logout/', 'fa fa-sign-out', logout],
             ]
         ],
     ]
+
+    user_id = User.objects.get(username=username).pk
+    tasks = Item.objects.filter(assigned_to=user_id, completed=False).order_by('-created_date')[:5]
+    for i in tasks:
+        task_icon = functions.get_task_icon(i.list_id)
+        task_url = '/dashboard/tasks/task/' + str(i.id)
+        creator_id = i.created_by_id
+        task_creator = User.objects.get(id=creator_id).username
+        date_created = i.created_date.strftime('%a, %-d %b, %Y')
+        date_due = i.due_date.strftime('%a, %-d %b, %Y')
+        task_item = ['2', task_url, task_icon, i.title, str(i.id), date_created, date_due, task_creator]
+        dropdowns[0][2].append(task_item)
+
+    close_tasks = ['3', reverse('todo-mine'), 'See All']
+    dropdowns[0][2].append(close_tasks)
 
     results = []
     _output = ''
 
     for item in dropdowns:
-        _output = '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa ' + item[0] + ' fa-fw"></i> <i class="fa fa-caret-down"></i></a><ul class="dropdown-menu ' + item[1] + '">'
+        if item[0] == 'fa-tasks':
+            _output = '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="' + item[0] + ' fa-fw"></i> <i class="fa fa-caret-down"></i></a><ul class="dropdown-menu ' + item[1] + '"><form action="" method="POST">'
+
+        else:
+            _output = '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="' + item[0] + ' fa-fw"></i> <i class="fa fa-caret-down"></i></a><ul class="dropdown-menu ' + item[1] + '">'
+
         for menu in item[2]:
             if menu[0] == 'divider':
                 _output = _output + '<li class="divider"></li>'
 
             elif menu[0] == '0':
-                _output = _output + '<li class="dropdown-section"><i class="fa ' + menu[2] + ' fa-fw"></i> ' + menu[3] + '</li>'
+                _output = _output + '<li class="dropdown-section"><i class="' + menu[2] + ' fa-fw"></i> ' + menu[3] + '</li>'
 
             elif menu[0] == '1':
-                _output = _output + '<li><a href="' + menu[1] + '"><i class="fa ' + menu[2] + ' fa-fw"></i> ' + menu[3] + '</a></li>'
+                _output = _output + '<li><a href="' + menu[1] + '"><i class="' + menu[2] + ' fa-fw"></i> ' + menu[3] + '</a></li>'
+
+            elif menu[0] == '2':
+                _output = _output + '<li><a href="' + menu[1] + '"><div><input class="dropdown-checkbox" type="checkbox" name="mark_done" value="' + menu[4]+ '" id="mark_done_' + menu[4] + '">' + menu[3] + '<span class="pull-right text-muted"><em>Due: ' + menu[6] + '</em></span></div><div><em>Created: ' + menu[5] + ' By: ' + menu[7] + '</em></div></a></li>'
+
+            elif menu[0] == '3':
+                _output = _output + '<li class="divider"></li><li><a class="text-center" href="' + menu[1] + '"><strong>' + menu[2] + ' </strong><i class="fa fa-angle-right"></i></a></li>'
 
 
-        _output = _output + '</ul></li>'
+        if dropdowns[0][0] == 'fa fa-tasks':
+            _output = _output + '</form></ul></li>'
+        else:
+            _output = _output + '</ul></li>'
+
         results.append(_output)
 
     return results

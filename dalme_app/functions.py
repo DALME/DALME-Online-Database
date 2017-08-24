@@ -446,3 +446,9 @@ def get_dam_preview(resource):
     results = 'http://dighist.fas.harvard.edu' + res[0]['preview']
 
     return results
+
+def get_task_icon(list_id):
+    if list_id == 1:
+        icon = 'fa-gears'
+
+    return icon
