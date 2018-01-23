@@ -4,3 +4,8 @@ staticfiles
 .env
 db.cnf
 db-test.cnf
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
