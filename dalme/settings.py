@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'django.contrib.sites',
-    # 'cms',
+    'cms',
     'menus',
     'treebeard',
     'sekizai',
