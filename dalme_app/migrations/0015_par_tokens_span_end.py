@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='par_tokens',
             name='span_end',
-            field=models.IntegerField(default='d'),
+            field=models.IntegerField(),
             preserve_default=False,
         ),
     ]
