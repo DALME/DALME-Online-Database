@@ -1,222 +1,221 @@
 {% extends "dash_base.html" %}
-{% load staticfiles i18n %}
 
+{% load staticfiles i18n %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}
+
 {% block content %}
-    <!-- Page Content -->
-    <div id="page-wrapper">
-        <div class="container-fluid">
+<!-- Page Content -->
+<div id="page-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1 class="page-header">Dashboard</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-3 col-md-6">
+        <div class="panel panel-red">
+          <div class="panel-heading">
             <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Dashboard</h1>
-                </div>
+              <div class="col-xs-3">
+                <i class="fa fa-book fa-5x"></i>
+              </div>
+              <div class="col-xs-9 text-right">
+                <div class="huge">{{ wiki_counter }}</div>
+                <div>Articles</div>
+              </div>
             </div>
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                                    <div class="panel panel-red">
-                                        <div class="panel-heading">
-                                            <div class="row">
-                                                <div class="col-xs-3">
-                                                    <i class="fa fa-book fa-5x"></i>
-                                                </div>
-                                                <div class="col-xs-9 text-right">
-                                                    <div class="huge">{{ wiki_counter }}</div>
-                                                    <div>Articles</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="http://dighist.fas.harvard.edu/projects/DALME/wiki" target="_blank">
-                                            <div class="panel-footer">
-                                                <span class="pull-left">Go to Wiki</span>
-                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                        </a>
-                                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                                    <div class="panel panel-primary">
-                                        <div class="panel-heading">
-                                            <div class="row">
-                                                <div class="col-xs-3">
-                                                    <i class="fa fa-image fa-5x"></i>
-                                                </div>
-                                                <div class="col-xs-9 text-right">
-                                                    <div class="huge">{{ dam_counter }}</div>
-                                                    <div>Assets</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="http://dighist.fas.harvard.edu/projects/DALME/dam" target="_blank">
-                                            <div class="panel-footer">
-                                                <span class="pull-left">Go to DAM</span>
-                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                        </a>
-                                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                                    <div class="panel panel-yellow">
-                                        <div class="panel-heading">
-                                            <div class="row">
-                                                <div class="col-xs-3">
-                                                    <i class="fa fa-list fa-5x"></i>
-                                                </div>
-                                                <div class="col-xs-9 text-right">
-                                                    <div class="huge">{{ inv_counter }}</div>
-                                                    <div>Inventories</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="/dashboard/list/inventories">
-                                            <div class="panel-footer">
-                                                <span class="pull-left">View Details</span>
-                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                        </a>
-                                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                                    <div class="panel panel-green">
-                                        <div class="panel-heading">
-                                            <div class="row">
-                                                <div class="col-xs-3">
-                                                    <i class="fa fa-beer fa-5x"></i>
-                                                </div>
-                                                <div class="col-xs-9 text-right">
-                                                    <div class="huge">{{ obj_counter }}</div>
-                                                    <div>Objects</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="/dashboard/list/objects">
-                                            <div class="panel-footer">
-                                                <span class="pull-left">View Details</span>
-                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                        </a>
-                                    </div>
-                </div>
+          </div>
+          <a href="http://dighist.fas.harvard.edu/projects/DALME/wiki" target="_blank">
+            <div class="panel-footer">
+              <span class="pull-left">Go to Wiki</span>
+              <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+              <div class="clearfix"></div>
             </div>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
             <div class="row">
-                <div class="col-lg-8">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Number of objects with "re-use terms" per material class
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+              <div class="col-xs-3">
+                <i class="fa fa-image fa-5x"></i>
+              </div>
+              <div class="col-xs-9 text-right">
+                <div class="huge">{{ dam_counter }}</div>
+                <div>Assets</div>
+              </div>
+            </div>
+          </div>
+          <a href="http://dighist.fas.harvard.edu/projects/DALME/dam" target="_blank">
+            <div class="panel-footer">
+              <span class="pull-left">Go to DAM</span>
+              <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+              <div class="clearfix"></div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="panel panel-yellow">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-xs-3">
+                <i class="fa fa-list fa-5x"></i>
+              </div>
+              <div class="col-xs-9 text-right">
+                <div class="huge">{{ inv_counter }}</div>
+                <div>Inventories</div>
+              </div>
+            </div>
+          </div>
+          <a href="/dashboard/list/inventories">
+            <div class="panel-footer">
+              <span class="pull-left">View Details</span>
+              <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+              <div class="clearfix"></div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="panel panel-green">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-xs-3">
+                <i class="fa fa-beer fa-5x"></i>
+              </div>
+              <div class="col-xs-9 text-right">
+                <div class="huge">{{ obj_counter }}</div>
+                <div>Objects</div>
+              </div>
+            </div>
+          </div>
+          <a href="/dashboard/list/objects">
+            <div class="panel-footer">
+              <span class="pull-left">View Details</span>
+              <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+              <div class="clearfix"></div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            Number of objects with "re-use terms" per material class
+            <div class="pull-right">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
                                         Charts
                                         <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu pull-right" role="menu">
-                                        <li><a href="#">Chart 1</a>
-                                        </li>
-                                        <li><a href="#">Chart 2</a>
-                                        </li>
-                                        <li><a href="#">Chart 3</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li><a href="#">All Reports</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div id="morris-bar-chart"></div>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <i class="fa fa-bell fa-fw"></i> Notifications
-                        </div>
-                            <!-- /.panel-heading -->
-                        <div class="panel-body">
-                                <div class="list-group">
-                                    <a href="#" class="list-group-item">
+                <ul class="dropdown-menu pull-right" role="menu">
+                  <li><a href="#">Chart 1</a>
+                  </li>
+                  <li><a href="#">Chart 2</a>
+                  </li>
+                  <li><a href="#">Chart 3</a>
+                  </li>
+                  <li class="divider"></li>
+                  <li><a href="#">All Reports</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- /.panel-heading -->
+          <div class="panel-body">
+            <div id="morris-bar-chart"></div>
+          </div>
+          <!-- /.panel-body -->
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <i class="fa fa-bell fa-fw"></i> Notifications
+          </div>
+          <!-- /.panel-heading -->
+          <div class="panel-body">
+            <div class="list-group">
+              <a href="#" class="list-group-item">
                                         <i class="fa fa-comment fa-fw"></i> New Comment
                                         <span class="pull-right text-muted small"><em>4 minutes ago</em>
                                         </span>
                                     </a>
-                                    <a href="#" class="list-group-item">
+              <a href="#" class="list-group-item">
                                         <i class="fa fa-twitter fa-fw"></i> 3 New Followers
                                         <span class="pull-right text-muted small"><em>12 minutes ago</em>
                                         </span>
                                     </a>
-                                    <a href="#" class="list-group-item">
+              <a href="#" class="list-group-item">
                                         <i class="fa fa-envelope fa-fw"></i> Message Sent
                                         <span class="pull-right text-muted small"><em>27 minutes ago</em>
                                         </span>
                                     </a>
-                                    <a href="#" class="list-group-item">
+              <a href="#" class="list-group-item">
                                         <i class="fa fa-tasks fa-fw"></i> New Task
                                         <span class="pull-right text-muted small"><em>43 minutes ago</em>
                                         </span>
                                     </a>
-                                    <a href="#" class="list-group-item">
+              <a href="#" class="list-group-item">
                                         <i class="fa fa-upload fa-fw"></i> Server Rebooted
                                         <span class="pull-right text-muted small"><em>11:32 AM</em>
                                         </span>
                                     </a>
-                                    <a href="#" class="list-group-item">
+              <a href="#" class="list-group-item">
                                         <i class="fa fa-bolt fa-fw"></i> Server Crashed!
                                         <span class="pull-right text-muted small"><em>11:13 AM</em>
                                         </span>
                                     </a>
-                                    <a href="#" class="list-group-item">
+              <a href="#" class="list-group-item">
                                         <i class="fa fa-warning fa-fw"></i> Server Not Responding
                                         <span class="pull-right text-muted small"><em>10:57 AM</em>
                                         </span>
                                     </a>
-                                </div>
-                                <!-- /.list-group -->
-                                <a href="#" class="btn btn-default btn-block">View All Alerts</a>
-                            </div>
-                            <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
             </div>
+            <!-- /.list-group -->
+            <a href="#" class="btn btn-default btn-block">View All Alerts</a>
+          </div>
+          <!-- /.panel-body -->
         </div>
-        <!-- /.container-fluid -->
+        <!-- /.panel -->
+      </div>
     </div>
-    <!-- /#page-wrapper -->
-{% endblock %}
-
-{% block extra_scripts %}
+  </div>
+  <!-- /.container-fluid -->
+</div>
+<!-- /#page-wrapper -->
+{% endblock %} {% block extra_scripts %}
 <!-- Morris Charts JavaScript -->
 <script src="{% static 'vendor/raphael/raphael.min.js' %}"></script>
 <script src="{% static 'vendor/morrisjs/morris.min.js' %}"></script>
 <script>
-$(function() {
+  $(function() {
 
     Morris.Bar({
-        element: 'morris-bar-chart',
-        data: [
-            {% for i in chart_data %}
-                {
-                y: '{{ i.0 }}',
-                a: {{ i.1 }}
-                },
-            {% endfor %}
-            ],
-        xkey: 'y',
-        ykeys: ['a'],
-        labels: ['Objects'],
-        hideHover: 'auto',
-        resize: true
+      element: 'morris-bar-chart',
+      data: [
+        {% for i in chart_data %}
+        {
+          y: '{{ i.0 }}',
+          a: {{ i.1 }}
+        },
+        {% endfor %}
+      ],
+      xkey: 'y',
+      ykeys: ['a'],
+      labels: ['Objects'],
+      hideHover: 'auto',
+      resize: true
     });
 
-});
+  });
 </script>
 
 {% endblock %}

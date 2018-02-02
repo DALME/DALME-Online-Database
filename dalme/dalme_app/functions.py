@@ -1,4 +1,4 @@
-import re, json, requests, hashlib
+import re, json, requests, hashlib, os
 from django.contrib import messages
 from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
 from django.contrib.auth.models import User
@@ -397,55 +397,72 @@ def bar_chart():
     return results
 
 def get_count(item):
+    """
+    Gets counts of different types of content based on `item` input string.
+    Valid values are: "inventories", "objects", "wiki-articles", "assets".
+    All other values for `item` return None
+    """
     if item == 'inventories':
-        counter = par_inventories.objects.count()
+        return par_inventories.objects.count()
 
     elif item == 'objects':
-        counter = par_objects.objects.count()
+        return par_objects.objects.count()
 
     elif item == 'wiki-articles':
-        wiki_user = 'api_bot'
-        wiki_pass = 'ouvyq9b'
-        base_url = 'http://dighist.fas.harvard.edu/projects/DALME/wiki/'
-        params = '?action=login&lgname=%s&lgpassword=%s&format=json'% (wiki_user,wiki_pass)
-        # Login request
-        r1 = requests.post(base_url+'api.php'+params)
-        token = r1.json()['login']['token']
-        params2 = params+'&lgtoken=%s'% token
-        r2 = requests.post(base_url+'api.php'+params2,cookies=r1.cookies)
-        r3 = requests.get(base_url+'api.php?action=query&meta=siteinfo&siprop=statistics&format=json',cookies=r2.cookies)
-        json_data = str(r3.json())
-        json_data = json_data.replace('\'', '\"')
-        stats = json.loads(json_data)
-        counter = stats['query']['statistics']['articles']
+        if 'WIKI_BOT_PASSWORD' in os.environ:
+            wiki_user = 'api_bot'
+            wiki_pass = os.environ['WIKI_BOT_PASSWORD']
+            base_url = 'http://dighist.fas.harvard.edu/projects/DALME/wiki/'
+            loginParams = {
+                "action": "login",
+                "lgname": wiki_user,
+                "lgpassword": wiki_pass,
+                "format": "json",
+            }
+            # Login request
+            r1 = requests.post(base_url+'api.php',params=loginParams)
+            loginParams['lgtoken'] = r1.json()['login']['token']
+            r2 = requests.post(base_url+'api.php',params=loginParams,cookies=r1.cookies)
+            queryParams = {
+                "action": "query",
+                "meta": "siteinfo",
+                "siprop": "statistics",
+                "format": "json",
+            }
+            r3 = requests.get(base_url+'api.php',params=queryParams,cookies=r2.cookies)
+            stats = r3.json()
+            return stats['query']['statistics']['articles']
+        else:
+            return None
 
     elif item == 'assets':
 
-        counter = 7342
+        return 7342
 
     else:
-        counter = None
-
-    return counter
+        return None
 
 def get_dam_preview(resource):
-    #private_key = '98d63d2457fee21dd6100d109422b890'
-    auth_key = 'eGV8SXt6bW97Lyx2eyF2JXxwLSYrISgnKiUiLi5xLXd7dCpwLHEgICAsLyIvJHskLncgJnwmKnB6cntyKSYlJX0neiArIysh'
-    #dam_user = 'api_bot'
-    #query = 'user=' + dam_user + '&function=do_search&param1=florence'
-    #sign = hashlib.sha256(private_key.encode('utf-8')+query.encode('utf-8'))
-    #req = 'http://dighist.fas.harvard.edu/projects/DALME/dam/plugins/api_core/?' + query + '&sign=' + sign.hexdigest()
-    base_url = 'http://dighist.fas.harvard.edu/projects/DALME/dam/plugins/api_search/?key='
-    query = auth_key + '&search=' + str(resource) + '&previewsize=scr'
-    req = base_url + query
-    r1 = requests.get(req)
-    json_data = str(r1.json())
-    json_data = json_data.replace('\'', '\"')
-    res = json.loads(json_data)
+    """
+    Returns the url for an image from the ResourceSpace Digital Asset Management
+    system for the given resource.
+    """
+    if 'DAM_BOT_KEY' in os.environ:
+        auth_key = os.environ['DAM_BOT_KEY']
+        queryParams = {
+            "key": auth_key,
+            "search": resource,
+            "previewsize": "scr"
+        }
+        base_url = 'http://dighist.fas.harvard.edu/projects/DALME/dam/plugins/api_search/'
+        r1 = requests.get(base_url, params=queryParams)
+        res = r1.json()
 
-    results = 'http://dighist.fas.harvard.edu' + res[0]['preview']
+        results = 'http://dighist.fas.harvard.edu' + res[0]['preview']
 
-    return results
+        return results
+    else:
+        return "#"
 
 def get_task_icon(list_id):
     if list_id == 1:
