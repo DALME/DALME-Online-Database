@@ -49,38 +49,7 @@ def uiref(request, module):
             'dropdowns': dropdowns(request.user.username)
         }
 
-    if module == 'dash_demo':
-        _url = 'UI_reference/dash_demo.html'
-
-    elif module == 'panels-wells':
-        _url = 'UI_reference/panels-wells.html'
-
-    elif module == 'buttons':
-        _url = 'UI_reference/buttons.html'
-
-    elif module == 'notifications':
-        _url = 'UI_reference/notifications.html'
-
-    elif module == 'typography':
-        _url = 'UI_reference/typography.html'
-
-    elif module == 'icons':
-        _url = 'UI_reference/icons.html'
-
-    elif module == 'grid':
-        _url = 'UI_reference/grid.html'
-
-    elif module == 'tables':
-        _url = 'UI_reference/tables.html'
-
-    elif module == 'flot':
-        _url = 'UI_reference/flot.html'
-
-    elif module == 'morris':
-        _url = 'UI_reference/morris.html'
-
-    elif module == 'forms':
-        _url = 'UI_reference/forms.html'
+    _url = 'UI_reference/{}.html'.format(module)
 
     return render(request, _url, context)
 
