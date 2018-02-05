@@ -2,86 +2,72 @@ from dalme_app import functions
 from django.core.urlresolvers import reverse
 from todo.models import Item, List, Comment
 from django.contrib.auth.models import User
+import json
+import os
 
 
 
-def sidebar_menu():
-    """ creates the sidebar menu """
+def sidebar_menu(template='sidebar_default.json'):
+    """Creates the sidebar menu based on a json file describing the menu items.
+    Menus are stored in the templates directory, under the menus subdirectory.
 
-    #this is an example of how a full, hierarchical menu would work
-    #the list includes these field : ['level', 'name', 'href', 'CSSicon', 'hasChildren', 'isLastSubmenu'], e.g.:
-    #menu = [
-        #['1', 'Top Level Test', '#', 'fa-question-circle', 'Yes', ''],
-        #    ['2', 'Second level 1', '#', 'fa-info-circle', 'No', ''],
-        #    ['2', 'Second level 2', '#', 'fa-info-circle', 'Yes', ''],
-        #        ['3', 'Third level 1', '#', '', 'No', ''],
-        #        ['3', 'Third level 2', '#', '', 'No', 'Last'],
-        #    ['2', 'Second level 3', '#', 'fa-info-circle', 'No', 'Last'],
-        #['1', 'Top Level Test 2', '#', 'fa-money', 'No', ''],
-        #]
-    inv_counter = str(functions.get_count('inventories'))
-    obj_counter = str(functions.get_count('objects'))
-    menu = [
-            ['0', 'section-first', 'Modules', 'fa-th'],
-            ['1c', 'Inventories', '/dashboard/list/inventories', 'fa-list', 'No', '', inv_counter],
-            ['1c', 'Objects', '/dashboard/list/objects', 'fa-beer', 'No', '', obj_counter],
-            ['0', 'section', 'Tools', 'fa-wrench'],
-            ['1', 'Bookmarks', '#', 'fa-bookmark', 'Yes', ''],
-                ['2', 'Wiki', 'http://dighist.fas.harvard.edu/projects/DALME/wiki', 'fa-book', 'No', ''],
-                ['2', 'DAM', 'http://dighist.fas.harvard.edu/projects/DALME/dam', 'fa-image', 'No', 'Last'],
-            ['1', 'Admin', '#', 'fa-group', 'Yes', ''],
-                ['2', 'Users', '#', 'fa-user', 'No', ''],
-                ['2', 'Website', '#', 'fa-globe', 'No', 'Last'],
-            ['1', 'Background Tasks', '/dashboard/list/tasks', 'fa-tasks', 'No', ''],
-            ]
+    Menu items may have the following properties:
+    text: Text to be shown in menu item.
+    iconClass: Class for Font Awesome icon.
+    section: If the menu item is a section marker, set this property to True.
+    link: Link for menu item
+    counter: Add a count of some kind to menu items. The value of this key will
+        be passed to the `functions.get_count()` function, and the return value
+        of that function will appear as the count.
+    children: Nest additional menu items as a list under this key.
 
+    All properties default to `None`, so if you don't want to include any
+    element, just leave out that key."""
+    template = os.path.join('dalme','dalme_app','templates','menus',template)
+    with open(template, 'r') as fp:
+        menu = json.load(fp)
 
-    results = []
     _output = ''
-    submenu = 0
 
     for item in menu:
-        if item[0] == '0':
-            _output = '<li class="sidebar-' + item[1] + '"><i class="fa ' + item[3] +' fa-fw"></i> ' + item[2] + '</li>'
+        _output += sidebar_menu_item(_output,**item)
 
-        else:
-            if item[4] == 'No':
-                if item[0] == '1c':
-                    _output = '<li><a href="' + item[2] + '"><i class="fa ' + item[3] +' fa-fw"></i> ' + item[1] + '<div class="menu-counter">' + item[6] + '</div></a></li>'
-                else:
-                    _output = '<li><a href="' + item[2] + '"><i class="fa ' + item[3] +' fa-fw"></i> ' + item[1] + '</a></li>'
+    return [_output]
 
-                if item[5] == 'Last' and submenu == 1:
-                    _output = _output + '</ul></li></ul></li>'
-                    submenu = 0
+LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
+def sidebar_menu_item(wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,children=None,section=None):
+    currentItem = '<li '
+    if section and wholeMenu == '':
+        currentItem += 'class="sidebar-section-first"'
+    elif section:
+        currentItem += 'class="sidebar-section"'
+    currentItem += '>'
+    if link:
+        currentItem += '<a href="{}">'.format(link)
+    if iconClass:
+        currentItem += '<i class="fa {} fa-fw"></i> '.format(iconClass)
+    if text:
+        currentItem += text
+    if counter:
+        counter = functions.get_count(counter)
+        currentItem += '<div class="menu-counter">{}</div>'.format(counter)
+    if children:
+        currentItem += '<span class="fa arrow"></span>'
+    if link:
+        currentItem += '</a>'
+    if children:
+        try:
+            currentItem += '<ul class="nav {}">'.format(LEVEL_LOOKUP[depth])
+        except IndexError:
+            print(depth)
+            currentItem += '<ul class="nav">'
+        for child in children:
+            currentItem += sidebar_menu_item(currentItem,depth=depth+1,**child)
+        currentItem += '</ul>'
+    currentItem += '</li>'
 
-                elif item[5] == 'Last' and submenu == 0:
-                    _output = _output + '</ul></li>'
+    return currentItem
 
-                else:
-                    _output = _output + '</li>'
-
-            elif item[4] == 'Yes':
-                _output = '<li><a href="' + item[2] + '"><i class="fa ' + item[3] +' fa-fw"></i> ' + item[1] + '<span class="fa arrow"></span></a>'
-
-                if item[0] == '1' or item[0] == '1c':
-                    _output = _output + '<ul class="nav nav-second-level">'
-
-                elif item[0] == '2':
-                    _output = _output + '<ul class="nav nav-third-level">'
-
-                elif item[0] == '3':
-                    _output = _output + '<ul class="nav nav-fourth-level">'
-
-                elif item[0] == '4':
-                    _output = _output + '<ul class="nav nav-fifth-level">'
-
-                if item[5] == 'Last':
-                    submenu = 1
-
-        results.append(_output)
-
-    return results
 
 def dropdowns(username):
     """ creates the top right dropdowns """

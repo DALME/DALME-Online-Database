@@ -1,0 +1,62 @@
+[{
+    "text": "Modules",
+    "iconClass": "fa-th",
+    "section": true
+  },
+  {
+    "text": "Inventories",
+    "link": "/dashboard/list/inventories",
+    "iconClass": "fa-list",
+    "counter": "inventories"
+  },
+  {
+    "text": "Objects",
+    "link": "/dashboard/list/objects",
+    "iconClass": "fa-beer",
+    "counter": "objects"
+  },
+  {
+    "text": "Tools",
+    "iconClass": "fa-wrench",
+    "section": true
+  },
+  {
+    "text": "Bookmarks",
+    "link": "#",
+    "iconClass": "fa-bookmark",
+    "children": [
+      {
+        "text": "Wiki",
+        "link": "http://dighist.fas.harvard.edu/projects/DALME/wiki",
+        "iconClass": "fa-book"
+      },
+      {
+        "text": "DAM",
+        "link": "http://dighist.fas.harvard.edu/projects/DALME/dam",
+        "iconClass": "fa-image"
+      }
+    ]
+  },
+  {
+    "text": "Admin",
+    "link": "#",
+    "iconClass": "fa-group",
+    "children": [
+      {
+        "text": "Users",
+        "link": "#",
+        "iconClass": "fa-user"
+      },
+      {
+        "text": "Website",
+        "link": "https://dalme.org",
+        "iconClass": "fa-globe"
+      }
+    ]
+  },
+  {
+    "text": "Background Tasks",
+    "link": "/dashboard/list/tasks",
+    "iconClass": "fa-tasks"
+  }
+]
