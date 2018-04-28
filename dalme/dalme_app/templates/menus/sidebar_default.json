@@ -5,13 +5,13 @@
   },
   {
     "text": "Inventories",
-    "link": "/dashboard/list/inventories",
+    "link": "/list/inventories",
     "iconClass": "fa-list",
     "counter": "inventories"
   },
   {
     "text": "Objects",
-    "link": "/dashboard/list/objects",
+    "link": "/list/objects",
     "iconClass": "fa-beer",
     "counter": "objects"
   },
@@ -56,7 +56,7 @@
   },
   {
     "text": "Background Tasks",
-    "link": "/dashboard/list/tasks",
+    "link": "/list/tasks",
     "iconClass": "fa-tasks"
   }
 ]

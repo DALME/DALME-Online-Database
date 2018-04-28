@@ -111,7 +111,7 @@ def list(request, item):
                     request.session['form_data'] = check
 
                     # redirect to inventory metadata form:
-                    return HttpResponseRedirect('/dashboard/form/inventory_metadata')
+                    return HttpResponseRedirect('/form/inventory_metadata')
 
             else:
                 functions.notification(request, 4003, data=form.errors)
@@ -126,7 +126,7 @@ def list(request, item):
 
             tr_class = ''
             row = [tr_class, (
-                '<td><a href="/dashboard/show/inventory/' + i._id + '">' + i.title + '</a></td>',
+                '<td><a href="/show/inventory/' + i._id + '">' + i.title + '</a></td>',
                 '<td>' + i.source + '</td>',
                 '<td>' + i.location + '</td>',
                 '<td>' + i.series + '</td>',
@@ -182,7 +182,7 @@ def list(request, item):
                 functions.notification(request, 2503, para={ 'code': str(e_code) })
 
                 # redirect to a new URL:
-                return HttpResponseRedirect('/dashboard/list/errors')
+                return HttpResponseRedirect('/list/errors')
 
             else:
                 functions.notification(request, 4003, data=form.errors)
@@ -286,7 +286,7 @@ def show(request, item, _id):
 
         if not folios:
             functions.notification(request, 4001)
-            return HttpResponseRedirect('/dashboard/list/inventories')
+            return HttpResponseRedirect('/list/inventories')
 
         else:
             context['page_title'] = 'DALME Dashboard | Inventory ' + inv.title
@@ -358,7 +358,7 @@ def form(request, item):
 
                 #redirect to inventories list with status message
                 functions.notification(request, 2001)
-                return HttpResponseRedirect('/dashboard/list/inventories')
+                return HttpResponseRedirect('/list/inventories')
 
             else:
                 functions.notification(request, 4003, data=form.errors)

@@ -29,7 +29,6 @@ DEBUG = True
 
 INSTALLED_APPS = [
     'dalme_app.apps.DalmeConfig',
-    # 'djangocms_admin_style',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,21 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'django.contrib.sites',
-    'cms',
+    #'cms',
     'menus',
     'treebeard',
     'sekizai',
     'todo',
-    'filer',
-    'easy_thumbnails',
-    'mptt',
-    'djangocms_text_ckeditor',
-    'djangocms_link',
-    'djangocms_file',
-    'djangocms_picture',
-    'djangocms_snippet',
-    'djangocms_style',
-    'djangocms_column',
+    #'filer',
+    #'easy_thumbnails',
+    #'mptt',
     'django_celery_results',
     'postman'
 ]
@@ -71,11 +63,11 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'cms.middleware.user.CurrentUserMiddleware',
-    'cms.middleware.page.CurrentPageMiddleware',
-    'cms.middleware.toolbar.ToolbarMiddleware',
-    'cms.middleware.language.LanguageCookieMiddleware',
-    'cms.middleware.utils.ApphookReloadMiddleware',
+    #'cms.middleware.user.CurrentUserMiddleware',
+    #'cms.middleware.page.CurrentPageMiddleware',
+    #'cms.middleware.toolbar.ToolbarMiddleware',
+    #'cms.middleware.language.LanguageCookieMiddleware',
+    #'cms.middleware.utils.ApphookReloadMiddleware',
     'async_messages.middleware.AsyncMiddleware',
 ]
 
@@ -93,7 +85,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'sekizai.context_processors.sekizai',
-                'cms.context_processors.cms_settings',
                 'postman.context_processors.inbox',
             ],
             'debug': DEBUG,
@@ -195,21 +186,6 @@ LOGIN_REDIRECT_URL = 'dashboard'
 #Settings for Task Manager
 
 TODO_STAFF_ONLY = True
-
-#Django CMS settings
-
-CMS_TEMPLATES = [
-    ('base.html', 'base project-wide page template'),
-]
-
-THUMBNAIL_HIGH_RESOLUTION = True
-
-THUMBNAIL_PROCESSORS = (
-    'easy_thumbnails.processors.colorspace',
-    'easy_thumbnails.processors.autocrop',
-    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
-    'easy_thumbnails.processors.filters'
-)
 
 CELERY_RESULT_BACKEND = 'django-db'
 

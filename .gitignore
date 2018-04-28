@@ -6,6 +6,7 @@ staticfiles
 db.cnf
 db-test.cnf
 *.DS_Store
+data
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
