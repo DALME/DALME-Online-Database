@@ -128,20 +128,23 @@ def dropdowns(username):
 
         ],
         ['fa fa-gears', 'dropdown-dev', [
-                ['1', '/dashboard/list/errors', 'fa fa-medkit', 'Error codes'],
+                ['1', '/list/errors', 'fa fa-medkit', 'Error codes'],
                 ['divider'],
                 ['0', '#', 'fa fa-list-alt', 'UI Reference:'],
-                ['1', '/dashboard/UIref/dash_demo', 'fa fa-dot-circle-o', 'Dashboard Content'],
-                ['1', '/dashboard/UIref/panels-wells', 'fa fa-dot-circle-o', 'Panels and Wells'],
-                ['1', '/dashboard/UIref/buttons', 'fa fa-dot-circle-o', 'Buttons'],
-                ['1', '/dashboard/UIref/notifications', 'fa fa-dot-circle-o', 'Notifications'],
-                ['1', '/dashboard/UIref/typography', 'fa fa-dot-circle-o', 'Typography'],
-                ['1', '/dashboard/UIref/icons', 'fa fa-dot-circle-o', 'Icons'],
-                ['1', '/dashboard/UIref/grid', 'fa fa-dot-circle-o', 'Grid'],
-                ['1', '/dashboard/UIref/tables', 'fa fa-dot-circle-o', 'Tables'],
-                ['1', '/dashboard/UIref/flot', 'fa fa-dot-circle-o', 'Flot Charts'],
-                ['1', '/dashboard/UIref/morris', 'fa fa-dot-circle-o', 'Morris.js Charts'],
-                ['1', '/dashboard/UIref/forms', 'fa fa-dot-circle-o', 'Forms'],
+                ['1', '/UIref/dash_demo', 'fa fa-dot-circle-o', 'Dashboard Content'],
+                ['1', '/UIref/panels-wells', 'fa fa-dot-circle-o', 'Panels and Wells'],
+                ['1', '/UIref/buttons', 'fa fa-dot-circle-o', 'Buttons'],
+                ['1', '/UIref/notifications', 'fa fa-dot-circle-o', 'Notifications'],
+                ['1', '/UIref/typography', 'fa fa-dot-circle-o', 'Typography'],
+                ['1', '/UIref/icons', 'fa fa-dot-circle-o', 'Icons'],
+                ['1', '/UIref/grid', 'fa fa-dot-circle-o', 'Grid'],
+                ['1', '/UIref/tables', 'fa fa-dot-circle-o', 'Tables'],
+                ['1', '/UIref/flot', 'fa fa-dot-circle-o', 'Flot Charts'],
+                ['1', '/UIref/morris', 'fa fa-dot-circle-o', 'Morris.js Charts'],
+                ['1', '/UIref/forms', 'fa fa-dot-circle-o', 'Forms'],
+                ['divider'],
+                ['0', '#', 'fa fa-gear', 'Dev Commands:'],
+                ['1', '/cmd/import_sources', 'fa fa-dot-circle-o', 'Import Sources CSV'],
             ]
         ],
         ['fa fa-user', 'dropdown-user', [
@@ -157,7 +160,7 @@ def dropdowns(username):
     tasks = Item.objects.filter(assigned_to=user_id, completed=False).order_by('-created_date')[:5]
     for i in tasks:
         task_icon = functions.get_task_icon(i.list_id)
-        task_url = '/dashboard/tasks/task/' + str(i.id)
+        task_url = '/tasks/task/' + str(i.id)
         creator_id = i.created_by_id
         task_creator = User.objects.get(id=creator_id).username
         date_created = i.created_date.strftime('%a, %-d %b, %Y')
