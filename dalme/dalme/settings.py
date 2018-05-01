@@ -45,12 +45,12 @@ INSTALLED_APPS = [
     'menus',
     'treebeard',
     'sekizai',
-    'todo',
+    #'todo',
     #'filer',
     #'easy_thumbnails',
     #'mptt',
     'django_celery_results',
-    'postman'
+    #'postman'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -85,7 +85,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'sekizai.context_processors.sekizai',
-                'postman.context_processors.inbox',
+                #'postman.context_processors.inbox',
             ],
             'debug': DEBUG,
         },
@@ -184,8 +184,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'dashboard'
 
 #Settings for Task Manager
-
-TODO_STAFF_ONLY = True
+#TODO_STAFF_ONLY = True
 
 CELERY_RESULT_BACKEND = 'django-db'
 
@@ -196,6 +195,6 @@ CACHES = {
     }
 }
 
-POSTMAN_DISALLOW_ANONYMOUS = True
-POSTMAN_DISABLE_USER_EMAILING = True
-POSTMAN_AUTO_MODERATE_AS = True
+#POSTMAN_DISALLOW_ANONYMOUS = True
+#POSTMAN_DISABLE_USER_EMAILING = True
+#POSTMAN_AUTO_MODERATE_AS = True

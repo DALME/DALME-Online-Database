@@ -17,33 +17,32 @@ class attribute_types(dalmeIntid):
 
 class attributes(dalmeUuid):
     attribute_type = models.IntegerField()
-    content_id = models.CharField(max_length=32)
+    content_id = models.UUIDField()
 
 class attributes_DATE(dalmeBasic):
-    attribute_id = models.ForeignKey('attributes', to_field='id', max_length=32)
-    value = models.DateField(auto_now=False, auto_now_add=False)
+    attribute_id = models.ForeignKey('attributes', to_field='id')
+    value = models.CharField(max_length=255)
     value_day = models.IntegerField()
     value_month = models.IntegerField()
     value_year = models.IntegerField()
 
 class attributes_DBR(dalmeBasic):
-    attribute_id = models.ForeignKey('attributes', to_field='id', max_length=32)
+    attribute_id = models.ForeignKey('attributes', to_field='id')
     value = models.CharField(max_length=32)
 
 class attributes_INT(dalmeBasic):
-    attribute_id = models.ForeignKey('attributes', to_field='id', max_length=32)
+    attribute_id = models.ForeignKey('attributes', to_field='id')
     value = models.IntegerField()
 
 class attributes_STR(dalmeBasic):
-    attribute_id = models.ForeignKey('attributes', to_field='id', max_length=32)
+    attribute_id = models.ForeignKey('attributes', to_field='id')
     value = models.CharField(max_length=255)
 
 class attributes_TXT(dalmeBasic):
-    attribute_id = models.ForeignKey('attributes', to_field='id', max_length=32)
+    attribute_id = models.ForeignKey('attributes', to_field='id')
     value = models.TextField()
 
 class concepts(dalmeUuid):
-    id = models.CharField(primary_key=True, max_length=32, unique=True)
     getty_id = models.IntegerField()
 
 class content_classes(dalmeIntid):
@@ -65,15 +64,15 @@ class content_types_x_attribute_types(dalmeBasic):
 class headwords(dalmeUuid):
     word = models.CharField(max_length=55)
     full_lemma = models.CharField(max_length=255)
-    concept_id = models.ForeignKey('concepts', to_field='id', max_length=32)
+    concept_id = models.ForeignKey('concepts', to_field='id')
 
 class objects(dalmeUuid):
-    concept_id = models.CharField(max_length=32)
-    object_phrase_id = models.ForeignKey('object_phrases', to_field='id', max_length=32)
+    concept_id = models.UUIDField()
+    object_phrase_id = models.ForeignKey('object_phrases', to_field='id')
 
 class object_attributes(dalmeBasic):
-    object_id = models.ForeignKey('objects', to_field='id', max_length=32)
-    concept_id = models.CharField(max_length=32)
+    object_id = models.ForeignKey('objects', to_field='id')
+    concept_id = models.UUIDField()
 
 class places(dalmeUuid):
     type = models.IntegerField()
@@ -82,43 +81,43 @@ class sources(dalmeUuid):
     type = models.IntegerField()
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
-    parent_source = models.CharField(max_length=32)
+    parent_source = models.UUIDField()
     is_inventory = models.BooleanField(default=False)
 
 class pages(dalmeUuid):
-    source_id = models.ForeignKey('sources', to_field='id', max_length=32)
+    source_id = models.ForeignKey('sources', to_field='id')
     name = models.CharField(max_length=55)
     dam_id = models.IntegerField()
     order = models.IntegerField()
 
 class transcriptions(dalmeUuid):
-    source_id = models.ForeignKey('sources', to_field='id', max_length=32)
+    source_id = models.ForeignKey('sources', to_field='id')
     transcription = models.TextField()
 
 class identity_phrases(dalmeUuid):
-    transcription_id = models.ForeignKey('transcriptions', to_field='id', max_length=32)
+    transcription_id = models.ForeignKey('transcriptions', to_field='id')
     phrase = models.TextField()
 
 class object_phrases(dalmeUuid):
-    transcription_id = models.ForeignKey('transcriptions', to_field='id', max_length=32)
+    transcription_id = models.ForeignKey('transcriptions', to_field='id')
     phrase = models.TextField()
 
 class word_forms(dalmeUuid):
     normalized_form = models.CharField(max_length=55)
     pos = models.CharField(max_length=255)
-    headword_id = models.ForeignKey('headwords', to_field='id', max_length=32)
+    headword_id = models.ForeignKey('headwords', to_field='id')
 
 class tokens(dalmeUuid):
-    object_phrase_id = models.ForeignKey('object_phrases', to_field='id', max_length=32)
-    word_form_id = models.ForeignKey('word_forms', to_field='id', max_length=32)
+    object_phrase_id = models.ForeignKey('object_phrases', to_field='id')
+    word_form_id = models.ForeignKey('word_forms', to_field='id')
     raw_token = models.CharField(max_length=255)
     clean_token = models.CharField(max_length=55)
     order = models.IntegerField()
     flags = models.CharField(max_length=10)
 
 class identity_phrases_x_entities(dalmeBasic):
-    identity_phrase_id = models.ForeignKey('identity_phrases', to_field='id', max_length=32)
-    entity_id = models.CharField(max_length=32)
+    identity_phrase_id = models.ForeignKey('identity_phrases', to_field='id')
+    entity_id = models.UUIDField()
 
 #app management models
 class error_messages(dalmeBasic):

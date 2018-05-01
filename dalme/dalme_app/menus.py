@@ -1,6 +1,5 @@
 from dalme_app import functions
 from django.core.urlresolvers import reverse
-from todo.models import Item, List, Comment
 from django.contrib.auth.models import User
 import json
 import os
@@ -118,17 +117,12 @@ def dropdowns(username):
     logout = 'Logout ' + username
 
     dropdowns = [
-        ['fa fa-tasks', 'dropdown-task-list', [
-                ['1', reverse('todo-lists'), 'fa fa-plus-circle', 'Add New Task'],
-                ['divider'],
-                ['1', reverse('todo-lists'), 'fa fa-info-circle', 'Manage Task Lists'],
-                ['1', reverse('todo-lists'), 'fa fa-check-circle', 'View Tasks Log'],
-                ['divider'],
-                ['0', '#', 'fa fa-star', 'My Tasks:'],
+        ['fa fa-gear', 'dropdown-scripts', [
+                ['1', '/script/import_sources', 'fa fa-gears', 'Import Sources CSV'],
             ]
 
         ],
-        ['fa fa-gears', 'dropdown-dev', [
+        ['fa fa-list-alt', 'dropdown-ref', [
                 ['1', '/list/errors', 'fa fa-medkit', 'Error codes'],
                 ['divider'],
                 ['0', '#', 'fa fa-list-alt', 'UI Reference:'],
@@ -143,9 +137,6 @@ def dropdowns(username):
                 ['1', '/UIref/flot', 'fa fa-dot-circle-o', 'Flot Charts'],
                 ['1', '/UIref/morris', 'fa fa-dot-circle-o', 'Morris.js Charts'],
                 ['1', '/UIref/forms', 'fa fa-dot-circle-o', 'Forms'],
-                ['divider'],
-                ['0', '#', 'fa fa-gear', 'Dev Commands:'],
-                ['1', '/cmd/import_sources', 'fa fa-dot-circle-o', 'Import Sources CSV'],
             ]
         ],
         ['fa fa-user', 'dropdown-user', [
@@ -158,20 +149,6 @@ def dropdowns(username):
     ]
 
     user_id = User.objects.get(username=username).pk
-    tasks = Item.objects.filter(assigned_to=user_id, completed=False).order_by('-created_date')[:5]
-    for i in tasks:
-        task_icon = functions.get_task_icon(i.list_id)
-        task_url = '/tasks/task/' + str(i.id)
-        creator_id = i.created_by_id
-        task_creator = User.objects.get(id=creator_id).username
-        date_created = i.created_date.strftime('%a, %-d %b, %Y')
-        date_due = i.due_date.strftime('%a, %-d %b, %Y')
-        task_item = ['2', task_url, task_icon, i.title, str(i.id), date_created, date_due, task_creator]
-        dropdowns[0][2].append(task_item)
-
-    close_tasks = ['3', reverse('todo-mine'), 'See All']
-    dropdowns[0][2].append(close_tasks)
-
     results = []
     _output = ''
 
@@ -198,11 +175,7 @@ def dropdowns(username):
             elif menu[0] == '3':
                 _output = _output + '<li class="divider"></li><li><a class="text-center" href="' + menu[1] + '"><strong>' + menu[2] + ' </strong><i class="fa fa-angle-right"></i></a></li>'
 
-
-        if dropdowns[0][0] == 'fa fa-tasks':
-            _output = _output + '</form></ul></li>'
-        else:
-            _output = _output + '</ul></li>'
+        _output = _output + '</ul></li>'
 
         results.append(_output)
 

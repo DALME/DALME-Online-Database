@@ -4,16 +4,14 @@ from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-#from .models import predicates, tokens, sources, predicate_labels, source_attributes
 import requests, uuid
 from .menus import sidebar_menu, dropdowns
 from .forms import upload_file, new_error, inventory_metadata
 from dalme_app import functions, scripts
-from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
+from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, agents, attribute_types, attributes, attributes_DATE, attributes_DBR, attributes_INT, attributes_STR, attributes_TXT, concepts, content_classes, content_types, content_types_x_attribute_types, headwords, objects, object_attributes, places, sources, pages, transcriptions, identity_phrases, object_phrases, word_forms, tokens, identity_phrases_x_entities
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dalme_app.tasks import parse_inventory
 from django_celery_results.models import TaskResult
-from postman.views import InboxView, SentView, ArchivesView, TrashView, WriteView, ReplyView, MessageView, ConversationView, ArchiveView, DeleteView, UndeleteView, MarkReadView, MarkUnreadView
 
 #import re
 
@@ -384,23 +382,6 @@ def form(request, item):
     context['panel_icon'] = panel_icon
     context['form'] = form
     context['req_text'] = req_text
-
-    return render(request, _url, context)
-
-@login_required
-def messaging(request, *args, **kwargs):
-    _url = 'postman/inbox.html'
-    item = kwargs['item']
-    if item == 'inbox':
-            InboxView.as_view()
-
-    context = {
-            'page_title':'DALME Dashboard Demo',
-            'authenticated': request.user.is_authenticated,
-            'username': request.user.username,
-            'sidebar': sidebar_menu(),
-            'dropdowns': dropdowns(request.user.username)
-        }
 
     return render(request, _url, context)
 

@@ -470,3 +470,9 @@ def get_task_icon(list_id):
         icon = 'fa-gears'
 
     return icon
+
+def get_date_from_elements(day, month, year):
+    #do some stuff
+    output = 'some stuff'
+
+    return output
