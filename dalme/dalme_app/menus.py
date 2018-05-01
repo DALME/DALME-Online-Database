@@ -40,6 +40,7 @@ def sidebar_menu(template='sidebar_default.json'):
     return [_output]
 
 LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
+
 def sidebar_menu_item(wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
     """
     Generates a menu item and incorporates it into `whoeleMenu`. This function

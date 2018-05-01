@@ -8,7 +8,7 @@ from django.contrib import messages
 import requests, uuid
 from .menus import sidebar_menu, dropdowns
 from .forms import upload_file, new_error, inventory_metadata
-from dalme_app import functions
+from dalme_app import functions, scripts
 from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dalme_app.tasks import parse_inventory
@@ -405,13 +405,13 @@ def messaging(request, *args, **kwargs):
     return render(request, _url, context)
 
 @login_required
-def cmd(request, module):
+def script(request, module):
     username = request.user.username
     if module == 'import_sources':
-        output = functions.import_sources(username)
+        output = scripts.import_sources_csv(username)
 
     context = {
-            'page_title':'DALME Command Execution',
+            'page_title':'DALME Script Results',
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
             'sidebar': sidebar_menu(),
@@ -420,6 +420,6 @@ def cmd(request, module):
             'output': output
         }
 
-    _url = 'cmd.html'
+    _url = 'script_results.html'
 
     return render(request, _url, context)
