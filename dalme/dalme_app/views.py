@@ -390,6 +390,8 @@ def script(request, module):
     username = request.user.username
     if module == 'import_sources':
         output = scripts.import_sources_csv(username)
+        if output == 'ok':
+            functions.notification(request, 2501)
 
     context = {
             'page_title':'DALME Script Results',
