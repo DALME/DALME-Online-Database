@@ -118,7 +118,8 @@ def dropdowns(username):
 
     dropdowns = [
         ['fa fa-gear', 'dropdown-scripts', [
-                ['1', '/script/import_sources', 'fa fa-gears', 'Import Sources CSV'],
+                ['1', '/script/import_sources_csv', 'fa fa-gears', 'Import Sources CSV'],
+                ['1', '/script/test_expression', 'fa fa-gears', 'Test Expression'],
             ]
 
         ],

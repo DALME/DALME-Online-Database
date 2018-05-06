@@ -1,9 +1,10 @@
 import re, json, requests, hashlib, os, uuid, calendar
 import pandas as pd
 from django.contrib import messages
-from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, agents, attribute_types, attributes, attributes_DATE, attributes_DBR, attributes_INT, attributes_STR, attributes_TXT, concepts, content_classes, content_types, content_types_x_attribute_types, headwords, objects, object_attributes, places, sources, pages, transcriptions, identity_phrases, object_phrases, word_forms, tokens, identity_phrases_x_entities
+from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
 from django.contrib.auth.models import User
 from async_messages import message_user
+from django.db.models import Q
 #from django.contrib.staticfiles.templatetags.staticfiles import static as _static
 #local files for testing
 #input_file_name = 'AM_FF_501.txt'
@@ -400,11 +401,23 @@ def bar_chart():
 def get_count(item):
     """
     Gets counts of different types of content based on `item` input string.
-    Valid values are: "inventories", "objects", "wiki-articles", "assets".
+    Valid values are: "inventories", "objects", "wiki-articles", "assets", "notarial_sources", "sources", "biblio_sources", "archives".
     All other values for `item` return None
     """
     if item == 'inventories':
-        return par_inventories.objects.count()
+        return Sources.objects.filter(is_inventory=True).count()
+
+    elif item == 'archives':
+        return Sources.objects.filter(type=19).count()
+
+    elif item == 'sources':
+        return Sources.objects.count()
+
+    elif item == 'notarial_sources':
+        return Sources.objects.filter(Q(type=12) | Q(type=13)).count()
+
+    elif item == 'biblio_sources':
+        return Sources.objects.filter(type__lte=11).count()
 
     elif item == 'objects':
         return par_objects.objects.count()
@@ -477,13 +490,13 @@ def get_date_from_elements(day, month, year):
         if month:
             month_name = calendar.month_name[abs(int(month))]
             if day:
-                output = str(abs(int(day))) + ' ' + month_name + ' ' + str(abs(int(year)))
+                output = str(abs(int(day))) + ' ' + month_name + ', ' + str(abs(int(year)))
 
             else:
                 output = month_name + ' ' + str(abs(int(year)))
         else:
             output = str(abs(int(year)))
     else:
-        output = 'n/d'
+        output = ''
 
     return output

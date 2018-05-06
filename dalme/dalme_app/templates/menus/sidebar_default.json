@@ -4,10 +4,45 @@
     "section": true
   },
   {
-    "text": "Inventories",
-    "link": "/list/inventories",
-    "iconClass": "fa-list",
-    "counter": "inventories"
+    "text": "Sources",
+    "link": "#",
+    "iconClass": "fa-bookmark",
+    "children": [
+      {
+        "text": "All",
+        "link": "/list/sources/all",
+        "iconClass": "fa-list",
+        "counter": "sources"
+      },
+
+      {
+        "text": "Acts & Registers",
+        "link": "/list/sources/notarial",
+        "iconClass": "fa-list",
+        "counter": "notarial_sources"
+      },
+
+      {
+        "text": "Inventories",
+        "link": "/list/sources/inventories",
+        "iconClass": "fa-list",
+        "counter": "inventories"
+      },
+
+      {
+        "text": "Bibliographic",
+        "link": "/list/sources/biblio",
+        "iconClass": "fa-list",
+        "counter": "biblio_sources"
+      },
+
+      {
+        "text": "Archives & Collections",
+        "link": "/list/sources/archives",
+        "iconClass": "fa-list",
+        "counter": "archives"
+      }
+    ]
   },
   {
     "text": "Objects",

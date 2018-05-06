@@ -8,10 +8,11 @@ import requests, uuid
 from .menus import sidebar_menu, dropdowns
 from .forms import upload_file, new_error, inventory_metadata
 from dalme_app import functions, scripts
-from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, agents, attribute_types, attributes, attributes_DATE, attributes_DBR, attributes_INT, attributes_STR, attributes_TXT, concepts, content_classes, content_types, content_types_x_attribute_types, headwords, objects, object_attributes, places, sources, pages, transcriptions, identity_phrases, object_phrases, word_forms, tokens, identity_phrases_x_entities
+from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dalme_app.tasks import parse_inventory
 from django_celery_results.models import TaskResult
+from django.db.models import Q
 
 #import re
 
@@ -52,19 +53,18 @@ def uiref(request, module):
     return render(request, _url, context)
 
 @login_required
-def list(request, item):
+def list(request, module, type='all'):
     _url = 'list.html'
     table_options = ''
     username = request.user.username
     context = {}
-    if item == 'inventories':
-        _title = 'DALME Dashboard | List Inventories'
-        _heading = 'Inventories'
-        panel_title = 'List of inventories'
+    if module == 'sources':
+        _title = 'DALME Dashboard | Sources'
+        _heading = 'Sources'
         panel_icon = 'fa-list'
         context['has_actions'] = 1
         context['actions'] = (
-            ('href="#import" data-toggle="modal" data-target="#import"', 'Import Inventory'),
+            ('href="#import" data-toggle="modal" data-target="#import"', 'Add new source'),
             ('divider', ' '),
             ('href="#"', 'Action 2'),
             ('href="#"', 'Action 3'),
@@ -72,7 +72,7 @@ def list(request, item):
         context['has_modals'] = 1
         context['modals'] = [
             ('import', [
-                'Import Inventory',
+                'Add New Source',
                 'form',
                 'Submit',
                 'type="submit" form="import-form"'
@@ -117,23 +117,76 @@ def list(request, item):
             form = upload_file()
 
         context['form'] = form
-        headers = ['Title', 'Source', 'Location', 'Series', 'Shelf', 'Transcriber']
-        inventories = par_inventories.objects.all()
-        rows = []
-        for i in inventories:
+        types = Content_types.objects.filter(content_class=1)
+        types_dict = {}
+        for t in types:
+            types_dict[t.id] = t.name
 
-            tr_class = ''
-            row = [tr_class, (
-                '<td><a href="/show/inventory/' + str(i.id) + '">' + i.title + '</a></td>',
-                '<td>' + i.source + '</td>',
-                '<td>' + i.location + '</td>',
-                '<td>' + i.series + '</td>',
-                '<td>' + i.shelf + '</td>',
-                '<td>' + i.transcriber + '</td>')
-            ]
-            rows.append(row)
+        if type == 'all':
+            panel_title = 'List of all sources'
+            headers = ['Type', 'Title']
+            sources_list = Sources.objects.all().order_by('type','short_name')
+            rows = []
 
-    elif item == 'errors':
+            for i in sources_list:
+                tr_class = ''
+
+                if i.type <= 11:
+                    title = i.short_name
+                else:
+                    title = i.name
+
+                type = types_dict.get(i.type,'n/a')
+                row = [tr_class, (
+                    '<td>' + type + '</td>',
+                    '<td><a href="/show/source/' + str(i.id) + '">' + title + '</a></td>',
+                    )
+                ]
+                rows.append(row)
+
+        elif type == 'notarial':
+            panel_title = 'List of notarial sources (acts and registers)'
+
+        elif type == 'inventories':
+            panel_title = 'List of inventories'
+            headers = ['Type', 'Title','Start Date','End Date','Source']
+            inventories = Sources.objects.filter(is_inventory=True).order_by('short_name')
+            dates_list = Attributes_DATE.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=25) | Q(attribute_id__attribute_type=26))
+            types_list = Attributes_STR.objects.select_related('attribute_id').filter(attribute_id__attribute_type=28)
+
+
+        elif type == 'biblio':
+            panel_title = 'List of bibliographic sources'
+            headers = ['Type', 'Title']
+            biblio_sources = Sources.objects.filter(type__lte=11).order_by('short_name')
+            attribute_list = Attributes_STR.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=15) | Q(attribute_id__attribute_type=1))
+            rows = []
+
+            for i in biblio_sources:
+                tr_class = ''
+                title = i.name + '</a>'
+                atts = attribute_list.filter(attribute_id__content_id=i.id)
+                if atts:
+                    lang_buttons = ''
+                    for a in atts:
+                        language = a.value
+                        l_button = '<div class="list_inrow_button">' + language + '</div>'
+                        lang_buttons = lang_buttons + l_button
+                    title = title + lang_buttons
+
+                type = types_dict.get(i.type,'n/a')
+                row = [tr_class, (
+                    '<td>' + type + '</td>',
+                    '<td><a href="/show/source/' + str(i.id) + '">' + title + '</td>',
+                    )
+                ]
+                rows.append(row)
+
+        elif type == 'archives':
+            panel_title = 'List of archives and collections'
+
+
+    elif module == 'errors':
         _title = 'DALME Dashboard | Errors and Notifications'
         _heading = 'Errors and Notifications'
         panel_title = 'List of error and notification codes'
@@ -207,7 +260,7 @@ def list(request, item):
             ]
             rows.append(row)
 
-    elif item == 'objects':
+    elif module == 'objects':
         _title = 'DALME Dashboard | List Objects'
         _heading = 'Objects'
         panel_title = 'List of Objects'
@@ -232,7 +285,7 @@ def list(request, item):
             ]
             rows.append(row)
 
-    elif item == 'tasks':
+    elif module == 'tasks':
         _title = 'DALME Dashboard | Background Tasks Manager'
         _heading = 'Background Tasks'
         panel_title = 'List of Task Results'
@@ -262,7 +315,7 @@ def list(request, item):
     context['page_title'] = _title
     context['authenticated'] = request.user.is_authenticated
     context['username'] = username
-    context['item'] = item.title()
+    context['item'] = 'THIS IS WHERE ITEM TITLE GOES'
     context['heading'] = _heading
     context['sidebar'] = sidebar_menu()
     context['dropdowns'] = dropdowns(request.user.username)
@@ -388,10 +441,7 @@ def form(request, item):
 @login_required
 def script(request, module):
     username = request.user.username
-    if module == 'import_sources':
-        output = scripts.import_sources_csv(username)
-        if output == 'ok':
-            functions.notification(request, 2501)
+    output = eval('scripts.' + module + '(username)')
 
     context = {
             'page_title':'DALME Script Results',
