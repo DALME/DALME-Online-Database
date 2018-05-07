@@ -10,3 +10,4 @@ celery==4.1.0
 django-celery-results==1.0.1
 django-async-messages==0.3.1
 django-postman==3.5.1
+pandas==0.22.0
