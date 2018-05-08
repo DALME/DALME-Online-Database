@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'treebeard',
     'sekizai',
     'django_celery_results',
-    'sslserver'
+    #'sslserver'
 ]
 
 MIDDLEWARE_CLASSES = [
