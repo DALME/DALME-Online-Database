@@ -11,3 +11,4 @@ django-celery-results==1.0.1
 django-async-messages==0.3.1
 django-postman==3.5.1
 pandas==0.22.0
+django-warrant==0.1.0

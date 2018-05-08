@@ -20,7 +20,8 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "k2%bwjntazcdlw#5seag!82%caia3&9e1$g=%=58ydm@*x3zrv"
+
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,16 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'django.contrib.sites',
-    #'cms',
-    'menus',
     'treebeard',
     'sekizai',
-    #'todo',
-    #'filer',
-    #'easy_thumbnails',
-    #'mptt',
     'django_celery_results',
-    #'postman'
+    'sslserver'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -63,11 +58,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    #'cms.middleware.user.CurrentUserMiddleware',
-    #'cms.middleware.page.CurrentPageMiddleware',
-    #'cms.middleware.toolbar.ToolbarMiddleware',
-    #'cms.middleware.language.LanguageCookieMiddleware',
-    #'cms.middleware.utils.ApphookReloadMiddleware',
     'async_messages.middleware.AsyncMiddleware',
 ]
 
@@ -85,7 +75,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'sekizai.context_processors.sekizai',
-                #'postman.context_processors.inbox',
             ],
             'debug': DEBUG,
         },
@@ -93,6 +82,22 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'dalme.wsgi.application'
+
+#authentication backends - GHP: for setting up cognito
+AUTHENTICATION_BACKENDS = [
+    'django_warrant.backend.CognitoBackend',
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+#GHP: settings Amazon cognito
+COGNITO_USER_POOL_ID = os.environ['COGNITO_USER_POOL_ID']
+COGNITO_APP_ID = os.environ['COGNITO_APP_ID']
+COGNITO_ATTR_MAPPING = {
+    'email': 'email',
+    'given_name': 'first_name',
+    'family_name': 'last_name',
+    'preferred_username': 'username',
+}
 
 
 # Database
@@ -184,8 +189,11 @@ SITE_ID = 1
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'dashboard'
 
-#Settings for Task Manager
-#TODO_STAFF_ONLY = True
+#HTTPS/SSL settings
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 
 CELERY_RESULT_BACKEND = 'django-db'
 
@@ -195,7 +203,3 @@ CACHES = {
         'LOCATION': 'cache_table',
     }
 }
-
-#POSTMAN_DISALLOW_ANONYMOUS = True
-#POSTMAN_DISABLE_USER_EMAILING = True
-#POSTMAN_AUTO_MODERATE_AS = True
