@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'treebeard',
     'sekizai',
     'django_celery_results',
-    #'sslserver'
+    #'sslserver',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 #authentication backends - GHP: for setting up cognito
 AUTHENTICATION_BACKENDS = [
     'django_warrant.backend.CognitoBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    #'django.contrib.auth.backends.ModelBackend'
 ]
 
 #GHP: settings Amazon cognito
@@ -99,6 +99,7 @@ COGNITO_ATTR_MAPPING = {
     'preferred_username': 'username',
 }
 
+#SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -157,9 +158,6 @@ USE_TZ = True
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
 
@@ -193,7 +191,8 @@ LOGIN_REDIRECT_URL = 'dashboard'
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CELERY_RESULT_BACKEND = 'django-db'
 

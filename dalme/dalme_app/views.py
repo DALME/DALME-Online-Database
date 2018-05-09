@@ -14,7 +14,6 @@ from dalme_app.tasks import parse_inventory
 from django_celery_results.models import TaskResult
 from django.db.models import Q
 
-#import re
 
 @login_required
 def index(request):
