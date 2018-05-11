@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'sekizai',
     'django_celery_results',
     #'sslserver',
+    'allaccess',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -85,7 +86,8 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 
 #authentication backends - GHP: for setting up cognito
 AUTHENTICATION_BACKENDS = [
-    'django_warrant.backend.CognitoBackend',
+    'allaccess.backends.AuthorizedServiceBackend',
+    #'django_warrant.backend.CognitoBackend',
     #'django.contrib.auth.backends.ModelBackend'
 ]
 
@@ -184,8 +186,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 SITE_ID = 1
 
 #authentication settings
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_URL = '/accounts/login/dalme_wp/'
+LOGIN_REDIRECT_URL = '/accounts/callback/dalme_wp/'
 
 #HTTPS/SSL settings
 SECURE_SSL_REDIRECT = True
