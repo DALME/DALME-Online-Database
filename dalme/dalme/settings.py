@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 AUTHENTICATION_BACKENDS = [
     'allaccess.backends.AuthorizedServiceBackend',
     #'django_warrant.backend.CognitoBackend',
-    #'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend'
 ]
 
 #GHP: settings Amazon cognito
@@ -187,7 +187,7 @@ SITE_ID = 1
 
 #authentication settings
 LOGIN_URL = '/accounts/login/dalme_wp/'
-LOGIN_REDIRECT_URL = '/accounts/callback/dalme_wp/'
+LOGIN_REDIRECT_URL = 'dashboard'
 
 #HTTPS/SSL settings
 SECURE_SSL_REDIRECT = True
