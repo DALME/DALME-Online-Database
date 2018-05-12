@@ -1,11 +1,30 @@
-from django.db import models
-from .modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
 import uuid
+from django.db import models
+from django.contrib.auth.models import User
+from .modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
+#function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():
     the_id = uuid.uuid4().hex
     return the_id
 
+#one-to-one extension of user model to accomodate full_name (used by WP-OAuth)
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=50, blank=True)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+#DALME data store
 class Agents(dalmeUuid):
     type = models.IntegerField()
 

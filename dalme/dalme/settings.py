@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     'treebeard',
     'sekizai',
     'django_celery_results',
-    #'sslserver',
     'allaccess',
+    #'sslserver',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -84,22 +84,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dalme.wsgi.application'
 
-#authentication backends - GHP: for setting up cognito
+#authentication backends
 AUTHENTICATION_BACKENDS = [
     'allaccess.backends.AuthorizedServiceBackend',
-    #'django_warrant.backend.CognitoBackend',
     'django.contrib.auth.backends.ModelBackend'
 ]
 
-#GHP: settings Amazon cognito
-COGNITO_USER_POOL_ID = os.environ['COGNITO_USER_POOL_ID']
-COGNITO_APP_ID = os.environ['COGNITO_APP_ID']
-COGNITO_ATTR_MAPPING = {
-    'email': 'email',
-    'given_name': 'first_name',
-    'family_name': 'last_name',
-    'preferred_username': 'username',
-}
+#authentication settings
+LOGIN_URL = 'accounts/login/dalme_wp/'
+LOGIN_REDIRECT_URL = '/'
 
 #SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
@@ -185,16 +178,12 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SITE_ID = 1
 
-#authentication settings
-LOGIN_URL = '/accounts/login/dalme_wp/'
-LOGIN_REDIRECT_URL = 'dashboard'
-
 #HTTPS/SSL settings
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CELERY_RESULT_BACKEND = 'django-db'
 

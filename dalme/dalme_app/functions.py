@@ -10,7 +10,7 @@ from django.db.models import Q
 #input_file_name = 'AM_FF_501.txt'
 #input_file_name = _static + 'dev_test/test_data.txt'
 
-
+#General functions
 def inventory_check(_file):
     """Takes the data from a DALME Inventory Package and makes sure it's properly formatted"""
 

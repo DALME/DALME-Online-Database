@@ -13,7 +13,26 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dalme_app.tasks import parse_inventory
 from django_celery_results.models import TaskResult
 from django.db.models import Q
+from allaccess.views import OAuthCallback
+from django.contrib.auth import get_user_model
 
+
+#authentication (sub)classses
+class OAuthCallback_WP(OAuthCallback):
+
+    def get_or_create_user(self, provider, access, info):
+        uname = info['user_login']
+        email = info['email']
+        name = info['display_name']
+        User = get_user_model()
+        try:
+            the_user = User.objects.get(username=uname)
+        except Entry.DoesNotExist:
+            the_user = User.objects.create_user(uname, email, None)
+            the_user.profile.full_name = name
+            the_user.save()
+
+        return the_user
 
 @login_required
 def index(request):
@@ -440,7 +459,7 @@ def form(request, item):
 @login_required
 def script(request, module):
     username = request.user.username
-    output = eval('scripts.' + module + '(username)')
+    output = eval('scripts.' + module + '(request, username)')
 
     context = {
             'page_title':'DALME Script Results',

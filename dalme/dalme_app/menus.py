@@ -120,6 +120,7 @@ def dropdowns(username):
         ['fa fa-gear', 'dropdown-scripts', [
                 ['1', '/script/import_sources_csv', 'fa fa-gears', 'Import Sources CSV'],
                 ['1', '/script/test_expression', 'fa fa-gears', 'Test Expression'],
+                ['1', '/script/session_info', 'fa fa-gears', 'Show Session Information'],
             ]
 
         ],
@@ -141,7 +142,7 @@ def dropdowns(username):
             ]
         ],
         ['fa fa-user', 'dropdown-user', [
-                ['1', '#', 'fa fa-user', 'Profile'],
+                ['1', 'https://dalme.org/wp/wp-admin/profile.php', 'fa fa-user', 'Profile'],
                 ['1', '#', 'fa fa-gear', 'Settings'],
                 ['divider'],
                 ['1', '/logout/', 'fa fa-sign-out', logout],

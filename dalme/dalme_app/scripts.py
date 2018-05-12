@@ -7,14 +7,19 @@ from async_messages import message_user
 from dalme_app import functions
 from django.core import serializers
 
-def test_expression(username):
+def session_info(request, username):
+    output = request.session
+
+    return output
+
+def test_expression(request, username):
 
     output = serializers.serialize("xml", Sources.objects.filter(type=13))
 
     return output
 
 
-def import_sources_csv(username):
+def import_sources_csv(request, username):
     _file = 'sources_final.csv'
     _file = os.path.join('dalme','dalme_app',_file)
     df = pd.read_csv(_file)
