@@ -1,0 +1,116 @@
+[
+  {
+    "topMenu": true,
+    "itemClass": "dropdown-scripts",
+    "iconClass": "fa-gear",
+    "childrenIconClass": "fa-gears",
+    "children": [
+          {
+            "text": "Import Sources CSV",
+            "link": "/script/import_sources_csv"
+          },
+          {
+            "text": "Test Expression",
+            "link": "/script/test_expression"
+          },
+          {
+            "text": "Show Session Information",
+            "link": "/script/session_info"
+          },
+          {
+            "text": "IIIF Viewer Test",
+            "link": "/iiif"
+          }
+        ]
+    },
+    {
+      "topMenu": true,
+      "itemClass": "dropdown-ref",
+      "iconClass": "fa-list-alt",
+      "childrenIconClass": "fa-dot-circle-o",
+      "children": [
+        {
+          "text": "Error codes",
+          "link": "/list/errors",
+          "iconClass": "fa-medkit"
+        },
+        {
+          "divider": true
+        },
+        {
+          "text": "UI Reference:",
+          "iconClass": "fa-list-alt",
+          "section": true
+        },
+        {
+          "text": "Dashboard Content",
+          "link": "/UIref/dash_demo"
+        },
+        {
+          "text": "Panels and Wells",
+          "link": "/UIref/panels-wells"
+        },
+        {
+          "text": "Buttons",
+          "link": "/UIref/buttons"
+        },
+        {
+          "text": "Notifications",
+          "link": "/UIref/notifications"
+        },
+        {
+          "text": "Typography",
+          "link": "/UIref/typography"
+        },
+        {
+          "text": "Icons",
+          "link": "/UIref/icons"
+        },
+        {
+          "text": "Grid",
+          "link": "/UIref/grid"
+        },
+        {
+          "text": "Tables",
+          "link": "/UIref/tables"
+        },
+        {
+          "text": "Flot Charts",
+          "link": "/UIref/flot"
+        },
+        {
+          "text": "Morris.js Charts",
+          "link": "/UIref/morris"
+        },
+        {
+          "text": "Forms",
+          "link": "/UIref/forms"
+        }
+      ]
+  },
+  {
+    "topMenu": true,
+    "itemClass": "dropdown-user",
+    "iconClass": "fa-user",
+    "children": [
+      {
+        "text": "Profile",
+        "link": "https://dalme.org/wp/wp-admin/profile.php",
+        "iconClass": "fa-user"
+      },
+      {
+        "text": "Settings",
+        "link": "#",
+        "iconClass": "fa-gear"
+      },
+      {
+        "divider": true
+      },
+      {
+        "logoutText": true,
+        "link": "/logout/",
+        "iconClass": "fa-sign-out"
+      }
+    ]
+  }
+]

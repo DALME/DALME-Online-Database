@@ -5,12 +5,31 @@ from .models import par_inventories, par_folios, par_tokens, par_objects, error_
 from django.contrib.auth.models import User
 from async_messages import message_user
 from django.db.models import Q
-#from django.contrib.staticfiles.templatetags.staticfiles import static as _static
-#local files for testing
-#input_file_name = 'AM_FF_501.txt'
-#input_file_name = _static + 'dev_test/test_data.txt'
+from django.db import connections
+from dalme_app import menus
+
+
 
 #General functions
+def menu_constructor(request, item_constructor, template):
+    """Builds menus based on an item_constructor and a json file describing the menu items.
+    Menus are stored in the templates directory, under the menus subdirectory."""
+    # Declare output string
+    _output = ''
+
+    # Get template from default location in dalme_app/templates/menus and read it
+    template = os.path.join('dalme','dalme_app','templates','menus',template)
+    with open(template, 'r') as fp:
+        menu = json.load(fp)
+
+    # Create menu by iterating through items in json file and appending to output
+    for item in menu:
+        _output += eval('menus.' + item_constructor + '(request,_output,**item)')
+
+    # Return output as part of a list, because renderer expects to iterate
+    return [_output]
+
+
 def inventory_check(_file):
     """Takes the data from a DALME Inventory Package and makes sure it's properly formatted"""
 
@@ -427,35 +446,29 @@ def get_count(item):
             wiki_user = 'Pizzorno@api_bot'
             wiki_pass = os.environ['WIKI_BOT_PASSWORD']
             base_url = 'https://wiki.dalme.org/'
-
             tokenParams = {
                 "action": "query",
                 "meta": "tokens",
                 "type": "login",
                 "format": "json",
             }
-
             loginParams = {
                 "action": "login",
                 "lgname": wiki_user,
                 "lgpassword": wiki_pass,
                 "format": "json",
             }
-
             queryParams = {
                 "action": "query",
                 "meta": "siteinfo",
                 "siprop": "statistics",
                 "format": "json",
             }
-
             #request token
             r1 = requests.post(base_url+'api.php',params=tokenParams)
             loginParams['lgtoken'] = r1.json()['query']['tokens']['logintoken']
-
             #Login
             r2 = requests.post(base_url+'api.php',data=loginParams,cookies=r1.cookies)
-
             #query api
             r3 = requests.get(base_url+'api.php',params=queryParams,cookies=r2.cookies)
             stats = r3.json()
@@ -464,8 +477,12 @@ def get_count(item):
             return None
 
     elif item == 'assets':
+        #cursor = connections['dam'].cursor()
+        #cursor.execute("SELECT COUNT(*) FROM resource")
+        #results = cursor.fetchone()[0]
+        #return results
 
-        return 7342
+        return "356"
 
     else:
         return None
@@ -477,25 +494,39 @@ def get_dam_preview(resource):
     """
     if 'DAM_BOT_KEY' in os.environ:
         auth_key = os.environ['DAM_BOT_KEY']
-        queryParams = {
-            "key": auth_key,
-            "search": resource,
-            "previewsize": "scr"
-        }
-        base_url = 'http://dighist.fas.harvard.edu/projects/DALME/dam/plugins/api_search/'
-        r1 = requests.get(base_url, params=queryParams)
-        res = r1.json()
+        query = 'user=api_bot&function=search_get_previews&param1=' + resource + '&param2=&param3=&param4=0&param5=&param6=asc&param7=&param8=scr&param9=jpg'
+        sign_primitive = auth_key + query
+        sign = hashlib.sha256(sign_primitive.encode('utf-8')).hexdigest()
 
-        results = 'http://dighist.fas.harvard.edu' + res[0]['preview']
+        queryParams = {
+            "user": "api_bot",
+            "function": "search_get_previews",
+            "param1": resource,
+            "param2": "",
+            "param3": "",
+            "param4": "0",
+            "param5": "1",
+            "param6": "asc",
+            "param7": "",
+            "param8": "scr",
+            "param9": "jpg",
+            "sign": sign,
+        }
+
+        base_url = 'https://dam.dalme.org/api/'
+        r1 = requests.get(base_url, params=queryParams)
+        res = json.loads(r1.text)
+
+        results = res[0]['url_scr']
 
         return results
+
     else:
         return "#"
 
 def get_task_icon(list_id):
     if list_id == 1:
         icon = 'fa-gears'
-
     return icon
 
 def get_date_from_elements(day, month, year):

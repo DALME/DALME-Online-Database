@@ -1,46 +1,11 @@
 from dalme_app import functions
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-import json
-import os
-
-
-
-def sidebar_menu(template='sidebar_default.json'):
-    """Creates the sidebar menu based on a json file describing the menu items.
-    Menus are stored in the templates directory, under the menus subdirectory.
-
-    Menu items may have the following properties:
-    text: Text to be shown in menu item.
-    iconClass: Class for Font Awesome icon.
-    section: If the menu item is a section marker, set this property to True.
-    link: Link for menu item
-    counter: Add a count of some kind to menu items. The value of this key will
-        be passed to the `functions.get_count()` function, and the return value
-        of that function will appear as the count.
-    children: Nest additional menu items as a list under this key.
-
-    All properties default to `None`, so if you don't want to include any
-    element, just leave out that key."""
-
-    # Get template from default location in dalme_app/templates/menus and read it
-    template = os.path.join('dalme','dalme_app','templates','menus',template)
-    with open(template, 'r') as fp:
-        menu = json.load(fp)
-
-    # Declare output string
-    _output = ''
-
-    # Create menu by iterating through items in json file and appending to output
-    for item in menu:
-        _output += sidebar_menu_item(_output,**item)
-
-    # Return output as part of a list, because renderer expects to iterate
-    return [_output]
+import json, os
 
 LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
 
-def sidebar_menu_item(wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
+def sidebar_item(request,wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
     """
     Generates a menu item and incorporates it into `whoeleMenu`. This function
     calls itself to recurse through hierarchies of menus, and uses the
@@ -105,80 +70,91 @@ def sidebar_menu_item(wholeMenu,depth=0,text=None,iconClass=None,link=None,count
         for child in children:
             # For each child item, provide the parameters it defines to this
             # function, incrementing the depth
-            currentItem += sidebar_menu_item(currentItem,depth=depth+1,**child)
+            currentItem += sidebar_item(request,currentItem,depth=depth+1,**child)
         currentItem += '</ul>'
     currentItem += '</li>'
 
     return currentItem
 
+def tile_item(request,wholeMenu,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None):
+    currentItem = '<div class="col-lg-3 col-md-6">'
 
-def dropdowns(username):
-    """ creates the top right dropdowns """
-    logout = 'Logout ' + username
+    if colourClass:
+        currentItem += '<div class="panel {}">'.format(colourClass)
 
-    dropdowns = [
-        ['fa fa-gear', 'dropdown-scripts', [
-                ['1', '/script/import_sources_csv', 'fa fa-gears', 'Import Sources CSV'],
-                ['1', '/script/test_expression', 'fa fa-gears', 'Test Expression'],
-                ['1', '/script/session_info', 'fa fa-gears', 'Show Session Information'],
-            ]
+    currentItem += '<div class="panel-heading"><div class="row"><div class="col-xs-3">'
 
-        ],
-        ['fa fa-list-alt', 'dropdown-ref', [
-                ['1', '/list/errors', 'fa fa-medkit', 'Error codes'],
-                ['divider'],
-                ['0', '#', 'fa fa-list-alt', 'UI Reference:'],
-                ['1', '/UIref/dash_demo', 'fa fa-dot-circle-o', 'Dashboard Content'],
-                ['1', '/UIref/panels-wells', 'fa fa-dot-circle-o', 'Panels and Wells'],
-                ['1', '/UIref/buttons', 'fa fa-dot-circle-o', 'Buttons'],
-                ['1', '/UIref/notifications', 'fa fa-dot-circle-o', 'Notifications'],
-                ['1', '/UIref/typography', 'fa fa-dot-circle-o', 'Typography'],
-                ['1', '/UIref/icons', 'fa fa-dot-circle-o', 'Icons'],
-                ['1', '/UIref/grid', 'fa fa-dot-circle-o', 'Grid'],
-                ['1', '/UIref/tables', 'fa fa-dot-circle-o', 'Tables'],
-                ['1', '/UIref/flot', 'fa fa-dot-circle-o', 'Flot Charts'],
-                ['1', '/UIref/morris', 'fa fa-dot-circle-o', 'Morris.js Charts'],
-                ['1', '/UIref/forms', 'fa fa-dot-circle-o', 'Forms'],
-            ]
-        ],
-        ['fa fa-user', 'dropdown-user', [
-                ['1', 'https://dalme.org/wp/wp-admin/profile.php', 'fa fa-user', 'Profile'],
-                ['1', '#', 'fa fa-gear', 'Settings'],
-                ['divider'],
-                ['1', '/logout/', 'fa fa-sign-out', logout],
-            ]
-        ],
-    ]
+    if iconClass:
+        currentItem += '<i class="fa {} fa-5x"></i> '.format(iconClass)
 
-    user_id = User.objects.get(username=username).pk
-    results = []
-    _output = ''
+    currentItem += '</div><div class="col-xs-9 text-right">'
 
-    for item in dropdowns:
-        if item[0] == 'fa-tasks':
-            _output = '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="' + item[0] + ' fa-fw"></i> <i class="fa fa-caret-down"></i></a><ul class="dropdown-menu ' + item[1] + '"><form action="" method="POST">'
+    if counter:
+        counter = functions.get_count(counter)
+        currentItem += '<div class="huge">{}</div>'.format(counter)
 
+    if counterTitle:
+        currentItem += '<div>{}</div>'.format(counterTitle)
+
+    currentItem += '</div></div></div>'
+
+    if linkTarget:
+        currentItem += '<a href="{}" target="_blank"><div class="panel-footer">'.format(linkTarget)
+
+    if linkTitle:
+        currentItem += '<span class="pull-left">{}</span>'.format(linkTitle)
+
+    currentItem += '<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div></div></a></div></div>'
+
+    return currentItem
+
+def dropdown_item(request,wholeMenu,topMenu=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,logoutText=None):
+    """ creates items for the top right dropdowns """
+    #generate dynamic menu items
+    if logoutText:
+        username = request.user.username
+        text = 'Logout ' + username
+
+    #start this dropdown
+    currentItem = ''
+    #check if it is a top menu
+    if topMenu:
+        currentItem += '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">'
+        #add the icon
+        currentItem += '<i class="fa {} fa-fw"></i><i class="fa fa-caret-down"></i>'.format(iconClass)
+        #add the class
+        currentItem += '</a><ul class="dropdown-menu {}">'.format(itemClass)
+        #now process children
+        for child in children:
+            # For each child item, provide the parameters it defines to this
+            # function, incrementing the depth
+            if childrenIconClass:
+                child['childrenIconClass'] = childrenIconClass
+            else:
+                child['childrenIconClass'] = 'fa-dot-circle-o'
+            currentItem += dropdown_item(request,currentItem,**child)
+        #close the tags
+        currentItem += '</ul></li>'
+
+    elif divider:
+        currentItem += '<li class="divider"></li>'
+
+    elif section:
+        currentItem += '<li class="dropdown-section">'
+        #add icon
+        currentItem += '<i class="fa {} fa-fw"></i>'.format(iconClass)
+        #add section name
+        currentItem += '{}</li>'.format(text)
+    else:
+        #add link
+        currentItem += '<li><a href="{}">'.format(link)
+        #add icon
+        if iconClass:
+            itemIcon = iconClass
         else:
-            _output = '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="' + item[0] + ' fa-fw"></i> <i class="fa fa-caret-down"></i></a><ul class="dropdown-menu ' + item[1] + '">'
+            itemIcon = childrenIconClass
+        currentItem += '<i class="fa {} fa-fw">'.format(itemIcon)
+        #add name
+        currentItem += '</i> {}</a></li>'.format(text)
 
-        for menu in item[2]:
-            if menu[0] == 'divider':
-                _output = _output + '<li class="divider"></li>'
-
-            elif menu[0] == '0':
-                _output = _output + '<li class="dropdown-section"><i class="' + menu[2] + ' fa-fw"></i> ' + menu[3] + '</li>'
-
-            elif menu[0] == '1':
-                _output = _output + '<li><a href="' + menu[1] + '"><i class="' + menu[2] + ' fa-fw"></i> ' + menu[3] + '</a></li>'
-
-            elif menu[0] == '2':
-                _output = _output + '<li><a href="' + menu[1] + '"><div><input class="dropdown-checkbox" type="checkbox" name="mark_done" value="' + menu[4]+ '" id="mark_done_' + menu[4] + '">' + menu[3] + '<span class="pull-right text-muted"><em>Due: ' + menu[6] + '</em></span></div><div><em>Created: ' + menu[5] + ' By: ' + menu[7] + '</em></div></a></li>'
-
-            elif menu[0] == '3':
-                _output = _output + '<li class="divider"></li><li><a class="text-center" href="' + menu[1] + '"><strong>' + menu[2] + ' </strong><i class="fa fa-angle-right"></i></a></li>'
-
-        _output = _output + '</ul></li>'
-
-        results.append(_output)
-
-    return results
+    return currentItem

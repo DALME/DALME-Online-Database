@@ -109,6 +109,15 @@ if 'RDS_DB_NAME' in os.environ:
             'HOST': os.environ['RDS_HOSTNAME'],
             'PORT': os.environ['RDS_PORT'],
             'CONN_MAX_AGE': 3600,
+        },
+        'dam': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['DAM_DB_NAME'],
+            'USER': os.environ['DAM_USERNAME'],
+            'PASSWORD': os.environ['DAM_PASSWORD'],
+            'HOST': os.environ['DAM_HOSTNAME'],
+            'PORT': os.environ['DAM_PORT'],
+            'CONN_MAX_AGE': 3600,
         }
     }
 else:

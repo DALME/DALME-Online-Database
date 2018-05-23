@@ -5,7 +5,6 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import requests, uuid
-from .menus import sidebar_menu, dropdowns
 from .forms import upload_file, new_error, inventory_metadata
 from dalme_app import functions, scripts
 from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
@@ -36,22 +35,14 @@ class OAuthCallback_WP(OAuthCallback):
 
 @login_required
 def index(request):
-    inv_counter = str(functions.get_count('inventories'))
-    obj_counter = str(functions.get_count('objects'))
-    wiki_counter = str(functions.get_count('wiki-articles'))
-    dam_counter = str(functions.get_count('assets'))
-
     context = {
             'page_title':'DALME Dashboard',
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
-            'sidebar': sidebar_menu(),
-            'dropdowns': dropdowns(request.user.username),
+            'sidebar': functions.menu_constructor(request, 'sidebar_item', 'sidebar_default.json'),
+            'dropdowns': functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json'),
+            'tiles': functions.menu_constructor(request, 'tile_item', 'home_tiles_default.json'),
             'chart_data': functions.bar_chart(),
-            'inv_counter': inv_counter,
-            'obj_counter': obj_counter,
-            'wiki_counter': wiki_counter,
-            'dam_counter': dam_counter,
         }
 
     return render(request, 'index.html', context)
@@ -62,8 +53,8 @@ def uiref(request, module):
             'page_title':'DALME Dashboard Demo',
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
-            'sidebar': sidebar_menu(),
-            'dropdowns': dropdowns(request.user.username)
+            'sidebar': functions.menu_constructor(request, 'sidebar_item', 'sidebar_default.json'),
+            'dropdowns': functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json'),
         }
 
     _url = 'UI_reference/{}.html'.format(module)
@@ -335,8 +326,8 @@ def list(request, module, type='all'):
     context['username'] = username
     context['item'] = 'THIS IS WHERE ITEM TITLE GOES'
     context['heading'] = _heading
-    context['sidebar'] = sidebar_menu()
-    context['dropdowns'] = dropdowns(request.user.username)
+    context['sidebar'] = functions.menu_constructor(request, 'sidebar_item', 'sidebar_default.json')
+    context['dropdowns'] = functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json')
     context['headers'] = headers
     context['rows'] = rows
     context['panel_title'] = panel_title
@@ -385,8 +376,8 @@ def show(request, item, id):
             context['authenticated'] = request.user.is_authenticated
             context['username'] = request.user.username
             context['item'] = item.title()
-            context['sidebar'] = sidebar_menu()
-            context['dropdowns'] = dropdowns(request.user.username)
+            context['sidebar'] = functions.menu_constructor(request, 'sidebar_item', 'sidebar_default.json')
+            context['dropdowns'] = functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json')
             context['inventory'] = inventory
             context['folios'] = folios
 
@@ -447,8 +438,8 @@ def form(request, item):
     context['authenticated'] = request.user.is_authenticated
     context['username'] = username
     context['heading'] = _heading
-    context['sidebar'] = sidebar_menu()
-    context['dropdowns'] = dropdowns(request.user.username)
+    context['sidebar'] = functions.menu_constructor(request, 'sidebar_item', 'sidebar_default.json')
+    context['dropdowns'] = functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json')
     context['panel_title'] = panel_title
     context['panel_icon'] = panel_icon
     context['form'] = form
@@ -465,8 +456,8 @@ def script(request, module):
             'page_title':'DALME Script Results',
             'authenticated': request.user.is_authenticated,
             'username': request.user.username,
-            'sidebar': sidebar_menu(),
-            'dropdowns': dropdowns(request.user.username),
+            'sidebar': functions.menu_constructor(request, 'sidebar_item', 'sidebar_default.json'),
+            'dropdowns': functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json'),
             'heading': module,
             'output': output
         }
@@ -474,3 +465,15 @@ def script(request, module):
     _url = 'script_results.html'
 
     return render(request, _url, context)
+
+@login_required
+def iiif(request):
+    context = {
+            'page_title':'DALME IIIF Viewer Test',
+            'authenticated': request.user.is_authenticated,
+            'username': request.user.username,
+            'sidebar': functions.menu_constructor(request, 'sidebar_item', 'sidebar_default.json'),
+            'dropdowns': functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json'),
+        }
+
+    return render(request, 'iiif_test.html', context)

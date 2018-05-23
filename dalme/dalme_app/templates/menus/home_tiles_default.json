@@ -1,0 +1,34 @@
+[
+  {
+    "colourClass": "panel-red",
+    "iconClass": "fa-file-text-o",
+    "counter": "wiki-articles",
+    "counterTitle": "Articles",
+    "linkTarget": "https://wiki.dalme.org",
+    "linkTitle": "Go to Wiki"
+  },
+  {
+    "colourClass": "panel-primary",
+    "iconClass": "fa-image",
+    "counter": "assets",
+    "counterTitle": "Assets",
+    "linkTarget": "https://dam.dalme.org",
+    "linkTitle": "Go to DAM"
+  },
+  {
+    "colourClass": "panel-yellow",
+    "iconClass": "fa-list",
+    "counter": "inventories",
+    "counterTitle": "Inventories",
+    "linkTarget": "/list/inventories",
+    "linkTitle": "View List"
+  },
+  {
+    "colourClass": "panel-green",
+    "iconClass": "fa-beer",
+    "counter": "objects",
+    "counterTitle": "Objects",
+    "linkTarget": "/list/objects",
+    "linkTitle": "View List"
+  }
+]

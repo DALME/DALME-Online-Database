@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^list/(?P<module>[a-z_-]+)(?:/(?P<type>[a-zA-Z]+))?/$', views.list),
     url(r'^form/([a-z_-]+)$', views.form),
     url(r'^show/([a-z_-]+)/([A-Za-z0-9-]+)$', views.show),
+    url(r'^iiif/', views.iiif),
     url(r'^$', views.index, name='dashboard'),
 ]
