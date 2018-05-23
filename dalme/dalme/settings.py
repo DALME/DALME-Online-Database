@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'sekizai',
     'django_celery_results',
     'allaccess',
-    #'sslserver',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -92,8 +91,8 @@ AUTHENTICATION_BACKENDS = [
 
 #authentication settings
 LOGIN_URL = 'accounts/login/dalme_wp/'
-#LOGIN_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = 'https://db.dalme.org'
+LOGIN_REDIRECT_URL = '/'
+#LOGIN_REDIRECT_URL = 'https://db.dalme.org'
 
 #SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 

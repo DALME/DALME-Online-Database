@@ -16,12 +16,12 @@ import dj_database_url
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "k2%bwjntazcdlw#5seag!82%caia3&9e1$g=%=58ydm@*x3zrv"
+
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,9 +41,15 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
+    'django.contrib.sites',
+    'treebeard',
+    'sekizai',
+    'django_celery_results',
+    'allaccess',
+    'sslserver',
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -52,9 +58,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'async_messages.middleware.AsyncMiddleware',
 ]
 
-ROOT_URLCONF = 'dalme.urls'
+ROOT_URLCONF = 'dalme.devUrls'
 
 TEMPLATES = [
     {
@@ -67,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'sekizai.context_processors.sekizai',
             ],
             'debug': DEBUG,
         },
@@ -75,22 +84,43 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dalme.wsgi.application'
 
+#authentication backends
+AUTHENTICATION_BACKENDS = [
+    #'allaccess.backends.AuthorizedServiceBackend',
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+#authentication settings
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = 'dashboard'
+#LOGIN_REDIRECT_URL = 'https://db.dalme.org'
+
+#SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, 'db-test.cnf')
+if 'RDS_DB_NAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+            'CONN_MAX_AGE': 3600,
         }
     }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'OPTIONS': {
+                'read_default_file': os.path.join(BASE_DIR, 'db.cnf')
+            }
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -109,8 +139,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
+LANGUAGES = [
+    ('en', 'English'),
+    ('fr', 'French'),
+]
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 TIME_ZONE = 'America/New_York'
 USE_I18N = True
 USE_L10N = True
@@ -120,17 +154,19 @@ USE_TZ = True
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, "..", "www", 'static')
 STATIC_URL = '/static/'
+
+# Media files location
+
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_URL = '/media/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = [
@@ -140,3 +176,21 @@ STATICFILES_DIRS = [
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+SITE_ID = 1
+
+#HTTPS/SSL settings
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
+    }
+}

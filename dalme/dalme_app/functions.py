@@ -424,25 +424,39 @@ def get_count(item):
 
     elif item == 'wiki-articles':
         if 'WIKI_BOT_PASSWORD' in os.environ:
-            wiki_user = 'api_bot'
+            wiki_user = 'Pizzorno@api_bot'
             wiki_pass = os.environ['WIKI_BOT_PASSWORD']
-            base_url = 'http://dighist.fas.harvard.edu/projects/DALME/wiki/'
+            base_url = 'https://wiki.dalme.org/'
+
+            tokenParams = {
+                "action": "query",
+                "meta": "tokens",
+                "type": "login",
+                "format": "json",
+            }
+
             loginParams = {
                 "action": "login",
                 "lgname": wiki_user,
                 "lgpassword": wiki_pass,
                 "format": "json",
             }
-            # Login request
-            r1 = requests.post(base_url+'api.php',params=loginParams)
-            loginParams['lgtoken'] = r1.json()['login']['token']
-            r2 = requests.post(base_url+'api.php',params=loginParams,cookies=r1.cookies)
+
             queryParams = {
                 "action": "query",
                 "meta": "siteinfo",
                 "siprop": "statistics",
                 "format": "json",
             }
+
+            #request token
+            r1 = requests.post(base_url+'api.php',params=tokenParams)
+            loginParams['lgtoken'] = r1.json()['query']['tokens']['logintoken']
+
+            #Login
+            r2 = requests.post(base_url+'api.php',data=loginParams,cookies=r1.cookies)
+
+            #query api
             r3 = requests.get(base_url+'api.php',params=queryParams,cookies=r2.cookies)
             stats = r3.json()
             return stats['query']['statistics']['articles']
