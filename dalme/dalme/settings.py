@@ -118,7 +118,7 @@ if 'RDS_DB_NAME' in os.environ:
         #    'HOST': os.environ['DAM_HOSTNAME'],
         #    'PORT': os.environ['DAM_PORT'],
         #    'CONN_MAX_AGE': 3600,
-        }
+        #}
     }
 else:
     DATABASES = {
