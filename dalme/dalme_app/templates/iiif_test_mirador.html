@@ -2,8 +2,8 @@
 {% load staticfiles i18n %}
 
 {% block extra_head %}
-<link href="{% static 'mirador/css/mirador-combined.min.css' %}" rel="stylesheet">
-<script src="{% static 'mirador/mirador.min.js' %}"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mirador@2.6.0/dist/css/mirador-combined.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/mirador@2.6.0/dist/mirador.js"></script>
 {% endblock %}
 
 {% block extra_dropdowns %}{% endblock %}
@@ -90,7 +90,6 @@
       $(function() {
         Mirador({
           id: "viewer",
-          buildPath: "{% static 'mirador/' %}",
           data: [
             { manifestUri: "http://iiif.harvardartmuseums.org/manifests/object/54426", location: "Harvard University" }
           ]
