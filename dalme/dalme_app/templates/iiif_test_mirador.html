@@ -1,0 +1,100 @@
+{% extends "dash_base.html" %}
+{% load staticfiles i18n %}
+
+{% block extra_head %}
+<link href="{% static 'mirador/css/mirador-combined.css' %}" rel="stylesheet">
+<script src="{% static 'mirador/mirador.js' %}"></script>
+{% endblock %}
+
+{% block extra_dropdowns %}{% endblock %}
+
+{% block content %}
+
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">{{ heading }}</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default panel-full-height">
+                <div class="panel-heading">
+                    <i class="fa {{ panel_icon }} fa-fw"></i> {{ panel_title }}
+                    {% if has_actions %}
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    Actions
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    {% for para, name in actions %}
+                                        {% if para == 'divider' %}
+                                            <li class="divider"></li>
+                                        {% elif para == 'title' %}
+                                            <li class="title">{{ name }}</li>
+                                        {% else %}
+                                            <li><a {{ para | safe }}>{{ name }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="panel-body">
+                    <div id="viewer"></div>
+                </div>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    {% if has_modals %}
+        {% for i, para in modals %}
+            <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="{{ i }}Label" aria-hidden="true" id="{{ i }}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="{{ i }}Label">{{ para.0 }}</h4>
+                        </div>
+                        <div class="modal-body">
+                            {% if para.1 == 'form' %}
+                                <form role="form" method="post" id="{{ i }}-form" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                </form>
+                            {% else %}
+                                {{ para.1 | safe }}
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" {{ para.3 | safe }} >{{ para.2 }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+<!-- /#page-wrapper -->
+</div>
+<!-- /#wrapper -->
+{% endblock %}
+
+{% block extra_scripts %}
+<script type="text/javascript">
+      $(function() {
+        Mirador({
+          id: "viewer",
+          buildPath: "{% static 'mirador/' %}",
+          data: [
+            { manifestUri: "http://iiif.harvardartmuseums.org/manifests/object/54426", location: "Harvard University" }
+          ]
+        });
+      });
+</script>
+{% endblock %}

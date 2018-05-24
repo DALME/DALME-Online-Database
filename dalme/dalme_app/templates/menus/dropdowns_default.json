@@ -18,8 +18,12 @@
             "link": "/script/session_info"
           },
           {
-            "text": "IIIF Viewer Test",
-            "link": "/iiif"
+            "text": "IIIF Viewer Test (Diva.js)",
+            "link": "/iiif/diva"
+          },
+          {
+            "text": "IIIF Viewer Test (Mirador)",
+            "link": "/iiif/mirador"
           }
         ]
     },

@@ -467,7 +467,12 @@ def script(request, module):
     return render(request, _url, context)
 
 @login_required
-def iiif(request):
+def iiif(request, module):
+    if module == 'diva':
+        url = 'iiif_test_diva.html'
+    elif module == 'mirador':
+        url = 'iiif_test_mirador.html'
+
     context = {
             'page_title':'DALME IIIF Viewer Test',
             'authenticated': request.user.is_authenticated,
@@ -476,4 +481,4 @@ def iiif(request):
             'dropdowns': functions.menu_constructor(request, 'dropdown_item', 'dropdowns_default.json'),
         }
 
-    return render(request, 'iiif_test.html', context)
+    return render(request, url, context)
