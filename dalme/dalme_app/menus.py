@@ -1,5 +1,5 @@
 from dalme_app import functions
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import User
 import json, os
 
@@ -108,12 +108,11 @@ def tile_item(request,wholeMenu,colourClass=None,iconClass=None,counter=None,cou
 
     return currentItem
 
-def dropdown_item(request,wholeMenu,topMenu=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,logoutText=None):
+def dropdown_item(request,wholeMenu,topMenu=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,logoutMenu=None):
     """ creates items for the top right dropdowns """
     #generate dynamic menu items
-    if logoutText:
-        username = request.user.username
-        text = 'Logout ' + username
+    if logoutMenu:
+        text = request.user.username
 
     #start this dropdown
     currentItem = ''
@@ -145,6 +144,10 @@ def dropdown_item(request,wholeMenu,topMenu=None,itemClass=None,iconClass=None,c
         currentItem += '<i class="fa {} fa-fw"></i>'.format(iconClass)
         #add section name
         currentItem += '{}</li>'.format(text)
+
+    elif title:
+        currentItem += '<div class="dropdown-title">{}</div>'.format(text)
+
     else:
         #add link
         currentItem += '<li><a href="{}">'.format(link)

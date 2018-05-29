@@ -1,11 +1,11 @@
 from django.shortcuts import get_object_or_404, render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-import requests, uuid
-from .forms import upload_file, new_error, inventory_metadata
+import requests, uuid, os, datetime
+from .forms import upload_file, new_error, inventory_metadata, new_user, home_search
 from dalme_app import functions, scripts
 from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -14,6 +14,8 @@ from django_celery_results.models import TaskResult
 from django.db.models import Q
 from allaccess.views import OAuthCallback
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from django.db import connections
 
 
 #authentication (sub)classses
@@ -46,6 +48,11 @@ def index(request):
         }
 
     return render(request, 'index.html', context)
+
+@login_required
+def search(request):
+
+    return render(request, 'search.html', context)
 
 @login_required
 def uiref(request, module):
@@ -321,6 +328,71 @@ def list(request, module, type='all'):
             ]
             rows.append(row)
 
+    elif module == 'users':
+        _title = 'DALME Dashboard | Users'
+        _heading = 'Users'
+        panel_title = 'List of users'
+        panel_icon = 'fa-users'
+        context['has_actions'] = 1
+        context['actions'] = (
+            ('href="#addNew" data-toggle="modal" data-target="#addNew"', 'Add New'),
+        )
+        context['has_modals'] = 1
+        context['modals'] = [
+            ('addNew', [
+                'Add New User',
+                'form',
+                'Submit',
+                'type="submit" form="addNew-form"'
+            ]),
+        ]
+
+        if request.method == 'POST':
+            form = new_user(request.POST)
+
+            if form.is_valid():
+                functions.create_user(request, form)
+                functions.notification(request, 2502)
+                # redirect to a new URL:
+                return HttpResponseRedirect('/list/users')
+
+            else:
+                functions.notification(request, 4003, data=form.errors)
+        else:
+            form = new_user()
+
+        context['form'] = form
+        headers = ['Username', 'Name', 'Email', 'Staff', 'Superuser', 'DAM Usergroup', 'Wiki Groups', 'WP Role']
+        users = User.objects.all().select_related('profile')
+        rows = []
+
+        for i in users:
+            d_username = i.username
+            d_name = i.profile.full_name
+            d_email = i.email
+            d_staff = str(i.is_staff)
+            d_superuser = str(i.is_superuser)
+            d_dam = i.profile.get_dam_usergroup_display()
+            d_wiki = i.profile.wiki_groups
+            d_wp = str(i.profile.get_wp_role_display())
+
+            tr_class = ''
+            row = [tr_class, (
+                '<td>' + d_username + '</td>',
+                '<td>' + d_name + '</td>',
+                '<td>' + d_email + '</td>',
+                '<td>' + d_staff + '</td>',
+                '<td>' + d_superuser + '</td>',
+                '<td>' + d_dam + '</td>',
+                '<td>' + d_wiki + '</td>',
+                '<td>' + d_wp + '</td>')
+            ]
+            rows.append(row)
+
+    else:
+        functions.notification(request, 4004)
+        return HttpResponseRedirect('/')
+
     context['page_title'] = _title
     context['authenticated'] = request.user.is_authenticated
     context['username'] = username
@@ -335,6 +407,7 @@ def list(request, module, type='all'):
     context['table_options'] = table_options
 
     return render(request, _url, context)
+
 
 @login_required
 def show(request, item, id):

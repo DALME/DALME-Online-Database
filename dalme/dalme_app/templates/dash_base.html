@@ -40,7 +40,7 @@
 
 {% block topbar %}
         <!-- Navigation -->
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-top-dalme navbar-static-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -48,9 +48,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <img class="dalme-logo" width="33" height="37" src="{% static 'dalme_logo_beta_sm.png'%}" alt="DALME">
                 <a class="navbar-brand" href="{% url 'dashboard' %}">
-                    DALME
+                    <img class="dalme-logo" height="40" src="{% static 'dalme-02.svg'%}" alt="DALME">
                 </a>
             </div>
             <!-- /.navbar-header -->
@@ -68,14 +67,17 @@
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
                         <li class="sidebar-search">
-                            <div class="input-group custom-search-form">
-                                <input type="text" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button">
+                            <form role="form" method="post" id="search-form" enctype="multipart/form-data" action="/search/?q=">
+                              {% csrf_token %}
+                              <div class="input-group custom-search-form">
+                                <input id="id_q" type="search" class="form-control" placeholder="Search..." name="q" value='{{ query }}' required>
+                                  <span class="input-group-btn">
+                                      <button class="btn btn-default" type="submit">
                                         <i class="fa fa-search"></i>
-                                    </button>
-                                </span>
-                            </div>
+                                      </button>
+                                  </span>
+                              </div>
+                            </form>
                         </li>
 
                         {% for item in sidebar %}
@@ -85,7 +87,14 @@
                         {% endfor %}
 
                         {% block extra_sidebar %}{% endblock %}
-
+                        <li>
+                          <div class="sidebar-tool-section">
+                            <i class="fa fa-wrench fa-fw"></i> Tools:
+                            <a class="sidebar-tool sb-red g-tooltip" href="https://wiki.dalme.org"><i class="fa fa-file-text-o fa-fw"></i><span class="g-tooltiptext">DALME Wiki</span></a>
+                            <a class="sidebar-tool sb-blue g-tooltip" href="https://dam.dalme.org"><i class="fa fa-image fa-fw"></i><span class="g-tooltiptext">DALME DAM</span></a>
+                            <a class="sidebar-tool sb-green g-tooltip" href="https://dalme.org"><i class="fa fa-globe fa-fw"></i><span class="g-tooltiptext">DALME Website</span></a>
+                          </div>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->

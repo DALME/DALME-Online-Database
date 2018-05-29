@@ -11,7 +11,7 @@
       {
         "text": "All",
         "link": "/list/sources/all",
-        "iconClass": "fa-list",
+        "iconClass": "fa-asterisk",
         "counter": "sources"
       },
 
@@ -25,21 +25,21 @@
       {
         "text": "Inventories",
         "link": "/list/sources/inventories",
-        "iconClass": "fa-list",
+        "iconClass": "fa-list-ol",
         "counter": "inventories"
       },
 
       {
         "text": "Bibliographic",
         "link": "/list/sources/biblio",
-        "iconClass": "fa-list",
+        "iconClass": "fa-book",
         "counter": "biblio_sources"
       },
 
       {
         "text": "Archives & Collections",
         "link": "/list/sources/archives",
-        "iconClass": "fa-list",
+        "iconClass": "fa-archive",
         "counter": "archives"
       }
     ]
@@ -49,49 +49,5 @@
     "link": "/list/objects",
     "iconClass": "fa-beer",
     "counter": "objects"
-  },
-  {
-    "text": "Tools",
-    "iconClass": "fa-wrench",
-    "section": true
-  },
-  {
-    "text": "Bookmarks",
-    "link": "#",
-    "iconClass": "fa-bookmark",
-    "children": [
-      {
-        "text": "Wiki",
-        "link": "http://dighist.fas.harvard.edu/projects/DALME/wiki",
-        "iconClass": "fa-file-text-o"
-      },
-      {
-        "text": "DAM",
-        "link": "http://dighist.fas.harvard.edu/projects/DALME/dam",
-        "iconClass": "fa-image"
-      }
-    ]
-  },
-  {
-    "text": "Admin",
-    "link": "#",
-    "iconClass": "fa-group",
-    "children": [
-      {
-        "text": "Users",
-        "link": "#",
-        "iconClass": "fa-user"
-      },
-      {
-        "text": "Website",
-        "link": "https://dalme.org/wp/wp-admin",
-        "iconClass": "fa-globe"
-      }
-    ]
-  },
-  {
-    "text": "Background Tasks",
-    "link": "/list/tasks",
-    "iconClass": "fa-tasks"
   }
 ]

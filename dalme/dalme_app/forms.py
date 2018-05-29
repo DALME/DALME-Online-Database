@@ -1,5 +1,5 @@
 from django import forms
-from .models import error_messages
+from .models import error_messages, Profile
 
 class upload_file(forms.Form):
     inv_file = forms.FileField(label='File to upload')
@@ -18,3 +18,17 @@ class new_error(forms.Form):
     e_level = forms.IntegerField(label='Level', widget=forms.Select(choices=error_messages.LEVELS))
     e_type = forms.IntegerField(label='Type', widget=forms.Select(choices=error_messages.TYPES))
     e_text = forms.CharField(label='Text', widget=forms.Textarea)
+
+class new_user(forms.Form):
+    username = forms.CharField(label='Username', max_length=50)
+    first_name = forms.CharField(label='Given name', max_length=50)
+    last_name = forms.CharField(label='Surname', max_length=50)
+    email = forms.CharField(label='Email', max_length=255)
+    is_staff = forms.BooleanField(label='Staff member', help_text="Staff members have access to Django admin.", required=False)
+    is_superuser = forms.BooleanField(label='Superuser', required=False)
+    dam_usergroup = forms.IntegerField(label='DAM user group', widget=forms.Select(choices=Profile.DAM_USERGROUPS))
+    wiki_groups = forms.MultipleChoiceField(label='Wiki groups', help_text="Use CMD to choose multiple groups.", choices=Profile.WIKI_GROUPS)
+    wp_role = forms.CharField(label='WP role', widget=forms.Select(choices=Profile.WP_ROLE))
+
+class home_search(forms.Form):
+    search_string = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Search...'}))

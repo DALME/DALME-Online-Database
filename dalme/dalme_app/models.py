@@ -12,8 +12,36 @@ def make_uuid():
 
 #one-to-one extension of user model to accomodate full_name (used by WP-OAuth)
 class Profile(models.Model):
+    DAM_USERGROUPS = (
+        (1, 'Administrator'),
+        (2, 'General User'),
+        (3, 'Super Admin'),
+        (4, 'Archivist')
+    )
+
+    WIKI_GROUPS = (
+        ('users', 'User'),
+        ('administrator', 'Administrator'),
+        ('bureaucrat', 'Bureaucrat')
+    )
+
+    WP_ROLE = (
+        ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
+        ('a:1:{s:6:"editor";b:1;}', 'Editor'),
+        ('a:1:{s:6:"author";b:1;}', 'Author'),
+        ('a:1:{s:11:"contributor";b:1;}', 'Contributor'),
+        ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber')
+    )
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=50, blank=True)
+    dam_userid = models.IntegerField(null=True)
+    dam_usergroup = models.IntegerField(choices=DAM_USERGROUPS, null=True)
+    wiki_userid = models.IntegerField(null=True)
+    wiki_username = models.CharField(max_length=50, null=True)
+    wiki_groups = models.CharField(max_length=255, null=True)
+    wp_userid = models.IntegerField(null=True)
+    wp_role = models.CharField(max_length=50, null=True, choices=WP_ROLE)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -39,26 +67,26 @@ class Attributes(dalmeUuid):
     content_id = models.UUIDField(db_index=True)
 
 class Attributes_DATE(dalmeBasic):
-    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True)
+    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True, on_delete=models.CASCADE)
     value = models.CharField(max_length=255)
     value_day = models.IntegerField()
     value_month = models.IntegerField()
     value_year = models.IntegerField()
 
 class Attributes_DBR(dalmeBasic):
-    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True)
+    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True, on_delete=models.CASCADE)
     value = models.CharField(max_length=32)
 
 class Attributes_INT(dalmeBasic):
-    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True)
+    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True, on_delete=models.CASCADE)
     value = models.IntegerField()
 
 class Attributes_STR(dalmeBasic):
-    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True)
+    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True, on_delete=models.CASCADE)
     value = models.CharField(max_length=255)
 
 class Attributes_TXT(dalmeBasic):
-    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True)
+    attribute_id = models.ForeignKey('Attributes', to_field='id', db_index=True, on_delete=models.CASCADE)
     value = models.TextField()
 
 class Concepts(dalmeUuid):
@@ -76,21 +104,21 @@ class Content_types(dalmeIntid):
     description = models.TextField()
 
 class Content_types_x_attribute_types(dalmeBasic):
-    content_type = models.ForeignKey('Content_types', to_field='id', db_index=True)
-    attribute_type = models.ForeignKey('Attribute_types', to_field='id', db_index=True)
+    content_type = models.ForeignKey('Content_types', to_field='id', db_index=True, on_delete=models.CASCADE)
+    attribute_type = models.ForeignKey('Attribute_types', to_field='id', db_index=True, on_delete=models.PROTECT)
     order = models.IntegerField(db_index=True)
 
 class Headwords(dalmeUuid):
     word = models.CharField(max_length=55)
     full_lemma = models.CharField(max_length=255)
-    concept_id = models.ForeignKey('Concepts', to_field='id', db_index=True)
+    concept_id = models.ForeignKey('Concepts', to_field='id', db_index=True, on_delete=models.PROTECT)
 
 class Objects(dalmeUuid):
     concept_id = models.UUIDField(db_index=True)
-    object_phrase_id = models.ForeignKey('Object_phrases', to_field='id', db_index=True)
+    object_phrase_id = models.ForeignKey('Object_phrases', to_field='id', db_index=True, on_delete=models.CASCADE)
 
 class Object_attributes(dalmeBasic):
-    object_id = models.ForeignKey('Objects', to_field='id', db_index=True)
+    object_id = models.ForeignKey('Objects', to_field='id', db_index=True, on_delete=models.CASCADE)
     concept_id = models.UUIDField(db_index=True)
 
 class Places(dalmeUuid):
@@ -104,38 +132,38 @@ class Sources(dalmeUuid):
     is_inventory = models.BooleanField(default=False, db_index=True)
 
 class Pages(dalmeUuid):
-    source_id = models.ForeignKey('Sources', to_field='id', db_index=True)
+    source_id = models.ForeignKey('Sources', to_field='id', db_index=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=55)
     dam_id = models.IntegerField(db_index=True)
     order = models.IntegerField(db_index=True)
 
 class Transcriptions(dalmeUuid):
-    source_id = models.ForeignKey('Sources', to_field='id', db_index=True)
+    source_id = models.ForeignKey('Sources', to_field='id', db_index=True, on_delete=models.CASCADE)
     transcription = models.TextField()
 
 class Identity_phrases(dalmeUuid):
-    transcription_id = models.ForeignKey('Transcriptions', to_field='id', db_index=True)
+    transcription_id = models.ForeignKey('Transcriptions', to_field='id', db_index=True, on_delete=models.CASCADE)
     phrase = models.TextField()
 
 class Object_phrases(dalmeUuid):
-    transcription_id = models.ForeignKey('Transcriptions', to_field='id', db_index=True)
+    transcription_id = models.ForeignKey('Transcriptions', to_field='id', db_index=True, on_delete=models.CASCADE)
     phrase = models.TextField()
 
 class Word_forms(dalmeUuid):
     normalized_form = models.CharField(max_length=55)
     pos = models.CharField(max_length=255)
-    headword_id = models.ForeignKey('Headwords', to_field='id', db_index=True)
+    headword_id = models.ForeignKey('Headwords', to_field='id', db_index=True, on_delete=models.PROTECT)
 
 class Tokens(dalmeUuid):
-    object_phrase_id = models.ForeignKey('Object_phrases', to_field='id', db_index=True)
-    word_form_id = models.ForeignKey('Word_forms', to_field='id', db_index=True)
+    object_phrase_id = models.ForeignKey('Object_phrases', to_field='id', db_index=True, on_delete=models.CASCADE)
+    word_form_id = models.ForeignKey('Word_forms', to_field='id', db_index=True, on_delete=models.PROTECT)
     raw_token = models.CharField(max_length=255)
     clean_token = models.CharField(max_length=55)
     order = models.IntegerField(db_index=True)
     flags = models.CharField(max_length=10)
 
 class Identity_phrases_x_entities(dalmeBasic):
-    identity_phrase_id = models.ForeignKey('Identity_phrases', to_field='id', db_index=True)
+    identity_phrase_id = models.ForeignKey('Identity_phrases', to_field='id', db_index=True, on_delete=models.CASCADE)
     entity_id = models.UUIDField(db_index=True)
 
 #app management models

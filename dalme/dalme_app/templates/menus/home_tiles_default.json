@@ -17,7 +17,7 @@
   },
   {
     "colourClass": "panel-yellow",
-    "iconClass": "fa-list",
+    "iconClass": "fa-list-ol",
     "counter": "inventories",
     "counterTitle": "Inventories",
     "linkTarget": "/list/inventories",

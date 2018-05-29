@@ -1,4 +1,4 @@
-import re, json, requests, hashlib, os, uuid, calendar
+import re, json, requests, hashlib, os, uuid, calendar, datetime
 import pandas as pd
 from django.contrib import messages
 from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
@@ -7,8 +7,8 @@ from async_messages import message_user
 from django.db.models import Q
 from django.db import connections
 from dalme_app import menus
-
-
+from .forms import new_user
+from django.contrib.auth import get_user_model
 
 #General functions
 def menu_constructor(request, item_constructor, template):
@@ -477,12 +477,12 @@ def get_count(item):
             return None
 
     elif item == 'assets':
-        #cursor = connections['dam'].cursor()
-        #cursor.execute("SELECT COUNT(*) FROM resource")
-        #results = cursor.fetchone()[0]
-        #return results
+        cursor = connections['dam'].cursor()
+        cursor.execute("SELECT COUNT(*) FROM resource")
+        results = cursor.fetchone()[0]
+        return results
 
-        return "356"
+        return results
 
     else:
         return None
@@ -545,3 +545,91 @@ def get_date_from_elements(day, month, year):
         output = ''
 
     return output
+
+def create_user(request, data):
+
+    # process the data in form.cleaned_data as required
+    username = data.cleaned_data['username']
+    first_name = data.cleaned_data['first_name']
+    last_name = data.cleaned_data['last_name']
+    email = data.cleaned_data['email']
+    is_staff = data.cleaned_data['is_staff']
+    is_superuser = data.cleaned_data['is_superuser']
+    dam_usergroup = data.cleaned_data['dam_usergroup']
+    wiki_groups_list = data.cleaned_data['wiki_groups']
+    if wiki_groups_list:
+        if len(wiki_groups_list) > 1:
+            wiki_groups = '|'.join(wiki_groups_list)
+        else:
+            wiki_groups = wiki_groups_list[0]
+    else:
+        wiki_groups = 'users'
+    wp_role = data.cleaned_data['wp_role']
+    #generate extra fields:
+    full_name = first_name + ' ' + last_name
+    wiki_username = username.title()
+    wiki_realname = username
+    password = str(uuid.uuid4().hex)
+    wp_user_registered = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    #create a new user object and add the fields
+    the_user = User()
+    the_user.username = username
+    the_user.first_name = first_name
+    the_user.last_name = last_name
+    the_user.email = email
+    the_user.is_staff = is_staff
+    the_user.is_superuser = is_superuser
+    the_user.save()
+    the_user.profile.dam_usergroup = dam_usergroup
+    the_user.profile.wp_role = wp_role
+    the_user.profile.full_name = full_name
+    the_user.profile.wiki_username = wiki_username
+    the_user.profile.wiki_groups = wiki_groups
+    the_user.save()
+
+    #create record in WP
+    cursor = connections['wp'].cursor()
+    cursor.execute("INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_registered, user_status, display_name) VALUES(%s, %s, %s, %s, %s, %s, %s)", (username, password, username, email, wp_user_registered, '0', full_name))
+
+    #get wp user id and add it to User object
+    cursor.execute("SELECT ID FROM wp_users WHERE user_login = %s",[username])
+    wp_userid = cursor.fetchone()[0]
+    the_user.profile.wp_userid = wp_userid
+    the_user.save()
+
+    #add user metadata
+    cursor.execute("INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES(%s, %s, %s)", (wp_userid, 'first_name', first_name))
+    cursor.execute("INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES(%s, %s, %s)", (wp_userid, 'last_name', last_name))
+    cursor.execute("INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES(%s, %s, %s)", (wp_userid, 'wp_capabilities', wp_role))
+
+    #create record in wiki
+    cursor = connections['wiki'].cursor()
+    cursor.execute("INSERT INTO user (user_name, user_real_name, user_password, user_newpassword, user_email) VALUES(%s, %s, %s, %s, %s)", (wiki_username, wiki_realname, password, password, email))
+
+    #get wiki user id and add it to User object
+    cursor.execute("SELECT user_id FROM user WHERE user_name = %s",[wiki_username])
+    wiki_userid = cursor.fetchone()[0]
+    the_user.profile.wiki_userid = wiki_userid
+    the_user.save()
+
+    #add user to groups if necessary
+    if wiki_groups != 'user':
+        for i in wiki_groups_list:
+            if i == 'administrator':
+                ug_group = 'sysop'
+            elif i == 'bureaucrat':
+                ug_group = 'bureaucrat'
+
+            cursor.execute("INSERT INTO user_groups (ug_user, ug_group) VALUES(%s, %s)", (wiki_userid, ug_group))
+
+
+    #create record in dam
+    cursor = connections['dam'].cursor()
+    cursor.execute("INSERT INTO user (username, password, fullname, email, usergroup, approved) VALUES(%s, %s, %s, %s, %s, %s)",(username, password, full_name, email,dam_usergroup,1))
+
+    #get dam user id and add it to User object
+    cursor.execute("SELECT ref FROM user WHERE username = %s",[username])
+    dam_userid = cursor.fetchone()[0]
+    the_user.profile.dam_userid = dam_userid
+    the_user.save()

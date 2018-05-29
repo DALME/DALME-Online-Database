@@ -42,10 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
     'django.contrib.sites',
+    'haystack',
     'treebeard',
     'sekizai',
     'django_celery_results',
-    'allaccess',
+    'allaccess.apps.AllAccessConfig',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -58,7 +59,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'async_messages.middleware.AsyncMiddleware',
+    #'async_messages.middleware.AsyncMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'
@@ -110,15 +111,33 @@ if 'RDS_DB_NAME' in os.environ:
             'PORT': os.environ['RDS_PORT'],
             'CONN_MAX_AGE': 3600,
         },
-        #'dam': {
-        #    'ENGINE': 'django.db.backends.mysql',
-        #    'NAME': os.environ['DAM_DB_NAME'],
-        #    'USER': os.environ['DAM_USERNAME'],
-        #    'PASSWORD': os.environ['DAM_PASSWORD'],
-        #    'HOST': os.environ['DAM_HOSTNAME'],
-        #    'PORT': os.environ['DAM_PORT'],
-        #    'CONN_MAX_AGE': 3600,
-        #}
+        'dam': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['DAM_DB_NAME'],
+            'USER': os.environ['DAM_USERNAME'],
+            'PASSWORD': os.environ['DAM_PASSWORD'],
+            'HOST': os.environ['DAM_HOSTNAME'],
+            'PORT': os.environ['DAM_PORT'],
+            'CONN_MAX_AGE': 3600,
+        },
+        'wp': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WP_DB_NAME'],
+            'USER': os.environ['WP_USERNAME'],
+            'PASSWORD': os.environ['WP_PASSWORD'],
+            'HOST': os.environ['WP_HOSTNAME'],
+            'PORT': os.environ['WP_PORT'],
+            'CONN_MAX_AGE': 3600,
+        },
+        'wiki': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WIKI_DB_NAME'],
+            'USER': os.environ['WIKI_USERNAME'],
+            'PASSWORD': os.environ['WIKI_PASSWORD'],
+            'HOST': os.environ['WIKI_HOSTNAME'],
+            'PORT': os.environ['WIKI_PORT'],
+            'CONN_MAX_AGE': 3600,
+        }
     }
 else:
     DATABASES = {
@@ -144,6 +163,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

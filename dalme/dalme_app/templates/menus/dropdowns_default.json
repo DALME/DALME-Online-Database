@@ -6,6 +6,33 @@
     "childrenIconClass": "fa-gears",
     "children": [
           {
+            "title": true,
+            "text": "Admin"
+          },
+          {
+            "text": "Manage Users",
+            "link": "/list/users",
+            "iconClass": "fa-users"
+          },
+          {
+            "text": "Website Admin",
+            "link": "https://dalme.org/wp/wp-admin",
+            "iconClass": "fa-globe"
+          },
+          {
+            "text": "Manage Notifications",
+            "link": "/list/errors",
+            "iconClass": "fa-medkit"
+          },
+          {
+            "text": "Background Tasks",
+            "link": "/list/tasks",
+            "iconClass": "fa-tasks"
+          },
+          {
+            "divider": true
+          },
+          {
             "text": "Import Sources CSV",
             "link": "/script/import_sources_csv"
           },
@@ -34,17 +61,8 @@
       "childrenIconClass": "fa-dot-circle-o",
       "children": [
         {
-          "text": "Error codes",
-          "link": "/list/errors",
-          "iconClass": "fa-medkit"
-        },
-        {
-          "divider": true
-        },
-        {
-          "text": "UI Reference:",
-          "iconClass": "fa-list-alt",
-          "section": true
+          "title": true,
+          "text": "UI Reference"
         },
         {
           "text": "Dashboard Content",
@@ -98,6 +116,10 @@
     "iconClass": "fa-user",
     "children": [
       {
+        "title": true,
+        "logoutMenu": true
+      },
+      {
         "text": "Profile",
         "link": "https://dalme.org/wp/wp-admin/profile.php",
         "iconClass": "fa-user"
@@ -111,7 +133,7 @@
         "divider": true
       },
       {
-        "logoutText": true,
+        "text": "Log out",
         "link": "/logout/",
         "iconClass": "fa-sign-out"
       }
