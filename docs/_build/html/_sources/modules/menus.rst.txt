@@ -1,5 +1,0 @@
-Menus
-=====
-
-.. automodule:: dalme_app.menus
-   :members:

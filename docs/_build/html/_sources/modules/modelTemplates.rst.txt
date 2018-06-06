@@ -1,5 +1,0 @@
-Model Templates
-===============
-
-.. automodule:: dalme_app.modelTemplates
-   :members:
