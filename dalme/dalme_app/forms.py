@@ -1,4 +1,9 @@
+"""
+This is where all of the forms used elsewhere in the site are set up.
+"""
+
 from django import forms
+
 from .models import error_messages, Profile
 
 class upload_file(forms.Form):

@@ -1,11 +1,16 @@
 from __future__ import absolute_import, unicode_literals
-import re, requests
-from dalme_app.models import par_inventories, par_folios, par_tokens, error_messages, par_objects
-from dalme_app import functions
-from dalme.celeryapp import app
-from async_messages import messages
+"""
+Celery tasks
+"""
+
 from django.contrib.auth.models import User
 
+import re, requests
+from async_messages import messages
+
+from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
+from . import functions
+from dalme.celeryapp import app
 
 @app.task
 def parse_inventory(form_data, inve_id, username):

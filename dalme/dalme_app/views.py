@@ -1,21 +1,34 @@
+"""
+Functions for managing views
+"""
+
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db import connections
+from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-import requests, uuid, os, datetime
-from .forms import upload_file, new_error, inventory_metadata, new_user, home_search
-from dalme_app import functions, scripts
-from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from dalme_app.tasks import parse_inventory
+
 from django_celery_results.models import TaskResult
-from django.db.models import Q
+
+import requests, uuid, os, datetime
 from allaccess.views import OAuthCallback
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
-from django.db import connections
+
+from . import functions, scripts
+from .forms import upload_file, new_error, inventory_metadata, new_user, home_search
+from .models import (par_inventories, par_folios, par_tokens, par_objects,
+    error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
+    Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
+    Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
+    Objects, Object_attributes, Places, Sources, Pages, Transcriptions,
+    Identity_phrases, Object_phrases, Word_forms, Tokens,
+    Identity_phrases_x_entities)
+from .tasks import parse_inventory
 
 
 #authentication (sub)classses

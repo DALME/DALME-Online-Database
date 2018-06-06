@@ -1,9 +1,17 @@
-import uuid
-from django.db import models
+"""
+This file defines all of the models used in the application. These models are
+used to create database entries, and can be used in other functions to access
+and iterate through data in the database without writing SQL statements.
+"""
+
 from django.contrib.auth.models import User
-from .modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+import uuid
+
+from .modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
 
 #function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():

@@ -1,13 +1,19 @@
-from dalme_app import functions
-from django.urls import reverse
+"""
+This menus module provides a streamlined way to create menus from simple json files.
+"""
+
 from django.contrib.auth.models import User
+from django.urls import reverse
+
 import json, os
+
+from . import functions
 
 LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
 
 def sidebar_item(request,wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
     """
-    Generates a menu item and incorporates it into `whoeleMenu`. This function
+    Generates a menu item and incorporates it into `wholeMenu`. This function
     calls itself to recurse through hierarchies of menus, and uses the
     `LEVEL_LOOKUP` variable with the `depth` parameter to give subheadings the
     right class.

@@ -1,11 +1,23 @@
+"""
+Contains general purpose scripts
+"""
+
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.core import serializers
+
 import re, json, requests, hashlib, os, uuid
 import pandas as pd
-from django.contrib import messages
-from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
-from django.contrib.auth.models import User
 from async_messages import message_user
-from dalme_app import functions
-from django.core import serializers
+
+from .models import (par_inventories, par_folios, par_tokens, par_objects,
+    error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
+    Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
+    Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
+    Objects, Object_attributes, Places, Sources, Pages, Transcriptions,
+    Identity_phrases, Object_phrases, Word_forms, Tokens,
+    Identity_phrases_x_entities)
+from . import functions
 
 def session_info(request, username):
     output = request.session

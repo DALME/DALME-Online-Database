@@ -1,14 +1,26 @@
-import re, json, requests, hashlib, os, uuid, calendar, datetime
-import pandas as pd
+"""
+This file houses all of the miscellaneous functions used elsewhere in the project.
+"""
+
 from django.contrib import messages
-from .models import par_inventories, par_folios, par_tokens, par_objects, error_messages, Agents, Attribute_types, Attributes, Attributes_DATE, Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts, Content_classes, Content_types, Content_types_x_attribute_types, Headwords, Objects, Object_attributes, Places, Sources, Pages, Transcriptions, Identity_phrases, Object_phrases, Word_forms, Tokens, Identity_phrases_x_entities
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from async_messages import message_user
 from django.db.models import Q
 from django.db import connections
-from dalme_app import menus
+
+from async_messages import message_user
+import re, json, requests, hashlib, os, uuid, calendar, datetime
+import pandas as pd
+
+from . import menus
 from .forms import new_user
-from django.contrib.auth import get_user_model
+from .models import (par_inventories, par_folios, par_tokens, par_objects,
+    error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
+    Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
+    Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
+    Objects, Object_attributes, Places, Sources, Pages, Transcriptions,
+    Identity_phrases, Object_phrases, Word_forms, Tokens,
+    Identity_phrases_x_entities)
 
 #General functions
 def menu_constructor(request, item_constructor, template):
@@ -472,7 +484,10 @@ def get_count(item):
             #query api
             r3 = requests.get(base_url+'api.php',params=queryParams,cookies=r2.cookies)
             stats = r3.json()
-            return stats['query']['statistics']['articles']
+            try:
+                return stats['query']['statistics']['articles']
+            except KeyError:
+                return "?"
         else:
             return None
 
