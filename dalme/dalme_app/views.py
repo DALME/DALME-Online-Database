@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.views.generic import ListView
 
 from django_celery_results.models import TaskResult
 
@@ -22,13 +23,13 @@ from allaccess.views import OAuthCallback
 from . import functions, scripts
 from .forms import upload_file, new_error, inventory_metadata, new_user, home_search
 from .menus import menu_constructor
-from .models import (par_inventories, par_folios, par_tokens, par_objects,
-    error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
-    Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
-    Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
-    Identity_phrases, Object_phrases, Word_forms, Tokens,
-    Identity_phrases_x_entities)
+from .models import (par_inventory, par_folio, par_token, par_object,
+    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
+    Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
+    Content_class, Content_type, Content_type_x_attribute_type, Headword,
+    Object, Object_attribute, Place, Source, Page, Transcription,
+    Identity_phrase, Object_phrase, Word_form, Token,
+    Identity_phrase_x_entity)
 from .tasks import parse_inventory
 
 
@@ -147,7 +148,7 @@ def list(request, module, type='all'):
             form = upload_file()
 
         context['form'] = form
-        types = Content_types.objects.filter(content_class=1)
+        types = Content_type.objects.filter(content_class=1)
         types_dict = {}
         for t in types:
             types_dict[t.id] = t.name
@@ -181,15 +182,15 @@ def list(request, module, type='all'):
             panel_title = 'List of inventories'
             headers = ['Type', 'Title','Start Date','End Date','Source']
             inventories = Source.objects.filter(is_inventory=True).order_by('short_name')
-            dates_list = Attributes_DATE.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=25) | Q(attribute_id__attribute_type=26))
-            types_list = Attributes_STR.objects.select_related('attribute_id').filter(attribute_id__attribute_type=28)
+            dates_list = Attribute_DATE.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=25) | Q(attribute_id__attribute_type=26))
+            types_list = Attribute_STR.objects.select_related('attribute_id').filter(attribute_id__attribute_type=28)
 
 
         elif type == 'biblio':
             panel_title = 'List of bibliographic sources'
             headers = ['Type', 'Title']
             biblio_sources = Source.objects.filter(type__lte=11).order_by('short_name')
-            attribute_list = Attributes_STR.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=15) | Q(attribute_id__attribute_type=1))
+            attribute_list = Attribute_STR.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=15) | Q(attribute_id__attribute_type=1))
             rows = []
 
             for i in biblio_sources:
@@ -252,7 +253,7 @@ def list(request, module, type='all'):
                 e_text = form.cleaned_data['e_text']
                 e_code = functions.get_new_error(e_level)
 
-                message = error_messages(
+                message = error_message(
                     e_code = e_code,
                     e_level = e_level,
                     e_type = e_type,
@@ -272,7 +273,7 @@ def list(request, module, type='all'):
 
         context['form'] = form
         headers = ['Code', 'Level', 'Type', 'Text']
-        errors = error_messages.objects.all()
+        errors = error_message.objects.all()
         rows = []
 
         for i in errors:
@@ -301,7 +302,7 @@ def list(request, module, type='all'):
             ('href="#"', 'Action 3'),
         )
         headers = ['Object ID', 'Name', 'Class', 'Material', 'Room', 'Terms']
-        objects = par_objects.objects.all()
+        objects = par_object.objects.all()
         rows = []
         for i in objects:
             tr_class = ''
@@ -429,8 +430,8 @@ def show(request, item, id):
     context = {}
     if item == 'inventory':
         id = uuid.UUID(id).hex
-        inv = par_inventories.objects.get(pk=id)
-        folios = inv.par_folios_set.all()
+        inv = par_inventory.objects.get(pk=id)
+        folios = inv.par_folio_set.all()
 
         if not folios:
             functions.notification(request, 4001)
@@ -488,7 +489,7 @@ def form(request, item):
 
             if form.is_valid():
                 #create inventory record in database
-                inv = par_inventories(
+                inv = par_inventory(
                     title=form.cleaned_data['inv_title'],
                     source=form.cleaned_data['inv_source'],
                     location=form.cleaned_data['inv_location'],

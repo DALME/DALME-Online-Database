@@ -10,13 +10,13 @@ import re, json, requests, hashlib, os, uuid
 import pandas as pd
 from async_messages import message_user
 
-from .models import (par_inventories, par_folios, par_tokens, par_objects,
-    error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
-    Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
-    Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
-    Identity_phrases, Object_phrases, Word_forms, Tokens,
-    Identity_phrases_x_entities)
+from .models import (par_inventory, par_folio, par_token, par_object,
+    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
+    Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
+    Content_class, Content_type, Content_type_x_attribute_type, Headword,
+    Object, Object_attribute, Place, Source, Page, Transcription,
+    Identity_phrase, Object_phrase, Word_form, Token,
+    Identity_phrase_x_entity)
 from . import functions
 
 def session_info(request, username):
@@ -54,7 +54,7 @@ def import_sources_csv(request, username):
         if '-2' in c:
             c = c.replace('-2','')
 
-        entry = Attribute_types.objects.get(short_name=c)
+        entry = Attribute_type.objects.get(short_name=c)
         dtype = entry.data_type
         atype = entry.id
         data_types.append((c,atype,dtype))
@@ -105,7 +105,7 @@ def import_sources_csv(request, username):
                 atype = a[1]
                 dtype = a[2]
 
-                new_attribute = Attributes()
+                new_attribute = Attribute()
                 new_attribute.attribute_type = int(atype)
                 new_attribute.content_id = uuid.UUID(row['id']).hex
                 new_attribute.creation_username = username
@@ -122,7 +122,7 @@ def import_sources_csv(request, username):
                 #att_id = attribute.id
 
                 if dtype == 'INT':
-                    new_att_INT = Attributes_INT()
+                    new_att_INT = Attribute_INT()
                     new_att_INT.attribute_id = new_attribute
                     new_att_INT.value = int(att_value)
                     new_att_INT.creation_username = username
@@ -138,7 +138,7 @@ def import_sources_csv(request, username):
                     #att_value.save()
 
                 elif dtype == 'STR':
-                    new_att_STR = Attributes_STR()
+                    new_att_STR = Attribute_STR()
                     new_att_STR.attribute_id = new_attribute
                     new_att_STR.value = att_value
                     new_att_STR.creation_username = username
@@ -154,7 +154,7 @@ def import_sources_csv(request, username):
                     #att_value.save()
 
                 elif dtype == 'TXT':
-                    new_att_TXT = Attributes_TXT()
+                    new_att_TXT = Attribute_TXT()
                     new_att_TXT.attribute_id = new_attribute
                     new_att_TXT.value = att_value
                     new_att_TXT.creation_username = username
@@ -170,7 +170,7 @@ def import_sources_csv(request, username):
                     #att_value.save()
 
                 elif dtype == 'DBR':
-                    new_att_DBR = Attributes_DBR()
+                    new_att_DBR = Attribute_DBR()
                     new_att_DBR.attribute_id = new_attribute
                     new_att_DBR.value = uuid.UUID(att_value).hex
                     new_att_DBR.creation_username = username
@@ -211,7 +211,7 @@ def import_sources_csv(request, username):
                         d_date = functions.get_date_from_elements(d_day, d_month, d_year)
 
                         if d_day or d_month or d_year or d_date:
-                            new_att_DATE = Attributes_DATE()
+                            new_att_DATE = Attribute_DATE()
                             new_att_DATE.attribute_id = new_attribute
                             if d_day:
                                 new_att_DATE.value_day = d_day
@@ -237,12 +237,12 @@ def import_sources_csv(request, username):
 
     #now run bulk_creates on the relevant models
     Source.objects.bulk_create(new_sources)
-    Attributes.objects.bulk_create(new_attributes)
-    Attributes_DATE.objects.bulk_create(new_attributes_DATE)
-    Attributes_INT.objects.bulk_create(new_attributes_INT)
-    Attributes_STR.objects.bulk_create(new_attributes_STR)
-    Attributes_TXT.objects.bulk_create(new_attributes_TXT)
-    Attributes_DBR.objects.bulk_create(new_attributes_DBR)
+    Attribute.objects.bulk_create(new_attributes)
+    Attribute_DATE.objects.bulk_create(new_attributes_DATE)
+    Attribute_INT.objects.bulk_create(new_attributes_INT)
+    Attribute_STR.objects.bulk_create(new_attributes_STR)
+    Attribute_TXT.objects.bulk_create(new_attributes_TXT)
+    Attribute_DBR.objects.bulk_create(new_attributes_DBR)
 
     output = 'Everything cool'
     return output

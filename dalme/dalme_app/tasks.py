@@ -8,14 +8,14 @@ from django.contrib.auth.models import User
 import re, requests
 from async_messages import messages
 
-from .models import par_inventories, par_folios, par_tokens, error_messages, par_objects
+from .models import par_inventory, par_folio, par_token, error_message, par_object
 from . import functions
 from dalme.celeryapp import app
 
 @app.task
 def parse_inventory(form_data, inve_id, username):
     """Parses the inventory"""
-    inv = par_inventories.objects.get(pk=inve_id)
+    inv = par_inventory.objects.get(pk=inve_id)
     inv_name = inv.title
     #first parse the STRUCTURE section
     f = form_data['text']
@@ -30,7 +30,7 @@ def parse_inventory(form_data, inve_id, username):
             m = line_pattern.match(line)
             _folio = m.group(1)
             dam_id = m.group(2)
-            fol = par_folios(
+            fol = par_folio(
                 inv_id = inv,
                 folio_no =_folio,
                 dam_id = dam_id,
@@ -69,10 +69,10 @@ def parse_inventory(form_data, inve_id, username):
 
         #create tokens in database
         for line, folio, tokens in lines_list:
-            fol = par_folios.objects.get(inv_id=inv, folio_no=folio)
+            fol = par_folio.objects.get(inv_id=inv, folio_no=folio)
             #add logic to deal with folio not existing
             for i, token in enumerate(tokens):
-                the_token = par_tokens(
+                the_token = par_token(
                     folio_id=fol,
                     line_no=line,
                     position=token['position'],

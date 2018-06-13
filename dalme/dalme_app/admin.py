@@ -5,13 +5,13 @@ This file is where all of the admin interface views are set up, available at
 
 from django.contrib import admin
 
-from .models import (par_inventories, par_folios, par_tokens, par_objects,
-    error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
-    Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
-    Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
-    Identity_phrases, Object_phrases, Word_forms, Tokens,
-    Identity_phrases_x_entities)
+from .models import (par_inventory, par_folio, par_token, par_object,
+    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
+    Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
+    Content_class, Content_type, Content_type_x_attribute_type, Headword,
+    Object, Object_attribute, Place, Source, Page, Transcription,
+    Identity_phrase, Object_phrase, Word_form, Token,
+    Identity_phrase_x_entity)
 
 class DalmeBaseAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
@@ -20,32 +20,32 @@ class DalmeBaseAdmin(admin.ModelAdmin):
         obj.modification_username = request.user.username
         obj.save()
 
-admin.site.register(par_inventories)
-admin.site.register(par_folios)
-admin.site.register(par_tokens)
-admin.site.register(par_objects)
-admin.site.register(error_messages)
-admin.site.register(Agents)
-admin.site.register(Attribute_types)
-admin.site.register(Attributes)
-admin.site.register(Attributes_DATE)
-admin.site.register(Attributes_DBR)
-admin.site.register(Attributes_INT)
-admin.site.register(Attributes_STR)
-admin.site.register(Attributes_TXT)
-admin.site.register(Concepts)
-admin.site.register(Content_classes)
-admin.site.register(Content_types)
-admin.site.register(Content_types_x_attribute_types)
-admin.site.register(Headwords)
-admin.site.register(Objects)
-admin.site.register(Object_attributes)
-admin.site.register(Places)
+admin.site.register(par_inventory)
+admin.site.register(par_folio)
+admin.site.register(par_token)
+admin.site.register(par_object)
+admin.site.register(error_message)
+admin.site.register(Agent)
+admin.site.register(Attribute_type)
+admin.site.register(Attribute)
+admin.site.register(Attribute_DATE)
+admin.site.register(Attribute_DBR)
+admin.site.register(Attribute_INT)
+admin.site.register(Attribute_STR)
+admin.site.register(Attribute_TXT)
+admin.site.register(Concept)
+admin.site.register(Content_class)
+admin.site.register(Content_type)
+admin.site.register(Content_type_x_attribute_type)
+admin.site.register(Headword)
+admin.site.register(Object)
+admin.site.register(Object_attribute)
+admin.site.register(Place)
 admin.site.register(Source)
-admin.site.register(Pages)
-admin.site.register(Transcriptions)
-admin.site.register(Identity_phrases)
-admin.site.register(Object_phrases)
-admin.site.register(Word_forms)
-admin.site.register(Tokens)
-admin.site.register(Identity_phrases_x_entities)
+admin.site.register(Page)
+admin.site.register(Transcription)
+admin.site.register(Identity_phrase)
+admin.site.register(Object_phrase)
+admin.site.register(Word_form)
+admin.site.register(Token)
+admin.site.register(Identity_phrase_x_entity)

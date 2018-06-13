@@ -14,13 +14,13 @@ import pandas as pd
 
 from . import menus
 from .forms import new_user
-from .models import (par_inventories, par_folios, par_tokens, par_objects,
-    error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
-    Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
-    Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
-    Identity_phrases, Object_phrases, Word_forms, Tokens,
-    Identity_phrases_x_entities)
+from .models import (par_inventory, par_folio, par_token, par_object,
+    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
+    Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
+    Content_class, Content_type, Content_type_x_attribute_type, Headword,
+    Object, Object_attribute, Place, Source, Page, Transcription,
+    Identity_phrase, Object_phrase, Word_form, Token,
+    Identity_phrase_x_entity)
 
 #General functions
 def inventory_check(_file):
@@ -278,14 +278,14 @@ def get_inventory(inv, output_type):
 
     if output_type == 'full':
         results = []
-        folios = inv.par_folios_set.all()
+        folios = inv.par_folio_set.all()
         folios = folios.order_by('folio_no')
         line = 1
         for i in folios:
             folio_no = i.folio_no
             image_url = get_dam_preview(i.dam_id)
             folio_list = [folio_no,image_url]
-            tokens = i.par_tokens_set.all()
+            tokens = i.par_token_set.all()
             tokens = tokens.order_by('line_no', 'position')
             all_lines = []
             line_list = [line]
@@ -354,7 +354,7 @@ def get_display_token_class(flag):
     return token_class
 
 def get_new_error(level):
-    errors = error_messages.objects.filter(e_level=level)
+    errors = error_message.objects.filter(e_level=level)
     no = errors.count()
 
     if no == None:
@@ -383,7 +383,7 @@ def get_new_error(level):
     return new
 
 def notification(request, code, **kwargs):
-    base_message = error_messages.objects.get(pk=code)
+    base_message = error_message.objects.get(pk=code)
     msg_text = base_message.e_text
     msg_level = base_message.e_level
 
@@ -408,10 +408,10 @@ def notification(request, code, **kwargs):
 
 def bar_chart():
     results = []
-    materials = par_objects.objects.order_by().values_list('material', flat=True).distinct()
+    materials = par_object.objects.order_by().values_list('material', flat=True).distinct()
 
     for i in materials:
-        count = par_objects.objects.filter(material=i).count()
+        count = par_object.objects.filter(material=i).count()
         entry = (i, count)
         results.append(entry)
 
@@ -424,22 +424,22 @@ def get_count(item):
     All other values for `item` return None
     """
     if item == 'inventories':
-        return Sources.objects.filter(is_inventory=True).count()
+        return Source.objects.filter(is_inventory=True).count()
 
     elif item == 'archives':
-        return Sources.objects.filter(type=19).count()
+        return Source.objects.filter(type=19).count()
 
     elif item == 'sources':
-        return Sources.objects.count()
+        return Source.objects.count()
 
     elif item == 'notarial_sources':
-        return Sources.objects.filter(Q(type=12) | Q(type=13)).count()
+        return Source.objects.filter(Q(type=12) | Q(type=13)).count()
 
     elif item == 'biblio_sources':
-        return Sources.objects.filter(type__lte=11).count()
+        return Source.objects.filter(type__lte=11).count()
 
     elif item == 'objects':
-        return par_objects.objects.count()
+        return par_object.objects.count()
 
     elif item == 'wiki-articles':
         if 'WIKI_BOT_PASSWORD' in os.environ:

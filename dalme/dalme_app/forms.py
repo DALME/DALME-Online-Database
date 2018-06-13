@@ -4,7 +4,7 @@ This is where all of the forms used elsewhere in the site are set up.
 
 from django import forms
 
-from .models import error_messages, Profile
+from .models import error_message, Profile
 
 class upload_file(forms.Form):
     inv_file = forms.FileField(label='File to upload')
@@ -20,8 +20,8 @@ class inventory_metadata(forms.Form):
     #inv_notes = forms.CharField(label='Notes', widget=forms.Textarea)
 
 class new_error(forms.Form):
-    e_level = forms.IntegerField(label='Level', widget=forms.Select(choices=error_messages.LEVELS))
-    e_type = forms.IntegerField(label='Type', widget=forms.Select(choices=error_messages.TYPES))
+    e_level = forms.IntegerField(label='Level', widget=forms.Select(choices=error_message.LEVELS))
+    e_type = forms.IntegerField(label='Type', widget=forms.Select(choices=error_message.TYPES))
     e_text = forms.CharField(label='Text', widget=forms.Textarea)
 
 class new_user(forms.Form):
