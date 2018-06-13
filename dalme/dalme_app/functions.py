@@ -23,25 +23,6 @@ from .models import (par_inventories, par_folios, par_tokens, par_objects,
     Identity_phrases_x_entities)
 
 #General functions
-def menu_constructor(request, item_constructor, template):
-    """Builds menus based on an item_constructor and a json file describing the menu items.
-    Menus are stored in the templates directory, under the menus subdirectory."""
-    # Declare output string
-    _output = ''
-
-    # Get template from default location in dalme_app/templates/menus and read it
-    template = os.path.join('dalme','dalme_app','templates','menus',template)
-    with open(template, 'r') as fp:
-        menu = json.load(fp)
-
-    # Create menu by iterating through items in json file and appending to output
-    for item in menu:
-        _output += eval('menus.' + item_constructor + '(request,_output,**item)')
-
-    # Return output as part of a list, because renderer expects to iterate
-    return [_output]
-
-
 def inventory_check(_file):
     """Takes the data from a DALME Inventory Package and makes sure it's properly formatted"""
 

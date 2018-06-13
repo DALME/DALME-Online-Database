@@ -11,6 +11,26 @@ from . import functions
 
 LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
 
+def menu_constructor(request, item_constructor, template):
+    """
+    Builds menus based on an item_constructor and a json file describing the menu items.
+    Menus are stored in the templates directory, under the menus subdirectory.
+    """
+    # Declare output string
+    _output = ''
+
+    # Get template from default location in dalme_app/templates/menus and read it
+    template = os.path.join('dalme','dalme_app','templates','menus',template)
+    with open(template, 'r') as fp:
+        menu = json.load(fp)
+
+    # Create menu by iterating through items in json file and appending to output
+    for item in menu:
+        _output += eval(item_constructor + '(request,_output,**item)')
+
+    # Return output as part of a list, because renderer expects to iterate
+    return [_output]
+
 def sidebar_item(request,wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
     """
     Generates a menu item and incorporates it into `wholeMenu`. This function
