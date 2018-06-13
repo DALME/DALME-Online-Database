@@ -14,7 +14,7 @@ from .models import (par_inventories, par_folios, par_tokens, par_objects,
     error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
     Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
     Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Sources, Pages, Transcriptions,
+    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
     Identity_phrases, Object_phrases, Word_forms, Tokens,
     Identity_phrases_x_entities)
 from . import functions
@@ -26,7 +26,7 @@ def session_info(request, username):
 
 def test_expression(request, username):
 
-    output = serializers.serialize("xml", Sources.objects.filter(type=13))
+    output = serializers.serialize("xml", Source.objects.filter(type=13))
 
     return output
 
@@ -70,7 +70,7 @@ def import_sources_csv(request, username):
             is_inv = False
 
         #create a new object of "source" type and add the relevant fields
-        new_source = Sources()
+        new_source = Source()
         new_source.id = uuid.UUID(row['id']).hex
         new_source.type = int(row['type'])
         new_source.name = row['name']
@@ -236,7 +236,7 @@ def import_sources_csv(request, username):
                         #)
 
     #now run bulk_creates on the relevant models
-    Sources.objects.bulk_create(new_sources)
+    Source.objects.bulk_create(new_sources)
     Attributes.objects.bulk_create(new_attributes)
     Attributes_DATE.objects.bulk_create(new_attributes_DATE)
     Attributes_INT.objects.bulk_create(new_attributes_INT)

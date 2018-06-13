@@ -132,7 +132,7 @@ class Object_attributes(dalmeBasic):
 class Places(dalmeUuid):
     type = models.IntegerField(db_index=True)
 
-class Sources(dalmeUuid):
+class Source(dalmeUuid):
     type = models.IntegerField(db_index=True)
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
@@ -140,13 +140,13 @@ class Sources(dalmeUuid):
     is_inventory = models.BooleanField(default=False, db_index=True)
 
 class Pages(dalmeUuid):
-    source_id = models.ForeignKey('Sources', to_field='id', db_index=True, on_delete=models.CASCADE)
+    source_id = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=55)
     dam_id = models.IntegerField(db_index=True)
     order = models.IntegerField(db_index=True)
 
 class Transcriptions(dalmeUuid):
-    source_id = models.ForeignKey('Sources', to_field='id', db_index=True, on_delete=models.CASCADE)
+    source_id = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     transcription = models.TextField()
 
 class Identity_phrases(dalmeUuid):

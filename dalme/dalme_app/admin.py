@@ -9,7 +9,7 @@ from .models import (par_inventories, par_folios, par_tokens, par_objects,
     error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
     Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
     Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Sources, Pages, Transcriptions,
+    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
     Identity_phrases, Object_phrases, Word_forms, Tokens,
     Identity_phrases_x_entities)
 
@@ -41,7 +41,7 @@ admin.site.register(Headwords)
 admin.site.register(Objects)
 admin.site.register(Object_attributes)
 admin.site.register(Places)
-admin.site.register(Sources)
+admin.site.register(Source)
 admin.site.register(Pages)
 admin.site.register(Transcriptions)
 admin.site.register(Identity_phrases)

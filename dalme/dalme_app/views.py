@@ -25,7 +25,7 @@ from .models import (par_inventories, par_folios, par_tokens, par_objects,
     error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
     Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
     Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Sources, Pages, Transcriptions,
+    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
     Identity_phrases, Object_phrases, Word_forms, Tokens,
     Identity_phrases_x_entities)
 from .tasks import parse_inventory
@@ -154,7 +154,7 @@ def list(request, module, type='all'):
         if type == 'all':
             panel_title = 'List of all sources'
             headers = ['Type', 'Title']
-            sources_list = Sources.objects.all().order_by('type','short_name')
+            sources_list = Source.objects.all().order_by('type','short_name')
             rows = []
 
             for i in sources_list:
@@ -179,7 +179,7 @@ def list(request, module, type='all'):
         elif type == 'inventories':
             panel_title = 'List of inventories'
             headers = ['Type', 'Title','Start Date','End Date','Source']
-            inventories = Sources.objects.filter(is_inventory=True).order_by('short_name')
+            inventories = Source.objects.filter(is_inventory=True).order_by('short_name')
             dates_list = Attributes_DATE.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=25) | Q(attribute_id__attribute_type=26))
             types_list = Attributes_STR.objects.select_related('attribute_id').filter(attribute_id__attribute_type=28)
 
@@ -187,7 +187,7 @@ def list(request, module, type='all'):
         elif type == 'biblio':
             panel_title = 'List of bibliographic sources'
             headers = ['Type', 'Title']
-            biblio_sources = Sources.objects.filter(type__lte=11).order_by('short_name')
+            biblio_sources = Source.objects.filter(type__lte=11).order_by('short_name')
             attribute_list = Attributes_STR.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=15) | Q(attribute_id__attribute_type=1))
             rows = []
 

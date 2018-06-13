@@ -18,7 +18,7 @@ from .models import (par_inventories, par_folios, par_tokens, par_objects,
     error_messages, Agents, Attribute_types, Attributes, Attributes_DATE,
     Attributes_DBR, Attributes_INT, Attributes_STR, Attributes_TXT, Concepts,
     Content_classes, Content_types, Content_types_x_attribute_types, Headwords,
-    Objects, Object_attributes, Places, Sources, Pages, Transcriptions,
+    Objects, Object_attributes, Places, Source, Pages, Transcriptions,
     Identity_phrases, Object_phrases, Word_forms, Tokens,
     Identity_phrases_x_entities)
 
