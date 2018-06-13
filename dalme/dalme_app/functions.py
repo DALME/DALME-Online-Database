@@ -24,9 +24,15 @@ from .models import (par_inventories, par_folios, par_tokens, par_objects,
 
 #General functions
 def inventory_check(_file):
-    """Takes the data from a DALME Inventory Package and makes sure it's properly formatted"""
+    """
+    Takes the data from a DALME Inventory Package and makes sure it's properly formatted
+    """
 
-    #ALSO NEEDS TO CHECK IF INVENTORY ALREADY EXISTS
+    # TODO: ALSO NEEDS TO CHECK IF INVENTORY ALREADY EXISTS
+
+    metadata_tag = '*METADATA*'
+    structure_tag = '*STRUCTURE*'
+    transcription_tag = '*TRANSCRIPTION*'
 
     status = {}
 
@@ -35,19 +41,19 @@ def inventory_check(_file):
         text = text.decode("utf-8")
 
     #check that the metadata section is there
-    if '*METADATA*' in text:
+    if metadata_tag in text:
         status['has_metadata'] = 1
     else:
         status['has_metadata'] = 0
 
     #check if the file has a STRUCTURE section
-    if '*STRUCTURE*' in text:
+    if structure_tag in text:
         status['has_structure'] = 1
     else:
         status['has_structure'] = 0
 
     #check if the file has a TRANSCRIPTION section
-    if '*TRANSCRIPTION*' in text:
+    if transcription_tag in text:
         status['has_transcription'] = 1
     else:
         status['has_transcription'] = 0
@@ -63,9 +69,6 @@ def inventory_check(_file):
         status['text'] = text
 
         #determine the boundaries of each section
-        metadata_tag = '*METADATA*'
-        structure_tag = '*STRUCTURE*'
-        transcription_tag = '*TRANSCRIPTION*'
         lines = text.split('\n')
         #get the starting lines for all the sections and the file's last line
         last_line = len(lines)
@@ -128,7 +131,9 @@ def inventory_check(_file):
 
 
 def tokenise(line, t_type):
-    """takes a line and returns a list of dictionaries, one for each token, with all the pertinent attributes"""
+    """
+    Takes a line and returns a list of dictionaries, one for each token, with all the pertinent attributes
+    """
 
     #create the tokens
     tokens = line.split(' ')
@@ -267,7 +272,9 @@ def tokenise(line, t_type):
     return results
 
 def get_inventory(inv, output_type):
-    """ returns information associated with an inventory in the specified format """
+    """
+    Returns information associated with an inventory in the specified format
+    """
 
     if output_type == 'full':
         results = []
