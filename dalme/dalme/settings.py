@@ -145,6 +145,9 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'OPTIONS': {
                 'read_default_file': os.path.join(BASE_DIR, 'db.cnf')
+            },
+            'TEST': {
+                'NAME': 'dalme_app_test',
             }
         }
     }
