@@ -87,12 +87,12 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 
 #authentication backends
 AUTHENTICATION_BACKENDS = [
-    #'allaccess.backends.AuthorizedServiceBackend',
+    'allaccess.backends.AuthorizedServiceBackend',
     'django.contrib.auth.backends.ModelBackend'
 ]
 
 #authentication settings
-LOGIN_URL = '/login/'
+LOGIN_URL = '/accounts/login/dalme_wp/'
 LOGIN_REDIRECT_URL = 'dashboard'
 #LOGIN_REDIRECT_URL = 'https://db.dalme.org'
 
@@ -111,33 +111,6 @@ if 'RDS_DB_NAME' in os.environ:
             'HOST': os.environ['RDS_HOSTNAME'],
             'PORT': os.environ['RDS_PORT'],
             'CONN_MAX_AGE': 3600,
-        },
-        'dam': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['DAM_DB_NAME'],
-            'USER': os.environ['DAM_USERNAME'],
-            'PASSWORD': os.environ['DAM_PASSWORD'],
-            'HOST': os.environ['DAM_HOSTNAME'],
-            'PORT': os.environ['DAM_PORT'],
-            'CONN_MAX_AGE': 3600,
-        },
-        'wp': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['WP_DB_NAME'],
-            'USER': os.environ['WP_USERNAME'],
-            'PASSWORD': os.environ['WP_PASSWORD'],
-            'HOST': os.environ['WP_HOSTNAME'],
-            'PORT': os.environ['WP_PORT'],
-            'CONN_MAX_AGE': 3600,
-        },
-        'wiki': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['WIKI_DB_NAME'],
-            'USER': os.environ['WIKI_USERNAME'],
-            'PASSWORD': os.environ['WIKI_PASSWORD'],
-            'HOST': os.environ['WIKI_HOSTNAME'],
-            'PORT': os.environ['WIKI_PORT'],
-            'CONN_MAX_AGE': 3600,
         }
     }
 else:
@@ -146,6 +119,9 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'OPTIONS': {
                 'read_default_file': os.path.join(BASE_DIR, 'db.cnf')
+            },
+            'TEST': {
+                'NAME': 'dalme_app_test',
             }
         }
     }
