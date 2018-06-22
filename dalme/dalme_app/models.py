@@ -10,16 +10,22 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import uuid
+from datetime import datetime
 
-from .modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
+from dalme_app.modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
+from dalme_app.scripts.db import wp_db, wiki_db, dam_db
 
 #function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():
     the_id = uuid.uuid4().hex
     return the_id
 
-#one-to-one extension of user model to accomodate full_name (used by WP-OAuth)
+
 class Profile(models.Model):
+    """
+    One-to-one extension of user model to accomodate additional user related
+    data, including permissions of associated accounts on other platforms.
+    """
     DAM_USERGROUPS = (
         (1, 'Administrator'),
         (2, 'General User'),
@@ -41,7 +47,7 @@ class Profile(models.Model):
         ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber')
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
     dam_userid = models.IntegerField(null=True)
     dam_usergroup = models.IntegerField(choices=DAM_USERGROUPS, null=True)
@@ -50,6 +56,216 @@ class Profile(models.Model):
     wiki_groups = models.CharField(max_length=255, null=True)
     wp_userid = models.IntegerField(null=True)
     wp_role = models.CharField(max_length=50, null=True, choices=WP_ROLE)
+
+    def pull_ids(self):
+        """
+        For a given user, set external identifiers for associated accounts.
+        These accounts have the same username as the associated user object
+        """
+        # Set Wordpress user ID, if it exists
+        wp_cursor = wp_db.cursor()
+        wp_user_exists = wp_cursor.execute("SELECT ID FROM wp_users WHERE user_login = %s",[self.user.username])
+        print(wp_user_exists)
+        if wp_user_exists:
+            self.wp_userid = wp_cursor.fetchone()[0]
+        else:
+            self.wp_userid = None
+        wp_cursor.close()
+        # Set Wiki user ID, if it exists
+        wiki_cursor = wiki_db.cursor()
+        wiki_user_exists = wiki_cursor.execute("SELECT user_id FROM user WHERE user_name = %s",[self.user.username])
+        if wiki_user_exists:
+            self.wiki_userid = wiki_cursor.fetchone()[0]
+        else:
+            self.wiki_userid = None
+        wiki_cursor.close()
+        # Set DAM user ID, if it exists
+        wiki_cursor = dam_db.cursor()
+        wiki_user_exists = wiki_cursor.execute("SELECT ref FROM user WHERE username = %s",[self.user.username])
+        if wiki_user_exists:
+            self.dam_userid = wiki_cursor.fetchone()[0]
+        else:
+            self.dam_userid = None
+        wiki_cursor.close()
+
+    def create_accounts(self):
+        """
+        Create accounts in external platforms, so long as they don't have
+        existing accounts
+        """
+        password = str(uuid.uuid4().hex)
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # Wordpress user setup
+        if self.wp_userid == None:
+            wp_cursor = wp_db.cursor()
+            wp_cursor.execute(
+                ("INSERT INTO wp_users ("
+                    "user_login,"
+                    "user_pass,"
+                    "user_nicename,"
+                    "user_email,"
+                    "user_registered,"
+                    "user_status,"
+                    "display_name"
+                ") VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')") % (
+                    self.user.username,
+                    password,
+                    self.user.username,
+                    self.user.email,
+                    current_time,
+                    '0',
+                    self.full_name
+                ))
+            wp_cursor.execute("SELECT ID FROM wp_users WHERE user_login = %s", [self.user.username])
+            wp_userid = wp_cursor.fetchone()[0]
+            self.wp_userid = wp_userid
+            wp_cursor.execute(
+                ("INSERT INTO wp_usermeta ("
+                    "user_id,"
+                    "meta_key,"
+                    "meta_value"
+                ") VALUES ('%s', %s, %s)"), (
+                    self.wp_userid,
+                    'first_name',
+                    self.user.first_name
+                )
+            )
+            wp_cursor.execute(
+                ("INSERT INTO wp_usermeta ("
+                    "user_id,"
+                    "meta_key,"
+                    "meta_value"
+                ") VALUES ('%s', %s, %s)"), (
+                    self.wp_userid,
+                    'last_name',
+                    self.user.last_name
+                )
+            )
+            wp_db.commit()
+            wp_cursor.close()
+        # Wiki user setup
+        if self.wiki_userid == None:
+            wiki_cursor = wiki_db.cursor()
+            wiki_cursor.execute(
+                ('INSERT INTO user ('
+                    'user_name,'
+                    'user_real_name,'
+                    'user_password,'
+                    'user_newpassword,'
+                    'user_email'
+                ') VALUES ("%s", "%s", "%s", "%s", "%s")' % (
+                    self.user.username,
+                    self.full_name,
+                    password,
+                    password,
+                    self.user.email
+                ))
+            )
+            wiki_cursor.execute('SELECT user_id FROM user WHERE user_name = %s',[self.user.username])
+            wiki_userid = wiki_cursor.fetchone()[0]
+            self.wiki_userid = wiki_userid
+            wiki_db.commit()
+            wiki_cursor.close()
+        if self.dam_userid == None:
+            dam_cursor = dam_db.cursor()
+            if self.dam_usergroup:
+                usergroup = self.dam_usergroup
+            else:
+                usergroup = 2
+            dam_cursor.execute(
+                ('INSERT INTO user ('
+                    'username,'
+                    'password,'
+                    'fullname,'
+                    'email,'
+                    'usergroup,'
+                    'approved'
+                ') VALUES ("%s", "%s", "%s", "%s", "%s", "%s")' % (
+                    self.user.username,
+                    password,
+                    self.full_name,
+                    self.user.email,
+                    usergroup,
+                    1
+                ))
+            )
+            dam_cursor.execute('SELECT ref FROM user WHERE username = %s',[self.user.username])
+            dam_userid = dam_cursor.fetchone()[0]
+            self.dam_userid = dam_userid
+            wiki_db.commit()
+            dam_cursor.close()
+
+    def push_permissions(self):
+        """
+        Updates external accounts with permissions set in user management here
+        """
+        if self.wp_userid != None and self.wp_role != None:
+            wp_cursor = wp_db.cursor()
+            wp_cursor.execute(
+                ("INSERT INTO wp_usermeta ("
+                    "user_id,"
+                    "meta_key,"
+                    "meta_value"
+                ") VALUES({}, {}, {})").format(
+                    wp_userid,
+                    'wp_capabilities',
+                    wp_role
+                )
+            )
+            wp_db.commit()
+            wp_cursor.close()
+        if self.wiki_userid != None and self.wiki_groups != None:
+            wiki_cursor = wiki_db.cursor()
+            wiki_group_dict = {
+                "administrator":"sysop",
+                "bureaucrat":"bureaucrat"
+            }
+            for group in self.wiki_groups:
+                if group in wiki_group_dict:
+                    wiki_cursor.execute(
+                        ("INSERT INTO user_groups ("
+                            "ug_user,"
+                            "ug_group"
+                        ") VALUES ({}, {})").format(
+                            wiki_userid,
+                            wiki_group_dict[group]
+                        )
+                    )
+            wiki_db.commit()
+            wiki_cursor.close()
+        if self.dam_userid != None and self.dam_usergroup != None:
+            dam_cursor = dam_db.cursor()
+            dam_cursor.execute(
+                ("UPDATE users"
+                 "SET (usergroup) "
+                 "VALUES ({}) WHERE ref={}").format(
+                    self.dam_usergroup,
+                    self.dam_userid
+                )
+            )
+            dam_db.commit()
+            dam_cursor.close()
+
+
+    def delete_external_accounts(self):
+        """
+        Deletes all external accounts associated with this account
+        """
+        # Delete Wordpress account
+        wp_cursor=wp_db.cursor()
+        wp_cursor.execute('DELETE FROM wp_users WHERE user_login=%s',[self.user.username])
+        wp_db.commit()
+        wp_cursor.close()
+        # Delete wiki account
+        wiki_cursor=wiki_db.cursor()
+        wiki_cursor.execute('DELETE FROM user WHERE user_name=%s',[self.user.username])
+        wiki_db.commit()
+        wiki_cursor.close()
+        # Delete DAM account
+        dam_cursor=dam_db.cursor()
+        dam_cursor.execute('DELETE FROM user WHERE username=%s',[self.user.username])
+        dam_db.commit()
+        dam_cursor.close()
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
