@@ -70,7 +70,7 @@
                             <form role="form" method="post" id="search-form" enctype="multipart/form-data" action="/search/?q=">
                               {% csrf_token %}
                               <div class="input-group custom-search-form">
-                                <input id="id_q" type="search" class="form-control" placeholder="Search..." name="q" value='{{ query }}' required>
+                                <input id="id_q" type="search" class="form-control" placeholder="Search..." name="q" value='{{ query|default:"" }}' required>
                                   <span class="input-group-btn">
                                       <button class="btn btn-default" type="submit">
                                         <i class="fa fa-search"></i>
