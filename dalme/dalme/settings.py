@@ -232,7 +232,7 @@ LOGGING = {
         # Might as well log any errors anywhere else in Django
         'django': {
             'handlers': ['logfile'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False,
         },
         # Your own app - this assumes all your logger names start with "myapp."
