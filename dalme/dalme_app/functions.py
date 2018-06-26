@@ -484,6 +484,7 @@ def get_count(item):
         cursor = dam_db.cursor()
         cursor.execute("SELECT COUNT(*) FROM resource")
         results = cursor.fetchone()[0]
+        cursor.close()
         return results
 
     else:
