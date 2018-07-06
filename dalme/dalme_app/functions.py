@@ -481,6 +481,7 @@ def get_count(item):
             return None
 
     elif item == 'assets':
+        dam_db.ping(True) # Check connection, refresh if needed
         cursor = dam_db.cursor()
         cursor.execute("SELECT COUNT(*) FROM resource")
         results = cursor.fetchone()[0]
@@ -592,6 +593,7 @@ def create_user(request, data):
     the_user.save()
 
     #create record in WP
+    wp_db.ping(True)
     cursor = wp_db.cursor()
     cursor.execute("INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_registered, user_status, display_name) VALUES(%s, %s, %s, %s, %s, %s, %s)", (username, password, username, email, wp_user_registered, '0', full_name))
 
@@ -607,6 +609,7 @@ def create_user(request, data):
     cursor.execute("INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES(%s, %s, %s)", (wp_userid, 'wp_capabilities', wp_role))
 
     #create record in wiki
+    wiki_db.ping(True)
     cursor = wiki_db.cursor()
     cursor.execute("INSERT INTO user (user_name, user_real_name, user_password, user_newpassword, user_email) VALUES(%s, %s, %s, %s, %s)", (wiki_username, wiki_realname, password, password, email))
 
@@ -628,6 +631,7 @@ def create_user(request, data):
 
 
     #create record in dam
+    dam_db.ping(True)
     cursor = dam_db.cursor()
     cursor.execute("INSERT INTO user (username, password, fullname, email, usergroup, approved) VALUES(%s, %s, %s, %s, %s, %s)",(username, password, full_name, email,dam_usergroup,1))
 
