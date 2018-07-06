@@ -2,8 +2,8 @@
 {% load staticfiles i18n %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mirador@2.6.0/dist/css/mirador-combined.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/mirador@2.6.0/dist/mirador.js"></script>
+<link rel="stylesheet" href="{% static 'css/mirador-combined.css' %}"/>
+<script src="{% static 'js/mirador.min.js' %}"></script>
 {% endblock %}
 
 {% block extra_dropdowns %}{% endblock %}
@@ -96,6 +96,7 @@
             { manifestUri: "https://dam.dalme.org/iiif/77/manifest", location: "DALME DAM" },
             { manifestUri: "https://dam.dalme.org/iiif/6937/manifest", location: "DALME DAM" },
             { manifestUri: "https://dam.dalme.org/iiif/3827/manifest", location: "DALME DAM" },
+            { manifestUri: "https://dam.dalme.org/iiif/4881/manifest", location: "DALME DAM" },
           ],
           windowObjects: [
             {
