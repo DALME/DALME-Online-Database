@@ -59,7 +59,6 @@ class OAuthCallback_WP(OAuthCallback):
         return the_user
 
 @method_decorator(login_required,name='dispatch')
-@method_decorator(login_required,name='dispatch')
 class SourceMain(View):
     """
     Collects views to be displayed from the root of sources. GET requests to
@@ -76,6 +75,7 @@ class SourceMain(View):
         """Handle creating new sources"""
         view = SourceCreate.as_view()
         return view(request, *args, **kwargs)
+
 class SourceList(ListView):
     paginate_by = 50
     template_name = 'dalme_app/generic_list.html'
@@ -94,6 +94,11 @@ class SourceList(ListView):
         context['object_properties'] = ['type']
         context['create_form'] = forms.source_main()
         return context
+
+class SourceCreate(CreateView):
+    model = Source
+    form_class = forms.source_main
+    template_name_suffix = "_create_form"
 
 @method_decorator(login_required,name='dispatch')
 class SourceDetail(View):
@@ -139,16 +144,79 @@ class SourceDisplay(DetailView):
             return object
         except:
             raise Http404
+
 class SourceUpdate(UpdateView):
     model = Source
     template_name_suffix = '_update_form'
     form_class = forms.source_main
+
 def SourceManifest(request,pk):
     context = {}
     source = Source.objects.get(pk=pk)
     context['source'] = source
     context['page_canvases'] = [page.get_canvas() for page in source.page_set.all()]
     return render(request, 'dalme_app/manifest.html', context)
+
+@method_decorator(login_required,name='dispatch')
+class PageMain(View):
+    def get(self, request, *args, **kwargs):
+        """Display list of pages"""
+        view = PageList.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Handle creating new pages"""
+        view = PageCreate.as_view()
+        return view(request, *args, **kwargs)
+
+@method_decorator(login_required,name='dispatch')
+class PageDetail(View):
+    def get(self, request, *args, **kwargs):
+        """Display list of sources"""
+        view = PageDisplay.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Handle creating new sources"""
+        view = PageUpdate.as_view()
+        return view(request, *args, **kwargs)
+
+class PageDisplay(DetailView):
+    model = Page
+    context_object_name = 'page'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['page_title'] = self.object.name
+        context['form'] = forms.page_main(instance=self.object)
+        return context
+
+class PageList(ListView):
+    model = Page
+    template_name = "dalme_app/generic_list.html"
+    paginate_by = 50
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['create_form'] = forms.page_main()
+        return context
+
+class PageUpdate(UpdateView):
+    model = Page
+    form_class = forms.page_main
+    template_name_suffix = '_update_form'
+
+class PageCreate(CreateView):
+    model = Page
+    form_class = forms.page_main
+    template_name_suffix = '_create_form'
+
 @login_required
 def index(request):
     context = {

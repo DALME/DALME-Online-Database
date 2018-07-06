@@ -1,0 +1,38 @@
+{% extends "dash_base.html" %}
+{% load staticfiles i18n %}
+
+{% block extra_head %}
+<link href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.bootstrap.min.css" rel="stylesheet">
+
+<script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.1.1/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.1.1/js/responsive.bootstrap.min.js"></script>
+{% endblock %}
+
+{% block extra_dropdowns %}{% endblock %}
+
+{% block content %}
+
+<div id="page-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Page Detail</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="fa fa-list-alt fa-fw"></i> Metadata
+        </div>
+        <div class="panel-body">
+          <p>Name: {{ page.name }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
