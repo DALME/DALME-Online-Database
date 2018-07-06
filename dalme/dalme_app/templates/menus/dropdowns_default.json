@@ -109,34 +109,5 @@
           "link": "/UIref/forms"
         }
       ]
-  },
-  {
-    "topMenu": true,
-    "itemClass": "dropdown-user",
-    "iconClass": "fa-user",
-    "children": [
-      {
-        "title": true,
-        "logoutMenu": true
-      },
-      {
-        "text": "Profile",
-        "link": "https://dalme.org/wp/wp-admin/profile.php",
-        "iconClass": "fa-user"
-      },
-      {
-        "text": "Settings",
-        "link": "#",
-        "iconClass": "fa-gear"
-      },
-      {
-        "divider": true
-      },
-      {
-        "text": "Log out",
-        "link": "/logout/",
-        "iconClass": "fa-sign-out"
-      }
-    ]
   }
 ]

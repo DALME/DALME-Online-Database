@@ -11,7 +11,7 @@ from . import functions
 
 LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
 
-def menu_constructor(request, item_constructor, template):
+def menu_constructor(item_constructor, template):
     """
     Builds menus based on an item_constructor and a json file describing the menu items.
     Menus are stored in the templates directory, under the menus subdirectory.
@@ -26,12 +26,12 @@ def menu_constructor(request, item_constructor, template):
 
     # Create menu by iterating through items in json file and appending to output
     for item in menu:
-        _output += eval(item_constructor + '(request,_output,**item)')
+        _output += eval(item_constructor + '(_output,**item)')
 
     # Return output as part of a list, because renderer expects to iterate
     return [_output]
 
-def sidebar_item(request,wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
+def sidebar_item(wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
     """
     Generates a menu item and incorporates it into `wholeMenu`. This function
     calls itself to recurse through hierarchies of menus, and uses the
@@ -96,13 +96,13 @@ def sidebar_item(request,wholeMenu,depth=0,text=None,iconClass=None,link=None,co
         for child in children:
             # For each child item, provide the parameters it defines to this
             # function, incrementing the depth
-            currentItem += sidebar_item(request,currentItem,depth=depth+1,**child)
+            currentItem += sidebar_item(currentItem,depth=depth+1,**child)
         currentItem += '</ul>'
     currentItem += '</li>'
 
     return currentItem
 
-def tile_item(request,wholeMenu,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None):
+def tile_item(wholeMenu,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None):
     currentItem = '<div class="col-lg-3 col-md-6">'
 
     if colourClass:
@@ -134,11 +134,8 @@ def tile_item(request,wholeMenu,colourClass=None,iconClass=None,counter=None,cou
 
     return currentItem
 
-def dropdown_item(request,wholeMenu,topMenu=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,logoutMenu=None):
+def dropdown_item(wholeMenu,topMenu=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,logoutMenu=None):
     """ creates items for the top right dropdowns """
-    #generate dynamic menu items
-    if logoutMenu:
-        text = request.user.username
 
     #start this dropdown
     currentItem = ''
@@ -157,7 +154,7 @@ def dropdown_item(request,wholeMenu,topMenu=None,title=None,itemClass=None,iconC
                 child['childrenIconClass'] = childrenIconClass
             else:
                 child['childrenIconClass'] = 'fa-dot-circle-o'
-            currentItem += dropdown_item(request,currentItem,**child)
+            currentItem += dropdown_item(currentItem,**child)
         #close the tags
         currentItem += '</ul></li>'
 

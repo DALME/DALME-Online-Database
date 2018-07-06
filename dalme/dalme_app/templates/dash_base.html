@@ -1,3 +1,23 @@
+{% comment %}
+Context variables used in this template:
+
+- page_title
+  - Set as title tag on page
+
+- messages (optional)
+  - message of various levels to display at top of page
+
+- dropdowns
+  - dropdown menus in page top right, in black header bar
+
+- query (optional)
+  - Existing query for search menu
+
+- sidebar
+  - items to appear in left hand sidebar menu
+
+{% endcomment %}
+
 {% load staticfiles i18n %}
 <!DOCTYPE html>
 <head>
@@ -7,13 +27,14 @@
     <meta name="description" content="DALME project internal dashboard">
     <meta name="author" content="DALME">
 
-    <title>{{ page_title }}</title>
+    <title>{{ page_title }} | DALME</title>
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="{% static 'vendor/metisMenu/metisMenu.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/sb-admin-2.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/morrisjs/morris.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/dalme_app.css' %}" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -59,6 +80,19 @@
                 {% for item in dropdowns %}
                     {{ item|safe }}
                 {% endfor %}
+                <li class="dropdown">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                    <i class="fa fa-user fa-fw"></i>
+                    <i class="fa fa-caret-down"></i>
+                  </a>
+                  <ul class="dropdown-menu dropdown-user">
+                    <div class="dropdown-title">{{ request.user.username }}</div>
+                    <li><a href="https://dalme.org/wp/wp-admin/profile.php"><i class="fa fa-user fa-fw"></i> Profile</a></li>
+                    <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="/logout/"><i class="fa fa-sign-out fa-fw"></i> Log out</a></li>
+                  </ul>
+                </li>
             </ul>
             <!-- /.navbar-top-links -->
 {% endblock %}
