@@ -165,309 +165,311 @@
 used to create database entries, and can be used in other functions to access
 and iterate through data in the database without writing SQL statements.</p>
 <dl class="class">
-<dt id="dalme_app.models.Agents">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Agents</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Agents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Agents" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Agent">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Agent</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Agent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Agent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Agents.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Agents.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Agent.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Agent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Agents.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Agents.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Agent.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Agent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Attribute_types">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute_types</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>name</em>, <em>short_name</em>, <em>description</em>, <em>data_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute_types" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_type</em>, <em>content_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Attribute_types.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute_types.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Attribute_types.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute_types.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Attributes">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attributes</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_type</em>, <em>content_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attributes" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_DATE">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute_DATE</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em>, <em>value_day</em>, <em>value_month</em>, <em>value_year</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute_DATE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute_DATE" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Attributes.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attributes.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_DATE.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute_DATE.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Attributes.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attributes.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_DATE.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute_DATE.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Attributes_DATE">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attributes_DATE</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em>, <em>value_day</em>, <em>value_month</em>, <em>value_year</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attributes_DATE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attributes_DATE" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_DBR">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute_DBR</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute_DBR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute_DBR" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Attributes_DATE.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attributes_DATE.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_DBR.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute_DBR.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Attributes_DATE.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attributes_DATE.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_DBR.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute_DBR.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Attributes_DBR">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attributes_DBR</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attributes_DBR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attributes_DBR" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_INT">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute_INT</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute_INT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute_INT" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Attributes_DBR.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attributes_DBR.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_INT.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute_INT.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Attributes_DBR.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attributes_DBR.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_INT.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute_INT.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Attributes_INT">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attributes_INT</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attributes_INT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attributes_INT" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_STR">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute_STR</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute_STR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute_STR" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Attributes_INT.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attributes_INT.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_STR.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute_STR.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Attributes_INT.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attributes_INT.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_STR.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute_STR.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Attributes_STR">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attributes_STR</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attributes_STR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attributes_STR" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_TXT">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute_TXT</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute_TXT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute_TXT" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Attributes_STR.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attributes_STR.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_TXT.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute_TXT.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Attributes_STR.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attributes_STR.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_TXT.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute_TXT.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Attributes_TXT">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attributes_TXT</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>attribute_id</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attributes_TXT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attributes_TXT" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_type">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Attribute_type</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>name</em>, <em>short_name</em>, <em>description</em>, <em>data_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Attribute_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Attribute_type" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Attributes_TXT.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attributes_TXT.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_type.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Attribute_type.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Attributes_TXT.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attributes_TXT.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Attribute_type.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Attribute_type.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Concepts">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Concepts</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>getty_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Concepts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Concepts" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Concept">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Concept</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>getty_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Concept"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Concept" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Concepts.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Concepts.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Concept.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Concept.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Concepts.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Concepts.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Concept.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Concept.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Content_classes">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Content_classes</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>name</em>, <em>short_name</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Content_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Content_classes" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_class">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Content_class</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>name</em>, <em>short_name</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Content_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Content_class" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Content_classes.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Content_classes.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_class.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Content_class.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Content_classes.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Content_classes.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_class.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Content_class.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Content_types">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Content_types</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>content_class</em>, <em>name</em>, <em>short_name</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Content_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Content_types" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_type">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Content_type</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>content_class</em>, <em>name</em>, <em>short_name</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Content_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Content_type" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Content_types.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Content_types.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_type.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Content_type.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Content_types.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Content_types.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_type.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Content_type.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Content_types_x_attribute_types">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Content_types_x_attribute_types</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>content_type</em>, <em>attribute_type</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Content_types_x_attribute_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Content_types_x_attribute_types" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_type_x_attribute_type">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Content_type_x_attribute_type</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>content_type</em>, <em>attribute_type</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Content_type_x_attribute_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Content_type_x_attribute_type" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Content_types_x_attribute_types.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Content_types_x_attribute_types.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_type_x_attribute_type.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Content_type_x_attribute_type.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Content_types_x_attribute_types.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Content_types_x_attribute_types.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Content_type_x_attribute_type.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Content_type_x_attribute_type.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Headwords">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Headwords</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>word</em>, <em>full_lemma</em>, <em>concept_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Headwords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Headwords" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Headword">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Headword</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>word</em>, <em>full_lemma</em>, <em>concept_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Headword"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Headword" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Headwords.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Headwords.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Headword.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Headword.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Headwords.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Headwords.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Headword.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Headword.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Identity_phrases">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Identity_phrases</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>transcription_id</em>, <em>phrase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Identity_phrases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Identity_phrases" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Identity_phrase">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Identity_phrase</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>transcription_id</em>, <em>phrase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Identity_phrase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Identity_phrase" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Identity_phrases.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Identity_phrases.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Identity_phrase.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Identity_phrase.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Identity_phrases.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Identity_phrases.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Identity_phrase.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Identity_phrase.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Identity_phrases_x_entities">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Identity_phrases_x_entities</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>identity_phrase_id</em>, <em>entity_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Identity_phrases_x_entities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Identity_phrases_x_entities" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Identity_phrase_x_entity">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Identity_phrase_x_entity</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>identity_phrase_id</em>, <em>entity_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Identity_phrase_x_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Identity_phrase_x_entity" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Identity_phrases_x_entities.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Identity_phrases_x_entities.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Identity_phrase_x_entity.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Identity_phrase_x_entity.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Identity_phrases_x_entities.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Identity_phrases_x_entities.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Identity_phrase_x_entity.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Identity_phrase_x_entity.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Object_attributes">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Object_attributes</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>object_id</em>, <em>concept_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Object_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Object_attributes" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Object</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>concept_id</em>, <em>object_phrase_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Object" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Object_attributes.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Object_attributes.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Object.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Object_attributes.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Object_attributes.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Object.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Object_phrases">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Object_phrases</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>transcription_id</em>, <em>phrase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Object_phrases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Object_phrases" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object_attribute">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Object_attribute</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>object_id</em>, <em>concept_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Object_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Object_attribute" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Object_phrases.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Object_phrases.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object_attribute.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Object_attribute.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Object_phrases.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Object_phrases.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object_attribute.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Object_attribute.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Objects">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Objects</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>concept_id</em>, <em>object_phrase_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Objects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Objects" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object_phrase">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Object_phrase</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>transcription_id</em>, <em>phrase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Object_phrase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Object_phrase" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Objects.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Objects.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object_phrase.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Object_phrase.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Objects.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Objects.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Object_phrase.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Object_phrase.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Pages">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Pages</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>source_id</em>, <em>name</em>, <em>dam_id</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Pages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Pages" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Page">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Page</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>name</em>, <em>dam_id</em>, <em>order</em>, <em>canvas</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Page" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Pages.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Pages.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Page.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Page.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Pages.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Pages.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Page.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Page.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Places">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Places</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Places"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Places" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Place">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Place</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Place"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Place" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Places.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Places.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Place.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Place.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Places.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Places.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Place.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Place.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="dalme_app.models.Profile">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Profile</code><span class="sig-paren">(</span><em>id</em>, <em>user</em>, <em>full_name</em>, <em>dam_userid</em>, <em>dam_usergroup</em>, <em>wiki_userid</em>, <em>wiki_username</em>, <em>wiki_groups</em>, <em>wp_userid</em>, <em>wp_role</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Profile" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="exception">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Profile</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>One-to-one extension of user model to accomodate additional user related
+data, including permissions of associated accounts on other platforms.</p>
+<dl class="exception">
 <dt id="dalme_app.models.Profile.DoesNotExist">
 <em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Profile.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -477,139 +479,179 @@ and iterate through data in the database without writing SQL statements.</p>
 <em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Profile.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="dalme_app.models.Profile.create_accounts">
+<code class="descname">create_accounts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Profile.create_accounts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Profile.create_accounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create accounts in external platforms, so long as they don’t have
+existing accounts</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="dalme_app.models.Sources">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Sources</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>type</em>, <em>name</em>, <em>short_name</em>, <em>parent_source</em>, <em>is_inventory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Sources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Sources" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="exception">
-<dt id="dalme_app.models.Sources.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Sources.DoesNotExist" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="exception">
-<dt id="dalme_app.models.Sources.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Sources.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<dl class="method">
+<dt id="dalme_app.models.Profile.delete_external_accounts">
+<code class="descname">delete_external_accounts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Profile.delete_external_accounts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Profile.delete_external_accounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all external accounts associated with this account</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="dalme_app.models.Tokens">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Tokens</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>object_phrase_id</em>, <em>word_form_id</em>, <em>raw_token</em>, <em>clean_token</em>, <em>order</em>, <em>flags</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Tokens" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="exception">
-<dt id="dalme_app.models.Tokens.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Tokens.DoesNotExist" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="dalme_app.models.Profile.pull_ids">
+<code class="descname">pull_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Profile.pull_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Profile.pull_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given user, set external identifiers for associated accounts.
+These accounts have the same username as the associated user object</p>
+</dd></dl>
 
-<dl class="exception">
-<dt id="dalme_app.models.Tokens.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Tokens.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="dalme_app.models.Profile.push_permissions">
+<code class="descname">push_permissions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Profile.push_permissions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Profile.push_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates external accounts with permissions set in user management here</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Transcriptions">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Transcriptions</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>source_id</em>, <em>transcription</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Transcriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Transcriptions" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Source">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Source</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>type</em>, <em>name</em>, <em>short_name</em>, <em>parent_source</em>, <em>is_inventory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Source" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Transcriptions.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Transcriptions.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Source.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Source.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Transcriptions.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Transcriptions.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Source.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Source.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="dalme_app.models.Source.get_attributes">
+<code class="descname">get_attributes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Source.get_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Source.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns associated attributes. This is a loose connection, with UUIDs
+in Attributes.content_id corresponding (potentially) to Sources</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dalme_app.models.Source.get_fields">
+<code class="descname">get_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Source.get_fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Source.get_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns fields as a list of tuple pairs like (field_name, field_value)
+for use in templates</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.Word_forms">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Word_forms</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>normalized_form</em>, <em>pos</em>, <em>headword_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Word_forms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Word_forms" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Token">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Token</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>object_phrase_id</em>, <em>word_form_id</em>, <em>raw_token</em>, <em>clean_token</em>, <em>order</em>, <em>flags</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Token" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.Word_forms.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Word_forms.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Token.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Token.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.Word_forms.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Word_forms.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="dalme_app.models.error_messages">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">error_messages</code><span class="sig-paren">(</span><em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>e_code</em>, <em>e_level</em>, <em>e_text</em>, <em>e_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#error_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.error_messages" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="exception">
-<dt id="dalme_app.models.error_messages.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.error_messages.DoesNotExist" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="exception">
-<dt id="dalme_app.models.error_messages.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.error_messages.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Token.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Token.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.par_folios">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_folios</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>inv_id</em>, <em>folio_no</em>, <em>dam_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_folios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_folios" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Transcription">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Transcription</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>source_id</em>, <em>transcription</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Transcription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Transcription" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.par_folios.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_folios.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Transcription.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Transcription.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.par_folios.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_folios.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Transcription.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Transcription.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.par_inventories">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_inventories</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>title</em>, <em>source</em>, <em>location</em>, <em>series</em>, <em>shelf</em>, <em>transcriber</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_inventories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_inventories" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Word_form">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">Word_form</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>normalized_form</em>, <em>pos</em>, <em>headword_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#Word_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.Word_form" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.par_inventories.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_inventories.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Word_form.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.Word_form.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.par_inventories.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_inventories.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.Word_form.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.Word_form.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.par_objects">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_objects</code><span class="sig-paren">(</span><em>obj_id</em>, <em>ont_class</em>, <em>name</em>, <em>terms</em>, <em>material</em>, <em>room</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_objects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_objects" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.error_message">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">error_message</code><span class="sig-paren">(</span><em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>e_code</em>, <em>e_level</em>, <em>e_text</em>, <em>e_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#error_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.error_message" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.par_objects.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_objects.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.error_message.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.error_message.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.par_objects.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_objects.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.error_message.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.error_message.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="dalme_app.models.par_tokens">
-<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_tokens</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>folio_id</em>, <em>line_no</em>, <em>position</em>, <em>raw_token</em>, <em>clean_token</em>, <em>norm_token</em>, <em>token_type</em>, <em>flags</em>, <em>span_start</em>, <em>span_end</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_tokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_tokens" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.par_folio">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_folio</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>inv_id</em>, <em>folio_no</em>, <em>dam_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_folio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_folio" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="exception">
-<dt id="dalme_app.models.par_tokens.DoesNotExist">
-<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_tokens.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.par_folio.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_folio.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="exception">
-<dt id="dalme_app.models.par_tokens.MultipleObjectsReturned">
-<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_tokens.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dt id="dalme_app.models.par_folio.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_folio.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dalme_app.models.par_inventory">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_inventory</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>title</em>, <em>source</em>, <em>location</em>, <em>series</em>, <em>shelf</em>, <em>transcriber</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_inventory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_inventory" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="exception">
+<dt id="dalme_app.models.par_inventory.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_inventory.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="dalme_app.models.par_inventory.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_inventory.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dalme_app.models.par_object">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_object</code><span class="sig-paren">(</span><em>obj_id</em>, <em>ont_class</em>, <em>name</em>, <em>terms</em>, <em>material</em>, <em>room</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_object" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="exception">
+<dt id="dalme_app.models.par_object.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_object.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="dalme_app.models.par_object.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_object.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dalme_app.models.par_token">
+<em class="property">class </em><code class="descclassname">dalme_app.models.</code><code class="descname">par_token</code><span class="sig-paren">(</span><em>id</em>, <em>creation_username</em>, <em>creation_timestamp</em>, <em>modification_username</em>, <em>modification_timestamp</em>, <em>folio_id</em>, <em>line_no</em>, <em>position</em>, <em>raw_token</em>, <em>clean_token</em>, <em>norm_token</em>, <em>token_type</em>, <em>flags</em>, <em>span_start</em>, <em>span_end</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/models.html#par_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.models.par_token" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="exception">
+<dt id="dalme_app.models.par_token.DoesNotExist">
+<em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#dalme_app.models.par_token.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="dalme_app.models.par_token.MultipleObjectsReturned">
+<em class="property">exception </em><code class="descname">MultipleObjectsReturned</code><a class="headerlink" href="#dalme_app.models.par_token.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -164,13 +164,20 @@
 <p>This menus module provides a streamlined way to create menus from simple json files.</p>
 <dl class="function">
 <dt id="dalme_app.menus.dropdown_item">
-<code class="descclassname">dalme_app.menus.</code><code class="descname">dropdown_item</code><span class="sig-paren">(</span><em>request</em>, <em>wholeMenu</em>, <em>topMenu=None</em>, <em>title=None</em>, <em>itemClass=None</em>, <em>iconClass=None</em>, <em>childrenIconClass=None</em>, <em>children=None</em>, <em>text=None</em>, <em>link=None</em>, <em>divider=None</em>, <em>section=None</em>, <em>logoutMenu=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#dropdown_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.dropdown_item" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dalme_app.menus.</code><code class="descname">dropdown_item</code><span class="sig-paren">(</span><em>wholeMenu</em>, <em>topMenu=None</em>, <em>title=None</em>, <em>itemClass=None</em>, <em>iconClass=None</em>, <em>childrenIconClass=None</em>, <em>children=None</em>, <em>text=None</em>, <em>link=None</em>, <em>divider=None</em>, <em>section=None</em>, <em>logoutMenu=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#dropdown_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.dropdown_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates items for the top right dropdowns</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="dalme_app.menus.menu_constructor">
+<code class="descclassname">dalme_app.menus.</code><code class="descname">menu_constructor</code><span class="sig-paren">(</span><em>item_constructor</em>, <em>template</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#menu_constructor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.menu_constructor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds menus based on an item_constructor and a json file describing the menu items.
+Menus are stored in the templates directory, under the menus subdirectory.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="dalme_app.menus.sidebar_item">
-<code class="descclassname">dalme_app.menus.</code><code class="descname">sidebar_item</code><span class="sig-paren">(</span><em>request</em>, <em>wholeMenu</em>, <em>depth=0</em>, <em>text=None</em>, <em>iconClass=None</em>, <em>link=None</em>, <em>counter=None</em>, <em>section=None</em>, <em>children=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#sidebar_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.sidebar_item" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">dalme_app.menus.</code><code class="descname">sidebar_item</code><span class="sig-paren">(</span><em>wholeMenu</em>, <em>depth=0</em>, <em>text=None</em>, <em>iconClass=None</em>, <em>link=None</em>, <em>counter=None</em>, <em>section=None</em>, <em>children=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#sidebar_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.sidebar_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a menu item and incorporates it into <cite>wholeMenu</cite>. This function
 calls itself to recurse through hierarchies of menus, and uses the
 <cite>LEVEL_LOOKUP</cite> variable with the <cite>depth</cite> parameter to give subheadings the

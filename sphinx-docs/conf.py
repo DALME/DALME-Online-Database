@@ -22,7 +22,7 @@ import sys
 
 import django
 sys.path.insert(0, os.path.abspath('../dalme'))
-os.environ['DJANGO_SETTINGS_MODULE'] = 'dalme.settings'
+# os.environ['DJANGO_SETTINGS_MODULE'] = 'dalme.settings'
 django.setup()
 
 # -- General configuration ------------------------------------------------
