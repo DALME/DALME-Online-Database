@@ -23,8 +23,7 @@ from django_celery_results.models import TaskResult
 import requests, uuid, os, datetime
 from allaccess.views import OAuthCallback
 
-from dalme_app import functions, scripts
-from dalme_app.forms import upload_file, new_error, inventory_metadata, new_user, home_search
+from dalme_app import functions, scripts, forms
 from dalme_app.menus import menu_constructor
 from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
     error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
@@ -33,7 +32,7 @@ from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
     Object, Object_attribute, Place, Source, Page, Transcription,
     Identity_phrase, Object_phrase, Word_form, Token,
     Identity_phrase_x_entity, Profile)
-from .tasks import parse_inventory
+from dalme_app.tasks import parse_inventory
 
 @register.filter
 def get_item(obj, key):
@@ -61,6 +60,22 @@ class OAuthCallback_WP(OAuthCallback):
 
 @method_decorator(login_required,name='dispatch')
 @method_decorator(login_required,name='dispatch')
+class SourceMain(View):
+    """
+    Collects views to be displayed from the root of sources. GET requests to
+    this endpoint will list sources, while POST requests will handle creating
+    new sources.
+    """
+
+    def get(self, request, *args, **kwargs):
+        """Display list of sources"""
+        view = SourceList.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Handle creating new sources"""
+        view = SourceCreate.as_view()
+        return view(request, *args, **kwargs)
 class SourceList(ListView):
     paginate_by = 50
     template_name = 'dalme_app/generic_list.html'
@@ -73,36 +88,32 @@ class SourceList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['page_title'] = "List of Sources"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
         context['object_properties'] = ['type']
-        context['heading'] = "Sources"
-        context['panel_icon'] = 'fa-list'
-        context['panel_title'] = "List of Sources"
-        context['actions'] = [
-            {
-                "display_type":"normal",
-                "name": "Add new source",
-                "a_params": 'href="#import" data-toggle="modal" data-target="#import"'
-            },
-            { "display_type": "divider" },
-            { "display_type": "title", "name": "Test Title" }
-        ]
-        context['modals'] = [
-            {
-                "id_":"import",
-                "label":"Add new source",
-                "type": "form",
-                "button": {
-                    "params":'type="submit" form="import-form"',
-                    "text":'Submit'
-                }
-            }
-        ]
+        context['create_form'] = forms.source_main()
         return context
 
 @method_decorator(login_required,name='dispatch')
-class SourceDetail(DetailView):
+class SourceDetail(View):
+    """
+    Container for views of individual Source objects. A GET request will
+    display the source, while a POST request will be a form handler to update
+    the source.
+    """
+
+    def get(self, request, *args, **kwargs):
+        """Display the source"""
+        view = SourceDisplay.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Update the source"""
+        view = SourceUpdate.as_view()
+        return view(request, *args, **kwargs)
+
+class SourceDisplay(DetailView):
     model = Source
     context_object_name = 'source'
 
@@ -114,6 +125,7 @@ class SourceDetail(DetailView):
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
         context['page_title'] = self.object.name
+        context['form'] = forms.source_main(instance=self.object)
         return context
 
     def get_object(self):
@@ -127,6 +139,10 @@ class SourceDetail(DetailView):
             return object
         except:
             raise Http404
+class SourceUpdate(UpdateView):
+    model = Source
+    template_name_suffix = '_update_form'
+    form_class = forms.source_main
 def SourceManifest(request,pk):
     context = {}
     source = Source.objects.get(pk=pk)
@@ -194,7 +210,7 @@ def list(request, module, type='all'):
         ]
 
         if request.method == 'POST':
-            form = upload_file(request.POST, request.FILES)
+            form = forms.upload_file(request.POST, request.FILES)
 
             if form.is_valid():
                 #ingest_inventory should check the file's format and look at the metadata
@@ -228,7 +244,7 @@ def list(request, module, type='all'):
             else:
                 functions.notification(request, 4003, data=form.errors)
         else:
-            form = upload_file()
+            form = forms.upload_file()
 
         context['form'] = form
         types = Content_type.objects.filter(content_class=1)
@@ -245,7 +261,7 @@ def list(request, module, type='all'):
             for i in sources_list:
                 tr_class = ''
 
-                if i.type <= 11:
+                if i.type.pk <= 11:
                     title = i.short_name
                 else:
                     title = i.name

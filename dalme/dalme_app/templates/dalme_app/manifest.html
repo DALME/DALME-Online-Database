@@ -1,0 +1,39 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "{{ request.build_absolute_uri }}",
+  "@type": "sc:Manifest",
+  "label": "{{ source.name }}",
+  "metadata": [],
+  "description": [{
+    "@value": "Manifest for {{ source.name }}",
+    "@language": "en"
+  }],
+  "license": "https://creativecommons.org/licenses/by/3.0/",
+  "attribution": "[Click to edit attribution]",
+  "thumbnail": {
+    "@id": "https://dam.dalme.org/loris/{{ source.page_set.all.0.dam_id }}/full/thm/0/default.jpg",
+    "@type": "dctypes:Image",
+    "height": 150,
+    "width": 56,
+    "format": "image/jpeg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://dam.dalme.org/loris/{{ source.page_set.all.0.dam_id }}",
+      "profile": "http://iiif.io/api/image/2/level1.json"
+    }
+  },
+  "sequences": [
+    {
+      "@id":"something",
+      "@type":"sc:Canvas",
+      "label":"something",
+      "canvases": [
+        {% for canvas in page_canvases %}
+        {{ canvas|safe }}
+        {% if forloop.last %}{% else %},{% endif %}
+        {% endfor %}
+      ]
+    }
+  ],
+  "structures": []
+}

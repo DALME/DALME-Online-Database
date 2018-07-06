@@ -39,6 +39,7 @@
             <p><strong>Parent source: </strong><a href="/source/{{ source.parent_source.pk }}">{{ source.parent_source.name }}</a></p>
             {% endif %}
             <p><strong>Is inventory: </strong>{{ source.is_inventory }}</p>
+            <a href="#source-detail-modals" data-toggle="modal" data-target="#source-detail-modals" class="btn btn-primary">Update source</a>
           </div>
         </div>
       </div>
@@ -109,6 +110,23 @@
             });
           });
         </script>
+      </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="source-detail-update-title" aria-hidden="true" id="source-detail-modals">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="source-detail-update-title">Update {{ source }}</h4>
+          </div>
+          <div class="modal-body">
+            <form method="post" id="source-detail-update-form" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <input type="submit" value="Update"/>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   {% endif %}
