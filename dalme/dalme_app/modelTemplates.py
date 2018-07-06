@@ -20,6 +20,8 @@ class dalmeBasic(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_username = models.CharField(max_length=255, null=True, blank=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
+    def class_name(self):
+        return self.__class__.__name__
     class Meta:
         abstract = True
 
@@ -33,6 +35,8 @@ class dalmeUuid(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_username = models.CharField(max_length=255, null=True, blank=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
+    def class_name(self):
+        return self.__class__.__name__
     class Meta:
         abstract = True
 
@@ -45,5 +49,7 @@ class dalmeIntid(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_username = models.CharField(max_length=255, null=True, blank=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
+    def class_name(self):
+        return self.__class__.__name__
     class Meta:
         abstract = True
