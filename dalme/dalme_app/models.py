@@ -8,12 +8,17 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 
 import uuid
+import json
+import os
 from datetime import datetime
+import requests
 
 from dalme_app.modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
 from dalme_app.scripts.db import wp_db, wiki_db, dam_db
+from dalme_app.dam import rs_api_query
 
 #function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():
@@ -56,6 +61,9 @@ class Profile(models.Model):
     wiki_groups = models.CharField(max_length=255, null=True)
     wp_userid = models.IntegerField(null=True)
     wp_role = models.CharField(max_length=50, null=True, choices=WP_ROLE)
+
+    def __str__(self):
+        return self.user.username
 
     def pull_ids(self):
         """
@@ -286,6 +294,9 @@ class Attribute_type(dalmeIntid):
     description = models.TextField()
     data_type = models.CharField(max_length=15)
 
+    def __str__(self):
+        return self.name
+
 class Attribute(dalmeUuid):
     attribute_type = models.ForeignKey(
         "Attribute_type",
@@ -307,6 +318,9 @@ class Attribute(dalmeUuid):
                 return eval('self.{}'.format(data_type))
         return None
 
+    def __str__(self):
+        return self.get_data()
+
 class Attribute_DATE(dalmeBasic):
     attribute_id = models.OneToOneField(
         Attribute,
@@ -318,6 +332,9 @@ class Attribute_DATE(dalmeBasic):
     value_month = models.IntegerField()
     value_year = models.IntegerField()
 
+    def __str__(self):
+        return self.value
+
 class Attribute_DBR(dalmeBasic):
     attribute_id = models.OneToOneField(
         Attribute,
@@ -325,6 +342,9 @@ class Attribute_DBR(dalmeBasic):
         on_delete=models.CASCADE
     )
     value = models.CharField(max_length=32)
+
+    def __str__(self):
+        return self.value
 
 class Attribute_INT(dalmeBasic):
     attribute_id = models.OneToOneField(
@@ -334,6 +354,9 @@ class Attribute_INT(dalmeBasic):
     )
     value = models.IntegerField()
 
+    def __str__(self):
+        return self.value
+
 class Attribute_STR(dalmeBasic):
     attribute_id = models.OneToOneField(
         Attribute,
@@ -341,6 +364,9 @@ class Attribute_STR(dalmeBasic):
         on_delete=models.CASCADE
     )
     value = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.value
 
 class Attribute_TXT(dalmeBasic):
     attribute_id = models.ForeignKey(
@@ -350,6 +376,9 @@ class Attribute_TXT(dalmeBasic):
     )
     value = models.TextField()
 
+    def __str__(self):
+        return self.value
+
 class Concept(dalmeUuid):
     getty_id = models.IntegerField(db_index=True)
 
@@ -358,11 +387,17 @@ class Content_class(dalmeIntid):
     short_name = models.CharField(max_length=55)
     description = models.TextField()
 
+    def __str__(self):
+        return self.name
+
 class Content_type(dalmeIntid):
     content_class = models.IntegerField()
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
+
+    def __str__(self):
+        return self.name
 
 class Content_type_x_attribute_type(dalmeBasic):
     content_type = models.ForeignKey(
@@ -388,6 +423,9 @@ class Headword(dalmeUuid):
         db_index=True,
         on_delete=models.PROTECT
     )
+
+    def __str__(self):
+        return self.word
 
 class Object(dalmeUuid):
     concept_id = models.UUIDField(db_index=True)
@@ -429,6 +467,8 @@ class Source(dalmeUuid):
     )
     is_inventory = models.BooleanField(default=False, db_index=True)
 
+    def __str__(self):
+        return self.name
     def get_fields(self):
         """
         Returns fields as a list of tuple pairs like (field_name, field_value)
@@ -444,15 +484,44 @@ class Source(dalmeUuid):
         return attributes
 
 class Page(dalmeUuid):
-    source_id = models.ForeignKey(
+    sources = models.ManyToManyField(
         'Source',
-        to_field='id',
-        db_index=True,
-        on_delete=models.CASCADE
+        db_index=True
     )
     name = models.CharField(max_length=55)
     dam_id = models.IntegerField(db_index=True)
     order = models.IntegerField(db_index=True)
+    canvas = models.TextField(null=True)
+
+    def __str__(self):
+        return self.name
+    def get_absolute_url(self):
+        return reverse('page_detail', kwargs={'pk':self.pk})
+    def get_canvas(self):
+        if not self.canvas:
+            api_params = {
+                "function": "get_resource_data",
+                "param1": self.dam_id
+            }
+            page_meta = rs_api_query(
+                "https://dam.dalme.org/api/?",
+                os.environ['DAM_API_USER'],
+                os.environ['DAM_API_KEY'],
+                **api_params
+            )
+            page_meta_obj = page_meta.json()
+            if type(page_meta_obj) == list:
+                folio = page_meta_obj[0]['field79']
+            elif type(page_meta_obj) == dict:
+                folio = page_meta_obj['field79']
+            canvas = requests.get(
+                "https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id,folio)
+            )
+            self.canvas = canvas.text
+            return canvas.text
+        else:
+            return self.canvas
+
 
 class Transcription(dalmeUuid):
     source_id = models.ForeignKey(
@@ -472,6 +541,9 @@ class Identity_phrase(dalmeUuid):
     )
     phrase = models.TextField()
 
+    def __str__(self):
+        return self.phrase
+
 class Object_phrase(dalmeUuid):
     transcription_id = models.ForeignKey(
         'Transcription',
@@ -480,6 +552,9 @@ class Object_phrase(dalmeUuid):
         on_delete=models.CASCADE
     )
     phrase = models.TextField()
+
+    def __str__(self):
+        return self.phrase
 
 class Word_form(dalmeUuid):
     normalized_form = models.CharField(max_length=55)
@@ -490,6 +565,9 @@ class Word_form(dalmeUuid):
         db_index=True,
         on_delete=models.PROTECT
     )
+
+    def __str__(self):
+        return self.normalized_form
 
 class Token(dalmeUuid):
     object_phrase_id = models.ForeignKey(
@@ -508,6 +586,9 @@ class Token(dalmeUuid):
     clean_token = models.CharField(max_length=55)
     order = models.IntegerField(db_index=True)
     flags = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.raw_token
 
 class Identity_phrase_x_entity(dalmeBasic):
     identity_phrase_id = models.ForeignKey(
