@@ -18,7 +18,7 @@ import requests
 
 from dalme_app.modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
 from dalme_app.scripts.db import wp_db, wiki_db, dam_db
-from dalme_app.dam import rs_api_query
+from dalme_app.scripts.dam import rs_api_query
 
 #function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():
@@ -469,6 +469,8 @@ class Source(dalmeUuid):
 
     def __str__(self):
         return self.name
+    def get_absolute_url(self):
+        return reverse('source_detail', kwargs={'pk':self.pk})
     def get_fields(self):
         """
         Returns fields as a list of tuple pairs like (field_name, field_value)
