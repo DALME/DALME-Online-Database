@@ -15,5 +15,8 @@ urlpatterns = [
     url(r'^show/([a-z_-]+)/([A-Za-z0-9-]+)$', views.show),
     url(r'^iiif/([a-z_-]+)$', views.iiif),
     url(r'^search/', include('haystack.urls')),
+    url(r'^source/(?P<pk>[a-zA-Z0-9-]+)/manifest', views.SourceManifest, name='source_manifest'),
+    url(r'^source/(?P<pk>[a-zA-Z0-9-]+)', views.SourceDetail.as_view(), name='source_detail'),
+    url(r'^source/', views.SourceList.as_view(), name='source_list'),
     url(r'^$', views.index, name='dashboard'),
 ]

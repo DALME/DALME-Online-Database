@@ -9,29 +9,38 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connections
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
+from django.template.defaulttags import register
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.views.generic import ListView
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from django_celery_results.models import TaskResult
 
 import requests, uuid, os, datetime
 from allaccess.views import OAuthCallback
 
-from . import functions, scripts
-from .forms import upload_file, new_error, inventory_metadata, new_user, home_search
-from .menus import menu_constructor
-from .models import (par_inventory, par_folio, par_token, par_object,
+from dalme_app import functions, scripts
+from dalme_app.forms import upload_file, new_error, inventory_metadata, new_user, home_search
+from dalme_app.menus import menu_constructor
+from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
     error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
     Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
     Content_class, Content_type, Content_type_x_attribute_type, Headword,
     Object, Object_attribute, Place, Source, Page, Transcription,
     Identity_phrase, Object_phrase, Word_form, Token,
-    Identity_phrase_x_entity)
+    Identity_phrase_x_entity, Profile)
 from .tasks import parse_inventory
 
+@register.filter
+def get_item(obj, key):
+    try:
+        return obj.get(key)
+    except AttributeError:
+        return getattr(obj,key)
 
 #authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
@@ -50,6 +59,80 @@ class OAuthCallback_WP(OAuthCallback):
 
         return the_user
 
+@method_decorator(login_required,name='dispatch')
+@method_decorator(login_required,name='dispatch')
+class SourceList(ListView):
+    paginate_by = 50
+    template_name = 'dalme_app/generic_list.html'
+    queryset = Source.objects.all().order_by('type','short_name')
+
+    # def get_ordering(self):
+    #     ordering = self.GET.get('ordering','name')
+    #     # TODO: add validation to ordering
+    #     return ordering
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['object_properties'] = ['type']
+        context['heading'] = "Sources"
+        context['panel_icon'] = 'fa-list'
+        context['panel_title'] = "List of Sources"
+        context['actions'] = [
+            {
+                "display_type":"normal",
+                "name": "Add new source",
+                "a_params": 'href="#import" data-toggle="modal" data-target="#import"'
+            },
+            { "display_type": "divider" },
+            { "display_type": "title", "name": "Test Title" }
+        ]
+        context['modals'] = [
+            {
+                "id_":"import",
+                "label":"Add new source",
+                "type": "form",
+                "button": {
+                    "params":'type="submit" form="import-form"',
+                    "text":'Submit'
+                }
+            }
+        ]
+        return context
+
+@method_decorator(login_required,name='dispatch')
+class SourceDetail(DetailView):
+    model = Source
+    context_object_name = 'source'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        context['source_has_children'] = len(self.object.source_set.all()) > 0
+        context['children'] = self.object.source_set.all().order_by('name')
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['page_title'] = self.object.name
+        return context
+
+    def get_object(self):
+        """
+        Raise a 404 on things that aren't proper UUIDs,
+        which would normally raise an exception.
+        """
+        try:
+            # Call the superclass
+            object = super().get_object()
+            return object
+        except:
+            raise Http404
+def SourceManifest(request,pk):
+    context = {}
+    source = Source.objects.get(pk=pk)
+    context['source'] = source
+    context['page_canvases'] = [page.get_canvas() for page in source.page_set.all()]
+    return render(request, 'dalme_app/manifest.html', context)
 @login_required
 def index(request):
     context = {
