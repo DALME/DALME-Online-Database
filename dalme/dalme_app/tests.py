@@ -1,6 +1,6 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
 from dalme_app.models import (Attribute, Attribute_type, Attribute_DATE,
@@ -100,12 +100,47 @@ class UserManagementTestCase(TestCase):
         self.PushPermissions()
         self.DeleteAccounts()
 
-class BasicViewsTestCase(TestCase):
-    def test_load_login_page(self):
-        c = Client()
-        response = c.get(reverse('dashboard'), follow=True)
+class BasicAuthTestCase(TestCase):
+    def setUp(self):
+        user = User.objects.create_superuser('test_user','test@test.com','seCuRePaSsWoRd')
+    def test_account_create(self):
+        user = User.objects.get(username='test_user')
+        self.assertTrue(user.is_superuser)
+    def test_login(self):
+        user = User.objects.get(username='test_user')
+        logged_in = self.client.login(username=user.username,password='seCuRePaSsWoRd')
+        self.assertTrue(logged_in)
+
+class SourceViewTestCase(TestCase):
+    def setUp(self):
+        user = User.objects.create_superuser('test_user','test@test.com','seCuRePaSsWoRd')
+        settings_manage = override_settings(SECURE_SSL_REDIRECT=False)
+        archiveContentType = Content_type.objects.create(
+            content_class=1,
+            name="Archive",
+            short_name='archive',
+            description='Archive containing primary source documents'
+        )
+        archive = Source.objects.create(
+            type=archiveContentType,
+            name="Archives Municipales de la ville de Marseille",
+            short_name="AMM",
+        )
+
+    def test_source_list(self):
+        logged_in = self.client.login(username='test_user',password='seCuRePaSsWoRd')
+        self.assertTrue(logged_in)
+        response = self.client.get(reverse('source_list'),secure=True)
         self.assertEqual(response.status_code,200)
-        self.assertContains(response,"Please Sign In")
+        self.assertContains(response,"Archives Municipales de la ville de Marseille")
+
+    def test_source_detail(self):
+        logged_in = self.client.login(username='test_user',password='seCuRePaSsWoRd')
+        self.assertTrue(logged_in)
+        archive = Source.objects.get(name="Archives Municipales de la ville de Marseille")
+        response = self.client.get(reverse('source_detail',kwargs={'pk':archive.pk}),secure=True)
+        self.assertEqual(response.status_code,200)
+        self.assertContains(response,"Archives Municipales de la ville de Marseille")
 
 class AttributeTestCase(TestCase):
     def setUp(self):
