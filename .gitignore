@@ -2,6 +2,7 @@ env
 venv
 *.pyc
 staticfiles
+www
 .env
 db.cnf
 db-test.cnf
