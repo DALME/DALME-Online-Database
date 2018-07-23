@@ -10,35 +10,28 @@
     "children": [
       {
         "text": "All",
-        "link": "/list/sources/all",
+        "link": "/sources",
         "iconClass": "fa-asterisk",
         "counter": "sources"
       },
 
       {
         "text": "Acts & Registers",
-        "link": "/list/sources/notarial",
+        "link": "/sources?type=Notarial act|Notarial register",
         "iconClass": "fa-list",
         "counter": "notarial_sources"
       },
 
       {
-        "text": "Inventories",
-        "link": "/list/sources/inventories",
-        "iconClass": "fa-list-ol",
-        "counter": "inventories"
-      },
-
-      {
         "text": "Bibliographic",
-        "link": "/list/sources/biblio",
+        "link": "/sources?type=Reference source|Book",
         "iconClass": "fa-book",
         "counter": "biblio_sources"
       },
 
       {
         "text": "Archives & Collections",
-        "link": "/list/sources/archives",
+        "link": "/sources?type=Archive",
         "iconClass": "fa-archive",
         "counter": "archives"
       }

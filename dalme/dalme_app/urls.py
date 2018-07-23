@@ -10,9 +10,9 @@ from . import views
 urlpatterns = [
     url(r'^UIref/([a-z_-]+)$', views.uiref, name='uiref'),
     url(r'^script/([a-z_-]+)$', views.script, name='scripts'),
-    url(r'^source/(?P<pk>[a-zA-Z0-9-]+)/manifest', views.SourceManifest, name='source_manifest'),
-    url(r'^source/(?P<pk>[a-zA-Z0-9-]+)', views.SourceDetail.as_view(), name='source_detail'),
-    url(r'^source/', views.SourceMain.as_view(), name='source_main'),
+    url(r'^sources/(?P<pk>[a-zA-Z0-9-]+)/manifest', views.SourceManifest, name='source_manifest'),
+    url(r'^sources/(?P<pk>[a-zA-Z0-9-]+)', views.SourceDetail.as_view(), name='source_detail'),
+    url(r'^sources/?', views.SourceMain.as_view(), name='source_main'),
     url(r'^pages/(?P<pk>[a-zA-Z0-9-]+)', views.PageDetail.as_view(), name='page_detail'),
     url(r'^pages/', views.PageMain.as_view(), name='page_list'),
     url(r'^list/(?P<module>[a-z_-]+)(?:/(?P<type>[a-zA-Z]+))?/$', views.list, name='lists'),

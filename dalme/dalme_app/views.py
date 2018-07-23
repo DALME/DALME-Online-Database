@@ -77,14 +77,35 @@ class SourceMain(View):
         return view(request, *args, **kwargs)
 
 class SourceList(ListView):
+    # TODO: Different columns for different filters
+    # TODO: Filter for is_inventory boolean field
+    # TODO: Allow for dynamic ordering
     paginate_by = 50
     template_name = 'dalme_app/generic_list.html'
-    queryset = Source.objects.all().order_by('type','short_name')
+    queryset = Source.objects.all()
 
-    # def get_ordering(self):
-    #     ordering = self.GET.get('ordering','name')
-    #     # TODO: add validation to ordering
-    #     return ordering
+    def get_queryset(self):
+        # get entire queryset
+        queryset = Source.objects.all()
+
+        # get valid types
+        types = {}
+        for type in Content_type.objects.all():
+            types[type.name] = type.pk
+
+        if 'type' in self.request.GET:
+            q_obj = Q()
+            type_filters = self.request.GET['type'].split('|')
+            for filter in type_filters:
+                if filter in types:
+                    q_obj |= Q(type=types[filter])
+            queryset = queryset.filter(q_obj)
+        if 'order' in self.request.GET:
+            # do something to change the order
+            pass
+        else:
+            queryset = queryset.order_by('type','short_name')
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,6 +147,7 @@ class SourceDisplay(DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         context['source_has_children'] = len(self.object.source_set.all()) > 0
+        context['source_has_pages'] = len(self.object.page_set.all()) > 0
         context['children'] = self.object.source_set.all().order_by('name')
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
@@ -205,6 +227,7 @@ class PageList(ListView):
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
         context['create_form'] = forms.page_main()
+        context['page_title'] = "Page List"
         return context
 
 class PageUpdate(UpdateView):

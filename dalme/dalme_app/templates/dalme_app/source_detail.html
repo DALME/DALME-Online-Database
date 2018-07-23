@@ -2,16 +2,20 @@
 {% load staticfiles i18n %}
 
 {% block extra_head %}
-<link href="{% static 'ImageViewer/imageviewer.css' %}" rel="stylesheet" type="text/css" />
-<script src="{% static 'ImageViewer/imageviewer.js' %}"></script>
-<link rel="stylesheet" href="{% static 'css/mirador-combined.css' %}"/>
-<script src="{% static 'js/mirador.min.js' %}"></script>
-<style media="screen">
-  #viewer {
-    height: 1000px;
-    width: 100%;
-  }
-</style>
+  <link href="{% static '/css/chosen.css' %}" rel="stylesheet">
+
+  {% if source_has_pages %}
+    <link href="{% static 'ImageViewer/imageviewer.css' %}" rel="stylesheet" type="text/css" />
+    <script src="{% static 'ImageViewer/imageviewer.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/mirador-combined.css' %}"/>
+    <script src="{% static 'js/mirador.min.js' %}"></script>
+    <style media="screen">
+      #viewer {
+        height: 1000px;
+        width: 100%;
+      }
+    </style>
+  {% endif %}
 {% endblock %}
 
 {% block extra_dropdowns %}{% endblock %}
@@ -25,69 +29,67 @@
     </div>
   </div>
   <div class="row">
-    <div class="well">
-      <div class="col-lg-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <i class="fa fa-list-alt fa-fw"></i> Metadata
-          </div>
-          <div class="panel-body">
-            <p><strong>Name: </strong>{{ source.name }}</p>
-            <p><strong>Type: </strong>{{ source.type.name }}</p>
-            <p><strong>Short name: </strong>{{ source.short_name }}</p>
-            {% if source.parent_source %}
-            <p><strong>Parent source: </strong><a href="/source/{{ source.parent_source.pk }}">{{ source.parent_source.name }}</a></p>
-            {% endif %}
-            <p><strong>Is inventory: </strong>{{ source.is_inventory }}</p>
-            <a href="#source-detail-modals" data-toggle="modal" data-target="#source-detail-modals" class="btn btn-primary">Update source</a>
-          </div>
+    <div class="col-lg-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="fa fa-list-alt fa-fw"></i> Metadata
+        </div>
+        <div class="panel-body">
+          <p><strong>Name: </strong>{{ source.name }}</p>
+          <p><strong>Type: </strong>{{ source.type.name }}</p>
+          <p><strong>Short name: </strong>{{ source.short_name }}</p>
+          {% if source.parent_source %}
+          <p><strong>Parent source: </strong><a href="/source/{{ source.parent_source.pk }}">{{ source.parent_source.name }}</a></p>
+          {% endif %}
+          <p><strong>Is inventory: </strong>{{ source.is_inventory }}</p>
+          <a href="#source-detail-modals" data-toggle="modal" data-target="#source-detail-modals" class="btn btn-primary">Update source</a>
         </div>
       </div>
-      {% if source_has_children %}
-      <div class="col-lg-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            Children
-          </div>
-          <div class="panel-body">
-            <ul>
-              {% for child in children %}
-              <li><a href="/source/{{ child.pk }}">{{ child.name }}</a></li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      {% if source.get_attributes %}
-      <div class="col-lg-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            Attributes
-          </div>
-          <div class="panel-body">
-            {% for attribute in source.get_attributes %}
-            <p><strong>{{ attribute.attribute_type.name }}: </strong>{{ attribute.get_data.value }}</p>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      {% if source.page_set.all %}
-      <div class="col-lg-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            Pages
-          </div>
-          <div class="panel-body">
-            {% for page in source.page_set.all %}
-              <p><a href="{% url 'page_detail' page.pk %}">{{ page }}</a></p>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-      {% endif %}
     </div>
+    {% if source_has_children %}
+    <div class="col-lg-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Children
+        </div>
+        <div class="panel-body">
+          <ul>
+            {% for child in children %}
+            <li><a href="/source/{{ child.pk }}">{{ child.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% if source.get_attributes %}
+    <div class="col-lg-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Attributes
+        </div>
+        <div class="panel-body">
+          {% for attribute in source.get_attributes %}
+          <p><strong>{{ attribute.attribute_type.name }}: </strong>{{ attribute.get_data.value }}</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% if source.page_set.all %}
+    <div class="col-lg-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Pages
+        </div>
+        <div class="panel-body">
+          {% for page in source.page_set.all %}
+            <p><a href="{% url 'page_detail' page.pk %}">{{ page }}</a></p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
   {% if source.page_set.all %}
     <div class="row">
@@ -112,6 +114,7 @@
         </script>
       </div>
     </div>
+  {% endif %}
     <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="source-detail-update-title" aria-hidden="true" id="source-detail-modals">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -129,7 +132,11 @@
         </div>
       </div>
     </div>
-  {% endif %}
 </div>
+
+<script src="{% static 'js/chosen.jquery.js' %}" charset="utf-8"></script>
+<script type="text/javascript">
+  $(".chosen-select").chosen({width:"100%"});
+</script>
 
 {% endblock %}

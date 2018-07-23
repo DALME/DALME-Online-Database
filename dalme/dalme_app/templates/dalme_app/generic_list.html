@@ -4,6 +4,7 @@
 {% block extra_head %}
 <link href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="{% static '/css/chosen.css' %}" rel="stylesheet">
 
 <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
@@ -42,7 +43,7 @@
             </thead>
             {% for object in object_list %}
             <tr>
-              <td><a href="{{ request.path }}{{ object.pk }}">{{ object.name }}</a></td>
+              <td><a href="{{ object.get_absolute_url }}">{{ object.name }}</a></td>
               {% if object_properties %}
                 {% for prop in object_properties %}
                   <td>{{ object|get_item:prop }}</td>
@@ -98,5 +99,10 @@
     </div>
   </div>
 </div>
+
+<script src="{% static 'js/chosen.jquery.js' %}" charset="utf-8"></script>
+<script type="text/javascript">
+  $(".chosen-select").chosen({ width: '100%'});
+</script>
 
 {% endblock %}
