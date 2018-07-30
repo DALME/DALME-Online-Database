@@ -5,6 +5,8 @@ and iterate through data in the database without writing SQL statements.
 """
 
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -298,6 +300,11 @@ class Attribute_type(dalmeIntid):
         return self.name
 
 class Attribute(dalmeUuid):
+    # Relational bit
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField(null=True)
+    content_object = GenericForeignKey('content_type','object_id')
+
     attribute_type = models.ForeignKey(
         "Attribute_type",
         db_index=True,
@@ -305,6 +312,19 @@ class Attribute(dalmeUuid):
         db_column="attribute_type"
     )
     content_id = models.UUIDField(db_index=True)
+
+    @property
+    def value(self):
+        for data_type in [
+            'attribute_date',
+            'attribute_dbr',
+            'attribute_int',
+            'attribute_str',
+            'attribute_txt'
+        ]:
+            if hasattr(self,data_type):
+                return eval('self.{}.value'.format(data_type))
+        return None
 
     def get_data(self):
         for data_type in [
@@ -319,7 +339,7 @@ class Attribute(dalmeUuid):
         return None
 
     def __str__(self):
-        return self.get_data()
+        return "{}: {}".format(self.attribute_type,self.get_data())
 
 class Attribute_DATE(dalmeBasic):
     attribute_id = models.OneToOneField(
@@ -333,7 +353,7 @@ class Attribute_DATE(dalmeBasic):
     value_year = models.IntegerField()
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 class Attribute_DBR(dalmeBasic):
     attribute_id = models.OneToOneField(
@@ -344,7 +364,7 @@ class Attribute_DBR(dalmeBasic):
     value = models.CharField(max_length=32)
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 class Attribute_INT(dalmeBasic):
     attribute_id = models.OneToOneField(
@@ -355,7 +375,7 @@ class Attribute_INT(dalmeBasic):
     value = models.IntegerField()
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 class Attribute_STR(dalmeBasic):
     attribute_id = models.OneToOneField(
@@ -366,7 +386,7 @@ class Attribute_STR(dalmeBasic):
     value = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 class Attribute_TXT(dalmeBasic):
     attribute_id = models.ForeignKey(
@@ -377,7 +397,7 @@ class Attribute_TXT(dalmeBasic):
     value = models.TextField()
 
     def __str__(self):
-        return self.value
+        return str(self.value)
 
 class Concept(dalmeUuid):
     getty_id = models.IntegerField(db_index=True)
@@ -448,6 +468,15 @@ class Object_attribute(dalmeBasic):
 class Place(dalmeUuid):
     type = models.IntegerField(db_index=True)
 
+
+class SourceManager(models.Manager):
+    """"""
+    def has_attribute(self,attribute):
+        if attribute in self.get_attributes():
+            return True
+        else:
+            return False
+
 class Source(dalmeUuid):
     type = models.ForeignKey(
         'Content_type',
@@ -466,6 +495,9 @@ class Source(dalmeUuid):
 
     )
     is_inventory = models.BooleanField(default=False, db_index=True)
+    attributes = GenericRelation(Attribute)
+
+    # objects = SourceManager()
 
     def __str__(self):
         return self.name
@@ -482,7 +514,12 @@ class Source(dalmeUuid):
         Returns associated attributes. This is a loose connection, with UUIDs
         in Attributes.content_id corresponding (potentially) to Sources
         """
-        attributes = Attribute.objects.all().filter(content_id=self.pk)
+        attribute_objects = Attribute.objects.all().filter(content_id=self.pk)
+        attributes = {}
+        for obj in attribute_objects:
+            if obj.attribute_type.name not in attributes:
+                attributes[obj.attribute_type.name] = []
+            attributes[obj.attribute_type.name].append(obj.get_data())
         return attributes
 
 class Page(dalmeUuid):

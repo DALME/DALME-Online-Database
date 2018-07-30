@@ -38,6 +38,11 @@
     ]
   },
   {
+    "text": "Pages",
+    "link": "/pages",
+    "iconClass": "fa-file"
+  },
+  {
     "text": "Objects",
     "link": "/list/objects",
     "iconClass": "fa-beer",

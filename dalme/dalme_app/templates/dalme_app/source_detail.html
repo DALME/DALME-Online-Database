@@ -39,7 +39,7 @@
           <p><strong>Type: </strong>{{ source.type.name }}</p>
           <p><strong>Short name: </strong>{{ source.short_name }}</p>
           {% if source.parent_source %}
-          <p><strong>Parent source: </strong><a href="/source/{{ source.parent_source.pk }}">{{ source.parent_source.name }}</a></p>
+          <p><strong>Parent source: </strong><a href="{% url 'source_detail' source.parent_source.pk %}">{{ source.parent_source.name }}</a></p>
           {% endif %}
           <p><strong>Is inventory: </strong>{{ source.is_inventory }}</p>
           <a href="#source-detail-modals" data-toggle="modal" data-target="#source-detail-modals" class="btn btn-primary">Update source</a>
@@ -55,7 +55,7 @@
         <div class="panel-body">
           <ul>
             {% for child in children %}
-            <li><a href="/source/{{ child.pk }}">{{ child.name }}</a></li>
+            <li><a href="{% url 'source_detail' child.pk %}">{{ child.name }}</a></li>
             {% endfor %}
           </ul>
         </div>
@@ -69,8 +69,8 @@
           Attributes
         </div>
         <div class="panel-body">
-          {% for attribute in source.get_attributes %}
-          <p><strong>{{ attribute.attribute_type.name }}: </strong>{{ attribute.get_data.value }}</p>
+          {% for attribute_type, attributes in source.get_attributes.items %}
+          <p><strong>{{ attribute_type }}: </strong>{{ attributes }}</p>
           {% endfor %}
         </div>
       </div>
@@ -134,9 +134,12 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
 <script src="{% static 'js/chosen.jquery.js' %}" charset="utf-8"></script>
 <script type="text/javascript">
   $(".chosen-select").chosen({width:"100%"});
 </script>
-
+<script src="{% static 'vendor/metisMenu/metisMenu.min.js' %}"></script>
 {% endblock %}
