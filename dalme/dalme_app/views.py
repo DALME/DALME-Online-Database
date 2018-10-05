@@ -80,6 +80,7 @@ class SourceList(ListView):
     # TODO: Different columns for different filters
     # TODO: Filter for is_inventory boolean field
     # TODO: Allow for dynamic ordering
+    # TODO: Get pagination working with filters
     paginate_by = 50
     template_name = 'dalme_app/generic_list.html'
     queryset = Source.objects.all()
