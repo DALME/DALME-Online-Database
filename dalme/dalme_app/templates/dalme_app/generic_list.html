@@ -55,19 +55,39 @@
         </div>
         <div class="panel-footer">
           {% if is_paginated %}
-            <div class="btn-group" role="toolbar">
-              <a class="btn btn-default" href="{{ request.path }}?page=1"><i class="fa fa-arrow-left"></i><i class="fa fa-arrow-left"></i> First</a>
-              {% if page_obj.has_previous %}
-                <a class="btn btn-default" href="{{ request.path }}?page={{ page_obj.previous_page_number }}"><i class="fa fa-arrow-left"></i> Previous</a>
-              {% else %}
-                <a class="btn btn-default disabled"><i class="fa fa-arrow-left"></i> Previous</a>
+            <div class="">
+              {# First page link #}
+              {% if page_obj.number != 1 %}
+                <a href="{{ request.path }}?page=1&type={{ type }}">1</a>
               {% endif %}
-              {% if page_obj.has_next %}
-                <a class="btn btn-default" href="{{ request.path }}?page={{ page_obj.next_page_number }}">Next <i class="fa fa-arrow-right"></i></a>
-              {% else %}
-                <a class="btn btn-default disabled">Next <i class="fa fa-arrow-right"></i></a>
+
+              {# Conditional ellipsis, only shows up when there's a gap in displayed numbers #}
+              {% if page_obj.number > 3 %}
+                <span>&nbsp;...&nbsp;</span>
               {% endif %}
-              <a class="btn btn-default" href="{{ request.path }}?page=last">Last <i class="fa fa-arrow-right"></i><i class="fa fa-arrow-right"></i></a>
+
+              {# Previous page link #}
+              {% if page_obj.has_previous and page_obj.previous_page_number != 1 %}
+                <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}&type={{ type }}">{{ page_obj.previous_page_number }}</a>
+              {% endif %}
+
+              {# Current page number (not a link) #}
+              <span>{{ page_obj.number }}</span>
+
+              {# Next page link #}
+              {% if page_obj.has_next and page_obj.next_page_number != page_obj.paginator.num_pages %}
+                <a href="{{ request.path }}?page={{ page_obj.next_page_number }}&type={{ type }}">{{ page_obj.next_page_number }}</a>
+              {% endif %}
+
+              {# Conditional ellipsis, only shows up when there's a gap in displayed numbers #}
+              {% if page_obj.next_page_number < page_obj.paginator.num_pages|add:"-1"  %}
+               <span>&nbsp;...&nbsp;</span>
+              {% endif %}
+
+              {# Last page link #}
+              {% if page_obj.number != page_obj.paginator.num_pages %}
+                <a href="{{ request.path }}?page=last&type={{ type }}">{{ page_obj.paginator.num_pages }}</a>
+              {% endif %}
             </div>
           {% endif %}
         </div>

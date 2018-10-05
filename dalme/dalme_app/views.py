@@ -80,10 +80,24 @@ class SourceList(ListView):
     # TODO: Different columns for different filters
     # TODO: Filter for is_inventory boolean field
     # TODO: Allow for dynamic ordering
-    # TODO: Get pagination working with filters
     paginate_by = 50
     template_name = 'dalme_app/generic_list.html'
     queryset = Source.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = "List of Sources"
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['object_properties'] = ['type']
+        context['create_form'] = forms.source_main()
+        if 'type' in self.request.GET:
+            context['type'] = self.request.GET['type']
+        else:
+            context['type'] = ""
+        if 'order' in self.request.GET:
+            context['order'] = self.request.GET['order']
+        return context
 
     def get_queryset(self):
         # get entire queryset
@@ -107,15 +121,6 @@ class SourceList(ListView):
         else:
             queryset = queryset.order_by('type','short_name')
         return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = "List of Sources"
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        context['object_properties'] = ['type']
-        context['create_form'] = forms.source_main()
-        return context
 
 class SourceCreate(CreateView):
     model = Source
