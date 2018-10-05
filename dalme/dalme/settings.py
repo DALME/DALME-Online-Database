@@ -195,7 +195,7 @@ CSRF_COOKIE_SECURE = True
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_BACKEND = 'db+mysql:///django-db'
 
 CACHES = {
     'default': {

@@ -5,11 +5,9 @@ from celery import Celery
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dalme.settings')
 
-app = Celery('dalme')
+app = Celery('dalme',result_backend="django-db")
 
-app = Celery('dalme',
-             broker='amqp://dalme_proc:dalme1435@heresiarch.local:5672/dalme_host',
-             include=['dalme_app.tasks'])
+# app.conf.update(result_backend="django-db")
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.

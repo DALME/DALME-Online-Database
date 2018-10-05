@@ -5,7 +5,7 @@ Celery tasks
 
 from django.contrib.auth.models import User
 
-import re, requests
+import re, requests, time
 from async_messages import messages
 
 from .models import par_inventory, par_folio, par_token, error_message, par_object
@@ -90,3 +90,9 @@ def parse_inventory(form_data, inve_id, username):
 
     #message
     functions.notification('req', 2502, para={'inv': inv_name}, user=username)
+
+@app.task
+def add(x,y):
+    print("{} is the result".format(x+y))
+    time.sleep(10)
+    return x+y
