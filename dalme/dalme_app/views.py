@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connections
-from django.db.models import Q
+from django.db.models import Q, Count, F
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.template.defaulttags import register
@@ -80,17 +80,23 @@ class SourceList(ListView):
     # TODO: Different columns for different filters
     # TODO: Filter for is_inventory boolean field
     # TODO: Allow for dynamic ordering
-    paginate_by = 50
+    paginate_by = 20
     template_name = 'dalme_app/generic_list.html'
-    queryset = Source.objects.all()
+    #queryset = Source.objects.all()
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = "List of Sources"
+        context['class_single'] = "source"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        context['object_properties'] = ['type']
+        context['object_properties'] = ['type','is_inventory','parent_source','attribute_list']
+        #context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
+        context['object_attributes'] = ['Title','Language','Start date','End date','City']
         context['create_form'] = forms.source_main()
+        #context['table_options'] = ['pageLength: 100', 'responsive: true', 'paging: true']
+
         if 'type' in self.request.GET:
             context['type'] = self.request.GET['type']
         else:
@@ -101,7 +107,19 @@ class SourceList(ListView):
 
     def get_queryset(self):
         # get entire queryset
-        queryset = Source.objects.all()
+        #queryset = Source.objects.all()
+        #test_source = Source.objects.get(pk='1abc52313988415192a0749282be2523')
+        #test_attributes = test_source.attributes.all()
+        #test_ct = test_source.type.attribute_list
+        #queryset = Source.objects.annotate(
+        #    no_attributes=Count('attributes'),
+        #    test=F('attributes__attribute_date__value'),
+        #    test2=self.annotate('john')
+        #    )
+        #queryset = Source.objects.annotate(
+        #    no_attributes=Count('attributes'),
+        #    test2=self.attributes.all()
+        #    )
 
         # get valid types
         types = {}
@@ -114,12 +132,17 @@ class SourceList(ListView):
             for filter in type_filters:
                 if filter in types:
                     q_obj |= Q(type=types[filter])
-            queryset = queryset.filter(q_obj)
+                elif filter == "inv":
+                    q_obj &= Q(is_inventory=True)
+            #queryset = Source.objects.filter(q_obj).annotate(no_attributes=Count('attributes'))
+            queryset = Source.objects.filter(q_obj)
+
         if 'order' in self.request.GET:
             # do something to change the order
             pass
         else:
             queryset = queryset.order_by('type','short_name')
+
         return queryset
 
 class SourceCreate(CreateView):

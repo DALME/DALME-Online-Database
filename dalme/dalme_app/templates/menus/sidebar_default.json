@@ -18,8 +18,15 @@
       {
         "text": "Acts & Registers",
         "link": "/sources?type=Notarial act|Notarial register",
-        "iconClass": "fa-list",
+        "iconClass": "fa-columns",
         "counter": "notarial_sources"
+      },
+
+      {
+        "text": "Inventories",
+        "link": "/sources?type=Notarial act|inv",
+        "iconClass": "fa-list-ol",
+        "counter": "inventories"
       },
 
       {

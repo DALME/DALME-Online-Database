@@ -32,10 +32,15 @@ The software required is listed below, along with commands for installation on O
     - Also try installing `psycopg` and/or `mysqlclient` with the following pip commands:
         - `env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip --no-cache install psycopg2`
         - `env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip --no-cache install mysqlclient`
+
+    - Alternatively, for compilers to find openssl you can set:
+        - `export LDFLAGS="-L/usr/local/opt/openssl/lib"`
+        - `export CPPFLAGS="-I/usr/local/opt/openssl/include"`
+
 4. Get a copy of db.cnf from someone else in the project to use the database connection, then place it in the root of the repository's directory
 5. Test the local development setup
-    - `python manage.py runserver`
+    - `python dalme/manage.py runserver`
 6. If you don't already have a user account, you can create one with:
-    - `python manage.py createsuperuser`
+    - `python dalme/manage.py createsuperuser`
     - If you create a new terminal to do this, you'll need to make sure that you're in your environment with `source ~/virtualenvs/dalme/bin/activate`
 6. Check out the site at `localhost:8000`

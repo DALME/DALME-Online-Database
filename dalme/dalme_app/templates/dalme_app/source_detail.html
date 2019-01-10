@@ -29,92 +29,112 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-lg-4">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <i class="fa fa-list-alt fa-fw"></i> Metadata
-        </div>
-        <div class="panel-body">
-          <p><strong>Name: </strong>{{ source.name }}</p>
-          <p><strong>Type: </strong>{{ source.type.name }}</p>
-          <p><strong>Short name: </strong>{{ source.short_name }}</p>
-          {% if source.parent_source %}
-          <p><strong>Parent source: </strong><a href="{% url 'source_detail' source.parent_source.pk %}">{{ source.parent_source.name }}</a></p>
-          {% endif %}
-          <p><strong>Is inventory: </strong>{{ source.is_inventory }}</p>
-          <a href="#source-detail-modals" data-toggle="modal" data-target="#source-detail-modals" class="btn btn-primary">Update source</a>
-        </div>
-      </div>
-    </div>
-    {% if source_has_children %}
-    <div class="col-lg-4">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          Children
-        </div>
-        <div class="panel-body">
-          <ul>
-            {% for child in children %}
-            <li><a href="{% url 'source_detail' child.pk %}">{{ child.name }}</a></li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-    {% if source.get_attributes %}
-    <div class="col-lg-4">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          Attributes
-        </div>
-        <div class="panel-body">
-          {% for attribute_type, attributes in source.get_attributes.items %}
-          <p><strong>{{ attribute_type }}: </strong>{{ attributes }}</p>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    {% endif %}
-    {% if source.page_set.all %}
-    <div class="col-lg-4">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          Pages
-        </div>
-        <div class="panel-body">
-          {% for page in source.page_set.all %}
-            <p><a href="{% url 'page_detail' page.pk %}">{{ page }}</a></p>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  </div>
-  {% if source.page_set.all %}
-    <div class="row">
-      <div class="col-lg-12 nopadding">
-        <div id="viewer"></div>
-        <script type="text/javascript">
-          $(function() {
-            Mirador({
-              id: "viewer",
-              data: [
-                { manifestUri: "{{ request.build_absolute_uri }}/manifest" },
-                { manifestUri: "https://dam.dalme.org/iiif/8145/manifest" },
-              ],
-              windowObjects: [
-                {
-                  loadedManifest: "{{ request.build_absolute_uri }}/manifest",
-                  viewType: "ImageView"
-                }
-              ]
-            });
-          });
-        </script>
-      </div>
-    </div>
-  {% endif %}
+      <div class="col-lg-12">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#document" data-toggle="tab">Document Viewer</a>
+              </li>
+              <li><a href="#metadata" data-toggle="tab">Metadata</a>
+              </li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="document">
+                  {% if source.page_set.all %}
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-lg-12 nopadding">
+                        <div id="viewer"></div>
+                        <script type="text/javascript">
+                          $(function() {
+                            Mirador({
+                              id: "viewer",
+                              data: [
+                                { manifestUri: "{{ request.build_absolute_uri }}/manifest" },
+                                { manifestUri: "https://dam.dalme.org/iiif/8145/manifest" },
+                              ],
+                              windowObjects: [
+                                {
+                                  loadedManifest: "{{ request.build_absolute_uri }}/manifest",
+                                  viewType: "ImageView"
+                                }
+                              ]
+                            });
+                          });
+                        </script>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="tab-pane fade" id="metadata">
+                  <div class="panel-body">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <i class="fa fa-list-alt fa-fw"></i> Metadata
+                        </div>
+                        <div class="panel-body">
+                          <p><strong>Name: </strong>{{ source.name }}</p>
+                          <p><strong>Type: </strong>{{ source.type.name }}</p>
+                          <p><strong>Short name: </strong>{{ source.short_name }}</p>
+                          {% if source.parent_source %}
+                          <p><strong>Parent source: </strong><a href="{% url 'source_detail' source.parent_source.pk %}">{{ source.parent_source.name }}</a></p>
+                          {% endif %}
+                          <p><strong>Is inventory: </strong>{{ source.is_inventory }}</p>
+                          <a href="#source-detail-modals" data-toggle="modal" data-target="#source-detail-modals" class="btn btn-primary">Update source</a>
+                        </div>
+                      </div>
+                    </div>
+                    {% if source_has_children %}
+                    <div class="col-lg-4">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          Children
+                        </div>
+                        <div class="panel-body">
+                          <ul>
+                            {% for child in children %}
+                            <li><a href="{% url 'source_detail' child.pk %}">{{ child.name }}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+                    {% if source.get_attributes %}
+                    <div class="col-lg-4">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          Attributes
+                        </div>
+                        <div class="panel-body">
+                          {% for attribute_type, attributes in source.get_attributes.items %}
+                          <p><strong>{{ attribute_type }}: </strong>{{ attributes }}</p>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+                    {% if source.page_set.all %}
+                    <div class="col-lg-4">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          Pages
+                        </div>
+                        <div class="panel-body">
+                          {% for page in source.page_set.all %}
+                            <p><a href="{% url 'page_detail' page.pk %}">{{ page }}</a></p>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+                </div>
+            </div>
+
     <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="source-detail-update-title" aria-hidden="true" id="source-detail-modals">
       <div class="modal-dialog">
         <div class="modal-content">

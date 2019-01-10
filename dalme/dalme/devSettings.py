@@ -48,10 +48,12 @@ INSTALLED_APPS = [
     'django_celery_results',
     'allaccess.apps.AllAccessConfig',
     'sslserver',
+    #'debug_toolbar',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -200,10 +202,13 @@ CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache_table',
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
     }
 }
+
+#setting for Debug Toolbar
+INTERNAL_IPS = '127.0.0.1'
 
 LOGGING = {
     'version': 1,

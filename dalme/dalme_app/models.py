@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 import uuid
 import json
@@ -313,7 +314,7 @@ class Attribute(dalmeUuid):
     )
     content_id = models.UUIDField(db_index=True)
 
-    @property
+    @cached_property
     def value(self):
         for data_type in [
             'attribute_date',
@@ -335,8 +336,29 @@ class Attribute(dalmeUuid):
             'attribute_txt'
         ]:
             if hasattr(self,data_type):
-                return eval('self.{}'.format(data_type))
+                try:
+                    att = str(eval('self.{}'.format(data_type))).split(':',1)[0]
+                except:
+                    att = str(eval('self.{}'.format(data_type)))
+                return att
         return None
+
+    #@cached_property
+    #def att_content(self):
+    #    for data_type in [
+    #        'attribute_date',
+    #        'attribute_dbr',
+    #        'attribute_int',
+    #        'attribute_str',
+    #        'attribute_txt'
+    #    ]:
+    #        if hasattr(self,data_type):
+    #            try:
+    #                att = str(eval('self.{}'.format(data_type))).split(':',1)[0]
+    #            except:
+    #                att = str(eval('self.{}'.format(data_type)))
+    #            return att
+    #    return None
 
     def __str__(self):
         return "{}: {}".format(self.attribute_type,self.get_data())
@@ -416,6 +438,16 @@ class Content_type(dalmeIntid):
     short_name = models.CharField(max_length=55)
     description = models.TextField()
 
+    #@property
+    #def attribute_list(self):
+    #    if len(self.content_type_x_attribute_type_set.all())>0:
+    #        attribute_objects = self.content_type_x_attribute_type_set.all()
+    #        attributes = []
+    #        for obj in attribute_objects:
+    #            if obj.attribute_type_id not in attributes:
+    #                attributes.append(obj.attribute_type_id)
+    #        return attributes
+
     def __str__(self):
         return self.name
 
@@ -492,12 +524,10 @@ class Source(dalmeUuid):
         on_delete=models.PROTECT,
         null=True,
         db_column="parent_source",
-
     )
     is_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation(Attribute)
-
-    # objects = SourceManager()
+    #objects = SourceManager()
 
     def __str__(self):
         return self.name
@@ -514,12 +544,19 @@ class Source(dalmeUuid):
         Returns associated attributes. This is a loose connection, with UUIDs
         in Attributes.content_id corresponding (potentially) to Sources
         """
-        attribute_objects = Attribute.objects.all().filter(content_id=self.pk)
+        attribute_objects = self.attributes.all()
         attributes = {}
         for obj in attribute_objects:
             if obj.attribute_type.name not in attributes:
-                attributes[obj.attribute_type.name] = []
-            attributes[obj.attribute_type.name].append(obj.get_data())
+                attributes[obj.attribute_type.name] = obj.get_data()
+        return attributes
+    @property
+    def attribute_list(self):
+        attribute_objects = self.attributes.all()
+        attributes = {}
+        for obj in attribute_objects:
+            if obj.attribute_type.name not in attributes:
+                attributes[obj.attribute_type.name] = obj.get_data()
         return attributes
 
 class Page(dalmeUuid):

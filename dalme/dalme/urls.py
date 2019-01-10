@@ -26,7 +26,7 @@ from dalme_app import views
 
 urlpatterns = [
     #url(r'^login/$', auth_views.login, {'template_name': 'login.html', 'redirect_authenticated_user': True}, name='login'),
-    url(r'^logout/$', auth_views.logout, {'next_page': 'https://dalme.org'}, name='logout'),
+    url(r'^logout/$', auth_views.LogoutView, {'next_page': 'https://dalme.org'}, name='logout'),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),
