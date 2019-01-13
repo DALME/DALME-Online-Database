@@ -84,24 +84,26 @@ class SourceListDT(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = "List of Sources"
-        context['class_single'] = "source"
+        context['class'] = 'source'
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        context['object_properties'] = ['type','is_inventory','parent_source']
+        context['columns'] = ['name','type','is_inventory','parent_source']
         #context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
         context['create_form'] = forms.source_main()
         context['table_options'] = ['pageLength: 25', 'responsive: true', 'paging: true', 'processing: true', 'serverSide: true']
-        context['ajax_source'] = 'source_data_table'
 
         if 'type' in self.request.GET:
             context['type'] = self.request.GET['type']
         else:
             context['type'] = ""
+
         if 'order' in self.request.GET:
             context['order'] = self.request.GET['order']
+
         return context
 
-class SourceDataTable(BaseDatatableView):
+
+class DataTableProvider(BaseDatatableView):
     # State the model the table should draw data from, or implement method "get_initial_queryset"
     #model = Source
     # define the columns that will be shown

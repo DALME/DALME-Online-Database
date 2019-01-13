@@ -27,16 +27,15 @@
       <div class="panel panel-default">
         <div class="panel-heading text-right">
           {% if create_form %}
-          <a href="#create-modal" data-toggle="modal" data-target="#create-modal" class="btn btn-primary">Create new {{ class_single }}</a>
+          <a href="#create-modal" data-toggle="modal" data-target="#create-modal" class="btn btn-primary">Create new {{ class }}</a>
           {% endif %}
         </div>
         <div class="panel-body">
           <table class="table table-striped table-bordered table-hover datatable" id="dataTables-list">
             <thead>
-              <th>Name</th>
-              {% if object_properties %}
-                {% for prop in object_properties %}
-                  <th>{{ prop|title }}</th>
+              {% if columns %}
+                {% for i in columns %}
+                  <th>{{ i|title }}</th>
                 {% endfor %}
               {% endif %}
             </thead>
@@ -82,8 +81,10 @@ $(document).ready(function() {
       {% endfor %}
     {% endif %}
         ajax: {
-              url: "{% url ajax_source %}",
-              data: { "type" : "{{ type }}" }
+              url: "{% url 'dt_provider' %}",
+              data: { "class" : "{{ class }}",
+                      "type" : "{{ type }}"
+                    }
             }
     });
 });
