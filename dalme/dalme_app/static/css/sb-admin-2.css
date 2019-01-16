@@ -6,6 +6,11 @@
 
 /* List of changes from GHP */
 
+.btn-circle-right {
+  border-radius: 15px !important;
+  float: right;
+}
+
 .dropdown-toggle {
   color: #c1c1c1;
 }

@@ -256,6 +256,9 @@ class SourceDisplay(DetailView):
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
         context['page_title'] = self.object.name
         context['form'] = forms.source_main(instance=self.object)
+        if Transcription.objects.filter(source_id=self.object.pk).count() > 0:
+            context['transcription'] = Transcription.objects.get(source_id=self.object.pk).transcription
+
         return context
 
     def get_object(self):

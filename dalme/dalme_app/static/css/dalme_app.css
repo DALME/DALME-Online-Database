@@ -2,3 +2,20 @@
   padding: 0 !important;
   margin: 0 !important;
 }
+
+.xonomy.nerd {
+  font-size: 1.5rem !important;
+}
+
+.xonomy.nerd .element > .childrenCollapsed {
+  font-size: 1.5rem !important;
+  background-color: #dae1f6 !important;
+}
+
+.xonomy.nerd .readonly {
+  color: #000 !important;
+}
+
+.xonomy.nerd .element > .tag.opening > .attributes > .attribute > .name {
+  color: #5376ff !important;
+}
