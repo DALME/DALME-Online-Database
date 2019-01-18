@@ -21,6 +21,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django_celery_results.models import TaskResult
 
 import requests, uuid, os, datetime
+import logging
 from allaccess.views import OAuthCallback
 
 from dalme_app import functions, scripts, forms
@@ -34,8 +35,11 @@ from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
     Identity_phrase_x_entity, Profile)
 from dalme_app.tasks import parse_inventory
 
+logger = logging.getLogger(__name__)
+
 @register.filter
 def get_item(obj, key):
+    logger.debug("get_item called on {}, {}".format(obj, key))
     try:
         return obj.get(key)
     except AttributeError:
@@ -91,8 +95,10 @@ class SourceList(ListView):
         context['class_single'] = "source"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+
+        # TODO: Instead of having this be a list of column headers that the template displays, this should be the python logic that assembles the table data in a way that's easy for the template to parse. In all likelihood there should be a function like `make_table_data` somewhere that takes these properties and attributes as arguments, and returns the table data in a sensible format.
         context['object_properties'] = ['type','is_inventory','parent_source','attribute_list']
-        #context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
+        # context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
         context['object_attributes'] = ['Title','Language','Start date','End date','City']
         context['create_form'] = forms.source_main()
         #context['table_options'] = ['pageLength: 100', 'responsive: true', 'paging: true']

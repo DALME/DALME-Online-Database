@@ -18,10 +18,13 @@ import json
 import os
 from datetime import datetime
 import requests
+import logging
 
 from dalme_app.modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
 from dalme_app.scripts.db import wp_db, wiki_db, dam_db
 from dalme_app.scripts.dam import rs_api_query
+
+logger = logging.getLogger(__name__)
 
 #function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():
@@ -328,6 +331,7 @@ class Attribute(dalmeUuid):
         return None
 
     def get_data(self):
+        logger.debug("attribute.get_data called")
         for data_type in [
             'attribute_date',
             'attribute_dbr',
@@ -552,11 +556,14 @@ class Source(dalmeUuid):
         return attributes
     @property
     def attribute_list(self):
+        logger.debug("attribute_list called on {}".format(self.name))
         attribute_objects = self.attributes.all()
+        logger.debug("self.attributes.all started")
         attributes = {}
         for obj in attribute_objects:
             if obj.attribute_type.name not in attributes:
                 attributes[obj.attribute_type.name] = obj.get_data()
+        logger.debug("attribute_list complete")
         return attributes
 
 class Page(dalmeUuid):
