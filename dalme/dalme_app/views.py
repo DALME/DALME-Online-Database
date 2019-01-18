@@ -171,16 +171,11 @@ class SourceList(ListView):
         context['class_single'] = "source"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-<<<<<<< HEAD
 
         # TODO: Instead of having this be a list of column headers that the template displays, this should be the python logic that assembles the table data in a way that's easy for the template to parse. In all likelihood there should be a function like `make_table_data` somewhere that takes these properties and attributes as arguments, and returns the table data in a sensible format.
         context['object_properties'] = ['type','is_inventory','parent_source','attribute_list']
         # context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
         context['object_attributes'] = ['Title','Language','Start date','End date','City']
-=======
-        context['object_properties'] = ['type','is_inventory','parent_source','no_attributes']
-        #context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
->>>>>>> 2c6f236ab7b283554359286d3ea94dbc37dba7e8
         context['create_form'] = forms.source_main()
 
         if 'type' in self.request.GET:
