@@ -3,12 +3,40 @@
 
 {% block extra_head %}
   <link href="{% static '/css/chosen.css' %}" rel="stylesheet">
+  <script type="text/javascript" src="{% static 'js/xonomy.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/xonomy_tei_docspecs.js' %}"></script>
+  <link type="text/css" rel="stylesheet" href="{% static 'css/xonomy.css' %}"/>
+
+  <!--TEMPORARY HACK: toggle button script for Xonomy mode-->
+  <script type="text/javascript">
+    function changeMode(buttonID) {
+      if (buttonID == "btnModeRead") {
+        document.getElementById(buttonID).className = "btn btn-primary";
+        document.getElementById("btnModeQuick").className = "btn btn-default";
+        document.getElementById("btnModeFull").className = "btn btn-default";
+        start(easy_read);
+      };
+      if (buttonID == "btnModeQuick") {
+        document.getElementById(buttonID).className = "btn btn-primary";
+        document.getElementById("btnModeRead").className = "btn btn-default";
+        document.getElementById("btnModeFull").className = "btn btn-default";
+        start(quick_edit);
+      };
+      if (buttonID == "btnModeFull") {
+        document.getElementById(buttonID).className = "btn btn-primary";
+        document.getElementById("btnModeQuick").className = "btn btn-default";
+        document.getElementById("btnModeRead").className = "btn btn-default";
+        start(full_edit);
+      };
+    }
+  </script>
 
   {% if source_has_pages %}
     <link href="{% static 'ImageViewer/imageviewer.css' %}" rel="stylesheet" type="text/css" />
     <script src="{% static 'ImageViewer/imageviewer.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/mirador-combined.css' %}"/>
     <script src="{% static 'js/mirador.min.js' %}"></script>
+
     <style media="screen">
       #viewer {
         height: 1000px;
@@ -32,6 +60,8 @@
       <div class="col-lg-12">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#document" data-toggle="tab">Document Viewer</a>
+              </li>
+              <li><a href="#transcription" data-toggle="tab">Transcription</a>
               </li>
               <li><a href="#metadata" data-toggle="tab">Metadata</a>
               </li>
@@ -65,6 +95,34 @@
                     </div>
                   </div>
                   {% endif %}
+                </div>
+                <div class="tab-pane fade" id="transcription">
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-lg-12 nopadding">
+                        <div class="panel panel-default">
+                          <div class="panel-heading text-right">
+                            Mode:
+                            <button type="button" id="btnModeRead" class="btn btn-primary" onclick="changeMode(this.id);">Easy Read</button>
+                            <button type="button" id="btnModeQuick" class="btn btn-default" onclick="changeMode(this.id);">Quick Edit</button>
+                            <button type="button" id="btnModeFull" class="btn btn-default" onclick="changeMode(this.id);">Full TEI</button>
+                          </div>
+                          <div class="panel-body">
+                            <div id="editor"></div>
+                            <script type="text/javascript">
+                              function start(mode) {
+                                  var spec = mode;
+                                  var xml='{{ transcription|safe }}';
+                                  var editor=document.getElementById("editor");
+                                  Xonomy.render(xml, editor, spec);
+                                  }
+                              start(easy_read);
+                            </script>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="tab-pane fade" id="metadata">
                   <div class="panel-body">
@@ -162,4 +220,5 @@
   $(".chosen-select").chosen({width:"100%"});
 </script>
 <script src="{% static 'vendor/metisMenu/metisMenu.min.js' %}"></script>
+
 {% endblock %}

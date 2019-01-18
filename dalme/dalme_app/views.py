@@ -17,6 +17,8 @@ from django.utils.safestring import mark_safe
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic.base import TemplateView
+from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from django_celery_results.models import TaskResult
 
@@ -72,7 +74,7 @@ class SourceMain(View):
 
     def get(self, request, *args, **kwargs):
         """Display list of sources"""
-        view = SourceList.as_view()
+        view = SourceListDT.as_view()
         return view(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -80,11 +82,85 @@ class SourceMain(View):
         view = SourceCreate.as_view()
         return view(request, *args, **kwargs)
 
+class SourceListDT(TemplateView):
+    template_name = 'dalme_app/generic_list_DT.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = "List of Sources"
+        context['class'] = 'source'
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['columns'] = ['name','type','is_inventory','parent_source']
+        #context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
+        context['create_form'] = forms.source_main()
+        context['table_options'] = ['pageLength: 25', 'responsive: true', 'paging: true', 'processing: true', 'serverSide: true']
+
+        if 'type' in self.request.GET:
+            context['type'] = self.request.GET['type']
+        else:
+            context['type'] = ""
+
+        if 'order' in self.request.GET:
+            context['order'] = self.request.GET['order']
+
+        return context
+
+
+class DataTableProvider(BaseDatatableView):
+    # State the model the table should draw data from, or implement method "get_initial_queryset"
+    #model = Source
+    # define the columns that will be shown
+    columns = ['name','type','is_inventory','parent_source']
+    # define columns that will be used for sorting
+    # keep same order as "columns" use empty string (i.e. '') for non-sortable columns
+    order_columns = ['name', 'type', 'is_inventory', '']
+    # set max limit of records returned, this is a security feature
+    #max_display_length = 20
+
+    def get_initial_queryset(self):
+        #get entire queryset
+        queryset = Source.objects.all()
+
+        # get valid types
+        types = {}
+        for type in Content_type.objects.all():
+            types[type.name] = type.pk
+
+        if 'type' in self.request.GET:
+            q_obj = Q()
+            type_filters = self.request.GET['type'].split('|')
+            for filter in type_filters:
+                if filter in types:
+                    q_obj |= Q(type=types[filter])
+                elif filter == "inv":
+                    q_obj &= Q(is_inventory=True)
+            #queryset = Source.objects.filter(q_obj).annotate(no_attributes=Count('attributes'))
+            queryset = Source.objects.filter(q_obj)
+
+        if 'order' in self.request.GET:
+            # do something to change the order
+            pass
+        else:
+            queryset = queryset.order_by('type','short_name')
+
+        return queryset
+
+    def filter_queryset(self, qs):
+        # use request parameters to filter queryset
+
+        search = self.request.GET.get('search[value]', None)
+        if search:
+            qs = qs.filter(name__istartswith=search)
+
+        return qs
+
+
 class SourceList(ListView):
     # TODO: Different columns for different filters
     # TODO: Filter for is_inventory boolean field
     # TODO: Allow for dynamic ordering
-    paginate_by = 20
+    #paginate_by = 20
     template_name = 'dalme_app/generic_list.html'
     #queryset = Source.objects.all()
 
@@ -95,13 +171,17 @@ class SourceList(ListView):
         context['class_single'] = "source"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+<<<<<<< HEAD
 
         # TODO: Instead of having this be a list of column headers that the template displays, this should be the python logic that assembles the table data in a way that's easy for the template to parse. In all likelihood there should be a function like `make_table_data` somewhere that takes these properties and attributes as arguments, and returns the table data in a sensible format.
         context['object_properties'] = ['type','is_inventory','parent_source','attribute_list']
         # context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
         context['object_attributes'] = ['Title','Language','Start date','End date','City']
+=======
+        context['object_properties'] = ['type','is_inventory','parent_source','no_attributes']
+        #context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
+>>>>>>> 2c6f236ab7b283554359286d3ea94dbc37dba7e8
         context['create_form'] = forms.source_main()
-        #context['table_options'] = ['pageLength: 100', 'responsive: true', 'paging: true']
 
         if 'type' in self.request.GET:
             context['type'] = self.request.GET['type']
@@ -140,8 +220,8 @@ class SourceList(ListView):
                     q_obj |= Q(type=types[filter])
                 elif filter == "inv":
                     q_obj &= Q(is_inventory=True)
-            #queryset = Source.objects.filter(q_obj).annotate(no_attributes=Count('attributes'))
-            queryset = Source.objects.filter(q_obj)
+            queryset = Source.objects.filter(q_obj).annotate(no_attributes=Count('attributes'))
+            #queryset = Source.objects.filter(q_obj)
 
         if 'order' in self.request.GET:
             # do something to change the order
@@ -188,6 +268,9 @@ class SourceDisplay(DetailView):
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
         context['page_title'] = self.object.name
         context['form'] = forms.source_main(instance=self.object)
+        if Transcription.objects.filter(source_id=self.object.pk).count() > 0:
+            context['transcription'] = Transcription.objects.get(source_id=self.object.pk).transcription
+
         return context
 
     def get_object(self):
@@ -794,4 +877,4 @@ def iiif(request, module):
             'dropdowns': menu_constructor('dropdown_item', 'dropdowns_default.json'),
         }
 
-    return render(request, url, context)
+    return render(request, _url, context)
