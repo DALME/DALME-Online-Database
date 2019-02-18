@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connections
-from django.db.models import Q, Count, F
+from django.db.models import Q, Count, F, Prefetch
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.template.defaulttags import register
@@ -34,7 +34,9 @@ from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
     Content_class, Content_type, Content_type_x_attribute_type, Headword,
     Object, Object_attribute, Place, Source, Page, Transcription,
     Identity_phrase, Object_phrase, Word_form, Token,
-    Identity_phrase_x_entity, Profile)
+    Identity_phrase_x_entity, Profile, Content_list, Content_list_x_content_type)
+
+
 from dalme_app.tasks import parse_inventory
 
 logger = logging.getLogger(__name__)
@@ -74,7 +76,7 @@ class SourceMain(View):
 
     def get(self, request, *args, **kwargs):
         """Display list of sources"""
-        view = SourceListDT.as_view()
+        view = SourceList.as_view()
         return view(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -82,149 +84,111 @@ class SourceMain(View):
         view = SourceCreate.as_view()
         return view(request, *args, **kwargs)
 
-class SourceListDT(TemplateView):
-    template_name = 'dalme_app/generic_list_DT.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = "List of Sources"
-        context['class'] = 'source'
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        context['columns'] = ['name','type','is_inventory','parent_source']
-        #context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
-        context['create_form'] = forms.source_main()
-        context['table_options'] = ['pageLength: 25', 'responsive: true', 'paging: true', 'processing: true', 'serverSide: true']
-
-        if 'type' in self.request.GET:
-            context['type'] = self.request.GET['type']
-        else:
-            context['type'] = ""
-
-        if 'order' in self.request.GET:
-            context['order'] = self.request.GET['order']
-
-        return context
-
-
-class DataTableProvider(BaseDatatableView):
-    # State the model the table should draw data from, or implement method "get_initial_queryset"
-    #model = Source
-    # define the columns that will be shown
-    columns = ['name','type','is_inventory','parent_source']
-    # define columns that will be used for sorting
-    # keep same order as "columns" use empty string (i.e. '') for non-sortable columns
-    order_columns = ['name', 'type', 'is_inventory', '']
-    # set max limit of records returned, this is a security feature
-    #max_display_length = 20
-
-    def get_initial_queryset(self):
-        #get entire queryset
-        queryset = Source.objects.all()
-
-        # get valid types
-        types = {}
-        for type in Content_type.objects.all():
-            types[type.name] = type.pk
-
-        if 'type' in self.request.GET:
-            q_obj = Q()
-            type_filters = self.request.GET['type'].split('|')
-            for filter in type_filters:
-                if filter in types:
-                    q_obj |= Q(type=types[filter])
-                elif filter == "inv":
-                    q_obj &= Q(is_inventory=True)
-            #queryset = Source.objects.filter(q_obj).annotate(no_attributes=Count('attributes'))
-            queryset = Source.objects.filter(q_obj)
-
-        if 'order' in self.request.GET:
-            # do something to change the order
-            pass
-        else:
-            queryset = queryset.order_by('type','short_name')
-
-        return queryset
-
-    def filter_queryset(self, qs):
-        # use request parameters to filter queryset
-
-        search = self.request.GET.get('search[value]', None)
-        if search:
-            qs = qs.filter(name__istartswith=search)
-
-        return qs
-
-
 class SourceList(ListView):
-    # TODO: Different columns for different filters
-    # TODO: Filter for is_inventory boolean field
-    # TODO: Allow for dynamic ordering
-    #paginate_by = 20
     template_name = 'dalme_app/generic_list.html'
-    #queryset = Source.objects.all()
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context['column_headers'] = context['object_list'][0]
+        context['object_list'] = context['object_list'][1]
+
         context['page_title'] = "List of Sources"
         context['class_single'] = "source"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
 
-        # TODO: Instead of having this be a list of column headers that the template displays, this should be the python logic that assembles the table data in a way that's easy for the template to parse. In all likelihood there should be a function like `make_table_data` somewhere that takes these properties and attributes as arguments, and returns the table data in a sensible format.
-        context['object_properties'] = ['type','is_inventory','parent_source','attribute_list']
-        # context['object_properties'] = ['type','is_inventory','parent_source','no_attributes','attribute_list']
-        context['object_attributes'] = ['Title','Language','Start date','End date','City']
+        #TODO: Instead of having this be a list of column headers that the template displays,
+        #this should be the python logic that assembles the table data in a way that's easy for the template to parse.
+        #In all likelihood there should be a function like `make_table_data` somewhere that takes these properties and
+        #attributes as arguments, and returns the table data in a sensible format.
+
+        context['table_options'] = ['pageLength: 25', 'responsive: true', 'paging: true']
         context['create_form'] = forms.source_main()
 
         if 'type' in self.request.GET:
             context['type'] = self.request.GET['type']
         else:
             context['type'] = ""
+
         if 'order' in self.request.GET:
             context['order'] = self.request.GET['order']
+
         return context
 
+
     def get_queryset(self):
-        # get entire queryset
-        #queryset = Source.objects.all()
-        #test_source = Source.objects.get(pk='1abc52313988415192a0749282be2523')
-        #test_attributes = test_source.attributes.all()
-        #test_ct = test_source.type.attribute_list
-        #queryset = Source.objects.annotate(
-        #    no_attributes=Count('attributes'),
-        #    test=F('attributes__attribute_date__value'),
-        #    test2=self.annotate('john')
-        #    )
-        #queryset = Source.objects.annotate(
-        #    no_attributes=Count('attributes'),
-        #    test2=self.attributes.all()
-        #    )
-
-        # get valid types
-        types = {}
-        for type in Content_type.objects.all():
-            types[type.name] = type.pk
-
         if 'type' in self.request.GET:
+            list_type = Content_list.objects.get(short_name=self.request.GET['type'])
+            content_types = Content_list_x_content_type.objects.filter(content_list=list_type.pk).select_related('content_type')
+            req_headers = str(list_type.default_headers).split(',')
             q_obj = Q()
-            type_filters = self.request.GET['type'].split('|')
-            for filter in type_filters:
-                if filter in types:
-                    q_obj |= Q(type=types[filter])
-                elif filter == "inv":
-                    q_obj &= Q(is_inventory=True)
-            queryset = Source.objects.filter(q_obj).annotate(no_attributes=Count('attributes'))
-            #queryset = Source.objects.filter(q_obj)
 
-        if 'order' in self.request.GET:
-            # do something to change the order
-            pass
+            if self.request.GET['type'] == 'inventories':
+                q_obj &= Q(is_inventory=True)
+
+            else:
+                filters = []
+                for i in content_types:
+                    filters.append(i.content_type)
+
+                for filter in filters:
+                    q_obj |= Q(type=filter)
+
+            queryset = Source.objects.filter(q_obj).prefetch_related(Prefetch('attributes', queryset=Attribute.objects.select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')), 'parent_source', 'type')
+
         else:
-            queryset = queryset.order_by('type','short_name')
+            req_headers = ['type',15]
+            queryset = Source.objects.all().prefetch_related(Prefetch('attributes', queryset=Attribute.objects.select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')), 'parent_source', 'type')
 
-        return queryset
+
+        #if 'order' in self.request.GET:
+            # do something to change the order
+        #    pass
+        #else:
+            #queryset = queryset.order_by('type','short_name')
+
+        #TEST: add attributes and build dictionary
+        att_dict = {}
+        for i in req_headers:
+            try:
+                label = Attribute_type.objects.get(pk=i).name
+            except:
+                label = i.capitalize()
+            att_dict[i] = label
+
+        column_headers = ['Name']
+        for k, v in att_dict.items():
+            column_headers.append(v)
+        qs = []
+        qs.append(column_headers)
+
+        query_dict = {}
+        for obj in queryset:
+            a_list = []
+            a_set = obj.attributes.all()
+            a_dic = {}
+            for a in a_set:
+                a_dic[str(a.attribute_type)] = a
+            for k, v in att_dict.items():
+                if v in a_dic:
+                    a_list.append(a_dic[v])
+                elif v == 'Type':
+                    a_list.append(obj.type)
+
+                elif v == 'Parent':
+                    a_list.append(obj.parent_source)
+
+                elif v == 'Inv':
+                    a_list.append(obj.is_inventory)
+
+                else:
+                    a_list.append('-')
+            query_dict[obj.name] = a_list
+
+        qs.append(query_dict)
+
+        return qs
 
 class SourceCreate(CreateView):
     model = Source

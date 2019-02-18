@@ -17,28 +17,28 @@
 
       {
         "text": "Acts & Registers",
-        "link": "/sources?type=Notarial act|Notarial register",
+        "link": "/sources?type=acts_and_registers",
         "iconClass": "fa-columns",
         "counter": "notarial_sources"
       },
 
       {
         "text": "Inventories",
-        "link": "/sources?type=Notarial act|inv",
+        "link": "/sources?type=inventories",
         "iconClass": "fa-list-ol",
         "counter": "inventories"
       },
 
       {
-        "text": "Bibliographic",
-        "link": "/sources?type=Reference source|Book",
+        "text": "Bibliography",
+        "link": "/sources?type=bibliography",
         "iconClass": "fa-book",
         "counter": "biblio_sources"
       },
 
       {
         "text": "Archives & Collections",
-        "link": "/sources?type=Archive",
+        "link": "/sources?type=archives_and_collections",
         "iconClass": "fa-archive",
         "counter": "archives"
       }

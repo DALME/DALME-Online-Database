@@ -303,6 +303,11 @@ class Attribute_type(dalmeIntid):
     def __str__(self):
         return self.name
 
+class AttributeManager(models.Manager):
+    def get_queryset(self):
+        queryset = super(AttributeManager, self).get_queryset().select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')
+        return queryset
+
 class Attribute(dalmeUuid):
     # Relational bit
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
@@ -316,56 +321,23 @@ class Attribute(dalmeUuid):
         db_column="attribute_type"
     )
     content_id = models.UUIDField(db_index=True)
-
-    @cached_property
-    def value(self):
-        for data_type in [
-            'attribute_date',
-            'attribute_dbr',
-            'attribute_int',
-            'attribute_str',
-            'attribute_txt'
-        ]:
-            if hasattr(self,data_type):
-                return eval('self.{}.value'.format(data_type))
-        return None
+    objects = AttributeManager()
 
     def get_data(self):
-        logger.debug("attribute.get_data called")
-        for data_type in [
-            'attribute_date',
-            'attribute_dbr',
-            'attribute_int',
-            'attribute_str',
-            'attribute_txt'
-        ]:
-            if hasattr(self,data_type):
-                try:
-                    att = str(eval('self.{}'.format(data_type))).split(':',1)[0]
-                except:
-                    att = str(eval('self.{}'.format(data_type)))
-                return att
-        return None
+        dt = self.attribute_type.data_type
+        data_type = 'attribute_' + dt.lower()
+        if hasattr(self,data_type):
+            att = str(eval('self.{}'.format(data_type))).split(':',1)[0]
+        else:
+            att = ''
 
-    #@cached_property
-    #def att_content(self):
-    #    for data_type in [
-    #        'attribute_date',
-    #        'attribute_dbr',
-    #        'attribute_int',
-    #        'attribute_str',
-    #        'attribute_txt'
-    #    ]:
-    #        if hasattr(self,data_type):
-    #            try:
-    #                att = str(eval('self.{}'.format(data_type))).split(':',1)[0]
-    #            except:
-    #                att = str(eval('self.{}'.format(data_type)))
-    #            return att
-    #    return None
+        return att
+
+    #def __str__(self):
+    #    return "{}: {}".format(self.attribute_type,self.get_data())
 
     def __str__(self):
-        return "{}: {}".format(self.attribute_type,self.get_data())
+        return self.get_data()
 
 class Attribute_DATE(dalmeBasic):
     attribute_id = models.OneToOneField(
@@ -442,16 +414,6 @@ class Content_type(dalmeIntid):
     short_name = models.CharField(max_length=55)
     description = models.TextField()
 
-    #@property
-    #def attribute_list(self):
-    #    if len(self.content_type_x_attribute_type_set.all())>0:
-    #        attribute_objects = self.content_type_x_attribute_type_set.all()
-    #        attributes = []
-    #        for obj in attribute_objects:
-    #            if obj.attribute_type_id not in attributes:
-    #                attributes.append(obj.attribute_type_id)
-    #        return attributes
-
     def __str__(self):
         return self.name
 
@@ -469,6 +431,29 @@ class Content_type_x_attribute_type(dalmeBasic):
         on_delete=models.PROTECT
     )
     order = models.IntegerField(db_index=True)
+
+class Content_list(dalmeIntid):
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=55)
+    description = models.TextField()
+    default_headers = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+        return self.name
+
+class Content_list_x_content_type(dalmeBasic):
+    content_list = models.ForeignKey(
+        'Content_list',
+        to_field='id',
+        db_index=True,
+        on_delete=models.CASCADE
+    )
+    content_type = models.ForeignKey(
+        'Content_type',
+        to_field='id',
+        db_index=True,
+        on_delete=models.PROTECT
+    )
 
 class Headword(dalmeUuid):
     word = models.CharField(max_length=55)
@@ -505,13 +490,13 @@ class Place(dalmeUuid):
     type = models.IntegerField(db_index=True)
 
 
-class SourceManager(models.Manager):
-    """"""
-    def has_attribute(self,attribute):
-        if attribute in self.get_attributes():
-            return True
-        else:
-            return False
+#class SourceManager(models.Manager):
+#    """"""
+#    def has_attribute(self,attribute):
+#        if attribute in self.get_attributes():
+#            return True
+#        else:
+#            return False
 
 class Source(dalmeUuid):
     type = models.ForeignKey(
@@ -535,36 +520,38 @@ class Source(dalmeUuid):
 
     def __str__(self):
         return self.name
+
     def get_absolute_url(self):
         return reverse('source_detail', kwargs={'pk':self.pk})
-    def get_fields(self):
-        """
-        Returns fields as a list of tuple pairs like (field_name, field_value)
-        for use in templates
-        """
-        return [(field.name, field.value_to_string(self)) for field in Source._meta.fields]
-    def get_attributes(self):
-        """
-        Returns associated attributes. This is a loose connection, with UUIDs
-        in Attributes.content_id corresponding (potentially) to Sources
-        """
-        attribute_objects = self.attributes.all()
-        attributes = {}
-        for obj in attribute_objects:
-            if obj.attribute_type.name not in attributes:
-                attributes[obj.attribute_type.name] = obj.get_data()
-        return attributes
-    @property
-    def attribute_list(self):
-        logger.debug("attribute_list called on {}".format(self.name))
-        attribute_objects = self.attributes.all()
-        logger.debug("self.attributes.all started")
-        attributes = {}
-        for obj in attribute_objects:
-            if obj.attribute_type.name not in attributes:
-                attributes[obj.attribute_type.name] = obj.get_data()
-        logger.debug("attribute_list complete")
-        return attributes
+
+    #def get_fields(self):
+    #    """
+    #    Returns fields as a list of tuple pairs like (field_name, field_value)
+    #    for use in templates
+    #    """
+    #    return [(field.name, field.value_to_string(self)) for field in Source._meta.fields]
+    #def get_attributes(self):
+    #    """
+    #    Returns associated attributes. This is a loose connection, with UUIDs
+    #    in Attributes.content_id corresponding (potentially) to Sources
+    #    """
+    #    attribute_objects = self.attributes.all()
+    #    attributes = {}
+    #    for obj in attribute_objects:
+    #        if obj.attribute_type.name not in attributes:
+    #            attributes[obj.attribute_type.name] = obj.get_data()
+    #    return attributes
+    #@property
+    #def attribute_list(self):
+    #    logger.debug("attribute_list called on {}".format(self.name))
+    #    attribute_objects = self.attributes.all()
+    #    logger.debug("self.attributes.all started")
+    #    attributes = {}
+    #    for obj in attribute_objects:
+    #        if obj.attribute_type.name not in attributes:
+    #            attributes[obj.attribute_type.name] = obj.get_data()
+    #    logger.debug("attribute_list complete")
+    #    return attributes
 
 class Page(dalmeUuid):
     sources = models.ManyToManyField(

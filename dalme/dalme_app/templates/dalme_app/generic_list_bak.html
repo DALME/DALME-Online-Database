@@ -33,24 +33,76 @@
         <div class="panel-body">
           <table class="table table-striped table-bordered table-hover" id="dataTables-list">
             <thead>
-              {% if column_headers %}
-                {% for i in column_headers %}
-                  <th>{{ i|title }}</th>
+              <th>Name</th>
+              {% if object_properties %}
+                {% for prop in object_properties %}
+                  <th>{{ prop|title }}</th>
+                {% endfor %}
+              {% endif %}
+              {% if object_attributes %}
+                {% for a in object_attributes %}
+                  <th>{{ a|title }}</th>
                 {% endfor %}
               {% endif %}
             </thead>
-            {% for key, value in object_list.items %}
+            {% for object in object_list %}
             <tr>
-              <td><a href="">{{ key }}</a></td>
-                {% for i in value %}
-                  <td>{{ i }}</td>
+            <td><a href="{{ object.get_absolute_url }}">{{ object.name }}</a></td>
+              {% if object_properties %}
+                {% for prop in object_properties %}
+                  {% if prop == "attribute_list" %}
+                    <td>{{ object.attributes.all }}</td>
+                  {% else %}
+                    <td>{{ object|get_item:prop }}</td>
+                  {% endif %}
                 {% endfor %}
-            </tr>
+             {% endif %}
+             {% if object_attributes %}
+               {% for a in object_attributes %}
+                 <td>{{ object.attribute_list|get_item:a }}</td>
+               {% endfor %}
+             {% endif %}
+           </tr>
             {% endfor %}
           </table>
         </div>
-        <!--div class="panel-footer">
-        </div-->
+        <div class="panel-footer">
+          {% if is_paginated %}
+            <div class="">
+              {# First page link #}
+              {% if page_obj.number != 1 %}
+                <a href="{{ request.path }}?page=1&type={{ type }}">1</a>
+              {% endif %}
+
+              {# Conditional ellipsis, only shows up when there's a gap in displayed numbers #}
+              {% if page_obj.number > 3 %}
+                <span>&nbsp;...&nbsp;</span>
+              {% endif %}
+
+              {# Previous page link #}
+              {% if page_obj.has_previous and page_obj.previous_page_number != 1 %}
+                <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}&type={{ type }}">{{ page_obj.previous_page_number }}</a>
+              {% endif %}
+
+              {# Current page number (not a link) #}
+              <span>{{ page_obj.number }}</span>
+
+              {# Next page link #}
+              {% if page_obj.has_next and page_obj.next_page_number != page_obj.paginator.num_pages %}
+                <a href="{{ request.path }}?page={{ page_obj.next_page_number }}&type={{ type }}">{{ page_obj.next_page_number }}</a>
+              {% endif %}
+
+              {# Conditional ellipsis, only shows up when there's a gap in displayed numbers #}
+              {% if page_obj.next_page_number < page_obj.paginator.num_pages|add:"-1"  %}
+               <span>&nbsp;...&nbsp;</span>
+              {% endif %}
+
+              {# Last page link #}
+              {% if page_obj.number != page_obj.paginator.num_pages %}
+                <a href="{{ request.path }}?page=last&type={{ type }}">{{ page_obj.paginator.num_pages }}</a>
+              {% endif %}
+            </div>
+        </div>
         {% if create_form %}
         <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="create-modal-title" aria-hidden="true" id="create-modal">
           <div class="modal-dialog">
@@ -70,6 +122,11 @@
           </div>
         </div>
         {% endif %}
+        {% else %}
+        <div class="panel-heading">
+          None found!
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -80,7 +137,7 @@
   $(".chosen-select").chosen({ width: '100%'});
 </script>
 
-<script>
+<!--script>
 $(document).ready(function() {
     $('#dataTables-list').DataTable({
         {% if table_options %}
@@ -90,6 +147,6 @@ $(document).ready(function() {
         {% endif %}
     });
 });
-</script>
+</script-->
 
 {% endblock %}
