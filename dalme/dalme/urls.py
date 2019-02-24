@@ -7,9 +7,15 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
 from allaccess.views import OAuthRedirect
+from rest_framework import routers
 from dalme_app import views
 
+router = routers.DefaultRouter()
+router.register(r'api/sources', views.SourceViewSet, base_name='sources')
+
 urlpatterns = [
+    path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('logout/', auth_views.LogoutView, {'next_page': 'https://dalme.org'}, name='logout'),
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),

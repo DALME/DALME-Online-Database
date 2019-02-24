@@ -437,6 +437,7 @@ class Content_list(dalmeIntid):
     short_name = models.CharField(max_length=55)
     description = models.TextField()
     default_headers = models.CharField(max_length=255, null=True)
+    extra_headers = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.name
@@ -523,35 +524,6 @@ class Source(dalmeUuid):
 
     def get_absolute_url(self):
         return reverse('source_detail', kwargs={'pk':self.pk})
-
-    #def get_fields(self):
-    #    """
-    #    Returns fields as a list of tuple pairs like (field_name, field_value)
-    #    for use in templates
-    #    """
-    #    return [(field.name, field.value_to_string(self)) for field in Source._meta.fields]
-    #def get_attributes(self):
-    #    """
-    #    Returns associated attributes. This is a loose connection, with UUIDs
-    #    in Attributes.content_id corresponding (potentially) to Sources
-    #    """
-    #    attribute_objects = self.attributes.all()
-    #    attributes = {}
-    #    for obj in attribute_objects:
-    #        if obj.attribute_type.name not in attributes:
-    #            attributes[obj.attribute_type.name] = obj.get_data()
-    #    return attributes
-    #@property
-    #def attribute_list(self):
-    #    logger.debug("attribute_list called on {}".format(self.name))
-    #    attribute_objects = self.attributes.all()
-    #    logger.debug("self.attributes.all started")
-    #    attributes = {}
-    #    for obj in attribute_objects:
-    #        if obj.attribute_type.name not in attributes:
-    #            attributes[obj.attribute_type.name] = obj.get_data()
-    #    logger.debug("attribute_list complete")
-    #    return attributes
 
 class Page(dalmeUuid):
     sources = models.ManyToManyField(

@@ -22,9 +22,14 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 
 from django_celery_results.models import TaskResult
 
-import requests, uuid, os, datetime
+import requests, uuid, os, datetime, json
 import logging
 from allaccess.views import OAuthCallback
+
+from rest_framework import viewsets, status
+from dalme_app.serializers import SourceSerializer
+from rest_framework.views import APIView
+from  rest_framework.response import Response
 
 from dalme_app import functions, scripts, forms
 from dalme_app.menus import menu_constructor
@@ -84,26 +89,129 @@ class SourceMain(View):
         view = SourceCreate.as_view()
         return view(request, *args, **kwargs)
 
-class SourceList(ListView):
+class SourceList(TemplateView):
     template_name = 'dalme_app/generic_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context['column_headers'] = context['object_list'][0]
-        context['object_list'] = context['object_list'][1]
-
+        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis"]', 'dom': '"Bfrtipl"', 'serverSide': 'true'}
         context['page_title'] = "List of Sources"
         context['class_single'] = "source"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
         context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['create_form'] = forms.source_main()
 
-        #TODO: Instead of having this be a list of column headers that the template displays,
-        #this should be the python logic that assembles the table data in a way that's easy for the template to parse.
-        #In all likelihood there should be a function like `make_table_data` somewhere that takes these properties and
-        #attributes as arguments, and returns the table data in a sensible format.
+        if 'type' in self.request.GET:
+            type = self.request.GET['type']
+            context['type'] = type
+            table_options['ajax'] = '"../api/sources/?format=json&type=' + type + '"'
+            list_type = Content_list.objects.get(short_name=self.request.GET['type'])
+            def_headers = list_type.default_headers.split(',')
+            if list_type.extra_headers:
+                extra_headers = list_type.extra_headers.split(',')
+            else:
+                extra_headers = []
 
-        context['table_options'] = ['pageLength: 25', 'responsive: true', 'paging: true']
+            q_obj = Q()
+            if self.request.GET['type'] == 'inventories':
+                #get ALL HEADERS
+                att_l = Content_type_x_attribute_type.objects.filter(content_type=13).select_related('attribute_type')
+                att_dict = {}
+                for a in att_l:
+                    if str(a.attribute_type_id) not in att_dict:
+                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+
+            else:
+                #get ALL HEADERS
+                content_types = Content_list_x_content_type.objects.filter(content_list=list_type.pk).select_related('content_type')
+                q = Q()
+                for c in content_types:
+                    q |= Q(content_type=c.content_type)
+
+                att_l = Content_type_x_attribute_type.objects.filter(q).select_related('attribute_type')
+                att_dict = {}
+                for a in att_l:
+                    if str(a.attribute_type_id) not in att_dict:
+                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+        else:
+            context['type'] = ""
+            def_headers = ['15']
+            extra_headers = ['type']
+            table_options['ajax'] = '"../api/sources/?format=json"'
+            #get ALL HEADERS
+            att_l = Content_type_x_attribute_type.objects.filter(content_type__content_class=1).select_related('attribute_type')
+            att_dict = {}
+            for a in att_l:
+                if str(a.attribute_type_id) not in att_dict:
+                    att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+
+
+        column_headers = [['Name','name',1]]
+        extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv'}
+        if extra_headers:
+            for i in extra_headers:
+                column_headers.append([extra_labels[i],i,1])
+
+        for id, names in att_dict.items():
+            if id in def_headers:
+                column_headers.append([names[0],names[1],1])
+            else:
+                column_headers.append([names[0],names[1],0])
+
+        columnDefs = []
+        col = 0
+        for i in column_headers:
+            c_dict = {}
+            c_dict['title'] = '"'+i[0]+'"'
+            c_dict['targets'] = col
+            c_dict['data'] = '"'+i[1]+'"'
+            c_dict['defaultContent'] = '"-"'
+            if i[2]:
+                c_dict['visible'] = 'true'
+            else:
+                c_dict['visible'] = 'false'
+            if i[0] == 'Name':
+                c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
+
+            columnDefs.append(c_dict)
+            col = col + 1
+
+        context['columnDefs'] = columnDefs
+        context['table_options'] = table_options
+
+        return context
+
+
+class SourceListBAK(ListView):
+    template_name = 'dalme_app/generic_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        column_headers = context['object_list'][0]
+        context['table_options'] = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis"]', 'dom': '"Bfrtipl"'}
+        columnDefs = []
+        col = 0
+        for i in column_headers:
+            c_dict = {}
+            c_dict['title'] = '"'+i[0]+'"'
+            c_dict['targets'] = col
+            c_dict['data'] = '"'+i[1]+'"'
+            if i[2]:
+                c_dict['visible'] = 'true'
+            else:
+                c_dict['visible'] = 'false'
+            if i[0] == 'Name':
+                c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
+
+            columnDefs.append(c_dict)
+            col = col + 1
+
+        context['columnDefs'] = columnDefs
+        context['object_list'] = json.dumps(context['object_list'][1])
+        context['page_title'] = "List of Sources"
+        context['class_single'] = "source"
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
         context['create_form'] = forms.source_main()
 
         if 'type' in self.request.GET:
@@ -120,14 +228,37 @@ class SourceList(ListView):
     def get_queryset(self):
         if 'type' in self.request.GET:
             list_type = Content_list.objects.get(short_name=self.request.GET['type'])
-            content_types = Content_list_x_content_type.objects.filter(content_list=list_type.pk).select_related('content_type')
-            req_headers = str(list_type.default_headers).split(',')
-            q_obj = Q()
+            def_headers = list_type.default_headers.split(',')
+            if list_type.extra_headers:
+                extra_headers = list_type.extra_headers.split(',')
+            else:
+                extra_headers = []
 
+            q_obj = Q()
             if self.request.GET['type'] == 'inventories':
+                #get ALL HEADERS
+                att_l = Content_type_x_attribute_type.objects.filter(content_type=13).select_related('attribute_type')
+                att_dict = {}
+                for a in att_l:
+                    if str(a.attribute_type_id) not in att_dict:
+                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+
+                #create query
                 q_obj &= Q(is_inventory=True)
 
             else:
+                #get ALL HEADERS
+                content_types = Content_list_x_content_type.objects.filter(content_list=list_type.pk).select_related('content_type')
+                q = Q()
+                for c in content_types:
+                    q |= Q(content_type=c.content_type)
+
+                att_l = Content_type_x_attribute_type.objects.filter(q).select_related('attribute_type')
+                att_dict = {}
+                for a in att_l:
+                    if str(a.attribute_type_id) not in att_dict:
+                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+                #create query
                 filters = []
                 for i in content_types:
                     filters.append(i.content_type)
@@ -138,55 +269,56 @@ class SourceList(ListView):
             queryset = Source.objects.filter(q_obj).prefetch_related(Prefetch('attributes', queryset=Attribute.objects.select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')), 'parent_source', 'type')
 
         else:
-            req_headers = ['type',15]
+            def_headers = ['15']
+            extra_headers = ['type']
+            #get ALL HEADERS
+            att_l = Content_type_x_attribute_type.objects.filter(content_type__content_class=1).select_related('attribute_type')
+            att_dict = {}
+            for a in att_l:
+                if str(a.attribute_type_id) not in att_dict:
+                    att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+
             queryset = Source.objects.all().prefetch_related(Prefetch('attributes', queryset=Attribute.objects.select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')), 'parent_source', 'type')
 
+        column_headers = [['Name','name',1]]
+        if extra_headers:
+            for i in extra_headers:
+                column_headers.append([i.capitalize(),i,1])
 
-        #if 'order' in self.request.GET:
-            # do something to change the order
-        #    pass
-        #else:
-            #queryset = queryset.order_by('type','short_name')
+        for id, names in att_dict.items():
+            if id in def_headers:
+                column_headers.append([names[0],names[1],1])
+            else:
+                column_headers.append([names[0],names[1],0])
 
-        #TEST: add attributes and build dictionary
-        att_dict = {}
-        for i in req_headers:
-            try:
-                label = Attribute_type.objects.get(pk=i).name
-            except:
-                label = i.capitalize()
-            att_dict[i] = label
-
-        column_headers = ['Name']
-        for k, v in att_dict.items():
-            column_headers.append(v)
         qs = []
         qs.append(column_headers)
 
-        query_dict = {}
+        data = []
         for obj in queryset:
-            a_list = []
-            a_set = obj.attributes.all()
+            name = {'name': obj.name,'url': obj.get_absolute_url()}
+            row_dict = {'name':name}
+            if 'type' in extra_headers:
+                row_dict['type'] = str(obj.type)
+            if 'parent' in extra_headers:
+                row_dict['parent'] = str(obj.parent_source)
+            if 'inv' in extra_headers:
+                row_dict['inv'] = str(obj.is_inventory)
+
+            all_attributes = obj.attributes.all()
             a_dic = {}
-            for a in a_set:
+            for a in all_attributes:
                 a_dic[str(a.attribute_type)] = a
+
             for k, v in att_dict.items():
-                if v in a_dic:
-                    a_list.append(a_dic[v])
-                elif v == 'Type':
-                    a_list.append(obj.type)
-
-                elif v == 'Parent':
-                    a_list.append(obj.parent_source)
-
-                elif v == 'Inv':
-                    a_list.append(obj.is_inventory)
-
+                if v[0] in a_dic:
+                    row_dict[v[1]] = str(a_dic[v[0]])
                 else:
-                    a_list.append('-')
-            query_dict[obj.name] = a_list
+                    row_dict[v[1]] = '-'
 
-        qs.append(query_dict)
+            data.append(row_dict)
+
+        qs.append(data)
 
         return qs
 
