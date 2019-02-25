@@ -4,10 +4,12 @@ from django.db.models import Q, Count, F, Prefetch
 import requests, uuid, os, datetime, json
 from rest_framework import viewsets, status
 from dalme_app.serializers import SourceSerializer
-from  rest_framework.response import Response
+from rest_framework.response import Response
 from dalme_app.models import (Attribute_type, Attribute, Attribute_DATE, Attribute_DBR, Attribute_INT,
 Attribute_STR, Attribute_TXT, Content_class, Content_type, Content_type_x_attribute_type,
 Content_list, Content_list_x_content_type, Source)
+from django.db.models.expressions import RawSQL
+
 
 
 class Sources(viewsets.ViewSet):
@@ -22,6 +24,8 @@ class Sources(viewsets.ViewSet):
         length = int(self.request.GET['length']) #number of records to be displayed
         if self.request.GET['search[value]'] != '':
             search_string = self.request.GET['search[value]'] #global search value to be applied to all columns with searchable=true
+        else:
+            search_string = None
         order_column_idx = self.request.GET['order[0][column]']
         order_dir = self.request.GET['order[0][dir]']
         order_column_name = self.request.GET['columns['+order_column_idx+'][data]']
@@ -50,7 +54,7 @@ class Sources(viewsets.ViewSet):
                 att_dict = {}
                 for a in att_l:
                     if str(a.attribute_type_id) not in att_dict:
-                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name,a.attribute_type.data_type]
 
                 #create query
                 q_obj &= Q(is_inventory=True)
@@ -66,7 +70,7 @@ class Sources(viewsets.ViewSet):
                 att_dict = {}
                 for a in att_l:
                     if str(a.attribute_type_id) not in att_dict:
-                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name,a.attribute_type.data_type]
                 #create query
                 filters = []
                 for i in content_types:
@@ -75,11 +79,12 @@ class Sources(viewsets.ViewSet):
                 for filter in filters:
                     q_obj |= Q(type=filter)
 
-            if order_column_name != 'name':
-                order_column_name = 'attributes__value'
+            extra_dict = {}
+            for k,v in att_dict.items():
+                extra_dict[v[1]] = 'SELECT dalme_app_attribute_'+v[2].lower()+'.value FROM dalme_app_attribute_'+v[2].lower()+' JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_'+v[2].lower()+'.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = '+k
 
-            queryset = Source.objects.filter(q_obj).prefetch_related(Prefetch('attributes', queryset=Attribute.objects.select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')), 'parent_source', 'type').order_by(order_column_name)
-            
+            queryset = Source.objects.filter(q_obj).extra(select=extra_dict).order_by(order_column_name)
+
         #if list type is not set, then the request is for all sources
         else:
             def_headers = ['15']
@@ -89,9 +94,24 @@ class Sources(viewsets.ViewSet):
             att_dict = {}
             for a in att_l:
                 if str(a.attribute_type_id) not in att_dict:
-                    att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+                    att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name,a.attribute_type.data_type]
 
-            queryset = Source.objects.all().prefetch_related(Prefetch('attributes', queryset=Attribute.objects.select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')), 'parent_source', 'type').order_by(order_column_name)
+            extra_dict = {}
+            for k,v in att_dict.items():
+                extra_dict[v[1]] = 'SELECT dalme_app_attribute_'+v[2].lower()+'.value FROM dalme_app_attribute_'+v[2].lower()+' JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_'+v[2].lower()+'.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = '+k
+
+            queryset = Source.objects.all().extra(select=extra_dict).order_by(order_column_name)
+
+
+        #if search_string:
+        #    source_fields = ['name', 'type', 'parent_source', 'is_inventory']
+        #    search_filters = Q(name__startswith=search_string) | Q(attributes__language__startswith=search_string)
+            #for k,v in att_dict.items():
+                #if v[1] in source_fields:
+                #search_filters[v[1]] = search_string
+                #else:
+        #    queryset = queryset.filter(search_filters).order_by(order_column_name)
+
         #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
         rec_count = queryset.count()
         data_dict['recordsTotal'] = rec_count
@@ -99,40 +119,44 @@ class Sources(viewsets.ViewSet):
         #filter the queryset for the current page
         queryset = queryset[start:limit]
         #create an array of fields present in the dataset. This will be used to dynamically filter the fields in the serializer
-        fields = ['name']
+        fields = ['id','name']
         if extra_headers:
             for i in extra_headers:
                 fields.append(i)
 
         for id, names in att_dict.items():
             fields.append(names[1])
-        #create the return dataset by parsing the queryset
-        qs = []
-        for obj in queryset:
-            name = {'name': obj.name,'url': obj.get_absolute_url()}
-            row_dict = {'name':name}
-            if 'type' in extra_headers:
-                row_dict['type'] = str(obj.type)
-            if 'parent_source' in extra_headers:
-                row_dict['parent_source'] = str(obj.parent_source)
-            if 'is_inventory' in extra_headers:
-                row_dict['is_inventory'] = str(obj.is_inventory)
 
-            all_attributes = obj.attributes.all()
-            a_dic = {}
-            for a in all_attributes:
-                a_dic[str(a.attribute_type)] = a
-
-            for k, v in att_dict.items():
-                if v[0] in a_dic:
-                    row_dict[v[1]] = str(a_dic[v[0]])
-                else:
-                    row_dict[v[1]] = None
-
-            qs.append(row_dict)
-        #serialize the dataset and add it to the return dictionary
-        serializer = SourceSerializer(qs, many=True, fields=fields)
+        serializer = SourceSerializer(queryset, many=True, fields=fields)
         data = serializer.data
         data_dict['data'] = data
 
         return Response(data_dict)
+
+        def q_for_search_word(self, word):
+            """
+            Given a word from the search text, return the Q object which you can filter on,
+            to show only objects containing this word.
+            Extend this in subclasses to include class-specific fields, if needed.
+            """
+            return Q(name=word) | Q(language=word)
+
+        def q_for_search(self, search):
+            """
+            Given the text from the search box, search on each word in this text.
+            Return a Q object which you can filter on, to show only those objects with _all_ the words present.
+            Do not expect to override/extend this in subclasses.
+            """
+            q = Q()
+            if search:
+                searches = search.split()
+                for word in searches:
+                    q = q & self.q_for_search_word(word)
+            return q
+
+        def filter_on_search(self, search):
+            """
+            Return the objects containing the search terms.
+            Do not expect to override/extend this in subclasses.
+            """
+            return self.filter(self.q_for_search(search))

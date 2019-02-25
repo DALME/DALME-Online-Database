@@ -23,12 +23,9 @@ class DynamicSerializer(serializers.Serializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
 
-class SourceNameSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=255)
-    url = serializers.CharField(max_length=255)
-
 class SourceSerializer(DynamicSerializer):
-    name = SourceNameSerializer()
+    id = serializers.UUIDField()
+    name = serializers.CharField(max_length=255)
     type = serializers.CharField(max_length=255)
     parent_source = serializers.CharField(max_length=255)
     is_inventory = serializers.BooleanField()
@@ -60,3 +57,11 @@ class SourceSerializer(DynamicSerializer):
     debt_source = serializers.CharField(max_length=255)
     comments = serializers.CharField()
     city = serializers.CharField(max_length=255)
+
+    def to_representation(self, instance):
+        """Create dictionaries for fields with links"""
+        ret = super().to_representation(instance)
+        ret['name'] = {'name': ret['name'], 'url': '/source/'+ret['id']}
+        if 'url' in ret:
+            ret['url'] = {'name': 'Visit Link', 'url': ret['url']}
+        return ret

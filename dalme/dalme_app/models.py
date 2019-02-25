@@ -303,11 +303,6 @@ class Attribute_type(dalmeIntid):
     def __str__(self):
         return self.name
 
-class AttributeManager(models.Manager):
-    def get_queryset(self):
-        queryset = super(AttributeManager, self).get_queryset().select_related('attribute_str','attribute_type', 'attribute_date', 'attribute_dbr', 'attribute_int')
-        return queryset
-
 class Attribute(dalmeUuid):
     # Relational bit
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
@@ -321,20 +316,6 @@ class Attribute(dalmeUuid):
         db_column="attribute_type"
     )
     content_id = models.UUIDField(db_index=True)
-    objects = AttributeManager()
-
-    def get_data(self):
-        dt = self.attribute_type.data_type
-        data_type = 'attribute_' + dt.lower()
-        if hasattr(self,data_type):
-            att = str(eval('self.{}'.format(data_type))).split(':',1)[0]
-        else:
-            att = ''
-
-        return att
-
-    #def __str__(self):
-    #    return "{}: {}".format(self.attribute_type,self.get_data())
 
     def __str__(self):
         return self.get_data()
@@ -490,15 +471,6 @@ class Object_attribute(dalmeBasic):
 class Place(dalmeUuid):
     type = models.IntegerField(db_index=True)
 
-
-#class SourceManager(models.Manager):
-#    """"""
-#    def has_attribute(self,attribute):
-#        if attribute in self.get_attributes():
-#            return True
-#        else:
-#            return False
-
 class Source(dalmeUuid):
     type = models.ForeignKey(
         'Content_type',
@@ -517,7 +489,6 @@ class Source(dalmeUuid):
     )
     is_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation(Attribute)
-    #objects = SourceManager()
 
     def __str__(self):
         return self.name
