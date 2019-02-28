@@ -317,6 +317,16 @@ class Attribute(dalmeUuid):
     )
     content_id = models.UUIDField(db_index=True)
 
+    def get_data(self):
+        dt = self.attribute_type.data_type
+        data_type = 'attribute_' + dt.lower()
+        if hasattr(self,data_type):
+            att = str(eval('self.{}'.format(data_type))).split(':',1)[0]
+        else:
+            att = ''
+
+        return att
+
     def __str__(self):
         return self.get_data()
 
@@ -330,6 +340,7 @@ class Attribute_DATE(dalmeBasic):
     value_day = models.IntegerField()
     value_month = models.IntegerField()
     value_year = models.IntegerField()
+    value_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return str(self.value)
@@ -495,6 +506,13 @@ class Source(dalmeUuid):
 
     def get_absolute_url(self):
         return reverse('source_detail', kwargs={'pk':self.pk})
+
+    #@property
+    #def att_blob(self):
+    #    blob = []
+    #    for a in self.attributes.all():
+    #        blob.append(str(a))
+    #    return blob
 
 class Page(dalmeUuid):
     sources = models.ManyToManyField(

@@ -11,6 +11,7 @@ urlpatterns = [
     re_path(r'^sources/(?P<pk>[a-zA-Z0-9-]+)/manifest', views.SourceManifest, name='source_manifest'),
     re_path(r'^sources/(?P<pk>[a-zA-Z0-9-]+)', views.SourceDetail.as_view(), name='source_detail'),
     re_path(r'^sources/?', views.SourceMain.as_view(), name='source_main'),
+    re_path(r'^admin/?', views.AdminMain.as_view(), name='admin_main'),
     re_path(r'^pages/(?P<pk>[a-zA-Z0-9-]+)', views.PageDetail.as_view(), name='page_detail'),
     re_path(r'^pages/', views.PageMain.as_view(), name='page_list'),
     re_path(r'^list/(?P<module>[a-z_-]+)(?:/(?P<type>[a-zA-Z]+))?/$', views.list, name='lists'),

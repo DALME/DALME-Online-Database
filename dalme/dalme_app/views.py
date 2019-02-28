@@ -43,6 +43,9 @@ from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
 
 
 from dalme_app.tasks import parse_inventory
+from django.db.models.functions import Concat
+from django.db.models import CharField, Value
+from django.db.models.expressions import RawSQL
 
 logger = logging.getLogger(__name__)
 
@@ -89,12 +92,122 @@ class SourceMain(View):
         view = SourceCreate.as_view()
         return view(request, *args, **kwargs)
 
+@method_decorator(login_required,name='dispatch')
+class AdminMain(View):
+    """
+    Routes requests to admin views
+    """
+    def get(self, request, *args, **kwargs):
+        if 'type' in self.request.GET:
+            type = self.request.GET['type']
+            view = eval('Admin'+type.capitalize()).as_view()
+        return view(request, *args, **kwargs)
+
+class AdminUsers(TemplateView):
+    template_name = 'dalme_app/generic_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength"]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true'}
+        context['page_title'] = "List of Users"
+        context['class_single'] = "user"
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        table_options['ajax'] = '"../api/users/?format=json"'
+
+        #create column headers
+        column_headers = [
+        ['User ID', 'id', 1],
+        ['Last login','last_login', 1],
+        ['SU','is_superuser', 1],
+        ['Username','username', 1],
+        ['Full name','full_name', 1],
+        ['First name','first_name', 0],
+        ['Last name','last_name', 0],
+        ['Email','email', 1],
+        ['Staff','is_staff', 0],
+        ['Active','is_active', 1],
+        ['Date joined','date_joined', 1],
+        ['DAM user group','dam_usergroup', 1],
+        ['DAM user ID','dam_userid', 1],
+        ['Wiki groups','wiki_groups', 1],
+        ['Wiki user ID','wiki_userid', 1],
+        ['Wiki username','wiki_username', 1],
+        ['WordPress user ID','wp_userid', 1],
+        ['WordPress role','wp_role', 1]]
+
+        #create column definitions for DT
+        columnDefs = []
+        col = 0
+        for i in column_headers:
+            c_dict = {}
+            c_dict['title'] = '"'+i[0]+'"'
+            c_dict['targets'] = col
+            c_dict['data'] = '"'+i[1]+'"'
+            c_dict['defaultContent'] = '"-"'
+            if i[2]:
+                c_dict['visible'] = 'true'
+            else:
+                c_dict['visible'] = 'false'
+            if i[0] in ['Email']:
+                c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
+
+            if i[0] in ['Last login', 'Date joined']:
+                c_dict['render'] = '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}'''
+
+            columnDefs.append(c_dict)
+            col = col + 1
+        context['columnDefs'] = columnDefs
+        context['table_options'] = table_options
+        return context
+
+class AdminNotifications(TemplateView):
+    template_name = 'dalme_app/generic_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength"]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true'}
+        context['page_title'] = "List of Notification Messages"
+        context['class_single'] = "notification"
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        table_options['ajax'] = '"../api/notifications/?format=json"'
+
+        #create column headers
+        column_headers = [
+        ['Code', 'e_code', 1],
+        ['Level','e_level', 1],
+        ['Text','e_text', 1],
+        ['Type','e_type', 1]]
+
+        #create column definitions for DT
+        columnDefs = []
+        col = 0
+        for i in column_headers:
+            c_dict = {}
+            c_dict['title'] = '"'+i[0]+'"'
+            c_dict['targets'] = col
+            c_dict['data'] = '"'+i[1]+'"'
+            c_dict['defaultContent'] = '"-"'
+            if i[2]:
+                c_dict['visible'] = 'true'
+            else:
+                c_dict['visible'] = 'false'
+            if i[0] in ['Email']:
+                c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
+            columnDefs.append(c_dict)
+            col = col + 1
+        context['columnDefs'] = columnDefs
+        context['table_options'] = table_options
+        return context
+
+
 class SourceList(TemplateView):
     template_name = 'dalme_app/generic_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis"]', 'dom': '"Bfrtipl"', 'serverSide': 'true'}
+        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength"]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true'}
         context['page_title'] = "List of Sources"
         context['class_single'] = "source"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
@@ -111,28 +224,17 @@ class SourceList(TemplateView):
                 extra_headers = list_type.extra_headers.split(',')
             else:
                 extra_headers = []
-
             q_obj = Q()
             if self.request.GET['type'] == 'inventories':
                 #get ALL HEADERS
                 att_l = Content_type_x_attribute_type.objects.filter(content_type=13).select_related('attribute_type')
-                att_dict = {}
-                for a in att_l:
-                    if str(a.attribute_type_id) not in att_dict:
-                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
-
             else:
                 #get ALL HEADERS
                 content_types = Content_list_x_content_type.objects.filter(content_list=list_type.pk).select_related('content_type')
                 q = Q()
                 for c in content_types:
                     q |= Q(content_type=c.content_type)
-
                 att_l = Content_type_x_attribute_type.objects.filter(q).select_related('attribute_type')
-                att_dict = {}
-                for a in att_l:
-                    if str(a.attribute_type_id) not in att_dict:
-                        att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
         else:
             context['type'] = ""
             def_headers = ['15']
@@ -140,24 +242,23 @@ class SourceList(TemplateView):
             table_options['ajax'] = '"../api/sources/?format=json"'
             #get ALL HEADERS
             att_l = Content_type_x_attribute_type.objects.filter(content_type__content_class=1).select_related('attribute_type')
-            att_dict = {}
-            for a in att_l:
-                if str(a.attribute_type_id) not in att_dict:
-                    att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
-
-
+        #compile attribute dictionary
+        att_dict = {}
+        for a in att_l:
+            if str(a.attribute_type_id) not in att_dict:
+                att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+        #create column headers
         column_headers = [['Name','name',1]]
         extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv'}
         if extra_headers:
             for i in extra_headers:
                 column_headers.append([extra_labels[i],i,1])
-
         for id, names in att_dict.items():
             if id in def_headers:
                 column_headers.append([names[0],names[1],1])
             else:
                 column_headers.append([names[0],names[1],0])
-
+        #create column definitions for DT
         columnDefs = []
         col = 0
         for i in column_headers:
@@ -172,13 +273,10 @@ class SourceList(TemplateView):
                 c_dict['visible'] = 'false'
             if i[0] in ['Name', 'Web address']:
                 c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
-
             columnDefs.append(c_dict)
             col = col + 1
-
         context['columnDefs'] = columnDefs
         context['table_options'] = table_options
-
         return context
 
 class SourceCreate(CreateView):
