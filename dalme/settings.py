@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 #authentication backends
 AUTHENTICATION_BACKENDS = [
     'allaccess.backends.AuthorizedServiceBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    #'django.contrib.auth.backends.ModelBackend'
 ]
 
 #authentication settings
