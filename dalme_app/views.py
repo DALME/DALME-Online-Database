@@ -51,8 +51,7 @@ def get_item(obj, key):
 
 #authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
-    logger.debug("OAuthCallback_WP triggered")
-
+    
     def get_or_create_user(self, provider, access, info):
         uname = info['user_login']
         email = info['email']
