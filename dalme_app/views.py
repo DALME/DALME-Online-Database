@@ -51,12 +51,12 @@ def get_item(obj, key):
 
 #authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
-    
+
     def get_or_create_user(self, provider, access, info):
         uname = info['user_login']
         email = info['email']
         name = info['display_name']
-        User = get_user_model()
+        #User = get_user_model()
         try:
             the_user = User.objects.get(username=uname)
         except Entry.DoesNotExist:
