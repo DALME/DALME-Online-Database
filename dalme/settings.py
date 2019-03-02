@@ -1,7 +1,4 @@
 """
-Django settings for dalme project on Heroku. For more info, see:
-https://github.com/heroku/heroku-django-template
-
 For more information on this file, see
 https://docs.djangoproject.com/en/1.10/topics/settings/
 
@@ -29,7 +26,7 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
-    'dalme_app.apps.DalmeConfig',
+    'dalme_app.application.DalmeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,14 +44,11 @@ INSTALLED_APPS = [
     'sekizai',
     'django_celery_results',
     'allaccess.apps.AllAccessConfig',
-    'sslserver',
-    'debug_toolbar',
     'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -66,7 +60,7 @@ MIDDLEWARE = [
     #'async_messages.middleware.AsyncMiddleware',
 ]
 
-ROOT_URLCONF = 'dalme.devUrls'
+ROOT_URLCONF = 'dalme.urls'
 
 TEMPLATES = [
     {
@@ -95,8 +89,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 #authentication settings
-LOGIN_URL = '/accounts/login/dalme_wp/'
-LOGIN_REDIRECT_URL = 'dashboard'
+#LOGIN_URL = '/accounts/login/dalme_wp/'
+#LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_URL = 'accounts/login/dalme_wp/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'https://dalme.org'
 #LOGIN_REDIRECT_URL = 'https://db.dalme.org'
 
 #SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
@@ -178,7 +175,7 @@ ALLOWED_HOSTS = ['*']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, "..", "www", 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 STATIC_URL = '/static/'
 
 # Media files location
@@ -193,7 +190,7 @@ STATICFILES_DIRS = [
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SITE_ID = 1
 
@@ -204,17 +201,14 @@ CSRF_COOKIE_SECURE = True
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_BACKEND = 'db+mysql:///django-db'
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
     }
 }
-
-#setting for Debug Toolbar
-INTERNAL_IPS = '127.0.0.1'
 
 LOGGING = {
     'version': 1,
@@ -231,7 +225,7 @@ LOGGING = {
         # Log to a text file that can be rotated by logrotate
         'logfile': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': '/var/log/django/dalme_app.log'
+            'filename': '/opt/python/log/dalme_app.log'
         },
     },
     'loggers': {
@@ -244,13 +238,13 @@ LOGGING = {
         # Might as well log any errors anywhere else in Django
         'django': {
             'handlers': ['logfile'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False,
         },
         # Your own app - this assumes all your logger names start with "myapp."
         'dalme_app': {
             'handlers': ['logfile'],
-            'level': 'WARNING', # Or maybe INFO or DEBUG
+            'level': 'DEBUG', # Or maybe INFO or DEBUG
             'propagate': False
         },
     },

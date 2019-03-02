@@ -267,7 +267,7 @@ class Notifications(viewsets.ViewSet):
                 queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute_str.value SEPARATOR ",") FROM dalme_app_attribute_str JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_str.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q).order_by(order_column_name)
 
         else:
-            queryset = error_message.objects.all().order_by(order_column_name)
+            queryset = Notifications.objects.all().order_by(order_column_name)
 
         #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
         rec_count = queryset.count()

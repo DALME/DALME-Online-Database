@@ -20,7 +20,7 @@ def menu_constructor(item_constructor, template):
     _output = ''
 
     # Get template from default location in dalme_app/templates/menus and read it
-    template = os.path.join('dalme','dalme_app','templates','menus',template)
+    template = os.path.join('dalme_app','templates','menus',template)
     with open(template, 'r') as fp:
         menu = json.load(fp)
 

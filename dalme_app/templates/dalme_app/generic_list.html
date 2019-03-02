@@ -81,7 +81,33 @@
 </script>
 
 <script>
+var editor;
+
 $(document).ready(function() {
+    editor = new $.fn.dataTable.Editor({
+      ajax: '../api/users/?format=json',
+      table: '#dataTables-list',
+      idSrc:  'Code',
+      fields: [
+          {
+            "label":"Code:",
+            "name": "e_code"
+          },
+          {
+            "label":"Level:",
+            "name": "e_level"
+          },
+          {
+            "label":"Text:",
+            "name": "e_text"
+          },
+          {
+            "label":"Type:",
+            "name": "e_type"
+          }
+      ]
+    });
+
     $('#dataTables-list').DataTable({
         {% if table_options %}
           {% for key,value in table_options.items %}

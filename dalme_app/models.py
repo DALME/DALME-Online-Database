@@ -587,7 +587,7 @@ class Object_phrase(dalmeUuid):
     def __str__(self):
         return self.phrase
 
-class Word_form(dalmeUuid):
+class Wordform(dalmeUuid):
     normalized_form = models.CharField(max_length=55)
     pos = models.CharField(max_length=255)
     headword_id = models.ForeignKey(
@@ -607,8 +607,8 @@ class Token(dalmeUuid):
         db_index=True,
         on_delete=models.CASCADE
     )
-    word_form_id = models.ForeignKey(
-        'Word_form',
+    wordform_id = models.ForeignKey(
+        'Wordform',
         to_field='id',
         db_index=True,
         on_delete=models.PROTECT
@@ -629,7 +629,25 @@ class Identity_phrase_x_entity(dalmeBasic):
         on_delete=models.CASCADE
     )
     entity_id = models.UUIDField(db_index=True)
+
 #app management models
+class Notification(dalmeIntid):
+    LEVELS = (
+        (10, 'DEBUG'),
+        (20, 'INFO'),
+        (25, 'SUCCESS'),
+        (30, 'WARNING'),
+        (40, 'ERROR')
+    )
+    TYPES = (
+        (1, 'MODAL'),
+        (2, 'NOTIFICATION')
+    )
+    code = models.IntegerField(unique=True, db_index=True)
+    level = models.IntegerField(choices=LEVELS)
+    type = models.IntegerField(choices=TYPES)
+    text = models.TextField()
+
 class error_message(dalmeBasic):
     LEVELS = (
         (10, 'DEBUG'),

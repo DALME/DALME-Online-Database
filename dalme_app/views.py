@@ -18,8 +18,6 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.base import TemplateView
-from django_datatables_view.base_datatable_view import BaseDatatableView
-
 from django_celery_results.models import TaskResult
 
 import requests, uuid, os, datetime, json
@@ -29,17 +27,11 @@ from allaccess.views import OAuthCallback
 from rest_framework import viewsets, status
 from dalme_app.serializers import SourceSerializer
 from rest_framework.views import APIView
-from  rest_framework.response import Response
+from rest_framework.response import Response
 
 from dalme_app import functions, scripts, forms
 from dalme_app.menus import menu_constructor
-from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
-    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
-    Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
-    Content_class, Content_type, Content_type_x_attribute_type, Headword,
-    Object, Object_attribute, Place, Source, Page, Transcription,
-    Identity_phrase, Object_phrase, Word_form, Token,
-    Identity_phrase_x_entity, Profile, Content_list, Content_list_x_content_type)
+from dalme_app.models import *
 
 
 from dalme_app.tasks import parse_inventory
@@ -59,6 +51,7 @@ def get_item(obj, key):
 
 #authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
+    logger.debug("OAuthCallback_WP triggered")
 
     def get_or_create_user(self, provider, access, info):
         uname = info['user_login']
@@ -166,7 +159,7 @@ class AdminNotifications(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength"]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true'}
+        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength", { extend: "create", editor: editor },{ extend: "edit",   editor: editor },{ extend: "remove", editor: editor }]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true', 'select': 'true'}
         context['page_title'] = "List of Notification Messages"
         context['class_single'] = "notification"
         context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')

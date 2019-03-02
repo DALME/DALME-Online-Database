@@ -19,7 +19,7 @@ from .models import (par_inventory, par_folio, par_token, par_object,
     Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
     Content_class, Content_type, Content_type_x_attribute_type, Headword,
     Object, Object_attribute, Place, Source, Page, Transcription,
-    Identity_phrase, Object_phrase, Word_form, Token,
+    Identity_phrase, Object_phrase, Wordform, Token,
     Identity_phrase_x_entity)
 from dalme_app.scripts.db import dam_db, wiki_db, wp_db
 
