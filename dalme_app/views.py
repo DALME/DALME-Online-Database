@@ -52,15 +52,17 @@ def get_item(obj, key):
 
 #authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
-
+    logger.debug("OAuthCallback_WP called")
     def get_or_create_user(self, provider, access, info):
         uname = info['user_login']
         email = info['email']
         name = info['display_name']
         #User = get_user_model()
         try:
+            logger.debug("OAuthCallback_WP tries to get user")
             the_user = User.objects.get(username=uname)
         except Entry.DoesNotExist:
+            logger.debug("OAuthCallback_WP fails to get user, tries to create it")
             the_user = User.objects.create_user(uname, email, None)
             the_user.profile.full_name = name
             the_user.save()
