@@ -11,7 +11,7 @@ import pandas as pd
 from async_messages import message_user
 
 from dalme_app.models import (par_inventory, par_folio, par_token, par_object,
-    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
+    Notification, Agent, Attribute_type, Attribute, Attribute_DATE,
     Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
     Content_class, Content_type, Content_type_x_attribute_type, Headword,
     Object, Object_attribute, Place, Source, Page, Transcription,

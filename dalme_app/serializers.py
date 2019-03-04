@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from dalme_app.models import (Attribute_type, Attribute, Attribute_DATE, Attribute_DBR, Attribute_INT,
 Attribute_STR, Attribute_TXT, Content_class, Content_type, Content_type_x_attribute_type,
-Content_list, Content_list_x_content_type, Source, error_message, Profile)
+Content_list, Content_list_x_content_type, Source, Notification, Profile)
 from rest_framework import serializers
 
 class DynamicSerializer(serializers.Serializer):
@@ -127,6 +127,29 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 class NotificationSerializer(serializers.ModelSerializer):
+    #level = serializers.ChoiceField(choices=Notification.LEVELS, source='get_level_display')
+    #type = serializers.ChoiceField(choices=Notification.TYPES, source='get_type_display')
+    #level = serializers.SerializerMethodField()
+    #type = serializers.SerializerMethodField()
+    code = serializers.IntegerField()
+
+    def to_representation(self, instance):
+        """Create dictionaries for fields with choices"""
+        ret = super().to_representation(instance)
+        ret['level'] = {'value': ret['level'], 'display': self.get_choice(ret['level'], 'LEVELS')}
+        ret['type'] = {'value': ret['type'], 'display': self.get_choice(ret['type'], 'TYPES')}
+        return ret
+
+    def get_choice(self, obj, listname):
+        if listname == 'LEVELS':
+            list = Notification.LEVELS
+        elif listname == 'TYPES':
+            list = Notification.TYPES
+        for t in list:
+            if obj in t:
+                label = t[1]
+        return label
+
     class Meta:
-        model = error_message
+        model = Notification
         fields = '__all__'

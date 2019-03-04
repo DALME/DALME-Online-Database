@@ -14,33 +14,61 @@
         "iconClass": "fa-asterisk",
         "counter": "sources"
       },
-
       {
         "text": "Acts & Registers",
         "link": "/sources?type=acts_and_registers",
         "iconClass": "fa-columns",
         "counter": "notarial_sources"
       },
-
       {
         "text": "Inventories",
         "link": "/sources?type=inventories",
         "iconClass": "fa-list-ol",
         "counter": "inventories"
       },
-
       {
         "text": "Bibliography",
         "link": "/sources?type=bibliography",
         "iconClass": "fa-book",
         "counter": "biblio_sources"
       },
-
       {
         "text": "Archives & Collections",
         "link": "/sources?type=archives_and_collections",
         "iconClass": "fa-archive",
         "counter": "archives"
+      }
+    ]
+  },
+  {
+    "text": "System",
+    "link": "#",
+    "iconClass": "fa-gear",
+    "children": [
+      {
+        "text": "Users",
+        "link": "/admin?type=users",
+        "iconClass": "fa-users"
+      },
+      {
+        "text": "Notifications",
+        "link": "/admin?type=notifications",
+        "iconClass": "fa-medkit"
+      },
+      {
+        "text": "Data Models",
+        "link": "/admin?type=models",
+        "iconClass": "fa-cubes"
+      },
+      {
+        "text": "Background Tasks",
+        "link": "/admin?type=bgtasks",
+        "iconClass": "fa-tasks"
+      },
+      {
+        "text": "Website",
+        "link": "https://dalme.org/wp/wp-admin",
+        "iconClass": "fa-globe"
       }
     ]
   },

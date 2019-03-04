@@ -4,7 +4,7 @@ This is where all of the forms used elsewhere in the site are set up.
 
 from django import forms
 
-from dalme_app.models import error_message, Page, Profile, Source, Content_type
+from dalme_app.models import Notification, Page, Profile, Source, Content_type
 
 class source_main(forms.ModelForm):
     parent_source = forms.ModelChoiceField(
@@ -67,11 +67,11 @@ class inventory_metadata(forms.Form):
 class new_error(forms.Form):
     e_level = forms.IntegerField(
         label='Level',
-        widget=forms.Select(choices=error_message.LEVELS)
+        widget=forms.Select(choices=Notification.LEVELS)
     )
     e_type = forms.IntegerField(
         label='Type',
-        widget=forms.Select(choices=error_message.TYPES)
+        widget=forms.Select(choices=Notification.TYPES)
     )
     e_text = forms.CharField(label='Text', widget=forms.Textarea)
 

@@ -69,6 +69,79 @@ class OAuthCallback_WP(OAuthCallback):
 
         return the_user
 
+class GenericListView(TemplateView):
+    template_name = 'dalme_app/generic_list.html'
+    table_options = {
+        'pageLength':25,
+        'responsive':'true',
+        'paging':'true',
+        'fixedHeader': 'true',
+        'dom': '"Bfrtip"',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': 'true'
+        }
+    table_buttons = ['"colvis"', '"pageLength"']
+    column_headers = []
+    render_dict = {}
+    ajax_string = ''
+    table_editor = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['page_title'] = self.get_page_title()
+        context['columnDefs'] = self.get_column_defs()
+        context['table_options'] = self.get_table_options()
+        context['table_buttons'] = self.get_table_buttons()
+        context['table_editor'] = self.get_table_editor()
+        return context
+
+    def get_table_options(self, *args, **kwargs):
+        table_options = self.table_options
+        table_options['ajax'] = self.get_table_ajax_str()
+        return table_options
+
+    def get_page_title(self, *args, **kwargs):
+        if self.kwargs['title']:
+            p_title = self.kwargs['title']
+        else:
+            p_title = 'List View'
+        return p_title
+
+    def get_table_buttons(self, *args, **kwargs):
+        return self.table_buttons
+
+    def get_table_editor(self, *args, **kwargs):
+        return self.table_editor
+
+    def get_column_defs(self, *args, **kwargs):
+        #create column headers
+        column_headers = self.column_headers
+        render_dict = self.render_dict
+        #create column definitions for DT
+        columnDefs = []
+        col = 0
+        for i in column_headers:
+            c_dict = {}
+            c_dict['title'] = '"'+i[0]+'"'
+            c_dict['targets'] = col
+            c_dict['data'] = '"'+i[1]+'"'
+            c_dict['defaultContent'] = '"-"'
+            if i[2]:
+                c_dict['visible'] = 'true'
+            else:
+                c_dict['visible'] = 'false'
+            if i[0] in render_dict:
+                c_dict['render'] = render_dict[i[0]]
+            columnDefs.append(c_dict)
+            col = col + 1
+        return columnDefs
+
+    def get_table_ajax_str(self, *args, **kwargs):
+        return self.ajax_string
+
 @method_decorator(login_required,name='dispatch')
 class SourceMain(View):
     """
@@ -95,107 +168,83 @@ class AdminMain(View):
     def get(self, request, *args, **kwargs):
         if 'type' in self.request.GET:
             type = self.request.GET['type']
+            title = 'List of '+type.capitalize()
             view = eval('Admin'+type.capitalize()).as_view()
-        return view(request, *args, **kwargs)
+        return view(request, title=title)
 
-class AdminUsers(TemplateView):
-    template_name = 'dalme_app/generic_list.html'
+class AdminUsers(GenericListView):
+    ajax_string = '"../api/users/?format=json"'
+    column_headers = [
+            ['User ID', 'id', 1],
+            ['Last login','last_login', 1],
+            ['SU','is_superuser', 1],
+            ['Username','username', 1],
+            ['Full name','full_name', 1],
+            ['First name','first_name', 0],
+            ['Last name','last_name', 0],
+            ['Email','email', 1],
+            ['Staff','is_staff', 0],
+            ['Active','is_active', 1],
+            ['Date joined','date_joined', 1],
+            ['DAM user group','dam_usergroup', 1],
+            ['DAM user ID','dam_userid', 1],
+            ['Wiki groups','wiki_groups', 1],
+            ['Wiki user ID','wiki_userid', 1],
+            ['Wiki username','wiki_username', 1],
+            ['WordPress user ID','wp_userid', 1],
+            ['WordPress role','wp_role', 1]]
+    render_dict = {
+            'Email': '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}''',
+            'Last login': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
+            'Date joined': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}'''
+            }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength"]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true'}
-        context['page_title'] = "List of Users"
-        context['class_single'] = "user"
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        table_options['ajax'] = '"../api/users/?format=json"'
 
-        #create column headers
-        column_headers = [
-        ['User ID', 'id', 1],
-        ['Last login','last_login', 1],
-        ['SU','is_superuser', 1],
-        ['Username','username', 1],
-        ['Full name','full_name', 1],
-        ['First name','first_name', 0],
-        ['Last name','last_name', 0],
-        ['Email','email', 1],
-        ['Staff','is_staff', 0],
-        ['Active','is_active', 1],
-        ['Date joined','date_joined', 1],
-        ['DAM user group','dam_usergroup', 1],
-        ['DAM user ID','dam_userid', 1],
-        ['Wiki groups','wiki_groups', 1],
-        ['Wiki user ID','wiki_userid', 1],
-        ['Wiki username','wiki_username', 1],
-        ['WordPress user ID','wp_userid', 1],
-        ['WordPress role','wp_role', 1]]
-
-        #create column definitions for DT
-        columnDefs = []
-        col = 0
-        for i in column_headers:
-            c_dict = {}
-            c_dict['title'] = '"'+i[0]+'"'
-            c_dict['targets'] = col
-            c_dict['data'] = '"'+i[1]+'"'
-            c_dict['defaultContent'] = '"-"'
-            if i[2]:
-                c_dict['visible'] = 'true'
-            else:
-                c_dict['visible'] = 'false'
-            if i[0] in ['Email']:
-                c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
-
-            if i[0] in ['Last login', 'Date joined']:
-                c_dict['render'] = '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}'''
-
-            columnDefs.append(c_dict)
-            col = col + 1
-        context['columnDefs'] = columnDefs
-        context['table_options'] = table_options
-        return context
-
-class AdminNotifications(TemplateView):
-    template_name = 'dalme_app/generic_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength", { extend: "create", editor: editor },{ extend: "edit",   editor: editor },{ extend: "remove", editor: editor }]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true', 'select': 'true'}
-        context['page_title'] = "List of Notification Messages"
-        context['class_single'] = "notification"
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        table_options['ajax'] = '"../api/notifications/?format=json"'
-
-        #create column headers
-        column_headers = [
-        ['Code', 'e_code', 1],
-        ['Level','e_level', 1],
-        ['Text','e_text', 1],
-        ['Type','e_type', 1]]
-
-        #create column definitions for DT
-        columnDefs = []
-        col = 0
-        for i in column_headers:
-            c_dict = {}
-            c_dict['title'] = '"'+i[0]+'"'
-            c_dict['targets'] = col
-            c_dict['data'] = '"'+i[1]+'"'
-            c_dict['defaultContent'] = '"-"'
-            if i[2]:
-                c_dict['visible'] = 'true'
-            else:
-                c_dict['visible'] = 'false'
-            if i[0] in ['Email']:
-                c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
-            columnDefs.append(c_dict)
-            col = col + 1
-        context['columnDefs'] = columnDefs
-        context['table_options'] = table_options
-        return context
-
+class AdminNotifications(GenericListView):
+    table_options = {
+        'pageLength':25,
+        'responsive':'true',
+        'paging':'true',
+        'fixedHeader': 'true',
+        'dom': '"Bfrtip"',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': 'true'
+        }
+    ajax_string = '"../api/notifications/?format=json"'
+    table_buttons = ['"colvis"', '"pageLength"', '{ extend: "create", editor: editor }','{ extend: "edit",   editor: editor }','{ extend: "remove", editor: editor }']
+    column_headers = [
+            ['Id', 'id', 0],
+            ['Code', 'code', 1],
+            ['Level','level', 1],
+            ['Text','text', 1],
+            ['Type','type', 1]
+            ]
+    render_dict = {
+            'Level': '''{"display": "display"}''',
+            'Type': '''{"display": "display"}''',
+            }
+    table_editor = {
+            'ajax_url': '../api/notifications/',
+            'idSrc': '"id"',
+            'fields': [
+                {'label':"Code:", 'name': "code"},
+                {'label':"Level:", 'name': "level.value", 'type': "select",
+                    'options': [
+                      {'label': "DEBUG", 'value': "10"},
+                      {'label': "INFO", 'value': "20"},
+                      {'label': "SUCCESS", 'value': "25"},
+                      {'label': "WARNING", 'value': "30"},
+                      {'label': "ERROR", 'value': "40"}
+                    ]},
+                 {'label':"Text:", 'name': "text"},
+                 {'label':"Type:", 'name': "type.value", 'type': "radio",
+                    'options': [
+                      {'label': "MODAL", 'value': "1"},
+                      {'label': "NOTIFICATION", 'value': "2"}
+                    ],}
+            ]
+            }
 
 class SourceList(TemplateView):
     template_name = 'dalme_app/generic_list.html'
@@ -604,7 +653,7 @@ def list(request, module, type='all'):
                 e_text = form.cleaned_data['e_text']
                 e_code = functions.get_new_error(e_level)
 
-                message = error_message(
+                message = Notification(
                     e_code = e_code,
                     e_level = e_level,
                     e_type = e_type,
@@ -624,7 +673,7 @@ def list(request, module, type='all'):
 
         context['form'] = form
         headers = ['Code', 'Level', 'Type', 'Text']
-        errors = error_message.objects.all()
+        errors = Notification.objects.all()
         rows = []
 
         for i in errors:

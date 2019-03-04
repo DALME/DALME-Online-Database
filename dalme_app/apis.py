@@ -1,13 +1,14 @@
 
 from django.contrib.auth.models import User
 from django.db.models import Q, Count, F, Prefetch
-import requests, uuid, os, datetime, json
+import re, requests, uuid, os, datetime, json
 from rest_framework import viewsets, status
 from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from dalme_app.models import (Attribute_type, Attribute, Attribute_DATE, Attribute_DBR, Attribute_INT,
 Attribute_STR, Attribute_TXT, Content_class, Content_type, Content_type_x_attribute_type,
-Content_list, Content_list_x_content_type, Source, error_message, Profile)
+Content_list, Content_list_x_content_type, Source, Profile, Notification)
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
 
@@ -267,7 +268,7 @@ class Notifications(viewsets.ViewSet):
                 queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute_str.value SEPARATOR ",") FROM dalme_app_attribute_str JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_str.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q).order_by(order_column_name)
 
         else:
-            queryset = Notifications.objects.all().order_by(order_column_name)
+            queryset = Notification.objects.all().order_by(order_column_name)
 
         #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
         rec_count = queryset.count()
@@ -280,3 +281,97 @@ class Notifications(viewsets.ViewSet):
         data_dict['data'] = data
 
         return Response(data_dict)
+
+    def create(self, request, format=None):
+        data = request.data
+        data_dict = {}
+        pattern = re.compile(r'\[([a-z0-9]+)\]', re.IGNORECASE)
+        for k,v in data.items():
+            if k != 'action':
+                key_list = pattern.findall(k)
+                key_count = len(key_list)
+                row_id = key_list[0]
+                field = key_list[1]
+                #generic code for nested data, not necessary here
+                #if key_count > 2:
+                #    counter = 2
+                #    while counter != key_count:
+                #        field = field+'.'+key_list[counter]
+                #        counter = counter + 1
+                #if row_id in data_dict:
+                #    data_dict[row_id].append((field, v))
+                #else:
+                data_dict[field] = v
+        #obj_dict = {}
+        #for k,v in data_dict.items():
+        #    obj_dict['id'] = k
+        #    for i in v:
+        #        obj_dict[i[0]] = i[1]
+
+        serializer = NotificationSerializer(data=data_dict)
+        if serializer.is_valid():
+            new_obj = serializer.save()
+            #get array with updated object
+            object = Notification.objects.get(pk=new_obj.id)
+            serializer = NotificationSerializer(object)
+            data = serializer.data
+            result = {}
+            result['data'] = data
+
+        else:
+            #get error message as string
+            result = serializer.errors
+
+        return Response(result)
+
+    def update(self, request, pk=None, format=None):
+        data = request.data
+        data_dict = {}
+        pattern = re.compile(r'\[([a-z0-9]+)\]', re.IGNORECASE)
+        for k,v in data.items():
+            if k != 'action':
+                key_list = pattern.findall(k)
+                row_id = key_list[0]
+                field = key_list[1]
+                if row_id in data_dict:
+                    data_dict[row_id].append((field, v))
+                else:
+                    data_dict[row_id] = [(field, v)]
+        obj_dict = {}
+        for k,v in data_dict.items():
+            obj_dict['id'] = k
+            for i in v:
+                obj_dict[i[0]] = i[1]
+
+        object = Notification.objects.get(pk=row_id)
+        serializer = NotificationSerializer(object ,data=obj_dict)
+        if serializer.is_valid():
+            serializer.save()
+            #get array with updated object
+            object = Notification.objects.get(pk=row_id)
+            serializer = NotificationSerializer(object)
+            data = serializer.data
+            result = {}
+            result['data'] = data
+
+        else:
+            #get error message as string
+            result = serializer.errors
+
+        return Response(result)
+
+    def destroy(self, request, pk=None, format=None):
+        ids = self.kwargs.get('pk').split(',')
+        q = Q()
+        for i in ids:
+            q |= Q(pk=i)
+        try:
+            Notification.objects.filter(q).delete()
+            obj = Notification.objects.all()
+            serializer = NotificationSerializer(obj, many=True)
+            data = serializer.data
+            result = {}
+            result['data'] = data
+        except:
+            result = 'nope'
+        return Response(result)

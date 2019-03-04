@@ -10,31 +10,6 @@
             "text": "Admin"
           },
           {
-            "text": "Users",
-            "link": "/admin?type=users",
-            "iconClass": "fa-users"
-          },
-          {
-            "text": "Website",
-            "link": "https://dalme.org/wp/wp-admin",
-            "iconClass": "fa-globe"
-          },
-          {
-            "text": "Notifications",
-            "link": "/admin?type=notifications",
-            "iconClass": "fa-medkit"
-          },
-          {
-            "text": "Background Tasks",
-            "link": "/admin?type=bgtasks",
-            "iconClass": "fa-tasks"
-          },
-          {
-            "text": "Data Models",
-            "link": "/admin?type=models",
-            "iconClass": "fa-cubes"
-          },
-          {
             "divider": true
           },
           {

@@ -6,7 +6,7 @@ This file is where all of the admin interface views are set up, available at
 from django.contrib import admin
 
 from .models import (par_inventory, par_folio, par_token, par_object,
-    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
+    Notification, Agent, Attribute_type, Attribute, Attribute_DATE,
     Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
     Content_class, Content_type, Content_type_x_attribute_type, Headword,
     Object, Object_attribute, Place, Source, Page, Transcription,
@@ -24,7 +24,7 @@ admin.site.register(par_inventory)
 admin.site.register(par_folio)
 admin.site.register(par_token)
 admin.site.register(par_object)
-admin.site.register(error_message)
+admin.site.register(Notification)
 admin.site.register(Agent)
 admin.site.register(Attribute_type)
 admin.site.register(Attribute)

@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 import re, requests, time
 from async_messages import messages
 
-from .models import par_inventory, par_folio, par_token, error_message, par_object
+from .models import par_inventory, par_folio, par_token, Notification, par_object
 from . import functions
 from dalme.celeryapp import app
 

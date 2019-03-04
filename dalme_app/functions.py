@@ -15,7 +15,7 @@ import pandas as pd
 from . import menus
 from .forms import new_user
 from .models import (par_inventory, par_folio, par_token, par_object,
-    error_message, Agent, Attribute_type, Attribute, Attribute_DATE,
+    Notification, Agent, Attribute_type, Attribute, Attribute_DATE,
     Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
     Content_class, Content_type, Content_type_x_attribute_type, Headword,
     Object, Object_attribute, Place, Source, Page, Transcription,
@@ -355,7 +355,7 @@ def get_display_token_class(flag):
     return token_class
 
 def get_new_error(level):
-    errors = error_message.objects.filter(e_level=level)
+    errors = Notification.objects.filter(e_level=level)
     no = errors.count()
 
     if no == None:
@@ -384,7 +384,7 @@ def get_new_error(level):
     return new
 
 def notification(request, code, **kwargs):
-    base_message = error_message.objects.get(pk=code)
+    base_message = Notification.objects.get(pk=code)
     msg_text = base_message.e_text
     msg_level = base_message.e_level
 

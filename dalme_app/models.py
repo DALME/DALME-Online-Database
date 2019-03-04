@@ -648,23 +648,6 @@ class Notification(dalmeIntid):
     type = models.IntegerField(choices=TYPES)
     text = models.TextField()
 
-class error_message(dalmeBasic):
-    LEVELS = (
-        (10, 'DEBUG'),
-        (20, 'INFO'),
-        (25, 'SUCCESS'),
-        (30, 'WARNING'),
-        (40, 'ERROR')
-    )
-    TYPES = (
-        (1, 'MODAL'),
-        (2, 'NOTIFICATION')
-    )
-    e_code = models.IntegerField(primary_key=True, unique=True, db_index=True)
-    e_level = models.IntegerField(choices=LEVELS)
-    e_text = models.TextField()
-    e_type = models.IntegerField(choices=TYPES)
-
 #temporary models for testing parser
 class par_inventory(dalmeUuid):
     title = models.CharField(max_length=255)
