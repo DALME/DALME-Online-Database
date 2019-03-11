@@ -1,12 +1,20 @@
 [{
-    "text": "Modules",
-    "iconClass": "fa-th",
+    "text": "Dashboard",
+    "iconClass": "fa-tachometer-alt",
+    "link": "/"
+  },
+  {
+    "divider": true
+  },
+  {
+    "text": "Content",
     "section": true
   },
   {
     "text": "Sources",
     "link": "#",
     "iconClass": "fa-bookmark",
+    "itemClass": "sources",
     "children": [
       {
         "text": "All",
@@ -41,9 +49,25 @@
     ]
   },
   {
+    "text": "Pages",
+    "link": "/pages",
+    "iconClass": "fa-file"
+  },
+  {
+    "text": "Objects",
+    "link": "/list/objects",
+    "iconClass": "fa-beer",
+    "counter": "objects"
+  },
+  {
+    "text": "Admin",
+    "section": true
+  },
+  {
     "text": "System",
     "link": "#",
-    "iconClass": "fa-gear",
+    "iconClass": "fa-cog",
+    "itemClass": "system",
     "children": [
       {
         "text": "Users",
@@ -56,31 +80,89 @@
         "iconClass": "fa-medkit"
       },
       {
-        "text": "Data Models",
-        "link": "/admin?type=models",
-        "iconClass": "fa-cubes"
-      },
-      {
         "text": "Background Tasks",
         "link": "/admin?type=bgtasks",
         "iconClass": "fa-tasks"
       },
       {
-        "text": "Website",
-        "link": "https://dalme.org/wp/wp-admin",
-        "iconClass": "fa-globe"
+        "text": "Data Models",
+        "link": "/admin?type=models",
+        "iconClass": "fa-cubes"
       }
     ]
   },
   {
-    "text": "Pages",
-    "link": "/pages",
-    "iconClass": "fa-file"
+    "text": "Dev",
+    "section": true
   },
   {
-    "text": "Objects",
-    "link": "/list/objects",
-    "iconClass": "fa-beer",
-    "counter": "objects"
+    "text": "UI Reference",
+    "link": "#",
+    "iconClass": "fa-window-restore",
+    "itemClass": "uiref",
+    "children": [
+      {
+        "text": "Home",
+        "link": "/uiref?m=home",
+        "iconClass": "fa-home"
+      },
+      {
+        "text": "Cards",
+        "link": "/uiref?m=cards",
+        "iconClass": "fa-address-card"
+      },
+      {
+        "text": "Charts",
+        "link": "/uiref?m=charts",
+        "iconClass": "fa-chart-pie"
+      },
+      {
+        "text": "Buttons",
+        "link": "/uiref?m=buttons",
+        "iconClass": "fa-window-close"
+      },
+      {
+        "text": "Tables",
+        "link": "/uiref?m=tables",
+        "iconClass": "fa-table"
+      },
+      {
+        "text": "Animations",
+        "link": "/uiref?m=animations",
+        "iconClass": "fa-video"
+      },
+      {
+        "text": "Borders",
+        "link": "/uiref?m=borders",
+        "iconClass": "fa-object-ungroup"
+      },
+      {
+        "text": "Colours",
+        "link": "/uiref?m=colours",
+        "iconClass": "fa-palette"
+      },
+      {
+        "text": "Other",
+        "link": "/uiref?m=other",
+        "iconClass": "fa-socks"
+      },
+      {
+        "text": "404",
+        "link": "/uiref?m=404",
+        "iconClass": "fa-exclamation-triangle"
+      },
+      {
+        "text": "Icons",
+        "link": "https://fontawesome.com/cheatsheet#use",
+        "blank": true,
+        "iconClass": "fa-ghost"
+      }
+    ]
+  },
+  {
+    "text": "Dev Scripts",
+    "link": "/scripts",
+    "iconClass": "fa-code"
   }
+
 ]

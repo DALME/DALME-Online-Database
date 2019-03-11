@@ -67,6 +67,42 @@ class SourceSerializer(DynamicSerializer):
             ret['url'] = {'name': 'Visit Link', 'url': ret['url']}
         return ret
 
+class SourceSerializerTr(DynamicSerializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField(max_length=255)
+    type = serializers.CharField(max_length=255)
+    parent_source = serializers.CharField(max_length=255)
+    is_inventory = serializers.BooleanField()
+    url = serializers.CharField(max_length=255)
+    mk2_identifier = serializers.CharField(max_length=255)
+    mk1_identifier = serializers.CharField(max_length=255)
+    alt_identifier = serializers.CharField(max_length=255)
+    title = serializers.CharField(max_length=255)
+    short_title = serializers.CharField(max_length=255)
+    language = serializers.CharField(max_length=255)
+    language_gc = serializers.CharField(max_length=255)
+    archival_series = serializers.CharField(max_length=255)
+    archival_number = serializers.CharField(max_length=255)
+    start_date_day = serializers.CharField(max_length=255)
+    start_date_month = serializers.CharField(max_length=255)
+    start_date_year = serializers.CharField(max_length=255)
+    end_date_day = serializers.CharField(max_length=255)
+    end_date_month = serializers.CharField(max_length=255)
+    end_date_year = serializers.CharField(max_length=255)
+    end_date = serializers.CharField(max_length=255)
+    start_date = serializers.CharField(max_length=255)
+    dataset = serializers.CharField(max_length=255)
+    act_type = serializers.CharField(max_length=255)
+    act_type_phrase = serializers.CharField(max_length=255)
+    debt_phrase = serializers.CharField(max_length=255)
+    debt_amount = serializers.IntegerField()
+    debt_unit = serializers.CharField(max_length=255)
+    debt_unit_type = serializers.CharField(max_length=255)
+    debt_source = serializers.CharField(max_length=255)
+    comments = serializers.CharField()
+    city = serializers.CharField(max_length=255)
+    transcription = serializers.CharField()
+
 class UserSerializer(serializers.ModelSerializer):
     """
     Basic serializer for user data
@@ -152,4 +188,30 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
+        fields = '__all__'
+
+class ContentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content_type
+        fields = ('id', 'name', 'description', 'content_class', 'short_name')
+
+class AttributeTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute_type
+        fields = '__all__'
+
+class ContentClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content_class
+        fields = '__all__'
+
+class ContentXAttributeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='attribute_type.id')
+    name = serializers.CharField(max_length=255, source='attribute_type.name')
+    short_name = serializers.CharField(max_length=55, source='attribute_type.short_name')
+    description = serializers.CharField(source='attribute_type.description')
+    data_type = serializers.CharField(max_length=15, source='attribute_type.data_type')
+
+    class Meta:
+        model = Content_type_x_attribute_type
         fields = '__all__'

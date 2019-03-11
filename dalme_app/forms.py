@@ -100,9 +100,5 @@ class new_user(forms.Form):
         widget=forms.Select(choices=Profile.WP_ROLE)
     )
 
-class home_search(forms.Form):
-    search_string = forms.CharField(
-        widget=forms.TextInput(
-            attrs={'class': 'form-control', 'placeholder': 'Search...'}
-        )
-    )
+#class home_search(forms.Form):
+#    search_string = forms.CharField()

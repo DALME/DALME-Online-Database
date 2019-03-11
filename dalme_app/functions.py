@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db import connections
 
-from async_messages import message_user
 import re, json, requests, hashlib, os, uuid, calendar, datetime
 import pandas as pd
 
@@ -21,7 +20,14 @@ from .models import (par_inventory, par_folio, par_token, par_object,
     Object, Object_attribute, Place, Source, Page, Transcription,
     Identity_phrase, Object_phrase, Wordform, Token,
     Identity_phrase_x_entity)
-from dalme_app.scripts.db import dam_db, wiki_db, wp_db
+
+import logging
+logger = logging.getLogger(__name__)
+
+try:
+    from dalme_app.scripts.db import wp_db, wiki_db, dam_db
+except:
+    logger.debug("Can't connect to MySQL instance containing Wiki, DAM, and WP databases.")
 
 #General functions
 def inventory_check(_file):

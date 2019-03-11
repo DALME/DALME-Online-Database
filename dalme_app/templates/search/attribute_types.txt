@@ -1,0 +1,3 @@
+{{ object.name }}
+{{ object.short_name }}
+{{ object.description }}

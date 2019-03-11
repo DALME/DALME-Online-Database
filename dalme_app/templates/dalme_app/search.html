@@ -1,0 +1,49 @@
+{% extends "dalme_app/dash_base.html" %}
+
+{% load staticfiles i18n %}
+{% block extra-dropdowns %}{% endblock %}
+{% block extra-sidebar %}{% endblock %}
+
+{% block content %}
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+      <!-- Page Heading -->
+      <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ page_title }}</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+      </div>
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Results</h6>
+        </div>
+        <div class="card-body">
+          <form method="get" action=".">
+              <table>
+                  {{ form.as_table }}
+                  <tr>
+                      <td>&nbsp;</td>
+                      <td>
+                          <input type="submit" value="Search">
+                      </td>
+                  </tr>
+              </table>
+                  {% for result in object_list %}
+                      <p>
+                          <a href="{{ result.object.get_absolute_url }}">{{ result.object.name }} ({{ result.object.short_name }})</a>
+                          {{ result.object.description }}
+                      </p>
+                  {% empty %}
+                      <p>No results found.</p>
+                  {% endfor %}
+            </form>
+          </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+{% endblock %}

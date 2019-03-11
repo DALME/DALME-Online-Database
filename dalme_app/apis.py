@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q, Count, F, Prefetch
 import re, requests, uuid, os, datetime, json
 from rest_framework import viewsets, status
-from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer
+from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.models import (Attribute_type, Attribute, Attribute_DATE, Attribute_DBR, Attribute_INT,
@@ -375,3 +375,71 @@ class Notifications(viewsets.ViewSet):
         except:
             result = 'nope'
         return Response(result)
+
+class Models(viewsets.ViewSet):
+    """
+    API Endpoint for viewing and editing content types, classes, and attributes.
+    """
+
+    def list(self, request, *args, **kwargs):
+        #get basic parameters from Datatables Ajax request
+        draw = self.request.GET['draw'] #draw number - to allow DT to match requests to responses
+        if self.request.GET['search[value]'] != '':
+            search_string = self.request.GET['search[value]'].lower() #global search value to be applied to all columns with searchable=true
+        else:
+            search_string = None
+        order_column_idx = self.request.GET['order[0][column]']
+        order_dir = self.request.GET['order[0][dir]']
+        order_column_name = self.request.GET['columns['+order_column_idx+'][data]']
+        if order_dir == 'desc':
+            order_column_name = '-'+order_column_name
+        #create a dictionary that will be returned as JSON + add the "draw" return value
+        #cast it as INT to prevent Cross Site Scripting (XSS) attacks
+        data_dict = {}
+        data_dict['draw'] = int(draw)
+        if 'type' in self.request.GET:
+            type = self.request.GET['type']
+            if type == 'classes':
+                queryset = Content_class.objects.all().order_by(order_column_name)
+                rec_count = queryset.count()
+                data_dict['recordsTotal'] = rec_count
+                data_dict['recordsFiltered'] = rec_count
+                serializer = ContentClassSerializer(queryset, many=True)
+
+            elif type == 'content':
+                if 'st' in self.request.GET:
+                    st = self.request.GET['st']
+                    queryset = Content_type.objects.filter(content_class=st).order_by('id')
+                    rec_count = queryset.count()
+                    data_dict['recordsTotal'] = rec_count
+                    data_dict['recordsFiltered'] = rec_count
+                    serializer = ContentTypeSerializer(queryset, many=True)
+                else:
+                    queryset = Content_type.objects.all().order_by('id')
+                    rec_count = queryset.count()
+                    data_dict['recordsTotal'] = rec_count
+                    data_dict['recordsFiltered'] = rec_count
+                    serializer = ContentTypeSerializer(queryset, many=True)
+
+            elif type == 'attributes':
+                if 'st' in self.request.GET:
+                    st = self.request.GET['st']
+                    queryset = Content_type_x_attribute_type.objects.filter(content_type_id=st).select_related('attribute_type').order_by('order')
+                    rec_count = queryset.count()
+                    data_dict['recordsTotal'] = rec_count
+                    data_dict['recordsFiltered'] = rec_count
+                    serializer = ContentXAttributeSerializer(queryset, many=True)
+                else:
+                    queryset = Attribute_type.objects.all().order_by('id')
+                    rec_count = queryset.count()
+                    data_dict['recordsTotal'] = rec_count
+                    data_dict['recordsFiltered'] = rec_count
+                    serializer = AttributeTypeSerializer(queryset, many=True)
+            else:
+                error = 'No type defined.'
+                return Response(error)
+
+        data = serializer.data
+        data_dict['data'] = data
+
+        return Response(data_dict)

@@ -22,7 +22,6 @@ from django.views.generic.base import TemplateView
 from django_celery_results.models import TaskResult
 
 import requests, uuid, os, datetime, json
-import logging
 from allaccess.views import OAuthCallback
 
 from rest_framework import viewsets, status
@@ -30,25 +29,28 @@ from dalme_app.serializers import SourceSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from dalme_app import functions, scripts, forms
+from dalme_app import functions, custom_scripts, forms
 from dalme_app.menus import menu_constructor
 from dalme_app.models import *
-
 
 from dalme_app.tasks import parse_inventory
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value
 from django.db.models.expressions import RawSQL
 
+from haystack.generic_views import SearchView
+from django.http import HttpResponse
+
+import logging
 logger = logging.getLogger(__name__)
 
-@register.filter
-def get_item(obj, key):
-    logger.debug("get_item called on {}, {}".format(obj, key))
-    try:
-        return obj.get(key)
-    except AttributeError:
-        return getattr(obj,key)
+#@register.filter
+#def get_item(obj, key):
+#    logger.debug("get_item called on {}, {}".format(obj, key))
+#    try:
+#        return obj.get(key)
+#    except AttributeError:
+#        return getattr(obj,key)
 
 #authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
@@ -69,8 +71,38 @@ class OAuthCallback_WP(OAuthCallback):
 
         return the_user
 
+def SessionUpdate(request):
+    if not request.is_ajax() or not request.method=='POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    if request.POST['var'] == 'sidebar_toggle':
+        if request.session['sidebar_toggle'] == '':
+            request.session['sidebar_toggle'] = 'toggled'
+        else:
+            request.session['sidebar_toggle'] = ''
+
+    return HttpResponse('ok')
+
+@method_decorator(login_required,name='dispatch')
+class DefaultSearch(SearchView):
+    """ Default search view for Haystack"""
+    template_name = 'dalme_app/search.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = ['Search']
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context['page_title'] = 'Search Results'
+
+        return context
+
 class GenericListView(TemplateView):
     template_name = 'dalme_app/generic_list.html'
+    breadcrumb = []
     table_options = {
         'pageLength':25,
         'responsive':'true',
@@ -79,9 +111,10 @@ class GenericListView(TemplateView):
         'dom': '"Bfrtip"',
         'serverSide': 'true',
         'stateSave': 'true',
-        'select': 'true'
+        'select': 'true',
+        'language': '{searchPlaceholder: "Search..."}'
         }
-    table_buttons = ['"colvis"', '"pageLength"']
+    table_buttons = ['{ extend: "colvis", text: "\uf0db" }', '"pageLength"']
     column_headers = []
     render_dict = {}
     ajax_string = ''
@@ -89,13 +122,18 @@ class GenericListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        breadcrumb = self.get_breadcrumb()
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
         context['page_title'] = self.get_page_title()
         context['columnDefs'] = self.get_column_defs()
         context['table_options'] = self.get_table_options()
         context['table_buttons'] = self.get_table_buttons()
         context['table_editor'] = self.get_table_editor()
+
         return context
 
     def get_table_options(self, *args, **kwargs):
@@ -112,6 +150,9 @@ class GenericListView(TemplateView):
 
     def get_table_buttons(self, *args, **kwargs):
         return self.table_buttons
+
+    def get_breadcrumb(self, *args, **kwargs):
+        return self.breadcrumb
 
     def get_table_editor(self, *args, **kwargs):
         return self.table_editor
@@ -173,9 +214,10 @@ class AdminMain(View):
         return view(request, title=title)
 
 class AdminUsers(GenericListView):
+    breadcrumb = ['System','Users']
     ajax_string = '"../api/users/?format=json"'
     column_headers = [
-            ['User ID', 'id', 1],
+            ['ID', 'id', 1],
             ['Last login','last_login', 1],
             ['SU','is_superuser', 1],
             ['Username','username', 1],
@@ -185,22 +227,26 @@ class AdminUsers(GenericListView):
             ['Email','email', 1],
             ['Staff','is_staff', 0],
             ['Active','is_active', 1],
-            ['Date joined','date_joined', 1],
-            ['DAM user group','dam_usergroup', 1],
-            ['DAM user ID','dam_userid', 1],
-            ['Wiki groups','wiki_groups', 1],
-            ['Wiki user ID','wiki_userid', 1],
-            ['Wiki username','wiki_username', 1],
-            ['WordPress user ID','wp_userid', 1],
-            ['WordPress role','wp_role', 1]]
+            ['Date joined','date_joined', 0],
+            ['DAM user group','dam_usergroup', 0],
+            ['DAM user ID','dam_userid', 0],
+            ['Wiki groups','wiki_groups', 0],
+            ['Wiki user ID','wiki_userid', 0],
+            ['Wiki username','wiki_username', 0],
+            ['WordPress user ID','wp_userid', 0],
+            ['WordPress role','wp_role', 0]]
     render_dict = {
+            'Username': '''function ( data, type, row, meta ) {return '<a href="/user/'+data+'">'+data+'</a>';}''',
             'Email': '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}''',
             'Last login': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
-            'Date joined': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}'''
+            'Date joined': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
+            'SU': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+            'Staff': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+            'Active': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
             }
 
-
 class AdminNotifications(GenericListView):
+    breadcrumb = ['System','Notifications']
     table_options = {
         'pageLength':25,
         'responsive':'true',
@@ -209,10 +255,17 @@ class AdminNotifications(GenericListView):
         'dom': '"Bfrtip"',
         'serverSide': 'true',
         'stateSave': 'true',
-        'select': 'true'
+        'select': 'true',
+        'language': '{searchPlaceholder: "Search..."}'
         }
     ajax_string = '"../api/notifications/?format=json"'
-    table_buttons = ['"colvis"', '"pageLength"', '{ extend: "create", editor: editor }','{ extend: "edit",   editor: editor }','{ extend: "remove", editor: editor }']
+    table_buttons = [
+        '{ extend: "colvis", text: "\uf0db" }',
+        '{ extend: "create", text: "\uf067", editor: editor }',
+        '{ extend: "edit", text: "\uf304", editor: editor }',
+        '{ extend: "remove", text: "\uf00d", editor: editor }',
+        '"pageLength"'
+        ]
     column_headers = [
             ['Id', 'id', 0],
             ['Code', 'code', 1],
@@ -221,8 +274,8 @@ class AdminNotifications(GenericListView):
             ['Type','type', 1]
             ]
     render_dict = {
-            'Level': '''{"display": "display"}''',
-            'Type': '''{"display": "display"}''',
+            'Level': '''function ( data, type, row, meta ) {return '<div class="dt_n_level dt_n_level_'+data.display+'">'+data.display+'</div>';}''',
+            'Type': '''function ( data, type, row, meta ) {return '<div class="dt_n_type">'+data.display+'</div>';}'''
             }
     table_editor = {
             'ajax_url': '../api/notifications/',
@@ -246,23 +299,145 @@ class AdminNotifications(GenericListView):
             ]
             }
 
+class AdminModels(TemplateView):
+    template_name = 'dalme_app/admin_models_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = ['System', 'Data Models']
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        column_headers_content = [
+                ['ID', 'id', 1],
+                ['Class','content_class', 0],
+                ['Name','name', 1],
+                ['Short name','short_name', 0],
+                ['Description','description', 1]]
+        column_headers_attributes = [
+                ['ID', 'id', 1],
+                ['Name','name', 1],
+                ['Short name','short_name', 1],
+                ['Description','description', 0],
+                ['DType','data_type', 1],
+                ['Order','order', 1]]
+        column_headers_classes = [
+                ['ID', 'id', 1],
+                ['Name','name', 1],
+                ['Short name','short_name', 0],
+                ['Description','description', 1]]
+        render_dict_content = {
+                'Username': '''function ( data, type, row, meta ) {return '<a href="/user/'+data+'">'+data+'</a>';}''',
+                'Email': '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}''',
+                'Last login': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
+                'Date joined': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
+                'SU': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+                'Staff': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+                'Active': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+                }
+        render_dict_attributes = {}
+        render_dict_classes = {}
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+
+        context['columnDefs_content'] = self.get_column_defs(column_headers_content, render_dict_content)
+        context['columnDefs_attributes'] = self.get_column_defs(column_headers_attributes, render_dict_attributes)
+        context['columnDefs_classes'] = self.get_column_defs(column_headers_classes, render_dict_classes)
+        context['table_options_content'] = {
+            'pageLength':25,
+            'responsive':'true',
+            'dom': '"Bfrt"',
+            'serverSide': 'true',
+            'stateSave': 'true',
+            'select': '{style: "single"}',
+            'ajax': '"../api/models/?format=json&type=content"',
+            'scrollY': '"15vh"',
+            'deferRender': 'true',
+            'scroller': 'true',
+            'rowId': '"id"',
+            'language': '{searchPlaceholder: "Search..."}'
+            }
+        context['table_options_attributes'] = {
+            'pageLength':25,
+            'responsive':'true',
+            'dom': '"Bfrt"',
+            'serverSide': 'true',
+            'stateSave': 'true',
+            'select': '{style: "single"}',
+            'ajax': '"../api/models/?format=json&type=attributes"',
+            'scrollY': '"30vh"',
+            'deferRender': 'true',
+            'scroller': 'true',
+            'rowId': '"id"',
+            'language': '{searchPlaceholder: "Search..."}'
+            }
+        context['table_options_classes'] = {
+            'pageLength':25,
+            'responsive':'true',
+            'dom': '"Bfrt"',
+            'serverSide': 'true',
+            'stateSave': 'true',
+            'select': '{style: "single"}',
+            'ajax': '"../api/models/?format=json&type=classes"',
+            'scrollY': '"15vh"',
+            'deferRender': 'true',
+            'scroller': 'true',
+            'rowId': '"id"',
+            'language': '{searchPlaceholder: "Search..."}'
+            }
+        context['table_buttons_content'] = ['{ extend: "colvis", text: "\uf0db", className: "btn_single" }']
+        context['table_buttons_attributes'] = ['{ extend: "colvis", text: "\uf0db", className: "btn_single"}']
+        context['table_buttons_classes'] = ['{ extend: "colvis", text: "\uf0db", className: "btn_single"}']
+        context['page_title'] = 'System Data Models'
+
+        return context
+
+    def get_column_defs(self, column_headers, render_dict):
+        columnDefs = []
+        col = 0
+        for i in column_headers:
+            c_dict = {}
+            c_dict['title'] = '"'+i[0]+'"'
+            c_dict['targets'] = col
+            c_dict['data'] = '"'+i[1]+'"'
+            c_dict['defaultContent'] = '"-"'
+            if i[2]:
+                c_dict['visible'] = 'true'
+            else:
+                c_dict['visible'] = 'false'
+            if i[0] in render_dict:
+                c_dict['render'] = render_dict[i[0]]
+            columnDefs.append(c_dict)
+            col = col + 1
+        return columnDefs
+
+
 class SourceList(TemplateView):
     template_name = 'dalme_app/generic_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        table_options = {'pageLength':25,'responsive':'true','paging':'true', 'fixedHeader': 'true', 'buttons':'["colvis", "pageLength"]', 'dom': '"Bfrtip"', 'serverSide': 'true', 'stateSave': 'true'}
-        context['page_title'] = "List of Sources"
-        context['class_single'] = "source"
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        context['create_form'] = forms.source_main()
+        table_options = {
+            'pageLength':25,
+            'responsive':'true',
+            'paging':'true',
+            'fixedHeader': 'true',
+            'dom': '"Bfrtip"',
+            'serverSide': 'true',
+            'stateSave': 'true',
+            'language': '{searchPlaceholder: "Search..."}'
+            }
+        table_buttons = ['{ extend: "colvis", text: "\uf0db" }', '"pageLength"']
+
+
 
         if 'type' in self.request.GET:
             type = self.request.GET['type']
             context['type'] = type
             table_options['ajax'] = '"../api/sources/?format=json&type=' + type + '"'
             list_type = Content_list.objects.get(short_name=self.request.GET['type'])
+            breadcrumb = ['Sources', list_type.name]
+            page_title = 'List of '+list_type.name
             def_headers = list_type.default_headers.split(',')
             if list_type.extra_headers:
                 extra_headers = list_type.extra_headers.split(',')
@@ -281,6 +456,8 @@ class SourceList(TemplateView):
                 att_l = Content_type_x_attribute_type.objects.filter(q).select_related('attribute_type')
         else:
             context['type'] = ""
+            breadcrumb = ['Sources', 'All']
+            page_title = "Sources"
             def_headers = ['15']
             extra_headers = ['type']
             table_options['ajax'] = '"../api/sources/?format=json"'
@@ -319,8 +496,17 @@ class SourceList(TemplateView):
                 c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
             columnDefs.append(c_dict)
             col = col + 1
+
         context['columnDefs'] = columnDefs
         context['table_options'] = table_options
+        context['table_buttons'] = table_buttons
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context['page_title'] = page_title
+
         return context
 
 class SourceCreate(CreateView):
@@ -353,11 +539,15 @@ class SourceDisplay(DetailView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
+        breadcrumb = ['Sources', 'All']
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['source_has_children'] = len(self.object.source_set.all()) > 0
         context['source_has_pages'] = len(self.object.page_set.all()) > 0
         context['children'] = self.object.source_set.all().order_by('name')
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
         context['page_title'] = self.object.name
         context['form'] = forms.source_main(instance=self.object)
         if Transcription.objects.filter(source_id=self.object.pk).count() > 0:
@@ -420,25 +610,36 @@ class PageDisplay(DetailView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
+        breadcrumb = ['Pages']
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
         context['page_title'] = self.object.name
         context['form'] = forms.page_main(instance=self.object)
         return context
 
-class PageList(ListView):
-    model = Page
-    template_name = "dalme_app/generic_list.html"
-    paginate_by = 50
+class PageList(GenericListView):
+    breadcrumb = ['Pages']
+    table_options = {
+        'pageLength':25,
+        'responsive':'true',
+        'paging':'true',
+        'fixedHeader': 'true',
+        'dom': '"Bfrtip"',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': 'true',
+        'language': '{searchPlaceholder: "Search..."}'
+        }
+    ajax_string = '"../api/pages/?format=json"'
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-        context['create_form'] = forms.page_main()
-        context['page_title'] = "Page List"
-        return context
+    column_headers = [
+            ['DAM ID', 'dam_id', 1],
+            ['Name', 'name', 1],
+            ['Order','order', 1]
+            ]
 
 class PageUpdate(UpdateView):
     model = Page
@@ -450,523 +651,69 @@ class PageCreate(CreateView):
     form_class = forms.page_main
     template_name_suffix = '_create_form'
 
-@login_required
-def index(request):
-    context = {
-            'page_title':'DALME Dashboard',
-            'authenticated': request.user.is_authenticated,
-            'username': request.user.username,
-            'sidebar': menu_constructor('sidebar_item', 'sidebar_default.json'),
-            'dropdowns': menu_constructor('dropdown_item', 'dropdowns_default.json'),
-            'tiles': menu_constructor('tile_item', 'home_tiles_default.json'),
-            'chart_data': functions.bar_chart(),
-        }
-
-    return render(request, 'index.html', context)
-
-@login_required
-def search(request):
-
-    return render(request, 'search.html', context)
-
-@login_required
-def uiref(request, module):
-    context = {
-            'page_title':'DALME Dashboard Demo',
-            'authenticated': request.user.is_authenticated,
-            'username': request.user.username,
-            'sidebar': menu_constructor('sidebar_item', 'sidebar_default.json'),
-            'dropdowns': menu_constructor('dropdown_item', 'dropdowns_default.json'),
-        }
-
-    _url = 'UI_reference/{}.html'.format(module)
-
-    return render(request, _url, context)
-
-@login_required
-def list(request, module, type='all'):
-    _url = 'list.html'
-    table_options = ''
-    username = request.user.username
-    context = {}
-    if module == 'sources':
-        _title = 'DALME Dashboard | Sources'
-        _heading = 'Sources'
-        panel_icon = 'fa-list'
-        context['has_actions'] = 1
-        context['actions'] = (
-            ('href="#import" data-toggle="modal" data-target="#import"', 'Add new source'),
-            ('divider', ' '),
-            ('href="#"', 'Action 2'),
-            ('href="#"', 'Action 3'),
-        )
-        context['has_modals'] = 1
-        context['modals'] = [
-            ('import', [
-                'Add New Source',
-                'form',
-                'Submit',
-                'type="submit" form="import-form"'
-            ]),
-        ]
-
-        if request.method == 'POST':
-            form = forms.upload_file(request.POST, request.FILES)
-
-            if form.is_valid():
-                #ingest_inventory should check the file's format and look at the metadata
-                check = functions.inventory_check(form.cleaned_data['inv_file'])
-                #missing structure section
-                if check['has_structure'] == 0:
-                    functions.notification(request, 4002)
-
-                else:
-                    #missing transcription section
-                    if check['has_transcription'] == 0:
-                        functions.notification(request, 3001)
-
-                    #prep metadata form
-                    #if missing metadata section entirely
-                    if check['has_metadata'] == 0:
-                        req_text = 'The file is missing the METADATA section, please input the relevant information below.'
-                    #if missing required fields
-                    elif check['required'] == 0:
-                        req_text = 'Required information is missing from the METADATA section in the file, please complete the fields highlighted below.'
-                    #if it's all there and this is just to verify
-                    else:
-                        req_text = 'The information below was extracted from the METADATA section of the file, please verify that the information is correct. If not, then change it accordingly.'
-
-                    check['req_text'] = req_text
-                    request.session['form_data'] = check
-
-                    # redirect to inventory metadata form:
-                    return HttpResponseRedirect('/form/inventory_metadata')
-
-            else:
-                functions.notification(request, 4003, data=form.errors)
-        else:
-            form = forms.upload_file()
-
-        context['form'] = form
-        types = Content_type.objects.filter(content_class=1)
-        types_dict = {}
-        for t in types:
-            types_dict[t.id] = t.name
-
-        if type == 'all':
-            panel_title = 'List of all sources'
-            headers = ['Type', 'Title']
-            sources_list = Source.objects.all().order_by('type','short_name')
-            rows = []
-
-            for i in sources_list:
-                tr_class = ''
-
-                if i.type.pk <= 11:
-                    title = i.short_name
-                else:
-                    title = i.name
-
-                type = types_dict.get(i.type,'n/a')
-                row = [tr_class, (
-                    '<td>' + type + '</td>',
-                    '<td><a href="/show/source/' + str(i.id) + '">' + title + '</a></td>',
-                    )
-                ]
-                rows.append(row)
-
-        elif type == 'notarial':
-            panel_title = 'List of notarial sources (acts and registers)'
-
-        elif type == 'inventories':
-            panel_title = 'List of inventories'
-            headers = ['Type', 'Title','Start Date','End Date','Source']
-            inventories = Source.objects.filter(is_inventory=True).order_by('short_name')
-            dates_list = Attribute_DATE.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=25) | Q(attribute_id__attribute_type=26))
-            types_list = Attribute_STR.objects.select_related('attribute_id').filter(attribute_id__attribute_type=28)
-
-
-        elif type == 'biblio':
-            panel_title = 'List of bibliographic sources'
-            headers = ['Type', 'Title']
-            biblio_sources = Source.objects.filter(type__lte=11).order_by('short_name')
-            attribute_list = Attribute_STR.objects.select_related('attribute_id').filter(Q(attribute_id__attribute_type=15) | Q(attribute_id__attribute_type=1))
-            rows = []
-
-            for i in biblio_sources:
-                tr_class = ''
-                title = i.name + '</a>'
-                atts = attribute_list.filter(attribute_id__content_id=i.id)
-                if atts:
-                    lang_buttons = ''
-                    for a in atts:
-                        language = a.value
-                        l_button = '<div class="list_inrow_button">' + language + '</div>'
-                        lang_buttons = lang_buttons + l_button
-                    title = title + lang_buttons
-
-                type = types_dict.get(i.type,'n/a')
-                row = [tr_class, (
-                    '<td>' + type + '</td>',
-                    '<td><a href="/show/source/' + str(i.id) + '">' + title + '</td>',
-                    )
-                ]
-                rows.append(row)
-
-        elif type == 'archives':
-            panel_title = 'List of archives and collections'
-
-
-    elif module == 'errors':
-        _title = 'DALME Dashboard | Errors and Notifications'
-        _heading = 'Errors and Notifications'
-        panel_title = 'List of error and notification codes'
-        panel_icon = 'fa-medkit'
-        context['has_actions'] = 1
-        context['actions'] = (
-            ('href="#addNew" data-toggle="modal" data-target="#addNew"', 'Add New'),
-            ('divider', ' '),
-            ('title', 'Filter by level:'),
-            ('href="#"', 'Debug'),
-            ('href="#"', 'Info'),
-            ('href="#"', 'Success'),
-            ('href="#"', 'Warning'),
-            ('href="#"', 'Error'),
-        )
-        context['has_modals'] = 1
-        context['modals'] = [
-            ('addNew', [
-                'Add New Code',
-                'form',
-                'Submit',
-                'type="submit" form="addNew-form"'
-            ]),
-        ]
-
-        if request.method == 'POST':
-            form = new_error(request.POST)
-
-            if form.is_valid():
-                # process the data in form.cleaned_data as required
-                e_level = form.cleaned_data['e_level']
-                e_type = form.cleaned_data['e_type']
-                e_text = form.cleaned_data['e_text']
-                e_code = functions.get_new_error(e_level)
-
-                message = Notification(
-                    e_code = e_code,
-                    e_level = e_level,
-                    e_type = e_type,
-                    e_text = e_text
-                    )
-                message.save()
-
-                functions.notification(request, 2503, para={ 'code': str(e_code) })
-
-                # redirect to a new URL:
-                return HttpResponseRedirect('/list/errors')
-
-            else:
-                functions.notification(request, 4003, data=form.errors)
-        else:
-            form = new_error()
-
-        context['form'] = form
-        headers = ['Code', 'Level', 'Type', 'Text']
-        errors = Notification.objects.all()
-        rows = []
-
-        for i in errors:
-            d_code = str(i.e_code)
-            d_level = i.get_e_level_display()
-            d_type = i.get_e_type_display()
-            d_text = i.e_text
-
-            tr_class = ''
-            row = [tr_class, (
-                '<td>' + d_code + '</td>',
-                '<td>' + d_level + '</td>',
-                '<td>' + d_type + '</td>',
-                '<td>' + d_text + '</td>')
-            ]
-            rows.append(row)
-
-    elif module == 'objects':
-        _title = 'DALME Dashboard | List Objects'
-        _heading = 'Objects'
-        panel_title = 'List of Objects'
-        panel_icon = 'fa-beer'
-        context['has_actions'] = 1
-        context['actions'] = (
-            ('href="#"', 'Action 2'),
-            ('href="#"', 'Action 3'),
-        )
-        headers = ['Object ID', 'Name', 'Class', 'Material', 'Room', 'Terms']
-        objects = par_object.objects.all()
-        rows = []
-        for i in objects:
-            tr_class = ''
-            row = [tr_class, (
-                '<td>' + str(i.obj_id) + '</td>',
-                '<td>' + i.name + '</td>',
-                '<td>' + i.ont_class + '</td>',
-                '<td>' + i.material + '</td>',
-                '<td>' + i.room + '</td>',
-                '<td>' + i.terms + '</td>')
-            ]
-            rows.append(row)
-
-    elif module == 'tasks':
-        _title = 'DALME Dashboard | Background Tasks Manager'
-        _heading = 'Background Tasks'
-        panel_title = 'List of Task Results'
-        panel_icon = 'fa-tasks'
-        context['has_actions'] = 1
-        context['actions'] = (
-            ('href="#"', 'Action 2'),
-            ('href="#"', 'Action 3'),
-        )
-        table_options = 'pageLength: 50'
-        headers = ['Task No.', 'Date', 'Status']
-        tasks = TaskResult.objects.all().order_by('status')
-        rows = []
-        for i in tasks:
-            if i.status == 'FAILURE':
-                tr_class = 'danger'
-            else:
-                tr_class = ''
-
-            row = [
-                tr_class, ('<td>' + str(i.id) + '</td>',
-                '<td>' + str(i.date_done) + '</td>',
-                '<td>' + i.status + '</td>')
-            ]
-            rows.append(row)
-
-    elif module == 'users':
-        _title = 'DALME Dashboard | Users'
-        _heading = 'Users'
-        panel_title = 'List of users'
-        panel_icon = 'fa-users'
-        context['has_actions'] = 1
-        context['actions'] = (
-            ('href="#addNew" data-toggle="modal" data-target="#addNew"', 'Add New'),
-        )
-        context['has_modals'] = 1
-        context['modals'] = [
-            ('addNew', [
-                'Add New User',
-                'form',
-                'Submit',
-                'type="submit" form="addNew-form"'
-            ]),
-        ]
-
-        if request.method == 'POST':
-            form = new_user(request.POST)
-
-            if form.is_valid():
-                functions.create_user(request, form)
-                functions.notification(request, 2502)
-                # redirect to a new URL:
-                return HttpResponseRedirect('/list/users')
-
-            else:
-                functions.notification(request, 4003, data=form.errors)
-        else:
-            form = new_user()
-
-        context['form'] = form
-        headers = ['Username', 'Name', 'Email', 'Staff', 'Superuser', 'DAM Usergroup', 'Wiki Groups', 'WP Role']
-        users = User.objects.all().select_related('profile')
-        rows = []
-
-        for i in users:
-            d_username = i.username
-            d_name = i.profile.full_name
-            d_email = i.email
-            d_staff = str(i.is_staff)
-            d_superuser = str(i.is_superuser)
-            d_dam = i.profile.get_dam_usergroup_display()
-            d_wiki = i.profile.wiki_groups
-            d_wp = str(i.profile.get_wp_role_display())
-
-            tr_class = ''
-            row = [tr_class, (
-                '<td>' + d_username + '</td>',
-                '<td>' + d_name + '</td>',
-                '<td>' + d_email + '</td>',
-                '<td>' + d_staff + '</td>',
-                '<td>' + d_superuser + '</td>',
-                '<td>' + d_dam + '</td>',
-                '<td>' + d_wiki + '</td>',
-                '<td>' + d_wp + '</td>')
-            ]
-            rows.append(row)
-
-    else:
-        functions.notification(request, 4004)
-        return HttpResponseRedirect('/')
-
-    context['page_title'] = _title
-    context['authenticated'] = request.user.is_authenticated
-    context['username'] = username
-    context['item'] = 'THIS IS WHERE ITEM TITLE GOES'
-    context['heading'] = _heading
-    context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-    context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-    context['headers'] = headers
-    context['rows'] = rows
-    context['panel_title'] = panel_title
-    context['panel_icon'] = panel_icon
-    context['table_options'] = table_options
-
-    return render(request, _url, context)
-
-
-@login_required
-def show(request, item, id):
-    username = request.user.username
-    context = {}
-    if item == 'inventory':
-        id = uuid.UUID(id).hex
-        inv = par_inventory.objects.get(pk=id)
-        folios = inv.par_folio_set.all()
-
-        if not folios:
-            functions.notification(request, 4001)
-            return HttpResponseRedirect('/list/inventories')
-
-        else:
-            context['page_title'] = 'DALME Dashboard | Inventory ' + inv.title
-            context['heading'] = inv.title
-            context['has_actions'] = 1
-            context['actions'] = (
-                ('href="javascript:change_autorefreshdiv();"', 'Tokenise'),
-                ('divider', ' '),
-                ('href="#"', 'Do something else'),
-                ('href="#"', 'Yay!'),
-            )
-            _url = 'show_inventory.html'
-            inventory = functions.get_inventory(inv, 'full')
-            page = request.GET.get('page', 1)
-            pages = Paginator(inventory, 1)
-
-            try:
-                folios = pages.page(page)
-
-            except PageNotAnInteger:
-                folios = pages.page(1)
-
-            except EmptyPage:
-                folios = pages.page(paginator.num_pages)
-
-            context['authenticated'] = request.user.is_authenticated
-            context['username'] = request.user.username
-            context['item'] = item.title()
-            context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-            context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-            context['inventory'] = inventory
-            context['folios'] = folios
-
-    return render(request, _url, context)
-
-@login_required
-def form(request, item):
-    username = request.user.username
-    context = {}
-    form_data = request.session.get('form_data')
-
-    if item == 'inventory_metadata':
-        _title = 'DALME Dashboard | Inventory Metadata'
-        _heading = 'Inventory Metadata'
-        panel_title = 'Metadata'
-        panel_icon = 'fa-list'
-        _url = 'inventory_metadata.html'
-        req_text = form_data['req_text']
-        if request.method == 'POST':
-            form = inventory_metadata(request.POST)
-
-            if form.is_valid():
-                #create inventory record in database
-                inv = par_inventory(
-                    title=form.cleaned_data['inv_title'],
-                    source=form.cleaned_data['inv_source'],
-                    location=form.cleaned_data['inv_location'],
-                    series=form.cleaned_data['inv_series'],
-                    shelf=form.cleaned_data['inv_shelf'],
-                    transcriber=form.cleaned_data['inv_transcriber'],
-                    creation_username=username,
-                    modification_username=username
-                    )
-                inv.save()
-                inv_id = str(inv.id)
-                #call parser to process content in parallel thread
-                task = parse_inventory.delay(form_data, inv_id, username)
-                task_id = task.id
-
-                #redirect to inventories list with status message
-                functions.notification(request, 2001)
-                return HttpResponseRedirect('/list/inventories')
-
-            else:
-                functions.notification(request, 4003, data=form.errors)
-
-        else:
-            ini_data = form_data['metadata']
-            ini_data['inv_title'] = ini_data.pop('Title')
-            ini_data['inv_source'] = ini_data.pop('Archival source')
-            ini_data['inv_location'] = ini_data.pop('Country')
-            ini_data['inv_series'] = ini_data.pop('Series')
-            ini_data['inv_shelf'] = ini_data.pop('Shelf')
-            ini_data['inv_transcriber'] = ini_data.pop('Transcriber')
-            form = inventory_metadata(initial=ini_data)
-
-    context['page_title'] = _title
-    context['authenticated'] = request.user.is_authenticated
-    context['username'] = username
-    context['heading'] = _heading
-    context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json')
-    context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json')
-    context['panel_title'] = panel_title
-    context['panel_icon'] = panel_icon
-    context['form'] = form
-    context['req_text'] = req_text
-
-    return render(request, _url, context)
-
-@login_required
-def script(request, module):
-    username = request.user.username
-    output = eval('scripts.' + module + '(request, username)')
-
-    context = {
-            'page_title':'DALME Script Results',
-            'authenticated': request.user.is_authenticated,
-            'username': request.user.username,
-            'sidebar': menu_constructor('sidebar_item', 'sidebar_default.json'),
-            'dropdowns': menu_constructor('dropdown_item', 'dropdowns_default.json'),
-            'heading': module,
-            'output': output
-        }
-
-    _url = 'script_results.html'
-
-    return render(request, _url, context)
-
-@login_required
-def iiif(request, module):
-    if module == 'diva':
-        url = 'iiif_test_diva.html'
-    elif module == 'mirador':
-        url = 'iiif_test_mirador.html'
-
-    context = {
-            'page_title':'DALME IIIF Viewer Test',
-            'authenticated': request.user.is_authenticated,
-            'username': request.user.username,
-            'sidebar': menu_constructor('sidebar_item', 'sidebar_default.json'),
-            'dropdowns': menu_constructor('dropdown_item', 'dropdowns_default.json'),
-        }
-
-    return render(request, _url, context)
+@method_decorator(login_required,name='dispatch')
+class Index(TemplateView):
+    template_name = 'dalme_app/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = ['Dashboard']
+        try:
+            sidebar_toggle = self.request.session['sidebar_toggle']
+        except:
+            self.request.session['sidebar_toggle'] = ''
+            sidebar_toggle = self.request.session['sidebar_toggle']
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['sidebar_toggle'] = sidebar_toggle
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context['tiles'] = menu_constructor('tile_item', 'home_tiles_default.json', state)
+        context['page_title'] = 'DALME Dashboard'
+
+        return context
+
+@method_decorator(login_required,name='dispatch')
+class UIRefMain(View):
+    """
+    Routes requests to UIRef views
+    """
+    def get(self, request, *args, **kwargs):
+        if 'm' in self.request.GET:
+            template = 'UI_reference/'+self.request.GET['m']+'.html'
+            breadcrumb = ['UI Reference', self.request.GET['m'].capitalize()]
+            view = UIRef.as_view(template_name=template)
+        return view(request, breadcrumb=breadcrumb)
+
+class UIRef(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = self.kwargs['breadcrumb']
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['sidebar_toggle'] = sidebar_toggle
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context['page_title'] = 'DALME UI Reference'
+
+        return context
+
+@method_decorator(login_required,name='dispatch')
+class Scripts(TemplateView):
+    template_name = 'dalme_app/scripts.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = ['Dev Scripts']
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['sidebar_toggle'] = sidebar_toggle
+        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
+        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context['tiles'] = menu_constructor('tile_item', 'home_tiles_default.json', state)
+        context['scripts'] = custom_scripts.get_script_menu()
+        context['page_title'] = 'Dev Scripts'
+        if 's' in self.request.GET:
+            scpt = self.request.GET['s']
+            context['output'] = eval('custom_scripts.'+scpt+'()')
+        return context

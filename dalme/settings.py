@@ -58,7 +58,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    #'async_messages.middleware.AsyncMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'
@@ -142,9 +141,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+awsauth = AWS4Auth(AWS_ACCESS_ID,AWS_ACCESS_KEY,AWS_REGION,'es')
+
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        'URL': AWS_ES_ENDPOINT,
+        'INDEX_NAME': 'haystack',
+        'KWARGS': {
+            'port': 443,
+            'http_auth': awsauth,
+            'use_ssl': True,
+            'verify_certs': True,
+            'connection_class': elasticsearch.RequestsHttpConnection,
+        }
     },
 }
 
@@ -203,6 +213,7 @@ CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CELERY_RESULT_BACKEND = 'db+mysql:///django-db'
+CELERY_BROKER_URL = 'redis://localhost'
 
 CACHES = {
     'default': {

@@ -11,7 +11,7 @@ from . import functions
 
 LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
 
-def menu_constructor(item_constructor, template):
+def menu_constructor(item_constructor, template, state):
     """
     Builds menus based on an item_constructor and a json file describing the menu items.
     Menus are stored in the templates directory, under the menus subdirectory.
@@ -26,161 +26,105 @@ def menu_constructor(item_constructor, template):
 
     # Create menu by iterating through items in json file and appending to output
     for item in menu:
-        _output += eval(item_constructor + '(_output,**item)')
+        _output += eval(item_constructor + '(_output,state,**item)')
 
     # Return output as part of a list, because renderer expects to iterate
     return [_output]
 
-def sidebar_item(wholeMenu,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None):
+def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None,divider=None, itemClass=None, blank=None):
     """
     Generates a menu item and incorporates it into `wholeMenu`. This function
-    calls itself to recurse through hierarchies of menus, and uses the
-    `LEVEL_LOOKUP` variable with the `depth` parameter to give subheadings the
-    right class.
-
-    :param wholeMenu: The entire collection of menu items to which the current
-        item will be added
-    :param depth: The level of depth within the menu of the current item.
-        Defaults to 0, but is incremented upon recursion
-    :param text: Text of the menu item
-    :param iconClass: Class for the Font Awesome icon to accompany menu item
-    :param link: Link to be used as the href for the menu item
-    :param counter: What kind of thing to count and add to the menu. The value
-        of this parameter will be passed to the `functions.get_count()` function
-        and the return value will be incorporated into the menu item
-    :param section: If this parameter is set to true, the menu item will be
-        given a class for a menu section header.
-    :param children: List of child menu items to appear under this item. Items
-        should be dictionaries, with keys corresponding to the parameters of
-        this function
+    calls itself to recurse through hierarchies of menus.
     """
-    currentItem = '<li '
-    # If this item is a section header and the whole menu is empty, this is the
-    # first section header
-    if section and wholeMenu == '':
-        currentItem += 'class="sidebar-section-first"'
-    elif section:
-        currentItem += 'class="sidebar-section"'
-    currentItem += '>'
 
-    if link:
-        currentItem += '<a href="{}">'.format(link)
+    if section:
+        currentItem = '<div class="sidebar-heading">{}</div><hr class="sidebar-divider">'.format(text)
+    elif divider:
+        currentItem = '<hr class="sidebar-divider">'
+    else:
+        if text in state['breadcrumb']:
+            currentItem = '<li class="nav-item active">'
+        else:
+            currentItem = '<li class="nav-item">'
+        if children:
+            currentItem += '<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{}" aria-expanded="true" aria-controls="collapse{}">'.format(itemClass, itemClass)
+            currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
+            currentItem += '<span>{}</span></a>'.format(text)
+            if text in state['breadcrumb'] and state['sidebar'] != 'toggled':
+                currentItem += '<div id="collapse{}" class="collapse show" aria-labelledby="heading{}" data-parent="#accordionSidebar">'.format(itemClass, itemClass)
+            else:
+                currentItem += '<div id="collapse{}" class="collapse" aria-labelledby="heading{}" data-parent="#accordionSidebar">'.format(itemClass, itemClass)
+            currentItem += '<div class="bg-white py-2 collapse-inner rounded">'
+            for child in children:
+                currentItem += '<a class="collapse-item'
+                if child['text'] in state['breadcrumb']:
+                    currentItem += ' active'
 
-    if iconClass:
-        currentItem += '<i class="fa {} fa-fw"></i> '.format(iconClass)
+                currentItem += '" href="{}"'.format(child['link'])
 
-    if text:
-        currentItem += text
+                if 'blank' in child:
+                    currentItem += ' target="_blank"'
 
-    if counter:
-        counter = functions.get_count(counter)
-        currentItem += '<div class="menu-counter">{}</div>'.format(counter)
+                currentItem += '><i class="fas fa-fw {}"></i> {}</a>'.format(child['iconClass'], child['text'])
+            currentItem += '</div></div></li>'
 
-    if children:
-        # If this item has children, append an arrow to show that
-        currentItem += '<span class="fa arrow"></span>'
-
-    if link:
-        # Close the anchor tag if it was opened
-        currentItem += '</a>'
-
-    if children:
-        # If there are child items, start a new unordered list based on the
-        # depth. If depth is not defined in LEVEL_LOOKUP, that <ul> doesn't get
-        # a class, so it might look weird.
-        try:
-            currentItem += '<ul class="nav {}">'.format(LEVEL_LOOKUP[depth])
-        except IndexError:
-            print(depth)
-            currentItem += '<ul class="nav">'
-        for child in children:
-            # For each child item, provide the parameters it defines to this
-            # function, incrementing the depth
-            currentItem += sidebar_item(currentItem,depth=depth+1,**child)
-        currentItem += '</ul>'
-    currentItem += '</li>'
+        else:
+            currentItem += '<a class="nav-link" href="{}">'.format(link)
+            currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
+            currentItem += '<span>{}</span></a></li>'.format(text)
 
     return currentItem
 
-def tile_item(wholeMenu,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None):
-    currentItem = '<div class="col-lg-3 col-md-6">'
+def tile_item(wholeMenu,state,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None):
 
-    if colourClass:
-        currentItem += '<div class="panel {}">'.format(colourClass)
-
-    currentItem += '<div class="panel-heading"><div class="row"><div class="col-xs-3">'
-
-    if iconClass:
-        currentItem += '<i class="fa {} fa-5x"></i> '.format(iconClass)
-
-    currentItem += '</div><div class="col-xs-9 text-right">'
-
-    if counter:
+    try:
         counter = functions.get_count(counter)
-        currentItem += '<div class="huge">{}</div>'.format(counter)
+    except:
+        counter = 'n/a'
 
-    if counterTitle:
-        currentItem += '<div>{}</div>'.format(counterTitle)
-
-    currentItem += '</div></div></div>'
-
-    if linkTarget:
-        currentItem += '<a href="{}" target="_blank"><div class="panel-footer">'.format(linkTarget)
-
-    if linkTitle:
-        currentItem += '<span class="pull-left">{}</span>'.format(linkTitle)
-
-    currentItem += '<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span><div class="clearfix"></div></div></a></div></div>'
+    currentItem = '<div class="col-xl-3 col-sm-6 mb-3">'
+    currentItem += '<div class="card shadow text-dark-grey bg-{}-soft o-hidden h-100"><div class="card-body">'.format(colourClass)
+    currentItem += '<div class="card-body-icon"><i class="fas {} fa-comments"></i></div>'.format(iconClass)
+    currentItem += '<div class="mr-5"><b>{}</b> {}</div></div>'.format(counter, counterTitle)
+    currentItem += '<a class="card-footer text-dark-grey clearfix small z-1" href="{}">'.format(linkTarget)
+    currentItem += '<span class="float-left">{}</span>'.format(linkTitle)
+    currentItem += '<span class="float-right"><i class="fas fa-angle-right"></i></span></a></div></div>'
 
     return currentItem
 
-def dropdown_item(wholeMenu,topMenu=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,logoutMenu=None):
+def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,counter=None,circleColour=None,moreText=None,moreLink=None):
     """ creates items for the top right dropdowns """
 
-    #start this dropdown
-    currentItem = ''
-    #check if it is a top menu
+    currentItem = '<li class="nav-item dropdown no-arrow mx-1">'
     if topMenu:
-        currentItem += '<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">'
-        #add the icon
-        currentItem += '<i class="fa {} fa-fw"></i><i class="fa fa-caret-down"></i>'.format(iconClass)
-        #add the class
-        currentItem += '</a><ul class="dropdown-menu {}">'.format(itemClass)
-        #now process children
+        currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
+        currentItem += '<i class="fas {} fa-fw"></i>'.format(iconClass)
+        currentItem += '</a><div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
+        currentItem += '<h6 class="dropdown-header">{}</h6>'.format(title)
         for child in children:
-            # For each child item, provide the parameters it defines to this
-            # function, incrementing the depth
-            if childrenIconClass:
-                child['childrenIconClass'] = childrenIconClass
+            if divider:
+                currentItem += '<div class="dropdown-divider"></div>'
             else:
-                child['childrenIconClass'] = 'fa-dot-circle-o'
-            currentItem += dropdown_item(currentItem,**child)
-        #close the tags
-        currentItem += '</ul></li>'
+                currentItem += '<a class="dropdown-item" href="{}">'.format(child['link'])
+                if 'iconClass' in child:
+                    currentItem += '<i class="fas {} fa-sm fa-fw mr-2 text-gray-400"></i>{}</a>'.format(child['iconClass'], child['text'])
+                else:
+                    currentItem += '<i class="fas {} fa-sm fa-fw mr-2 text-gray-400"></i>{}</a>'.format(childrenIconClass, child['text'])
 
-    elif divider:
-        currentItem += '<li class="divider"></li>'
+        currentItem += '</div></li> '
 
-    elif section:
-        currentItem += '<li class="dropdown-section">'
-        #add icon
-        currentItem += '<i class="fa {} fa-fw"></i>'.format(iconClass)
-        #add section name
-        currentItem += '{}</li>'.format(text)
+    if infoPanel:
+        currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
+        currentItem += '<i class="fas {} fa-fw"></i>'.format(iconClass)
+        if counter:
+            currentItem += '<span class="badge badge-danger badge-counter">{}</span>'.format(counter)
+        currentItem += '</a><div class="dropdown-list dropdown-infopanel dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
+        currentItem += '<h6 class="dropdown-header">{}</h6>'.format(title)
+        for child in children:
+            currentItem += '<a class="dropdown-item d-flex align-items-center" href="{}">'.format(child['link'])
+            currentItem += '<div class="mr-3"><div class="icon-circle bg-{}"><i class="fas {} text-white"></i></div></div>'.format(child['circleColour'], child['iconClass'])
+            currentItem += '<div><div class="small text-gray-500">{}</div><span class="font-weight-bold">{}</span></div></a>'.format(child['small_text'], child['text'])
 
-    elif title:
-        currentItem += '<div class="dropdown-title">{}</div>'.format(text)
-
-    else:
-        #add link
-        currentItem += '<li><a href="{}">'.format(link)
-        #add icon
-        if iconClass:
-            itemIcon = iconClass
-        else:
-            itemIcon = childrenIconClass
-        currentItem += '<i class="fa {} fa-fw">'.format(itemIcon)
-        #add name
-        currentItem += '</i> {}</a></li>'.format(text)
+        currentItem += '<a class="dropdown-item text-center small text-gray-500" href="{}">{}</a></div></li>'.format(moreLink, moreText)
 
     return currentItem

@@ -1,0 +1,230 @@
+{% extends "dalme_app/dash_base.html" %}
+{% load staticfiles i18n %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.4/css/buttons.bootstrap4.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.4/css/fixedHeader.bootstrap4.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.bootstrap4.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/1.5.0/css/scroller.bootstrap4.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.6/css/select.bootstrap4.min.css"/>
+<link rel="stylesheet" type="text/css" href="{% static 'Editor-1.8.1/css/editor.bootstrap4.css' %}">
+
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.4/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.4/js/buttons.bootstrap4.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.4/js/buttons.colVis.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.1.4/js/dataTables.fixedHeader.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.2/js/responsive.bootstrap4.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/scroller/1.5.0/js/dataTables.scroller.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/select/1.2.6/js/dataTables.select.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+<script type="text/javascript" src="{% static 'Editor-1.8.1/js/dataTables.editor.js' %}"></script>
+<script type="text/javascript" src="{% static 'Editor-1.8.1/js/editor.bootstrap4.js' %}"></script>
+{% endblock %}
+
+{% block extra_dropdowns %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <h1 class="page_header h3 mb-2 text-gray-800">{{ page_title }}</h1>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card shadow mb-3">
+          <div class="card-header ch-primary">
+            <i class="fa fa-th-large fa-fw"></i> Content Classes
+          </div>
+          <div class="card-body table_scroller">
+            <div class="table-responsive">
+              <table class="table table-hover table_scroll" id="dataTables-classes" width="100%">
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1">
+        <div class="table_connector_col">
+        <i class="fa fa-arrow-alt-circle-right fa-lg"></i>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="card shadow mb-3">
+          <div class="card-header ch-primary">
+            <i class="fa fa-th fa-fw"></i> Content Types
+          </div>
+          <div class="card-body table_scroller">
+            <div class="table-responsive">
+              <table class="table table-hover table_scroll" id="dataTables-content" width="100%">
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="table_connector_row">
+        <i class="fa fa-arrow-alt-circle-down fa-lg"></i>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card shadow mb-4">
+          <div class="card-header ch-primary">
+              <i class="fa fa-tags fa-fw"></i> Attributes
+          </div>
+          <div class="card-body table_scroller">
+            <div class="table-responsive">
+              <table class="table table-hover table_scroll" id="dataTables-attributes" width="100%">
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+<script>
+$(document).ready(function() {
+    {% if table_editor %}
+    var editor = new $.fn.dataTable.Editor({
+      ajax: {
+        create: {
+          type: 'POST',
+          url: '{{ table_editor.ajax_url | safe }}',
+          headers: {'X-CSRFToken': '{{csrf_token}}' }
+        },
+        edit: {
+          type: 'PUT',
+          url: '{{ table_editor.ajax_url | safe }}_id_/',
+          headers: {'X-CSRFToken': '{{csrf_token}}' }
+        },
+        remove: {
+          type: 'DELETE',
+          url: '{{ table_editor.ajax_url | safe }}_id_/',
+          headers: {'X-CSRFToken': '{{csrf_token}}' }
+        }
+        },
+      table: '#dataTables-list',
+      idSrc:  {{ table_editor.idSrc | safe }},
+      fields: [
+        {% for i in table_editor.fields %}
+        {
+          {% for k,v in i.items %}
+            {% if k == 'options' %}
+              options: [
+              {% for o in v %}
+                {
+                {% for l,p in o.items %}
+                  {{ l | safe }}: "{{ p | safe }}",
+                {% endfor %}
+                },
+              {% endfor %}
+              ],
+            {% else %}
+              {{ k | safe }}: "{{ v | safe }}",
+            {% endif %}
+          {% endfor %}
+        },
+        {% endfor %}
+      ]
+    });
+    {% endif %}
+    var table_content = $('#dataTables-content').DataTable({
+        {% if table_options_content %}
+          {% for key,value in table_options_content.items %}
+            {{ key | safe }}: {{ value | safe }},
+          {% endfor %}
+        {% endif %}
+        {% if table_buttons_content %}
+          buttons: [
+          {% for i in table_buttons_content %}
+            {{ i | safe }},
+          {% endfor %}
+        ],
+        {% endif %}
+        {% if columnDefs_content %}
+          columnDefs:[
+          {% for dict in columnDefs_content %}
+          {
+            {% for row,prop in dict.items %}
+              "{{ row }}": {{ prop | safe }},
+            {% endfor %}
+          },
+          {% endfor %}
+          ]
+        {% endif %}
+    });
+    var table_attributes = $('#dataTables-attributes').DataTable({
+        {% if table_options_attributes %}
+          {% for key,value in table_options_attributes.items %}
+            {{ key | safe }}: {{ value | safe }},
+          {% endfor %}
+        {% endif %}
+        {% if table_buttons_attributes %}
+          buttons: [
+          {% for i in table_buttons_attributes %}
+            {{ i | safe }},
+          {% endfor %}
+        ],
+        {% endif %}
+        {% if columnDefs_attributes %}
+          columnDefs:[
+          {% for dict in columnDefs_attributes %}
+          {
+            {% for row,prop in dict.items %}
+              "{{ row }}": {{ prop | safe }},
+            {% endfor %}
+          },
+          {% endfor %}
+          ]
+        {% endif %}
+    });
+    var table_classes = $('#dataTables-classes').DataTable({
+        {% if table_options_classes %}
+          {% for key,value in table_options_classes.items %}
+            {{ key | safe }}: {{ value | safe }},
+          {% endfor %}
+        {% endif %}
+        {% if table_buttons_classes %}
+          buttons: [
+          {% for i in table_buttons_classes %}
+            {{ i | safe }},
+          {% endfor %}
+        ],
+        {% endif %}
+        {% if columnDefs_classes %}
+          columnDefs:[
+          {% for dict in columnDefs_classes %}
+          {
+            {% for row,prop in dict.items %}
+              "{{ row }}": {{ prop | safe }},
+            {% endfor %}
+          },
+          {% endfor %}
+          ]
+        {% endif %}
+    });
+
+    table_classes
+      .on( 'select', function ( e, dt, type, indexes ) {
+          table_content.ajax.url("../api/models/?format=json&type=content&st=" + dt.id()).draw();
+      } )
+      .on( 'deselect', function ( e, dt, type, indexes ) {
+          table_content.ajax.url("../api/models/?format=json&type=content").draw();;
+      } );
+
+    table_content
+      .on( 'select', function ( e, dt, type, indexes ) {
+          table_attributes.ajax.url("../api/models/?format=json&type=attributes&st=" + dt.id()).draw();
+      } )
+      .on( 'deselect', function ( e, dt, type, indexes ) {
+          table_attributes.ajax.url("../api/models/?format=json&type=attributes").draw();;
+      } );
+});
+</script>
+{% endblock %}

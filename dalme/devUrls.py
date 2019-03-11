@@ -14,6 +14,7 @@ router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='source')
 router.register(r'users', apis.Users, basename='user')
 router.register(r'notifications', apis.Notifications, basename='notification')
+router.register(r'models', apis.Models, basename='model')
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -26,8 +27,8 @@ urlpatterns = [
     re_path(r'^', include('dalme_app.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns = [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+#if settings.DEBUG:
+#    import debug_toolbar
+#    urlpatterns = [
+#        path('__debug__/', include(debug_toolbar.urls)),
+#    ] + urlpatterns

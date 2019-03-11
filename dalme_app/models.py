@@ -19,12 +19,17 @@ import os
 from datetime import datetime
 import requests
 import logging
+logger = logging.getLogger(__name__)
 
 from dalme_app.modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
-from dalme_app.scripts.db import wp_db, wiki_db, dam_db
-from dalme_app.scripts.dam import rs_api_query
 
-logger = logging.getLogger(__name__)
+try:
+    from dalme_app.scripts.db import wp_db, wiki_db, dam_db
+    from dalme_app.scripts.dam import rs_api_query
+except:
+    logger.debug("Can't connect to MySQL instance containing Wiki, DAM, and WP databases.")
+
+
 
 #function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():
@@ -67,6 +72,7 @@ class Profile(models.Model):
     wiki_groups = models.CharField(max_length=255, null=True)
     wp_userid = models.IntegerField(null=True)
     wp_role = models.CharField(max_length=50, null=True, choices=WP_ROLE)
+    wp_avatar_url = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.user.username
@@ -507,12 +513,6 @@ class Source(dalmeUuid):
     def get_absolute_url(self):
         return reverse('source_detail', kwargs={'pk':self.pk})
 
-    #@property
-    #def att_blob(self):
-    #    blob = []
-    #    for a in self.attributes.all():
-    #        blob.append(str(a))
-    #    return blob
 
 class Page(dalmeUuid):
     sources = models.ManyToManyField(

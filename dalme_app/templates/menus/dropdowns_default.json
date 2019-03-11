@@ -1,93 +1,57 @@
 [
   {
     "topMenu": true,
-    "itemClass": "dropdown-scripts",
-    "iconClass": "fa-gear",
-    "childrenIconClass": "fa-gears",
+    "itemClass": "tools",
+    "iconClass": "fa-tools",
+    "title": "Tools",
     "children": [
           {
-            "title": true,
-            "text": "Admin"
+            "text": "Wiki",
+            "link": "https://wiki.dalme.org",
+            "iconClass": "fa-file-alt"
           },
           {
-            "divider": true
+            "text": "DAM",
+            "link": "https://dam.dalme.org",
+            "iconClass": "fa-image"
           },
           {
-            "text": "Import Sources CSV",
-            "link": "/script/import_sources_csv"
-          },
-          {
-            "text": "Test Expression",
-            "link": "/script/test_expression"
-          },
-          {
-            "text": "Show Session Information",
-            "link": "/script/session_info"
-          },
-          {
-            "text": "IIIF Viewer Test (Diva.js)",
-            "link": "/iiif/diva"
-          },
-          {
-            "text": "IIIF Viewer Test (Mirador)",
-            "link": "/iiif/mirador"
+            "text": "Website",
+            "link": "https://dalme.org",
+            "iconClass": "fa-globe"
           }
         ]
     },
     {
-      "topMenu": true,
-      "itemClass": "dropdown-ref",
-      "iconClass": "fa-list-alt",
-      "childrenIconClass": "fa-dot-circle-o",
+      "infoPanel": true,
+      "itemClass": "alerts",
+      "iconClass": "fa-bell",
+      "title": "Alerts Center",
+      "counter": "3+",
+      "moreText": "Show All Alerts",
+      "moreLink": "#",
       "children": [
-        {
-          "title": true,
-          "text": "UI Reference"
-        },
-        {
-          "text": "Dashboard Content",
-          "link": "/UIref/dash_demo"
-        },
-        {
-          "text": "Panels and Wells",
-          "link": "/UIref/panels-wells"
-        },
-        {
-          "text": "Buttons",
-          "link": "/UIref/buttons"
-        },
-        {
-          "text": "Notifications",
-          "link": "/UIref/notifications"
-        },
-        {
-          "text": "Typography",
-          "link": "/UIref/typography"
-        },
-        {
-          "text": "Icons",
-          "link": "/UIref/icons"
-        },
-        {
-          "text": "Grid",
-          "link": "/UIref/grid"
-        },
-        {
-          "text": "Tables",
-          "link": "/UIref/tables"
-        },
-        {
-          "text": "Flot Charts",
-          "link": "/UIref/flot"
-        },
-        {
-          "text": "Morris.js Charts",
-          "link": "/UIref/morris"
-        },
-        {
-          "text": "Forms",
-          "link": "/UIref/forms"
-        }
-      ]
-  }
+            {
+              "small_text": "December 12, 2019",
+              "text": "A new monthly report is ready to download!",
+              "iconClass": "fa-file-alt",
+              "circleColour": "primary",
+              "link": "#"
+            },
+            {
+              "small_text": "December 7, 2019",
+              "text": "$290.29 has been deposited into your account!",
+              "iconClass": "fa-donate",
+              "circleColour": "success",
+              "link": "#"
+            },
+            {
+              "small_text": "December 2, 2019",
+              "text": "Spending Alert: We've noticed unusually high spending for your account.",
+              "iconClass": "fa-exclamation-triangle",
+              "circleColour": "warning",
+              "link": "#"
+            }
+          ]
+      }
 ]
