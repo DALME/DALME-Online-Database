@@ -27,7 +27,7 @@ AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
 AWS_REGION = os.environ['AWS_DEFAULT_REGION']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # Allow all host headers
 ALLOWED_HOSTS = ['dalme.org']
