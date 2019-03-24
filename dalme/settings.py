@@ -30,7 +30,7 @@ AWS_REGION = os.environ['AWS_DEFAULT_REGION']
 DEBUG = True
 
 # Allow all host headers
-ALLOWED_HOSTS = ['dalme.org']
+ALLOWED_HOSTS = ['db.dalme.org']
 
 # Application definition
 
