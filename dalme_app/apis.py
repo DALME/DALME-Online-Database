@@ -2,283 +2,143 @@
 from django.contrib.auth.models import User
 from django.db.models import Q, Count, F, Prefetch
 import re, requests, uuid, os, datetime, json
-from rest_framework import viewsets, status
-from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer
+from rest_framework import viewsets, status, views
+from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer, TranscriptionSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.models import (Attribute_type, Attribute, Attribute_DATE, Attribute_DBR, Attribute_INT,
-Attribute_STR, Attribute_TXT, Content_class, Content_type, Content_type_x_attribute_type,
-Content_list, Content_list_x_content_type, Source, Profile, Notification)
+from dalme_app.models import *
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 
 
-class Sources(viewsets.ViewSet):
+class Transcriptions(viewsets.ViewSet):
     """
-    API Endpoint for viewing and editing sources.
+    API endpoint for managing transcriptions
     """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Transcription.objects.none()
+
+    def retrieve(self, request, pk=None):
+        source_id = self.request.GET['s']
+        page_id = self.request.GET['p']
+        try:
+            transcription_id = Source_pages.objects.get(source_id=source_id,page_id=page_id).transcription_id
+            queryset = Transcription.objects.all()
+            transcription = get_object_or_404(queryset, pk=transcription_id)
+            serializer = TranscriptionSerializer(transcription)
+            data = serializer.data
+        except:
+            data = ''    
+
+        return Response(data)
+
+
+class Models(viewsets.ViewSet):
+    """
+    API endpoint for managing notifications
+    """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Content_type.objects.none()
 
     def list(self, request, *args, **kwargs):
-        #get basic parameters from Datatables Ajax request
-        draw = self.request.GET['draw'] #draw number - to allow DT to match requests to responses
-        start = int(self.request.GET['start']) #starting record
-        length = int(self.request.GET['length']) #number of records to be displayed
-        if self.request.GET['search[value]'] != '':
-            search_string = self.request.GET['search[value]'].lower() #global search value to be applied to all columns with searchable=true
-        else:
-            search_string = None
-        order_column_idx = self.request.GET['order[0][column]']
-        order_dir = self.request.GET['order[0][dir]']
-        order_column_name = self.request.GET['columns['+order_column_idx+'][data]']
-        if order_dir == 'desc':
-            order_column_name = '-'+order_column_name
-        #calculate limit for queryset, i.e. upper number of Python range
-        limit = start + length
-        #create a dictionary that will be returned as JSON + add the "draw" return value
-        #cast it as INT to prevent Cross Site Scripting (XSS) attacks
-        data_dict = {}
-        data_dict['draw'] = int(draw)
-        #check if type of list is set
-        if 'type' in self.request.GET:
+        try:
             type = self.request.GET['type']
-            list_type = Content_list.objects.get(short_name=type)
-            def_headers = list_type.default_headers.split(',')
-            if list_type.extra_headers:
-                extra_headers = list_type.extra_headers.split(',')
-            else:
-                extra_headers = []
-
-            q_obj = Q()
-
-            if type == 'inventories':
-                #get ALL HEADERS
-                att_l = Content_type_x_attribute_type.objects.filter(content_type=13).select_related('attribute_type')
-                #create query
-                q_obj &= Q(is_inventory=True)
-
-            else:
-                #get ALL HEADERS
-                content_types = Content_list_x_content_type.objects.filter(content_list=list_type.pk).select_related('content_type')
-                q = Q()
-                for c in content_types:
-                    q |= Q(content_type=c.content_type)
-
-                att_l = Content_type_x_attribute_type.objects.filter(q).select_related('attribute_type')
-                #create query
-                filters = []
-                for i in content_types:
-                    filters.append(i.content_type)
-
-                for filter in filters:
-                    q_obj |= Q(type=filter)
-
-        #if list type is not set, then the request is for all sources
-        else:
-            def_headers = ['15']
-            extra_headers = ['type']
-            #get ALL HEADERS
-            att_l = Content_type_x_attribute_type.objects.filter(content_type__content_class=1).select_related('attribute_type')
-            #create query
-            q_obj = ~Q(pk=None)
-
-        #create attribute dictionary
-        att_dict = {}
-        #for a in att_l:
-        #        if a.attribute_type.short_name not in att_dict:
-        #            att_dict[a.attribute_type.short_name] = [a.attribute_type.name,a.attribute_type.data_type,str(a.attribute_type_id)]
-
-        for a in att_l:
-                if a.attribute_type.short_name not in att_dict:
-                    att_dict[a.attribute_type.short_name] = [a.attribute_type.name,a.attribute_type.data_type,str(a.attribute_type_id)]
-
-        extra_dict = {}
-        for k,v in att_dict.items():
-            extra_dict[k] = 'SELECT dalme_app_attribute_'+v[1].lower()+'.value FROM dalme_app_attribute_'+v[1].lower()+' JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_'+v[1].lower()+'.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = '+v[2]
-
-        #filter_on_search
-        if search_string:
-            search_words = search_string.split()
-            if search_words[0][-1:] == ':' and search_words[0][0:-1] in att_dict:
-                search_col = search_words[0][0:-1]
-                search_words.pop(0)
-                search_q = Q()
-                for word in search_words:
-                    search_word = Q(search_field__startswith=word)
-                    search_q &= search_word
-
-                target_table = 'dalme_app_attribute_'+att_dict[search_col][1].lower()
-                target_field = target_table+'.value'
-                target_table_index = target_table+'.attribute_id_id'
-                att_type_id = att_dict[search_col][2]
-                queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(search_field=RawSQL('SELECT '+ target_field +' FROM '+ target_table +' JOIN dalme_app_attribute ON dalme_app_attribute.id = '+ target_table_index +' JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = %s', [att_type_id])).filter(search_q).order_by(order_column_name)
-
-            else:
-                search_q = Q()
-                for word in search_words:
-                    search_word = Q(name__icontains=word) | Q(att_blob__icontains=word)
-                    if 'type' in extra_headers: search_word |= Q(type__name__icontains=word)
-                    if 'parent_source' in extra_headers: search_word |= Q(parent_source__name__icontains=word)
-                    search_q &= search_word
-
-                queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute_str.value SEPARATOR ",") FROM dalme_app_attribute_str JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_str.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q).order_by(order_column_name)
-
-        else:
-            queryset = Source.objects.filter(q_obj).extra(select=extra_dict).order_by(order_column_name)
-
-        #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
-        rec_count = queryset.count()
-        data_dict['recordsTotal'] = rec_count
-        data_dict['recordsFiltered'] = rec_count
-        #filter the queryset for the current page
-        queryset = queryset[start:limit]
-        #create an array of fields present in the dataset. This will be used to dynamically filter the fields in the serializer
-        fields = ['id','name']
-        if extra_headers:
-            for i in extra_headers:
-                fields.append(i)
-
-        for id, names in att_dict.items():
-            fields.append(id)
-
-        serializer = SourceSerializer(queryset, many=True, fields=fields)
-        data = serializer.data
-        data_dict['data'] = data
-
-        return Response(data_dict)
-
-class Users(viewsets.ViewSet):
-    """
-    API Endpoint for viewing and editing users.
-    """
-
-    def list(self, request, *args, **kwargs):
+        except:
+            type = ''
+        try:
+            subtype = self.request.GET['st']
+        except:
+            subtype = ''
         #get basic parameters from Datatables Ajax request
-        draw = self.request.GET['draw'] #draw number - to allow DT to match requests to responses
-        start = int(self.request.GET['start']) #starting record
-        length = int(self.request.GET['length']) #number of records to be displayed
-        if self.request.GET['search[value]'] != '':
-            search_string = self.request.GET['search[value]'].lower() #global search value to be applied to all columns with searchable=true
-        else:
-            search_string = None
-        order_column_idx = self.request.GET['order[0][column]']
-        order_dir = self.request.GET['order[0][dir]']
-        order_column_name = self.request.GET['columns['+order_column_idx+'][data]']
-        if order_dir == 'desc':
-            order_column_name = '-'+order_column_name
-        #calculate limit for queryset, i.e. upper number of Python range
-        limit = start + length
+        dt_para = get_dt_parameters(request)
         #create a dictionary that will be returned as JSON + add the "draw" return value
         #cast it as INT to prevent Cross Site Scripting (XSS) attacks
         data_dict = {}
-        data_dict['draw'] = int(draw)
-
-        #filter_on_search
-        if search_string:
-            search_words = search_string.split()
-            if search_words[0][-1:] == ':' and search_words[0][0:-1] in att_dict:
-                search_col = search_words[0][0:-1]
-                search_words.pop(0)
-                search_q = Q()
-                for word in search_words:
-                    search_word = Q(search_field__startswith=word)
-                    search_q &= search_word
-
-                target_table = 'dalme_app_attribute_'+att_dict[search_col][1].lower()
-                target_field = target_table+'.value'
-                target_table_index = target_table+'.attribute_id_id'
-                att_type_id = att_dict[search_col][2]
-                queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(search_field=RawSQL('SELECT '+ target_field +' FROM '+ target_table +' JOIN dalme_app_attribute ON dalme_app_attribute.id = '+ target_table_index +' JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = %s', [att_type_id])).filter(search_q).order_by(order_column_name)
-
-            else:
-                search_q = Q()
-                for word in search_words:
-                    search_word = Q(name__icontains=word) | Q(att_blob__icontains=word)
-                    if 'type' in extra_headers: search_word |= Q(type__name__icontains=word)
-                    if 'parent_source' in extra_headers: search_word |= Q(parent_source__name__icontains=word)
-                    search_q &= search_word
-
-                queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute_str.value SEPARATOR ",") FROM dalme_app_attribute_str JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_str.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q).order_by(order_column_name)
-
-        else:
-            queryset = Profile.objects.all().order_by(order_column_name)
-
-        #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
-        rec_count = queryset.count()
-        data_dict['recordsTotal'] = rec_count
-        data_dict['recordsFiltered'] = rec_count
-        #filter the queryset for the current page
-        queryset = queryset[start:limit]
-        serializer = ProfileSerializer(queryset, many=True)
-        data = serializer.data
-        data_dict['data'] = data
+        data_dict['draw'] = int(dt_para['draw'])
+        try:
+            queryset = self.get_qset(type=type, subtype=subtype)
+            #queryset = queryset.order_by(dt_para['order'])
+            #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
+            rec_count = queryset.count()
+            data_dict['recordsTotal'] = rec_count
+            data_dict['recordsFiltered'] = rec_count
+            #filter the queryset for the current page
+            queryset = queryset[dt_para['start']:dt_para['limit']]
+            data_dict['data'] = self.serialize_queryset(queryset=queryset, type=type, subtype=subtype)
+        except Exception as e:
+            data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
 
         return Response(data_dict)
+
+    def get_qset(self, *args, **kwargs):
+        type = kwargs['type']
+        subtype = kwargs['subtype']
+        if type == 'classes':
+            queryset = Content_class.objects.all()
+
+        elif type == 'content':
+            if subtype == '':
+                queryset = Content_type.objects.all()
+            else:
+                queryset = Content_type.objects.filter(content_class=subtype)
+
+        elif type == 'attributes':
+            if subtype == '':
+                queryset = Attribute_type.objects.all()
+            else:
+                queryset = Content_attributes.objects.filter(content_type_id=subtype).order_by('order')
+
+        return queryset
+
+    def serialize_queryset(self, *args, **kwargs):
+        queryset = kwargs['queryset']
+        type = kwargs['type']
+        subtype = kwargs['subtype']
+        if type == 'classes':
+            serializer = ContentClassSerializer(queryset, many=True)
+        elif type == 'content':
+            serializer = ContentTypeSerializer(queryset, many=True)
+        elif type == 'attributes':
+            if subtype == '':
+                serializer = AttributeTypeSerializer(queryset, many=True)
+            else:
+                serializer = ContentXAttributeSerializer(queryset, many=True)
+
+        data = serializer.data
+        return data
 
 class Notifications(viewsets.ViewSet):
     """
-    API Endpoint for viewing and editing notifications and error messages.
+    API endpoint for managing notifications
     """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Notification.objects.all()
 
     def list(self, request, *args, **kwargs):
         #get basic parameters from Datatables Ajax request
-        draw = self.request.GET['draw'] #draw number - to allow DT to match requests to responses
-        start = int(self.request.GET['start']) #starting record
-        length = int(self.request.GET['length']) #number of records to be displayed
-        if self.request.GET['search[value]'] != '':
-            search_string = self.request.GET['search[value]'].lower() #global search value to be applied to all columns with searchable=true
-        else:
-            search_string = None
-        order_column_idx = self.request.GET['order[0][column]']
-        order_dir = self.request.GET['order[0][dir]']
-        order_column_name = self.request.GET['columns['+order_column_idx+'][data]']
-        if order_dir == 'desc':
-            order_column_name = '-'+order_column_name
-        #calculate limit for queryset, i.e. upper number of Python range
-        limit = start + length
+        dt_para = get_dt_parameters(request)
+        fields = ['code','level','type','text']
         #create a dictionary that will be returned as JSON + add the "draw" return value
         #cast it as INT to prevent Cross Site Scripting (XSS) attacks
         data_dict = {}
-        data_dict['draw'] = int(draw)
-
-        #filter_on_search
-        if search_string:
-            search_words = search_string.split()
-            if search_words[0][-1:] == ':' and search_words[0][0:-1] in att_dict:
-                search_col = search_words[0][0:-1]
-                search_words.pop(0)
-                search_q = Q()
-                for word in search_words:
-                    search_word = Q(search_field__startswith=word)
-                    search_q &= search_word
-
-                target_table = 'dalme_app_attribute_'+att_dict[search_col][1].lower()
-                target_field = target_table+'.value'
-                target_table_index = target_table+'.attribute_id_id'
-                att_type_id = att_dict[search_col][2]
-                queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(search_field=RawSQL('SELECT '+ target_field +' FROM '+ target_table +' JOIN dalme_app_attribute ON dalme_app_attribute.id = '+ target_table_index +' JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = %s', [att_type_id])).filter(search_q).order_by(order_column_name)
-
-            else:
-                search_q = Q()
-                for word in search_words:
-                    search_word = Q(name__icontains=word) | Q(att_blob__icontains=word)
-                    if 'type' in extra_headers: search_word |= Q(type__name__icontains=word)
-                    if 'parent_source' in extra_headers: search_word |= Q(parent_source__name__icontains=word)
-                    search_q &= search_word
-
-                queryset = Source.objects.filter(q_obj).extra(select=extra_dict).annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute_str.value SEPARATOR ",") FROM dalme_app_attribute_str JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_str.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q).order_by(order_column_name)
-
-        else:
-            queryset = Notification.objects.all().order_by(order_column_name)
-
-        #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
-        rec_count = queryset.count()
-        data_dict['recordsTotal'] = rec_count
-        data_dict['recordsFiltered'] = rec_count
-        #filter the queryset for the current page
-        queryset = queryset[start:limit]
-        serializer = NotificationSerializer(queryset, many=True)
-        data = serializer.data
-        data_dict['data'] = data
+        data_dict['draw'] = int(dt_para['draw'])
+        try:
+            queryset = self.queryset
+            if dt_para['search_string']:
+                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
+            queryset = queryset.order_by(dt_para['order'])
+            #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
+            rec_count = queryset.count()
+            data_dict['recordsTotal'] = rec_count
+            data_dict['recordsFiltered'] = rec_count
+            #filter the queryset for the current page
+            queryset = queryset[dt_para['start']:dt_para['limit']]
+            serializer = NotificationSerializer(queryset, many=True)
+            data = serializer.data
+            data_dict['data'] = data
+        except Exception as e:
+            data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
 
         return Response(data_dict)
 
@@ -324,7 +184,7 @@ class Notifications(viewsets.ViewSet):
 
         return Response(result)
 
-    def update(self, request, pk=None, format=None):
+    def update(self, pk=None, format=None):
         data = request.data
         data_dict = {}
         pattern = re.compile(r'\[([a-z0-9]+)\]', re.IGNORECASE)
@@ -360,7 +220,7 @@ class Notifications(viewsets.ViewSet):
 
         return Response(result)
 
-    def destroy(self, request, pk=None, format=None):
+    def destroy(self, pk=None, format=None):
         ids = self.kwargs.get('pk').split(',')
         q = Q()
         for i in ids:
@@ -376,70 +236,279 @@ class Notifications(viewsets.ViewSet):
             result = 'nope'
         return Response(result)
 
-class Models(viewsets.ViewSet):
+    def filter_on_search(self, *args, **kwargs):
+        search_string = kwargs['search_string']
+        queryset = kwargs['queryset']
+        fields = kwargs['fields']
+        search_words = search_string.split()
+        search_q = Q()
+
+        if search_words[0][-1:] == ':' and search_words[0][0:-1] in fields:
+            search_col = search_words[0][0:-1]
+            search_words.pop(0)
+            for word in search_words:
+                search_word = Q(**{'%s__istartswith' % search_col: word})
+                search_q &= search_word
+        else:
+            search_q = Q()
+            for word in search_words:
+                for f in fields:
+                    search_word = Q(**{'%s__icontains' % f: word})
+                    search_q |= search_word
+
+        queryset = queryset.filter(search_q)
+
+        return queryset
+
+class Users(viewsets.ViewSet):
     """
-    API Endpoint for viewing and editing content types, classes, and attributes.
+    API endpoint for managing users
     """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Profile.objects.all()
 
     def list(self, request, *args, **kwargs):
         #get basic parameters from Datatables Ajax request
-        draw = self.request.GET['draw'] #draw number - to allow DT to match requests to responses
-        if self.request.GET['search[value]'] != '':
-            search_string = self.request.GET['search[value]'].lower() #global search value to be applied to all columns with searchable=true
-        else:
-            search_string = None
-        order_column_idx = self.request.GET['order[0][column]']
-        order_dir = self.request.GET['order[0][dir]']
-        order_column_name = self.request.GET['columns['+order_column_idx+'][data]']
-        if order_dir == 'desc':
-            order_column_name = '-'+order_column_name
+        dt_para = get_dt_parameters(request)
+        profile_fields = ['full_name','dam_usergroup','dam_userid','wiki_groups','wiki_userid','wiki_username','wp_userid','wp_role','wp_avatar_url']
+        user_fields = ['last_login','is_superuser','username','first_name','last_name','email','is_staff','is_active','date_joined']
         #create a dictionary that will be returned as JSON + add the "draw" return value
         #cast it as INT to prevent Cross Site Scripting (XSS) attacks
         data_dict = {}
-        data_dict['draw'] = int(draw)
-        if 'type' in self.request.GET:
-            type = self.request.GET['type']
-            if type == 'classes':
-                queryset = Content_class.objects.all().order_by(order_column_name)
-                rec_count = queryset.count()
-                data_dict['recordsTotal'] = rec_count
-                data_dict['recordsFiltered'] = rec_count
-                serializer = ContentClassSerializer(queryset, many=True)
-
-            elif type == 'content':
-                if 'st' in self.request.GET:
-                    st = self.request.GET['st']
-                    queryset = Content_type.objects.filter(content_class=st).order_by('id')
-                    rec_count = queryset.count()
-                    data_dict['recordsTotal'] = rec_count
-                    data_dict['recordsFiltered'] = rec_count
-                    serializer = ContentTypeSerializer(queryset, many=True)
-                else:
-                    queryset = Content_type.objects.all().order_by('id')
-                    rec_count = queryset.count()
-                    data_dict['recordsTotal'] = rec_count
-                    data_dict['recordsFiltered'] = rec_count
-                    serializer = ContentTypeSerializer(queryset, many=True)
-
-            elif type == 'attributes':
-                if 'st' in self.request.GET:
-                    st = self.request.GET['st']
-                    queryset = Content_type_x_attribute_type.objects.filter(content_type_id=st).select_related('attribute_type').order_by('order')
-                    rec_count = queryset.count()
-                    data_dict['recordsTotal'] = rec_count
-                    data_dict['recordsFiltered'] = rec_count
-                    serializer = ContentXAttributeSerializer(queryset, many=True)
-                else:
-                    queryset = Attribute_type.objects.all().order_by('id')
-                    rec_count = queryset.count()
-                    data_dict['recordsTotal'] = rec_count
-                    data_dict['recordsFiltered'] = rec_count
-                    serializer = AttributeTypeSerializer(queryset, many=True)
-            else:
-                error = 'No type defined.'
-                return Response(error)
-
-        data = serializer.data
-        data_dict['data'] = data
+        data_dict['draw'] = int(dt_para['draw'])
+        try:
+            queryset = self.queryset
+            if dt_para['search_string']:
+                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], profile_fields=profile_fields, user_fields=user_fields)
+            queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para, user_fields=user_fields)
+            #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
+            rec_count = queryset.count()
+            data_dict['recordsTotal'] = rec_count
+            data_dict['recordsFiltered'] = rec_count
+            #filter the queryset for the current page
+            queryset = queryset[dt_para['start']:dt_para['limit']]
+            serializer = ProfileSerializer(queryset, many=True)
+            data = serializer.data
+            data_dict['data'] = data
+        except Exception as e:
+            data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
 
         return Response(data_dict)
+
+    def filter_on_search(self, *args, **kwargs):
+        search_string = kwargs['search_string']
+        queryset = kwargs['queryset']
+        profile_fields = kwargs['profile_fields']
+        user_fields = kwargs['user_fields']
+        search_words = search_string.split()
+        search_q = Q()
+
+
+        if search_words[0][-1:] == ':':
+            search_col = search_words[0][0:-1]
+            if search_col in profile_fields:
+                search_words.pop(0)
+                for word in search_words:
+                    search_word = Q(**{'%s__istartswith' % search_col: word})
+                    search_q &= search_word
+
+            elif search_col in user_fields:
+                search_words.pop(0)
+                for word in search_words:
+                    field = 'user__'+search_col
+                    search_word = search_word = Q(**{'%s__istartswith' % field: word})
+                    search_q &= search_word
+
+        else:
+            search_q = Q()
+            for word in search_words:
+                for f in profile_fields:
+                    search_word = Q(**{'%s__istartswith' % f: word})
+                    search_q |= search_word
+
+                for f in user_fields:
+                    field = 'user__'+f
+                    search_word = Q(**{'%s__istartswith' % field: word})
+                    search_q |= search_word
+
+        queryset = queryset.filter(search_q)
+
+        return queryset
+
+    def get_ordered_queryset(self, *args, **kwargs):
+        queryset = kwargs['queryset']
+        user_fields = kwargs['user_fields']
+        dt_para = kwargs['dt_para']
+        order_column_name = dt_para['order_column_name']
+        order_dir = dt_para['order_dir']
+        order = dt_para['order']
+        if order_column_name in user_fields:
+            order = 'user__'+order_column_name
+            if order_dir == 'desc':
+                order = '-'+order
+
+        queryset = queryset.order_by(order)
+
+        return queryset
+
+
+class Sources(viewsets.ViewSet):
+    """
+    API endpoint for managing sources
+    """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Source.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        try:
+            type = self.request.GET['type']
+        except:
+            type = ''
+        fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes')
+        if type == 'inventories':
+            fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes', 'no_folios')
+        else:
+            fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes')
+        #get basic parameters from Datatables Ajax request
+        dt_para = get_dt_parameters(request)
+        #create a dictionary that will be returned as JSON + add the "draw" return value
+        #cast it as INT to prevent Cross Site Scripting (XSS) attacks
+        data_dict = {}
+        data_dict['draw'] = int(dt_para['draw'])
+        try:
+            queryset = self.get_qset(type=type)
+            if dt_para['search_string']:
+                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'])
+            queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para)
+            #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
+            rec_count = queryset.count()
+            data_dict['recordsTotal'] = rec_count
+            data_dict['recordsFiltered'] = rec_count
+            #filter the queryset for the current page
+            queryset = queryset[dt_para['start']:dt_para['limit']]
+            serializer = SourceSerializer(queryset, many=True, fields=fields)
+            data = serializer.data
+            data_dict['data'] = data
+        except Exception as e:
+            data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+
+        return Response(data_dict)
+
+    def retrieve(self, pk=None):
+        queryset = Source.objects.all()
+        source = get_object_or_404(queryset, pk=pk)
+        serializer = SourceSerializer(source)
+        return Response(serializer.data)
+
+    def get_qset(self, *args, **kwargs):
+        type = kwargs.get('type')
+        queryset = self.queryset
+        q_obj = Q()
+        if type != '':
+            if type == 'inventories':
+                q_obj &= Q(is_inventory=True)
+                queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages'))
+
+            else:
+                content_types = Content_list.objects.get(short_name=type).content_types.all()
+                for i in content_types:
+                    q_obj |= Q(type=i.pk)
+                queryset = queryset.filter(q_obj)
+
+        return queryset
+
+    def filter_on_search(self, *args, **kwargs):
+        search_string = kwargs['search_string']
+        queryset = kwargs['queryset']
+        search_words = search_string.split()
+        search_q = Q()
+        kwsearch = False
+        if search_words[0][-1:] == ':':
+            try:
+                search_col = search_words[0][0:-1]
+                att_type = Attribute_type.objects.get(short_name=search_col)
+                #local_fields = ['id','type','name','short_name','parent_source','is_inventory']
+                kwsearch = True
+            except:
+                kwsearch = False
+
+        if kwsearch:
+            att_type_id = att_type.id
+            att_dt = att_type.data_type
+            search_words.pop(0)
+            for word in search_words:
+                search_word = Q(search_field__istartswith=word)
+                search_q &= search_word
+
+            att_type_id = att_type.id
+            att_dt = att_type.data_type
+            if att_dt == 'DATE':
+                target_field = 'value_STR'
+            else:
+                target_field = 'value_'+ att_dt
+
+            queryset = queryset.annotate(search_field=RawSQL('SELECT '+ target_field +' FROM dalme_app_attribute JOIN dalme_app_source src2 ON dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = %s',[att_type_id])).filter(search_q)
+
+        else:
+            search_q = Q()
+            for word in search_words:
+                search_word = Q(name__icontains=word) | Q(type__name__icontains=word) | Q(parent_source__name__icontains=word) | Q(att_blob__icontains=word)
+                search_q &= search_word
+
+            queryset = queryset.annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute.value_STR SEPARATOR ",") FROM dalme_app_attribute JOIN dalme_app_source src2 ON dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q)
+
+        return queryset
+
+    def get_ordered_queryset(self, *args, **kwargs):
+        queryset = kwargs['queryset']
+        dt_para = kwargs['dt_para']
+        order_column_name = dt_para['order_column_name']
+        order_dir = dt_para['order_dir']
+        order = dt_para['order']
+        local_fields = ['id','type','name','short_name','parent_source','is_inventory', 'no_folios']
+
+        if order_column_name not in local_fields:
+            att_type = Attribute_type.objects.get(short_name=order_column_name)
+            att_type_id = att_type.id
+            att_dt = att_type.data_type
+            if att_dt == 'DATE':
+                target_field = 'value_STR'
+            else:
+                target_field = 'value_'+ att_dt
+
+            queryset = queryset.annotate(ord_field=RawSQL('SELECT '+ target_field +' FROM dalme_app_attribute JOIN dalme_app_source src2 ON dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = %s',[att_type_id]))
+            if order_dir == 'desc':
+                order = '-ord_field'
+            else:
+                order = 'ord_field'
+
+        queryset = queryset.order_by(order)
+
+        return queryset
+
+
+def get_dt_parameters(request):
+    para_dict = {}
+    para_dict['draw'] = request.GET['draw'] #draw number - to allow DT to match requests to responses
+    para_dict['start'] = int(request.GET['start']) #starting record
+    length = int(request.GET['length']) #number of records to be displayed
+    #calculate limit for queryset, i.e. upper number of Python range
+    para_dict['limit'] = para_dict['start'] + length
+    if request.GET['search[value]'] != '':
+        search_string = request.GET['search[value]'] #global search value to be applied to all columns with searchable=true
+    else:
+        search_string = None
+    para_dict['search_string'] = search_string
+    order_column_idx = request.GET['order[0][column]']
+    order_dir = request.GET['order[0][dir]']
+    order_column_name = request.GET['columns['+order_column_idx+'][data]']
+    if order_dir == 'desc':
+        order = '-'+order_column_name
+    else:
+        order = order_column_name
+
+    para_dict['order_dir'] = order_dir
+    para_dict['order_column_name'] = order_column_name
+    para_dict['order'] = order
+
+    return para_dict

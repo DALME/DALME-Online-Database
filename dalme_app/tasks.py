@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 import re, requests, time
 
-from .models import par_inventory, par_folio, par_token, Notification, par_object
+from .models import *
 from . import functions
 from dalme.celeryapp import app
 

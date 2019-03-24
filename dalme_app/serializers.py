@@ -1,10 +1,8 @@
 from django.contrib.auth.models import User
-from dalme_app.models import (Attribute_type, Attribute, Attribute_DATE, Attribute_DBR, Attribute_INT,
-Attribute_STR, Attribute_TXT, Content_class, Content_type, Content_type_x_attribute_type,
-Content_list, Content_list_x_content_type, Source, Notification, Profile)
+from dalme_app.models import *
 from rest_framework import serializers
 
-class DynamicSerializer(serializers.Serializer):
+class DynamicSerializer(serializers.ModelSerializer):
     """
     A serializer that takes an additional `fields` argument that
     controls which fields should be displayed.
@@ -24,48 +22,72 @@ class DynamicSerializer(serializers.Serializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
 
+class TranscriptionSerializer(serializers.ModelSerializer):
+    """
+    Basic serializer for transcriptions
+    """
+
+    class Meta:
+        model = Transcription
+        fields = ('transcription')
+
+class AttributeSerializer(serializers.ModelSerializer):
+    """
+    Basic serializer for attribute data
+    """
+
+    def to_representation(self, instance):
+        types = Attribute_type.objects.all()
+        type_dict = {}
+        for t in types:
+            type_dict[t.id] = [t.short_name,t.data_type]
+
+        ret = super().to_representation(instance)
+        new_ret = {}
+        for i in ret:
+            dtype = type_dict[ret['attribute_type']][1]
+            label = type_dict[ret['attribute_type']][0]
+            if dtype == 'DATE':
+                value = ret['value_STR']
+            else:
+                value = eval("ret['value_"+ dtype +"']")
+
+            new_ret[label] = value
+
+        return new_ret
+
+    class Meta:
+        model = Attribute
+        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DBR')
+
 class SourceSerializer(DynamicSerializer):
-    id = serializers.UUIDField()
-    name = serializers.CharField(max_length=255)
-    type = serializers.CharField(max_length=255)
-    parent_source = serializers.CharField(max_length=255)
-    is_inventory = serializers.BooleanField()
-    url = serializers.CharField(max_length=255)
-    mk2_identifier = serializers.CharField(max_length=255)
-    mk1_identifier = serializers.CharField(max_length=255)
-    alt_identifier = serializers.CharField(max_length=255)
-    title = serializers.CharField(max_length=255)
-    short_title = serializers.CharField(max_length=255)
-    language = serializers.CharField(max_length=255)
-    language_gc = serializers.CharField(max_length=255)
-    archival_series = serializers.CharField(max_length=255)
-    archival_number = serializers.CharField(max_length=255)
-    start_date_day = serializers.CharField(max_length=255)
-    start_date_month = serializers.CharField(max_length=255)
-    start_date_year = serializers.CharField(max_length=255)
-    end_date_day = serializers.CharField(max_length=255)
-    end_date_month = serializers.CharField(max_length=255)
-    end_date_year = serializers.CharField(max_length=255)
-    end_date = serializers.CharField(max_length=255)
-    start_date = serializers.CharField(max_length=255)
-    dataset = serializers.CharField(max_length=255)
-    act_type = serializers.CharField(max_length=255)
-    act_type_phrase = serializers.CharField(max_length=255)
-    debt_phrase = serializers.CharField(max_length=255)
-    debt_amount = serializers.IntegerField()
-    debt_unit = serializers.CharField(max_length=255)
-    debt_unit_type = serializers.CharField(max_length=255)
-    debt_source = serializers.CharField(max_length=255)
-    comments = serializers.CharField()
-    city = serializers.CharField(max_length=255)
+    type = serializers.StringRelatedField()
+    name = serializers.CharField(max_length=255, source='short_name')
+    parent_source_id = serializers.PrimaryKeyRelatedField(source='parent_source', read_only=True)
+    parent_source = serializers.StringRelatedField()
+    attributes = AttributeSerializer(many=True)
+    no_folios = serializers.IntegerField()
 
     def to_representation(self, instance):
         """Create dictionaries for fields with links"""
+        fields = self.context.get('fields')
         ret = super().to_representation(instance)
-        ret['name'] = {'name': ret['name'], 'url': '/source/'+ret['id']}
+
+        attributes = ret.pop('attributes')
+        for i in attributes:
+            (k, v), = i.items()
+            ret[k] = v
+
+        ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id']}
+        ret['parent_source'] = {'name': ret['parent_source'], 'url': '/sources/'+str(ret['parent_source_id'])}
         if 'url' in ret:
             ret['url'] = {'name': 'Visit Link', 'url': ret['url']}
+
         return ret
+
+    class Meta:
+        model = Source
+        fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes', 'no_folios')
 
 class SourceSerializerTr(DynamicSerializer):
     id = serializers.UUIDField()
@@ -109,7 +131,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('id','last_login','is_superuser','username','first_name','last_name','email','is_staff','is_active','date_joined')
 
 class ProfileSerializer(serializers.ModelSerializer):
     """
@@ -119,7 +141,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ('id','full_name','user_id','dam_usergroup','dam_userid','wiki_groups','wiki_userid','wiki_username','wp_userid','wp_role','wp_avatar_url', 'user')
 
     def to_representation(self, instance):
         """
@@ -188,7 +210,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = '__all__'
+        fields = ('id','code','level','type','text')
 
 class ContentTypeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -196,14 +218,15 @@ class ContentTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'content_class', 'short_name')
 
 class AttributeTypeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Attribute_type
-        fields = '__all__'
+        fields = ('id', 'name', 'short_name', 'description', 'data_type')
 
 class ContentClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content_class
-        fields = '__all__'
+        fields = ('id', 'name', 'short_name', 'description')
 
 class ContentXAttributeSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='attribute_type.id')
@@ -213,5 +236,5 @@ class ContentXAttributeSerializer(serializers.ModelSerializer):
     data_type = serializers.CharField(max_length=15, source='attribute_type.data_type')
 
     class Meta:
-        model = Content_type_x_attribute_type
+        model = Content_attributes
         fields = '__all__'

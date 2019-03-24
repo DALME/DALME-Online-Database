@@ -4,7 +4,7 @@ This is where all of the forms used elsewhere in the site are set up.
 
 from django import forms
 
-from dalme_app.models import Notification, Page, Profile, Source, Content_type
+from dalme_app.models import *
 
 class source_main(forms.ModelForm):
     parent_source = forms.ModelChoiceField(

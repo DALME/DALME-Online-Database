@@ -5,12 +5,15 @@ Contains general purpose scripts
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.db.models import Q, Count, F, Prefetch
 
 import re, json, requests, hashlib, os, uuid
 import pandas as pd
 
 from dalme_app.models import *
 from dalme_app import functions
+from datetime import date
+from django.db.models.expressions import RawSQL
 
 from dalme_app.serializers import SourceSerializerTr
 
@@ -29,8 +32,18 @@ def get_script_menu():
         },
         {
             "name": "import_sources_csv",
-            "description": "Used to parses a .csv file containing sources and creating the corresponding records in the database.",
+            "description": "Used to parse a .csv file containing sources and creating the corresponding records in the database.",
             "type": "danger"
+        },
+        {
+            "name": "merge_attributes_csv",
+            "description": "Parses a .csv file containing attribute values and merges them into the database matching by attribute_id.",
+            "type": "danger"
+        },
+        {
+            "name": "add_attribute_types",
+            "description": "Takes a dictionary representing a metadata schema and creates entries in the attribute types reference table.",
+            "type": "warning"
         }
     ]
 
@@ -53,9 +66,44 @@ def get_script_menu_item(name=None,description=None,type=None):
     currentItem = '<div class="card-split"><div class="card-split-icon bg-{}-soft"><i class="fas {} text-{}"></i></div><div class="card-split-body">'.format(type, icon_dict[type], type)
     currentItem += '<span class="font-weight-bold text-{} mb-1">{}: </span>'.format(type, name)
     currentItem += '<span class="mb-0 text-dark-gray">{}</span>'.format(description)
-    currentItem += '</div><a href="/scripts/?s={}" class="btn btn-primary btn-card-split"><span class="icon text-white-50"><i class="fas fa-cogs"></i></span></a></div>'.format(name)
+    currentItem += '</div><a href="/scripts?s={}" class="btn btn-primary btn-card-split"><span class="icon text-white-50"><i class="fas fa-cogs"></i></span></a></div>'.format(name)
 
     return currentItem
+
+def add_attribute_types():
+    schema = []
+
+    try:
+        entries = []
+        for i in schema:
+            new_entry = AttributeReference()
+            new_entry.name = i['Label']
+            new_entry.short_name = i['Short Name']
+            new_entry.data_type = 'STR'
+            new_entry.source = i['URI']
+            new_entry.description = i['Definition']
+            new_entry.term_type = i['Type of Term']
+            if 'Comment' in i:
+                new_entry.notes = i['Comment']
+
+            entries.append(new_entry)
+
+        AttributeReference.objects.bulk_create(entries)
+        result = 'Cool!'
+    except Exception as e:
+        result = 'Oops!'+str(e)
+
+    return result
+
+def prep_transcriptions ():
+    line_types = {
+        'house': '8C7A91FB-ACB1-4AC9-B270-3E14E2511C13',
+        'room': 'FED9C6D0-3AAC-408B-A285-0EC80B392155',
+        'object phrase': '0134DDF8-7816-4C1F-8490-A482F59794B8',
+        'context': '2E2712EE-30D0-4A3D-B8D8-4831D35E42B6',
+        'container': 'E65E4129-1577-45D9-83A0-6276C8027A5B',
+    }
+    return x
 
 def session_info(request, username):
     output = request.session
@@ -63,26 +111,58 @@ def session_info(request, username):
 
 def test_expression():
 
-    att_l = Content_type_x_attribute_type.objects.filter(content_type__content_class=1).select_related('attribute_type')
-    att_dict = {}
-    for a in att_l:
-            if a.attribute_type.short_name not in att_dict:
-                att_dict[a.attribute_type.short_name] = [a.attribute_type.name,a.attribute_type.data_type,str(a.attribute_type_id)]
-    extra_dict = {}
-    for k,v in att_dict.items():
-        extra_dict[k] = 'SELECT dalme_app_attribute_'+v[1].lower()+'.value FROM dalme_app_attribute_'+v[1].lower()+' JOIN dalme_app_attribute ON dalme_app_attribute.id = dalme_app_attribute_'+v[1].lower()+'.attribute_id_id JOIN dalme_app_source src2 ON dalme_app_attribute.content_id = src2.id WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = '+v[2]
+    result = Source.objects.get(pk='0106c3984edb43dc9fa941825cdd9b4d').attributes.all().order_by('content_object__attribute_types__order')
+    return result
 
-    extra_dict['transcription'] = 'SELECT transcription FROM dalme_app_transcription WHERE dalme_app_transcription.source_id_id = dalme_app_source.id'
+def merge_attributes_csv():
+    _file = 'attribute_date.csv'
+    _file = os.path.join('dalme_app',_file)
+    df = pd.read_csv(_file)
+    results = []
+    for i, row in df.iterrows():
+        att_id = row['attribute_id_id']
+        try:
+            if not pd.isnull(row['value_day']) and not pd.isnull(row['value_month']):
+                day = int(row['value_day'])
+                month = int(row['value_month'])
+                year = int(row['value_year'])
+                the_date = date(year, month, day)
+                date_str = the_date.strftime("%d-%b-%Y").lstrip("0").replace(" 0", " ")
+                att = Attribute.objects.get(pk=att_id)
+                att.value_DATE_d = day
+                att.value_DATE_m = month
+                att.value_DATE_y = year
+                att.value_DATE = the_date
+                att.value_STR = date_str
+                att.save()
+                results.append(str(i) + ', ' + att_id + ': OK')
 
-    queryset = Source.objects.all().extra(select=extra_dict)
-    fields = ['id','name', 'type', 'transcription']
-    for id, names in att_dict.items():
-        fields.append(id)
+            elif not pd.isnull(row['value_month']):
+                month = int(row['value_month'])
+                year = int(row['value_year'])
+                the_date = date(year, month, 1)
+                date_str = the_date.strftime("%b-%Y")
+                att = Attribute.objects.get(pk=att_id)
+                att.value_DATE_m = month
+                att.value_DATE_y = year
+                att.value_STR = date_str
+                att.save()
+                results.append(str(i) + ', ' + att_id + ': OK')
 
-    serializer = SourceSerializerTr(queryset, many=True, fields=fields)
-    output = serializer.data
+            else:
+                date_str = row['value_year']
+                year = int(date_str)
+                att = Attribute.objects.get(pk=att_id)
+                att.value_DATE_y = year
+                att.value_STR = date_str
+                att.save()
+                results.append(str(i) + ', ' + att_id + ': OK')
 
-    return output
+        except:
+            results.append(str(i) + ', ' + att_id + ': BAD')
+
+    return results
+
 
 def import_sources_csv(request, username):
     _file = 'sources_final.csv'

@@ -1,5 +1,6 @@
 {% load staticfiles i18n %}
-<!DOCTYPE html>
+<!doctype html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,17 +9,15 @@
     <meta name="author" content="DALME">
 
     <title>{{ page_title }} | DALME</title>
-
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/dalme_app.css' %}" rel="stylesheet">
-
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="{% static 'js/dalme_app.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_app.js' %}"></script>
 
     {% block extra_head %}{% endblock %}
 </head>
@@ -75,46 +74,27 @@
 
       <!-- Topbar -->
         {% block topbar %}
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+        <nav class="navbar navbar-expand navbar-light topbar-dalme topbar mb-4 static-top shadow">
 
           <!-- Sidebar Toggle (Topbar) -->
           <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
             <i class="fa fa-bars"></i>
           </button>
-
-          <!-- Topbar Search -->
-          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" role="form" method="get" id="search-form" enctype="multipart/form-data" action="/search">
-            {% csrf_token %}
-            <div class="input-group" id="home-search-group">
-              <input id="topbar_search" type="text" class="form-control bg-light border-0 small" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" name="q" value='{{ query|default:"" }}' required>
-              <div class="input-group-append">
-                <button class="btn btn-top-search" type="submit">
-                  <i class="fas fa-search fa-sm"></i>
-                </button>
-              </div>
-            </div>
-          </form>
+          <div class="page_title">{{ page_title }}</div>
 
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
 
             <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-            <li class="nav-item dropdown no-arrow d-sm-none">
-              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-search fa-fw"></i>
+            <li class="nav-item dropleft topbar-border-left" id="searchIcon">
+              <a class="nav-link" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-g"></i>
               </a>
               <!-- Dropdown - Search -->
-              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
-                <form class="form-inline mr-auto w-100 navbar-search">
+              <div class="dropdown-menu dropdown-menu-right animated--grow-in search-slider" aria-labelledby="searchDropdown">
+                <form class="form-inline navbar-search" role="form" method="get" id="search-form" enctype="multipart/form-data" action="/search">
                   {% csrf_token %}
-                  <div class="input-group">
-                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                      <button class="btn btn-primary" type="button">
-                        <i class="fas fa-search fa-sm"></i>
-                      </button>
-                    </div>
-                  </div>
+                  <input id="topbar_search" type="text" class="form-control border-0 small" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2" name="q" value='{{ query|default:"" }}' required>
                 </form>
               </div>
             </li>
@@ -125,17 +105,14 @@
             {% endfor %}
 
             <!-- Nav Item - User Information -->
-            <li class="nav-item dropdown no-arrow">
+            <li class="nav-item dropdown no-arrow topbar-border-left">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.user.profile.full_name }}</span>
-                  {% if request.user.profile.wp_avatar_url %}
-                    <img class="img-profile rounded-circle" src="{{ request.user.profile.wp_avatar_url }}">
-                  {% else %}
-                    <img class="img-profile rounded-circle" src="{% static 'generic-user.png' %}">
-                  {% endif %}
+                  <i class="fas fa-user-circle fa-g mr-2"></i>
+                  {{ request.user.profile.full_name }}
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <h6 class="dropdown-header">{{ request.user.profile.full_name }}</h6>
                 <a class="dropdown-item" href="https://dalme.org/wp/wp-admin/profile.php">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                   Profile
@@ -155,7 +132,12 @@
                 </a>
               </div>
             </li>
-
+            <!-- Nav Item - Full screen toggle -->
+            <li class="nav-item no-arrow topbar-border-left" id="fullScreenToggle">
+              <a class="nav-link" href="#" role="button" onclick="fullScreenMode('on')">
+                  <i class="fas fa-expand fa-g"></i>
+              </a>
+            </li>
           </ul>
         </nav>
         <!-- End of Topbar -->
@@ -169,13 +151,13 @@
         <!-- End of Main Content -->
 
     <!-- Footer -->
-    <footer class="sticky-footer bg-white">
+    <!--footer class="sticky-footer bg-white">
       <div class="container my-auto">
         <div class="copyright text-center my-auto">
           <span>Copyright &copy; DALME 2019</span>
         </div>
       </div>
-    </footer>
+    </footer-->
     <!-- End of Footer -->
 
   </div>

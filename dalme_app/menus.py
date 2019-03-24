@@ -2,7 +2,6 @@
 This menus module provides a streamlined way to create menus from simple json files.
 """
 
-from django.contrib.auth.models import User
 from django.urls import reverse
 
 import json, os
@@ -11,7 +10,7 @@ from . import functions
 
 LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
 
-def menu_constructor(item_constructor, template, state):
+def menu_constructor(request, item_constructor, template, state):
     """
     Builds menus based on an item_constructor and a json file describing the menu items.
     Menus are stored in the templates directory, under the menus subdirectory.
@@ -26,12 +25,16 @@ def menu_constructor(item_constructor, template, state):
 
     # Create menu by iterating through items in json file and appending to output
     for item in menu:
-        _output += eval(item_constructor + '(_output,state,**item)')
+        if 'permissions' in item:
+            if functions.check_group(request, item['permissions']):
+                _output += eval(item_constructor + '(_output,state,**item)')
+        else:
+            _output += eval(item_constructor + '(_output,state,**item)')
 
     # Return output as part of a list, because renderer expects to iterate
     return [_output]
 
-def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None,divider=None, itemClass=None, blank=None):
+def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None,divider=None, itemClass=None, blank=None, permissions=None):
     """
     Generates a menu item and incorporates it into `wholeMenu`. This function
     calls itself to recurse through hierarchies of menus.
@@ -75,7 +78,7 @@ def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,coun
 
     return currentItem
 
-def tile_item(wholeMenu,state,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None):
+def tile_item(wholeMenu,state,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None, permissions=None):
 
     try:
         counter = functions.get_count(counter)
@@ -92,13 +95,13 @@ def tile_item(wholeMenu,state,colourClass=None,iconClass=None,counter=None,count
 
     return currentItem
 
-def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,counter=None,circleColour=None,moreText=None,moreLink=None):
+def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,counter=None,circleColour=None,moreText=None,moreLink=None,permissions=None):
     """ creates items for the top right dropdowns """
 
-    currentItem = '<li class="nav-item dropdown no-arrow mx-1">'
+    currentItem = '<li class="nav-item dropdown no-arrow topbar-border-left">'
     if topMenu:
         currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
-        currentItem += '<i class="fas {} fa-fw"></i>'.format(iconClass)
+        currentItem += '<i class="fas {} fa-g"></i>'.format(iconClass)
         currentItem += '</a><div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
         currentItem += '<h6 class="dropdown-header">{}</h6>'.format(title)
         for child in children:
@@ -117,7 +120,7 @@ def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemCla
         currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
         currentItem += '<i class="fas {} fa-fw"></i>'.format(iconClass)
         if counter:
-            currentItem += '<span class="badge badge-danger badge-counter">{}</span>'.format(counter)
+            currentItem += '<span class="badge topbar-badge">{}</span>'.format(counter)
         currentItem += '</a><div class="dropdown-list dropdown-infopanel dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
         currentItem += '<h6 class="dropdown-header">{}</h6>'.format(title)
         for child in children:

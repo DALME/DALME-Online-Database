@@ -1,0 +1,180 @@
+{% extends "dalme_app/dash_base.html" %}
+{% load staticfiles i18n %}
+
+{% block extra_head %}
+  <link href="{% static 'css/diva.css' %}" rel="stylesheet">
+  <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/xonomy.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/xonomy_tei_docspecs.js' %}"></script>
+  <link type="text/css" rel="stylesheet" href="{% static 'css/xonomy.css' %}"/>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function ()
+        {
+            let diva = new Diva('diva_viewer', {
+                objectData: "{{ request.build_absolute_uri }}/manifest",
+                enableAutoTitle: false,
+                enableFullscreen: false,
+                enableGotoPage: false
+            });
+        }, false)
+    </script>
+    <script>
+      function fixButton() {
+        document.getElementById("diva-1-zoom-in-button").innerHTML = '<i class="fas fa-search-plus fa-lg"></i>';
+        document.getElementById("diva-1-zoom-out-button").innerHTML = '<i class="fas fa-search-minus fa-lg"></i>';
+        document.getElementById("diva-1-view-icon").innerHTML = '<i class="fas fa-file-alt fa-lg"></i>';
+        document.getElementById("diva-1-book-icon").innerHTML = '<i class="fas fa-book-open fa-lg"></i>';
+        document.getElementById("diva-1-grid-icon").innerHTML = '<i class="fas fa-th fa-lg"></i>'
+      };
+      Diva.Events.subscribe("DocumentDidLoad", fixButton);
+
+    </script>
+    <!--TEMPORARY HACK: toggle button script for Xonomy mode-->
+    <script type="text/javascript">
+      function changeMode(buttonID) {
+        if (buttonID == "btnModeRead") {
+          document.getElementById(buttonID).className = "btn btn-primary hearderBtn";
+          document.getElementById("btnModeQuick").className = "btn btn-default hearderBtn";
+          document.getElementById("btnModeFull").className = "btn btn-default hearderBtn";
+          start(easy_read);
+        };
+        if (buttonID == "btnModeQuick") {
+          document.getElementById(buttonID).className = "btn btn-primary hearderBtn";
+          document.getElementById("btnModeRead").className = "btn btn-default hearderBtn";
+          document.getElementById("btnModeFull").className = "btn btn-default hearderBtn";
+          start(quick_edit);
+        };
+        if (buttonID == "btnModeFull") {
+          document.getElementById(buttonID).className = "btn btn-primary hearderBtn";
+          document.getElementById("btnModeQuick").className = "btn btn-default hearderBtn";
+          document.getElementById("btnModeRead").className = "btn btn-default hearderBtn";
+          start(full_edit);
+        };
+      }
+    </script>
+
+{% endblock %}
+
+{% block extra_dropdowns %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+      <!-- Page Heading -->
+      <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Source Details</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+      </div>
+      <!-- tabs -->
+      <ul class="nav nav-tabs" id="sourceTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="editor-tab" data-toggle="tab" href="#editor" role="tab" aria-controls="editor" aria-selected="true">Source Editor</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Source Information</a>
+        </li>
+      </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+      <div class="tab-pane active tab-card" id="editor" role="tabpanel" aria-labelledby="editor-tab">
+            {% if source.page_set.all %}
+              <div id="diva_viewer"></div>
+              <div class="tab_card_middle_bar text-right">
+                Mode:
+                <button type="button" id="btnModeRead" class="btn btn-primary hearderBtn" onclick="changeMode(this.id);">Easy Read</button>
+                <button type="button" id="btnModeQuick" class="btn btn-default hearderBtn" onclick="changeMode(this.id);">Quick Edit</button>
+                <button type="button" id="btnModeFull" class="btn btn-default hearderBtn" onclick="changeMode(this.id);">Full TEI</button>
+              </div>
+              <div id="xml_editor"></div>
+              <script type="text/javascript">
+                function start(mode) {
+                    var spec = mode;
+                    var xml='{{ transcription|safe }}';
+                    var editor=document.getElementById("xml_editor");
+                    Xonomy.render(xml, editor, spec);
+                    }
+                start(easy_read);
+              </script>
+            {% endif %}
+      </div>
+      <div class="tab-pane tab-card" id="info" role="tabpanel" aria-labelledby="info-tab">
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="card shadow mb-3">
+              <div id="ace_editor">{{ transcription }}</div>
+
+              <script>
+                  var editor = ace.edit("ace_editor");
+                  editor.setTheme("ace/theme/monokai");
+                  editor.session.setMode("ace/mode/xml");
+              </script>
+
+              <div class="card-header">
+                <i class="fa fa-list-alt fa-fw"></i> Metadata
+              </div>
+              <div class="card-body">
+                <p><strong>Name: </strong>{{ source.name }}</p>
+                <p><strong>Type: </strong>{{ source.type.name }}</p>
+                <p><strong>Short name: </strong>{{ source.short_name }}</p>
+                {% if source.parent_source %}
+                <p><strong>Parent source: </strong><a href="{% url 'source_detail' source.parent_source.pk %}">{{ source.parent_source.name }}</a></p>
+                {% endif %}
+                <p><strong>Is inventory: </strong>{{ source.is_inventory }}</p>
+                <a href="#source-detail-modals" data-toggle="modal" data-target="#source-detail-modals" class="btn btn-primary">Update source</a>
+              </div>
+            </div>
+          </div>
+          {% if source_has_children %}
+            <div class="col-lg-4">
+              <div class="card shadow mb-3">
+                <div class="card-header">
+                  Children
+                </div>
+                <div class="card-body">
+                  <ul>
+                    {% for child in children %}
+                      <li><a href="{% url 'source_detail' child.pk %}">{{ child.name }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          {% if source.get_attributes %}
+            <div class="col-lg-4">
+              <div class="card shadow mb-3">
+                <div class="card-header">
+                  Attributes
+                </div>
+                <div class="card-body">
+                  {% for attribute_type, attributes in source.get_attributes.items %}
+                  <p><strong>{{ attribute_type }}: </strong>{{ attributes }}</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          {% if source.page_set.all %}
+            <div class="col-lg-4">
+              <div class="card shadow mb-3">
+                <div class="card-header">
+                  Pages
+                </div>
+                <div class="card-body">
+                  {% for page in source.page_set.all %}
+                    <p><a href="{% url 'page_detail' page.pk %}">{{ page }}</a></p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}

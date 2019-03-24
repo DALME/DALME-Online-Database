@@ -1,7 +1,3 @@
-"""
-Functions for managing views
-"""
-
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -44,13 +40,6 @@ from django.http import HttpResponse
 import logging
 logger = logging.getLogger(__name__)
 
-#@register.filter
-#def get_item(obj, key):
-#    logger.debug("get_item called on {}, {}".format(obj, key))
-#    try:
-#        return obj.get(key)
-#    except AttributeError:
-#        return getattr(obj,key)
 
 #authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
@@ -94,29 +83,28 @@ class DefaultSearch(SearchView):
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context = functions.set_menus(self.request, context, state)
         context['page_title'] = 'Search Results'
 
         return context
 
-class GenericListView(TemplateView):
-    template_name = 'dalme_app/generic_list.html'
+class DTListView(TemplateView):
+    template_name = 'dalme_app/dtlistview.html'
     breadcrumb = []
     table_options = {
         'pageLength':25,
         'responsive':'true',
-        'paging':'true',
-        'fixedHeader': 'true',
-        'dom': '"Bfrtip"',
+        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
         'serverSide': 'true',
         'stateSave': 'true',
         'select': 'true',
+        'deferRender': 'true',
         'language': '{searchPlaceholder: "Search..."}'
         }
-    table_buttons = ['{ extend: "colvis", text: "\uf0db" }', '"pageLength"']
+    table_buttons = ['{ extend: "colvis", text: "\uf0db", className: "btn_single"}']
     column_headers = []
     render_dict = {}
+    nowrap_list = []
     ajax_string = ''
     table_editor = None
 
@@ -126,8 +114,7 @@ class GenericListView(TemplateView):
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context = functions.set_menus(self.request, context, state)
         context['page_title'] = self.get_page_title()
         context['columnDefs'] = self.get_column_defs()
         context['table_options'] = self.get_table_options()
@@ -157,10 +144,14 @@ class GenericListView(TemplateView):
     def get_table_editor(self, *args, **kwargs):
         return self.table_editor
 
+    def get_column_headers(self, *args, **kwargs):
+        return self.column_headers
+
     def get_column_defs(self, *args, **kwargs):
         #create column headers
-        column_headers = self.column_headers
+        column_headers = self.get_column_headers()
         render_dict = self.render_dict
+        nowrap_list = self.nowrap_list
         #create column definitions for DT
         columnDefs = []
         col = 0
@@ -176,6 +167,8 @@ class GenericListView(TemplateView):
                 c_dict['visible'] = 'false'
             if i[0] in render_dict:
                 c_dict['render'] = render_dict[i[0]]
+            if i[0] in nowrap_list:
+                c_dict['className'] = '"nowrap"'
             columnDefs.append(c_dict)
             col = col + 1
         return columnDefs
@@ -213,7 +206,7 @@ class AdminMain(View):
             view = eval('Admin'+type.capitalize()).as_view()
         return view(request, title=title)
 
-class AdminUsers(GenericListView):
+class AdminUsers(DTListView):
     breadcrumb = ['System','Users']
     ajax_string = '"../api/users/?format=json"'
     column_headers = [
@@ -244,18 +237,17 @@ class AdminUsers(GenericListView):
             'Staff': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
             'Active': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
             }
+    nowrap_list = []
 
-class AdminNotifications(GenericListView):
+class AdminNotifications(DTListView):
     breadcrumb = ['System','Notifications']
     table_options = {
         'pageLength':25,
         'responsive':'true',
-        'paging':'true',
-        'fixedHeader': 'true',
-        'dom': '"Bfrtip"',
+        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
         'serverSide': 'true',
         'stateSave': 'true',
-        'select': 'true',
+        'deferRender': 'true',
         'language': '{searchPlaceholder: "Search..."}'
         }
     ajax_string = '"../api/notifications/?format=json"'
@@ -263,8 +255,7 @@ class AdminNotifications(GenericListView):
         '{ extend: "colvis", text: "\uf0db" }',
         '{ extend: "create", text: "\uf067", editor: editor }',
         '{ extend: "edit", text: "\uf304", editor: editor }',
-        '{ extend: "remove", text: "\uf00d", editor: editor }',
-        '"pageLength"'
+        '{ extend: "remove", text: "\uf00d", editor: editor }'
         ]
     column_headers = [
             ['Id', 'id', 0],
@@ -277,6 +268,7 @@ class AdminNotifications(GenericListView):
             'Level': '''function ( data, type, row, meta ) {return '<div class="dt_n_level dt_n_level_'+data.display+'">'+data.display+'</div>';}''',
             'Type': '''function ( data, type, row, meta ) {return '<div class="dt_n_type">'+data.display+'</div>';}'''
             }
+    nowrap_list = []
     table_editor = {
             'ajax_url': '../api/notifications/',
             'idSrc': '"id"',
@@ -300,7 +292,7 @@ class AdminNotifications(GenericListView):
             }
 
 class AdminModels(TemplateView):
-    template_name = 'dalme_app/admin_models_list.html'
+    template_name = 'dalme_app/dtlistview_models.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -321,11 +313,6 @@ class AdminModels(TemplateView):
                 ['Description','description', 0],
                 ['DType','data_type', 1],
                 ['Order','order', 1]]
-        column_headers_classes = [
-                ['ID', 'id', 1],
-                ['Name','name', 1],
-                ['Short name','short_name', 0],
-                ['Description','description', 1]]
         render_dict_content = {
                 'Username': '''function ( data, type, row, meta ) {return '<a href="/user/'+data+'">'+data+'</a>';}''',
                 'Email': '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}''',
@@ -336,58 +323,47 @@ class AdminModels(TemplateView):
                 'Active': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
                 }
         render_dict_attributes = {}
-        render_dict_classes = {}
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
-
+        context = functions.set_menus(self.request, context, state)
         context['columnDefs_content'] = self.get_column_defs(column_headers_content, render_dict_content)
         context['columnDefs_attributes'] = self.get_column_defs(column_headers_attributes, render_dict_attributes)
-        context['columnDefs_classes'] = self.get_column_defs(column_headers_classes, render_dict_classes)
         context['table_options_content'] = {
             'pageLength':25,
             'responsive':'true',
-            'dom': '"Bfrt"',
+            'dom': '''"<'#content_card.card-header'<'#c-title'><'#c-classes_button'>B><'card-body't>"''',
             'serverSide': 'true',
             'stateSave': 'true',
             'select': '{style: "single"}',
-            'ajax': '"../api/models/?format=json&type=content"',
-            'scrollY': '"15vh"',
+            'ajax': '"../api/models/?type=content&format=json"',
+            'scrollY': '100',
+            'scrollResize': 'true',
             'deferRender': 'true',
             'scroller': 'true',
             'rowId': '"id"',
-            'language': '{searchPlaceholder: "Search..."}'
             }
         context['table_options_attributes'] = {
             'pageLength':25,
             'responsive':'true',
-            'dom': '"Bfrt"',
+            'dom': '''"<'#attribute_card.card-header'<'#a-title'>B><'card-body't>"''',
             'serverSide': 'true',
             'stateSave': 'true',
             'select': '{style: "single"}',
-            'ajax': '"../api/models/?format=json&type=attributes"',
-            'scrollY': '"30vh"',
+            'ajax': '"../api/models/?type=attributes&format=json"',
+            'scrollY': '100',
+            'scrollResize': 'true',
             'deferRender': 'true',
             'scroller': 'true',
             'rowId': '"id"',
-            'language': '{searchPlaceholder: "Search..."}'
             }
-        context['table_options_classes'] = {
-            'pageLength':25,
-            'responsive':'true',
-            'dom': '"Bfrt"',
-            'serverSide': 'true',
-            'stateSave': 'true',
-            'select': '{style: "single"}',
-            'ajax': '"../api/models/?format=json&type=classes"',
-            'scrollY': '"15vh"',
-            'deferRender': 'true',
-            'scroller': 'true',
-            'rowId': '"id"',
-            'language': '{searchPlaceholder: "Search..."}'
-            }
-        context['table_buttons_content'] = ['{ extend: "colvis", text: "\uf0db", className: "btn_single" }']
+
+        classes = Content_class.objects.all()
+        classes_button = '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="classes_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Class: All</button><div class="dropdown-menu dropdown-menu-right" aria-labelledby="classes_menu"><a class="dropdown-item" href="#">Add new...</a><div class="dropdown-divider"></div><a class="dropdown-item" href="#" onclick="class_select(0, \\\'All\\\')">All</a>'
+        for c in classes:
+            classes_button += '<a class="dropdown-item" href="#" onclick="class_select({},\\\'{}\\\')">{}</a>'.format(c.id, c.name, c.name)
+        classes_button += '</div>'
+
+        context['classes_button'] = classes_button
+        context['table_buttons_content'] = ['{ extend: "colvis", text: "\uf0db" }']
         context['table_buttons_attributes'] = ['{ extend: "colvis", text: "\uf0db", className: "btn_single"}']
-        context['table_buttons_classes'] = ['{ extend: "colvis", text: "\uf0db", className: "btn_single"}']
         context['page_title'] = 'System Data Models'
 
         return context
@@ -412,65 +388,99 @@ class AdminModels(TemplateView):
         return columnDefs
 
 
-class SourceList(TemplateView):
-    template_name = 'dalme_app/generic_list.html'
+class SourceList(DTListView):
+    table_options = {
+        'pageLength':25,
+        'responsive':'true',
+        'fixedHeader': 'true',
+        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'deferRender': 'true',
+        'paging': 'true',
+        'language': '{searchPlaceholder: "Search..."}'
+        }
+    table_buttons = [
+        '{ extend: "colvis", text: "\uf0db" }',
+        '"pageLength"'
+        ]
+    render_dict = {
+        'Name': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.name+'</a>';}''',
+        'Web address': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.name+'</a>';}''',
+        'Parent': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.name+'</a>';}''',
+        'Inv': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}'''
+        }
+    nowrap_list = ['Type']
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        table_options = {
-            'pageLength':25,
-            'responsive':'true',
-            'paging':'true',
-            'fixedHeader': 'true',
-            'dom': '"Bfrtip"',
-            'serverSide': 'true',
-            'stateSave': 'true',
-            'language': '{searchPlaceholder: "Search..."}'
-            }
-        table_buttons = ['{ extend: "colvis", text: "\uf0db" }', '"pageLength"']
-
-
-
+    def get_type(self):
         if 'type' in self.request.GET:
-            type = self.request.GET['type']
-            context['type'] = type
-            table_options['ajax'] = '"../api/sources/?format=json&type=' + type + '"'
-            list_type = Content_list.objects.get(short_name=self.request.GET['type'])
-            breadcrumb = ['Sources', list_type.name]
-            page_title = 'List of '+list_type.name
+            return self.request.GET['type']
+        else:
+            return ''
+
+    def get_list_type(self, type):
+        return Content_list.objects.get(short_name=type)
+
+    def get_table_ajax_str(self, *args, **kwargs):
+        type = self.get_type()
+        if type == '':
+            ajax_string = '"../api/sources/?format=json"'
+        else:
+            ajax_string = '"../api/sources/?format=json&type=' + type + '"'
+        return ajax_string
+
+    def get_breadcrumb(self, *args, **kwargs):
+        type = self.get_type()
+        if type == '':
+            breadcrumb = ['Sources', 'All']
+        else:
+            breadcrumb = ['Sources', self.get_list_type(type).name]
+        return breadcrumb
+
+    def get_page_title(self, *args, **kwargs):
+        type = self.get_type()
+        if type == '':
+            page_title = "Sources"
+        else:
+            page_title = 'List of '+ self.get_list_type(type).name
+        return page_title
+
+    def get_column_headers(self, *args, **kwargs):
+        type = self.get_type()
+        if type == '':
+            def_headers = ['15']
+            extra_headers = ['type']
+            ct_l = Content_type.objects.filter(content_class=1)
+            att_l = Attribute_type.objects.filter(content_type__in=ct_l)
+        else:
+            list_type = self.get_list_type(type)
             def_headers = list_type.default_headers.split(',')
             if list_type.extra_headers:
                 extra_headers = list_type.extra_headers.split(',')
             else:
                 extra_headers = []
             q_obj = Q()
-            if self.request.GET['type'] == 'inventories':
-                #get ALL HEADERS
-                att_l = Content_type_x_attribute_type.objects.filter(content_type=13).select_related('attribute_type')
+            if type == 'inventories':
+                att_l = Content_type.objects.get(pk=13).attribute_types.all()
+                extra_headers.append('no_folios')
             else:
-                #get ALL HEADERS
-                content_types = Content_list_x_content_type.objects.filter(content_list=list_type.pk).select_related('content_type')
+                content_types = list_type.content_types.all()
                 q = Q()
                 for c in content_types:
-                    q |= Q(content_type=c.content_type)
-                att_l = Content_type_x_attribute_type.objects.filter(q).select_related('attribute_type')
-        else:
-            context['type'] = ""
-            breadcrumb = ['Sources', 'All']
-            page_title = "Sources"
-            def_headers = ['15']
-            extra_headers = ['type']
-            table_options['ajax'] = '"../api/sources/?format=json"'
-            #get ALL HEADERS
-            att_l = Content_type_x_attribute_type.objects.filter(content_type__content_class=1).select_related('attribute_type')
+                    q |= Q(pk=c.pk)
+                ct_l = Content_type.objects.filter(q)
+                att_l = Attribute_type.objects.filter(content_type__in=ct_l)
+
         #compile attribute dictionary
         att_dict = {}
         for a in att_l:
-            if str(a.attribute_type_id) not in att_dict:
-                att_dict[str(a.attribute_type_id)] = [a.attribute_type.name,a.attribute_type.short_name]
+            if str(a.pk) not in att_dict:
+                att_dict[str(a.pk)] = [a.name,a.short_name]
+
         #create column headers
         column_headers = [['Name','name',1]]
-        extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv'}
+        extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv','no_folios':'#Fol'}
+
         if extra_headers:
             for i in extra_headers:
                 column_headers.append([extra_labels[i],i,1])
@@ -479,35 +489,9 @@ class SourceList(TemplateView):
                 column_headers.append([names[0],names[1],1])
             else:
                 column_headers.append([names[0],names[1],0])
-        #create column definitions for DT
-        columnDefs = []
-        col = 0
-        for i in column_headers:
-            c_dict = {}
-            c_dict['title'] = '"'+i[0]+'"'
-            c_dict['targets'] = col
-            c_dict['data'] = '"'+i[1]+'"'
-            c_dict['defaultContent'] = '"-"'
-            if i[2]:
-                c_dict['visible'] = 'true'
-            else:
-                c_dict['visible'] = 'false'
-            if i[0] in ['Name', 'Web address']:
-                c_dict['render'] = '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}'''
-            columnDefs.append(c_dict)
-            col = col + 1
 
-        context['columnDefs'] = columnDefs
-        context['table_options'] = table_options
-        context['table_buttons'] = table_buttons
-        sidebar_toggle = self.request.session['sidebar_toggle']
-        context['sidebar_toggle'] = sidebar_toggle
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
-        context['page_title'] = page_title
+        return column_headers
 
-        return context
 
 class SourceCreate(CreateView):
     model = Source
@@ -534,24 +518,110 @@ class SourceDetail(View):
 
 class SourceDisplay(DetailView):
     model = Source
-    context_object_name = 'source'
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         breadcrumb = ['Sources', 'All']
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['source_has_children'] = len(self.object.source_set.all()) > 0
-        context['source_has_pages'] = len(self.object.page_set.all()) > 0
-        context['children'] = self.object.source_set.all().order_by('name')
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context = functions.set_menus(self.request, context, state)
         context['page_title'] = self.object.name
-        context['form'] = forms.source_main(instance=self.object)
-        if Transcription.objects.filter(source_id=self.object.pk).count() > 0:
-            context['transcription'] = Transcription.objects.get(source_id=self.object.pk).transcription
+        is_inv = self.object.is_inventory
+        has_pages = len(self.object.pages.all()) > 0
+        has_children = len(self.object.source_set.all()) > 0
+        context['is_inv'] = is_inv
+        context['has_pages'] = has_pages
+        context['has_children'] = has_children
+        source_data = {
+            'Type': self.object.type.name,
+            'Name': self.object.name,
+            'Short name': self.object.short_name,
+        }
+
+        if is_inv:
+            source_data['Inventory?'] = '<i class="fa fa-check-circle dt_checkbox_true"></i>'
+        else:
+            source_data['Inventory?'] = '<i class="fa fa-times-circle dt_checkbox_false"></i>'
+
+        if self.object.parent_source:
+            name = self.object.parent_source.name
+            url = '/sources/'+str(self.object.parent_source.id)
+            source_data['Parent'] = '<a href="{}">{}</a>'.format(url,name)
+
+        context['source_data'] = source_data
+        created = self.object.creation_timestamp.strftime('%d-%b-%Y@%H:%M')
+        modified = self.object.modification_timestamp.strftime('%d-%b-%Y@%H:%M')
+        c_user = Profile.objects.get(user__username=self.object.creation_username)
+        created_user = '<a href="/user/{}">{}</a>'.format(c_user.user_id, c_user.full_name)
+        m_user = Profile.objects.get(user__username=self.object.modification_username)
+        modified_user = '<a href="/user/{}">{}</a>'.format(m_user.user_id, m_user.full_name)
+
+        context['source_metadata'] = {
+            'ID': str(self.object.id),
+            'Created': created+' by '+created_user,
+            'Modified': modified+' by '+modified_user
+        }
+
+        attribute_data = []
+        attributes = self.object.attributes.all().select_related('attribute_type')
+        for a in attributes:
+            label = a.attribute_type.name
+            order = Content_attributes.objects.get(content_type_id=self.object.type,attribute_type_id=a.attribute_type).order
+            dt = a.attribute_type.data_type
+            value = eval('a.value_'+dt)
+            if dt == 'DATE':
+                value = value.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+
+            dict = {
+                'label': label,
+                'value': value,
+                'order': order
+            }
+            attribute_data.append(dict)
+
+        attribute_data = sorted(attribute_data, key=lambda x:x['order'])
+        context['attribute_data'] = attribute_data
+
+        if is_inv and has_pages:
+            folios = functions.get_editor_folios(self.object)
+            context['folio_count'] = folios['folio_count']
+            context['folio_menu'] = folios['folio_menu']
+            context['folio_list'] = folios['folio_list']
+            context['table_options_pages'] = {
+                'pageLength':5,
+                'responsive':'true',
+                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>Br><'card-body'tip>"''',
+                'stateSave': 'true',
+                'select': 'true',
+                'paging': 'true',
+                'language': '{searchPlaceholder: "Search..."}'
+                }
+            context['table_buttons_pages'] = [
+                '{ extend: "colvis", text: "\uf0db" }',
+                #'{ extend: "create", text: "\uf067", editor: editor }',
+                #'{ extend: "edit", text: "\uf304", editor: editor }',
+                #'{ extend: "remove", text: "\uf00d", editor: editor }'
+                ]
+
+
+        if has_children:
+            context['children'] = self.object.source_set.all().order_by('name')
+            context['table_options_children'] = {
+                'pageLength':5,
+                'responsive':'true',
+                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>Br><'card-body'tip>"''',
+                'stateSave': 'true',
+                'select': 'true',
+                'paging': 'true',
+                'language': '{searchPlaceholder: "Search..."}'
+                }
+            context['table_buttons_children'] = [
+                '{ extend: "colvis", text: "\uf0db" }',
+                #'{ extend: "create", text: "\uf067", editor: editor }',
+                #'{ extend: "edit", text: "\uf304", editor: editor }',
+                #'{ extend: "remove", text: "\uf00d", editor: editor }'
+                ]
 
         return context
 
@@ -572,12 +642,19 @@ class SourceUpdate(UpdateView):
     template_name_suffix = '_update_form'
     form_class = forms.source_main
 
-def SourceManifest(request,pk):
+def SourceManifest(request, pk):
     context = {}
     source = Source.objects.get(pk=pk)
     context['source'] = source
-    context['page_canvases'] = [page.get_canvas() for page in source.page_set.all()]
-    return render(request, 'dalme_app/manifest.html', context)
+    context['page_canvases'] = [page.get_canvas() for page in source.pages.all()]
+    return render(request, 'dalme_app/source_manifest.html', context)
+
+def PageManifest(request, pk):
+    context = {}
+    page = Page.objects.get(pk=pk)
+    context['page'] = page
+    context['canvas'] = page.get_canvas()
+    return render(request, 'dalme_app/page_manifest.html', context)
 
 @method_decorator(login_required,name='dispatch')
 class PageMain(View):
@@ -614,26 +691,27 @@ class PageDisplay(DetailView):
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context = functions.set_menus(self.request, context, state)
         context['page_title'] = self.object.name
         context['form'] = forms.page_main(instance=self.object)
         return context
 
-class PageList(GenericListView):
+class PageList(DTListView):
     breadcrumb = ['Pages']
     table_options = {
         'pageLength':25,
         'responsive':'true',
-        'paging':'true',
-        'fixedHeader': 'true',
-        'dom': '"Bfrtip"',
+        'dom': '''"<'card-header'Bfr><'card-body'tip>"''',
         'serverSide': 'true',
         'stateSave': 'true',
         'select': 'true',
+        'scrollY': '100',
+        'scrollResize': 'true',
+        'deferRender': 'true',
+        'scroller': 'true',
         'language': '{searchPlaceholder: "Search..."}'
         }
-    ajax_string = '"../api/pages/?format=json"'
+    ajax_string = '"../api/dt?m=pages&format=json"'
 
     column_headers = [
             ['DAM ID', 'dam_id', 1],
@@ -665,9 +743,8 @@ class Index(TemplateView):
             sidebar_toggle = self.request.session['sidebar_toggle']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
-        context['tiles'] = menu_constructor('tile_item', 'home_tiles_default.json', state)
+        context = functions.set_menus(self.request, context, state)
+        context['tiles'] = menu_constructor(self.request, 'tile_item', 'home_tiles_default.json', state)
         context['page_title'] = 'DALME Dashboard'
 
         return context
@@ -692,8 +769,7 @@ class UIRef(TemplateView):
         sidebar_toggle = self.request.session['sidebar_toggle']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
+        context = functions.set_menus(self.request, context, state)
         context['page_title'] = 'DALME UI Reference'
 
         return context
@@ -708,9 +784,7 @@ class Scripts(TemplateView):
         sidebar_toggle = self.request.session['sidebar_toggle']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
-        context['dropdowns'] = menu_constructor('dropdown_item', 'dropdowns_default.json', state)
-        context['sidebar'] = menu_constructor('sidebar_item', 'sidebar_default.json', state)
-        context['tiles'] = menu_constructor('tile_item', 'home_tiles_default.json', state)
+        context = functions.set_menus(self.request, context, state)
         context['scripts'] = custom_scripts.get_script_menu()
         context['page_title'] = 'Dev Scripts'
         if 's' in self.request.GET:

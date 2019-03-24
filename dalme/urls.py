@@ -11,9 +11,11 @@ from rest_framework import routers
 from dalme_app import views, apis
 
 router = routers.DefaultRouter()
-router.register(r'sources', apis.Sources, basename='source')
-router.register(r'users', apis.Users, basename='user')
-router.register(r'notifications', apis.Notifications, basename='notification')
+router.register(r'sources', apis.Sources, basename='sources')
+router.register(r'users', apis.Users, basename='users')
+router.register(r'models', apis.Models, basename='models')
+router.register(r'notifications', apis.Notifications, basename='notifications')
+router.register(r'transcriptions', apis.Transcriptions, basename='transcriptions')
 
 urlpatterns = [
     path('api/', include(router.urls)),

@@ -31,8 +31,9 @@ AWS_REGION = os.environ['AWS_DEFAULT_REGION']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 # Application definition
+# Allow all host headers
+ALLOWED_HOSTS = ['127.0.0.1:8000','127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'dalme_app.application.DalmeConfig',
@@ -172,8 +173,15 @@ HAYSTACK_CONNECTIONS = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 25
+    'PAGE_SIZE': 25,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -191,9 +199,6 @@ USE_TZ = True
 # Update database configuration with $DATABASE_URL.
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
-
-# Allow all host headers
-ALLOWED_HOSTS = ['*']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -213,7 +218,7 @@ STATICFILES_DIRS = [
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SITE_ID = 1
 

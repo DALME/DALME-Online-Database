@@ -3,8 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
-from dalme_app.models import (Attribute, Attribute_type, Attribute_DATE,
-    Content_type, Source, Profile)
+from dalme_app.models import *
 
 class UserManagementTestCase(TestCase):
     def setUp(self):

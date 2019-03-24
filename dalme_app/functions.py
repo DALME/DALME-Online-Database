@@ -7,19 +7,15 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db import connections
+from dalme_app.menus import menu_constructor
 
 import re, json, requests, hashlib, os, uuid, calendar, datetime
 import pandas as pd
 
 from . import menus
 from .forms import new_user
-from .models import (par_inventory, par_folio, par_token, par_object,
-    Notification, Agent, Attribute_type, Attribute, Attribute_DATE,
-    Attribute_DBR, Attribute_INT, Attribute_STR, Attribute_TXT, Concept,
-    Content_class, Content_type, Content_type_x_attribute_type, Headword,
-    Object, Object_attribute, Place, Source, Page, Transcription,
-    Identity_phrase, Object_phrase, Wordform, Token,
-    Identity_phrase_x_entity)
+from .models import *
+from functools import wraps
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,7 +25,85 @@ try:
 except:
     logger.debug("Can't connect to MySQL instance containing Wiki, DAM, and WP databases.")
 
+
+#Security and permissions functions
+def check_group(request, group_name):
+    """
+    Checks if the current user is a member of the passed group.
+    """
+    try:
+        if request.user.is_superuser:
+        #if request.user.groups.filter(name=group_name).exists() or request.user.is_superuser:
+            result = True
+        else:
+            result = False
+    except:
+        result = False
+
+    return result
+
+def in_group(group_name):
+    """
+    Takes a group name and checks whether the current user is in the group.
+    Used by adding as decorator before function/class: @functions.in_group('group_name')
+    """
+    def _in_group(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            #print request.user
+            if request.user.is_anonymous:
+                return redirect('/admin/')
+            if (not (request.user.groups.filter(name=group_name).exists())
+                or request.user.is_superuser):
+                raise Http404
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return _in_group
+
+
 #General functions
+def set_menus(request, context, state):
+    context['dropdowns'] = menu_constructor(request, 'dropdown_item', 'dropdowns_default.json', state)
+    context['sidebar'] = menu_constructor(request, 'sidebar_item', 'sidebar_default.json', state)
+    return context
+
+def get_editor_folios(source):
+    folios = source.pages.all().order_by('order')
+    folio_count = len(folios)
+    editor_folios = { 'folio_count': folio_count }
+    folio_list = []
+    if folio_count == 1:
+        folio_menu = '<div class="single_folio">Folio {} (1/1)</div>'.format(folios[0].name)
+    else:
+        folio_menu = '<div class="disabled-btn-left"><i class="fa fa-caret-left fa-fw"></i></div>'
+        count = 1
+        for f in folios:
+            folio_dict = {
+                'name': f.name,
+                'id': str(f.id),
+                'dam_id': f.dam_id,
+                'order': f.order,
+                'tr_id': str(Source_pages.objects.get(source_id=source.id, page_id=f.id).transcription_id)
+                }
+            if count == 1:
+                folio_menu += '<button id="folios" type="button" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name,folio_count)
+                folio_menu += '<div class="current-folio-menu">Folio {}</div>'.format(f.name)
+            elif count == 2:
+                next = f.name
+                folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="folioSwitch(this.id)">Folio {}</a>'.format(f.name, f.name)
+            else:
+                folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="folioSwitch(this.id)">Folio {}</a>'.format(f.name, f.name)
+            count = count + 1
+            folio_list.append(folio_dict)
+
+        folio_menu += '</div><button type="button" class="editor-btn button-border-left" id="{}" onclick="folioSwitch(this.id)"><i class="fa fa-caret-right fa-fw"></i></button>'.format(next)
+
+    editor_folios['folio_menu'] = folio_menu
+    editor_folios['folio_list'] = folio_list
+
+    return editor_folios
+
+#Special functions [outdated?]
 def inventory_check(_file):
     """
     Takes the data from a DALME Inventory Package and makes sure it's properly formatted

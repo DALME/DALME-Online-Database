@@ -51,23 +51,27 @@
   {
     "text": "Pages",
     "link": "/pages",
-    "iconClass": "fa-file"
+    "iconClass": "fa-file",
+    "permissions": "Developers"
   },
   {
     "text": "Objects",
     "link": "/list/objects",
     "iconClass": "fa-beer",
-    "counter": "objects"
+    "counter": "objects",
+    "permissions": "Developers"
   },
   {
     "text": "Admin",
-    "section": true
+    "section": true,
+    "permissions": "Staff"
   },
   {
     "text": "System",
     "link": "#",
     "iconClass": "fa-cog",
     "itemClass": "system",
+    "permissions": "Staff",
     "children": [
       {
         "text": "Users",
@@ -88,18 +92,25 @@
         "text": "Data Models",
         "link": "/admin?type=models",
         "iconClass": "fa-cubes"
+      },
+      {
+        "text": "Django Admin",
+        "link": "/django_admin",
+        "iconClass": "fa-user-cog"
       }
     ]
   },
   {
     "text": "Dev",
-    "section": true
+    "section": true,
+    "permissions": "Developers"
   },
   {
     "text": "UI Reference",
     "link": "#",
     "iconClass": "fa-window-restore",
     "itemClass": "uiref",
+    "permissions": "Developers",
     "children": [
       {
         "text": "Home",
@@ -162,7 +173,8 @@
   {
     "text": "Dev Scripts",
     "link": "/scripts",
-    "iconClass": "fa-code"
+    "iconClass": "fa-code",
+    "permissions": "Developers"
   }
 
 ]
