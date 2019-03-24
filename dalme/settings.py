@@ -21,9 +21,16 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = os.environ['SECRET_KEY']
+AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
+AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
+AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
+AWS_REGION = os.environ['AWS_DEFAULT_REGION']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+
+# Allow all host headers
+ALLOWED_HOSTS = ['dalme.org']
 
 # Application definition
 
@@ -187,9 +194,6 @@ USE_TZ = True
 # Update database configuration with $DATABASE_URL.
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
-
-# Allow all host headers
-ALLOWED_HOSTS = []
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
