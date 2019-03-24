@@ -10,28 +10,24 @@ from dalme_app.models import *
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
+from django.shortcuts import get_object_or_404
 
 
-class Transcriptions(viewsets.ViewSet):
+class Transcriptions(viewsets.ModelViewSet):
     """
     API endpoint for managing transcriptions
     """
     permission_classes = (DjangoModelPermissions,)
-    queryset = Transcription.objects.none()
+    queryset = Transcription.objects.all()
+    serializer_class = TranscriptionSerializer
 
-    def retrieve(self, request, pk=None):
-        source_id = self.request.GET['s']
-        page_id = self.request.GET['p']
-        try:
-            transcription_id = Source_pages.objects.get(source_id=source_id,page_id=page_id).transcription_id
-            queryset = Transcription.objects.all()
-            transcription = get_object_or_404(queryset, pk=transcription_id)
-            serializer = TranscriptionSerializer(transcription)
-            data = serializer.data
-        except:
-            data = ''    
+    #def retrieve(self, request, pk=None):
+    #    queryset = Transcription.objects.all()
+    #    transcription = get_object_or_404(queryset, pk=pk)
+    #    serializer = TranscriptionSerializer(transcription)
+    #    data = serializer.data
 
-        return Response(data)
+    #    return Response(data)  
 
 
 class Models(viewsets.ViewSet):

@@ -461,6 +461,9 @@ class Transcription(dalmeUuid):
     transcription = models.TextField(blank=True, null=True)
     author = models.CharField(max_length=255, default=get_current_user)
 
+    def __str__(self):
+        return str(self.id)
+
 class Identity_phrase(dalmeUuid):
     transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
     phrase = models.TextField()

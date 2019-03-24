@@ -528,8 +528,6 @@ div.DTS div.dataTables_scrollBody {
   font-size: 1.5rem;
 }
 
-
-
 table.table_scroll thead th {
   border-bottom: 1px solid #a3b1bd !important;
   white-space: nowrap !important;
@@ -551,8 +549,6 @@ th.sorting_asc::before, th.sorting_asc::after, th.sorting_desc::before, th.sorti
   vertical-align: middle;
   padding: .5rem;
 }
-
-
 
 /*datatables search filter*/
 
@@ -583,8 +579,6 @@ div.table_scroller .dataTables_filter label {
   outline: 1px solid #0361aa !important;
   box-shadow: none !important;
 }
-
-
 
 .table-hover tbody tr:hover {
   color: #212529;
@@ -819,6 +813,7 @@ table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
 
 .topbar .dropdown-list {
   width: auto !important;
+  white-space: normal;
 }
 
 .topbar .dropdown-infopanel {
@@ -855,13 +850,6 @@ li#searchIcon.show a {
 }
 
 .topbar-badge {
-  /* position: absolute; */
-  /* -webkit-transform: scale(.7); */
-  /* transform: scale(.7); */
-  /* -webkit-transform-origin: top right; */
-  /* transform-origin: top right; */
-  /* right: .25rem; */
-  /* margin-top: -.25rem; */
   color: #1b1b1b;
   background-color: #939393;
 }
@@ -878,9 +866,37 @@ li#searchIcon.show a {
   font-size: .8rem !important;
 }
 
-.img-profile {
-  height: 1.7rem !important;
-  width: 1.7rem !important;
+.topbar .dropdown-list .dropdown-item {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: block !important;
+  color: #3a3b45 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  margin-right: 0 !important;
+  margin-top: .2rem !important;
+  margin-left: 0 !important;
+  margin-bottom: .2rem !important;
+  font-weight: 600 !important;
+  line-height: 1.5rem !important;
+  border: 0 !important;
+  font-size: .85rem!important;
+}
+
+.topbar .dropdown-list .dropdown-item.active {
+  color: #0361aa !important;
+  background-color: #fff !important;
+  border-left: 0.25rem solid #1f7f31 !important;
+  padding-left: .75rem !important;
+}
+
+.topbar .dropdown-list .dropdown-item:hover {
+  padding-left: .75rem !important;
+  border-radius: 0 !important;
+  border-left: 0.25rem solid #0361aa !important;
+  background-color: rgba(0,0,0,.075) !important;
 }
 
 /* topbar search form */

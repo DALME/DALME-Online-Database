@@ -68,7 +68,8 @@ def set_menus(request, context, state):
     return context
 
 def get_editor_folios(source):
-    folios = source.pages.all().order_by('order')
+    folios = source.pages.all()
+    folios = folios.order_by('order')
     folio_count = len(folios)
     editor_folios = { 'folio_count': folio_count }
     folio_list = []
@@ -82,9 +83,10 @@ def get_editor_folios(source):
                 'name': f.name,
                 'id': str(f.id),
                 'dam_id': f.dam_id,
-                'order': f.order,
-                'tr_id': str(Source_pages.objects.get(source_id=source.id, page_id=f.id).transcription_id)
+                'order': f.order
                 }
+            transcription_id = Source_pages.objects.get(source_id=source.id, page_id=f.id).transcription_id
+            folio_dict['tr_id'] = str(transcription_id)
             if count == 1:
                 folio_menu += '<button id="folios" type="button" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name,folio_count)
                 folio_menu += '<div class="current-folio-menu">Folio {}</div>'.format(f.name)

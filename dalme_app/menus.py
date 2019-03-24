@@ -102,17 +102,16 @@ def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemCla
     if topMenu:
         currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
         currentItem += '<i class="fas {} fa-g"></i>'.format(iconClass)
-        currentItem += '</a><div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
-        currentItem += '<h6 class="dropdown-header">{}</h6>'.format(title)
+        currentItem += '</a><div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
         for child in children:
             if divider:
                 currentItem += '<div class="dropdown-divider"></div>'
             else:
                 currentItem += '<a class="dropdown-item" href="{}">'.format(child['link'])
                 if 'iconClass' in child:
-                    currentItem += '<i class="fas {} fa-sm fa-fw mr-2 text-gray-400"></i>{}</a>'.format(child['iconClass'], child['text'])
+                    currentItem += '<i class="fas {} fa-fw mr-2 text-gray-400"></i>{}</a>'.format(child['iconClass'], child['text'])
                 else:
-                    currentItem += '<i class="fas {} fa-sm fa-fw mr-2 text-gray-400"></i>{}</a>'.format(childrenIconClass, child['text'])
+                    currentItem += '<i class="fas {} fa-fw mr-2 text-gray-400"></i>{}</a>'.format(childrenIconClass, child['text'])
 
         currentItem += '</div></li> '
 

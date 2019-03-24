@@ -15,7 +15,6 @@
   {% if is_inv %}
     <link href="{% static 'css/diva.css' %}" rel="stylesheet">
     <link href="{% static 'jquery-ui-resizable/jquery-ui.min.css' %}" rel="stylesheet">
-    <!--script type="module" src="{% static 'js/diva-dalme.js' %}"></script-->
     <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
     <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
@@ -161,7 +160,7 @@
                           <td>{{ row.id }}</td>
                           <td>{{ row.name }}</td>
                           <td>{{ row.dam_id }}</td>
-                          <td>{{ row.dam_order }}</td>
+                          <td>{{ row.order }}</td>
                           {% if row.tr_id == 'None' %}
                             <td><i class="fa fa-times"></i></td>
                           {% else %}
@@ -267,7 +266,7 @@
                   </div>
                 </form>
               </div>
-            <button class="editor-btn float-right button-border-left" type="button">
+            <button class="editor-btn float-right button-border-left" type="button" onclick="xmleditor.setReadOnly(false);">
               Edit
             </button>
           </div>

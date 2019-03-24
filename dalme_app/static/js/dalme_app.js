@@ -25,6 +25,17 @@ function updateSession(data) {
     });
 }
 
+function getTranscription(pk) {
+  if (pk != 'None') {
+    url = "/api/transcriptions/"+pk+"?format=json"
+    $.get(url, function ( data ) {
+      xmleditor.session.setValue(data.transcription);
+    }, 'json');
+  } else {
+    xmleditor.session.setValue('');
+  }
+}
+
 function fullScreenMode(action) {
   if (action == 'on') {
     var elem = document.documentElement;
@@ -63,13 +74,13 @@ function setupTranscriber() {
         //blockMobileMove: false,
         enableGotoPage: false,
         enableGridIcon: false,
-        enableImageTitles: false,
-        //plugins: [Diva.DalmePlugin],
+        enableImageTitles: false
     });
-
+  
     xmleditor = ace.edit("xml_editor");
     xmleditor.setOptions({
         theme: "ace/theme/chrome",
+        readOnly: true,
         highlightActiveLine: true,
         highlightSelectedWord: true,
         highlightGutterLine: true,
@@ -88,7 +99,8 @@ function setupTranscriber() {
         //enableBasicAutocompletion: true,
         //enableLiveAutocompletion: true,
     });
-    xmleditor.session.setValue(getTranscription(folio_list[0].tr_id));
+
+    getTranscription(folio_list[0].tr_id);
 
     $('.panel-top').resizable(
       {
@@ -115,14 +127,6 @@ function setupTranscriber() {
         }, false);
 }
 
-function getTranscription(pk) {
-  if (pk != 'None') {
-    url = "/api/transcriptions/"+pk
-    return $.get(url);
-  } else {
-    return ''
-  }
-}
 
 function getFolioIndex(folio) {
   return folio_list.findIndex(x => x.name === folio);
@@ -157,13 +161,12 @@ function folioSwitch (target) {
   goto = folio_list[goto_index];
   //save state of ACE IF IN EDIT MODE
   //current_tr = xmleditor.getValue(); // or session.getValue
-  //folio_list[current_index].tr = current_tr;
   //send message to diva.js to reload with new object data
   manifest = '/pages/'+goto.id+'/manifest';
   diva.changeObject(manifest);
   $(window).trigger('resize');
   //send message to ACE to switch to new transcription data
-  //xmleditor.session.setValue(getTranscription(goto.tr_id)); // set value and reset undo history
+  getTranscription(goto.tr_id);
 
   //change interface elements
   if (prev != 0) {

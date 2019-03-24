@@ -29,7 +29,7 @@ class TranscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transcription
-        fields = ('transcription')
+        fields = '__all__'
 
 class AttributeSerializer(serializers.ModelSerializer):
     """
