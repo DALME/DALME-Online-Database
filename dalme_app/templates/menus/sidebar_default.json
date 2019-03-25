@@ -29,12 +29,6 @@
         "counter": "notarial_sources"
       },
       {
-        "text": "Inventories",
-        "link": "/sources?type=inventories",
-        "iconClass": "fa-list-ol",
-        "counter": "inventories"
-      },
-      {
         "text": "Bibliography",
         "link": "/sources?type=bibliography",
         "iconClass": "fa-book",
@@ -49,17 +43,68 @@
     ]
   },
   {
-    "text": "Pages",
-    "link": "/pages",
-    "iconClass": "fa-file",
-    "permissions": "Developers"
+    "text": "Repository",
+    "link": "#",
+    "iconClass": "fa-boxes",
+    "itemClass": "repository",
+    "children": [
+      {
+        "text": "Inventories",
+        "link": "/sources?type=inventories",
+        "iconClass": "fa-list-ol",
+        "permissions": "Staff"
+      },
+      {
+        "text": "Images",
+        "link": "#",
+        "iconClass": "fa-images",
+        "permissions": "Staff"
+      },
+      {
+        "text": "Pages",
+        "link": "#",
+        "iconClass": "fa-file",
+        "permissions": "Staff"
+      }
+    ]
   },
   {
-    "text": "Objects",
-    "link": "/list/objects",
-    "iconClass": "fa-beer",
-    "counter": "objects",
-    "permissions": "Developers"
+    "text": "Lexicon",
+    "link": "#",
+    "iconClass": "fa-book",
+    "itemClass": "lexicon",
+    "children": [
+      {
+        "text": "Dictionary",
+        "link": "#",
+        "iconClass": "fa-language",
+        "permissions": "Staff"
+      },
+      {
+        "text": "Corpus",
+        "link": "#",
+        "iconClass": "fa-stream",
+        "permissions": "Staff"
+      },
+      {
+        "text": "Wordforms",
+        "link": "#",
+        "iconClass": "fa-bars",
+        "permissions": "Staff"
+      },
+      {
+        "text": "Headwords",
+        "link": "#",
+        "iconClass": "fa-list",
+        "permissions": "Staff"
+      },
+      {
+        "text": "Concepts",
+        "link": "#",
+        "iconClass": "fa-lightbulb",
+        "permissions": "Staff"
+      }
+    ]
   },
   {
     "text": "Admin",
