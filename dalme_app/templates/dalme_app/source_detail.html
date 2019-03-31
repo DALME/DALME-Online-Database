@@ -35,7 +35,7 @@
       <!-- tabs -->
       <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" onclick="leaveTranscriber()">Information</a>
         </li>
         {% if is_inv and has_pages %}
         <li class="nav-item">
@@ -279,28 +279,31 @@
                     </div>
                 </form>
               </div>
-            <button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();">Edit</button>
-            <button class="editor-btn float-right button-border-left" id="xmleditor_save" type="button" onclick="editorButtonSave();">Save</button>
-            <button class="editor-btn float-right button-border-left" id="xmleditor_undo" type="button" onclick="xmleditor.undo();">Undo</button>
-            <button class="editor-btn float-right button-border-left" id="xmleditor_redo" type="button" onclick="xmleditor.redo();">Redo</button>
+            <div id="editor-button-bar">
+              <button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();"><i class="fa fa-edit fa-fw"></i> Edit</button>
+            </div>
           </div>
-          <div id="xml_editor" class="d-flex justify-content-center">
+          <div id="xml_editor" class="d-flex justify-content-center active" role="tabpanel" aria-labelledby="tei-tab">
               <div class="spinner-border mt-auto mb-auto"></div>
+          </div>
+          <div id="xml_render" class="d-flex justify-content-center" role="tabpanel" aria-labelledby="render-tab">
           </div>
         </div>
       </div>
       {% endif %}
     </div>
     <div class="tab-footer">
-      <ul class="nav nav-tabs card-footer-tabs float-right" id="editor-tabs" role="tablist">
-        <li class="nav-item">
-          <a class="nav-link active" id="tei-tab" data-toggle="tab" href="#tei" role="tab" aria-controls="tei" aria-selected="false">TEI Encoding</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="render-tab" data-toggle="tab" href="#render" role="tab" aria-controls="render" aria-selected="true" onclick="">Rendered Text</a>
-        </li>
-      </ul>
-      <small class="text-muted float-left tab-footer-text" id="transcriber"></small>
+      <div id="tab-footer-interface" class="clearfix">
+        <ul class="nav nav-tabs card-footer-tabs float-right" id="editor-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="tei-tab" data-toggle="tab" href="#tei" role="tab" aria-controls="tei" aria-selected="false">TEI Encoding</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="render-tab" data-toggle="tab" href="#render" role="tab" aria-controls="render" aria-selected="true">Rendered Text</a>
+          </li>
+        </ul>
+        <small class="text-muted float-left tab-footer-text" id="transcriber"></small>
+      </div>
     </div>
   </div>
 

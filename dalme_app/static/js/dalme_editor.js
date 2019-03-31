@@ -1,4 +1,9 @@
 function setupTranscriber() {
+    editor_container = document.getElementById('xml_editor');
+    transcriber_container = document.getElementById('transcriber');
+    footer_menubar = document.getElementById('tab-footer-interface');
+    viewer_container = document.getElementById('diva_viewer');
+    editor_buttons = document.getElementById('editor-button-bar');
 
     getViewer('initial', 0);
     getEditor('initial', folio_list[0].tr_id);
@@ -28,14 +33,17 @@ function setupTranscriber() {
       });
 }
 
+function leaveTranscriber() {
+  footer_menubar.style.display = "none";
+}
+
 function getEditor(mode, target) {
-  editor_container = document.getElementById('xml_editor');
-  transcriber_container = document.getElementById('transcriber');
   if (mode != 'initial') {
     //save session
     xmleditor.destroy()
     editor_container.innerHTML = '<div class="spinner-border mt-auto mb-auto"></div>';
     transcriber_container.innerHTML = '';
+    footer_menubar.style.display = "none";
   };
 
   if (target != 'None') {
@@ -46,14 +54,15 @@ function getEditor(mode, target) {
           xmleditor = ace.edit("xml_editor");
           setEditorOptions();
           xmleditor.session.setValue(data.transcription);
-          transcriber_container.innerHTML = 'Transcribed by '+data.author
-          var refs = {};
-          xmleditor.on("input", updateToolbar);
+          footer_menubar.style.display = "block";
+          transcriber_container.innerHTML = 'Transcribed by '+data.author;
+          document.getElementById('xml_render').innerHTML = data.transcription_html;
       }, 'json');
   } else {
     xmleditor = ace.edit("xml_editor");
     setEditorOptions();
     xmleditor.session.setValue('Start new transcription...');
+    footer_menubar.style.display = "block";
     transcriber_container.innerHTML = 'New transcription';
     var refs = {};
     xmleditor.on("input", updateToolbar);
@@ -62,7 +71,6 @@ function getEditor(mode, target) {
 }
 
 function getViewer(mode, target_idx) {
-  viewer_container = document.getElementById('diva_viewer');
   target = folio_list[target_idx].id
   dam_id = folio_list[target_idx].dam_id
   if (dam_id == 'None') {
@@ -128,14 +136,14 @@ function folioSwitch (target) {
 
 function updateToolbar() {
   if (xmleditor.session.getUndoManager().isClean()) {
-    document.getElementById("xmleditor_save").classList.add('disabled');
+    $("#xmleditor_save").addClass("disabled");
   };
 
   if (!xmleditor.session.getUndoManager().hasUndo()) {
-    document.getElementById("xmleditor_undo").classList.add('disabled');
+    $("#xmleditor_undo").addClass("disabled");
   };
   if (!xmleditor.session.getUndoManager().hasRedo()) {
-    document.getElementById("xmleditor_redo").classList.add('disabled');
+    $("#xmleditor_redo").addClass("disabled");
   };
 }
 
@@ -147,9 +155,21 @@ function editorButtonSave() {
     updateToolbar();
 }
 
+function editorButtonCancel() {
+    do {
+      xmleditor.undo()
+    } while (xmleditor.session.getUndoManager().hasUndo());
+    xmleditor.setReadOnly(true);
+    editor_buttons.innerHTML = '<button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();"><i class="fa fa-edit fa-fw"></i> Edit</button>';
+}
+
 function editorButtonEdit() {
     xmleditor.setReadOnly(false);
-    updateToolbar();
+    editor_buttons.innerHTML = '<button class="editor-btn float-right button-border-left editor-save" id="xmleditor_save" type="button" onclick="editorButtonSave();"><i class="fa fa-save fa-fw"></i> Save</button>\
+    <button class="editor-btn float-right button-border-left editor-cancel" id="xmleditor_cancel" type="button" onclick="editorButtonCancel();"><i class="fa fa-times-circle fa-fw"></i> Cancel</button>\
+    <button class="editor-btn float-left button-border-right" id="xmleditor_undo" type="button" onclick="xmleditor.undo();"><i class="fa fa-undo-alt fa-fw"></i></button>\
+    <button class="editor-btn float-left button-border-right" id="xmleditor_redo" type="button" onclick="xmleditor.redo();"><i class="fa fa-redo-alt fa-fw"></i></button>';
+    xmleditor.on("input", updateToolbar);
 }
 
 function setEditorOptions() {
@@ -175,17 +195,6 @@ function setEditorOptions() {
       //enableBasicAutocompletion: true,
       //enableLiveAutocompletion: true,
   });
-}
-
-function switchTranscription(pk) {
-  if (pk != 'None') {
-    url = "/api/transcriptions/"+pk+"?format=json"
-    $.get(url, function ( data ) {
-      xmleditor.session.setValue(data.transcription);
-    }, 'json');
-  } else {
-    xmleditor.session.setValue('');
-  }
 }
 
 function getFolioIndex(folio) {

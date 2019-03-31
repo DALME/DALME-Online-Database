@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from dalme_app.models import *
 from rest_framework import serializers
+from dalme_app import functions
 
 class DynamicSerializer(serializers.ModelSerializer):
     """
@@ -26,6 +27,11 @@ class TranscriptionSerializer(serializers.ModelSerializer):
     """
     Basic serializer for transcriptions
     """
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        transcription_xml = '<xml>'+ret['transcription']+'</xml>'
+        ret['transcription_html'] = functions.render_transcription(transcription_xml)
+        return ret
 
     class Meta:
         model = Transcription

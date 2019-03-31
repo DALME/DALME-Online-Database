@@ -597,7 +597,8 @@ class SourceDisplay(DetailView):
                 'stateSave': 'true',
                 'select': 'true',
                 'paging': 'true',
-                'language': '{searchPlaceholder: "Search..."}'
+                'language': '{searchPlaceholder: "Search..."}',
+                'order': [[ 3, "asc" ]]
                 }
             context['table_buttons_pages'] = [
                 '{ extend: "colvis", text: "\uf0db" }',

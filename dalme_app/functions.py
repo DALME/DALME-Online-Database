@@ -1,7 +1,8 @@
 """
 This file houses all of the miscellaneous functions used elsewhere in the project.
 """
-
+import os
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -11,6 +12,7 @@ from dalme_app.menus import menu_constructor
 
 import re, json, requests, hashlib, os, uuid, calendar, datetime
 import pandas as pd
+import lxml.etree as etree
 
 from . import menus
 from .forms import new_user
@@ -112,6 +114,14 @@ def get_editor_folios(source):
     editor_folios['folio_list'] = folio_list
 
     return editor_folios
+
+def render_transcription(transcription):
+    dom = etree.fromstring(transcription)
+    xslt = etree.parse(os.path.join(settings.BASE_DIR, 'dalme_app/templates/xslt/tei_transcription.xslt'))
+    transform = etree.XSLT(xslt)
+    newdom = transform(dom)
+    render = etree.tostring(newdom)
+    return render
 
 #Special functions [outdated?]
 def inventory_check(_file):

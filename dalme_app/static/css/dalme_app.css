@@ -297,6 +297,36 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
   color: #3a3b45;
 }
 
+.editor-btn:hover {
+  background-color: #c4e1ef;
+  color: #0361aa;
+}
+
+.editor-btn:focus, .editor-btn:active {
+  background-color: #c4e1ef !important;
+  color: #024e88 !important;
+}
+
+.editor-save {
+  background-color: #fafff5;
+  color: #2a4936;
+}
+
+.editor-cancel {
+  background-color: #fff8fd;
+  color: #734847;
+}
+
+.editor-save:hover {
+  background-color: #dae9d3;
+  color: #025e13;
+}
+
+.editor-cancel:hover {
+  background-color: #f5e9e8;
+  color: #ae040e;
+}
+
 .button-border-left {
   border-left: 1px solid #a5a5a5;
 }
@@ -305,15 +335,7 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
   border-right: 1px solid #a5a5a5;
 }
 
-.editor-btn:hover {
-  background-color: #c4e1ef !important;
-  color: #0361aa !important;
-}
 
-.editor-btn:focus, .editor-btn:active {
-  background-color: #c4e1ef !important;
-  color: #024e88 !important;
-}
 
 .single_folio {
   font-size: .8rem;
@@ -355,6 +377,10 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
   border-bottom: 1px solid #a5a5a5;
 }
 
+#tab-footer-interface {
+  display: none;
+}
+
 .tab-footer {
   padding-top: 0;
   padding-bottom: .4rem;
@@ -363,6 +389,7 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
   padding-left: 1rem;
   border-bottom-left-radius: .2rem !important;
   border-bottom-right-radius: .2rem !important;
+  height: 32px;
 }
 
 .card-footer-tabs {
