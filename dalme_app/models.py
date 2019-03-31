@@ -404,7 +404,7 @@ class Place(dalmeUuid):
 
 class Page(dalmeUuid):
     name = models.CharField(max_length=55)
-    dam_id = models.IntegerField(db_index=True)
+    dam_id = models.IntegerField(db_index=True, null=True, blank=True)
     order = models.IntegerField(db_index=True)
     canvas = models.TextField(null=True)
 

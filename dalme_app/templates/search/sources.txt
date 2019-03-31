@@ -1,3 +1,2 @@
-{{ object.name }}
-{{ object.type }}
-{{ object.transcription }}
+Name: {{ object.name }} (type = {{ object.type }})
+Blob: {{ object.att_blob }}

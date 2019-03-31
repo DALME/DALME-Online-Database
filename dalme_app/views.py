@@ -433,6 +433,8 @@ class SourceList(DTListView):
         type = self.get_type()
         if type == '':
             breadcrumb = ['Sources', 'All']
+        elif type == 'inventories':
+            breadcrumb = ['Repository', 'Inventories']
         else:
             breadcrumb = ['Sources', self.get_list_type(type).name]
         return breadcrumb
@@ -478,7 +480,7 @@ class SourceList(DTListView):
                 att_dict[str(a.pk)] = [a.name,a.short_name]
 
         #create column headers
-        column_headers = [['Name','name',1]]
+        column_headers = [['Name','name',1],['Short Name','short_name',0]]
         extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv','no_folios':'#Fol'}
 
         if extra_headers:
@@ -521,7 +523,7 @@ class SourceDisplay(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = ['Sources', 'All']
+        breadcrumb = ['Repository', 'Inventories']
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
@@ -603,7 +605,6 @@ class SourceDisplay(DetailView):
                 #'{ extend: "edit", text: "\uf304", editor: editor }',
                 #'{ extend: "remove", text: "\uf00d", editor: editor }'
                 ]
-
 
         if has_children:
             context['children'] = self.object.source_set.all().order_by('name')

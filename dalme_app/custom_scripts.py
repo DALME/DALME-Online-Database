@@ -15,8 +15,6 @@ from dalme_app import functions
 from datetime import date
 from django.db.models.expressions import RawSQL
 
-from dalme_app.serializers import SourceSerializerTr
-
 
 def get_script_menu():
     script_register = [
@@ -110,9 +108,24 @@ def session_info(request, username):
     return output
 
 def test_expression():
+    persons = []
 
-    result = Source.objects.get(pk='0106c3984edb43dc9fa941825cdd9b4d').attributes.all().order_by('content_object__attribute_types__order')
-    return result
+    for p in persons:
+        source_id = p[0]
+        persons = p[1]
+        #get source
+        #source = Source.objects.get(pk=source_id)
+        #get attribute type
+        attribute = Attribute_type.objects.get(pk=37)
+        #create new attribute
+        new_att = Attribute()
+        new_att.attribute_type = attribute
+        new_att.content_type_id = 125
+        new_att.object_id = source_id
+        new_att.value_STR = persons
+        new_att.save()
+
+    return 'okay!'
 
 def merge_attributes_csv():
     _file = 'attribute_date.csv'

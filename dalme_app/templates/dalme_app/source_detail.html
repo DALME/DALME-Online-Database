@@ -12,12 +12,13 @@
     <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.bootstrap4.js' %}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
   {% endif %}
-  {% if is_inv %}
+  {% if is_inv and has_pages %}
     <link href="{% static 'css/diva.css' %}" rel="stylesheet">
     <link href="{% static 'jquery-ui-resizable/jquery-ui.min.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
     <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
   {% endif %}
   {% if has_pages %}
     <script type="text/javascript">
@@ -36,7 +37,7 @@
         <li class="nav-item">
           <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
         </li>
-        {% if is_inv %}
+        {% if is_inv and has_pages %}
         <li class="nav-item">
           <a class="nav-link" id="tr_editor-tab" data-toggle="tab" href="#tr_editor" role="tab" aria-controls="tr_editor" aria-selected="true" onclick="setupTranscriber()">Editor</a>
         </li>
@@ -65,6 +66,8 @@
                   {% endfor %}
               </div>
             </div>
+          </div>
+          <div class="col-md-6">
             <div class="card mb-3">
               <div class="sub-card-header">
                 <i class="fa fa-info-circle fa-fw"></i> Metadata
@@ -83,7 +86,9 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+        </div>
+        <div class="row">
+          <div class="col-md-12">
             <div class="card mb-3">
               <div class="sub-card-header">
                 <i class="fa fa-list-alt fa-fw"></i> Attributes
@@ -91,10 +96,10 @@
               <div class="card-body attribute_list">
                   {% for i in attribute_data %}
                   <div class="form-row">
-                      <div class="col-sm-3 text-right">
+                      <div class="col-sm-2 text-right">
                         <span class="attribute_list_label">{{ i.label }}</span>
                       </div>
-                      <div class="col-sm-9">
+                      <div class="col-sm-10">
                         <span class="attribute_list_value">{{ i.value | safe }}</span>
                       </div>
                   </div>
@@ -151,7 +156,8 @@
                         <th>Name</th>
                         <th>DAM ID</th>
                         <th>Order</th>
-                        <th>Transc</th>
+                        <th>Img</th>
+                        <th>Tr</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -161,6 +167,11 @@
                           <td>{{ row.name }}</td>
                           <td>{{ row.dam_id }}</td>
                           <td>{{ row.order }}</td>
+                          {% if row.dam_id == 'None' %}
+                            <td><i class="fa fa-times"></i></td>
+                          {% else %}
+                            <td><i class="fa fa-check"></i></td>
+                          {% endif %}
                           {% if row.tr_id == 'None' %}
                             <td><i class="fa fa-times"></i></td>
                           {% else %}
@@ -176,7 +187,7 @@
         </div>
         {% endif %}
       </div>
-      {% if is_inv %}
+      {% if is_inv and has_pages %}
       <div class="tab-pane card-body p-0 clearfix transcription-editor" id="tr_editor" role="tabpanel" aria-labelledby="tr_editor-tab">
         <div class="panel-top">
           <div class="editor-menubar clearfix">
@@ -188,7 +199,9 @@
               {{ folio_menu | safe }}
             </div>
           </div>
-          <div id="diva_viewer"></div>
+          <div id="diva_viewer" class="d-flex justify-content-center">
+              <div class="spinner-border text-light mt-auto mb-auto"></div>
+          </div>
           <div class="splitter-horizontal ui-resizable-handle ui-resizable-s"></div>
         </div>
         <div class="panel-bottom">
@@ -197,85 +210,100 @@
                 <i class="fas fa-cog fa-fw"></i>
               </button>
               <!-- Dropdown - options -->
-              <div class="dropdown-menu shadow" aria-labelledby="tr_editorOptions">
-                <form class="p-3">
+              <div class="dropdown-menu shadow xmleditor-options" aria-labelledby="tr_editorOptions">
+                <h6 class="dropdown-header text-center">Editor Options</h6>
+                <form class="pb-1 pt-1 pr-3 pl-3">
                   <div class="form-row">
-                    <div class="col-sm-6">
-                      <!--div class="dropdown-divider"></div-->
-                      <h6 class="dropdown-header">Editor Options</h6>
-                      <div class="form-row">
-                        <label for="modeSelect" class="col-sm-5 col-form-label-sm nowrap">Mode</label>
-                        <div class="col-sm-7">
-                          <select class="custom-select custom-select-sm nowrap" id="modeSelect">
-                            <option value="text">plain text</option>
-                            <option value="xml" selected>XML/TEI</option>
-                          </select>
-                        </div>
+                    <div class="col-6">
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="invisiblesSwitch">
+                          <label class="custom-control-label nowrap" for="invisiblesSwitch">Show invisibles</label>
                       </div>
-                      <div class="form-row">
-                        <label for="themeSelect" class="col-sm-5 col-form-label-sm nowrap">Theme</label>
-                        <div class="col-sm-7">
-                          <select class="custom-select custom-select-sm nowrap" id="themeSelect">
-                            <option value="Chrome" selected>Chrome</option>
-                            <option value="Clouds">Clouds</option>
-                          </select>
-                        </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="livecompSwitch">
+                          <label class="custom-control-label nowrap" for="livecompSwitch">Autocomplete</label>
                       </div>
-                      <div class="form-row">
-                          <label for="fontSizeSelect" class="col-sm-5 col-form-label-sm nowrap">Font size</label>
-                        <div class="col-sm-7">
-                          <select class="custom-select custom-select-sm nowrap" id="fontSizeSelect">
-                            <option value="12">12</option>
-                            <option value="14" selected>14</option>
-                            <option value="16">16</option>
-                            <option value="18">18</option>
-                          </select>
-                        </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="highlightWordSwitch" checked>
+                          <label class="custom-control-label nowrap" for="highlightWordSwitch">Highlight word</label>
+                      </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="softWrapSwitch" checked>
+                          <label class="custom-control-label nowrap" for="softWrapSwitch">Soft wrap</label>
                       </div>
                     </div>
-                    <div class="col-sm-6">
-                          <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="invisiblesSwitch">
-                              <label class="custom-control-label nowrap" for="invisiblesSwitch">Show invisibles</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="livecompSwitch">
-                              <label class="custom-control-label nowrap" for="livecompSwitch">Autocomplete</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="highlightWordSwitch" checked>
-                              <label class="custom-control-label nowrap" for="highlightWordSwitch">Highlight word</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="softWrapSwitch" checked>
-                              <label class="custom-control-label nowrap" for="softWrapSwitch">Soft wrap</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="indentGuidesSwitch" checked>
-                              <label class="custom-control-label nowrap" for="indentGuidesSwitch">Show guides</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="gutterSwitch" checked>
-                              <label class="custom-control-label nowrap" for="gutterSwitch">Show gutter</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="lineNumbersSwitch" checked>
-                              <label class="custom-control-label nowrap" for="lineNumbersSwitch">Show line numbers</label>
-                          </div>
+                    <div class="col-6">
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="indentGuidesSwitch" checked>
+                          <label class="custom-control-label nowrap" for="indentGuidesSwitch">Show guides</label>
+                      </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="gutterSwitch" checked>
+                          <label class="custom-control-label nowrap" for="gutterSwitch">Show gutter</label>
+                      </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="lineNumbersSwitch" checked>
+                          <label class="custom-control-label nowrap" for="lineNumbersSwitch">Show line numbers</label>
+                      </div>
                     </div>
                   </div>
+                  <div class="dropdown-divider"></div>
+                    <div class="form-row">
+                      <label for="modeSelect" class="col-3 col-form-label nowrap">Mode</label>
+                      <div class="col-9">
+                        <select class="custom-select nowrap" id="modeSelect">
+                          <option value="text">plain text</option>
+                          <option value="xml" selected>XML/TEI</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <label for="themeSelect" class="col-3 col-form-label nowrap">Theme</label>
+                      <div class="col-9">
+                        <select class="custom-select nowrap" id="themeSelect">
+                          <option value="Chrome" selected>Chrome</option>
+                          <option value="Clouds">Clouds</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="fontSizeSelect" class="col-3 col-form-label nowrap">Font size</label>
+                      <div class="col-9">
+                        <select class="custom-select nowrap" id="fontSizeSelect">
+                          <option value="12">12</option>
+                          <option value="14" selected>14</option>
+                          <option value="16">16</option>
+                          <option value="18">18</option>
+                        </select>
+                      </div>
+                    </div>
                 </form>
               </div>
-            <button class="editor-btn float-right button-border-left" type="button" onclick="xmleditor.setReadOnly(false);">
-              Edit
-            </button>
+            <button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();">Edit</button>
+            <button class="editor-btn float-right button-border-left" id="xmleditor_save" type="button" onclick="editorButtonSave();">Save</button>
+            <button class="editor-btn float-right button-border-left" id="xmleditor_undo" type="button" onclick="xmleditor.undo();">Undo</button>
+            <button class="editor-btn float-right button-border-left" id="xmleditor_redo" type="button" onclick="xmleditor.redo();">Redo</button>
           </div>
-          <div id="xml_editor"></div>
+          <div id="xml_editor" class="d-flex justify-content-center">
+              <div class="spinner-border mt-auto mb-auto"></div>
+          </div>
         </div>
       </div>
       {% endif %}
     </div>
+    <div class="tab-footer">
+      <ul class="nav nav-tabs card-footer-tabs float-right" id="editor-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="tei-tab" data-toggle="tab" href="#tei" role="tab" aria-controls="tei" aria-selected="false">TEI Encoding</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="render-tab" data-toggle="tab" href="#render" role="tab" aria-controls="render" aria-selected="true" onclick="">Rendered Text</a>
+        </li>
+      </ul>
+      <small class="text-muted float-left tab-footer-text" id="transcriber"></small>
+    </div>
   </div>
+
 {% endblock %}
 {% block extra_scripts %}
   {% if has_pages %}
