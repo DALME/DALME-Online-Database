@@ -123,6 +123,17 @@ def render_transcription(transcription):
     render = etree.tostring(newdom)
     return render
 
+def get_attribute_value(attribute):
+    dt = attribute.attribute_type.data_type
+    if dt == 'DATE':
+        if attribute.value_DATE_d == None or attribute.value_DATE_m == None or attribute.value_DATE_y == None:
+            value = attribute.value_STR
+        else:
+            value = attribute.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+    else:
+        value = eval('attribute.value_'+dt)
+    return value
+
 #Special functions [outdated?]
 def inventory_check(_file):
     """

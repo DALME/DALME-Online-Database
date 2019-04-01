@@ -570,11 +570,7 @@ class SourceDisplay(DetailView):
         for a in attributes:
             label = a.attribute_type.name
             order = Content_attributes.objects.get(content_type_id=self.object.type,attribute_type_id=a.attribute_type).order
-            dt = a.attribute_type.data_type
-            value = eval('a.value_'+dt)
-            if dt == 'DATE':
-                value = value.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
-
+            value = functions.get_attribute_value(a)
             dict = {
                 'label': label,
                 'value': value,

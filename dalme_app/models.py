@@ -410,8 +410,10 @@ class Page(dalmeUuid):
 
     def __str__(self):
         return self.name
+
     def get_absolute_url(self):
         return reverse('page_detail', kwargs={'pk':self.pk})
+        
     def get_canvas(self):
         if not self.canvas:
             api_params = {
