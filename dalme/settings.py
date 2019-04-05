@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'treebeard',
     'sekizai',
     'django_celery_results',
-    #'allaccess.apps.AllAccessConfig',
+    'allaccess.apps.AllAccessConfig',
     'rest_framework',
 ]
 
@@ -93,8 +93,8 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 
 #authentication backends
 AUTHENTICATION_BACKENDS = [
-    #'allaccess.backends.AuthorizedServiceBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'allaccess.backends.AuthorizedServiceBackend',
+    #'django.contrib.auth.backends.ModelBackend'
 ]
 
 #authentication settings

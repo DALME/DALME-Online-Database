@@ -20,9 +20,8 @@ router.register(r'transcriptions', apis.Transcriptions, basename='transcriptions
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('accounts/', include('django.contrib.auth.urls')),
-    #path('accounts/login/<slug:provider>/', OAuthRedirect.as_view(), name='allaccess-login'),
-    #path('accounts/callback/<slug:provider>/', views.OAuthCallback_WP.as_view(provider_id = 'ID'), name='allaccess-callback'),
+    path('accounts/login/<slug:provider>/', OAuthRedirect.as_view(), name='allaccess-login'),
+    path('accounts/callback/<slug:provider>/', views.OAuthCallback_WP.as_view(provider_id = 'ID'), name='allaccess-callback'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('django_admin/doc/', include('django.contrib.admindocs.urls')),
     path('django_admin/', admin.site.urls),

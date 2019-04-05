@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'sekizai',
     'django_celery_results',
     'allaccess.apps.AllAccessConfig',
-    'sslserver',
+    #'sslserver',
     #'debug_toolbar',
     'rest_framework',
 ]
