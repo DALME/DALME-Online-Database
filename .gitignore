@@ -16,3 +16,6 @@ data
 
 # Local misc. files
 _extra
+
+#certificate stuff for development server
+ssl-certs
