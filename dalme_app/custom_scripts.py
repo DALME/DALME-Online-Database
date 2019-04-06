@@ -108,24 +108,10 @@ def session_info(request, username):
     return output
 
 def test_expression():
-    persons = []
 
-    for p in persons:
-        source_id = p[0]
-        persons = p[1]
-        #get source
-        #source = Source.objects.get(pk=source_id)
-        #get attribute type
-        attribute = Attribute_type.objects.get(pk=37)
-        #create new attribute
-        new_att = Attribute()
-        new_att.attribute_type = attribute
-        new_att.content_type_id = 125
-        new_att.object_id = source_id
-        new_att.value_STR = persons
-        new_att.save()
+    data = resource.objects.all()
 
-    return 'okay!'
+    return data
 
 def merge_attributes_csv():
     _file = 'attribute_date.csv'

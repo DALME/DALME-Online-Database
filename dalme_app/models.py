@@ -13,24 +13,13 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
 from dalme_app.middleware import get_current_user
-
-import uuid
-import json
-import os
+import uuid, json, os, requests, logging
 from datetime import datetime
-import requests
-import logging
-logger = logging.getLogger(__name__)
-
 from dalme_app.modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
+import django.db.models.options as options
+options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
-try:
-    from dalme_app.scripts.db import wp_db, wiki_db, dam_db
-    from dalme_app.scripts.dam import rs_api_query
-except:
-    logger.debug("Can't connect to MySQL instance containing Wiki, DAM, and WP databases.")
-
-
+logger = logging.getLogger(__name__)
 
 #function for creating UUIDs - not used, but migrations won't work without it
 def make_uuid():
@@ -84,30 +73,25 @@ class Profile(models.Model):
         These accounts have the same username as the associated user object
         """
         # Set Wordpress user ID, if it exists
-        wp_cursor = wp_db.cursor()
-        wp_user_exists = wp_cursor.execute("SELECT ID FROM wp_users WHERE user_login = %s",[self.user.username])
-        print(wp_user_exists)
-        if wp_user_exists:
-            self.wp_userid = wp_cursor.fetchone()[0]
-        else:
+        try:
+            wp_user_exists = wp_users.objects.get(user_login=self.user.username).ID
+            self.wp_userid = str(wp_user_exists)
+        except:
             self.wp_userid = None
-        wp_cursor.close()
+
         # Set Wiki user ID, if it exists
-        wiki_cursor = wiki_db.cursor()
-        wiki_user_exists = wiki_cursor.execute("SELECT user_id FROM user WHERE user_name = %s",[self.user.username])
-        if wiki_user_exists:
-            self.wiki_userid = wiki_cursor.fetchone()[0]
-        else:
+        try:
+            wiki_user_exists = wiki_user.objects.get(user_name=self.user.username).user_id
+            self.wiki_userid = str(wiki_user_exists)
+        except:
             self.wiki_userid = None
-        wiki_cursor.close()
+
         # Set DAM user ID, if it exists
-        wiki_cursor = dam_db.cursor()
-        wiki_user_exists = wiki_cursor.execute("SELECT ref FROM user WHERE username = %s",[self.user.username])
-        if wiki_user_exists:
-            self.dam_userid = wiki_cursor.fetchone()[0]
-        else:
+        try:
+            dam_user_exists = rs_user.objects.get(username=self.user.username).ref
+            self.dam_userid = str(dam_user_exists)
+        except:
             self.dam_userid = None
-        wiki_cursor.close()
 
     def create_accounts(self):
         """
@@ -118,154 +102,83 @@ class Profile(models.Model):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         # Wordpress user setup
         if self.wp_userid == None:
-            wp_cursor = wp_db.cursor()
-            wp_cursor.execute(
-                ("INSERT INTO wp_users ("
-                    "user_login,"
-                    "user_pass,"
-                    "user_nicename,"
-                    "user_email,"
-                    "user_registered,"
-                    "user_status,"
-                    "display_name"
-                ") VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')") % (
-                    self.user.username,
-                    password,
-                    self.user.username,
-                    self.user.email,
-                    current_time,
-                    '0',
-                    self.full_name
-                ))
-            wp_cursor.execute("SELECT ID FROM wp_users WHERE user_login = %s", [self.user.username])
-            wp_userid = wp_cursor.fetchone()[0]
+            new_wp_user = wp_users()
+            new_wp_user.user_login = self.user.username
+            new_wp_user.user_pass = password
+            new_wp_user.user_nicename = self.user.username
+            new_wp_user.user_email = self.user.email
+            new_wp_user.user_registered = current_time
+            new_wp_user.user_status = '0'
+            new_wp_user.display_name = self.full_name
+            new_wp_user.save()
+            wp_userid = new_wp_user.ID
             self.wp_userid = wp_userid
-            wp_cursor.execute(
-                ("INSERT INTO wp_usermeta ("
-                    "user_id,"
-                    "meta_key,"
-                    "meta_value"
-                ") VALUES ('%s', %s, %s)"), (
-                    self.wp_userid,
-                    'first_name',
-                    self.user.first_name
-                )
-            )
-            wp_cursor.execute(
-                ("INSERT INTO wp_usermeta ("
-                    "user_id,"
-                    "meta_key,"
-                    "meta_value"
-                ") VALUES ('%s', %s, %s)"), (
-                    self.wp_userid,
-                    'last_name',
-                    self.user.last_name
-                )
-            )
-            wp_db.commit()
-            wp_cursor.close()
+            new_wp_meta = wp_usermeta()
+            new_wp_meta.user_id = self.wp_userid
+            new_wp_meta.meta_key = 'first_name'
+            new_wp_meta.meta_value = self.user.first_name
+            new_wp_meta.save()
+            new_wp_meta = wp_usermeta()
+            new_wp_meta.user_id = self.wp_userid
+            new_wp_meta.meta_key = 'last_name'
+            new_wp_meta.meta_value = self.user.last_name
+            new_wp_meta.save()
+
         # Wiki user setup
         if self.wiki_userid == None:
-            wiki_cursor = wiki_db.cursor()
-            wiki_cursor.execute(
-                ('INSERT INTO user ('
-                    'user_name,'
-                    'user_real_name,'
-                    'user_password,'
-                    'user_newpassword,'
-                    'user_email'
-                ') VALUES ("%s", "%s", "%s", "%s", "%s")' % (
-                    self.user.username,
-                    self.full_name,
-                    password,
-                    password,
-                    self.user.email
-                ))
-            )
-            wiki_cursor.execute('SELECT user_id FROM user WHERE user_name = %s',[self.user.username])
-            wiki_userid = wiki_cursor.fetchone()[0]
+            new_wiki_user = wiki_users()
+            new_wiki_user.user_name = self.user.username
+            new_wiki_user.user_real_name = self.full_name
+            new_wiki_user.user_password = password
+            new_wiki_user.user_newpassword = password
+            new_wiki_user.user_email = self.user.email
+            new_wiki_user.save()
+            wiki_userid = new_wiki_user.user_id
             self.wiki_userid = wiki_userid
-            wiki_db.commit()
-            wiki_cursor.close()
+
         if self.dam_userid == None:
-            dam_cursor = dam_db.cursor()
             if self.dam_usergroup:
                 usergroup = self.dam_usergroup
             else:
                 usergroup = 2
-            dam_cursor.execute(
-                ('INSERT INTO user ('
-                    'username,'
-                    'password,'
-                    'fullname,'
-                    'email,'
-                    'usergroup,'
-                    'approved'
-                ') VALUES ("%s", "%s", "%s", "%s", "%s", "%s")' % (
-                    self.user.username,
-                    password,
-                    self.full_name,
-                    self.user.email,
-                    usergroup,
-                    1
-                ))
-            )
-            dam_cursor.execute('SELECT ref FROM user WHERE username = %s',[self.user.username])
-            dam_userid = dam_cursor.fetchone()[0]
+            new_dam_user = rs_user()
+            new_dam_user.username = self.user.username
+            new_dam_user.password = password
+            new_dam_user.fullname = self.full_name
+            new_dam_user.email = self.user.email
+            new_dam_user.usergroup = usergroup
+            new_dam_user.approved = 1
+            new_dam_user.save()
+            dam_userid = new_dam_user.ref
             self.dam_userid = dam_userid
-            wiki_db.commit()
-            dam_cursor.close()
 
     def push_permissions(self):
         """
         Updates external accounts with permissions set in user management here
         """
         if self.wp_userid != None and self.wp_role != None:
-            wp_cursor = wp_db.cursor()
-            wp_cursor.execute(
-                ("INSERT INTO wp_usermeta ("
-                    "user_id,"
-                    "meta_key,"
-                    "meta_value"
-                ") VALUES({}, {}, {})").format(
-                    wp_userid,
-                    'wp_capabilities',
-                    wp_role
-                )
-            )
-            wp_db.commit()
-            wp_cursor.close()
+            new_wp_meta = wp_usermeta()
+            new_wp_meta.user_id = self.wp_userid
+            new_wp_meta.meta_key = 'wp_capabilities'
+            new_wp_meta.meta_value = self.wp_role
+            new_wp_meta.save()
+
         if self.wiki_userid != None and self.wiki_groups != None:
-            wiki_cursor = wiki_db.cursor()
             wiki_group_dict = {
                 "administrator":"sysop",
                 "bureaucrat":"bureaucrat"
             }
             for group in self.wiki_groups:
                 if group in wiki_group_dict:
-                    wiki_cursor.execute(
-                        ("INSERT INTO user_groups ("
-                            "ug_user,"
-                            "ug_group"
-                        ") VALUES ({}, {})").format(
-                            wiki_userid,
-                            wiki_group_dict[group]
-                        )
-                    )
-            wiki_db.commit()
-            wiki_cursor.close()
+                    wiki_ug = wiki_user_groups()
+                    wiki_ug.ug_user = self.wiki_userid
+                    wiki_ug.ug_group = wiki_group_dict[group]
+                    wiki_ug.save()
+
         if self.dam_userid != None and self.dam_usergroup != None:
-            dam_cursor = dam_db.cursor()
-            dam_cursor.execute(
-                ("UPDATE users"
-                 "SET (usergroup) "
-                 "VALUES ({}) WHERE ref={}").format(
-                    self.dam_usergroup,
-                    self.dam_userid
-                )
-            )
-            dam_db.commit()
-            dam_cursor.close()
+            dam_user = rs_user.objects.get(ref=self.dam_userid)
+            dam_user.usergroup = self.dam_usergroup
+            dam_user.save()
 
 
     def delete_external_accounts(self):
@@ -273,20 +186,14 @@ class Profile(models.Model):
         Deletes all external accounts associated with this account
         """
         # Delete Wordpress account
-        wp_cursor=wp_db.cursor()
-        wp_cursor.execute('DELETE FROM wp_users WHERE user_login=%s',[self.user.username])
-        wp_db.commit()
-        wp_cursor.close()
+        wp_user = wp_users.objects.get(user_login=self.user.username)
+        wp_user.delete()
         # Delete wiki account
-        wiki_cursor=wiki_db.cursor()
-        wiki_cursor.execute('DELETE FROM user WHERE user_name=%s',[self.user.username])
-        wiki_db.commit()
-        wiki_cursor.close()
+        wiki_user = wiki_user.objects.get(user_name=self.user.username)
+        wiki_user.delete()
         # Delete DAM account
-        dam_cursor=dam_db.cursor()
-        dam_cursor.execute('DELETE FROM user WHERE username=%s',[self.user.username])
-        dam_db.commit()
-        dam_cursor.close()
+        dam_user = rs_user.objects.get(username=self.user.username)
+        dam_user.delete()
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -413,7 +320,7 @@ class Page(dalmeUuid):
 
     def get_absolute_url(self):
         return reverse('page_detail', kwargs={'pk':self.pk})
-        
+
     def get_canvas(self):
         if not self.canvas:
             api_params = {
@@ -532,6 +439,290 @@ class AttributeReference(dalmeUuid):
 class Comment(dalmeUuid):
     target = models.UUIDField(db_index=True)
     text = models.TextField()
+
+#unmanaged models from DAM
+class rs_resource(models.Model):
+    ref = models.IntegerField(primary_key=True, max_length=11)
+    title = models.CharField(max_length=200, null=True)
+    resource_type = models.IntegerField(max_length=11, null=True)
+    has_image = models.IntegerField(max_length=11, default='0')
+    is_transcoding = models.IntegerField(max_length=11, default='0')
+    hit_count = models.IntegerField(max_length=11, default='0')
+    new_hit_count = models.IntegerField(max_length=11, default='0')
+    creation_date = models.DateTimeField(null=True, blank=True)
+    rating = models.IntegerField(max_length=11, null=True)
+    user_rating = models.IntegerField(max_length=11, null=True)
+    user_rating_count = models.IntegerField(max_length=11, null=True)
+    user_rating_total = models.IntegerField(max_length=11, null=True)
+    country = models.CharField(max_length=200, null=True)
+    file_extension = models.CharField(max_length=10, null=True)
+    preview_extension = models.CharField(max_length=10, null=True)
+    image_red = models.IntegerField(max_length=11, null=True)
+    image_green = models.IntegerField(max_length=11, null=True)
+    image_blue = models.IntegerField(max_length=11, null=True)
+    thumb_width = models.IntegerField(max_length=11, null=True)
+    thumb_height = models.IntegerField(max_length=11, null=True)
+    archive = models.IntegerField(max_length=11, default='0')
+    access = models.IntegerField(max_length=11, default='0')
+    colour_key = models.CharField(max_length=5, null=True)
+    created_by = models.IntegerField(max_length=11, null=True)
+    file_path = models.CharField(max_length=500, null=True)
+    file_modified = models.DateTimeField(null=True, blank=True)
+    file_checksum = models.CharField(max_length=32, null=True)
+    request_count = models.IntegerField(max_length=11, default='0')
+    expiry_notification_sent = models.IntegerField(max_length=11, default='0')
+    preview_tweaks = models.CharField(max_length=50, null=True)
+    geo_lat = models.FloatField(null=True)
+    geo_long = models.FloatField(null=True)
+    mapzoom = models.IntegerField(max_length=11, null=True)
+    disk_usage = models.IntegerField(max_length=20, null=True)
+    disk_usage_last_updated = models.DateTimeField(null=True, blank=True)
+    file_size = models.IntegerField(max_length=20, null=True)
+    preview_attempts = models.IntegerField(max_length=11, null=True)
+    field12 = models.CharField(max_length=200, null=True)
+    field8 = models.CharField(max_length=200, null=True)
+    field3 = models.CharField(max_length=200, null=True)
+    annotation_count = models.IntegerField(max_length=11, null=True)
+    field51 = models.CharField(max_length=200, null=True)
+    field79 = models.CharField(max_length=200, null=True)
+    modified = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    class Meta:
+       managed = False
+       db_table = 'resource'
+       in_db = 'dam'
+
+class rs_resource_data(models.Model):
+    resource = models.IntegerField(max_length=11, null=True, primary_key=True)
+    resource_type_field = models.IntegerField(max_length=11, null=True)
+    value = models.TextField()
+
+    class Meta:
+       managed = False
+       db_table = 'resource_data'
+       in_db = 'dam'
+
+class rs_collection(models.Model):
+    ref = models.IntegerField(primary_key=True, max_length=11)
+    name = models.CharField(max_length=100, null=True)
+    user = models.IntegerField(max_length=11, null=True)
+    created = models.DateTimeField(null=True, blank=True)
+    public = models.IntegerField(max_length=11, default='0')
+    theme = models.CharField(max_length=100, null=True)
+    theme2 = models.CharField(max_length=100, null=True)
+    theme3 = models.CharField(max_length=100, null=True)
+    allow_changes = models.IntegerField(max_length=11, default='0')
+    cant_delete = models.IntegerField(max_length=11, default='0')
+    keywords = models.TextField()
+    savedsearch = models.IntegerField(max_length=11, null=True)
+    home_page_publish = models.IntegerField(max_length=11, null=True)
+    home_page_text = models.TextField()
+    home_page_image = models.IntegerField(max_length=11, null=True)
+    session_id = models.IntegerField(max_length=11, null=True)
+    theme4 = models.CharField(max_length=100, null=True)
+    theme5 = models.CharField(max_length=100, null=True)
+    theme6 = models.CharField(max_length=100, null=True)
+    theme7 = models.CharField(max_length=100, null=True)
+    theme8 = models.CharField(max_length=100, null=True)
+    theme9 = models.CharField(max_length=100, null=True)
+    theme10 = models.CharField(max_length=100, null=True)
+    theme11 = models.CharField(max_length=100, null=True)
+    theme12 = models.CharField(max_length=100, null=True)
+    theme13 = models.CharField(max_length=100, null=True)
+    theme14 = models.CharField(max_length=100, null=True)
+    theme15 = models.CharField(max_length=100, null=True)
+    theme16 = models.CharField(max_length=100, null=True)
+    theme17 = models.CharField(max_length=100, null=True)
+    theme18 = models.CharField(max_length=100, null=True)
+    theme19 = models.CharField(max_length=100, null=True)
+    theme20 = models.CharField(max_length=100, null=True)
+
+    class Meta:
+       managed = False
+       db_table = 'collection'
+       in_db = 'dam'
+
+class rs_collection_resource(models.Model):
+    collection = models.IntegerField(max_length=11, null=True)
+    resource = models.IntegerField(max_length=11, null=True)
+    date_added = models.DateTimeField(auto_now_add=True, null=True, blank=True, primary_key=True)
+    comment = models.TextField()
+    rating = models.IntegerField(max_length=11, null=True)
+    use_as_theme_thumbnail = models.IntegerField(max_length=11, null=True)
+    purchase_size = models.CharField(max_length=10, null=True)
+    purchase_complete = models.IntegerField(max_length=11, default='0')
+    purchase_price = models.FloatField(max_length=10, default='0.00')
+    sortorder = models.IntegerField(max_length=11, null=True)
+
+    class Meta:
+       managed = False
+       db_table = 'collection_resource'
+       in_db = 'dam'
+
+class rs_user(models.Model):
+    ref = models.IntegerField(primary_key=True, max_length=11)
+    username = models.CharField(max_length=50, null=True)
+    password = models.CharField(max_length=64, null=True)
+    fullname = models.CharField(max_length=100, null=True)
+    email = models.CharField(max_length=100, null=True)
+    usergroup = models.IntegerField(max_length=11, null=True)
+    last_active = models.DateTimeField(null=True, blank=True)
+    logged_in = models.IntegerField(max_length=11, null=True)
+    last_browser = models.TextField()
+    last_ip = models.CharField(max_length=100, null=True)
+    current_collection = models.IntegerField(max_length=11, null=True)
+    accepted_terms = models.IntegerField(max_length=11, default='0')
+    account_expires = models.DateTimeField(null=True, blank=True)
+    comments = models.TextField()
+    session = models.CharField(max_length=50, null=True)
+    ip_restrict = models.TextField()
+    search_filter_override = models.TextField()
+    password_last_change = models.DateTimeField(null=True)
+    login_tries = models.IntegerField(max_length=11, default='0')
+    login_last_try = models.DateTimeField(null=True, blank=True)
+    approved = models.IntegerField(max_length=11, default='1')
+    lang = models.CharField(max_length=11, null=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    hidden_collections = models.TextField()
+    password_reset_hash = models.CharField(max_length=100, null=True)
+    origin = models.CharField(max_length=50, null=True)
+    unique_hash = models.CharField(max_length=50, null=True)
+    wp_authrequest = models.CharField(max_length=50, null=True)
+    csrf_token = models.CharField(max_length=255, null=True)
+
+    class Meta:
+       managed = False
+       db_table = 'user'
+       in_db = 'dam'
+
+class rs_resource_type_field(models.Model):
+    ref = models.IntegerField(primary_key=True, max_length=11)
+    name = models.CharField(max_length=50, null=True)
+    title = models.CharField(max_length=400, null=True)
+    type = models.IntegerField(max_length=11, null=True)
+    order_by = models.IntegerField(max_length=11, default='0')
+    keywords_index = models.IntegerField(max_length=11, default='0')
+    partial_index = models.IntegerField(max_length=11, default='0')
+    resource_type = models.IntegerField(max_length=11, default='0')
+    resource_column = models.CharField(max_length=50, null=True)
+    display_field = models.IntegerField(max_length=11, default='1')
+    use_for_similar = models.IntegerField(max_length=11, default='1')
+    iptc_equiv = models.CharField(max_length=20, null=True)
+    display_template = models.TextField()
+    tab_name = models.CharField(max_length=50, null=True)
+    required = models.IntegerField(max_length=11, default='0')
+    smart_theme_name = models.CharField(max_length=200, null=True)
+    exiftool_field = models.CharField(max_length=200, null=True)
+    advanced_search = models.IntegerField(max_length=11, default='1')
+    simple_search = models.IntegerField(max_length=11, default='0')
+    help_text = models.TextField()
+    display_as_dropdown = models.IntegerField(max_length=11, default='0')
+    external_user_access = models.IntegerField(max_length=11, default='1')
+    autocomplete_macro = models.TextField()
+    hide_when_uploading = models.IntegerField(max_length=11, default='0')
+    hide_when_restricted = models.IntegerField(max_length=11, default='0')
+    value_filter = models.TextField()
+    exiftool_filter = models.TextField()
+    omit_when_copying = models.IntegerField(max_length=11, default='0')
+    tooltip_text = models.TextField()
+    regexp_filter = models.CharField(max_length=400, null=True)
+    sync_field = models.IntegerField(max_length=11, null=True)
+    display_condition = models.CharField(max_length=400, null=True)
+    onchange_macro = models.TextField()
+    field_constraint = models.IntegerField(max_length=11, null=True)
+    linked_data_field = models.TextField()
+    automatic_nodes_ordering = models.IntegerField(max_length=1, default='0')
+    fits_field = models.CharField(max_length=255, null=True)
+    personal_data = models.IntegerField(max_length=1, default='0')
+
+    class Meta:
+       managed = False
+       db_table = 'resource_type_field'
+       in_db = 'dam'
+
+#unmanaged models from WIKI
+class wiki_user(models.Model):
+    user_id = models.IntegerField(primary_key=True, max_length=10)
+    user_name = models.BinaryField(max_length=255, unique=True)
+    user_real_name = models.BinaryField(max_length=255)
+    user_password = models.BinaryField()
+    user_newpassword = models.BinaryField()
+    user_newpass_time = models.BinaryField(max_length=14, null=True)
+    user_email = models.BinaryField()
+    user_touched = models.BinaryField(max_length=14)
+    user_token = models.BinaryField(max_length=32)
+    user_email_authenticated = models.BinaryField(max_length=14, null=True)
+    user_email_token = models.BinaryField(max_length=32, null=True)
+    user_email_token_expires = models.BinaryField(max_length=14, null=True)
+    user_registration = models.BinaryField(max_length=14, null=True)
+    user_editcount = models.IntegerField(max_length=11, null=True)
+    user_password_expires = models.BinaryField(max_length=14, null=True)
+
+    class Meta:
+       managed = False
+       db_table = 'user'
+       in_db = 'wiki'
+
+class wiki_user_groups(models.Model):
+    ug_user = models.IntegerField(max_length=10, default='0')
+    ug_group = models.BinaryField(max_length=255)
+    ug_expiry = models.BinaryField(max_length=14, null=True)
+
+    class Meta:
+       managed = False
+       db_table = 'user_groups'
+       in_db = 'wiki'
+
+class wiki_page(models.Model):
+    page_id = models.IntegerField(primary_key=True, max_length=10)
+    page_namespace = models.IntegerField(max_length=11)
+    page_title = models.BinaryField(max_length=255)
+    page_restrictions = models.BinaryField()
+    page_is_redirect = models.IntegerField(max_length=3, default='0')
+    page_is_new = models.IntegerField(max_length=3, default='0')
+    page_random = models.FloatField()
+    page_touched = models.BinaryField(max_length=14)
+    page_links_updated = models.BinaryField(max_length=14, null=True)
+    page_latest = models.IntegerField(max_length=10)
+    page_len = models.IntegerField(max_length=10)
+    page_content_model = models.BinaryField(max_length=32, null=True)
+    page_lang = models.BinaryField(max_length=35, null=True)
+
+    class Meta:
+       managed = False
+       db_table = 'page'
+       in_db = 'wiki'
+
+#unmanaged models from WORDPRESS
+class wp_users(models.Model):
+    ID = models.IntegerField(primary_key=True, max_length=20)
+    user_login = models.CharField(max_length=60)
+    user_pass = models.CharField(max_length=255)
+    user_nicename = models.CharField(max_length=50)
+    user_email = models.CharField(max_length=100)
+    user_url = models.CharField(max_length=100)
+    user_registered = models.DateTimeField(default='0000-00-00 00:00:00')
+    user_activation_key = models.CharField(max_length=255)
+    user_status = models.IntegerField(max_length=11, default='0')
+    display_name = models.CharField(max_length=250)
+
+    class Meta:
+       managed = False
+       db_table = 'wp_users'
+       in_db = 'wp'
+
+
+class wp_usermeta(models.Model):
+    umeta_id = models.IntegerField(primary_key=True, max_length=20)
+    user_id = models.IntegerField(max_length=20, default='0')
+    meta_key = models.CharField(max_length=255, null=True)
+    meta_value = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'wp_usermeta'
+        in_db = 'wp'
+
 
 #temporary models for testing parser
 class par_inventory(dalmeUuid):

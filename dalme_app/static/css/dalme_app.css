@@ -11,6 +11,12 @@ body {
   background-color: #fff;
 }
 
+.img-placeholder {
+  height: 50vh;
+  background-color: #8a8a8a;
+  color: #c8c8c8;
+}
+
 .nowrap {
   white-space: nowrap !important;
 }

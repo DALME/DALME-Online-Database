@@ -22,7 +22,6 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
 SECRET_KEY = os.environ['SECRET_KEY']
 AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
 AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
@@ -32,7 +31,6 @@ AWS_REGION = os.environ['AWS_DEFAULT_REGION']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # Application definition
-# Allow all host headers
 ALLOWED_HOSTS = ['127.0.0.1:8000','127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443']
 
 INSTALLED_APPS = [
@@ -112,6 +110,8 @@ LOGOUT_REDIRECT_URL = 'https://dalme.org'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+DATABASE_ROUTERS = ['dalme_app.db_routers.ModelDatabaseRouter']
+
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
@@ -133,8 +133,29 @@ else:
             },
             'TEST': {
                 'NAME': 'dalme_app_test',
-            }
-        }
+            },
+        },
+        'dam': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['DAM_DB_NAME'],
+            'USER': os.environ['DAM_USERNAME'],
+            'PASSWORD': os.environ['DAM_PASSWORD'],
+            'HOST': os.environ['DAM_HOSTNAME'],
+        },
+        'wiki': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WIKI_DB_NAME'],
+            'USER': os.environ['WIKI_USERNAME'],
+            'PASSWORD': os.environ['WIKI_PASSWORD'],
+            'HOST': os.environ['WIKI_HOSTNAME'],
+        },
+        'wp': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WP_DB_NAME'],
+            'USER': os.environ['WP_USERNAME'],
+            'PASSWORD': os.environ['WP_PASSWORD'],
+            'HOST': os.environ['WP_HOSTNAME'],
+        },
     }
 
 AUTH_PASSWORD_VALIDATORS = [

@@ -1,0 +1,145 @@
+{% extends "dalme_app/dash_base.html" %}
+{% load staticfiles i18n %}
+{% block extra_head %}
+  {% if collections %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/fh-3.1.4/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'Editor-1.9.0/css/editor.bootstrap4.css' %}">
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/fh-3.1.4/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
+    <script type="text/javascript" src="{% static 'Editor-1.9.0/js/dataTables.editor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.bootstrap4.js' %}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
+  {% endif %}
+{% endblock %}
+{% block extra_dropdowns %}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card shadow mb-3">
+    <div class="card-header card-tabs-header">
+      <!-- tabs -->
+      <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" onclick="leaveTranscriber()">Information</a>
+        </li>
+      </ul>
+    </div>
+    <!-- Tab panes -->
+    <div class="tab-content h-100">
+      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
+        <div class="row">
+          <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="sub-card-header">
+                  <i class="fa fa-image fa-fw"></i> Image
+                </div>
+                <div class="card-body attribute_list">
+                    {% for k,v in image_data.items %}
+                      <div class="form-row">
+                          <div class="col-sm-3 text-right">
+                            <span class="attribute_list_label">{{ k }}</span>
+                          </div>
+                          <div class="col-sm-9">
+                            <span class="attribute_list_value">{{ v | safe }}</span>
+                          </div>
+                      </div>
+                    {% endfor %}
+                </div>
+              </div>
+              <div class="card mb-3">
+                <div class="sub-card-header">
+                  <i class="fa fa-list-alt fa-fw"></i> Attributes
+                </div>
+                <div class="card-body attribute_list">
+                    {% for i in attribute_data %}
+                    <div class="form-row">
+                        <div class="col-sm-3 text-right">
+                          <span class="attribute_list_label">{{ i.label }}</span>
+                        </div>
+                        <div class="col-sm-9">
+                          <span class="attribute_list_value">{{ i.value | safe }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+              </div>
+              <div class="card mb-3">
+                {% if collections %}
+                <div class="table-responsive dt-embed">
+                  <table class="table table-hover compact" id="dataTables-collections" width="100%">
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Creator</th>
+                        <th>Path</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for row in collections %}
+                        <tr>
+                          <td>{{ row.id }}</td>
+                          <td>{{ row.name }}</td>
+                          <td>{{ row.creator | safe }}</td>
+                          <td>{{ row.path}}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                {% else %}
+                <div class="sub-card-header">
+                  <i class="fa fa-th-large fa-fw"></i> Collections
+                </div>
+                <div class="card-body">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <i class="d-block fa fa-plus-square fa-fw mt-3 mb-3 mr-2"></i> Add to collection...
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-3">
+              {% if image_url %}
+              <img src="{{ image_url | safe }}" class="card-img-top" alt="dam image">
+              {% else %}
+              <div class="img-placeholder d-flex justify-content-center align-items-center">
+                <i class="d-block fa fa-eye-slash fa-4x mt-5 mb-5"></i>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-footer">
+        <div id="tab-footer-interface" class="clearfix">
+          <small class="text-muted float-left tab-footer-text" id="transcriber"></small>
+        </div>
+      </div>
+  </div>
+
+{% endblock %}
+{% block extra_scripts %}
+{% if collections %}
+  <script>
+    $(document).ready(function() {
+        var table_col = $('#dataTables-collections').DataTable({
+            {% if table_options %}
+              {% for key,value in table_options.items %}
+                {{ key | safe }}: {{ value | safe }},
+              {% endfor %}
+            {% endif %}
+            {% if table_buttons %}
+              buttons: [
+              {% for i in table_buttons %}
+                {{ i | safe }},
+              {% endfor %}
+            ],
+            {% endif %}
+        });
+        $("div.card-header-title").html('<i class="fa fa-th-large fa-fw"></i> Collections');
+      });
+    </script>
+{% endif %}
+{% endblock %}

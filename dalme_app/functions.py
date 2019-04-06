@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db import connections
 from dalme_app.menus import menu_constructor
-
+from urllib.parse import urlencode
 import re, json, requests, hashlib, os, uuid, calendar, datetime
 import pandas as pd
 import lxml.etree as etree
@@ -126,13 +126,107 @@ def render_transcription(transcription):
 def get_attribute_value(attribute):
     dt = attribute.attribute_type.data_type
     if dt == 'DATE':
-        if attribute.value_DATE_d == None or attribute.value_DATE_m == None or attribute.value_DATE_y == None:
-            value = attribute.value_STR
-        else:
-            value = attribute.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+        value = format_date(attribute, 'attribute')
     else:
         value = eval('attribute.value_'+dt)
     return value
+
+def format_date(value, type):
+    if type == 'timestamp':
+        try:
+            date_str = value.strftime('%d-%b-%Y@%H:%M')
+        except:
+            date_str = str(value)
+    elif type == 'attribute':
+        if value.value_DATE_d == None or value.value_DATE_m == None or value.value_DATE_y == None:
+            date_str = value.value_STR
+        else:
+            date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+    else:
+        date_str = str(value)
+
+    return date_str
+
+def get_dam_user(ref,output):
+    user = rs_user.objects.get(ref=ref).username
+    try:
+        c_user = Profile.objects.get(user__username=str(user))
+        if output == 'html':
+            ret = '<a href="/user/{}">{}</a>'.format(c_user.user_id, c_user.full_name)
+        else:
+            ret = str(c_user.username)
+    except:
+        ret = str(user)
+
+    return ret
+
+def rs_api_query(endpoint, user, key, **kwargs):
+    sign = hashlib.sha256(key.encode('utf-8'))
+    paramDict = kwargs
+    paramDict['user'] = user
+    paramstr = urlencode(paramDict)
+    sign.update(paramstr.encode('utf-8'))
+    R = requests.get(endpoint + paramstr + "&sign=" + sign.hexdigest())
+    return R
+
+def get_dam_preview(resource):
+    """
+    Returns the url for an image from the ResourceSpace Digital Asset Management
+    system for the given resource.
+    """
+    endpoint = 'https://dam.dalme.org/api/?'
+    user = 'api_bot'
+    key = os.environ['DAM_API_KEY']
+    queryParams = {
+        "function": "search_get_previews",
+        "param1": resource,
+        "param2": "",
+        "param3": "",
+        "param4": "0",
+        "param5": "1",
+        "param6": "asc",
+        "param7": "",
+        "param8": "scr",
+        "param9": "jpg",
+    }
+    try:
+        response = rs_api_query(endpoint, user, key, **queryParams)
+        data = json.loads(response.text)
+        preview_url = data[0]['url_scr']
+    except:
+        preview_url = None
+
+    return preview_url
+
+def get_count(item):
+    """
+    Gets counts of different types of content based on `item` input string.
+    Valid values are: "inventories", "objects", "wiki-articles", "assets", "notarial_sources", "sources", "biblio_sources", "archives".
+    All other values for `item` return None
+    """
+    if item == 'inventories':
+        return Source.objects.filter(is_inventory=True).count()
+
+    elif item == 'archives':
+        return Source.objects.filter(type=19).count()
+
+    elif item == 'sources':
+        return Source.objects.count()
+
+    elif item == 'notarial_sources':
+        return Source.objects.filter(Q(type=12) | Q(type=13)).count()
+
+    elif item == 'biblio_sources':
+        return Source.objects.filter(type__lte=11).count()
+
+    elif item == 'wiki-articles':
+        return wiki_page.objects.filter(page_is_new=1).count()
+
+    elif item == 'assets':
+        return rs_resource.objects.count()
+
+    else:
+        return None
 
 #Special functions [outdated?]
 def inventory_check(_file):
@@ -528,116 +622,6 @@ def bar_chart():
         results.append(entry)
 
     return results
-
-def get_count(item):
-    """
-    Gets counts of different types of content based on `item` input string.
-    Valid values are: "inventories", "objects", "wiki-articles", "assets", "notarial_sources", "sources", "biblio_sources", "archives".
-    All other values for `item` return None
-    """
-    if item == 'inventories':
-        return Source.objects.filter(is_inventory=True).count()
-
-    elif item == 'archives':
-        return Source.objects.filter(type=19).count()
-
-    elif item == 'sources':
-        return Source.objects.count()
-
-    elif item == 'notarial_sources':
-        return Source.objects.filter(Q(type=12) | Q(type=13)).count()
-
-    elif item == 'biblio_sources':
-        return Source.objects.filter(type__lte=11).count()
-
-    elif item == 'objects':
-        return par_object.objects.count()
-
-    elif item == 'wiki-articles':
-        if 'WIKI_BOT_PASSWORD' in os.environ:
-            wiki_user = 'Pizzorno@api_bot'
-            wiki_pass = os.environ['WIKI_BOT_PASSWORD']
-            base_url = 'https://wiki.dalme.org/'
-            tokenParams = {
-                "action": "query",
-                "meta": "tokens",
-                "type": "login",
-                "format": "json",
-            }
-            loginParams = {
-                "action": "login",
-                "lgname": wiki_user,
-                "lgpassword": wiki_pass,
-                "format": "json",
-            }
-            queryParams = {
-                "action": "query",
-                "meta": "siteinfo",
-                "siprop": "statistics",
-                "format": "json",
-            }
-            #request token
-            r1 = requests.post(base_url+'api.php',params=tokenParams)
-            loginParams['lgtoken'] = r1.json()['query']['tokens']['logintoken']
-            #Login
-            r2 = requests.post(base_url+'api.php',data=loginParams,cookies=r1.cookies)
-            #query api
-            r3 = requests.get(base_url+'api.php',params=queryParams,cookies=r2.cookies)
-            stats = r3.json()
-            try:
-                return stats['query']['statistics']['articles']
-            except KeyError:
-                return "?"
-        else:
-            return None
-
-    elif item == 'assets':
-        dam_db.ping(True) # Check connection, refresh if needed
-        cursor = dam_db.cursor()
-        cursor.execute("SELECT COUNT(*) FROM resource")
-        results = cursor.fetchone()[0]
-        cursor.close()
-        return results
-
-    else:
-        return None
-
-def get_dam_preview(resource):
-    """
-    Returns the url for an image from the ResourceSpace Digital Asset Management
-    system for the given resource.
-    """
-    if 'DAM_BOT_KEY' in os.environ:
-        auth_key = os.environ['DAM_BOT_KEY']
-        query = 'user=api_bot&function=search_get_previews&param1=' + resource + '&param2=&param3=&param4=0&param5=&param6=asc&param7=&param8=scr&param9=jpg'
-        sign_primitive = auth_key + query
-        sign = hashlib.sha256(sign_primitive.encode('utf-8')).hexdigest()
-
-        queryParams = {
-            "user": "api_bot",
-            "function": "search_get_previews",
-            "param1": resource,
-            "param2": "",
-            "param3": "",
-            "param4": "0",
-            "param5": "1",
-            "param6": "asc",
-            "param7": "",
-            "param8": "scr",
-            "param9": "jpg",
-            "sign": sign,
-        }
-
-        base_url = 'https://dam.dalme.org/api/'
-        r1 = requests.get(base_url, params=queryParams)
-        res = json.loads(r1.text)
-
-        results = res[0]['url_scr']
-
-        return results
-
-    else:
-        return "#"
 
 def get_task_icon(list_id):
     if list_id == 1:

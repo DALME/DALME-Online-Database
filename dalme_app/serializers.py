@@ -23,6 +23,31 @@ class DynamicSerializer(serializers.ModelSerializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
 
+class PageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Page
+        fields = ('name', 'dam_id','order')
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    collections = serializers.CharField(max_length=255)
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        try:
+            ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
+        except:
+            ret['created_by'] = ret['created_by']
+
+        ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
+
+        return ret
+
+    class Meta:
+        model = rs_resource
+        fields = ('ref', 'has_image','creation_date','created_by','field12','field8','field3','field51','field79','collections')
+
 class TranscriptionSerializer(serializers.ModelSerializer):
     """
     Basic serializer for transcriptions

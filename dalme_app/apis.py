@@ -1,9 +1,9 @@
 
 from django.contrib.auth.models import User
 from django.db.models import Q, Count, F, Prefetch
-import re, requests, uuid, os, datetime, json
+import re, requests, uuid, os, datetime, json, hashlib
 from rest_framework import viewsets, status, views
-from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer, TranscriptionSerializer
+from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer, TranscriptionSerializer, ImageSerializer, PageSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.models import *
@@ -12,6 +12,158 @@ from django.db.models.functions import Concat
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from django.shortcuts import get_object_or_404
 
+class Pages(viewsets.ViewSet):
+    """
+    API endpoint for managing pages
+    """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Page.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        #get basic parameters from Datatables Ajax request
+        dt_para = get_dt_parameters(request)
+        fields = [
+                'name',
+                'dam_id',
+                'order'
+            ]
+        #create a dictionary that will be returned as JSON + add the "draw" return value
+        #cast it as INT to prevent Cross Site Scripting (XSS) attacks
+        data_dict = {}
+        data_dict['draw'] = int(dt_para['draw'])
+        try:
+            queryset = self.queryset
+            if dt_para['search_string']:
+                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
+            queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
+            #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
+            rec_count = queryset.count()
+            data_dict['recordsTotal'] = rec_count
+            data_dict['recordsFiltered'] = rec_count
+            #filter the queryset for the current page
+            queryset = queryset[dt_para['start']:dt_para['limit']]
+            serializer = PageSerializer(queryset, many=True)
+            data = serializer.data
+            data_dict['data'] = data
+        except Exception as e:
+            data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+
+        return Response(data_dict)
+
+    def filter_on_search(self, *args, **kwargs):
+        search_string = kwargs['search_string']
+        queryset = kwargs['queryset']
+        fields = kwargs['fields']
+        search_words = search_string.split()
+        search_q = Q()
+
+        if search_words[0][-1:] == ':':
+            search_col = search_words[0][0:-1]
+            if search_col in fields:
+                search_words.pop(0)
+                for word in search_words:
+                    search_word = Q(**{'%s__istartswith' % search_col: word})
+                    search_q &= search_word
+        else:
+            search_q = Q()
+            for word in search_words:
+                for f in fields:
+                    search_word = Q(**{'%s__istartswith' % f: word})
+                    search_q |= search_word
+
+        queryset = queryset.filter(search_q)
+
+        return queryset
+
+    def get_ordered_queryset(self, *args, **kwargs):
+        queryset = kwargs['queryset']
+        dt_para = kwargs['dt_para']
+        order_column_name = dt_para['order_column_name']
+        order_dir = dt_para['order_dir']
+        order = dt_para['order']
+        queryset = queryset.order_by(order)
+
+        return queryset
+
+class Images(viewsets.ViewSet):
+    """
+    API endpoint for managing DAM images
+    """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = rs_resource.objects.filter(resource_type=1)
+    queryset = queryset.annotate(collections=RawSQL('SELECT GROUP_CONCAT(collection.name SEPARATOR ", ") FROM collection_resource JOIN resource rs2 ON collection_resource.resource = rs2.ref JOIN collection ON collection.ref = collection_resource.collection WHERE rs2.ref = resource.ref', []))
+
+    def list(self, request, *args, **kwargs):
+        #get basic parameters from Datatables Ajax request
+        dt_para = get_dt_parameters(request)
+        fields = [
+                'ref',
+                'has_image',
+                'creation_date',
+                'created_by',
+                'field12',
+                'field8',
+                'field3',
+                'field51',
+                'field79',
+            ]
+        #create a dictionary that will be returned as JSON + add the "draw" return value
+        #cast it as INT to prevent Cross Site Scripting (XSS) attacks
+        data_dict = {}
+        data_dict['draw'] = int(dt_para['draw'])
+        try:
+            queryset = self.queryset
+            if dt_para['search_string']:
+                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
+            queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
+            #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
+            rec_count = queryset.count()
+            data_dict['recordsTotal'] = rec_count
+            data_dict['recordsFiltered'] = rec_count
+            #filter the queryset for the current page
+            queryset = queryset[dt_para['start']:dt_para['limit']]
+            serializer = ImageSerializer(queryset, many=True)
+            data = serializer.data
+            data_dict['data'] = data
+        except Exception as e:
+            data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+
+        return Response(data_dict)
+
+    def filter_on_search(self, *args, **kwargs):
+        search_string = kwargs['search_string']
+        queryset = kwargs['queryset']
+        fields = kwargs['fields']
+        search_words = search_string.split()
+        search_q = Q()
+
+        if search_words[0][-1:] == ':':
+            search_col = search_words[0][0:-1]
+            if search_col in fields:
+                search_words.pop(0)
+                for word in search_words:
+                    search_word = Q(**{'%s__istartswith' % search_col: word})
+                    search_q &= search_word
+        else:
+            search_q = Q()
+            for word in search_words:
+                for f in fields:
+                    search_word = Q(**{'%s__istartswith' % f: word})
+                    search_q |= search_word
+
+        queryset = queryset.filter(search_q)
+
+        return queryset
+
+    def get_ordered_queryset(self, *args, **kwargs):
+        queryset = kwargs['queryset']
+        dt_para = kwargs['dt_para']
+        order_column_name = dt_para['order_column_name']
+        order_dir = dt_para['order_dir']
+        order = dt_para['order']
+        queryset = queryset.order_by(order)
+
+        return queryset
 
 class Transcriptions(viewsets.ModelViewSet):
     """
@@ -27,7 +179,7 @@ class Transcriptions(viewsets.ModelViewSet):
     #    serializer = TranscriptionSerializer(transcription)
     #    data = serializer.data
 
-    #    return Response(data)  
+    #    return Response(data)
 
 
 class Models(viewsets.ViewSet):

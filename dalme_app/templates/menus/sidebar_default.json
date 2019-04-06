@@ -56,13 +56,13 @@
       },
       {
         "text": "Images",
-        "link": "#",
+        "link": "/images",
         "iconClass": "fa-images",
         "permissions": "Staff"
       },
       {
         "text": "Pages",
-        "link": "#",
+        "link": "/pages",
         "iconClass": "fa-file",
         "permissions": "Staff"
       }

@@ -129,9 +129,9 @@ class DTListView(TemplateView):
         return table_options
 
     def get_page_title(self, *args, **kwargs):
-        if self.kwargs['title']:
+        try:
             p_title = self.kwargs['title']
-        else:
+        except:
             p_title = 'List View'
         return p_title
 
@@ -655,6 +655,134 @@ def PageManifest(request, pk):
     return render(request, 'dalme_app/page_manifest.html', context)
 
 @method_decorator(login_required,name='dispatch')
+class ImageDetail(DetailView):
+    model = rs_resource
+    template_name = 'dalme_app/image_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = ['Repository', 'Images']
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context = functions.set_menus(self.request, context, state)
+        context['page_title'] = 'DAM Image ' + str(self.object.ref)
+
+        image_data = {
+            'DAM Id': self.object.ref,
+            'Created': functions.format_date(self.object.creation_date, 'timestamp'),
+            'Creator': functions.get_dam_user(self.object.created_by, 'html'),
+            'Record modified': functions.format_date(self.object.modified, 'timestamp'),
+            'File modified': functions.format_date(self.object.file_modified, 'timestamp'),
+            'Filesize': self.object.file_size,
+        }
+
+        if self.object.has_image:
+            image_data['Image?'] = '<i class="fa fa-check-circle dt_checkbox_true"></i>'
+        else:
+            image_data['Image?'] = '<i class="fa fa-times-circle dt_checkbox_false"></i>'
+
+        context['image_data'] = image_data
+
+        try:
+            attribute_data = []
+            attributes = rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field')
+            for a in attributes:
+                value = a.value
+                label = rs_resource_type_field.objects.get(ref=a.resource_type_field).title
+                dict = {
+                    'label': label,
+                    'value': value,
+                }
+                attribute_data.append(dict)
+
+            context['attribute_data'] = attribute_data
+
+        except:
+            attribute_data = None
+
+
+        collections = []
+        col_list = rs_collection_resource.objects.filter(resource=self.object.ref)
+        for c in col_list:
+            col = rs_collection.objects.get(ref=c.collection)
+            dict = {
+                'id': col.ref,
+                'name': col.name,
+                'creator': functions.get_dam_user(col.user, 'html'),
+                'path': col.theme+' ≫ '+col.theme2+' ≫ '+col.theme3,
+            }
+            collections.append(dict)
+
+        context['collections'] = collections
+
+        context['table_options'] = {
+            'pageLength':5,
+            'responsive':'true',
+            'dom': '''"<'sub-card-header clearfix'<'card-header-title'>Br><'card-body'tip>"''',
+            'stateSave': 'true',
+            'select': 'true',
+            'paging': 'true',
+            'language': '{searchPlaceholder: "Search..."}',
+            }
+        context['table_buttons'] = [
+            '{ extend: "colvis", text: "\uf0db" }',
+            ]
+
+        context['image_url'] = functions.get_dam_preview(self.object.ref)
+
+        return context
+
+    def get_object(self):
+        """
+        Raise a 404 on things that aren't proper UUIDs,
+        which would normally raise an exception.
+        """
+        try:
+            # Call the superclass
+            object = super().get_object()
+            return object
+        except:
+            raise Http404
+
+
+@method_decorator(login_required,name='dispatch')
+class ImageList(DTListView):
+    page_title = 'Image List'
+    breadcrumb = ['Repository','Images']
+    table_options = {
+        'pageLength':25,
+        'responsive':'true',
+        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'deferRender': 'true',
+        'language': '{searchPlaceholder: "Search..."}'
+        }
+    ajax_string = '"../api/images/?format=json"'
+    table_buttons = [
+        '{ extend: "colvis", text: "\uf0db" }',
+        ]
+    column_headers = [
+            ['DAM Id','ref',1],
+            ['Title','field8',1],
+            ['Folio','field79',1],
+            ['Image','has_image',1],
+            ['Date','field12',0],
+            ['Created','creation_date',0],
+            ['Creator','created_by',0],
+            ['Country','field3',0],
+            ['Collections','collections',1],
+            ['Original filename','field51',0],
+            ]
+    render_dict = {
+            'Image': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+            'Date': '''function ( data ) {return moment(data).format("DD-MMM-YYYY");}''',
+            'Created': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
+            'DAM Id': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.ref+'</a>';}''',
+            }
+
+@method_decorator(login_required,name='dispatch')
 class PageMain(View):
     def get(self, request, *args, **kwargs):
         """Display list of pages"""
@@ -665,6 +793,35 @@ class PageMain(View):
         """Handle creating new pages"""
         view = PageCreate.as_view()
         return view(request, *args, **kwargs)
+
+@method_decorator(login_required,name='dispatch')
+class PageList(DTListView):
+    breadcrumb = ['Repository','Pages']
+    page_title = 'Page List'
+    table_options = {
+        'pageLength':25,
+        'responsive':'true',
+        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'deferRender': 'true',
+        'language': '{searchPlaceholder: "Search..."}'
+        }
+    ajax_string = '"../api/pages/?format=json"'
+    table_buttons = [
+        '{ extend: "colvis", text: "\uf0db" }',
+        ]
+    column_headers = [
+            ['Name', 'name', 1],
+            ['DAM Id', 'dam_id', 1],
+            ['Order','order', 1]
+            ]
+    #render_dict = {
+    #        'Image': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+    #        'Date': '''function ( data ) {return moment(data).format("DD-MMM-YYYY");}''',
+    #        'Created': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
+    #        'DAM Id': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.ref+'</a>';}''',
+    #        }
 
 @method_decorator(login_required,name='dispatch')
 class PageDetail(View):
@@ -693,29 +850,6 @@ class PageDisplay(DetailView):
         context['page_title'] = self.object.name
         context['form'] = forms.page_main(instance=self.object)
         return context
-
-class PageList(DTListView):
-    breadcrumb = ['Pages']
-    table_options = {
-        'pageLength':25,
-        'responsive':'true',
-        'dom': '''"<'card-header'Bfr><'card-body'tip>"''',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': 'true',
-        'scrollY': '100',
-        'scrollResize': 'true',
-        'deferRender': 'true',
-        'scroller': 'true',
-        'language': '{searchPlaceholder: "Search..."}'
-        }
-    ajax_string = '"../api/dt?m=pages&format=json"'
-
-    column_headers = [
-            ['DAM ID', 'dam_id', 1],
-            ['Name', 'name', 1],
-            ['Order','order', 1]
-            ]
 
 class PageUpdate(UpdateView):
     model = Page
