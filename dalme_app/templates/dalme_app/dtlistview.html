@@ -10,6 +10,13 @@
 <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
 <script type="text/javascript" src="{% static 'Editor-1.9.0/js/dataTables.editor.js' %}"></script>
 <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.bootstrap4.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
+
+{% if filters %}
+  <script type="text/javascript">
+    var filters = {{ filters | safe }};
+  </script>
+{% endif %}
 
 {% endblock %}
 
@@ -102,22 +109,10 @@ $(document).ready(function() {
           ]
         {% endif %}
     });
+    {% if filters %}
+      addDtToolbarButton('filters');
+    {% endif %}
 });
 </script>
-<!--script>
-    $(document).ready(function(){
-      resizeDiv();
-    });
 
-    window.onresize = function(event) {
-      resizeDiv();
-    }
-
-    function resizeDiv() {
-      vpw = $(window).width();
-      vph = $(window).height();
-      nh = vph - 234;
-      $(".table-responsive").css({"height": nh + "px"});
-    }
-</script-->
 {% endblock %}

@@ -50,6 +50,7 @@
                 <div class="sub-card-header">
                   <i class="fa fa-list-alt fa-fw"></i> Attributes
                 </div>
+                {% if attribute_data %}
                 <div class="card-body attribute_list">
                     {% for i in attribute_data %}
                     <div class="form-row">
@@ -62,6 +63,13 @@
                     </div>
                     {% endfor %}
                 </div>
+                {% else %}
+                <div class="card-body">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <i class="d-block fa fa-plus-square fa-fw mt-3 mb-3 mr-2"></i> Add attributes...
+                  </div>
+                </div>
+                {% endif %}
               </div>
               <div class="card mb-3">
                 {% if collections %}

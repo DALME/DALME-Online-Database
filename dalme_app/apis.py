@@ -96,6 +96,9 @@ class Images(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         #get basic parameters from Datatables Ajax request
         dt_para = get_dt_parameters(request)
+        #if 'filters' in dt_para:
+        #    filters = get_q_from_filters(dt_para['filters'])
+
         fields = [
                 'ref',
                 'has_image',
@@ -634,6 +637,12 @@ class Sources(viewsets.ViewSet):
 
         return queryset
 
+#def get_q_from_filters(filters):
+#    q_objects = []
+#    for f in filters:
+#        qo = Q()
+
+#    return q_objects
 
 def get_dt_parameters(request):
     para_dict = {}
@@ -642,6 +651,9 @@ def get_dt_parameters(request):
     length = int(request.GET['length']) #number of records to be displayed
     #calculate limit for queryset, i.e. upper number of Python range
     para_dict['limit'] = para_dict['start'] + length
+    #check for filters
+    if request.GET['filters']:
+        para_dict['filters'] = request.GET['filters']
     if request.GET['search[value]'] != '':
         search_string = request.GET['search[value]'] #global search value to be applied to all columns with searchable=true
     else:

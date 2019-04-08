@@ -107,6 +107,7 @@ class DTListView(TemplateView):
     nowrap_list = []
     ajax_string = ''
     table_editor = None
+    filters = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -120,6 +121,7 @@ class DTListView(TemplateView):
         context['table_options'] = self.get_table_options()
         context['table_buttons'] = self.get_table_buttons()
         context['table_editor'] = self.get_table_editor()
+        context['filters'] = self.get_filters()
 
         return context
 
@@ -132,11 +134,17 @@ class DTListView(TemplateView):
         try:
             p_title = self.kwargs['title']
         except:
-            p_title = 'List View'
+            try:
+                p_title = self.page_title
+            except:
+                p_title = 'List View'
         return p_title
 
     def get_table_buttons(self, *args, **kwargs):
         return self.table_buttons
+
+    def get_filters(self, *args, **kwargs):
+        return self.filters
 
     def get_breadcrumb(self, *args, **kwargs):
         return self.breadcrumb
@@ -597,7 +605,7 @@ class SourceDisplay(DetailView):
                 'order': [[ 3, "asc" ]]
                 }
             context['table_buttons_pages'] = [
-                '{ extend: "colvis", text: "\uf0db" }',
+                '{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
                 #'{ extend: "create", text: "\uf067", editor: editor }',
                 #'{ extend: "edit", text: "\uf304", editor: editor }',
                 #'{ extend: "remove", text: "\uf00d", editor: editor }'
@@ -615,7 +623,7 @@ class SourceDisplay(DetailView):
                 'language': '{searchPlaceholder: "Search..."}'
                 }
             context['table_buttons_children'] = [
-                '{ extend: "colvis", text: "\uf0db" }',
+                '{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
                 #'{ extend: "create", text: "\uf067", editor: editor }',
                 #'{ extend: "edit", text: "\uf304", editor: editor }',
                 #'{ extend: "remove", text: "\uf00d", editor: editor }'
@@ -753,15 +761,16 @@ class ImageList(DTListView):
     table_options = {
         'pageLength':25,
         'responsive':'true',
-        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
+        'dom': '''"<'card-table-header'B<'#filters-button-ct.dt-buttons'>fr><'#filters-container.collapse.clearfix'><'card-table-body'tip>"''',
         'serverSide': 'true',
         'stateSave': 'true',
         'deferRender': 'true',
-        'language': '{searchPlaceholder: "Search..."}'
+        'language': '{searchPlaceholder: "Search"}'
         }
     ajax_string = '"../api/images/?format=json"'
     table_buttons = [
         '{ extend: "colvis", text: "\uf0db" }',
+        '"pageLength"',
         ]
     column_headers = [
             ['DAM Id','ref',1],
@@ -781,6 +790,46 @@ class ImageList(DTListView):
             'Created': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
             'DAM Id': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.ref+'</a>';}''',
             }
+    filters = [
+        {
+            'label':'Title',
+            'field':'field8',
+            'type':'text',
+            'lookups':[
+                {'label':'is', 'lookup':'exact'},
+                {'label':'contains', 'lookup':'contains'},
+                {'label':'in', 'lookup':'in'},
+                {'label':'starts with', 'lookup':'startswith'},
+                {'label':'ends with', 'lookup':'endswith'},
+                {'label':'matches regex', 'lookup':'regex'},
+            ],
+        },
+        {
+            'label':'Has Image',
+            'field':'has_image',
+            'type':'switch',
+        },
+        {
+            'label':'Country',
+            'field':'field3',
+            'type':'check',
+            'options': [
+                {'label':'France'},
+                {'label':'Italy'},
+                {'label':'Spain'},
+            ],
+        },
+        {
+            'label':'Collections',
+            'field':'collections',
+            'type':'select',
+            'options': [
+                {'label':'Collection 1'},
+                {'label':'Collection 2'},
+                {'label':'Collection 3'},
+            ],
+        },
+    ]
 
 @method_decorator(login_required,name='dispatch')
 class PageMain(View):
@@ -810,6 +859,7 @@ class PageList(DTListView):
     ajax_string = '"../api/pages/?format=json"'
     table_buttons = [
         '{ extend: "colvis", text: "\uf0db" }',
+        '"pageLength"',
         ]
     column_headers = [
             ['Name', 'name', 1],
