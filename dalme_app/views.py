@@ -789,12 +789,14 @@ class ImageList(DTListView):
             'Date': '''function ( data ) {return moment(data).format("DD-MMM-YYYY");}''',
             'Created': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
             'DAM Id': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.ref+'</a>';}''',
+            'Creator': '''function ( data, type, row, meta ) { var isnum = /^\\d+$/.test(data); return isnum == false ? '<a href="/user/'+data+'">'+data+'</a>' : data ;}''',
             }
     filters = [
         {
             'label':'Title',
             'field':'field8',
             'type':'text',
+            'operator':'and',
             'lookups':[
                 {'label':'is', 'lookup':'exact'},
                 {'label':'contains', 'lookup':'contains'},
@@ -808,28 +810,25 @@ class ImageList(DTListView):
             'label':'Has Image',
             'field':'has_image',
             'type':'switch',
+            'operator':'and',
         },
-        {
+    ]
+    countries = rs_resource.objects.filter(resource_type=1, archive=0).values('field3').distinct()
+    collections = rs_collection.objects.all().values('name').distinct()
+    c_filter = {
             'label':'Country',
             'field':'field3',
             'type':'check',
-            'options': [
-                {'label':'France'},
-                {'label':'Italy'},
-                {'label':'Spain'},
-            ],
-        },
-        {
+            'operator':'or',
+        }
+    col_filter = {
             'label':'Collections',
             'field':'collections',
             'type':'select',
-            'options': [
-                {'label':'Collection 1'},
-                {'label':'Collection 2'},
-                {'label':'Collection 3'},
-            ],
-        },
-    ]
+            'operator':'or',
+        }
+    filters = functions.add_filter_options(countries, c_filter, filters, 'check')
+    filters = functions.add_filter_options(collections, col_filter, filters)
 
 @method_decorator(login_required,name='dispatch')
 class PageMain(View):

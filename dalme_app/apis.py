@@ -1,7 +1,8 @@
 
 from django.contrib.auth.models import User
 from django.db.models import Q, Count, F, Prefetch
-import re, requests, uuid, os, datetime, json, hashlib
+import re, requests, uuid, os, datetime, json, hashlib, ast, operator
+from functools import reduce
 from rest_framework import viewsets, status, views
 from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer, TranscriptionSerializer, ImageSerializer, PageSerializer
 from rest_framework.response import Response
@@ -90,15 +91,12 @@ class Images(viewsets.ViewSet):
     API endpoint for managing DAM images
     """
     permission_classes = (DjangoModelPermissions,)
-    queryset = rs_resource.objects.filter(resource_type=1)
+    queryset = rs_resource.objects.filter(resource_type=1, archive=0)
     queryset = queryset.annotate(collections=RawSQL('SELECT GROUP_CONCAT(collection.name SEPARATOR ", ") FROM collection_resource JOIN resource rs2 ON collection_resource.resource = rs2.ref JOIN collection ON collection.ref = collection_resource.collection WHERE rs2.ref = resource.ref', []))
 
     def list(self, request, *args, **kwargs):
         #get basic parameters from Datatables Ajax request
         dt_para = get_dt_parameters(request)
-        #if 'filters' in dt_para:
-        #    filters = get_q_from_filters(dt_para['filters'])
-
         fields = [
                 'ref',
                 'has_image',
@@ -118,6 +116,12 @@ class Images(viewsets.ViewSet):
             queryset = self.queryset
             if dt_para['search_string']:
                 queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
+            if dt_para['filters']:
+                filters = dt_para['filters']
+                if 'and_list' in filters:
+                    queryset = queryset.filter(reduce(operator.and_, (Q(**q) for q in filters['and_list'])))
+                if 'or_list' in filters:
+                    queryset = queryset.filter(reduce(operator.or_, (Q(**q) for q in filters['or_list'])))
             queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
             #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
             rec_count = queryset.count()
@@ -652,8 +656,11 @@ def get_dt_parameters(request):
     #calculate limit for queryset, i.e. upper number of Python range
     para_dict['limit'] = para_dict['start'] + length
     #check for filters
-    if request.GET['filters']:
-        para_dict['filters'] = request.GET['filters']
+    if 'filters' in request.GET:
+        filters = ast.literal_eval(request.GET['filters'])
+    else:
+        filters = None
+    para_dict['filters'] = filters
     if request.GET['search[value]'] != '':
         search_string = request.GET['search[value]'] #global search value to be applied to all columns with searchable=true
     else:

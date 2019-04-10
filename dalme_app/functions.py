@@ -131,6 +131,22 @@ def get_attribute_value(attribute):
         value = eval('attribute.value_'+dt)
     return value
 
+def add_filter_options(values, filter, filters, mode='complete'):
+    if mode == 'strict':
+        op = []
+    elif mode == 'check':
+        op = [{'label':'None'}]   
+    else:
+        op = [{'label':'Any'}, {'label':'None'}, {'label':'divider'}]
+
+    for d in values:
+        v = list(d.values())[0]
+        if v != '':
+            op.append({'label':v})
+    filter['options'] = op
+    filters.append(filter)
+    return filters
+
 def format_date(value, type):
     if type == 'timestamp':
         try:
