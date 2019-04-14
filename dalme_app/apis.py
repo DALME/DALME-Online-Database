@@ -1,7 +1,7 @@
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db.models import Q, Count, F, Prefetch
-import re, requests, uuid, os, datetime, json, hashlib, ast, operator
+import re, requests, uuid, os, datetime, json, hashlib, ast, operator, uu, base64
 from functools import reduce
 from rest_framework import viewsets, status, views
 from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer, TranscriptionSerializer, ImageSerializer, PageSerializer
@@ -12,6 +12,10 @@ from django.db.models.expressions import RawSQL
 from django.db.models.functions import Concat
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from django.shortcuts import get_object_or_404
+from passlib.apps import phpass_context
+from dalme_app import functions
+import logging
+logger = logging.getLogger('DJANGO_APIS')
 
 class Pages(viewsets.ViewSet):
     """
@@ -23,11 +27,7 @@ class Pages(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         #get basic parameters from Datatables Ajax request
         dt_para = get_dt_parameters(request)
-        fields = [
-                'name',
-                'dam_id',
-                'order'
-            ]
+        fields = ['name','dam_id','order']
         #create a dictionary that will be returned as JSON + add the "draw" return value
         #cast it as INT to prevent Cross Site Scripting (XSS) attacks
         data_dict = {}
@@ -35,8 +35,8 @@ class Pages(viewsets.ViewSet):
         try:
             queryset = self.queryset
             if dt_para['search_string']:
-                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
-            queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
+                queryset = filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
+            queryset = get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
             #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
             rec_count = queryset.count()
             data_dict['recordsTotal'] = rec_count
@@ -51,45 +51,8 @@ class Pages(viewsets.ViewSet):
 
         return Response(data_dict)
 
-    def filter_on_search(self, *args, **kwargs):
-        search_string = kwargs['search_string']
-        queryset = kwargs['queryset']
-        fields = kwargs['fields']
-        search_words = search_string.split()
-        search_q = Q()
-
-        if search_words[0][-1:] == ':':
-            search_col = search_words[0][0:-1]
-            if search_col in fields:
-                search_words.pop(0)
-                for word in search_words:
-                    search_word = Q(**{'%s__istartswith' % search_col: word})
-                    search_q &= search_word
-        else:
-            search_q = Q()
-            for word in search_words:
-                for f in fields:
-                    search_word = Q(**{'%s__istartswith' % f: word})
-                    search_q |= search_word
-
-        queryset = queryset.filter(search_q)
-
-        return queryset
-
-    def get_ordered_queryset(self, *args, **kwargs):
-        queryset = kwargs['queryset']
-        dt_para = kwargs['dt_para']
-        order_column_name = dt_para['order_column_name']
-        order_dir = dt_para['order_dir']
-        order = dt_para['order']
-        queryset = queryset.order_by(order)
-
-        return queryset
-
 class Images(viewsets.ViewSet):
-    """
-    API endpoint for managing DAM images
-    """
+    """ API endpoint for managing DAM images """
     permission_classes = (DjangoModelPermissions,)
     queryset = rs_resource.objects.filter(resource_type=1, archive=0)
     queryset = queryset.annotate(collections=RawSQL('SELECT GROUP_CONCAT(collection.name SEPARATOR ", ") FROM collection_resource JOIN resource rs2 ON collection_resource.resource = rs2.ref JOIN collection ON collection.ref = collection_resource.collection WHERE rs2.ref = resource.ref', []))
@@ -97,17 +60,7 @@ class Images(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         #get basic parameters from Datatables Ajax request
         dt_para = get_dt_parameters(request)
-        fields = [
-                'ref',
-                'has_image',
-                'creation_date',
-                'created_by',
-                'field12',
-                'field8',
-                'field3',
-                'field51',
-                'field79',
-            ]
+        fields = ['ref','has_image','creation_date','created_by','field12','field8','field3','field51','field79']
         #create a dictionary that will be returned as JSON + add the "draw" return value
         #cast it as INT to prevent Cross Site Scripting (XSS) attacks
         data_dict = {}
@@ -115,14 +68,14 @@ class Images(viewsets.ViewSet):
         try:
             queryset = self.queryset
             if dt_para['search_string']:
-                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
+                queryset = filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
             if dt_para['filters']:
                 filters = dt_para['filters']
                 if 'and_list' in filters:
                     queryset = queryset.filter(reduce(operator.and_, (Q(**q) for q in filters['and_list'])))
                 if 'or_list' in filters:
                     queryset = queryset.filter(reduce(operator.or_, (Q(**q) for q in filters['or_list'])))
-            queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
+            queryset = get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
             #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
             rec_count = queryset.count()
             data_dict['recordsTotal'] = rec_count
@@ -137,62 +90,14 @@ class Images(viewsets.ViewSet):
 
         return Response(data_dict)
 
-    def filter_on_search(self, *args, **kwargs):
-        search_string = kwargs['search_string']
-        queryset = kwargs['queryset']
-        fields = kwargs['fields']
-        search_words = search_string.split()
-        search_q = Q()
-
-        if search_words[0][-1:] == ':':
-            search_col = search_words[0][0:-1]
-            if search_col in fields:
-                search_words.pop(0)
-                for word in search_words:
-                    search_word = Q(**{'%s__istartswith' % search_col: word})
-                    search_q &= search_word
-        else:
-            search_q = Q()
-            for word in search_words:
-                for f in fields:
-                    search_word = Q(**{'%s__istartswith' % f: word})
-                    search_q |= search_word
-
-        queryset = queryset.filter(search_q)
-
-        return queryset
-
-    def get_ordered_queryset(self, *args, **kwargs):
-        queryset = kwargs['queryset']
-        dt_para = kwargs['dt_para']
-        order_column_name = dt_para['order_column_name']
-        order_dir = dt_para['order_dir']
-        order = dt_para['order']
-        queryset = queryset.order_by(order)
-
-        return queryset
-
 class Transcriptions(viewsets.ModelViewSet):
-    """
-    API endpoint for managing transcriptions
-    """
+    """ API endpoint for managing transcriptions """
     permission_classes = (DjangoModelPermissions,)
     queryset = Transcription.objects.all()
     serializer_class = TranscriptionSerializer
 
-    #def retrieve(self, request, pk=None):
-    #    queryset = Transcription.objects.all()
-    #    transcription = get_object_or_404(queryset, pk=pk)
-    #    serializer = TranscriptionSerializer(transcription)
-    #    data = serializer.data
-
-    #    return Response(data)
-
-
 class Models(viewsets.ViewSet):
-    """
-    API endpoint for managing notifications
-    """
+    """ API endpoint for managing notifications """
     permission_classes = (DjangoModelPermissions,)
     queryset = Content_type.objects.none()
 
@@ -264,9 +169,7 @@ class Models(viewsets.ViewSet):
         return data
 
 class Notifications(viewsets.ViewSet):
-    """
-    API endpoint for managing notifications
-    """
+    """ API endpoint for managing notifications """
     permission_classes = (DjangoModelPermissions,)
     queryset = Notification.objects.all()
 
@@ -391,42 +294,18 @@ class Notifications(viewsets.ViewSet):
             result = 'nope'
         return Response(result)
 
-    def filter_on_search(self, *args, **kwargs):
-        search_string = kwargs['search_string']
-        queryset = kwargs['queryset']
-        fields = kwargs['fields']
-        search_words = search_string.split()
-        search_q = Q()
-
-        if search_words[0][-1:] == ':' and search_words[0][0:-1] in fields:
-            search_col = search_words[0][0:-1]
-            search_words.pop(0)
-            for word in search_words:
-                search_word = Q(**{'%s__istartswith' % search_col: word})
-                search_q &= search_word
-        else:
-            search_q = Q()
-            for word in search_words:
-                for f in fields:
-                    search_word = Q(**{'%s__icontains' % f: word})
-                    search_q |= search_word
-
-        queryset = queryset.filter(search_q)
-
-        return queryset
-
 class Users(viewsets.ViewSet):
-    """
-    API endpoint for managing users
-    """
+    """ API endpoint for managing users """
+
     permission_classes = (DjangoModelPermissions,)
     queryset = Profile.objects.all()
 
     def list(self, request, *args, **kwargs):
         #get basic parameters from Datatables Ajax request
         dt_para = get_dt_parameters(request)
-        profile_fields = ['full_name','dam_usergroup','dam_userid','wiki_groups','wiki_userid','wiki_username','wp_userid','wp_role','wp_avatar_url']
-        user_fields = ['last_login','is_superuser','username','first_name','last_name','email','is_staff','is_active','date_joined']
+
+        #get programatically: UserSerializer.Meta.fields
+        fields = ['full_name','dam_user','wiki_user','wp_role', 'wp_user', 'user__last_login','user__is_superuser','user__username','user__first_name','user__last_name','user__email','user__is_staff','user__is_active','user__date_joined']
         #create a dictionary that will be returned as JSON + add the "draw" return value
         #cast it as INT to prevent Cross Site Scripting (XSS) attacks
         data_dict = {}
@@ -434,8 +313,8 @@ class Users(viewsets.ViewSet):
         try:
             queryset = self.queryset
             if dt_para['search_string']:
-                queryset = self.filter_on_search(queryset=queryset, search_string=dt_para['search_string'], profile_fields=profile_fields, user_fields=user_fields)
-            queryset = self.get_ordered_queryset(queryset=queryset, dt_para=dt_para, user_fields=user_fields)
+                queryset = filter_on_search(queryset=queryset, search_string=dt_para['search_string'], fields=fields)
+            queryset = get_ordered_queryset(queryset=queryset, dt_para=dt_para, fields=fields)
             #count the records in the queryset and add the values for "recordsTotal" and "recordsFiltered" to the return dictionary
             rec_count = queryset.count()
             data_dict['recordsTotal'] = rec_count
@@ -450,67 +329,172 @@ class Users(viewsets.ViewSet):
 
         return Response(data_dict)
 
-    def filter_on_search(self, *args, **kwargs):
-        search_string = kwargs['search_string']
-        queryset = kwargs['queryset']
-        profile_fields = kwargs['profile_fields']
-        user_fields = kwargs['user_fields']
-        search_words = search_string.split()
-        search_q = Q()
+    def create(self, request, format=None):
+        display_fields = ['dam_usergroup', 'wp_role']
+        result = {}
+        data = request.data
+        data_dict = {}
+        user = {}
+        groups = []
+        wiki_groups = []
+        for k,v in data.items():
+            if k != 'action':
+                k = json.loads('['+k[4:].replace(']','",').replace('[','"')[:-1]+']')
+                k.pop(0)
+                for i,f in enumerate(k):
+                    if 'many-count' in f or f == '' or f.isdigit():
+                        k.pop(i)
+                if k != []:
+                    if k[0] == 'user':
+                        if len(k) > 1:
+                            if k[1] == 'groups':
+                                groups.append({k[2]:v})
+                            else:
+                                user[k[1]] = v
+                    elif k[0] == 'wiki_groups':
+                            wiki_groups.append({k[1]:v})
+                    else:
+                        if len(k) > 1:
+                            data_dict[k[0]] = { k[1]:v }
+                        else:
+                            data_dict[k[0]] = v
+            user['groups'] = groups
+            data_dict['user'] = user
+            data_dict['wiki_groups'] = wiki_groups
 
+        serializer = ProfileSerializer(data=data_dict)
+        if serializer.is_valid():
+            #create wp user
+            wp_dict = {
+                'user_login': functions.get_unique_username(data_dict['user']['username'],'wp'),
+                'user_pass': phpass_context.hash(data_dict['user']['password']),
+                'user_nicename': data_dict['user']['username'],
+                'user_email': data_dict['user']['email'],
+                'user_registered': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'display_name': data_dict['full_name']
+                }
 
-        if search_words[0][-1:] == ':':
-            search_col = search_words[0][0:-1]
-            if search_col in profile_fields:
-                search_words.pop(0)
-                for word in search_words:
-                    search_word = Q(**{'%s__istartswith' % search_col: word})
-                    search_q &= search_word
+            wp_meta_list = [
+                ['nickname', data_dict['user']['username']],
+                ['first_name', data_dict['user']['first_name']],
+                ['last_name', data_dict['user']['last_name']],
+                ['wp_capabilities', data_dict['wp_role']]
+            ]
+            wp_user = wp_users(**wp_dict).save()
+            wp_user = wp_users.objects.get(user_login=wp_dict['user_login'])
+            for i in wp_meta_list:
+                dict = {
+                    'user_id': wp_user.pk,
+                    'meta_key': i[0],
+                    'meta_value': i[1],
+                    }
+                wp_usermeta(**dict).save()
+            #add id to data_dict
+            data_dict['wp_user'] = wp_user.pk
+            #create dam user
+            dam_dict = {
+                'username': functions.get_unique_username(data_dict['user']['username'], 'dam'),
+                'password': str(uuid.uuid4().hex),
+                'fullname': data_dict['full_name'],
+                'email': data_dict['user']['email'],
+                'usergroup': data_dict['dam_usergroup'],
+                'approved': 1,
+            }
+            dam_user = rs_user(**dam_dict).save()
+            dam_user = rs_user.objects.get(username=dam_dict['username'])
+            del data_dict['dam_usergroup']
+            #add id to data_dict
+            data_dict['dam_user'] = dam_user.pk
+            #create wiki user
+            wiki_dict = {
+                'user_name': bytes(functions.get_unique_username(data_dict['user']['username'], 'wiki'), encoding='ascii'),
+                'user_real_name': bytes(data_dict['full_name'], encoding='ascii'),
+                'user_password': bytes(str(uuid.uuid4().hex), encoding='ascii'),
+                'user_email': bytes(data_dict['user']['email'], encoding='ascii'),
+            }
+            wiki_usr = wiki_user(**wiki_dict).save()
+            wiki_usr = wiki_user.objects.get(user_name=wiki_dict['user_name'])
+            for i in wiki_groups:
+                dict = {
+                    'ug_user': wiki_usr,
+                    'ug_group': bytes(i, encoding='ascii')
+                }
+                wiki_user_groups(**dict).save()
+            #add ids to data_dict
+            data_dict['wiki_user'] = wiki_usr.pk
+            serializer = ProfileSerializer(data=data_dict, context={'groups': groups})
+            if serializer.is_valid():
+                new_obj = serializer.save()
+                #get array with updated object
+                object = Profile.objects.get(pk=new_obj.id)
+                serializer = ProfileSerializer(object)
+                result['data'] = serializer.data
+                status=201
 
-            elif search_col in user_fields:
-                search_words.pop(0)
-                for word in search_words:
-                    field = 'user__'+search_col
-                    search_word = search_word = Q(**{'%s__istartswith' % field: word})
-                    search_q &= search_word
+            else:
+                result['fieldErrors'] = get_error_array(serializer.errors, display_fields)
+                status=400
 
         else:
-            search_q = Q()
-            for word in search_words:
-                for f in profile_fields:
-                    search_word = Q(**{'%s__istartswith' % f: word})
-                    search_q |= search_word
+            result['fieldErrors'] = get_error_array(serializer.errors, display_fields)
+            status=400
 
-                for f in user_fields:
-                    field = 'user__'+f
-                    search_word = Q(**{'%s__istartswith' % field: word})
-                    search_q |= search_word
+        return Response(result, status)
 
-        queryset = queryset.filter(search_q)
+    def update(self, pk=None, format=None):
+        data = request.data
+        data_dict = {}
+        pattern = re.compile(r'\[([a-z0-9]+)\]', re.IGNORECASE)
+        for k,v in data.items():
+            if k != 'action':
+                key_list = pattern.findall(k)
+                row_id = key_list[0]
+                field = key_list[1]
+                if row_id in data_dict:
+                    data_dict[row_id].append((field, v))
+                else:
+                    data_dict[row_id] = [(field, v)]
+        obj_dict = {}
+        for k,v in data_dict.items():
+            obj_dict['id'] = k
+            for i in v:
+                obj_dict[i[0]] = i[1]
 
-        return queryset
+        object = Notification.objects.get(pk=row_id)
+        serializer = NotificationSerializer(object ,data=obj_dict)
+        if serializer.is_valid():
+            serializer.save()
+            #get array with updated object
+            object = Notification.objects.get(pk=row_id)
+            serializer = NotificationSerializer(object)
+            data = serializer.data
+            result = {}
+            result['data'] = data
 
-    def get_ordered_queryset(self, *args, **kwargs):
-        queryset = kwargs['queryset']
-        user_fields = kwargs['user_fields']
-        dt_para = kwargs['dt_para']
-        order_column_name = dt_para['order_column_name']
-        order_dir = dt_para['order_dir']
-        order = dt_para['order']
-        if order_column_name in user_fields:
-            order = 'user__'+order_column_name
-            if order_dir == 'desc':
-                order = '-'+order
+        else:
+            #get error message as string
+            result = serializer.errors
 
-        queryset = queryset.order_by(order)
+        return Response(result)
 
-        return queryset
-
+    def destroy(self, pk=None, format=None):
+        ids = self.kwargs.get('pk').split(',')
+        q = Q()
+        for i in ids:
+            q |= Q(pk=i)
+        try:
+            Notification.objects.filter(q).delete()
+            obj = Notification.objects.all()
+            serializer = NotificationSerializer(obj, many=True)
+            data = serializer.data
+            result = {}
+            result['data'] = data
+        except:
+            result = 'nope'
+        return Response(result)
 
 class Sources(viewsets.ViewSet):
-    """
-    API endpoint for managing sources
-    """
+    """ API endpoint for managing sources """
     permission_classes = (DjangoModelPermissions,)
     queryset = Source.objects.all()
 
@@ -641,13 +625,7 @@ class Sources(viewsets.ViewSet):
 
         return queryset
 
-#def get_q_from_filters(filters):
-#    q_objects = []
-#    for f in filters:
-#        qo = Q()
-
-#    return q_objects
-
+# GENERALIZED FUNCTIONS
 def get_dt_parameters(request):
     para_dict = {}
     para_dict['draw'] = request.GET['draw'] #draw number - to allow DT to match requests to responses
@@ -679,3 +657,45 @@ def get_dt_parameters(request):
     para_dict['order'] = order
 
     return para_dict
+
+def filter_on_search(*args, **kwargs):
+    search_string = kwargs['search_string']
+    queryset = kwargs['queryset']
+    fields = kwargs['fields']
+    search_words = search_string.split()
+    search_q = Q()
+    for word in search_words:
+        for f in fields:
+            search_word = Q(**{'%s__icontains' % f: word})
+            search_q |= search_word
+    queryset = queryset.filter(search_q)
+    return queryset
+
+def get_ordered_queryset(*args, **kwargs):
+    queryset = kwargs['queryset']
+    fields = kwargs['fields']
+    dt_para = kwargs['dt_para']
+    order_column_name = dt_para['order_column_name']
+    order_dir = dt_para['order_dir']
+    order = dt_para['order']
+    if order_column_name in fields:
+        order = 'user__'+order_column_name
+        if order_dir == 'desc':
+            order = '-'+order
+    queryset = queryset.order_by(order)
+    return queryset
+
+def get_error_array(errors, display_fields):
+    fieldErrors = []
+    for k,v in errors.items():
+        if type(v) is dict:
+            for k2, v2 in v.items():
+                field = k+'.'+k2
+                fieldErrors.append({'name':field,'status':str(v2[0])})
+        else:
+            if k in display_fields:
+                field = k+'.value'
+            else:
+                field = k
+            fieldErrors.append({'name':field,'status':str(v[0])})
+    return fieldErrors

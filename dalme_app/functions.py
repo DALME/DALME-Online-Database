@@ -13,9 +13,9 @@ from urllib.parse import urlencode
 import re, json, requests, hashlib, os, uuid, calendar, datetime
 import pandas as pd
 import lxml.etree as etree
+from random import randint
 
 from . import menus
-from .forms import new_user
 from .models import *
 from functools import wraps
 
@@ -61,7 +61,6 @@ def in_group(group_name):
             return view_func(request, *args, **kwargs)
         return wrapper
     return _in_group
-
 
 #General functions
 def set_menus(request, context, state):
@@ -135,7 +134,7 @@ def add_filter_options(values, filter, filters, mode='complete'):
     if mode == 'strict':
         op = []
     elif mode == 'check':
-        op = [{'label':'None'}]   
+        op = [{'label':'None'}]
     else:
         op = [{'label':'Any'}, {'label':'None'}, {'label':'divider'}]
 
@@ -213,6 +212,20 @@ def get_dam_preview(resource):
         preview_url = None
 
     return preview_url
+
+def get_unique_username(username, app):
+    try:
+        if app == 'wp':
+            exists = wp_users.objects.get(user_login=username)
+        if app == 'wiki':
+            exists = wiki_user.objects.get(user_name=bytes(username, encoding='ascii'))
+        if app == 'dam':
+            exists = rs_user.objects.get(username=username)
+    except:
+        exists = False
+    if exists:
+        username = username + str(randint(100, 999))
+    return username
 
 def get_count(item):
     """

@@ -1,21 +1,18 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from dalme_app.models import *
 from rest_framework import serializers
 from dalme_app import functions
+import uu, base64
 
 class DynamicSerializer(serializers.ModelSerializer):
-    """
-    A serializer that takes an additional `fields` argument that
-    controls which fields should be displayed.
-    """
+    """ A serializer that takes an additional `fields` argument that
+    controls which fields should be displayed. """
 
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
         fields = kwargs.pop('fields', None)
-
         # Instantiate the superclass normally
         super(DynamicSerializer, self).__init__(*args, **kwargs)
-
         if fields is not None:
             # Drop any fields that are not specified in the `fields` argument.
             allowed = set(fields)
@@ -39,9 +36,7 @@ class ImageSerializer(serializers.ModelSerializer):
             ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
         except:
             ret['created_by'] = ret['created_by']
-
         ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
-
         return ret
 
     class Meta:
@@ -49,9 +44,7 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ('ref', 'has_image','creation_date','created_by','field12','field8','field3','field51','field79','collections')
 
 class TranscriptionSerializer(serializers.ModelSerializer):
-    """
-    Basic serializer for transcriptions
-    """
+    """ Basic serializer for transcriptions """
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         transcription_xml = '<xml>'+ret['transcription']+'</xml>'
@@ -63,16 +56,17 @@ class TranscriptionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AttributeSerializer(serializers.ModelSerializer):
-    """
-    Basic serializer for attribute data
-    """
+    """ Basic serializer for attribute data """
+
+    class Meta:
+        model = Attribute
+        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DBR')
 
     def to_representation(self, instance):
         types = Attribute_type.objects.all()
         type_dict = {}
         for t in types:
             type_dict[t.id] = [t.short_name,t.data_type]
-
         ret = super().to_representation(instance)
         new_ret = {}
         for i in ret:
@@ -82,14 +76,8 @@ class AttributeSerializer(serializers.ModelSerializer):
                 value = ret['value_STR']
             else:
                 value = eval("ret['value_"+ dtype +"']")
-
             new_ret[label] = value
-
         return new_ret
-
-    class Meta:
-        model = Attribute
-        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DBR')
 
 class SourceSerializer(DynamicSerializer):
     type = serializers.StringRelatedField()
@@ -103,88 +91,122 @@ class SourceSerializer(DynamicSerializer):
         """Create dictionaries for fields with links"""
         fields = self.context.get('fields')
         ret = super().to_representation(instance)
-
         attributes = ret.pop('attributes')
         for i in attributes:
             (k, v), = i.items()
             ret[k] = v
-
         ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id']}
         ret['parent_source'] = {'name': ret['parent_source'], 'url': '/sources/'+str(ret['parent_source_id'])}
         if 'url' in ret:
             ret['url'] = {'name': 'Visit Link', 'url': ret['url']}
-
         return ret
 
     class Meta:
         model = Source
         fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes', 'no_folios')
 
+class WikiGroupSerializer(serializers.ModelSerializer):
+    """Basic serializer for user group data from the wiki database"""
+
+    class Meta:
+        model = wiki_user_groups
+        fields = ('ug_group',)
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        for key, value in ret.items():
+            ret[key] = base64.b64decode(value).capitalize()
+        return ret
+
+    #def to_internal_value(self, data):
+    #    """ convert string fields to binary representation + make lower case"""
+    #    internal = super().to_internal_value(data)
+    #    if internal['ug_group'] != None:
+    #            internal['ug_group'] = base64.b64encode(internal['ug_group'].lower())
+    #    return internal
+
+class GroupSerializer(serializers.ModelSerializer):
+    """ Basic serializer for user group data """
+    name = serializers.CharField(max_length=255, required=False)
+    class Meta:
+        model = Group
+        fields = ('id','name')
+
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Basic serializer for user data
-    """
+    """ Basic serializer for user data """
+    groups = GroupSerializer(many=True, required=False)
+
     class Meta:
         model = User
-        fields = ('id','last_login','is_superuser','username','first_name','last_name','email','is_staff','is_active','date_joined')
+        fields = ('id','last_login','is_superuser','username','first_name','last_name','email','is_staff','is_active','date_joined','groups')
 
 class ProfileSerializer(serializers.ModelSerializer):
-    """
-    Serialises user profiles and combines user data
-    """
+    """ Serialises user profiles and combines user data """
     user = UserSerializer(required=True)
+    dam_usergroup = serializers.ChoiceField(choices=rs_user.DAM_USERGROUPS, source='get_dam_usergroup', required=False)
+    wiki_groups = serializers.SerializerMethodField(required=False)
+    wp_role_display = serializers.ChoiceField(choices=Profile.WP_ROLE, source='get_wp_role_display', required=False)
+    dam_usergroup_display = serializers.ChoiceField(choices=rs_user.DAM_USERGROUPS, source='get_dam_usergroup_display', required=False)
 
     class Meta:
         model = Profile
-        fields = ('id','full_name','user_id','dam_usergroup','dam_userid','wiki_groups','wiki_userid','wiki_username','wp_userid','wp_role','wp_avatar_url', 'user')
+        fields = ('id','full_name','user_id','dam_usergroup','wiki_groups', 'wp_role', 'user', 'wp_role_display', 'dam_usergroup_display', 'wiki_user', 'dam_user', 'wp_user')
+
+    def get_wiki_groups(self, obj):
+        wg = wiki_user_groups.objects.filter(ug_user=obj.wiki_user)
+        serializer = WikiGroupSerializer(instance=wg, many=True)
+        return serializer.data
 
     def to_representation(self, instance):
-        """
-        Move fields from user to profile representation.
-        """
+        """ set display for choice fields """
         ret = super().to_representation(instance)
-        user_representation = ret.pop('user')
-        for key in user_representation:
-            ret[key] = user_representation[key]
-
-        if 'email' in ret:
-            ret['email'] = {'name': ret['email'], 'url': 'mailto:'+ret['email']}
-
+        if 'wp_role' in ret:
+            if ret['wp_role'] != '':
+                wp_role_d = ret.pop('wp_role_display')
+                ret['wp_role'] = {'name': wp_role_d, 'value': ret['wp_role']}
+        if 'dam_usergroup' in ret:
+            if ret['dam_usergroup'] != '':
+                dam_group_d = ret.pop('dam_usergroup_display')
+                ret['dam_usergroup'] = {'name': dam_group_d, 'value': ret['dam_usergroup']}
         return ret
 
     def to_internal_value(self, data):
-        """
-        Move fields related to user to their own user dictionary.
-        """
-        user_internal = {}
-        for key in UserSerializer.Meta.fields:
-            if key in data:
-                user_internal[key] = data.pop(key)
-
-        internal = super().to_internal_value(data)
-        internal['user'] = user_internal
-        return internal
+        """ revert display fields """
+        if 'wp_role' in data:
+            wp_role = data.pop('wp_role')['value']
+            data['wp_role'] = wp_role
+        if 'dam_usergroup' in data:
+            dam_usergroup = data.pop('dam_usergroup')['value']
+            data['dam_usergroup'] = dam_usergroup
+        return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
-        """
-        Update profile and user. Assumes there is a user for every profile.
-        """
+        """ Update profile and user. Assumes there is a user for every profile """
         user_data = validated_data.pop('user')
         super().update(instance, validated_data)
-
         user = instance.user
         for attr, value in user_data.items():
             setattr(user, attr, value)
         user.save()
-
         return instance
 
+    def create(self, validated_data):
+        """ Create profile and user. Assumes there is a user for every profile """
+        user_data = validated_data.pop('user')
+        groups = self.context['groups']
+        user = User.objects.create_user(**user_data)
+        for g in groups:
+            #group = Group.objects.get(pk=g['id'])
+            user.groups.add(g)
+        profile = Profile.objects.create(user=user, **validated_data)
+        return profile
+
 class NotificationSerializer(serializers.ModelSerializer):
-    #level = serializers.ChoiceField(choices=Notification.LEVELS, source='get_level_display')
-    #type = serializers.ChoiceField(choices=Notification.TYPES, source='get_type_display')
-    #level = serializers.SerializerMethodField()
-    #type = serializers.SerializerMethodField()
     code = serializers.IntegerField()
+
+    class Meta:
+        model = Notification
+        fields = ('id','code','level','type','text')
 
     def to_representation(self, instance):
         """Create dictionaries for fields with choices"""
@@ -202,10 +224,6 @@ class NotificationSerializer(serializers.ModelSerializer):
             if obj in t:
                 label = t[1]
         return label
-
-    class Meta:
-        model = Notification
-        fields = ('id','code','level','type','text')
 
 class ContentTypeSerializer(serializers.ModelSerializer):
     class Meta:

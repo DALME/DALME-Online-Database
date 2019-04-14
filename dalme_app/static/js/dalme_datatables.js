@@ -1,3 +1,20 @@
+function createDatatable(target, helper) {
+  if (typeof dt_editor_options !== 'undefined') {
+    dt_editor_options['table'] = target;
+    dt_editor = new $.fn.dataTable.Editor(dt_editor_options);
+    if (helper != 'None') { initializeHelper(dt_editor); };
+    if (typeof dt_editor_buttons !== 'undefined') {
+      var buttons = dt_editor_buttons;
+      var index, len;
+      for (index = 0, len = buttons.length; index < len; ++index) {
+        var dict = { 'extend': buttons[index].extend, 'text': buttons[index].text, 'editor': dt_editor};
+        dt_options.buttons.push(dict);
+      };
+    };
+  };
+  dt_table = $(target).DataTable(dt_options);
+}
+
 function addDtToolbarButton(button) {
   if (button == 'filters') {
     filters_btn_container = document.getElementById("filters-button-ct");

@@ -3,18 +3,20 @@ Contains general purpose scripts
 """
 
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core import serializers
 from django.db.models import Q, Count, F, Prefetch
+from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer, TranscriptionSerializer, ImageSerializer, PageSerializer
+from rest_framework.response import Response
 
-import re, json, requests, hashlib, os, uuid
+import re, requests, uuid, os, datetime, json, ast, operator
 import pandas as pd
 
 from dalme_app.models import *
 from dalme_app import functions
 from datetime import date
 from django.db.models.expressions import RawSQL
-
+from passlib.apps import phpass_context
 
 def get_script_menu():
     script_register = [
@@ -25,6 +27,11 @@ def get_script_menu():
         },
         {
             "name": "test_expression",
+            "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
+            "type": "info"
+        },
+        {
+            "name": "test_expression2",
             "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
             "type": "info"
         },
@@ -109,9 +116,205 @@ def session_info(request, username):
 
 def test_expression():
 
-    data = resource.objects.all()
+    data = {
+        'action' : 'create',
+        'data[0][user][first_name]' : 'John',
+        'data[0][user][last_name]' : 'Smith',
+        'data[0][full_name]' : 'John Smith',
+        'data[0][user][email]' : 'jsmith@harvard.edu',
+        'data[0][user][username]' : 'jsmith',
+        'data[0][user][password]' : 'jjsmith1929',
+        'data[0][user][is_staff][]' : '1',
+        'data[0][user][is_superuser][]' : '1',
+        'data[0][user][groups][0][id]' : '3',
+        'data[0][user][groups][1][id]' : '4',
+        'data[0][groups-many-count]' : '2',
+        'data[0][dam_usergroup][value]' : '3',
+        'data[0][wiki_user][wiki_groups][0][ug_group]' : 'Bureaucrat',
+        'data[0][wiki_user][wiki_groups-many-count]' : '1',
+        'data[0][wp_role][value]' : 'a:1:{s:6:"author";b:1;}',
+    }
+    profile = {}
+    groups = []
+    wiki_groups = []
+    pattern = re.compile(r'\[([a-z0-9_-]+)\]', re.IGNORECASE)
+    for k,v in data.items():
+        if k != 'action':
+            key_list = pattern.findall(k)
+            key_count = len(key_list)
+            fields = []
+            for k in key_list:
+                if 'many-count' not in k and k != '' and not k.isdigit() and k != 'value':
+                    fields.append(k)
+            if fields != []:
+                if fields[0] == 'user':
+                    if fields[1] == 'groups':
+                        groups.append(v)
+                    else:
+                        field = 'user.'+fields[1]
+                        profile[field] = v
+                elif fields[0] == 'wiki_user':
+                    if len(fields) > 1:
+                        wiki_groups.append(v.lower())
+                else:
+                    profile[fields[0]] = v
+    #needs to check data! users MUST be unique!
+    wp_user_att = {
+        'user_login': profile['user.username'],
+        'user_pass': phpass_context.hash(profile['user.password']),
+        'user_nicename': profile['user.username'],
+        'user_email': profile['user.email'],
+        'user_registered': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'display_name': profile['full_name']
+        }
 
-    return data
+    dam_user_att = {
+        'username': profile['user.username'],
+        'password': str(uuid.uuid4().hex),
+        'fullname': profile['full_name'],
+        'email': profile['user.email'],
+        'usergroup': profile['dam_usergroup'],
+        'approved': 1,
+    }
+
+    wiki_user_att = {
+        'user_name': bytes(profile['user.username'], encoding='ascii'),
+        'user_real_name': bytes(profile['full_name'], encoding='ascii'),
+        'user_password': bytes(str(uuid.uuid4().hex), encoding='ascii'),
+        'user_email': bytes(profile['user.email'], encoding='ascii'),
+    }
+
+    wp_meta_list = [
+        ['nickname', profile['user.username']],
+        ['first_name', profile['user.first_name']],
+        ['last_name', profile['user.last_name']],
+        ['wp_capabilities', profile['wp_role']]
+    ]
+
+    new_wp_user = wp_users(**wp_user_att).save()
+    new_wp_user = wp_users.objects.get(user_login=profile['user.username'])
+
+    for i in wp_meta_list:
+        dict = {
+            'user_id': new_wp_user.pk,
+            'meta_key': i[0],
+            'meta_value': i[1],
+            }
+        wp_usermeta(**dict).save()
+
+    new_dam_user = rs_user(**dam_user_att).save()
+    new_dam_user = rs_user.objects.get(username=profile['user.username'])
+    new_wiki_user = wiki_user(**wiki_user_att).save()
+    new_wiki_user = wiki_user.objects.get(user_name=wiki_user_att['user_name'])
+    for i in wiki_groups:
+        dict = {
+            'ug_user': new_wiki_user,
+            'ug_group': bytes(i, encoding='ascii')
+        }
+        wiki_user_groups(**dict).save()
+
+    del profile['dam_usergroup']
+    profile['wp_user'] = new_wp_user
+    profile['dam_user'] = new_dam_user
+    profile['wiki_user'] = new_wiki_user
+
+    new_profile = Profile(**profile).save()
+    for i in groups:
+        new_profile.groups.add(i)
+
+    serializer = ProfileSerializer(new_profile)
+    data = serializer.data
+    result = {}
+    result['data'] = data
+
+    return result
+
+def test_expression2():
+
+    data2 = {
+        'action' : 'create',
+        'data[0][user][first_name]' : 'John',
+        'data[0][user][last_name]' : 'Smith',
+        'data[0][full_name]' : 'John Smith',
+        'data[0][user][email]' : 'jsmith@harvard.edu',
+        'data[0][user][username]' : 'jsmith',
+        'data[0][user][password]' : 'jjsmith1929',
+        'data[0][user][is_staff][]' : '1',
+        'data[0][user][is_superuser][]' : '1',
+        'data[0][user][groups][0][id]' : '3',
+        'data[0][user][groups][1][id]' : '4',
+        'data[0][groups-many-count]' : '2',
+        'data[0][dam_usergroup][value]' : '3',
+        'data[0][wiki_groups][0][ug_group]' : 'Bureaucrat',
+        'data[0][wiki_groups][1][ug_group]' : 'Sysop',
+        'data[0][wiki_groups-many-count]' : '2',
+        'data[0][wp_role][value]' : 'a:1:{s:6:"author";b:1;}',
+    }
+
+    data = {
+        'action' : 'create',
+        'data[0][user][first_name]' : 'd',
+        'data[0][user][last_name]' : 'd',
+        'data[0][full_name]' : 'd d',
+        'data[0][user][email]' : 'ddd',
+        'data[0][user][username]' : '',
+        'data[0][user][password]' : '',
+        'data[0][user][groups][0][id]' : '',
+        'data[0][groups-many-count]' : '0',
+        'data[0][dam_usergroup][value]' : '',
+        'data[0][wiki_groups-many-count]' : '0',
+        'data[0][wp_role][value]' : '',
+    }
+
+    data_dict = {}
+    user = {}
+    groups = []
+    wiki_groups = []
+    for k,v in data.items():
+        if k != 'action':
+            k = json.loads('['+k[4:].replace(']','",').replace('[','"')[:-1]+']')
+            k.pop(0)
+            for i,f in enumerate(k):
+                if 'many-count' in f or f == '' or f.isdigit():
+                    k.pop(i)
+            if k != []:
+                if k[0] == 'user':
+                    if len(k) > 1:
+                        if k[1] == 'groups':
+                            groups.append({k[2]:v})
+                        else:
+                            user[k[1]] = v
+                elif k[0] == 'wiki_groups':
+                        wiki_groups.append({k[1]:v})
+                else:
+                    if len(k) > 1:
+                        data_dict[k[0]] = { k[1]:v }
+                    else:
+                        data_dict[k[0]] = v
+        user['groups'] = groups
+        data_dict['user'] = user
+        data_dict['wiki_groups'] = wiki_groups
+
+    serializer = ProfileSerializer(data=data_dict)
+    if serializer.is_valid():
+        val = 'yay!'
+    else:
+        display_fields = ['dam_usergroup', 'wp_role']
+        errors = serializer.errors
+        fieldErrors = []
+        for k,v in errors.items():
+            if type(v) is dict:
+                for k2, v2 in v.items():
+                    field = k+'.'+k2
+                    fieldErrors.append({'name':field,'status':str(v2[0])})
+            else:
+                if k in display_fields:
+                    field = k+'.value'
+                else:
+                    field = k
+                fieldErrors.append({'name':field,'status':str(v[0])})
+        val = fieldErrors
+    return val
 
 def merge_attributes_csv():
     _file = 'attribute_date.csv'
@@ -161,6 +364,7 @@ def merge_attributes_csv():
             results.append(str(i) + ', ' + att_id + ': BAD')
 
     return results
+
 
 
 def import_sources_csv(request, username):

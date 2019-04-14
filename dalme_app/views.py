@@ -90,23 +90,28 @@ class DefaultSearch(SearchView):
 
 class DTListView(TemplateView):
     template_name = 'dalme_app/dtlistview.html'
+    form_helper = None
     breadcrumb = []
-    table_options = {
+    dt_options = {
         'pageLength':25,
         'responsive':'true',
-        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
+        'fixedHeader': 'true',
+        'dom': '\'<"card-table-header"B<"#filters-button-ct.dt-buttons">fr><"#filters-container.collapse.clearfix"><"card-table-body"tip>\'',
         'serverSide': 'true',
         'stateSave': 'true',
         'select': 'true',
         'deferRender': 'true',
-        'language': '{searchPlaceholder: "Search..."}'
+        'language': {'searchPlaceholder': 'Search'}
         }
-    table_buttons = ['{ extend: "colvis", text: "\uf0db", className: "btn_single"}']
-    column_headers = []
-    render_dict = {}
-    nowrap_list = []
-    ajax_string = ''
-    table_editor = None
+    dt_buttons = [{ 'extend': '"colvis"', 'text': '"\uf0db"'}]
+    dt_buttons_extra = ['"pageLength"']
+    dt_column_headers = []
+    dt_render_dict = {}
+    dt_nowrap_list = []
+    dt_ajax_base_url = ''
+    dt_editor_options = None
+    dt_editor_buttons = None
+    dt_editor_fields = None
     filters = None
 
     def get_context_data(self, **kwargs):
@@ -117,18 +122,21 @@ class DTListView(TemplateView):
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
         context['page_title'] = self.get_page_title()
-        context['columnDefs'] = self.get_column_defs()
-        context['table_options'] = self.get_table_options()
-        context['table_buttons'] = self.get_table_buttons()
-        context['table_editor'] = self.get_table_editor()
+        context['dt_options'] = self.get_dt_options()
+        context['dt_editor'] = self.get_dt_editor()
         context['filters'] = self.get_filters()
-
+        context['form_helper'] = self.form_helper
         return context
 
-    def get_table_options(self, *args, **kwargs):
-        table_options = self.table_options
-        table_options['ajax'] = self.get_table_ajax_str()
-        return table_options
+    def get_dt_options(self, *args, **kwargs):
+        dt_options = {}
+        options = self.dt_options
+        options['ajax'] = self.get_dt_ajax_str()
+        dt_options['options'] = options
+        dt_options['buttons'] = self.dt_buttons
+        dt_options['buttons_extra'] = self.dt_buttons_extra
+        dt_options['columnDefs'] = self.get_dt_column_defs()
+        return dt_options
 
     def get_page_title(self, *args, **kwargs):
         try:
@@ -140,26 +148,38 @@ class DTListView(TemplateView):
                 p_title = 'List View'
         return p_title
 
-    def get_table_buttons(self, *args, **kwargs):
-        return self.table_buttons
-
     def get_filters(self, *args, **kwargs):
         return self.filters
 
     def get_breadcrumb(self, *args, **kwargs):
         return self.breadcrumb
 
-    def get_table_editor(self, *args, **kwargs):
-        return self.table_editor
+    def get_dt_ajax_str(self, *args, **kwargs):
+        base_url = self.dt_ajax_base_url
+        dt_ajax_str = '"'+base_url+'?format=json"'
+        return dt_ajax_str
+
+    def get_dt_editor(self, *args, **kwargs):
+        if self.dt_editor_fields:
+            dt_editor = {}
+            dt_editor['fields'] = self.dt_editor_fields
+            dt_editor['ajax_url'] = self.dt_ajax_base_url
+            if self.dt_editor_options:
+                dt_editor['options'] = self.dt_editor_options
+            if self.dt_editor_buttons:
+                dt_editor['buttons'] = self.dt_editor_buttons
+        else:
+            dt_editor = None
+        return dt_editor
 
     def get_column_headers(self, *args, **kwargs):
-        return self.column_headers
+        return self.dt_column_headers
 
-    def get_column_defs(self, *args, **kwargs):
+    def get_dt_column_defs(self, *args, **kwargs):
         #create column headers
         column_headers = self.get_column_headers()
-        render_dict = self.render_dict
-        nowrap_list = self.nowrap_list
+        render_dict = self.dt_render_dict
+        nowrap_list = self.dt_nowrap_list
         #create column definitions for DT
         columnDefs = []
         col = 0
@@ -168,7 +188,7 @@ class DTListView(TemplateView):
             c_dict['title'] = '"'+i[0]+'"'
             c_dict['targets'] = col
             c_dict['data'] = '"'+i[1]+'"'
-            c_dict['defaultContent'] = '"-"'
+            c_dict['defaultContent'] = '""'
             if i[2]:
                 c_dict['visible'] = 'true'
             else:
@@ -180,9 +200,6 @@ class DTListView(TemplateView):
             columnDefs.append(c_dict)
             col = col + 1
         return columnDefs
-
-    def get_table_ajax_str(self, *args, **kwargs):
-        return self.ajax_string
 
 @method_decorator(login_required,name='dispatch')
 class SourceMain(View):
@@ -216,88 +233,132 @@ class AdminMain(View):
 
 class AdminUsers(DTListView):
     breadcrumb = ['System','Users']
-    ajax_string = '"../api/users/?format=json"'
-    column_headers = [
-            ['ID', 'id', 1],
-            ['Last login','last_login', 1],
-            ['SU','is_superuser', 1],
-            ['Username','username', 1],
+    dt_ajax_base_url = '../api/users/'
+    form_helper = 'users_helper.js'
+    dt_column_headers = [
+            ['Id', 'id', 1],
+            ['Last login','user.last_login', 1],
+            ['SU','user.is_superuser', 1],
+            ['Username','user.username', 1],
             ['Full name','full_name', 1],
-            ['First name','first_name', 0],
-            ['Last name','last_name', 0],
-            ['Email','email', 1],
-            ['Staff','is_staff', 0],
-            ['Active','is_active', 1],
-            ['Date joined','date_joined', 0],
-            ['DAM user group','dam_usergroup', 0],
-            ['DAM user ID','dam_userid', 0],
+            ['First name','user.first_name', 0],
+            ['Last name','user.last_name', 0],
+            ['Email','user.email', 1],
+            ['Staff','user.is_staff', 0],
+            ['Active','user.is_active', 1],
+            ['Groups','user.groups', 0],
+            ['Date joined','user.date_joined', 0],
+            ['DAM user group','dam_usergroup.name', 0],
             ['Wiki groups','wiki_groups', 0],
-            ['Wiki user ID','wiki_userid', 0],
-            ['Wiki username','wiki_username', 0],
-            ['WordPress user ID','wp_userid', 0],
-            ['WordPress role','wp_role', 0]]
-    render_dict = {
-            'Username': '''function ( data, type, row, meta ) {return '<a href="/user/'+data+'">'+data+'</a>';}''',
-            'Email': '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}''',
-            'Last login': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
-            'Date joined': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
-            'SU': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
-            'Staff': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
-            'Active': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
+            ['WordPress role','wp_role.name', 0]]
+    dt_render_dict = {
+            'Username': 'function ( data, type, row, meta ) {return \'<a href="/user/\'+data+\'">\'+data+\'</a>\';}',
+            'Email': 'function ( data, type, row, meta ) {return \'<a href="mailto:\'+data+\'">\'+data+\'</a>\';}',
+            'Last login': 'function ( data ) {return data != null ? moment(data).format("DD-MMM-YYYY@HH:mm") : "Never";}',
+            'Date joined': 'function ( data ) {return moment(data).format("DD-MMM-YYYY");}',
+            'SU': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+            'Staff': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+            'Active': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+            'Groups': '"[, ].name"',
+            'Wiki groups': '"[, ].ug_group"'
             }
-    nowrap_list = []
+    dt_editor_options = {'idSrc': '"id"',}
+    dt_editor_buttons = [
+        { 'extend': 'create', 'text': '\uf067' },
+        { 'extend': 'edit', 'text': '\uf304' },
+        { 'extend': 'remove', 'text': '\uf00d' },
+    ]
+    dt_editor_fields = [
+        { 'label':'First name', 'name':'user.first_name' },
+        { 'label':'Last name', 'name':'user.last_name' },
+        { 'label':'Full name', 'name':'full_name' },
+        { 'label':'Email', 'name':'user.email' },
+        { 'label':'Username', 'name':'user.username' },
+        { 'label':'Password', 'name':'user.password', 'type': "password" },
+        { 'label':'Staff', 'name':'user.is_staff', 'type': "checkbox",
+            'options': [
+                {'label': "Yes", 'value': "1"},
+            ]},
+        { 'label':'Super user', 'name':'user.is_superuser', 'type': "checkbox",
+            'options': [
+                {'label': "Yes", 'value': "1"},
+            ]},
+        { 'label':'Groups', 'name':'user.groups[].id', 'type': "checkbox",
+            'options': [
+                {'label': "Super Administrators", 'value': "1"},
+                {'label': "Developers", 'value': "2"},
+                {'label': "Staff", 'value': "3"},
+                {'label': "Users", 'value': "4"},
+            ]},
+        { 'label':'DAM user group', 'name':'dam_usergroup.value', 'type': "chosen",
+            'opts': {
+                "disable_search": 'true',
+            },
+            'options': [
+                {'label': "", 'value': ""},
+                {'label': "Administrator", 'value': "1"},
+                {'label': "General User", 'value': "2"},
+                {'label': "Super Admin", 'value': "3"},
+                {'label': "Archivist", 'value': "4"},
+            ]},
+        { 'label':'Wiki groups', 'name':'wiki_groups[].ug_group', 'type': "checkbox",
+            'options': [
+                {'label': "Users", 'value': "Users"},
+                {'label': "Administrator", 'value': "Administrator"},
+                {'label': "Bureaucrat", 'value': "Bureaucrat"},
+                {'label': "Sysop", 'value': "Sysop"},
+            ]},
+        { 'label':'WordPress role', 'name':'wp_role.value', 'type': "chosen",
+            'opts': {
+                "disable_search": 'true',
+            },
+            'options': [
+                {'label': "", 'value': ""},
+                {'label': "Administrator", 'value': "a:1:{s:13:\\\"administrator\\\";b:1;}"},
+                {'label': "Editor", 'value': "a:1:{s:6:\\\"editor\\\";b:1;}"},
+                {'label': "Author", 'value': "a:1:{s:6:\\\"author\\\";b:1;}"},
+                {'label': "Contributor", 'value': "a:1:{s:11:\\\"contributor\\\";b:1;}"},
+                {'label': "Subscriber", 'value': "a:1:{s:10:\\\"subscriber\\\";b:1;}"},
+            ]},
+    ]
 
 class AdminNotifications(DTListView):
     breadcrumb = ['System','Notifications']
-    table_options = {
-        'pageLength':25,
-        'responsive':'true',
-        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'deferRender': 'true',
-        'language': '{searchPlaceholder: "Search..."}'
-        }
-    ajax_string = '"../api/notifications/?format=json"'
-    table_buttons = [
-        '{ extend: "colvis", text: "\uf0db" }',
-        '{ extend: "create", text: "\uf067", editor: editor }',
-        '{ extend: "edit", text: "\uf304", editor: editor }',
-        '{ extend: "remove", text: "\uf00d", editor: editor }'
-        ]
-    column_headers = [
+    dt_ajax_base_url = '../api/notifications/'
+    dt_column_headers = [
             ['Id', 'id', 0],
             ['Code', 'code', 1],
             ['Level','level', 1],
             ['Text','text', 1],
             ['Type','type', 1]
             ]
-    render_dict = {
-            'Level': '''function ( data, type, row, meta ) {return '<div class="dt_n_level dt_n_level_'+data.display+'">'+data.display+'</div>';}''',
-            'Type': '''function ( data, type, row, meta ) {return '<div class="dt_n_type">'+data.display+'</div>';}'''
+    dt_render_dict = {
+            'Level': 'function ( data, type, row, meta ) {return \'<div class="dt_n_level dt_n_level_\'+data.display+\'">\'+data.display+\'</div>\';}',
+            'Type': 'function ( data, type, row, meta ) {return \'<div class="dt_n_type">\'+data.display+\'</div>\';}'
             }
-    nowrap_list = []
-    table_editor = {
-            'ajax_url': '../api/notifications/',
-            'idSrc': '"id"',
-            'fields': [
-                {'label':"Code:", 'name': "code"},
-                {'label':"Level:", 'name': "level.value", 'type': "select",
-                    'options': [
-                      {'label': "DEBUG", 'value': "10"},
-                      {'label': "INFO", 'value': "20"},
-                      {'label': "SUCCESS", 'value': "25"},
-                      {'label': "WARNING", 'value': "30"},
-                      {'label': "ERROR", 'value': "40"}
-                    ]},
-                 {'label':"Text:", 'name': "text"},
-                 {'label':"Type:", 'name': "type.value", 'type': "radio",
-                    'options': [
-                      {'label': "MODAL", 'value': "1"},
-                      {'label': "NOTIFICATION", 'value': "2"}
-                    ],}
-            ]
-            }
+    dt_editor_options = {'idSrc': '"id"',}
+    dt_editor_buttons = [
+        { 'extend': 'create', 'text': '\uf067' },
+        { 'extend': 'edit', 'text': '\uf304' },
+        { 'extend': 'remove', 'text': '\uf00d' },
+    ]
+    dt_editor_fields = [
+            {'label':"Code:", 'name': "code"},
+            {'label':"Level:", 'name': "level.value", 'type': "select",
+                'options': [
+                  {'label': "DEBUG", 'value': "10"},
+                  {'label': "INFO", 'value': "20"},
+                  {'label': "SUCCESS", 'value': "25"},
+                  {'label': "WARNING", 'value': "30"},
+                  {'label': "ERROR", 'value': "40"}
+                ]},
+             {'label':"Text:", 'name': "text"},
+             {'label':"Type:", 'name': "type.value", 'type': "radio",
+                'options': [
+                  {'label': "MODAL", 'value': "1"},
+                  {'label': "NOTIFICATION", 'value': "2"}
+                ],}
+        ]
 
 class AdminModels(TemplateView):
     template_name = 'dalme_app/dtlistview_models.html'
@@ -397,28 +458,14 @@ class AdminModels(TemplateView):
 
 
 class SourceList(DTListView):
-    table_options = {
-        'pageLength':25,
-        'responsive':'true',
-        'fixedHeader': 'true',
-        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'deferRender': 'true',
-        'paging': 'true',
-        'language': '{searchPlaceholder: "Search..."}'
+    dt_render_dict = {
+        'Name': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
+        'Web address': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
+        'Parent': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
+        'Inv': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}'
         }
-    table_buttons = [
-        '{ extend: "colvis", text: "\uf0db" }',
-        '"pageLength"'
-        ]
-    render_dict = {
-        'Name': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.name+'</a>';}''',
-        'Web address': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.name+'</a>';}''',
-        'Parent': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.name+'</a>';}''',
-        'Inv': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}'''
-        }
-    nowrap_list = ['Type']
+    dt_nowrap_list = ['Type']
+    dt_ajax_base_url = '../api/sources/'
 
     def get_type(self):
         if 'type' in self.request.GET:
@@ -429,12 +476,13 @@ class SourceList(DTListView):
     def get_list_type(self, type):
         return Content_list.objects.get(short_name=type)
 
-    def get_table_ajax_str(self, *args, **kwargs):
+    def get_dt_ajax_str(self, *args, **kwargs):
         type = self.get_type()
+        base_url = self.dt_ajax_base_url
         if type == '':
-            ajax_string = '"../api/sources/?format=json"'
+            ajax_string = '"'+base_url+'?format=json"'
         else:
-            ajax_string = '"../api/sources/?format=json&type=' + type + '"'
+            ajax_string = '"'+base_url+'?format=json&type='+type+'"'
         return ajax_string
 
     def get_breadcrumb(self, *args, **kwargs):
@@ -758,21 +806,8 @@ class ImageDetail(DetailView):
 class ImageList(DTListView):
     page_title = 'Image List'
     breadcrumb = ['Repository','Images']
-    table_options = {
-        'pageLength':25,
-        'responsive':'true',
-        'dom': '''"<'card-table-header'B<'#filters-button-ct.dt-buttons'>fr><'#filters-container.collapse.clearfix'><'card-table-body'tip>"''',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'deferRender': 'true',
-        'language': '{searchPlaceholder: "Search"}'
-        }
-    ajax_string = '"../api/images/?format=json"'
-    table_buttons = [
-        '{ extend: "colvis", text: "\uf0db" }',
-        '"pageLength"',
-        ]
-    column_headers = [
+    dt_ajax_base_url = '../api/images/'
+    dt_column_headers = [
             ['DAM Id','ref',1],
             ['Title','field8',1],
             ['Folio','field79',1],
@@ -784,12 +819,12 @@ class ImageList(DTListView):
             ['Collections','collections',1],
             ['Original filename','field51',0],
             ]
-    render_dict = {
-            'Image': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
-            'Date': '''function ( data ) {return moment(data).format("DD-MMM-YYYY");}''',
-            'Created': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
-            'DAM Id': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.ref+'</a>';}''',
-            'Creator': '''function ( data, type, row, meta ) { var isnum = /^\\d+$/.test(data); return isnum == false ? '<a href="/user/'+data+'">'+data+'</a>' : data ;}''',
+    dt_render_dict = {
+            'Image': 'function ( data, type, row, meta ) {return data == 1 ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+            'Date': 'function(data) {return moment(data).format("DD-MMM-YYYY");}',
+            'Created': 'function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}',
+            'DAM Id': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.ref+\'</a>\';}',
+            'Creator': 'function ( data, type, row, meta ) { var isnum = /^\\d+$/.test(data); return isnum == false ? \'<a href="/user/\'+data+\'">\'+data+\'</a>\' : data ;}',
             }
     filters = [
         {
@@ -846,31 +881,12 @@ class PageMain(View):
 class PageList(DTListView):
     breadcrumb = ['Repository','Pages']
     page_title = 'Page List'
-    table_options = {
-        'pageLength':25,
-        'responsive':'true',
-        'dom': '''"<'card-table-header'Bfr><'card-table-body'tip>"''',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'deferRender': 'true',
-        'language': '{searchPlaceholder: "Search..."}'
-        }
-    ajax_string = '"../api/pages/?format=json"'
-    table_buttons = [
-        '{ extend: "colvis", text: "\uf0db" }',
-        '"pageLength"',
-        ]
-    column_headers = [
+    dt_ajax_base_url = '../api/pages/'
+    dt_column_headers = [
             ['Name', 'name', 1],
             ['DAM Id', 'dam_id', 1],
             ['Order','order', 1]
             ]
-    #render_dict = {
-    #        'Image': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
-    #        'Date': '''function ( data ) {return moment(data).format("DD-MMM-YYYY");}''',
-    #        'Created': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
-    #        'DAM Id': '''function ( data, type, row, meta ) {return (typeof data == 'undefined') ? "" : '<a href="'+data.url+'">'+data.ref+'</a>';}''',
-    #        }
 
 @method_decorator(login_required,name='dispatch')
 class PageDetail(View):

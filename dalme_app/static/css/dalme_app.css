@@ -125,6 +125,12 @@ table.dataTable {
   font-size: .8rem;
 }
 
+.page-link {
+  padding: .35rem .75rem;
+  line-height: 1;
+  border-color: #a3b1bd;
+}
+
 .dataTables_info {
   display: inline-block;
   float: left;
@@ -172,7 +178,80 @@ table.dataTable {
 }
 
 .dt-embed .dataTables_info, .dt-embed .dataTables_paginate {
-    font-size: .8rem;
+  font-size: .8rem;
+}
+
+/* datatables Editor form classes */
+
+.modal-header {
+  padding: .5rem 1rem;
+  border-bottom: 1px solid #a5a5a5;
+  background-color: #e3f0f5;
+  color: #376783;
+}
+
+.modal-header .close {
+  font-size: 1.3rem;
+  color: #00005e;
+
+}
+
+
+
+h5.modal-title {
+  font-size: 1rem;
+}
+
+.DTE {
+  font-size: .9rem;
+}
+
+.DTE .form-group {
+  margin-bottom: .25rem;
+}
+
+.DTE .form-control {
+  font-size: .9rem;
+  height: 1.8rem;
+  padding: .2rem .5rem;
+  line-height: 1;
+  border: 1px solid #a5a5a5;
+}
+
+.DTE .form-control:focus {
+  outline: 1px solid #0361aa !important;
+  box-shadow: none !important;
+}
+
+.DTE .col-form-label {
+  line-height: 1;
+  height: 1.8rem;
+  text-align: right;
+  font-size: .9rem;
+}
+
+.DTE .error {
+  width: auto;
+}
+
+.DTE .form-text {
+  font-size: .8rem;
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
+.DTE_Field_InputControl {
+  display: flex !important;
+}
+
+.DTE .btn {
+  font-size: .8rem;
+  line-height: 1.2;
+}
+
+div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
+  line-height: 1;
+  margin-bottom: 0;
 }
 
 /* dashboard cards/tiles */
@@ -567,6 +646,18 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
 .btn-secondary:hover {
   color: #fff;
   background-color: #212529;
+  border-color: #212529;
+}
+
+.btn-light {
+  color: #2f2f2f;
+  background-color: #d1d4d7;
+  border-color: #888;
+}
+
+.btn-light:hover {
+  color: #fff;
+  background-color: #5d656c;
   border-color: #212529;
 }
 
@@ -1331,7 +1422,7 @@ li#searchIcon.show a {
 }
 
 .bg-primary-soft {
-  background-color: rgba(3, 97, 170, 0.43) !important
+  background-color: #91bcd9 !important
 }
 
 a.bg-primary:hover, a.bg-primary:focus,
