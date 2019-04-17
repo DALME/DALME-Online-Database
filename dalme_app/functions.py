@@ -15,8 +15,8 @@ import pandas as pd
 import lxml.etree as etree
 from random import randint
 
-from . import menus
-from .models import *
+from dalme_app import menus
+from dalme_app.models import *
 from functools import wraps
 
 import logging
@@ -68,6 +68,52 @@ def set_menus(request, context, state):
     context['sidebar'] = menu_constructor(request, 'sidebar_item', 'sidebar_default.json', state)
     return context
 
+def notification(request, **kwargs):
+    if 'level' and 'text' in kwargs:
+        msg_level = eval('messages.'+kwargs['level'])
+        msg_output = kwargs['text']
+    elif 'code' in kwargs:
+        base_message = Notification.objects.get(code=code)
+        msg_text = base_message.text
+        msg_level = base_message.level
+
+        if 'para' in kwargs:
+            para = kwargs['para']
+            msg_output = msg_text.format(**para)
+        elif 'data' in kwargs:
+            data = kwargs['data']
+            msg_output = msg_text + '<p>' + str(data) + '</p>'
+        else:
+            msg_output = msg_text
+    else:
+        msg_level = 'DEBUG'
+        msg_output = 'There was a problem processing this notification: No notification code was supplied.'
+
+    if 'user' in kwargs:
+        user = kwargs['user']
+        the_user = User.objects.get(username=user)
+        message_user(the_user, msg_output, msg_level)
+
+    else:
+        messages.add_message(request, msg_level, msg_output)
+
+def format_date(value, type):
+    if type == 'timestamp':
+        try:
+            date_str = value.strftime('%d-%b-%Y@%H:%M')
+        except:
+            date_str = str(value)
+    elif type == 'attribute':
+        if value.value_DATE_d == None or value.value_DATE_m == None or value.value_DATE_y == None:
+            date_str = value.value_STR
+        else:
+            date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+    else:
+        date_str = str(value)
+
+    return date_str
+
+#module-specific functions
 def get_editor_folios(source):
     folios = source.pages.all().order_by('order')
     folio_count = len(folios)
@@ -146,22 +192,6 @@ def add_filter_options(values, filter, filters, mode='complete'):
     filters.append(filter)
     return filters
 
-def format_date(value, type):
-    if type == 'timestamp':
-        try:
-            date_str = value.strftime('%d-%b-%Y@%H:%M')
-        except:
-            date_str = str(value)
-    elif type == 'attribute':
-        if value.value_DATE_d == None or value.value_DATE_m == None or value.value_DATE_y == None:
-            date_str = value.value_STR
-        else:
-            date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
-    else:
-        date_str = str(value)
-
-    return date_str
-
 def get_dam_user(ref,output):
     user = rs_user.objects.get(ref=ref).username
     try:
@@ -174,15 +204,6 @@ def get_dam_user(ref,output):
         ret = str(user)
 
     return ret
-
-def rs_api_query(endpoint, user, key, **kwargs):
-    sign = hashlib.sha256(key.encode('utf-8'))
-    paramDict = kwargs
-    paramDict['user'] = user
-    paramstr = urlencode(paramDict)
-    sign.update(paramstr.encode('utf-8'))
-    R = requests.get(endpoint + paramstr + "&sign=" + sign.hexdigest())
-    return R
 
 def get_dam_preview(resource):
     """
@@ -587,59 +608,6 @@ def get_display_token_class(flag):
         token_class = 'token_flag_error'
 
     return token_class
-
-def get_new_error(level):
-    errors = Notification.objects.filter(e_level=level)
-    no = errors.count()
-
-    if no == None:
-        if level == 10:
-            new = 1000
-        elif level == 20:
-            new = 2000
-        elif level == 25:
-            new = 2500
-        elif level == 30:
-            new = 3000
-        elif level == 40:
-            new = 4000
-    else:
-        if level == 10:
-            new = 1001 + no
-        elif level == 20:
-            new = 2001 + no
-        elif level == 25:
-            new = 2501 + no
-        elif level == 30:
-            new = 3001 + no
-        elif level == 40:
-            new = 4001 + no
-
-    return new
-
-def notification(request, code, **kwargs):
-    base_message = Notification.objects.get(pk=code)
-    msg_text = base_message.e_text
-    msg_level = base_message.e_level
-
-    if 'para' in kwargs:
-        para = kwargs['para']
-        msg_output = msg_text.format(**para)
-
-    elif 'data' in kwargs:
-        data = kwargs['data']
-        msg_output = msg_text + '<p>' + str(data) + '</p>'
-
-    else:
-        msg_output = msg_text
-
-    if 'user' in kwargs:
-        user = kwargs['user']
-        the_user = User.objects.get(username=user)
-        message_user(the_user, msg_output, msg_level)
-
-    else:
-        messages.add_message(request, msg_level, msg_output)
 
 def bar_chart():
     results = []

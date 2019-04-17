@@ -23,19 +23,6 @@
 </head>
 <body id="page-top">
   <div id="wrapper">
-
-  {% if messages %}
-      {% for message in messages %}
-          {% if message.level == DEFAULT_MESSAGE_LEVELS.DEBUG %}<div class="alert alert-info alert-dismissable">{% endif %}
-          {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}<div class="alert alert-info alert-dismissable">{% endif %}
-          {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}<div class="alert alert-success alert-dismissable">{% endif %}
-          {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}<div class="alert alert-warning alert-dismissable">{% endif %}
-          {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}<div class="alert alert-danger alert-dismissable">{% endif %}
-          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-          {{ message | safe }}</div>
-      {% endfor %}
-  {% endif %}
-
   <!-- Sidebar -->
   {% block sidebar %}
       <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion {{ sidebar_toggle }}" id="accordionSidebar">
@@ -142,7 +129,14 @@
         <!-- End of Topbar -->
         {% endblock %}
         <!-- End of Topbar -->
-
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }} alert-dismissable" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                  {{ message | safe }}
+                </div>
+            {% endfor %}
+        {% endif %}
         <!-- Begin Page Content -->
         {% block content %}{% endblock %}
 

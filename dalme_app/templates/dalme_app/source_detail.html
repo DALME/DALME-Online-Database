@@ -17,8 +17,8 @@
     <link href="{% static 'jquery-ui-resizable/jquery-ui.min.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
-    <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
   {% endif %}
   {% if has_pages %}
     <script type="text/javascript">
@@ -283,10 +283,16 @@
               <button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();"><i class="fa fa-edit fa-fw"></i> Edit</button>
             </div>
           </div>
-          <div id="xml_editor" class="d-flex justify-content-center active" role="tabpanel" aria-labelledby="tei-tab">
+          <div id="tab_editor" class="tab-pane active" role="tabpanel" aria-labelledby="tei-tab">
+          <div id="xml_editor" class="d-flex justify-content-center">
               <div class="spinner-border mt-auto mb-auto"></div>
           </div>
-          <div id="xml_render" class="d-flex justify-content-center" role="tabpanel" aria-labelledby="render-tab">
+          </div>
+          <div id="tab_editor" class="tab-pane" role="tabpanel" aria-labelledby="render-tab">
+          <div id="text_render" class="d-flex justify-content-center">
+            Editor's standalone mode is activated by simply not using a table parameter in the initialisation configuration object.
+            The HTML elements that Editor operates on are controlled by two data attributes:
+          </div>
           </div>
         </div>
       </div>
@@ -296,10 +302,10 @@
       <div id="tab-footer-interface" class="clearfix">
         <ul class="nav nav-tabs card-footer-tabs float-right" id="editor-tabs" role="tablist">
           <li class="nav-item">
-            <a class="nav-link active" id="tei-tab" data-toggle="tab" href="#tei" role="tab" aria-controls="tei" aria-selected="false">TEI Encoding</a>
+            <a class="nav-link active" id="tei-tab" data-toggle="tab" href="#tab_editor" role="tab" aria-controls="tei" aria-selected="true">TEI Encoding</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="render-tab" data-toggle="tab" href="#render" role="tab" aria-controls="render" aria-selected="true">Rendered Text</a>
+            <a class="nav-link" id="render-tab" data-toggle="tab" href="#tab_render" role="tab" aria-controls="render" aria-selected="false">Rendered Text</a>
           </li>
         </ul>
         <small class="text-muted float-left tab-footer-text" id="transcriber"></small>

@@ -9,7 +9,50 @@
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
     <script type="text/javascript" src="{% static 'Editor-1.9.0/js/dataTables.editor.js' %}"></script>
     <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.bootstrap4.js' %}"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.chosen.js' %}"></script>
+
+
+    <script>
+      $(document).ready(function() {
+          dt_editor = new $.fn.dataTable.Editor( {
+              ajax: "../php/standalone.php",
+              fields: [ {
+                      name:  "country",
+                      type:  'chosen',
+                      options: [
+                          { label: 'Italy',  value: 'Italy' },
+                          { label: 'France', value: 'France' },
+                          { label: 'Spain', value: 'Spain' }
+                      ]
+                      }, {
+                          name:  "title"
+                      }, {
+                          fieldInfo: "Input value is in seconds",
+                          name:      "credit"
+                      }, {
+                          name: "resourcedate",
+                          type: "date"
+                      }, {
+                          name: "source"
+                      }, {
+                          name: "Series"
+                      }, {
+                          name: "shelfnumber"
+                      }, {
+                          name: "SourceStartDate"
+                      }, {
+                        name: "archivalsource"
+                      }
+                    ]
+                } );
+
+          $('[data-editor-field]').on( 'click', function (e) {
+              dt_editor.bubble( this );
+          } );
+      } );
+    </script>
+
   {% endif %}
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
@@ -55,10 +98,10 @@
                     {% for i in attribute_data %}
                     <div class="form-row">
                         <div class="col-sm-3 text-right">
-                          <span class="attribute_list_label">{{ i.label }}</span>
+                          <span class="attribute_list_label" data-editor-label="{{ i.name }}">{{ i.label }}</span>
                         </div>
                         <div class="col-sm-9">
-                          <span class="attribute_list_value">{{ i.value | safe }}</span>
+                          <span class="attribute_list_value" data-editor-field="{{ i.name }}">{{ i.value | safe }}</span>
                         </div>
                     </div>
                     {% endfor %}

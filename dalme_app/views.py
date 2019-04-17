@@ -88,6 +88,7 @@ class DefaultSearch(SearchView):
 
         return context
 
+@method_decorator(login_required,name='dispatch')
 class DTListView(TemplateView):
     template_name = 'dalme_app/dtlistview.html'
     form_helper = None
@@ -110,7 +111,11 @@ class DTListView(TemplateView):
     dt_nowrap_list = []
     dt_ajax_base_url = ''
     dt_editor_options = None
-    dt_editor_buttons = None
+    dt_editor_buttons = [
+        { 'extend': 'create', 'text': '\uf067 Add' },
+        { 'extend': 'edit', 'text': '\uf304 Edit' },
+        { 'extend': 'remove', 'text': '\uf00d Delete' },
+    ]
     dt_editor_fields = None
     filters = None
 
@@ -263,11 +268,6 @@ class AdminUsers(DTListView):
             'Wiki groups': '"[, ].ug_group"'
             }
     dt_editor_options = {'idSrc': '"id"',}
-    dt_editor_buttons = [
-        { 'extend': 'create', 'text': '\uf067' },
-        { 'extend': 'edit', 'text': '\uf304' },
-        { 'extend': 'remove', 'text': '\uf00d' },
-    ]
     dt_editor_fields = [
         { 'label':'First name', 'name':'user.first_name' },
         { 'label':'Last name', 'name':'user.last_name' },
@@ -313,7 +313,6 @@ class AdminUsers(DTListView):
                 "disable_search": 'true',
             },
             'options': [
-                {'label': "", 'value': ""},
                 {'label': "Administrator", 'value': "a:1:{s:13:\\\"administrator\\\";b:1;}"},
                 {'label': "Editor", 'value': "a:1:{s:6:\\\"editor\\\";b:1;}"},
                 {'label': "Author", 'value': "a:1:{s:6:\\\"author\\\";b:1;}"},
@@ -337,26 +336,24 @@ class AdminNotifications(DTListView):
             'Type': 'function ( data, type, row, meta ) {return \'<div class="dt_n_type">\'+data.display+\'</div>\';}'
             }
     dt_editor_options = {'idSrc': '"id"',}
-    dt_editor_buttons = [
-        { 'extend': 'create', 'text': '\uf067' },
-        { 'extend': 'edit', 'text': '\uf304' },
-        { 'extend': 'remove', 'text': '\uf00d' },
-    ]
     dt_editor_fields = [
             {'label':"Code:", 'name': "code"},
-            {'label':"Level:", 'name': "level.value", 'type': "select",
+            {'label':"Level:", 'name': "level.value", 'type': "chosen",
+                'opts': {
+                    "disable_search": 'true',
+                },
                 'options': [
-                  {'label': "DEBUG", 'value': "10"},
-                  {'label': "INFO", 'value': "20"},
-                  {'label': "SUCCESS", 'value': "25"},
-                  {'label': "WARNING", 'value': "30"},
-                  {'label': "ERROR", 'value': "40"}
+                  {'label': "Debug", 'value': "10"},
+                  {'label': "Info", 'value': "20"},
+                  {'label': "Success", 'value': "25"},
+                  {'label': "Warning", 'value': "30"},
+                  {'label': "Error", 'value': "40"}
                 ]},
              {'label':"Text:", 'name': "text"},
              {'label':"Type:", 'name': "type.value", 'type': "radio",
                 'options': [
-                  {'label': "MODAL", 'value': "1"},
-                  {'label': "NOTIFICATION", 'value': "2"}
+                  {'label': "Modal", 'value': "1"},
+                  {'label': "Notification", 'value': "2"}
                 ],}
         ]
 
@@ -645,37 +642,37 @@ class SourceDisplay(DetailView):
             context['table_options_pages'] = {
                 'pageLength':5,
                 'responsive':'true',
-                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>Br><'card-body'tip>"''',
+                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
                 'stateSave': 'true',
                 'select': 'true',
                 'paging': 'true',
                 'language': '{searchPlaceholder: "Search..."}',
                 'order': [[ 3, "asc" ]]
                 }
-            context['table_buttons_pages'] = [
-                '{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
+            #context['table_buttons_pages'] = [
+                #'{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
                 #'{ extend: "create", text: "\uf067", editor: editor }',
                 #'{ extend: "edit", text: "\uf304", editor: editor }',
                 #'{ extend: "remove", text: "\uf00d", editor: editor }'
-                ]
+                #]
 
         if has_children:
             context['children'] = self.object.source_set.all().order_by('name')
             context['table_options_children'] = {
                 'pageLength':5,
                 'responsive':'true',
-                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>Br><'card-body'tip>"''',
+                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
                 'stateSave': 'true',
                 'select': 'true',
                 'paging': 'true',
                 'language': '{searchPlaceholder: "Search..."}'
                 }
-            context['table_buttons_children'] = [
-                '{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
+            #context['table_buttons_children'] = [
+                #'{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
                 #'{ extend: "create", text: "\uf067", editor: editor }',
                 #'{ extend: "edit", text: "\uf304", editor: editor }',
                 #'{ extend: "remove", text: "\uf00d", editor: editor }'
-                ]
+                #]
 
         return context
 
@@ -745,28 +742,35 @@ class ImageDetail(DetailView):
             attributes = rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field')
             for a in attributes:
                 value = a.value
-                label = rs_resource_type_field.objects.get(ref=a.resource_type_field).title
+                res_type_obj = rs_resource_type_field.objects.get(ref=a.resource_type_field)
+                name = res_type_obj.name
+                label = res_type_obj.title
                 dict = {
+                    'name': name,
                     'label': label,
                     'value': value,
                 }
                 attribute_data.append(dict)
-
             context['attribute_data'] = attribute_data
-
         except:
             attribute_data = None
-
 
         collections = []
         col_list = rs_collection_resource.objects.filter(resource=self.object.ref)
         for c in col_list:
             col = rs_collection.objects.get(ref=c.collection)
+            path = ''
+            if col.theme:
+                path += col.theme
+                if col.theme2:
+                    path += ' ≫ '+col.theme2
+                    if col.theme3:
+                        path += ' ≫ '+col.theme3
             dict = {
                 'id': col.ref,
                 'name': col.name,
                 'creator': functions.get_dam_user(col.user, 'html'),
-                'path': col.theme+' ≫ '+col.theme2+' ≫ '+col.theme3,
+                'path': path
             }
             collections.append(dict)
 
@@ -775,15 +779,11 @@ class ImageDetail(DetailView):
         context['table_options'] = {
             'pageLength':5,
             'responsive':'true',
-            'dom': '''"<'sub-card-header clearfix'<'card-header-title'>Br><'card-body'tip>"''',
+            'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
             'stateSave': 'true',
             'select': 'true',
             'paging': 'true',
-            'language': '{searchPlaceholder: "Search..."}',
             }
-        context['table_buttons'] = [
-            '{ extend: "colvis", text: "\uf0db" }',
-            ]
 
         context['image_url'] = functions.get_dam_preview(self.object.ref)
 
@@ -977,6 +977,7 @@ class Scripts(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        request = self.request
         breadcrumb = ['Dev Scripts']
         sidebar_toggle = self.request.session['sidebar_toggle']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
@@ -986,5 +987,5 @@ class Scripts(TemplateView):
         context['page_title'] = 'Dev Scripts'
         if 's' in self.request.GET:
             scpt = self.request.GET['s']
-            context['output'] = eval('custom_scripts.'+scpt+'()')
+            context['output'] = eval('custom_scripts.'+scpt+'(request)')
         return context

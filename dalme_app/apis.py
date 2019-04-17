@@ -18,9 +18,7 @@ import logging
 logger = logging.getLogger('DJANGO_APIS')
 
 class Pages(viewsets.ViewSet):
-    """
-    API endpoint for managing pages
-    """
+    """ API endpoint for managing pages """
     permission_classes = (DjangoModelPermissions,)
     queryset = Page.objects.all()
 
@@ -679,7 +677,7 @@ def get_ordered_queryset(*args, **kwargs):
     order_dir = dt_para['order_dir']
     order = dt_para['order']
     if order_column_name in fields:
-        order = 'user__'+order_column_name
+        order = order_column_name
         if order_dir == 'desc':
             order = '-'+order
     queryset = queryset.order_by(order)

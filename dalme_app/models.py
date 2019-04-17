@@ -13,19 +13,29 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
 from dalme_app.middleware import get_current_user
-import uuid, json, os, requests, logging
+import uuid, json, os, requests, logging, hashlib
+from urllib.parse import urlencode
 from datetime import datetime
-from dalme_app.modelTemplates import dalmeBasic, dalmeUuid, dalmeIntid
+from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
 import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 logger = logging.getLogger(__name__)
 
-#function for creating UUIDs - not used, but migrations won't work without it
+#model helper functions
+#make_uuid not used, but migrations won't work without it
 def make_uuid():
     the_id = uuid.uuid4().hex
     return the_id
 
+def rs_api_query(endpoint, user, key, **kwargs):
+    sign = hashlib.sha256(key.encode('utf-8'))
+    paramDict = kwargs
+    paramDict['user'] = user
+    paramstr = urlencode(paramDict)
+    sign.update(paramstr.encode('utf-8'))
+    R = requests.get(endpoint + paramstr + "&sign=" + sign.hexdigest())
+    return R
 
 class Profile(models.Model):
     """
@@ -58,15 +68,6 @@ class Profile(models.Model):
     def get_dam_usergroup_display(self):
         dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
         return dam_ug
-
-#@receiver(post_save, sender=User)
-#def create_user_profile(sender, instance, created, **kwargs):
-#    if created:
-#        Profile.objects.create(user=instance)
-
-#@receiver(post_save, sender=User)
-#def save_user_profile(sender, instance, **kwargs):
-#    instance.profile.save()
 
 #DALME data store
 class Agent(dalmeUuid):

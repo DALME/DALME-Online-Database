@@ -1,3 +1,4 @@
+
 function setupTranscriber() {
     editor_container = document.getElementById('xml_editor');
     transcriber_container = document.getElementById('transcriber');
@@ -5,32 +6,39 @@ function setupTranscriber() {
     viewer_container = document.getElementById('diva_viewer');
     editor_buttons = document.getElementById('editor-button-bar');
 
-    getViewer('initial', 0);
-    getEditor('initial', folio_list[0].tr_id);
+    if (typeof xmleditor == 'undefined') {
+      getViewer('initial', 0);
+      getEditor('initial', folio_list[0].tr_id);
 
-    window.addEventListener('resize', function ()
-      {
-        xmleditor.resize();
-      }, false);
+      window.addEventListener('resize', function () {
+          xmleditor.resize();
+        }, false);
 
-    $('.panel-top').resizable(
-      {
-        handles: {s: '.splitter-horizontal'},
-        resize: function(e, ui) {
-            var parent = ui.element.parent();
-            var remainingSpace = parent.height() - ui.element.outerHeight();
-            var divTwo = ui.element.next();
-            var divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
-            var divTwoPercent = divTwoHeight/parent.height()*100+"%";
-            divTwo.height(divTwoPercent);
-            $('#xml_editor').height(divTwoHeight - 34);
-            },
-        stop: function (e, ui) {
-          var parent = ui.element.parent();
-          ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
-          window.dispatchEvent(new Event('resize'));
-          }
+      window.addEventListener('beforeunload', function (e) {
+        return false
       });
+
+      $('.panel-top').resizable(
+        {
+          handles: {s: '.splitter-horizontal'},
+          resize: function(e, ui) {
+              var parent = ui.element.parent();
+              var remainingSpace = parent.height() - ui.element.outerHeight();
+              var divTwo = ui.element.next();
+              var divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
+              var divTwoPercent = divTwoHeight/parent.height()*100+"%";
+              divTwo.height(divTwoPercent);
+              $('#xml_editor').height(divTwoHeight - 34);
+              },
+          stop: function (e, ui) {
+            var parent = ui.element.parent();
+            ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
+            window.dispatchEvent(new Event('resize'));
+            }
+        });
+    } else {
+      footer_menubar.style.display = "block";
+    }
 }
 
 function leaveTranscriber() {
@@ -83,11 +91,14 @@ function getViewer(mode, target_idx) {
           objectData: manifest,
           enableAutoTitle: false,
           enableFullscreen: false,
-          //enableKeyScroll: false,
-          //blockMobileMove: false,
+          enableKeyScroll: true,
+          blockMobileMove: true,
           enableGotoPage: false,
           enableGridIcon: false,
-          enableImageTitles: false
+          enableImageTitles: false,
+          enableToolbar: false,
+          tileHeight: 1000,
+          tileWidth: 1000,
       });
       } else {
         diva.changeObject(manifest);

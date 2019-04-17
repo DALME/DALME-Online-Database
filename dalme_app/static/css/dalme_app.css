@@ -46,6 +46,18 @@ a {
   overflow: scroll;
 }
 
+/* messages and alerts */
+
+.alert {
+  padding: .75rem 1.25rem;
+  margin-bottom: 1.5rem;
+  margin-top: -1.5rem;
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-size: .9rem;
+}
+
+
 /* default cards */
 
 .card {
@@ -136,6 +148,10 @@ table.dataTable {
   float: left;
   font-size: .8rem;
   margin-top: 6px;
+}
+
+table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
+  color: #0361aa;
 }
 
 /* embed table cards */
