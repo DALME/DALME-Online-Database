@@ -3,8 +3,18 @@ This is where all of the forms used elsewhere in the site are set up.
 """
 
 from django import forms
-
 from dalme_app.models import *
+from haystack.forms import SearchForm
+
+# class dalme_searchform(SearchForm):
+#     def no_query_found(self):
+#         """
+#         Determines the behavior when no query was found.
+#         By default, no results are returned (``EmptySearchQuerySet``).
+#         Should you want to show all results, override this method in your
+#         own ``SearchForm`` subclass and do ``return self.searchqueryset.all()``.
+#         """
+#         return self.searchqueryset.all()
 
 class source_main(forms.ModelForm):
     parent_source = forms.ModelChoiceField(

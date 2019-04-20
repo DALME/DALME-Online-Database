@@ -17,7 +17,7 @@
     "itemClass": "sources",
     "children": [
       {
-        "text": "All",
+        "text": "All Sources",
         "link": "/sources",
         "iconClass": "fa-asterisk",
         "counter": "sources"

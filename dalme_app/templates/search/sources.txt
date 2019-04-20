@@ -1,2 +1,6 @@
-Name: {{ object.name }} (type = {{ object.type }})
-Blob: {{ object.att_blob }}
+{{ object.name }}
+{{ object.type }}
+{{ object.str_blob }}
+{{ object.txt_blob }}
+{{ object.int_blob }}
+{{ object.transcriptions }}

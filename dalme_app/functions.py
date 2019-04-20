@@ -64,6 +64,10 @@ def in_group(group_name):
 
 #General functions
 def set_menus(request, context, state):
+    bc = []
+    for i in state['breadcrumb']:
+        bc.append(i[0])
+    state['breadcrumb'] = bc
     context['dropdowns'] = menu_constructor(request, 'dropdown_item', 'dropdowns_default.json', state)
     context['sidebar'] = menu_constructor(request, 'sidebar_item', 'sidebar_default.json', state)
     return context
@@ -176,7 +180,7 @@ def get_attribute_value(attribute):
         value = eval('attribute.value_'+dt)
     return value
 
-def add_filter_options(values, filter, filters, mode='complete'):
+def add_filter_options(values, filter, mode='complete'):
     if mode == 'strict':
         op = []
     elif mode == 'check':
@@ -189,8 +193,7 @@ def add_filter_options(values, filter, filters, mode='complete'):
         if v != '':
             op.append({'label':v})
     filter['options'] = op
-    filters.append(filter)
-    return filters
+    return filter
 
 def get_dam_user(ref,output):
     user = rs_user.objects.get(ref=ref).username
@@ -204,6 +207,29 @@ def get_dam_user(ref,output):
         ret = str(user)
 
     return ret
+
+def get_page_chain(breadcrumb, current=None):
+    i_count = len(breadcrumb)
+    title = ''
+    if current and current != breadcrumb[i_count-1][0]:
+        if len(current) > 55:
+            current = current[:55] + ' <i class="fa fa-plus-circle fa-fw" data-toggle="tooltip" data-placement="bottom" title="{}"></i> '.format(current)
+        for i in breadcrumb:
+            if i[1] != '':
+                title += '<a href="{}" class="title_link">{}</a>'.format(i[1],i[0])
+            else:
+                title += i[0]
+            title += ' <i class="fa fa-caret-right fa-fw"></i> '
+        title += '<span class="title_current">{}</span>'.format(current)
+    else:
+        c = 0
+        while c <= i_count - 1:
+            if c == i_count - 1:
+                title += '<span class="title_current">{}</span>'.format(breadcrumb[c][0])
+            else:
+                title += breadcrumb[c][0] + ' <i class="fa fa-caret-right fa-fw"></i> '
+            c = c + 1
+    return title
 
 def get_dam_preview(resource):
     """

@@ -19,7 +19,7 @@ function addDtToolbarButton(button) {
   if (button == 'filters') {
     filters_btn_container = document.getElementById("filters-button-ct");
     filters_container = document.getElementById("filters-container");
-    filters_btn_container.innerHTML = '<button class="btn btn-secondary buttons-collection" id="btn-filters" data-toggle="collapse" data-target="#filters-container" aria-expanded="false" aria-controls="filters-container" type="button" onclick="this.classList.toggle(\'active\')"><i class="fa fa-filter fa-sm"></i> Filters</button>';
+    filters_btn_container.innerHTML = '<button class="btn buttons-collection" id="btn-filters" data-toggle="collapse" data-target="#filters-container" aria-expanded="false" aria-controls="filters-container" type="button" onclick="this.classList.toggle(\'active\')"><i class="fa fa-filter fa-sm"></i> Filters</button>';
     var search_box = document.getElementById("dataTables-list_filter").getElementsByClassName("form-control")[0];
     search_box.style.borderTopRightRadius = "0";
     search_box.style.borderBottomRightRadius = "0";
@@ -183,7 +183,7 @@ function removeFilter(event) {
 }
 
 function resetFilters() {
-  filters_container.innerHTML = '<div id="filter0" class="table-filter clearfix"><div class="filter_info">Filter: DAM Images</div><button class="btn filters-btn add_filter" type="button"><i class="fa fa-plus fa-sm"></i></button></div>';
+  filters_container.innerHTML = '<div id="filter0" class="table-filter clearfix"><div class="filter_info">Filters</div><button class="btn filters-btn add_filter" type="button"><i class="fa fa-plus fa-sm"></i></button></div>';
   filterNum = 0;
   filter_register = { 'filter0': [], };
   updateTable('');

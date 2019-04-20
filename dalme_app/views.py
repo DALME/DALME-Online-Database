@@ -1,8 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connections
 from django.db.models import Q, Count, F, Prefetch
@@ -16,6 +15,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.base import TemplateView
 from django_celery_results.models import TaskResult
+from django.db.models.query import QuerySet
 
 import requests, uuid, os, datetime, json
 from allaccess.views import OAuthCallback
@@ -25,7 +25,7 @@ from dalme_app.serializers import SourceSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from dalme_app import functions, custom_scripts, forms
+from dalme_app import functions, custom_scripts
 from dalme_app.menus import menu_constructor
 from dalme_app.models import *
 
@@ -36,12 +36,10 @@ from django.db.models.expressions import RawSQL
 
 from haystack.generic_views import SearchView
 from django.http import HttpResponse
-
+import urllib.parse as urlparse
 import logging
 logger = logging.getLogger(__name__)
 
-
-#authentication (sub)classses
 class OAuthCallback_WP(OAuthCallback):
     logger.debug("OAuthCallback_WP called")
     def get_or_create_user(self, provider, access, info):
@@ -57,41 +55,41 @@ class OAuthCallback_WP(OAuthCallback):
             the_user = User.objects.create_user(uname, email, None)
             the_user.profile.full_name = name
             the_user.save()
-
         return the_user
 
 def SessionUpdate(request):
     if not request.is_ajax() or not request.method=='POST':
         return HttpResponseNotAllowed(['POST'])
-
     if request.POST['var'] == 'sidebar_toggle':
         if request.session['sidebar_toggle'] == '':
             request.session['sidebar_toggle'] = 'toggled'
         else:
             request.session['sidebar_toggle'] = ''
-
     return HttpResponse('ok')
 
 @method_decorator(login_required,name='dispatch')
 class DefaultSearch(SearchView):
     """ Default search view for Haystack"""
     template_name = 'dalme_app/search.html'
+    results_per_page = 10
+    #form_class = dalme_searchform
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = ['Search']
+        breadcrumb = [('Search', ''), ('Search Results', '')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
-        context['page_title'] = 'Search Results'
-
+        page_title = 'Search Results'
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         return context
 
 @method_decorator(login_required,name='dispatch')
 class DTListView(TemplateView):
+    """ Generic list view that feeds Datatables """
     template_name = 'dalme_app/dtlistview.html'
-    form_helper = None
     breadcrumb = []
     dt_options = {
         'pageLength':25,
@@ -106,18 +104,13 @@ class DTListView(TemplateView):
         }
     dt_buttons = [{ 'extend': '"colvis"', 'text': '"\uf0db"'}]
     dt_buttons_extra = ['"pageLength"']
-    dt_column_headers = []
-    dt_render_dict = {}
-    dt_nowrap_list = []
-    dt_ajax_base_url = ''
     dt_editor_options = None
     dt_editor_buttons = [
         { 'extend': 'create', 'text': '\uf067 Add' },
         { 'extend': 'edit', 'text': '\uf304 Edit' },
         { 'extend': 'remove', 'text': '\uf00d Delete' },
     ]
-    dt_editor_fields = None
-    filters = None
+    dte_field_list = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,49 +119,131 @@ class DTListView(TemplateView):
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
-        context['page_title'] = self.get_page_title()
-        context['dt_options'] = self.get_dt_options()
-        context['dt_editor'] = self.get_dt_editor()
-        context['filters'] = self.get_filters()
-        context['form_helper'] = self.form_helper
+        list_name = self.get_list_name()
+        list = DT_list.objects.get(short_name=list_name)
+        fields_dict = self.get_fields_dict(list)
+        page_title = self.get_page_title(list)
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['dt_options'] = self.get_dt_options(list, fields_dict)
+        context['dt_editor'] = self.get_dt_editor(list, fields_dict)
+        context['filters'] = self.get_filters(fields_dict)
+        context['form_helper'] = self.get_form_helper(list)
         return context
 
-    def get_dt_options(self, *args, **kwargs):
-        dt_options = {}
-        options = self.dt_options
-        options['ajax'] = self.get_dt_ajax_str()
-        dt_options['options'] = options
-        dt_options['buttons'] = self.dt_buttons
-        dt_options['buttons_extra'] = self.dt_buttons_extra
-        dt_options['columnDefs'] = self.get_dt_column_defs()
-        return dt_options
+    def get_list_name(self, *args, **kwargs):
+        return self.list_name
 
-    def get_page_title(self, *args, **kwargs):
-        try:
-            p_title = self.kwargs['title']
-        except:
-            try:
-                p_title = self.page_title
-            except:
-                p_title = 'List View'
-        return p_title
-
-    def get_filters(self, *args, **kwargs):
-        return self.filters
+    def get_fields_dict(self, list, *args, **kwargs):
+        fields = [
+            'field__short_name',
+            'field__name',
+            'orderable',
+            'visible',
+            'searchable',
+            'render_exp',
+            'dte_type',
+            'dte_options',
+            'dt_name',
+            'dte_name',
+            'nowrap',
+            'dte_opts',
+            'is_filter',
+            'filter_options',
+            'filter_mode',
+            'filter_type',
+            'filter_operator'
+        ]
+        qset = DT_fields.objects.filter(list=list.id).values(*fields)
+        fields_dict = {}
+        for i in qset:
+            fields_dict[i['field__short_name']] = i
+        return fields_dict
 
     def get_breadcrumb(self, *args, **kwargs):
         return self.breadcrumb
 
-    def get_dt_ajax_str(self, *args, **kwargs):
-        base_url = self.dt_ajax_base_url
+    def get_page_title(self, list, *args, **kwargs):
+        title = list.name
+        return title
+
+    def get_dt_options(self, list, fields_dict, *args, **kwargs):
+        dt_options = {}
+        options = self.dt_options
+        options['ajax'] = self.get_dt_ajax_str(list)
+        dt_options['options'] = options
+        dt_options['buttons'] = self.dt_buttons
+        dt_options['buttons_extra'] = self.dt_buttons_extra
+        dt_options['columnDefs'] = self.get_dt_column_defs(list, fields_dict)
+        return dt_options
+
+    def get_dt_ajax_str(self, list, *args, **kwargs):
+        base_url = list.api_url
         dt_ajax_str = '"'+base_url+'?format=json"'
         return dt_ajax_str
 
-    def get_dt_editor(self, *args, **kwargs):
-        if self.dt_editor_fields:
+    def get_dt_column_defs(self, list, fields_dict, *args, **kwargs):
+        dt_fields = self.get_dt_fields(list)
+        column_defs = []
+        col = 0
+        for f in dt_fields:
+            lf = fields_dict[f]
+            c_dict = {}
+            dt_name = lf['field__short_name']
+            if lf['dt_name']:
+                dt_name = lf['dt_name']
+            c_dict['title'] = '"'+lf['field__name']+'"'
+            c_dict['targets'] = col
+            c_dict['data'] = '"'+dt_name+'"'
+            c_dict['defaultContent'] = '""'
+            if not lf['visible']:
+                c_dict['visible'] = 'false'
+            if not lf['orderable']:
+                c_dict['orderable'] = 'false'
+            if not lf['searchable']:
+                c_dict['searchable'] = 'false'
+            if lf['render_exp']:
+                c_dict['render'] = lf['render_exp']
+            if lf['nowrap']:
+                c_dict['className'] = '"nowrap"'
+            column_defs.append(c_dict)
+            col = col + 1
+        return column_defs
+
+    def get_dt_fields(self, list, *args, **kwargs):
+        return self.dt_field_list
+
+    def get_dte_fields(self, list, *args, **kwargs):
+        if self.dte_field_list:
+            dte_fields = self.dte_field_list
+        else:
+            dte_fields = None
+        return dte_fields
+
+    def get_dt_editor(self, list, fields_dict, *args, **kwargs):
+        if self.get_dte_fields(list):
+            dte_fields = self.get_dte_fields(list)
             dt_editor = {}
-            dt_editor['fields'] = self.dt_editor_fields
-            dt_editor['ajax_url'] = self.dt_ajax_base_url
+            dt_editor['ajax_url'] = list.api_url
+            fields = []
+            for f in dte_fields:
+                lf = fields_dict[f]
+                f_dict = {}
+                f_name = lf['field__short_name']
+                if lf['dt_name']:
+                    f_name = lf['dt_name']
+                if lf['dte_name']:
+                    f_name = lf['dte_name']
+                f_dict['label'] = lf['field__name']
+                f_dict['name'] = f_name
+                if lf['dte_type']:
+                    f_dict['type'] = lf['dte_type']
+                if lf['dte_opts']:
+                    f_dict['opts'] = eval(lf['dte_opts'])
+                if lf['dte_options']:
+                    f_dict['options'] = self.get_dte_options(lf['dte_options'], lf['dte_type'])
+                fields.append(f_dict)
+            dt_editor['fields'] = fields
             if self.dt_editor_options:
                 dt_editor['options'] = self.dt_editor_options
             if self.dt_editor_buttons:
@@ -177,58 +252,213 @@ class DTListView(TemplateView):
             dt_editor = None
         return dt_editor
 
-    def get_column_headers(self, *args, **kwargs):
-        return self.dt_column_headers
+    def get_dte_options(self, options, field_type, *args, **kwargs):
+        if field_type == 'chosen':
+            opts = [{'label': "", 'value': ""}]
+        else:
+            opts = []
+        options = eval(options)
+        if type(options) is dict:
+            opts.append(options)
+        elif type(options) is list:
+            q = eval(options[0])
+            if isinstance(q, QuerySet):
+                for e in q:
+                    opt = { 'label': getattr(e, options[1]), 'value': getattr(e, options[2]) }
+                    opts.append(opt)
+            elif isinstance(q, tuple):
+                for value, label in q:
+                    opt = { 'label': label, 'value': value }
+                    opts.append(opt)
+        return opts
 
-    def get_dt_column_defs(self, *args, **kwargs):
-        #create column headers
-        column_headers = self.get_column_headers()
-        render_dict = self.dt_render_dict
-        nowrap_list = self.dt_nowrap_list
-        #create column definitions for DT
-        columnDefs = []
-        col = 0
-        for i in column_headers:
-            c_dict = {}
-            c_dict['title'] = '"'+i[0]+'"'
-            c_dict['targets'] = col
-            c_dict['data'] = '"'+i[1]+'"'
-            c_dict['defaultContent'] = '""'
-            if i[2]:
-                c_dict['visible'] = 'true'
-            else:
-                c_dict['visible'] = 'false'
-            if i[0] in render_dict:
-                c_dict['render'] = render_dict[i[0]]
-            if i[0] in nowrap_list:
-                c_dict['className'] = '"nowrap"'
-            columnDefs.append(c_dict)
-            col = col + 1
-        return columnDefs
+    def get_filters(self, fields_dict, *args, **kwargs):
+        filters = []
+        for key, dict in fields_dict.items():
+            if dict['is_filter']:
+                filter = {}
+                filter['label'] = dict['field__name']
+                filter['field'] = key
+                filter['type'] = dict['filter_type']
+                filter['operator'] = dict['filter_operator']
+                if dict['filter_type'] == 'text':
+                    filter['lookups'] = [
+                            {'label':'is', 'lookup':'exact'},
+                            {'label':'contains', 'lookup':'contains'},
+                            {'label':'in', 'lookup':'in'},
+                            {'label':'starts with', 'lookup':'startswith'},
+                            {'label':'ends with', 'lookup':'endswith'},
+                            {'label':'matches regex', 'lookup':'regex'},
+                    ]
+                elif dict['filter_type'] == 'check' or dict['filter_type'] == 'select':
+                    values = eval(dict['filter_options'])
+                    filter = functions.add_filter_options(values, filter, dict['filter_mode'])
+                filters.append(filter)
+        if filters == []:
+            filters = None
+        return filters
+
+    def get_form_helper(self, list, *args, **kwargs):
+        if list.form_helper:
+            form_helper = list.form_helper
+        else:
+            form_helper = None
+        return form_helper
 
 @method_decorator(login_required,name='dispatch')
-class SourceMain(View):
-    """
-    Collects views to be displayed from the root of sources. GET requests to
-    this endpoint will list sources, while POST requests will handle creating
-    new sources.
-    """
+class SourceList(DTListView):
+    """ Lists sources """
+    def get_list_name(self, *args, **kwargs):
+        list_name = 'all'
+        if 'type' in self.request.GET:
+            list_name = self.request.GET['type']
+        return list_name
 
-    def get(self, request, *args, **kwargs):
-        """Display list of sources"""
-        view = SourceList.as_view()
-        return view(request, *args, **kwargs)
+    def get_breadcrumb(self, *args, **kwargs):
+        type = self.get_list_name()
+        if type == 'all':
+            breadcrumb = [('Sources', ''),('All Sources', '/sources')]
+        elif type == 'inventories':
+            breadcrumb = [('Repository',''), ('Inventories','/sources?type=inventories')]
+        else:
+            list_label = DT_list.objects.get(short_name=type).name
+            breadcrumb = [('Sources', ''), (list_label, '/sources?type='+type)]
+        return breadcrumb
 
-    def post(self, request, *args, **kwargs):
-        """Handle creating new sources"""
-        view = SourceCreate.as_view()
-        return view(request, *args, **kwargs)
+    def get_dt_ajax_str(self, list, *args, **kwargs):
+        base_url = list.api_url
+        type = list.short_name
+        if type == 'sources':
+            dt_ajax_str = '"'+base_url+'?format=json"'
+        else:
+            dt_ajax_str = '"'+base_url+'?format=json&type='+type+'"'
+        return dt_ajax_str
+
+    def get_dt_fields(self, list, *args, **kwargs):
+        dt_fields = DT_fields.objects.filter(list=list).values_list('field__short_name', flat=True)
+        return dt_fields
+
+@method_decorator(login_required,name='dispatch')
+class SourceDetail(DetailView):
+    model = Source
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = self.get_breadcrumb()
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context = functions.set_menus(self.request, context, state)
+        page_title = self.object.name
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        is_inv = self.object.is_inventory
+        has_pages = len(self.object.pages.all()) > 0
+        has_children = len(self.object.source_set.all()) > 0
+        context['is_inv'] = is_inv
+        context['has_pages'] = has_pages
+        context['has_children'] = has_children
+        source_data = {
+            'Type': self.object.type.name,
+            'Name': self.object.name,
+            'Short name': self.object.short_name,
+        }
+        if is_inv:
+            source_data['Inventory?'] = '<i class="fa fa-check-circle dt_checkbox_true"></i>'
+        else:
+            source_data['Inventory?'] = '<i class="fa fa-times-circle dt_checkbox_false"></i>'
+        if self.object.parent_source:
+            name = self.object.parent_source.name
+            url = '/sources/'+str(self.object.parent_source.id)
+            source_data['Parent'] = '<a href="{}">{}</a>'.format(url,name)
+        context['source_data'] = source_data
+        created = self.object.creation_timestamp.strftime('%d-%b-%Y@%H:%M')
+        modified = self.object.modification_timestamp.strftime('%d-%b-%Y@%H:%M')
+        c_user = Profile.objects.get(user__username=self.object.creation_username)
+        created_user = '<a href="/user/{}">{}</a>'.format(c_user.user_id, c_user.full_name)
+        m_user = Profile.objects.get(user__username=self.object.modification_username)
+        modified_user = '<a href="/user/{}">{}</a>'.format(m_user.user_id, m_user.full_name)
+        context['source_metadata'] = {
+            'ID': str(self.object.id),
+            'Created': created+' by '+created_user,
+            'Modified': modified+' by '+modified_user
+        }
+        attribute_data = []
+        attributes = self.object.attributes.all().select_related('attribute_type')
+        for a in attributes:
+            label = a.attribute_type.name
+            order = Content_attributes.objects.get(content_type_id=self.object.type,attribute_type_id=a.attribute_type).order
+            value = functions.get_attribute_value(a)
+            dict = {
+                'label': label,
+                'value': value,
+                'order': order
+            }
+            attribute_data.append(dict)
+        attribute_data = sorted(attribute_data, key=lambda x:x['order'])
+        context['attribute_data'] = attribute_data
+        if is_inv and has_pages:
+            folios = functions.get_editor_folios(self.object)
+            context['folio_count'] = folios['folio_count']
+            context['folio_menu'] = folios['folio_menu']
+            context['folio_list'] = folios['folio_list']
+            context['table_options_pages'] = {
+                'pageLength':5,
+                'responsive':'true',
+                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
+                'stateSave': 'true',
+                'select': 'true',
+                'paging': 'true',
+                'language': '{searchPlaceholder: "Search..."}',
+                'order': [[ 3, "asc" ]]
+                }
+        if has_children:
+            context['children'] = self.object.source_set.all().order_by('name')
+            context['table_options_children'] = {
+                'pageLength':5,
+                'responsive':'true',
+                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
+                'stateSave': 'true',
+                'select': 'true',
+                'paging': 'true',
+                'language': '{searchPlaceholder: "Search..."}'
+                }
+        return context
+
+    def get_breadcrumb(self, *args, **kwargs):
+        try:
+            request = self.request
+            ref = request.META.get('HTTP_REFERER', '/')
+            parsed_ref = urlparse.urlparse(ref)
+            s_type = urlparse.parse_qs(parsed_ref.query)['type'][0]
+        except:
+            s_type = 'all'
+        if type == 'all':
+            breadcrumb = [('Sources', ''),('All Sources', '/sources')]
+        elif type == 'inventories':
+            breadcrumb = [('Repository',''), ('Inventories','/sources?type=inventories')]
+        else:
+            list_label = DT_list.objects.get(short_name=s_type).name
+            breadcrumb = [('Sources', ''), (list_label, '/sources?type='+s_type)]
+        return breadcrumb
+
+    def get_object(self):
+        """ Raise a 404 instead of exception on things that aren't proper UUIDs """
+        try:
+            object = super().get_object()
+            return object
+        except:
+            raise Http404
+
+def SourceManifest(request, pk):
+    context = {}
+    source = Source.objects.get(pk=pk)
+    context['source'] = source
+    context['page_canvases'] = [page.get_canvas() for page in source.pages.all()]
+    return render(request, 'dalme_app/source_manifest.html', context)
 
 @method_decorator(login_required,name='dispatch')
 class AdminMain(View):
-    """
-    Routes requests to admin views
-    """
+    """ Routes requests to admin views """
     def get(self, request, *args, **kwargs):
         if 'type' in self.request.GET:
             type = self.request.GET['type']
@@ -237,92 +467,15 @@ class AdminMain(View):
         return view(request, title=title)
 
 class AdminUsers(DTListView):
-    breadcrumb = ['System','Users']
-    dt_ajax_base_url = '../api/users/'
-    form_helper = 'users_helper.js'
-    dt_column_headers = [
-            ['Id', 'id', 1],
-            ['Last login','user.last_login', 1],
-            ['SU','user.is_superuser', 1],
-            ['Username','user.username', 1],
-            ['Full name','full_name', 1],
-            ['First name','user.first_name', 0],
-            ['Last name','user.last_name', 0],
-            ['Email','user.email', 1],
-            ['Staff','user.is_staff', 0],
-            ['Active','user.is_active', 1],
-            ['Groups','user.groups', 0],
-            ['Date joined','user.date_joined', 0],
-            ['DAM user group','dam_usergroup.name', 0],
-            ['Wiki groups','wiki_groups', 0],
-            ['WordPress role','wp_role.name', 0]]
-    dt_render_dict = {
-            'Username': 'function ( data, type, row, meta ) {return \'<a href="/user/\'+data+\'">\'+data+\'</a>\';}',
-            'Email': 'function ( data, type, row, meta ) {return \'<a href="mailto:\'+data+\'">\'+data+\'</a>\';}',
-            'Last login': 'function ( data ) {return data != null ? moment(data).format("DD-MMM-YYYY@HH:mm") : "Never";}',
-            'Date joined': 'function ( data ) {return moment(data).format("DD-MMM-YYYY");}',
-            'SU': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-            'Staff': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-            'Active': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-            'Groups': '"[, ].name"',
-            'Wiki groups': '"[, ].ug_group"'
-            }
-    dt_editor_options = {'idSrc': '"id"',}
-    dt_editor_fields = [
-        { 'label':'First name', 'name':'user.first_name' },
-        { 'label':'Last name', 'name':'user.last_name' },
-        { 'label':'Full name', 'name':'full_name' },
-        { 'label':'Email', 'name':'user.email' },
-        { 'label':'Username', 'name':'user.username' },
-        { 'label':'Password', 'name':'user.password', 'type': "password" },
-        { 'label':'Staff', 'name':'user.is_staff', 'type': "checkbox",
-            'options': [
-                {'label': "Yes", 'value': "1"},
-            ]},
-        { 'label':'Super user', 'name':'user.is_superuser', 'type': "checkbox",
-            'options': [
-                {'label': "Yes", 'value': "1"},
-            ]},
-        { 'label':'Groups', 'name':'user.groups[].id', 'type': "checkbox",
-            'options': [
-                {'label': "Super Administrators", 'value': "1"},
-                {'label': "Developers", 'value': "2"},
-                {'label': "Staff", 'value': "3"},
-                {'label': "Users", 'value': "4"},
-            ]},
-        { 'label':'DAM user group', 'name':'dam_usergroup.value', 'type': "chosen",
-            'opts': {
-                "disable_search": 'true',
-            },
-            'options': [
-                {'label': "", 'value': ""},
-                {'label': "Administrator", 'value': "1"},
-                {'label': "General User", 'value': "2"},
-                {'label': "Super Admin", 'value': "3"},
-                {'label': "Archivist", 'value': "4"},
-            ]},
-        { 'label':'Wiki groups', 'name':'wiki_groups[].ug_group', 'type': "checkbox",
-            'options': [
-                {'label': "Users", 'value': "Users"},
-                {'label': "Administrator", 'value': "Administrator"},
-                {'label': "Bureaucrat", 'value': "Bureaucrat"},
-                {'label': "Sysop", 'value': "Sysop"},
-            ]},
-        { 'label':'WordPress role', 'name':'wp_role.value', 'type': "chosen",
-            'opts': {
-                "disable_search": 'true',
-            },
-            'options': [
-                {'label': "Administrator", 'value': "a:1:{s:13:\\\"administrator\\\";b:1;}"},
-                {'label': "Editor", 'value': "a:1:{s:6:\\\"editor\\\";b:1;}"},
-                {'label': "Author", 'value': "a:1:{s:6:\\\"author\\\";b:1;}"},
-                {'label': "Contributor", 'value': "a:1:{s:11:\\\"contributor\\\";b:1;}"},
-                {'label': "Subscriber", 'value': "a:1:{s:10:\\\"subscriber\\\";b:1;}"},
-            ]},
-    ]
+    """ Lists users and allows editing and creation of new records via the API """
+    list_name = 'users'
+    breadcrumb = [('System', ''),('Users', '/admin?type=users')]
+    dt_editor_options = {'idSrc': '"id"'}
+    dt_field_list = ['id','last_login', 'is_superuser', 'username', 'full_name', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'groups', 'date_joined', 'dam_usergroup', 'wiki_groups', 'wp_role']
+    dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username', 'password', 'is_staff', 'is_superuser', 'groups', 'dam_usergroup', 'wiki_groups', 'wp_role']
 
 class AdminNotifications(DTListView):
-    breadcrumb = ['System','Notifications']
+    breadcrumb = [('System', ''),('Notifications', '/admin?type=notifications')]
     dt_ajax_base_url = '../api/notifications/'
     dt_column_headers = [
             ['Id', 'id', 0],
@@ -362,7 +515,7 @@ class AdminModels(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = ['System', 'Data Models']
+        breadcrumb = [('System', ''), ('Data Models', '/admin?type=models')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
@@ -453,259 +606,11 @@ class AdminModels(TemplateView):
             col = col + 1
         return columnDefs
 
-
-class SourceList(DTListView):
-    dt_render_dict = {
-        'Name': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
-        'Web address': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
-        'Parent': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
-        'Inv': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}'
-        }
-    dt_nowrap_list = ['Type']
-    dt_ajax_base_url = '../api/sources/'
-
-    def get_type(self):
-        if 'type' in self.request.GET:
-            return self.request.GET['type']
-        else:
-            return ''
-
-    def get_list_type(self, type):
-        return Content_list.objects.get(short_name=type)
-
-    def get_dt_ajax_str(self, *args, **kwargs):
-        type = self.get_type()
-        base_url = self.dt_ajax_base_url
-        if type == '':
-            ajax_string = '"'+base_url+'?format=json"'
-        else:
-            ajax_string = '"'+base_url+'?format=json&type='+type+'"'
-        return ajax_string
-
-    def get_breadcrumb(self, *args, **kwargs):
-        type = self.get_type()
-        if type == '':
-            breadcrumb = ['Sources', 'All']
-        elif type == 'inventories':
-            breadcrumb = ['Repository', 'Inventories']
-        else:
-            breadcrumb = ['Sources', self.get_list_type(type).name]
-        return breadcrumb
-
-    def get_page_title(self, *args, **kwargs):
-        type = self.get_type()
-        if type == '':
-            page_title = "Sources"
-        else:
-            page_title = 'List of '+ self.get_list_type(type).name
-        return page_title
-
-    def get_column_headers(self, *args, **kwargs):
-        type = self.get_type()
-        if type == '':
-            def_headers = ['15']
-            extra_headers = ['type']
-            ct_l = Content_type.objects.filter(content_class=1)
-            att_l = Attribute_type.objects.filter(content_type__in=ct_l)
-        else:
-            list_type = self.get_list_type(type)
-            def_headers = list_type.default_headers.split(',')
-            if list_type.extra_headers:
-                extra_headers = list_type.extra_headers.split(',')
-            else:
-                extra_headers = []
-            q_obj = Q()
-            if type == 'inventories':
-                att_l = Content_type.objects.get(pk=13).attribute_types.all()
-                extra_headers.append('no_folios')
-            else:
-                content_types = list_type.content_types.all()
-                q = Q()
-                for c in content_types:
-                    q |= Q(pk=c.pk)
-                ct_l = Content_type.objects.filter(q)
-                att_l = Attribute_type.objects.filter(content_type__in=ct_l)
-
-        #compile attribute dictionary
-        att_dict = {}
-        for a in att_l:
-            if str(a.pk) not in att_dict:
-                att_dict[str(a.pk)] = [a.name,a.short_name]
-
-        #create column headers
-        column_headers = [['Name','name',1],['Short Name','short_name',0]]
-        extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv','no_folios':'#Fol'}
-
-        if extra_headers:
-            for i in extra_headers:
-                column_headers.append([extra_labels[i],i,1])
-        for id, names in att_dict.items():
-            if id in def_headers:
-                column_headers.append([names[0],names[1],1])
-            else:
-                column_headers.append([names[0],names[1],0])
-
-        return column_headers
-
-
-class SourceCreate(CreateView):
-    model = Source
-    form_class = forms.source_main
-    template_name_suffix = "_create_form"
-
 @method_decorator(login_required,name='dispatch')
-class SourceDetail(View):
-    """
-    Container for views of individual Source objects. A GET request will
-    display the source, while a POST request will be a form handler to update
-    the source.
-    """
-
-    def get(self, request, *args, **kwargs):
-        """Display the source"""
-        view = SourceDisplay.as_view()
-        return view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        """Update the source"""
-        view = SourceUpdate.as_view()
-        return view(request, *args, **kwargs)
-
-class SourceDisplay(DetailView):
-    model = Source
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        breadcrumb = ['Repository', 'Inventories']
-        sidebar_toggle = self.request.session['sidebar_toggle']
-        context['sidebar_toggle'] = sidebar_toggle
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
-        context['page_title'] = self.object.name
-        is_inv = self.object.is_inventory
-        has_pages = len(self.object.pages.all()) > 0
-        has_children = len(self.object.source_set.all()) > 0
-        context['is_inv'] = is_inv
-        context['has_pages'] = has_pages
-        context['has_children'] = has_children
-        source_data = {
-            'Type': self.object.type.name,
-            'Name': self.object.name,
-            'Short name': self.object.short_name,
-        }
-
-        if is_inv:
-            source_data['Inventory?'] = '<i class="fa fa-check-circle dt_checkbox_true"></i>'
-        else:
-            source_data['Inventory?'] = '<i class="fa fa-times-circle dt_checkbox_false"></i>'
-
-        if self.object.parent_source:
-            name = self.object.parent_source.name
-            url = '/sources/'+str(self.object.parent_source.id)
-            source_data['Parent'] = '<a href="{}">{}</a>'.format(url,name)
-
-        context['source_data'] = source_data
-        created = self.object.creation_timestamp.strftime('%d-%b-%Y@%H:%M')
-        modified = self.object.modification_timestamp.strftime('%d-%b-%Y@%H:%M')
-        c_user = Profile.objects.get(user__username=self.object.creation_username)
-        created_user = '<a href="/user/{}">{}</a>'.format(c_user.user_id, c_user.full_name)
-        m_user = Profile.objects.get(user__username=self.object.modification_username)
-        modified_user = '<a href="/user/{}">{}</a>'.format(m_user.user_id, m_user.full_name)
-
-        context['source_metadata'] = {
-            'ID': str(self.object.id),
-            'Created': created+' by '+created_user,
-            'Modified': modified+' by '+modified_user
-        }
-
-        attribute_data = []
-        attributes = self.object.attributes.all().select_related('attribute_type')
-        for a in attributes:
-            label = a.attribute_type.name
-            order = Content_attributes.objects.get(content_type_id=self.object.type,attribute_type_id=a.attribute_type).order
-            value = functions.get_attribute_value(a)
-            dict = {
-                'label': label,
-                'value': value,
-                'order': order
-            }
-            attribute_data.append(dict)
-
-        attribute_data = sorted(attribute_data, key=lambda x:x['order'])
-        context['attribute_data'] = attribute_data
-
-        if is_inv and has_pages:
-            folios = functions.get_editor_folios(self.object)
-            context['folio_count'] = folios['folio_count']
-            context['folio_menu'] = folios['folio_menu']
-            context['folio_list'] = folios['folio_list']
-            context['table_options_pages'] = {
-                'pageLength':5,
-                'responsive':'true',
-                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
-                'stateSave': 'true',
-                'select': 'true',
-                'paging': 'true',
-                'language': '{searchPlaceholder: "Search..."}',
-                'order': [[ 3, "asc" ]]
-                }
-            #context['table_buttons_pages'] = [
-                #'{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
-                #'{ extend: "create", text: "\uf067", editor: editor }',
-                #'{ extend: "edit", text: "\uf304", editor: editor }',
-                #'{ extend: "remove", text: "\uf00d", editor: editor }'
-                #]
-
-        if has_children:
-            context['children'] = self.object.source_set.all().order_by('name')
-            context['table_options_children'] = {
-                'pageLength':5,
-                'responsive':'true',
-                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
-                'stateSave': 'true',
-                'select': 'true',
-                'paging': 'true',
-                'language': '{searchPlaceholder: "Search..."}'
-                }
-            #context['table_buttons_children'] = [
-                #'{ extend: "colvis", text: "\uf0db", className: "dt-buttons-subcard dt-buttons-corner-right" }',
-                #'{ extend: "create", text: "\uf067", editor: editor }',
-                #'{ extend: "edit", text: "\uf304", editor: editor }',
-                #'{ extend: "remove", text: "\uf00d", editor: editor }'
-                #]
-
-        return context
-
-    def get_object(self):
-        """
-        Raise a 404 on things that aren't proper UUIDs,
-        which would normally raise an exception.
-        """
-        try:
-            # Call the superclass
-            object = super().get_object()
-            return object
-        except:
-            raise Http404
-
-class SourceUpdate(UpdateView):
-    model = Source
-    template_name_suffix = '_update_form'
-    form_class = forms.source_main
-
-def SourceManifest(request, pk):
-    context = {}
-    source = Source.objects.get(pk=pk)
-    context['source'] = source
-    context['page_canvases'] = [page.get_canvas() for page in source.pages.all()]
-    return render(request, 'dalme_app/source_manifest.html', context)
-
-def PageManifest(request, pk):
-    context = {}
-    page = Page.objects.get(pk=pk)
-    context['page'] = page
-    context['canvas'] = page.get_canvas()
-    return render(request, 'dalme_app/page_manifest.html', context)
+class ImageList(DTListView):
+    breadcrumb = [('Repository', ''),('Images', '/images')]
+    list_name = 'images'
+    dt_field_list = ['ref','field8', 'field79', 'has_image', 'field12', 'creation_date', 'created_by', 'field3', 'collections', 'field51']
 
 @method_decorator(login_required,name='dispatch')
 class ImageDetail(DetailView):
@@ -714,13 +619,14 @@ class ImageDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = ['Repository', 'Images']
+        breadcrumb = [('Repository', ''), ('Images', '/images')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
-        context['page_title'] = 'DAM Image ' + str(self.object.ref)
-
+        page_title = 'DAM Image ' + str(self.object.ref)
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         image_data = {
             'DAM Id': self.object.ref,
             'Created': functions.format_date(self.object.creation_date, 'timestamp'),
@@ -729,14 +635,11 @@ class ImageDetail(DetailView):
             'File modified': functions.format_date(self.object.file_modified, 'timestamp'),
             'Filesize': self.object.file_size,
         }
-
         if self.object.has_image:
             image_data['Image?'] = '<i class="fa fa-check-circle dt_checkbox_true"></i>'
         else:
             image_data['Image?'] = '<i class="fa fa-times-circle dt_checkbox_false"></i>'
-
         context['image_data'] = image_data
-
         try:
             attribute_data = []
             attributes = rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field')
@@ -754,7 +657,6 @@ class ImageDetail(DetailView):
             context['attribute_data'] = attribute_data
         except:
             attribute_data = None
-
         collections = []
         col_list = rs_collection_resource.objects.filter(resource=self.object.ref)
         for c in col_list:
@@ -773,9 +675,7 @@ class ImageDetail(DetailView):
                 'path': path
             }
             collections.append(dict)
-
         context['collections'] = collections
-
         context['table_options'] = {
             'pageLength':5,
             'responsive':'true',
@@ -784,155 +684,46 @@ class ImageDetail(DetailView):
             'select': 'true',
             'paging': 'true',
             }
-
         context['image_url'] = functions.get_dam_preview(self.object.ref)
-
         return context
 
     def get_object(self):
-        """
-        Raise a 404 on things that aren't proper UUIDs,
-        which would normally raise an exception.
-        """
+        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
         try:
-            # Call the superclass
             object = super().get_object()
             return object
         except:
             raise Http404
 
-
-@method_decorator(login_required,name='dispatch')
-class ImageList(DTListView):
-    page_title = 'Image List'
-    breadcrumb = ['Repository','Images']
-    dt_ajax_base_url = '../api/images/'
-    dt_column_headers = [
-            ['DAM Id','ref',1],
-            ['Title','field8',1],
-            ['Folio','field79',1],
-            ['Image','has_image',1],
-            ['Date','field12',0],
-            ['Created','creation_date',0],
-            ['Creator','created_by',0],
-            ['Country','field3',0],
-            ['Collections','collections',1],
-            ['Original filename','field51',0],
-            ]
-    dt_render_dict = {
-            'Image': 'function ( data, type, row, meta ) {return data == 1 ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-            'Date': 'function(data) {return moment(data).format("DD-MMM-YYYY");}',
-            'Created': 'function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}',
-            'DAM Id': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.ref+\'</a>\';}',
-            'Creator': 'function ( data, type, row, meta ) { var isnum = /^\\d+$/.test(data); return isnum == false ? \'<a href="/user/\'+data+\'">\'+data+\'</a>\' : data ;}',
-            }
-    filters = [
-        {
-            'label':'Title',
-            'field':'field8',
-            'type':'text',
-            'operator':'and',
-            'lookups':[
-                {'label':'is', 'lookup':'exact'},
-                {'label':'contains', 'lookup':'contains'},
-                {'label':'in', 'lookup':'in'},
-                {'label':'starts with', 'lookup':'startswith'},
-                {'label':'ends with', 'lookup':'endswith'},
-                {'label':'matches regex', 'lookup':'regex'},
-            ],
-        },
-        {
-            'label':'Has Image',
-            'field':'has_image',
-            'type':'switch',
-            'operator':'and',
-        },
-    ]
-    countries = rs_resource.objects.filter(resource_type=1, archive=0).values('field3').distinct()
-    collections = rs_collection.objects.all().values('name').distinct()
-    c_filter = {
-            'label':'Country',
-            'field':'field3',
-            'type':'check',
-            'operator':'or',
-        }
-    col_filter = {
-            'label':'Collections',
-            'field':'collections',
-            'type':'select',
-            'operator':'or',
-        }
-    filters = functions.add_filter_options(countries, c_filter, filters, 'check')
-    filters = functions.add_filter_options(collections, col_filter, filters)
-
-@method_decorator(login_required,name='dispatch')
-class PageMain(View):
-    def get(self, request, *args, **kwargs):
-        """Display list of pages"""
-        view = PageList.as_view()
-        return view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        """Handle creating new pages"""
-        view = PageCreate.as_view()
-        return view(request, *args, **kwargs)
-
 @method_decorator(login_required,name='dispatch')
 class PageList(DTListView):
-    breadcrumb = ['Repository','Pages']
-    page_title = 'Page List'
-    dt_ajax_base_url = '../api/pages/'
-    dt_column_headers = [
-            ['Name', 'name', 1],
-            ['DAM Id', 'dam_id', 1],
-            ['Order','order', 1]
-            ]
+    breadcrumb = [('Repository', ''),('Pages', '/pages')]
+    list_name = 'pages'
+    dt_field_list = ['name', 'dam_id', 'order']
 
 @method_decorator(login_required,name='dispatch')
-class PageDetail(View):
-    def get(self, request, *args, **kwargs):
-        """Display list of sources"""
-        view = PageDisplay.as_view()
-        return view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        """Handle creating new sources"""
-        view = PageUpdate.as_view()
-        return view(request, *args, **kwargs)
-
-class PageDisplay(DetailView):
+class PageDetail(DetailView):
     model = Page
     context_object_name = 'page'
-
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         breadcrumb = ['Pages']
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
-        context['page_title'] = self.object.name
+        page_title = self.object.name
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         context['form'] = forms.page_main(instance=self.object)
         return context
-
-class PageUpdate(UpdateView):
-    model = Page
-    form_class = forms.page_main
-    template_name_suffix = '_update_form'
-
-class PageCreate(CreateView):
-    model = Page
-    form_class = forms.page_main
-    template_name_suffix = '_create_form'
 
 @method_decorator(login_required,name='dispatch')
 class Index(TemplateView):
     template_name = 'dalme_app/index.html'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = ['Dashboard']
+        breadcrumb = [('Dashboard', '')]
         try:
             sidebar_toggle = self.request.session['sidebar_toggle']
         except:
@@ -942,24 +733,29 @@ class Index(TemplateView):
         context['sidebar_toggle'] = sidebar_toggle
         context = functions.set_menus(self.request, context, state)
         context['tiles'] = menu_constructor(self.request, 'tile_item', 'home_tiles_default.json', state)
-        context['page_title'] = 'DALME Dashboard'
-
+        page_title = 'Dashboard'
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         return context
+
+def PageManifest(request, pk):
+    context = {}
+    page = Page.objects.get(pk=pk)
+    context['page'] = page
+    context['canvas'] = page.get_canvas()
+    return render(request, 'dalme_app/page_manifest.html', context)
 
 @method_decorator(login_required,name='dispatch')
 class UIRefMain(View):
-    """
-    Routes requests to UIRef views
-    """
+    """ Routes requests to UIRef views """
     def get(self, request, *args, **kwargs):
         if 'm' in self.request.GET:
             template = 'UI_reference/'+self.request.GET['m']+'.html'
-            breadcrumb = ['UI Reference', self.request.GET['m'].capitalize()]
+            breadcrumb = [('UI Reference', ''), (self.request.GET['m'].capitalize(), template)]
             view = UIRef.as_view(template_name=template)
         return view(request, breadcrumb=breadcrumb)
 
 class UIRef(TemplateView):
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = self.kwargs['breadcrumb']
@@ -967,24 +763,24 @@ class UIRef(TemplateView):
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context = functions.set_menus(self.request, context, state)
-        context['page_title'] = 'DALME UI Reference'
-
+        context['page_chain'] = functions.get_page_chain(breadcrumb)
         return context
 
 @method_decorator(login_required,name='dispatch')
 class Scripts(TemplateView):
     template_name = 'dalme_app/scripts.html'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         request = self.request
-        breadcrumb = ['Dev Scripts']
+        breadcrumb = [('Dev Scripts', '')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context = functions.set_menus(self.request, context, state)
         context['scripts'] = custom_scripts.get_script_menu()
-        context['page_title'] = 'Dev Scripts'
+        page_title = 'Dev Scripts'
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         if 's' in self.request.GET:
             scpt = self.request.GET['s']
             context['output'] = eval('custom_scripts.'+scpt+'(request)')

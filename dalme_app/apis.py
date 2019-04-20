@@ -547,7 +547,7 @@ class Sources(viewsets.ViewSet):
                 queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages'))
 
             else:
-                content_types = Content_list.objects.get(short_name=type).content_types.all()
+                content_types = DT_list.objects.get(short_name=type).content_types.all()
                 for i in content_types:
                     q_obj |= Q(type=i.pk)
                 queryset = queryset.filter(q_obj)

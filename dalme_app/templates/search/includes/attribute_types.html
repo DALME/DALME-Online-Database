@@ -1,0 +1,5 @@
+{% load highlight %}
+<div class="search-result-entry">
+    <h4><a href="{{ result.object.get_absolute_url }}">Attribute type: {{ result.object.name }} ({{ result.object.short_name }})</a></h4>
+    <p>{{ result.object.description }}</p>
+</div>

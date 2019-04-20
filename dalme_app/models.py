@@ -78,6 +78,8 @@ class Attribute_type(dalmeIntid):
     short_name = models.CharField(max_length=55)
     description = models.TextField()
     data_type = models.CharField(max_length=15)
+    source = models.CharField(max_length=255, null=True)
+    same_as = models.CharField(max_length=55, null=True)
 
     def __str__(self):
         return self.name
@@ -141,19 +143,47 @@ class Content_attributes(dalmeIntid):
     attribute_type = models.ForeignKey('Attribute_type',to_field='id',db_index=True,on_delete=models.PROTECT)
     order = models.IntegerField(db_index=True)
 
-class Content_list(dalmeIntid):
+class DT_list(dalmeIntid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
     default_headers = models.CharField(max_length=255, null=True)
     extra_headers = models.CharField(max_length=255, null=True)
     content_types = models.ManyToManyField(Content_type)
+    api_url = models.CharField(max_length=255, null=True)
+    form_helper = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['id']
+
+class DT_fields(dalmeIntid):
+
+    FILTER_OPS = (
+        ('and', 'and'),
+        ('or', 'or')
+    )
+
+    list = models.ForeignKey('DT_list', to_field='id', db_index=True, on_delete=models.CASCADE)
+    field = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE)
+    render_exp = models.CharField(max_length=255, null=True)
+    orderable = models.BooleanField(default=False)
+    visible = models.BooleanField(default=False)
+    searchable = models.BooleanField(default=False)
+    nowrap = models.BooleanField(default=False)
+    dt_name = models.CharField(max_length=55, null=True)
+    dte_name = models.CharField(max_length=55, null=True)
+    dte_type = models.CharField(max_length=55, null=True)
+    dte_options = models.CharField(max_length=255, null=True)
+    dte_opts = models.CharField(max_length=255, null=True)
+    is_filter = models.BooleanField(default=False)
+    filter_type = models.CharField(max_length=55, null=True)
+    filter_mode = models.CharField(max_length=55, null=True)
+    filter_operator = models.CharField(max_length=55, null=True, choices=FILTER_OPS)
+    filter_options = models.CharField(max_length=255, null=True)
+
 
 class Headword(dalmeUuid):
     word = models.CharField(max_length=55)

@@ -115,9 +115,81 @@ def session_info(request, username):
     return output
 
 def test_expression(request):
-    functions.notification(request, level='INFO', text='Yes!')
+    dt_fields = []
+    render_dict = {
+        'Name': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
+        'Web address': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
+        'Parent': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
+        'Inv': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}'
+        }
+    nowrap_list = ['Type']
+    types = ['acts_and_registers', 'bibliography', 'archives_and_collections', 'inventories', '']
+    for type in types:
+        if type == '':
+            def_headers = ['15']
+            extra_headers = ['type']
+            ct_l = Content_type.objects.filter(content_class=1)
+            att_l = Attribute_type.objects.filter(content_type__in=ct_l)
+            list_type = DT_list.objects.get(short_name='sources')
+        else:
+            list_type = DT_list.objects.get(short_name=type)
+            def_headers = list_type.default_headers.split(',')
+            if list_type.extra_headers:
+                extra_headers = list_type.extra_headers.split(',')
+            else:
+                extra_headers = []
+            q_obj = Q()
+            if type == 'inventories':
+                att_l = Content_type.objects.get(pk=13).attribute_types.all()
+                extra_headers.append('no_folios')
+            else:
+                content_types = list_type.content_types.all()
+                q = Q()
+                for c in content_types:
+                    q |= Q(pk=c.pk)
+                ct_l = Content_type.objects.filter(q)
+                att_l = Attribute_type.objects.filter(content_type__in=ct_l)
 
-    return 'ok'
+        #compile attribute dictionary
+        att_dict = {}
+        for a in att_l:
+            if str(a.pk) not in att_dict:
+                att_dict[str(a.pk)] = [a.name,a.short_name]
+
+        #create column headers
+        column_headers = [['Name','name',1],['Short Name','short_name',0]]
+        extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv','no_folios':'#Fol'}
+
+        if extra_headers:
+            for i in extra_headers:
+                column_headers.append([extra_labels[i],i,1])
+        for id, names in att_dict.items():
+            if id in def_headers:
+                column_headers.append([names[0],names[1],1])
+            else:
+                column_headers.append([names[0],names[1],0])
+
+
+
+        for i in column_headers:
+            c_dict = {}
+            c_dict['list'] = list_type
+            c_dict['field'] = Attribute_type.objects.get(short_name=i[1])
+            if i[2]:
+                c_dict['visible'] = True
+            else:
+                c_dict['visible'] = False
+            if i[0] in render_dict:
+                c_dict['render_exp'] = render_dict[i[0]]
+            if i[0] in nowrap_list:
+                c_dict['nowrap'] = True
+
+            dt_fields.append(c_dict)
+
+    for d in dt_fields:
+        new_record = DT_fields(**d).save()
+
+    return 'okay'
 
 def test_expression2():
 

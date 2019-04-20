@@ -33,7 +33,7 @@
           {% for o in v %}
             {
               {% for l,p in o.items %}
-                {{ l | safe }}: "{{ p | safe }}",
+                {{ l | safe }}: "{{ p | escapejs }}",
               {% endfor %}
             },
           {% endfor %}

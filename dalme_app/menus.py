@@ -1,45 +1,26 @@
-"""
-This menus module provides a streamlined way to create menus from simple json files.
-"""
-
 from django.urls import reverse
-
 import json, os
-
 from . import functions
-
-LEVEL_LOOKUP = ['nav-second-level', 'nav-third-level', 'nav-fourth-level', 'nav-fifth-level']
 
 def menu_constructor(request, item_constructor, template, state):
     """
     Builds menus based on an item_constructor and a json file describing the menu items.
     Menus are stored in the templates directory, under the menus subdirectory.
     """
-    # Declare output string
     _output = ''
-
-    # Get template from default location in dalme_app/templates/menus and read it
     template = os.path.join('dalme_app','templates','menus',template)
     with open(template, 'r') as fp:
         menu = json.load(fp)
-
-    # Create menu by iterating through items in json file and appending to output
     for item in menu:
         if 'permissions' in item:
             if functions.check_group(request, item['permissions']):
                 _output += eval(item_constructor + '(_output,state,**item)')
         else:
             _output += eval(item_constructor + '(_output,state,**item)')
-
-    # Return output as part of a list, because renderer expects to iterate
     return [_output]
 
 def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None,divider=None, itemClass=None, blank=None, permissions=None):
-    """
-    Generates a menu item and incorporates it into `wholeMenu`. This function
-    calls itself to recurse through hierarchies of menus.
-    """
-
+    """ creates menu items for the sidebar """
     if section:
         currentItem = '<div class="sidebar-heading">{}</div><hr class="sidebar-divider">'.format(text)
     elif divider:
@@ -62,29 +43,23 @@ def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,coun
                 currentItem += '<a class="collapse-item'
                 if child['text'] in state['breadcrumb']:
                     currentItem += ' active'
-
                 currentItem += '" href="{}"'.format(child['link'])
-
                 if 'blank' in child:
                     currentItem += ' target="_blank"'
-
                 currentItem += '><i class="fas fa-fw {}"></i> {}</a>'.format(child['iconClass'], child['text'])
             currentItem += '</div></div></li>'
-
         else:
             currentItem += '<a class="nav-link" href="{}">'.format(link)
             currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
             currentItem += '<span>{}</span></a></li>'.format(text)
-
     return currentItem
 
 def tile_item(wholeMenu,state,colourClass=None,iconClass=None,counter=None,counterTitle=None,linkTarget=None,linkTitle=None, permissions=None):
-
+    """ creates tiles for the dashboard homepage """
     try:
         counter = functions.get_count(counter)
     except:
         counter = 'n/a'
-
     currentItem = '<div class="col-xl-3 col-sm-6 mb-3">'
     currentItem += '<div class="card shadow text-dark-grey bg-{}-soft o-hidden h-100"><div class="card-body">'.format(colourClass)
     currentItem += '<div class="card-body-icon"><i class="fas {} fa-comments"></i></div>'.format(iconClass)
@@ -92,12 +67,10 @@ def tile_item(wholeMenu,state,colourClass=None,iconClass=None,counter=None,count
     currentItem += '<a class="card-footer text-dark-grey clearfix small z-1" href="{}">'.format(linkTarget)
     currentItem += '<span class="float-left">{}</span>'.format(linkTitle)
     currentItem += '<span class="float-right"><i class="fas fa-angle-right"></i></span></a></div></div>'
-
     return currentItem
 
 def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,counter=None,circleColour=None,moreText=None,moreLink=None,permissions=None):
     """ creates items for the top right dropdowns """
-
     currentItem = '<li class="nav-item dropdown no-arrow topbar-border-left">'
     if topMenu:
         currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
@@ -112,9 +85,7 @@ def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemCla
                     currentItem += '<i class="fas {} fa-fw mr-2 text-gray-400"></i>{}</a>'.format(child['iconClass'], child['text'])
                 else:
                     currentItem += '<i class="fas {} fa-fw mr-2 text-gray-400"></i>{}</a>'.format(childrenIconClass, child['text'])
-
         currentItem += '</div></li> '
-
     if infoPanel:
         currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
         currentItem += '<i class="fas {} fa-fw"></i>'.format(iconClass)
@@ -126,7 +97,5 @@ def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemCla
             currentItem += '<a class="dropdown-item d-flex align-items-center" href="{}">'.format(child['link'])
             currentItem += '<div class="mr-3"><div class="icon-circle bg-{}"><i class="fas {} text-white"></i></div></div>'.format(child['circleColour'], child['iconClass'])
             currentItem += '<div><div class="small text-gray-500">{}</div><span class="font-weight-bold">{}</span></div></a>'.format(child['small_text'], child['text'])
-
         currentItem += '<a class="dropdown-item text-center small text-gray-500" href="{}">{}</a></div></li>'.format(moreLink, moreText)
-
     return currentItem

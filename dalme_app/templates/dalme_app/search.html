@@ -1,49 +1,91 @@
 {% extends "dalme_app/dash_base.html" %}
-
 {% load staticfiles i18n %}
+{% load template_helpers %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}
-
 {% block content %}
-
-<!-- Begin Page Content -->
 <div class="container-fluid">
-
-      <!-- Page Heading -->
-      <!--div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ page_title }}</h1>
-        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-      </div-->
-      <div class="card shadow mb-4">
-        <div class="card-header py-3">
-          <h6 class="m-0 font-weight-bold text-primary">Results</h6>
-        </div>
-        <div class="card-body">
-          <form method="get" action=".">
-              <table>
-                  {{ form.as_table }}
-                  <tr>
-                      <td>&nbsp;</td>
-                      <td>
-                          <input type="submit" value="Search">
-                      </td>
-                  </tr>
-              </table>
-                  {% for result in object_list %}
-                      <p>
-                          <a href="{{ result.object.get_absolute_url }}">{{ result.object.name }} ({{ result.object.short_name }})</a>
-                          {{ result.object.description }}
-                      </p>
-                  {% empty %}
-                      <p>No results found.</p>
-                  {% endfor %}
-            </form>
+  <form method="get" action=".">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card mb-3">
+          <div class="sub-card-header">
+            <i class="fa fa-search fa-fw"></i> Search
+          </div>
+          <div class="card-body">
+            <label class="sr-only" for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
+            <div class="input-group mb-2 mr-sm-2 mt-3">
+              <div class="input-group-prepend">
+                <div class="input-group-text search-prepend">Search query:</div>
+              </div>
+              <input type="text" class="form-control form-control-sm search-results-input" id="{{ form.q.id_for_label }}" name="{{ form.q.html_name }}" value="{{ form.q.value }}">
+              <button type="submit" class="btn btn-primary search-results-btn">Search</button>
+            </div>
+            <label class="col-form-label-sm mr-3 ml-2">Search in:</label>
+            {% for choice in form.models %}
+              <div class="form-check form-check-inline search-results-checkbox">
+                {{ choice.tag }} {{ choice.choice_label }}
+              </div>
+            {% endfor %}
           </div>
         </div>
+      </div>
     </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card mb-3">
+          <div class="sub-card-header">
+            <i class="fa fa-list-alt fa-fw"></i> Results
+          </div>
+          <div class="card-body">
+            {% for result in page_obj.object_list %}
+
+                {% if result.content_type == "dalme_app.source" %}
+                {% include "search/includes/sources.html" %}
+                {% endif %}
+                {% if result.content_type == "dalme_app.attribute_type" %}
+                {% include "search/includes/attribute_types.html" %}
+                {% endif %}
+
+            {% empty %}
+                <div class="search-results-none">No results found.</div>
+            {% endfor %}
+            {% if is_paginated %}
+            <nav aria-label="Search results pages">
+              <ul class="pagination">
+                {% if page_obj.has_previous %}
+                  <li class="page-item"><a class="page-link" href="{% relative_url page_obj.previous_page_number 'page' request.GET.urlencode %}">Previous</a></li>
+                {% else %}
+                  <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
+                {% endif %}
+                {% for i in page_obj.paginator.page_range %}
+                  {% if page_obj.number == i %}
+                    <li class="page-item active" aria-current="page">
+                      <a class="page-link" href="#">{{ i }}<span class="sr-only">(current)</span></a>
+                    </li>
+                  {% else %}
+                    <li class="page-item"><a class="page-link" href="{% relative_url i 'page' request.GET.urlencode %}">{{ i }}</a></li>
+                  {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                  <li class="page-item"><a class="page-link" href="{% relative_url page_obj.next_page_number 'page' request.GET.urlencode %}">Next</a></li>
+                {% else %}
+                  <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>
+                {% endif %}
+              </ul>
+            </nav>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+      <!--div class="tab-footer">
+        <small class="text-muted float-left tab-footer-text" id="transcriber">Search results...</small>
+      </div-->
+</div>
 
 {% endblock %}
-
 {% block extra_scripts %}
-
 {% endblock %}

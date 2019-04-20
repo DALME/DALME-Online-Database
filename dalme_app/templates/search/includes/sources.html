@@ -1,0 +1,5 @@
+{% load highlight %}
+<div class="search-result-entry">
+    <h4><a href="{{ result.object.get_absolute_url }}">{{ result.object.type }}: {{ result.object.name }}</a></h4>
+    <p>{% highlight result.object.transcriptions with query max_length 500 %}</p>
+</div>
