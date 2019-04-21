@@ -28,10 +28,10 @@ AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
 AWS_REGION = os.environ['AWS_DEFAULT_REGION']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Allow all host headers
-ALLOWED_HOSTS = ['db.dalme.org','127.0.0.1.xip.io', '127.0.0.1.xip.io:8443']
+ALLOWED_HOSTS = ['db.dalme.org']
 
 # Application definition
 
@@ -111,6 +111,8 @@ LOGOUT_REDIRECT_URL = 'https://dalme.org'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+DATABASE_ROUTERS = ['dalme_app.db_routers.ModelDatabaseRouter']
+
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
@@ -121,7 +123,28 @@ if 'RDS_DB_NAME' in os.environ:
             'HOST': os.environ['RDS_HOSTNAME'],
             'PORT': os.environ['RDS_PORT'],
             'CONN_MAX_AGE': 3600,
-        }
+        },
+        'dam': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['DAM_DB_NAME'],
+            'USER': os.environ['DAM_USERNAME'],
+            'PASSWORD': os.environ['DAM_PASSWORD'],
+            'HOST': os.environ['DAM_HOSTNAME'],
+        },
+        'wiki': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WIKI_DB_NAME'],
+            'USER': os.environ['WIKI_USERNAME'],
+            'PASSWORD': os.environ['WIKI_PASSWORD'],
+            'HOST': os.environ['WIKI_HOSTNAME'],
+        },
+        'wp': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WP_DB_NAME'],
+            'USER': os.environ['WP_USERNAME'],
+            'PASSWORD': os.environ['WP_PASSWORD'],
+            'HOST': os.environ['WP_HOSTNAME'],
+        },
     }
 else:
     DATABASES = {
@@ -137,18 +160,10 @@ else:
     }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_ID,AWS_ACCESS_KEY,AWS_REGION,'es')

@@ -16,6 +16,8 @@ router.register(r'users', apis.Users, basename='users')
 router.register(r'models', apis.Models, basename='models')
 router.register(r'notifications', apis.Notifications, basename='notifications')
 router.register(r'transcriptions', apis.Transcriptions, basename='transcriptions')
+router.register(r'images', apis.Images, basename='images')
+router.register(r'pages', apis.Pages, basename='pages')
 
 urlpatterns = [
     path('api/', include(router.urls)),
