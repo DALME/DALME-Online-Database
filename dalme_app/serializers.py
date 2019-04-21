@@ -45,15 +45,20 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class TranscriptionSerializer(serializers.ModelSerializer):
     """ Basic serializer for transcriptions """
+    author = serializers.CharField(max_length=255, required=False)
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        transcription_xml = '<xml>'+ret['transcription']+'</xml>'
-        ret['transcription_html'] = functions.render_transcription(transcription_xml)
+        if ret['transcription']:
+            transcription_xml = '<xml>'+ret['transcription']+'</xml>'
+            ret['transcription_html'] = functions.render_transcription(transcription_xml)
+        else:
+            ret['transcription_html'] = ''
         return ret
 
     class Meta:
         model = Transcription
-        fields = '__all__'
+        fields = ('id', 'transcription', 'author', 'version')
 
 class AttributeSerializer(serializers.ModelSerializer):
     """ Basic serializer for attribute data """
@@ -117,13 +122,6 @@ class WikiGroupSerializer(serializers.ModelSerializer):
         for key, value in ret.items():
             ret[key] = base64.b64decode(value).capitalize()
         return ret
-
-    #def to_internal_value(self, data):
-    #    """ convert string fields to binary representation + make lower case"""
-    #    internal = super().to_internal_value(data)
-    #    if internal['ug_group'] != None:
-    #            internal['ug_group'] = base64.b64encode(internal['ug_group'].lower())
-    #    return internal
 
 class GroupSerializer(serializers.ModelSerializer):
     """ Basic serializer for user group data """

@@ -17,15 +17,16 @@
     <link href="{% static 'jquery-ui-resizable/jquery-ui.min.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
+    <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
     <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
   {% endif %}
   {% if has_pages %}
     <script type="text/javascript">
       var folio_list = {{ folio_list | safe }};
+      var source_id = "{{ source_id }}";
     </script>
   {% endif %}
-
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}
@@ -212,68 +213,76 @@
               <!-- Dropdown - options -->
               <div class="dropdown-menu shadow xmleditor-options" aria-labelledby="tr_editorOptions">
                 <h6 class="dropdown-header text-center">Editor Options</h6>
-                <form class="pb-1 pt-1 pr-3 pl-3">
+                <form class="pb-1 pt-1 pr-3 pl-3" id="xml-editor_options">
                   <div class="form-row">
                     <div class="col-6">
                       <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="invisiblesSwitch">
-                          <label class="custom-control-label nowrap" for="invisiblesSwitch">Show invisibles</label>
+                          <input type="checkbox" class="custom-control-input" id="showInvisibles">
+                          <label class="custom-control-label nowrap" for="showInvisibles">Show invisibles</label>
                       </div>
                       <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="livecompSwitch">
-                          <label class="custom-control-label nowrap" for="livecompSwitch">Autocomplete</label>
+                          <input type="checkbox" class="custom-control-input" id="highlightSelectedWord" checked>
+                          <label class="custom-control-label nowrap" for="highlightSelectedWord">Highlight word</label>
                       </div>
                       <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="highlightWordSwitch" checked>
-                          <label class="custom-control-label nowrap" for="highlightWordSwitch">Highlight word</label>
-                      </div>
-                      <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="softWrapSwitch" checked>
-                          <label class="custom-control-label nowrap" for="softWrapSwitch">Soft wrap</label>
+                          <input type="checkbox" class="custom-control-input" id="wrap" checked>
+                          <label class="custom-control-label nowrap" for="wrap">Soft wrap</label>
                       </div>
                     </div>
                     <div class="col-6">
                       <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="indentGuidesSwitch" checked>
-                          <label class="custom-control-label nowrap" for="indentGuidesSwitch">Show guides</label>
+                          <input type="checkbox" class="custom-control-input" id="displayIndentGuides" checked>
+                          <label class="custom-control-label nowrap" for="displayIndentGuides">Show guides</label>
                       </div>
                       <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="gutterSwitch" checked>
-                          <label class="custom-control-label nowrap" for="gutterSwitch">Show gutter</label>
+                          <input type="checkbox" class="custom-control-input" id="showGutter" checked>
+                          <label class="custom-control-label nowrap" for="showGutter">Show gutter</label>
                       </div>
                       <div class="custom-control custom-switch">
-                          <input type="checkbox" class="custom-control-input" id="lineNumbersSwitch" checked>
-                          <label class="custom-control-label nowrap" for="lineNumbersSwitch">Show line numbers</label>
+                          <input type="checkbox" class="custom-control-input" id="showLineNumbers" checked>
+                          <label class="custom-control-label nowrap" for="showLineNumbers">Show line numbers</label>
                       </div>
                     </div>
                   </div>
                   <div class="dropdown-divider"></div>
                     <div class="form-row">
-                      <label for="modeSelect" class="col-3 col-form-label nowrap">Mode</label>
+                      <label for="mode" class="col-3 col-form-label nowrap">Mode</label>
                       <div class="col-9">
-                        <select class="custom-select nowrap" id="modeSelect">
-                          <option value="text">plain text</option>
-                          <option value="xml" selected>XML/TEI</option>
+                        <select class="custom-select nowrap" id="mode">
+                          <option value="ace/mode/html">HTML</option>
+                          <option value="ace/mode/text">plain text</option>
+                          <option value="ace/mode/xml">TEI</option>
+                          <option value="ace/mode/xml" selected>XML</option>
                         </select>
                       </div>
                     </div>
                     <div class="form-row">
-                      <label for="themeSelect" class="col-3 col-form-label nowrap">Theme</label>
+                      <label for="theme" class="col-3 col-form-label nowrap">Theme</label>
                       <div class="col-9">
-                        <select class="custom-select nowrap" id="themeSelect">
-                          <option value="Chrome" selected>Chrome</option>
-                          <option value="Clouds">Clouds</option>
+                        <select class="custom-select nowrap" id="theme">
+                          <option disabled>Light themes</option>
+                          <option value="ace/theme/chrome" selected>Chrome</option>
+                          <option value="ace/theme/clouds">Clouds</option>
+                          <option value="ace/theme/xcode">XCode</option>
+                          <option value="ace/theme/kuroir">Kuroir</option>
+                          <option value="ace/theme/sqlserver">SQL Server</option>
+                          <option disabled>Dark themes</option>
+                          <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+                          <option value="ace/theme/cobalt">Cobalt</option>
+                          <option value="ace/theme/idle_fingers">Idle Fingers</option>
+                          <option value="ace/theme/terminal">Terminal</option>
+                          <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
                         </select>
                       </div>
                     </div>
                     <div class="form-row">
-                        <label for="fontSizeSelect" class="col-3 col-form-label nowrap">Font size</label>
+                        <label for="fontSize" class="col-3 col-form-label nowrap">Font size</label>
                       <div class="col-9">
-                        <select class="custom-select nowrap" id="fontSizeSelect">
-                          <option value="12">12</option>
-                          <option value="14" selected>14</option>
-                          <option value="16">16</option>
-                          <option value="18">18</option>
+                        <select class="custom-select nowrap" id="fontSize">
+                          <option value="12px">12</option>
+                          <option value="14px" selected>14</option>
+                          <option value="16px">16</option>
+                          <option value="18px">18</option>
                         </select>
                       </div>
                     </div>

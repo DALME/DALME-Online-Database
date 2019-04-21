@@ -131,8 +131,17 @@ def get_editor_folios(source):
             'dam_id': str(folios[0].dam_id),
             'order': str(folios[0].order)
             }
-        transcription_id = Source_pages.objects.get(source_id=source.id, page_id=folios[0].id).transcription_id
-        folio_dict['tr_id'] = str(transcription_id)
+        transcription = Source_pages.objects.get(source_id=source.id, page_id=folios[0].id)
+        if transcription.transcription_id:
+            folio_dict['tr_id'] = str(transcription.transcription_id)
+            transcription_version = transcription.transcription_id.version
+            if transcription_version:
+                folio_dict['tr_version'] = transcription_version
+            else:
+                folio_dict['tr_version'] = 0
+        else:
+            folio_dict['tr_id'] = "None"
+            folio_dict['tr_version'] = 0
         folio_list.append(folio_dict)
     else:
         folio_menu = '<div class="disabled-btn-left"><i class="fa fa-caret-left fa-fw"></i></div>'
@@ -144,8 +153,17 @@ def get_editor_folios(source):
                 'dam_id': str(f.dam_id),
                 'order': str(f.order)
                 }
-            transcription_id = Source_pages.objects.get(source_id=source.id, page_id=f.id).transcription_id
-            folio_dict['tr_id'] = str(transcription_id)
+            transcription = Source_pages.objects.get(source_id=source.id, page_id=f.id)
+            if transcription.transcription_id:
+                folio_dict['tr_id'] = str(transcription.transcription_id)
+                transcription_version = transcription.transcription_id.version
+                if transcription_version:
+                    folio_dict['tr_version'] = transcription_version
+                else:
+                    folio_dict['tr_version'] = 0
+            else:
+                folio_dict['tr_id'] = "None"
+                folio_dict['tr_version'] = 0
             if count == 1:
                 folio_menu += '<button id="folios" type="button" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name,folio_count)
                 folio_menu += '<div class="current-folio-menu">Folio {}</div>'.format(f.name)
@@ -165,11 +183,14 @@ def get_editor_folios(source):
     return editor_folios
 
 def render_transcription(transcription):
-    dom = etree.fromstring(transcription)
-    xslt = etree.parse(os.path.join(settings.BASE_DIR, 'dalme_app/templates/xslt/tei_transcription.xslt'))
-    transform = etree.XSLT(xslt)
-    newdom = transform(dom)
-    render = etree.tostring(newdom)
+    try:
+        dom = etree.fromstring(transcription)
+        xslt = etree.parse(os.path.join(settings.BASE_DIR, 'dalme_app/templates/xslt/tei_transcription.xslt'))
+        transform = etree.XSLT(xslt)
+        newdom = transform(dom)
+        render = etree.tostring(newdom)
+    except:
+        render = '<b>Rendering failed.</b>'
     return render
 
 def get_attribute_value(attribute):

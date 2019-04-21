@@ -351,6 +351,7 @@ class SourceDetail(DetailView):
         page_title = self.object.name
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['source_id'] = self.object.id
         is_inv = self.object.is_inventory
         has_pages = len(self.object.pages.all()) > 0
         has_children = len(self.object.source_set.all()) > 0

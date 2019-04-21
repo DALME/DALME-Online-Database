@@ -140,7 +140,7 @@ class Content_type(dalmeIntid):
 
 class Content_attributes(dalmeIntid):
     content_type = models.ForeignKey('Content_type',to_field='id',db_index=True,on_delete=models.CASCADE)
-    attribute_type = models.ForeignKey('Attribute_type',to_field='id',db_index=True,on_delete=models.PROTECT)
+    attribute_type = models.ForeignKey('Attribute_type',to_field='id',db_index=True,on_delete=models.CASCADE)
     order = models.IntegerField(db_index=True)
 
 class DT_list(dalmeIntid):
@@ -244,13 +244,13 @@ class Page(dalmeUuid):
 class Source_pages(dalmeIntid):
     source_id = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     page_id = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE)
-    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.PROTECT, null=True, blank=True)
+    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, blank=True)
 
 class Source(dalmeUuid):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
-    parent_source = models.ForeignKey('self', on_delete=models.PROTECT, null=True, db_column="parent_source")
+    parent_source = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, db_column="parent_source")
     is_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation(Attribute, related_query_name='sources')
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
@@ -264,6 +264,7 @@ class Source(dalmeUuid):
 class Transcription(dalmeUuid):
     transcription = models.TextField(blank=True, null=True)
     author = models.CharField(max_length=255, default=get_current_user)
+    version = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.id)
