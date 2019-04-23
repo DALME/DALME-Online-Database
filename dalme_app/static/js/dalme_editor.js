@@ -186,7 +186,7 @@ function editorButtonSave() {
 function editorSave() {
     var tr_folio = folio_idx;
     var tr_text = xmleditor.getValue();
-    if (tr_text != '' && tr_text != 'Start new transcription...') {
+    if (tr_text != '' && tr_text != 'Start new transcription...' &&  !xmleditor.getReadOnly()) {
       var tr_id = folio_array[tr_folio].tr_id
       var tr_ver = folio_array[tr_folio].tr_version + 1;
       var tr_page = folio_array[tr_folio].id
@@ -270,6 +270,30 @@ function setEditorOptions(mode) {
       xmleditor.setOption(option, value);
     }
   };
+}
+
+function renderer(st) {
+  var editor = $('#xml_editor');
+  var renderer = $('#text_render');
+  if (st == 'on') {
+    var e_height = editor.innerHeight();
+    var e_width = editor.innerWidth();
+    var text = xmleditor.getValue();
+    var xml = $($.parseXML('<xml><div>' + text + '</div></xml>'));
+    xml.find("unclear").each( function (index) { $(this).replaceWith('<span class="tei-unclear" data-toggle="tooltip" data-placement="top" title="unclear">'+$(this).text()+'</span>');} );
+    xml.find("gap").each( function (index) { $(this).replaceWith('<span class="tei-gap" data-toggle="tooltip" data-placement="top" title="gap of '+$(this).attr('extent')+' extent, reason: '+$(this).attr('reason')+'.">[...]</span>');} );
+    editor.css({"z-index": -1});
+    renderer.height(e_height-40);
+    renderer.width(e_width-40);
+    renderer.css({"margin-top": -e_height + 'px', "z-index": 100});
+    var xml_string = (new XMLSerializer()).serializeToString(xml[0]);
+    renderer.html(xml_string);
+    $('[data-toggle="tooltip"]').tooltip({container: 'body'})
+    //renderer.append(xml).html();
+  } else if (st == 'off') {
+    editor.css({"z-index": 100});
+    renderer.css({"margin-top": 0, "z-index": -1});
+  }
 }
 
 function getFolioIndex(folio) {

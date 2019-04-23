@@ -504,7 +504,23 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
   border-right: 1px solid #a5a5a5;
 }
 
+#text_render {
+  background-color: #fff;
+  color: #111;
+  padding: 20px;
+  overflow: scroll;
+  white-space: pre;
+}
 
+.tei-unclear {
+  font-weight: 700;
+  color: #cf7c77;
+}
+
+.tei-gap {
+  font-weight: 800;
+  color: #a5a5a5;
+}
 
 .single_folio {
   font-size: .8rem;
