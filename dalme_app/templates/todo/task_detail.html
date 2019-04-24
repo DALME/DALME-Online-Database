@@ -1,0 +1,223 @@
+{% extends "todo/base.html" %}
+
+{% block title %}Task:{{ task.title }}{% endblock %}
+
+{% block extrahead %}
+<style>
+.select2 {
+    width: 100% !important;
+}
+
+.select2-container {
+    min-width: 0 !important;
+}
+</style>
+{{ form.media }}
+{{ merge_form.media }}
+{% endblock %}
+
+
+
+{% block content %}
+  <div class="card-deck">
+    <div class="card col-sm-8">
+      <div class="card-body">
+        <h3 class="card-title">{{ task.title }}</h3>
+        {% if task.note %}
+        <div class="card-text">{{ task.note|safe|urlize|linebreaks }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card col-sm-4 p-0">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <button
+            class="btn btn-sm btn-primary"
+            id="EditTaskButton"
+            type="button"
+            data-toggle="collapse"
+            data-target="#TaskEdit">
+            Edit Task
+          </button>
+
+          <form method="post" action="{% url "todo:task_toggle_done" task.id %}" role="form" class="d-inline">
+            {% csrf_token %}
+            <div style="display:inline;">
+              <button class="btn btn-info btn-sm" type="submit" name="toggle_done">
+                {% if task.completed %} Mark Not Done {% else %} Mark Done {% endif %}
+              </button>
+            </div>
+          </form>
+
+          <form method="post" action="{% url "todo:delete_task" task.id %}" role="form" class="d-inline">
+            {% csrf_token %}
+            <div style="display:inline;">
+              <button class="btn btn-danger btn-sm" type="submit" name="submit_delete">
+                Delete
+              </button>
+            </div>
+          </form>
+        </li>
+        <li class="list-group-item">
+          <strong>Assigned to:</strong>
+          {% if task.assigned_to %} {{ task.assigned_to.get_full_name }} {% else %} Anyone {% endif %}
+        </li>
+        <li class="list-group-item">
+          <strong>Reported by:</strong> {{ task.created_by.get_full_name }}
+        </li>
+        <li class="list-group-item">
+          <strong>Due date:</strong> {{ task.due_date }}
+        </li>
+
+        {% if task.completed %}
+          <li class="list-group-item">
+            <strong>Completed on:</strong> {{ task.completed_date}}
+          </li>
+        {% else %}
+          <li class="list-group-item">
+            <strong>Completed:</strong> {{ task.completed|yesno:"Yes,No" }}
+          </li>
+        {% endif %}
+
+        <li class="list-group-item">
+          <strong>In list:</strong>
+          <a href="{% url 'todo:list_detail' task.task_list.id task.task_list.slug %}">
+            {{ task.task_list }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="TaskEdit" class="collapse">
+    {# Task edit / new task form #}
+    {% include 'todo/include/task_edit.html' %}
+    {% if merge_form is not None %}
+    <form action="" method="post">
+      <div class="card border-danger">
+      <div class="card-header">Merge task</div>
+      <div class="card-body">
+        <div class="">
+          <p>Merging is a destructive operation. This task will not exist anymore, and comments will be moved to the target task.</p>
+        {% csrf_token %}
+        {% for field in merge_form.visible_fields %}
+        <p>
+          {{ field.errors }}
+          {{ field }}
+        </p>
+        {% endfor %}
+        <input class="d-inline btn btn-sm btn-outline-danger" type="submit" name="merge_task_into" value="Merge">
+      </div>
+      </div>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+
+{% if attachments_enabled %}
+  <div class="card mt-4">
+    <h5 class="card-header">
+      Attachments
+    </h5>
+
+    <div class="card-body pb-0">
+      {% if task.attachment_set.count %}
+        <div class="table-responsive">
+          <table class="table mb-3">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Uploaded</th>
+                <th>By</th>
+                <th>Type</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for attachment in task.attachment_set.all %}
+                <tr>
+                  <td><a href="{{ attachment.file.url }}">{{ attachment.filename }}</a></td>
+                  <td>{{ attachment.timestamp }}</td>
+                  <td>{{ attachment.added_by.get_full_name }}</td>
+                  <td>{{ attachment.extension.lower }}</td>
+                  <td>
+                    <form action="{% url "todo:remove_attachment" attachment.id %}" method="POST">
+                      {% csrf_token %}
+                      <input type="submit" value="X" class="btn btn-danger btn-sm">
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
+      <form method="POST" action="" enctype="multipart/form-data" style="width:50%;">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="attachment_file_input" name="attachment_file_input" />
+            <label class="custom-file-label" for="attachment_file_input">Choose file</label>
+          </div>
+          <div class="input-group-append">
+            <button class="btn btn-primary">Upload</button>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+{% endif %}
+
+  <div class="mt-3">
+    <h5>Add comment</h5>
+    <form action="" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <textarea class="form-control" name="comment-body" rows="3" required></textarea>
+      </div>
+      <input class="btn btn-sm btn-primary" type="submit" name="add_comment" value="Add Comment">
+    </form>
+  </div>
+
+  <div class="task_comments mt-4">
+    {% if comment_list %}
+      <h5>Comments on this task</h5>
+      {% for comment in comment_list %}
+      <div class="mb-3 card">
+        <div class="card-header">
+          <div class="float-left">
+            {% if comment.email_message_id %}
+            <span class="badge badge-warning">email</span>
+            {% endif %}
+            {{ comment.author_text }}
+          </div>
+          <span class="float-right d-inline-block text-muted">
+            {{ comment.date|date:"F d Y P" }}
+          </span>
+        </div>
+        <div class="{{ comment_classes | join:" " }} card-body">
+          {{ comment.body|safe|urlize|linebreaks }}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+        <h5>No comments (yet).</h5>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {# Support file attachment uploader #}
+  <script>
+    $('#attachment_file_input').on('change',function(){
+      // Get the file name and remove browser-added "fakepath."
+      // Then replace the "Choose a file" label.
+      var fileName = $(this).val().replace('C:\\fakepath\\', " ");
+      $(this).next('.custom-file-label').html(fileName);
+    })
+  </script>
+{% endblock extra_js %}
+

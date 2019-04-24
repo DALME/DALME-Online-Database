@@ -262,7 +262,7 @@ def get_dam_preview(resource):
     key = os.environ['DAM_API_KEY']
     queryParams = {
         "function": "search_get_previews",
-        "param1": resource,
+        "param1": '!list'+str(resource),
         "param2": "",
         "param3": "",
         "param4": "0",

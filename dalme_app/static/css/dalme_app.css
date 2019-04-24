@@ -164,7 +164,7 @@ table.dataTable {
 }
 
 table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
-  color: #0361aa;
+  color: #0361aa !important;
 }
 
 /* embed table cards */
@@ -509,7 +509,7 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
   color: #111;
   padding: 20px;
   overflow: scroll;
-  white-space: pre;
+  white-space: pre-line;
 }
 
 .tei-unclear {
@@ -1187,6 +1187,17 @@ a.page-link:focus, a.page-link:active {
   font-size: .65rem;
 }
 
+.sidebar .sidebar-menu-heading {
+  text-align: left;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.8rem;
+  padding-bottom: 0.2rem;
+  font-weight: 600;
+  font-size: .8rem;
+  color: #949494;
+}
+
 .sidebar .nav-item .nav-link {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
@@ -1248,10 +1259,6 @@ a.page-link:focus, a.page-link:active {
   white-space: normal;
 }
 
-.topbar .dropdown-infopanel {
-  width: 20rem !important;
-}
-
 .topbar.navbar-light .navbar-nav .nav-item .nav-link {
   color: #939393;
 }
@@ -1284,6 +1291,11 @@ li#searchIcon.show a {
 .topbar-badge {
   color: #1b1b1b;
   background-color: #939393;
+}
+
+.topbar-badge-alert {
+  color: #fff;
+  background-color: #a6332b;
 }
 
 .topbar-border-left {
@@ -1330,6 +1342,151 @@ li#searchIcon.show a {
   border-left: 0.25rem solid #0361aa !important;
   background-color: rgba(0,0,0,.075) !important;
 }
+
+/* topbar tasks */
+
+.dropdown-tasks {
+  width: 20rem !important;
+  padding: 0;
+}
+
+.dropdown-tasks-header {
+  padding-top: 1rem;
+  padding-bottom: .75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  color: #888;
+  border-bottom: 1px dotted #a5a5a5;
+  font-weight: 700;
+}
+
+.dropdown-tasks-item {
+  border-bottom: 1px dotted #a5a5a5;
+  font-weight: 600;
+  color: #5c5c5c;
+  font-size: 1rem;
+}
+
+.dropdown-tasks-item:hover {
+  text-decoration: none;
+  color: #0361aa;
+  background-color: #f0f8ff;
+}
+
+.dropdown-tasks-item a:hover {
+  text-decoration: none;
+}
+
+.dropdown-tasks-action {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #888;
+  display: inline-block;
+  width: 50%;
+  text-align: center;
+}
+.dropdown-tasks-action-rb {
+  border-right: 1px dotted #a5a5a5;
+}
+
+.dropdown-tasks-action:hover {
+  text-decoration: none;
+  background-color: #0361aa;
+  border-color: #0361aa;
+  color: #fff;
+}
+
+.dropdown-tasks-info {
+  align-self: flex-start;
+  flex-grow: 4;
+  padding-top: 6px;
+  padding-bottom: 10px;
+  padding-left: 1rem;
+  padding-right: .75rem;
+}
+
+.dropdown-tasks-buttons {
+  width: 33px;
+  margin-left: auto;
+  height: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  display: block;
+  border-bottom: 1px transparent;
+}
+
+.dropdown-tasks-btn-bb {
+  border-bottom: 1px dotted #d8d8d8 !important;
+}
+
+.dropdown-tasks-btn {
+  margin: 0;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: .8rem;
+  border: none;
+  border-left: 1px dotted #d8d8d8;
+  color: #a5a5a5;
+  background-color: #fff;
+  border-radius: 0;
+  height: 50%;
+}
+
+.dropdown-tasks-btn:hover {
+  background-color: #0361aa;
+  border-color: #0361aa;
+  color: #fff;
+}
+
+.dropdown-tasks-empty {
+  padding: 1rem;
+  border-bottom: 1px dotted #a5a5a5;
+  text-align: center;
+}
+
+.dropdown-tasks-list {
+  border: 1px solid #b8bcbb;
+  border-radius: .35rem;
+  font-size: .6rem;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #f4f4f4;
+  color: #878c8c;
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+.dropdown-tasks-due {
+  border: 1px solid #896f2f;
+  border-radius: .35rem;
+  font-size: .6rem;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #eedba4;
+  color: #816132;
+  align-self: flex-end;
+}
+
+.dropdown-tasks-overdue {
+  border: 1px solid #853933;
+  border-radius: .35rem;
+  font-size: .6rem;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #d9b9bd;
+  color: #943737;
+  align-self: flex-end;
+}
+
 
 /* topbar search form */
 .search-slider {

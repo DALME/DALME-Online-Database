@@ -19,5 +19,6 @@ urlpatterns = [
     path('pages/', views.PageList.as_view(), name='page_list'),
     path('su/', views.SessionUpdate, name='session_update'),
     path('search/', views.DefaultSearch.as_view(), name='search'),
+    path('tasks/', include('todo.urls', namespace='todo')),
     path('', views.Index.as_view(), name='dashboard'),
 ]

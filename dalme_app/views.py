@@ -16,29 +16,25 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.base import TemplateView
 from django_celery_results.models import TaskResult
 from django.db.models.query import QuerySet
-
 import requests, uuid, os, datetime, json
 from allaccess.views import OAuthCallback
-
 from rest_framework import viewsets, status
 from dalme_app.serializers import SourceSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
 from dalme_app import functions, custom_scripts
 from dalme_app.menus import menu_constructor
 from dalme_app.models import *
-
 from dalme_app.tasks import parse_inventory
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value
 from django.db.models.expressions import RawSQL
-
 from haystack.generic_views import SearchView
 from django.http import HttpResponse
 import urllib.parse as urlparse
 import logging
 logger = logging.getLogger(__name__)
+
 
 class OAuthCallback_WP(OAuthCallback):
     logger.debug("OAuthCallback_WP called")
@@ -433,9 +429,9 @@ class SourceDetail(DetailView):
             s_type = urlparse.parse_qs(parsed_ref.query)['type'][0]
         except:
             s_type = 'all'
-        if type == 'all':
+        if s_type == 'all':
             breadcrumb = [('Sources', ''),('All Sources', '/sources')]
-        elif type == 'inventories':
+        elif s_type == 'inventories':
             breadcrumb = [('Repository',''), ('Inventories','/sources?type=inventories')]
         else:
             list_label = DT_list.objects.get(short_name=s_type).name

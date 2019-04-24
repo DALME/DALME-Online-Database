@@ -1,12 +1,14 @@
 from django.urls import reverse
 import json, os
 from . import functions
+from todo.models import Task
 
 def menu_constructor(request, item_constructor, template, state):
     """
     Builds menus based on an item_constructor and a json file describing the menu items.
     Menus are stored in the templates directory, under the menus subdirectory.
     """
+    user_id = request.user.id
     _output = ''
     template = os.path.join('dalme_app','templates','menus',template)
     with open(template, 'r') as fp:
@@ -17,6 +19,8 @@ def menu_constructor(request, item_constructor, template, state):
                 _output += eval(item_constructor + '(_output,state,**item)')
         else:
             _output += eval(item_constructor + '(_output,state,**item)')
+    if item_constructor == 'dropdown_item':
+        _output = dropdown_tasks(_output, user_id)
     return [_output]
 
 def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,counter=None,section=None,children=None,divider=None, itemClass=None, blank=None, permissions=None):
@@ -40,13 +44,16 @@ def sidebar_item(wholeMenu,state,depth=0,text=None,iconClass=None,link=None,coun
                 currentItem += '<div id="collapse{}" class="collapse" aria-labelledby="heading{}" data-parent="#accordionSidebar">'.format(itemClass, itemClass)
             currentItem += '<div class="bg-white py-2 collapse-inner rounded">'
             for child in children:
-                currentItem += '<a class="collapse-item'
-                if child['text'] in state['breadcrumb']:
-                    currentItem += ' active'
-                currentItem += '" href="{}"'.format(child['link'])
-                if 'blank' in child:
-                    currentItem += ' target="_blank"'
-                currentItem += '><i class="fas fa-fw {}"></i> {}</a>'.format(child['iconClass'], child['text'])
+                if 'section' in child:
+                    currentItem += '<div class="sidebar-menu-heading">{}</div>'.format(child['text'])
+                else:
+                    currentItem += '<a class="collapse-item'
+                    if child['text'] in state['breadcrumb']:
+                        currentItem += ' active'
+                    currentItem += '" href="{}"'.format(child['link'])
+                    if 'blank' in child:
+                        currentItem += ' target="_blank"'
+                    currentItem += '><i class="fas fa-fw {}"></i> {}</a>'.format(child['iconClass'], child['text'])
             currentItem += '</div></div></li>'
         else:
             currentItem += '<a class="nav-link" href="{}">'.format(link)
@@ -69,10 +76,14 @@ def tile_item(wholeMenu,state,colourClass=None,iconClass=None,counter=None,count
     currentItem += '<span class="float-right"><i class="fas fa-angle-right"></i></span></a></div></div>'
     return currentItem
 
-def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,counter=None,circleColour=None,moreText=None,moreLink=None,permissions=None):
+def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemClass=None,iconClass=None,childrenIconClass=None,children=None,text=None,link=None,divider=None,section=None,counter=None,circleColour=None,moreText=None,moreLink=None,permissions=None, tooltip=None):
     """ creates items for the top right dropdowns """
-    currentItem = '<li class="nav-item dropdown no-arrow topbar-border-left">'
-    if topMenu:
+    if link:
+        currentItem = '<li class="nav-item dropdown no-arrow topbar-border-left">'
+        currentItem += '<a class="nav-link dropdown-toggle" href="{}" id="{}button" role="button" data-toggle="tooltip" data-placement="bottom" title="{}" data-delay=\'&#123;"show":"1000", "hide":"0"&#125;\'>'.format(link, itemClass, tooltip)
+        currentItem += '<i class="fas {} fa-g"></i></a>'.format(iconClass)
+    else:
+        currentItem = '<li class="nav-item dropdown no-arrow topbar-border-left" data-toggle="tooltip" data-placement="bottom" title="{}" data-delay=\'&#123;"show":"1000", "hide":"0"&#125;\'>'.format(tooltip)
         currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
         currentItem += '<i class="fas {} fa-g"></i>'.format(iconClass)
         currentItem += '</a><div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
@@ -86,16 +97,41 @@ def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemCla
                 else:
                     currentItem += '<i class="fas {} fa-fw mr-2 text-gray-400"></i>{}</a>'.format(childrenIconClass, child['text'])
         currentItem += '</div></li> '
-    if infoPanel:
-        currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
-        currentItem += '<i class="fas {} fa-fw"></i>'.format(iconClass)
-        if counter:
-            currentItem += '<span class="badge topbar-badge">{}</span>'.format(counter)
-        currentItem += '</a><div class="dropdown-list dropdown-infopanel dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
-        currentItem += '<h6 class="dropdown-header">{}</h6>'.format(title)
-        for child in children:
-            currentItem += '<a class="dropdown-item d-flex align-items-center" href="{}">'.format(child['link'])
-            currentItem += '<div class="mr-3"><div class="icon-circle bg-{}"><i class="fas {} text-white"></i></div></div>'.format(child['circleColour'], child['iconClass'])
-            currentItem += '<div><div class="small text-gray-500">{}</div><span class="font-weight-bold">{}</span></div></a>'.format(child['small_text'], child['text'])
-        currentItem += '<a class="dropdown-item text-center small text-gray-500" href="{}">{}</a></div></li>'.format(moreLink, moreText)
     return currentItem
+
+def dropdown_tasks(wholeMenu, user_id):
+    button = ''
+    dropmenu = ''
+    overdue = False
+    counter = False
+    try:
+        tasks = Task.objects.filter(assigned_to=user_id, completed=0)
+        counter = tasks.count()
+        tasks = tasks[:5]
+        for task in tasks:
+            dropmenu += '<div class="dropdown-tasks-item d-flex"><div class="dropdown-tasks-info"><a href="{}">'.format(task.get_absolute_url())
+            dropmenu += '<div class="mb-1">{}</div><div class="d-flex"><div class="dropdown-tasks-list float-left">{}</div>'.format(task.title, task.task_list)
+            if task.due_date:
+                if task.overdue_status():
+                    overdue = True
+                    dropmenu += '<div class="dropdown-tasks-overdue float-right">Due: {}</div>'.format(task.due_date)
+                else:
+                    dropmenu += '<div class="dropdown-tasks-due float-right">Due: {}</div>'.format(task.due_date)
+            dropmenu += '</div></div></a><div class="dropdown-tasks-buttons"><a class="btn dropdown-tasks-btn dropdown-tasks-btn-bb" href=""><i class="fa fa-pen fa-fw"></i></a><a class="btn dropdown-tasks-btn" href="{% url "todo:task_toggle_done" task.id %}"><i class="fa fa-check fa-fw"></i></a></div></div>'
+    except:
+        dropmenu += '<div class="dropdown-tasks-empty">No tasks are currently assigned to you.</div>'
+    dropmenu += '<a class="dropdown-tasks-action dropdown-tasks-action-rb" href="{}">{}</a>'.format('/tasks/mine', 'Show all my tasks')
+    dropmenu += '<a class="dropdown-tasks-action" href="{}">{}</a></div></li>'.format('/tasks', 'Show task lists')
+    button = '<li class="nav-item dropdown no-arrow topbar-border-left" data-toggle="tooltip" data-placement="bottom" title="Your task list" data-delay=\'{"show":"1000", "hide":"0"}\'>'
+    button += '<a class="nav-link dropdown-toggle" href="#" id="tasksDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+    button += '<i class="fas fa-tasks fa-fw"></i>'
+    if counter:
+        if overdue:
+            button += '<span class="badge topbar-badge-alert">{}</span>'.format(counter)
+        else:
+            button += '<span class="badge topbar-badge">{}</span>'.format(counter)
+    button += '</a><div class="dropdown-tasks dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="tasksDropdown">'
+    button += '<div class="dropdown-tasks-header">Your Tasks</div>'
+    wholeMenu += button
+    wholeMenu += dropmenu
+    return wholeMenu

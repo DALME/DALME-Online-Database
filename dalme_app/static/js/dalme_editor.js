@@ -280,8 +280,12 @@ function renderer(st) {
     var e_width = editor.innerWidth();
     var text = xmleditor.getValue();
     var xml = $($.parseXML('<xml><div>' + text + '</div></xml>'));
-    xml.find("unclear").each( function (index) { $(this).replaceWith('<span class="tei-unclear" data-toggle="tooltip" data-placement="top" title="unclear">'+$(this).text()+'</span>');} );
-    xml.find("gap").each( function (index) { $(this).replaceWith('<span class="tei-gap" data-toggle="tooltip" data-placement="top" title="gap of '+$(this).attr('extent')+' extent, reason: '+$(this).attr('reason')+'.">[...]</span>');} );
+    xml.find("unclear").each( function (index) {
+      $(this).replaceWith('<span class="tei-unclear" data-toggle="tooltip" data-placement="top" title="unclear">'+$(this).text()+'</span>');
+    });
+    xml.find("gap").each( function (index) {
+      $(this).replaceWith('<span class="tei-gap" data-toggle="tooltip" data-placement="top" title="gap of '+$(this).attr('extent')+' extent, reason: '+$(this).attr('reason')+'.">[...]</span>');
+    });
     editor.css({"z-index": -1});
     renderer.height(e_height-40);
     renderer.width(e_width-40);

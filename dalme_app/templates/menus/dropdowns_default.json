@@ -1,9 +1,17 @@
 [
   {
     "topMenu": true,
+    "itemClass": "help",
+    "iconClass": "fa-question-circle",
+    "link": "/tasks/ticket/add/",
+    "tooltip": "Get help"
+  },
+  {
+    "topMenu": true,
     "itemClass": "tools",
     "iconClass": "fa-tools",
     "title": "Tools",
+    "tooltip": "DALME tools",
     "children": [
           {
             "text": "Wiki",
@@ -21,37 +29,5 @@
             "iconClass": "fa-globe"
           }
         ]
-    },
-    {
-      "infoPanel": true,
-      "itemClass": "alerts",
-      "iconClass": "fa-bell",
-      "title": "Alerts Center",
-      "counter": "3+",
-      "moreText": "Show All Alerts",
-      "moreLink": "#",
-      "children": [
-            {
-              "small_text": "December 12, 2019",
-              "text": "A new monthly report is ready to download!",
-              "iconClass": "fa-file-alt",
-              "circleColour": "primary",
-              "link": "#"
-            },
-            {
-              "small_text": "December 7, 2019",
-              "text": "$290.29 has been deposited into your account!",
-              "iconClass": "fa-donate",
-              "circleColour": "success",
-              "link": "#"
-            },
-            {
-              "small_text": "December 2, 2019",
-              "text": "Spending Alert: We've noticed unusually high spending for your account.",
-              "iconClass": "fa-exclamation-triangle",
-              "circleColour": "warning",
-              "link": "#"
-            }
-          ]
-      }
+    }
 ]

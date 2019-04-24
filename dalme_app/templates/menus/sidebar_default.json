@@ -109,14 +109,14 @@
   {
     "text": "Admin",
     "section": true,
-    "permissions": "Staff"
+    "permissions": "Administrators"
   },
   {
-    "text": "System",
+    "text": "Project",
     "link": "#",
-    "iconClass": "fa-cog",
-    "itemClass": "system",
-    "permissions": "Staff",
+    "iconClass": "fa-briefcase",
+    "itemClass": "project",
+    "permissions": "Administrators",
     "children": [
       {
         "text": "Users",
@@ -124,19 +124,34 @@
         "iconClass": "fa-users"
       },
       {
+        "text": "Task Lists",
+        "link": "/tasks",
+        "iconClass": "fa-tasks"
+      },
+      {
+        "text": "Problem Tickets",
+        "link": "/tasks/2/tickets/",
+        "iconClass": "fa-ticket-alt"
+      }
+    ]
+  },
+  {
+    "text": "System",
+    "link": "#",
+    "iconClass": "fa-cog",
+    "itemClass": "system",
+    "permissions": "Administrators",
+    "children": [
+      {
         "text": "Notifications",
         "link": "/admin?type=notifications",
         "iconClass": "fa-medkit"
       },
+
       {
         "text": "Background Tasks",
         "link": "/admin?type=bgtasks",
         "iconClass": "fa-tasks"
-      },
-      {
-        "text": "Data Models",
-        "link": "/admin?type=models",
-        "iconClass": "fa-cubes"
       },
       {
         "text": "Django Admin",
@@ -147,16 +162,25 @@
   },
   {
     "text": "Dev",
-    "section": true,
-    "permissions": "Developers"
-  },
-  {
-    "text": "UI Reference",
     "link": "#",
-    "iconClass": "fa-window-restore",
-    "itemClass": "uiref",
+    "iconClass": "fa-laptop-code",
+    "itemClass": "dev",
     "permissions": "Developers",
     "children": [
+      {
+        "text": "Scripts",
+        "link": "/scripts",
+        "iconClass": "fa-code"
+      },
+      {
+        "text": "Data Models",
+        "link": "/admin?type=models",
+        "iconClass": "fa-cubes"
+      },
+      {
+        "text": "UI Reference",
+        "section": true
+      },
       {
         "text": "Home",
         "link": "/uiref?m=home",
@@ -214,12 +238,5 @@
         "iconClass": "fa-ghost"
       }
     ]
-  },
-  {
-    "text": "Dev Scripts",
-    "link": "/scripts",
-    "iconClass": "fa-code",
-    "permissions": "Developers"
   }
-
 ]

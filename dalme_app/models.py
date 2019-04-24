@@ -3,8 +3,7 @@ This file defines all of the models used in the application. These models are
 used to create database entries, and can be used in other functions to access
 and iterate through data in the database without writing SQL statements.
 """
-
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -21,12 +20,6 @@ import django.db.models.options as options
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 logger = logging.getLogger(__name__)
-
-#model helper functions
-#make_uuid not used, but migrations won't work without it
-def make_uuid():
-    the_id = uuid.uuid4().hex
-    return the_id
 
 def rs_api_query(endpoint, user, key, **kwargs):
     sign = hashlib.sha256(key.encode('utf-8'))
@@ -332,7 +325,7 @@ class AttributeReference(dalmeUuid):
     source = models.CharField(max_length=255)
     term_type = models.CharField(max_length=55, blank=True, null=True)
 
-class Comment(dalmeUuid):
+class Notes(dalmeUuid):
     target = models.UUIDField(db_index=True)
     text = models.TextField()
 
