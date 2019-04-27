@@ -1,5 +1,4 @@
-"""dalme URL Configuration
-"""
+"""dalme URL Configuration"""
 from django.urls import path, re_path, include
 from django.contrib import admin
 from django.conf import settings
@@ -19,7 +18,6 @@ router.register(r'images', apis.Images, basename='images')
 router.register(r'pages', apis.Pages, basename='pages')
 router.register(r'tasks', apis.Tasks, basename='tasks')
 router.register(r'worksets', apis.Worksets, basename='worksets')
-
 
 urlpatterns = [
     path('api/', include(router.urls)),

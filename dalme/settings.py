@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'sekizai',
     'django_celery_results',
     'allaccess.apps.AllAccessConfig',
+    'todo',
     'rest_framework',
 ]
 
@@ -79,7 +80,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'sekizai.context_processors.sekizai',
+                #'sekizai.context_processors.sekizai',
+                'dalme_app.context_processors.dalme_general',
             ],
             'debug': DEBUG,
         },
@@ -295,3 +297,8 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+#django-todo settings
+TODO_STAFF_ONLY = True
+TODO_DEFAULT_ASSIGNEE = 'pizzorno'
+TODO_DEFAULT_LIST_SLUG = 'tickets'
