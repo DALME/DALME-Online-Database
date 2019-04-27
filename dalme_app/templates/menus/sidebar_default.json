@@ -1,12 +1,4 @@
-[{
-    "text": "Dashboard",
-    "iconClass": "fa-tachometer-alt",
-    "link": "/"
-  },
-  {
-    "divider": true
-  },
-  {
+[ {
     "text": "Content",
     "section": true
   },
@@ -120,7 +112,7 @@
     "children": [
       {
         "text": "Users",
-        "link": "/admin?type=users",
+        "link": "/users",
         "iconClass": "fa-users"
       },
       {
@@ -143,14 +135,8 @@
     "permissions": "Administrators",
     "children": [
       {
-        "text": "Notifications",
-        "link": "/admin?type=notifications",
-        "iconClass": "fa-medkit"
-      },
-
-      {
         "text": "Background Tasks",
-        "link": "/admin?type=bgtasks",
+        "link": "#",
         "iconClass": "fa-tasks"
       },
       {
@@ -162,25 +148,40 @@
   },
   {
     "text": "Dev",
+    "section": true,
+    "permissions": "Developers"
+  },
+  {
+    "text": "Data Models",
     "link": "#",
-    "iconClass": "fa-laptop-code",
-    "itemClass": "dev",
+    "iconClass": "fa-cubes",
+    "itemClass": "models",
     "permissions": "Developers",
     "children": [
       {
-        "text": "Scripts",
-        "link": "/scripts",
-        "iconClass": "fa-code"
+        "text": "Content Types",
+        "link": "/models?model=content",
+        "iconClass": "fa-cube"
       },
       {
-        "text": "Data Models",
-        "link": "/admin?type=models",
-        "iconClass": "fa-cubes"
+        "text": "Attributes",
+        "link": "/models?model=attributes",
+        "iconClass": "fa-cube"
       },
       {
-        "text": "UI Reference",
-        "section": true
-      },
+        "text": "Lists",
+        "link": "/models?model=lists",
+        "iconClass": "fa-cube"
+      }
+    ]
+  },
+  {
+    "text": "UI Reference",
+    "link": "#",
+    "iconClass": "fa-window-restore",
+    "itemClass": "uiref",
+    "permissions": "Developers",
+    "children": [
       {
         "text": "Home",
         "link": "/uiref?m=home",
@@ -238,5 +239,12 @@
         "iconClass": "fa-ghost"
       }
     ]
+  },
+  {
+    "text": "Scripts",
+    "link": "/scripts",
+    "iconClass": "fa-code",
+    "itemClass": "scripts",
+    "permissions": "Developers"
   }
 ]

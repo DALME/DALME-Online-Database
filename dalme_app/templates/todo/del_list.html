@@ -2,6 +2,7 @@
 {% block title %}Delete list{% endblock %}
 
 {% block content %}
+<div class="container-fluid">
   {% if user.is_staff %}
   <h1>Delete entire list: {{ task_list.name }} ?</h1>
 

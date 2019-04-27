@@ -1,31 +1,40 @@
 from django.contrib.auth.models import User, Group
 from dalme_app.models import *
+from todo.models import *
 from rest_framework import serializers
 from dalme_app import functions
-import uu, base64
+import uu, base64, ast
+from datetime import datetime
+from django.utils import timezone
 
 class DynamicSerializer(serializers.ModelSerializer):
     """ A serializer that takes an additional `fields` argument that
-    controls which fields should be displayed. """
+    indicates which fields should be removed. """
 
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
-        fields = kwargs.pop('fields', None)
+        rem_fields = kwargs.pop('fields', None)
         # Instantiate the superclass normally
         super(DynamicSerializer, self).__init__(*args, **kwargs)
-        if fields is not None:
-            # Drop any fields that are not specified in the `fields` argument.
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
+        if rem_fields is not None:
+            for field_name in rem_fields:
                 self.fields.pop(field_name)
+
+class WorksetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Workset
+        fields = '__all__'
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = '__all__'
 
 class PageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
         fields = ('name', 'dam_id','order')
-
 
 class ImageSerializer(serializers.ModelSerializer):
     collections = serializers.CharField(max_length=255)
@@ -168,15 +177,16 @@ class ProfileSerializer(serializers.ModelSerializer):
                 ret['dam_usergroup'] = {'name': dam_group_d, 'value': ret['dam_usergroup']}
         return ret
 
-    def to_internal_value(self, data):
-        """ revert display fields """
-        if 'wp_role' in data:
-            wp_role = data.pop('wp_role')['value']
-            data['wp_role'] = wp_role
-        if 'dam_usergroup' in data:
-            dam_usergroup = data.pop('dam_usergroup')['value']
-            data['dam_usergroup'] = dam_usergroup
-        return super().to_internal_value(data)
+    # def to_internal_value(self, data):
+    #     """ revert display fields """
+    #     data = data
+    #     if 'wp_role' in data:
+    #         wp_role = data.pop('wp_role')
+    #         data['wp_role'] = wp_role['value']
+    #     if 'dam_usergroup' in data:
+    #         dam_usergroup = ast.literal_eval(str(data['dam_usergroup']))
+    #         data['dam_usergroup'] = dam_usergroup['value']
+    #     return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
         """ Update profile and user. Assumes there is a user for every profile """
@@ -191,6 +201,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """ Create profile and user. Assumes there is a user for every profile """
         user_data = validated_data.pop('user')
+        user_data.pop('groups')
         groups = self.context['groups']
         user = User.objects.create_user(**user_data)
         for g in groups:
@@ -198,30 +209,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             user.groups.add(g)
         profile = Profile.objects.create(user=user, **validated_data)
         return profile
-
-class NotificationSerializer(serializers.ModelSerializer):
-    code = serializers.IntegerField()
-
-    class Meta:
-        model = Notification
-        fields = ('id','code','level','type','text')
-
-    def to_representation(self, instance):
-        """Create dictionaries for fields with choices"""
-        ret = super().to_representation(instance)
-        ret['level'] = {'value': ret['level'], 'display': self.get_choice(ret['level'], 'LEVELS')}
-        ret['type'] = {'value': ret['type'], 'display': self.get_choice(ret['type'], 'TYPES')}
-        return ret
-
-    def get_choice(self, obj, listname):
-        if listname == 'LEVELS':
-            list = Notification.LEVELS
-        elif listname == 'TYPES':
-            list = Notification.TYPES
-        for t in list:
-            if obj in t:
-                label = t[1]
-        return label
 
 class ContentTypeSerializer(serializers.ModelSerializer):
     class Meta:

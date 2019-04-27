@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.core import serializers
 from django.db.models import Q, Count, F, Prefetch
-from dalme_app.serializers import SourceSerializer, UserSerializer, NotificationSerializer, ProfileSerializer, ContentTypeSerializer, AttributeTypeSerializer, ContentXAttributeSerializer, ContentClassSerializer, TranscriptionSerializer, ImageSerializer, PageSerializer
+from dalme_app.serializers import *
 from rest_framework.response import Response
 
 import re, requests, uuid, os, datetime, json, ast, operator
@@ -115,85 +115,14 @@ def session_info(request, username):
     return output
 
 def test_expression(request):
-    dt_fields = []
-    render_dict = {
-        'Name': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
-        'Web address': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
-        'Parent': 'function ( data, type, row, meta ) {return (typeof data == "undefined") ? "" : \'<a href="\'+data.url+\'">\'+data.name+\'</a>\';}',
-        'Inv': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}'
-        }
-    nowrap_list = ['Type']
-    types = ['acts_and_registers', 'bibliography', 'archives_and_collections', 'inventories', '']
-    for type in types:
-        if type == '':
-            def_headers = ['15']
-            extra_headers = ['type']
-            ct_l = Content_type.objects.filter(content_class=1)
-            att_l = Attribute_type.objects.filter(content_type__in=ct_l)
-            list_type = DT_list.objects.get(short_name='sources')
-        else:
-            list_type = DT_list.objects.get(short_name=type)
-            def_headers = list_type.default_headers.split(',')
-            if list_type.extra_headers:
-                extra_headers = list_type.extra_headers.split(',')
-            else:
-                extra_headers = []
-            q_obj = Q()
-            if type == 'inventories':
-                att_l = Content_type.objects.get(pk=13).attribute_types.all()
-                extra_headers.append('no_folios')
-            else:
-                content_types = list_type.content_types.all()
-                q = Q()
-                for c in content_types:
-                    q |= Q(pk=c.pk)
-                ct_l = Content_type.objects.filter(q)
-                att_l = Attribute_type.objects.filter(content_type__in=ct_l)
-
-        #compile attribute dictionary
-        att_dict = {}
-        for a in att_l:
-            if str(a.pk) not in att_dict:
-                att_dict[str(a.pk)] = [a.name,a.short_name]
-
-        #create column headers
-        column_headers = [['Name','name',1],['Short Name','short_name',0]]
-        extra_labels = {'type': 'Type','parent_source':'Parent','is_inventory':'Inv','no_folios':'#Fol'}
-
-        if extra_headers:
-            for i in extra_headers:
-                column_headers.append([extra_labels[i],i,1])
-        for id, names in att_dict.items():
-            if id in def_headers:
-                column_headers.append([names[0],names[1],1])
-            else:
-                column_headers.append([names[0],names[1],0])
-
-
-
-        for i in column_headers:
-            c_dict = {}
-            c_dict['list'] = list_type
-            c_dict['field'] = Attribute_type.objects.get(short_name=i[1])
-            if i[2]:
-                c_dict['visible'] = True
-            else:
-                c_dict['visible'] = False
-            if i[0] in render_dict:
-                c_dict['render_exp'] = render_dict[i[0]]
-            if i[0] in nowrap_list:
-                c_dict['nowrap'] = True
-
-            dt_fields.append(c_dict)
-
-    for d in dt_fields:
-        new_record = DT_fields(**d).save()
-
-    return 'okay'
+    data = '{"action":"create","data":{"0":{"user":{"first_name":"John","last_name":"Smith","email":"jsmith@harvard.edu","username":"jsmith","password":"thepassword1234","is_staff":["1"],"is_superuser":["1"],"groups":[{"id":"2"},{"id":"3"},{"id":"4"}],"groups-many-count":3},"full_name":"John Smith","dam_usergroup":{"value":"2"},"wiki_groups":[{"ug_group":"administrator"},{"ug_group":"bureaucrat"}],"wiki_groups-many-count":2,"wp_role":{"value":"a:1:{s:6:\\"author\\";b:1;}"}}}}'
+    dt_request = json.loads(data)
+    data_dict = dt_request['data']['0']
+    return data_dict
 
 def test_expression2():
 
-    data2 = {
+    dset = {
         'action' : 'create',
         'data[0][user][first_name]' : 'John',
         'data[0][user][last_name]' : 'Smith',
@@ -213,29 +142,16 @@ def test_expression2():
         'data[0][wp_role][value]' : 'a:1:{s:6:"author";b:1;}',
     }
 
-    data = {
-        'action' : 'create',
-        'data[0][user][first_name]' : 'd',
-        'data[0][user][last_name]' : 'd',
-        'data[0][full_name]' : 'd d',
-        'data[0][user][email]' : 'ddd',
-        'data[0][user][username]' : '',
-        'data[0][user][password]' : '',
-        'data[0][user][groups][0][id]' : '',
-        'data[0][groups-many-count]' : '0',
-        'data[0][dam_usergroup][value]' : '',
-        'data[0][wiki_groups-many-count]' : '0',
-        'data[0][wp_role][value]' : '',
-    }
+    data = []
+    rows = []
 
-    data_dict = {}
-    user = {}
-    groups = []
-    wiki_groups = []
-    for k,v in data.items():
+    for k,v in dset.items():
         if k != 'action':
             k = json.loads('['+k[4:].replace(']','",').replace('[','"')[:-1]+']')
-            k.pop(0)
+
+
+
+
             for i,f in enumerate(k):
                 if 'many-count' in f or f == '' or f.isdigit():
                     k.pop(i)

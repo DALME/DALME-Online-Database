@@ -11,12 +11,13 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
-from dalme_app.middleware import get_current_user
+from dalme_app.middleware import get_current_user, get_current_username
 import uuid, json, os, requests, logging, hashlib
 from urllib.parse import urlencode
 from datetime import datetime
 from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
 import django.db.models.options as options
+from todo.models import Task
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 logger = logging.getLogger(__name__)
@@ -50,6 +51,7 @@ class Profile(models.Model):
     wiki_user = models.IntegerField(null=True)
     wp_user = models.IntegerField(null=True)
     wp_role = models.CharField(max_length=50, null=True, choices=WP_ROLE)
+    profile_image = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -61,6 +63,20 @@ class Profile(models.Model):
     def get_dam_usergroup_display(self):
         dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
         return dam_ug
+
+class TaskExtension(models.Model):
+    task = models.OneToOneField(Task, on_delete=models.CASCADE, related_name='extension')
+    workset = models.ForeignKey('Workset', on_delete=models.PROTECT, null=True)
+
+class Workset(dalmeIntid):
+    name = models.CharField(max_length=55)
+    description = models.TextField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
+    query = models.TextField()
+    position = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+        return self.name
 
 #DALME data store
 class Agent(dalmeUuid):
@@ -140,8 +156,6 @@ class DT_list(dalmeIntid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
-    default_headers = models.CharField(max_length=255, null=True)
-    extra_headers = models.CharField(max_length=255, null=True)
     content_types = models.ManyToManyField(Content_type)
     api_url = models.CharField(max_length=255, null=True)
     form_helper = models.CharField(max_length=255, null=True)
@@ -256,7 +270,7 @@ class Source(dalmeUuid):
 
 class Transcription(dalmeUuid):
     transcription = models.TextField(blank=True, null=True)
-    author = models.CharField(max_length=255, default=get_current_user)
+    author = models.CharField(max_length=255, default=get_current_username)
     version = models.IntegerField(null=True)
 
     def __str__(self):
@@ -300,23 +314,6 @@ class Identity_phrase_x_entity(dalmeBasic):
     entity_id = models.UUIDField(db_index=True)
 
 #app management models
-class Notification(dalmeIntid):
-    LEVELS = (
-        (10, 'DEBUG'),
-        (20, 'INFO'),
-        (25, 'SUCCESS'),
-        (30, 'WARNING'),
-        (40, 'ERROR')
-    )
-    TYPES = (
-        (1, 'MODAL'),
-        (2, 'NOTIFICATION')
-    )
-    code = models.IntegerField(unique=True, db_index=True)
-    level = models.IntegerField(choices=LEVELS)
-    type = models.IntegerField(choices=TYPES)
-    text = models.TextField()
-
 class AttributeReference(dalmeUuid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
@@ -616,7 +613,6 @@ class wp_users(models.Model):
        db_table='wp_users'
        in_db='wp'
 
-
 class wp_usermeta(models.Model):
     umeta_id = models.IntegerField(primary_key=True)
     user_id = models.IntegerField(default='0')
@@ -627,38 +623,3 @@ class wp_usermeta(models.Model):
         managed=False
         db_table='wp_usermeta'
         in_db='wp'
-
-
-#temporary models for testing parser
-class par_inventory(dalmeUuid):
-    title = models.CharField(max_length=255)
-    source = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    series = models.CharField(max_length=16)
-    shelf = models.CharField(max_length=32)
-    transcriber = models.CharField(max_length=32)
-
-class par_folio(dalmeUuid):
-    inv_id = models.ForeignKey('par_inventory', on_delete=models.CASCADE)
-    folio_no = models.CharField(max_length=32)
-    dam_id = models.IntegerField()
-
-class par_token(dalmeUuid):
-    folio_id = models.ForeignKey('par_folio', on_delete=models.CASCADE)
-    line_no = models.IntegerField()
-    position = models.IntegerField()
-    raw_token = models.CharField(max_length=64)
-    clean_token = models.CharField(max_length=64)
-    norm_token = models.CharField(max_length=64)
-    token_type = models.CharField(max_length=32)
-    flags = models.CharField(max_length=16, null=True, blank=True)
-    span_start = models.IntegerField(null=True, blank=True)
-    span_end = models.IntegerField(null=True, blank=True)
-
-class par_object(models.Model):
-    obj_id = models.IntegerField(primary_key=True, unique=True)
-    ont_class = models.CharField(max_length=64)
-    name = models.CharField(max_length=64)
-    terms = models.CharField(max_length=255)
-    material = models.CharField(max_length=64)
-    room = models.CharField(max_length=64)

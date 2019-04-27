@@ -69,3 +69,15 @@ function removeParam(key, sourceURL) {
     }
     return rtn;
 }
+
+function taskMarkDone(task) {
+  var url = "/api/tasks/"+task.id+"/";
+  $.ajax({
+    method: "PUT",
+    url: url,
+    headers: { 'X-CSRFToken': getCookie("csrftoken") },
+    data: { 'completed': 1 },
+  }).done(function(data, textStatus, jqXHR) {
+      alert('done');
+  }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error: '+errorThrown); });
+}

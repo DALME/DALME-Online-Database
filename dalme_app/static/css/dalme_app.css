@@ -11,6 +11,11 @@ body {
   background-color: #fff;
 }
 
+.shadow {
+-webkit-box-shadow: 0 .3rem .4rem 0 rgba(58,59,69,.15)!important;
+box-shadow: 0 .3rem .4rem 0 rgba(58,59,69,.15)!important;
+}
+
 .img-placeholder {
   height: 50vh;
   background-color: #8a8a8a;
@@ -188,6 +193,18 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
   color: #376783;
 }
 
+.sub-card-footer {
+  padding-top: 0;
+  padding-bottom: .4rem;
+  background-color: #e8e9ec;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  border-bottom-left-radius: .2rem !important;
+  border-bottom-right-radius: .2rem !important;
+  height: 32px;
+  border-top: 1px solid #a5a5a5;
+}
+
 .card-header-title {
   float: left;
   margin-top: .5rem;
@@ -224,8 +241,6 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
   color: #00005e;
 
 }
-
-
 
 h5.modal-title {
   font-size: 1rem;
@@ -283,7 +298,34 @@ div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
   margin-bottom: 0;
 }
 
+div.DTE_Field_Type_textarea textarea {
+    height: 120px;
+}
+
 /* dashboard cards/tiles */
+
+.homecard {
+  border: 1px solid #a5a5a5;
+  border-radius: 0.25rem;
+}
+
+.homecard .card-footer:hover {
+  background-color: rgba(165, 165, 165, 0.61);
+  border-top: 1px solid #a5a5a5;
+}
+
+.homecard-action {
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+.homecard-action {
+  align-self: flex-end;
+}
+
+.homecard a:hover {
+  text-decoration: none;
+}
 
 .ch-primary {
   background-color: #0361aa;
@@ -1163,6 +1205,10 @@ a.page-link:focus, a.page-link:active {
     float: left;
     margin-top: 5px;
     background-color: #fff;
+}
+
+.sidebar.toggled .nav-item .nav-link {
+  padding: .5rem 1rem !important;
 }
 
 .sidebar-brand-text {

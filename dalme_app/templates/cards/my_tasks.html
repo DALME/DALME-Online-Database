@@ -1,0 +1,61 @@
+<div class="card mb-3 w-100 shadow">
+  {% if tasks %}
+  <div class="table-responsive dt-embed">
+    <table class="table table-hover compact" id="dataTables-tasks" width="100%">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>List</th>
+          <th>Due date</th>
+          <th>Date created</th>
+          <th>Created by</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks %}
+          <tr>
+            <td>
+              <div class="task_title">{{ task.title }}</div>
+              <div class="task_description">{{ task.note }}</div>
+            </td>
+            <td>
+              <div class="dropdown-tasks-list float-left">{{ task.task_list }}</div>
+            </td>
+            <td>
+              {% if task.due_date %}
+                {% if task.overdue_status %}
+                  <div class="dropdown-tasks-overdue float-right">Due: {{ task.due_date }}</div>
+                {% else %}
+                  <div class="dropdown-tasks-due float-right">Due: {{ task.due_date }}</div>
+                {% endif %}
+              {% endif %}
+            </td>
+            <td>
+              {{ task.created_date }}
+            </td>
+            <td>
+              {{ task.created_by }}
+            </td>
+            <td>
+              <div class="dropdown-tasks-buttons">
+                <button class="dropdown-tasks-btn dropdown-tasks-btn-bb" type="button"><i class="fa fa-pen fa-fw"></i></button>
+                <button class="dropdown-tasks-btn" type="button" id="{{ task.id }}" onclick="taskMarkDone(this)"><i class="fa fa-check fa-fw"></i></button>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="dash-no-content">There are no tasks in your queue.</div>
+  {% endif %}
+  <div class="sub-card-footer">
+    <small class="text-muted float-left tab-footer-text">
+      {% if tasks %}
+        {{ tasks.count }} task{{ tasks.count|pluralize }}
+      {% endif %}
+    </small>
+  </div>
+</div>

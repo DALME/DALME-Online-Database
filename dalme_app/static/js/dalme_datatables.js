@@ -13,6 +13,11 @@ function createDatatable(target, helper) {
     };
   };
   dt_table = $(target).DataTable(dt_options);
+  fix_search();
+}
+
+function fix_search() {
+  $('.dataTables_filter label').each(function() { $(this).html( $(this).find('input') )});
 }
 
 function addDtToolbarButton(button) {
@@ -29,8 +34,46 @@ function addDtToolbarButton(button) {
   }
 }
 
+function saveFilterForm(query) {
+  filterForm = new $.fn.dataTable.Editor( {
+        ajax: {
+          method: "POST",
+          url: "../api/worksets/",
+          headers: { 'X-CSRFToken': getCookie("csrftoken") },
+          data: { 'query': JSON.stringify(query) },
+        },
+        fields: [{
+                label: "Name:",
+                name:  "name"
+              }, {
+                label: "Description:",
+                name:  "description",
+                type: "textarea"
+              }]
+    });
+    filterForm.buttons({
+      text: "Save",
+      className: "btn btn-primary",
+      action: function () { this.submit(); }
+    }).title('Create new workset').create();
+}
+
 function saveFilterSet() {
-  alert('save search triggered');
+  var data = dt_table.ajax.params();
+  var url = dt_table.ajax.url();
+  var filters = collectFilters();
+  var order_col = data.columns[data.order[0].column].data;
+  var order_dir = data.order[0].dir;
+  var search = data.search.value;
+  var api = url.split("/")[2];
+  var query = {
+    'search': search,
+    'order_field': order_col,
+    'order_dir': order_dir,
+    'filters': filters,
+    'api': api
+  };
+  saveFilterForm(query);
 }
 
 function applyFilters() {

@@ -4,6 +4,7 @@
 {% block content_title %}<h2 class="page_title">Search</h2>{% endblock %}
 
 {% block content %}
+<div class="container-fluid">
   {% if found_tasks %}
   <h2>{{found_tasks.count}} search results for term: "{{ query_string }}"</h2>
   <div class="post_list">

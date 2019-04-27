@@ -79,7 +79,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 #'sekizai.context_processors.sekizai',
-                'dalme_app.context_processors.dalme_general',
+                #'dalme_app.context_processors.dalme_general',
             ],
             'debug': DEBUG,
         },

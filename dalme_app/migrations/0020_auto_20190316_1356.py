@@ -16,9 +16,9 @@ class Migration(migrations.Migration):
             name='Source_pages',
             fields=[
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
-                ('creation_username', models.CharField(blank=True, default=dalme_app.middleware.get_current_user, max_length=255, null=True)),
+                ('creation_username', models.CharField(blank=True, default=dalme_app.middleware.get_current_username, max_length=255, null=True)),
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
-                ('modification_username', models.CharField(blank=True, default=dalme_app.middleware.get_current_user, max_length=255, null=True)),
+                ('modification_username', models.CharField(blank=True, default=dalme_app.middleware.get_current_username, max_length=255, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('order', models.IntegerField(db_index=True)),
                 ('transcription', models.TextField()),

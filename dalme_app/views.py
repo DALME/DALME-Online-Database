@@ -31,6 +31,7 @@ from django.db.models import CharField, Value
 from django.db.models.expressions import RawSQL
 from haystack.generic_views import SearchView
 from django.http import HttpResponse
+from todo.models import Task
 import urllib.parse as urlparse
 import logging
 logger = logging.getLogger(__name__)
@@ -358,11 +359,8 @@ class SourceDetail(DetailView):
             'Type': self.object.type.name,
             'Name': self.object.name,
             'Short name': self.object.short_name,
+            'Inventory?': functions.displayBoolean(is_inv),
         }
-        if is_inv:
-            source_data['Inventory?'] = '<i class="fa fa-check-circle dt_checkbox_true"></i>'
-        else:
-            source_data['Inventory?'] = '<i class="fa fa-times-circle dt_checkbox_false"></i>'
         if self.object.parent_source:
             name = self.object.parent_source.name
             url = '/sources/'+str(self.object.parent_source.id)
@@ -371,9 +369,9 @@ class SourceDetail(DetailView):
         created = self.object.creation_timestamp.strftime('%d-%b-%Y@%H:%M')
         modified = self.object.modification_timestamp.strftime('%d-%b-%Y@%H:%M')
         c_user = Profile.objects.get(user__username=self.object.creation_username)
-        created_user = '<a href="/user/{}">{}</a>'.format(c_user.user_id, c_user.full_name)
+        created_user = '<a href="/users/{}">{}</a>'.format(self.object.creation_username, c_user.full_name)
         m_user = Profile.objects.get(user__username=self.object.modification_username)
-        modified_user = '<a href="/user/{}">{}</a>'.format(m_user.user_id, m_user.full_name)
+        modified_user = '<a href="/users/{}">{}</a>'.format(self.object.modification_username, m_user.full_name)
         context['source_metadata'] = {
             'ID': str(self.object.id),
             'Created': created+' by '+created_user,
@@ -454,154 +452,55 @@ def SourceManifest(request, pk):
     return render(request, 'dalme_app/source_manifest.html', context)
 
 @method_decorator(login_required,name='dispatch')
-class AdminMain(View):
-    """ Routes requests to admin views """
-    def get(self, request, *args, **kwargs):
-        if 'type' in self.request.GET:
-            type = self.request.GET['type']
-            title = 'List of '+type.capitalize()
-            view = eval('Admin'+type.capitalize()).as_view()
-        return view(request, title=title)
-
-class AdminUsers(DTListView):
+class UserList(DTListView):
     """ Lists users and allows editing and creation of new records via the API """
     list_name = 'users'
-    breadcrumb = [('System', ''),('Users', '/admin?type=users')]
+    breadcrumb = [('Project', ''),('Users', '/users')]
     dt_editor_options = {'idSrc': '"id"'}
     dt_field_list = ['id','last_login', 'is_superuser', 'username', 'full_name', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'groups', 'date_joined', 'dam_usergroup', 'wiki_groups', 'wp_role']
     dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username', 'password', 'is_staff', 'is_superuser', 'groups', 'dam_usergroup', 'wiki_groups', 'wp_role']
 
-class AdminNotifications(DTListView):
-    breadcrumb = [('System', ''),('Notifications', '/admin?type=notifications')]
-    dt_ajax_base_url = '../api/notifications/'
-    dt_column_headers = [
-            ['Id', 'id', 0],
-            ['Code', 'code', 1],
-            ['Level','level', 1],
-            ['Text','text', 1],
-            ['Type','type', 1]
-            ]
-    dt_render_dict = {
-            'Level': 'function ( data, type, row, meta ) {return \'<div class="dt_n_level dt_n_level_\'+data.display+\'">\'+data.display+\'</div>\';}',
-            'Type': 'function ( data, type, row, meta ) {return \'<div class="dt_n_type">\'+data.display+\'</div>\';}'
-            }
-    dt_editor_options = {'idSrc': '"id"',}
-    dt_editor_fields = [
-            {'label':"Code:", 'name': "code"},
-            {'label':"Level:", 'name': "level.value", 'type': "chosen",
-                'opts': {
-                    "disable_search": 'true',
-                },
-                'options': [
-                  {'label': "Debug", 'value': "10"},
-                  {'label': "Info", 'value': "20"},
-                  {'label': "Success", 'value': "25"},
-                  {'label': "Warning", 'value': "30"},
-                  {'label': "Error", 'value': "40"}
-                ]},
-             {'label':"Text:", 'name': "text"},
-             {'label':"Type:", 'name': "type.value", 'type': "radio",
-                'options': [
-                  {'label': "Modal", 'value': "1"},
-                  {'label': "Notification", 'value': "2"}
-                ],}
-        ]
-
-class AdminModels(TemplateView):
-    template_name = 'dalme_app/dtlistview_models.html'
+@method_decorator(login_required,name='dispatch')
+class UserDetail(DetailView):
+    model = Profile
+    template_name = 'dalme_app/user_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = [('System', ''), ('Data Models', '/admin?type=models')]
+        breadcrumb = [('Project', ''), ('Users', '/users')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        column_headers_content = [
-                ['ID', 'id', 1],
-                ['Class','content_class', 0],
-                ['Name','name', 1],
-                ['Short name','short_name', 0],
-                ['Description','description', 1]]
-        column_headers_attributes = [
-                ['ID', 'id', 1],
-                ['Name','name', 1],
-                ['Short name','short_name', 1],
-                ['Description','description', 0],
-                ['DType','data_type', 1],
-                ['Order','order', 1]]
-        render_dict_content = {
-                'Username': '''function ( data, type, row, meta ) {return '<a href="/user/'+data+'">'+data+'</a>';}''',
-                'Email': '''function ( data, type, row, meta ) {return '<a href="'+data.url+'">'+data.name+'</a>';}''',
-                'Last login': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
-                'Date joined': '''function ( data ) {return moment(data).format("DD-MMM-YYYY@HH:mm");}''',
-                'SU': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
-                'Staff': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
-                'Active': '''function ( data, type, row, meta ) {return data == true ? '<i class="fa fa-check-circle dt_checkbox_true"></i>' : '<i class="fa fa-times-circle dt_checkbox_false"></i>';}''',
-                }
-        render_dict_attributes = {}
         context = functions.set_menus(self.request, context, state)
-        context['columnDefs_content'] = self.get_column_defs(column_headers_content, render_dict_content)
-        context['columnDefs_attributes'] = self.get_column_defs(column_headers_attributes, render_dict_attributes)
-        context['table_options_content'] = {
-            'pageLength':25,
-            'responsive':'true',
-            'dom': '''"<'#content_card.card-header'<'#c-title'><'#c-classes_button'>B><'card-body't>"''',
-            'serverSide': 'true',
-            'stateSave': 'true',
-            'select': '{style: "single"}',
-            'ajax': '"../api/models/?type=content&format=json"',
-            'scrollY': '100',
-            'scrollResize': 'true',
-            'deferRender': 'true',
-            'scroller': 'true',
-            'rowId': '"id"',
-            }
-        context['table_options_attributes'] = {
-            'pageLength':25,
-            'responsive':'true',
-            'dom': '''"<'#attribute_card.card-header'<'#a-title'>B><'card-body't>"''',
-            'serverSide': 'true',
-            'stateSave': 'true',
-            'select': '{style: "single"}',
-            'ajax': '"../api/models/?type=attributes&format=json"',
-            'scrollY': '100',
-            'scrollResize': 'true',
-            'deferRender': 'true',
-            'scroller': 'true',
-            'rowId': '"id"',
-            }
-
-        classes = Content_class.objects.all()
-        classes_button = '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="classes_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Class: All</button><div class="dropdown-menu dropdown-menu-right" aria-labelledby="classes_menu"><a class="dropdown-item" href="#">Add new...</a><div class="dropdown-divider"></div><a class="dropdown-item" href="#" onclick="class_select(0, \\\'All\\\')">All</a>'
-        for c in classes:
-            classes_button += '<a class="dropdown-item" href="#" onclick="class_select({},\\\'{}\\\')">{}</a>'.format(c.id, c.name, c.name)
-        classes_button += '</div>'
-
-        context['classes_button'] = classes_button
-        context['table_buttons_content'] = ['{ extend: "colvis", text: "\uf0db" }']
-        context['table_buttons_attributes'] = ['{ extend: "colvis", text: "\uf0db", className: "btn_single"}']
-        context['page_title'] = 'System Data Models'
-
+        page_title = self.object.full_name
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        user_data = {
+            'First name': self.object.user.first_name,
+            'Last name': self.object.user.last_name,
+            'User Id': self.object.user.id,
+            'Email': '<a href="mailto:'+self.object.user.email+'">'+self.object.user.email+'</a>',
+            'Staff': functions.displayBoolean(self.object.user.is_staff),
+            'Superuser': functions.displayBoolean(self.object.user.is_superuser),
+            'Active': functions.displayBoolean(self.object.user.is_active),
+            'Joined': functions.format_date(self.object.user.date_joined, 'timestamp-long'),
+            'Last login': functions.format_date(self.object.user.last_login, 'timestamp-long'),
+            'Groups': self.object.user.groups,
+            #'Wiki groups': self.object.wiki_user__wiki_groups,
+            #'DAM group': self.object.dam_user.usergroup,
+            'WordPress role': self.object.get_wp_role_display()
+        }
+        context['user_data'] = user_data
+        context['image_url'] = self.object.profile_image
         return context
 
-    def get_column_defs(self, column_headers, render_dict):
-        columnDefs = []
-        col = 0
-        for i in column_headers:
-            c_dict = {}
-            c_dict['title'] = '"'+i[0]+'"'
-            c_dict['targets'] = col
-            c_dict['data'] = '"'+i[1]+'"'
-            c_dict['defaultContent'] = '"-"'
-            if i[2]:
-                c_dict['visible'] = 'true'
-            else:
-                c_dict['visible'] = 'false'
-            if i[0] in render_dict:
-                c_dict['render'] = render_dict[i[0]]
-            columnDefs.append(c_dict)
-            col = col + 1
-        return columnDefs
+    def get_object(self):
+        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
+        try:
+            object = Profile.objects.get(user__username=self.kwargs['username'])
+            return object
+        except:
+            raise Http404
 
 @method_decorator(login_required,name='dispatch')
 class ImageList(DTListView):
@@ -631,11 +530,8 @@ class ImageDetail(DetailView):
             'Record modified': functions.format_date(self.object.modified, 'timestamp'),
             'File modified': functions.format_date(self.object.file_modified, 'timestamp'),
             'Filesize': self.object.file_size,
+            'Image?': functions.displayBoolean(self.object.has_image)
         }
-        if self.object.has_image:
-            image_data['Image?'] = '<i class="fa fa-check-circle dt_checkbox_true"></i>'
-        else:
-            image_data['Image?'] = '<i class="fa fa-times-circle dt_checkbox_false"></i>'
         context['image_data'] = image_data
         try:
             attribute_data = []
@@ -718,6 +614,11 @@ class PageDetail(DetailView):
 @method_decorator(login_required,name='dispatch')
 class Index(TemplateView):
     template_name = 'dalme_app/index.html'
+    default_cards = [
+    'cards/counter_articles.html',
+    'cards/counter_assets.html',
+    'cards/counter_inventories.html'
+    ]
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Dashboard', '')]
@@ -729,10 +630,28 @@ class Index(TemplateView):
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context = functions.set_menus(self.request, context, state)
-        context['tiles'] = menu_constructor(self.request, 'tile_item', 'home_tiles_default.json', state)
         page_title = 'Dashboard'
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['worksets'] = Workset.objects.filter(owner=self.request.user)
+        context['table_options'] = {
+            'responsive':'true',
+            'dom': '''"<'sub-card-header clearfix'<'card-header-title'>fr>t"''',
+            'stateSave': 'true',
+            'select': 'true',
+            'scrollY': 200,
+            'deferRender': 'true',
+            'scroller': 'true',
+            'language': '{searchPlaceholder: "Search"}'
+            }
+        context['cards'] = self.default_cards
+        counters = functions.get_counters(['wiki_articles', 'dam_assets', 'inventories'])
+        for k,v in counters.items():
+            context[k] = v
+        try:
+            context['tasks'] = Task.objects.filter(assigned_to=self.request.user.id, completed=0)
+        except:
+            context['tasks'] = None
         return context
 
 def PageManifest(request, pk):

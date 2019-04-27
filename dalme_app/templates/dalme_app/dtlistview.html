@@ -20,30 +20,97 @@
 
 <script type="text/javascript">
     {% if dt_editor %}
-      var dt_editor_options = {'ajax': {'create': {'type': 'POST','url': '{{ dt_editor.ajax_url }}','headers': {'X-CSRFToken': getCookie("csrftoken") }},'edit': {'type': 'PUT','url': '{{ dt_editor.ajax_url }}_id_/','headers': {'X-CSRFToken': getCookie("csrftoken") }},'remove': {'type': 'DELETE','url': '{{ dt_editor.ajax_url }}_id_/','headers': {'X-CSRFToken': getCookie("csrftoken") }}}, {% for k,v in dt_editor.options.items %}{{ k }}:{{ v | safe }},{% endfor %}
-      fields: [ {% for i in dt_editor.fields %} { {% for k,v in i.items %}
-      {% if k == 'opts' %}
-        opts: {
-          {% for ok, ov in v.items %}
-            {{ ok | safe }}: "{{ ov | safe }}",
-          {% endfor %}
-        },
-      {% elif k == 'options' %}
-        options: [
-          {% for o in v %}
-            {
-              {% for l,p in o.items %}
-                {{ l | safe }}: "{{ p | escapejs }}",
-              {% endfor %}
+      var dt_editor_options = {
+        'ajax': {
+          'create': {
+              'type': 'POST',
+              'url': '{{ dt_editor.ajax_url }}',
+              'headers': {'X-CSRFToken': getCookie("csrftoken") },
+              'data': function (data) { return { "data": JSON.stringify( data ) }; }
             },
+          'edit': {
+              'type': 'PUT',
+              'url': '{{ dt_editor.ajax_url }}_id_/',
+              'headers': {'X-CSRFToken': getCookie("csrftoken") },
+              'data': function (data) { return { "data": JSON.stringify( data ) }; }
+            },
+          'remove': {
+              'type': 'DELETE',
+              'url': '{{ dt_editor.ajax_url }}_id_/',
+              'headers': {'X-CSRFToken': getCookie("csrftoken") },
+              'data': function (data) { return { "data": JSON.stringify( data ) }; }
+            }
+          },
+          {% for k,v in dt_editor.options.items %}
+            {{ k }}:{{ v | safe }},
           {% endfor %}
-          ],
-          {% else %}{{ k | safe }}: "{{ v | safe }}",{% endif %}{% endfor %} },{% endfor %} ]};
+          fields: [
+            {% for i in dt_editor.fields %}
+              {
+                {% for k,v in i.items %}
+                  {% if k == 'opts' %}
+                    opts: {
+                      {% for ok, ov in v.items %}
+                        {{ ok | safe }}: "{{ ov | safe }}",
+                      {% endfor %}
+                    },
+                  {% elif k == 'options' %}
+                    options: [
+                      {% for o in v %}
+                        {
+                          {% for l,p in o.items %}
+                            {{ l | safe }}: "{{ p | escapejs }}",
+                          {% endfor %}
+                        },
+                      {% endfor %}
+                    ],
+                  {% else %}
+                    {{ k | safe }}: "{{ v | safe }}",
+                  {% endif %}
+                {% endfor %}
+              },
+            {% endfor %}
+          ]};
     {% endif %}
+
     {% if dt_editor.buttons %}
       var dt_editor_buttons = {{ dt_editor.buttons | safe }};
     {% endif %}
-    var dt_options = { {% for k,v in dt_options.options.items %}{{ k }}:{{ v | safe }},{% endfor %} buttons:[ {% for dict in dt_options.buttons %} { {% for k,v in dict.items %}{{ k }}:{{ v | safe }},{% endfor %} },{% endfor %}{% if dt_options.buttons_extra %}{% for b in dt_options.buttons_extra %}{{ b | safe }},{% endfor %}{% endif %} ], columnDefs:[ {% for dict in dt_options.columnDefs %} { {% for k,v in dict.items %}{{ k }}:{{ v | safe }},{% endfor %} },{% endfor %} ]};
+
+    var dt_options = {
+      {% for k,v in dt_options.options.items %}
+        {% if k == 'ajax' %}
+          'ajax': {
+            'url': {{ v | safe }},
+            'data': function (data) { return { "data": JSON.stringify( data ) }; }
+          },
+        {% else %}
+          {{ k }}:{{ v | safe }},
+        {% endif %}
+      {% endfor %}
+        buttons:[
+          {% for dict in dt_options.buttons %}
+            {
+              {% for k,v in dict.items %}
+                {{ k }}:{{ v | safe }},
+              {% endfor %}
+            },
+          {% endfor %}
+          {% if dt_options.buttons_extra %}
+            {% for b in dt_options.buttons_extra %}
+              {{ b | safe }},
+            {% endfor %}
+          {% endif %}
+          ],
+          columnDefs:[
+            {% for dict in dt_options.columnDefs %}
+              {
+                {% for k,v in dict.items %}
+                  {{ k }}:{{ v | safe }},
+                {% endfor %}
+              },
+            {% endfor %}
+          ]};
     $(document).ready( function () { createDatatable('#dataTables-list', "{{ form_helper }}") });
     {% if filters %}
       var filters = {{ filters | safe }};
