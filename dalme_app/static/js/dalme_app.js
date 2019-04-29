@@ -15,6 +15,98 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function fix_dt_search() {
+  $('.dataTables_filter label').each(function() { $(this).html( $(this).find('input') )});
+}
+
+function createTaskList() {
+  $.get("/api/options/?form=createtasklist&format=json", function ( data ) {
+      var groups = data.groups;
+      taskListForm = new $.fn.dataTable.Editor( {
+            ajax: {
+              method: "POST",
+              url: "../api/tasklists/",
+              headers: { 'X-CSRFToken': getCookie("csrftoken") },
+              data: function (data) { return { "data": JSON.stringify( data ) }; }
+            },
+            fields: [
+              {
+                label: "List name",
+                name: "name",
+                message: "Name of the list to be created"
+              },
+              {
+                label: "Group",
+                name:  "group",
+                type: "chosen",
+                options: groups
+              },
+            ]
+        });
+        taskListForm.buttons({
+          text: "Save",
+          className: "btn btn-primary",
+          action: function () { this.submit(); }
+        }).title('Create new list').create();
+  }, 'json');
+}
+
+function createTask() {
+  $.get("/api/options/?form=createtask&format=json", function ( data ) {
+      var staff = data.staff;
+      var worksets = data.worksets;
+      var lists = data.lists;
+      taskForm = new $.fn.dataTable.Editor( {
+            ajax: {
+              method: "POST",
+              url: "../api/tasks/",
+              headers: { 'X-CSRFToken': getCookie("csrftoken") },
+              data: function (data) { return { "data": JSON.stringify( data ) }; }
+            },
+            fields: [
+              {
+                label: "Task",
+                name:  "title"
+              },
+              {
+                label: "Description",
+                name:  "description",
+                type: "textarea"
+              },
+              {
+                label: "Workset",
+                name:  "workset",
+                type: "chosen",
+                options: worksets
+              },
+              {
+                label: "Due date",
+                name:  "due_date",
+                type: "datetime",
+                format: "YYYY-MM-DD"
+              },
+              {
+                label: "Assigned to",
+                name:  "assigned_to",
+                type: "chosen",
+                options: staff
+              },
+              {
+                label: "List",
+                name:  "task_list",
+                type: "chosen",
+                options: lists
+              }
+                ]
+        });
+        taskForm.buttons({
+          text: "Save",
+          className: "btn btn-primary",
+          action: function () { this.submit(); }
+        }).title('Create new task').create();
+  }, 'json');
+}
+
 function updateSession(data) {
     $.ajax({
       type : "POST",

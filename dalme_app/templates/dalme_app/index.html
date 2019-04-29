@@ -1,15 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles i18n %}
 {% block extra_head %}
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/fh-3.1.4/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.css"/>
-<link rel="stylesheet" type="text/css" href="{% static 'Editor-1.9.0/css/editor.bootstrap4.css' %}">
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/fh-3.1.4/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
-<script type="text/javascript" src="{% static 'Editor-1.9.0/js/dataTables.editor.js' %}"></script>
-<script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.bootstrap4.js' %}"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
-<script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
 {% endblock %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}
@@ -19,9 +10,11 @@
     <div class="col-md-8">
       {% include "cards/my_tasks.html" %}
       <div class="card-columns">
-        {% for card in cards %}
-          {% include card %}
-        {% endfor %}
+        {% if cards %}
+          {% for card in cards %}
+            {% include card %}
+          {% endfor %}
+        {% endif %}
       </div>
     </div>
     <div class="col-md-4">
@@ -31,26 +24,22 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
-<script>
-  $(document).ready(function() {
-      var table_tasks = $('#dataTables-tasks').DataTable({
-          {% if table_options %}
-            {% for key,value in table_options.items %}
-              {{ key | safe }}: {{ value | safe }},
-            {% endfor %}
-          {% endif %}
+{% if tables %}
+  <script>
+    {% for table in tables %}
+      $(document).ready(function() {
+          var table_tasks = $('#dataTables-{{ table.0 }}').DataTable({
+              {% if table_options %}
+                {% for key,value in table_options.items %}
+                  {{ key | safe }}: {{ value | safe }},
+                {% endfor %}
+              {% endif %}
+          });
+          $('#dataTables-{{ table.0 }}_wrapper').find('.card-header-title').html('<i class="fa {{ table.1 }} fa-fw"></i> {{ table.2 }}');
+          fix_dt_search();
+          $('#dataTables-tasks_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addtask" type="button" onclick="createTask()"><i class="fa fa-plus fa-sm"></i> Add</button>');
       });
-      $("div.card-header-title").html('<i class="fa fa-tasks fa-fw"></i> My Tasks');
-  });
-  $(document).ready(function() {
-      var table_worksets = $('#dataTables-worksets').DataTable({
-          {% if table_options %}
-            {% for key,value in table_options.items %}
-              {{ key | safe }}: {{ value | safe }},
-            {% endfor %}
-          {% endif %}
-      });
-      $("div.card-header-title").html('<i class="fa fa-layer-group fa-fw"></i> My Worksets');
-    });
+    {% endfor %}
   </script>
+{% endif %}
 {% endblock %}

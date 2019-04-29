@@ -13,21 +13,16 @@ function createDatatable(target, helper) {
     };
   };
   dt_table = $(target).DataTable(dt_options);
-  fix_search();
-}
-
-function fix_search() {
-  $('.dataTables_filter label').each(function() { $(this).html( $(this).find('input') )});
+  fix_dt_search();
 }
 
 function addDtToolbarButton(button) {
   if (button == 'filters') {
-    filters_btn_container = document.getElementById("filters-button-ct");
     filters_container = document.getElementById("filters-container");
-    filters_btn_container.innerHTML = '<button class="btn buttons-collection" id="btn-filters" data-toggle="collapse" data-target="#filters-container" aria-expanded="false" aria-controls="filters-container" type="button" onclick="this.classList.toggle(\'active\')"><i class="fa fa-filter fa-sm"></i> Filters</button>';
-    var search_box = document.getElementById("dataTables-list_filter").getElementsByClassName("form-control")[0];
-    search_box.style.borderTopRightRadius = "0";
-    search_box.style.borderBottomRightRadius = "0";
+    $('#dataTables-list_filter').parent().prepend('<button class="btn dt-btn buttons-collection" id="btn-filters" data-toggle="collapse" data-target="#filters-container" aria-expanded="false" aria-controls="filters-container" type="button" onclick="this.classList.toggle(\'active\')"><i class="fa fa-filter fa-sm"></i> Filters</button>');
+    $('#dataTables-list_filter .form-control')[0].style.borderTopLeftRadius = "0";
+    $('#dataTables-list_filter .form-control')[0].style.borderBottomLeftRadius = "0";
+    $('#btn-filters').css("margin-right","-1px");
     resetFilters();
     $('#filters-container').on('click', '.add_filter', addFilter);
     $('#filters-container').on('click', '.remove_filter', removeFilter);

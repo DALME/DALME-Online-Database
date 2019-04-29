@@ -67,12 +67,8 @@ def get_script_menu_item(name=None,description=None,type=None):
         'secondary': 'fa-scroll',
         'success': 'thumbs-up',
     }
-
-    currentItem = '<div class="card-split"><div class="card-split-icon bg-{}-soft"><i class="fas {} text-{}"></i></div><div class="card-split-body">'.format(type, icon_dict[type], type)
-    currentItem += '<span class="font-weight-bold text-{} mb-1">{}: </span>'.format(type, name)
-    currentItem += '<span class="mb-0 text-dark-gray">{}</span>'.format(description)
-    currentItem += '</div><a href="/scripts?s={}" class="btn btn-primary btn-card-split"><span class="icon text-white-50"><i class="fas fa-cogs"></i></span></a></div>'.format(name)
-
+    currentItem = '<a class="script-item d-flex text-dark-gray" href="/scripts?s={}"><div class="script-icon bg-{}-soft"><i class="fas {} text-{}"></i></div>'.format(name, type, icon_dict[type], type)
+    currentItem += '<span class="font-weight-bold mr-1">{}: </span> {}</a>'.format(name, description)
     return currentItem
 
 def add_attribute_types():

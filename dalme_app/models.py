@@ -12,12 +12,11 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.functional import cached_property
 from dalme_app.middleware import get_current_user, get_current_username
-import uuid, json, os, requests, logging, hashlib
+import uuid, json, os, requests, logging, hashlib, textwrap
 from urllib.parse import urlencode
-from datetime import datetime
+import datetime
 from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
 import django.db.models.options as options
-from todo.models import Task
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 logger = logging.getLogger(__name__)
@@ -63,20 +62,6 @@ class Profile(models.Model):
     def get_dam_usergroup_display(self):
         dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
         return dam_ug
-
-class TaskExtension(models.Model):
-    task = models.OneToOneField(Task, on_delete=models.CASCADE, related_name='extension')
-    workset = models.ForeignKey('Workset', on_delete=models.PROTECT, null=True)
-
-class Workset(dalmeIntid):
-    name = models.CharField(max_length=55)
-    description = models.TextField()
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
-    query = models.TextField()
-    position = models.CharField(max_length=255, null=True)
-
-    def __str__(self):
-        return self.name
 
 #DALME data store
 class Agent(dalmeUuid):
@@ -325,6 +310,94 @@ class AttributeReference(dalmeUuid):
 class Notes(dalmeUuid):
     target = models.UUIDField(db_index=True)
     text = models.TextField()
+
+class Workset(dalmeIntid):
+    name = models.CharField(max_length=55)
+    description = models.TextField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
+    query = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+#task management
+class TaskList(dalmeIntid):
+    name = models.CharField(max_length=60)
+    slug = models.SlugField(default="")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="task_list_group")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Task Lists"
+        # Prevents (at the database level) creation of two lists with the same slug in the same group
+        unique_together = ("group", "slug")
+
+class Task(dalmeIntid):
+    title = models.CharField(max_length=140)
+    task_list = models.ForeignKey(TaskList, on_delete=models.CASCADE, null=True)
+    due_date = models.DateField(blank=True, null=True)
+    completed = models.BooleanField(default=False)
+    completed_date = models.DateField(blank=True, null=True)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name="task_created_by", default=get_current_user)
+    assigned_to = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name="task_assigned_to")
+    description = models.TextField(blank=True, null=True)
+    priority = models.PositiveIntegerField(blank=True, null=True)
+    workset = models.ForeignKey(Workset, on_delete=models.PROTECT, null=True)
+    position = models.CharField(max_length=255, null=True)
+
+    # Has due date for an instance of this object passed?
+    def overdue_status(self):
+        '''Returns whether the Tasks's due date has passed or not.'''
+        if self.due_date and datetime.date.today() > self.due_date:
+            return True
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse("/tasks/", kwargs={"task_id": self.id})
+
+    # Auto-set the Task creation / completed date
+    def save(self, **kwargs):
+        # If Task is being marked complete, set the completed_date
+        if self.completed:
+            self.completed_date = datetime.datetime.now()
+        super(Task, self).save()
+
+    class Meta:
+        ordering = ["priority", "creation_timestamp"]
+
+class TaskComment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, default=get_current_user)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    date = models.DateTimeField(default=datetime.datetime.now)
+    email_from = models.CharField(max_length=320, blank=True, null=True)
+    email_message_id = models.CharField(max_length=255, blank=True, null=True)
+    body = models.TextField(blank=True)
+
+    class Meta:
+        # an email should only appear once per task
+        unique_together = ("task", "email_message_id")
+
+    @property
+    def author_text(self):
+        if self.author is not None:
+            return str(self.author)
+
+        assert self.email_message_id is not None
+        return str(self.email_from)
+
+    @property
+    def snippet(self):
+        body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
+        # Define here rather than in __str__ so we can use it in the admin list_display
+        return "{author} - {snippet}...".format(author=self.author_text, snippet=body_snippet)
+
+    def __str__(self):
+        return self.snippet
 
 #unmanaged models from DAM
 class rs_resource(models.Model):

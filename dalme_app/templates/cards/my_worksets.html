@@ -14,7 +14,7 @@
             <td>
               <div class="workset_name">{{ row.name }}</div>
               <div class="workset_description">{{ row.description }}</div>
-            </td>  
+            </td>
             <td>
               <div class="workset_created">{{ row.creation_timestamp }}</div>
             </td>
@@ -27,7 +27,7 @@
   <div class="dash-no-content">You have no worksets defined.</div>
   {% endif %}
   <div class="sub-card-footer">
-    <small class="text-muted float-left tab-footer-text">
+    <small class="text-muted">
       {% if worksets %}
         {{ worksets.count }} workset{{ worksets.count|pluralize }}
       {% endif %}

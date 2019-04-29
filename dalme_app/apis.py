@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import User, Group
 from django.db.models import Q, Count, F, Prefetch
 import re, requests, uuid, os, datetime, json, hashlib, ast, operator, uu, base64
@@ -14,7 +13,6 @@ from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from django.shortcuts import get_object_or_404
 from passlib.apps import phpass_context
 from dalme_app import functions
-from todo.models import *
 import logging
 logger = logging.getLogger('DJANGO_APIS')
 
@@ -66,6 +64,39 @@ class DTViewSet(viewsets.ViewSet):
         queryset = kwargs['queryset']
         return serializer(queryset, many=True)
 
+class Options(viewsets.ViewSet):
+    """ API endpoint for generating lists of options for DTE forms """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Workset.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        try:
+            form = self.request.GET['form']
+            data_dict = {}
+            if form == 'createtask':
+                staff_options = "['Profile.objects.all()','full_name','user_id']"
+                staff = functions.get_dte_options(staff_options, 'chosen')
+                worksets_options = '[\'Workset.objects.filter(owner='+str(request.user.id)+')\',\'name\',\'id\']'
+                worksets = functions.get_dte_options(worksets_options, 'chosen')
+                groups = request.user.groups.all()
+                all_lists = TaskList.objects.all()
+                lists = [{'label': "", 'value': ""}]
+                for list in all_lists:
+                    if list.group in groups:
+                        lists.append({'label': list.name+' ('+list.group+')', 'value': list.id})
+                data_dict['staff'] = staff
+                data_dict['worksets'] = worksets
+                data_dict['lists'] = lists
+            elif form == 'createtasklist':
+                groups = []
+                ugroups = request.user.groups.all()
+                for g in ugroups:
+                    groups.append({'label': g.name, 'value': g.id})
+                data_dict['groups'] = groups
+        except Exception as e:
+            data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+        return Response(data_dict)
+
 class Worksets(viewsets.ModelViewSet):
     """ API endpoint for managing worksets """
     permission_classes = (DjangoModelPermissions,)
@@ -91,11 +122,35 @@ class Worksets(viewsets.ModelViewSet):
             status = 400
         return Response(result, status)
 
-class Tasks(viewsets.ModelViewSet):
+class Tasks(DTViewSet):
     """ API endpoint for managing tasks """
     permission_classes = (DjangoModelPermissions,)
     queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+    serializer = TaskSerializer
+
+    def get_qset(self, *args, **kwargs):
+        try:
+            list = self.request.GET['list']
+            queryset = Task.objects.filter(task_list=list)
+        except:
+            queryset = Task.objects.all()
+        return queryset
+
+    def create(self, request, format=None):
+        result = {}
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        serializer = TaskSerializer(data=data_dict)
+        if serializer.is_valid():
+            new_obj = serializer.save()
+            object = Task.objects.get(pk=new_obj.id)
+            serializer = TaskSerializer(object)
+            result['data'] = serializer.data
+            status=201
+        else:
+            result['fieldErrors'] = get_error_array(serializer.errors)
+            status=400
+        return Response(result, status)
 
     # def update(self, request, pk=None, format=None):
     #     data = request.data
@@ -110,6 +165,28 @@ class Tasks(viewsets.ModelViewSet):
     #         result = serializer.errors
     #         status = 400
     #     return Response(result, status)
+
+class TaskLists(DTViewSet):
+    """ API endpoint for managing tasks lists """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = TaskList.objects.all().annotate(task_count=Count('task'))
+    serializer = TaskListSerializer
+
+    def create(self, request, format=None):
+        result = {}
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        serializer = TaskListSerializer(data=data_dict)
+        if serializer.is_valid():
+            new_obj = serializer.save()
+            object = TaskList.objects.get(pk=new_obj.id)
+            serializer = TaskListSerializer(object)
+            result['data'] = serializer.data
+            status=201
+        else:
+            result['fieldErrors'] = get_error_array(serializer.errors)
+            status=400
+        return Response(result, status)
 
 class Pages(DTViewSet):
     """ API endpoint for managing pages """
@@ -319,26 +396,7 @@ class Users(DTViewSet):
         result = {}
         display_fields = ['dam_usergroup', 'wp_role']
         data_dict = get_dte_data(request)
-        try:
-            data_dict['user']['is_staff'] = data_dict['user']['is_staff'][0]
-        except:
-            data_dict['user']['is_staff'] = 0
-        try:
-            data_dict['user']['is_superuser'] = data_dict['user']['is_superuser'][0]
-        except:
-            data_dict['user']['is_superuser'] = 0
-        if 'groups-many-count' in data_dict['user']:
-            data_dict['user'].pop('groups-many-count')
-        if 'wiki_groups-many-count' in data_dict:
-            data_dict.pop('wiki_groups-many-count')
-        if 'dam_usergroup' in data_dict:
-            data_dict['dam_usergroup'] = data_dict['dam_usergroup']['value']
-        if 'wp_role' in data_dict:
-            data_dict['wp_role'] = data_dict['wp_role']['value']
-        if 'groups' in data_dict['user']:
-            groups = []
-            for i in data_dict['user']['groups']:
-                groups.append(i['id'])
+        data_dict = self.clean_response(data_dict)
         serializer = ProfileSerializer(data=data_dict)
         if serializer.is_valid():
             #create wp user
@@ -361,10 +419,10 @@ class Users(DTViewSet):
                 data_dict.pop('wiki_groups')
             else:
                 return Response(result['error'], result['status'])
+            groups = [i['id'] for i in data_dict['user']['groups']]
             serializer = ProfileSerializer(data=data_dict, context={'groups': groups})
             if serializer.is_valid():
                 new_obj = serializer.save()
-                #get array with updated object
                 object = Profile.objects.get(pk=new_obj.id)
                 serializer = ProfileSerializer(object)
                 result['data'] = serializer.data
@@ -376,6 +434,81 @@ class Users(DTViewSet):
             result['fieldErrors'] = get_error_array(serializer.errors, display_fields)
             status=400
         return Response(result, status)
+
+    def update(self, request, pk=None, format=None):
+        result = {}
+        profile_id = self.kwargs.get('pk')
+        object = Profile.objects.get(pk=profile_id)
+        display_fields = ['dam_usergroup', 'wp_role']
+        data_dict = get_dte_data(request)
+        data_dict = self.clean_response(data_dict)
+        dam_usergroup = data_dict.pop('dam_usergroup')
+        wiki_groups = [ i['ug_group'] for i in data_dict.pop('wiki_groups')]
+        groups = [ i['id'] for i in data_dict['user'].pop('groups')]
+        wp_role = data_dict['wp_role']
+        serializer = ProfileSerializer(object, data=data_dict, context={'groups': groups})
+        if serializer.is_valid():
+            serializer.save()
+            if dam_usergroup != '':
+                rs_user.objects.filter(ref=object.dam_user).update(usergroup=dam_usergroup)
+            if wp_role != '':
+                wp_usermeta.objects.filter(user_id=object.wp_user, meta_key='wp_capabilities').update(meta_value=wp_role)
+            if wiki_groups != []:
+                wiki_user_groups.objects.filter(ug_user=object.wiki_user).delete()
+                for i in wiki_groups:
+                    dict = {
+                        'ug_user': object.wiki_user,
+                        'ug_group': bytes(i, encoding='ascii')
+                    }
+                    wiki_user_groups(**dict).save()
+            object = Profile.objects.get(pk=profile_id)
+            serializer = ProfileSerializer(object)
+            result['data'] = serializer.data
+            status=201
+        else:
+            result['fieldErrors'] = get_error_array(serializer.errors, display_fields)
+            status=400
+        return Response(result, status)
+
+    def destroy(self, request, pk=None, format=None):
+        result = {}
+        profile_id = self.kwargs.get('pk')
+        object = Profile.objects.get(pk=profile_id)
+        try:
+            #django switch active to false
+            User.objects.filter(id=object.user.pk).update(is_active=False)
+            #resourcespace switch "approved" to false
+            rs_user.objects.filter(ref=object.dam_user).update(approved=0)
+            #wordpress change role to: -no role for this site- in meta, wp_capabilities = a:0:{}
+            wp_usermeta.objects.filter(user_id=object.wp_user, meta_key='wp_capabilities').update(meta_value='a:0:{}')
+            object = Profile.objects.get(pk=object.pk)
+            serializer = ProfileSerializer(object)
+            result['data'] = serializer.data
+            status=201
+        except Exception as e:
+            result['error'] = 'There was a problem deleting the user: ' + str(e)
+            status=400
+        return Response(result, status)
+
+    def clean_response(self, data_dict):
+        data_dict = data_dict[0][1]
+        try:
+            data_dict['user']['is_staff'] = data_dict['user']['is_staff'][0]
+        except:
+            data_dict['user']['is_staff'] = 0
+        try:
+            data_dict['user']['is_superuser'] = data_dict['user']['is_superuser'][0]
+        except:
+            data_dict['user']['is_superuser'] = 0
+        if 'groups-many-count' in data_dict['user']:
+            data_dict['user'].pop('groups-many-count')
+        if 'wiki_groups-many-count' in data_dict:
+            data_dict.pop('wiki_groups-many-count')
+        if 'dam_usergroup' in data_dict:
+            data_dict['dam_usergroup'] = data_dict['dam_usergroup']['value']
+        if 'wp_role' in data_dict:
+            data_dict['wp_role'] = data_dict['wp_role']['value']
+        return data_dict
 
 class Sources(DTViewSet):
     """ API endpoint for managing sources """
@@ -605,11 +738,9 @@ def create_wiki_user(data_dict):
 
 def get_dte_data(request):
     dt_request = json.loads(request.data['data'])
-    if dt_request['action'] == 'create':
-        data_dict = dt_request['data']['0']
-    elif dt_request['action'] == 'update':
-        data_rows = dt_request['data']
-        data_dict = []
-        for row,data in data_rows.items():
-            data_dict.append(data)
+    dt_request.pop('action')
+    rows = dt_request['data']
+    data_dict = []
+    for k,v in rows.items():
+        data_dict.append([k,v])
     return data_dict

@@ -7,27 +7,27 @@
 {% block content %}
 
 <div class="container-fluid">
-      <!-- Page Heading -->
-      <!--div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ page_title }}</h1>
-        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-      </div-->
-  <!-- Content Row -->
-  <div class="row">
-    <div class="col-md-12">
-        <div class="card shadow mb-3">
-          <div class="card-body">
-            {% for item in scripts %}
-              {{ item | safe }}
-            {% endfor %}
-          </div>
-        </div>
-    </div>
-  </div>
   <div class="row">
     <div class="col-md-12">
       <div class="card shadow mb-3">
-        <div class="card-header ch-primary">Results</div>
+        <div class="sub-card-header">
+          <div class="card-header-title"><i class="fa fa-file-code fa-fw"></i> Scripts</div>
+        </div>
+        <div class="card-body">
+            {% for item in scripts %}
+              {{ item | safe }}
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card shadow mb-3">
+        <div class="sub-card-header">
+          <div class="card-header-title"><i class="fa fa-caret-square-right fa-fw"></i> Results</div>
+        </div>
         <div class="card-body script-results">
           {{ output | safe }}
         </div>

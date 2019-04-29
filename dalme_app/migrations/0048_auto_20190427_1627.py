@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('todo', '0010_attachment'),
         ('dalme_app', '0047_auto_20190426_1110'),
     ]
 
@@ -16,7 +15,7 @@ class Migration(migrations.Migration):
             name='TaskExtension',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('task', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='extension', to='todo.Task')),
+                ('task', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='extension', to='Profile')),
                 ('workset', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='dalme_app.Workset')),
             ],
         ),
