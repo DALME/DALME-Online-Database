@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Menus (menus.py) &mdash; DALME DB 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Tasks (tasks.py)" href="tasks.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DALME DB
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../routing/index.html">Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database/index.html">Database</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Functions</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="functions.html">Functions (functions.py)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripts.html">Scripts (scripts.py)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tasks.html">Tasks (tasks.py)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Menus (menus.py)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DALME DB</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Functions</a> &raquo;</li>
+        
+      <li>Menus (menus.py)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/functions/menus.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-dalme_app.menus">
+<span id="menus-menus-py"></span><h1>Menus (menus.py)<a class="headerlink" href="#module-dalme_app.menus" title="Permalink to this headline">¶</a></h1>
+<p>This menus module provides a streamlined way to create menus from simple json files.</p>
+<dl class="function">
+<dt id="dalme_app.menus.dropdown_item">
+<code class="descclassname">dalme_app.menus.</code><code class="descname">dropdown_item</code><span class="sig-paren">(</span><em>wholeMenu</em>, <em>topMenu=None</em>, <em>title=None</em>, <em>itemClass=None</em>, <em>iconClass=None</em>, <em>childrenIconClass=None</em>, <em>children=None</em>, <em>text=None</em>, <em>link=None</em>, <em>divider=None</em>, <em>section=None</em>, <em>logoutMenu=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#dropdown_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.dropdown_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates items for the top right dropdowns</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dalme_app.menus.menu_constructor">
+<code class="descclassname">dalme_app.menus.</code><code class="descname">menu_constructor</code><span class="sig-paren">(</span><em>item_constructor</em>, <em>template</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#menu_constructor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.menu_constructor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds menus based on an item_constructor and a json file describing the menu items.
+Menus are stored in the templates directory, under the menus subdirectory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dalme_app.menus.sidebar_item">
+<code class="descclassname">dalme_app.menus.</code><code class="descname">sidebar_item</code><span class="sig-paren">(</span><em>wholeMenu</em>, <em>depth=0</em>, <em>text=None</em>, <em>iconClass=None</em>, <em>link=None</em>, <em>counter=None</em>, <em>section=None</em>, <em>children=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dalme_app/menus.html#sidebar_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dalme_app.menus.sidebar_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a menu item and incorporates it into <cite>wholeMenu</cite>. This function
+calls itself to recurse through hierarchies of menus, and uses the
+<cite>LEVEL_LOOKUP</cite> variable with the <cite>depth</cite> parameter to give subheadings the
+right class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>wholeMenu</strong> – The entire collection of menu items to which the current
+item will be added</li>
+<li><strong>depth</strong> – The level of depth within the menu of the current item.
+Defaults to 0, but is incremented upon recursion</li>
+<li><strong>text</strong> – Text of the menu item</li>
+<li><strong>iconClass</strong> – Class for the Font Awesome icon to accompany menu item</li>
+<li><strong>link</strong> – Link to be used as the href for the menu item</li>
+<li><strong>counter</strong> – What kind of thing to count and add to the menu. The value
+of this parameter will be passed to the <cite>functions.get_count()</cite> function
+and the return value will be incorporated into the menu item</li>
+<li><strong>section</strong> – If this parameter is set to true, the menu item will be
+given a class for a menu section header.</li>
+<li><strong>children</strong> – List of child menu items to appear under this item. Items
+should be dictionaries, with keys corresponding to the parameters of
+this function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="tasks.html" class="btn btn-neutral" title="Tasks (tasks.py)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Harvard Digital History.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

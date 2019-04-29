@@ -1,0 +1,851 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dalme_app.functions &mdash; DALME DB 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> DALME DB
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../routing/index.html">Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database/index.html">Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functions/index.html">Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DALME DB</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>dalme_app.functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dalme_app.functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file houses all of the miscellaneous functions used elsewhere in the project.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="k">import</span> <span class="n">messages</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="k">import</span> <span class="n">get_user_model</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="k">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="k">import</span> <span class="n">Q</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="k">import</span> <span class="n">connections</span>
+
+<span class="kn">from</span> <span class="nn">async_messages</span> <span class="k">import</span> <span class="n">message_user</span>
+<span class="kn">import</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">requests</span><span class="o">,</span> <span class="nn">hashlib</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">uuid</span><span class="o">,</span> <span class="nn">calendar</span><span class="o">,</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">menus</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="k">import</span> <span class="n">new_user</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="k">import</span> <span class="p">(</span><span class="n">par_inventory</span><span class="p">,</span> <span class="n">par_folio</span><span class="p">,</span> <span class="n">par_token</span><span class="p">,</span> <span class="n">par_object</span><span class="p">,</span>
+    <span class="n">error_message</span><span class="p">,</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">Attribute_type</span><span class="p">,</span> <span class="n">Attribute</span><span class="p">,</span> <span class="n">Attribute_DATE</span><span class="p">,</span>
+    <span class="n">Attribute_DBR</span><span class="p">,</span> <span class="n">Attribute_INT</span><span class="p">,</span> <span class="n">Attribute_STR</span><span class="p">,</span> <span class="n">Attribute_TXT</span><span class="p">,</span> <span class="n">Concept</span><span class="p">,</span>
+    <span class="n">Content_class</span><span class="p">,</span> <span class="n">Content_type</span><span class="p">,</span> <span class="n">Content_type_x_attribute_type</span><span class="p">,</span> <span class="n">Headword</span><span class="p">,</span>
+    <span class="n">Object</span><span class="p">,</span> <span class="n">Object_attribute</span><span class="p">,</span> <span class="n">Place</span><span class="p">,</span> <span class="n">Source</span><span class="p">,</span> <span class="n">Page</span><span class="p">,</span> <span class="n">Transcription</span><span class="p">,</span>
+    <span class="n">Identity_phrase</span><span class="p">,</span> <span class="n">Object_phrase</span><span class="p">,</span> <span class="n">Word_form</span><span class="p">,</span> <span class="n">Token</span><span class="p">,</span>
+    <span class="n">Identity_phrase_x_entity</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">dalme_app.scripts.db</span> <span class="k">import</span> <span class="n">dam_db</span><span class="p">,</span> <span class="n">wiki_db</span><span class="p">,</span> <span class="n">wp_db</span>
+
+<span class="c1">#General functions</span>
+<div class="viewcode-block" id="inventory_check"><a class="viewcode-back" href="../../functions/functions.html#dalme_app.functions.inventory_check">[docs]</a><span class="k">def</span> <span class="nf">inventory_check</span><span class="p">(</span><span class="n">_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes the data from a DALME Inventory Package and makes sure it&#39;s properly formatted</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># TODO: ALSO NEEDS TO CHECK IF INVENTORY ALREADY EXISTS</span>
+
+    <span class="n">metadata_tag</span> <span class="o">=</span> <span class="s1">&#39;*METADATA*&#39;</span>
+    <span class="n">structure_tag</span> <span class="o">=</span> <span class="s1">&#39;*STRUCTURE*&#39;</span>
+    <span class="n">transcription_tag</span> <span class="o">=</span> <span class="s1">&#39;*TRANSCRIPTION*&#39;</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">with</span> <span class="n">_file</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+    <span class="c1">#check that the metadata section is there</span>
+    <span class="k">if</span> <span class="n">metadata_tag</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1">#check if the file has a STRUCTURE section</span>
+    <span class="k">if</span> <span class="n">structure_tag</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_structure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_structure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1">#check if the file has a TRANSCRIPTION section</span>
+    <span class="k">if</span> <span class="n">transcription_tag</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_transcription&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_transcription&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1">#if the STRUCTURE section is missing, just stop and send the report back</span>
+    <span class="k">if</span> <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_structure&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">status</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#remove blank lines</span>
+        <span class="n">empty_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\n$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">empty_pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
+
+        <span class="c1">#determine the boundaries of each section</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1">#get the starting lines for all the sections and the file&#39;s last line</span>
+        <span class="n">last_line</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">metadata_tag</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">status</span><span class="p">[</span><span class="s1">&#39;metadata_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span>
+
+            <span class="k">elif</span> <span class="n">structure_tag</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">status</span><span class="p">[</span><span class="s1">&#39;structure_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span>
+
+            <span class="k">elif</span> <span class="n">transcription_tag</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">status</span><span class="p">[</span><span class="s1">&#39;transcription_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span>
+
+        <span class="c1">#assign the outer boundaries of each section</span>
+        <span class="c1">#if it has a METADATA section, assign outer boundary and parse it</span>
+        <span class="k">if</span> <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_metadata&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;metadata_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">status</span><span class="p">[</span><span class="s1">&#39;structure_start&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">meta_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">status</span><span class="p">[</span><span class="s1">&#39;metadata_start&#39;</span><span class="p">]:</span><span class="n">status</span><span class="p">[</span><span class="s1">&#39;metadata_end&#39;</span><span class="p">]]</span>
+            <span class="n">label_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^([\w ]+):&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="n">line_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([\w ]+): (.+)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="n">full_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(.+)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="c1">#get metadata</span>
+            <span class="n">meta_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">meta_lines</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">label_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">line_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">label</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">meta_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_content</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+                    <span class="n">old_content</span> <span class="o">=</span> <span class="n">meta_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+                    <span class="n">meta_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_content</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">new_content</span>
+
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta_dict</span>
+
+            <span class="c1">#see which fields are included and whether all the required ones are present</span>
+            <span class="n">required_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Title&#39;</span><span class="p">,</span> <span class="s1">&#39;Archival source&#39;</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Series&#39;</span><span class="p">,</span> <span class="s1">&#39;Shelf&#39;</span><span class="p">,</span> <span class="s1">&#39;Transcriber&#39;</span><span class="p">]</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">required_fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">meta_dict</span><span class="p">:</span>
+                    <span class="n">present</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">present</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">required</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">present</span><span class="p">))</span>
+
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields</span>
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">required</span>
+
+        <span class="k">if</span> <span class="n">status</span><span class="p">[</span><span class="s1">&#39;has_transcription&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;structure_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">status</span><span class="p">[</span><span class="s1">&#39;transcription_start&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;transcription_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">last_line</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">status</span><span class="p">[</span><span class="s1">&#39;structure_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">last_line</span>
+
+    <span class="k">return</span> <span class="n">status</span></div>
+
+
+<div class="viewcode-block" id="tokenise"><a class="viewcode-back" href="../../functions/functions.html#dalme_app.functions.tokenise">[docs]</a><span class="k">def</span> <span class="nf">tokenise</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">t_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes a line and returns a list of dictionaries, one for each token, with all the pertinent attributes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#create the tokens</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">keyword_substract</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">type_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(CONTEXT|INVENTORY):&#39;</span><span class="p">)</span>
+    <span class="n">token_type</span> <span class="o">=</span> <span class="n">t_type</span>
+    <span class="n">tokens_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">tokens_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">token</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">type_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">type_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">token_type</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">keyword_substract</span> <span class="o">=</span> <span class="n">keyword_substract</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#deal with flags, situations to consider:</span>
+            <span class="c1">#[nostri]</span>
+            <span class="c1">#presen[tibus]</span>
+            <span class="c1">#lxxxxvii^o^</span>
+            <span class="c1">#-Ad evit-</span>
+            <span class="c1">#(word missing) or (word or words missing)</span>
+            <span class="c1">#?sin[e]berti?</span>
+            <span class="c1">#^quondam^</span>
+            <span class="c1">#-dicti-</span>
+            <span class="c1">#-?Raymunde?-</span>
+            <span class="c1">#?als arcs?</span>
+
+            <span class="c1">#also flags for need punctuation, so it can be used later for defining sentences</span>
+            <span class="c1">#and tokens should be lower-case, but track uppercase for determining sentences+proper names?</span>
+
+            <span class="n">tags_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(-|\?|\^|\[|\]|\.)&#39;</span><span class="p">)</span>
+            <span class="n">tags_pattern_enc</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(-|\?|\^|\[|\.)([a-z]+)(-|\?|\^|\]|\.)$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="n">tags_pattern_hyphen</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(_|\[_\])$&#39;</span><span class="p">)</span>
+            <span class="n">tags_pattern_period</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\.$&#39;</span><span class="p">)</span>
+            <span class="n">tags_pattern_partial</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([a-z]+)(-|\?|\^|\[|\]|\{|\()([a-z]+)(-|\?|\^|\[|\]|\{|\()(-|\?|\^|\[|\]|\{|\(|([a-z]*))&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">tags_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+
+                <span class="c1">#first check for simple cases of flags that enclose words</span>
+                <span class="k">if</span> <span class="n">tags_pattern_enc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">tags_pattern_enc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                    <span class="n">flags</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">clean_token</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">norm_token</span> <span class="o">=</span> <span class="n">clean_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="n">tokens_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span> <span class="o">-</span> <span class="n">keyword_substract</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;raw_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;clean_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;norm_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token_type</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flags</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="c1">#then words that break at the end of a line, we&#39;ll just flag them here and rejoin them later</span>
+                <span class="k">elif</span> <span class="n">tags_pattern_hyphen</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+                    <span class="n">flags</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span>
+                    <span class="n">clean_token</span> <span class="o">=</span> <span class="n">tags_pattern_hyphen</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+                    <span class="n">norm_token</span> <span class="o">=</span> <span class="n">clean_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="n">tokens_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span> <span class="o">-</span> <span class="n">keyword_substract</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;raw_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;clean_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;norm_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token_type</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flags</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="c1">#then check for full stops, i.e. flag tokens that mark end-of-sentence</span>
+                <span class="k">elif</span> <span class="n">tags_pattern_period</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+                    <span class="n">flags</span> <span class="o">=</span> <span class="s1">&#39;eos&#39;</span>
+                    <span class="n">clean_token</span> <span class="o">=</span> <span class="n">tags_pattern_period</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+                    <span class="n">norm_token</span> <span class="o">=</span> <span class="n">clean_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="n">tokens_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span> <span class="o">-</span> <span class="n">keyword_substract</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;raw_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;clean_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;norm_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token_type</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flags</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="c1">#check for tags enclosing only part of the word</span>
+                <span class="k">elif</span> <span class="n">tags_pattern_partial</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+                     <span class="n">m</span> <span class="o">=</span> <span class="n">tags_pattern_partial</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                     <span class="n">t</span> <span class="o">=</span> <span class="n">tags_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                     <span class="n">flags</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                     <span class="n">clean_token</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+                     <span class="n">norm_token</span> <span class="o">=</span> <span class="n">clean_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                     <span class="n">span_start</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">())</span>
+                     <span class="n">span_end</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">())</span>
+                     <span class="n">tokens_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span> <span class="o">-</span> <span class="n">keyword_substract</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;raw_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;clean_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_token</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;norm_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_token</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token_type</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flags</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">span_start</span>
+                     <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">span_end</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">flags</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="n">clean_token</span> <span class="o">=</span> <span class="s1">&#39;FUCK&#39;</span>
+                    <span class="n">norm_token</span> <span class="o">=</span> <span class="n">clean_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="n">tokens_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span> <span class="o">-</span> <span class="n">keyword_substract</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;raw_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;clean_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;norm_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_token</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token_type</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flags</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flags</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">clean_token</span> <span class="o">=</span> <span class="n">token</span>
+                <span class="n">norm_token</span> <span class="o">=</span> <span class="n">clean_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="n">tokens_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span> <span class="o">-</span> <span class="n">keyword_substract</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;raw_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;clean_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_token</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;norm_token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm_token</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token_type</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flags</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">tokens_dict</span><span class="p">[</span><span class="s1">&#39;span_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">tokens_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokens_dict</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">token_type</span><span class="p">,</span> <span class="n">tokens_list</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="get_inventory"><a class="viewcode-back" href="../../functions/functions.html#dalme_app.functions.get_inventory">[docs]</a><span class="k">def</span> <span class="nf">get_inventory</span><span class="p">(</span><span class="n">inv</span><span class="p">,</span> <span class="n">output_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns information associated with an inventory in the specified format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">folios</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">par_folio_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">folios</span> <span class="o">=</span> <span class="n">folios</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;folio_no&#39;</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">folios</span><span class="p">:</span>
+            <span class="n">folio_no</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">folio_no</span>
+            <span class="n">image_url</span> <span class="o">=</span> <span class="n">get_dam_preview</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dam_id</span><span class="p">)</span>
+            <span class="n">folio_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">folio_no</span><span class="p">,</span><span class="n">image_url</span><span class="p">]</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">par_token_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;line_no&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">)</span>
+            <span class="n">all_lines</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">line_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
+            <span class="n">line_tokens</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">no_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">token</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="n">no_tokens</span><span class="p">:</span>
+                    <span class="n">out_token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">clean_token</span>
+                    <span class="n">out_class</span> <span class="o">=</span> <span class="n">get_display_token_class</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">flags</span><span class="p">)</span>
+                    <span class="n">line_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">out_token</span><span class="p">,</span> <span class="n">out_class</span><span class="p">))</span>
+                    <span class="n">line_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_tokens</span><span class="p">)</span>
+                    <span class="n">all_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_list</span><span class="p">)</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">line_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
+                    <span class="n">line_tokens</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">line_no</span> <span class="o">!=</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="n">line_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_tokens</span><span class="p">)</span>
+                        <span class="n">all_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_list</span><span class="p">)</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span> <span class="o">+</span> <span class="mi">1</span>
+                        <span class="n">line_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
+                        <span class="n">line_tokens</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">out_token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">clean_token</span>
+                        <span class="n">out_class</span> <span class="o">=</span> <span class="n">get_display_token_class</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">flags</span><span class="p">)</span>
+                        <span class="n">line_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">out_token</span><span class="p">,</span> <span class="n">out_class</span><span class="p">))</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out_token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">clean_token</span>
+                        <span class="n">out_class</span> <span class="o">=</span> <span class="n">get_display_token_class</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">flags</span><span class="p">)</span>
+                        <span class="n">line_tokens</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">out_token</span><span class="p">,</span> <span class="n">out_class</span><span class="p">))</span>
+
+            <span class="n">folio_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">all_lines</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">folio_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+<span class="k">def</span> <span class="nf">get_display_token_class</span><span class="p">(</span><span class="n">flag</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_strikeout&#39;</span>
+
+    <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;^&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_superscript&#39;</span>
+
+    <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;?&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_uncertain&#39;</span>
+
+    <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_supplied&#39;</span>
+
+    <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_imputed&#39;</span>
+
+    <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_clean&#39;</span>
+
+    <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_periods&#39;</span>
+
+    <span class="k">elif</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;eos&#39;</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_eos&#39;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">token_class</span> <span class="o">=</span> <span class="s1">&#39;token_flag_error&#39;</span>
+
+    <span class="k">return</span> <span class="n">token_class</span>
+
+<span class="k">def</span> <span class="nf">get_new_error</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">error_message</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">e_level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
+    <span class="n">no</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">no</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">2000</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">25</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">2500</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">3000</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">4000</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">1001</span> <span class="o">+</span> <span class="n">no</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">2001</span> <span class="o">+</span> <span class="n">no</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">25</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">2501</span> <span class="o">+</span> <span class="n">no</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">3001</span> <span class="o">+</span> <span class="n">no</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="mi">4001</span> <span class="o">+</span> <span class="n">no</span>
+
+    <span class="k">return</span> <span class="n">new</span>
+
+<span class="k">def</span> <span class="nf">notification</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">base_message</span> <span class="o">=</span> <span class="n">error_message</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">code</span><span class="p">)</span>
+    <span class="n">msg_text</span> <span class="o">=</span> <span class="n">base_message</span><span class="o">.</span><span class="n">e_text</span>
+    <span class="n">msg_level</span> <span class="o">=</span> <span class="n">base_message</span><span class="o">.</span><span class="n">e_level</span>
+
+    <span class="k">if</span> <span class="s1">&#39;para&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">para</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;para&#39;</span><span class="p">]</span>
+        <span class="n">msg_output</span> <span class="o">=</span> <span class="n">msg_text</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">para</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="s1">&#39;data&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+        <span class="n">msg_output</span> <span class="o">=</span> <span class="n">msg_text</span> <span class="o">+</span> <span class="s1">&#39;&lt;p&gt;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/p&gt;&#39;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg_output</span> <span class="o">=</span> <span class="n">msg_text</span>
+
+    <span class="k">if</span> <span class="s1">&#39;user&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
+        <span class="n">the_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">message_user</span><span class="p">(</span><span class="n">the_user</span><span class="p">,</span> <span class="n">msg_output</span><span class="p">,</span> <span class="n">msg_level</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg_level</span><span class="p">,</span> <span class="n">msg_output</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">bar_chart</span><span class="p">():</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">materials</span> <span class="o">=</span> <span class="n">par_object</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">()</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">materials</span><span class="p">:</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">par_object</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">material</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+
+<div class="viewcode-block" id="get_count"><a class="viewcode-back" href="../../functions/functions.html#dalme_app.functions.get_count">[docs]</a><span class="k">def</span> <span class="nf">get_count</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets counts of different types of content based on `item` input string.</span>
+<span class="sd">    Valid values are: &quot;inventories&quot;, &quot;objects&quot;, &quot;wiki-articles&quot;, &quot;assets&quot;, &quot;notarial_sources&quot;, &quot;sources&quot;, &quot;biblio_sources&quot;, &quot;archives&quot;.</span>
+<span class="sd">    All other values for `item` return None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;inventories&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_inventory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;archives&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">19</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;sources&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;notarial_sources&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="mi">13</span><span class="p">))</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;biblio_sources&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Source</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">type__lte</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;objects&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">par_object</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;wiki-articles&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;WIKI_BOT_PASSWORD&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">wiki_user</span> <span class="o">=</span> <span class="s1">&#39;Pizzorno@api_bot&#39;</span>
+            <span class="n">wiki_pass</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;WIKI_BOT_PASSWORD&#39;</span><span class="p">]</span>
+            <span class="n">base_url</span> <span class="o">=</span> <span class="s1">&#39;https://wiki.dalme.org/&#39;</span>
+            <span class="n">tokenParams</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;query&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="s2">&quot;tokens&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;login&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">loginParams</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;login&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;lgname&quot;</span><span class="p">:</span> <span class="n">wiki_user</span><span class="p">,</span>
+                <span class="s2">&quot;lgpassword&quot;</span><span class="p">:</span> <span class="n">wiki_pass</span><span class="p">,</span>
+                <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">queryParams</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;query&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="s2">&quot;siteinfo&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;siprop&quot;</span><span class="p">:</span> <span class="s2">&quot;statistics&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="c1">#request token</span>
+            <span class="n">r1</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">base_url</span><span class="o">+</span><span class="s1">&#39;api.php&#39;</span><span class="p">,</span><span class="n">params</span><span class="o">=</span><span class="n">tokenParams</span><span class="p">)</span>
+            <span class="n">loginParams</span><span class="p">[</span><span class="s1">&#39;lgtoken&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r1</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;query&#39;</span><span class="p">][</span><span class="s1">&#39;tokens&#39;</span><span class="p">][</span><span class="s1">&#39;logintoken&#39;</span><span class="p">]</span>
+            <span class="c1">#Login</span>
+            <span class="n">r2</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">base_url</span><span class="o">+</span><span class="s1">&#39;api.php&#39;</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">loginParams</span><span class="p">,</span><span class="n">cookies</span><span class="o">=</span><span class="n">r1</span><span class="o">.</span><span class="n">cookies</span><span class="p">)</span>
+            <span class="c1">#query api</span>
+            <span class="n">r3</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base_url</span><span class="o">+</span><span class="s1">&#39;api.php&#39;</span><span class="p">,</span><span class="n">params</span><span class="o">=</span><span class="n">queryParams</span><span class="p">,</span><span class="n">cookies</span><span class="o">=</span><span class="n">r2</span><span class="o">.</span><span class="n">cookies</span><span class="p">)</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">r3</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;query&#39;</span><span class="p">][</span><span class="s1">&#39;statistics&#39;</span><span class="p">][</span><span class="s1">&#39;articles&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;?&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s1">&#39;assets&#39;</span><span class="p">:</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">dam_db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT COUNT(*) FROM resource&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="get_dam_preview"><a class="viewcode-back" href="../../functions/functions.html#dalme_app.functions.get_dam_preview">[docs]</a><span class="k">def</span> <span class="nf">get_dam_preview</span><span class="p">(</span><span class="n">resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the url for an image from the ResourceSpace Digital Asset Management</span>
+<span class="sd">    system for the given resource.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;DAM_BOT_KEY&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">auth_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DAM_BOT_KEY&#39;</span><span class="p">]</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;user=api_bot&amp;function=search_get_previews&amp;param1=&#39;</span> <span class="o">+</span> <span class="n">resource</span> <span class="o">+</span> <span class="s1">&#39;&amp;param2=&amp;param3=&amp;param4=0&amp;param5=&amp;param6=asc&amp;param7=&amp;param8=scr&amp;param9=jpg&#39;</span>
+        <span class="n">sign_primitive</span> <span class="o">=</span> <span class="n">auth_key</span> <span class="o">+</span> <span class="n">query</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">sign_primitive</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+        <span class="n">queryParams</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="s2">&quot;api_bot&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="s2">&quot;search_get_previews&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param1&quot;</span><span class="p">:</span> <span class="n">resource</span><span class="p">,</span>
+            <span class="s2">&quot;param2&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param3&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param4&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param5&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param6&quot;</span><span class="p">:</span> <span class="s2">&quot;asc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param7&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param8&quot;</span><span class="p">:</span> <span class="s2">&quot;scr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;param9&quot;</span><span class="p">:</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sign&quot;</span><span class="p">:</span> <span class="n">sign</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">base_url</span> <span class="o">=</span> <span class="s1">&#39;https://dam.dalme.org/api/&#39;</span>
+        <span class="n">r1</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">queryParams</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r1</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;url_scr&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;#&quot;</span></div>
+
+<span class="k">def</span> <span class="nf">get_task_icon</span><span class="p">(</span><span class="n">list_id</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">list_id</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">icon</span> <span class="o">=</span> <span class="s1">&#39;fa-gears&#39;</span>
+    <span class="k">return</span> <span class="n">icon</span>
+
+<span class="k">def</span> <span class="nf">get_date_from_elements</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
+    <span class="c1">#do some stuff</span>
+    <span class="k">if</span> <span class="n">year</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">month</span><span class="p">:</span>
+            <span class="n">month_name</span> <span class="o">=</span> <span class="n">calendar</span><span class="o">.</span><span class="n">month_name</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">month</span><span class="p">))]</span>
+            <span class="k">if</span> <span class="n">day</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">day</span><span class="p">)))</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">month_name</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">month_name</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">return</span> <span class="n">output</span>
+
+<span class="k">def</span> <span class="nf">create_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+    <span class="c1"># process the data in form.cleaned_data as required</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">]</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;last_name&#39;</span><span class="p">]</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
+    <span class="n">is_staff</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;is_staff&#39;</span><span class="p">]</span>
+    <span class="n">is_superuser</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;is_superuser&#39;</span><span class="p">]</span>
+    <span class="n">dam_usergroup</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;dam_usergroup&#39;</span><span class="p">]</span>
+    <span class="n">wiki_groups_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;wiki_groups&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">wiki_groups_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">wiki_groups_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">wiki_groups</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wiki_groups_list</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wiki_groups</span> <span class="o">=</span> <span class="n">wiki_groups_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wiki_groups</span> <span class="o">=</span> <span class="s1">&#39;users&#39;</span>
+    <span class="n">wp_role</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;wp_role&#39;</span><span class="p">]</span>
+    <span class="c1">#generate extra fields:</span>
+    <span class="n">full_name</span> <span class="o">=</span> <span class="n">first_name</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">last_name</span>
+    <span class="n">wiki_username</span> <span class="o">=</span> <span class="n">username</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+    <span class="n">wiki_realname</span> <span class="o">=</span> <span class="n">username</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">)</span>
+    <span class="n">wp_user_registered</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+
+    <span class="c1">#create a new user object and add the fields</span>
+    <span class="n">the_user</span> <span class="o">=</span> <span class="n">User</span><span class="p">()</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">first_name</span> <span class="o">=</span> <span class="n">first_name</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">last_name</span> <span class="o">=</span> <span class="n">last_name</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">email</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">is_staff</span> <span class="o">=</span> <span class="n">is_staff</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">is_superuser</span> <span class="o">=</span> <span class="n">is_superuser</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">dam_usergroup</span> <span class="o">=</span> <span class="n">dam_usergroup</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">wp_role</span> <span class="o">=</span> <span class="n">wp_role</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">full_name</span> <span class="o">=</span> <span class="n">full_name</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">wiki_username</span> <span class="o">=</span> <span class="n">wiki_username</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">wiki_groups</span> <span class="o">=</span> <span class="n">wiki_groups</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c1">#create record in WP</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">wp_db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_registered, user_status, display_name) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">wp_user_registered</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">full_name</span><span class="p">))</span>
+
+    <span class="c1">#get wp user id and add it to User object</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT ID FROM wp_users WHERE user_login = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,[</span><span class="n">username</span><span class="p">])</span>
+    <span class="n">wp_userid</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">wp_userid</span> <span class="o">=</span> <span class="n">wp_userid</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c1">#add user metadata</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">wp_userid</span><span class="p">,</span> <span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="n">first_name</span><span class="p">))</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">wp_userid</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="p">))</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">wp_userid</span><span class="p">,</span> <span class="s1">&#39;wp_capabilities&#39;</span><span class="p">,</span> <span class="n">wp_role</span><span class="p">))</span>
+
+    <span class="c1">#create record in wiki</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">wiki_db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO user (user_name, user_real_name, user_password, user_newpassword, user_email) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">wiki_username</span><span class="p">,</span> <span class="n">wiki_realname</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">email</span><span class="p">))</span>
+
+    <span class="c1">#get wiki user id and add it to User object</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT user_id FROM user WHERE user_name = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,[</span><span class="n">wiki_username</span><span class="p">])</span>
+    <span class="n">wiki_userid</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">wiki_userid</span> <span class="o">=</span> <span class="n">wiki_userid</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c1">#add user to groups if necessary</span>
+    <span class="k">if</span> <span class="n">wiki_groups</span> <span class="o">!=</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">wiki_groups_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;administrator&#39;</span><span class="p">:</span>
+                <span class="n">ug_group</span> <span class="o">=</span> <span class="s1">&#39;sysop&#39;</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;bureaucrat&#39;</span><span class="p">:</span>
+                <span class="n">ug_group</span> <span class="o">=</span> <span class="s1">&#39;bureaucrat&#39;</span>
+
+            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO user_groups (ug_user, ug_group) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">wiki_userid</span><span class="p">,</span> <span class="n">ug_group</span><span class="p">))</span>
+
+
+    <span class="c1">#create record in dam</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="n">dam_db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO user (username, password, fullname, email, usergroup, approved) VALUES(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">full_name</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span><span class="n">dam_usergroup</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1">#get dam user id and add it to User object</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT ref FROM user WHERE username = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,[</span><span class="n">username</span><span class="p">])</span>
+    <span class="n">dam_userid</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">dam_userid</span> <span class="o">=</span> <span class="n">dam_userid</span>
+    <span class="n">the_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Harvard Digital History.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dalme_app.menus &mdash; DALME DB 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> DALME DB
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../routing/index.html">Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database/index.html">Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../functions/index.html">Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DALME DB</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>dalme_app.menus</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dalme_app.menus</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This menus module provides a streamlined way to create menus from simple json files.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="k">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.urls</span> <span class="k">import</span> <span class="n">reverse</span>
+
+<span class="kn">import</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">functions</span>
+
+<span class="n">LEVEL_LOOKUP</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nav-second-level&#39;</span><span class="p">,</span> <span class="s1">&#39;nav-third-level&#39;</span><span class="p">,</span> <span class="s1">&#39;nav-fourth-level&#39;</span><span class="p">,</span> <span class="s1">&#39;nav-fifth-level&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="menu_constructor"><a class="viewcode-back" href="../../functions/menus.html#dalme_app.menus.menu_constructor">[docs]</a><span class="k">def</span> <span class="nf">menu_constructor</span><span class="p">(</span><span class="n">item_constructor</span><span class="p">,</span> <span class="n">template</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds menus based on an item_constructor and a json file describing the menu items.</span>
+<span class="sd">    Menus are stored in the templates directory, under the menus subdirectory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Declare output string</span>
+    <span class="n">_output</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="c1"># Get template from default location in dalme_app/templates/menus and read it</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;dalme&#39;</span><span class="p">,</span><span class="s1">&#39;dalme_app&#39;</span><span class="p">,</span><span class="s1">&#39;templates&#39;</span><span class="p">,</span><span class="s1">&#39;menus&#39;</span><span class="p">,</span><span class="n">template</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+
+    <span class="c1"># Create menu by iterating through items in json file and appending to output</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">menu</span><span class="p">:</span>
+        <span class="n">_output</span> <span class="o">+=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">item_constructor</span> <span class="o">+</span> <span class="s1">&#39;(_output,**item)&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Return output as part of a list, because renderer expects to iterate</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">_output</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="sidebar_item"><a class="viewcode-back" href="../../functions/menus.html#dalme_app.menus.sidebar_item">[docs]</a><span class="k">def</span> <span class="nf">sidebar_item</span><span class="p">(</span><span class="n">wholeMenu</span><span class="p">,</span><span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">iconClass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">counter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">children</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a menu item and incorporates it into `wholeMenu`. This function</span>
+<span class="sd">    calls itself to recurse through hierarchies of menus, and uses the</span>
+<span class="sd">    `LEVEL_LOOKUP` variable with the `depth` parameter to give subheadings the</span>
+<span class="sd">    right class.</span>
+
+<span class="sd">    :param wholeMenu: The entire collection of menu items to which the current</span>
+<span class="sd">        item will be added</span>
+<span class="sd">    :param depth: The level of depth within the menu of the current item.</span>
+<span class="sd">        Defaults to 0, but is incremented upon recursion</span>
+<span class="sd">    :param text: Text of the menu item</span>
+<span class="sd">    :param iconClass: Class for the Font Awesome icon to accompany menu item</span>
+<span class="sd">    :param link: Link to be used as the href for the menu item</span>
+<span class="sd">    :param counter: What kind of thing to count and add to the menu. The value</span>
+<span class="sd">        of this parameter will be passed to the `functions.get_count()` function</span>
+<span class="sd">        and the return value will be incorporated into the menu item</span>
+<span class="sd">    :param section: If this parameter is set to true, the menu item will be</span>
+<span class="sd">        given a class for a menu section header.</span>
+<span class="sd">    :param children: List of child menu items to appear under this item. Items</span>
+<span class="sd">        should be dictionaries, with keys corresponding to the parameters of</span>
+<span class="sd">        this function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">currentItem</span> <span class="o">=</span> <span class="s1">&#39;&lt;li &#39;</span>
+    <span class="c1"># If this item is a section header and the whole menu is empty, this is the</span>
+    <span class="c1"># first section header</span>
+    <span class="k">if</span> <span class="n">section</span> <span class="ow">and</span> <span class="n">wholeMenu</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;class=&quot;sidebar-section-first&quot;&#39;</span>
+    <span class="k">elif</span> <span class="n">section</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;class=&quot;sidebar-section&quot;&#39;</span>
+    <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&gt;&#39;</span>
+
+    <span class="k">if</span> <span class="n">link</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;a href=&quot;</span><span class="si">{}</span><span class="s1">&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">iconClass</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;i class=&quot;fa </span><span class="si">{}</span><span class="s1"> fa-fw&quot;&gt;&lt;/i&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iconClass</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="n">text</span>
+
+    <span class="k">if</span> <span class="n">counter</span><span class="p">:</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_count</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;div class=&quot;menu-counter&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
+        <span class="c1"># If this item has children, append an arrow to show that</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;span class=&quot;fa arrow&quot;&gt;&lt;/span&gt;&#39;</span>
+
+    <span class="k">if</span> <span class="n">link</span><span class="p">:</span>
+        <span class="c1"># Close the anchor tag if it was opened</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/a&gt;&#39;</span>
+
+    <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
+        <span class="c1"># If there are child items, start a new unordered list based on the</span>
+        <span class="c1"># depth. If depth is not defined in LEVEL_LOOKUP, that &lt;ul&gt; doesn&#39;t get</span>
+        <span class="c1"># a class, so it might look weird.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;ul class=&quot;nav </span><span class="si">{}</span><span class="s1">&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">LEVEL_LOOKUP</span><span class="p">[</span><span class="n">depth</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
+            <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;ul class=&quot;nav&quot;&gt;&#39;</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+            <span class="c1"># For each child item, provide the parameters it defines to this</span>
+            <span class="c1"># function, incrementing the depth</span>
+            <span class="n">currentItem</span> <span class="o">+=</span> <span class="n">sidebar_item</span><span class="p">(</span><span class="n">currentItem</span><span class="p">,</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="o">**</span><span class="n">child</span><span class="p">)</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/ul&gt;&#39;</span>
+    <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/li&gt;&#39;</span>
+
+    <span class="k">return</span> <span class="n">currentItem</span></div>
+
+<span class="k">def</span> <span class="nf">tile_item</span><span class="p">(</span><span class="n">wholeMenu</span><span class="p">,</span><span class="n">colourClass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">iconClass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">counter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">counterTitle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">linkTarget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">linkTitle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">currentItem</span> <span class="o">=</span> <span class="s1">&#39;&lt;div class=&quot;col-lg-3 col-md-6&quot;&gt;&#39;</span>
+
+    <span class="k">if</span> <span class="n">colourClass</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;div class=&quot;panel </span><span class="si">{}</span><span class="s1">&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colourClass</span><span class="p">)</span>
+
+    <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;div class=&quot;panel-heading&quot;&gt;&lt;div class=&quot;row&quot;&gt;&lt;div class=&quot;col-xs-3&quot;&gt;&#39;</span>
+
+    <span class="k">if</span> <span class="n">iconClass</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;i class=&quot;fa </span><span class="si">{}</span><span class="s1"> fa-5x&quot;&gt;&lt;/i&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iconClass</span><span class="p">)</span>
+
+    <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/div&gt;&lt;div class=&quot;col-xs-9 text-right&quot;&gt;&#39;</span>
+
+    <span class="k">if</span> <span class="n">counter</span><span class="p">:</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">get_count</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;div class=&quot;huge&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">counterTitle</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;div&gt;</span><span class="si">{}</span><span class="s1">&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">counterTitle</span><span class="p">)</span>
+
+    <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&#39;</span>
+
+    <span class="k">if</span> <span class="n">linkTarget</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;a href=&quot;</span><span class="si">{}</span><span class="s1">&quot; target=&quot;_blank&quot;&gt;&lt;div class=&quot;panel-footer&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">linkTarget</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">linkTitle</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;span class=&quot;pull-left&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/span&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">linkTitle</span><span class="p">)</span>
+
+    <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;span class=&quot;pull-right&quot;&gt;&lt;i class=&quot;fa fa-arrow-circle-right&quot;&gt;&lt;/i&gt;&lt;/span&gt;&lt;div class=&quot;clearfix&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&#39;</span>
+
+    <span class="k">return</span> <span class="n">currentItem</span>
+
+<div class="viewcode-block" id="dropdown_item"><a class="viewcode-back" href="../../functions/menus.html#dalme_app.menus.dropdown_item">[docs]</a><span class="k">def</span> <span class="nf">dropdown_item</span><span class="p">(</span><span class="n">wholeMenu</span><span class="p">,</span><span class="n">topMenu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">itemClass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">iconClass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">childrenIconClass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">children</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">divider</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">logoutMenu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; creates items for the top right dropdowns &quot;&quot;&quot;</span>
+
+    <span class="c1">#start this dropdown</span>
+    <span class="n">currentItem</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="c1">#check if it is a top menu</span>
+    <span class="k">if</span> <span class="n">topMenu</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;li class=&quot;dropdown&quot;&gt;&lt;a class=&quot;dropdown-toggle&quot; data-toggle=&quot;dropdown&quot; href=&quot;#&quot;&gt;&#39;</span>
+        <span class="c1">#add the icon</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;i class=&quot;fa </span><span class="si">{}</span><span class="s1"> fa-fw&quot;&gt;&lt;/i&gt;&lt;i class=&quot;fa fa-caret-down&quot;&gt;&lt;/i&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iconClass</span><span class="p">)</span>
+        <span class="c1">#add the class</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/a&gt;&lt;ul class=&quot;dropdown-menu </span><span class="si">{}</span><span class="s1">&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itemClass</span><span class="p">)</span>
+        <span class="c1">#now process children</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+            <span class="c1"># For each child item, provide the parameters it defines to this</span>
+            <span class="c1"># function, incrementing the depth</span>
+            <span class="k">if</span> <span class="n">childrenIconClass</span><span class="p">:</span>
+                <span class="n">child</span><span class="p">[</span><span class="s1">&#39;childrenIconClass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">childrenIconClass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">child</span><span class="p">[</span><span class="s1">&#39;childrenIconClass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;fa-dot-circle-o&#39;</span>
+            <span class="n">currentItem</span> <span class="o">+=</span> <span class="n">dropdown_item</span><span class="p">(</span><span class="n">currentItem</span><span class="p">,</span><span class="o">**</span><span class="n">child</span><span class="p">)</span>
+        <span class="c1">#close the tags</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/ul&gt;&lt;/li&gt;&#39;</span>
+
+    <span class="k">elif</span> <span class="n">divider</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;&#39;</span>
+
+    <span class="k">elif</span> <span class="n">section</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;li class=&quot;dropdown-section&quot;&gt;&#39;</span>
+        <span class="c1">#add icon</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;i class=&quot;fa </span><span class="si">{}</span><span class="s1"> fa-fw&quot;&gt;&lt;/i&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iconClass</span><span class="p">)</span>
+        <span class="c1">#add section name</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&lt;/li&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;div class=&quot;dropdown-title&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#add link</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;li&gt;&lt;a href=&quot;</span><span class="si">{}</span><span class="s1">&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">link</span><span class="p">)</span>
+        <span class="c1">#add icon</span>
+        <span class="k">if</span> <span class="n">iconClass</span><span class="p">:</span>
+            <span class="n">itemIcon</span> <span class="o">=</span> <span class="n">iconClass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">itemIcon</span> <span class="o">=</span> <span class="n">childrenIconClass</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;i class=&quot;fa </span><span class="si">{}</span><span class="s1"> fa-fw&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itemIcon</span><span class="p">)</span>
+        <span class="c1">#add name</span>
+        <span class="n">currentItem</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/i&gt; </span><span class="si">{}</span><span class="s1">&lt;/a&gt;&lt;/li&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">currentItem</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Harvard Digital History.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
