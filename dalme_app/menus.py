@@ -1,7 +1,7 @@
 from django.urls import reverse
 import json, os
 from . import functions
-from todo.models import Task
+from dalme_app.models import *
 
 def menu_constructor(request, item_constructor, template, state):
     """
@@ -109,7 +109,7 @@ def dropdown_tasks(wholeMenu, user_id):
         counter = tasks.count()
         tasks = tasks[:5]
         for task in tasks:
-            dropmenu += '<div class="dropdown-tasks-item d-flex"><div class="dropdown-tasks-info"><a href="{}">'.format(task.get_absolute_url())
+            dropmenu += '<div class="dropdown-tasks-item d-flex"><div class="dropdown-tasks-info"><a href="/tasks/{}">'.format(task.id)
             dropmenu += '<div class="mb-1">{}</div><div class="d-flex"><div class="dropdown-tasks-list float-left">{}</div>'.format(task.title, task.task_list)
             if task.due_date:
                 if task.overdue_status():
@@ -121,7 +121,7 @@ def dropdown_tasks(wholeMenu, user_id):
     except:
         dropmenu += '<div class="dropdown-tasks-empty">No tasks are currently assigned to you.</div>'
     dropmenu += '<a class="dropdown-tasks-action dropdown-tasks-action-rb" href="{}">{}</a>'.format('/tasks/mine', 'Show all my tasks')
-    dropmenu += '<a class="dropdown-tasks-action" href="{}">{}</a></div></li>'.format('/tasks', 'Show task lists')
+    dropmenu += '<a class="dropdown-tasks-action" href="#" onclick="{}">{}</a></div></li>'.format('createTask()', 'Add new task')
     button = '<li class="nav-item dropdown no-arrow topbar-border-left" data-toggle="tooltip" data-placement="bottom" title="Your task list" data-delay=\'{"show":"1000", "hide":"0"}\'>'
     button += '<a class="nav-link dropdown-toggle" href="#" id="tasksDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
     button += '<i class="fas fa-tasks fa-fw"></i>'

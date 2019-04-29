@@ -17,14 +17,15 @@ router.register(r'transcriptions', apis.Transcriptions, basename='transcriptions
 router.register(r'images', apis.Images, basename='images')
 router.register(r'pages', apis.Pages, basename='pages')
 router.register(r'tasks', apis.Tasks, basename='tasks')
+router.register(r'tasklists', apis.TaskLists, basename='tasklists')
 router.register(r'worksets', apis.Worksets, basename='worksets')
+router.register(r'options', apis.Options, basename='options')
 
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('django_admin/doc/', include('django.contrib.admindocs.urls')),
     path('django_admin/', admin.site.urls),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),
     re_path(r'^', include('dalme_app.urls')),

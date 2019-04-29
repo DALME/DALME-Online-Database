@@ -31,7 +31,6 @@ from django.db.models import CharField, Value
 from django.db.models.expressions import RawSQL
 from haystack.generic_views import SearchView
 from django.http import HttpResponse
-from todo.models import Task
 import urllib.parse as urlparse
 import logging
 logger = logging.getLogger(__name__)
@@ -92,10 +91,10 @@ class DTListView(TemplateView):
         'pageLength':25,
         'responsive':'true',
         'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"#filters-button-ct.dt-buttons">fr><"#filters-container.collapse.clearfix"><"card-table-body"tip>\'',
+        'dom': '\'<"card-table-header"B<"btn-group"f>r><"#filters-container.collapse.clearfix"><"card-table-body"t><"sub-card-footer"ip>\'',
         'serverSide': 'true',
         'stateSave': 'true',
-        'select': 'true',
+        'select': { 'style': 'single'},
         'deferRender': 'true',
         'language': {'searchPlaceholder': 'Search'}
         }
@@ -250,24 +249,7 @@ class DTListView(TemplateView):
         return dt_editor
 
     def get_dte_options(self, options, field_type, *args, **kwargs):
-        if field_type == 'chosen':
-            opts = [{'label': "", 'value': ""}]
-        else:
-            opts = []
-        options = eval(options)
-        if type(options) is dict:
-            opts.append(options)
-        elif type(options) is list:
-            q = eval(options[0])
-            if isinstance(q, QuerySet):
-                for e in q:
-                    opt = { 'label': getattr(e, options[1]), 'value': getattr(e, options[2]) }
-                    opts.append(opt)
-            elif isinstance(q, tuple):
-                for value, label in q:
-                    opt = { 'label': label, 'value': value }
-                    opts.append(opt)
-        return opts
+        return functions.get_dte_options(options, field_type, *args, **kwargs)
 
     def get_filters(self, fields_dict, *args, **kwargs):
         filters = []
@@ -359,23 +341,15 @@ class SourceDetail(DetailView):
             'Type': self.object.type.name,
             'Name': self.object.name,
             'Short name': self.object.short_name,
-            'Inventory?': functions.displayBoolean(is_inv),
+            'Inventory?': functions.format_boolean(is_inv),
         }
         if self.object.parent_source:
-            name = self.object.parent_source.name
-            url = '/sources/'+str(self.object.parent_source.id)
-            source_data['Parent'] = '<a href="{}">{}</a>'.format(url,name)
+            source_data['Parent'] = '<a href="{}">{}</a>'.format('/sources/'+str(self.object.parent_source.id),self.object.parent_source.name)
         context['source_data'] = source_data
-        created = self.object.creation_timestamp.strftime('%d-%b-%Y@%H:%M')
-        modified = self.object.modification_timestamp.strftime('%d-%b-%Y@%H:%M')
-        c_user = Profile.objects.get(user__username=self.object.creation_username)
-        created_user = '<a href="/users/{}">{}</a>'.format(self.object.creation_username, c_user.full_name)
-        m_user = Profile.objects.get(user__username=self.object.modification_username)
-        modified_user = '<a href="/users/{}">{}</a>'.format(self.object.modification_username, m_user.full_name)
         context['source_metadata'] = {
             'ID': str(self.object.id),
-            'Created': created+' by '+created_user,
-            'Modified': modified+' by '+modified_user
+            'Created': functions.format_rct(self.object.creation_username, self.object.creation_timestamp),
+            'Modified': functions.format_rct(self.object.modification_username, self.object.modification_timestamp),
         }
         attribute_data = []
         attributes = self.object.attributes.all().select_related('attribute_type')
@@ -391,31 +365,27 @@ class SourceDetail(DetailView):
             attribute_data.append(dict)
         attribute_data = sorted(attribute_data, key=lambda x:x['order'])
         context['attribute_data'] = attribute_data
+        tables = []
         if is_inv and has_pages:
             folios = functions.get_editor_folios(self.object)
             context['folio_count'] = folios['folio_count']
             context['folio_menu'] = folios['folio_menu']
             context['folio_list'] = folios['folio_list']
-            context['table_options_pages'] = {
-                'pageLength':5,
-                'responsive':'true',
-                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
-                'stateSave': 'true',
-                'select': 'true',
-                'paging': 'true',
-                'language': '{searchPlaceholder: "Search..."}',
-                'order': [[ 3, "asc" ]]
-                }
+            tables.append(['pages','fa-book-open','Pages'])
         if has_children:
             context['children'] = self.object.source_set.all().order_by('name')
-            context['table_options_children'] = {
-                'pageLength':5,
+            tables.append(['children','fa-sitemap','Children'])
+        if tables != []:
+            context['tables'] = tables
+            context['table_options'] = {
                 'responsive':'true',
-                'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
+                'dom': '''"<'sub-card-header d-flex'<'card-header-title'>fr><'card-body't>"''',
                 'stateSave': 'true',
-                'select': 'true',
-                'paging': 'true',
-                'language': '{searchPlaceholder: "Search..."}'
+                'select': { 'style': 'single'},
+                'scrollY': 150,
+                'deferRender': 'true',
+                'scroller': 'true',
+                'language': '{searchPlaceholder: "Search"}'
                 }
         return context
 
@@ -479,10 +449,10 @@ class UserDetail(DetailView):
             'First name': self.object.user.first_name,
             'Last name': self.object.user.last_name,
             'User Id': self.object.user.id,
-            'Email': '<a href="mailto:'+self.object.user.email+'">'+self.object.user.email+'</a>',
-            'Staff': functions.displayBoolean(self.object.user.is_staff),
-            'Superuser': functions.displayBoolean(self.object.user.is_superuser),
-            'Active': functions.displayBoolean(self.object.user.is_active),
+            'Email': functions.format_email(self.object.user.email),
+            'Staff': functions.format_boolean(self.object.user.is_staff),
+            'Superuser': functions.format_boolean(self.object.user.is_superuser),
+            'Active': functions.format_boolean(self.object.user.is_active),
             'Joined': functions.format_date(self.object.user.date_joined, 'timestamp-long'),
             'Last login': functions.format_date(self.object.user.last_login, 'timestamp-long'),
             'Groups': self.object.user.groups,
@@ -526,14 +496,15 @@ class ImageDetail(DetailView):
         image_data = {
             'DAM Id': self.object.ref,
             'Created': functions.format_date(self.object.creation_date, 'timestamp'),
-            'Creator': functions.get_dam_user(self.object.created_by, 'html'),
+            'Creator': functions.format_user(self.object.created_by, 'dam', 'html'),
             'Record modified': functions.format_date(self.object.modified, 'timestamp'),
             'File modified': functions.format_date(self.object.file_modified, 'timestamp'),
             'Filesize': self.object.file_size,
-            'Image?': functions.displayBoolean(self.object.has_image)
+            'Image?': functions.format_boolean(self.object.has_image)
         }
         context['image_data'] = image_data
-        try:
+        tables = []
+        if rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field').exists():
             attribute_data = []
             attributes = rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field')
             for a in attributes:
@@ -548,35 +519,39 @@ class ImageDetail(DetailView):
                 }
                 attribute_data.append(dict)
             context['attribute_data'] = attribute_data
-        except:
-            attribute_data = None
-        collections = []
-        col_list = rs_collection_resource.objects.filter(resource=self.object.ref)
-        for c in col_list:
-            col = rs_collection.objects.get(ref=c.collection)
-            path = ''
-            if col.theme:
-                path += col.theme
-                if col.theme2:
-                    path += ' ≫ '+col.theme2
-                    if col.theme3:
-                        path += ' ≫ '+col.theme3
-            dict = {
-                'id': col.ref,
-                'name': col.name,
-                'creator': functions.get_dam_user(col.user, 'html'),
-                'path': path
-            }
-            collections.append(dict)
-        context['collections'] = collections
-        context['table_options'] = {
-            'pageLength':5,
-            'responsive':'true',
-            'dom': '''"<'sub-card-header clearfix'<'card-header-title'>r><'card-body'tip>"''',
-            'stateSave': 'true',
-            'select': 'true',
-            'paging': 'true',
-            }
+        if rs_collection_resource.objects.filter(resource=self.object.ref).exists():
+            collections = []
+            col_list = rs_collection_resource.objects.filter(resource=self.object.ref)
+            for c in col_list:
+                col = rs_collection.objects.get(ref=c.collection)
+                path = ''
+                if col.theme:
+                    path += col.theme
+                    if col.theme2:
+                        path += ' ≫ '+col.theme2
+                        if col.theme3:
+                            path += ' ≫ '+col.theme3
+                dict = {
+                    'id': col.ref,
+                    'name': col.name,
+                    'creator': functions.format_user(col.user, 'dam','html'),
+                    'path': path
+                }
+                collections.append(dict)
+            context['collections'] = collections
+            tables.append(['collections','fa-th-large','Collections'])
+        if tables != []:
+            context['tables'] = tables
+            context['table_options'] = {
+                'responsive':'true',
+                'dom': '''"<'sub-card-header d-flex'<'card-header-title'>fr><'card-body't>"''',
+                'stateSave': 'true',
+                'select': { 'style': 'single'},
+                'scrollY': 150,
+                'deferRender': 'true',
+                'scroller': 'true',
+                'language': '{searchPlaceholder: "Search"}'
+                }
         context['image_url'] = functions.get_dam_preview(self.object.ref)
         return context
 
@@ -633,25 +608,27 @@ class Index(TemplateView):
         page_title = 'Dashboard'
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
-        context['worksets'] = Workset.objects.filter(owner=self.request.user)
-        context['table_options'] = {
-            'responsive':'true',
-            'dom': '''"<'sub-card-header clearfix'<'card-header-title'>fr>t"''',
-            'stateSave': 'true',
-            'select': 'true',
-            'scrollY': 200,
-            'deferRender': 'true',
-            'scroller': 'true',
-            'language': '{searchPlaceholder: "Search"}'
-            }
-        context['cards'] = self.default_cards
-        counters = functions.get_counters(['wiki_articles', 'dam_assets', 'inventories'])
-        for k,v in counters.items():
-            context[k] = v
-        try:
+        tables = []
+        if Workset.objects.filter(owner=self.request.user).exists():
+            context['worksets'] = Workset.objects.filter(owner=self.request.user)
+            tables.append(['worksets','fa-layer-group', 'My Worksets'])
+        if Task.objects.filter(assigned_to=self.request.user.id, completed=0).exists():
             context['tasks'] = Task.objects.filter(assigned_to=self.request.user.id, completed=0)
-        except:
-            context['tasks'] = None
+            tables.append(['tasks','fa-tasks', 'My Tasks'])
+        if tables != []:
+            context['tables'] = tables
+            context['table_options'] = {
+                'responsive':'true',
+                'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't>"''',
+                'stateSave': 'true',
+                'select': { 'style': 'single'},
+                'scrollY': 200,
+                'deferRender': 'true',
+                'scroller': 'true',
+                'language': '{searchPlaceholder: "Search"}'
+                }
+        context['cards'] = self.default_cards
+        context['counters'] = functions.get_counters(['wiki_articles', 'dam_assets', 'inventories'])
         return context
 
 def PageManifest(request, pk):
@@ -688,16 +665,124 @@ class Scripts(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         request = self.request
-        breadcrumb = [('Dev Scripts', '')]
+        breadcrumb = [('Scripts', '')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context = functions.set_menus(self.request, context, state)
         context['scripts'] = custom_scripts.get_script_menu()
-        page_title = 'Dev Scripts'
+        page_title = 'Custom Scripts'
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         if 's' in self.request.GET:
             scpt = self.request.GET['s']
             context['output'] = eval('custom_scripts.'+scpt+'(request)')
+        return context
+
+@method_decorator(login_required,name='dispatch')
+class TasksList(TemplateView):
+    template_name = 'dalme_app/tasks.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request = self.request
+        breadcrumb = [('Project', ''),('Tasks', '/tasks')]
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['sidebar_toggle'] = sidebar_toggle
+        context = functions.set_menus(self.request, context, state)
+        page_title = 'Task Manager'
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        # Superusers see all lists
+        if request.user.is_superuser:
+            lists = TaskList.objects.all().order_by('group', 'name')
+        else:
+            lists = TaskList.objects.filter(group__in=request.user.groups.all()).order_by('group', 'name')
+        list_count = lists.count()
+        # superusers see all lists, so count shouldn't filter by just lists the admin belongs to
+        if request.user.is_superuser:
+            task_count = Task.objects.filter(completed=0).count()
+        else:
+            task_count = Task.objects.filter(completed=0).filter(task_list__group__in=request.user.groups.all()).count()
+
+        context['lists'] = lists
+        context['list_count'] = list_count
+        context['task_count'] = task_count
+        context['tables'] = [
+            ['lists','fa-tasks', 'Lists', {
+                'ajax': '"../api/tasklists/?format=json"',
+                'serverSide': 'true',
+                'responsive':'true',
+                'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>r><'card-body't><'sub-card-footer'i>"''',
+                'stateSave': 'true',
+                'select': { 'style': 'single'},
+                'scrollY': '"75vh"',
+                'deferRender': 'true',
+                'scroller': 'true',
+                'rowGroup': {
+                    'dataSrc': "group"
+                },
+                'rowId': '"id"',
+                'columnDefs':[
+                      {
+                          'title':'"List"',
+                          'targets':0,
+                          'data':'"name"'
+                      },
+                      {
+                          'title':'"Group"',
+                          'targets':1,
+                          'data':'"group"',
+                          "visible":'false'
+                      }
+                  ]
+                }
+            ],
+            ['tasks','fa-check-square', 'Tasks', {
+                'ajax': '"../api/tasks/?format=json"',
+                'serverSide': 'true',
+                'responsive':'true',
+                'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>"''',
+                'stateSave': 'true',
+                'select': { 'style': 'single'},
+                'scrollY': '"75vh"',
+                'deferRender': 'true',
+                'scroller': 'true',
+                'language': '{searchPlaceholder: "Search"}',
+                'rowId': '"id"',
+                'columnDefs':[
+                      {
+                          'title':'"Task"',
+                          'targets':0,
+                          'data':'"title"'
+                      },
+                      {
+                          'title':'"Description"',
+                          'targets':1,
+                          'data':'"description"'
+                      },
+                      {
+                          'title':'"Due date"',
+                          'targets':2,
+                          'data':'"due_date"'
+                      },
+                      {
+                          'title':'"Assigned to"',
+                          'targets':3,
+                          'data':'"assigned_to"'
+                      },
+                      {
+                          'title':'"Created by"',
+                          'targets':4,
+                          'data':'"created_by"'
+                      },
+                      {
+                          'title':'"Created on"',
+                          'targets':5,
+                          'data':'"creation_timestamp"'
+                      }
+                  ]
+                }
+            ]
+        ]
         return context

@@ -39,14 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admindocs',
+    #'django.contrib.admindocs',
     'django.contrib.sites',
     'haystack',
-    'treebeard',
-    'sekizai',
+    #'treebeard',
+    #'sekizai',
     'django_celery_results',
     'allaccess.apps.AllAccessConfig',
-    'todo',
+    #'todo',
     #'debug_toolbar',
     'rest_framework',
 ]
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'dalme_app.middleware.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.locale.LocaleMiddleware'
+    #'django.middleware.locale.LocaleMiddleware'
 ]
 
 ROOT_URLCONF = 'dalme.devUrls'
@@ -79,7 +79,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 #'sekizai.context_processors.sekizai',
-                'dalme_app.context_processors.dalme_general',
             ],
             'debug': DEBUG,
         },
@@ -154,7 +153,7 @@ else:
     }
 
 AUTH_PASSWORD_VALIDATORS = [
-    { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},

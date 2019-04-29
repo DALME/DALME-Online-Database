@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User, Group
 from dalme_app.models import *
-from todo.models import *
 from rest_framework import serializers
 from dalme_app import functions
 import uu, base64, ast
@@ -30,8 +29,21 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = '__all__'
 
-class PageSerializer(serializers.ModelSerializer):
+class TaskListSerializer(serializers.ModelSerializer):
+    task_count = serializers.IntegerField()
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['group'] = Group.objects.get(pk=ret['group']).name
+        task_count = ret.pop('task_count')
+        ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div><div class="badge badge-primary badge-pill align-self-end">'+str(task_count)+'</div></div>'
+        return ret
+
+    class Meta:
+        model = TaskList
+        fields = ('id', 'name', 'group', 'task_count')
+
+class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Page
         fields = ('name', 'dam_id','order')
@@ -146,6 +158,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id','last_login','is_superuser','username','first_name','last_name','email','is_staff','is_active','date_joined','groups')
+        extra_kwargs = {
+            'username': {
+                'validators': [],
+            }
+        }
 
 class ProfileSerializer(serializers.ModelSerializer):
     """ Serialises user profiles and combines user data """
@@ -177,17 +194,6 @@ class ProfileSerializer(serializers.ModelSerializer):
                 ret['dam_usergroup'] = {'name': dam_group_d, 'value': ret['dam_usergroup']}
         return ret
 
-    # def to_internal_value(self, data):
-    #     """ revert display fields """
-    #     data = data
-    #     if 'wp_role' in data:
-    #         wp_role = data.pop('wp_role')
-    #         data['wp_role'] = wp_role['value']
-    #     if 'dam_usergroup' in data:
-    #         dam_usergroup = ast.literal_eval(str(data['dam_usergroup']))
-    #         data['dam_usergroup'] = dam_usergroup['value']
-    #     return super().to_internal_value(data)
-
     def update(self, instance, validated_data):
         """ Update profile and user. Assumes there is a user for every profile """
         user_data = validated_data.pop('user')
@@ -196,6 +202,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         for attr, value in user_data.items():
             setattr(user, attr, value)
         user.save()
+        groups = self.context['groups']
+        user.groups.clear()
+        for g in groups:
+            user.groups.add(g)
         return instance
 
     def create(self, validated_data):
@@ -205,7 +215,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         groups = self.context['groups']
         user = User.objects.create_user(**user_data)
         for g in groups:
-            #group = Group.objects.get(pk=g['id'])
             user.groups.add(g)
         profile = Profile.objects.create(user=user, **validated_data)
         return profile

@@ -116,7 +116,7 @@
         "iconClass": "fa-users"
       },
       {
-        "text": "Task Lists",
+        "text": "Tasks",
         "link": "/tasks",
         "iconClass": "fa-tasks"
       },

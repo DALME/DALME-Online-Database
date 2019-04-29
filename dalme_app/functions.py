@@ -14,6 +14,7 @@ import re, json, requests, hashlib, os, uuid, calendar, datetime
 import pandas as pd
 import lxml.etree as etree
 from random import randint
+from django.db.models.query import QuerySet
 
 from dalme_app import menus
 from dalme_app.models import *
@@ -100,27 +101,6 @@ def notification(request, **kwargs):
 
     else:
         messages.add_message(request, msg_level, msg_output)
-
-def format_date(value, type):
-    if type == 'timestamp':
-        try:
-            date_str = value.strftime('%d-%b-%Y@%H:%M')
-        except:
-            date_str = str(value)
-    elif type == 'attribute':
-        if value.value_DATE_d == None or value.value_DATE_m == None or value.value_DATE_y == None:
-            date_str = value.value_STR
-        else:
-            date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
-    elif type == 'timestamp-long':
-        try:
-            date_str = value.strftime('%A, %d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " ")
-        except:
-            date_str = str(value)
-    else:
-        date_str = str(value)
-
-    return date_str
 
 #module-specific functions
 def get_editor_folios(source):
@@ -221,19 +201,6 @@ def add_filter_options(values, filter, mode='complete'):
     filter['options'] = op
     return filter
 
-def get_dam_user(ref,output):
-    user = rs_user.objects.get(ref=ref).username
-    try:
-        c_user = Profile.objects.get(user__username=str(user))
-        if output == 'html':
-            ret = '<a href="/users/{}">{}</a>'.format(c_user.user_id, c_user.full_name)
-        else:
-            ret = str(c_user.username)
-    except:
-        ret = str(user)
-
-    return ret
-
 def get_page_chain(breadcrumb, current=None):
     i_count = len(breadcrumb)
     title = ''
@@ -257,11 +224,25 @@ def get_page_chain(breadcrumb, current=None):
             c = c + 1
     return title
 
-def displayBoolean(value):
-    if value:
-        return '<i class="fa fa-check-circle dt_checkbox_true"></i>'
+def get_dte_options(options, field_type, *args, **kwargs):
+    if field_type == 'chosen':
+        opts = [{'label': "", 'value': ""}]
     else:
-        return '<i class="fa fa-times-circle dt_checkbox_false"></i>'
+        opts = []
+    options = eval(options)
+    if type(options) is dict:
+        opts.append(options)
+    elif type(options) is list:
+        q = eval(options[0])
+        if isinstance(q, QuerySet):
+            for e in q:
+                opt = { 'label': getattr(e, options[1]), 'value': getattr(e, options[2]) }
+                opts.append(opt)
+        elif isinstance(q, tuple):
+            for value, label in q:
+                opt = { 'label': label, 'value': value }
+                opts.append(opt)
+    return opts
 
 def get_dam_preview(resource):
     """
@@ -334,3 +315,59 @@ def get_count(item):
         return rs_resource.objects.count()
     else:
         return None
+
+#formatting functions
+
+def format_date(value, type):
+    if type == 'timestamp':
+        try:
+            date_str = value.strftime('%d-%b-%Y@%H:%M')
+        except:
+            date_str = str(value)
+    elif type == 'attribute':
+        if value.value_DATE_d == None or value.value_DATE_m == None or value.value_DATE_y == None:
+            date_str = value.value_STR
+        else:
+            date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+    elif type == 'timestamp-long':
+        try:
+            date_str = value.strftime('%A, %d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " ")
+        except:
+            date_str = str(value)
+    else:
+        date_str = str(value)
+    return date_str
+
+def format_boolean(value):
+    if value:
+        return '<i class="fa fa-check-circle dt_checkbox_true"></i>'
+    else:
+        return '<i class="fa fa-times-circle dt_checkbox_false"></i>'
+
+def format_user(ref, type, output):
+    if type == 'dam':
+        if Profile.objects.get(dam_user=ref):
+            user = Profile.objects.get(dam_user=ref)
+            if output == 'html':
+                f_user = '<a href="/users/{}">{}</a>'.format(user.user.username, user.full_name)
+            else:
+                f_user = str(user.user.username)
+        else:
+            user = rs_user.objects.get(ref=ref).username
+            f_user = str(user)
+    elif type == 'username':
+            user = Profile.objects.get(user__username=ref)
+            if output == 'html':
+                f_user = '<a href="/users/{}">{}</a>'.format(user.user.username, user.full_name)
+            else:
+                f_user = str(user.user.username)
+    return f_user
+
+def format_email(email):
+    return '<a href="mailto:'+email+'">'+email+'</a>'
+
+def format_rct(user, timestamp):
+    f_timestamp = format_date(timestamp, 'timestamp')
+    f_user = format_user(user, 'username', 'html')
+    record = f_timestamp+' by '+f_user
+    return record
