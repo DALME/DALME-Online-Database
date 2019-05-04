@@ -228,7 +228,11 @@ class Transcriptions(viewsets.ModelViewSet):
     def update(self, request, pk=None, format=None):
         data = request.data
         object = self.get_object()
-        if int(data['version']) > int(object.version):
+        if object.version:
+            version = int(object.version)
+        else:
+            version = 0
+        if int(data['version']) > version:
             serializer = TranscriptionSerializer(object, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()

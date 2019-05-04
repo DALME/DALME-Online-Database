@@ -86,7 +86,7 @@ def dropdown_item(wholeMenu,state,topMenu=None,infoPanel=None,title=None,itemCla
         currentItem = '<li class="nav-item dropdown no-arrow topbar-border-left" data-toggle="tooltip" data-placement="bottom" title="{}" data-delay=\'&#123;"show":"1000", "hide":"0"&#125;\'>'.format(tooltip)
         currentItem += '<a class="nav-link dropdown-toggle" href="#" id="{}Dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.format(itemClass)
         currentItem += '<i class="fas {} fa-g"></i>'.format(iconClass)
-        currentItem += '</a><div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
+        currentItem += '</a><div class="dropdown-menu dropdown-menu-right animated--grow-in" aria-labelledby="{}Dropdown">'.format(itemClass)
         for child in children:
             if divider:
                 currentItem += '<div class="dropdown-divider"></div>'
@@ -130,7 +130,7 @@ def dropdown_tasks(wholeMenu, user_id):
             button += '<span class="badge topbar-badge-alert">{}</span>'.format(counter)
         else:
             button += '<span class="badge topbar-badge">{}</span>'.format(counter)
-    button += '</a><div class="dropdown-tasks dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="tasksDropdown">'
+    button += '</a><div class="dropdown-tasks dropdown-menu dropdown-menu-right animated--grow-in" aria-labelledby="tasksDropdown">'
     button += '<div class="dropdown-tasks-header">Your Tasks</div>'
     wholeMenu += button
     wholeMenu += dropmenu

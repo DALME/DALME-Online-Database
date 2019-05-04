@@ -16,7 +16,7 @@ function getCookie(name) {
 }
 
 function fix_dt_search() {
-  $('.dataTables_filter label').each(function() { $(this).html( $(this).find('input') )});
+  $('.dataTables_filter label').contents().filter(function () { return this.nodeType == 3; }).remove();
 }
 
 function createTaskList() {

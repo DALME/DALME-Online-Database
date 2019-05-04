@@ -13,9 +13,9 @@
     <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
     <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
     <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
   {% endif %}
   {% if has_pages %}
     <script type="text/javascript">
@@ -32,11 +32,11 @@
       <!-- tabs -->
       <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" onclick="transcriber('off')">Information</a>
         </li>
         {% if is_inv and has_pages %}
         <li class="nav-item">
-          <a class="nav-link" id="tr_editor-tab" data-toggle="tab" href="#tr_editor" role="tab" aria-controls="tr_editor" aria-selected="true" onclick="startEditor()">Editor</a>
+          <a class="nav-link" id="tr_editor-tab" data-toggle="tab" href="#tr_editor" role="tab" aria-controls="tr_editor" aria-selected="true" onclick="transcriber('on')">Editor</a>
         </li>
         {% endif %}
       </ul>
@@ -186,41 +186,128 @@
       </div>
       {% if is_inv and has_pages %}
       <div class="tab-pane card-body p-0 clearfix transcription-editor" id="tr_editor" role="tabpanel" aria-labelledby="tr_editor-tab">
-          <div id="viewer-toolbar" class="d-flex">
-            <div class="btn-group align-self-start mr-auto" role="group" aria-label="zoom">
-              <button class="editor-btn button-border-right" onclick="diva.zoomOut()"><i class="fa fa-search-minus fa-fw"></i></button>
-              <button class="editor-btn button-border-right" onclick="diva.zoomIn()"><i class="fa fa-search-plus fa-fw"></i></button>
+        <div class="panel-top">
+          <div class="editor-menubar clearfix">
+            <div class="btn-group float-left" role="group" aria-label="zoom">
+              <button type="button" class="editor-btn button-border-right" onclick="diva.zoomOut()"><i class="fa fa-search-minus fa-fw"></i></button>
+              <button type="button" class="editor-btn button-border-right" onclick="diva.zoomIn()"><i class="fa fa-search-plus fa-fw"></i></button>
             </div>
-            <div id="folio-menu" class="btn-group align-self-end" role="group" aria-label="foliation" >
+            <div class="btn-group float-right" role="group" aria-label="foliation" id="folio-menu">
               {{ folio_menu | safe }}
             </div>
           </div>
-          <div class="panel-top">
           <div id="diva_viewer" class="d-flex justify-content-center">
               <div class="spinner-border text-light mt-auto mb-auto"></div>
           </div>
           <div class="splitter-horizontal ui-resizable-handle ui-resizable-s"></div>
         </div>
         <div class="panel-bottom">
-          <div id="editor-toolbar" class="dropdown d-flex">
-            <div id="editor-left-toolbar" class="align-self-start mr-auto btn-group">
+          <div class="editor-menubar menubar-border-top dropdown dropleft clearfix">
+              <button class="editor-btn float-right button-border-left" type="button" id="tr_editorOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-cog fa-fw"></i>
+              </button>
               <!-- Dropdown - options -->
-              <div class="dropdown-menu" id="xmleditor-options">
+              <div class="dropdown-menu shadow xmleditor-options" aria-labelledby="tr_editorOptions">
+                <h6 class="dropdown-header text-center">Editor Options</h6>
+                <form class="pb-1 pt-1 pr-3 pl-3" id="xml-editor_options">
+                  <div class="form-row">
+                    <div class="col-6">
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="showInvisibles">
+                          <label class="custom-control-label nowrap" for="showInvisibles">Show invisibles</label>
+                      </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="highlightSelectedWord" checked>
+                          <label class="custom-control-label nowrap" for="highlightSelectedWord">Highlight word</label>
+                      </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="wrap" checked>
+                          <label class="custom-control-label nowrap" for="wrap">Soft wrap</label>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="displayIndentGuides" checked>
+                          <label class="custom-control-label nowrap" for="displayIndentGuides">Show guides</label>
+                      </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="showGutter" checked>
+                          <label class="custom-control-label nowrap" for="showGutter">Show gutter</label>
+                      </div>
+                      <div class="custom-control custom-switch">
+                          <input type="checkbox" class="custom-control-input" id="showLineNumbers" checked>
+                          <label class="custom-control-label nowrap" for="showLineNumbers">Show line numbers</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                    <div class="form-row">
+                      <label for="mode" class="col-3 col-form-label nowrap">Mode</label>
+                      <div class="col-9">
+                        <select class="custom-select nowrap" id="mode">
+                          <option value="ace/mode/html">HTML</option>
+                          <option value="ace/mode/text">plain text</option>
+                          <option value="ace/mode/xml">TEI</option>
+                          <option value="ace/mode/xml" selected>XML</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <label for="theme" class="col-3 col-form-label nowrap">Theme</label>
+                      <div class="col-9">
+                        <select class="custom-select nowrap" id="theme">
+                          <option disabled>Light themes</option>
+                          <option value="ace/theme/chrome" selected>Chrome</option>
+                          <option value="ace/theme/clouds">Clouds</option>
+                          <option value="ace/theme/xcode">XCode</option>
+                          <option value="ace/theme/kuroir">Kuroir</option>
+                          <option value="ace/theme/sqlserver">SQL Server</option>
+                          <option disabled>Dark themes</option>
+                          <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+                          <option value="ace/theme/cobalt">Cobalt</option>
+                          <option value="ace/theme/idle_fingers">Idle Fingers</option>
+                          <option value="ace/theme/terminal">Terminal</option>
+                          <option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="fontSize" class="col-3 col-form-label nowrap">Font size</label>
+                      <div class="col-9">
+                        <select class="custom-select nowrap" id="fontSize">
+                          <option value="12px">12</option>
+                          <option value="14px" selected>14</option>
+                          <option value="16px">16</option>
+                          <option value="18px">18</option>
+                        </select>
+                      </div>
+                    </div>
+                </form>
               </div>
-            </div>
-            <div id="editor-right-toolbar" class="align-self-end btn-group">
-              <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
+            <div id="editor-button-bar">
+              <button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();"><i class="fa fa-edit fa-fw"></i> Edit</button>
             </div>
           </div>
-          <div id="editor" class="d-flex justify-content-center">
+          <div id="xml_editor" class="d-flex justify-content-center">
               <div class="spinner-border mt-auto mb-auto"></div>
           </div>
+          <div id="text_render" class="d-flex justify-content-left">
+          </div>
+        </div>
       </div>
       {% endif %}
     </div>
     <div class="tab-footer">
-      <div id="tab-footer-interface" class="d-flex">
-        <small class="text-muted tab-footer-text align-self-start" id="author"></small>
+      <div id="tab-footer-interface" class="clearfix">
+        <ul class="nav nav-tabs card-footer-tabs float-right" id="editor-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="tei-tab" data-toggle="tab" href="#tab_editor" role="tab" aria-controls="tei" aria-selected="true" onclick="renderer('off')">TEI Encoding</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="render-tab" data-toggle="tab" href="#tab_render" role="tab" aria-controls="render" aria-selected="false" onclick="renderer('on')">Rendered Text</a>
+          </li>
+        </ul>
+        <small class="text-muted float-left tab-footer-text" id="transcriber"></small>
       </div>
     </div>
   </div>

@@ -129,8 +129,8 @@ def get_editor_folios(source):
             folio_dict['tr_version'] = 0
         folio_list.append(folio_dict)
     else:
-        folio_menu = '<div class="disabled-btn-left"><i class="fa fa-caret-left fa-fw"></i></div>'
-        count = 1
+        folio_menu = '<button class="editor-btn button-border-left" id="btn_prevFolio" value="" onclick="changeEditorFolio(this.value)" disabled><i class="fa fa-caret-left fa-fw"></i></button>'
+        count = 0
         for f in folios:
             folio_dict = {
                 'name': f.name,
@@ -149,18 +149,18 @@ def get_editor_folios(source):
             else:
                 folio_dict['tr_id'] = "None"
                 folio_dict['tr_version'] = 0
-            if count == 1:
-                folio_menu += '<button id="folios" type="button" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name,folio_count)
-                folio_menu += '<div class="current-folio-menu">Folio {}</div>'.format(f.name)
-            elif count == 2:
-                next = f.name
-                folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="folioSwitch(this.id)">Folio {}</a>'.format(f.name, f.name)
+            if count == 0:
+                folio_menu += '<button id="btn_selectFolio" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name,folio_count)
+                folio_menu += '<a class="dropdown-item current-folio" href="#" id="0" onclick="changeEditorFolio(this.id)">Folio {}</a>'.format(f.name)
+            #elif count == 2:
+                #next = f.name
+                #folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="changeFolio(this.id)">Folio {}</a>'.format(f.name, f.name)
             else:
-                folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="folioSwitch(this.id)">Folio {}</a>'.format(f.name, f.name)
+                folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="changeEditorFolio(this.id)">Folio {}</a>'.format(count, f.name)
             count = count + 1
             folio_list.append(folio_dict)
 
-        folio_menu += '</div><button type="button" class="editor-btn button-border-left" id="{}" onclick="folioSwitch(this.id)"><i class="fa fa-caret-right fa-fw"></i></button>'.format(next)
+        folio_menu += '</div><button class="editor-btn button-border-left" id="btn_nextFolio" value="1" onclick="changeEditorFolio(this.value)"><i class="fa fa-caret-right fa-fw"></i></button>'
 
     editor_folios['folio_menu'] = folio_menu
     editor_folios['folio_list'] = folio_list

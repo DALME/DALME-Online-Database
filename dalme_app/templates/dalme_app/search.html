@@ -9,9 +9,11 @@
     {% csrf_token %}
     <div class="row">
       <div class="col-md-12">
-        <div class="card mb-3">
-          <div class="sub-card-header">
-            <i class="fa fa-search fa-fw"></i> Search
+        <div class="card shadow mb-3">
+          <div class="sub-card-header d-flex">
+            <div class="card-header-title">
+              <i class="fa fa-search fa-fw"></i> Search
+            </div>
           </div>
           <div class="card-body">
             <label class="sr-only" for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
@@ -34,9 +36,11 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <div class="card mb-3">
-          <div class="sub-card-header">
-            <i class="fa fa-list-alt fa-fw"></i> Results
+        <div class="card shadow mb-3">
+          <div class="sub-card-header d-flex">
+            <div class="card-header-title">
+              <i class="fa fa-list-alt fa-fw"></i> Results
+            </div>
           </div>
           <div class="card-body">
             {% for result in page_obj.object_list %}
@@ -51,39 +55,39 @@
             {% empty %}
                 <div class="search-results-none">No results found.</div>
             {% endfor %}
-            {% if is_paginated %}
-            <nav aria-label="Search results pages">
-              <ul class="pagination">
-                {% if page_obj.has_previous %}
-                  <li class="page-item"><a class="page-link" href="{% relative_url page_obj.previous_page_number 'page' request.GET.urlencode %}">Previous</a></li>
-                {% else %}
-                  <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
-                {% endif %}
-                {% for i in page_obj.paginator.page_range %}
-                  {% if page_obj.number == i %}
-                    <li class="page-item active" aria-current="page">
-                      <a class="page-link" href="#">{{ i }}<span class="sr-only">(current)</span></a>
-                    </li>
+            </div>
+            <div class="sub-card-footer">
+              <div class="dataTables_info"></div>
+              {% if is_paginated %}
+              <div class="dataTables_paginate paging_simple_numbers" id="search_results_paginate">
+                <ul class="pagination">
+                  {% if page_obj.has_previous %}
+                    <li class="paginate_button page-item"><a class="page-link" href="{% relative_url page_obj.previous_page_number 'page' request.GET.urlencode %}">Previous</a></li>
                   {% else %}
-                    <li class="page-item"><a class="page-link" href="{% relative_url i 'page' request.GET.urlencode %}">{{ i }}</a></li>
+                    <li class="paginate_button page-item previous disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
                   {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                  <li class="page-item"><a class="page-link" href="{% relative_url page_obj.next_page_number 'page' request.GET.urlencode %}">Next</a></li>
-                {% else %}
-                  <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>
-                {% endif %}
-              </ul>
-            </nav>
-            {% endif %}
+                  {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                      <li class="paginate_button page-item active" aria-current="page">
+                        <a class="page-link" href="#">{{ i }}<span class="sr-only">(current)</span></a>
+                      </li>
+                    {% else %}
+                      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url i 'page' request.GET.urlencode %}">{{ i }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                  {% if page_obj.has_next %}
+                    <li class="paginate_button page-item"><a class="page-link" href="{% relative_url page_obj.next_page_number 'page' request.GET.urlencode %}">Next</a></li>
+                  {% else %}
+                    <li class="paginate_button page-item next disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>
+                  {% endif %}
+                </ul>
+              </div>
+              {% endif %}
+            </div>
           </div>
-        </div>
       </div>
     </div>
   </form>
-      <!--div class="tab-footer">
-        <small class="text-muted float-left tab-footer-text" id="transcriber">Search results...</small>
-      </div-->
 </div>
 
 {% endblock %}

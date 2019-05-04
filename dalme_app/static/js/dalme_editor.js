@@ -1,247 +1,154 @@
-
-function setupTranscriber() {
-    editor_container = document.getElementById('xml_editor');
-    transcriber_container = document.getElementById('transcriber');
-    footer_menubar = document.getElementById('tab-footer-interface');
-    viewer_container = document.getElementById('diva_viewer');
-    editor_buttons = document.getElementById('editor-button-bar');
-    folio_array = folio_list;
-
-    if (typeof xmleditor == 'undefined') {
-      getViewer('initial', 0);
-      getEditor('initial', 0);
-
-      window.addEventListener('resize', function () { xmleditor.resize(); }, false);
-      //listerner for editor options
-      $('#xml-editor_options').find('input').on('change', '', function (e) { setEditorOptions(e) });
-      $('#xml-editor_options').find('select').on('change', function (e) { setEditorOptions(e) });
-      $('.panel-top').resizable(
-        {
-          handles: {s: '.splitter-horizontal'},
-          resize: function(e, ui) {
-              var parent = ui.element.parent();
-              var remainingSpace = parent.height() - ui.element.outerHeight();
-              var divTwo = ui.element.next();
-              var divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
-              var divTwoPercent = divTwoHeight/parent.height()*100+"%";
-              divTwo.height(divTwoPercent);
-              $('#xml_editor').height(divTwoHeight - 34);
-              },
-          stop: function (e, ui) {
-            var parent = ui.element.parent();
-            ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
-            window.dispatchEvent(new Event('resize'));
-            }
-        });
-    } else {
-      footer_menubar.style.display = "block";
-    };
+function startEditor() {
+  if (typeof transcriber_state == 'undefined') {
+      transcriber_state = 'on';
+      viewer_container = document.getElementById('diva_viewer');
+      editor_container = document.getElementById('editor');
+      editor_toolbar = document.getElementById('editor-toolbar');
+      author_container = document.getElementById('author');
+      top_panel = document.getElementsByClassName('panel-top');
+      editor_mode = 'render';
+      edit_mode = 'off';
+      folio_array = folio_list;
+      folio_idx = 0;
+      if (folio_array[0].dam_id == 'None') {
+          viewer_container.innerHTML = '<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>';
+      } else {
+          viewer_container.innerHTML = "";
+          diva = new Diva('diva_viewer', {
+             objectData: '/pages/'+folio_array[0].id+'/manifest',
+             enableAutoTitle: false,
+             enableFullscreen: false,
+             enableKeyScroll: true,
+             blockMobileMove: true,
+             enableGotoPage: false,
+             enableGridIcon: false,
+             enableImageTitles: false,
+             enableToolbar: false,
+             tileHeight: 1000,
+             tileWidth: 1000
+          });
+      };
+      if (folio_array[0].tr_id == 'None') {
+          render_container.innerHTML = '<div class="mt-auto mb-auto">This folio/page has not been transcribed. Click on Edit to start...</div>';
+      } else {
+          $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
+              tr_text = data.transcription;
+              tei = new CETEI();
+              tei.addBehaviors({
+                'tei': {
+                  'gap': function(e) { e.setAttribute("title", getTitle(e, 'gap')); e.setAttribute("data-toggle", "tooltip"); }, //@reason, @unit, @quantity, @extent
+                  'space': function(e) { e.setAttribute("title", getTitle(e, 'space')); e.setAttribute("data-toggle", "tooltip"); }, //@unit, @quantity, @extent
+                  'unclear': function(e) { e.setAttribute("title", getTitle(e, 'unclear')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
+                  'supplied': function(e) { e.setAttribute("title", getTitle(e, 'supplied')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
+                  'add': function(e) { e.setAttribute("title", getTitle(e, 'addition')); e.setAttribute("data-toggle", "tooltip"); }, //@place
+                  'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
+                  'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
+                  'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); } //@resp
+                  }
+              });
+              tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+                  $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
+              });
+              $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+              $(author_container).html('Transcribed by '+data.author);
+              $(top_panel).resizable({
+                  handles: {s: '.splitter-horizontal'},
+                  resize: function(e, ui) {
+                      var parent = ui.element.parent();
+                      var remainingSpace = parent.height() - ui.element.outerHeight();
+                      var divTwo = ui.element.next();
+                      var divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
+                      var divTwoPercent = (divTwoHeight-28)/parent.height()*100+"%";
+                      divTwo.height(divTwoPercent);
+                      $(editor_container).height(divTwoHeight - 56);
+                      },
+                  stop: function (e, ui) {
+                    var parent = ui.element.parent();
+                    ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
+                    window.dispatchEvent(new Event('resize'));
+                    }
+              });
+          }, 'json');
+          window.addEventListener('resize', function () { resizeEditor(); }, false);
+          //Diva.Events.subscribe('ObjectDidLoad', function () { alert('success'); });
+      };
+  }
 }
 
-function leaveTranscriber() {
-  footer_menubar.style.display = "none";
-}
-
-function getEditor(mode, target_idx) {
-  var target = folio_array[target_idx].tr_id
-  folio_idx = target_idx
-  if (mode != 'initial') {
-    //save session + remove event handlers + restore default state of ui
-    editorSave();
-    xmleditor.off()
-    xmleditor.destroy()
-    editor_container.innerHTML = '<div class="spinner-border mt-auto mb-auto"></div>';
-    transcriber_container.innerHTML = '';
-    footer_menubar.style.display = "none";
-  };
-
-  if (target != 'None') {
-    //check if we have the session stored, if not, get the text from the API
-    var url = "/api/transcriptions/"+target+"?format=json"
-    $.get(url, function ( data ) {
-          xmleditor = ace.edit("xml_editor");
-          setEditorOptions('default');
-          xmleditor.session.setValue(data.transcription);
-          footer_menubar.style.display = "block";
-          transcriber_container.innerHTML = 'Transcribed by '+data.author;
-          document.getElementById('text_render').innerHTML = data.transcription_html;
-          updateToolbar();
-          xmleditor.session.on("change", debounce(editorSave, 500));
-      }, 'json');
-  } else {
-    xmleditor = ace.edit("xml_editor");
-    setEditorOptions('default');
-    xmleditor.session.setValue('Start new transcription...');
-    footer_menubar.style.display = "block";
-    transcriber_container.innerHTML = 'New transcription';
-    xmleditor.on("input", updateToolbar);
-    xmleditor.session.on("change", debounce(editorSave, 500));
-  };
-
-}
-
-function testKeybindings() {
-  xmleditor.commands.addCommand({
-    name: 'supplied_tag',
-    bindKey: {win: 'Ctrl-P',  mac: 'Command-Option-S'},
-    exec: function(xmleditor) {
-        var txt = xmleditor.getSelectedText();
-        var range = xmleditor.session.getTextRange(xmleditor.getSelectionRange());
-        txt = '<supplied>'+txt+'</supplied>';
-        xmleditor.session.replace(range, txt);
-    },
-    readOnly: false // false if this command should not apply in readOnly mode
-  });
-}
-
-function getViewer(mode, target_idx) {
-  var target = folio_array[target_idx].id
-  var dam_id = folio_array[target_idx].dam_id
-  if (dam_id == 'None') {
-    viewer_container.innerHTML = '<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>';
-  } else {
-    var manifest = '/pages/'+target+'/manifest';
-    if (mode == 'initial') {
-      viewer_container.innerHTML = "";
-      diva = new Diva('diva_viewer', {
-          objectData: manifest,
-          enableAutoTitle: false,
-          enableFullscreen: false,
-          enableKeyScroll: true,
-          blockMobileMove: true,
-          enableGotoPage: false,
-          enableGridIcon: false,
-          enableImageTitles: false,
-          enableToolbar: false,
-          tileHeight: 1000,
-          tileWidth: 1000,
+function changeEditorMode() {
+  if (editor_mode == 'render') {
+      editor_mode = 'xml';
+      $(editor_container).empty();
+      $('#btn_edit').html('<i class="fa fa-eye fa-fw"></i> View');
+      xmleditor = ace.edit("editor");
+      setEditorOptions();
+      xmleditor.session.setValue(tr_text);
+      xmleditor.session.on("change", debounce(saveEditor, 1000));
+      setEditorToolbar();
+      $(editor_container).one("input", updateEditorToolbar);
+  } else if (editor_mode == 'xml') {
+      editor_mode = 'render';
+      saveEditor();
+      removeEditorToolbar();
+      xmleditor.off();
+      xmleditor.destroy();
+      $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
+      tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+          $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
       });
-      } else {
-        diva.changeObject(manifest);
-      };
-    };
-    //window.dispatchEvent(new Event('resize'));
+      $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+  }
 }
 
-function folioSwitch (target) {
-  //use global folio dictionary to get required values
-  var total = folio_array.length;
-  var prev = prevFolio(getFolioIndex(target));
-  var next = nextFolio(getFolioIndex(target));
-  var goto_index = getFolioIndex(target)
-  var current_index = goto_index - 1
-  var count = goto_index + 1
-  var goto = folio_array[goto_index];
-  //switch viewer
-  getViewer('switch', goto_index)
-  //switch editor
-  getEditor('switch', goto_index)
-  var folio_menu = ''
-  //change folio menu
-  if (prev != 0) {
-    folio_menu = '<button type="button" class="editor-btn button-border-left disabled" id="'+prev.name+'" onclick="folioSwitch(this.id)"><i class="fa fa-caret-left fa-fw"></i></button>';
+function changeEditorFolio(target) {
+  $(document.body).css('cursor', 'wait');
+  if (target != '') {
+    var target = parseInt(target, 10);
+    var total = folio_array.length;
+    var prev = target != 0 ? target - 1 : '';
+    var next = target + 1 >= total ? '' : target + 1;
+    $.get("/api/transcriptions/"+folio_array[target].tr_id+"?format=json", function (data) {
+        tr_text = data.transcription;
+        if (editor_mode == 'render') {
+            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+                $(editor_container).html(text);
+            });
+            $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+        } else if (editor_mode == 'xml') {
+            saveEditor();
+            xmleditor.session.setValue(tr_text);
+            xmleditor.session.getUndoManager().reset();
+            updateEditorToolbar();
+            $(editor_container).one("input", updateEditorToolbar);
+        }
+        $(author_container).html('Transcribed by '+data.author);
+        $('#btn_prevFolio').attr('value', prev);
+        $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
+        $('#folio-menu').find('.current-folio').removeClass('current-folio');
+        $('#folio-menu').find('#'+target).addClass('current-folio');
+        $('#btn_nextFolio').attr('value', next);
+        updateFolioButtons();
+        diva.changeObject('/pages/'+folio_array[target].id+'/manifest');
+        folio_idx = target;
+        $(document.body).css('cursor', 'default');
+        window.dispatchEvent(new Event('resize'));
+    });
+  }
+}
+
+function updateFolioButtons() {
+  $("#btn_prevFolio").attr("disabled", $('#btn_prevFolio').attr('value') == '');
+  $("#btn_nextFolio").attr("disabled", $('#btn_nextFolio').attr('value') == '');
+}
+
+function setEditorOptions(dict) {
+  if (typeof dict !== 'undefined') {
+    var value = $(dict.target).is('select') ? $(dict.target).val() : $(dict.target).prop('checked');
+    xmleditor.setOption(dict.target.id, value);
   } else {
-    folio_menu = '<div class="disabled-btn-left"><i class="fa fa-caret-left fa-fw"></i></div>';
-  };
-  folio_menu = folio_menu+'<button id="folios" type="button" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Folio '+goto.name+' ('+count+'/'+total+')</button><div class="dropdown-menu" aria-labelledby="folios">';
-  for ( i=0; i<total; i++ ) {
-    if (i == goto_index) {
-      folio_menu = folio_menu+'<div class="current-folio-menu">Folio '+folio_array[i].name+'</div>';
-    } else {
-      folio_menu = folio_menu+'<a class="dropdown-item" href="#" id="'+folio_array[i].name+'" onclick="folioSwitch(this.id)">Folio '+folio_array[i].name+'</a>';
-    }
-  };
-  folio_menu = folio_menu+'</div>';
-  if (next != 0) {
-    folio_menu = folio_menu+'<button type="button" class="editor-btn button-border-left" id="'+next.name+'" onclick="folioSwitch(this.id)"><i class="fa fa-caret-right fa-fw"></i></button>';
-  } else {
-    folio_menu = folio_menu+'<div class="disabled-btn-left"><i class="fa fa-caret-right fa-fw"></i></div>';
-  };
-  document.getElementById('folio-menu').innerHTML = folio_menu;
-}
-
-
-function updateToolbar() {
-  if (xmleditor.session.getUndoManager().isClean()) {
-    $("#xmleditor_save").addClass("disabled");
-  };
-
-  if (!xmleditor.session.getUndoManager().hasUndo()) {
-    $("#xmleditor_undo").addClass("disabled");
-  };
-  if (!xmleditor.session.getUndoManager().hasRedo()) {
-    $("#xmleditor_redo").addClass("disabled");
-  };
-}
-
-//editor.session.setValue(localStorage.savedValue || "Welcome to ace Toolbar demo!")
-
-function editorButtonSave() {
-    editorSave();
-    xmleditor.setReadOnly(true);
-    editor_buttons.innerHTML = '<button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();"><i class="fa fa-edit fa-fw"></i> Edit</button>';
-    //xmleditor.session.getUndoManager().markClean();
-}
-
-function editorSave() {
-    var tr_folio = folio_idx;
-    var tr_text = xmleditor.getValue();
-    if (tr_text != '' && tr_text != 'Start new transcription...' &&  !xmleditor.getReadOnly()) {
-      var tr_id = folio_array[tr_folio].tr_id
-      var tr_ver = folio_array[tr_folio].tr_version + 1;
-      var tr_page = folio_array[tr_folio].id
-      var tr_source = source_id;
-      if (tr_id != 'None') {
-        var url = "/api/transcriptions/"+tr_id+"/";
-        $.ajax({
-          method: "PUT",
-          url: url,
-          headers: { 'X-CSRFToken': getCookie("csrftoken") },
-          data: { 'version': tr_ver, 'transcription': tr_text },
-        }).done(function(data, textStatus, jqXHR) {
-            if (data['version'] > folio_array[tr_folio]['tr_version']) { folio_array[tr_folio]['tr_version'] = data['version'] };
-        }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
-      } else {
-        var url = "/api/transcriptions/";
-        $.ajax({
-          method: "POST",
-          url: url,
-          headers: { 'X-CSRFToken': getCookie("csrftoken") },
-          data: { 'version': tr_ver, 'transcription': tr_text, 'source': tr_source, 'page': tr_page },
-        }).done(function(data, textStatus, jqXHR) {
-            folio_array[tr_folio]['tr_id'] = data['id'];
-            folio_array[tr_folio]['tr_version'] = data['version'];
-            transcriber_container.innerHTML = 'Transcribed by '+data['author'];
-        }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
-      };
-    }
-}
-
-function editorButtonCancel() {
-    do {
-      xmleditor.undo()
-    } while (xmleditor.session.getUndoManager().hasUndo());
-    editorSave();
-    xmleditor.setReadOnly(true);
-    if (xmleditor.getValue() == '') { xmleditor.session.setValue('Start new transcription...'); };
-    editor_buttons.innerHTML = '<button class="editor-btn float-right button-border-left" id="xmleditor_edit" type="button" onclick="editorButtonEdit();"><i class="fa fa-edit fa-fw"></i> Edit</button>';
-}
-
-function editorButtonEdit() {
-    xmleditor.setReadOnly(false);
-    if (xmleditor.getValue() == 'Start new transcription...') { xmleditor.session.setValue(''); };
-    editor_buttons.innerHTML = '<button class="editor-btn float-right button-border-left editor-save" id="xmleditor_save" type="button" onclick="editorButtonSave();"><i class="fa fa-save fa-fw"></i> Save</button>\
-    <button class="editor-btn float-right button-border-left editor-cancel" id="xmleditor_cancel" type="button" onclick="editorButtonCancel();"><i class="fa fa-times-circle fa-fw"></i> Cancel</button>\
-    <button class="editor-btn float-left button-border-right" id="xmleditor_undo" type="button" onclick="xmleditor.undo();"><i class="fa fa-undo-alt fa-fw"></i></button>\
-    <button class="editor-btn float-left button-border-right" id="xmleditor_redo" type="button" onclick="xmleditor.redo();"><i class="fa fa-redo-alt fa-fw"></i></button>';
-    xmleditor.on("input", updateToolbar);
-}
-
-function setEditorOptions(mode) {
-  if (mode == 'default') {
     xmleditor.setOptions({
         theme: "ace/theme/chrome",
-        readOnly: true,
+        readOnly: false,
         highlightActiveLine: true,
         highlightSelectedWord: true,
         highlightGutterLine: true,
@@ -257,67 +164,145 @@ function setEditorOptions(mode) {
         mode: "ace/mode/xml",
         indentedSoftWrap: true,
         fixedWidthGutter: true,
+        autoScrollEditorIntoView: true,
+        scrollPastEnd: 0.1
     });
-  } else {
-    if (typeof mode !== 'undefined')  {
-      var target = mode.target;
-      var option = target.id;
-      if ($(target).is('select')) {
-        var value = $(target).val()
-      } else {
-        var value = $(target).prop('checked')
-      }
-      xmleditor.setOption(option, value);
-    }
-  };
-}
-
-function renderer(st) {
-  var editor = $('#xml_editor');
-  var renderer = $('#text_render');
-  if (st == 'on') {
-    var e_height = editor.innerHeight();
-    var e_width = editor.innerWidth();
-    var text = xmleditor.getValue();
-    var xml = $($.parseXML('<xml><div>' + text + '</div></xml>'));
-    xml.find("unclear").each( function (index) {
-      $(this).replaceWith('<span class="tei-unclear" data-toggle="tooltip" data-placement="top" title="unclear">'+$(this).text()+'</span>');
-    });
-    xml.find("gap").each( function (index) {
-      $(this).replaceWith('<span class="tei-gap" data-toggle="tooltip" data-placement="top" title="gap of '+$(this).attr('extent')+' extent, reason: '+$(this).attr('reason')+'.">[...]</span>');
-    });
-    editor.css({"z-index": -1});
-    renderer.height(e_height-40);
-    renderer.width(e_width-40);
-    renderer.css({"margin-top": -e_height + 'px', "z-index": 100});
-    var xml_string = (new XMLSerializer()).serializeToString(xml[0]);
-    renderer.html(xml_string);
-    $('[data-toggle="tooltip"]').tooltip({container: 'body'})
-    //renderer.append(xml).html();
-  } else if (st == 'off') {
-    editor.css({"z-index": 100});
-    renderer.css({"margin-top": 0, "z-index": -1});
   }
 }
 
-function getFolioIndex(folio) {
-  return folio_array.findIndex(x => x.name === folio);
+function setEditorToolbar() {
+  $('#editor-right-toolbar')
+    .prepend('<button class="editor-btn button-border-left" id="btn_cancel" onclick="cancelEditor()"><i class="fa fa-times-circle fa-fw"></i> Cancel</button>')
+    .prepend('<button class="editor-btn button-border-left" id="btn_save" onclick="saveEditor()" disabled><i class="fa fa-save fa-fw"></i> Save</button>');
+  $('#editor-left-toolbar')
+    .prepend('<button class="editor-btn button-border-right" id="btn_options" onclick="editorOptionsMenu()" title="Editor options" data-toggle="tooltip"><i class="fas fa-cog fa-fw" ></i></button>')
+    .append('<button class="editor-btn button-border-right" id="btn_redo" onclick="redoEditor()" title="Redo" data-toggle="tooltip" disabled><i class="fa fa-redo-alt fa-fw"></i></button>')
+    .append('<button class="editor-btn button-border-right" id="btn_undo" onclick="undoEditor()" title="Undo" data-toggle="tooltip" disabled><i class="fa fa-undo-alt fa-fw"></i></button>');
+  $('#xmleditor-options').load('/static/includes/xmleditor_options.html', function() {
+    $('#xmleditor-options-form').find('input').on('change', function (e) { setEditorOptions(e) });
+    $('#xmleditor-options-form').find('select').on('change', function (e) { setEditorOptions(e) });
+    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+  });
 }
 
-function nextFolio(i) {
-    if (i+1 >= folio_array.length) {
-      return 0;
-    } else {
-      i = i + 1; // increase i by one
-      return folio_array[i]; // give us back the item of where we are now
-    }
+function removeEditorToolbar() {
+  $('#btn_cancel').remove();
+  $('#btn_save').remove();
+  $('#xmleditor-options-form').find('input').off();
+  $('#xmleditor-options-form').find('select').off();
+  $('#xmleditor-options').empty();
+  $('#btn_options').remove();
+  $('#btn_undo').remove();
+  $('#btn_redo').remove();
 }
 
-function prevFolio(i) {
-    if (i == 0) {
-      return 0;
+function updateEditorToolbar() {
+  $("#btn_save").attr("disabled", xmleditor.session.getUndoManager().isClean());
+  $("#btn_undo").attr("disabled", !xmleditor.session.getUndoManager().hasUndo());
+  $("#btn_redo").attr("disabled", !xmleditor.session.getUndoManager().hasRedo());
+}
+
+function saveEditor() {
+  var folio = folio_idx;
+  var text = xmleditor.getValue();
+  if (text != '' && !xmleditor.session.getUndoManager().isClean()) {
+    var id = folio_array[folio].tr_id
+    var ver = folio_array[folio].tr_version + 1;
+    var page = folio_array[folio].id
+    var source = source_id;
+    if (id != 'None') {
+      var url = "/api/transcriptions/"+id+"/";
+      $.ajax({
+        method: "PUT",
+        url: url,
+        headers: { 'X-CSRFToken': getCookie("csrftoken") },
+        data: { 'version': ver, 'transcription': text },
+      }).done(function(data, textStatus, jqXHR) {
+          if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
+      }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
     } else {
-      i = i - 1; // decrease by one
-      return folio_array[i]; // give us back the item of where we are now
+      var url = "/api/transcriptions/";
+      $.ajax({
+        method: "POST",
+        url: url,
+        headers: { 'X-CSRFToken': getCookie("csrftoken") },
+        data: { 'version': ver, 'transcription': text, 'source': source, 'page': page },
+      }).done(function(data, textStatus, jqXHR) {
+          folio_array[folio]['tr_id'] = data['id'];
+          folio_array[folio]['tr_version'] = data['version'];
+          $(author_container).html('Transcribed by '+data['author']);
+      }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
+    };
+  }
+}
+
+function cancelEditor() {
+  do {
+      xmleditor.undo()
+  } while (xmleditor.session.getUndoManager().hasUndo());
+  changeEditorMode();
+}
+
+function editorOptionsMenu() {
+  $('#xmleditor-options').toggle();
+}
+
+function undoEditor() {
+  xmleditor.undo();
+  updateEditorToolbar();
+}
+
+function redoEditor() {
+  xmleditor.redo();
+  updateEditorToolbar();
+}
+
+function resizeEditor() {
+  if (editor_mode == 'xml') {
+      xmleditor.resize();
+  }
+}
+
+/***** Utility functions *********/
+
+function getTitle(e, tag) {
+  if (e.hasAttribute("unit") && e.hasAttribute("quantity")) {
+    var extent = 'extent ' + e.getAttribute("quantity") + ' ' + e.getAttribute("unit");
+  } else if (e.hasAttribute("extent")) {
+    var extent = 'extent ' + e.getAttribute("extent");
+  };
+  if (e.hasAttribute("reason")) { var reason = e.getAttribute("reason") };
+  if (e.hasAttribute("type")) { var type = e.getAttribute("type") };
+  if (e.hasAttribute("lemma")) { var lemma = '"' + e.getAttribute("lemma") + '"' };
+  if (e.hasAttribute("resp")) { var resp = ' by ' + e.getAttribute("resp") };
+  if (tag == 'word' && type && lemma) {
+    var title = type + ': ' + lemma;
+  } else {
+    var title = tag;
+    if (extent) {
+      title = title + ': ' + extent;
+      if (reason) { title = title + ', ' + reason; };
+    } else if (reason) {
+      title = title + ': ' + reason;
+    } else if (type) {
+      title = title + ': ' + type;
+    } else if (resp) {
+      title = title + resp;
     }
+  };
+  return title
+}
+
+function testKeybindings() {
+  xmleditor.commands.addCommand({
+    name: 'supplied_tag',
+    bindKey: {win: 'Ctrl-P',  mac: 'Command-Option-S'},
+    exec: function(xmleditor) {
+        var txt = xmleditor.getSelectedText();
+        var range = xmleditor.session.getTextRange(xmleditor.getSelectionRange());
+        txt = '<supplied>'+txt+'</supplied>';
+        xmleditor.session.replace(range, txt);
+    },
+    readOnly: false // false if this command should not apply in readOnly mode
+  });
 }
