@@ -144,6 +144,7 @@ class DT_list(dalmeIntid):
     content_types = models.ManyToManyField(Content_type)
     api_url = models.CharField(max_length=255, null=True)
     form_helper = models.CharField(max_length=255, null=True)
+    preview_helper = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.name

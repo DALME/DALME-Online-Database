@@ -4,12 +4,12 @@
 {% if form_helper %}
 <script type="text/javascript" src="{% static 'dalme_form_helpers/' %}{{ form_helper }}"></script>
 {% endif %}
-{% if preview_helper %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.0/css/scroller.bootstrap4.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/scroller/2.0.0/js/dataTables.scroller.min.js"></script>
 <link href="{% static 'jquery-ui-resizable/jquery-ui.min.css' %}" rel="stylesheet">
 <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'dalme_preview_helpers/' %}{{ preview_helper }}"></script>
-{% endif %}
 <script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dalme_list_preview.js' %}"></script>
 
 <script type="text/javascript">
     {% if dt_editor %}
@@ -104,13 +104,16 @@
               },
             {% endfor %}
           ]};
-    $(document).ready( function () { createDatatable('#dataTables-list', "{{ form_helper }}") });
+    $(document).ready( function () {
+      createDatatable('#dataTables-list', "{{ form_helper }}");
+      // startPreview();
+    });
     {% if filters %}
       var filters = {{ filters | safe }};
-      $(document).on('init.dt', function () { addDtToolbarButton('filters')} );
-    {% endif %}
-    {% if preview_helper %}
-      $(document).on('init.dt', function () { addDtToolbarButton('preview')} );
+      $(document).on('init.dt', function () {
+        addDtToolbarButton('filters');
+        addDtToolbarButton('preview');
+      });
     {% endif %}
 </script>
 {% endblock %}
@@ -131,5 +134,6 @@
     </div>
   </div>
 {% endblock %}
+
 {% block extra_scripts %}
 {% endblock %}

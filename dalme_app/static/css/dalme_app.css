@@ -12,13 +12,13 @@ body {
 }
 
 .shadow {
--webkit-box-shadow: 0 .3rem .4rem 0 rgba(58,59,69,.15)!important;
-box-shadow: 0 .3rem .4rem 0 rgba(58,59,69,.15)!important;
+  box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.25) !important;
 }
 
+
 .img-placeholder {
-  height: 50vh;
-  background-color: #8a8a8a;
+  height: 80vh;
+  /* background-color: #8a8a8a; */
   color: #c8c8c8;
 }
 
@@ -504,9 +504,9 @@ div.DTE_Field_Type_textarea textarea {
 }
 
 .dt-btn.active {
-  color: #3a3b45;
-  background-color: #e3e4e7;
-  border-color: #a5a5a5;
+  color: #3a3b45 !important;
+  background-color: #e3e4e7 !important;
+  border-color: #a5a5a5 !important;
 }
 
 .dt-buttons button.btn:hover {
@@ -1070,7 +1070,7 @@ table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
   background-color: #fff;
   box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.45);
   border: none;
-  top: 90%;
+  top: 100%;
 }
 
 .dropdown-item {
@@ -1199,6 +1199,10 @@ a.page-link:focus, a.page-link:active {
     float: left;
     margin-top: 5px;
     background-color: #fff;
+}
+
+.sidebar .nav-item .collapse .collapse-inner {
+  box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.45) !important;
 }
 
 .sidebar.toggled .nav-item .nav-link {
@@ -1580,10 +1584,58 @@ li#searchIcon.show a {
   /* box-shadow: inset 50px 0px 0px #ebebeb; */
 }
 
+.panel-container {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  position: relative;
+  /* height: calc(100vh - 114px); */
+}
+
 .panel-top {
   flex: 0 0 auto;
-  height: 400px; /*adjusted manually, but what about initial*/
+  height: 400px; /*adjusted manually*/
   width: 100%;
+}
+
+.panel-bottom {
+  flex: 1 1 auto;
+  height: calc(100vh - 543px); /*topbar+tb-margin+card-header+panel-top+card-margin = 24+24+45+400+16 all -9 adjustment*/
+  padding-top: 4px;
+}
+
+.panel-left {
+  flex: 0 0 auto;
+  width: 100%; /*adjusted manually*/
+  height: 100%;
+  padding-top: .2rem;
+  padding-bottom: 1rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.panel-right {
+  flex: 1 1 auto;
+  padding-left: 4px;
+  height: 100%;
+}
+
+.splitter-horizontal {
+  flex: 0 0 auto;
+  height: 10px !important;
+  background: url(./horizontalgrip.png) center center/33px 6px no-repeat #e8e9ec;
+  cursor: row-resize !important;
+  border-top: 1px solid #a5a5a5;
+  border-bottom: 1px solid #a5a5a5;
+}
+
+.splitter-vertical {
+  flex: 0 0 auto;
+  width: 10px !important;
+  background: url(./verticalgrip.png) center center/6px 33px no-repeat #e8e9ec;
+  cursor: col-resize !important;
+  border-right: 1px solid #a5a5a5;
+  border-left: 1px solid #a5a5a5;
 }
 
 #diva_viewer {
@@ -1608,22 +1660,6 @@ li#searchIcon.show a {
 .diva-tools {
   height: 0 !important;
   overflow: hidden !important;
-}
-
-
-.splitter-horizontal {
-  flex: 0 0 auto;
-  height: 10px !important;
-  background: url(./horizontalgrip.png) center center/33px 6px no-repeat #e8e9ec;
-  cursor: row-resize !important;
-  border-top: 1px solid #a5a5a5;
-  border-bottom: 1px solid #a5a5a5;
-}
-
-.panel-bottom {
-  flex: 1 1 auto;
-  height: calc(100vh - 543px); /*topbar+tb-margin+card-header+panel-top+card-margin = 24+24+45+400+16 all -9 adjustment*/
-  padding-top: 4px;
 }
 
 #editor {

@@ -6,20 +6,21 @@ function startEditor() {
       editor_toolbar = document.getElementById('editor-toolbar');
       author_container = document.getElementById('author');
       top_panel = document.getElementsByClassName('panel-top');
+      maxHeight = $(window).height() - 340;
       editor_mode = 'render';
       edit_mode = 'off';
       folio_array = folio_list;
       folio_idx = 0;
       if (folio_array[0].dam_id == 'None') {
-          viewer_container.innerHTML = '<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>';
+          $(viewer_container).html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
       } else {
           viewer_container.innerHTML = "";
           diva = new Diva('diva_viewer', {
              objectData: '/pages/'+folio_array[0].id+'/manifest',
              enableAutoTitle: false,
              enableFullscreen: false,
-             enableKeyScroll: true,
-             blockMobileMove: true,
+             //enableKeyScroll: true,
+             //blockMobileMove: true,
              enableGotoPage: false,
              enableGridIcon: false,
              enableImageTitles: false,
@@ -29,7 +30,8 @@ function startEditor() {
           });
       };
       if (folio_array[0].tr_id == 'None') {
-          render_container.innerHTML = '<div class="mt-auto mb-auto">This folio/page has not been transcribed. Click on Edit to start...</div>';
+          $(editor_container).html('<div class="mt-auto mb-auto">This folio/page has not been transcribed. Click on Edit to start...</div>');
+          $(author_container).html('No transcription available');
       } else {
           $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
               tr_text = data.transcription;
@@ -51,27 +53,29 @@ function startEditor() {
               });
               $('[data-toggle="tooltip"]').tooltip({container: 'body'});
               $(author_container).html('Transcribed by '+data.author);
-              $(top_panel).resizable({
-                  handles: {s: '.splitter-horizontal'},
-                  resize: function(e, ui) {
-                      var parent = ui.element.parent();
-                      var remainingSpace = parent.height() - ui.element.outerHeight();
-                      var divTwo = ui.element.next();
-                      var divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
-                      var divTwoPercent = (divTwoHeight-28)/parent.height()*100+"%";
-                      divTwo.height(divTwoPercent);
-                      $(editor_container).height(divTwoHeight - 56);
-                      },
-                  stop: function (e, ui) {
-                    var parent = ui.element.parent();
-                    ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
-                    window.dispatchEvent(new Event('resize'));
-                    }
-              });
           }, 'json');
-          window.addEventListener('resize', function () { resizeEditor(); }, false);
-          //Diva.Events.subscribe('ObjectDidLoad', function () { alert('success'); });
       };
+      $(top_panel).resizable({
+          handles: {s: '.splitter-horizontal'},
+          maxHeight: maxHeight,
+          minHeight: 200,
+          resize: function(e, ui) {
+              var parent = ui.element.parent();
+              var remainingSpace = parent.height() - ui.element.outerHeight();
+              var divTwo = ui.element.next();
+              var divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
+              var divTwoPercent = (divTwoHeight-28)/parent.height()*100+"%";
+              divTwo.height(divTwoPercent);
+              $(editor_container).height(divTwoHeight - 56);
+              },
+          stop: function (e, ui) {
+            var parent = ui.element.parent();
+            ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
+            window.dispatchEvent(new Event('resize'));
+            }
+      });
+      window.addEventListener('resize', function () { resizeEditor(); }, false);
+      //Diva.Events.subscribe('ObjectDidLoad', function () { alert('success'); });
   }
 }
 
@@ -85,11 +89,12 @@ function changeEditorMode() {
       xmleditor.session.setValue(tr_text);
       xmleditor.session.on("change", debounce(saveEditor, 1000));
       setEditorToolbar();
-      $(editor_container).one("input", updateEditorToolbar);
+      $(editor_container).on("input", updateEditorToolbar);
   } else if (editor_mode == 'xml') {
       editor_mode = 'render';
       saveEditor();
       removeEditorToolbar();
+      tr_text = xmleditor.getValue();
       xmleditor.off();
       xmleditor.destroy();
       $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
@@ -119,7 +124,6 @@ function changeEditorFolio(target) {
             xmleditor.session.setValue(tr_text);
             xmleditor.session.getUndoManager().reset();
             updateEditorToolbar();
-            $(editor_container).one("input", updateEditorToolbar);
         }
         $(author_container).html('Transcribed by '+data.author);
         $('#btn_prevFolio').attr('value', prev);
@@ -164,7 +168,6 @@ function setEditorOptions(dict) {
         mode: "ace/mode/xml",
         indentedSoftWrap: true,
         fixedWidthGutter: true,
-        autoScrollEditorIntoView: true,
         scrollPastEnd: 0.1
     });
   }
@@ -173,7 +176,7 @@ function setEditorOptions(dict) {
 function setEditorToolbar() {
   $('#editor-right-toolbar')
     .prepend('<button class="editor-btn button-border-left" id="btn_cancel" onclick="cancelEditor()"><i class="fa fa-times-circle fa-fw"></i> Cancel</button>')
-    .prepend('<button class="editor-btn button-border-left" id="btn_save" onclick="saveEditor()" disabled><i class="fa fa-save fa-fw"></i> Save</button>');
+    .prepend('<button class="editor-btn button-border-left" id="btn_save" onclick="saveButton()" disabled><i class="fa fa-save fa-fw"></i> Save</button>');
   $('#editor-left-toolbar')
     .prepend('<button class="editor-btn button-border-right" id="btn_options" onclick="editorOptionsMenu()" title="Editor options" data-toggle="tooltip"><i class="fas fa-cog fa-fw" ></i></button>')
     .append('<button class="editor-btn button-border-right" id="btn_redo" onclick="redoEditor()" title="Redo" data-toggle="tooltip" disabled><i class="fa fa-redo-alt fa-fw"></i></button>')
@@ -200,6 +203,11 @@ function updateEditorToolbar() {
   $("#btn_save").attr("disabled", xmleditor.session.getUndoManager().isClean());
   $("#btn_undo").attr("disabled", !xmleditor.session.getUndoManager().hasUndo());
   $("#btn_redo").attr("disabled", !xmleditor.session.getUndoManager().hasRedo());
+}
+
+function saveButton() {
+  saveEditor();
+  $("#btn_save").attr("disabled", true);
 }
 
 function saveEditor() {
@@ -258,6 +266,7 @@ function redoEditor() {
 }
 
 function resizeEditor() {
+  maxHeight = $(window).height() - 340;
   if (editor_mode == 'xml') {
       xmleditor.resize();
   }

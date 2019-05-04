@@ -1,4 +1,4 @@
-function createDatatable(target, helper) {
+function createDatatable(target, helper, callback) {
   if (typeof dt_editor_options !== 'undefined') {
     dt_editor_options['table'] = target;
     dt_editor = new $.fn.dataTable.Editor(dt_editor_options);
@@ -13,7 +13,13 @@ function createDatatable(target, helper) {
     };
   };
   dt_table = $(target).DataTable(dt_options);
-  fix_dt_search();
+  dt_table.on('init', function() {
+    fix_dt_search();
+    if (typeof callback !== 'undefined') {
+      callback();
+    }
+  });
+
 }
 
 function addDtToolbarButton(button) {
@@ -26,6 +32,47 @@ function addDtToolbarButton(button) {
     resetFilters();
     $('#filters-container').on('click', '.add_filter', addFilter);
     $('#filters-container').on('click', '.remove_filter', removeFilter);
+  } else if (button == 'preview') {
+    $('.dt-buttons').append('<button class="btn dt-btn buttons-collection" id="btn-preview" onclick="togglePreview()"><i class="fa fa-eye fa-sm"></i> Preview</button>');
+  }
+}
+
+function togglePreview() {
+  if (typeof preview_state == 'undefined' || preview_state == 'off') {
+      preview_state = 'on';
+      maxWidth = $(window).width() - 422;
+      $('#btn-preview').addClass('active');
+      $('.panel-left').append('<div class="splitter-vertical ui-resizable-handle ui-resizable-e"></div>');
+      $('.panel-container').append('<div class="panel-right"><div class="img-placeholder d-flex justify-content-center align-items-center"><i class="d-block fa fa-eye-slash fa-4x mt-5 mb-5"></i></div></div>');
+      $('.panel-left').width('70%');
+      $('.panel-right').width('30%');
+      $('.panel-left').resizable({
+          handles: {e: '.splitter-vertical'},
+          maxWidth: maxWidth,
+          minWidth: 400,
+          resize: function(e, ui) {
+              var parent = ui.element.parent();
+              var remainingSpace = parent.width() - ui.element.outerWidth();
+              var divTwo = ui.element.next();
+              var divTwoWidth = (remainingSpace - (divTwo.outerWidth() - divTwo.width()));
+              var divTwoPercent = divTwoWidth/parent.width()*100+"%";
+              divTwo.width(divTwoPercent);
+              //$(editor_container).height(divTwoHeight - 56);
+              },
+          stop: function (e, ui) {
+            var parent = ui.element.parent();
+            ui.element.css({ width: ui.element.width()/parent.width()*100+"%", });
+            window.dispatchEvent(new Event('resize'));
+            }
+      });
+      initializeHelper();
+  } else {
+      preview_state = 'off';
+      $('#btn-preview').removeClass('active');
+      $('.splitter-vertical').remove();
+      $('.panel-right').remove();
+      $('.panel-left').resizable('destroy');
+      $('.panel-left').width('100%');
   }
 }
 

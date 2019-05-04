@@ -1,4 +1,3 @@
-
 function initializeHelper(editor) {
   editor.on('open', function( e, mode, action ) { changeForm(e, action) });
   editor.on('close', function( e ) { changeForm(e) });

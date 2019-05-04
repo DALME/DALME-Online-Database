@@ -201,6 +201,23 @@ class Images(DTViewSet):
     queryset = queryset.annotate(collections=RawSQL('SELECT GROUP_CONCAT(collection.name SEPARATOR ", ") FROM collection_resource JOIN resource rs2 ON collection_resource.resource = rs2.ref JOIN collection ON collection.ref = collection_resource.collection WHERE rs2.ref = resource.ref', []))
     serializer = ImageSerializer
 
+    @action(detail=True)
+    def get_preview_url(self, request, pk=None):
+        result = {}
+        try:
+            url = functions.get_dam_preview(pk)
+            result['preview_url'] = url
+            status=201
+        except Exception as e:
+            result['error'] = str(e)
+            status=400
+        return Response(result, status)
+
+    def retrieve(self, request, pk=None):
+        image = get_object_or_404(self.queryset, pk=pk)
+        serializer = ImageSerializer(image)
+        return Response(serializer.data)
+
 class Transcriptions(viewsets.ModelViewSet):
     """ API endpoint for managing transcriptions """
     permission_classes = (DjangoModelPermissions,)

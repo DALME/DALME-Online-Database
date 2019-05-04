@@ -91,11 +91,12 @@ class DTListView(TemplateView):
         'pageLength':25,
         'responsive':'true',
         'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group"f>r><"#filters-container.collapse.clearfix"><"card-table-body"t><"sub-card-footer"ip>\'',
+        'dom': '\'<"card-table-header"B<"btn-group"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
         'serverSide': 'true',
         'stateSave': 'true',
         'select': { 'style': 'single'},
         'deferRender': 'true',
+        'rowId': '"id"',
         'language': {'searchPlaceholder': 'Search'}
         }
     dt_buttons = [{ 'extend': '"colvis"', 'text': '"\uf0db"'}]
@@ -125,6 +126,7 @@ class DTListView(TemplateView):
         context['dt_editor'] = self.get_dt_editor(list, fields_dict)
         context['filters'] = self.get_filters(fields_dict)
         context['form_helper'] = self.get_form_helper(list)
+        context['preview_helper'] = self.get_preview_helper(list)
         return context
 
     def get_list_name(self, *args, **kwargs):
@@ -283,6 +285,13 @@ class DTListView(TemplateView):
         else:
             form_helper = None
         return form_helper
+
+    def get_preview_helper(self, list, *args, **kwargs):
+        if list.preview_helper:
+            preview_helper = list.preview_helper
+        else:
+            preview_helper = None
+        return preview_helper
 
 @method_decorator(login_required,name='dispatch')
 class SourceList(DTListView):

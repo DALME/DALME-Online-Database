@@ -57,6 +57,7 @@ class ImageSerializer(serializers.ModelSerializer):
             ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
         except:
             ret['created_by'] = ret['created_by']
+        ret['id'] = ret['ref']
         ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
         return ret
 
