@@ -14,7 +14,7 @@ function startEditor() {
       if (folio_array[0].dam_id == 'None') {
           $(viewer_container).html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
       } else {
-          viewer_container.innerHTML = "";
+          $(viewer_container).empty();
           diva = new Diva('diva_viewer', {
              objectData: '/pages/'+folio_array[0].id+'/manifest',
              enableAutoTitle: false,
@@ -60,16 +60,16 @@ function startEditor() {
           maxHeight: maxHeight,
           minHeight: 200,
           resize: function(e, ui) {
-              var parent = ui.element.parent();
-              var remainingSpace = parent.height() - ui.element.outerHeight();
-              var divTwo = ui.element.next();
-              var divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
-              var divTwoPercent = (divTwoHeight-28)/parent.height()*100+"%";
+              const parent = ui.element.parent();
+              const remainingSpace = parent.height() - ui.element.outerHeight();
+              const divTwo = ui.element.next();
+              const divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
+              const divTwoPercent = (divTwoHeight-28)/parent.height()*100+"%";
               divTwo.height(divTwoPercent);
               $(editor_container).height(divTwoHeight - 56);
               },
           stop: function (e, ui) {
-            var parent = ui.element.parent();
+            const parent = ui.element.parent();
             ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
             window.dispatchEvent(new Event('resize'));
             }
@@ -108,10 +108,10 @@ function changeEditorMode() {
 function changeEditorFolio(target) {
   $(document.body).css('cursor', 'wait');
   if (target != '') {
-    var target = parseInt(target, 10);
-    var total = folio_array.length;
-    var prev = target != 0 ? target - 1 : '';
-    var next = target + 1 >= total ? '' : target + 1;
+    const target = parseInt(target, 10);
+    const total = folio_array.length;
+    const prev = target != 0 ? target - 1 : '';
+    const next = target + 1 >= total ? '' : target + 1;
     $.get("/api/transcriptions/"+folio_array[target].tr_id+"?format=json", function (data) {
         tr_text = data.transcription;
         if (editor_mode == 'render') {
@@ -147,7 +147,7 @@ function updateFolioButtons() {
 
 function setEditorOptions(dict) {
   if (typeof dict !== 'undefined') {
-    var value = $(dict.target).is('select') ? $(dict.target).val() : $(dict.target).prop('checked');
+    const value = $(dict.target).is('select') ? $(dict.target).val() : $(dict.target).prop('checked');
     xmleditor.setOption(dict.target.id, value);
   } else {
     xmleditor.setOptions({
@@ -211,15 +211,15 @@ function saveButton() {
 }
 
 function saveEditor() {
-  var folio = folio_idx;
-  var text = xmleditor.getValue();
+  const folio = folio_idx;
+  const text = xmleditor.getValue();
   if (text != '' && !xmleditor.session.getUndoManager().isClean()) {
-    var id = folio_array[folio].tr_id
-    var ver = folio_array[folio].tr_version + 1;
-    var page = folio_array[folio].id
-    var source = source_id;
+    const id = folio_array[folio].tr_id
+    const ver = folio_array[folio].tr_version + 1;
+    const page = folio_array[folio].id
+    const source = source_id;
     if (id != 'None') {
-      var url = "/api/transcriptions/"+id+"/";
+      const url = "/api/transcriptions/"+id+"/";
       $.ajax({
         method: "PUT",
         url: url,
@@ -229,7 +229,7 @@ function saveEditor() {
           if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
       }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
     } else {
-      var url = "/api/transcriptions/";
+      const url = "/api/transcriptions/";
       $.ajax({
         method: "POST",
         url: url,
@@ -307,8 +307,8 @@ function testKeybindings() {
     name: 'supplied_tag',
     bindKey: {win: 'Ctrl-P',  mac: 'Command-Option-S'},
     exec: function(xmleditor) {
-        var txt = xmleditor.getSelectedText();
-        var range = xmleditor.session.getTextRange(xmleditor.getSelectionRange());
+        let txt = xmleditor.getSelectedText();
+        const range = xmleditor.session.getTextRange(xmleditor.getSelectionRange());
         txt = '<supplied>'+txt+'</supplied>';
         xmleditor.session.replace(range, txt);
     },

@@ -160,17 +160,17 @@
     "children": [
       {
         "text": "Content Types",
-        "link": "/models?model=content",
+        "link": "/models/content",
         "iconClass": "fa-cube"
       },
       {
         "text": "Attributes",
-        "link": "/models?model=attributes",
+        "link": "/models/attributes",
         "iconClass": "fa-cube"
       },
       {
         "text": "Lists",
-        "link": "/models?model=lists",
+        "link": "/models/lists",
         "iconClass": "fa-cube"
       }
     ]

@@ -83,12 +83,317 @@ class DefaultSearch(SearchView):
         return context
 
 @method_decorator(login_required,name='dispatch')
+class ModelLists(TemplateView):
+    template_name = 'dalme_app/models.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model = self.kwargs['model']
+        request = self.request
+        tables = []
+        if model == 'content':
+            breadcrumb = [('Data Models', ''),('Content Types', '/models/content')]
+            page_title = 'Models: Content Type'
+        elif model == 'attributes':
+            breadcrumb = [('Data Models', ''),('Attributes', '/models/attributes')]
+            page_title = 'Models: Attributes'
+        elif model == 'lists':
+            breadcrumb = [('Data Models', ''),('Lists', '/models/lists')]
+            page_title = 'Models: Lists'
+            qs = DT_list.objects.all()
+            pc_opt = {i.id:i.name for i in qs}
+            context['parent_class'] = {
+                'name': 'list',
+                'options': pc_opt
+            }
+            context['dt_options'] = {
+                'options': {
+                    'ajax': '"/api/fields/?format=json"',
+                    'serverSide': 'true',
+                    'responsive': 'true',
+                    'dom': '\'<"sub-card-header-embed d-flex"B<"btn-group"f>r><"card-body"t><"sub-card-footer"i>\'',
+                    'stateSave': 'true',
+                    'select': { 'style': 'single'},
+                    'scrollResize': 'true',
+                    'scrollY': '"50vh"',
+                    'deferRender': 'true',
+                    'scroller': 'true',
+                    'language': {'searchPlaceholder': 'Search'},
+                    'rowId': '"id"',
+                },
+                'buttons': [{ 'extend': '"colvis"', 'text': '"\uf0db"'}],
+                'columnDefs':[
+                        {
+                          'title':'"Id"',
+                          'targets':0,
+                          'data':'"id"',
+                          "visible":'false'
+                        },
+                        {
+                          'title':'"List"',
+                          'targets':1,
+                          'data':'"list"',
+                          "visible":'false'
+                        },
+                        {
+                          'title':'"Field"',
+                          'targets':2,
+                          'data':'"field"'
+                        },
+                        {
+                          'title':'"DT Name"',
+                          'targets':3,
+                          'data':'"dt_name"'
+                        },
+                        {
+                          'title':'"Vis."',
+                          'targets':4,
+                          'data':'"visible"',
+                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+                        },
+                        {
+                          'title':'"Ord."',
+                          'targets':5,
+                          'data':'"orderable"',
+                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+                        },
+                        {
+                          'title':'"Srch."',
+                          'targets':6,
+                          'data':'"searchable"',
+                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+                        },
+                        {
+                          'title':'"Nowrap"',
+                          'targets':7,
+                          'data':'"nowrap"',
+                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+                        },
+                        {
+                          'title':'"Render Exp."',
+                          'targets':8,
+                          'data':'"render_exp"'
+                        },
+                        {
+                          'title':'"DTE Name"',
+                          'targets':9,
+                          'data':'"dte_name"'
+                        },
+                        {
+                          'title':'"DTE Type"',
+                          'targets':10,
+                          'data':'"dte_type"'
+                        },
+                        {
+                          'title':'"DTE Options"',
+                          'targets':11,
+                          'data':'"dte_options"'
+                        },
+                        {
+                          'title':'"DTE Opts"',
+                          'targets':12,
+                          'data':'"dte_opts"'
+                        },
+                        {
+                          'title':'"Filter"',
+                          'targets':13,
+                          'data':'"is_filter"',
+                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+                        },
+                        {
+                          'title':'"Filter type"',
+                          'targets':14,
+                          'data':'"filter_type"'
+                        },
+                        {
+                          'title':'"Filter mode"',
+                          'targets':15,
+                          'data':'"filter_mode"'
+                        },
+                        {
+                          'title':'"Filter Op."',
+                          'targets':16,
+                          'data':'"filter_operator"'
+                        },
+                        {
+                          'title':'"Filter options"',
+                          'targets':17,
+                          'data':'"filter_options"'
+                        },
+                        {
+                          'title':'"Filter lookup"',
+                          'targets':18,
+                          'data':'"filter_lookup"'
+                        },
+                  ]
+            }
+            opt_lists = [{'label':i.name,'value':i.id} for i in DT_list.objects.all()]
+            opt_fields = [{'label':i.short_name,'value':i.id} for i in Attribute_type.objects.all()]
+            opt_dte_types = [
+                    {'label':'checkbox', 'value':'checkbox'},
+                    {'label':'chosen', 'value':'chosen'},
+                    {'label':'date', 'value':'date'},
+                    {'label':'datetime', 'value':'datetime'},
+                    {'label':'hidden', 'value':'hidden'},
+                    {'label':'password', 'value':'password'},
+                    {'label':'radio', 'value':'radio'},
+                    {'label':'readonly', 'value':'readonly'},
+                    {'label':'select', 'value':'select'},
+                    {'label':'text', 'value':'text'},
+                    {'label':'textarea', 'value':'textarea'},
+                    {'label':'upload', 'value':'upload'},
+                    {'label':'uploadMany', 'value':'uploadMany'},
+            ]
+            opt_filter_types = [
+                    {'label':'check', 'value':'check'},
+                    {'label':'select', 'value':'select'},
+                    {'label':'switch', 'value':'switch'},
+                    {'label':'text', 'value':'text'},
+            ]
+            opt_filter_modes = [
+                    {'label':'check', 'value':'check'},
+                    {'label':'complete', 'value':'complete'},
+                    {'label':'strict', 'value':'strict'},
+            ]
+            opt_filter_ops = [
+                    {'label':'and', 'value':'and'},
+                    {'label':'or', 'value':'or'},
+            ]
+            opt_filter_lookups = [
+                    {'label':'exact', 'value':'exact'},
+                    {'label':'contains', 'value':'contains'},
+                    {'label':'in', 'value':'in'},
+                    {'label':'startswith', 'value':'startswith'},
+                    {'label':'endswith', 'value':'endswith'},
+                    {'label':'regex', 'value':'regex'},
+            ]
+            context['dt_editor'] = {
+                'ajax_url': '/api/fields/',
+                'options': {
+                    'idSrc': '"id"'
+                },
+                'fields': [
+                        {
+                          'label':"List",
+                          'name':"list",
+                          'type': "chosen",
+                          'options': opt_lists
+                        },
+                        {
+                          'label':"Field",
+                          'name':"field",
+                          'type': "chosen",
+                          'options': opt_fields
+                        },
+                        {
+                          'label':"DT Name",
+                          'name':"dt_name"
+                        },
+                        {
+                          'label':"Vis.",
+                          'name':"visible",
+                          'type': "checkbox",
+                          'options': [{'label': "",'value': "1"}],
+                        },
+                        {
+                          'label':"Ord.",
+                          'name':"orderable",
+                          'type': "checkbox",
+                          'options': [{'label': "",'value': "1"}],
+                        },
+                        {
+                          'label':"Srch.",
+                          'name':"searchable",
+                          'type': "checkbox",
+                          'options': [{'label': "",'value': "1"}],
+                        },
+                        {
+                          'label':"Nowrap",
+                          'name':"nowrap",
+                          'type': "checkbox",
+                          'options': [{'label': "",'value': "1"}],
+                        },
+                        {
+                          'label':"Render Exp.",
+                          'name':"render_exp"
+                        },
+                        {
+                          'label':"DTE Name",
+                          'name':"dte_name"
+                        },
+                        {
+                          'label':"DTE Type",
+                          'name':"dte_type",
+                          'type': "chosen",
+                          'opts': {'disable_search': "true"},
+                          'options': opt_dte_types
+                        },
+                        {
+                          'label':"DTE Options",
+                          'name':"dte_options"
+                        },
+                        {
+                          'label':"DTE Opts",
+                          'name':"dte_opts"
+                        },
+                        {
+                          'label':"Filter",
+                          'name':"is_filter",
+                          'type': "checkbox",
+                          'options': [{'label': "",'value': "1"}],
+                        },
+                        {
+                          'label':"Filter type",
+                          'name':"filter_type",
+                          'type': "chosen",
+                          'opts': {'disable_search': "true"},
+                          'options': opt_filter_types
+                        },
+                        {
+                          'label':"Filter mode",
+                          'name':"filter_mode",
+                          'type': "chosen",
+                          'opts': {'disable_search': "true"},
+                          'options': opt_filter_modes
+                        },
+                        {
+                          'label':"Filter Op.",
+                          'name':"filter_operator",
+                          'type': "chosen",
+                          'opts': {'disable_search': "true"},
+                          'options': opt_filter_ops
+                        },
+                        {
+                          'label':"Filter options",
+                          'name':"filter_options"
+                        },
+                        {
+                          'label':"Filter lookup",
+                          'name':"filter_lookup",
+                          'type': "chosen",
+                          'opts': {'disable_search': "true"},
+                          'options': opt_filter_lookups
+                        },
+                ]
+            }
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['sidebar_toggle'] = sidebar_toggle
+        context = functions.set_menus(self.request, context, state)
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['form_helper'] = 'model_form.js'
+        return context
+
+
+@method_decorator(login_required,name='dispatch')
 class DTListView(TemplateView):
     """ Generic list view that feeds Datatables """
     template_name = 'dalme_app/dtlistview.html'
     breadcrumb = []
     dt_options = {
         'pageLength':25,
+        'paging': 'true',
         'responsive':'true',
         'fixedHeader': 'true',
         'dom': '\'<"card-table-header"B<"btn-group"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
@@ -150,7 +455,8 @@ class DTListView(TemplateView):
             'filter_options',
             'filter_mode',
             'filter_type',
-            'filter_operator'
+            'filter_operator',
+            'filter_lookup'
         ]
         qset = DT_fields.objects.filter(list=list.id).values(*fields)
         fields_dict = {}
@@ -262,6 +568,8 @@ class DTListView(TemplateView):
                 filter['field'] = key
                 filter['type'] = dict['filter_type']
                 filter['operator'] = dict['filter_operator']
+                if 'lookup' in filter:
+                    filter['lookup'] = dict['filter_lookup']
                 if dict['filter_type'] == 'text':
                     filter['lookups'] = [
                             {'label':'is', 'lookup':'exact'},

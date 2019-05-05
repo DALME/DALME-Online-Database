@@ -20,6 +20,8 @@ router.register(r'tasks', apis.Tasks, basename='tasks')
 router.register(r'tasklists', apis.TaskLists, basename='tasklists')
 router.register(r'worksets', apis.Worksets, basename='worksets')
 router.register(r'options', apis.Options, basename='options')
+router.register(r'lists', apis.Lists, basename='lists')
+router.register(r'fields', apis.FieldAttributes, basename='fields')
 
 urlpatterns = [
     path('api/', include(router.urls)),

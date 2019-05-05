@@ -1,4 +1,4 @@
-function initializeHelper() {
+function initializePreviewHelper() {
   $('#dataTables-list').on('select.dt', function ( e, dt, type, indexes ) {
       $('.panel-right').empty();
       $.ajax({

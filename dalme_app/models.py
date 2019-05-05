@@ -76,7 +76,7 @@ class Attribute_type(dalmeIntid):
     same_as = models.CharField(max_length=55, null=True)
 
     def __str__(self):
-        return self.name
+        return self.short_name
 
     class Meta:
         ordering = ['id']
@@ -176,7 +176,7 @@ class DT_fields(dalmeIntid):
     filter_mode = models.CharField(max_length=55, null=True)
     filter_operator = models.CharField(max_length=55, null=True, choices=FILTER_OPS)
     filter_options = models.CharField(max_length=255, null=True)
-
+    filter_lookup = models.CharField(max_length=55, null=True)
 
 class Headword(dalmeUuid):
     word = models.CharField(max_length=55)

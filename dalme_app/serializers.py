@@ -19,6 +19,18 @@ class DynamicSerializer(serializers.ModelSerializer):
             for field_name in rem_fields:
                 self.fields.pop(field_name)
 
+class FieldAttributesSerializer(serializers.ModelSerializer):
+    field = serializers.StringRelatedField()
+
+    class Meta:
+        model = DT_fields
+        fields = '__all__'
+
+class ListsSerializer(DynamicSerializer):
+    class Meta:
+        model = DT_list
+        fields = '__all__'
+
 class WorksetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workset

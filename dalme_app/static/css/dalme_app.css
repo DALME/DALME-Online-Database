@@ -115,6 +115,10 @@ a {
   border-radius: 0.25rem;
 }
 
+.card-full {
+  height: calc(100vh - 163px);
+}
+
 .card-header {
   font-size: 0.85rem;
   font-weight: 600;
@@ -166,10 +170,13 @@ a {
 }
 
 .table thead th {
-  border-bottom: 2px solid #a3b1bd !important;
+  border-bottom: 1px solid #a5a5a5 !important;
   white-space: nowrap !important;
   vertical-align: middle;
-  padding: .5rem;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
   border-color: #a3b1bd !important;
   border-top: none;
   font-size: .8rem;
@@ -179,8 +186,6 @@ table.dataTable {
   border-color: #a3b1bd !important;
   color: #212529 !important;
   font-size: .9rem;
-  border-bottom: 1px dotted #a3b1bd;
-
 }
 
 .dataTables_paginate {
@@ -214,6 +219,83 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
   color: #0361aa !important;
 }
 
+/* model template */
+
+.model-select-container {
+  min-width: 200px;
+}
+
+.model-button-container {
+  width: 80px;
+}
+
+.model-btn {
+  border: none;
+  border-radius: 0;
+  height: 50%;
+  font-size: .8rem;
+  font-weight: 500;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  width: 100%;
+  margin-top: -1px;
+}
+
+.model-btn:hover {
+  background-color: #0361aa;
+  border-color: #0361aa;
+  color: #fff;
+}
+
+.model-btn:disabled, .model-btn:disabled:hover {
+  opacity: .65;
+  color: #858796;
+  border-color: transparent;
+  border-color: #a5a5a5;
+}
+
+.border-colour-a5 {
+  border-color: #a5a5a5;
+}
+
+.model-attribute-container {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.model-attribute-label {
+  font-weight: 500;
+  border: 1px solid rgb(215, 215, 215);
+  padding-right: .5rem;
+  padding-left: .5rem;
+  border-bottom-left-radius: .5rem;
+  border-top-left-radius: .5rem;
+  padding-bottom: .1rem;
+  padding-top: .1rem;
+  font-size: .8rem;
+  background-color: #f6f6f6;
+  white-space: nowrap;
+  display: inline;
+}
+
+.model-attribute-value {
+  border: 1px solid rgb(215, 215, 215);
+  font-weight: 400;
+  padding-right: .5rem;
+  padding-left: .5rem;
+  border-bottom-right-radius: .5rem;
+  border-top-right-radius: .5rem;
+  padding-bottom: .1rem;
+  padding-top: .1rem;
+  font-size: .8rem;
+  background-color: #fff;
+  white-space: nowrap;
+  display: inline;
+  margin-left: -6px;
+}
+
 /* embed table cards */
 
 .sub-card-header {
@@ -225,6 +307,20 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
   height: 36px;
   border-top-left-radius: .2rem;
   border-top-right-radius: .2rem;
+  color: #376783;
+}
+
+.sub-card-header-embed {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: #e8e9ec;
+  border-bottom: 1px solid #a5a5a5;
+  border-top: 1px solid #a5a5a5;
+  height: 36px;
   color: #376783;
 }
 
@@ -528,8 +624,8 @@ div.DTE_Field_Type_textarea textarea {
 
 .buttons-colvis {
   font-family: "Font Awesome 5 Free" !important;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  /* border-top-right-radius: 0;
+  border-bottom-right-radius: 0; */
 }
 
 button.buttons-create, button.buttons-edit, button.buttons-remove {
@@ -711,34 +807,6 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
   line-height: 2rem;
 }
 
-
-
-/* embed table card toolbar */
-
-.dt-embed .dt-buttons {
-  float: right;
-}
-
-.dt-embed .dt-buttons button.btn {
-  border: none;
-  font-size: .875rem !important;
-  background-color: #e3f0f5;
-  color: #376783;
-  padding: 7px 7px;
-  line-height: 1.5;
-  border-radius: 0;
-  border-left: 1px solid #a5a5a5;
-}
-
-.dt-embed .dt-buttons button.btn:hover {
-  background-color: #d7e3e8;
-  color: #182e3a;
-}
-
-.btn_last {
-  border-top-right-radius: .2rem;
-}
-
 /* general buttons */
 
 .hearderBtn {
@@ -883,9 +951,24 @@ th.sorting_asc::before, th.sorting_asc::after, th.sorting_desc::before, th.sorti
 }
 
 .table td {
-  border-top: 1px solid #a3b1bd !important;
+  border-bottom: 1px dotted #a3b1bd !important;
+  border-top: none !important;
   vertical-align: middle;
-  padding: .5rem;
+  padding: 8px;
+  /*border-right: 1px solid #ebeef0;*/
+}
+
+table.c_stripe tbody td:nth-of-type(odd) {
+  background: rgba(238, 238, 240, 0.57);
+}
+
+table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>th:first-child {
+  padding-left: 35px !important;
+}
+
+table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child:before, table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>th:first-child:before {
+  top: 9px !important;
+  left: 9px !important;
 }
 
 /*datatables search filter*/

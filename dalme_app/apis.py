@@ -60,9 +60,35 @@ class DTViewSet(viewsets.ViewSet):
         return get_ordered_queryset(*args, **kwargs)
 
     def get_serializer(self, *args, **kwargs):
-        serializer = self.serializer
+        serializer = self.serializer_class
         queryset = kwargs['queryset']
         return serializer(queryset, many=True)
+
+class FieldAttributes(DTViewSet):
+    """ API endpoint for managing DataTables list field attributes """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = DT_fields.objects.all()
+    serializer_class = FieldAttributesSerializer
+
+    def get_qset(self, *args, **kwargs):
+        try:
+            list = self.request.GET['list']
+            queryset = DT_fields.objects.filter(list=list)
+        except:
+            queryset = DT_fields.objects.all()
+        return queryset
+
+class Lists(DTViewSet):
+    """ API endpoint for managing DataTables lists """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = DT_list.objects.all()
+    serializer_class = ListsSerializer
+
+    def retrieve(self, request, pk=None):
+        list = get_object_or_404(self.queryset, pk=pk)
+        fields = ['creation_username','creation_timestamp','modification_username','modification_timestamp','name']
+        serializer = ListsSerializer(list, fields=fields)
+        return Response(serializer.data)
 
 class Options(viewsets.ViewSet):
     """ API endpoint for generating lists of options for DTE forms """
@@ -93,6 +119,12 @@ class Options(viewsets.ViewSet):
                 for g in ugroups:
                     groups.append({'label': g.name, 'value': g.id})
                 data_dict['groups'] = groups
+            elif form == 'modelslist':
+                content_types = []
+                ctypes = Content_type.objects.all()
+                for t in ctypes:
+                    content_types.append({'label': t.name, 'value': t.id})
+                data_dict['content_types'] = content_types
         except Exception as e:
             data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
         return Response(data_dict)
@@ -126,7 +158,7 @@ class Tasks(DTViewSet):
     """ API endpoint for managing tasks """
     permission_classes = (DjangoModelPermissions,)
     queryset = Task.objects.all()
-    serializer = TaskSerializer
+    serializer_class = TaskSerializer
 
     def get_qset(self, *args, **kwargs):
         try:
@@ -170,7 +202,7 @@ class TaskLists(DTViewSet):
     """ API endpoint for managing tasks lists """
     permission_classes = (DjangoModelPermissions,)
     queryset = TaskList.objects.all().annotate(task_count=Count('task'))
-    serializer = TaskListSerializer
+    serializer_class = TaskListSerializer
 
     def create(self, request, format=None):
         result = {}
@@ -192,14 +224,14 @@ class Pages(DTViewSet):
     """ API endpoint for managing pages """
     permission_classes = (DjangoModelPermissions,)
     queryset = Page.objects.all()
-    serializer = PageSerializer
+    serializer_class = PageSerializer
 
 class Images(DTViewSet):
     """ API endpoint for managing DAM images """
     permission_classes = (DjangoModelPermissions,)
     queryset = rs_resource.objects.filter(resource_type=1, archive=0)
     queryset = queryset.annotate(collections=RawSQL('SELECT GROUP_CONCAT(collection.name SEPARATOR ", ") FROM collection_resource JOIN resource rs2 ON collection_resource.resource = rs2.ref JOIN collection ON collection.ref = collection_resource.collection WHERE rs2.ref = resource.ref', []))
-    serializer = ImageSerializer
+    serializer_class = ImageSerializer
 
     @action(detail=True)
     def get_preview_url(self, request, pk=None):
@@ -411,7 +443,7 @@ class Users(DTViewSet):
     """ API endpoint for managing users """
     permission_classes = (DjangoModelPermissions,)
     queryset = Profile.objects.all()
-    serializer = ProfileSerializer
+    serializer_class = ProfileSerializer
 
     def create(self, request, format=None):
         result = {}
@@ -535,7 +567,7 @@ class Sources(DTViewSet):
     """ API endpoint for managing sources """
     permission_classes = (DjangoModelPermissions,)
     queryset = Source.objects.all()
-    serializer = SourceSerializer
+    serializer_class = SourceSerializer
 
     def retrieve(self, pk=None):
         queryset = Source.objects.all()

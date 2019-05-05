@@ -2,9 +2,9 @@
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
             // Does this cookie string begin with the name we want?
             if (cookie.substring(0, name.length + 1) == (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -21,7 +21,7 @@ function fix_dt_search() {
 
 function createTaskList() {
   $.get("/api/options/?form=createtasklist&format=json", function ( data ) {
-      var groups = data.groups;
+      const groups = data.groups;
       taskListForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
@@ -53,9 +53,9 @@ function createTaskList() {
 
 function createTask() {
   $.get("/api/options/?form=createtask&format=json", function ( data ) {
-      var staff = data.staff;
-      var worksets = data.worksets;
-      var lists = data.lists;
+      const staff = data.staff;
+      const worksets = data.worksets;
+      const lists = data.lists;
       taskForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
@@ -119,7 +119,7 @@ function updateSession(data) {
 
 function fullScreenMode(action) {
   if (action == 'on') {
-    var elem = document.documentElement;
+    const elem = document.documentElement;
     if (elem.requestFullscreen) {
         elem.requestFullscreen();
       } else if (elem.mozRequestFullScreen) { /* Firefox */
@@ -151,7 +151,7 @@ function removeParam(key, sourceURL) {
         queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
     if (queryString !== "") {
         params_arr = queryString.split("&");
-        for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+        for (let i = params_arr.length - 1; i >= 0; i -= 1) {
             param = params_arr[i].split("=")[0];
             if (param === key) {
                 params_arr.splice(i, 1);
@@ -163,7 +163,7 @@ function removeParam(key, sourceURL) {
 }
 
 function taskMarkDone(task) {
-  var url = "/api/tasks/"+task.id+"/";
+  const url = "/api/tasks/"+task.id+"/";
   $.ajax({
     method: "PUT",
     url: url,

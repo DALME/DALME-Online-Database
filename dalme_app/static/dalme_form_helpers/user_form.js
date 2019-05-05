@@ -1,4 +1,4 @@
-function initializeHelper(editor) {
+function initializeFormHelper(editor) {
   editor.on('open', function( e, mode, action ) { changeForm(e, action) });
   editor.on('close', function( e ) { changeForm(e) });
   password_state = 'divs';
