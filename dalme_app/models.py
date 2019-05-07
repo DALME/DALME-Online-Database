@@ -69,14 +69,14 @@ class Agent(dalmeUuid):
 
 class Attribute_type(dalmeIntid):
     name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55)
+    short_name = models.CharField(max_length=55, unique=True)
     description = models.TextField()
     data_type = models.CharField(max_length=15)
     source = models.CharField(max_length=255, null=True)
     same_as = models.CharField(max_length=55, null=True)
 
     def __str__(self):
-        return self.short_name
+        return self.name + ' ('+self.short_name+')'
 
     class Meta:
         ordering = ['id']
@@ -110,7 +110,7 @@ class Concept(dalmeUuid):
 
 class Content_class(dalmeIntid):
     name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55)
+    short_name = models.CharField(max_length=55, unique=True)
     description = models.TextField()
 
     def __str__(self):
@@ -121,7 +121,7 @@ class Content_class(dalmeIntid):
 
 class Content_type(dalmeIntid):
     content_class = models.IntegerField()
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
     attribute_types = models.ManyToManyField(Attribute_type, through='Content_attributes')
@@ -139,12 +139,11 @@ class Content_attributes(dalmeIntid):
 
 class DT_list(dalmeIntid):
     name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55)
-    description = models.TextField()
+    short_name = models.CharField(max_length=55, unique=True)
+    description = models.TextField(blank=True, null=True)
     content_types = models.ManyToManyField(Content_type)
-    api_url = models.CharField(max_length=255, null=True)
-    form_helper = models.CharField(max_length=255, null=True)
-    preview_helper = models.CharField(max_length=255, null=True)
+    api_url = models.CharField(max_length=255, null=True, blank=True)
+    helpers = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -154,29 +153,95 @@ class DT_list(dalmeIntid):
 
 class DT_fields(dalmeIntid):
 
-    FILTER_OPS = (
+    DTE_TYPES = (
+        ('checkbox', 'checkbox'),
+        ('chosen', 'chosen'),
+        ('date', 'date'),
+        ('datetime', 'datetime'),
+        ('hidden', 'hidden'),
+        ('password', 'password'),
+        ('radio', 'radio'),
+        ('readonly', 'readonly'),
+        ('select', 'select'),
+        ('text', 'text'),
+        ('textarea', 'textarea'),
+        ('upload', 'upload'),
+        ('uploadMany', 'uploadMany')
+    )
+
+    FILTER_TYPES = (
+        ('check', 'check'),
+        ('select', 'select'),
+        ('switch', 'switch'),
+        ('text', 'text')
+    )
+
+    FILTER_MODES = (
+        ('check', 'check'),
+        ('complete', 'complete'),
+        ('strict', 'strict')
+    )
+
+    FILTER_OPERATORS = (
         ('and', 'and'),
         ('or', 'or')
     )
 
-    list = models.ForeignKey('DT_list', to_field='id', db_index=True, on_delete=models.CASCADE)
+    FILTER_LOOKUPS = (
+        ('contains', 'contains'),
+        ('date', 'date'),
+        ('day', 'day'),
+        ('endswith', 'endswith'),
+        ('exact', 'exact'),
+        ('gt', 'gt'),
+        ('gte', 'gte'),
+        ('hour', 'hour'),
+        ('icontains', 'icontains'),
+        ('iendswith', 'iendswith'),
+        ('iexact', 'iexact'),
+        ('in', 'in'),
+        ('iregex', 'iregex'),
+        ('isnull', 'isnull'),
+        ('istartswith', 'istartswith'),
+        ('lt', 'lt'),
+        ('lte', 'lte'),
+        ('minute', 'minute'),
+        ('month', 'month'),
+        ('quarter', 'quarter'),
+        ('range', 'range'),
+        ('regex', 'regex'),
+        ('second', 'second'),
+        ('startswith', 'startswith'),
+        ('time', 'time'),
+        ('week', 'week'),
+        ('week_day', 'week_day'),
+        ('year', 'year')
+    )
+
+    list = models.ForeignKey('DT_list', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='fields')
     field = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE)
-    render_exp = models.CharField(max_length=255, null=True)
+    render_exp = models.CharField(max_length=255, null=True, blank=True)
     orderable = models.BooleanField(default=False)
     visible = models.BooleanField(default=False)
     searchable = models.BooleanField(default=False)
     nowrap = models.BooleanField(default=False)
-    dt_name = models.CharField(max_length=55, null=True)
-    dte_name = models.CharField(max_length=55, null=True)
-    dte_type = models.CharField(max_length=55, null=True)
-    dte_options = models.CharField(max_length=255, null=True)
-    dte_opts = models.CharField(max_length=255, null=True)
+    dt_name = models.CharField(max_length=55, null=True, blank=True)
+    dte_name = models.CharField(max_length=55, null=True, blank=True)
+    dte_type = models.CharField(max_length=55, null=True, blank=True, choices=DTE_TYPES)
+    dte_options = models.CharField(max_length=255, null=True, blank=True)
+    dte_opts = models.CharField(max_length=255, null=True, blank=True)
     is_filter = models.BooleanField(default=False)
-    filter_type = models.CharField(max_length=55, null=True)
-    filter_mode = models.CharField(max_length=55, null=True)
-    filter_operator = models.CharField(max_length=55, null=True, choices=FILTER_OPS)
-    filter_options = models.CharField(max_length=255, null=True)
-    filter_lookup = models.CharField(max_length=55, null=True)
+    filter_type = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_TYPES)
+    filter_mode = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_MODES)
+    filter_operator = models.CharField(max_length=55, null=True, choices=FILTER_OPERATORS)
+    filter_options = models.CharField(max_length=255, null=True, blank=True)
+    filter_lookup = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_LOOKUPS)
+
+    def __str__(self):
+        return self.field
+
+    class Meta:
+        unique_together = ("list", "field")
 
 class Headword(dalmeUuid):
     word = models.CharField(max_length=55)

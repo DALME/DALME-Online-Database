@@ -229,18 +229,32 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
   width: 80px;
 }
 
+.edit-mode-btn {
+  height: 26px;
+  background-color: #fff;
+  border-color: #a3b1bd;
+  color: #787878;
+}
+
+.edit-mode-btn.active {
+  background-color: #f1e2e3 !important;
+  color: #784442 !important;
+  border-color: #b29e9d !important;
+}
+
 .model-btn {
-  border: none;
+  border: 1px solid #e8e9ec;
   border-radius: 0;
   height: 50%;
   font-size: .8rem;
   font-weight: 500;
   padding-left: 10px;
   padding-right: 10px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 3px;
+  padding-bottom: 3px;
   width: 100%;
-  margin-top: -1px;
+  background-color: #e8e9ec;
+  color: #787878;
 }
 
 .model-btn:hover {
@@ -251,13 +265,30 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
 
 .model-btn:disabled, .model-btn:disabled:hover {
   opacity: .65;
-  color: #858796;
-  border-color: transparent;
-  border-color: #a5a5a5;
+  background-color: #e8e9ec;
+  border: 1px solid #e8e9ec;
+  color: #787878;
 }
 
-.border-colour-a5 {
-  border-color: #a5a5a5;
+.custom_select {
+  color: #787878;
+  border: 1px solid #a5a5a5;
+}
+
+.border-left {
+  border-left: 1px solid #a5a5a5 !important;
+}
+
+.border-right {
+  border-right: 1px solid #a5a5a5 !important;
+}
+
+.border-top {
+  border-top: 1px solid #a5a5a5 !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #a5a5a5 !important;
 }
 
 .model-attribute-container {
@@ -368,17 +399,34 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
 
 /* datatables Editor form classes */
 
+.modal-content {
+  border-radius: 8px;
+}
+
 .modal-header {
   padding: .5rem 1rem;
   border-bottom: 1px solid #a5a5a5;
-  background-color: #e3f0f5;
-  color: #376783;
+  background-color: #2f333c;
+  color: #ffffff;
+  background-image: linear-gradient(180deg,#11587c 10%,#17222b 100%);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-weight: 600;
 }
 
 .modal-header .close {
   font-size: 1.3rem;
-  color: #00005e;
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  line-height: .8;
+}
 
+.modal-footer {
+  border-top: 1px solid #a5a5a5;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  background-color: #e8e9ec;
 }
 
 h5.modal-title {
@@ -426,9 +474,21 @@ h5.modal-title {
   display: flex !important;
 }
 
+.DTE_Field_InputControl textarea {
+  min-height: 100px;
+  height: 100px;
+}
+
+.chosen-container-multi .chosen-choices {
+  border-radius: .35rem;
+  border: 1px solid #a5a5a5;
+  background-image: none;
+}
+
 .DTE .btn {
   font-size: .8rem;
   line-height: 1.2;
+  margin-left: 10px;
 }
 
 div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
@@ -817,7 +877,7 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
 
 .btn-primary {
   color: #fff;
-  background-color: #0361aa;
+  background-color: #215986;
   border-color: #011536;
 }
 
@@ -890,13 +950,13 @@ button.buttons-create, button.buttons-edit, button.buttons-remove {
 .btn-danger {
   color: #fff;
   background-color: #a6332b;
-  border-color: #be2617;
+  border-color: #7d190f;
 }
 
 .btn-danger:hover {
   color: #fff;
   background-color: #be2617;
-  border-color: #be2617;
+  border-color: #7d190f;
 }
 
 .badge-pill {

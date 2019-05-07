@@ -31,6 +31,8 @@ function addDtToolbarButton(button) {
     $('#filters-container').on('click', '.remove_filter', removeFilter);
   } else if (button == 'preview') {
     $('.dt-buttons').append('<button class="btn dt-btn buttons-collection" id="btn-preview" onclick="togglePreview()"><i class="fa fa-eye fa-sm"></i> Preview</button>');
+  } else if (button == 'edit') {
+    $('.dt-buttons').append('<button class="btn buttons-collection edit-mode-btn" id="btn-field-edit" onclick="toggleFieldEdit()"><i class="fa fa-pen fa-sm"></i> Edit Mode</button>');
   }
 }
 

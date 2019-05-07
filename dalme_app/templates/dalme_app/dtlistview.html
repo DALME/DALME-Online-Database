@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% load staticfiles i18n %}
 {% block extra_head %}
-{% if form_helper %}
-<script type="text/javascript" src="{% static 'dalme_form_helpers/' %}{{ form_helper }}"></script>
+{% if helpers %}
+  {% for helper in helpers %}
+    <script type="text/javascript" src="{% static 'dalme_helpers/' %}{{ helper }}"></script>
+  {% endfor %}
 {% endif %}
-{% if preview_helper %}
+{% if preview %}
 <link href="{% static 'jquery-ui-resizable/jquery-ui.min.css' %}" rel="stylesheet">
 <script type="text/javascript" src="{% static 'jquery-ui-resizable/jquery-ui.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'dalme_preview_helpers/' %}{{ preview_helper }}"></script>
 {% endif %}
 <script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
 
@@ -104,12 +105,12 @@
               },
             {% endfor %}
           ]};
-    $(document).ready( function () { createDatatable('#dataTables-list', "{{ form_helper }}") });
+    $(document).ready( function () { createDatatable('#dataTables-list', "{{ helpers }}") });
     {% if filters %}
       var filters = {{ filters | safe }};
       $(document).on('init.dt', function () { addDtToolbarButton('filters')} );
     {% endif %}
-    {% if preview_helper %}
+    {% if preview %}
       $(document).on('init.dt', function () { addDtToolbarButton('preview')} );
     {% endif %}
 </script>

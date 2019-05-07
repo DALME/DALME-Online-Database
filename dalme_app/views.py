@@ -138,7 +138,7 @@ class ModelLists(TemplateView):
                         {
                           'title':'"Field"',
                           'targets':2,
-                          'data':'"field"'
+                          'data':'"field_name"'
                         },
                         {
                           'title':'"DT Name"',
@@ -201,12 +201,12 @@ class ModelLists(TemplateView):
                           'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
                         },
                         {
-                          'title':'"Filter type"',
+                          'title':'"Filter Type"',
                           'targets':14,
                           'data':'"filter_type"'
                         },
                         {
-                          'title':'"Filter mode"',
+                          'title':'"Filter Mode"',
                           'targets':15,
                           'data':'"filter_mode"'
                         },
@@ -216,12 +216,12 @@ class ModelLists(TemplateView):
                           'data':'"filter_operator"'
                         },
                         {
-                          'title':'"Filter options"',
+                          'title':'"Filter Options"',
                           'targets':17,
                           'data':'"filter_options"'
                         },
                         {
-                          'title':'"Filter lookup"',
+                          'title':'"Filter Lookup"',
                           'targets':18,
                           'data':'"filter_lookup"'
                         },
@@ -229,44 +229,11 @@ class ModelLists(TemplateView):
             }
             opt_lists = [{'label':i.name,'value':i.id} for i in DT_list.objects.all()]
             opt_fields = [{'label':i.short_name,'value':i.id} for i in Attribute_type.objects.all()]
-            opt_dte_types = [
-                    {'label':'checkbox', 'value':'checkbox'},
-                    {'label':'chosen', 'value':'chosen'},
-                    {'label':'date', 'value':'date'},
-                    {'label':'datetime', 'value':'datetime'},
-                    {'label':'hidden', 'value':'hidden'},
-                    {'label':'password', 'value':'password'},
-                    {'label':'radio', 'value':'radio'},
-                    {'label':'readonly', 'value':'readonly'},
-                    {'label':'select', 'value':'select'},
-                    {'label':'text', 'value':'text'},
-                    {'label':'textarea', 'value':'textarea'},
-                    {'label':'upload', 'value':'upload'},
-                    {'label':'uploadMany', 'value':'uploadMany'},
-            ]
-            opt_filter_types = [
-                    {'label':'check', 'value':'check'},
-                    {'label':'select', 'value':'select'},
-                    {'label':'switch', 'value':'switch'},
-                    {'label':'text', 'value':'text'},
-            ]
-            opt_filter_modes = [
-                    {'label':'check', 'value':'check'},
-                    {'label':'complete', 'value':'complete'},
-                    {'label':'strict', 'value':'strict'},
-            ]
-            opt_filter_ops = [
-                    {'label':'and', 'value':'and'},
-                    {'label':'or', 'value':'or'},
-            ]
-            opt_filter_lookups = [
-                    {'label':'exact', 'value':'exact'},
-                    {'label':'contains', 'value':'contains'},
-                    {'label':'in', 'value':'in'},
-                    {'label':'startswith', 'value':'startswith'},
-                    {'label':'endswith', 'value':'endswith'},
-                    {'label':'regex', 'value':'regex'},
-            ]
+            opt_dte_types = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('dte_type').choices]
+            opt_filter_types = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_type').choices]
+            opt_filter_modes = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_mode').choices]
+            opt_filter_ops = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_operator').choices]
+            opt_filter_lookups = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_lookup').choices]
             context['dt_editor'] = {
                 'ajax_url': '/api/fields/',
                 'options': {
@@ -290,19 +257,19 @@ class ModelLists(TemplateView):
                           'name':"dt_name"
                         },
                         {
-                          'label':"Vis.",
+                          'label':"Visible",
                           'name':"visible",
                           'type': "checkbox",
                           'options': [{'label': "",'value': "1"}],
                         },
                         {
-                          'label':"Ord.",
+                          'label':"Orderable",
                           'name':"orderable",
                           'type': "checkbox",
                           'options': [{'label': "",'value': "1"}],
                         },
                         {
-                          'label':"Srch.",
+                          'label':"Searchable",
                           'name':"searchable",
                           'type': "checkbox",
                           'options': [{'label': "",'value': "1"}],
@@ -314,7 +281,7 @@ class ModelLists(TemplateView):
                           'options': [{'label': "",'value': "1"}],
                         },
                         {
-                          'label':"Render Exp.",
+                          'label':"Render Expression",
                           'name':"render_exp"
                         },
                         {
@@ -343,32 +310,32 @@ class ModelLists(TemplateView):
                           'options': [{'label': "",'value': "1"}],
                         },
                         {
-                          'label':"Filter type",
+                          'label':"Filter Type",
                           'name':"filter_type",
                           'type': "chosen",
                           'opts': {'disable_search': "true"},
                           'options': opt_filter_types
                         },
                         {
-                          'label':"Filter mode",
+                          'label':"Filter Mode",
                           'name':"filter_mode",
                           'type': "chosen",
                           'opts': {'disable_search': "true"},
                           'options': opt_filter_modes
                         },
                         {
-                          'label':"Filter Op.",
+                          'label':"Filter Operator",
                           'name':"filter_operator",
                           'type': "chosen",
                           'opts': {'disable_search': "true"},
                           'options': opt_filter_ops
                         },
                         {
-                          'label':"Filter options",
+                          'label':"Filter Options",
                           'name':"filter_options"
                         },
                         {
-                          'label':"Filter lookup",
+                          'label':"Filter Lookup",
                           'name':"filter_lookup",
                           'type': "chosen",
                           'opts': {'disable_search': "true"},
@@ -382,7 +349,7 @@ class ModelLists(TemplateView):
         context = functions.set_menus(self.request, context, state)
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
-        context['form_helper'] = 'model_form.js'
+        context['helpers'] = ['model_form.js']
         return context
 
 
@@ -430,8 +397,8 @@ class DTListView(TemplateView):
         context['dt_options'] = self.get_dt_options(list, fields_dict)
         context['dt_editor'] = self.get_dt_editor(list, fields_dict)
         context['filters'] = self.get_filters(fields_dict)
-        context['form_helper'] = self.get_form_helper(list)
-        context['preview_helper'] = self.get_preview_helper(list)
+        context['helpers'] = self.get_helpers(list)
+
         return context
 
     def get_list_name(self, *args, **kwargs):
@@ -587,19 +554,13 @@ class DTListView(TemplateView):
             filters = None
         return filters
 
-    def get_form_helper(self, list, *args, **kwargs):
-        if list.form_helper:
-            form_helper = list.form_helper
+    def get_helpers(self, list, *args, **kwargs):
+        if list.helpers:
+            helpers = list.helpers.split(',')
         else:
-            form_helper = None
-        return form_helper
+            helpers = None
+        return helpers
 
-    def get_preview_helper(self, list, *args, **kwargs):
-        if list.preview_helper:
-            preview_helper = list.preview_helper
-        else:
-            preview_helper = None
-        return preview_helper
 
 @method_decorator(login_required,name='dispatch')
 class SourceList(DTListView):

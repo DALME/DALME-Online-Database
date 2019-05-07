@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% load staticfiles i18n %}
 {% block extra_head %}
-{% if form_helper %}
-<script type="text/javascript" src="{% static 'dalme_form_helpers/' %}{{ form_helper }}"></script>
+{% if helpers %}
+  {% for helper in helpers %}
+    <script type="text/javascript" src="{% static 'dalme_helpers/' %}{{ helper }}"></script>
+  {% endfor %}
 {% endif %}
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.0/css/scroller.bootstrap4.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/scroller/2.0.0/js/dataTables.scroller.min.js"></script>
@@ -104,8 +106,10 @@ var dt_options = {
         {% endfor %}
       ]};
 $(document).ready( function () {
-  createDatatable('#dataTables-table', "{{ form_helper }}");
+  createDatatable('#dataTables-table', "{{ helpers }}");
+  $(document).on('init.dt', function () { addDtToolbarButton('edit')} );
 });
+
 </script>
 
 {% endblock %}
@@ -131,8 +135,8 @@ $(document).ready( function () {
             <div class="mr-auto align-self-center mt-1 mb-1" id="parent_class_info">
             </div>
             <div class="model-button-container">
-              <button class="btn model-btn border-colour-a5 border-left border-bottom" onclick="addClassEntry()"><i class="fa fa-plus fa-sm mr-1"></i> Add</button>
-              <button class="btn model-btn border-colour-a5 border-left" onclick="editClassEntry()" disabled><i class="fa fa-pen fa-sm mr-1"></i> Edit</button>
+              <button id="btn_class_add" class="btn model-btn border-left border-bottom" onclick="addClassEntry()"><i class="fa fa-plus fa-sm mr-1"></i> Add</button>
+              <button id="btn_class_edit" class="btn model-btn border-left" onclick="editClassEntry()" disabled><i class="fa fa-pen fa-sm mr-1"></i> Edit</button>
             </div>
         </div>
         <div class="table-responsive dt-embed card-full" id="resize_wrapper">

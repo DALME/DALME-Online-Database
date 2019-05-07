@@ -20,16 +20,19 @@ class DynamicSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 class FieldAttributesSerializer(serializers.ModelSerializer):
-    field = serializers.StringRelatedField()
+    field_name = serializers.StringRelatedField(source='field')
 
     class Meta:
         model = DT_fields
-        fields = '__all__'
+        fields = ('id', 'list','field','render_exp','orderable','visible','searchable','nowrap','dt_name','dte_name','dte_type','dte_options','dte_opts','is_filter','filter_type','filter_mode','filter_operator','filter_options','filter_lookup', 'field_name')
 
-class ListsSerializer(DynamicSerializer):
+class ListsSerializer(serializers.ModelSerializer):
+    fields = FieldAttributesSerializer(many=True, required=False)
+
     class Meta:
         model = DT_list
-        fields = '__all__'
+        fields = ('id', 'name', 'short_name', 'description', 'content_types', 'api_url', 'helpers', 'fields')
+        extra_kwargs = { 'content_types': { 'required': False } }
 
 class WorksetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,16 +47,16 @@ class TaskSerializer(serializers.ModelSerializer):
 class TaskListSerializer(serializers.ModelSerializer):
     task_count = serializers.IntegerField()
 
+    class Meta:
+        model = TaskList
+        fields = ('id', 'name', 'group', 'task_count')
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['group'] = Group.objects.get(pk=ret['group']).name
         task_count = ret.pop('task_count')
         ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div><div class="badge badge-primary badge-pill align-self-end">'+str(task_count)+'</div></div>'
         return ret
-
-    class Meta:
-        model = TaskList
-        fields = ('id', 'name', 'group', 'task_count')
 
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,6 +65,10 @@ class PageSerializer(serializers.ModelSerializer):
 
 class ImageSerializer(serializers.ModelSerializer):
     collections = serializers.CharField(max_length=255)
+
+    class Meta:
+        model = rs_resource
+        fields = ('ref', 'has_image','creation_date','created_by','field12','field8','field3','field51','field79','collections')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -73,13 +80,13 @@ class ImageSerializer(serializers.ModelSerializer):
         ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
         return ret
 
-    class Meta:
-        model = rs_resource
-        fields = ('ref', 'has_image','creation_date','created_by','field12','field8','field3','field51','field79','collections')
-
 class TranscriptionSerializer(serializers.ModelSerializer):
     """ Basic serializer for transcriptions """
     author = serializers.CharField(max_length=255, required=False)
+
+    class Meta:
+        model = Transcription
+        fields = ('id', 'transcription', 'author', 'version')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -89,10 +96,6 @@ class TranscriptionSerializer(serializers.ModelSerializer):
         else:
             ret['transcription_html'] = ''
         return ret
-
-    class Meta:
-        model = Transcription
-        fields = ('id', 'transcription', 'author', 'version')
 
 class AttributeSerializer(serializers.ModelSerializer):
     """ Basic serializer for attribute data """
@@ -126,6 +129,10 @@ class SourceSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True)
     no_folios = serializers.IntegerField()
 
+    class Meta:
+        model = Source
+        fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes', 'no_folios')
+
     def to_representation(self, instance):
         """Create dictionaries for fields with links"""
         fields = self.context.get('fields')
@@ -140,9 +147,6 @@ class SourceSerializer(DynamicSerializer):
             ret['url'] = {'name': 'Visit Link', 'url': ret['url']}
         return ret
 
-    class Meta:
-        model = Source
-        fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes', 'no_folios')
 
 class WikiGroupSerializer(serializers.ModelSerializer):
     """Basic serializer for user group data from the wiki database"""
@@ -160,6 +164,7 @@ class WikiGroupSerializer(serializers.ModelSerializer):
 class GroupSerializer(serializers.ModelSerializer):
     """ Basic serializer for user group data """
     name = serializers.CharField(max_length=255, required=False)
+
     class Meta:
         model = Group
         fields = ('id','name')

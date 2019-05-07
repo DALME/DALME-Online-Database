@@ -111,10 +111,17 @@ def session_info(request, username):
     return output
 
 def test_expression(request):
-    data = '{"action":"create","data":{"0":{"user":{"first_name":"John","last_name":"Smith","email":"jsmith@harvard.edu","username":"jsmith","password":"thepassword1234","is_staff":["1"],"is_superuser":["1"],"groups":[{"id":"2"},{"id":"3"},{"id":"4"}],"groups-many-count":3},"full_name":"John Smith","dam_usergroup":{"value":"2"},"wiki_groups":[{"ug_group":"administrator"},{"ug_group":"bureaucrat"}],"wiki_groups-many-count":2,"wp_role":{"value":"a:1:{s:6:\\"author\\";b:1;}"}}}}'
-    dt_request = json.loads(data)
-    data_dict = dt_request['data']['0']
-    return data_dict
+    fields = ["79","42"]
+    fields = [int(i) for i in fields]
+    current_fields = DT_fields.objects.filter(list="11").values_list('field', flat=True)
+    add_fields = list(set(fields) - set(current_fields))
+    remove_fields = list(set(current_fields) - set(fields))
+    ret = {
+    'current_fields': str(current_fields),
+    'add_fields': add_fields,
+    'remove_fields': remove_fields
+    }
+    return ret
 
 def test_expression2():
 

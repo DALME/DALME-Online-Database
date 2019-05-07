@@ -86,9 +86,102 @@ class Lists(DTViewSet):
 
     def retrieve(self, request, pk=None):
         list = get_object_or_404(self.queryset, pk=pk)
-        fields = ['creation_username','creation_timestamp','modification_username','modification_timestamp','name']
-        serializer = ListsSerializer(list, fields=fields)
+        serializer = ListsSerializer(list)
         return Response(serializer.data)
+
+    def create(self, request, format=None):
+        result = {}
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        if 'fields' in data_dict:
+            fields = data_dict.pop('fields')
+        if 'content_types' in data_dict:
+            content_types = data_dict.pop('content_types')
+        serializer = ListsSerializer(data=data_dict)
+        if serializer.is_valid():
+            new_obj = serializer.save()
+            if fields:
+                for f in fields:
+                    new_field = DT_fields()
+                    new_field.list = new_obj
+                    new_field.field = Attribute_type.objects.get(pk=f)
+                    new_field.save()
+            if content_types:
+                object = DT_list.objects.get(pk=new_obj.id)
+                for ct in content_types:
+                    ctype = Content_type.objects.get(id=ct)
+                    object.content_types.add(ctype)
+            object = DT_list.objects.get(pk=new_obj.id)
+            serializer = ListsSerializer(object)
+            result['data'] = serializer.data
+            status=201
+        else:
+            result['fieldErrors'] = get_error_array(serializer.errors)
+            status=400
+        return Response(result, status)
+
+    def update(self, request, pk=None, format=None):
+        result = {}
+        object = get_object_or_404(self.queryset, pk=pk)
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        if 'fields' in data_dict:
+            fields = data_dict.pop('fields')
+        if 'content_types' in data_dict:
+            content_types = data_dict.pop('content_types')
+        serializer = ListsSerializer(object, data=data_dict)
+        if serializer.is_valid():
+            serializer.save()
+            if fields:
+                fields = [int(i) for i in fields]
+                current_fields = DT_fields.objects.filter(list=object.id).values_list('field', flat=True)
+                add_fields = list(set(fields) - set(current_fields))
+                remove_fields = list(set(current_fields) - set(fields))
+                if add_fields:
+                    for f in add_fields:
+                        new_field = DT_fields()
+                        new_field.list = object
+                        new_field.field = Attribute_type.objects.get(pk=f)
+                        new_field.save()
+                if remove_fields:
+                    q = Q(list=object.id)
+                    for f in remove_fields:
+                        q &= Q(field=f)
+                    DT_fields.objects.filter(q).delete()
+            if content_types:
+                content_types = [int(i) for i in content_types]
+                current_ct = object.content_types.all().values_list('id', flat=True)
+                add_ct = list(set(content_types) - set(current_ct))
+                remove_ct = list(set(current_ct) - set(content_types))
+                if add_ct:
+                    for ct in add_ct:
+                        ctype = Content_type.objects.get(id=ct)
+                        object.content_types.add(ctype)
+                if remove_ct:
+                    for ct in remove_ct:
+                        ctype = Content_type.objects.get(id=ct)
+                        object.content_types.remove(ctype)
+            object = DT_list.objects.get(pk=object.id)
+            serializer = ListsSerializer(object)
+            result['data'] = serializer.data
+            status=201
+        else:
+            result['fieldErrors'] = get_error_array(serializer.errors)
+            status=400
+        return Response(result, status)
+
+    def destroy(self, request, pk=None, format=None):
+        result = {}
+        object = get_object_or_404(self.queryset, pk=request.data['data']['id'])
+        try:
+            object.delete()
+            result['result'] = 'success'
+            status=201
+        except Exception as e:
+            result['result'] = 'error'
+            result['error'] = 'The following error occured while trying to delete the data: ' + str(e)
+            status=400
+        return Response(result, status)
 
 class Options(viewsets.ViewSet):
     """ API endpoint for generating lists of options for DTE forms """
@@ -104,8 +197,8 @@ class Options(viewsets.ViewSet):
                 staff = functions.get_dte_options(staff_options, 'chosen')
                 worksets_options = '[\'Workset.objects.filter(owner='+str(request.user.id)+')\',\'name\',\'id\']'
                 worksets = functions.get_dte_options(worksets_options, 'chosen')
-                groups = request.user.groups.all()
-                all_lists = TaskList.objects.all()
+                groups = request.user.groups.all().order_by('name')
+                all_lists = TaskList.objects.all().order_by('name')
                 lists = [{'label': "", 'value': ""}]
                 for list in all_lists:
                     if list.group in groups:
@@ -114,17 +207,10 @@ class Options(viewsets.ViewSet):
                 data_dict['worksets'] = worksets
                 data_dict['lists'] = lists
             elif form == 'createtasklist':
-                groups = []
-                ugroups = request.user.groups.all()
-                for g in ugroups:
-                    groups.append({'label': g.name, 'value': g.id})
-                data_dict['groups'] = groups
+                data_dict['groups'] = [{'label': i.name, 'value': i.id} for i in request.user.groups.all().order_by('name')]
             elif form == 'modelslist':
-                content_types = []
-                ctypes = Content_type.objects.all()
-                for t in ctypes:
-                    content_types.append({'label': t.name, 'value': t.id})
-                data_dict['content_types'] = content_types
+                data_dict['content_types'] = [{'label': i.name, 'value': i.id} for i in Content_type.objects.all().order_by('name')]
+                data_dict['fields'] = [{'label': i.name +' ('+i.short_name+')', 'value': i.id} for i in Attribute_type.objects.all().order_by('name')]
         except Exception as e:
             data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
         return Response(data_dict)
