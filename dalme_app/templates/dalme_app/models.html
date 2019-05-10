@@ -13,6 +13,10 @@
 <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
 <script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
 <script type="text/javascript">
+var model = "{{ model }}";
+{% if dt_fieldsets %}
+var dt_fieldsets = {{ dt_fieldsets | safe }};
+{% endif %}
 {% if dt_editor %}
   var dt_editor_options = {
     'ajax': {
@@ -20,19 +24,22 @@
           'type': 'POST',
           'url': '{{ dt_editor.ajax_url }}',
           'headers': {'X-CSRFToken': getCookie("csrftoken") },
-          'data': function (data) { return { "data": JSON.stringify( data ) }; }
+          'data': function (data) { return { "data": JSON.stringify(data) }; }
         },
       'edit': {
-          'type': 'PUT',
+          'type': 'PATCH',
           'url': '{{ dt_editor.ajax_url }}_id_/',
           'headers': {'X-CSRFToken': getCookie("csrftoken") },
-          'data': function (data) { return { "data": JSON.stringify( data ) }; }
+          'data': function (data) { return { "data": JSON.stringify(data) }; }
         },
       'remove': {
           'type': 'DELETE',
           'url': '{{ dt_editor.ajax_url }}_id_/',
           'headers': {'X-CSRFToken': getCookie("csrftoken") },
-          'data': function (data) { return { "data": JSON.stringify( data ) }; }
+          'data': function (data) {
+                      data.data = null;
+                      return data;
+                  }
         }
       },
       {% for k,v in dt_editor.options.items %}
@@ -42,10 +49,20 @@
         {% for i in dt_editor.fields %}
           {
             {% for k,v in i.items %}
-              {% if k == 'opts' %}
+              {% if k == 'attr' %}
+                attr: {
+                  {% for ak, av in v.items %}
+                    {{ ak | safe }}: {{ av | safe }},
+                  {% endfor %}
+                },
+              {% elif k == 'opts' %}
                 opts: {
                   {% for ok, ov in v.items %}
-                    {{ ok | safe }}: "{{ ov | safe }}",
+                    {% if ok == 'source' %}
+                      {{ ok | safe }}: {{ ov | safe }},
+                    {% else %}
+                      {{ ok | safe }}: "{{ ov | safe }}",
+                    {% endif %}
                   {% endfor %}
                 },
               {% elif k == 'options' %}
@@ -107,9 +124,14 @@ var dt_options = {
       ]};
 $(document).ready( function () {
   createDatatable('#dataTables-table', "{{ helpers }}");
-  $(document).on('init.dt', function () { addDtToolbarButton('edit')} );
+  dt_table.on('draw', function(){ $(window).trigger('resize'); });
+  dt_table.on('column-visibility', function(){ $(window).trigger('resize'); });
+  $(document).on('init.dt', function () {
+    if (model == 'dt_fields') {
+      addDtToolbarButton('edit');
+    };
+  });
 });
-
 </script>
 
 {% endblock %}
@@ -119,9 +141,9 @@ $(document).ready( function () {
     <div class="col-md-12">
       <div class="card shadow mb-3">
         <div class="sub-card-header">
-          <div class="card-header-title"><i class="fa fa-list fa-fw"></i> Lists and Field attributes</div>
+          <div class="card-header-title"><i class="fa fa-cubes fa-fw"></i> {{ page_title }}</div>
         </div>
-        <div class="d-flex">
+        <div class="d-flex overflow-hidden flex-shrink-1">
           {% if parent_class %}
             <div class="align-self-start align-self-center mr-4 model-select-container ml-4">
               <select class="custom-select custom-select-sm" id="parent_class_select">
@@ -132,7 +154,7 @@ $(document).ready( function () {
               </select>
             </div>
           {% endif %}
-            <div class="mr-auto align-self-center mt-1 mb-1" id="parent_class_info">
+            <div class="mr-auto align-self-center mt-1 mb-1 overflow-hidden flex-shrink-1" id="parent_class_info">
             </div>
             <div class="model-button-container">
               <button id="btn_class_add" class="btn model-btn border-left border-bottom" onclick="addClassEntry()"><i class="fa fa-plus fa-sm mr-1"></i> Add</button>

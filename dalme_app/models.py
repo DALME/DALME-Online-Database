@@ -37,11 +37,11 @@ class Profile(models.Model):
     """
 
     WP_ROLE = (
-        ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
-        ('a:1:{s:6:"editor";b:1;}', 'Editor'),
-        ('a:1:{s:6:"author";b:1;}', 'Author'),
+        ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber'),
         ('a:1:{s:11:"contributor";b:1;}', 'Contributor'),
-        ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber')
+        ('a:1:{s:6:"author";b:1;}', 'Author'),
+        ('a:1:{s:6:"editor";b:1;}', 'Editor'),
+        ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -68,12 +68,20 @@ class Agent(dalmeUuid):
     type = models.IntegerField()
 
 class Attribute_type(dalmeIntid):
+
+    DATA_TYPES = (
+        ('DATE', 'DATE (date)'),
+        ('INT', 'INT (integer)'),
+        ('STR', 'STR (string)'),
+        ('TXT', 'TXT (text)')
+    )
+
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55, unique=True)
     description = models.TextField()
-    data_type = models.CharField(max_length=15)
+    data_type = models.CharField(max_length=15, choices=DATA_TYPES)
     source = models.CharField(max_length=255, null=True)
-    same_as = models.CharField(max_length=55, null=True)
+    same_as = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, db_column="same_as")
 
     def __str__(self):
         return self.name + ' ('+self.short_name+')'
@@ -85,7 +93,7 @@ class Attribute(dalmeUuid):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.UUIDField(null=True, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    attribute_type = models.ForeignKey("Attribute_type", db_index=True, on_delete=models.PROTECT, db_column="attribute_type")
+    attribute_type = models.ForeignKey("Attribute_type", db_index=True, on_delete=models.CASCADE, db_column="attribute_type")
     value_STR = models.CharField(max_length=255, blank=True, null=True)
     value_DATE_d = models.IntegerField(blank=True, null=True)
     value_DATE_m = models.IntegerField(blank=True, null=True)
@@ -120,7 +128,7 @@ class Content_class(dalmeIntid):
         ordering = ['id']
 
 class Content_type(dalmeIntid):
-    content_class = models.IntegerField()
+    content_class = models.ForeignKey('Content_class', to_field='id', db_index=True, on_delete=models.PROTECT)
     name = models.CharField(max_length=255, unique=True)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
@@ -133,9 +141,9 @@ class Content_type(dalmeIntid):
         ordering = ['id']
 
 class Content_attributes(dalmeIntid):
-    content_type = models.ForeignKey('Content_type',to_field='id',db_index=True,on_delete=models.CASCADE)
-    attribute_type = models.ForeignKey('Attribute_type',to_field='id',db_index=True,on_delete=models.CASCADE)
-    order = models.IntegerField(db_index=True)
+    content_type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='attribute_type_list')
+    attribute_type = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='content_types')
+    order = models.IntegerField(db_index=True, null=True)
 
 class DT_list(dalmeIntid):
     name = models.CharField(max_length=255)
@@ -154,11 +162,13 @@ class DT_list(dalmeIntid):
 class DT_fields(dalmeIntid):
 
     DTE_TYPES = (
+        ('autoComplete', 'autoComplete'),
         ('checkbox', 'checkbox'),
         ('chosen', 'chosen'),
         ('date', 'date'),
         ('datetime', 'datetime'),
         ('hidden', 'hidden'),
+        ('multi-chosen', 'multi-chosen'),
         ('password', 'password'),
         ('radio', 'radio'),
         ('readonly', 'readonly'),
@@ -226,10 +236,14 @@ class DT_fields(dalmeIntid):
     searchable = models.BooleanField(default=False)
     nowrap = models.BooleanField(default=False)
     dt_name = models.CharField(max_length=55, null=True, blank=True)
+    dt_class_name = models.CharField(max_length=255, null=True, blank=True)
+    dte_class_name = models.CharField(max_length=255, null=True, blank=True)
+    dt_width = models.CharField(max_length=255, null=True, blank=True)
     dte_name = models.CharField(max_length=55, null=True, blank=True)
     dte_type = models.CharField(max_length=55, null=True, blank=True, choices=DTE_TYPES)
     dte_options = models.CharField(max_length=255, null=True, blank=True)
     dte_opts = models.CharField(max_length=255, null=True, blank=True)
+    dte_message = models.CharField(max_length=255, null=True, blank=True)
     is_filter = models.BooleanField(default=False)
     filter_type = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_TYPES)
     filter_mode = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_MODES)
@@ -587,10 +601,10 @@ class rs_collection_resource(models.Model):
 class rs_user(models.Model):
 
     DAM_USERGROUPS = (
-        (1, 'Administrator'),
         (2, 'General User'),
+        (4, 'Archivist'),
+        (1, 'Administrator'),
         (3, 'Super Admin'),
-        (4, 'Archivist')
     )
 
     ref = models.IntegerField(primary_key=True)

@@ -68,7 +68,6 @@ class DefaultSearch(SearchView):
     """ Default search view for Haystack"""
     template_name = 'dalme_app/search.html'
     results_per_page = 10
-    #form_class = dalme_searchform
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,277 +82,6 @@ class DefaultSearch(SearchView):
         return context
 
 @method_decorator(login_required,name='dispatch')
-class ModelLists(TemplateView):
-    template_name = 'dalme_app/models.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        model = self.kwargs['model']
-        request = self.request
-        tables = []
-        if model == 'content':
-            breadcrumb = [('Data Models', ''),('Content Types', '/models/content')]
-            page_title = 'Models: Content Type'
-        elif model == 'attributes':
-            breadcrumb = [('Data Models', ''),('Attributes', '/models/attributes')]
-            page_title = 'Models: Attributes'
-        elif model == 'lists':
-            breadcrumb = [('Data Models', ''),('Lists', '/models/lists')]
-            page_title = 'Models: Lists'
-            qs = DT_list.objects.all()
-            pc_opt = {i.id:i.name for i in qs}
-            context['parent_class'] = {
-                'name': 'list',
-                'options': pc_opt
-            }
-            context['dt_options'] = {
-                'options': {
-                    'ajax': '"/api/fields/?format=json"',
-                    'serverSide': 'true',
-                    'responsive': 'true',
-                    'dom': '\'<"sub-card-header-embed d-flex"B<"btn-group"f>r><"card-body"t><"sub-card-footer"i>\'',
-                    'stateSave': 'true',
-                    'select': { 'style': 'single'},
-                    'scrollResize': 'true',
-                    'scrollY': '"50vh"',
-                    'deferRender': 'true',
-                    'scroller': 'true',
-                    'language': {'searchPlaceholder': 'Search'},
-                    'rowId': '"id"',
-                },
-                'buttons': [{ 'extend': '"colvis"', 'text': '"\uf0db"'}],
-                'columnDefs':[
-                        {
-                          'title':'"Id"',
-                          'targets':0,
-                          'data':'"id"',
-                          "visible":'false'
-                        },
-                        {
-                          'title':'"List"',
-                          'targets':1,
-                          'data':'"list"',
-                          "visible":'false'
-                        },
-                        {
-                          'title':'"Field"',
-                          'targets':2,
-                          'data':'"field_name"'
-                        },
-                        {
-                          'title':'"DT Name"',
-                          'targets':3,
-                          'data':'"dt_name"'
-                        },
-                        {
-                          'title':'"Vis."',
-                          'targets':4,
-                          'data':'"visible"',
-                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-                        },
-                        {
-                          'title':'"Ord."',
-                          'targets':5,
-                          'data':'"orderable"',
-                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-                        },
-                        {
-                          'title':'"Srch."',
-                          'targets':6,
-                          'data':'"searchable"',
-                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-                        },
-                        {
-                          'title':'"Nowrap"',
-                          'targets':7,
-                          'data':'"nowrap"',
-                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-                        },
-                        {
-                          'title':'"Render Exp."',
-                          'targets':8,
-                          'data':'"render_exp"'
-                        },
-                        {
-                          'title':'"DTE Name"',
-                          'targets':9,
-                          'data':'"dte_name"'
-                        },
-                        {
-                          'title':'"DTE Type"',
-                          'targets':10,
-                          'data':'"dte_type"'
-                        },
-                        {
-                          'title':'"DTE Options"',
-                          'targets':11,
-                          'data':'"dte_options"'
-                        },
-                        {
-                          'title':'"DTE Opts"',
-                          'targets':12,
-                          'data':'"dte_opts"'
-                        },
-                        {
-                          'title':'"Filter"',
-                          'targets':13,
-                          'data':'"is_filter"',
-                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-                        },
-                        {
-                          'title':'"Filter Type"',
-                          'targets':14,
-                          'data':'"filter_type"'
-                        },
-                        {
-                          'title':'"Filter Mode"',
-                          'targets':15,
-                          'data':'"filter_mode"'
-                        },
-                        {
-                          'title':'"Filter Op."',
-                          'targets':16,
-                          'data':'"filter_operator"'
-                        },
-                        {
-                          'title':'"Filter Options"',
-                          'targets':17,
-                          'data':'"filter_options"'
-                        },
-                        {
-                          'title':'"Filter Lookup"',
-                          'targets':18,
-                          'data':'"filter_lookup"'
-                        },
-                  ]
-            }
-            opt_lists = [{'label':i.name,'value':i.id} for i in DT_list.objects.all()]
-            opt_fields = [{'label':i.short_name,'value':i.id} for i in Attribute_type.objects.all()]
-            opt_dte_types = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('dte_type').choices]
-            opt_filter_types = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_type').choices]
-            opt_filter_modes = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_mode').choices]
-            opt_filter_ops = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_operator').choices]
-            opt_filter_lookups = [{'label': i[1], 'value': i[0]} for i in DT_fields._meta.get_field('filter_lookup').choices]
-            context['dt_editor'] = {
-                'ajax_url': '/api/fields/',
-                'options': {
-                    'idSrc': '"id"'
-                },
-                'fields': [
-                        {
-                          'label':"List",
-                          'name':"list",
-                          'type': "chosen",
-                          'options': opt_lists
-                        },
-                        {
-                          'label':"Field",
-                          'name':"field",
-                          'type': "chosen",
-                          'options': opt_fields
-                        },
-                        {
-                          'label':"DT Name",
-                          'name':"dt_name"
-                        },
-                        {
-                          'label':"Visible",
-                          'name':"visible",
-                          'type': "checkbox",
-                          'options': [{'label': "",'value': "1"}],
-                        },
-                        {
-                          'label':"Orderable",
-                          'name':"orderable",
-                          'type': "checkbox",
-                          'options': [{'label': "",'value': "1"}],
-                        },
-                        {
-                          'label':"Searchable",
-                          'name':"searchable",
-                          'type': "checkbox",
-                          'options': [{'label': "",'value': "1"}],
-                        },
-                        {
-                          'label':"Nowrap",
-                          'name':"nowrap",
-                          'type': "checkbox",
-                          'options': [{'label': "",'value': "1"}],
-                        },
-                        {
-                          'label':"Render Expression",
-                          'name':"render_exp"
-                        },
-                        {
-                          'label':"DTE Name",
-                          'name':"dte_name"
-                        },
-                        {
-                          'label':"DTE Type",
-                          'name':"dte_type",
-                          'type': "chosen",
-                          'opts': {'disable_search': "true"},
-                          'options': opt_dte_types
-                        },
-                        {
-                          'label':"DTE Options",
-                          'name':"dte_options"
-                        },
-                        {
-                          'label':"DTE Opts",
-                          'name':"dte_opts"
-                        },
-                        {
-                          'label':"Filter",
-                          'name':"is_filter",
-                          'type': "checkbox",
-                          'options': [{'label': "",'value': "1"}],
-                        },
-                        {
-                          'label':"Filter Type",
-                          'name':"filter_type",
-                          'type': "chosen",
-                          'opts': {'disable_search': "true"},
-                          'options': opt_filter_types
-                        },
-                        {
-                          'label':"Filter Mode",
-                          'name':"filter_mode",
-                          'type': "chosen",
-                          'opts': {'disable_search': "true"},
-                          'options': opt_filter_modes
-                        },
-                        {
-                          'label':"Filter Operator",
-                          'name':"filter_operator",
-                          'type': "chosen",
-                          'opts': {'disable_search': "true"},
-                          'options': opt_filter_ops
-                        },
-                        {
-                          'label':"Filter Options",
-                          'name':"filter_options"
-                        },
-                        {
-                          'label':"Filter Lookup",
-                          'name':"filter_lookup",
-                          'type': "chosen",
-                          'opts': {'disable_search': "true"},
-                          'options': opt_filter_lookups
-                        },
-                ]
-            }
-        sidebar_toggle = self.request.session['sidebar_toggle']
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['sidebar_toggle'] = sidebar_toggle
-        context = functions.set_menus(self.request, context, state)
-        context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
-        context['helpers'] = ['model_form.js']
-        return context
-
-
-@method_decorator(login_required,name='dispatch')
 class DTListView(TemplateView):
     """ Generic list view that feeds Datatables """
     template_name = 'dalme_app/dtlistview.html'
@@ -363,7 +91,7 @@ class DTListView(TemplateView):
         'paging': 'true',
         'responsive':'true',
         'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
         'serverSide': 'true',
         'stateSave': 'true',
         'select': { 'style': 'single'},
@@ -373,7 +101,6 @@ class DTListView(TemplateView):
         }
     dt_buttons = [{ 'extend': '"colvis"', 'text': '"\uf0db"'}]
     dt_buttons_extra = ['"pageLength"']
-    dt_editor_options = None
     dt_editor_buttons = [
         { 'extend': 'create', 'text': '\uf067 Add' },
         { 'extend': 'edit', 'text': '\uf304 Edit' },
@@ -389,72 +116,100 @@ class DTListView(TemplateView):
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
         list_name = self.get_list_name()
-        list = DT_list.objects.get(short_name=list_name)
-        fields_dict = self.get_fields_dict(list)
-        page_title = self.get_page_title(list)
+        _list = self.get_list(list_name)
+        fields_dict = self.get_fields_dict(_list)
+        page_title = self.get_page_title(_list)
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
-        context['dt_options'] = self.get_dt_options(list, fields_dict)
-        context['dt_editor'] = self.get_dt_editor(list, fields_dict)
+        context['dt_options'] = self.get_dt_options(_list, fields_dict)
+        context['dt_editor'] = self.get_dt_editor(_list, fields_dict)
         context['filters'] = self.get_filters(fields_dict)
-        context['helpers'] = self.get_helpers(list)
-
+        context['helpers'] = self.get_helpers(_list)
+        context['preview'] = self.get_preview()
         return context
 
     def get_list_name(self, *args, **kwargs):
-        return self.list_name
+        try:
+            list_name = self.list_name
+        except:
+            list_name = None
+        return list_name
 
-    def get_fields_dict(self, list, *args, **kwargs):
-        fields = [
-            'field__short_name',
-            'field__name',
-            'orderable',
-            'visible',
-            'searchable',
-            'render_exp',
-            'dte_type',
-            'dte_options',
-            'dt_name',
-            'dte_name',
-            'nowrap',
-            'dte_opts',
-            'is_filter',
-            'filter_options',
-            'filter_mode',
-            'filter_type',
-            'filter_operator',
-            'filter_lookup'
-        ]
-        qset = DT_fields.objects.filter(list=list.id).values(*fields)
-        fields_dict = {}
-        for i in qset:
-            fields_dict[i['field__short_name']] = i
+    def get_list(self, list_name, *args, **kwargs):
+        try:
+            _list = DT_list.objects.get(short_name=list_name)
+        except:
+            _list = None
+        return _list
+
+    def get_fields_dict(self, _list, *args, **kwargs):
+        try:
+            fields = [
+                'field__short_name',
+                'field__name',
+                'orderable',
+                'visible',
+                'searchable',
+                'render_exp',
+                'dte_type',
+                'dte_options',
+                'dte_message',
+                'dt_class_name',
+                'dte_class_name',
+                'dt_width',
+                'dt_name',
+                'dte_name',
+                'nowrap',
+                'dte_opts',
+                'is_filter',
+                'filter_options',
+                'filter_mode',
+                'filter_type',
+                'filter_operator',
+                'filter_lookup'
+            ]
+            qset = DT_fields.objects.filter(list=_list.id).values(*fields)
+            fields_dict = {}
+            for i in qset:
+                fields_dict[i['field__short_name']] = i
+        except:
+            fields_dict = None
         return fields_dict
 
     def get_breadcrumb(self, *args, **kwargs):
-        return self.breadcrumb
+        try:
+            breadcrumb = self.breadcrumb
+        except:
+            breadcrumb = None
+        return breadcrumb
 
-    def get_page_title(self, list, *args, **kwargs):
-        title = list.name
+    def get_page_title(self, _list, *args, **kwargs):
+        try:
+            title = _list.name
+        except:
+            title = None
         return title
 
-    def get_dt_options(self, list, fields_dict, *args, **kwargs):
+    def get_dt_options(self, _list, fields_dict, *args, **kwargs):
         dt_options = {}
         options = self.dt_options
-        options['ajax'] = self.get_dt_ajax_str(list)
+        options['ajax'] = self.get_dt_ajax_str(_list)
         dt_options['options'] = options
         dt_options['buttons'] = self.dt_buttons
         dt_options['buttons_extra'] = self.dt_buttons_extra
-        dt_options['columnDefs'] = self.get_dt_column_defs(list, fields_dict)
+        dt_options['columnDefs'] = self.get_dt_column_defs(_list, fields_dict)
         return dt_options
 
-    def get_dt_ajax_str(self, list, *args, **kwargs):
-        base_url = list.api_url
-        dt_ajax_str = '"'+base_url+'?format=json"'
+    def get_dt_ajax_str(self, _list, *args, **kwargs):
+        try:
+            base_url = _list.api_url
+            dt_ajax_str = '"'+base_url+'?format=json"'
+        except:
+            dt_ajax_str = None
         return dt_ajax_str
 
-    def get_dt_column_defs(self, list, fields_dict, *args, **kwargs):
-        dt_fields = self.get_dt_fields(list)
+    def get_dt_column_defs(self, _list, fields_dict, *args, **kwargs):
+        dt_fields = self.get_dt_fields(_list)
         column_defs = []
         col = 0
         for f in dt_fields:
@@ -475,27 +230,37 @@ class DTListView(TemplateView):
                 c_dict['searchable'] = 'false'
             if lf['render_exp']:
                 c_dict['render'] = lf['render_exp']
-            if lf['nowrap']:
+            if lf['dt_width']:
+                c_dict['width'] = '"'+lf['dt_width']+'"'
+            if lf['dt_class_name'] and lf['nowrap']:
+                c_dict['className'] = '"' + lf['dt_class_name'] + ' nowrap"'
+            elif lf['dt_class_name']:
+                c_dict['className'] = '"' + lf['dt_class_name'] + '"'
+            elif lf['nowrap']:
                 c_dict['className'] = '"nowrap"'
             column_defs.append(c_dict)
             col = col + 1
         return column_defs
 
-    def get_dt_fields(self, list, *args, **kwargs):
-        return self.dt_field_list
+    def get_dt_fields(self, _list, *args, **kwargs):
+        try:
+            dt_fields = self.dt_field_list
+        except:
+            dt_fields = None
+        return dt_fields
 
-    def get_dte_fields(self, list, *args, **kwargs):
+    def get_dte_fields(self, _list, *args, **kwargs):
         if self.dte_field_list:
             dte_fields = self.dte_field_list
         else:
             dte_fields = None
         return dte_fields
 
-    def get_dt_editor(self, list, fields_dict, *args, **kwargs):
-        if self.get_dte_fields(list):
-            dte_fields = self.get_dte_fields(list)
+    def get_dt_editor(self, _list, fields_dict, *args, **kwargs):
+        if self.get_dte_fields(_list):
+            dte_fields = self.get_dte_fields(_list)
             dt_editor = {}
-            dt_editor['ajax_url'] = list.api_url
+            dt_editor['ajax_url'] = _list.api_url
             fields = []
             for f in dte_fields:
                 lf = fields_dict[f]
@@ -508,59 +273,207 @@ class DTListView(TemplateView):
                 f_dict['label'] = lf['field__name']
                 f_dict['name'] = f_name
                 if lf['dte_type']:
-                    f_dict['type'] = lf['dte_type']
+                    if lf['dte_type'] == 'multi-chosen':
+                        f_dict['type'] = 'chosen'
+                        f_dict['attr'] = { 'multiple': 'true' }
+                    else:
+                        f_dict['type'] = lf['dte_type']
                 if lf['dte_opts']:
-                    f_dict['opts'] = eval(lf['dte_opts'])
+                    if lf['dte_type'] == 'autocomplete':
+                        ac_opts = eval(lf['dte_opts'])
+                    else:
+                        f_dict['opts'] = eval(lf['dte_opts'])
                 if lf['dte_options']:
-                    f_dict['options'] = self.get_dte_options(lf['dte_options'], lf['dte_type'])
+                    if lf['dte_type'] == 'autoComplete':
+                        try:
+                            ac_opts['source'] = functions.get_dte_options(lf['dte_options'], lf['dte_type'])
+                        except:
+                            ac_opts = { 'source': functions.get_dte_options(lf['dte_options'], lf['dte_type'])}
+                        f_dict['opts'] = ac_opts
+                    else:
+                        f_dict['options'] = functions.get_dte_options(lf['dte_options'], lf['dte_type'])
+                if lf['dte_message']:
+                    f_dict['message'] = lf['dte_message']
                 fields.append(f_dict)
             dt_editor['fields'] = fields
-            if self.dt_editor_options:
-                dt_editor['options'] = self.dt_editor_options
-            if self.dt_editor_buttons:
-                dt_editor['buttons'] = self.dt_editor_buttons
+            if self.get_dte_options():
+                dt_editor['options'] = self.get_dte_options()
+            if self.get_dte_buttons():
+                dt_editor['buttons'] = self.get_dte_buttons()
         else:
             dt_editor = None
         return dt_editor
 
-    def get_dte_options(self, options, field_type, *args, **kwargs):
-        return functions.get_dte_options(options, field_type, *args, **kwargs)
-
     def get_filters(self, fields_dict, *args, **kwargs):
-        filters = []
-        for key, dict in fields_dict.items():
-            if dict['is_filter']:
-                filter = {}
-                filter['label'] = dict['field__name']
-                filter['field'] = key
-                filter['type'] = dict['filter_type']
-                filter['operator'] = dict['filter_operator']
-                if 'lookup' in filter:
-                    filter['lookup'] = dict['filter_lookup']
-                if dict['filter_type'] == 'text':
-                    filter['lookups'] = [
-                            {'label':'is', 'lookup':'exact'},
-                            {'label':'contains', 'lookup':'contains'},
-                            {'label':'in', 'lookup':'in'},
-                            {'label':'starts with', 'lookup':'startswith'},
-                            {'label':'ends with', 'lookup':'endswith'},
-                            {'label':'matches regex', 'lookup':'regex'},
-                    ]
-                elif dict['filter_type'] == 'check' or dict['filter_type'] == 'select':
-                    values = eval(dict['filter_options'])
-                    filter = functions.add_filter_options(values, filter, dict['filter_mode'])
-                filters.append(filter)
-        if filters == []:
+        try:
+            filters = []
+            for key, dict in fields_dict.items():
+                if dict['is_filter']:
+                    filter = {}
+                    filter['label'] = dict['field__name']
+                    filter['field'] = key
+                    filter['type'] = dict['filter_type']
+                    filter['operator'] = dict['filter_operator']
+                    if 'lookup' in filter:
+                        filter['lookup'] = dict['filter_lookup']
+                    if dict['filter_type'] == 'text':
+                        filter['lookups'] = [
+                                {'label':'is', 'lookup':'exact'},
+                                {'label':'contains', 'lookup':'contains'},
+                                {'label':'in', 'lookup':'in'},
+                                {'label':'starts with', 'lookup':'startswith'},
+                                {'label':'ends with', 'lookup':'endswith'},
+                                {'label':'matches regex', 'lookup':'regex'},
+                        ]
+                    elif dict['filter_type'] == 'check' or dict['filter_type'] == 'select':
+                        values = eval(dict['filter_options'])
+                        filter = functions.add_filter_options(values, filter, dict['filter_mode'])
+                    filters.append(filter)
+            if filters == []:
+                filters = None
+        except:
             filters = None
         return filters
 
-    def get_helpers(self, list, *args, **kwargs):
-        if list.helpers:
-            helpers = list.helpers.split(',')
-        else:
+    def get_helpers(self, _list, *args, **kwargs):
+        try:
+            helpers = _list.helpers.split(',')
+        except:
             helpers = None
         return helpers
 
+    def get_preview(self, *args, **kwargs):
+        try:
+            preview = self.preview
+        except:
+            preview = False
+        return preview
+
+    def get_dte_options(self, *args, **kwargs):
+        try:
+            dte_options = self.dt_editor_options
+        except:
+            dte_options = False
+        return dte_options
+
+    def get_dte_buttons(self, *args, **kwargs):
+        try:
+            dte_buttons = self.dt_editor_buttons
+        except:
+            dte_buttons = False
+        return dte_buttons
+
+@method_decorator(login_required,name='dispatch')
+class ModelLists(DTListView):
+    template_name = 'dalme_app/models.html'
+    dt_editor_options = {'idSrc': '"id"'}
+    dt_options = {
+        'serverSide': 'true',
+        'responsive': 'true',
+        'dom': '\'<"sub-card-header-embed d-flex"B<"#fieldsets.btn-group mr-auto"><"btn-group"f>r><"card-body"t><"sub-card-footer"i>\'',
+        'stateSave': 'true',
+        'select': { 'style': 'single'},
+        'scrollResize': 'true',
+        'scrollY': '"50vh"',
+        'deferRender': 'true',
+        'scroller': 'true',
+        'language': {'searchPlaceholder': 'Search'},
+        'rowId': '"id"',
+    }
+    dt_buttons = [{ 'extend': '"colvis"', 'text': '"\uf0db"'}]
+    dt_buttons_extra = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = self.get_breadcrumb()
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context = functions.set_menus(self.request, context, state)
+        page_title = self.get_page_title('')
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        model = self.kwargs['model']
+        context['model'] = model
+        if model == 'content_types':
+            qs = Content_class.objects.all()
+            parent_class_opt = {i.id:i.name for i in qs}
+            context['parent_class'] = {
+                'name': 'content class',
+                'options': parent_class_opt
+            }
+        elif model == 'attribute_types':
+            qs = Content_type.objects.all()
+            parent_class_opt = {i.id:i.name for i in qs}
+            context['parent_class'] = {
+                'name': 'content type',
+                'options': parent_class_opt
+            }
+        elif model == 'dt_fields':
+            context['dt_fieldsets'] = {'DT Fields': [3,4,5,6,7,8,9,10], 'DTE Fields': [11,12,13,14,15,16], 'Filter Fields': [17,18,19,20,21,22]}
+            qs = DT_list.objects.all()
+            parent_class_opt = {i.id:i.name for i in qs}
+            context['parent_class'] = {
+                'name': 'list',
+                'options': parent_class_opt
+            }
+        list_name = self.get_list_name()
+        _list = self.get_list(list_name)
+        fields_dict = self.get_fields_dict(_list)
+        context['dt_options'] = self.get_dt_options(_list, fields_dict)
+        context['dt_editor'] = self.get_dt_editor(_list, fields_dict)
+        context['helpers'] = self.get_helpers(_list)
+        return context
+
+    def get_list_name(self, *args, **kwargs):
+        return self.kwargs['model']
+
+    def get_breadcrumb(self, *args, **kwargs):
+        if self.kwargs['model'] == 'dt_fields':
+            breadcrumb = [('Data Models', ''), ( 'DataTables Fields', '/models/dt_fields')]
+        else:
+            breadcrumb = [('Data Models', ''),(self.kwargs['model'].replace('_',' ').title(), '/models/'+self.kwargs['model'])]
+        return breadcrumb
+
+    def get_page_title(self, _list, *args, **kwargs):
+        model = self.kwargs['model']
+        if model == 'content_types':
+            page_title = 'Content classes and types'
+        elif model == 'attribute_types':
+            page_title = 'Content types and attributes'
+        elif model == 'dt_fields':
+            page_title = 'DataTables lists and fields'
+        return page_title
+
+    def get_dt_fields(self, _list, *args, **kwargs):
+        model = self.kwargs['model']
+        if model == 'content_types':
+            dt_field_list = ['id', 'name', 'short_name', 'content_class', 'description', 'attribute_types']
+        elif model == 'attribute_types':
+            dt_field_list = ['id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as']
+        elif model == 'dt_fields':
+            dt_field_list = ['id', 'list','field','dt_name','orderable','visible','searchable','nowrap','render_exp','dt_class_name','dt_width','dte_name','dte_type','dte_options','dte_opts','dte_message','dte_class_name','is_filter','filter_type','filter_mode','filter_operator','filter_options','filter_lookup']
+        return dt_field_list
+
+    def get_dte_fields(self, _list, *args, **kwargs):
+        model = self.kwargs['model']
+        if model == 'content_types':
+            dte_fields = ['name', 'short_name', 'content_class', 'description', 'attribute_types']
+        elif model == 'attribute_types':
+            dte_fields = ['name', 'short_name', 'description', 'data_type', 'source', 'same_as']
+        elif model == 'dt_fields':
+            dte_fields = ['dt_name','orderable','visible','searchable','nowrap','render_exp','dt_class_name','dt_width','dte_name','dte_type','dte_options','dte_opts','dte_message','dte_class_name','is_filter','filter_type','filter_mode','filter_operator','filter_options','filter_lookup']
+        else:
+            dte_fields = None
+        return dte_fields
+
+    def get_dte_buttons(self, *args, **kwargs):
+        model = self.kwargs['model']
+        dte_buttons = [ { 'extend': 'create', 'text': '\uf067 Add' } ]
+        if model != 'dt_fields':
+            dte_buttons.append({ 'extend': 'edit', 'text': '\uf304 Edit' })
+        dte_buttons.append({ 'extend': 'remove', 'text': '\uf00d Delete' })
+        return dte_buttons
 
 @method_decorator(login_required,name='dispatch')
 class SourceList(DTListView):
@@ -582,17 +495,17 @@ class SourceList(DTListView):
             breadcrumb = [('Sources', ''), (list_label, '/sources?type='+type)]
         return breadcrumb
 
-    def get_dt_ajax_str(self, list, *args, **kwargs):
-        base_url = list.api_url
-        type = list.short_name
+    def get_dt_ajax_str(self, _list, *args, **kwargs):
+        base_url = _list.api_url
+        type = _list.short_name
         if type == 'sources':
             dt_ajax_str = '"'+base_url+'?format=json"'
         else:
             dt_ajax_str = '"'+base_url+'?format=json&type='+type+'"'
         return dt_ajax_str
 
-    def get_dt_fields(self, list, *args, **kwargs):
-        dt_fields = DT_fields.objects.filter(list=list).values_list('field__short_name', flat=True)
+    def get_dt_fields(self, _list, *args, **kwargs):
+        dt_fields = DT_fields.objects.filter(list=_list).values_list('field__short_name', flat=True)
         return dt_fields
 
 @method_decorator(login_required,name='dispatch')
@@ -755,6 +668,7 @@ class ImageList(DTListView):
     breadcrumb = [('Repository', ''),('Images', '/images')]
     list_name = 'images'
     dt_field_list = ['ref','field8', 'field79', 'has_image', 'field12', 'creation_date', 'created_by', 'field3', 'collections', 'field51']
+    preview = True
 
 @method_decorator(login_required,name='dispatch')
 class ImageDetail(DetailView):

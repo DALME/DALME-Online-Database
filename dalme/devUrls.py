@@ -12,7 +12,6 @@ from dalme_app import views, apis
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
 router.register(r'users', apis.Users, basename='users')
-router.register(r'models', apis.Models, basename='models')
 router.register(r'transcriptions', apis.Transcriptions, basename='transcriptions')
 router.register(r'images', apis.Images, basename='images')
 router.register(r'pages', apis.Pages, basename='pages')
@@ -20,8 +19,11 @@ router.register(r'tasks', apis.Tasks, basename='tasks')
 router.register(r'tasklists', apis.TaskLists, basename='tasklists')
 router.register(r'worksets', apis.Worksets, basename='worksets')
 router.register(r'options', apis.Options, basename='options')
-router.register(r'lists', apis.Lists, basename='lists')
-router.register(r'fields', apis.FieldAttributes, basename='fields')
+router.register(r'dt_lists', apis.DTLists, basename='dt_lists')
+router.register(r'dt_fields', apis.DTFields, basename='dt_fields')
+router.register(r'attribute_types', apis.AttributeTypes, basename='attribute_types')
+router.register(r'content_types', apis.ContentTypes, basename='content_types')
+router.register(r'content_classes', apis.ContentClasses, basename='content_classes')
 
 urlpatterns = [
     path('api/', include(router.urls)),

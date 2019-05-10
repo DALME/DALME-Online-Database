@@ -230,18 +230,7 @@ def get_dte_options(options, field_type, *args, **kwargs):
     else:
         opts = []
     options = eval(options)
-    if type(options) is dict:
-        opts.append(options)
-    elif type(options) is list:
-        q = eval(options[0])
-        if isinstance(q, QuerySet):
-            for e in q:
-                opt = { 'label': getattr(e, options[1]), 'value': getattr(e, options[2]) }
-                opts.append(opt)
-        elif isinstance(q, tuple):
-            for value, label in q:
-                opt = { 'label': label, 'value': value }
-                opts.append(opt)
+    opts = opts + options
     return opts
 
 def get_dam_preview(resource):

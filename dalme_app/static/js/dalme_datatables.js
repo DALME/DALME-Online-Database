@@ -16,7 +16,10 @@ function createDatatable(target, form_helper, callback) {
     fix_dt_search();
     if (typeof callback !== 'undefined') {
       callback();
-    }
+    };
+  if (typeof dt_fieldsets !== 'undefined') {
+      addDtToolbarButton('fieldsets');
+  };
   });
 }
 
@@ -33,7 +36,26 @@ function addDtToolbarButton(button) {
     $('.dt-buttons').append('<button class="btn dt-btn buttons-collection" id="btn-preview" onclick="togglePreview()"><i class="fa fa-eye fa-sm"></i> Preview</button>');
   } else if (button == 'edit') {
     $('.dt-buttons').append('<button class="btn buttons-collection edit-mode-btn" id="btn-field-edit" onclick="toggleFieldEdit()"><i class="fa fa-pen fa-sm"></i> Edit Mode</button>');
+  } else if (button == 'fieldsets') {
+    var button_html = '<div class="btn-group dropdown"><button class="btn buttons-collection dropdown-toggle" id="fieldsets_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-swatchbook fa-sm"></i> Fieldsets</button><div class="dropdown-menu" aria-labelledby="fieldsets_button">';
+    for (const prop in dt_fieldsets) {
+        if (dt_fieldsets.hasOwnProperty(prop)) {
+          button_html += '<a class="dt-button dropdown-item" href="#" onclick="toggleColumns(this)"><span>'+ prop +'</span></a>';
+        }
+    };
+    button_html += '</div></div>';
+    $('.dt-buttons').append(button_html);
   }
+}
+
+function toggleColumns(button) {
+  $(button).parent().find('.active').removeClass('active');
+  $(button).toggleClass('active');
+  var range = dt_fieldsets[$(button).text()];
+  for (let i = 3; i < dt_table.columns().count(); ++i) {
+    range.includes(i) ? dt_table.column(i).visible(true) : dt_table.column(i).visible(false);
+  };
+  dt_table.columns.adjust();
 }
 
 function togglePreview() {

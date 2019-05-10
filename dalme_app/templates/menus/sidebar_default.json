@@ -160,17 +160,17 @@
     "children": [
       {
         "text": "Content Types",
-        "link": "/models/content",
+        "link": "/models/content_types",
         "iconClass": "fa-cube"
       },
       {
-        "text": "Attributes",
-        "link": "/models/attributes",
+        "text": "Attribute Types",
+        "link": "/models/attribute_types",
         "iconClass": "fa-cube"
       },
       {
-        "text": "Lists",
-        "link": "/models/lists",
+        "text": "DataTables Fields",
+        "link": "/models/dt_fields",
         "iconClass": "fa-cube"
       }
     ]

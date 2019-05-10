@@ -111,17 +111,11 @@ def session_info(request, username):
     return output
 
 def test_expression(request):
-    fields = ["79","42"]
-    fields = [int(i) for i in fields]
-    current_fields = DT_fields.objects.filter(list="11").values_list('field', flat=True)
-    add_fields = list(set(fields) - set(current_fields))
-    remove_fields = list(set(current_fields) - set(fields))
-    ret = {
-    'current_fields': str(current_fields),
-    'add_fields': add_fields,
-    'remove_fields': remove_fields
-    }
-    return ret
+    v = '["1"]'
+    v = ast.literal_eval(v)
+    if type(v) is list and len(v) == 1:
+        v = v[0]
+    return v
 
 def test_expression2():
 

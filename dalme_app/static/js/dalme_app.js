@@ -20,8 +20,8 @@ function fix_dt_search() {
 }
 
 function createTaskList() {
-  $.get("/api/options/?form=createtasklist&format=json", function ( data ) {
-      const groups = data.groups;
+  $.get("/api/options/?lists=user_group_list&format=json", function ( data ) {
+      const groups = data.user_group_list;
       taskListForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
@@ -52,10 +52,10 @@ function createTaskList() {
 }
 
 function createTask() {
-  $.get("/api/options/?form=createtask&format=json", function ( data ) {
-      const staff = data.staff;
-      const worksets = data.worksets;
-      const lists = data.lists;
+  $.get("/api/options/?lists=staff_list,workset_list,user_task_lists&format=json", function ( data ) {
+      const staff = data.staff_list;
+      const worksets = data.workset_list;
+      const lists = data.user_task_lists;
       taskForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",

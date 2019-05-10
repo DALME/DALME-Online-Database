@@ -58,6 +58,11 @@ a {
   margin: 0 !important;
 }
 
+.chosen-container ul.chosen-results li.highlighted {
+  background-color: #0361aa;
+  background-image: none;
+}
+
 .script-results {
   min-height: 30vh;
   max-height: 50vh;
@@ -223,10 +228,13 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
 
 .model-select-container {
   min-width: 200px;
+  overflow: hidden;
 }
 
 .model-button-container {
   width: 80px;
+  min-width: 80px;
+  overflow: hidden;
 }
 
 .edit-mode-btn {
@@ -294,6 +302,7 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
 .model-attribute-container {
   display: inline-block;
   margin-right: 5px;
+  overflow: hidden;
 }
 
 .model-attribute-label {
@@ -309,6 +318,7 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
   background-color: #f6f6f6;
   white-space: nowrap;
   display: inline;
+  overflow: hidden;
 }
 
 .model-attribute-value {
@@ -322,8 +332,10 @@ table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.
   padding-top: .1rem;
   font-size: .8rem;
   background-color: #fff;
-  white-space: nowrap;
   display: inline;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   margin-left: -6px;
 }
 
@@ -435,6 +447,14 @@ h5.modal-title {
 
 .DTE {
   font-size: .9rem;
+}
+
+.dte_field_center .DTE_Field_InputControl {
+  justify-content: center;
+}
+
+.dte_field_center .DTE_Field_InputControl label {
+  margin-left: 0;
 }
 
 .DTE .form-group {
@@ -590,13 +610,22 @@ div.DTE_Field_Type_textarea textarea {
   border-color: #a5a5a5 #a5a5a5 #fff;
 }
 
+.ui-autocomplete {
+  position: absolute;
+  cursor: default;
+  z-index: 9999 !important;
+  font-size: .9rem !important;
+  border-radius: 4px !important;
+  border: 1px solid #a5a5a5 !important;
+  color: #5d656c !important;
+}
 /* full card toolbar */
 
 .dt-buttons {
   margin-bottom: 0;
   height: 26px;
   align-self: flex-start;
-  margin-right: auto;
+  margin-right: 5px;
 }
 
 .dt-buttons-subcard {
@@ -619,6 +648,10 @@ div.DTE_Field_Type_textarea textarea {
   color: #787878;
   padding: .25rem .5rem;
   line-height: 1.2;
+}
+
+.dt-toolbar-text {
+
 }
 
 .dt-btn-group {
@@ -1010,6 +1043,10 @@ th.sorting_asc::before, th.sorting_asc::after, th.sorting_desc::before, th.sorti
   bottom: .5em !important;
 }
 
+.td-center {
+  text-align: center;
+}
+
 .table td {
   border-bottom: 1px dotted #a3b1bd !important;
   border-top: none !important;
@@ -1019,7 +1056,7 @@ th.sorting_asc::before, th.sorting_asc::after, th.sorting_desc::before, th.sorti
 }
 
 table.c_stripe tbody td:nth-of-type(odd) {
-  background: rgba(238, 238, 240, 0.57);
+  background: #f8f8f8;
 }
 
 table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>th:first-child {
@@ -1073,9 +1110,14 @@ div.table_scroller .dataTables_filter label {
   color: #212529;
 }
 
-table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
-  background-color: #f0f8ff !important;
+table.dataTable tbody>tr.selected td, table.dataTable tbody>tr>.selected td {
+  background-color: #e3f0f5 !important;
   color: #0361aa !important;
+  font-weight: 600;
+}
+
+li.search-field input.default {
+  width: 100% !important;
 }
 
 /*DALME tables search filter system */

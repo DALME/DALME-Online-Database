@@ -19,15 +19,22 @@ class DynamicSerializer(serializers.ModelSerializer):
             for field_name in rem_fields:
                 self.fields.pop(field_name)
 
-class FieldAttributesSerializer(serializers.ModelSerializer):
-    field_name = serializers.StringRelatedField(source='field')
+class DTFieldsSerializer(serializers.ModelSerializer):
+    field_label = serializers.StringRelatedField(source='field')
 
     class Meta:
         model = DT_fields
-        fields = ('id', 'list','field','render_exp','orderable','visible','searchable','nowrap','dt_name','dte_name','dte_type','dte_options','dte_opts','is_filter','filter_type','filter_mode','filter_operator','filter_options','filter_lookup', 'field_name')
+        fields = ('id', 'list','field','render_exp','orderable','visible','searchable','nowrap','dt_name','dte_name','dte_type','dte_options','dte_opts','dte_message','is_filter','filter_type','filter_mode','filter_operator','filter_options','filter_lookup', 'field_label', 'dt_class_name', 'dt_width', 'dte_class_name')
 
-class ListsSerializer(serializers.ModelSerializer):
-    fields = FieldAttributesSerializer(many=True, required=False)
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if ret['field'] and ret['field_label']:
+            name = ret.pop('field_label')
+            ret['field'] = { 'name': name, 'value': ret['field'] }
+        return ret
+
+class DTListsSerializer(serializers.ModelSerializer):
+    fields = DTFieldsSerializer(many=True, required=False)
 
     class Meta:
         model = DT_list
@@ -237,21 +244,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile = Profile.objects.create(user=user, **validated_data)
         return profile
 
-class ContentTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Content_type
-        fields = ('id', 'name', 'description', 'content_class', 'short_name')
-
 class AttributeTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attribute_type
-        fields = ('id', 'name', 'short_name', 'description', 'data_type')
-
-class ContentClassSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Content_class
-        fields = ('id', 'name', 'short_name', 'description')
+        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as')
 
 class ContentXAttributeSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='attribute_type.id')
@@ -263,3 +260,28 @@ class ContentXAttributeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content_attributes
         fields = '__all__'
+
+class ContentTypeSerializer(serializers.ModelSerializer):
+    cont_class = serializers.StringRelatedField(source='content_class', required=False)
+    attribute_types = AttributeTypeSerializer(many=True, required=False)
+
+    class Meta:
+        model = Content_type
+        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types')
+        extra_kwargs = {
+            'name': {
+                'validators': [],
+            }
+        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if ret['content_class'] and ret['cont_class']:
+            name = ret.pop('cont_class')
+            ret['content_class'] = { 'name': name, 'value': ret['content_class'] }
+        return ret
+
+class ContentClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content_class
+        fields = ('id', 'name', 'short_name', 'description')
