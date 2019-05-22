@@ -16,5 +16,4 @@ django-sekizai==0.10.0
 elasticsearch>=2.0.0,<3.0.0
 requests-aws4auth==0.9
 redis==3.2.0
-lxml==4.3.3
 passlib==1.7.1

@@ -7,19 +7,21 @@ from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.urls import reverse
-from django.utils.functional import cached_property
 from dalme_app.middleware import get_current_user, get_current_username
-import uuid, json, os, requests, logging, hashlib, textwrap
+import os
+import requests
+import hashlib
+import textwrap
 from urllib.parse import urlencode
 import datetime
 from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
 import django.db.models.options as options
+from django.utils.dateparse import parse_date
+import calendar
+
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
-logger = logging.getLogger(__name__)
 
 def rs_api_query(endpoint, user, key, **kwargs):
     sign = hashlib.sha256(key.encode('utf-8'))
@@ -29,6 +31,7 @@ def rs_api_query(endpoint, user, key, **kwargs):
     sign.update(paramstr.encode('utf-8'))
     R = requests.get(endpoint + paramstr + "&sign=" + sign.hexdigest())
     return R
+
 
 class Profile(models.Model):
     """
@@ -49,7 +52,7 @@ class Profile(models.Model):
     dam_user = models.IntegerField(null=True)
     wiki_user = models.IntegerField(null=True)
     wp_user = models.IntegerField(null=True)
-    wp_role = models.CharField(max_length=50, null=True, choices=WP_ROLE)
+    wp_role = models.CharField(max_length=50, blank=True, choices=WP_ROLE, default='a:1:{s:10:"subscriber";b:1;}')
     profile_image = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
@@ -63,9 +66,12 @@ class Profile(models.Model):
         dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
         return dam_ug
 
-#DALME data store
+# DALME data store
+
+
 class Agent(dalmeUuid):
     type = models.IntegerField()
+
 
 class Attribute_type(dalmeIntid):
 
@@ -80,8 +86,9 @@ class Attribute_type(dalmeIntid):
     short_name = models.CharField(max_length=55, unique=True)
     description = models.TextField()
     data_type = models.CharField(max_length=15, choices=DATA_TYPES)
-    source = models.CharField(max_length=255, null=True)
+    source = models.CharField(max_length=255, blank=True, null=True, default=None)
     same_as = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, db_column="same_as")
+    options_list = models.CharField(max_length=255, blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name + ' ('+self.short_name+')'
@@ -89,32 +96,50 @@ class Attribute_type(dalmeIntid):
     class Meta:
         ordering = ['id']
 
+
 class Attribute(dalmeUuid):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.UUIDField(null=True, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     attribute_type = models.ForeignKey("Attribute_type", db_index=True, on_delete=models.CASCADE, db_column="attribute_type")
-    value_STR = models.CharField(max_length=255, blank=True, null=True)
+    value_STR = models.CharField(max_length=255, blank=True, null=True, default=None)
     value_DATE_d = models.IntegerField(blank=True, null=True)
     value_DATE_m = models.IntegerField(blank=True, null=True)
     value_DATE_y = models.IntegerField(blank=True, null=True)
     value_DATE = models.DateField(blank=True, null=True)
-    value_DBR = models.UUIDField(blank=True, null=True)
     value_INT = models.IntegerField(blank=True, null=True)
-    value_TXT = models.TextField(blank=True, null=True)
-
-    #need function that generates DATE field + string value on save
+    value_TXT = models.TextField(blank=True, default=None)
 
     def __str__(self):
-        if self.data_type == 'DATE':
+        if self.attribute_type.data_type == 'DATE':
             str_val = self.value_STR
         else:
-            str_val = eval('self.value_' + self.data_type)
-            str_val = str(str_val)
+            str_val = str(eval('self.value_' + self.attribute_type.data_type))
         return str_val
+
+    def save(self, *args, **kwargs):
+        if self.attribute_type.data_type == 'DATE':
+            if self.value_DATE is not None:
+                self.value_DATE_d = self.value_DATE.strftime('%d')
+                self.value_DATE_m = self.value_DATE.strftime('%m')
+                self.value_DATE_y = self.value_DATE.strftime('%Y')
+                self.value_STR = self.value_DATE.strftime('%d-%B-%Y').lstrip("0").replace(" 0", " ")
+            else:
+                if self.value_DATE_d is not None and self.value_DATE_m is not None and self.value_DATE_y is not None:
+                    date = str(self.value_DATE_y)+'-'+str(self.value_DATE_m)+'-'+str(self.value_DATE_d).zfill(2)
+                    pDate = parse_date(date)
+                    self.value_DATE = pDate
+                    self.value_STR = self.value_DATE.strftime('%d-%B-%Y').lstrip("0").replace(" 0", " ")
+                elif self.value_DATE_m is not None and self.value_DATE_y is not None:
+                    self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
+                elif self.value_DATE_y is not None:
+                    self.value_STR = str(self.value_DATE_y)
+        super().save(*args, **kwargs)
+
 
 class Concept(dalmeUuid):
     getty_id = models.IntegerField(db_index=True)
+
 
 class Content_class(dalmeIntid):
     name = models.CharField(max_length=255)
@@ -126,6 +151,7 @@ class Content_class(dalmeIntid):
 
     class Meta:
         ordering = ['id']
+
 
 class Content_type(dalmeIntid):
     content_class = models.ForeignKey('Content_class', to_field='id', db_index=True, on_delete=models.PROTECT)
@@ -140,24 +166,28 @@ class Content_type(dalmeIntid):
     class Meta:
         ordering = ['id']
 
+
 class Content_attributes(dalmeIntid):
     content_type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='attribute_type_list')
     attribute_type = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='content_types')
     order = models.IntegerField(db_index=True, null=True)
+    required = models.BooleanField(default=False)
+
 
 class DT_list(dalmeIntid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55, unique=True)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, default=None)
     content_types = models.ManyToManyField(Content_type)
-    api_url = models.CharField(max_length=255, null=True, blank=True)
-    helpers = models.CharField(max_length=255, null=True, blank=True)
+    api_url = models.CharField(max_length=255, blank=True, default=None, null=True)
+    helpers = models.CharField(max_length=255, blank=True, default=None, null=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['id']
+
 
 class DT_fields(dalmeIntid):
 
@@ -183,7 +213,10 @@ class DT_fields(dalmeIntid):
         ('check', 'check'),
         ('select', 'select'),
         ('switch', 'switch'),
-        ('text', 'text')
+        ('text', 'text'),
+        ('date', 'date'),
+        ('datetime', 'datetime'),
+        ('integer', 'integer')
     )
 
     FILTER_MODES = (
@@ -198,64 +231,64 @@ class DT_fields(dalmeIntid):
     )
 
     FILTER_LOOKUPS = (
-        ('contains', 'contains'),
-        ('date', 'date'),
-        ('day', 'day'),
-        ('endswith', 'endswith'),
-        ('exact', 'exact'),
-        ('gt', 'gt'),
-        ('gte', 'gte'),
-        ('hour', 'hour'),
-        ('icontains', 'icontains'),
-        ('iendswith', 'iendswith'),
-        ('iexact', 'iexact'),
-        ('in', 'in'),
-        ('iregex', 'iregex'),
-        ('isnull', 'isnull'),
-        ('istartswith', 'istartswith'),
-        ('lt', 'lt'),
-        ('lte', 'lte'),
-        ('minute', 'minute'),
-        ('month', 'month'),
-        ('quarter', 'quarter'),
-        ('range', 'range'),
-        ('regex', 'regex'),
-        ('second', 'second'),
-        ('startswith', 'startswith'),
-        ('time', 'time'),
-        ('week', 'week'),
-        ('week_day', 'week_day'),
-        ('year', 'year')
+        ('__contains', 'contains'),
+        ('__date', 'date'),
+        ('__day', 'day'),
+        ('__endswith', 'endswith'),
+        ('__exact', 'exact'),
+        ('__gt', 'gt'),
+        ('__gte', 'gte'),
+        ('__hour', 'hour'),
+        ('__icontains', 'icontains'),
+        ('__iendswith', 'iendswith'),
+        ('__iexact', 'iexact'),
+        ('__in', 'in'),
+        ('__iregex', 'iregex'),
+        ('__isnull', 'isnull'),
+        ('__istartswith', 'istartswith'),
+        ('__lt', 'lt'),
+        ('__lte', 'lte'),
+        ('__minute', 'minute'),
+        ('__month', 'month'),
+        ('__quarter', 'quarter'),
+        ('__range', 'range'),
+        ('__regex', 'regex'),
+        ('__second', 'second'),
+        ('__startswith', 'startswith'),
+        ('__time', 'time'),
+        ('__week', 'week'),
+        ('__week_day', 'week_day'),
+        ('__year', 'year')
     )
 
     list = models.ForeignKey('DT_list', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='fields')
     field = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE)
-    render_exp = models.CharField(max_length=255, null=True, blank=True)
+    render_exp = models.CharField(max_length=255, null=True, default=None)
     orderable = models.BooleanField(default=False)
     visible = models.BooleanField(default=False)
     searchable = models.BooleanField(default=False)
-    nowrap = models.BooleanField(default=False)
-    dt_name = models.CharField(max_length=55, null=True, blank=True)
-    dt_class_name = models.CharField(max_length=255, null=True, blank=True)
-    dte_class_name = models.CharField(max_length=255, null=True, blank=True)
-    dt_width = models.CharField(max_length=255, null=True, blank=True)
-    dte_name = models.CharField(max_length=55, null=True, blank=True)
-    dte_type = models.CharField(max_length=55, null=True, blank=True, choices=DTE_TYPES)
-    dte_options = models.CharField(max_length=255, null=True, blank=True)
-    dte_opts = models.CharField(max_length=255, null=True, blank=True)
-    dte_message = models.CharField(max_length=255, null=True, blank=True)
+    dt_name = models.CharField(max_length=55, null=True, default=None)
+    dt_class_name = models.CharField(max_length=255, null=True, default=None)
+    dt_width = models.CharField(max_length=255, null=True, default=None)
+    dte_name = models.CharField(max_length=55, null=True, default=None)
+    dte_type = models.CharField(max_length=55, null=True, default=None, choices=DTE_TYPES)
+    dte_options = models.CharField(max_length=255, null=True, default=None)
+    dte_opts = models.CharField(max_length=255, null=True, default=None)
+    dte_message = models.CharField(max_length=255, null=True, default=None)
     is_filter = models.BooleanField(default=False)
-    filter_type = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_TYPES)
-    filter_mode = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_MODES)
-    filter_operator = models.CharField(max_length=55, null=True, choices=FILTER_OPERATORS)
-    filter_options = models.CharField(max_length=255, null=True, blank=True)
-    filter_lookup = models.CharField(max_length=55, null=True, blank=True, choices=FILTER_LOOKUPS)
+    filter_type = models.CharField(max_length=55, null=True, default=None, choices=FILTER_TYPES)
+    filter_mode = models.CharField(max_length=55, null=True, default=None, choices=FILTER_MODES)
+    filter_options = models.CharField(max_length=255, null=True, default=None)
+    filter_lookup = models.CharField(max_length=55, null=True, default=None, choices=FILTER_LOOKUPS)
+    order = models.IntegerField(db_index=True, null=True, default=None)
 
     def __str__(self):
         return self.field
 
     class Meta:
         unique_together = ("list", "field")
+        ordering = ['order']
+
 
 class Headword(dalmeUuid):
     word = models.CharField(max_length=55)
@@ -265,20 +298,24 @@ class Headword(dalmeUuid):
     def __str__(self):
         return self.word
 
+
 class Object(dalmeUuid):
     concept_id = models.UUIDField(db_index=True)
     object_phrase_id = models.ForeignKey('Object_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
+
 
 class Object_attribute(dalmeBasic):
     object_id = models.ForeignKey('Object', to_field='id', db_index=True, on_delete=models.CASCADE)
     concept_id = models.UUIDField(db_index=True)
 
+
 class Place(dalmeUuid):
     type = models.IntegerField(db_index=True)
 
+
 class Page(dalmeUuid):
     name = models.CharField(max_length=55)
-    dam_id = models.IntegerField(db_index=True, null=True, blank=True)
+    dam_id = models.IntegerField(db_index=True, null=True)
     order = models.IntegerField(db_index=True)
     canvas = models.TextField(null=True)
 
@@ -286,7 +323,7 @@ class Page(dalmeUuid):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('page_detail', kwargs={'pk':self.pk})
+        return reverse('page_detail', kwargs={'pk': self.pk})
 
     def get_canvas(self):
         if not self.canvas:
@@ -306,40 +343,44 @@ class Page(dalmeUuid):
             elif type(page_meta_obj) == dict:
                 folio = page_meta_obj['field79']
             canvas = requests.get(
-                "https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id,folio)
+                "https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id, folio)
             )
             self.canvas = canvas.text
             return canvas.text
         else:
             return self.canvas
 
+
 class Source_pages(dalmeIntid):
     source_id = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     page_id = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE)
-    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, blank=True)
+    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
+
 
 class Source(dalmeUuid):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
-    parent_source = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, db_column="parent_source")
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     is_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation(Attribute, related_query_name='sources')
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
 
     def __str__(self):
-        return self.short_name
+        return self.name
 
     def get_absolute_url(self):
-        return reverse('source_detail', kwargs={'pk':self.pk})
+        return reverse('source_detail', kwargs={'pk': self.pk})
+
 
 class Transcription(dalmeUuid):
-    transcription = models.TextField(blank=True, null=True)
+    transcription = models.TextField(blank=True, default=None)
     author = models.CharField(max_length=255, default=get_current_username)
     version = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.id)
+
 
 class Identity_phrase(dalmeUuid):
     transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
@@ -348,12 +389,14 @@ class Identity_phrase(dalmeUuid):
     def __str__(self):
         return self.phrase
 
+
 class Object_phrase(dalmeUuid):
     transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
     phrase = models.TextField()
 
     def __str__(self):
         return self.phrase
+
 
 class Wordform(dalmeUuid):
     normalized_form = models.CharField(max_length=55)
@@ -362,6 +405,7 @@ class Wordform(dalmeUuid):
 
     def __str__(self):
         return self.normalized_form
+
 
 class Token(dalmeUuid):
     object_phrase_id = models.ForeignKey('Object_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
@@ -374,22 +418,60 @@ class Token(dalmeUuid):
     def __str__(self):
         return self.raw_token
 
+
 class Identity_phrase_x_entity(dalmeBasic):
     identity_phrase_id = models.ForeignKey('Identity_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
     entity_id = models.UUIDField(db_index=True)
 
-#app management models
+# app management models
+
+
+class Country(dalmeIntid):
+    short_name = models.CharField(max_length=255, unique=True)
+    alpha_3_code = models.CharField(max_length=3)
+    alpha_2_code = models.CharField(max_length=2)
+    num_code = models.IntegerField()
+
+    def __str__(self):
+        return self.short_name
+
+    class Meta:
+        ordering = ["short_name"]
+
+
+class Language(dalmeIntid):
+
+    LANGUAGE_TYPES = (
+        ('language', 'language'),
+        ('dialect', 'dialect')
+    )
+
+    glottocode = models.CharField(max_length=25, unique=True)
+    iso6393 = models.CharField(max_length=25, unique=True, blank=True, null=True, default=None)
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=15, choices=LANGUAGE_TYPES)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name+' ('+self.glottocode+')'
+
+    class Meta:
+        ordering = ["name"]
+
+
 class AttributeReference(dalmeUuid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
     data_type = models.CharField(max_length=15)
     source = models.CharField(max_length=255)
-    term_type = models.CharField(max_length=55, blank=True, null=True)
+    term_type = models.CharField(max_length=55, blank=True, default=None)
+
 
 class Notes(dalmeUuid):
     target = models.UUIDField(db_index=True)
     text = models.TextField()
+
 
 class Workset(dalmeIntid):
     name = models.CharField(max_length=55)
@@ -400,7 +482,9 @@ class Workset(dalmeIntid):
     def __str__(self):
         return self.name
 
-#task management
+
+# task management
+
 class TaskList(dalmeIntid):
     name = models.CharField(max_length=60)
     slug = models.SlugField(default="")
@@ -415,6 +499,7 @@ class TaskList(dalmeIntid):
         # Prevents (at the database level) creation of two lists with the same slug in the same group
         unique_together = ("group", "slug")
 
+
 class Task(dalmeIntid):
     title = models.CharField(max_length=140)
     task_list = models.ForeignKey(TaskList, on_delete=models.CASCADE, null=True)
@@ -426,7 +511,7 @@ class Task(dalmeIntid):
     description = models.TextField(blank=True, null=True)
     priority = models.PositiveIntegerField(blank=True, null=True)
     workset = models.ForeignKey(Workset, on_delete=models.PROTECT, null=True)
-    position = models.CharField(max_length=255, null=True)
+    position = models.CharField(max_length=255, blank=True, default=None)
 
     # Has due date for an instance of this object passed?
     def overdue_status(self):
@@ -450,13 +535,14 @@ class Task(dalmeIntid):
     class Meta:
         ordering = ["priority", "creation_timestamp"]
 
+
 class TaskComment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, default=get_current_user)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     date = models.DateTimeField(default=datetime.datetime.now)
-    email_from = models.CharField(max_length=320, blank=True, null=True)
-    email_message_id = models.CharField(max_length=255, blank=True, null=True)
-    body = models.TextField(blank=True)
+    email_from = models.CharField(max_length=320, blank=True, default=None)
+    email_message_id = models.CharField(max_length=255, blank=True, default=None)
+    body = models.TextField(blank=True, default=None)
 
     class Meta:
         # an email should only appear once per task
@@ -479,8 +565,11 @@ class TaskComment(models.Model):
     def __str__(self):
         return self.snippet
 
-#unmanaged models from DAM
+# unmanaged models from DAM
+
+
 class rs_resource(models.Model):
+
     ref = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=200, null=True)
     resource_type = models.IntegerField(null=True)
@@ -493,7 +582,7 @@ class rs_resource(models.Model):
     user_rating = models.IntegerField(null=True)
     user_rating_count = models.IntegerField(null=True)
     user_rating_total = models.IntegerField(null=True)
-    country = models.CharField(max_length=200, null=True)
+    country = models.CharField(max_length=200, null=True, default=None)
     file_extension = models.CharField(max_length=10, null=True)
     preview_extension = models.CharField(max_length=10, null=True)
     image_red = models.IntegerField(null=True)
@@ -511,35 +600,39 @@ class rs_resource(models.Model):
     request_count = models.IntegerField(default='0')
     expiry_notification_sent = models.IntegerField(default='0')
     preview_tweaks = models.CharField(max_length=50, null=True)
-    geo_lat = models.FloatField(null=True)
-    geo_long = models.FloatField(null=True)
+    geo_lat = models.FloatField(null=True, default=None)
+    geo_long = models.FloatField(null=True, default=None)
     mapzoom = models.IntegerField(null=True)
     disk_usage = models.IntegerField(null=True)
     disk_usage_last_updated = models.DateTimeField(null=True, blank=True)
-    file_size = models.IntegerField(null=True)
-    preview_attempts = models.IntegerField(null=True)
-    field12 = models.CharField(max_length=200, null=True)
-    field8 = models.CharField(max_length=200, null=True)
-    field3 = models.CharField(max_length=200, null=True)
+    file_size = models.IntegerField(null=True, default=None)
+    preview_attempts = models.IntegerField(null=True, default=None)
+    field12 = models.CharField(max_length=200, null=True, default=None)
+    field8 = models.CharField(max_length=200, null=True, default=None)
+    field3 = models.CharField(max_length=200, null=True, default=None)
     annotation_count = models.IntegerField(null=True)
-    field51 = models.CharField(max_length=200, null=True)
-    field79 = models.CharField(max_length=200, null=True)
+    field51 = models.CharField(max_length=200, null=True, default=None)
+    field79 = models.CharField(max_length=200, null=True, default=None, blank=True)
     modified = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    collections = models.ManyToManyField('rs_collection', through='rs_collection_resource')
 
     class Meta:
-       managed=False
-       db_table='resource'
-       in_db='dam'
+        managed = False
+        db_table = 'resource'
+        in_db = 'dam'
+
 
 class rs_resource_data(models.Model):
-    resource = models.IntegerField(primary_key=True)
-    resource_type_field = models.IntegerField(null=True)
+    django_id = models.IntegerField(primary_key=True, db_column="django_id")
+    resource = models.ForeignKey('rs_resource', db_column="resource", to_field='ref', on_delete=models.CASCADE, related_name='resource_data')
+    resource_type_field = models.ForeignKey('rs_resource_type_field', db_column="resource_type_field", to_field='ref', on_delete=models.CASCADE, related_name='resource_data_field')
     value = models.TextField()
 
     class Meta:
-       managed=False
-       db_table='resource_data'
-       in_db='dam'
+        managed = False
+        db_table = 'resource_data'
+        in_db = 'dam'
+
 
 class rs_collection(models.Model):
     ref = models.IntegerField(primary_key=True)
@@ -577,13 +670,14 @@ class rs_collection(models.Model):
     theme20 = models.CharField(max_length=100, null=True)
 
     class Meta:
-       managed=False
-       db_table='collection'
-       in_db='dam'
+        managed = False
+        db_table = 'collection'
+        in_db = 'dam'
+
 
 class rs_collection_resource(models.Model):
-    collection = models.IntegerField(null=True)
-    resource = models.IntegerField(null=True)
+    collection = models.ForeignKey('rs_collection', db_column="collection", to_field='ref', on_delete=models.CASCADE, related_name='resources_list')
+    resource = models.ForeignKey('rs_resource', db_column="resource", to_field='ref', on_delete=models.CASCADE, related_name='collections_list')
     date_added = models.DateTimeField(auto_now_add=True, primary_key=True)
     comment = models.TextField()
     rating = models.IntegerField(null=True)
@@ -594,9 +688,10 @@ class rs_collection_resource(models.Model):
     sortorder = models.IntegerField(null=True)
 
     class Meta:
-       managed=False
-       db_table='collection_resource'
-       in_db='dam'
+        managed = False
+        db_table = 'collection_resource'
+        in_db = 'dam'
+
 
 class rs_user(models.Model):
 
@@ -638,9 +733,10 @@ class rs_user(models.Model):
     csrf_token = models.CharField(max_length=255, null=True)
 
     class Meta:
-       managed=False
-       db_table='user'
-       in_db='dam'
+        managed = False
+        db_table = 'user'
+        in_db = 'dam'
+
 
 class rs_resource_type_field(models.Model):
     ref = models.IntegerField(primary_key=True)
@@ -683,11 +779,13 @@ class rs_resource_type_field(models.Model):
     personal_data = models.IntegerField(default='0')
 
     class Meta:
-       managed=False
-       db_table='resource_type_field'
-       in_db='dam'
+        managed = False
+        db_table = 'resource_type_field'
+        in_db = 'dam'
 
-#unmanaged models from WIKI
+# unmanaged models from WIKI
+
+
 class wiki_user(models.Model):
     user_id = models.IntegerField(primary_key=True)
     user_name = models.BinaryField(max_length=255, unique=True)
@@ -706,9 +804,10 @@ class wiki_user(models.Model):
     user_password_expires = models.BinaryField(max_length=14, null=True)
 
     class Meta:
-       managed=False
-       db_table='user'
-       in_db='wiki'
+        managed = False
+        db_table = 'user'
+        in_db = 'wiki'
+
 
 class wiki_user_groups(models.Model):
 
@@ -724,9 +823,10 @@ class wiki_user_groups(models.Model):
     ug_expiry = models.BinaryField(max_length=14, primary_key=True)
 
     class Meta:
-       managed=False
-       db_table='user_groups'
-       in_db='wiki'
+        managed = False
+        db_table = 'user_groups'
+        in_db = 'wiki'
+
 
 class wiki_page(models.Model):
     page_id = models.IntegerField(primary_key=True)
@@ -744,11 +844,12 @@ class wiki_page(models.Model):
     page_lang = models.BinaryField(max_length=35, null=True)
 
     class Meta:
-       managed=False
-       db_table='page'
-       in_db='wiki'
+        managed = False
+        db_table = 'page'
+        in_db = 'wiki'
 
-#unmanaged models from WORDPRESS
+
+# unmanaged models from WORDPRESS
 class wp_users(models.Model):
     ID = models.IntegerField(primary_key=True)
     user_login = models.CharField(max_length=60, unique=True)
@@ -762,9 +863,10 @@ class wp_users(models.Model):
     display_name = models.CharField(max_length=250)
 
     class Meta:
-       managed=False
-       db_table='wp_users'
-       in_db='wp'
+        managed = False
+        db_table = 'wp_users'
+        in_db = 'wp'
+
 
 class wp_usermeta(models.Model):
     umeta_id = models.IntegerField(primary_key=True)
@@ -773,6 +875,6 @@ class wp_usermeta(models.Model):
     meta_value = models.TextField()
 
     class Meta:
-        managed=False
-        db_table='wp_usermeta'
-        in_db='wp'
+        managed = False
+        db_table = 'wp_usermeta'
+        in_db = 'wp'

@@ -87,20 +87,21 @@ function changeEditorMode() {
       xmleditor = ace.edit("editor");
       setEditorOptions();
       xmleditor.session.setValue(tr_text);
-      xmleditor.session.on("change", debounce(saveEditor, 1000));
+      xmleditor.session.on("change.dalme", debounce(saveEditor, 1000));
       setEditorToolbar();
-      $(editor_container).on("input", updateEditorToolbar);
+      $(editor_container).on("input.dalme", updateEditorToolbar);
   } else if (editor_mode == 'xml') {
       editor_mode = 'render';
       saveEditor();
       removeEditorToolbar();
       tr_text = xmleditor.getValue();
-      xmleditor.off();
+      xmleditor.off("change.dalme");
       xmleditor.destroy();
       $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
       tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
           $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
       });
+      $(editor_container).off("input.dalme");
       $('[data-toggle="tooltip"]').tooltip({container: 'body'});
   }
 }
@@ -108,10 +109,10 @@ function changeEditorMode() {
 function changeEditorFolio(target) {
   $(document.body).css('cursor', 'wait');
   if (target != '') {
-    const target = parseInt(target, 10);
-    const total = folio_array.length;
-    const prev = target != 0 ? target - 1 : '';
-    const next = target + 1 >= total ? '' : target + 1;
+    var target = parseInt(target, 10);
+    var total = folio_array.length;
+    var prev = target != 0 ? target - 1 : '';
+    var next = target + 1 >= total ? '' : target + 1;
     $.get("/api/transcriptions/"+folio_array[target].tr_id+"?format=json", function (data) {
         tr_text = data.transcription;
         if (editor_mode == 'render') {
@@ -147,7 +148,7 @@ function updateFolioButtons() {
 
 function setEditorOptions(dict) {
   if (typeof dict !== 'undefined') {
-    const value = $(dict.target).is('select') ? $(dict.target).val() : $(dict.target).prop('checked');
+    var value = $(dict.target).is('select') ? $(dict.target).val() : $(dict.target).prop('checked');
     xmleditor.setOption(dict.target.id, value);
   } else {
     xmleditor.setOptions({
@@ -182,8 +183,8 @@ function setEditorToolbar() {
     .append('<button class="editor-btn button-border-right" id="btn_redo" onclick="redoEditor()" title="Redo" data-toggle="tooltip" disabled><i class="fa fa-redo-alt fa-fw"></i></button>')
     .append('<button class="editor-btn button-border-right" id="btn_undo" onclick="undoEditor()" title="Undo" data-toggle="tooltip" disabled><i class="fa fa-undo-alt fa-fw"></i></button>');
   $('#xmleditor-options').load('/static/includes/xmleditor_options.html', function() {
-    $('#xmleditor-options-form').find('input').on('change', function (e) { setEditorOptions(e) });
-    $('#xmleditor-options-form').find('select').on('change', function (e) { setEditorOptions(e) });
+    $('#xmleditor-options-form').find('input').on('change.dalme', function (e) { setEditorOptions(e) });
+    $('#xmleditor-options-form').find('select').on('change.dalme', function (e) { setEditorOptions(e) });
     $('[data-toggle="tooltip"]').tooltip({container: 'body'});
   });
 }
@@ -191,8 +192,8 @@ function setEditorToolbar() {
 function removeEditorToolbar() {
   $('#btn_cancel').remove();
   $('#btn_save').remove();
-  $('#xmleditor-options-form').find('input').off();
-  $('#xmleditor-options-form').find('select').off();
+  $('#xmleditor-options-form').find('input').off('change.dalme');
+  $('#xmleditor-options-form').find('select').off('change.dalme');
   $('#xmleditor-options').empty();
   $('#btn_options').remove();
   $('#btn_undo').remove();
@@ -211,15 +212,15 @@ function saveButton() {
 }
 
 function saveEditor() {
-  const folio = folio_idx;
-  const text = xmleditor.getValue();
+  var folio = folio_idx;
+  var text = xmleditor.getValue();
   if (text != '' && !xmleditor.session.getUndoManager().isClean()) {
-    const id = folio_array[folio].tr_id
-    const ver = folio_array[folio].tr_version + 1;
-    const page = folio_array[folio].id
-    const source = source_id;
+    var id = folio_array[folio].tr_id
+    var ver = folio_array[folio].tr_version + 1;
+    var page = folio_array[folio].id
+    var source = source_id;
     if (id != 'None') {
-      const url = "/api/transcriptions/"+id+"/";
+      var url = "/api/transcriptions/"+id+"/";
       $.ajax({
         method: "PUT",
         url: url,
@@ -229,7 +230,7 @@ function saveEditor() {
           if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
       }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
     } else {
-      const url = "/api/transcriptions/";
+      var url = "/api/transcriptions/";
       $.ajax({
         method: "POST",
         url: url,

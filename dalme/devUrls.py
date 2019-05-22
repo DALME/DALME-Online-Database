@@ -24,6 +24,7 @@ router.register(r'dt_fields', apis.DTFields, basename='dt_fields')
 router.register(r'attribute_types', apis.AttributeTypes, basename='attribute_types')
 router.register(r'content_types', apis.ContentTypes, basename='content_types')
 router.register(r'content_classes', apis.ContentClasses, basename='content_classes')
+router.register(r'languages', apis.Languages, basename='languages')
 
 urlpatterns = [
     path('api/', include(router.urls)),

@@ -1,6 +1,6 @@
-function initializeFormHelper(editor) {
-  editor.on('open', function( e, mode, action ) { changeForm(e, action) });
-  editor.on('close', function( e ) { changeForm(e) });
+function user_form() {
+  dt_editor.on('open.dalme', function( e, mode, action ) { changeForm(e, action) });
+  dt_editor.on('close.dalme', function( e ) { changeForm(e) });
   password_state = 'divs';
 }
 
@@ -10,11 +10,16 @@ function changeForm(e, action) {
       togglePasswordButton(e);
     } else if (action == 'create') {
       //add listeners
-      $(dt_editor.field('user.last_name').node()).find('input').on('change', function() { suggestFullname() });
-      $(dt_editor.field('user.email').node()).find('input').on('change', function() { suggestUsername() });
+      $(dt_editor.field('user.last_name').node()).find('input').on('change.dalme', function() { suggestFullname() });
+      $(dt_editor.field('user.email').node()).find('input').on('change.dalme', function() { suggestUsername() });
     }
   } else if (e.type == 'close') {
-    togglePasswordButton(e);
+      if (action == 'edit') {
+        togglePasswordButton(e);
+      } else if (action == 'create') {
+        $(dt_editor.field('user.last_name').node()).find('input').off('change.dalme');
+        $(dt_editor.field('user.email').node()).find('input').off('change.dalme');
+      }
   }
 }
 

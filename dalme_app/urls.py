@@ -1,8 +1,4 @@
-"""
-URL routing is handled here
-"""
-from django.urls import path, re_path, include
-from django.contrib import admin
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
@@ -22,5 +18,7 @@ urlpatterns = [
     path('su/', views.SessionUpdate, name='session_update'),
     path('search/', views.DefaultSearch.as_view(), name='search'),
     path('tasks/', views.TasksList.as_view(), name='task_list'),
+    path('languages/', views.LanguageList.as_view(), name='language_list'),
+    # path('form_test/', views.SourceCreateView.as_view(), name='form_test'),
     path('', views.Index.as_view(), name='dashboard'),
 ]

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allaccess.apps.AllAccessConfig',
     #'todo',
     #'debug_toolbar',
+    #'crispy_forms',
     'rest_framework',
 ]
 
@@ -278,7 +279,5 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-#django-todo settings
-TODO_STAFF_ONLY = True
-TODO_DEFAULT_ASSIGNEE = 'pizzorno'
-TODO_DEFAULT_LIST_SLUG = 'tickets'
+#django-crispy_forms settings
+#CRISPY_TEMPLATE_PACK = 'bootstrap4'

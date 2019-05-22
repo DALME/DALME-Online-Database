@@ -1,5 +1,5 @@
-function initializeFormHelper() {
-  $('#parent_class_select').on('change', updateClass );
+function model_form() {
+  $('#parent_class_select').on('change.dalme', updateClass);
 }
 
 function updateClass() {
@@ -53,16 +53,16 @@ function updateClass() {
 
 function addClassEntry() {
   if (model == 'dt_fields') {
-    var option_lists = "content_types_list,attribute_types_list";
+    var option_lists = "content_types,attribute_types";
     var model_class_name = 'DT list'
   } else if (model == 'attribute_types') {
-    var option_lists = "content_classes_list,attribute_types_list";
+    var option_lists = "content_classes,attribute_types";
     var model_class_name = 'content type'
   };
   if (typeof option_lists !== 'undefined') {
     $.get("/api/options/?lists="+option_lists+"&format=json", function ( data ) {
         var modelClassForm = editorForm('create', data);
-        modelClassForm.on('postSubmit', function(e, json, data, action) {
+        modelClassForm.on('postSubmit.dalme', function(e, json, data, action) {
             if (json.data) {
               $('#parent_class_select').append(new Option(json.data.name, json.data.id));
               $('#parent_class_select').val(json.data.id);
@@ -100,16 +100,16 @@ function addClassEntry() {
 
 function editClassEntry() {
   if (model == 'dt_fields') {
-    var option_lists = "content_types_list,attribute_types_list";
+    var option_lists = "content_types,attribute_types";
     var model_class_name = 'DT list';
   } else if (model == 'attribute_types') {
-    var option_lists = "content_classes_list,attribute_types_list";
+    var option_lists = "content_classes,attribute_types";
     var model_class_name = 'content type';
   };
   if (typeof option_lists !== 'undefined') {
     $.get("/api/options/?lists="+option_lists+"&format=json", function ( data ) {
         var modelClassForm = editorForm('edit', data);
-        modelClassForm.on('postSubmit', function(e, json, data, action) {
+        modelClassForm.on('postSubmit.dalme', function(e, json, data, action) {
             if (action == 'edit') {
                 if (json.data && json.data !== "null" && typeof json.data !== "undefined" && json.data !== null) {
                   updateClass();
@@ -141,11 +141,11 @@ function editClassEntry() {
               var conf = confirm("Are you sure you wish to delete this record?");
               if (conf == true) {
                 modelClassForm2 = editorForm('remove');
-                modelClassForm2.on('preSubmit', function (e, d) {
+                modelClassForm2.on('preSubmit.dalme', function (e, d) {
                     $('#parent_class_info').attr('data-editor-id', '');
                     d.data = current_class.id;
                 });
-                modelClassForm2.on('postSubmit', function(e, json, data, action) {
+                modelClassForm2.on('postSubmit.dalme', function(e, json, data, action) {
                         if (json.result == 'success') {
                           $('#parent_class_select option[value='+current_class.id+']').remove();
                           $('#parent_class_select').val(0);
@@ -170,7 +170,7 @@ function editClassEntry() {
     }, 'json');
   } else {
       var modelClassForm = editorForm('edit');
-      modelClassForm.on('postSubmit', function(e, json, data, action) {
+      modelClassForm.on('postSubmit.dalme', function(e, json, data, action) {
           if (action == 'edit') {
               if (json.data && json.data !== "null" && typeof json.data !== "undefined" && json.data !== null) {
                 updateClass();
@@ -186,11 +186,11 @@ function editClassEntry() {
             var conf = confirm("Are you sure you wish to delete this record?");
             if (conf == true) {
               modelClassForm2 = editorForm('remove');
-              modelClassForm2.on('preSubmit', function (e, d) {
+              modelClassForm2.on('preSubmit.dalme', function (e, d) {
                   $('#parent_class_info').attr('data-editor-id', '');
                   d.data = current_class.id;
               });
-              modelClassForm2.on('postSubmit', function(e, json, data, action) {
+              modelClassForm2.on('postSubmit.dalme', function(e, json, data, action) {
                       if (json.result == 'success') {
                         $('#parent_class_select option[value='+current_class.id+']').remove();
                         $('#parent_class_select').val(0);
@@ -227,8 +227,8 @@ function editorForm(action, data) {
                   { label: "Description", name:  "description", type: "textarea" },
                   { label: "API URL", name:  "api_url" },
                   { label: "Helper/s", name:  "helpers", message: "A comma-separated list of js helpers for this list."},
-                  { label: "Fields", name:  "fields", type: "chosen", attr: { multiple: true }, options: data.attribute_types_list },
-                  { label: "Content Types", name:  "content_types", type: "chosen", attr: { multiple: true }, options: data.content_types_list }
+                  { label: "Fields", name:  "fields", type: "chosen", attr: { multiple: true }, options: data.attribute_types },
+                  { label: "Content Types", name:  "content_types", type: "chosen", attr: { multiple: true }, options: data.content_types }
                 ];
             };
             break;
@@ -239,8 +239,8 @@ function editorForm(action, data) {
                   { label: "Name", name:  "name" },
                   { label: "Short Name", name:  "short_name" },
                   { label: "Description", name:  "description", type: "textarea" },
-                  { label: "Content Class", name:  "content_class", type: "chosen", opts: { disable_search: true}, options: data.content_classes_list },
-                  { label: "Attribute Types", name:  "attribute_types", type: "chosen", attr: { multiple: true }, options: data.attribute_types_list }
+                  { label: "Content Class", name:  "content_class", type: "chosen", opts: { disable_search: true}, options: data.content_classes },
+                  { label: "Attribute Types", name:  "attribute_types", type: "chosen", attr: { multiple: true }, options: data.attribute_types }
                 ];
             };
             break;
@@ -276,18 +276,4 @@ function editorForm(action, data) {
           fields: fields
       });
     return modelClassForm
-}
-
-function toggleFieldEdit() {
-  if (typeof edit_mode == 'undefined' || edit_mode == 'off') {
-    edit_mode = 'on';
-    $('#btn-field-edit').addClass('active');
-    $('#dataTables-table').on('click', 'tbody td:not(:first-child)', function (e) {
-          dt_editor.inline(dt_table.cell(this).index(), { onBlur: 'submit' });
-      });
-  } else {
-    edit_mode = 'off';
-    $('#btn-field-edit').removeClass('active');
-    $('#dataTables-table').off();
-  }
 }

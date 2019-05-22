@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User, Group
-from dalme_app.models import *
+from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
+                              DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
+                              rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type)
 from rest_framework import serializers
 from dalme_app import functions
-import uu, base64, ast
-from datetime import datetime
-from django.utils import timezone
+import base64
+
 
 class DynamicSerializer(serializers.ModelSerializer):
     """ A serializer that takes an additional `fields` argument that
@@ -19,19 +20,23 @@ class DynamicSerializer(serializers.ModelSerializer):
             for field_name in rem_fields:
                 self.fields.pop(field_name)
 
+
 class DTFieldsSerializer(serializers.ModelSerializer):
     field_label = serializers.StringRelatedField(source='field')
 
     class Meta:
         model = DT_fields
-        fields = ('id', 'list','field','render_exp','orderable','visible','searchable','nowrap','dt_name','dte_name','dte_type','dte_options','dte_opts','dte_message','is_filter','filter_type','filter_mode','filter_operator','filter_options','filter_lookup', 'field_label', 'dt_class_name', 'dt_width', 'dte_class_name')
+        fields = ('id', 'list', 'field', 'render_exp', 'orderable', 'visible', 'searchable', 'dt_name', 'dte_name', 'dte_type',
+                  'dte_options', 'dte_opts', 'dte_message', 'is_filter', 'filter_type', 'filter_mode', 'filter_options',
+                  'filter_lookup', 'field_label', 'dt_class_name', 'dt_width', 'order')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if ret['field'] and ret['field_label']:
             name = ret.pop('field_label')
-            ret['field'] = { 'name': name, 'value': ret['field'] }
+            ret['field'] = {'name': name, 'value': ret['field']}
         return ret
+
 
 class DTListsSerializer(serializers.ModelSerializer):
     fields = DTFieldsSerializer(many=True, required=False)
@@ -39,17 +44,35 @@ class DTListsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DT_list
         fields = ('id', 'name', 'short_name', 'description', 'content_types', 'api_url', 'helpers', 'fields')
-        extra_kwargs = { 'content_types': { 'required': False } }
+        extra_kwargs = {'content_types': {'required': False}}
+
+
+class LanguageSerializer(serializers.ModelSerializer):
+    parent_name = serializers.StringRelatedField(source='parent')
+
+    class Meta:
+        model = Language
+        fields = ('id', 'glottocode', 'iso6393', 'name', 'type', 'parent', 'parent_name')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if ret['parent'] and ret['parent_name']:
+            name = ret.pop('parent_name')
+            ret['parent'] = {'name': name, 'value': ret['parent']}
+        return ret
+
 
 class WorksetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workset
         fields = '__all__'
 
+
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = '__all__'
+
 
 class TaskListSerializer(serializers.ModelSerializer):
     task_count = serializers.IntegerField()
@@ -62,30 +85,50 @@ class TaskListSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['group'] = Group.objects.get(pk=ret['group']).name
         task_count = ret.pop('task_count')
-        ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div><div class="badge badge-primary badge-pill align-self-end">'+str(task_count)+'</div></div>'
+        ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div>\
+                       <div class="badge badge-primary badge-pill align-self-end">'+str(task_count)+'</div></div>'
         return ret
+
 
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Page
-        fields = ('name', 'dam_id','order')
+        fields = ('name', 'dam_id', 'order')
 
-class ImageSerializer(serializers.ModelSerializer):
-    collections = serializers.CharField(max_length=255)
+
+class RSCollectionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = rs_collection
+        fields = ('ref', 'name', 'user', 'theme', 'theme2', 'theme3')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        t1 = ret.pop('theme')
+        t2 = ret.pop('theme2')
+        t3 = ret.pop('theme3')
+        usr = ret.pop('user')
+        ret['name'] = functions.get_full_collection_string(t1, t2, t3, functions.format_user(usr, 'dam'), ret['name'])
+        return ret
+
+
+class RSImageSerializer(serializers.ModelSerializer):
+    collections = RSCollectionsSerializer(many=True, required=False)
 
     class Meta:
         model = rs_resource
-        fields = ('ref', 'has_image','creation_date','created_by','field12','field8','field3','field51','field79','collections')
+        fields = ('ref', 'has_image', 'creation_date', 'created_by', 'field12', 'field8',
+                  'field3', 'field51', 'field79', 'collections')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         try:
             ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
-        except:
+        except rs_user.DoesNotExist:
             ret['created_by'] = ret['created_by']
         ret['id'] = ret['ref']
         ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
         return ret
+
 
 class TranscriptionSerializer(serializers.ModelSerializer):
     """ Basic serializer for transcriptions """
@@ -104,52 +147,44 @@ class TranscriptionSerializer(serializers.ModelSerializer):
             ret['transcription_html'] = ''
         return ret
 
+
 class AttributeSerializer(serializers.ModelSerializer):
     """ Basic serializer for attribute data """
 
     class Meta:
         model = Attribute
-        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DBR')
+        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT')
 
     def to_representation(self, instance):
-        types = Attribute_type.objects.all()
-        type_dict = {}
-        for t in types:
-            type_dict[t.id] = [t.short_name,t.data_type]
-        ret = super().to_representation(instance)
-        new_ret = {}
-        for i in ret:
-            dtype = type_dict[ret['attribute_type']][1]
-            label = type_dict[ret['attribute_type']][0]
-            if dtype == 'DATE':
-                value = ret['value_STR']
-            else:
-                value = eval("ret['value_"+ dtype +"']")
-            new_ret[label] = value
-        return new_ret
+        label = instance.attribute_type.short_name
+        value = str(instance)
+        ret = {label: value}
+        return ret
+
 
 class SourceSerializer(DynamicSerializer):
     type = serializers.StringRelatedField()
     name = serializers.CharField(max_length=255)
-    parent_source_id = serializers.PrimaryKeyRelatedField(source='parent_source', read_only=True)
-    parent_source = serializers.StringRelatedField()
+    parent_id = serializers.PrimaryKeyRelatedField(source='parent', read_only=True)
+    parent = serializers.StringRelatedField()
     attributes = AttributeSerializer(many=True)
     no_folios = serializers.IntegerField()
 
     class Meta:
         model = Source
-        fields = ('id','type','name','short_name','parent_source','parent_source_id','is_inventory', 'attributes', 'no_folios')
+        fields = ('id', 'type', 'name', 'short_name', 'parent', 'parent_id', 'is_inventory',
+                  'attributes', 'no_folios')
 
     def to_representation(self, instance):
-        """Create dictionaries for fields with links"""
-        fields = self.context.get('fields')
         ret = super().to_representation(instance)
         attributes = ret.pop('attributes')
+        new_att = {}
         for i in attributes:
             (k, v), = i.items()
-            ret[k] = v
+            new_att[k] = v
+        ret['attributes'] = new_att
         ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id']}
-        ret['parent_source'] = {'name': ret['parent_source'], 'url': '/sources/'+str(ret['parent_source_id'])}
+        ret['parent'] = {'name': ret['parent'], 'url': '/sources/'+str(ret['parent_id'])}
         if 'url' in ret:
             ret['url'] = {'name': 'Visit Link', 'url': ret['url']}
         return ret
@@ -168,13 +203,15 @@ class WikiGroupSerializer(serializers.ModelSerializer):
             ret[key] = base64.b64decode(value).capitalize()
         return ret
 
+
 class GroupSerializer(serializers.ModelSerializer):
     """ Basic serializer for user group data """
     name = serializers.CharField(max_length=255, required=False)
 
     class Meta:
         model = Group
-        fields = ('id','name')
+        fields = ('id', 'name')
+
 
 class UserSerializer(serializers.ModelSerializer):
     """ Basic serializer for user data """
@@ -182,12 +219,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id','last_login','is_superuser','username','first_name','last_name','email','is_staff','is_active','date_joined','groups')
-        extra_kwargs = {
-            'username': {
-                'validators': [],
-            }
-        }
+        fields = ('id', 'last_login', 'is_superuser', 'username', 'first_name', 'last_name',
+                  'email', 'is_staff', 'is_active', 'date_joined', 'groups')
+        extra_kwargs = {'username': {'validators': []}}
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     """ Serialises user profiles and combines user data """
@@ -199,7 +234,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id','full_name','user_id','dam_usergroup','wiki_groups', 'wp_role', 'user', 'wp_role_display', 'dam_usergroup_display', 'wiki_user', 'dam_user', 'wp_user')
+        fields = ('id', 'full_name', 'user_id', 'dam_usergroup', 'wiki_groups', 'wp_role',
+                  'user', 'wp_role_display', 'dam_usergroup_display', 'wiki_user', 'dam_user',
+                  'wp_user')
 
     def get_wiki_groups(self, obj):
         wg = wiki_user_groups.objects.filter(ug_user=obj.wiki_user)
@@ -244,11 +281,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile = Profile.objects.create(user=user, **validated_data)
         return profile
 
+
 class AttributeTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attribute_type
-        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as')
+        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'options_list', 'same_as')
+
 
 class ContentXAttributeSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='attribute_type.id')
@@ -256,10 +295,15 @@ class ContentXAttributeSerializer(serializers.ModelSerializer):
     short_name = serializers.CharField(max_length=55, source='attribute_type.short_name')
     description = serializers.CharField(source='attribute_type.description')
     data_type = serializers.CharField(max_length=15, source='attribute_type.data_type')
+    source = serializers.CharField(max_length=255, source='attribute_type.source')
+    same_as = serializers.PrimaryKeyRelatedField(source='attribute_type.same_as', read_only=True)
+    options_list = serializers.CharField(max_length=255, source='attribute_type.options_list')
+    required = serializers.BooleanField()
 
     class Meta:
         model = Content_attributes
-        fields = '__all__'
+        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as', 'options_list', 'required')
+
 
 class ContentTypeSerializer(serializers.ModelSerializer):
     cont_class = serializers.StringRelatedField(source='content_class', required=False)
@@ -268,18 +312,15 @@ class ContentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content_type
         fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types')
-        extra_kwargs = {
-            'name': {
-                'validators': [],
-            }
-        }
+        extra_kwargs = {'name': {'validators': []}}
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if ret['content_class'] and ret['cont_class']:
             name = ret.pop('cont_class')
-            ret['content_class'] = { 'name': name, 'value': ret['content_class'] }
+            ret['content_class'] = {'name': name, 'value': ret['content_class']}
         return ret
+
 
 class ContentClassSerializer(serializers.ModelSerializer):
     class Meta:

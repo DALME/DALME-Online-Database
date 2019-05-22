@@ -1,6 +1,6 @@
 class ModelDatabaseRouter(object):
     """Allows each model to set its own db target"""
-    
+
     def db_for_read(self, model, **hints):
         # Specify target database with field in_db in model's Meta class
         if hasattr(model._meta, 'in_db'):

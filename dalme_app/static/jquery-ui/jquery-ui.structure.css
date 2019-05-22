@@ -168,6 +168,19 @@
 	right: -5px;
 	top: -5px;
 }
+.ui-selectable {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.ui-selectable-helper {
+	position: absolute;
+	z-index: 100;
+	border: 1px dotted black;
+}
+.ui-sortable-handle {
+	-ms-touch-action: none;
+	touch-action: none;
+}
 .ui-autocomplete {
 	position: absolute;
 	top: 0;

@@ -3,14 +3,15 @@ This file contains templates for models, used in dalme_app.models. These templat
 are used to more easily associate common data points with those models, things like
 timestamps and unique IDs.
 """
-
 from django.db import models
 from dalme_app.middleware import get_current_username
 import uuid
 
+
 def make_uuid():
     the_id = uuid.uuid4().hex
     return the_id
+
 
 class dalmeBasic(models.Model):
     """
@@ -20,10 +21,13 @@ class dalmeBasic(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
+
     def class_name(self):
         return self.__class__.__name__
+
     class Meta:
         abstract = True
+
 
 class dalmeUuid(models.Model):
     """
@@ -35,10 +39,13 @@ class dalmeUuid(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
+
     def class_name(self):
         return self.__class__.__name__
+
     class Meta:
         abstract = True
+
 
 class dalmeIntid(models.Model):
     """
@@ -49,7 +56,9 @@ class dalmeIntid(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
+
     def class_name(self):
         return self.__class__.__name__
+
     class Meta:
         abstract = True

@@ -143,6 +143,11 @@
         "text": "Django Admin",
         "link": "/django_admin",
         "iconClass": "fa-user-cog"
+      },
+      {
+        "text": "Languages",
+        "link": "/languages",
+        "iconClass": "fa-language"
       }
     ]
   },

@@ -20,12 +20,12 @@ function fix_dt_search() {
 }
 
 function createTaskList() {
-  $.get("/api/options/?lists=user_group_list&format=json", function ( data ) {
+  $.get("/api/options/?lists=user_groups&format=json", function ( data ) {
       const groups = data.user_group_list;
       taskListForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
-              url: "../api/tasklists/",
+              url: "/api/tasklists/",
               headers: { 'X-CSRFToken': getCookie("csrftoken") },
               data: function (data) { return { "data": JSON.stringify( data ) }; }
             },
@@ -51,59 +51,82 @@ function createTaskList() {
   }, 'json');
 }
 
-function createTask() {
-  $.get("/api/options/?lists=staff_list,workset_list,user_task_lists&format=json", function ( data ) {
+function createTask(type) {
+  $.get("/api/options/?lists=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
       const staff = data.staff_list;
       const worksets = data.workset_list;
       const lists = data.user_task_lists;
+      if (type != 'ticket') {
+        var fields = [
+          {
+            label: "Task",
+            name:  "title"
+          },
+          {
+            label: "Description",
+            name:  "description",
+            type: "textarea"
+          },
+          {
+            label: "Workset",
+            name:  "workset",
+            type: "chosen",
+            options: worksets
+          },
+          {
+            label: "Due date",
+            name:  "due_date",
+            type: "datetime",
+            format: "YYYY-MM-DD"
+          },
+          {
+            label: "Assigned to",
+            name:  "assigned_to",
+            type: "chosen",
+            options: staff
+          },
+          {
+            label: "List",
+            name:  "task_list",
+            type: "chosen",
+            options: lists
+          }
+            ]
+      } else {
+        var fields = [
+            {
+              label: "Issue",
+              name:  "title"
+            },
+            {
+              label: "Description",
+              name:  "description",
+              type: "textarea"
+            }
+          ]
+      }
       taskForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
-              url: "../api/tasks/",
+              url: "/api/tasks/",
               headers: { 'X-CSRFToken': getCookie("csrftoken") },
               data: function (data) { return { "data": JSON.stringify( data ) }; }
             },
-            fields: [
-              {
-                label: "Task",
-                name:  "title"
-              },
-              {
-                label: "Description",
-                name:  "description",
-                type: "textarea"
-              },
-              {
-                label: "Workset",
-                name:  "workset",
-                type: "chosen",
-                options: worksets
-              },
-              {
-                label: "Due date",
-                name:  "due_date",
-                type: "datetime",
-                format: "YYYY-MM-DD"
-              },
-              {
-                label: "Assigned to",
-                name:  "assigned_to",
-                type: "chosen",
-                options: staff
-              },
-              {
-                label: "List",
-                name:  "task_list",
-                type: "chosen",
-                options: lists
-              }
-                ]
+            fields: fields
         });
+      if (type != 'ticket') {
         taskForm.buttons({
-          text: "Save",
+          text: "Create",
           className: "btn btn-primary",
           action: function () { this.submit(); }
-        }).title('Create new task').create();
+        }).title('Create New Task').create();
+      } else {
+        taskForm.buttons({
+          text: "Report",
+          className: "btn btn-primary",
+          action: function () { this.submit(); }
+        }).title('Report Issue').create();
+      }
   }, 'json');
 }
 

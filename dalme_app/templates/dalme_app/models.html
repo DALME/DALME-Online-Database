@@ -3,7 +3,9 @@
 {% block extra_head %}
 {% if helpers %}
   {% for helper in helpers %}
-    <script type="text/javascript" src="{% static 'dalme_helpers/' %}{{ helper }}"></script>
+    {% with 'dalme_helpers/'|add:helper|add:'.js' as helper_static %}
+      <script type="text/javascript" src="{% static helper_static %}"></script>
+    {% endwith %}
   {% endfor %}
 {% endif %}
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.0/css/scroller.bootstrap4.min.css"/>
@@ -14,6 +16,9 @@
 <script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
 <script type="text/javascript">
 var model = "{{ model }}";
+{% if action %}
+  var action = {{ action | safe }};
+{% endif %}
 {% if dt_fieldsets %}
 var dt_fieldsets = {{ dt_fieldsets | safe }};
 {% endif %}
@@ -83,11 +88,21 @@ var dt_fieldsets = {{ dt_fieldsets | safe }};
         {% endfor %}
       ]};
 {% endif %}
-
 {% if dt_editor.buttons %}
-  var dt_editor_buttons = {{ dt_editor.buttons | safe }};
+  var dt_editor_buttons = [
+  {% for b in dt_editor.buttons %}
+  {
+    {% for p,d in b.items %}
+      {% if p == 'action' %}
+        {{ p | safe }}: function() { {{ d | safe }} },
+      {% else %}
+        {{ p | safe }}: '{{ d | safe }}',
+      {% endif %}
+    {% endfor %}
+  },
+  {% endfor %}
+  ];
 {% endif %}
-
 var dt_options = {
   {% for k,v in dt_options.options.items %}
     {% if k == 'ajax' %}
@@ -103,15 +118,10 @@ var dt_options = {
       {% for dict in dt_options.buttons %}
         {
           {% for k,v in dict.items %}
-            {{ k }}:{{ v | safe }},
+            {{ k }}:'{{ v | safe }}',
           {% endfor %}
         },
       {% endfor %}
-      {% if dt_options.buttons_extra %}
-        {% for b in dt_options.buttons_extra %}
-          {{ b | safe }},
-        {% endfor %}
-      {% endif %}
       ],
       columnDefs:[
         {% for dict in dt_options.columnDefs %}
@@ -122,16 +132,9 @@ var dt_options = {
           },
         {% endfor %}
       ]};
-$(document).ready( function () {
-  createDatatable('#dataTables-table', "{{ helpers }}");
-  dt_table.on('draw', function(){ $(window).trigger('resize'); });
-  dt_table.on('column-visibility', function(){ $(window).trigger('resize'); });
-  $(document).on('init.dt', function () {
-    if (model == 'dt_fields') {
-      addDtToolbarButton('edit');
-    };
-  });
-});
+      $(document).ready( function () {
+        createDatatable('#dataTables-list', "{{ helpers | safe }}", "{{ modules | safe }}");
+      });
 </script>
 
 {% endblock %}
@@ -162,7 +165,7 @@ $(document).ready( function () {
             </div>
         </div>
         <div class="table-responsive dt-embed card-full" id="resize_wrapper">
-          <table class="table c_stripe responsive" id="dataTables-table" width="100%">
+          <table class="table c_stripe responsive" id="dataTables-list" width="100%">
           </table>
         </div>
       </div>

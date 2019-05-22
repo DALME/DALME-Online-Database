@@ -2,31 +2,52 @@
   {
     "topMenu": true,
     "itemClass": "help",
-    "iconClass": "fa-question-circle",
-    "link": "/tasks/ticket/add/",
-    "tooltip": "Get help"
+    "iconClass": "fas fa-question-circle",
+    "title": "Help",
+    "tooltip": "Get help",
+    "children": [
+          {
+            "text": "Report Issue",
+            "link": "#",
+            "action": "createTask('ticket')",
+            "iconClass": "fas fa-bug"
+          },
+          {
+            "divider": true
+          },
+          {
+            "text": "Documentation",
+            "link": "#",
+            "iconClass": "fas fa-file-alt"
+          },
+          {
+            "text": "Search Help",
+            "link": "#",
+            "iconClass": "fas fa-search-location"
+          }
+    ]
   },
   {
     "topMenu": true,
     "itemClass": "tools",
-    "iconClass": "fa-tools",
+    "iconClass": "fas fa-tools",
     "title": "Tools",
     "tooltip": "DALME tools",
     "children": [
           {
             "text": "Wiki",
             "link": "https://wiki.dalme.org",
-            "iconClass": "fa-file-alt"
+            "iconClass": "fab fa-wikipedia-w"
           },
           {
             "text": "DAM",
             "link": "https://dam.dalme.org",
-            "iconClass": "fa-image"
+            "iconClass": "fas fa-image"
           },
           {
             "text": "Website",
             "link": "https://dalme.org",
-            "iconClass": "fa-globe"
+            "iconClass": "fas fa-globe"
           }
         ]
     }

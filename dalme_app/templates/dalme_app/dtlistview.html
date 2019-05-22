@@ -3,117 +3,138 @@
 {% block extra_head %}
 {% if helpers %}
   {% for helper in helpers %}
-    <script type="text/javascript" src="{% static 'dalme_helpers/' %}{{ helper }}"></script>
+    {% with 'dalme_helpers/'|add:helper|add:'.js' as helper_static %}
+      <script type="text/javascript" src="{% static helper_static %}"></script>
+    {% endwith %}
   {% endfor %}
 {% endif %}
 <script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
-
 <script type="text/javascript">
-    {% if dt_editor %}
-      var dt_editor_options = {
-        'ajax': {
-          'create': {
-              'type': 'POST',
-              'url': '{{ dt_editor.ajax_url }}',
-              'headers': {'X-CSRFToken': getCookie("csrftoken") },
-              'data': function (data) { return { "data": JSON.stringify( data ) }; }
-            },
-          'edit': {
-              'type': 'PUT',
-              'url': '{{ dt_editor.ajax_url }}_id_/',
-              'headers': {'X-CSRFToken': getCookie("csrftoken") },
-              'data': function (data) { return { "data": JSON.stringify( data ) }; }
-            },
+  {% if action %}
+    var action = {{ action | safe }};
+  {% endif %}
+  {% if filters %}
+    var filters = {{ filters | safe }};
+  {% endif %}
+  {% if form_data %}
+    var form_data = {{ form_data | safe }};
+  {% endif %}
+  {% if dt_editor %}
+    var dt_editor_options = {
+      'ajax': {
+        'create': {
+            'type': 'POST',
+            'url': '{{ dt_editor.ajax_url }}',
+            'headers': {'X-CSRFToken': getCookie("csrftoken") },
+            'data': function (data) { return { "data": JSON.stringify( data ) }; }
+          },
+        'edit': {
+            'type': 'PATCH',
+            'url': '{{ dt_editor.ajax_url }}_id_/',
+            'headers': {'X-CSRFToken': getCookie("csrftoken") },
+            'data': function (data) { return { "data": JSON.stringify( data ) }; }
+          },
           'remove': {
               'type': 'DELETE',
               'url': '{{ dt_editor.ajax_url }}_id_/',
               'headers': {'X-CSRFToken': getCookie("csrftoken") },
-              'data': function (data) { return { "data": JSON.stringify( data ) }; }
+              'data': function (data) {
+                          data.data = null;
+                          return data;
+                      }
             }
-          },
-          {% for k,v in dt_editor.options.items %}
-            {{ k }}:{{ v | safe }},
-          {% endfor %}
-          fields: [
-            {% for i in dt_editor.fields %}
-              {
-                {% for k,v in i.items %}
-                  {% if k == 'opts' %}
-                    opts: {
-                      {% for ok, ov in v.items %}
-                        {{ ok | safe }}: "{{ ov | safe }}",
-                      {% endfor %}
-                    },
-                  {% elif k == 'options' %}
-                    options: [
-                      {% for o in v %}
-                        {
-                          {% for l,p in o.items %}
-                            {{ l | safe }}: "{{ p | escapejs }}",
-                          {% endfor %}
-                        },
-                      {% endfor %}
-                    ],
-                  {% else %}
-                    {{ k | safe }}: "{{ v | safe }}",
-                  {% endif %}
-                {% endfor %}
-              },
-            {% endfor %}
-          ]};
-    {% endif %}
-
-    {% if dt_editor.buttons %}
-      var dt_editor_buttons = {{ dt_editor.buttons | safe }};
-    {% endif %}
-
-    var dt_options = {
-      {% for k,v in dt_options.options.items %}
-        {% if k == 'ajax' %}
-          'ajax': {
-            'url': {{ v | safe }},
-            'data': function (data) { return { "data": JSON.stringify( data ) }; }
-          },
-        {% else %}
+        },
+        {% for k,v in dt_editor.options.items %}
           {{ k }}:{{ v | safe }},
+        {% endfor %}
+        fields: [
+          {% for i in dt_editor.fields %}
+            {
+              {% for k,v in i.items %}
+              {% if k == 'attr' %}
+                attr: {
+                  {% for ak, av in v.items %}
+                    {{ ak | safe }}: {{ av | safe }},
+                  {% endfor %}
+                },
+                {% elif k == 'opts' %}
+                  opts: {
+                    {% for ok, ov in v.items %}
+                      {% if ok == 'source' %}
+                        {{ ok | safe }}: {{ ov | safe }},
+                      {% else %}
+                        {{ ok | safe }}: "{{ ov | safe }}",
+                      {% endif %}
+                    {% endfor %}
+                  },
+                {% elif k == 'options' %}
+                  options: [
+                    {% for o in v %}
+                      {
+                        {% for l,p in o.items %}
+                          {{ l | safe }}: "{{ p | escapejs }}",
+                        {% endfor %}
+                      },
+                    {% endfor %}
+                  ],
+                {% else %}
+                  {{ k | safe }}: "{{ v | safe }}",
+                {% endif %}
+              {% endfor %}
+            },
+          {% endfor %}
+        ]};
+  {% endif %}
+  {% if dt_editor.buttons %}
+    var dt_editor_buttons = [
+    {% for b in dt_editor.buttons %}
+    {
+      {% for p,d in b.items %}
+        {% if p == 'action' %}
+          {{ p | safe }}: function() { {{ d | safe }} },
+        {% else %}
+          {{ p | safe }}: '{{ d | safe }}',
         {% endif %}
       {% endfor %}
-        buttons:[
-          {% for dict in dt_options.buttons %}
+    },
+    {% endfor %}
+    ];
+  {% endif %}
+  var dt_options = {
+    {% for k,v in dt_options.options.items %}
+      {% if k == 'ajax' %}
+        'ajax': {
+          'url': {{ v | safe }},
+          'data': function (data) { return { "data": JSON.stringify( data ) }; }
+        },
+      {% else %}
+        {{ k }}:{{ v | safe }},
+      {% endif %}
+    {% endfor %}
+      buttons:[
+        {% for dict in dt_options.buttons %}
+          {
+            {% for k,v in dict.items %}
+              {{ k }}:'{{ v | safe }}',
+            {% endfor %}
+          },
+        {% endfor %}
+        ],
+        columnDefs:[
+          {% for dict in dt_options.columnDefs %}
             {
               {% for k,v in dict.items %}
                 {{ k }}:{{ v | safe }},
               {% endfor %}
             },
           {% endfor %}
-          {% if dt_options.buttons_extra %}
-            {% for b in dt_options.buttons_extra %}
-              {{ b | safe }},
-            {% endfor %}
-          {% endif %}
-          ],
-          columnDefs:[
-            {% for dict in dt_options.columnDefs %}
-              {
-                {% for k,v in dict.items %}
-                  {{ k }}:{{ v | safe }},
-                {% endfor %}
-              },
-            {% endfor %}
-          ]};
-    $(document).ready( function () { createDatatable('#dataTables-list', "{{ helpers }}") });
-    {% if filters %}
-      var filters = {{ filters | safe }};
-      $(document).on('init.dt', function () { addDtToolbarButton('filters')} );
-    {% endif %}
-    {% if preview %}
-      $(document).on('init.dt', function () { addDtToolbarButton('preview')} );
-    {% endif %}
+        ]};
+  $(document).ready( function () {
+    createDatatable('#dataTables-list', "{{ helpers | safe }}", "{{ modules | safe }}");
+  });
 </script>
 {% endblock %}
-
 {% block extra_dropdowns %}{% endblock %}
-
 {% block content %}
 <!-- Begin Page Content -->
 <div class="container-fluid">
@@ -127,6 +148,7 @@
       </div>
     </div>
   </div>
+{% include 'forms/dte_inventories.html' %}
 {% endblock %}
 {% block extra_scripts %}
 {% endblock %}
