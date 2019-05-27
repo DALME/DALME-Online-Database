@@ -10,13 +10,15 @@ from rest_framework import viewsets
 from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, WorksetSerializer,
                                    TaskSerializer, TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
-                                   ContentTypeSerializer, ContentClassSerializer)
+                                   ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
+                                   SimplePageSerializer)
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, Language, Workset,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
-                              wiki_user_groups, wp_users, wp_usermeta)
+                              wiki_user_groups, wp_users, wp_usermeta, Attribute)
+from django_celery_results.models import TaskResult
 from django.db.models.expressions import RawSQL
 from rest_framework.permissions import DjangoModelPermissions
 from django.shortcuts import get_object_or_404
@@ -29,14 +31,14 @@ class DTViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoModelPermissions,)
 
     def list(self, request, *args, **kwargs):
-        dt_data = json.loads(request.GET['data'])
-        if hasattr(self, 'search_dict'):
-            search_dict = self.search_dict
-        else:
-            search_dict = {}
         data_dict = {}
-        data_dict['draw'] = int(dt_data.get('draw'))  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
         try:
+            dt_data = json.loads(request.GET['data'])
+            if hasattr(self, 'search_dict'):
+                search_dict = self.search_dict
+            else:
+                search_dict = {}
+            data_dict['draw'] = int(dt_data.get('draw'))  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
             queryset = self.get_qset()
             if dt_data['search']['value']:
                 queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
@@ -135,6 +137,13 @@ class DTViewSet(viewsets.ModelViewSet):
         }
 
 
+class AsynchronousTasks(DTViewSet):
+    """ API endpoint for managing asynchronous tasks """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = TaskResult.objects.all()
+    serializer_class = AsyncTaskSerializer
+
+
 class AttributeTypes(DTViewSet):
     """ API endpoint for managing attribute types """
     permission_classes = (DjangoModelPermissions,)
@@ -155,6 +164,20 @@ class AttributeTypes(DTViewSet):
         else:
             serializer = self.serializer_class
         return serializer
+
+
+class Attributes(viewsets.ModelViewSet):
+    """ API endpoint for managing attributes """
+    permission_classes = (DjangoModelPermissions,)
+    serializer_class = SimpleAttributeSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('object') is not None:
+            object = self.request.GET['object']
+            queryset = Attribute.objects.filter(object_id=object)
+        else:
+            queryset = Attribute.objects.all()
+        return queryset
 
 
 class ContentClasses(DTViewSet):
@@ -574,6 +597,20 @@ class Options(viewsets.ViewSet):
         return opt_list
 
 
+class Pages(viewsets.ModelViewSet):
+    """ API endpoint for managing pages """
+    permission_classes = (DjangoModelPermissions,)
+    serializer_class = SimplePageSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('object') is not None:
+            object = self.request.GET['object']
+            queryset = Attribute.objects.filter(object_id=object)
+        else:
+            queryset = Attribute.objects.all()
+        return queryset
+
+
 class Pages(DTViewSet):
     """ API endpoint for managing pages """
     permission_classes = (DjangoModelPermissions,)
@@ -691,8 +728,8 @@ class Transcriptions(viewsets.ModelViewSet):
         if serializer.is_valid():
             new_obj = serializer.save()
             object = Transcription.objects.get(pk=new_obj.id)
-            sp = Source_pages.objects.get(source_id=data['source'], page_id=data['page'])
-            sp.transcription_id = object
+            sp = Source_pages.objects.get(source=data['source'], page=data['page'])
+            sp.transcription = object
             sp.save()
             serializer = TranscriptionSerializer(object)
             result = serializer.data
@@ -902,7 +939,8 @@ def get_dte_data(request):
                     value = {key: normalize_value(val) for key, val in value.items()}
             else:
                 value = normalize_value(value)
-            row_values[field] = value
+            if value is not None:
+                row_values[field] = value
         data_list.append([k, row_values])
     return data_list
 
@@ -915,7 +953,10 @@ def normalize_value(value):
     elif type(value) is str and value.isdigit():
         n_value = int(value)
     else:
-        n_value = value
+        if value != '' and value != 'none' and value != 'null' and value != 'Null':
+            n_value = value
+        else:
+            n_value = None
     return n_value
 
 

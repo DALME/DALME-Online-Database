@@ -8,7 +8,6 @@ function changeForm(e, action) {
     if (action == 'edit') {
       att_set = 0;
       page_set = 0;
-      changeOnType(setEditAttributes);
     } else if (action == 'create') {
       $('#DTE_Field_type').on('change.dalme', changeOnType);
       $('#DTE_Field_is_inventory_0').on('click.dalme', changeOnInv);
@@ -20,21 +19,6 @@ function changeForm(e, action) {
         alert('close - create');
       }
   }
-}
-
-function setEditAttributes() {
-    $.get("/api/attributes/?object="+dt_editor.ids()+"&format=json", function ( attribute_data ) {
-        var att_data = attribute_data.results;
-        for (let i = 0, len = att_data.length; i < len; ++i) {
-            var prop_dict = {};
-            for (const prop in att_data[i]) {
-                if (att_data[i].hasOwnProperty(prop)) {
-                   prop_dict[prop] = att_data[i][prop];
-                }
-            };
-            addAttributeSet(prop_dict);
-        }
-    }, 'json');
 }
 
 function init_source_editor(para_data) {
@@ -113,10 +97,10 @@ function init_source_editor(para_data) {
     }, 'json');
 }
 
-function changeOnType(callback) {
+function changeOnType() {
     att_set = 0;
-    //var c_type = $('#DTE_Field_type').val();
-    $.get("/api/options/?lists=attribute_types_"+dt_editor.get('type.id')+"&extra=1&format=json", function ( option_data ) {
+    var c_type = $('#DTE_Field_type').val();
+    $.get("/api/options/?lists=attribute_types_"+c_type+"&extra=1&format=json", function ( option_data ) {
           atype_choices = option_data.attribute_types.options;
           atype_ref = option_data.attribute_types.ref;
           if ($('#attribute-formset').hasClass('show')) {
@@ -125,9 +109,7 @@ function changeOnType(callback) {
           } else {
               $('#attribute-formset').collapse('show');
           };
-          if (typeof callback !== 'undefined') {
-              Function('"use strict";return (' + callback +'())')();
-          }
+          addAttributeSet();
     }, 'json');
 }
 
@@ -152,7 +134,7 @@ function changeOnInv() {
     };
 }
 
-function addAttributeSet(attribute) {
+function addAttributeSet() {
     if (att_set == 0) {
       $('#attribute-formset').find('.formset-none').remove();
     };
@@ -161,15 +143,12 @@ function addAttributeSet(attribute) {
     new_set += '<div class="formset-field-container" data-editor-template="attributes.'+att_set+'.type">\
                 </div><a class="remove_icon" onclick="removeSet(this)"><i class="fa fa-minus-circle"></i></a></div>'
     $('#attribute-formset').find('.formset-body').append(new_set);
-    dt_editor.add({
+    source_editor.add({
             label: "Attribute type",
             name: "attributes."+att_set+".type",
             type: "chosen",
             options: atype_choices
           });
-    if (typeof attribute !== 'undefined') {
-      dt_editor.set("attributes."+att_set+".type", attribute['attribute_type']);
-    }
     var container = $("div[data-editor-template='attributes."+att_set+".type']");
     container.find('label').remove();
     container.find('select').chosen().change(showAttributeField);

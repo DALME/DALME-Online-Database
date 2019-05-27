@@ -31,7 +31,7 @@ class SourceIndex(indexes.SearchIndex, indexes.Indexable):
                                                       WHERE src2.id = dalme_app_source.id', []))
         queryset = queryset.annotate(transcriptions=RawSQL('SELECT GROUP_CONCAT(dalme_app_transcription.transcription SEPARATOR "|") \
                                                             FROM dalme_app_transcription \
-                                                            JOIN dalme_app_source_pages ON dalme_app_transcription.id = dalme_app_source_pages.transcription_id_id \
-                                                            JOIN dalme_app_source src2 ON dalme_app_source_pages.source_id_id = src2.id \
+                                                            JOIN dalme_app_source_pages ON dalme_app_transcription.id = dalme_app_source_pages.transcription_id \
+                                                            JOIN dalme_app_source src2 ON dalme_app_source_pages.source_id = src2.id \
                                                             WHERE src2.id = dalme_app_source.id', []))
         return queryset

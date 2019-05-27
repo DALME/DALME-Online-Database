@@ -48,10 +48,10 @@ def get_editor_folios(source):
             'dam_id': str(folios[0].dam_id),
             'order': str(folios[0].order)
             }
-        transcription = Source_pages.objects.get(source_id=source.id, page_id=folios[0].id)
-        if transcription.transcription_id:
-            folio_dict['tr_id'] = str(transcription.transcription_id)
-            transcription_version = transcription.transcription_id.version
+        transcription = Source_pages.objects.get(source=source.id, page=folios[0].id)
+        if transcription.transcription:
+            folio_dict['tr_id'] = str(transcription.transcription)
+            transcription_version = transcription.transcription.version
             if transcription_version:
                 folio_dict['tr_version'] = transcription_version
             else:
@@ -70,10 +70,10 @@ def get_editor_folios(source):
                 'dam_id': str(f.dam_id),
                 'order': str(f.order)
                 }
-            transcription = Source_pages.objects.get(source_id=source.id, page_id=f.id)
-            if transcription.transcription_id:
-                folio_dict['tr_id'] = str(transcription.transcription_id)
-                transcription_version = transcription.transcription_id.version
+            transcription = Source_pages.objects.get(source=source.id, page=f.id)
+            if transcription.transcription:
+                folio_dict['tr_id'] = str(transcription.transcription)
+                transcription_version = transcription.transcription.version
                 if transcription_version:
                     folio_dict['tr_version'] = transcription_version
                 else:

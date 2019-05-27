@@ -8,9 +8,9 @@ from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 from allaccess.views import OAuthCallback
 from dalme_app import functions, custom_scripts
-from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
-                              DT_list, DT_fields, Page, Source, Workset, TaskList, Task,
-                              rs_resource, rs_collection_resource, rs_resource_data, rs_resource_type_field)
+from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
+                              Source, Workset, TaskList, Task, rs_resource, rs_collection_resource,
+                              rs_resource_data, rs_resource_type_field)
 from haystack.generic_views import SearchView
 from django.http import HttpResponse, HttpResponseNotAllowed
 import urllib.parse as urlparse
@@ -299,7 +299,7 @@ class DTListView(TemplateView):
 
     def get_helpers(self, _list, *args, **kwargs):
         helpers = _list.helpers
-        if helpers is not None:
+        if helpers is not None and helpers != '':
             helpers = [i.strip() for i in helpers.split(',')]
         return helpers
 
@@ -464,9 +464,7 @@ class ModelLists(DTListView):
 class SourceList(DTListView):
     """ Lists sources """
     dt_editor_options = {'idSrc': '"id"', 'template': '"#inventoryForm"'}
-    dte_field_list = ['name', 'short_name', 'parent', 'type', 'is_inventory']
-    dt_editor_buttons = [{'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New'}]
-    module_list = ['form']
+    dte_field_list = ['name', 'short_name', 'type', 'parent', 'is_inventory']
 
     def get_list_name(self, *args, **kwargs):
         list_name = 'all'
@@ -538,15 +536,15 @@ class SourceDetail(DetailView):
         attributes = self.object.attributes.all().select_related('attribute_type')
         for a in attributes:
             label = a.attribute_type.name
-            order = Content_attributes.objects.get(content_type_id=self.object.type, attribute_type_id=a.attribute_type).order
+            #order = Content_attributes.objects.get(content_type_id=self.object.type, attribute_type_id=a.attribute_type).order
             value = functions.get_attribute_value(a)
             dict = {
                 'label': label,
                 'value': value,
-                'order': order
+                #'order': order
             }
             attribute_data.append(dict)
-        attribute_data = sorted(attribute_data, key=lambda x: x['order'])
+        #attribute_data = sorted(attribute_data, key=lambda x: x['order'])
         context['attribute_data'] = attribute_data
         tables = []
         if is_inv and has_pages:
@@ -576,7 +574,7 @@ class SourceDetail(DetailView):
         try:
             parsed_ref = urlparse.urlparse(self.request.META.get('HTTP_REFERER', '/'))
             s_type = urlparse.parse_qs(parsed_ref.query)['type'][0]
-        except IndexError:
+        except:
             s_type = 'all'
         if s_type == 'all':
             breadcrumb = [('Sources', ''), ('All Sources', '/sources')]
@@ -659,6 +657,26 @@ class UserDetail(DetailView):
             return object
         except ObjectDoesNotExist:
             raise Http404
+
+
+@method_decorator(login_required, name='dispatch')
+class AsyncTaskList(DTListView):
+    breadcrumb = [('System', ''), ('Asynchronous Tasks', '/async_tasks')]
+    list_name = 'async_tasks'
+    dt_options = {
+        'pageLength': 25,
+        'paging': 'true',
+        'responsive': 'true',
+        'fixedHeader': 'true',
+        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': {'style': 'single'},
+        'deferRender': 'true',
+        'rowId': '"id"',
+        'language': {'searchPlaceholder': 'Search'},
+        'order': '[[ 0, "desc" ]]'
+        }
 
 
 @method_decorator(login_required, name='dispatch')

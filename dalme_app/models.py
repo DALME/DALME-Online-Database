@@ -71,6 +71,7 @@ class Profile(models.Model):
 
 class Agent(dalmeUuid):
     type = models.IntegerField()
+    tags = GenericRelation('Tag', related_query_name='agents')
 
 
 class Attribute_type(dalmeIntid):
@@ -139,6 +140,7 @@ class Attribute(dalmeUuid):
 
 class Concept(dalmeUuid):
     getty_id = models.IntegerField(db_index=True)
+    tags = GenericRelation('Tag', related_query_name='concepts')
 
 
 class Content_class(dalmeIntid):
@@ -294,6 +296,7 @@ class Headword(dalmeUuid):
     word = models.CharField(max_length=55)
     full_lemma = models.CharField(max_length=255)
     concept_id = models.ForeignKey('Concept', to_field='id', db_index=True, on_delete=models.PROTECT)
+    tags = GenericRelation('Tag', related_query_name='headwords')
 
     def __str__(self):
         return self.word
@@ -302,6 +305,7 @@ class Headword(dalmeUuid):
 class Object(dalmeUuid):
     concept_id = models.UUIDField(db_index=True)
     object_phrase_id = models.ForeignKey('Object_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
+    tags = GenericRelation('Tag', related_query_name='objects')
 
 
 class Object_attribute(dalmeBasic):
@@ -311,6 +315,7 @@ class Object_attribute(dalmeBasic):
 
 class Place(dalmeUuid):
     type = models.IntegerField(db_index=True)
+    tags = GenericRelation('Tag', related_query_name='places')
 
 
 class Page(dalmeUuid):
@@ -318,6 +323,7 @@ class Page(dalmeUuid):
     dam_id = models.IntegerField(db_index=True, null=True)
     order = models.IntegerField(db_index=True)
     canvas = models.TextField(null=True)
+    tags = GenericRelation('Tag', related_query_name='pages')
 
     def __str__(self):
         return self.name
@@ -352,9 +358,9 @@ class Page(dalmeUuid):
 
 
 class Source_pages(dalmeIntid):
-    source_id = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
-    page_id = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE)
-    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
+    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
+    page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE)
+    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
 
 
 class Source(dalmeUuid):
@@ -365,6 +371,7 @@ class Source(dalmeUuid):
     is_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation(Attribute, related_query_name='sources')
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
+    tags = GenericRelation('Tag', related_query_name='sources')
 
     def __str__(self):
         return self.name
@@ -383,7 +390,7 @@ class Transcription(dalmeUuid):
 
 
 class Identity_phrase(dalmeUuid):
-    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
+    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
     phrase = models.TextField()
 
     def __str__(self):
@@ -391,7 +398,7 @@ class Identity_phrase(dalmeUuid):
 
 
 class Object_phrase(dalmeUuid):
-    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
+    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
     phrase = models.TextField()
 
     def __str__(self):
@@ -402,6 +409,7 @@ class Wordform(dalmeUuid):
     normalized_form = models.CharField(max_length=55)
     pos = models.CharField(max_length=255)
     headword_id = models.ForeignKey('Headword', to_field='id', db_index=True, on_delete=models.PROTECT)
+    tags = GenericRelation('Tag', related_query_name='wordforms')
 
     def __str__(self):
         return self.normalized_form
@@ -414,6 +422,7 @@ class Token(dalmeUuid):
     clean_token = models.CharField(max_length=55)
     order = models.IntegerField(db_index=True)
     flags = models.CharField(max_length=10)
+    tags = GenericRelation('Tag', related_query_name='tokens')
 
     def __str__(self):
         return self.raw_token
@@ -471,6 +480,7 @@ class AttributeReference(dalmeUuid):
 class Notes(dalmeUuid):
     target = models.UUIDField(db_index=True)
     text = models.TextField()
+    tags = GenericRelation('Tag', related_query_name='notes')
 
 
 class Workset(dalmeIntid):
@@ -478,12 +488,29 @@ class Workset(dalmeIntid):
     description = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
     query = models.TextField()
+    tags = GenericRelation('Tag', related_query_name='worksets')
 
     def __str__(self):
         return self.name
 
 
+class Tag(dalmeUuid):
+    WORKFLOW = 'WF'  # type of tags used to keep track of general DALME workflow
+    CONTROL = 'C'  # general purpose control tags
+    TAG_TYPES = (
+        (WORKFLOW, 'Workflow'),
+        (CONTROL, 'Control')
+    )
+
+    tag_type = models.CharField(max_length=2, choices=TAG_TYPES)
+    tag = models.CharField(max_length=55, null=True, default=None)
+    tag_group = models.CharField(max_length=255, null=True, default=None)
+    content_object = GenericForeignKey()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField(null=True, db_index=True)
+
 # task management
+
 
 class TaskList(dalmeIntid):
     name = models.CharField(max_length=60)

@@ -21,16 +21,16 @@
         "counter": "notarial_sources"
       },
       {
-        "text": "Bibliography",
-        "link": "/sources?type=bibliography",
-        "iconClass": "fa-book",
-        "counter": "biblio_sources"
-      },
-      {
         "text": "Archives & Collections",
         "link": "/sources?type=archives_and_collections",
         "iconClass": "fa-archive",
         "counter": "archives"
+      },
+      {
+        "text": "Bibliography",
+        "link": "/sources?type=bibliography",
+        "iconClass": "fa-book",
+        "counter": "biblio_sources"
       }
     ]
   },
@@ -111,19 +111,19 @@
     "permissions": "Administrators",
     "children": [
       {
-        "text": "Users",
-        "link": "/users",
-        "iconClass": "fa-users"
-      },
-      {
         "text": "Tasks",
         "link": "/tasks",
         "iconClass": "fa-tasks"
       },
       {
-        "text": "Problem Tickets",
+        "text": "Issue Tickets",
         "link": "/tasks/2/tickets/",
         "iconClass": "fa-ticket-alt"
+      },
+      {
+        "text": "Users",
+        "link": "/users",
+        "iconClass": "fa-users"
       }
     ]
   },
@@ -135,19 +135,19 @@
     "permissions": "Administrators",
     "children": [
       {
-        "text": "Background Tasks",
-        "link": "#",
+        "text": "Asynchronous Tasks",
+        "link": "/async_tasks",
         "iconClass": "fa-tasks"
-      },
-      {
-        "text": "Django Admin",
-        "link": "/django_admin",
-        "iconClass": "fa-user-cog"
       },
       {
         "text": "Languages",
         "link": "/languages",
         "iconClass": "fa-language"
+      },
+      {
+        "text": "Django Admin",
+        "link": "/django_admin",
+        "iconClass": "fa-user-cog"
       }
     ]
   },

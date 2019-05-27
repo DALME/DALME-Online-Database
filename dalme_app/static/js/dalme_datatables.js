@@ -64,8 +64,8 @@ function initModule(mod) {
         $('.dt-buttons').append(button_html);
         break;
     case 'form':
-        dt_editor.on('open.dalme', source_form_on);
-        dt_editor.on('close.dalme', source_form_off);
+        dt_editor.on('open.dalme', function(e, mode, action) { form_open(action) });
+        dt_editor.on('close.dalme', function(e, mode, action) { form_close(action) });
   }
 }
 

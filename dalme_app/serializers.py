@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
                               rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type)
+from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
 import base64
@@ -60,6 +61,12 @@ class LanguageSerializer(serializers.ModelSerializer):
             name = ret.pop('parent_name')
             ret['parent'] = {'name': name, 'value': ret['parent']}
         return ret
+
+
+class AsyncTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskResult
+        fields = '__all__'
 
 
 class WorksetSerializer(serializers.ModelSerializer):
@@ -138,18 +145,33 @@ class TranscriptionSerializer(serializers.ModelSerializer):
         model = Transcription
         fields = ('id', 'transcription', 'author', 'version')
 
+
+class SimpleAttributeSerializer(serializers.ModelSerializer):
+    """ Basic serializer for attribute data """
+    attribute_name = serializers.StringRelatedField(source='attribute_type')
+    attribute_type = serializers.PrimaryKeyRelatedField(read_only=True)
+    data_type = serializers.CharField(max_length=15, source='attribute_type.data_type', read_only=True)
+
+    class Meta:
+        model = Attribute
+        fields = ('attribute_type', 'value_STR', 'value_TXT', 'attribute_name',
+                  'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'data_type')
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['transcription']:
-            transcription_xml = '<xml>'+ret['transcription']+'</xml>'
-            ret['transcription_html'] = functions.render_transcription(transcription_xml)
-        else:
-            ret['transcription_html'] = ''
+        if instance.attribute_type.data_type != 'DATE':
+            ret.pop('value_DATE_d')
+            ret.pop('value_DATE_m')
+            ret.pop('value_DATE_y')
+        if instance.attribute_type.data_type != 'TXT':
+            ret.pop('value_TXT')
+        if instance.attribute_type.data_type != 'STR' and instance.attribute_type.data_type != 'INT':
+            ret.pop('value_STR')
         return ret
 
 
 class AttributeSerializer(serializers.ModelSerializer):
-    """ Basic serializer for attribute data """
+    """ DT serializer for attribute data """
 
     class Meta:
         model = Attribute
@@ -164,6 +186,7 @@ class AttributeSerializer(serializers.ModelSerializer):
 
 class SourceSerializer(DynamicSerializer):
     type = serializers.StringRelatedField()
+    type_id = serializers.PrimaryKeyRelatedField(source='type', read_only=True)
     name = serializers.CharField(max_length=255)
     parent_id = serializers.PrimaryKeyRelatedField(source='parent', read_only=True)
     parent = serializers.StringRelatedField()
@@ -172,7 +195,7 @@ class SourceSerializer(DynamicSerializer):
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'name', 'short_name', 'parent', 'parent_id', 'is_inventory',
+        fields = ('id', 'type', 'type_id', 'name', 'short_name', 'parent', 'parent_id', 'is_inventory',
                   'attributes', 'no_folios')
 
     def to_representation(self, instance):
@@ -184,9 +207,12 @@ class SourceSerializer(DynamicSerializer):
             new_att[k] = v
         ret['attributes'] = new_att
         ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id']}
-        ret['parent'] = {'name': ret['parent'], 'url': '/sources/'+str(ret['parent_id'])}
+        parent_id = ret.pop('parent_id')
+        ret['parent'] = {'name': ret['parent'], 'url': '/sources/'+str(parent_id), 'id': parent_id}
+        type_id = ret.pop('type_id')
+        ret['type'] = {'name': ret['type'], 'id': type_id}
         if 'url' in ret:
-            ret['url'] = {'name': 'Visit Link', 'url': ret['url']}
+            ret['url'] = {'name': 'Visit website', 'url': ret['url']}
         return ret
 
 

@@ -5,9 +5,11 @@ import re
 import os
 import json
 import pandas as pd
-from dalme_app.models import AttributeReference, Language, Attribute
+from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source
 from datetime import date
-import calendar
+from dalme_app.async_tasks import update_rs_folio_field
+from async_messages import messages
+from django.contrib.auth.models import User
 
 
 def get_script_menu():
@@ -16,6 +18,11 @@ def get_script_menu():
             "name": "session_info",
             "description": "Outputs the contents of the current session.",
             "type": "info"
+        },
+        {
+            "name": "update_folios_in_dam",
+            "description": "Updates the contents of the 'folio' field in the DAM to match the value in the corresponding DALME page.",
+            "type": "warning"
         },
         {
             "name": "import_languages",
@@ -85,6 +92,12 @@ def session_info(request, username):
     return output
 
 
+def update_folios_in_dam(request):
+    user_id = request.user.id
+    update_rs_folio_field.delay(user_id)
+    return 'Process started...'
+
+
 def import_languages(request):
     file = os.path.join('dalme_app', 'templates', 'menus', 'uk.json')
     with open(file, 'r') as fp:
@@ -114,8 +127,56 @@ def import_languages(request):
 
 
 def test_expression(request):
-    val = calendar.month_abbr[3]
-    return val
+    user = request.user
+    messages.info(user, 'This is an info message sample. <b>Bold</b>. <a href="#">Link sample</a>')
+    messages.success(user, 'This is a success message sample. <b>Bold</b>. <a href="#">Link sample</a>')
+    messages.warning(user, 'This is a warning message sample. <b>Bold</b>. <a href="#">Link sample</a>')
+    messages.error(user, 'This is an error message sample. <b>Bold</b>. <a href="#">Link sample</a>')
+    return 'done'
+
+
+def import_transcriptions(request):
+    data = []
+    count = 0
+    current_id = 'bc3a2c32639e44d6b5a21829b42ae0b5'
+    for e in data:
+        # manage counter for folio order
+        if e[0] == current_id:
+            count = count + 1
+        else:
+            count = 1
+            current_id = e[0]
+
+        # create the transcription record
+        new_tr = Transcription()
+        new_tr.transcription = e[4]
+        new_tr.author = 'smail'
+        new_tr.version = 0
+        new_tr.save()
+
+        # create the page
+        source_object = Source.objects.get(pk=e[0])
+        source_object.pages.create(
+            name=e[1],
+            dam_id=e[2],
+            order=count,
+            through_defaults={
+                    'transcription': new_tr
+                }
+        )
+        # create dan's done tag if necessary
+        if e[3] == 1:
+            source_object.tags.create(
+                tag_type='C',
+                tag='Done',
+                tag_group='DLS_Lucca_Transcription_Review'
+            )
+
+        # update source's is_inventory field
+        source_object.is_inventory = 1
+        source_object.save()
+
+    return 'done'
 
 
 def merge_attributes_csv():

@@ -1,8 +1,8 @@
 <div id="inventoryForm">
-  <div data-editor-template="name"></div>
+  <div data-editor-template="name.name"></div>
   <div data-editor-template="short_name"></div>
-  <div data-editor-template="parent"></div>
-  <div data-editor-template="type"></div>
+  <div data-editor-template="parent.id"></div>
+  <div data-editor-template="type.id"></div>
   <div data-editor-template="is_inventory"></div>
   <div class="card collapse" id="attribute-formset">
     <div class="formset-header">
@@ -10,6 +10,7 @@
       <button class="editor-btn button-border-left" type="button" id="btn_add_set" onclick="addAttributeSet()"><i class="fa fa-plus fa-fw"></i></button>
     </div>
     <div class="formset-body">
+      <div class="formset-none">No attributes assigned.</div>
     </div>
   </div>
   <div class="card collapse" id="page-formset">

@@ -25,6 +25,8 @@ router.register(r'attribute_types', apis.AttributeTypes, basename='attribute_typ
 router.register(r'content_types', apis.ContentTypes, basename='content_types')
 router.register(r'content_classes', apis.ContentClasses, basename='content_classes')
 router.register(r'languages', apis.Languages, basename='languages')
+router.register(r'async_tasks', apis.AsynchronousTasks, basename='async_tasks')
+router.register(r'attributes', apis.Attributes, basename='attributes')
 
 urlpatterns = [
     path('api/', include(router.urls)),

@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'dalme_app.middleware.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'dalme_app.middleware.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'django.middleware.locale.LocaleMiddleware'
 ]
