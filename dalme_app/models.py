@@ -120,21 +120,15 @@ class Attribute(dalmeUuid):
 
     def save(self, *args, **kwargs):
         if self.attribute_type.data_type == 'DATE':
-            if self.value_DATE is not None:
-                self.value_DATE_d = self.value_DATE.strftime('%d')
-                self.value_DATE_m = self.value_DATE.strftime('%m')
-                self.value_DATE_y = self.value_DATE.strftime('%Y')
+            if self.value_DATE_d is not None and self.value_DATE_m is not None and self.value_DATE_y is not None:
+                date = str(self.value_DATE_y)+'-'+str(self.value_DATE_m)+'-'+str(self.value_DATE_d).zfill(2)
+                pDate = parse_date(date)
+                self.value_DATE = pDate
                 self.value_STR = self.value_DATE.strftime('%d-%B-%Y').lstrip("0").replace(" 0", " ")
-            else:
-                if self.value_DATE_d is not None and self.value_DATE_m is not None and self.value_DATE_y is not None:
-                    date = str(self.value_DATE_y)+'-'+str(self.value_DATE_m)+'-'+str(self.value_DATE_d).zfill(2)
-                    pDate = parse_date(date)
-                    self.value_DATE = pDate
-                    self.value_STR = self.value_DATE.strftime('%d-%B-%Y').lstrip("0").replace(" 0", " ")
-                elif self.value_DATE_m is not None and self.value_DATE_y is not None:
-                    self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
-                elif self.value_DATE_y is not None:
-                    self.value_STR = str(self.value_DATE_y)
+            elif self.value_DATE_m is not None and self.value_DATE_y is not None:
+                self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
+            elif self.value_DATE_y is not None:
+                self.value_STR = str(self.value_DATE_y)
         super().save(*args, **kwargs)
 
 
@@ -196,15 +190,14 @@ class DT_fields(dalmeIntid):
     DTE_TYPES = (
         ('autoComplete', 'autoComplete'),
         ('checkbox', 'checkbox'),
-        ('chosen', 'chosen'),
         ('date', 'date'),
         ('datetime', 'datetime'),
         ('hidden', 'hidden'),
-        ('multi-chosen', 'multi-chosen'),
         ('password', 'password'),
         ('radio', 'radio'),
         ('readonly', 'readonly'),
         ('select', 'select'),
+        ('selectize', 'selectize'),
         ('text', 'text'),
         ('textarea', 'textarea'),
         ('upload', 'upload'),
@@ -269,7 +262,7 @@ class DT_fields(dalmeIntid):
     orderable = models.BooleanField(default=False)
     visible = models.BooleanField(default=False)
     searchable = models.BooleanField(default=False)
-    dt_name = models.CharField(max_length=55, null=True, default=None)
+    dt_name = models.CharField(max_length=55, null=True, default=None, blank=True)
     dt_class_name = models.CharField(max_length=255, null=True, default=None)
     dt_width = models.CharField(max_length=255, null=True, default=None)
     dte_name = models.CharField(max_length=55, null=True, default=None)
@@ -359,7 +352,7 @@ class Page(dalmeUuid):
 
 class Source_pages(dalmeIntid):
     source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
-    page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE)
+    page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
     transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
 
 
@@ -436,16 +429,29 @@ class Identity_phrase_x_entity(dalmeBasic):
 
 
 class Country(dalmeIntid):
-    short_name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     alpha_3_code = models.CharField(max_length=3)
     alpha_2_code = models.CharField(max_length=2)
     num_code = models.IntegerField()
 
     def __str__(self):
-        return self.short_name
+        return self.name
 
     class Meta:
-        ordering = ["short_name"]
+        ordering = ["name"]
+
+
+class City(dalmeIntid):
+    name = models.CharField(max_length=255)
+    administrative_region = models.CharField(max_length=255)
+    country = models.ForeignKey('Country', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name + '(' + self.country.name + ')'
+
+    class Meta:
+        ordering = ['country', 'name']
+        unique_together = ("name", "administrative_region")
 
 
 class Language(dalmeIntid):

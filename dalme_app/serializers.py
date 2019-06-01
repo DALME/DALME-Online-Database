@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
-                              rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type)
+                              rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
+                              Country, City)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
@@ -63,6 +64,26 @@ class LanguageSerializer(serializers.ModelSerializer):
         return ret
 
 
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ('id', 'name', 'alpha_2_code', 'alpha_3_code', 'num_code')
+
+
+class CitySerializer(serializers.ModelSerializer):
+    country_name = serializers.StringRelatedField(source='country')
+
+    class Meta:
+        model = City
+        fields = ('id', 'name', 'administrative_region', 'country', 'country_name')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        country_name = ret.pop('country_name')
+        ret['country'] = {'name': country_name, 'value': ret['country']}
+        return ret
+
+
 class AsyncTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskResult
@@ -100,7 +121,7 @@ class TaskListSerializer(serializers.ModelSerializer):
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Page
-        fields = ('name', 'dam_id', 'order')
+        fields = ('id', 'name', 'dam_id', 'order')
 
 
 class RSCollectionsSerializer(serializers.ModelSerializer):
@@ -151,11 +172,12 @@ class SimpleAttributeSerializer(serializers.ModelSerializer):
     attribute_name = serializers.StringRelatedField(source='attribute_type')
     attribute_type = serializers.PrimaryKeyRelatedField(read_only=True)
     data_type = serializers.CharField(max_length=15, source='attribute_type.data_type', read_only=True)
+    options_list = serializers.CharField(max_length=15, source='attribute_type.options_list', read_only=True)
 
     class Meta:
         model = Attribute
-        fields = ('attribute_type', 'value_STR', 'value_TXT', 'attribute_name',
-                  'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'data_type')
+        fields = ('id', 'attribute_type', 'value_STR', 'value_TXT', 'attribute_name',
+                  'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'data_type', 'options_list')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -185,17 +207,18 @@ class AttributeSerializer(serializers.ModelSerializer):
 
 
 class SourceSerializer(DynamicSerializer):
-    type = serializers.StringRelatedField()
-    type_id = serializers.PrimaryKeyRelatedField(source='type', read_only=True)
+    type_name = serializers.StringRelatedField(source='type', read_only=True, required=False)
+    type = serializers.PrimaryKeyRelatedField(queryset=Content_type.objects.all())
     name = serializers.CharField(max_length=255)
-    parent_id = serializers.PrimaryKeyRelatedField(source='parent', read_only=True)
-    parent = serializers.StringRelatedField()
-    attributes = AttributeSerializer(many=True)
-    no_folios = serializers.IntegerField()
+    short_name = serializers.CharField(max_length=55, required=True)
+    parent = serializers.PrimaryKeyRelatedField(queryset=Source.objects.all(), allow_null=True)
+    parent_name = serializers.StringRelatedField(source='parent', read_only=True, required=False)
+    attributes = AttributeSerializer(many=True, required=False)
+    no_folios = serializers.IntegerField(required=False)
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'type_id', 'name', 'short_name', 'parent', 'parent_id', 'is_inventory',
+        fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'is_inventory',
                   'attributes', 'no_folios')
 
     def to_representation(self, instance):
@@ -206,13 +229,14 @@ class SourceSerializer(DynamicSerializer):
             (k, v), = i.items()
             new_att[k] = v
         ret['attributes'] = new_att
-        ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id']}
-        parent_id = ret.pop('parent_id')
-        ret['parent'] = {'name': ret['parent'], 'url': '/sources/'+str(parent_id), 'id': parent_id}
-        type_id = ret.pop('type_id')
-        ret['type'] = {'name': ret['type'], 'id': type_id}
-        if 'url' in ret:
-            ret['url'] = {'name': 'Visit website', 'url': ret['url']}
+        ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id'], 'value': ret['name']}
+        parent_name = ret.pop('parent_name', None)
+        if parent_name is not None:
+            ret['parent'] = {'name': parent_name, 'url': '/sources/'+str(ret['parent']), 'value': ret['parent']}
+        else:
+            ret.pop('parent')
+        type_name = ret.pop('type_name')
+        ret['type'] = {'name': type_name, 'value': ret['type']}
         return ret
 
 
@@ -290,20 +314,22 @@ class ProfileSerializer(serializers.ModelSerializer):
         for attr, value in user_data.items():
             setattr(user, attr, value)
         user.save()
-        groups = self.context['groups']
-        user.groups.clear()
-        for g in groups:
-            user.groups.add(g)
+        if self.context.get('groups') is not None:
+            groups = self.context['groups']
+            user.groups.clear()
+            for g in groups:
+                user.groups.add(g)
         return instance
 
     def create(self, validated_data):
         """ Create profile and user. Assumes there is a user for every profile """
         user_data = validated_data.pop('user')
         user_data.pop('groups')
-        groups = self.context['groups']
         user = User.objects.create_user(**user_data)
-        for g in groups:
-            user.groups.add(g)
+        if self.context.get('groups') is not None:
+            groups = self.context['groups']
+            for g in groups:
+                user.groups.add(g)
         profile = Profile.objects.create(user=user, **validated_data)
         return profile
 

@@ -20,6 +20,7 @@ urlpatterns = [
     path('tasks/', views.TasksList.as_view(), name='task_list'),
     path('languages/', views.LanguageList.as_view(), name='language_list'),
     path('async_tasks/', views.AsyncTaskList.as_view(), name='async_task_list'),
-    # path('form_test/', views.SourceCreateView.as_view(), name='form_test'),
+    path('countries/', views.CountryList.as_view(), name='country_list'),
+    path('cities/', views.CityList.as_view(), name='city_list'),
     path('', views.Index.as_view(), name='dashboard'),
 ]

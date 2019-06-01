@@ -28,19 +28,19 @@ var dt_fieldsets = {{ dt_fieldsets | safe }};
       'create': {
           'type': 'POST',
           'url': '{{ dt_editor.ajax_url }}',
-          'headers': {'X-CSRFToken': getCookie("csrftoken") },
+          'headers': {'X-CSRFToken': get_cookie("csrftoken") },
           'data': function (data) { return { "data": JSON.stringify(data) }; }
         },
       'edit': {
           'type': 'PATCH',
           'url': '{{ dt_editor.ajax_url }}_id_/',
-          'headers': {'X-CSRFToken': getCookie("csrftoken") },
+          'headers': {'X-CSRFToken': get_cookie("csrftoken") },
           'data': function (data) { return { "data": JSON.stringify(data) }; }
         },
       'remove': {
           'type': 'DELETE',
           'url': '{{ dt_editor.ajax_url }}_id_/',
-          'headers': {'X-CSRFToken': getCookie("csrftoken") },
+          'headers': {'X-CSRFToken': get_cookie("csrftoken") },
           'data': function (data) {
                       data.data = null;
                       return data;
@@ -63,7 +63,7 @@ var dt_fieldsets = {{ dt_fieldsets | safe }};
               {% elif k == 'opts' %}
                 opts: {
                   {% for ok, ov in v.items %}
-                    {% if ok == 'source' %}
+                    {% if ok == 'plugins' %}
                       {{ ok | safe }}: {{ ov | safe }},
                     {% else %}
                       {{ ok | safe }}: "{{ ov | safe }}",
@@ -133,7 +133,7 @@ var dt_options = {
         {% endfor %}
       ]};
       $(document).ready( function () {
-        createDatatable('#dataTables-list', "{{ helpers | safe }}", "{{ modules | safe }}");
+        create_datatable('#dataTables-list', "{{ helpers | safe }}", "{{ modules | safe }}");
       });
 </script>
 
@@ -160,8 +160,8 @@ var dt_options = {
             <div class="mr-auto align-self-center mt-1 mb-1 overflow-hidden flex-shrink-1" id="parent_class_info">
             </div>
             <div class="model-button-container">
-              <button id="btn_class_add" class="btn model-btn border-left border-bottom" onclick="addClassEntry()"><i class="fa fa-plus fa-sm mr-1"></i> Add</button>
-              <button id="btn_class_edit" class="btn model-btn border-left" onclick="editClassEntry()" disabled><i class="fa fa-pen fa-sm mr-1"></i> Edit</button>
+              <button id="btn_class_add" class="btn model-btn border-left border-bottom" onclick="add_class_entry()"><i class="fa fa-plus fa-sm mr-1"></i> Add</button>
+              <button id="btn_class_edit" class="btn model-btn border-left" onclick="edit_class_entry()" disabled><i class="fa fa-pen fa-sm mr-1"></i> Edit</button>
             </div>
         </div>
         <div class="table-responsive dt-embed card-full" id="resize_wrapper">

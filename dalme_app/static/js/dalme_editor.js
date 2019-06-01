@@ -1,6 +1,7 @@
 function startEditor() {
   if (typeof transcriber_state == 'undefined') {
       transcriber_state = 'on';
+      footer_content = '...';
       viewer_container = document.getElementById('diva_viewer');
       editor_container = document.getElementById('editor');
       editor_toolbar = document.getElementById('editor-toolbar');
@@ -75,8 +76,15 @@ function startEditor() {
             }
       });
       window.addEventListener('resize', function () { resizeEditor(); }, false);
-      //Diva.Events.subscribe('ObjectDidLoad', function () { alert('success'); });
+      Diva.Events.subscribe('ObjectDidLoad', function () { alert('success'); });
+  } else {
+    $(author_container).html(footer_content);
   }
+}
+
+function cleanFooter() {
+  footer_content = $(author_container).html();
+  $(author_container).html('');
 }
 
 function changeEditorMode() {
@@ -224,7 +232,7 @@ function saveEditor() {
       $.ajax({
         method: "PUT",
         url: url,
-        headers: { 'X-CSRFToken': getCookie("csrftoken") },
+        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
         data: { 'version': ver, 'transcription': text },
       }).done(function(data, textStatus, jqXHR) {
           if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
@@ -234,7 +242,7 @@ function saveEditor() {
       $.ajax({
         method: "POST",
         url: url,
-        headers: { 'X-CSRFToken': getCookie("csrftoken") },
+        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
         data: { 'version': ver, 'transcription': text, 'source': source, 'page': page },
       }).done(function(data, textStatus, jqXHR) {
           folio_array[folio]['tr_id'] = data['id'];
@@ -246,10 +254,12 @@ function saveEditor() {
 }
 
 function cancelEditor() {
-  do {
-      xmleditor.undo()
-  } while (xmleditor.session.getUndoManager().hasUndo());
-  changeEditorMode();
+  if (confirm("Cancel the editing session? All your changes will be lost.")) {
+      do {
+          xmleditor.undo()
+      } while (xmleditor.session.getUndoManager().hasUndo());
+      changeEditorMode();
+  }
 }
 
 function editorOptionsMenu() {

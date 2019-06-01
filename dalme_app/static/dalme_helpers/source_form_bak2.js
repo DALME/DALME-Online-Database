@@ -1,10 +1,10 @@
 function source_form() {
   if (dt_table.ajax.url().split("/")[2] == 'sources') {
       source_editor = dt_editor;
-      source_editor.on('open.dalme', function(e, mode, action) { change_form(e, action) });
-      source_editor.on('close.dalme', function(e) { change_form(e) });
+      source_editor.on('open.dalme', function( e, mode, action ) { change_form(e, action) });
+      source_editor.on('close.dalme', function( e ) { change_form(e) });
   } else if (dt_table.ajax.url().split("/")[2] == 'images') {
-      $.get("/api/options/?lists=content_types_1,parent_sources_13&format=json", function (option_data) {
+      $.get("/api/options/?lists=content_types_1,parent_sources_13&format=json", function ( option_data ) {
             const type_options = option_data.content_types;
             const parent_options = option_data.parent_sources;
             source_editor = new $.fn.dataTable.Editor( {
@@ -32,35 +32,33 @@ function source_form() {
                   template: "#inventoryForm",
                   fields: [
                       {
-                            name: "name.value",
+                            name: "name.name",
                             label: "Name",
                             type: "text",
-                            message: "Name of the source, <i>eg: Inventory of Poncius Gassini (ADBR 3B 57)</i>",
                       },
                       {
                             name: "short_name",
                             label: "Short name",
                             type: "text",
-                            message: "A short name for the source to use in lists, <i>eg: ADBR 3B 57 (Gassini)</i>"
                       },
                       {
-                            name: "parent.value",
+                            name: "parent.id",
                             label: "Parent",
-                            type: "selectize",
+                            type: "chosen",
+                            opts: {allow_single_deselect: "true"},
                             options: parent_options,
-                            message: "Parent record,if applicable, <i>eg: a book for a book chapter, a register for an act, etc.</i>"
                       },
                       {
-                            name: "type.value",
+                            name: "type.id",
                             label: "Type",
-                            type: "selectize",
+                            type: "chosen",
                             options: type_options,
                       },
                       {
                             name: "is_inventory",
                             label: "Inventory",
                             type: "checkbox",
-                            options: [{label: "Indicates whether this source should be processed as an inventory.", value: "1"}],
+                            options: [{label: "", value: "1"}],
                       },
                   ]
               });
@@ -76,20 +74,12 @@ function change_form(e, action) {
       page_set = 0;
       attribute_formset = 'off';
       page_formset = 'off';
-      attribute_control = {};
-      page_control = {};
       $('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-2');
       $('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-10');
-      if (action == 'edit') {
-          init_editor()
-      } else if (action == 'create') {
-          foo = 1;
-      };
-      source_editor.field('type.value').input().on('change.dalme', change_on_type);
-      source_editor.field('is_inventory').input().on('change.dalme', change_on_inv);
+      if (action == 'edit') { init_editor() };
+      source_editor.field('type.id').input().on('change', change_on_type);
+      source_editor.field('is_inventory').input().on('change', change_on_inv);
   } else if (e.type == 'close') {
-      source_editor.field('type.value').input().off('change.dalme');
-      source_editor.field('is_inventory').input().off('change.dalme');
       clear_entries('attributes');
       $('#attribute-formset').collapse('hide');
       clear_entries('pages');
@@ -97,8 +87,8 @@ function change_form(e, action) {
   }
 }
 
-function change_on_type(callback='undefined') {
-    $.get("/api/options/?lists=attribute_types_"+source_editor.get('type.value')+"&extra=1&format=json", function (option_data) {
+function change_on_type(callback) {
+    $.get("/api/options/?lists=attribute_types_"+source_editor.get('type.id')+"&extra=1&format=json", function (option_data) {
           atype_choices = option_data.attribute_types.options;
           atype_ref = option_data.attribute_types.ref;
           if ($('#attribute-formset').hasClass('show')) {
@@ -129,7 +119,7 @@ function change_on_inv() {
 function clear_entries(e_type) {
   switch (e_type) {
     case 'attributes':
-        $('#attribute-formset').find('select').off('change.dalme');
+        $('#attribute-formset').find('select').off('dalme');
         if (!jQuery.isEmptyObject(attribute_control)) {
           for (const prop in attribute_control) {
               if (attribute_control.hasOwnProperty(prop)) {
@@ -139,9 +129,7 @@ function clear_entries(e_type) {
         };
         attribute_control = {};
         $('#attribute-formset').find('.formset-item').remove();
-        if (!$('#attribute-formset').find('.formset-none').length) {
-            $('#attribute-formset').find('.formset-body').append('<div class="formset-none">No attributes assigned.</div>');
-        }
+        $('#attribute-formset').find('.formset-body').append('<div class="formset-none">No attributes assigned.</div>');
         break;
     case 'pages':
         if (!jQuery.isEmptyObject(page_control)) {
@@ -152,10 +140,8 @@ function clear_entries(e_type) {
           };
         };
         page_control = {};
-        $('#page-formset').find('.formset-item').remove();
-        if (!$('#page-formset').find('.formset-none').length) {
-            $('#page-formset').find('.formset-body').append('<div class="formset-none">No folios selected.</div>');
-        }
+        $('#page-formset').find('.formset-table').remove();
+        $('#page-formset').find('.formset-body').append('<div class="formset-none">No folios selected.</div>');
   }
 }
 
@@ -200,21 +186,17 @@ function add_attribute_set(attribute) {
     var set_list = [];
     var new_set = '<div class="formset-item formset-row" id="'+set_id+'">'
     new_set += '<div class="formset-field-container mr-auto" data-editor-template="attributes.'+att_set+'.attribute_type">\
-                </div><a class="remove_icon remove_attribute_set" onclick="remove_set(this)"\
-                data-toggle="tooltip" data-placement="top" title="Remove attribute"><i class="fa fa-minus-circle"></i></a></div>'
+                </div><a class="remove_icon remove_attribute_set" onclick="remove_set(this)"><i class="fa fa-minus-circle"></i></a></div>'
     $('#attribute-formset').find('.formset-body').append(new_set);
-    if (typeof attribute !== 'undefined') {
-      source_editor.add({
-              name: "attributes."+att_set+".id",
-              type: "hidden"
-            });
-      set_list.push("attributes."+att_set+".id");
-    };
+    source_editor.add({
+            name: "attributes."+att_set+".id",
+            type: "hidden"
+          });
+    set_list.push("attributes."+att_set+".id");
     source_editor.add({
             label: "Attribute type",
             name: "attributes."+att_set+".attribute_type",
-            type: "selectize",
-            className: "attribute_selectize",
+            type: "chosen",
             options: atype_choices
           });
     set_list.push("attributes."+att_set+".attribute_type");
@@ -223,58 +205,54 @@ function add_attribute_set(attribute) {
     if (typeof attribute !== 'undefined') {
       source_editor.field("attributes."+att_set+".id").val(attribute['id']);
       source_editor.set("attributes."+att_set+".attribute_type", attribute['attribute_type']);
+      container.find('select').chosen({width: "200px"});
       add_attribute_values(att_set, attribute);
     } else {
-      container.find('select').change( function() {
-           add_attribute_values($(this).attr('id').match(/\d+/)[0]);
+      container.find('select').chosen({width: "200px"}).change( function() {
+          add_attribute_values($(this).attr('id').match(/\d+/)[0]);
       });
     }
     container.find('label').remove();
     container.find('.col-lg-8').removeClass('col-lg-8');
     $('#'+set_id).find('.form-group').removeClass('form-group').removeClass('row');
-    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
 }
 
 function add_page_set(page) {
     if (page_set == 0) {
       $('#page-formset').find('.formset-none').remove();
+      $('#page-formset').find('.formset-body').append('<table class="formset-table">\
+                            <thead><tr><th>Order</th><th>Folio</th><th>DAM Id</th></tr></thead>\
+                            <tbody></tbody></table>');
     };
     page_set = page_set + 1
     var set_id = 'pageset_'+page_set;
     var set_list = [];
-    var new_set = '<fieldset class="formset-item formset-row" id="'+set_id+'">'
-    new_set += '<div class="formset-field-container w-15" data-editor-template="pages.'+page_set+'.order"></div>\
-                <div class="formset-field-container w-15" data-editor-template="pages.'+page_set+'.name"></div>\
-                <div class="formset-field-container flex-fill" data-editor-template="pages.'+page_set+'.dam_id"></div>\
-                <div class="util-icon-set"><a class="info_icon" data-toggle="popover" title="DAM Metadata"\
-                data-content="Metadata from the DAM can only be shown if an image id is included in the page record."><i class="fa fa-info-circle"></i></a>\
-                <a class="remove_icon remove_page_set" onclick="remove_set(this)" data-toggle="tooltip" data-placement="top"\
-                title="Remove folio"><i class="fa fa-minus-circle"></i></a></div></fieldset>'
-    $('#page-formset').find('.formset-body').append(new_set);
+    var new_set = '<tr class="formset-row" id="'+set_id+'">';
+    new_set += '<td class="formset-td" data-editor-template="pages.'+page_set+'.order"></td>\
+                <td class="formset-td" data-editor-template="pages.'+page_set+'.name"></td>\
+                <td class="formset-td" data-editor-template="pages.'+page_set+'.dam_id"></td>';
+    $('#page-formset').find('tbody').append(new_set);
     source_editor.add({
             name: "pages."+page_set+".id",
             type: "hidden"
           });
     set_list.push("pages."+page_set+".id");
     source_editor.add({
-            label: "Order",
+            label: "Folio order",
             name: "pages."+page_set+".order",
-            type: "text",
-            className: "d-flex"
+            type: "text"
           });
     set_list.push("pages."+page_set+".order");
     source_editor.add({
-            label: "Folio",
+            label: "Folio name",
             name: "pages."+page_set+".name",
-            type: "text",
-            className: "d-flex"
+            type: "text"
           });
     set_list.push("pages."+page_set+".name");
     source_editor.add({
-            label: "DAM Id",
+            label: "Folio dam_id",
             name: "pages."+page_set+".dam_id",
-            type: "text",
-            className: "d-flex"
+            type: "text"
           });
     set_list.push("pages."+page_set+".dam_id");
     page_control[set_id] = set_list;
@@ -284,11 +262,12 @@ function add_page_set(page) {
       source_editor.set("pages."+page_set+".name", page['name']);
       source_editor.set("pages."+page_set+".dam_id", page['dam_id']);
     };
-    $('#'+set_id).find('.col-lg-8').removeClass('col-lg-8').addClass('flex-grow-1');
-    $('#'+set_id).find('.col-lg-4').removeClass('col-lg-4');
-    $('#'+set_id).find('.form-group').removeClass('form-group').removeClass('row');
-    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
-    $('[data-toggle="popover"]').popover({container: 'body'});
+    $('[data-editor-template="pages.'+page_set+'.dam_id"]').find('.DTE_Field').append('<a class="remove_icon" onclick="alert(\'info\')"><i class="fa fa-info-circle"></i></a>\
+      <a class="remove_icon remove_page_set" onclick="remove_set(this)"><i class="fa fa-minus-circle"></i></a>');
+    var fields = $('#pageset_'+page_set).find('.formset-td');
+    fields.find('label').remove();
+    fields.find('.col-lg-8').removeClass('col-lg-8');
+    fields.find('.DTE_Field').removeClass('form-group row');
 }
 
 function remove_set(el) {
@@ -311,29 +290,14 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
         var type = attribute['data_type'];
         var opt = attribute['options_list'] || false;
         var type_container = $("div[data-editor-template='attributes."+id+".attribute_type']");
-        var set_id = 'attributeset_'+id;
-        if (Object.keys(attribute_control[set_id]).length > 2) {
-            for (let i = 2, len = Object.keys(attribute_control[set_id]).length; i < len; ++i) {
-              source_editor.clear(attribute_control[set_id][i]);
-              $("div[data-editor-template='"+attribute_control[set_id][i]+"']").remove();
-              delete attribute_control[set_id][i];
-            }
-        }
     } else {
         var id = att_set;
         var type_container = $("div[data-editor-template='attributes."+id+".attribute_type']");
         var selected = $(type_container).find('select').val();
         var type = atype_ref[selected][0];
         var opt = atype_ref[selected][1] || false;
-        var set_id = 'attributeset_'+id;
-        if (Object.keys(attribute_control[set_id]).length > 1) {
-          for (let i = 1, len = Object.keys(attribute_control[set_id]).length; i < len; ++i) {
-            source_editor.clear(attribute_control[set_id][i]);
-            $("div[data-editor-template='"+attribute_control[set_id][i]+"']").remove();
-            delete attribute_control[set_id][i];
-          }
-        }
     };
+    var set_id = 'attributeset_'+id;
     if (opt) {
         $.get("/api/options/?lists=attribute_optexp_"+selected+"&format=json", function ( data ) {
             var choices = data.attribute_optexp;
@@ -341,7 +305,7 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
             source_editor.add({
                     label: "Attribute value",
                     name: "attributes."+id+".value_STR",
-                    type: "selectize",
+                    type: "chosen",
                     options: choices
                   });
             if (typeof attribute !== 'undefined') {
@@ -349,6 +313,7 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
             };
             attribute_control[set_id].push("attributes."+id+".value_STR");
             $("div[data-editor-template='attributes."+id+".value_"+type+"']").find('label').remove();
+            $("div[data-editor-template='attributes."+id+".value_"+type+"']").find('select').chosen();
         }, 'json');
     } else {
         switch (type) {
@@ -401,40 +366,45 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
                         attr: { maxlength: 2, placeholder: 'day'},
                         type: "text"
                       });
+                if (typeof attribute !== 'undefined') {
+                    source_editor.set("attributes."+id+".value_DATE_d", attribute['value_DATE_d']);
+                };
+                attribute_control[set_id].push("attributes."+id+".value_DATE_d");
                 source_editor.add({
                         label: "Month",
                         name: "attributes."+id+".value_DATE_m",
-                        type: "selectize",
-                        opts: { placeholder: "month" },
-                        options: [
-                          {'label': "January", 'value': 1},
-                          {'label': "February", 'value': 2},
-                          {'label': "March", 'value': 3},
-                          {'label': "April", 'value': 4},
-                          {'label': "May", 'value': 5},
-                          {'label': "June", 'value': 6},
-                          {'label': "July", 'value': 7},
-                          {'label': "August", 'value': 8},
-                          {'label': "September", 'value': 9},
-                          {'label': "October", 'value': 10},
-                          {'label': "November", 'value': 11},
-                          {'label': "December", 'value': 12}
-                        ]
+                        type: "chosen",
+                        opts: {"disable_search": true},
+                        options: {
+                          "":"",
+                          "January":1,
+                          "February":2,
+                          "March":3,
+                          "April":4,
+                          "May":5,
+                          "June":6,
+                          "July":7,
+                          "August":8,
+                          "September":9,
+                          "October":10,
+                          "November":11,
+                          "December":12
+                        }
                       });
+                if (typeof attribute !== 'undefined') {
+                    source_editor.set("attributes."+id+".value_DATE_m", attribute['value_DATE_m']);
+                };
+                attribute_control[set_id].push("attributes."+id+".value_DATE_m");
                 source_editor.add({
                         label: "Year",
                         name: "attributes."+id+".value_DATE_y",
                         attr: { maxlength: 4, placeholder: 'year'},
                         type: "text"
                       });
-                attribute_control[set_id].push("attributes."+id+".value_DATE_d");
-                attribute_control[set_id].push("attributes."+id+".value_DATE_m");
-                attribute_control[set_id].push("attributes."+id+".value_DATE_y");
                 if (typeof attribute !== 'undefined') {
-                    source_editor.set("attributes."+id+".value_DATE_d", attribute['value_DATE_d']);
-                    source_editor.set("attributes."+id+".value_DATE_m", attribute['value_DATE_m']);
                     source_editor.set("attributes."+id+".value_DATE_y", attribute['value_DATE_y']);
                 };
+                attribute_control[set_id].push("attributes."+id+".value_DATE_y");
                 $("div[data-editor-template='attributes."+id+".value_DATE_d']").find('label').remove();
                 $("div[data-editor-template='attributes."+id+".value_DATE_m']").find('label').remove();
                 $("div[data-editor-template='attributes."+id+".value_DATE_y']").find('label').remove();
@@ -447,46 +417,75 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
 function init_source_editor(para_data) {
     img_data = para_data.data.image_data
     var suggested_fields = para_data.data.suggested_fields
-    source_editor.create(false);
-    source_editor.set('type.value', 13);
-    source_editor.set('is_inventory', 1);
-    source_editor.field('type.value').disable();
-    source_editor.field('is_inventory').disable();
-    if ('name' in suggested_fields) {
-        source_editor.set('name.value', suggested_fields.name);
-    } else {
-        source_editor.field('name.value').input().attr("placeholder", "No suggestion, please enter name manually");
-    }
-    if ('short_name' in suggested_fields) {
-        source_editor.set('short_name', suggested_fields.short_name);
-    } else {
-        source_editor.field('short_name').input().attr("placeholder", "No suggestion, please enter short name manually");
-    }
-    source_editor.buttons({
-        text: "Create",
-        className: "btn btn-primary",
-        action: function () { this.submit(); }
-    }).title('Create New Source').open();
-    create_from_images();
-}
-
-function create_from_images() {
-    if (attribute_formset == 'on') {
-        change_on_inv();
-        let order = 0;
-        var pages = []
-        for (const prop in img_data) {
-          if (img_data.hasOwnProperty(prop)) {
-              add_page_set({
-                'id': 'null',
-                'order': order+1,
-                'name': img_data[prop]['folio'],
-                'dam_id': prop
-              });
-              order = order + 1;
-          }
-        }
-    } else {
-        change_on_type(create_from_images);
-    }
+    $.get("/api/options/?lists=content_types_1,parent_sources_13&format=json", function ( option_data ) {
+          const type_options = option_data.content_types;
+          const parent_options = option_data.parent_sources;
+          source_editor = new $.fn.dataTable.Editor( {
+              ajax: {
+                create: {
+                    type: 'POST',
+                    url: '/api/sources/',
+                    headers: {'X-CSRFToken': get_cookie("csrftoken") },
+                    data: function (data) { return { "data": JSON.stringify( data ) }; }
+                  },
+                edit: {
+                    type: 'PATCH',
+                    url: '/api/sources/_id_/',
+                    headers: {'X-CSRFToken': get_cookie("csrftoken") },
+                    data: function (data) { return { "data": JSON.stringify( data ) }; }
+                  },
+                remove: {
+                    type: 'DELETE',
+                    url: '/api/sources/_id_/',
+                    headers: {'X-CSRFToken': get_cookie("csrftoken") },
+                    data: function (data) { data.data = null; return data; }
+                  }
+                },
+                idSrc: "id",
+                template: "#inventoryForm",
+                fields: [
+                    {
+                          name: "name",
+                          label: "Name",
+                          type: "text",
+                    },
+                    {
+                          name: "short_name",
+                          label: "Short name",
+                          type: "text",
+                    },
+                    {
+                          name: "type",
+                          label: "Type",
+                          type: "chosen",
+                          options: type_options,
+                    },
+                    {
+                          name: "parent",
+                          label: "Parent",
+                          type: "chosen",
+                          opts: {allow_single_deselect: "true"},
+                          options: parent_options,
+                    },
+                    {
+                          name: "is_inventory",
+                          label: "Inventory",
+                          type: "checkbox",
+                          options: [{label: "", value: "1"}],
+                    },
+                ]
+            });
+            source_editor.create(false);
+            source_editor.set('type', 13);
+            source_editor.set('is_inventory', 1);
+            if ('name' in suggested_fields) { source_editor.set('name', suggested_fields.name); };
+            if ('short_name' in suggested_fields) { source_editor.set('short_name', suggested_fields.short_name); };
+            source_editor.buttons({
+                text: "Create",
+                className: "btn btn-primary",
+                action: function () { this.submit(); }
+              }).title('Create New Source').open();
+            change_on_type();
+            change_on_inv();
+    }, 'json');
 }

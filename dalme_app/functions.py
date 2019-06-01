@@ -182,16 +182,6 @@ def get_full_collection_string(t1, t2, t3, user, name):
     return full_name
 
 
-def get_dte_options(options, field_type, *args, **kwargs):
-    if field_type == 'chosen':
-        opts = [{'label': "", 'value': ""}]
-    else:
-        opts = []
-    options = eval(options)
-    opts = opts + options
-    return opts
-
-
 def get_dam_preview(resource):
     """
     Returns the url for an image from the ResourceSpace Digital Asset Management
@@ -263,20 +253,21 @@ def get_count(item):
         return None
 
 # formatting functions
-
-
 def format_date(value, type):
-    if type == 'timestamp':
-        date_str = value.strftime('%d-%b-%Y@%H:%M')
-    elif type == 'attribute':
-        if value.value_DATE_d is None or value.value_DATE_m is None or value.value_DATE_y is None:
-            date_str = value.value_STR
+    if value is not None:
+        if type == 'timestamp':
+            date_str = value.strftime('%d-%b-%Y@%H:%M')
+        elif type == 'attribute':
+            if value.value_DATE_d is None or value.value_DATE_m is None or value.value_DATE_y is None:
+                date_str = value.value_STR
+            else:
+                date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+        elif type == 'timestamp-long':
+            date_str = value.strftime('%A, %d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " ")
         else:
-            date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
-    elif type == 'timestamp-long':
-        date_str = value.strftime('%A, %d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " ")
+            date_str = str(value)
     else:
-        date_str = str(value)
+        date_str = None
     return date_str
 
 

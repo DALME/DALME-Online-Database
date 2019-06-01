@@ -37,7 +37,7 @@
           });
           $('#dataTables-{{ table.0 }}_wrapper').find('.card-header-title').html('<i class="fa {{ table.1 }} fa-fw"></i> {{ table.2 }}');
           fix_dt_search();
-          $('#dataTables-tasks_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addtask" type="button" onclick="createTask()"><i class="fa fa-plus fa-sm"></i> Add</button>');
+          $('#dataTables-tasks_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addtask" type="button" onclick="create_task()"><i class="fa fa-plus fa-sm"></i> Add</button>');
       });
     {% endfor %}
   </script>

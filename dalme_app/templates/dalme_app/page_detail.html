@@ -2,20 +2,10 @@
 {% load staticfiles i18n %}
 
 {% block extra_head %}
-<link href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.bootstrap.min.css" rel="stylesheet">
-<link href="{% static '/css/chosen.css' %}" rel="stylesheet">
-
-<script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.1.1/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.1.1/js/responsive.bootstrap.min.js"></script>
 {% endblock %}
-
 {% block extra_dropdowns %}{% endblock %}
 
 {% block content %}
-
 <div id="page-wrapper">
   <div class="row">
     <div class="col-lg-12">
@@ -31,7 +21,6 @@
         <div class="panel-body">
           <p>Name: {{ page.name }}</p>
           <p>DAM ID: <a href="https://dam.dalme.org/?r={{ page.dam_id }}" target="_blank">{{ page.dam_id}}</a></p>
-          <a href="#page-detail-modals" class="btn btn-primary" data-toggle="modal" data-target="#page-detail-modals">Update Page</a>
         </div>
       </div>
     </div>
@@ -48,28 +37,5 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="page-detail-update-title" aria-hidden="true" id="page-detail-modals">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title" id="page-detail-update-title">Update {{ page }}</h4>
-        </div>
-        <div class="modal-body">
-          <form method="post" id="page-detail-update-form" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Update">
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
-
-<script src="{% static 'js/chosen.jquery.js' %}" charset="utf-8"></script>
-<script type="text/javascript">
-  $(".chosen-select").chosen({width:"100%"});
-</script>
-
 {% endblock %}

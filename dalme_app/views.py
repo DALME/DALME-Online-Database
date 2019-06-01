@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render
@@ -10,7 +10,8 @@ from allaccess.views import OAuthCallback
 from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
                               Source, Workset, TaskList, Task, rs_resource, rs_collection_resource,
-                              rs_resource_data, rs_resource_type_field)
+                              rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, Language,
+                              Attribute_type, Country, rs_collection)
 from haystack.generic_views import SearchView
 from django.http import HttpResponse, HttpResponseNotAllowed
 import urllib.parse as urlparse
@@ -202,13 +203,6 @@ class DTListView(TemplateView):
             col = col + 1
         return column_defs
 
-    # def get_dt_fields(self, _list, *args, **kwargs):
-    #     if hasattr(self, 'dt_field_list'):
-    #         dt_fields = self.dt_field_list
-    #     else:
-    #         dt_fields = None
-    #     return dt_fields
-
     def get_dte_fields(self, _list, *args, **kwargs):
         if hasattr(self, 'dte_field_list'):
             dte_fields = self.dte_field_list
@@ -223,41 +217,38 @@ class DTListView(TemplateView):
             dt_editor['ajax_url'] = _list.api_url
             fields = []
             for f in dte_fields:
-                lf = fields_dict[f]
-                f_dict = {}
-                if lf.get('dte_name') is not None:
-                    f_dict['name'] = lf['dte_name']
-                elif lf.get('dt_name') is not None:
-                    f_dict['name'] = lf['dt_name']
-                else:
-                    f_dict['name'] = lf['field__short_name']
-                f_dict['label'] = lf['field__name']
-                if lf.get('dte_type') is not None:
-                    if lf['dte_type'] == 'multi-chosen':
-                        f_dict['type'] = 'chosen'
-                        f_dict['attr'] = {'multiple': 'true'}
+                lf = fields_dict.get(f)
+                if lf is not None:
+                    f_dict = {}
+                    if lf.get('dte_name') is not None:
+                        f_dict['name'] = lf['dte_name']
+                    elif lf.get('dt_name') is not None:
+                        f_dict['name'] = lf['dt_name']
                     else:
+                        f_dict['name'] = lf['field__short_name']
+                    f_dict['label'] = lf['field__name']
+                    if lf.get('dte_type') is not None:
                         f_dict['type'] = lf['dte_type']
-                else:
-                    f_dict['type'] = 'text'
-                if lf.get('dte_opts') is not None:
-                    if f_dict['type'] == 'autoComplete':
-                        ac_opts = eval(lf['dte_opts'])
                     else:
-                        f_dict['opts'] = eval(lf['dte_opts'])
-                        ac_opts = None
-                if lf.get('dte_options') is not None:
-                    if f_dict['type'] == 'autoComplete':
-                        if type(ac_opts) is dict:
-                            ac_opts['source'] = functions.get_dte_options(lf['dte_options'], f_dict['type'])
+                        f_dict['type'] = 'text'
+                    if lf.get('dte_opts') is not None:
+                        if f_dict['type'] == 'autoComplete':
+                            ac_opts = eval(lf['dte_opts'])
                         else:
-                            ac_opts = {'source': functions.get_dte_options(lf['dte_options'], f_dict['type'])}
-                        f_dict['opts'] = ac_opts
-                    else:
-                        f_dict['options'] = functions.get_dte_options(lf['dte_options'], f_dict['type'])
-                if lf.get('dte_message') is not None:
-                    f_dict['message'] = lf['dte_message']
-                fields.append(f_dict)
+                            f_dict['opts'] = eval(lf['dte_opts'])
+                            ac_opts = None
+                    if lf.get('dte_options') is not None:
+                        if f_dict['type'] == 'autoComplete':
+                            if type(ac_opts) is dict:
+                                ac_opts['source'] = eval(lf['dte_options'])
+                            else:
+                                ac_opts = {'source': eval(lf['dte_options'])}
+                            f_dict['opts'] = ac_opts
+                        else:
+                            f_dict['options'] = eval(lf['dte_options'])
+                    if lf.get('dte_message') is not None:
+                        f_dict['message'] = lf['dte_message']
+                    fields.append(f_dict)
             dt_editor['fields'] = fields
             if self.get_dte_options() is not None:
                 dt_editor['options'] = self.get_dte_options()
@@ -334,7 +325,7 @@ class ModelLists(DTListView):
         'responsive': 'true',
         'dom': '\'<"sub-card-header-embed d-flex"B<"#fieldsets.btn-group mr-auto"><"btn-group"f>r><"card-body"t><"sub-card-footer"i>\'',
         'stateSave': 'true',
-        'select': {'style': 'single'},
+        'select': {'style': 'multi'},
         'scrollResize': 'true',
         'scrollY': '"50vh"',
         'scrollX': '"100%"',
@@ -446,9 +437,10 @@ class ModelLists(DTListView):
         if model != 'dt_fields':
             dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New'})
             dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected'})
-        dte_buttons.append({'action': 'toggleInlineEdit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline',
+        dte_buttons.append({'action': 'toggle_inline_edit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline',
                             'className': "inline-edit-toggle"})
         dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected'})
+        dte_buttons.append({'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'})
         return dte_buttons
 
     def get_modules(self, *args, **kwargs):
@@ -465,6 +457,12 @@ class SourceList(DTListView):
     """ Lists sources """
     dt_editor_options = {'idSrc': '"id"', 'template': '"#inventoryForm"'}
     dte_field_list = ['name', 'short_name', 'type', 'parent', 'is_inventory']
+    dt_editor_buttons = [
+        {'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Source'},
+        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Source Information'},
+        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Source',
+         'formMessage': 'Are you sure you wish to remove this source from the database? This action cannot be undone.'},
+    ]
 
     def get_list_name(self, *args, **kwargs):
         list_name = 'all'
@@ -614,6 +612,11 @@ class UserList(DTListView):
     dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username',
                       'password', 'is_staff', 'is_superuser', 'groups', 'dam_usergroup',
                       'wiki_groups', 'wp_role']
+    dt_editor_buttons = [
+        {'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New User'},
+        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit User Information'},
+        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete User'},
+    ]
 
 
 @method_decorator(login_required, name='dispatch')
@@ -680,6 +683,46 @@ class AsyncTaskList(DTListView):
 
 
 @method_decorator(login_required, name='dispatch')
+class CountryList(DTListView):
+    breadcrumb = [('System', ''), ('Countries', '/countries')]
+    list_name = 'countries'
+    dt_options = {
+        'pageLength': 25,
+        'paging': 'true',
+        'responsive': 'true',
+        'fixedHeader': 'true',
+        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': {'style': 'single'},
+        'deferRender': 'true',
+        'rowId': '"id"',
+        'language': {'searchPlaceholder': 'Search'},
+        'order': '[[ 1, "asc" ]]'
+        }
+
+
+@method_decorator(login_required, name='dispatch')
+class CityList(DTListView):
+    breadcrumb = [('System', ''), ('Cities', '/cities')]
+    list_name = 'cities'
+    dt_options = {
+        'pageLength': 25,
+        'paging': 'true',
+        'responsive': 'true',
+        'fixedHeader': 'true',
+        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': {'style': 'single'},
+        'deferRender': 'true',
+        'rowId': '"id"',
+        'language': {'searchPlaceholder': 'Search'},
+        'order': '[[ 1, "asc" ]]'
+        }
+
+
+@method_decorator(login_required, name='dispatch')
 class LanguageList(DTListView):
     breadcrumb = [('System', ''), ('Languages', '/languages')]
     list_name = 'languages'
@@ -723,9 +766,10 @@ class ImageList(DTListView):
         # 'order': '[[ 1, "asc" ]]'
         }
     dt_editor_buttons = [
-        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected'},
-        {'action': 'toggleInlineEdit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline', 'className': "inline-edit-toggle"},
-        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected'},
+        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Image Information'},
+        {'action': 'toggle_inline_edit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline', 'className': "inline-edit-toggle"},
+        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Image',
+         'formMessage': 'Are you sure you wish to remove this image from the DAM? This action cannot be undone.'},
         {'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'},
         {'extend': 'selected', 'action': 'create_source_from_selected()', 'text': '<i class="fa fa-plus-square fa-fw dt_menu_icon"></i> Create Source from Selection'}
     ]
@@ -763,9 +807,8 @@ class ImageDetail(DetailView):
             attributes = rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field')
             for a in attributes:
                 value = a.value
-                res_type_obj = rs_resource_type_field.objects.get(ref=a.resource_type_field)
-                name = res_type_obj.name
-                label = res_type_obj.title
+                name = a.resource_type_field.name
+                label = a.resource_type_field.title
                 dict = {
                     'name': name,
                     'label': label,

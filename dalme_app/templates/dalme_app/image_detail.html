@@ -1,48 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles i18n %}
 {% block extra_head %}
-  {% if collections %}
-    <script>
-      $(document).ready(function() {
-          dt_editor = new $.fn.dataTable.Editor( {
-              ajax: "../php/standalone.php",
-              fields: [ {
-                      name:  "country",
-                      type:  'chosen',
-                      options: [
-                          { label: 'Italy',  value: 'Italy' },
-                          { label: 'France', value: 'France' },
-                          { label: 'Spain', value: 'Spain' }
-                      ]
-                      }, {
-                          name:  "title"
-                      }, {
-                          fieldInfo: "Input value is in seconds",
-                          name:      "credit"
-                      }, {
-                          name: "resourcedate",
-                          type: "date"
-                      }, {
-                          name: "source"
-                      }, {
-                          name: "Series"
-                      }, {
-                          name: "shelfnumber"
-                      }, {
-                          name: "SourceStartDate"
-                      }, {
-                        name: "archivalsource"
-                      }
-                    ]
-                } );
-
-          $('[data-editor-field]').on( 'click', function (e) {
-              dt_editor.bubble( this );
-          } );
-      } );
-    </script>
-
-  {% endif %}
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}

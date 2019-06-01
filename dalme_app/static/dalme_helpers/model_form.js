@@ -1,21 +1,21 @@
 function model_form() {
-  $('#parent_class_select').on('change.dalme', updateClass);
+  $('#parent_class_select').on('change.dalme', update_class);
 }
 
-function updateClass() {
+function update_class() {
   if (model == 'dt_fields') {
     var table_url = "/api/dt_fields/?format=json";
-    var url_prop = "&list=";
+    var url_prop = "&filter=list,";
     var pc_url = "/api/dt_lists/";
     var info_skip = ['name', 'fields', 'content_types'];
   } else if (model == 'attribute_types') {
     var table_url = "/api/attribute_types/?format=json";
-    var url_prop = "&content_type=";
+    var url_prop = "&filter=content_type,";
     var pc_url = "/api/content_types/";
     var info_skip = ['name', 'attribute_types', 'content_class'];
   } else if (model == 'content_types') {
     var table_url = "/api/content_types/?format=json";
-    var url_prop = "&class=";
+    var url_prop = "&filter=content_class,";
     var pc_url = "/api/content_classes/";
     var info_skip = ['name'];
   };
@@ -51,7 +51,7 @@ function updateClass() {
   $(window).trigger('resize');
 }
 
-function addClassEntry() {
+function add_class_entry() {
   if (model == 'dt_fields') {
     var option_lists = "content_types,attribute_types";
     var model_class_name = 'DT list'
@@ -61,44 +61,44 @@ function addClassEntry() {
   };
   if (typeof option_lists !== 'undefined') {
     $.get("/api/options/?lists="+option_lists+"&format=json", function ( data ) {
-        var modelClassForm = editorForm('create', data);
-        modelClassForm.on('postSubmit.dalme', function(e, json, data, action) {
+        var model_class_form = editor_form('create', data);
+        model_class_form.on('postSubmit.dalme', function(e, json, data, action) {
             if (json.data) {
               $('#parent_class_select').append(new Option(json.data.name, json.data.id));
               $('#parent_class_select').val(json.data.id);
-              updateClass();
+              update_class();
             }
         });
-        modelClassForm.buttons(
+        model_class_form.buttons(
           {
             text: "Create",
             className: "btn btn-primary",
             action: function () { this.submit(); }
           }
         );
-        modelClassForm.title('Create new '+model_class_name).create();
+        model_class_form.title('Create new '+model_class_name).create();
     }, 'json');
   } else {
-    var modelClassForm = editorForm('create');
-    modelClassForm.on('postSubmit', function(e, json, data, action) {
+    var model_class_form = editor_form('create');
+    model_class_form.on('postSubmit', function(e, json, data, action) {
         if (json.data) {
           $('#parent_class_select').append(new Option(json.data.name, json.data.id));
           $('#parent_class_select').val(json.data.id);
-          updateClass();
+          update_class();
         }
     });
-    modelClassForm.buttons(
+    model_class_form.buttons(
       {
         text: "Create",
         className: "btn btn-primary",
         action: function () { this.submit(); }
       }
     );
-    modelClassForm.title('Create new content class').create();
+    model_class_form.title('Create new content class').create();
   }
 }
 
-function editClassEntry() {
+function edit_class_entry() {
   if (model == 'dt_fields') {
     var option_lists = "content_types,attribute_types";
     var model_class_name = 'DT list';
@@ -108,11 +108,11 @@ function editClassEntry() {
   };
   if (typeof option_lists !== 'undefined') {
     $.get("/api/options/?lists="+option_lists+"&format=json", function ( data ) {
-        var modelClassForm = editorForm('edit', data);
-        modelClassForm.on('postSubmit.dalme', function(e, json, data, action) {
+        var model_class_form = editor_form('edit', data);
+        model_class_form.on('postSubmit.dalme', function(e, json, data, action) {
             if (action == 'edit') {
                 if (json.data && json.data !== "null" && typeof json.data !== "undefined" && json.data !== null) {
-                  updateClass();
+                  update_class();
                 }
             }
         });
@@ -121,41 +121,41 @@ function editClassEntry() {
             for (let i = 0, len = current_class.fields.length; i < len; ++i) {
               field_list.push(current_class.fields[i].field['value']);
             };
-            modelClassForm.field('name').def(current_class.name);
-            modelClassForm.field('fields').def(field_list);
-            modelClassForm.field('content_types').def(current_class.content_types);
+            model_class_form.field('name').def(current_class.name);
+            model_class_form.field('fields').def(field_list);
+            model_class_form.field('content_types').def(current_class.content_types);
         } else if (model == 'attribute_types') {
             var att_list = [];
             for (let i = 0, len = current_class.attribute_types.length; i < len; ++i) {
               att_list.push(current_class.attribute_types[i].id);
             };
-            modelClassForm.field('name').def(current_class.name);
-            modelClassForm.field('content_class').def(current_class.content_class["value"]);
-            modelClassForm.field('attribute_types').def(att_list);
+            model_class_form.field('name').def(current_class.name);
+            model_class_form.field('content_class').def(current_class.content_class["value"]);
+            model_class_form.field('attribute_types').def(att_list);
         };
-        modelClassForm.buttons([
+        model_class_form.buttons([
           {
             text: "Delete",
             className: "btn btn-danger",
             action: function () {
               var conf = confirm("Are you sure you wish to delete this record?");
               if (conf == true) {
-                modelClassForm2 = editorForm('remove');
-                modelClassForm2.on('preSubmit.dalme', function (e, d) {
+                model_class_form2 = editor_form('remove');
+                model_class_form2.on('preSubmit.dalme', function (e, d) {
                     $('#parent_class_info').attr('data-editor-id', '');
                     d.data = current_class.id;
                 });
-                modelClassForm2.on('postSubmit.dalme', function(e, json, data, action) {
+                model_class_form2.on('postSubmit.dalme', function(e, json, data, action) {
                         if (json.result == 'success') {
                           $('#parent_class_select option[value='+current_class.id+']').remove();
                           $('#parent_class_select').val(0);
                           current_class = '';
-                          updateClass();
+                          update_class();
                         } else if (json.result == 'error') {
                           alert(json.error);
                         }
                 });
-                modelClassForm2.remove(current_class.id, false).submit();
+                model_class_form2.remove(current_class.id, false).submit();
                 this.close();
               }
             }
@@ -166,41 +166,41 @@ function editClassEntry() {
             action: function () { this.submit(); }
           }
         ]);
-        modelClassForm.title('Edit '+model_class_name).edit(current_class.id);
+        model_class_form.title('Edit '+model_class_name).edit(current_class.id);
     }, 'json');
   } else {
-      var modelClassForm = editorForm('edit');
-      modelClassForm.on('postSubmit.dalme', function(e, json, data, action) {
+      var model_class_form = editor_form('edit');
+      model_class_form.on('postSubmit.dalme', function(e, json, data, action) {
           if (action == 'edit') {
               if (json.data && json.data !== "null" && typeof json.data !== "undefined" && json.data !== null) {
-                updateClass();
+                update_class();
               }
           }
       });
-      modelClassForm.field('name').def(current_class.name);
-      modelClassForm.buttons([
+      model_class_form.field('name').def(current_class.name);
+      model_class_form.buttons([
         {
           text: "Delete",
           className: "btn btn-danger",
           action: function () {
             var conf = confirm("Are you sure you wish to delete this record?");
             if (conf == true) {
-              modelClassForm2 = editorForm('remove');
-              modelClassForm2.on('preSubmit.dalme', function (e, d) {
+              model_class_form2 = editor_form('remove');
+              model_class_form2.on('preSubmit.dalme', function (e, d) {
                   $('#parent_class_info').attr('data-editor-id', '');
                   d.data = current_class.id;
               });
-              modelClassForm2.on('postSubmit.dalme', function(e, json, data, action) {
+              model_class_form2.on('postSubmit.dalme', function(e, json, data, action) {
                       if (json.result == 'success') {
                         $('#parent_class_select option[value='+current_class.id+']').remove();
                         $('#parent_class_select').val(0);
                         current_class = '';
-                        updateClass();
+                        update_class();
                       } else if (json.result == 'error') {
                         alert(json.error);
                       }
               });
-              modelClassForm2.remove(current_class.id, false).submit();
+              model_class_form2.remove(current_class.id, false).submit();
               this.close();
             }
           }
@@ -211,11 +211,11 @@ function editClassEntry() {
           action: function () { this.submit(); }
         }
       ]);
-      modelClassForm.title('Edit content class').edit(current_class.id);
+      model_class_form.title('Edit content class').edit(current_class.id);
   };
 }
 
-function editorForm(action, data) {
+function editor_form(action, data) {
     var fields;
     switch (model) {
         case 'dt_fields':
@@ -227,8 +227,8 @@ function editorForm(action, data) {
                   { label: "Description", name:  "description", type: "textarea" },
                   { label: "API URL", name:  "api_url" },
                   { label: "Helper/s", name:  "helpers", message: "A comma-separated list of js helpers for this list."},
-                  { label: "Fields", name:  "fields", type: "chosen", attr: { multiple: true }, options: data.attribute_types },
-                  { label: "Content Types", name:  "content_types", type: "chosen", attr: { multiple: true }, options: data.content_types }
+                  { label: "Fields", name:  "fields", type: "selectize", opts: { maxItems: 'null' }, options: data.attribute_types },
+                  { label: "Content Types", name:  "content_types", type: "selectize", opts: { maxItems: 'null' }, options: data.content_types }
                 ];
             };
             break;
@@ -239,8 +239,8 @@ function editorForm(action, data) {
                   { label: "Name", name:  "name" },
                   { label: "Short Name", name:  "short_name" },
                   { label: "Description", name:  "description", type: "textarea" },
-                  { label: "Content Class", name:  "content_class", type: "chosen", opts: { disable_search: true}, options: data.content_classes },
-                  { label: "Attribute Types", name:  "attribute_types", type: "chosen", attr: { multiple: true }, options: data.attribute_types }
+                  { label: "Content Class", name:  "content_class", type: "selectize", opts: { maxItems: 'null' }, options: data.content_classes },
+                  { label: "Attribute Types", name:  "attribute_types", type: "selectize", opts: { maxItems: 'null' }, options: data.attribute_types }
                 ];
             };
             break;
@@ -266,14 +266,17 @@ function editorForm(action, data) {
             var method = "DELETE";
             url = url+"_id_/";
     };
-    var modelClassForm = new $.fn.dataTable.Editor( {
+    var model_class_form = new $.fn.dataTable.Editor( {
           ajax: {
               method: method,
               url: url,
-              headers: { 'X-CSRFToken': getCookie("csrftoken") },
+              headers: { 'X-CSRFToken': get_cookie("csrftoken") },
               data: function (data) { return { "data": JSON.stringify(data)};}
               },
           fields: fields
       });
-    return modelClassForm
+    model_class_form.on('open.dalme', function(){
+      $('.selectize-control').parent().addClass('flex-grow-1');
+    })
+    return model_class_form
 }

@@ -23,25 +23,27 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/dalme_app.css' %}" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/fh-3.1.4/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.css"/>
     <link rel="stylesheet" type="text/css" href="{% static 'Editor-1.9.0/css/editor.bootstrap4.css' %}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.min.css" rel="stylesheet" />
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/fh-3.1.4/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
     <script type="text/javascript" src="{% static 'Editor-1.9.0/js/dataTables.editor.js' %}"></script>
     <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.bootstrap4.js' %}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min.js"></script>
-    <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.chosen.js' %}"></script>
+    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.min.css" integrity="sha256-EhmqrzYSImS7269rfDxk4H+AHDyu/KwV1d8FDgIXScI=" crossorigin="anonymous" /-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" integrity="sha256-ibvTNlNAB4VMqE5uFlnBME6hlparj5sEr1ovZ3B/bNA=" crossorigin="anonymous" />
+    <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.selectize.js' %}"></script>
+    <link href="{% static 'Editor-1.9.0/css/editor.selectize.css' %}" rel="stylesheet">
     <link href="{% static 'jquery-ui/jquery-ui.min.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.autoComplete.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dalme_app.js' %}"></script>
+    <link href="{% static 'css/dalme_app.css' %}" rel="stylesheet">
     <script>$(function () { $('[data-toggle="tooltip"]').tooltip({container: 'body'}) })</script>
     {% block extra_head %}{% endblock %}
     {% block extra_js %}{% endblock %}
@@ -60,7 +62,7 @@
       {% block extra_sidebar %}{% endblock %}
       <hr class="sidebar-divider d-none d-md-block mt-3">
       <div class="text-center d-none d-md-inline">
-        <button class="rounded-circle border-0" id="sidebarToggle" onclick="updateSession({var:'sidebar_toggle'})"></button>
+        <button class="rounded-circle border-0" id="sidebarToggle" onclick="update_session({var:'sidebar_toggle'})"></button>
       </div>
     </ul>
   {% endblock %}
@@ -114,7 +116,7 @@
             </li>
             <!-- Nav Item - Full screen toggle -->
             <li class="nav-item no-arrow topbar-border-left" id="fullScreenToggle" data-toggle="tooltip" data-placement="bottom" title="Full screen mode" data-delay='{"show":"1000", "hide":"0"}'>
-              <a class="nav-link" href="#" role="button" onclick="fullScreenMode('on')">
+              <a class="nav-link" href="#" role="button" onclick="full_screen_mode('on')">
                   <i class="fas fa-expand fa-g"></i>
               </a>
             </li>

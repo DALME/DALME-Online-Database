@@ -1,5 +1,5 @@
 /* custom JavaScript functions used by dalme.app */
-function getCookie(name) {
+function get_cookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
         const cookies = document.cookie.split(';');
@@ -19,14 +19,14 @@ function fix_dt_search() {
   $('.dataTables_filter label').contents().filter(function () { return this.nodeType == 3; }).remove();
 }
 
-function createTaskList() {
+function create_task_list() {
   $.get("/api/options/?lists=user_groups&format=json", function ( data ) {
       const groups = data.user_group_list;
       taskListForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
               url: "/api/tasklists/",
-              headers: { 'X-CSRFToken': getCookie("csrftoken") },
+              headers: { 'X-CSRFToken': get_cookie("csrftoken") },
               data: function (data) { return { "data": JSON.stringify( data ) }; }
             },
             fields: [
@@ -51,7 +51,7 @@ function createTaskList() {
   }, 'json');
 }
 
-function createTask(type) {
+function create_task(type) {
   $.get("/api/options/?lists=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
       const staff = data.staff_list;
       const worksets = data.workset_list;
@@ -109,7 +109,7 @@ function createTask(type) {
             ajax: {
               method: "POST",
               url: "/api/tasks/",
-              headers: { 'X-CSRFToken': getCookie("csrftoken") },
+              headers: { 'X-CSRFToken': get_cookie("csrftoken") },
               data: function (data) { return { "data": JSON.stringify( data ) }; }
             },
             fields: fields
@@ -130,17 +130,17 @@ function createTask(type) {
   }, 'json');
 }
 
-function updateSession(data) {
+function update_session(data) {
     $.ajax({
       type : "POST",
       url : "/su/",
-      headers : {'X-CSRFToken': getCookie('csrftoken') },
+      headers : {'X-CSRFToken': get_cookie('csrftoken') },
       dataType : "json",
       data : data
     });
 }
 
-function fullScreenMode(action) {
+function full_screen_mode(action) {
   if (action == 'on') {
     const elem = document.documentElement;
     if (elem.requestFullscreen) {
@@ -152,7 +152,7 @@ function fullScreenMode(action) {
       } else if (elem.msRequestFullscreen) { /* IE/Edge */
         elem.msRequestFullscreen();
       };
-    document.getElementById('fullScreenToggle').innerHTML = '<a class="nav-link" href="#" role="button" onclick="fullScreenMode(\'off\')"><i class="fas fa-compress fa-g"></i></a>';
+    document.getElementById('fullScreenToggle').innerHTML = '<a class="nav-link" href="#" role="button" onclick="full_screen_mode(\'off\')"><i class="fas fa-compress fa-g"></i></a>';
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -163,11 +163,11 @@ function fullScreenMode(action) {
     } else if (document.msExitFullscreen) { /* IE/Edge */
       document.msExitFullscreen();
     };
-    document.getElementById("fullScreenToggle").innerHTML = '<a class="nav-link" href="#" role="button" onclick="fullScreenMode(\'on\')"><i class="fas fa-expand fa-g"></i></a>';
+    document.getElementById("fullScreenToggle").innerHTML = '<a class="nav-link" href="#" role="button" onclick="full_screen_mode(\'on\')"><i class="fas fa-expand fa-g"></i></a>';
   }
 }
 
-function removeParam(key, sourceURL) {
+function remove_param(key, sourceURL) {
     var rtn = sourceURL.split("?")[0],
         param,
         params_arr = [],
@@ -185,12 +185,12 @@ function removeParam(key, sourceURL) {
     return rtn;
 }
 
-function taskMarkDone(task) {
+function mark_task_done(task) {
   const url = "/api/tasks/"+task.id+"/";
   $.ajax({
     method: "PUT",
     url: url,
-    headers: { 'X-CSRFToken': getCookie("csrftoken") },
+    headers: { 'X-CSRFToken': get_cookie("csrftoken") },
     data: { 'completed': 1 },
   }).done(function(data, textStatus, jqXHR) {
       alert('done');

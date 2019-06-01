@@ -16,28 +16,25 @@
   {% if filters %}
     var filters = {{ filters | safe }};
   {% endif %}
-  {% if form_data %}
-    var form_data = {{ form_data | safe }};
-  {% endif %}
   {% if dt_editor %}
     var dt_editor_options = {
       'ajax': {
         'create': {
             'type': 'POST',
             'url': '{{ dt_editor.ajax_url }}',
-            'headers': {'X-CSRFToken': getCookie("csrftoken") },
+            'headers': {'X-CSRFToken': get_cookie("csrftoken") },
             'data': function (data) { return { "data": JSON.stringify( data ) }; }
           },
         'edit': {
             'type': 'PATCH',
             'url': '{{ dt_editor.ajax_url }}_id_/',
-            'headers': {'X-CSRFToken': getCookie("csrftoken") },
+            'headers': {'X-CSRFToken': get_cookie("csrftoken") },
             'data': function (data) { return { "data": JSON.stringify( data ) }; }
           },
           'remove': {
               'type': 'DELETE',
               'url': '{{ dt_editor.ajax_url }}_id_/',
-              'headers': {'X-CSRFToken': getCookie("csrftoken") },
+              'headers': {'X-CSRFToken': get_cookie("csrftoken") },
               'data': function (data) {
                           data.data = null;
                           return data;
@@ -60,7 +57,7 @@
                 {% elif k == 'opts' %}
                   opts: {
                     {% for ok, ov in v.items %}
-                      {% if ok == 'source' %}
+                      {% if ok == 'plugins' %}
                         {{ ok | safe }}: {{ ov | safe }},
                       {% else %}
                         {{ ok | safe }}: "{{ ov | safe }}",
@@ -130,7 +127,7 @@
           {% endfor %}
         ]};
   $(document).ready( function () {
-    createDatatable('#dataTables-list', "{{ helpers | safe }}", "{{ modules | safe }}");
+    create_datatable('#dataTables-list', "{{ helpers | safe }}", "{{ modules | safe }}");
   });
 </script>
 {% endblock %}

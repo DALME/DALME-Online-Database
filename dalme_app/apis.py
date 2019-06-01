@@ -11,13 +11,13 @@ from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, Langua
                                    TaskSerializer, TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
-                                   SimplePageSerializer)
+                                   CountrySerializer, CitySerializer)
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, Language, Workset,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
-                              wiki_user_groups, wp_users, wp_usermeta, Attribute)
+                              wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City)
 from django_celery_results.models import TaskResult
 from django.db.models.expressions import RawSQL
 from rest_framework.permissions import DjangoModelPermissions
@@ -27,34 +27,44 @@ from dalme_app import functions
 
 
 class DTViewSet(viewsets.ModelViewSet):
-    """ Generic viewset for managing communication with DataTables. Should be subclassed for specific API endpoints. """
+    """ Generic viewset for managing communication with DataTables.
+    Should be subclassed for specific API endpoints. """
     permission_classes = (DjangoModelPermissions,)
 
     def list(self, request, *args, **kwargs):
         data_dict = {}
-        try:
+        if request.GET.get('data') is not None:
             dt_data = json.loads(request.GET['data'])
             if hasattr(self, 'search_dict'):
                 search_dict = self.search_dict
             else:
                 search_dict = {}
-            data_dict['draw'] = int(dt_data.get('draw'))  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-            queryset = self.get_qset()
-            if dt_data['search']['value']:
-                queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-            if request.GET.get('filters') is not None:
-                queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
-            queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-            rec_count = queryset.count()
-            data_dict['recordsTotal'] = rec_count
-            data_dict['recordsFiltered'] = rec_count
-            # filter the queryset for the current page
-            queryset = queryset[dt_data.get('start'):dt_data.get('start')+dt_data.get('length')]
-            serializer = self.get_serializer(queryset, many=True)
-            data = serializer.data
-            data_dict['data'] = data
-        except Exception as e:
-            data_dict['error'] = 'The following error occured while trying to fetch the list data: ' + str(e)
+            queryset = self.get_queryset()
+            try:
+                data_dict['draw'] = int(dt_data.get('draw'))  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                if dt_data['search']['value']:
+                    queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+                if request.GET.get('filters') is not None:
+                    queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
+                queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+                rec_count = queryset.count()
+                data_dict['recordsTotal'] = rec_count
+                data_dict['recordsFiltered'] = rec_count
+                # filter the queryset for the current page
+                queryset = queryset[dt_data.get('start'):dt_data.get('start')+dt_data.get('length')]
+                serializer = self.get_serializer(queryset, many=True)
+                data = serializer.data
+                data_dict['data'] = data
+            except Exception as e:
+                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+        else:
+            queryset = self.get_queryset()
+            try:
+                serializer = self.get_serializer(queryset, many=True)
+                data = serializer.data
+                data_dict['data'] = data
+            except Exception as e:
+                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
         return Response(data_dict)
 
     def retrieve(self, request, pk=None):
@@ -96,21 +106,35 @@ class DTViewSet(viewsets.ModelViewSet):
             status = 400
         return Response(result, status)
 
-    def destroy(self, request, pk=None, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         result = {}
-        object = self.get_object()
-        try:
-            object.delete()
-            result['result'] = 'success'
-            status = 201
-        except Exception as e:
-            result['result'] = 'error'
-            result['error'] = 'The following error occured while trying to delete the data: ' + str(e)
-            status = 400
+        status = 0
+        # object = self.get_object()
+        if kwargs.get('pk') is not None:
+            if ',' in str(kwargs.get('pk')):
+                object_ids = kwargs.get('pk').split(',')
+            else:
+                object_ids = [kwargs.get('pk')]
+            for obj in object_ids:
+                object = get_object_or_404(self.queryset, pk=obj)
+                try:
+                    object.delete()
+                    result['result'] = 'success'
+                    status = 201
+                except Exception as e:
+                    result['result'] = 'error'
+                    result['error'] = 'The following error occured while trying to delete the data: ' + str(e)
+                    status = 400
         return Response(result, status)
 
-    def get_qset(self, *args, **kwargs):
-        return self.queryset
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('filter') is not None:
+            filter = self.request.GET['filter'].split(',')
+            filter_q = Q(**{filter[0]: filter[1]})
+            queryset = self.queryset.filter(filter_q).distinct()
+        else:
+            queryset = self.queryset
+        return queryset
 
     def filter_on_search(self, *args, **kwargs):
         return filter_on_search(*args, **kwargs)
@@ -144,16 +168,31 @@ class AsynchronousTasks(DTViewSet):
     serializer_class = AsyncTaskSerializer
 
 
+class Countries(DTViewSet):
+    """ API endpoint for managing countries """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+
+class Cities(DTViewSet):
+    """ API endpoint for managing cities """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = City.objects.all()
+    serializer_class = CitySerializer
+
+
 class AttributeTypes(DTViewSet):
     """ API endpoint for managing attribute types """
     permission_classes = (DjangoModelPermissions,)
     queryset = Attribute_type.objects.all()
     serializer_class = AttributeTypeSerializer
 
-    def get_qset(self, *args, **kwargs):
-        if self.request.GET.get('content_type') is not None:
-            content_type = self.request.GET['content_type']
-            queryset = Content_attributes.objects.filter(content_type=content_type)
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('filter') is not None:
+            filter = self.request.GET['filter'].split(',')
+            filter_q = Q(**{filter[0]: filter[1]})
+            queryset = Content_attributes.objects.filter(filter_q)
         else:
             queryset = Attribute_type.objects.all()
         return queryset
@@ -166,18 +205,11 @@ class AttributeTypes(DTViewSet):
         return serializer
 
 
-class Attributes(viewsets.ModelViewSet):
+class Attributes(DTViewSet):
     """ API endpoint for managing attributes """
     permission_classes = (DjangoModelPermissions,)
+    queryset = Attribute.objects.all().order_by('attribute_type')
     serializer_class = SimpleAttributeSerializer
-
-    def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('object') is not None:
-            object = self.request.GET['object']
-            queryset = Attribute.objects.filter(object_id=object)
-        else:
-            queryset = Attribute.objects.all()
-        return queryset
 
 
 class ContentClasses(DTViewSet):
@@ -193,26 +225,19 @@ class ContentTypes(DTViewSet):
     queryset = Content_type.objects.all()
     serializer_class = ContentTypeSerializer
 
-    def get_qset(self, *args, **kwargs):
-        if self.request.GET.get('class') is not None:
-            content_class = self.request.GET['class']
-            queryset = Content_type.objects.filter(content_class=content_class)
-        else:
-            queryset = Content_type.objects.all()
-        return queryset
-
     def create(self, request, format=None):
         result = {}
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
-        if 'attribute_types' in data_dict:
-            attribute_types = data_dict.pop('attribute_types')
+        attribute_types = data_dict.pop('attribute_types', None)
         serializer = self.get_serializer(data=data_dict)
         if serializer.is_valid():
             new_obj = serializer.save()
-            if attribute_types:
+            if attribute_types is not None:
                 object = Content_type.objects.get(pk=new_obj.id)
-                if type(attribute_types) is not list:
+                if ',' in str(attribute_types):
+                    attribute_types = [int(i) for i in attribute_types.split(',')]
+                else:
                     attribute_types = [attribute_types]
                 for a in attribute_types:
                     atype = Attribute_type.objects.get(id=a)
@@ -233,15 +258,14 @@ class ContentTypes(DTViewSet):
         object = get_object_or_404(self.queryset, pk=pk)
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
-        if 'attribute_types' in data_dict:
-            attribute_types = data_dict.pop('attribute_types')
+        attribute_types = data_dict.pop('attribute_types', None)
         serializer = self.get_serializer(object, data=data_dict)
         if serializer.is_valid():
-            serializer.save()
-            if attribute_types:
-                if type(attribute_types) is not list:
+            if attribute_types is not None:
+                if ',' in str(attribute_types):
+                    attribute_types = [int(i) for i in attribute_types.split(',')]
+                else:
                     attribute_types = [attribute_types]
-                # new_types = [int(i) for i in attribute_types]
                 current_types = Content_attributes.objects.filter(content_type=object.id).values_list('attribute_type', flat=True)
                 add_types = list(set(attribute_types) - set(current_types))
                 remove_types = list(set(current_types) - set(attribute_types))
@@ -256,6 +280,7 @@ class ContentTypes(DTViewSet):
                     for t in remove_types:
                         q &= Q(attribute_type=t)
                         Content_attributes.objects.filter(q).delete()
+            serializer.save()
             serializer = self.get_serializer(object)
             result['data'] = serializer.data
             status = 201
@@ -271,14 +296,6 @@ class DTFields(DTViewSet):
     queryset = DT_fields.objects.all()
     serializer_class = DTFieldsSerializer
 
-    def get_qset(self, *args, **kwargs):
-        if self.request.GET.get('list') is not None:
-            list = self.request.GET['list']
-            queryset = DT_fields.objects.filter(list=list)
-        else:
-            queryset = DT_fields.objects.all()
-        return queryset
-
 
 class DTLists(DTViewSet):
     """ API endpoint for managing DataTables lists """
@@ -286,34 +303,36 @@ class DTLists(DTViewSet):
     queryset = DT_list.objects.all()
     serializer_class = DTListsSerializer
 
-    def create(self, request, format=None):
+    def create(self, request, *args, **kwargs):
         result = {}
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
-        if 'fields' in data_dict:
-            fields = data_dict.pop('fields')
-        if 'content_types' in data_dict:
-            content_types = data_dict.pop('content_types')
-        serializer = DTListsSerializer(data=data_dict)
+        fields = data_dict.pop('fields', None)
+        content_types = data_dict.pop('content_types', None)
+        serializer = self.get_serializer(data=data_dict)
         if serializer.is_valid():
             new_obj = serializer.save()
-            if fields:
-                if type(fields) is not list:
+            if fields is not None:
+                if ',' in str(fields):
+                    fields = [int(i) for i in fields.split(',')]
+                else:
                     fields = [fields]
                 for f in fields:
                     new_field = DT_fields()
                     new_field.list = new_obj
                     new_field.field = Attribute_type.objects.get(pk=f)
                     new_field.save()
-            if content_types:
-                if type(content_types) is not list:
+            if content_types is not None:
+                if ',' in str(content_types):
+                    content_types = [int(i) for i in content_types.split(',')]
+                else:
                     content_types = [content_types]
                 object = DT_list.objects.get(pk=new_obj.id)
                 for ct in content_types:
                     ctype = Content_type.objects.get(id=ct)
                     object.content_types.add(ctype)
             object = DT_list.objects.get(pk=new_obj.id)
-            serializer = DTListsSerializer(object)
+            serializer = self.get_serializer(object)
             result['data'] = serializer.data
             status = 201
         else:
@@ -321,40 +340,43 @@ class DTLists(DTViewSet):
             status = 400
         return Response(result, status)
 
-    def update(self, request, pk=None, format=None):
+    def update(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=pk)
+        partial = kwargs.pop('partial', False)
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
-        if 'fields' in data_dict:
-            fields = data_dict.pop('fields')
-        if 'content_types' in data_dict:
-            content_types = data_dict.pop('content_types')
-        serializer = DTListsSerializer(object, data=data_dict)
+        fields = data_dict.pop('fields', None)
+        content_types = data_dict.pop('content_types', None)
+        serializer = self.get_serializer(object, data=data_dict, partial=partial)
         if serializer.is_valid():
-            serializer.save()
-            if fields:
-                if type(fields) is not list:
+            if fields is not None:
+                if ',' in str(fields):
+                    fields = [int(i) for i in fields.split(',')]
+                else:
                     fields = [fields]
-                # fields = [int(i) for i in fields]
                 current_fields = DT_fields.objects.filter(list=object.id).values_list('field', flat=True)
                 add_fields = list(set(fields) - set(current_fields))
                 remove_fields = list(set(current_fields) - set(fields))
                 if add_fields:
                     for f in add_fields:
-                        new_field = DT_fields()
-                        new_field.list = object
-                        new_field.field = Attribute_type.objects.get(pk=f)
-                        new_field.save()
+                        try:
+                            new_field = DT_fields()
+                            new_field.list = object
+                            new_field.field = Attribute_type.objects.get(pk=f)
+                            new_field.save()
+                        except Exception as e:
+                            data_dict['error'] = 'The following error occured while trying to update the database: ' + str(e)
                 if remove_fields:
                     q = Q(list=object.id)
                     for f in remove_fields:
                         q &= Q(field=f)
                         DT_fields.objects.filter(q).delete()
-            if content_types:
-                if type(content_types) is not list:
+            if content_types is not None:
+                if ',' in str(content_types):
+                    content_types = [int(i) for i in content_types.split(',')]
+                else:
                     content_types = [content_types]
-                # content_types = [int(i) for i in content_types]
                 current_ct = object.content_types.all().values_list('id', flat=True)
                 add_ct = list(set(content_types) - set(current_ct))
                 remove_ct = list(set(current_ct) - set(content_types))
@@ -366,8 +388,9 @@ class DTLists(DTViewSet):
                     for ct in remove_ct:
                         ctype = Content_type.objects.get(id=ct)
                         object.content_types.remove(ctype)
+            serializer.save()
             object = DT_list.objects.get(pk=object.id)
-            serializer = DTListsSerializer(object)
+            serializer = self.get_serializer(object)
             result['data'] = serializer.data
             status = 201
         else:
@@ -381,7 +404,7 @@ class Images(DTViewSet):
     permission_classes = (DjangoModelPermissions,)
     queryset = rs_resource.objects.filter(resource_type=1, archive=0, ref__gte=0)
     serializer_class = RSImageSerializer
-    search_dict = {'collections': 'collections__ref'}
+    search_dict = {'collections': 'collections__name'}
 
     @action(detail=True)
     def get_preview_url(self, request, pk=None):
@@ -446,10 +469,7 @@ class Images(DTViewSet):
                         'short_name': sug_short_name
                     }
                 else:
-                    sug_dict = {
-                        'name': 'No suggestions',
-                        'short_name': 'No suggestions'
-                    }
+                    sug_dict = {}
                 result['data'] = {'suggested_fields': sug_dict, 'image_data': img_data}
                 status = 201
             except Exception as e:
@@ -466,13 +486,13 @@ class Images(DTViewSet):
         object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
-        if 'collections' in data_dict:
-            collections = [i['ref'] for i in data_dict.pop('collections')]
+        collections = data_dict.pop('collections', None)
         serializer = self.get_serializer(object, data=data_dict, partial=partial)
         if serializer.is_valid():
-            serializer.save()
-            if collections:
-                if type(collections) is not list:
+            if collections is not None:
+                if ',' in str(collections):
+                    collections = [int(i) for i in collections.split(',')]
+                else:
                     collections = [collections]
                 current_collections = rs_collection_resource.objects.filter(resource=object.ref).values_list('collection', flat=True)
                 add_collections = list(set(collections) - set(current_collections))
@@ -488,6 +508,7 @@ class Images(DTViewSet):
                     for c in remove_collections:
                         q &= Q(collection=c)
                         rs_collection_resource.objects.filter(q).delete()
+            serializer.save()
             object = rs_resource.objects.get(pk=object.ref)
             serializer = self.get_serializer(object)
             result['data'] = serializer.data
@@ -533,7 +554,7 @@ class Options(viewsets.ViewSet):
     def attribute_optexp(self, attribute_type=None, **kwargs):
         if attribute_type is not None:
             opt_exp = Attribute_type.objects.get(pk=attribute_type).options_list
-            options_list = functions.get_dte_options(opt_exp, 'chosen')
+            options_list = eval(opt_exp)
         else:
             options_list = [{'label': "", 'value': ""}]
         return options_list
@@ -541,74 +562,55 @@ class Options(viewsets.ViewSet):
     def attribute_types(self, content_type=None, **kwargs):
         if content_type is not None:
             qset = Content_attributes.objects.filter(content_type=content_type).order_by('attribute_type__short_name')
-            opt_list = self.add_blank_option([{'label': i.attribute_type.name+' ('+i.attribute_type.short_name+')', 'value': i.attribute_type.id} for i in qset])
+            opt_list = [{'label': i.attribute_type.name+' ('+i.attribute_type.short_name+')', 'value': i.attribute_type.id} for i in qset]
             if self.request.GET.get('extra') is not None:
                 ref_dict = {i.attribute_type.id: [i.attribute_type.data_type, i.attribute_type.options_list] for i in qset}
                 options_list = {'options': opt_list, 'ref': ref_dict}
             else:
                 options_list = opt_list
         else:
-            options_list = self.add_blank_option([{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Attribute_type.objects.all().order_by('name')])
+            options_list = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Attribute_type.objects.all().order_by('name')]
         return options_list
 
     def active_staff(self, **kwargs):
-        staff_options = self.add_blank_option([{'label': i.full_name, 'value': i.user_id} for i in Profile.objects.filter(user__is_active=1).order_by('user__username')])
+        staff_options = [{'label': i.full_name, 'value': i.user_id} for i in Profile.objects.filter(user__is_active=1).order_by('user__username')]
         return staff_options
 
     def content_types(self, content_class=None, **kwargs):
         if content_class is not None:
-            content_types = self.add_blank_option([{'label': i.name, 'value': i.id} for i in Content_type.objects.filter(content_class=content_class).order_by('name')])
+            content_types = [{'label': i.name, 'value': i.id} for i in Content_type.objects.filter(content_class=content_class).order_by('name')]
         else:
-            content_types = self.add_blank_option([{'label': i.name, 'value': i.id} for i in Content_type.objects.all().order_by('name')])
+            content_types = [{'label': i.name, 'value': i.id} for i in Content_type.objects.all().order_by('name')]
         return content_types
 
     def user_worksets(self, **kwargs):
-        worksets_options = self.add_blank_option([{'label': i.name, 'value': i.id} for i in Workset.objects.filter(owner=str(self.request.user.id)).order_by('name')])
+        worksets_options = [{'label': i.name, 'value': i.id} for i in Workset.objects.filter(owner=str(self.request.user.id)).order_by('name')]
         return worksets_options
 
     def user_groups(self, **kwargs):
-        user_groups = self.add_blank_option([{'label': i.name, 'value': i.id} for i in self.request.user.groups.all().order_by('name')])
+        user_groups = [{'label': i.name, 'value': i.id} for i in self.request.user.groups.all().order_by('name')]
         return user_groups
 
     def user_task_lists(self, **kwargs):
         groups = self.request.user.groups.all()
         all_lists = TaskList.objects.all().order_by('name')
-        task_lists = [{'label': "", 'value': ""}]
+        task_lists = []
         for list in all_lists:
             if list.group in groups:
                 task_lists.append({'label': list.name+' ('+str(list.group)+')', 'value': list.id})
         return task_lists
 
     def content_classes(self, **kwargs):
-        content_classes = self.add_blank_option([{'label': i.name, 'value': i.id} for i in Content_class.objects.all().order_by('name')])
+        content_classes = [{'label': i.name, 'value': i.id} for i in Content_class.objects.all().order_by('name')]
         return content_classes
 
     def parent_sources(self, source_type=None, **kwargs):
         if source_type is not None:
             if source_type == 13:
-                parent_sources = self.add_blank_option([{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.filter(type=12).order_by('short_name')])
+                parent_sources = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.filter(type=12).order_by('short_name')]
         else:
-            parent_sources = self.add_blank_option([{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.all().order_by('short_name')])
+            parent_sources = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.all().order_by('short_name')]
         return parent_sources
-
-    def add_blank_option(self, options):
-        p_holder = [{'label': "", 'value': ""}]
-        opt_list = p_holder + options
-        return opt_list
-
-
-class Pages(viewsets.ModelViewSet):
-    """ API endpoint for managing pages """
-    permission_classes = (DjangoModelPermissions,)
-    serializer_class = SimplePageSerializer
-
-    def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('object') is not None:
-            object = self.request.GET['object']
-            queryset = Attribute.objects.filter(object_id=object)
-        else:
-            queryset = Attribute.objects.all()
-        return queryset
 
 
 class Pages(DTViewSet):
@@ -623,8 +625,163 @@ class Sources(DTViewSet):
     permission_classes = (DjangoModelPermissions,)
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
+    display_fields = ['name', 'type', 'parent']
 
-    def get_qset(self, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
+        result = {}
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        validated_extra = self.validate_extra(data_dict.pop('attributes', None), data_dict.pop('pages', None))
+        serializer = self.get_serializer(data=data_dict)
+        if validated_extra['valid'] and serializer.is_valid():
+            attributes = validated_extra['attributes']
+            pages = validated_extra['pages']
+            new_obj = serializer.save()
+            object = Source.objects.get(pk=new_obj.id)
+            if attributes is not None:
+                create_attributes = []
+                for a in attributes:
+                    a_type = a.pop('attribute_type', None)
+                    if a_type is not None:
+                        a['attribute_type'] = Attribute_type.objects.get(pk=a_type)
+                        create_attributes.append(a)
+                if create_attributes:
+                    for new_att in create_attributes:
+                        object.attributes.create(**new_att)
+            if pages is not None:
+                create_pages = []
+                for page in pages:
+                    page.pop('id', None)
+                    create_pages.append(page)
+                if create_pages:
+                    for new_page in create_pages:
+                        object.pages.create(**new_page)
+            result['data'] = serializer.data
+            status = 201
+        else:
+            fieldErrors = []
+            if validated_extra.get('fieldErrors') is not None:
+                fieldErrors += validated_extra['fieldErrors']
+            if not serializer.is_valid():
+                fieldErrors += get_error_array(serializer.errors, self.display_fields)
+            result['fieldErrors'] = fieldErrors
+            status = 400
+        return Response(result, status)
+
+    def update(self, request, *args, **kwargs):
+        result = {}
+        partial = kwargs.pop('partial', False)
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        validated_extra = self.validate_extra(data_dict.pop('attributes', None), data_dict.pop('pages', None))
+        serializer = self.get_serializer(object, data=data_dict, partial=partial)
+        if validated_extra['valid'] and serializer.is_valid():
+            attributes = validated_extra['attributes']
+            pages = validated_extra['pages']
+            if attributes is not None:
+                create_attributes = []
+                update_attributes = {}
+                for a in attributes:
+                    a_id = a.pop('id', None)
+                    a_type = a.pop('attribute_type', None)
+                    if a_type is not None:
+                        a['attribute_type'] = Attribute_type.objects.get(pk=a_type)
+                        if a_id is not None:
+                            update_attributes[a_id] = a
+                        else:
+                            create_attributes.append(a)
+                if update_attributes:
+                    old_attributes = object.attributes.all()
+                    for att in old_attributes:
+                        if str(att.id) in update_attributes:
+                            up_att = update_attributes.get(str(att.id))
+                            att_object = Attribute.objects.get(pk=att.id)
+                            for attr, val in up_att.items():
+                                setattr(att_object, attr, val)
+                            att_object.save()
+                        else:
+                            # id = att.id
+                            object.attributes.remove(att)
+                            # Attribute.objects.get(pk=id).delete()
+                if create_attributes:
+                    for new_att in create_attributes:
+                        object.attributes.create(**new_att)
+            if pages is not None:
+                create_pages = []
+                update_pages = {}
+                for page in pages:
+                    p_id = page.pop('id', None)
+                    if p_id is not None:
+                        update_pages[p_id] = page
+                    else:
+                        create_pages.append(page)
+                if update_pages:
+                    old_pages = object.pages.all()
+                    for pp in old_pages:
+                        if str(pp.id) in update_pages:
+                            up_page = update_pages.get(str(pp.id))
+                            page_object = Page.objects.get(pk=pp.id)
+                            for attr, val in up_page.items():
+                                setattr(page_object, attr, val)
+                            page_object.save()
+                        else:
+                            # id = att.id
+                            object.pages.remove(pp)
+                            # Attribute.objects.get(pk=id).delete()
+                if create_pages:
+                    for new_page in create_pages:
+                        object.pages.create(**new_page)
+            serializer.save()
+            object = Source.objects.get(pk=object.id)
+            serializer = self.get_serializer(object)
+            result['data'] = serializer.data
+            status = 201
+        else:
+            fieldErrors = []
+            if validated_extra.get('fieldErrors') is not None:
+                fieldErrors += validated_extra['fieldErrors']
+            if not serializer.is_valid():
+                fieldErrors += get_error_array(serializer.errors, self.display_fields)
+            result['fieldErrors'] = fieldErrors
+            status = 400
+        return Response(result, status)
+
+    def validate_extra(self, attributes, pages):
+        result = {}
+        fieldErrors = []
+        if attributes is not None:
+            if 'attribute_type' in attributes:
+                test_attributes = {'1': attributes}
+                attributes = [attributes]
+            else:
+                test_attributes = attributes
+                attributes = list(attributes.values())
+            for key, value in test_attributes.items():
+                if value['attribute_type'] is None:
+                    fieldErrors.append({'name': 'attributes.'+str(key)+'.attribute_type', 'status': 'Attribute type must be selected.'})
+        if pages is not None:
+            if 'id' in pages:
+                test_pages = {'1': pages}
+                pages = [pages]
+            else:
+                test_pages = pages
+                pages = list(pages.values())
+            for key, value in test_pages.items():
+                if value['order'] is None:
+                    fieldErrors.append({'name': 'pages.'+str(key)+'.order', 'status': 'A value for order must be included.'})
+                if value['name'] is None:
+                    fieldErrors.append({'name': 'pages.'+str(key)+'.name', 'status': 'A name for the folio must be included.'})
+        if fieldErrors:
+            result['valid'] = False
+            result['fieldErrors'] = fieldErrors
+        else:
+            result['valid'] = True
+            result['attributes'] = attributes
+            result['pages'] = pages
+        return result
+
+    def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('type') is not None:
             type = self.request.GET['type']
             queryset = self.queryset
@@ -657,29 +814,53 @@ class Sources(DTViewSet):
         queryset = kwargs['queryset']
         dt_data = kwargs['dt_data']
         order_column = dt_data['order'][0]['column']
-        order_column_name = get_clean_field_name(dt_data['columns'][order_column]['data'], **kwargs)
-        order_dir = dt_data['order'][0]['dir']
-        if order_dir == 'desc':
-            order = '-'+order_column_name
+        order_column_name_raw = dt_data['columns'][order_column]['data']
+        if '.' in order_column_name_raw:
+            field_list = order_column_name_raw.split('.')
+            if field_list[0] in ['type', 'parent', 'name']:
+                order_column_name = field_list[0]
+            elif field_list[0] == 'attributes':
+                order_column_name = field_list[1]
+        elif ',' in order_column_name_raw:
+            field_list = order_column_name_raw.split(',')
+            order_column_name = field_list[0]
         else:
-            order = order_column_name
+            order_column_name = order_column_name_raw
+        order_dir = dt_data['order'][0]['dir']
         local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'is_inventory', 'no_folios']
         if order_column_name not in local_fields:
             att_type = Attribute_type.objects.get(short_name=order_column_name)
             att_type_id = att_type.id
             att_dt = att_type.data_type
             if att_dt == 'DATE':
-                target_field = 'value_STR'
-            else:
-                target_field = 'value_' + att_dt
-            queryset = queryset.annotate(ord_field=RawSQL('SELECT '+target_field+' FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
+                queryset = queryset.annotate(value_DATE_d=RawSQL('SELECT value_DATE_d FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
                                                             dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
                                                             dalme_app_attribute.attribute_type = %s', [att_type_id]))
-            if order_dir == 'desc':
-                order = '-ord_field'
+                queryset = queryset.annotate(value_DATE_m=RawSQL('SELECT value_DATE_m FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
+                                                            dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
+                                                            dalme_app_attribute.attribute_type = %s', [att_type_id]))
+                queryset = queryset.annotate(value_DATE_y=RawSQL('SELECT value_DATE_y FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
+                                                            dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
+                                                            dalme_app_attribute.attribute_type = %s', [att_type_id]))
+                if order_dir == 'desc':
+                    queryset = queryset.order_by('-value_DATE_y', '-value_DATE_m', '-value_DATE_d')
+                else:
+                    queryset = queryset.order_by('value_DATE_y', 'value_DATE_m', 'value_DATE_d')
             else:
-                order = 'ord_field'
-        queryset = queryset.order_by(order)
+                target_field = 'value_' + att_dt
+                queryset = queryset.annotate(ord_field=RawSQL('SELECT '+target_field+' FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
+                                                            dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
+                                                            dalme_app_attribute.attribute_type = %s', [att_type_id]))
+                if order_dir == 'desc':
+                    queryset = queryset.order_by('-ord_field')
+                else:
+                    queryset = queryset.order_by('ord_field')
+        else:
+            if order_dir == 'desc':
+                order = '-'+order_column_name
+            else:
+                order = order_column_name
+            queryset = queryset.order_by(order)
         return queryset
 
     def get_serializer(self, *args, **kwargs):
@@ -698,14 +879,6 @@ class Tasks(DTViewSet):
     permission_classes = (DjangoModelPermissions,)
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-
-    def get_qset(self, *args, **kwargs):
-        if self.request.GET.get('list') is not None:
-            list = self.request.GET['list']
-            queryset = Task.objects.filter(task_list=list)
-        else:
-            queryset = Task.objects.all()
-        return queryset
 
 
 class TaskLists(DTViewSet):
@@ -769,12 +942,12 @@ class Users(DTViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
-    def create(self, request, format=None):
+    def create(self, request, *args, **kwargs):
         result = {}
         display_fields = ['dam_usergroup', 'wp_role']
         data_dict = get_dte_data(request)
-        data_dict = self.clean_response(data_dict)
-        serializer = ProfileSerializer(data=data_dict)
+        data_dict = data_dict[0][1]
+        serializer = self.get_serializer(data=data_dict)
         if serializer.is_valid():
             # create wp user
             result = create_wp_user(data_dict)
@@ -786,22 +959,25 @@ class Users(DTViewSet):
             result = create_dam_user(data_dict)
             if result['status'] == 201:
                 data_dict['dam_user'] = result['id']
-                data_dict.pop('dam_usergroup')
+                data_dict.pop('dam_usergroup', None)
             else:
                 return Response(result['error'], result['status'])
             # create wiki user
             result = create_wiki_user(data_dict)
             if result['status'] == 201:
                 data_dict['wiki_user'] = result['id']
-                data_dict.pop('wiki_groups')
+                data_dict.pop('wiki_groups', None)
             else:
                 return Response(result['error'], result['status'])
-            groups = [i['id'] for i in data_dict['user']['groups']]
-            serializer = ProfileSerializer(data=data_dict, context={'groups': groups})
+            if data_dict['user'].get('groups') is not None and data_dict['user'].get('groups') != 0:
+                groups = [i['id'] for i in data_dict['user']['groups']]
+                serializer = self.get_serializer(data=data_dict, context={'groups': groups})
+            else:
+                serializer = self.get_serializer(data=data_dict)
             if serializer.is_valid():
                 new_obj = serializer.save()
                 object = Profile.objects.get(pk=new_obj.id)
-                serializer = ProfileSerializer(object)
+                serializer = self.get_serializer(object)
                 result['data'] = serializer.data
                 status = 201
             else:
@@ -812,25 +988,32 @@ class Users(DTViewSet):
             status = 400
         return Response(result, status)
 
-    def update(self, request, pk=None, format=None):
+    def update(self, request, *args, **kwargs):
         result = {}
-        profile_id = self.kwargs.get('pk')
-        object = Profile.objects.get(pk=profile_id)
+        partial = kwargs.pop('partial', False)
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         display_fields = ['dam_usergroup', 'wp_role']
         data_dict = get_dte_data(request)
-        data_dict = self.clean_response(data_dict)
-        dam_usergroup = data_dict.pop('dam_usergroup')
-        wiki_groups = [i['ug_group'] for i in data_dict.pop('wiki_groups')]
-        groups = [i['id'] for i in data_dict['user'].pop('groups')]
+        data_dict = data_dict[0][1]
+        dam_usergroup = data_dict.pop('dam_usergroup', None)
+        if data_dict.get('wiki_groups') is not None and data_dict.get('wiki_groups') != 0:
+            wiki_groups = [i['ug_group'] for i in data_dict.pop('wiki_groups', None)]
+        else:
+            wiki_groups = None
         wp_role = data_dict['wp_role']
-        serializer = ProfileSerializer(object, data=data_dict, context={'groups': groups})
+        if data_dict['user'].get('groups') is not None and data_dict['user'].get('groups') != 0:
+            groups = [i['id'] for i in data_dict['user'].pop('groups', None)]
+            serializer = self.get_serializer(object, data=data_dict, partial=partial, context={'groups': groups})
+        else:
+            groups = None
+            serializer = self.get_serializer(object, data=data_dict, partial=partial)
         if serializer.is_valid():
             serializer.save()
             if dam_usergroup != '':
                 rs_user.objects.filter(ref=object.dam_user).update(usergroup=dam_usergroup)
             if wp_role != '':
                 wp_usermeta.objects.filter(user_id=object.wp_user, meta_key='wp_capabilities').update(meta_value=wp_role)
-            if wiki_groups != []:
+            if wiki_groups is not None:
                 wiki_user_groups.objects.filter(ug_user=object.wiki_user).delete()
                 for i in wiki_groups:
                     dict = {
@@ -838,8 +1021,8 @@ class Users(DTViewSet):
                         'ug_group': bytes(i, encoding='ascii')
                     }
                     wiki_user_groups(**dict).save()
-            object = Profile.objects.get(pk=profile_id)
-            serializer = ProfileSerializer(object)
+            object = Profile.objects.get(pk=object.id)
+            serializer = self.get_serializer(object)
             result['data'] = serializer.data
             status = 201
         else:
@@ -866,26 +1049,6 @@ class Users(DTViewSet):
             result['error'] = 'There was a problem deleting the user: ' + str(e)
             status = 400
         return Response(result, status)
-
-    def clean_response(self, data_dict):
-        data_dict = data_dict[0][1]
-        try:
-            data_dict['user']['is_staff'] = data_dict['user']['is_staff'][0]
-        except IndexError:
-            data_dict['user']['is_staff'] = 0
-        try:
-            data_dict['user']['is_superuser'] = data_dict['user']['is_superuser'][0]
-        except IndexError:
-            data_dict['user']['is_superuser'] = 0
-        if 'groups-many-count' in data_dict['user']:
-            data_dict['user'].pop('groups-many-count')
-        if 'wiki_groups-many-count' in data_dict:
-            data_dict.pop('wiki_groups-many-count')
-        if 'dam_usergroup' in data_dict:
-            data_dict['dam_usergroup'] = data_dict['dam_usergroup']['value']
-        if 'wp_role' in data_dict:
-            data_dict['wp_role'] = data_dict['wp_role']['value']
-        return data_dict
 
 
 class Worksets(viewsets.ModelViewSet):
@@ -919,27 +1082,29 @@ class Worksets(viewsets.ModelViewSet):
 
 def get_dte_data(request):
     dt_request = json.loads(request.data['data'])
-    dt_request.pop('action')
+    dt_request.pop('action', None)
     rows = dt_request['data']
     data_list = []
     for k, v in rows.items():
         row_values = {}
         for field, value in v.items():
-            if type(value) is list:
-                if len(value) == 1:
-                    value = normalize_value(value[0])
-                elif len(value) == 0:
-                    value = 0
+            if 'many-count' not in field:
+                if type(value) is list:
+                    if len(value) == 1:
+                        value = normalize_value(value[0])
+                    elif len(value) == 0:
+                        value = 0
+                    else:
+                        value = [normalize_value(i) for i in value]
+                elif type(value) is dict:
+                    # if len(value) == 1 and value.get('value') is not None:
+                    if len(value) == 1:
+                        # value = normalize_value(value['value'])
+                        value = normalize_value(list(value.values())[0])
+                    else:
+                        value = {key: normalize_value(val) for key, val in value.items() if 'many-count' not in key}
                 else:
-                    value = [normalize_value(i) for i in value]
-            elif type(value) is dict:
-                if len(value) == 1 and value['value']:
-                    value = normalize_value(value['value'])
-                else:
-                    value = {key: normalize_value(val) for key, val in value.items()}
-            else:
-                value = normalize_value(value)
-            if value is not None:
+                    value = normalize_value(value)
                 row_values[field] = value
         data_list.append([k, row_values])
     return data_list
@@ -947,9 +1112,14 @@ def get_dte_data(request):
 
 def normalize_value(value):
     if type(value) is list:
-        n_value = [normalize_value(i) for i in value]
+        if len(value) == 1:
+            n_value = normalize_value(value[0])
+        elif len(value) == 0:
+            n_value = 0
+        else:
+            n_value = [normalize_value(i) for i in value]
     elif type(value) is dict:
-        n_value = {key: normalize_value(val) for key, val in value.items()}
+        n_value = {key: normalize_value(val) for key, val in value.items() if 'many-count' not in key}
     elif type(value) is str and value.isdigit():
         n_value = int(value)
     else:

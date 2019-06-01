@@ -44,14 +44,12 @@
           </div>
           <div class="card-body">
             {% for result in page_obj.object_list %}
-
                 {% if result.content_type == "dalme_app.source" %}
                 {% include "search/includes/sources.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.attribute_type" %}
                 {% include "search/includes/attribute_types.html" %}
                 {% endif %}
-
             {% empty %}
                 <div class="search-results-none">No results found.</div>
             {% endfor %}
@@ -89,7 +87,6 @@
     </div>
   </form>
 </div>
-
 {% endblock %}
 {% block extra_scripts %}
 {% endblock %}

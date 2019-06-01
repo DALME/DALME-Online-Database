@@ -140,6 +140,16 @@
         "iconClass": "fa-tasks"
       },
       {
+        "text": "Cities",
+        "link": "/cities",
+        "iconClass": "fa-city"
+      },
+      {
+        "text": "Countries",
+        "link": "/countries",
+        "iconClass": "fa-globe"
+      },
+      {
         "text": "Languages",
         "link": "/languages",
         "iconClass": "fa-language"

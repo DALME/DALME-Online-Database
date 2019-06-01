@@ -32,19 +32,19 @@ function init_source_editor(para_data) {
                 create: {
                     type: 'POST',
                     url: '/api/sources/',
-                    headers: {'X-CSRFToken': getCookie("csrftoken") },
+                    headers: {'X-CSRFToken': get_cookie("csrftoken") },
                     data: function (data) { return { "data": JSON.stringify( data ) }; }
                   },
                 edit: {
                     type: 'PATCH',
                     url: '/api/sources/_id_/',
-                    headers: {'X-CSRFToken': getCookie("csrftoken") },
+                    headers: {'X-CSRFToken': get_cookie("csrftoken") },
                     data: function (data) { return { "data": JSON.stringify( data ) }; }
                   },
                 remove: {
                     type: 'DELETE',
                     url: '/api/sources/_id_/',
-                    headers: {'X-CSRFToken': getCookie("csrftoken") },
+                    headers: {'X-CSRFToken': get_cookie("csrftoken") },
                     data: function (data) { data.data = null; return data; }
                   }
                 },

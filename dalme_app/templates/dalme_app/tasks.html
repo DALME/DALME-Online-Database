@@ -57,10 +57,10 @@
         $('#dataTables-{{ table.0 }}_wrapper').find('.card-header-title').html('<i class="fa {{ table.1 }} fa-fw"></i> {{ table.2 }}');
       {% endfor %}
         fix_dt_search();
-        $('#dataTables-tasks_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addtask" type="button" onclick="createTask()"><i class="fa fa-plus fa-sm"></i> Add</button>');
-        $('#dataTables-lists_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addlist" type="button" onclick="createTaskList()"><i class="fa fa-plus fa-sm"></i> Add</button>');
+        $('#dataTables-tasks_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addtask" type="button" onclick="create_task()"><i class="fa fa-plus fa-sm"></i> Add</button>');
+        $('#dataTables-lists_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addlist" type="button" onclick="create_task_list()"><i class="fa fa-plus fa-sm"></i> Add</button>');
         table_lists.on('select', function ( e, dt, type, indexes ) {
-          table_tasks.ajax.url("../api/tasks/?format=json&list=" + dt.id()).draw();
+          table_tasks.ajax.url("../api/tasks/?format=json&filter=task_list," + dt.id()).draw();
         });
         table_lists.on('deselect', function ( e, dt, type, indexes ) {
           table_tasks.ajax.url("../api/tasks/?format=json").draw();

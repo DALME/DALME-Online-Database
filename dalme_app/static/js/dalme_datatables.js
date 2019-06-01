@@ -1,11 +1,7 @@
-function createDatatable(target, helpers, modules) {
+function create_datatable(target, helpers, modules) {
   if (typeof dt_editor_options !== 'undefined') {
     dt_editor_options['table'] = target;
     dt_editor = new $.fn.dataTable.Editor(dt_editor_options);
-    if (helpers != 'None') {
-      helpers = JSON.parse(helpers.replace(/'/g, '"'));
-      for (let i = 0, len = helpers.length; i < len; ++i) { eval(helpers[i]+'()'); };
-    };
     if (typeof dt_editor_buttons !== 'undefined') {
       buttons = dt_editor_buttons
       for (let i = 0, len = buttons.length; i < len; ++i) {
@@ -27,49 +23,49 @@ function createDatatable(target, helpers, modules) {
         dt_table.responsive.recalc();
         window.dispatchEvent(new Event('resize'));
     });
+    if (helpers != 'None') {
+      helpers = JSON.parse(helpers.replace(/'/g, '"'));
+      for (let i = 0, len = helpers.length; i < len; ++i) { eval(helpers[i]+'()'); };
+    };
     if (modules != 'None') {
       modules = JSON.parse(modules.replace(/'/g, '"'));
-      for (let i = 0, len = modules.length; i < len; ++i) { initModule(modules[i]); };
+      for (let i = 0, len = modules.length; i < len; ++i) { init_module(modules[i]); };
     };
     if (typeof action !== 'undefined') {
-      performAction(action);
+      perform_action(action);
     };
   });
 }
 
-function performAction(action) {
+function perform_action(action) {
   eval(action['action']+'(['+action['data']+'])');
 }
 
-function initModule(mod) {
+function init_module(mod) {
   switch(mod) {
     case 'filters':
         $('#dataTables-list_filter').parent().prepend('<button class="btn dt-btn buttons-collection" id="btn-filters" data-toggle="collapse" data-target="#filters-container" aria-expanded="false" aria-controls="filters-container" type="button" onclick="this.classList.toggle(\'active\')"><i class="fa fa-filter fa-sm"></i> Filters</button>');
         $('#dataTables-list_filter .form-control')[0].style.borderTopLeftRadius = "0";
         $('#dataTables-list_filter .form-control')[0].style.borderBottomLeftRadius = "0";
         $('#btn-filters').css("margin-right","-1px");
-        resetFilters();
-        $('#filters-container').on('click', '.add_filter', addFilter);
-        $('#filters-container').on('click', '.remove_filter', removeFilter);
+        reset_filters();
+        $('#filters-container').on('click', '.add_filter', add_filter);
+        $('#filters-container').on('click', '.remove_filter', remove_filter);
         break;
     case 'preview':
-        $('.dt-buttons').append('<button class="btn dt-btn buttons-collection" id="btn-preview" onclick="togglePreview()"><i class="fa fa-eye fa-sm"></i> Preview</button>');
+        $('.dt-buttons').append('<button class="btn dt-btn buttons-collection" id="btn-preview" onclick="toggle_preview()"><i class="fa fa-eye fa-sm"></i> Preview</button>');
         break;
     case 'fieldsets':
         var button_html = '<div class="btn-group dropdown"><button class="btn buttons-collection dropdown-toggle" id="fieldsets_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-swatchbook fa-sm"></i> Fieldsets</button><div class="dropdown-menu" aria-labelledby="fieldsets_button">';
         for (const prop in dt_fieldsets) {
-            if (dt_fieldsets.hasOwnProperty(prop)) { button_html += '<a class="dt-button dropdown-item" href="#" onclick="toggleColumns(this)"><span>'+ prop +'</span></a>'; }
+            if (dt_fieldsets.hasOwnProperty(prop)) { button_html += '<a class="dt-button dropdown-item" href="#" onclick="toggle_columns(this)"><span>'+ prop +'</span></a>'; }
         };
         button_html += '</div></div>';
         $('.dt-buttons').append(button_html);
-        break;
-    case 'form':
-        dt_editor.on('open.dalme', function(e, mode, action) { form_open(action) });
-        dt_editor.on('close.dalme', function(e, mode, action) { form_close(action) });
   }
 }
 
-function toggleInlineEdit() {
+function toggle_inline_edit() {
   if (typeof edit_mode == 'undefined' || edit_mode == 'off') {
     edit_mode = 'on';
     $('.inline-edit-toggle').addClass('active');
@@ -83,7 +79,7 @@ function toggleInlineEdit() {
   }
 }
 
-function toggleColumns(button) {
+function toggle_columns(button) {
   $(button).parent().find('.active').removeClass('active');
   $(button).toggleClass('active');
   var range = dt_fieldsets[$(button).text()];
@@ -94,7 +90,7 @@ function toggleColumns(button) {
   window.dispatchEvent(new Event('resize'));
 }
 
-function togglePreview() {
+function toggle_preview() {
   if (typeof preview_state == 'undefined' || preview_state == 'off') {
       preview_state = 'on';
       maxWidth = $(window).width() - 522;
@@ -135,7 +131,7 @@ function togglePreview() {
   }
 }
 
-function addFilter(event) {
+function add_filter(event) {
   var filter = $(this).parent().parent();
   filterNum++;
   var next_id = 'filter' + filterNum;
@@ -144,22 +140,22 @@ function addFilter(event) {
     $(this).html('<i class="fa fa-minus fa-sm"></i>');
     $(this).removeClass('add_filter');
     $(this).addClass('remove_filter');
-    $(this).parent().prepend('<button class="btn filters-btn" onclick="saveFilterSet()">Save</button><button class="btn filters-btn" onclick="applyFilters()">Apply</button>');
+    $(this).parent().prepend('<button class="btn filters-btn" onclick="save_filter_set()">Save</button><button class="btn filters-btn" onclick="apply_filters()">Apply</button>');
   } else {
-    var op_select = createSelect(filters, next_id, 'operator');
+    var op_select = create_select(filters, next_id, 'operator');
     nextHtml += op_select;
   };
   var select_id = next_id+'_sel';
-  var select = createSelect(filters, next_id, 'initial');
+  var select = create_select(filters, next_id, 'initial');
   nextHtml += select;
   nextHtml += '<div class="filter_buttons"><button class="btn filters-btn remove_filter" type="button"><i class="fa fa-minus fa-sm"></i></button>';
   nextHtml += '<button class="btn filters-btn add_filter" type="button" id="btn'+filterNum+'"><i class="fa fa-plus fa-sm"></i></button></div></div>';
   $(filter).after(nextHtml);
-  $('#'+select_id).on('change.dalme', filterNext);
+  $('#'+select_id).on('change.dalme', filter_next);
   filter_register[next_id] = [];
 }
 
-function filterNext() {
+function filter_next() {
   var selected = $(this).children("option:selected").val();
   var filter_id = $(this).parent().attr('id');
   $(this).parent().attr('data-filter-type', filters[selected]['type']);
@@ -170,7 +166,7 @@ function filterNext() {
   };
   if ($(this).children("option:selected").text() != 'Select filter') {
     if (fields_with_lookups.includes(filters[selected]['type'])) {
-        var next_filter = createSelect(filters[selected]['lookups'], filter_id, 'lookups');
+        var next_filter = create_select(filters[selected]['lookups'], filter_id, 'lookups');
         next_filter += '<input type="text" class="form-control filter-text" id="'+filter_id+'_el1">';
         filter_register[filter_id].push(filter_id+'_el1');
         if (filters[selected]['type'] == 'text') {
@@ -180,58 +176,58 @@ function filterNext() {
           next_filter += '<label class="form-check-label" for="'+filter_id+'_el2cb'+'">Ignore case</label></div>';
         }
     } else if (filters[selected]['type'] == 'switch') {
-        var next_filter = createSwitch(filter_id);
+        var next_filter = create_switch(filter_id);
     } else if (filters[selected]['type'] == 'select') {
-        var next_filter = createSelect(filters[selected]['options'], filter_id);
+        var next_filter = create_select(filters[selected]['options'], filter_id);
     } else if (filters[selected]['type'] == 'check') {
-        var next_filter = createCheckboxes(filters[selected]['options'], filter_id);
+        var next_filter = create_checkboxes(filters[selected]['options'], filter_id);
     } else {
         var next_filter = 'There was an error processing this filter.';
     };
     $('#'+filter_id+'_sel').after(next_filter);
     if (fields_with_lookups.includes(filters[selected]['type'])) {
       $('#'+filter_id+'_el0').on('change.dalme', function() {
-        createTextset($(this).parent().attr('id'));
+        create_text_set($(this).parent().attr('id'));
       });
     }
   }
 }
 
-function removeFilter(event) {
+function remove_filter(event) {
   var filter = $(this).parent().parent();
   if (filter.attr('id') == 'filter0') {
-    resetFilters();
+    reset_filters();
   } else {
     $('#'+filter.attr('id')+'_sel').off('change.dalme');
     filter.remove();
     delete filter_register[filter.attr('id')];
   };
   if (Object.keys(filter_register).length == 1) {
-    resetFilters();
+    reset_filters();
   }
 }
 
-function resetFilters() {
+function reset_filters() {
   $('#filters-container').html('<div id="filter0" class="table-filter"><div class="filter_info">Filters</div><div class="filter_buttons"><button class="btn filters-btn add_filter" type="button"><i class="fa fa-plus fa-sm"></i></button></div></div>');
   filterNum = 0;
   filter_register = { 'filter0': [], };
-  updateTable('');
+  update_table('');
 }
 
-function applyFilters() {
-  const fv = collectFilters();
+function apply_filters() {
+  const fv = collect_filters();
   const filter_str = '&filters='+fv;
-  updateTable(filter_str);
+  update_table(filter_str);
 }
 
-function updateTable(filters) {
+function update_table(filters) {
   var dt = $('#dataTables-list').DataTable();
-  var dt_url = removeParam('filters', dt.ajax.url())
+  var dt_url = remove_param('filters', dt.ajax.url())
   var new_url = dt_url + filters;
   dt.ajax.url(new_url).load();
 }
 
-function collectFilters() {
+function collect_filters() {
   var and_list = '';
   var or_list = '';
   for (let i = 1, len = Object.keys(filter_register).length; i < len; ++i) {
@@ -239,7 +235,7 @@ function collectFilters() {
     let selected = $('#filter'+i+'_sel').children("option:selected").val();
     let fdict = filters[selected];
     let filtervalues = [];
-    filtervalues = getFilterValues('filter'+i, fdict, filtervalues);
+    filtervalues = get_filter_values('filter'+i, fdict, filtervalues);
     if (filterop == 'and') {
       and_list += filtervalues+',';
     } else {
@@ -253,7 +249,7 @@ function collectFilters() {
   return fv
 }
 
-function getFilterValues(filter_id, dict, filtervalues) {
+function get_filter_values(filter_id, dict, filtervalues) {
   var type = dict['type'];
   var field = dict['field'];
   //var lookup = typeof dict['lookup'] != 'undefined' ? dict['lookup'] : '';
@@ -317,10 +313,10 @@ function getFilterValues(filter_id, dict, filtervalues) {
   return filtervalues
 }
 
-function saveFilterSet() {
+function save_filter_set() {
   var data = JSON.parse(dt_table.ajax.params().data);
   var url = dt_table.ajax.url();
-  var filters = collectFilters();
+  var filters = collect_filters();
   var query = {
     'order_field': data.columns[data.order[0].column].data,
     'order_dir': data.order[0].dir,
@@ -330,15 +326,15 @@ function saveFilterSet() {
   if (typeof data.search.value != 'undefined') {
     query['search'] = data.search.value;
   };
-  saveFilterForm(query);
+  save_filter_form(query);
 }
 
-function saveFilterForm(query) {
+function save_filter_form(query) {
   filterForm = new $.fn.dataTable.Editor( {
         ajax: {
           method: "POST",
           url: "/api/worksets/",
-          headers: { 'X-CSRFToken': getCookie("csrftoken") },
+          headers: { 'X-CSRFToken': get_cookie("csrftoken") },
           data: { 'query': JSON.stringify(query) },
         },
         fields: [{
@@ -358,7 +354,7 @@ function saveFilterForm(query) {
 }
 
 /*** utility functions for creating specific filter types ***/
-function createSelect(dict, filter_id, type) {
+function create_select(dict, filter_id, type) {
   if (type == 'operator') {
     let id = filter_id + '_op'
     var select = '<select class="custom-select filter-select" id="'+id+'">'
@@ -386,7 +382,7 @@ function createSelect(dict, filter_id, type) {
   return select
 }
 
-function createSwitch(filter_id) {
+function create_switch(filter_id) {
   let id = filter_id + '_el0'
   let _switch = '<div class="custom-control custom-switch filter-switch" id="'+id+'">';
   _switch += '<input type="checkbox" class="custom-control-input" id="'+id+'cb'+'">';
@@ -395,7 +391,7 @@ function createSwitch(filter_id) {
   return _switch
 }
 
-function createCheckboxes(dict, filter_id) {
+function create_checkboxes(dict, filter_id) {
   let chkboxes = '';
   for (let i = 0, len = dict.length; i < len; ++i) {
       let cnt = i
@@ -408,7 +404,7 @@ function createCheckboxes(dict, filter_id) {
   return chkboxes
 }
 
-function createTextset(filter_id) {
+function create_text_set(filter_id) {
   var lookup = $('#'+filter_id+'_el0').children("option:selected").val();
   var i_lookups = ['exact', 'contains','startswith','endswith', 'regex'];
   const fe = filter_register[filter_id];
