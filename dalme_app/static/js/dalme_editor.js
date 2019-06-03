@@ -52,7 +52,7 @@ function startEditor() {
               tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
                   $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
               });
-              $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+              $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
               $(author_container).html('Transcribed by '+data.author);
           }, 'json');
       };
@@ -72,11 +72,11 @@ function startEditor() {
           stop: function (e, ui) {
             const parent = ui.element.parent();
             ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
-            window.dispatchEvent(new Event('resize'));
+            //window.dispatchEvent(new Event('resize'));
             }
       });
       window.addEventListener('resize', function () { resizeEditor(); }, false);
-      Diva.Events.subscribe('ObjectDidLoad', function () { alert('success'); });
+      Diva.Events.subscribe('DocumentDidLoad', function () { window.dispatchEvent(new Event('resize')); });
   } else {
     $(author_container).html(footer_content);
   }
@@ -110,7 +110,7 @@ function changeEditorMode() {
           $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
       });
       $(editor_container).off("input.dalme");
-      $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+      $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
   }
 }
 
@@ -127,7 +127,7 @@ function changeEditorFolio(target) {
             tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
                 $(editor_container).html(text);
             });
-            $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
         } else if (editor_mode == 'xml') {
             saveEditor();
             xmleditor.session.setValue(tr_text);
@@ -144,7 +144,7 @@ function changeEditorFolio(target) {
         diva.changeObject('/pages/'+folio_array[target].id+'/manifest');
         folio_idx = target;
         $(document.body).css('cursor', 'default');
-        window.dispatchEvent(new Event('resize'));
+        //window.dispatchEvent(new Event('resize'));
     });
   }
 }
@@ -193,7 +193,7 @@ function setEditorToolbar() {
   $('#xmleditor-options').load('/static/includes/xmleditor_options.html', function() {
     $('#xmleditor-options-form').find('input').on('change.dalme', function (e) { setEditorOptions(e) });
     $('#xmleditor-options-form').find('select').on('change.dalme', function (e) { setEditorOptions(e) });
-    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+    $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
   });
 }
 
@@ -236,7 +236,9 @@ function saveEditor() {
         data: { 'version': ver, 'transcription': text },
       }).done(function(data, textStatus, jqXHR) {
           if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
-      }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        show_message('danger', 'There was an error saving the transcription to the server: '+errorThrown);
+      });
     } else {
       var url = "/api/transcriptions/";
       $.ajax({
@@ -248,7 +250,9 @@ function saveEditor() {
           folio_array[folio]['tr_id'] = data['id'];
           folio_array[folio]['tr_version'] = data['version'];
           $(author_container).html('Transcribed by '+data['author']);
-      }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error saving the transcription to the server: '+errorThrown); });
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        show_message('danger', 'There was an error saving the transcription to the server: '+errorThrown);
+      });
     };
   }
 }

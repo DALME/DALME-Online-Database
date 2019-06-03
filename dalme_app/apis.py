@@ -31,6 +31,35 @@ class DTViewSet(viewsets.ModelViewSet):
     Should be subclassed for specific API endpoints. """
     permission_classes = (DjangoModelPermissions,)
 
+    @action(detail=False)
+    def get_workset(self, request, *args, **kwargs):
+        data_dict = {}
+        if request.GET.get('data') is not None:
+            dt_data = json.loads(request.GET['data'])
+            if hasattr(self, 'search_dict'):
+                search_dict = self.search_dict
+            else:
+                search_dict = {}
+            queryset = self.get_queryset()
+            try:
+                if dt_data['search']['value']:
+                    queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+                if request.GET.get('filters') is not None:
+                    queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
+                queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+                count = 1
+                resp_data = {}
+                for obj in queryset:
+                    obj_dict = {'pk': obj.pk}
+                    resp_data[count] = obj_dict
+                    count = count + 1
+                data_dict['data'] = resp_data
+            except Exception as e:
+                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+        else:
+            data_dict['error'] = 'There was no data in the request.'
+        return Response(data_dict)
+
     def list(self, request, *args, **kwargs):
         data_dict = {}
         if request.GET.get('data') is not None:
@@ -810,6 +839,38 @@ class Sources(DTViewSet):
         queryset = queryset.annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute.value_STR SEPARATOR ",") FROM dalme_app_attribute JOIN dalme_app_source src2 ON dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q)
         return queryset
 
+    def filter_on_filters(self, *args, **kwargs):
+        queryset = kwargs['queryset']
+        filters = kwargs['filters']
+        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'is_inventory', 'no_folios', 'tags']
+        annotate_dict = {}
+        if filters.get('and_list') is not None:
+            for filter in filters['and_list']:
+                annotate_dict = self.get_annotation(filter, local_fields, annotate_dict)
+        if filters.get('or_list') is not None:
+            for filter in filters['and_list']:
+                annotate_dict = self.get_annotation(filter, local_fields, annotate_dict)
+        queryset = queryset.annotate(**annotate_dict)
+        if filters.get('and_list') is not None:
+            queryset = queryset.filter(reduce(operator.and_, (Q(**q) for q in filters['and_list']))).distinct()
+        if filters.get('or_list') is not None:
+            queryset = queryset.filter(reduce(operator.or_, (Q(**q) for q in filters['or_list']))).distinct()
+        return queryset
+
+    def get_annotation(self, filter, local_fields, annotate_dict):
+        (k, v), = filter.items()
+        if '__' in k:
+            field = k.split('__')[0]
+        else:
+            field = k
+        if field not in local_fields:
+            if Attribute_type.objects.filter(short_name=field).exists():
+                att_type_id = Attribute_type.objects.get(short_name=field).id
+                annotate_dict[field] = RawSQL('SELECT value_STR FROM dalme_app_attribute \
+                                               JOIN dalme_app_source src2 ON dalme_app_attribute.object_id = src2.id \
+                                               WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = %s', [att_type_id])
+        return annotate_dict
+
     def get_ordered_queryset(self, *args, **kwargs):
         queryset = kwargs['queryset']
         dt_data = kwargs['dt_data']
@@ -1057,12 +1118,38 @@ class Worksets(viewsets.ModelViewSet):
     queryset = Workset.objects.all()
     serializer_class = WorksetSerializer
 
+    @action(detail=True)
+    def set_state(self, request, *args, **kwargs):
+        result = {}
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        try:
+            action = self.request.GET['action']
+            seq = self.request.GET['seq']
+            if action == 'mark_done':
+                qset = json.loads(object.qset)
+                qset[str(seq)]['done'] = True
+                object.current_record = int(seq) + 1
+                object.qset = json.dumps(qset)
+                object.save()
+            elif action == 'mark_undone':
+                qset = json.loads(object.qset)
+                qset[str(seq)].pop('done')
+                object.qset = json.dumps(qset)
+                object.save()
+            result['message'] = 'Update succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
     def create(self, request, format=None):
         data = request.data
         data_dict = {
             'name': data['data[0][name]'],
             'description': data['data[0][description]'],
-            'query': data['query'],
+            'qset': data['qset'],
+            'endpoint': data['endpoint'],
         }
         serializer = WorksetSerializer(data=data_dict)
         if serializer.is_valid():

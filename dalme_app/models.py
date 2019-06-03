@@ -10,6 +10,7 @@ from django.db import models
 from django.urls import reverse
 from dalme_app.middleware import get_current_user, get_current_username
 import os
+import json
 import requests
 import hashlib
 import textwrap
@@ -71,7 +72,7 @@ class Profile(models.Model):
 
 class Agent(dalmeUuid):
     type = models.IntegerField()
-    tags = GenericRelation('Tag', related_query_name='agents')
+    tags = GenericRelation('Tag')
 
 
 class Attribute_type(dalmeIntid):
@@ -134,7 +135,7 @@ class Attribute(dalmeUuid):
 
 class Concept(dalmeUuid):
     getty_id = models.IntegerField(db_index=True)
-    tags = GenericRelation('Tag', related_query_name='concepts')
+    tags = GenericRelation('Tag')
 
 
 class Content_class(dalmeIntid):
@@ -214,46 +215,9 @@ class DT_fields(dalmeIntid):
         ('integer', 'integer')
     )
 
-    FILTER_MODES = (
-        ('check', 'check'),
-        ('complete', 'complete'),
-        ('strict', 'strict')
-    )
-
     FILTER_OPERATORS = (
         ('and', 'and'),
         ('or', 'or')
-    )
-
-    FILTER_LOOKUPS = (
-        ('__contains', 'contains'),
-        ('__date', 'date'),
-        ('__day', 'day'),
-        ('__endswith', 'endswith'),
-        ('__exact', 'exact'),
-        ('__gt', 'gt'),
-        ('__gte', 'gte'),
-        ('__hour', 'hour'),
-        ('__icontains', 'icontains'),
-        ('__iendswith', 'iendswith'),
-        ('__iexact', 'iexact'),
-        ('__in', 'in'),
-        ('__iregex', 'iregex'),
-        ('__isnull', 'isnull'),
-        ('__istartswith', 'istartswith'),
-        ('__lt', 'lt'),
-        ('__lte', 'lte'),
-        ('__minute', 'minute'),
-        ('__month', 'month'),
-        ('__quarter', 'quarter'),
-        ('__range', 'range'),
-        ('__regex', 'regex'),
-        ('__second', 'second'),
-        ('__startswith', 'startswith'),
-        ('__time', 'time'),
-        ('__week', 'week'),
-        ('__week_day', 'week_day'),
-        ('__year', 'year')
     )
 
     list = models.ForeignKey('DT_list', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='fields')
@@ -272,9 +236,8 @@ class DT_fields(dalmeIntid):
     dte_message = models.CharField(max_length=255, null=True, default=None)
     is_filter = models.BooleanField(default=False)
     filter_type = models.CharField(max_length=55, null=True, default=None, choices=FILTER_TYPES)
-    filter_mode = models.CharField(max_length=55, null=True, default=None, choices=FILTER_MODES)
     filter_options = models.CharField(max_length=255, null=True, default=None)
-    filter_lookup = models.CharField(max_length=55, null=True, default=None, choices=FILTER_LOOKUPS)
+    filter_lookup = models.CharField(max_length=255, null=True, default=None)
     order = models.IntegerField(db_index=True, null=True, default=None)
 
     def __str__(self):
@@ -289,7 +252,7 @@ class Headword(dalmeUuid):
     word = models.CharField(max_length=55)
     full_lemma = models.CharField(max_length=255)
     concept_id = models.ForeignKey('Concept', to_field='id', db_index=True, on_delete=models.PROTECT)
-    tags = GenericRelation('Tag', related_query_name='headwords')
+    tags = GenericRelation('Tag')
 
     def __str__(self):
         return self.word
@@ -298,7 +261,7 @@ class Headword(dalmeUuid):
 class Object(dalmeUuid):
     concept_id = models.UUIDField(db_index=True)
     object_phrase_id = models.ForeignKey('Object_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
-    tags = GenericRelation('Tag', related_query_name='objects')
+    tags = GenericRelation('Tag')
 
 
 class Object_attribute(dalmeBasic):
@@ -308,7 +271,7 @@ class Object_attribute(dalmeBasic):
 
 class Place(dalmeUuid):
     type = models.IntegerField(db_index=True)
-    tags = GenericRelation('Tag', related_query_name='places')
+    tags = GenericRelation('Tag')
 
 
 class Page(dalmeUuid):
@@ -316,7 +279,7 @@ class Page(dalmeUuid):
     dam_id = models.IntegerField(db_index=True, null=True)
     order = models.IntegerField(db_index=True)
     canvas = models.TextField(null=True)
-    tags = GenericRelation('Tag', related_query_name='pages')
+    tags = GenericRelation('Tag')
 
     def __str__(self):
         return self.name
@@ -364,7 +327,7 @@ class Source(dalmeUuid):
     is_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation(Attribute, related_query_name='sources')
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
-    tags = GenericRelation('Tag', related_query_name='sources')
+    tags = GenericRelation('Tag')
 
     def __str__(self):
         return self.name
@@ -402,7 +365,7 @@ class Wordform(dalmeUuid):
     normalized_form = models.CharField(max_length=55)
     pos = models.CharField(max_length=255)
     headword_id = models.ForeignKey('Headword', to_field='id', db_index=True, on_delete=models.PROTECT)
-    tags = GenericRelation('Tag', related_query_name='wordforms')
+    tags = GenericRelation('Tag')
 
     def __str__(self):
         return self.normalized_form
@@ -415,7 +378,7 @@ class Token(dalmeUuid):
     clean_token = models.CharField(max_length=55)
     order = models.IntegerField(db_index=True)
     flags = models.CharField(max_length=10)
-    tags = GenericRelation('Tag', related_query_name='tokens')
+    tags = GenericRelation('Tag')
 
     def __str__(self):
         return self.raw_token
@@ -486,18 +449,28 @@ class AttributeReference(dalmeUuid):
 class Notes(dalmeUuid):
     target = models.UUIDField(db_index=True)
     text = models.TextField()
-    tags = GenericRelation('Tag', related_query_name='notes')
+    tags = GenericRelation('Tag')
 
 
 class Workset(dalmeIntid):
     name = models.CharField(max_length=55)
     description = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
-    query = models.TextField()
-    tags = GenericRelation('Tag', related_query_name='worksets')
+    qset = models.TextField()
+    endpoint = models.CharField(max_length=55)
+    progress = models.FloatField(default=0)
+    current_record = models.IntegerField(default=1)
+    tags = GenericRelation('Tag')
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        new_qset = json.loads(self.qset)
+        done = sum(1 for value in new_qset.values() if 'done' in value)
+        total = len(new_qset)
+        self.progress = done * 100 / total
+        super(Workset, self).save(*args, **kwargs)
 
 
 class Tag(dalmeUuid):
@@ -511,9 +484,12 @@ class Tag(dalmeUuid):
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES)
     tag = models.CharField(max_length=55, null=True, default=None)
     tag_group = models.CharField(max_length=255, null=True, default=None)
-    content_object = GenericForeignKey()
+    content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.UUIDField(null=True, db_index=True)
+
+    def __str__(self):
+        return self.tag
 
 # task management
 

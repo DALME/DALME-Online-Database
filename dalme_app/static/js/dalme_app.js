@@ -185,6 +185,21 @@ function remove_param(key, sourceURL) {
     return rtn;
 }
 
+function get_params(sourceURL) {
+    var params = {};
+    var parts = sourceURL.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        params[key] = value;
+    });
+    return params;
+}
+
+function show_message(type, text) {
+  var message = '<div class="alert alert-'+type+' alert-dismissable" role="alert">';
+  message += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>';
+  message += text+'</div>';
+  $('.topbar-dalme').after(message);
+}
+
 function mark_task_done(task) {
   const url = "/api/tasks/"+task.id+"/";
   $.ajax({
@@ -193,6 +208,8 @@ function mark_task_done(task) {
     headers: { 'X-CSRFToken': get_cookie("csrftoken") },
     data: { 'completed': 1 },
   }).done(function(data, textStatus, jqXHR) {
-      alert('done');
-  }).fail(function(jqXHR, textStatus, errorThrown) { alert('There was an error: '+errorThrown); });
+    show_message('success', 'Task marked as completed.');
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+  });
 }

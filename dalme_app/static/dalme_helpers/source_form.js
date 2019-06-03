@@ -81,8 +81,10 @@ function change_form(e, action) {
       $('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-2');
       $('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-10');
       if (action == 'edit') {
+          source_editor.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The source was updated succesfully.') });
           init_editor()
       } else if (action == 'create') {
+          source_editor.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The source was created succesfully.') });
           foo = 1;
       };
       source_editor.field('type.value').input().on('change.dalme', change_on_type);
@@ -232,7 +234,7 @@ function add_attribute_set(attribute) {
     container.find('label').remove();
     container.find('.col-lg-8').removeClass('col-lg-8');
     $('#'+set_id).find('.form-group').removeClass('form-group').removeClass('row');
-    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+    $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
 }
 
 function add_page_set(page) {
@@ -287,7 +289,7 @@ function add_page_set(page) {
     $('#'+set_id).find('.col-lg-8').removeClass('col-lg-8').addClass('flex-grow-1');
     $('#'+set_id).find('.col-lg-4').removeClass('col-lg-4');
     $('#'+set_id).find('.form-group').removeClass('form-group').removeClass('row');
-    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+    $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
     $('[data-toggle="popover"]').popover({container: 'body'});
 }
 

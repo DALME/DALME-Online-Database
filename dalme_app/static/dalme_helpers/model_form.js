@@ -40,7 +40,7 @@ function update_class() {
           }
         };
       }).fail(function(jqXHR, textStatus, errorThrown) {
-          alert('There was an error retrieving the data from the server: '+errorThrown);
+          show_message('danger', 'There was an error retrieving the data from the server: '+errorThrown);
       });
       $('#btn_class_edit').attr('disabled', false);
   } else {
@@ -69,6 +69,7 @@ function add_class_entry() {
               update_class();
             }
         });
+        model_class_form.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The new record was successfully added.') });
         model_class_form.buttons(
           {
             text: "Create",
@@ -152,7 +153,7 @@ function edit_class_entry() {
                           current_class = '';
                           update_class();
                         } else if (json.result == 'error') {
-                          alert(json.error);
+                          show_message('danger', 'There was an error retrieving data from the server: '+json.error);
                         }
                 });
                 model_class_form2.remove(current_class.id, false).submit();
@@ -197,7 +198,7 @@ function edit_class_entry() {
                         current_class = '';
                         update_class();
                       } else if (json.result == 'error') {
-                        alert(json.error);
+                        show_message('danger', 'There was an error retrieving data from the server: '+json.error);
                       }
               });
               model_class_form2.remove(current_class.id, false).submit();

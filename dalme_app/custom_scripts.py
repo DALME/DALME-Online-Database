@@ -5,12 +5,17 @@ import re
 import os
 import json
 import pandas as pd
-from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields
+from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Workset
 from datetime import date
 from dalme_app.async_tasks import update_rs_folio_field
 from async_messages import messages
 from django.contrib.auth.models import User
 from dalme_app.apis import normalize_value
+from django.db.models.expressions import RawSQL
+import operator
+from functools import reduce
+from django.db.models import Q, Count
+from collections import OrderedDict
 
 
 def get_script_menu():
@@ -133,31 +138,15 @@ def import_languages(request):
 
 
 def test_expression2(request):
-    result = []
-    object = Source.objects.get(pk='4bad6531-67fc-4546-a47b-1a7099fa72f0')
-    type = Attribute_type.objects.get(pk=26)
-    attribute_object = Attribute.objects.get(id='90ee886e-c362-490b-93f5-51a26904f56c')
-    # new_att = Attribute()
-    # new_att.object_id = '4bad6531-67fc-4546-a47b-1a7099fa72f0'
-    # new_att.attribute_type = type
-    # new_att.value_DATE_d = 10
-    # new_att.value_DATE_m = 9
-    # new_att.value_DATE_y = 1976
-    # new_att.save()
-    new_att = {
-        'attribute_type': type,
-        'value_DATE_d': 11,
-        'value_DATE_m': 9,
-        'value_DATE_y': 1976,
-    }
-    #object.attributes.create(**new_att)
-    # for attr, val in new_att.items():
-    #     setattr(attribute_object, attr, val)
-    # attribute_object.save()
-    #attribute_object.update(**new_att)
-    attribute_object.value_DATE_d = 11
-    attribute_object.save()
-    return 'okay'
+    object = Workset.objects.get(pk=8)
+    seq = 3
+    qset = json.loads(object.qset)
+    qset[str(seq)]['done'] = True
+    object.current_record = int(seq) + 1
+    object.qset = json.dumps(qset)
+    object.save()
+    foo=bar
+    return 'done'
 
 
 def test_expression(request):

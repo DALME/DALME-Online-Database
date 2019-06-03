@@ -14,6 +14,15 @@
     <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
   {% endif %}
+  {% if workset %}
+    <script type="text/javascript" src="{% static 'js/dalme_worksets.js' %}"></script>
+    <script type="text/javascript">
+      var workset = {{ workset | safe }};
+      $(document).ready(function() {
+          init_worksets();
+      });
+    </script>
+  {% endif %}
   {% if has_pages %}
     <script type="text/javascript">
       var folio_list = {{ folio_list | safe }};
@@ -37,10 +46,13 @@
         </li>
         {% endif %}
       </ul>
+      {% if workset %}
+        {% include "includes/workset_controller.html" with current=workset.current total=workset.total progress=workset.progress%}
+      {% endif %}
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
+      <div class="tab-pane card-body active transcription-editor" id="info" role="tabpanel" aria-labelledby="info-tab">
         <div class="row">
           <div class="col-md-6">
             <div class="card mb-3">
@@ -221,7 +233,6 @@
       </div>
     </div>
   </div>
-
 {% endblock %}
 {% block extra_scripts %}
 {% if tables %}

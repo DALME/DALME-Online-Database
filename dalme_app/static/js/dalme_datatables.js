@@ -151,20 +151,27 @@ function add_filter(event) {
   nextHtml += '<div class="filter_buttons"><button class="btn filters-btn remove_filter" type="button"><i class="fa fa-minus fa-sm"></i></button>';
   nextHtml += '<button class="btn filters-btn add_filter" type="button" id="btn'+filterNum+'"><i class="fa fa-plus fa-sm"></i></button></div></div>';
   $(filter).after(nextHtml);
-  $('#'+select_id).on('change.dalme', filter_next);
+  if ($(filter).attr('id') != 'filter0') {
+    $('#'+next_id+'_op').selectize();
+    $('#'+next_id+'_op').parent().find('.selectize-input').css('min-width', '30px');
+  }
+  let swidth = $('#'+select_id).width();
+  $('#'+select_id).selectize().on('change.dalme', filter_next);
+  $('#'+select_id).parent().find('.selectize-input').css('min-width', swidth);
   filter_register[next_id] = [];
 }
 
 function filter_next() {
-  var selected = $(this).children("option:selected").val();
-  var filter_id = $(this).parent().attr('id');
-  $(this).parent().attr('data-filter-type', filters[selected]['type']);
+  var selected = $(this).val();
+  var container = $(this).parent();
+  var filter_id = container.parent().attr('id');
+  container.parent().attr('data-filter-type', filters[selected]['type']);
   var fe = filter_register[filter_id];
   var fields_with_lookups = ['text', 'integer', 'date', 'datetime'];
   for (let i = 0, len = fe.length; i < len; ++i) {
     $('#'+filter_id+'_el'+i).remove()
   };
-  if ($(this).children("option:selected").text() != 'Select filter') {
+  if ($(this).text() != 'Select filter') {
     if (fields_with_lookups.includes(filters[selected]['type'])) {
         var next_filter = create_select(filters[selected]['lookups'], filter_id, 'lookups');
         next_filter += '<input type="text" class="form-control filter-text" id="'+filter_id+'_el1">';
@@ -184,11 +191,17 @@ function filter_next() {
     } else {
         var next_filter = 'There was an error processing this filter.';
     };
-    $('#'+filter_id+'_sel').after(next_filter);
+    $('#'+filter_id+'_sel').parent().after(next_filter);
     if (fields_with_lookups.includes(filters[selected]['type'])) {
-      $('#'+filter_id+'_el0').on('change.dalme', function() {
-        create_text_set($(this).parent().attr('id'));
+      $('#'+filter_id+'_el0').find('select').selectize().on('change.dalme', function() {
+        create_text_set(container.parent().attr('id'));
       });
+      $('#'+filter_id+'_el0').find('.selectize-input').css('min-width', '150px');
+    };
+    if (filters[selected]['type'] == 'select') {
+        let swidth = $('#'+filter_id+'_el0').find('select').width();
+        $('#'+filter_id+'_el0').find('select').selectize();
+        $('#'+filter_id+'_el0').find('.selectize-input').css('min-width', swidth);
     }
   }
 }
@@ -221,10 +234,10 @@ function apply_filters() {
 }
 
 function update_table(filters) {
-  var dt = $('#dataTables-list').DataTable();
-  var dt_url = remove_param('filters', dt.ajax.url())
+  //var dt = $('#dataTables-list').DataTable();
+  var dt_url = remove_param('filters', dt_table.ajax.url())
   var new_url = dt_url + filters;
-  dt.ajax.url(new_url).load();
+  dt_table.ajax.url(new_url).load();
 }
 
 function collect_filters() {
@@ -251,30 +264,27 @@ function collect_filters() {
 
 function get_filter_values(filter_id, dict, filtervalues) {
   var type = dict['type'];
-  var field = dict['field'];
-  //var lookup = typeof dict['lookup'] != 'undefined' ? dict['lookup'] : '';
+  if (typeof dict['lookup'] != 'undefined') {
+    var field = dict['lookup'];
+  } else {
+    var field = dict['field'];
+  };
   if (type == 'select') {
-      var sel_v = $('#'+filter_id+'_el0').children("option:selected").val();
-      // var select = document.getElementById(filter_id+'_el0');
-      // var sel_v = select.options[select.selectedIndex].text;
+      var sel_v = $('#'+filter_id+'_el0').find('select').children("option:selected").val();
       if (sel_v == 'any') {
-        var val = '{\''+field+'__isnull\':\'False\'}';
+        var val = '{\''+field+'__isnull\':False}';
         filtervalues.push(val);
       } else if (sel_v == 'none') {
-        var val = '{\''+field+'__isnull\':\'True\'}';
-        filtervalues.push(val);
-        val = '{\''+field+'__exact\':\'\'}';
+        var val = '{\''+field+'__isnull\':True}';
         filtervalues.push(val);
       } else {
         var val = '{\''+field+'\':\''+sel_v+'\'}';
         filtervalues.push(val);
       }
   } else if (type == 'text' || type == 'integer') {
-      var lookup = $('#'+filter_id+'_el0').children("option:selected").val();
+      var lookup = $('#'+filter_id+'_el0').find('select').children("option:selected").val();
       if (lookup == 'isnull') {
-          var val = '{\''+field+'__isnull\':\'True\'}';
-          filtervalues.push(val);
-          val = '{\''+field+'__exact\':\'\'}';
+          var val = '{\''+field+'__isnull\':True}';
           filtervalues.push(val);
       } else if (lookup == 'range') {
           var txt_v1 = $('#'+filter_id+'_el1').val();
@@ -297,7 +307,7 @@ function get_filter_values(filter_id, dict, filtervalues) {
       for (let i = 0, len = cboxes.length; i < len; ++i) {
         if ($('#'+cboxes[i]+'cb').is(':checked')) {
           if ($('#'+cboxes[i]+'cb').val() == 'none') {
-            var val = '{\''+field+'__isnull\':\'True\'}';
+            var val = '{\''+field+'__isnull\':True}';
           } else {
             var val = '{\''+field+'\':\''+$('#'+cboxes[i]+'cb').val()+'\'}';
           };
@@ -314,38 +324,36 @@ function get_filter_values(filter_id, dict, filtervalues) {
 }
 
 function save_filter_set() {
-  var data = JSON.parse(dt_table.ajax.params().data);
-  var url = dt_table.ajax.url();
-  var filters = collect_filters();
-  var query = {
-    'order_field': data.columns[data.order[0].column].data,
-    'order_dir': data.order[0].dir,
-    'filters': filters,
-    'api': url.split("/")[2]
-  };
-  if (typeof data.search.value != 'undefined') {
-    query['search'] = data.search.value;
-  };
-  save_filter_form(query);
+  var url_params = dt_table.ajax.url().split("/");
+  $.ajax({
+    method: "GET",
+    url: "/"+url_params[1]+"/"+url_params[2]+"/get_workset/"+url_params[3],
+    data: dt_table.ajax.params()
+  }).done(function(data, textStatus, jqXHR) {
+        save_filter_form(data.data, url_params[2]);
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+        show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+  });
 }
 
-function save_filter_form(query) {
-  filterForm = new $.fn.dataTable.Editor( {
-        ajax: {
-          method: "POST",
-          url: "/api/worksets/",
-          headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-          data: { 'query': JSON.stringify(query) },
-        },
-        fields: [{
-                label: "Name:",
-                name:  "name"
-              }, {
-                label: "Description:",
-                name:  "description",
-                type: "textarea"
-              }]
+function save_filter_form(qset, endpoint) {
+    filterForm = new $.fn.dataTable.Editor( {
+          ajax: {
+            method: "POST",
+            url: "/api/worksets/",
+            headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+            data: { 'qset': JSON.stringify(qset), 'endpoint': endpoint },
+          },
+          fields: [{
+                  label: "Name:",
+                  name:  "name"
+                }, {
+                  label: "Description:",
+                  name:  "description",
+                  type: "textarea"
+                }]
     });
+    filterForm.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The workset was saved successfully.') });
     filterForm.buttons({
       text: "Save",
       className: "btn btn-primary",
@@ -357,14 +365,15 @@ function save_filter_form(query) {
 function create_select(dict, filter_id, type) {
   if (type == 'operator') {
     let id = filter_id + '_op'
-    var select = '<select class="custom-select filter-select" id="'+id+'">'
+    var select = '<div class="sel_container"><select id="'+id+'">'
     select += '<option selected value="and">and</option>';
-    select += '<option value="or">or</option></select>';
+    select += '<option value="or">or</option></select></div>';
   } else {
-      let id = filter_id + '_el0'
-      if (type == 'initial') { id = filter_id + '_sel' };
-      var select = '<select class="custom-select filter-select" id="'+id+'">'
-      if (type == 'initial') { select += '<option selected>Select filter</option>'};
+      if (type == 'initial') {
+        var select = '<div class="sel_container"><select id="'+filter_id+'_sel"><option selected>Select filter</option>';
+      } else {
+        var select = '<div id="'+filter_id+'_el0"><select>';
+      };
       for (let i = 0, len = dict.length; i < len; ++i) {
         if (dict[i]['label'] == 'divider') {
           select += '<option disabled>──────</option>';
@@ -376,8 +385,8 @@ function create_select(dict, filter_id, type) {
           select += 'value="'+s_value+'">'+dict[i]['label']+'</option>';
         }
       };
-      select += '</select>';
-      if (type != 'initial') { filter_register[filter_id].push(id) };
+      select += '</select></div>';
+      if (type != 'initial') { filter_register[filter_id].push(filter_id+'_el0') };
   };
   return select
 }
@@ -405,7 +414,7 @@ function create_checkboxes(dict, filter_id) {
 }
 
 function create_text_set(filter_id) {
-  var lookup = $('#'+filter_id+'_el0').children("option:selected").val();
+  var lookup = $('#'+filter_id+'_el0').find('select').children("option:selected").val();
   var i_lookups = ['exact', 'contains','startswith','endswith', 'regex'];
   const fe = filter_register[filter_id];
   for (let i = 1, len = fe.length; i < len; ++i) {

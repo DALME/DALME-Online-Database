@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+import json
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render
@@ -94,10 +95,6 @@ class DTListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'action' in self.request.GET:
-            context['action'] = {'action': self.request.GET['action'], 'data': self.request.GET['data']}
-        else:
-            context['action'] = None
         breadcrumb = self.get_breadcrumb()
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
@@ -133,7 +130,7 @@ class DTListView(TemplateView):
     def get_fields_dict(self, _list, *args, **kwargs):
         fields = ['field__short_name', 'field__name', 'orderable', 'visible', 'searchable', 'render_exp', 'dte_type', 'dte_options',
                   'dte_message', 'dt_class_name', 'dt_width', 'dt_name', 'dte_name', 'dte_opts', 'is_filter', 'filter_options',
-                  'filter_mode', 'filter_type', 'filter_lookup', 'order']
+                  'filter_type', 'filter_lookup', 'order']
         qset = DT_fields.objects.filter(list=_list.id).order_by('order').values(*fields)
         fields_dict = {}
         for i in qset:
@@ -270,8 +267,8 @@ class DTListView(TemplateView):
                     filter['type'] = dict['filter_type']
                 else:
                     filter['type'] = 'text'
-                # if dict.get('filter_lookup') is not None:
-                #     filter['lookup'] = dict['filter_lookup']
+                if dict.get('filter_lookup') is not None:
+                    filter['lookup'] = dict['filter_lookup']
                 if filter['type'] in types_w_lookups:
                     filter['lookups'] = functions.get_filter_lookups(filter['type'])
                 if filter['type'] == 'check' or filter['type'] == 'select':
@@ -366,7 +363,7 @@ class ModelLists(DTListView):
             context['dt_fieldsets'] = {
                 'DT Fields': [3, 4, 5, 6, 7, 8, 9, 10],
                 'DTE Fields': [11, 12, 13, 14, 15],
-                'Filter Fields': [16, 17, 18, 19, 20]
+                'Filter Fields': [16, 17, 18, 19]
                 }
             qs = DT_list.objects.all().order_by('name')
             parent_class_opt = {i.id: i.name for i in qs}
@@ -471,28 +468,36 @@ class SourceList(DTListView):
         return list_name
 
     def get_breadcrumb(self, *args, **kwargs):
-        type = self.get_list_name()
-        if type == 'all':
+        _type = self.get_list_name()
+        if _type == 'all':
             breadcrumb = [('Sources', ''), ('All Sources', '/sources')]
-        elif type == 'inventories':
+        elif _type == 'inventories':
             breadcrumb = [('Repository', ''), ('Inventories', '/sources?type=inventories')]
         else:
-            list_label = DT_list.objects.get(short_name=type).name
-            breadcrumb = [('Sources', ''), (list_label, '/sources?type='+type)]
+            list_label = DT_list.objects.get(short_name=_type).name
+            breadcrumb = [('Sources', ''), (list_label, '/sources?type='+_type)]
         return breadcrumb
 
     def get_dt_ajax_str(self, _list, *args, **kwargs):
         base_url = _list.api_url
-        type = _list.short_name
-        if type == 'sources':
+        _type = _list.short_name
+        if _type == 'sources':
             dt_ajax_str = '"'+base_url+'?format=json"'
         else:
-            dt_ajax_str = '"'+base_url+'?format=json&type='+type+'"'
+            dt_ajax_str = '"'+base_url+'?format=json&type='+_type+'"'
         return dt_ajax_str
 
     def get_dt_fields(self, _list, *args, **kwargs):
         dt_fields = DT_fields.objects.filter(list=_list).values_list('field__short_name', flat=True)
         return dt_fields
+
+    def get_modules(self, *args, **kwargs):
+        if 'type' in self.request.GET:
+            if self.request.GET['type'] == 'inventories':
+                module_list = ['filters']
+            else:
+                module_list = None
+        return module_list
 
 
 @method_decorator(login_required, name='dispatch')
@@ -501,6 +506,21 @@ class SourceDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if 'workset' in self.request.GET:
+            workset_obj = Workset.objects.get(pk=self.request.GET['workset'])
+            qset = json.loads(workset_obj.qset)
+            seq = self.request.GET.get('seq', 1)
+            workset = {
+                'workset_id': self.request.GET['workset'],
+                'current': str(seq),
+                'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
+                'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
+                'total': len(qset),
+                'endpoint': workset_obj.endpoint,
+                'progress': round(workset_obj.progress, 2)
+            }
+            context['workset'] = workset
+            # listOfKeys = [key  for (key, value) in dictOfWords.items() if value == 43]
         breadcrumb = self.get_breadcrumb()
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
@@ -747,7 +767,7 @@ class LanguageList(DTListView):
 class ImageList(DTListView):
     breadcrumb = [('Repository', ''), ('Images', '/images')]
     list_name = 'images'
-    dt_field_list = ['ref', 'field8', 'field79', 'has_image', 'field12', 'creation_date', 'created_by', 'field3', 'collections', 'field51']
+    # dt_field_list = ['ref', 'field8', 'field79', 'has_image', 'field12', 'creation_date', 'created_by', 'field3', 'collections', 'field51']
     dt_editor_options = {'idSrc': '"id"'}
     dte_field_list = ['field8', 'field79', 'field12', 'field3', 'collections']
     dt_options = {

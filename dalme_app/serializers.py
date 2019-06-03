@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
                               rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              Country, City)
+                              Country, City, Tag)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
@@ -29,7 +29,7 @@ class DTFieldsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DT_fields
         fields = ('id', 'list', 'field', 'render_exp', 'orderable', 'visible', 'searchable', 'dt_name', 'dte_name', 'dte_type',
-                  'dte_options', 'dte_opts', 'dte_message', 'is_filter', 'filter_type', 'filter_mode', 'filter_options',
+                  'dte_options', 'dte_opts', 'dte_message', 'is_filter', 'filter_type', 'filter_options',
                   'filter_lookup', 'field_label', 'dt_class_name', 'dt_width', 'order')
 
     def to_representation(self, instance):
@@ -192,6 +192,15 @@ class SimpleAttributeSerializer(serializers.ModelSerializer):
         return ret
 
 
+class TagSerializer(serializers.ModelSerializer):
+    """ Serializer for tag data """
+    tag_type_name = serializers.ChoiceField(choices=Tag.TAG_TYPES, source='get_tag_type_display', required=False)
+
+    class Meta:
+        model = Tag
+        fields = ('tag_type', 'tag', 'tag_group', 'tag_type_name')
+
+
 class AttributeSerializer(serializers.ModelSerializer):
     """ DT serializer for attribute data """
 
@@ -215,11 +224,12 @@ class SourceSerializer(DynamicSerializer):
     parent_name = serializers.StringRelatedField(source='parent', read_only=True, required=False)
     attributes = AttributeSerializer(many=True, required=False)
     no_folios = serializers.IntegerField(required=False)
+    tags = TagSerializer(many=True, required=False)
 
     class Meta:
         model = Source
         fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'is_inventory',
-                  'attributes', 'no_folios')
+                  'attributes', 'no_folios', 'tags')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
