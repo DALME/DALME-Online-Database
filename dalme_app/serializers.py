@@ -93,17 +93,59 @@ class AsyncTaskSerializer(serializers.ModelSerializer):
 class WorksetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workset
-        fields = '__all__'
+        fields = ('id', 'name', 'description', 'owner', 'endpoint', 'progress')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['workset'] = '<div class="workset-title">{}</div><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['name'], ret['description'], ret['endpoint'])
+        progress = ret['progress']
+        angle = round((progress * 360 / 100))
+        if angle <= 180:
+            right_style = 'style="display:none;"'
+            pie_style = ''
+        else:
+            right_style = 'style="transform:rotate(180deg);"'
+            pie_style = 'style="clip:rect(auto, auto, auto, auto);"'
+        left_style = 'style="transform:rotate(' + str(angle) + 'deg);"'
+        progress_circle = '<div class="pie-wrapper"><span class="label">{}<span class="smaller">%</span></span><div class="pie" {}>'.format(round(progress), pie_style)
+        progress_circle += '<div class="left-side half-circle" {}></div><div class="right-side half-circle" {}></div></div></div>'.format(left_style, right_style)
+        ret['progress_circle'] = progress_circle
+        return ret
 
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ('title', 'task_list', 'due_date', 'completed', 'completed_date', 'created_by', 'assigned_to', 'description', 'workset', 'url', 'creation_timestamp', 'overdue_status')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['task'] = '<div class="task-title">{}</div><div class="task-description">{}</div>'.format(ret['title'], ret['description'])
+        attachments = ''
+        if ret['workset'] is not None:
+            attachments += '<a href="/worksets/{}" class="task-attachment">Workset</a>'.format(ret['workset'])
+        if ret['url'] is not None:
+            attachments += '<a href="{}" class="task-attachment">URL</a>'.format(ret['url'])
+        ret['attachments'] = attachments
+        overdue = ret.pop('overdue_status')
+        dates = '<div class="task-date">Cre: ' + instance.creation_timestamp.strftime('%d-%b-%Y') + '</div>'
+        if ret['due_date'] is not None:
+            dates += '<div class="task-date task-'
+            if overdue:
+                dates += 'over'
+            dates += 'due">Due: ' + instance.due_date.strftime('%d-%b-%Y') + '</div>'
+        if ret['completed_date'] is not None:
+            dates += '<div class="task-date task-completed">Com: ' + instance.completed_date.strftime('%d-%b-%Y') + '</div>'
+        ret['dates'] = dates
+        if ret['assigned_to'] is None:
+            ret['assigned_to'] = instance.task_list.group.name
+        else:
+            ret['assigned_to'] = instance.assigned_to.profile.full_name
+        return ret
 
 
 class TaskListSerializer(serializers.ModelSerializer):
-    task_count = serializers.IntegerField()
+    task_count = serializers.IntegerField(required=False)
 
     class Meta:
         model = TaskList
@@ -112,7 +154,10 @@ class TaskListSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['group'] = Group.objects.get(pk=ret['group']).name
-        task_count = ret.pop('task_count')
+        if 'task_count' in ret:
+            task_count = ret.pop('task_count')
+        else:
+            task_count = 0
         ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div>\
                        <div class="badge badge-primary badge-pill align-self-end">'+str(task_count)+'</div></div>'
         return ret

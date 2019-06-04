@@ -5,12 +5,18 @@
       <i class="fa fa-bars fa-fw"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="workset-menu">
-      <a class="dropdown-item" href="#">
-        <i class="fas fa-user fa-fw mr-2 text-gray-400"></i> Show List
+      <div class="dropdown-title">Workset: {{ name }}</div>
+      <div class="dropdown-text">{{ description }}</div>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="#" onclick="ws_mark('mark_done')">
+        <i class="fas fa-check fa-fw mr-2 text-gray-400"></i> Mark Done
+      </a>
+      <a class="dropdown-item" href="#" onclick="ws_mark('mark_undone')">
+        <i class="fas fa-times fa-fw mr-2 text-gray-400"></i> Mark Not Done
       </a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="#">
-        <i class="fas fa-sign-out-alt fa-fw mr-2 text-gray-400"></i> Mark Undone
+      <a class="dropdown-item" href="#" onclick="ws_show_list()">
+        <i class="fas fa-clipboard-list fa-fw mr-2 text-gray-400"></i> Show List
       </a>
     </div>
     <button class="btn-controller workset-controller-next" onclick="ws_next();"><i class="fa fa-caret-right fa-fw"></i></button>

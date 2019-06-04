@@ -26,15 +26,6 @@ function ws_next() {
   }
 }
 
-// function ws_next() {
-//   if (workset['next_id'] != 'none') {
-//       ws_mark('mark_done');
-//       let next_seq = parseInt(workset['current'])+1;
-//       let url = '/'+workset['endpoint']+'/'+workset['next_id']+'/?workset='+workset['workset_id']+'&seq='+next_seq;
-//       window.location.href = url;
-//   }
-// }
-
 function ws_prev() {
   if (workset['prev_id'] != 'none') {
       let prev_seq = parseInt(workset['current'])-1;

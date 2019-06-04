@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 import json
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -14,9 +14,9 @@ from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_
                               rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, Language,
                               Attribute_type, Country, rs_collection)
 from haystack.generic_views import SearchView
-from django.http import HttpResponse, HttpResponseNotAllowed
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 
 
 class OAuthCallback_WP(OAuthCallback):
@@ -492,11 +492,10 @@ class SourceList(DTListView):
         return dt_fields
 
     def get_modules(self, *args, **kwargs):
+        module_list = None
         if 'type' in self.request.GET:
             if self.request.GET['type'] == 'inventories':
                 module_list = ['filters']
-            else:
-                module_list = None
         return module_list
 
 
@@ -507,20 +506,18 @@ class SourceDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if 'workset' in self.request.GET:
-            workset_obj = Workset.objects.get(pk=self.request.GET['workset'])
-            qset = json.loads(workset_obj.qset)
-            seq = self.request.GET.get('seq', 1)
             workset = {
                 'workset_id': self.request.GET['workset'],
-                'current': str(seq),
-                'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
-                'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
-                'total': len(qset),
-                'endpoint': workset_obj.endpoint,
-                'progress': round(workset_obj.progress, 2)
+                'name': self.request.GET['name'],
+                'description': self.request.GET['description'],
+                'current': self.request.GET['current'],
+                'prev_id': self.request.GET['prev_id'],
+                'next_id': self.request.GET['next_id'],
+                'total': self.request.GET['total'],
+                'endpoint': self.request.GET['endpoint'],
+                'progress': self.request.GET['progress']
             }
             context['workset'] = workset
-            # listOfKeys = [key  for (key, value) in dictOfWords.items() if value == 43]
         breadcrumb = self.get_breadcrumb()
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
@@ -927,27 +924,128 @@ class Index(TemplateView):
         page_title = 'Dashboard'
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
-        tables = []
-        if Workset.objects.filter(owner=self.request.user).exists():
-            context['worksets'] = Workset.objects.filter(owner=self.request.user)
-            tables.append(['worksets', 'fa-layer-group', 'My Worksets'])
-        if Task.objects.filter(assigned_to=self.request.user.id, completed=0).exists():
-            context['tasks'] = Task.objects.filter(assigned_to=self.request.user.id, completed=0)
-            tables.append(['tasks', 'fa-tasks', 'My Tasks'])
-        if tables != []:
-            context['tables'] = tables
-            context['table_options'] = {
+        # tables = []
+        # if Workset.objects.filter(owner=self.request.user).exists():
+        #     context['worksets'] = Workset.objects.filter(owner=self.request.user)
+        #     tables.append(['worksets', 'fa-layer-group', 'My Worksets'])
+        # if Task.objects.filter(assigned_to=self.request.user.id, completed=0).exists():
+        #     context['tasks'] = Task.objects.filter(assigned_to=self.request.user.id, completed=0)
+        #     tables.append(['tasks', 'fa-tasks', 'My Tasks'])
+        context['tables'] = [
+            ['worksets', 'fa-layer-group', 'My Worksets', {
+                'ajax': '"/api/worksets/?format=json"',
+                'serverSide': 'true',
                 'responsive': 'true',
-                'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't>"''',
-                'stateSave': 'true',
+                'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>r><'card-body't><'sub-card-footer'i>"''',
                 'select': {'style': 'single'},
-                'scrollY': 200,
+                'scrollResize': 'true',
+                'scrollY': '"30vh"',
+                'scrollX': '"100%"',
                 'deferRender': 'true',
                 'scroller': 'true',
-                'language': '{searchPlaceholder: "Search"}'
+                'rowId': '"id"',
+                'columnDefs': [
+                      {
+                          'title': '"Id"',
+                          'targets': 0,
+                          'data': '"id"',
+                          'visible': 0
+                      },
+                      {
+                          'title': '"Workset"',
+                          'targets': 1,
+                          'data': '"workset"'
+                      },
+                      {
+                          'title': '"Progress"',
+                          'targets': 2,
+                          'data': '"progress_circle"',
+                      }
+                      ]
                 }
-        context['cards'] = self.default_cards
-        context['counters'] = functions.get_counters(['wiki_articles', 'dam_assets', 'inventories'])
+             ],
+            ['tasks', 'fa-user-check', 'My Tasks', {
+                'ajax': '"/api/tasks/?format=json"',
+                'serverSide': 'true',
+                'responsive': 'true',
+                'dom': '''"<'sub-card-header pr-2 d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>"''',
+                'select': {'style': 'single'},
+                'scrollY': '"40vh"',
+                'scrollX': '"100%"',
+                'deferRender': 'true',
+                'scroller': 'true',
+                'language': '{searchPlaceholder: "Search"}',
+                'rowId': '"id"',
+                'columnDefs': [
+                      {
+                          'title': '"Task"',
+                          'targets': 0,
+                          'data': '"task"',
+                          'visible': 1,
+                          "orderData": '[ 6, 7 ]',
+                          'searchable': 0
+                      },
+                      {
+                          'title': '"Dates"',
+                          'targets': 1,
+                          'data': '"dates"',
+                          'visible': 1,
+                          "orderData": '[ 5, 7 ]',
+                          'searchable': 0
+                      },
+                      {
+                          'title': '"Assigned to"',
+                          'targets': 2,
+                          'data': '"assigned_to"',
+                          'visible': 1,
+                          'searchable': 0
+                      },
+                      {
+                          'title': '"Attachments"',
+                          'targets': 3,
+                          'data': '"attachments"',
+                          'visible': 1,
+                          'orderable': 0,
+                          'searchable': 0,
+                      },
+                      {
+                          'title': '"Done"',
+                          'targets': 4,
+                          'data': '"completed"',
+                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+                          'className': '"td-center"',
+                          'width': '"19px"',
+                          'visible': 1,
+                          'searchable': 0
+                      },
+                      {
+                          'title': '"Due date"',
+                          'targets': 5,
+                          'data': '"due_date"',
+                          'visible': 0,
+                      },
+                      {
+                          'title': '"Title"',
+                          'targets': 6,
+                          'data': '"title"',
+                          'visible': 0,
+                      },
+                      {
+                          'title': '"Created"',
+                          'targets': 7,
+                          'data': '"creation_timestamp"',
+                          'visible': 0,
+                      },
+                      {
+                          'title': '"Description"',
+                          'targets': 8,
+                          'data': '"description"',
+                          'visible': 0,
+                      }
+                  ]
+                }
+             ]
+        ]
         return context
 
 
@@ -968,6 +1066,30 @@ class UIRefMain(View):
             breadcrumb = [('UI Reference', ''), (self.request.GET['m'].capitalize(), template)]
             view = UIRef.as_view(template_name=template)
         return view(request, breadcrumb=breadcrumb)
+
+
+@method_decorator(login_required, name='dispatch')
+class WorksetsRedirect(View):
+    def get(self, request, *args, **kwargs):
+        workset = get_object_or_404(Workset, pk=kwargs['pk'])
+        qset = json.loads(workset.qset)
+        seq = str(workset.current_record + 1)
+        seq_id = qset[seq]['pk']
+        para = {
+            'workset': workset.id,
+            'name': workset.name,
+            'description': workset.description,
+            'current': seq,
+            'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
+            'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
+            'total': len(qset),
+            'endpoint': workset.endpoint,
+            'progress': round(workset.progress, 2)
+        }
+        url = '/{}/{}/?'.format(workset.endpoint, seq_id)
+        url += '&'.join(['{}={}'.format(key, value) for key, value in para.items()])
+        # return redirect('/website/')
+        return HttpResponseRedirect(url)
 
 
 class UIRef(TemplateView):
@@ -1032,19 +1154,19 @@ class TasksList(TemplateView):
         context['task_count'] = task_count
         context['tables'] = [
             ['lists', 'fa-tasks', 'Lists', {
-                'ajax': '"../api/tasklists/?format=json"',
+                'ajax': '"/api/tasklists/?format=json"',
                 'serverSide': 'true',
                 'responsive': 'true',
                 'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>r><'card-body't><'sub-card-footer'i>"''',
-                'stateSave': 'true',
                 'select': {'style': 'single'},
-                'scrollY': '"75vh"',
+                'scrollResize': 'true',
+                'scrollY': '"82vh"',
+                'scrollX': '"100%"',
                 'deferRender': 'true',
                 'scroller': 'true',
-                'rowGroup': {
-                    'dataSrc': "group"
-                },
                 'rowId': '"id"',
+                'order': '[ 1, "asc" ]',
+                'rowGroup': '{dataSrc: \'group\'}',
                 'columnDefs': [
                       {
                           'title': '"List"',
@@ -1060,14 +1182,15 @@ class TasksList(TemplateView):
                       ]
                 }
              ],
-            ['tasks', 'fa-check-square', 'Tasks', {
-                'ajax': '"../api/tasks/?format=json"',
+            ['tasks', 'fa-calendar-check', 'Tasks', {
+                'ajax': '"/api/tasks/?format=json"',
                 'serverSide': 'true',
                 'responsive': 'true',
                 'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>"''',
-                'stateSave': 'true',
                 'select': {'style': 'single'},
-                'scrollY': '"75vh"',
+                'scrollResize': 'true',
+                'scrollY': '"82vh"',
+                'scrollX': '"100%"',
                 'deferRender': 'true',
                 'scroller': 'true',
                 'language': '{searchPlaceholder: "Search"}',
@@ -1076,32 +1199,67 @@ class TasksList(TemplateView):
                       {
                           'title': '"Task"',
                           'targets': 0,
-                          'data': '"title"'
+                          'data': '"task"',
+                          'visible': 1,
+                          "orderData": '[ 6, 7 ]',
+                          'searchable': 0
                       },
                       {
-                          'title': '"Description"',
+                          'title': '"Dates"',
                           'targets': 1,
-                          'data': '"description"'
-                      },
-                      {
-                          'title': '"Due date"',
-                          'targets': 2,
-                          'data': '"due_date"'
+                          'data': '"dates"',
+                          'visible': 1,
+                          "orderData": '[ 5, 7 ]',
+                          'searchable': 0
                       },
                       {
                           'title': '"Assigned to"',
+                          'targets': 2,
+                          'data': '"assigned_to"',
+                          'visible': 1,
+                          'searchable': 0
+                      },
+                      {
+                          'title': '"Attachments"',
                           'targets': 3,
-                          'data': '"assigned_to"'
+                          'data': '"attachments"',
+                          'visible': 1,
+                          'orderable': 0,
+                          'searchable': 0,
                       },
                       {
-                          'title': '"Created by"',
+                          'title': '"Done"',
                           'targets': 4,
-                          'data': '"created_by"'
+                          'data': '"completed"',
+                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
+                          'className': '"td-center"',
+                          'width': '"19px"',
+                          'visible': 1,
+                          'searchable': 0
                       },
                       {
-                          'title': '"Created on"',
+                          'title': '"Due date"',
                           'targets': 5,
-                          'data': '"creation_timestamp"'
+                          'data': '"due_date"',
+                          'visible': 0,
+                      },
+                      {
+                          'title': '"Title"',
+                          'targets': 6,
+                          'data': '"title"',
+                          'visible': 0,
+                      },
+                      {
+                          'title': '"Created"',
+                          'targets': 7,
+                          'data': '"creation_timestamp"',
+                          'visible': 0,
+                      },
+                      {
+                          'title': '"Description"',
+                          'targets': 8,
+                          'data': '"description"',
+                          'visible': 0,
                       }
                   ]
                 }

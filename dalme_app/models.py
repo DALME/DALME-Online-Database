@@ -508,6 +508,10 @@ class TaskList(dalmeIntid):
         # Prevents (at the database level) creation of two lists with the same slug in the same group
         unique_together = ("group", "slug")
 
+    def save(self, **kwargs):
+        self.slug = '_'.join(self.name.lower().split())
+        super(TaskList, self).save()
+
 
 class Task(dalmeIntid):
     title = models.CharField(max_length=140)
@@ -521,6 +525,7 @@ class Task(dalmeIntid):
     priority = models.PositiveIntegerField(blank=True, null=True)
     workset = models.ForeignKey(Workset, on_delete=models.PROTECT, null=True)
     position = models.CharField(max_length=255, blank=True, default=None)
+    url = models.CharField(max_length=255, null=True, default=None)
 
     # Has due date for an instance of this object passed?
     def overdue_status(self):

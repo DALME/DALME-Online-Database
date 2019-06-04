@@ -42,6 +42,10 @@ parsererror div {
   font-size: 14px !important;
 }
 
+tei-TEI {
+    width: 100%
+}
+
 .img-placeholder {
   height: 80vh;
   /* background-color: #8a8a8a; */
@@ -233,7 +237,6 @@ a {
   padding-top: 3px;
   padding-bottom: 1px;
   background: linear-gradient(to right, #e3f0f5, #e3f0f5 49%, #ffffff 51%, #ffffff);
-  color: #376783;
   font-weight: 600;
   font-size: 13px;
 }
@@ -251,6 +254,10 @@ a {
 
 .card-full {
   height: calc(100vh - 163px);
+}
+
+.card-full-tasks {
+  height: calc(100vh - 72px);
 }
 
 .card-header {
@@ -550,6 +557,19 @@ table.dataTable {
   background-color: #e8e9ec;
   border-bottom: 1px solid #a5a5a5;
   border-top: 1px solid #a5a5a5;
+  height: 36px;
+  color: #376783;
+}
+
+.sub-card-header-embed-top {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #e8e9ec;
+  border-bottom: 1px solid #a5a5a5;
   height: 36px;
   color: #376783;
 }
@@ -1036,10 +1056,6 @@ div.DTE_Field_Type_textarea textarea {
   padding: 4px 8px;
 }
 
-.dt-toolbar-text {
-
-}
-
 .dt-btn-group {
   margin-top: 1px;
   margin-right: 5px;
@@ -1346,9 +1362,18 @@ div.DTE_Field_Type_textarea textarea {
   line-height: 10px;
 }
 
+.badge-primary {
+  background-color: #1b5f94;
+  color: #ffffff;
+}
+
 /*DataTables general fixes */
 div.DTS div.dataTables_scrollBody {
   background: none !important;
+}
+
+div.dts tbody td {
+  white-space: normal !important;
 }
 
 table.dataTable tr.dtrg-group td {
@@ -1654,6 +1679,21 @@ li.search-field input.default {
   background-color: rgba(0,0,0,.075)
 }
 
+.dropdown-title {
+  padding-left: 16px;
+  padding-right: 16px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: #376783;
+  margin-bottom: 3px;
+}
+
+.dropdown-text {
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
 .page-item.active .page-link {
   background-color: #0361aa !important;
   border-color: #0361aa !important;
@@ -1880,10 +1920,99 @@ li#searchIcon.show a {
   background-color: rgba(0,0,0,.075) !important;
 }
 
-/* topbar tasks */
+/* worksets */
+
+.workset-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b5f94;
+  margin-top: -5px;
+}
+
+.workset-endpoint {
+  border: 1px solid #949a99;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #ebebeb;
+  color: #707575;
+  white-space: nowrap;
+  margin-top: 5px;
+  display: inline-block;
+}
+
+/* tasks */
+
+.task-title {
+  padding-left: 5px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b5f94;
+  margin-top: -5px;
+}
+
+.task-description {
+  padding-left: 5px;
+  margin-bottom: -3px;
+}
+
+.task-date {
+  border: 1px solid #949a99;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #ebebeb;
+  color: #707575;
+  white-space: nowrap;
+  margin-bottom: 3px;
+}
+
+.task-due {
+  border-color: #896f2f !important;
+  background-color: #eedba4 !important;
+  color: #816132 !important;
+}
+
+.task-overdue {
+  border-color: #853933 !important;
+  background-color: #d9b9bd !important;
+  color: #943737 !important;
+}
+
+.task-completed {
+  border-color: #5d9b7e !important;
+  background-color: #dfe7e5 !important;
+  color: #367451 !important;
+}
+
+.task-attachment {
+  border: 1px solid #436784;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 5px;
+  text-transform: uppercase;
+  background-color: #dce8ee;
+  color: #486e8d;
+  white-space: nowrap;
+}
+
+.task-attachment:hover {
+  text-decoration: none;
+  border: 1px solid #253949;
+  background-color: #bad2dd;
+  color: #253949;
+}
+
+/* topbar tasks popup */
 
 .dropdown-tasks {
-  width: 320px !important;
+  width: 420px !important;
   padding: 0;
 }
 
@@ -1895,23 +2024,72 @@ li#searchIcon.show a {
   color: #888;
   border-bottom: 1px dotted #a5a5a5;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-task-add {
+  margin-left: auto;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 8px;
+  color: #fff;
+}
+
+.dropdown-task-add i {
+  color: #888;
+}
+
+.dropdown-task-add:hover {
+  border-color: #1b5f94;
+  color: #1b5f94;
+}
+
+.dropdown-task-add:hover i {
+  color: #1b5f94;
 }
 
 .dropdown-tasks-item {
   border-bottom: 1px dotted #a5a5a5;
+  display: flex;
+}
+
+.dropdown-tasks-text {
+  padding: 5px 16px;
+}
+
+.dropdown-task-title {
+  font-size: 14px;
   font-weight: 600;
-  color: #5c5c5c;
-  font-size: 16px;
+  color: #1b5f94;
 }
 
-.dropdown-tasks-item:hover {
-  text-decoration: none;
-  color: #0361aa;
-  background-color: #f0f8ff;
+.dropdown-task-title:hover {
+  color: #1b5f94;
 }
 
-.dropdown-tasks-item a:hover {
-  text-decoration: none;
+.dropdown-task-description {
+  font-size: 13px;
+}
+
+.dropdown-tasks-info {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-right: 10px;
+  margin-left: auto;
+}
+
+.dropdown-tasks-pill {
+  border: 1px solid #949a99;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #ebebeb;
+  color: #707575;
+  white-space: nowrap;
+  margin-bottom: 3px;
 }
 
 .dropdown-tasks-action {
@@ -1932,53 +2110,22 @@ li#searchIcon.show a {
 
 .dropdown-tasks-action:hover {
   text-decoration: none;
-  background-color: #0361aa;
-  border-color: #0361aa;
-  color: #fff;
-}
-
-.dropdown-tasks-info {
-  align-self: flex-start;
-  flex-grow: 4;
-  padding-top: 6px;
-  padding-bottom: 10px;
-  padding-left: 16px;
-  padding-right: 12px;
+  background-color: #f4f4f4;
+  color: #1b5f94;
 }
 
 .dropdown-tasks-buttons {
-  width: 33px;
-  margin-left: auto;
-  height: auto;
-  margin-top: 0;
-  margin-bottom: 0;
-  display: block;
-  border-bottom: 1px transparent;
+  padding-top: 15px;
+  background-color: #f4f4f4;
 }
 
-.dropdown-tasks-btn-bb {
-  border-bottom: 1px dotted #d8d8d8 !important;
+.btn_task_complete {
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
-.dropdown-tasks-btn {
-  margin: 0;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  padding-left: 8px;
-  padding-right: 8px;
-  font-size: 13px;
-  border: none;
-  border-left: 1px dotted #d8d8d8;
-  color: #a5a5a5;
-  background-color: #fff;
-  border-radius: 0;
-  height: 50%;
-}
-
-.dropdown-tasks-btn:hover {
-  background-color: #0361aa;
-  border-color: #0361aa;
-  color: #fff;
+.btn_task_complete:hover {
+  color: #1b5f94;
 }
 
 .dropdown-tasks-empty {
@@ -1987,43 +2134,77 @@ li#searchIcon.show a {
   text-align: center;
 }
 
-.dropdown-tasks-list {
-  border: 1px solid #b8bcbb;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 0px 5px;
-  text-transform: uppercase;
-  background-color: #f4f4f4;
-  color: #878c8c;
-  align-self: flex-start;
-  margin-right: auto;
+/* progress pies */
+
+.pie-wrapper {
+  height: 65px;
+  width: 65px;
+  float: left;
+  position: relative;
 }
 
-.dropdown-tasks-due {
-  border: 1px solid #896f2f;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 0px 5px;
-  text-transform: uppercase;
-  background-color: #eedba4;
-  color: #816132;
-  align-self: flex-end;
+.pie-wrapper:nth-child(3n + 1) {
+  clear: both;
 }
 
-.dropdown-tasks-overdue {
-  border: 1px solid #853933;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 0px 5px;
-  text-transform: uppercase;
-  background-color: #d9b9bd;
-  color: #943737;
-  align-self: flex-end;
+.pie-wrapper .pie {
+  height: 100%;
+  width: 100%;
+  clip: rect(0, 65px, 65px, 37px);
+  left: 0;
+  position: absolute;
+  top: 0;
 }
 
+.pie-wrapper .pie .half-circle {
+  height: 100%;
+  width: 100%;
+  border: 8px solid #ca843f;
+  border-radius: 50%;
+  clip: rect(0, 37px, 65px, 0);
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+
+.pie-wrapper .label {
+  background: #436585;
+  border-radius: 50%;
+  bottom: 7px;
+  color: #ecf0f1;
+  cursor: default;
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  left: 7px;
+  line-height: 53px;
+  position: absolute;
+  right: 7px;
+  text-align: center;
+  top: 7px;
+}
+
+.pie-wrapper .label .smaller {
+  color: #bdc3c7;
+  font-size: 12px;
+}
+
+.pie-wrapper .shadow {
+  height: 100%;
+  width: 100%;
+  border: 0.5em solid #bdc3c7;
+  border-radius: 50%;
+}
+
+/* task viewer */
+
+.task-viewer-embed {
+  border-left: 1px solid #a5a5a5;
+}
+
+.task-viewer {
+
+}
 
 /* topbar search form */
 .search-slider {

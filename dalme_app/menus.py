@@ -69,22 +69,6 @@ def sidebar_item(wholeMenu, state, depth=0, text=None, iconClass=None, link=None
     return currentItem
 
 
-# def tile_item(wholeMenu, state, colourClass=None, iconClass=None, counter=None, counterTitle=None,
-#               linkTarget=None, linkTitle=None, permissions=None):
-#     """ creates tiles for the dashboard homepage """
-#     try:
-#         counter = functions.get_count(counter)
-#     except:
-#         counter = 'n/a'
-#     currentItem = '<div class="col-xl-3 col-sm-6 mb-3">'
-#     currentItem += '<div class="card shadow text-dark-grey bg-{}-soft o-hidden h-100"><div class="card-body">'.format(colourClass)
-#     currentItem += '<div class="card-body-icon"><i class="fas {} fa-comments"></i></div>'.format(iconClass)
-#     currentItem += '<div class="mr-5"><b>{}</b> {}</div></div>'.format(counter, counterTitle)
-#     currentItem += '<a class="card-footer text-dark-grey clearfix small z-1" href="{}">'.format(linkTarget)
-#     currentItem += '<span class="float-left">{}</span>'.format(linkTitle)
-#     currentItem += '<span class="float-right"><i class="fas fa-angle-right"></i></span></a></div></div>'
-#     return currentItem
-
 def dropdown_item(wholeMenu, state, topMenu=None, infoPanel=None, title=None, itemClass=None, iconClass=None,
                   childrenIconClass=None, children=None, text=None, link=None, action=None, divider=None, section=None,
                   counter=None, circleColour=None, moreText=None, moreLink=None, permissions=None, tooltip=None):
@@ -128,23 +112,24 @@ def dropdown_tasks(wholeMenu, user_id):
         counter = tasks.count()
         tasks = tasks[:5]
         for task in tasks:
-            dropmenu += '<div class="dropdown-tasks-item d-flex"><div class="dropdown-tasks-info">\
-                        <a href="/tasks/{}">'.format(task.id)
-            dropmenu += '<div class="mb-1">{}</div><div class="d-flex"><div class="dropdown-tasks-list \
-                        float-left">{}</div>'.format(task.title, task.task_list)
+            dropmenu += '<div class="dropdown-tasks-item">\
+                            <div class="dropdown-tasks-text">\
+                                <a href="/tasks/{}" class="dropdown-task-title">{}</a>'.format(task.id, task.title)
+            dropmenu += '<div class="dropdown-task-description">{}</div></div>'.format(task.description)
+            dropmenu += '<div class="dropdown-tasks-info"><div class="dropdown-tasks-pill">{}</div>'.format(task.task_list)
             if task.due_date:
+                dropmenu += '<div class="dropdown-tasks-pill task-'
                 if task.overdue_status():
                     overdue = True
-                    dropmenu += '<div class="dropdown-tasks-overdue float-right">Due: {}</div>'.format(task.due_date)
-                else:
-                    dropmenu += '<div class="dropdown-tasks-due float-right">Due: {}</div>'.format(task.due_date)
-            dropmenu += '</div></div></a><div class="dropdown-tasks-buttons"><a class="btn dropdown-tasks-btn \
-                        dropdown-tasks-btn-bb" href=""><i class="fa fa-pen fa-fw"></i></a><a class="btn dropdown-tasks-btn" \
-                        href="{% url "todo:task_toggle_done" task.id %}"><i class="fa fa-check fa-fw"></i></a></div></div>'
+                    dropmenu += 'over'
+                dropmenu += 'due">Due: {}</div>'.format(task.due_date.strftime('%d-%b-%Y'))
+            dropmenu += '</div><div class="dropdown-tasks-buttons"><div class="btn_task_complete" id="{}" onclick="task_set_state({}, {})">\
+                        <i class="far fa-square fa-lg"></i></div></div></div>'.format('task_'+str(task.id), task.id, 'mark_done')
     else:
-        dropmenu += '<div class="dropdown-tasks-empty">No tasks are currently assigned to you.</div>'
-    dropmenu += '<a class="dropdown-tasks-action dropdown-tasks-action-rb" href="{}">{}</a>'.format('/tasks/mine', 'Show all my tasks')
-    dropmenu += '<a class="dropdown-tasks-action" href="#" onclick="{}">{}</a></div></li>'.format('createTask()', 'Add new task')
+        dropmenu += '<div class="dropdown-tasks-empty">There are currently no tasks in your queue.</div>'
+    dropmenu += '<a class="dropdown-tasks-action dropdown-tasks-action-rb" href="{}">{}</a>'.format('/tasks/mine', 'My Tasks')
+    dropmenu += '<a class="dropdown-tasks-action" href="{}">{}</a></div></li>'.format('/tasks/', 'All Tasks')
+
     button = '<li class="nav-item dropdown no-arrow topbar-border-left" data-toggle="tooltip" data-placement="bottom" title="Your task list" \
               data-delay=\'{"show":"1000", "hide":"0"}\'>'
     button += '<a class="nav-link dropdown-toggle" href="#" id="tasksDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" \
@@ -156,7 +141,7 @@ def dropdown_tasks(wholeMenu, user_id):
         else:
             button += '<span class="badge topbar-badge">{}</span>'.format(counter)
     button += '</a><div class="dropdown-tasks dropdown-menu dropdown-menu-right animated--grow-in" aria-labelledby="tasksDropdown">'
-    button += '<div class="dropdown-tasks-header">Your Tasks</div>'
+    button += '<div class="dropdown-tasks-header">Your Tasks <div class="dropdown-task-add" onclick="create_task()">Add New <i class="fa fa-plus fa-fw"></i></div></div>'
     wholeMenu += button
     wholeMenu += dropmenu
     return wholeMenu

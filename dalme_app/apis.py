@@ -107,9 +107,13 @@ class DTViewSet(viewsets.ModelViewSet):
         data_dict = data_dict[0][1]
         serializer = self.get_serializer(data=data_dict)
         if serializer.is_valid():
-            serializer.save()
-            result['data'] = serializer.data
-            status = 201
+            try:
+                serializer.save()
+                result['data'] = serializer.data
+                status = 201
+            except Exception as e:
+                result['error'] = 'The following error occured while trying to save the data: ' + str(e)
+                status = 400
         else:
             result['fieldErrors'] = get_error_array(serializer.errors)
             status = 400
@@ -941,6 +945,25 @@ class Tasks(DTViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
+    @action(detail=True)
+    def set_state(self, request, *args, **kwargs):
+        result = {}
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        try:
+            action = self.request.GET['action']
+            if action == 'mark_done':
+                object.completed = True
+                object.save()
+            elif action == 'mark_undone':
+                object.completed = False
+                object.save()
+            result['message'] = 'Update succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
 
 class TaskLists(DTViewSet):
     """ API endpoint for managing tasks lists """
@@ -1112,7 +1135,7 @@ class Users(DTViewSet):
         return Response(result, status)
 
 
-class Worksets(viewsets.ModelViewSet):
+class Worksets(DTViewSet):
     """ API endpoint for managing worksets """
     permission_classes = (DjangoModelPermissions,)
     queryset = Workset.objects.all()
@@ -1153,7 +1176,8 @@ class Worksets(viewsets.ModelViewSet):
         }
         serializer = WorksetSerializer(data=data_dict)
         if serializer.is_valid():
-            new_obj = serializer.save()
+            new_obj = Workset(**data_dict)
+            new_obj.save()
             object = Workset.objects.get(pk=new_obj.id)
             serializer = WorksetSerializer(object)
             result = serializer.data

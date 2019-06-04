@@ -21,7 +21,7 @@ function fix_dt_search() {
 
 function create_task_list() {
   $.get("/api/options/?lists=user_groups&format=json", function ( data ) {
-      const groups = data.user_group_list;
+      const groups = data.user_groups;
       taskListForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
@@ -38,73 +38,32 @@ function create_task_list() {
               {
                 label: "Group",
                 name:  "group",
-                type: "chosen",
+                message: "Group of users that will utilize the list",
+                type: "selectize",
+                opts: {'placeholder': "Select user group"},
                 options: groups
               },
             ]
         });
+        taskListForm.on('submitSuccess', function(e, json, data, action) {
+          show_message('success', 'The task list was created successfully.');
+          if (typeof table_lists != 'undefined') {
+            table_lists.ajax.reload();
+          }
+        });
         taskListForm.buttons({
-          text: "Save",
+          text: "Create",
           className: "btn btn-primary",
           action: function () { this.submit(); }
-        }).title('Create new list').create();
+        }).title('Create New Task List').create();
   }, 'json');
 }
 
-function create_task(type) {
+function create_task() {
   $.get("/api/options/?lists=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
-      const staff = data.staff_list;
-      const worksets = data.workset_list;
+      const staff = data.active_staff;
+      const worksets = data.user_worksets;
       const lists = data.user_task_lists;
-      if (type != 'ticket') {
-        var fields = [
-          {
-            label: "Task",
-            name:  "title"
-          },
-          {
-            label: "Description",
-            name:  "description",
-            type: "textarea"
-          },
-          {
-            label: "Workset",
-            name:  "workset",
-            type: "chosen",
-            options: worksets
-          },
-          {
-            label: "Due date",
-            name:  "due_date",
-            type: "datetime",
-            format: "YYYY-MM-DD"
-          },
-          {
-            label: "Assigned to",
-            name:  "assigned_to",
-            type: "chosen",
-            options: staff
-          },
-          {
-            label: "List",
-            name:  "task_list",
-            type: "chosen",
-            options: lists
-          }
-            ]
-      } else {
-        var fields = [
-            {
-              label: "Issue",
-              name:  "title"
-            },
-            {
-              label: "Description",
-              name:  "description",
-              type: "textarea"
-            }
-          ]
-      }
       taskForm = new $.fn.dataTable.Editor( {
             ajax: {
               method: "POST",
@@ -112,22 +71,105 @@ function create_task(type) {
               headers: { 'X-CSRFToken': get_cookie("csrftoken") },
               data: function (data) { return { "data": JSON.stringify( data ) }; }
             },
-            fields: fields
-        });
-      if (type != 'ticket') {
-        taskForm.buttons({
+            fields: [
+                {
+                  label: "Task",
+                  name:  "title"
+                },
+                {
+                  label: "Description",
+                  name:  "description",
+                  type: "textarea"
+                },
+                {
+                  label: "List",
+                  name:  "task_list",
+                  type: "selectize",
+                  opts: {'placeholder': "Select list"},
+                  message: "Task list to which the task should be added",
+                  options: lists
+                },
+                {
+                  label: "Workset",
+                  name:  "workset",
+                  message: "Workset to be used for the task, if applicable",
+                  type: "selectize",
+                  opts: {'placeholder': "Select workset"},
+                  options: worksets
+                },
+                {
+                  label: "URL",
+                  name:  "url",
+                  message: "URL related to the task, if applicable",
+                  type: "text"
+                },
+                {
+                  label: "Due date",
+                  name:  "due_date",
+                  type: "datetime",
+                  format: "YYYY-MM-DD"
+                },
+                {
+                  label: "Assigned to",
+                  name:  "assigned_to",
+                  type: "selectize",
+                  opts: {'placeholder': "Select user"},
+                  options: staff
+                }
+            ]
+      });
+      taskForm.on('submitSuccess', function(e, json, data, action) {
+        show_message('success', 'The task was created successfully.');
+        if (typeof table_tasks != 'undefined') {
+          table_tasks.ajax.reload().draw();
+        }
+      });
+      taskForm.buttons({
           text: "Create",
           className: "btn btn-primary",
           action: function () { this.submit(); }
         }).title('Create New Task').create();
-      } else {
-        taskForm.buttons({
-          text: "Report",
-          className: "btn btn-primary",
-          action: function () { this.submit(); }
-        }).title('Report Issue').create();
-      }
   }, 'json');
+}
+
+function task_set_state(task, action) {
+    $.ajax({
+      method: "GET",
+      url: "/api/tasks/"+task+"/set_state/?action="+action,
+    }).done(function(data, textStatus, jqXHR) {
+        if ( $('#task_'+task).length ) {
+          $('#task_'+task).html('<i class="far fa-check-square fa-lg"></i>');
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+    });
+}
+
+function create_ticket() {
+    ticketForm = new $.fn.dataTable.Editor( {
+          ajax: {
+            method: "POST",
+            url: "/api/tasks/",
+            headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+            data: function (data) { return { "data": JSON.stringify( data ) }; }
+          },
+          fields: [
+                   {
+                     label: "Issue",
+                     name:  "title"
+                   },
+                   {
+                     label: "Description",
+                     name:  "description",
+                     type: "textarea"
+                   }
+                 ]
+      });
+      ticketForm.buttons({
+        text: "Report",
+        className: "btn btn-primary",
+        action: function () { this.submit(); }
+      }).title('Report Issue').create();
 }
 
 function update_session(data) {
@@ -198,18 +240,4 @@ function show_message(type, text) {
   message += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>';
   message += text+'</div>';
   $('.topbar-dalme').after(message);
-}
-
-function mark_task_done(task) {
-  const url = "/api/tasks/"+task.id+"/";
-  $.ajax({
-    method: "PUT",
-    url: url,
-    headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-    data: { 'completed': 1 },
-  }).done(function(data, textStatus, jqXHR) {
-    show_message('success', 'Task marked as completed.');
-  }).fail(function(jqXHR, textStatus, errorThrown) {
-    show_message('danger', 'There was an error communicating with the server: '+errorThrown);
-  });
 }
