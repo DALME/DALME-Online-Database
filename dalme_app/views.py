@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 import json
 import mimetypes
 import os
@@ -540,18 +540,21 @@ class SourceDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if 'workset' in self.request.GET:
-            workset = {
-                'workset_id': self.request.GET['workset'],
-                'name': self.request.GET['name'],
-                'description': self.request.GET['description'],
-                'current': self.request.GET['current'],
-                'prev_id': self.request.GET['prev_id'],
-                'next_id': self.request.GET['next_id'],
-                'total': self.request.GET['total'],
-                'endpoint': self.request.GET['endpoint'],
-                'progress': self.request.GET['progress']
+            workset = Workset.objects.get(pk=self.request.GET['workset'])
+            qset = json.loads(workset.qset)
+            seq = workset.current_record
+            para = {
+                'workset_id': workset.id,
+                'name': workset.name,
+                'description': workset.description,
+                'current': seq,
+                'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
+                'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
+                'total': len(qset),
+                'endpoint': workset.endpoint,
+                'progress': round(workset.progress, 2)
             }
-            context['workset'] = workset
+            context['workset'] = para
         breadcrumb = self.get_breadcrumb()
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
@@ -979,19 +982,19 @@ class WorksetsRedirect(View):
         qset = json.loads(workset.qset)
         seq = str(workset.current_record + 1)
         seq_id = qset[seq]['pk']
-        para = {
-            'workset': workset.id,
-            'name': workset.name,
-            'description': workset.description,
-            'current': seq,
-            'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
-            'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
-            'total': len(qset),
-            'endpoint': workset.endpoint,
-            'progress': round(workset.progress, 2)
-        }
-        url = '/{}/{}/?'.format(workset.endpoint, seq_id)
-        url += '&'.join(['{}={}'.format(key, value) for key, value in para.items()])
+        # para = {
+        #     'workset': workset.id,
+        #     'name': workset.name,
+        #     'description': workset.description,
+        #     'current': seq,
+        #     'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
+        #     'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
+        #     'total': len(qset),
+        #     'endpoint': workset.endpoint,
+        #     'progress': round(workset.progress, 2)
+        # }
+        url = '/{}/{}/?workset={}'.format(workset.endpoint, seq_id, workset.id)
+        # url += '&'.join(['{}={}'.format(key, value) for key, value in para.items()])
         # return redirect('/website/')
         return HttpResponseRedirect(url)
 
