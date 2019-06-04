@@ -23,5 +23,6 @@ urlpatterns = [
     path('countries/', views.CountryList.as_view(), name='country_list'),
     path('cities/', views.CityList.as_view(), name='city_list'),
     path('worksets/<slug:pk>/', views.WorksetsRedirect.as_view(), name='worksets_redirect'),
+    path('download/<path:path>/', views.DownloadAttachment, name='download_attachment'),
     path('', views.Index.as_view(), name='dashboard'),
 ]

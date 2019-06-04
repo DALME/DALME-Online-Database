@@ -2,11 +2,12 @@ from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
                               rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              Country, City, Tag)
+                              Country, City, Tag, Attachment, Ticket)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
 import base64
+import textwrap
 
 
 class DynamicSerializer(serializers.ModelSerializer):
@@ -116,27 +117,40 @@ class WorksetSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('title', 'task_list', 'due_date', 'completed', 'completed_date', 'created_by', 'assigned_to', 'description', 'workset', 'url', 'creation_timestamp', 'overdue_status')
+        fields = ('id', 'title', 'task_list', 'due_date', 'completed', 'completed_date', 'created_by', 'assigned_to', 'description', 'workset', 'url', 'creation_timestamp', 'overdue_status', 'file')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['task'] = '<div class="task-title">{}</div><div class="task-description">{}</div>'.format(ret['title'], ret['description'])
         attachments = ''
+        attachments_detail = ''
         if ret['workset'] is not None:
             attachments += '<a href="/worksets/{}" class="task-attachment">Workset</a>'.format(ret['workset'])
+            attachments_detail += '<a href="/worksets/{}" class="task-attachment">Workset: {}</a>'.format(ret['workset'], instance.workset.name)
         if ret['url'] is not None:
             attachments += '<a href="{}" class="task-attachment">URL</a>'.format(ret['url'])
+            attachments_detail += '<a href="{}" class="task-attachment">URL: {}</a>'.format(ret['url'], textwrap.shorten(instance.url, width=35, placeholder="..."))
+        if ret['file'] is not None:
+            attachments += '<a href="/download/{}" class="task-attachment">File</a>'.format(instance.file.file)
+            attachments_detail += '<a href="/download/{}" class="task-attachment">File: {}</a>'.format(instance.file.file, instance.file.filename)
         ret['attachments'] = attachments
+        ret['attachments_detail'] = attachments_detail
         overdue = ret.pop('overdue_status')
         dates = '<div class="task-date">Cre: ' + instance.creation_timestamp.strftime('%d-%b-%Y') + '</div>'
+        dates_detail = '<span class="task-date">Created: ' + instance.creation_timestamp.strftime('%d-%b-%Y') + ' by '+instance.creation_username+'</span>'
         if ret['due_date'] is not None:
             dates += '<div class="task-date task-'
+            dates_detail += '<span class="task-date task-'
             if overdue:
                 dates += 'over'
+                dates_detail += 'over'
             dates += 'due">Due: ' + instance.due_date.strftime('%d-%b-%Y') + '</div>'
+            dates_detail += 'due">Due: ' + instance.due_date.strftime('%d-%b-%Y') + '</span>'
         if ret['completed_date'] is not None:
             dates += '<div class="task-date task-completed">Com: ' + instance.completed_date.strftime('%d-%b-%Y') + '</div>'
+            dates_detail += '<span class="task-date task-completed">Completed: ' + instance.completed_date.strftime('%d-%b-%Y') + '</span>'
         ret['dates'] = dates
+        ret['dates_detail'] = dates_detail
         if ret['assigned_to'] is None:
             ret['assigned_to'] = instance.task_list.group.name
         else:
@@ -244,6 +258,37 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('tag_type', 'tag', 'tag_group', 'tag_type_name')
+        extra_kwargs = {'tag_type': {'required': False}}
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True, required=False)
+
+    class Meta:
+        model = Ticket
+        fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file', 'creation_username', 'creation_timestamp')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if ret['status']:
+            ticket = '<div class="ticket-closed">Closed</div>'
+        else:
+            ticket = '<div class="ticket-open">Open</div>'
+        ticket += ret['subject']
+        ret['ticket'] = ticket
+        attachments = ''
+        if ret['url'] is not None:
+            attachments += '<a href="{}" class="task-attachment">URL</a>'.format(ret['url'])
+        if ret['file'] is not None:
+            attachments += '<a href="/download/{}" class="task-attachment">File</a>'.format(instance.file.file)
+        ret['attachments'] = attachments
+        tags = ret.pop('tags', None)
+        if tags is not None:
+            tag_string = ''
+            for tag in tags:
+                tag_string += '<div class="ticket-tag ticket-{}">{}</div>'.format(tag['tag'], tag['tag'])
+            ret['tags'] = tag_string
+        return ret
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -433,3 +478,9 @@ class ContentClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content_class
         fields = ('id', 'name', 'short_name', 'description')
+
+
+class AttachmentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Attachment
+        fields = '__all__'

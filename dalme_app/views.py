@@ -1,5 +1,8 @@
 from django.contrib.auth.models import User
 import json
+import mimetypes
+import os
+import urllib
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import render
@@ -17,6 +20,7 @@ from haystack.generic_views import SearchView
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 
 class OAuthCallback_WP(OAuthCallback):
@@ -43,6 +47,36 @@ def SessionUpdate(request):
         else:
             request.session['sidebar_toggle'] = ''
     return HttpResponse('ok')
+
+
+def DownloadAttachment(request, path):
+    path_tokens = path.split('/')
+    original_filename = path_tokens.pop(-1)
+    file_path = settings.MEDIA_ROOT + '/' + path
+    fp = open(file_path, 'rb')
+    response = HttpResponse(fp.read())
+    fp.close()
+    type, encoding = mimetypes.guess_type(original_filename)
+    if type is None:
+        type = 'application/octet-stream'
+    response['Content-Type'] = type
+    response['Content-Length'] = str(os.stat(file_path).st_size)
+    if encoding is not None:
+        response['Content-Encoding'] = encoding
+    # To inspect details for the below code, see http://greenbytes.de/tech/tc2231/
+    if u'WebKit' in request.META['HTTP_USER_AGENT']:
+        # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
+        # filename_header = 'filename=%s' % original_filename.encode('utf-8')
+        filename_header = 'filename=%s' % original_filename
+    elif u'MSIE' in request.META['HTTP_USER_AGENT']:
+        # IE does not support internationalized filename at all.
+        # It can only recognize internationalized URL, so we do the trick via routing rules.
+        filename_header = ''
+    else:
+        # For others like Firefox, we follow RFC2231 (encoding extension in HTTP headers).
+        filename_header = 'filename*=UTF-8\'\'%s' % urllib.quote(original_filename.encode('utf-8'))
+    response['Content-Disposition'] = 'attachment; ' + filename_header
+    return response
 
 
 @method_decorator(login_required, name='dispatch')
@@ -924,128 +958,6 @@ class Index(TemplateView):
         page_title = 'Dashboard'
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
-        # tables = []
-        # if Workset.objects.filter(owner=self.request.user).exists():
-        #     context['worksets'] = Workset.objects.filter(owner=self.request.user)
-        #     tables.append(['worksets', 'fa-layer-group', 'My Worksets'])
-        # if Task.objects.filter(assigned_to=self.request.user.id, completed=0).exists():
-        #     context['tasks'] = Task.objects.filter(assigned_to=self.request.user.id, completed=0)
-        #     tables.append(['tasks', 'fa-tasks', 'My Tasks'])
-        context['tables'] = [
-            ['worksets', 'fa-layer-group', 'My Worksets', {
-                'ajax': '"/api/worksets/?format=json"',
-                'serverSide': 'true',
-                'responsive': 'true',
-                'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>r><'card-body't><'sub-card-footer'i>"''',
-                'select': {'style': 'single'},
-                'scrollResize': 'true',
-                'scrollY': '"30vh"',
-                'scrollX': '"100%"',
-                'deferRender': 'true',
-                'scroller': 'true',
-                'rowId': '"id"',
-                'columnDefs': [
-                      {
-                          'title': '"Id"',
-                          'targets': 0,
-                          'data': '"id"',
-                          'visible': 0
-                      },
-                      {
-                          'title': '"Workset"',
-                          'targets': 1,
-                          'data': '"workset"'
-                      },
-                      {
-                          'title': '"Progress"',
-                          'targets': 2,
-                          'data': '"progress_circle"',
-                      }
-                      ]
-                }
-             ],
-            ['tasks', 'fa-user-check', 'My Tasks', {
-                'ajax': '"/api/tasks/?format=json"',
-                'serverSide': 'true',
-                'responsive': 'true',
-                'dom': '''"<'sub-card-header pr-2 d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>"''',
-                'select': {'style': 'single'},
-                'scrollY': '"40vh"',
-                'scrollX': '"100%"',
-                'deferRender': 'true',
-                'scroller': 'true',
-                'language': '{searchPlaceholder: "Search"}',
-                'rowId': '"id"',
-                'columnDefs': [
-                      {
-                          'title': '"Task"',
-                          'targets': 0,
-                          'data': '"task"',
-                          'visible': 1,
-                          "orderData": '[ 6, 7 ]',
-                          'searchable': 0
-                      },
-                      {
-                          'title': '"Dates"',
-                          'targets': 1,
-                          'data': '"dates"',
-                          'visible': 1,
-                          "orderData": '[ 5, 7 ]',
-                          'searchable': 0
-                      },
-                      {
-                          'title': '"Assigned to"',
-                          'targets': 2,
-                          'data': '"assigned_to"',
-                          'visible': 1,
-                          'searchable': 0
-                      },
-                      {
-                          'title': '"Attachments"',
-                          'targets': 3,
-                          'data': '"attachments"',
-                          'visible': 1,
-                          'orderable': 0,
-                          'searchable': 0,
-                      },
-                      {
-                          'title': '"Done"',
-                          'targets': 4,
-                          'data': '"completed"',
-                          'render': 'function ( data, type, row, meta ) {return data == true ? \'<i class="fa fa-check-circle dt_checkbox_true"></i>\' : \'<i class="fa fa-times-circle dt_checkbox_false"></i>\';}',
-                          'className': '"td-center"',
-                          'width': '"19px"',
-                          'visible': 1,
-                          'searchable': 0
-                      },
-                      {
-                          'title': '"Due date"',
-                          'targets': 5,
-                          'data': '"due_date"',
-                          'visible': 0,
-                      },
-                      {
-                          'title': '"Title"',
-                          'targets': 6,
-                          'data': '"title"',
-                          'visible': 0,
-                      },
-                      {
-                          'title': '"Created"',
-                          'targets': 7,
-                          'data': '"creation_timestamp"',
-                          'visible': 0,
-                      },
-                      {
-                          'title': '"Description"',
-                          'targets': 8,
-                          'data': '"description"',
-                          'visible': 0,
-                      }
-                  ]
-                }
-             ]
-        ]
         return context
 
 

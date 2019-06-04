@@ -150,66 +150,7 @@ def test_expression2(request):
 
 
 def test_expression(request):
-    data = '{\
-        "action": "edit",\
-        "data": {\
-          "bf137648-c581-4806-932a-5cf741f909dc": {\
-            "name": {\
-              "name": "Act 2759, Podestà di Lucca 116, 98r-v"\
-            },\
-            "short_name": "Act 2759, PdL 116",\
-            "type": {\
-              "id": "13"\
-            },\
-            "parent": {\
-              "id": "78a52237-3bd0-47bf-a071-9c3f76243bdb"\
-            },\
-            "is_inventory": [\
-              "1"\
-            ],\
-            "pages": {\
-              "1": {\
-                "order": "1",\
-                "name": "98r",\
-                "dam_id": "5326"\
-              },\
-              "2": {\
-                "order": "2",\
-                "name": "98v",\
-                "dam_id": "5327"\
-              }\
-            },\
-            "attributes": {\
-              "1": {\
-                "type": "28",\
-                "value_STR": "Seizure"\
-              },\
-              "2": {\
-                "type": "25",\
-                "value_DATE_d": "16",\
-                "value_DATE_m": "12",\
-                "value_DATE_y": "1342"\
-              },\
-              "3": {\
-                "type": "3",\
-                "value_INT": "2759"\
-              },\
-              "4": {\
-                "type": "26",\
-                "value_DATE_d": "16",\
-                "value_DATE_m": "12",\
-                "value_DATE_y": "1342"\
-              },\
-              "6": {\
-                "type": "27",\
-                "value_STR": "Lucca.Starter.1"\
-              }\
-            }\
-          }\
-        }\
-      }'
-    data2 = '{"action":"edit","data":{"5d4744eb-5963-43e4-8b81-f45feee2c3ba":{"name":{"name":"Act 6, Podestà di Lucca 33, 3v-4r"},"short_name":"Act 6, PdL 33[test]","type":{"id":"13"},"parent":{"id":"05c64292-62d1-4333-a259-df078155bc8a"},"is_inventory":["1"],"pages":{"1":{"id":"c659c720-4bac-4b0f-9c10-a5a7aa7ab3dc","order":"1","name":"3v","dam_id":"5340"},"2":{"id":"db4dc814-1b68-46d0-af38-cd63a24f1348","order":"2","name":"4r","dam_id":"5341"}},"attributes":{"1":{"id":"49d3da0f-ed7e-45a9-84e1-b47b642b5e50","attribute_type":"3","value_INT":"6"},"2":{"id":"0011eb9f-89e2-49a8-8fd1-746a148b2b57","attribute_type":"28","value_STR":"Seizure"},"3":{"id":"e96389af-c964-458a-b4ad-492676865ebf","attribute_type":"26","value_DATE_d":"9","value_DATE_m":"1","value_DATE_y":"1333"},"7":{"id":"","attribute_type":"35","value_TXT":"new comment TEST"}}}}}'
-    data3 = '{"action": "edit","data": {"1": {"name": "Acts & Registers","short_name": "acts_and_registers","description": "List of acts and registers in the database.","api_url": "/api/sources/","helpers": "source_form","fields": "4,17,18,27,2,25,26,42,43,41,38,39,36,28,3","content_types": ""}}}'
+    data3 = '{"action":"create","data":{"0":{"title":"some issue","description":"desc","tags":["bug","something"],"url":"https://127.0.0.1.xip.io:8443/models/dt_fields/#","file":"b976cb3c-907e-48b0-b368-ab5e7ab2efd4"}}}'
     dt_request = json.loads(data3)
     dt_request.pop('action')
     rows = dt_request['data']
@@ -237,13 +178,14 @@ def test_expression(request):
                 row_values[field] = value
         data_list.append([k, row_values])
     data_dict = data_list[0][1]
-    fields1 = data_dict.pop('fields', None)
-    if fields1 is not None:
-        if ',' in str(fields1):
-            fields2 = fields1.split(',')
+    foo=bar
+    fields = data_dict.pop('fields', None)
+    if fields is not None:
+        if ',' in str(fields):
+            fields = fields.split(',')
         else:
-            fields2 = [fields1]
-    fields3 = [int(i) for i in fields2]
+            fields = [fields]
+    fields = [int(i) for i in fields]
     current_fields = DT_fields.objects.filter(list=1).values_list('field', flat=True)
     add_fields = list(set(fields3) - set(current_fields))
     remove_fields = list(set(current_fields) - set(fields3))

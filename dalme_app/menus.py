@@ -127,7 +127,7 @@ def dropdown_tasks(wholeMenu, user_id):
                         <i class="far fa-square fa-lg"></i></div></div></div>'.format('task_'+str(task.id), task.id, 'mark_done')
     else:
         dropmenu += '<div class="dropdown-tasks-empty">There are currently no tasks in your queue.</div>'
-    dropmenu += '<a class="dropdown-tasks-action dropdown-tasks-action-rb" href="{}">{}</a>'.format('/tasks/mine', 'My Tasks')
+    dropmenu += '<a class="dropdown-tasks-action dropdown-tasks-action-rb" href="{}">{}</a>'.format('/', 'My Tasks')
     dropmenu += '<a class="dropdown-tasks-action" href="{}">{}</a></div></li>'.format('/tasks/', 'All Tasks')
 
     button = '<li class="nav-item dropdown no-arrow topbar-border-left" data-toggle="tooltip" data-placement="bottom" title="Your task list" \

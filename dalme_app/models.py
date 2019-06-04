@@ -446,12 +446,6 @@ class AttributeReference(dalmeUuid):
     term_type = models.CharField(max_length=55, blank=True, default=None)
 
 
-class Notes(dalmeUuid):
-    target = models.UUIDField(db_index=True)
-    text = models.TextField()
-    tags = GenericRelation('Tag')
-
-
 class Workset(dalmeIntid):
     name = models.CharField(max_length=55)
     description = models.TextField()
@@ -476,9 +470,18 @@ class Workset(dalmeIntid):
 class Tag(dalmeUuid):
     WORKFLOW = 'WF'  # type of tags used to keep track of general DALME workflow
     CONTROL = 'C'  # general purpose control tags
+    TICKET = 'T'  # tags for issue ticket management
     TAG_TYPES = (
         (WORKFLOW, 'Workflow'),
-        (CONTROL, 'Control')
+        (CONTROL, 'Control'),
+        (TICKET, 'Ticket')
+    )
+    TICKET_TAGS = (
+        ('bug', 'bug'),
+        ('feature', 'feature'),
+        ('documentation', 'documentation'),
+        ('question', 'question'),
+        ('content', 'content')
     )
 
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES)
@@ -486,7 +489,7 @@ class Tag(dalmeUuid):
     tag_group = models.CharField(max_length=255, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = models.UUIDField(null=True, db_index=True)
+    object_id = object_id = models.CharField(max_length=55, null=True, db_index=True)
 
     def __str__(self):
         return self.tag
@@ -526,6 +529,8 @@ class Task(dalmeIntid):
     workset = models.ForeignKey(Workset, on_delete=models.PROTECT, null=True)
     position = models.CharField(max_length=255, blank=True, default=None)
     url = models.CharField(max_length=255, null=True, default=None)
+    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = GenericRelation('Comment')
 
     # Has due date for an instance of this object passed?
     def overdue_status(self):
@@ -550,34 +555,57 @@ class Task(dalmeIntid):
         ordering = ["priority", "creation_timestamp"]
 
 
-class TaskComment(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, default=get_current_user)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    date = models.DateTimeField(default=datetime.datetime.now)
-    email_from = models.CharField(max_length=320, blank=True, default=None)
-    email_message_id = models.CharField(max_length=255, blank=True, default=None)
-    body = models.TextField(blank=True, default=None)
+class Ticket(dalmeIntid):
+    OPEN = 0
+    CLOSED = 1
+    STATUS = (
+        (OPEN, 'Open'),
+        (CLOSED, 'Closed')
+    )
+
+    subject = models.CharField(max_length=140)
+    description = models.TextField(blank=True, null=True)
+    status = models.IntegerField(choices=STATUS, default=0)
+    tags = GenericRelation('Tag')
+    url = models.CharField(max_length=255, null=True, default=None)
+    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = GenericRelation('Comment')
+
+    def __str__(self):
+        return str(self.id) + ' - ' + self.title + ' ('+self.get_status_display+')'
 
     class Meta:
-        # an email should only appear once per task
-        unique_together = ("task", "email_message_id")
+        ordering = ["status", "creation_timestamp"]
 
-    @property
-    def author_text(self):
-        if self.author is not None:
-            return str(self.author)
 
-        assert self.email_message_id is not None
-        return str(self.email_from)
+class Comment(dalmeIntid):
+    content_object = GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.CharField(max_length=55, null=True, db_index=True)
+    body = models.TextField(blank=True, null=True, default=None)
 
     @property
     def snippet(self):
         body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
-        # Define here rather than in __str__ so we can use it in the admin list_display
-        return "{author} - {snippet}...".format(author=self.author_text, snippet=body_snippet)
+        return "{author} - {snippet}...".format(author=self.creation_username, snippet=body_snippet)
 
     def __str__(self):
         return self.snippet
+
+
+class Attachment(dalmeUuid):
+    file = models.FileField(upload_to='attachments/%Y/%m/')
+
+    def filename(self):
+        return os.path.basename(self.file.name)
+
+    def extension(self):
+        name, extension = os.path.splitext(self.file.name)
+        return extension
+
+    def __str__(self):
+        return self.file.name
+
 
 # unmanaged models from DAM
 

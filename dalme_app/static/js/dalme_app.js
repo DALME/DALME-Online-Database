@@ -90,6 +90,19 @@ function create_task() {
                   options: lists
                 },
                 {
+                  label: "Assigned to",
+                  name:  "assigned_to",
+                  type: "selectize",
+                  opts: {'placeholder': "Select user"},
+                  options: staff
+                },
+                {
+                  label: "Due date",
+                  name:  "due_date",
+                  type: "datetime",
+                  format: "YYYY-MM-DD"
+                },
+                {
                   label: "Workset",
                   name:  "workset",
                   message: "Workset to be used for the task, if applicable",
@@ -104,17 +117,22 @@ function create_task() {
                   type: "text"
                 },
                 {
-                  label: "Due date",
-                  name:  "due_date",
-                  type: "datetime",
-                  format: "YYYY-MM-DD"
-                },
-                {
-                  label: "Assigned to",
-                  name:  "assigned_to",
-                  type: "selectize",
-                  opts: {'placeholder': "Select user"},
-                  options: staff
+                  label: "Attachment",
+                  name:  "file",
+                  message: "A file to be attached to the task ",
+                  type: "upload",
+                  ajax: {
+                    method: "POST",
+                    url: "/api/attachments/",
+                    headers: { 'X-CSRFToken': get_cookie("csrftoken")},
+                  },
+                  display: function ( fileId ) {
+                    return taskForm.file('Attachment', fileId ).filename;
+                  },
+                  clearText: "Remove File",
+                  dragDrop: 'true',
+                  dragDropText: "Drag file here",
+                  uploadText: "Choose file..."
                 }
             ]
       });
@@ -149,27 +167,66 @@ function create_ticket() {
     ticketForm = new $.fn.dataTable.Editor( {
           ajax: {
             method: "POST",
-            url: "/api/tasks/",
+            url: "/api/tickets/",
             headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-            data: function (data) { return { "data": JSON.stringify( data ) }; }
+            data: function (data) { return { "data": JSON.stringify( data ) };}
           },
           fields: [
-                   {
-                     label: "Issue",
-                     name:  "title"
-                   },
-                   {
-                     label: "Description",
-                     name:  "description",
-                     type: "textarea"
-                   }
-                 ]
-      });
-      ticketForm.buttons({
-        text: "Report",
+              {
+                label: "Subject",
+                name:  "subject"
+              },
+              {
+                label: "Description",
+                name:  "description",
+                type: "textarea"
+              },
+              {
+                label: "Tags",
+                name:  "tags",
+                type: "selectize",
+                opts: {'maxItems': 10, 'plugins': ["remove_button"], 'placeholder': "Tag ticket"},
+                options: [
+                  {"label": "bug", "value": "bug"},
+                  {"label": "feature", "value": "feature"},
+                  {"label": "documentation", "value": "documentation"},
+                  {"label": "question", "value": "question"},
+                  {"label": "content", "value": "content"}
+                ]
+              },
+              {
+                label: "URL",
+                name:  "url",
+                message: "A URL related to the ticket, if applicable",
+                type: "text"
+              },
+              {
+                label: "Attachment",
+                name:  "file",
+                message: "A file to be attached to the ticket, <i>e.g. a screenshot</i>",
+                type: "upload",
+                ajax: {
+                  method: "POST",
+                  url: "/api/attachments/",
+                  headers: { 'X-CSRFToken': get_cookie("csrftoken")},
+                },
+                dragDrop: 'true',
+                dragDropText: "Drag file here",
+                uploadText: "Choose file..."
+              }
+          ]
+    });
+    ticketForm.on('submitSuccess', function(e, json, data, action) {
+      show_message('success', 'The ticket was created successfully.');
+      if (typeof table_tickets != 'undefined') {
+        table_tickets.ajax.reload().draw();
+      }
+    });
+    ticketForm.buttons({
+        text: "Create",
         className: "btn btn-primary",
         action: function () { this.submit(); }
-      }).title('Report Issue').create();
+      }).title('Create New Issue Ticket').create();
 }
 
 function update_session(data) {

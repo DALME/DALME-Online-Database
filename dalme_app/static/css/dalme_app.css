@@ -390,6 +390,10 @@ table.dataTable {
   color: #f2f2f2;
 } */
 
+table.dataTable tbody tr.selected a, table.dataTable tbody td.selected a {
+  color: inherit !important;
+}
+
 .panel-preview {
   background-color: #fff;
   background-image: url(../images/no_image.png);
@@ -701,8 +705,18 @@ h5.modal-title {
   margin-left: 5px;
 }
 
-.DTE_Field_InputControl {
-  /* display: flex !important; */
+.DTE .editor_upload button {
+  margin-left: 0;
+  width: auto;
+  background-image: linear-gradient(to bottom,#fefefe,#f2f2f2);
+  font-size: 13px;
+  color: #777;
+}
+
+.DTE .editor_upload .drop {
+  border: 1px dashed #a5a5a5;
+  color: #777;
+  padding-top: 15px;
 }
 
 .DTE_Field_InputControl label {
@@ -1491,8 +1505,6 @@ div.table_scroller .dataTables_filter label {
 table.dataTable tbody>tr.selected td, table.dataTable tbody>tr>.selected td {
   background-color: #e3f0f5 !important;
   color: #0361aa !important;
-  font-weight: 600;
-  font-size: 95%;
 }
 
 li.search-field input.default {
@@ -1991,22 +2003,98 @@ li#searchIcon.show a {
 }
 
 .task-attachment {
-  border: 1px solid #436784;
+  border: 1px solid #949a99;
   border-radius: 6px;
   font-size: 10px;
   font-weight: 600;
-  padding: 2px 5px;
+  padding: 0px 5px;
   text-transform: uppercase;
-  background-color: #dce8ee;
-  color: #486e8d;
+  background-color: #ebebeb;
+  color: #707575;
   white-space: nowrap;
+  display: table;
+  margin-bottom: 3px;
 }
 
 .task-attachment:hover {
   text-decoration: none;
-  border: 1px solid #253949;
-  background-color: #bad2dd;
-  color: #253949;
+  border: 1px solid #436784;
+  background-color: #dce8ee;
+  color: #486e8d;
+}
+
+.ticket-open{
+  border: 1px solid #853933;
+  border-radius: 6px;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #d9b9bd;
+  color: #943737;
+  white-space: nowrap;
+  display: inline-block;
+  margin-bottom: 3px;
+  margin-right: 5px;
+}
+
+.ticket-closed {
+  border: 1px solid #5d9b7e;
+  border-radius: 6px;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #dfe7e5;
+  color: #367451;
+  white-space: nowrap;
+  display: inline-block;
+  margin-bottom: 3px;
+  margin-right: 5px;
+}
+
+.ticket-tag {
+  border: 1px solid #949a99;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  background-color: #ebebeb;
+  color: #707575;
+  white-space: nowrap;
+  display: table;
+  margin-bottom: 3px;
+}
+
+.ticket-bug {
+  background-color: #db8784;
+  color: #3e3e3e;
+  border-color: #5d5d5d;
+}
+
+.ticket-feature {
+  background-color: #efafa0;
+  color: #3e3e3e;
+  border-color: #5d5d5d;
+}
+
+.ticket-documentation {
+  background-color: #fbe7d7;
+  color: #3e3e3e;
+  border-color: #5d5d5d;
+}
+
+.ticket-question {
+  background-color: #a0c77f;
+  color: #3e3e3e;
+  border-color: #5d5d5d;
+}
+
+.ticket-content {
+  background-color: #d7e102;
+  color: #3e3e3e;
+  border-color: #5d5d5d;
 }
 
 /* topbar tasks popup */
@@ -2132,6 +2220,50 @@ li#searchIcon.show a {
   padding: 16px;
   border-bottom: 1px dotted #a5a5a5;
   text-align: center;
+}
+
+/* task details */
+
+.task-detail-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1b5f94;
+}
+
+.task-detail-description {
+  font-size: 15px;
+  font-weight: 400;
+  color: #777;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.task-detail-dates_detail {
+  display: flex;
+  line-height: 1.5;
+  flex-direction: column;
+}
+.task-detail-dates_detail .task-date, .task-detail-attachments_detail .task-attachment {
+  margin-right: auto;
+  font-size: 12px;
+  text-transform: capitalize;
+  margin-bottom: 5px;
+}
+
+.task-detail-attachments_detail {
+  display: flex;
+  line-height: 1.5;
+  margin-top: 10px;
+  flex-direction: column;
+}
+
+.task-detail-attachments_detail:before {
+  content: "Attachments:";
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 /* progress pies */

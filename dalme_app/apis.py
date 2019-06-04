@@ -11,13 +11,14 @@ from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, Langua
                                    TaskSerializer, TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
-                                   CountrySerializer, CitySerializer)
+                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer)
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, Language, Workset,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
-                              wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City)
+                              wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City, Attachment, Ticket, Tag)
 from django_celery_results.models import TaskResult
 from django.db.models.expressions import RawSQL
 from rest_framework.permissions import DjangoModelPermissions
@@ -965,11 +966,72 @@ class Tasks(DTViewSet):
         return Response(result, status)
 
 
+class Tickets(DTViewSet):
+    """ API endpoint for managing issue tickets """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer
+
+    def create(self, request, *args, **kwargs):
+        result = {}
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        tags = data_dict.pop('tags', None)
+        serializer = self.get_serializer(data=data_dict)
+        if serializer.is_valid():
+            new_obj = serializer.save()
+            if tags is not None:
+                if type(tags) is not list:
+                    tags = [tags]
+                for tag in tags:
+                    tag_dict = {
+                            'content_object': new_obj,
+                            'tag_type': 'T',
+                            'tag': tag
+                        }
+                    Tag.objects.create(**tag_dict)
+                    # new_tag = Tag(**tag_dict)
+                    # new_tag.save()
+            object = Ticket.objects.get(pk=new_obj.id)
+            serializer = self.get_serializer(object)
+            result['data'] = serializer.data
+            status = 201
+        else:
+            result['fieldErrors'] = get_error_array(serializer.errors)
+            status = 400
+        return Response(result, status)
+
+
 class TaskLists(DTViewSet):
     """ API endpoint for managing tasks lists """
     permission_classes = (DjangoModelPermissions,)
     queryset = TaskList.objects.all().annotate(task_count=Count('task'))
     serializer_class = TaskListSerializer
+
+
+class Attachments(viewsets.ModelViewSet):
+    """ API endpoint for managing attachments """
+    permission_classes = (DjangoModelPermissions,)
+    parser_classes = (MultiPartParser, FormParser, FileUploadParser,)
+    queryset = Attachment.objects.all()
+    serializer_class = AttachmentSerializer
+
+    def create(self, request, format=None):
+        result = {}
+        try:
+            new_obj = Attachment()
+            new_obj.file = request.data['upload']
+            new_obj.save()
+            result['upload'] = {'id': new_obj.id}
+            result['files'] = {'Attachment': {str(new_obj.id): {
+                'filename': str(new_obj.filename),
+                'web_path': str(new_obj.file)
+            }}}
+            status = 201
+        except Exception as e:
+            result['error'] = 'There was an error processing the file: '+str(e)
+            status = 400
+        return Response(result, status)
 
 
 class Transcriptions(viewsets.ModelViewSet):

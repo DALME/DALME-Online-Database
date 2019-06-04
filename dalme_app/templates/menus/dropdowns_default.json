@@ -9,7 +9,7 @@
           {
             "text": "Report Issue",
             "link": "#",
-            "action": "createTask('ticket')",
+            "action": "create_ticket()",
             "iconClass": "fas fa-bug"
           },
           {
