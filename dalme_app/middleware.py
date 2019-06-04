@@ -1,5 +1,4 @@
 from threading import local
-from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib import messages
 from async_messages import get_messages

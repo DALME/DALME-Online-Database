@@ -585,15 +585,12 @@ class SourceDetail(DetailView):
         attributes = self.object.attributes.all().select_related('attribute_type')
         for a in attributes:
             label = a.attribute_type.name
-            #order = Content_attributes.objects.get(content_type_id=self.object.type, attribute_type_id=a.attribute_type).order
             value = functions.get_attribute_value(a)
             dict = {
                 'label': label,
                 'value': value,
-                #'order': order
             }
             attribute_data.append(dict)
-        #attribute_data = sorted(attribute_data, key=lambda x: x['order'])
         context['attribute_data'] = attribute_data
         tables = []
         if is_inv and has_pages:
@@ -657,9 +654,6 @@ class UserList(DTListView):
     list_name = 'users'
     breadcrumb = [('Project', ''), ('Users', '/users')]
     dt_editor_options = {'idSrc': '"id"'}
-    # dt_field_list = ['id', 'last_login', 'is_superuser', 'username', 'full_name', 'first_name',
-    #                  'last_name', 'email', 'is_staff', 'is_active', 'groups', 'date_joined',
-    #                  'dam_usergroup', 'wiki_groups', 'wp_role']
     dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username',
                       'password', 'is_staff', 'is_superuser', 'groups', 'dam_usergroup',
                       'wiki_groups', 'wp_role']
@@ -696,8 +690,6 @@ class UserDetail(DetailView):
             'Joined': functions.format_date(self.object.user.date_joined, 'timestamp-long'),
             'Last login': functions.format_date(self.object.user.last_login, 'timestamp-long'),
             'Groups': self.object.user.groups,
-            # 'Wiki groups': self.object.wiki_user__wiki_groups,
-            # 'DAM group': self.object.dam_user.usergroup,
             'WordPress role': self.object.get_wp_role_display()
         }
         context['user_data'] = user_data
