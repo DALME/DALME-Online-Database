@@ -176,7 +176,7 @@ function init_tables() {
                      title: "Done",
                      targets: 4,
                      data: "completed",
-                     render: function ( data, type, row, meta ) { return data == true ? '<i class="far fa-check-square"></i>' : '<i class="far fa-square"></i>';},
+                     render: function ( data, type, row, meta ) { return data == 1 ? '<i class="far fa-check-square"></i>' : '<i class="far fa-square"></i>';},
                      className: "td-center",
                      width: "19px",
                      visible: 1,
