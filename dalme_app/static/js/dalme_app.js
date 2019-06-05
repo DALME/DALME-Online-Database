@@ -150,13 +150,24 @@ function create_task() {
   }, 'json');
 }
 
-function task_set_state(task, action) {
+function task_set_state(task, state) {
+    if (state == 'True' || state == true || state == 'true' || state == 1 || state == '1') {
+      var action = 'mark_undone';
+    } else {
+      var action = 'mark_done';
+    };
     $.ajax({
       method: "GET",
       url: "/api/tasks/"+task+"/set_state/?action="+action,
     }).done(function(data, textStatus, jqXHR) {
         if ( $('#task_'+task).length ) {
-          $('#task_'+task).html('<i class="far fa-check-square fa-lg"></i>');
+          switch (action) {
+            case 'mark_undone':
+              $('#task_'+task).html('<i class="far fa-square fa-lg"></i>');
+              break;
+            case 'mark_done':
+              $('#task_'+task).html('<i class="far fa-check-square fa-lg"></i>');
+          }
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         show_message('danger', 'There was an error communicating with the server: '+errorThrown);
@@ -297,4 +308,37 @@ function show_message(type, text) {
   message += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>';
   message += text+'</div>';
   $('.topbar-dalme').after(message);
+}
+
+function enable_comments(model, object) {
+  $.get("/api/comments/?model="+model+"&object="+object+"&format=json", function ( data ) {
+        if (data.results.length > 0) {
+          $('#comments').prepend('<div id="comments-container"></div>');
+          for (let i = 0; i < data.results.length; i++) {
+              var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.results[i].avatar+'</div>';
+              comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
+              comment += '<b>'+data.results[i].user+'</b> commented on '+data.results[i].date+'</div>';
+              comment += '<div class="comment-body">'+data.results[i].body+'</div></div></div>';
+              $('#comments-container').append(comment);
+          }
+        };
+  }, 'json');
+}
+
+function create_comment(model, object) {
+  var body = $('#new_comment_text').val();
+  $.ajax({
+        method: "POST",
+        url: "/api/comments/",
+        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+        data: { 'model': model, 'object': object, 'body': body },
+  }).done(function(data, textStatus, jqXHR) {
+        var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.avatar+'</div>';
+        comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
+        comment += '<b>'+data.user+'</b> commented on '+data.date+'</div>';
+        comment += '<div class="comment-body">'+data.body+'</div></div></div>';
+        $('#comments-container').append(comment);
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+        show_message('danger', 'There was an error saving your comment: '+errorThrown);
+  });
 }

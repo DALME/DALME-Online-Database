@@ -530,7 +530,7 @@ class Task(dalmeIntid):
     position = models.CharField(max_length=255, blank=True, default=None)
     url = models.CharField(max_length=255, null=True, default=None)
     file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-    comments = GenericRelation('Comment')
+    comments = GenericRelation('Comment', related_query_name='tasks')
 
     # Has due date for an instance of this object passed?
     def overdue_status(self):

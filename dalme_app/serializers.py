@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
                               rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              Country, City, Tag, Attachment, Ticket)
+                              Country, City, Tag, Attachment, Ticket, Comment)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
@@ -22,6 +22,23 @@ class DynamicSerializer(serializers.ModelSerializer):
         if rem_fields is not None:
             for field_name in rem_fields:
                 self.fields.pop(field_name)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('body',)
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['date'] = instance.creation_timestamp.strftime('%d-%b-%Y@%H:%M')
+        user = Profile.objects.get(user__username=instance.creation_username)
+        ret['user'] = '<a href="/users/{}">{}</a>'.format(user.user.username, user.full_name)
+        if user.profile_image is not None:
+            ret['avatar'] = '<img src="{}" class="img_avatar" alt="avatar">'.format(user.profile_image)
+        else:
+            ret['avatar'] = '<i class="fa fa-user-alt-slash img_avatar mt-1 fa-2x"></i>'
+        return ret
 
 
 class DTFieldsSerializer(serializers.ModelSerializer):
@@ -121,7 +138,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['task'] = '<div class="task-title">{}</div><div class="task-description">{}</div>'.format(ret['title'], ret['description'])
+        ret['task'] = '<a href="/tasks/{}" class="task-title">{}</a><div class="task-description">{}</div>'.format(ret['id'], ret['title'], ret['description'])
         attachments = ''
         attachments_detail = ''
         if ret['workset'] is not None:

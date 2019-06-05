@@ -11,6 +11,18 @@ body {
   background-color: #fff;
 }
 
+.card-full-no-footer {
+  height: calc(100vh - 111px);
+}
+
+.card-full {
+  height: calc(100vh - 163px);
+}
+
+.card-full-tasks {
+  height: calc(100vh - 72px);
+}
+
 .shadow {
   box-shadow: 0 2px 28px 0 rgba(58,59,69,.25) !important;
 }
@@ -135,8 +147,72 @@ a {
   width: 36px;
 }
 
-.script-button {
+/* comments */
 
+.img_avatar {
+  height: 44px;
+  width: 44px;
+  text-align: center;
+  color: #478db1;
+  border-radius: 10px;
+}
+
+.comment-card {
+  border: 1px solid #d5d5d5;
+  border-radius: 6px;
+  flex-grow: 1;
+}
+
+.comment-header {
+  background-color: #f6f8fa;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom: 1px solid #d5d5d5;
+  padding: 6px 15px;
+  font-size: 14px;
+}
+
+.comment-body {
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #353535;
+}
+
+#comments-container {
+  border-bottom: 1px solid #d5d5d5;
+  margin-bottom: 15px;
+}
+
+.comment-box {
+  background-color: #fafbfc;
+}
+
+.comment-textarea {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 1px dashed #d5d5d5;
+  padding: 5px 10px;
+  min-height: 100px;
+}
+
+.comment-textarea::placeholder {
+  color: #bebebe
+}
+
+.comment-textarea:focus {
+  box-shadow: 0px 0px 1px 2px #0361aa inset !important;
+}
+
+.comment-tip {
+  border-right: 1px solid #d5d5d5;
+  border-left: 1px solid #d5d5d5;
+  border-bottom: 1px solid #d5d5d5;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  color: #bebebe;
+  background-color: #fff;
 }
 
 /* messages and alerts */
@@ -250,14 +326,6 @@ a {
 .card {
   border: 1px solid #a5a5a5;
   border-radius: 4px;
-}
-
-.card-full {
-  height: calc(100vh - 163px);
-}
-
-.card-full-tasks {
-  height: calc(100vh - 72px);
 }
 
 .card-header {
@@ -727,7 +795,6 @@ h5.modal-title {
 
 .DTE_Field_InputControl textarea {
   min-height: 100px;
-  height: 100px;
 }
 
 .DTE_Field_Type_checkbox div[data-dte-e="input"] {
@@ -746,7 +813,7 @@ div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
 }
 
 div.DTE_Field_Type_textarea textarea {
-    height: 120px;
+    min-height: 120px;
 }
 
 /* special form classes  */
@@ -1955,7 +2022,22 @@ li#searchIcon.show a {
   display: inline-block;
 }
 
+.workset-text {
+  font-size: 13px;
+}
 /* tasks */
+
+.edit_button_on {
+  border: 1px solid #834246;
+  color: #9b3030;
+  background-color: #efe9ed;
+}
+
+.task_edit_switch {
+  padding-top: 3px !important;
+  color: #888 !important;
+  font-size: 13px;
+}
 
 .task-title {
   padding-left: 5px;
@@ -2210,6 +2292,7 @@ li#searchIcon.show a {
 .btn_task_complete {
   margin-right: 10px;
   margin-left: 10px;
+  cursor: pointer;
 }
 
 .btn_task_complete:hover {
@@ -2266,6 +2349,70 @@ li#searchIcon.show a {
   margin-bottom: 10px;
 }
 
+.task-d_text {
+  font-size: 16px;
+  font-weight: 400;
+  color: #777;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+.task-d_pill {
+  border: 1px solid #a5a5a5;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 10px;
+  text-transform: uppercase;
+  background-color: #fafbfc;
+  color: #888;
+  white-space: nowrap;
+  margin-bottom: 5px;
+  display: table;
+}
+
+.task-d_status {
+  display: inline-block;
+  font-size: 14px;
+  align-self: center;
+}
+
+.task-da_header {
+  background-color: #f8fafb;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom: 1px solid #d5d5d5;
+  padding: 4px 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.task-da_body {
+  border: 1px solid #d5d5d5;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.task-da_body .workset-title {
+  margin-bottom: 5px;
+}
+
+.task-da_body .pie-wrapper {
+  float: right;
+}
+
+.task-da_body .workset-endpoint {
+  border-color: #a5a5a5;
+  background-color: #fafbfc;
+  color: #888;
+}
+
+.task_status_button {
+    cursor: pointer;
+}
 /* progress pies */
 
 .pie-wrapper {

@@ -11,14 +11,15 @@ from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, Langua
                                    TaskSerializer, TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
-                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer)
+                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer, CommentSerializer)
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, Language, Workset,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
-                              wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City, Attachment, Ticket, Tag)
+                              wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City, Attachment, Ticket, Tag,
+                              Comment)
 from django_celery_results.models import TaskResult
 from django.db.models.expressions import RawSQL
 from rest_framework.permissions import DjangoModelPermissions
@@ -962,6 +963,38 @@ class Tasks(DTViewSet):
             status = 201
         except Exception as e:
             result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
+
+class Comments(viewsets.ModelViewSet):
+    """ API endpoint for managing comments """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
+            model = self.request.GET['model']
+            object = self.request.GET['object']
+            obj_instance = eval(model+'.objects.get(pk='+str(object)+')')
+            queryset = obj_instance.comments.all()
+        else:
+            queryset = self.queryset
+            # raise ValueError('A model and object must be provided to filter the comments dataset.')
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        result = {}
+        data = request.data
+        try:
+            content_object = eval(data['model']+'.objects.get(pk='+data['object']+')')
+            new_comment = content_object.comments.create(body=data['body'])
+            serializer = self.get_serializer(new_comment)
+            result = serializer.data
+            status = 201
+        except Exception as e:
+            result = str(e)
             status = 400
         return Response(result, status)
 

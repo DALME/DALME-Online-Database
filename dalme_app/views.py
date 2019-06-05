@@ -1032,6 +1032,33 @@ class Scripts(TemplateView):
 
 
 @method_decorator(login_required, name='dispatch')
+class TasksDetail(DetailView):
+    model = Task
+    template_name = 'dalme_app/task_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = [('Project', ''), ('Tasks', '/tasks')]
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context = functions.set_menus(self.request, context, state)
+        page_title = 'Task #'+str(self.object.id)+' ('+self.object.task_list.name+')'
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['task'] = self.object
+        context['comments'] = True
+        return context
+
+    def get_object(self):
+        try:
+            object = super().get_object()
+            return object
+        except ObjectDoesNotExist:
+            raise Http404
+
+
+@method_decorator(login_required, name='dispatch')
 class TasksList(TemplateView):
     template_name = 'dalme_app/tasks.html'
 

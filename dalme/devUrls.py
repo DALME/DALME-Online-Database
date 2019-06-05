@@ -31,6 +31,7 @@ router.register(r'countries', apis.Countries, basename='countries')
 router.register(r'cities', apis.Cities, basename='cities')
 router.register(r'attachments', apis.Attachments, basename='attachments')
 router.register(r'tickets', apis.Tickets, basename='tickets')
+router.register(r'comments', apis.Comments, basename='comments')
 
 urlpatterns = [
     path('api/', include(router.urls)),

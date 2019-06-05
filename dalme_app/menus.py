@@ -124,7 +124,7 @@ def dropdown_tasks(wholeMenu, user_id):
                     dropmenu += 'over'
                 dropmenu += 'due">Due: {}</div>'.format(task.due_date.strftime('%d-%b-%Y'))
             dropmenu += '</div><div class="dropdown-tasks-buttons"><div class="btn_task_complete" id="{}" onclick="task_set_state({}, {})">\
-                        <i class="far fa-square fa-lg"></i></div></div></div>'.format('task_'+str(task.id), task.id, 'mark_done')
+                        <i class="far fa-square fa-lg"></i></div></div></div>'.format('task_'+str(task.id), task.id, 'False')
     else:
         dropmenu += '<div class="dropdown-tasks-empty">There are currently no tasks in your queue.</div>'
     dropmenu += '<a class="dropdown-tasks-action dropdown-tasks-action-rb" href="{}">{}</a>'.format('/', 'My Tasks')

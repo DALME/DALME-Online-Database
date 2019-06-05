@@ -5,7 +5,7 @@ import re
 import os
 import json
 import pandas as pd
-from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Workset
+from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Workset, Task
 from datetime import date
 from dalme_app.async_tasks import update_rs_folio_field
 from async_messages import messages
@@ -138,14 +138,8 @@ def import_languages(request):
 
 
 def test_expression2(request):
-    object = Workset.objects.get(pk=8)
-    seq = 3
-    qset = json.loads(object.qset)
-    qset[str(seq)]['done'] = True
-    object.current_record = int(seq) + 1
-    object.qset = json.dumps(qset)
-    object.save()
-    foo=bar
+    object = Task.objects.get(pk=2)
+    object.comments.create(body="test")
     return 'done'
 
 
