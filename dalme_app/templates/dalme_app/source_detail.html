@@ -20,6 +20,10 @@
       var workset = {{ workset | safe }};
       $(document).ready(function() {
           init_worksets();
+          if (localStorage.getItem('sourceTab')) {
+            $('#' + localStorage.getItem('sourceTab')).tab('show');
+            switch_tab(localStorage.getItem('sourceTab'));
+          }
       });
     </script>
   {% endif %}
@@ -38,11 +42,11 @@
       <!-- tabs -->
       <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" onclick="cleanFooter()">Information</a>
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" onclick="switch_tab('info-tab')">Information</a>
         </li>
         {% if is_inv and has_pages %}
         <li class="nav-item">
-          <a class="nav-link" id="tr_editor-tab" data-toggle="tab" href="#tr_editor" role="tab" aria-controls="tr_editor" aria-selected="true" onclick="startEditor()">Editor</a>
+          <a class="nav-link" id="editor-tab" data-toggle="tab" href="#tr_editor" role="tab" aria-controls="tr_editor" aria-selected="true" onclick="switch_tab('editor-tab')">Editor</a>
         </li>
         {% endif %}
       </ul>
@@ -194,7 +198,7 @@
         {% endif %}
       </div>
       {% if is_inv and has_pages %}
-      <div class="tab-pane card-body p-0 clearfix transcription-editor" id="tr_editor" role="tabpanel" aria-labelledby="tr_editor-tab">
+      <div class="tab-pane card-body p-0 clearfix transcription-editor" id="tr_editor" role="tabpanel" aria-labelledby="editor-tab">
           <div id="viewer-toolbar" class="d-flex">
             <div class="btn-group align-self-start mr-auto" role="group" aria-label="zoom">
               <button class="editor-btn button-border-right" onclick="diva.zoomOut()"><i class="fa fa-search-minus fa-fw"></i></button>

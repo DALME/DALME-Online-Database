@@ -44,13 +44,13 @@
     <script type="text/javascript" src="{% static 'js/dalme_app.js' %}"></script>
     <link href="{% static 'css/dalme_app.css' %}" rel="stylesheet">
     <script>
-      $(function () { $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'}) });
       $(document).ready(function () {
           $(document).click(function (event) {
               var clickover = $(event.target);
               var _opened = $(".navbar-collapse").hasClass("show");
               if (_opened === true && !clickover.hasClass("navbar-toggler")) { $(".navbar-toggler").click(); }
           });
+          $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
       });
     </script>
     {% block extra_head %}{% endblock %}

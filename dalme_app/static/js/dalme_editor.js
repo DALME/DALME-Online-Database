@@ -1,3 +1,15 @@
+function switch_tab(tab) {
+  switch (tab) {
+    case 'info-tab':
+      cleanFooter();
+      localStorage.setItem('sourceTab','info-tab');
+      break;
+    case 'editor-tab':
+      startEditor();
+      localStorage.setItem('sourceTab','editor-tab');
+  }
+}
+
 function startEditor() {
   if (typeof transcriber_state == 'undefined') {
       transcriber_state = 'on';
