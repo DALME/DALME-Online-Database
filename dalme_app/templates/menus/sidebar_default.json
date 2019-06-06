@@ -117,7 +117,7 @@
       },
       {
         "text": "Issue Tickets",
-        "link": "/tasks/2/tickets/",
+        "link": "/tickets",
         "iconClass": "fa-ticket-alt"
       },
       {

@@ -342,3 +342,27 @@ function create_comment(model, object) {
         show_message('danger', 'There was an error saving your comment: '+errorThrown);
   });
 }
+
+function ticket_set_state(id, action) {
+  $.ajax({
+    method: "GET",
+    url: "/api/tickets/"+id+"/set_state/?action="+action,
+  }).done(function(data, textStatus, jqXHR) {
+        switch (action) {
+          case 'Close':
+            $('#ticket_status').removeClass('ticket-detail-open').addClass('ticket-detail-closed');
+            $('#ticket_status').html('<i class="fa fa-exclamation-circle fa-fw"></i> Closed');
+            let today = new Date();
+            $('#ticket_status_box').prepend('<div class="ticket-detail-date">'+today.toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric' })+' | '+data.username+'</div>');
+            $('#ticket_status_box').find('button').removeClass('btn-primary').addClass('btn-danger').text('Open');
+            break;
+          case 'Open':
+            $('#ticket_status').removeClass('ticket-detail-closed').addClass('ticket-detail-open');
+            $('#ticket_status').html('<i class="fa fa-exclamation-circle fa-fw"></i> Open');
+            $('.ticket-detail-date').remove();
+            $('#ticket_status_box').find('button').removeClass('btn-danger').addClass('btn-primary').text('Close');
+        }
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+      show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+  });
+}

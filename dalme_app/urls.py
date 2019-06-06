@@ -25,5 +25,7 @@ urlpatterns = [
     path('users/<username>/', views.UserDetail.as_view(), name='user_detail'),
     path('tasks/', views.TasksList.as_view(), name='tasks_list'),
     path('tasks/<slug:pk>/', views.TasksDetail.as_view(), name='tasks_detail'),
+    path('tickets/', views.TicketList.as_view(), name='ticket_list'),
+    path('tickets/<slug:pk>/', views.TicketDetail.as_view(), name='ticket_detail'),
     path('', views.Index.as_view(), name='dashboard'),
 ]

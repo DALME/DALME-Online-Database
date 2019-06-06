@@ -1005,6 +1005,25 @@ class Tickets(DTViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
+    @action(detail=True)
+    def set_state(self, request, *args, **kwargs):
+        result = {}
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        try:
+            action = self.request.GET['action']
+            if action == 'Close':
+                object.status = 1
+                object.save()
+            elif action == 'Open':
+                object.status = 0
+                object.save()
+            result['username'] = self.request.user.username
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
     def create(self, request, *args, **kwargs):
         result = {}
         data_dict = get_dte_data(request)

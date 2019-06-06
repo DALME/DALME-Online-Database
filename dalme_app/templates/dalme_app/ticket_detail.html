@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load staticfiles i18n %}
+{% block extra_head %}
+{% endblock %}
+{% block extra_dropdowns %}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card shadow mb-3">
+    <div class="card-header card-tabs-header">
+      <!-- tabs -->
+      <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
+        </li>
+      </ul>
+    </div>
+    <!-- Tab panes -->
+    <div class="tab-content h-100">
+      <div class="card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
+        <div class="row">
+          <div class="col-md-9">
+            <div class="card mb-3">
+              <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="ticket-detail-subject">{{ ticket.subject }}</div><div class="ticket-detail-id">#{{ ticket.id }}</div>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    {% if ticket.status == 0 %}
+                      <div id="ticket_status" class="ticket-detail-open"><i class="fa fa-exclamation-circle fa-fw"></i> Open</div>
+                    {% else %}
+                      <div id="ticket_status" class="ticket-detail-closed"><i class="fa fa-exclamation-circle fa-fw"></i> Closed</div>
+                    {% endif %}
+                    <div class="ticket-detail-meta"><b>{{ ticket.creation_username }}</b> opened this issue on {{ ticket.creation_timestamp|date:"j M, Y" }}</div>
+                  </div>
+                  <div class="ticket-detail-text">{{ ticket.description }}</div>
+                  {{ tags }}
+                    {% if ticket.tags %}
+                      {% for tag in tags %}
+                        <span class="task-d_pill {{ tag.tag }}">{{ tag }}</span>
+                      {% endfor %}
+                    {% endif %}
+              </div>
+            </div>
+            {% if comments %}
+              {% include "includes/comments_box.html" with model='Ticket' object=ticket.id %}
+            {% endif %}
+          </div>
+          <div class="col-md-3">
+            <div class="card mb-3">
+              <div id="ticket_status_box" class="card-body d-flex align-items-center">
+                {% if ticket.status == 0 %}
+                  <button class="btn btn-primary ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ ticket.id }}, $(this).text())">Close</button>
+                {% else %}
+                  <div class="ticket-detail-date">{{ ticket.modification_timestamp|date:"j-M-Y" }} | {{ ticket.modification_username }}</div>
+                  <button class="btn btn-danger ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ ticket.id }}, $(this).text())">Open</button>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="sub-card-header">
+                <div class="card-header-title"><i class="fa fa-paperclip fa-fw"></i> Attachments</div>
+              </div>
+                <div class="card-body p-2">
+                  {% if ticket.url %}
+                    <div class="task-da_body">
+                      <div class="task-da_header">URL</div>
+                      <div class="p-2">
+                        <a href="{{ task.url }}" class="nowrap">{{ ticket.url|truncatechars:40 }}</a>
+                      </div>
+                    </div>
+                  {% endif %}
+                  {% if ticket.file %}
+                    <div class="task-da_body">
+                      <div class="task-da_header">File</div>
+                      <div class="p-2">
+                        <a href="/download/{{ task.file.file }}"><i class="fa fa-file fa-fw"></i> {{ ticket.file.filename }}</a>
+                      </div>
+                    </div>
+                  {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+{% if comments %}
+<script>$(document).ready(function() { enable_comments('Ticket', {{ ticket.id }}); });</script>
+{% endif %}
+{% endblock %}

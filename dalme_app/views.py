@@ -15,7 +15,7 @@ from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
                               Source, Workset, TaskList, Task, rs_resource, rs_collection_resource,
                               rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, Language,
-                              Attribute_type, Country, rs_collection)
+                              Attribute_type, Country, rs_collection, Ticket)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
@@ -1029,6 +1029,53 @@ class Scripts(TemplateView):
         if self.request.GET.get('s') is not None:
             context['output'] = eval('custom_scripts.'+self.request.GET['s']+'(self.request)')
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class TicketDetail(DetailView):
+    model = Ticket
+    template_name = 'dalme_app/ticket_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context = functions.set_menus(self.request, context, state)
+        page_title = 'Ticket #'+str(self.object.id)
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['ticket'] = self.object
+        context['comments'] = True
+        return context
+
+    def get_object(self):
+        try:
+            object = super().get_object()
+            return object
+        except ObjectDoesNotExist:
+            raise Http404
+
+
+@method_decorator(login_required, name='dispatch')
+class TicketList(DTListView):
+    breadcrumb = [('System', ''), ('Asynchronous Tasks', '/async_tasks')]
+    list_name = 'async_tasks'
+    dt_options = {
+        'pageLength': 25,
+        'paging': 'true',
+        'responsive': 'true',
+        'fixedHeader': 'true',
+        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': {'style': 'single'},
+        'deferRender': 'true',
+        'rowId': '"id"',
+        'language': {'searchPlaceholder': 'Search'},
+        'order': '[[ 0, "desc" ]]'
+        }
 
 
 @method_decorator(login_required, name='dispatch')

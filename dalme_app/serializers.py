@@ -288,10 +288,10 @@ class TicketSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if ret['status']:
-            ticket = '<div class="ticket-closed">Closed</div>'
+            ticket = '<div class="d-flex align-items-center"><div class="ticket-closed">Closed</div>'
         else:
-            ticket = '<div class="ticket-open">Open</div>'
-        ticket += ret['subject']
+            ticket = '<div class="d-flex align-items-center"><div class="ticket-open">Open</div>'
+        ticket += '<a href="/tickets/'+str(ret['id'])+'" class="ticket_subject">'+ret['subject']+'</a></div>'
         ret['ticket'] = ticket
         attachments = ''
         if ret['url'] is not None:
