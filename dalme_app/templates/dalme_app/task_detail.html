@@ -36,8 +36,10 @@
                       <span class="task-d_pill" data-editor-field="assigned_to">Assigned to: {{ task.assigned_to.username }}</span>
                     </div>
                     <div class="col-sm-6 d-flex flex-column">
-                      <span class="task-d_pill align-self-end task-{% if task.overdue %}over{% endif %}due" data-editor-field="due_date">Due: {{ task.due_date|date:"j-M-Y" }}</span>
-                      <span class="task-d_pill align-self-end">Created:{{ task.creation_timestamp|date:"j-M-Y" }} by {{ task.created_by.username }}</span>
+                      {% if task.due_date %}
+                      <span class="task-d_pill align-self-end task-{% if task.overdue %}over{% endif %}due" data-editor-field="due_date">Due: {{ task.due_date }}</span>
+                      {% endif %}
+                      <span class="task-d_pill align-self-end">Created:{{ task.creation_timestamp }} by {{ task.created_by.username }}</span>
                     </div>
                   </div>
               </div>
@@ -50,7 +52,7 @@
             <div class="card mb-3">
               <div class="card-body d-flex">
                 {% if task.completed %}
-                  <div class="task-d_status">Completed: {{ task.completed_date|date:"j-M-Y" }}</div>
+                  <div class="task-d_status">Completed: {{ task.completed_date }}</div>
                   <div class="task_status_button d-inline-block ml-auto" id="task_{{ task.id }}" onclick="task_change_state({{ task.id }}, 'mark_undone')">
                     <i class="far fa-check-square fa-lg"></i>
                   </div>

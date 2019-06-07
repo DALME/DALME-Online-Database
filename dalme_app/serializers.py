@@ -25,13 +25,14 @@ class DynamicSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
+
     class Meta:
         model = Comment
-        fields = ('body',)
+        fields = ('body', 'creation_timestamp')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['date'] = instance.creation_timestamp.strftime('%d-%b-%Y@%H:%M')
         user = Profile.objects.get(user__username=instance.creation_username)
         ret['user'] = '<a href="/users/{}">{}</a>'.format(user.user.username, user.full_name)
         if user.profile_image is not None:
@@ -132,6 +133,10 @@ class WorksetSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y')
+    completed_date = serializers.DateField(format='%d-%b-%Y')
+    due_date = serializers.DateField(format='%d-%b-%Y')
+
     class Meta:
         model = Task
         fields = ('id', 'title', 'task_list', 'due_date', 'completed', 'completed_date', 'created_by', 'assigned_to', 'description', 'workset', 'url', 'creation_timestamp', 'overdue_status', 'file')
@@ -153,19 +158,19 @@ class TaskSerializer(serializers.ModelSerializer):
         ret['attachments'] = attachments
         ret['attachments_detail'] = attachments_detail
         overdue = ret.pop('overdue_status')
-        dates = '<div class="task-date">Cre: ' + instance.creation_timestamp.strftime('%d-%b-%Y') + '</div>'
-        dates_detail = '<span class="task-date">Created: ' + instance.creation_timestamp.strftime('%d-%b-%Y') + ' by '+instance.creation_username+'</span>'
+        dates = '<div class="task-date">Cre: ' + ret['creation_timestamp'] + '</div>'
+        dates_detail = '<span class="task-date">Created: ' + ret['creation_timestamp'] + ' by '+instance.creation_username+'</span>'
         if ret['due_date'] is not None:
             dates += '<div class="task-date task-'
             dates_detail += '<span class="task-date task-'
             if overdue:
                 dates += 'over'
                 dates_detail += 'over'
-            dates += 'due">Due: ' + instance.due_date.strftime('%d-%b-%Y') + '</div>'
-            dates_detail += 'due">Due: ' + instance.due_date.strftime('%d-%b-%Y') + '</span>'
+            dates += 'due">Due: ' + ret['due_date'] + '</div>'
+            dates_detail += 'due">Due: ' + ret['due_date'] + '</span>'
         if ret['completed_date'] is not None:
-            dates += '<div class="task-date task-completed">Com: ' + instance.completed_date.strftime('%d-%b-%Y') + '</div>'
-            dates_detail += '<span class="task-date task-completed">Completed: ' + instance.completed_date.strftime('%d-%b-%Y') + '</span>'
+            dates += '<div class="task-date task-completed">Com: ' + ret['completed_date'] + '</div>'
+            dates_detail += '<span class="task-date task-completed">Completed: ' + ret['completed_date'] + '</span>'
         ret['dates'] = dates
         ret['dates_detail'] = dates_detail
         if ret['assigned_to'] is None:
@@ -280,6 +285,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class TicketSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, required=False)
+    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
 
     class Meta:
         model = Ticket
@@ -383,6 +389,8 @@ class GroupSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """ Basic serializer for user data """
     groups = GroupSerializer(many=True, required=False)
+    last_login = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
+    date_joined = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
 
     class Meta:
         model = User

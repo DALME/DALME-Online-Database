@@ -317,7 +317,7 @@ function enable_comments(model, object) {
           for (let i = 0; i < data.results.length; i++) {
               var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.results[i].avatar+'</div>';
               comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
-              comment += '<b>'+data.results[i].user+'</b> commented on '+data.results[i].date+'</div>';
+              comment += '<b>'+data.results[i].user+'</b> commented on '+data.results[i].creation_timestamp+'</div>';
               comment += '<div class="comment-body">'+data.results[i].body+'</div></div></div>';
               $('#comments-container').append(comment);
           }
@@ -335,7 +335,7 @@ function create_comment(model, object) {
   }).done(function(data, textStatus, jqXHR) {
         var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.avatar+'</div>';
         comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
-        comment += '<b>'+data.user+'</b> commented on '+data.date+'</div>';
+        comment += '<b>'+data.user+'</b> commented on '+data.creation_timestamp+'</div>';
         comment += '<div class="comment-body">'+data.body+'</div></div></div>';
         $('#comments-container').append(comment);
   }).fail(function(jqXHR, textStatus, errorThrown) {

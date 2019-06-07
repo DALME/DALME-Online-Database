@@ -67,6 +67,7 @@ MIDDLEWARE = [
     #'django.middleware.locale.LocaleMiddleware'
 ]
 
+
 ROOT_URLCONF = 'dalme.devUrls'
 
 TEMPLATES = [
@@ -118,7 +119,28 @@ if 'RDS_DB_NAME' in os.environ:
             'HOST': os.environ['RDS_HOSTNAME'],
             'PORT': os.environ['RDS_PORT'],
             'CONN_MAX_AGE': 3600,
-        }
+        },
+        'dam': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['DAM_DB_NAME'],
+            'USER': os.environ['DAM_USERNAME'],
+            'PASSWORD': os.environ['DAM_PASSWORD'],
+            'HOST': os.environ['DAM_HOSTNAME'],
+        },
+        'wiki': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WIKI_DB_NAME'],
+            'USER': os.environ['WIKI_USERNAME'],
+            'PASSWORD': os.environ['WIKI_PASSWORD'],
+            'HOST': os.environ['WIKI_HOSTNAME'],
+        },
+        'wp': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['WP_DB_NAME'],
+            'USER': os.environ['WP_USERNAME'],
+            'PASSWORD': os.environ['WP_PASSWORD'],
+            'HOST': os.environ['WP_HOSTNAME'],
+        },
     }
 else:
     DATABASES = {
