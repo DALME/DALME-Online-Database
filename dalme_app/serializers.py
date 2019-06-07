@@ -25,7 +25,7 @@ class DynamicSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
+    creation_timestamp = serializers.DateTimeField(format='%-d-%b-%Y@%H:%M')
 
     class Meta:
         model = Comment
@@ -133,17 +133,24 @@ class WorksetSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y')
-    completed_date = serializers.DateField(format='%d-%b-%Y')
-    due_date = serializers.DateField(format='%d-%b-%Y')
+    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y', required=False)
+    completed_date = serializers.DateField(format='%d-%b-%Y', required=False)
+    due_date = serializers.DateField(format='%d-%b-%Y', required=False)
 
     class Meta:
         model = Task
-        fields = ('id', 'title', 'task_list', 'due_date', 'completed', 'completed_date', 'created_by', 'assigned_to', 'description', 'workset', 'url', 'creation_timestamp', 'overdue_status', 'file')
+        fields = ('id', 'title', 'task_list', 'due_date', 'completed', 'completed_date', 'created_by', 'assigned_to', 'description',
+                  'workset', 'url', 'creation_timestamp', 'overdue_status', 'file')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['task'] = '<a href="/tasks/{}" class="task-title">{}</a><div class="task-description">{}</div>'.format(ret['id'], ret['title'], ret['description'])
+        ret['comment_count'] = instance.comments.count()
+        task = '<div class="d-flex align-items-center mb-1"><a href="/tasks/{}" class="task-title">{}</a>'.format(ret['id'], ret['title'])
+        if ret['comment_count'] > 0:
+            task += '<div class="align-self-end ml-auto d-flex mr-2"><i class="fas fa-comment fa-lg icon-badge">\
+            </i><span class="icon-badge-count">{}</span></div>'.format(ret['comment_count'])
+        task += '</div><div class="task-description">{}</div>'.format(ret['description'])
+        ret['task'] = task
         attachments = ''
         attachments_detail = ''
         if ret['workset'] is not None:
@@ -289,15 +296,16 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file', 'creation_username', 'creation_timestamp')
+        fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file',
+                  'creation_username', 'creation_timestamp')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['status']:
-            ticket = '<div class="d-flex align-items-center"><div class="ticket-closed">Closed</div>'
-        else:
-            ticket = '<div class="d-flex align-items-center"><div class="ticket-open">Open</div>'
-        ticket += '<a href="/tickets/'+str(ret['id'])+'" class="ticket_subject">'+ret['subject']+'</a></div>'
+        ret['comment_count'] = instance.comments.count()
+        ticket = '<div class="d-flex align-items-center"><i class="fa fa-exclamation-circle ticket-status-{} fa-fw"></i>'.format(ret['status'])
+        ticket += '<a href="/tickets/'+str(ret['id'])+'" class="ticket_subject">'+ret['subject']+'</a>'
+        if ret['comment_count'] > 0:
+            ticket += '<i class="fas fa-comment fa-lg icon-badge ml-2"></i><span class="icon-badge-count">{}</span></div>'.format(ret['comment_count'])
         ret['ticket'] = ticket
         attachments = ''
         if ret['url'] is not None:
