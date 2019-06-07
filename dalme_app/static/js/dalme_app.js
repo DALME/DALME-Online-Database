@@ -333,6 +333,9 @@ function create_comment(model, object) {
         headers: { 'X-CSRFToken': get_cookie("csrftoken") },
         data: { 'model': model, 'object': object, 'body': body },
   }).done(function(data, textStatus, jqXHR) {
+        if (!$('#comments-container').length) {
+          $('#comments').prepend('<div id="comments-container"></div>');
+        };
         var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.avatar+'</div>';
         comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
         comment += '<b>'+data.user+'</b> commented on '+data.creation_timestamp+'</div>';
