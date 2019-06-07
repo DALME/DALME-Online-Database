@@ -2,6 +2,19 @@
 {% load staticfiles i18n %}
 {% block extra_head %}
 <script type="text/javascript" src="{% static 'dalme_helpers/task_detail.js' %}"></script>
+<script>
+  var task = {
+    "title": "{{ task.title }}",
+    "task_list": "{{ task.task_list.id }}",
+    "due_date": "{{ task.due_date|date:"Y-m-d" }}",
+    "assigned_to": "{{ task.assigned_to.id }}",
+    "description": "{{ task.description }}",
+    "workset": "{{ task.workset.id }}",
+    "url": "{{ task.url }}",
+    "file": "{{ task.file.id }}"
+  }
+</script>
+
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}
@@ -21,27 +34,27 @@
         <div class="row">
           <div class="col-md-9">
             <div class="card mb-3">
-              <div class="card-body">
+              <div class="card-body pb-3">
                   <div class="d-flex align-items-center">
-                    <div class="task-detail-title" data-editor-field="title">{{ task.title }}</div>
-                    <div class="custom-control custom-switch ml-auto">
-                      <input type="checkbox" class="custom-control-input" id="edit_mode_switch" onclick="edit_task()">
-                      <label class="custom-control-label task_edit_switch" for="edit_mode_switch">Edit mode</label>
-                    </div>
+                    <div class="record-title">{{ task.title }}</div>
+                    {% if perms.dalme_app.can_change_task %}
+                        <div class="dropdown-task-add" onclick="edit_task({{ task.id }})">Edit <i class="fa fa-pen fa-fw"></i></div>
+                    {% endif %}
                   </div>
-                  <div class="task-d_text" data-editor-field="description">{{ task.description }}</div>
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <span class="task-d_pill" data-editor-field="task_list">List: {{ task.task_list.name }} ({{ task.task_list.group.name }})</span>
-                      <span class="task-d_pill" data-editor-field="assigned_to">Assigned to: {{ task.assigned_to.username }}</span>
-                    </div>
-                    <div class="col-sm-6 d-flex flex-column">
-                      {% if task.due_date %}
-                      <span class="task-d_pill align-self-end task-{% if task.overdue %}over{% endif %}due" data-editor-field="due_date">Due: {{ task.due_date }}</span>
-                      {% endif %}
-                      <span class="task-d_pill align-self-end">Created:{{ task.creation_timestamp }} by {{ task.created_by.username }}</span>
-                    </div>
+                  <div class="record-title-meta">
+                    <a href="/users/{{ task.created_by.username }}">{{ task.created_by.profile.full_name }}</a> created this task on {{ task.creation_timestamp|date:"j-M-Y" }}
+                    in <a href="/tasks/">{{ task.task_list.name }} ({{ task.task_list.group.name }})</a>
+                    {% if task.comments.count > 0 %}
+                      ・ {{ task.comments.count }} comment{{ task.comments.count|pluralize }}
+                    {% endif %}
                   </div>
+                  <div class="record-description">{{ task.description }}</div>
+                  {% if task.assigned_to %}
+                  <a class="basic-pill" href="/users/{{ task.assigned_to.username }}">Assigned to {{ task.assigned_to.profile.full_name }}</a>
+                  {% endif %}
+                  {% if task.due_date %}
+                  <span class="basic-pill align-self-end task-{% if task.overdue %}over{% endif %}due">Due on {{ task.due_date }}</span>
+                  {% endif %}
               </div>
             </div>
             {% if comments %}
@@ -52,13 +65,13 @@
             <div class="card mb-3">
               <div class="card-body d-flex">
                 {% if task.completed %}
-                  <div class="task-d_status">Completed: {{ task.completed_date }}</div>
-                  <div class="task_status_button d-inline-block ml-auto" id="task_{{ task.id }}" onclick="task_change_state({{ task.id }}, 'mark_undone')">
+                  <div class="task-detail-status">Completed: {{ task.completed_date }}</div>
+                  <div class="button-pointer d-inline-block ml-auto" id="task_{{ task.id }}" onclick="task_change_state({{ task.id }}, 'mark_undone')">
                     <i class="far fa-check-square fa-lg"></i>
                   </div>
                 {% else %}
-                  <div class="task-d_status">Not completed.</div>
-                  <div class="task_status_button d-inline-block ml-auto" id="task_{{ task.id }}" onclick="task_change_state({{ task.id }}, 'mark_done')">
+                  <div class="task-detail-status">Not completed.</div>
+                  <div class="button-pointer d-inline-block ml-auto" id="task_{{ task.id }}" onclick="task_change_state({{ task.id }}, 'mark_done')">
                     <i class="far fa-square fa-lg"></i>
                   </div>
                 {% endif %}
@@ -70,8 +83,11 @@
               </div>
                 <div class="card-body p-2">
                   {% if task.workset %}
-                      <div class="task-da_body">
-                        <div class="task-da_header" >Workset</div>
+                      <div class="attachment-container-body">
+                        <div class="attachment-container-header">
+                            <div class="attachment-container-icon"><i class="fa fa-layer-group fa-fw"></i></div>
+                            <div class="attachment-container-label">Endpoint: {{ task.workset.endpoint }}</div>
+                        </div>
                         <div class="p-2">
                             <a href="/worksets/{{ task.workset.id }}" class="workset-title">{{ task.workset.name }}</a>
                             {% widthratio task.workset.progress 100 360 as angle %}
@@ -93,25 +109,17 @@
                               </div>
                             {% endif %}
                             <div class="workset-text">{{ task.workset.description }}</div>
-                            <div class="workset-endpoint">Endpoint: {{ task.workset.endpoint }}</div>
                         </div>
                       </div>
                   {% endif %}
                   {% if task.url %}
-                    <div class="task-da_body">
-                      <div class="task-da_header">URL</div>
-                      <div class="p-2">
-                        <a href="{{ task.url }}" class="nowrap">{{ task.url|truncatechars:40 }}</a>
-                      </div>
-                    </div>
+                        <a href="{{ task.url }}" class="pill-url d-flex align-items-center">
+                          <div class="pill-url-icon"><i class="fa fa-link fa-fw"></i></div>
+                          <div class="pill-url-label">{{ task.url }}</div>
+                        </a>
                   {% endif %}
                   {% if task.file %}
-                    <div class="task-da_body">
-                      <div class="task-da_header">File</div>
-                      <div class="p-2">
-                        <a href="/download/{{ task.file.file }}" class=""><i class="fa fa-file fa-fw"></i> {{ task.file.filename }}</a>
-                      </div>
-                    </div>
+                    {{ task.file.preview | safe }}
                   {% endif %}
               </div>
             </div>

@@ -1,10 +1,7 @@
 function task_detail() {
 }
 
-function edit_task() {
-  if (typeof edit_state == 'undefined' || edit_state == 'off') {
-      edit_state = 'on';
-      $('.dropdown-task-add').addClass('edit_button_on');
+function edit_task(id) {
       $.get("/api/options/?lists=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
           const staff = data.active_staff;
           const worksets = data.user_worksets;
@@ -76,8 +73,8 @@ function edit_task() {
                         url: "/api/attachments/",
                         headers: { 'X-CSRFToken': get_cookie("csrftoken")},
                       },
-                      display: function ( fileId ) {
-                        return taskForm.file('Attachment', fileId ).filename;
+                      display: function (id) {
+                        return editTaskForm.file('Attachment', id).filename;
                       },
                       clearText: "Remove File",
                       dragDrop: 'true',
@@ -86,15 +83,25 @@ function edit_task() {
                     }
                 ]
           });
-          $('[data-editor-field]').on( 'click.dalme', function (e) {
-            editTaskForm.bubble(this);
-          } );
+          editTaskForm.on('submitSuccess', function(e, json, data, action) {
+            show_message('success', 'The task was updated successfully.');
+            location.reload();
+          });
+          editTaskForm.buttons({
+            text: "Update",
+            className: "btn btn-primary",
+            action: function () { this.submit(); }
+          }).title('Edit Task').edit(id, false);
+          let file_obj = {}
+          file_obj[task['file']] = { id: task['file'], filename: $('.attachment-file-label').text() };
+          $.fn.dataTable.Editor.files['Attachment'] = file_obj;
+          for (const prop in task) {
+              if (task.hasOwnProperty(prop)) {
+                  editTaskForm.set(prop, task[prop]);
+              }
+          };
+          editTaskForm.open();
       }, 'json');
-  } else {
-      edit_state = 'off';
-      $('.dropdown-task-add').removeClass('edit_button_on');
-      $('[data-editor-field]').off('click.dalme');
-  }
 }
 
 function task_change_state(task, action) {

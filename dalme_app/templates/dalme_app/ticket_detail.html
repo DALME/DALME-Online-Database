@@ -22,7 +22,7 @@
             <div class="card mb-3">
               <div class="card-body">
                   <div class="d-flex align-items-center">
-                    <div class="ticket-detail-subject">{{ ticket.subject }}</div><div class="ticket-detail-id">#{{ ticket.id }}</div>
+                    <div class="record-title">{{ ticket.subject }}</div><div class="record-title-detail">#{{ ticket.id }}</div>
                   </div>
                   <div class="d-flex align-items-center">
                     {% if ticket.status == 0 %}
@@ -30,13 +30,17 @@
                     {% else %}
                       <div id="ticket_status" class="ticket-detail-closed"><i class="fa fa-exclamation-circle fa-fw"></i> Closed</div>
                     {% endif %}
-                    <div class="ticket-detail-meta"><b>{{ ticket.creation_username }}</b> opened this issue on {{ ticket.creation_timestamp|date:"j M, Y" }}</div>
+                    <div class="record-title-meta">
+                      <a href="/users/{{ ticket.creation_username }}">{{ ticket.creation_name }}</a> opened this issue on {{ ticket.creation_timestamp|date:"j-M-Y" }}
+                      {% if ticket.comments.count > 0 %}
+                        ・ {{ ticket.comments.count }} comment{{ ticket.comments.count|pluralize }}
+                      {% endif %}
+                    </div>
                   </div>
-                  <div class="ticket-detail-text">{{ ticket.description }}</div>
-                  {{ tags }}
+                  <div class="record-description">{{ ticket.description }}</div>
                     {% if ticket.tags %}
-                      {% for tag in tags %}
-                        <span class="task-d_pill {{ tag.tag }}">{{ tag }}</span>
+                      {% for t in ticket.tags.all %}
+                        <span class="basic-pill ticket-{{ t.tag }}">{{ t.tag }}</span>
                       {% endfor %}
                     {% endif %}
               </div>
@@ -51,7 +55,7 @@
                 {% if ticket.status == 0 %}
                   <button class="btn btn-primary ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ ticket.id }}, $(this).text())">Close</button>
                 {% else %}
-                  <div class="ticket-detail-date">{{ ticket.modification_timestamp|date:"j-M-Y" }} | {{ ticket.modification_username }}</div>
+                  <div class="ticket-detail-status">{{ ticket.modification_timestamp|date:"j-M-Y" }} | {{ ticket.modification_username }}</div>
                   <button class="btn btn-danger ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ ticket.id }}, $(this).text())">Open</button>
                 {% endif %}
               </div>
@@ -62,20 +66,13 @@
               </div>
                 <div class="card-body p-2">
                   {% if ticket.url %}
-                    <div class="task-da_body">
-                      <div class="task-da_header">URL</div>
-                      <div class="p-2">
-                        <a href="{{ task.url }}" class="nowrap">{{ ticket.url|truncatechars:40 }}</a>
-                      </div>
-                    </div>
+                        <a href="{{ ticket.url }}" class="pill-url d-flex align-items-center">
+                          <div class="pill-url-icon"><i class="fa fa-link fa-fw"></i></div>
+                          <div class="pill-url-label">{{ ticket.url }}</div>
+                        </a>
                   {% endif %}
                   {% if ticket.file %}
-                    <div class="task-da_body">
-                      <div class="task-da_header">File</div>
-                      <div class="p-2">
-                        <a href="/download/{{ task.file.file }}"><i class="fa fa-file fa-fw"></i> {{ ticket.file.filename }}</a>
-                      </div>
-                    </div>
+                    {{ ticket.file.preview | safe }}
                   {% endif %}
               </div>
             </div>

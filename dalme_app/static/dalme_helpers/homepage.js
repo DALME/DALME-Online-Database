@@ -6,7 +6,7 @@ function init_tables() {
           },
           serverSide: true,
           responsive: true,
-          dom: "<'sub-card-header pr-2 d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>",
+          dom: "<'sub-card-header pr-2 d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'iB>",
           select: { style: 'single' },
           scrollResize: true,
           scrollY: "30vh",
@@ -15,6 +15,28 @@ function init_tables() {
           scroller: true,
           language: { searchPlaceholder: "Search" },
           rowId: "id",
+          buttons: [
+              {
+                extend: 'collection',
+                dropup: true,
+                autoClose: true,
+                text: 'Sort',
+                buttons: [
+                  {
+                        text: 'Subject',
+                        action: function () { table_tickets.order([4,'asc']).draw() }
+                  },
+                  {
+                        text: 'Status',
+                        action: function () { table_tickets.order([5,'asc']).draw() }
+                  },
+                  {
+                        text: 'Comments',
+                        action: function () { table_tickets.order([6,'asc']).draw() }
+                  },
+                ]
+              }
+          ],
           columnDefs: [
                 {
                     title: "Id",
@@ -57,6 +79,12 @@ function init_tables() {
                     title: "Status",
                     targets: 5,
                     data: "status",
+                    visible: 0
+                },
+                {
+                    title: "Comments",
+                    targets: 6,
+                    data: "comment_count",
                     visible: 0
                 },
           ]
