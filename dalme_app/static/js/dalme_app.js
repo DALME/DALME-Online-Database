@@ -307,7 +307,7 @@ function show_message(type, text) {
   var message = '<div class="alert alert-'+type+' alert-dismissable" role="alert">';
   message += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>';
   message += text+'</div>';
-  $('.topbar-dalme').after(message);
+  $('.alert-container').append(message);
 }
 
 function enable_comments(model, object) {

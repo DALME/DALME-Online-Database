@@ -27,6 +27,7 @@ body {
   text-align: center;
   color: #fff;
   width: 19px;
+  line-height: 1.2;
 }
 
 .card-full-no-footer {
@@ -234,39 +235,48 @@ a {
 }
 
 /* messages and alerts */
+.alert-container {
+  margin-top: -24px;
+  position: absolute;
+  width: 100%;
+  z-index: 100;
+}
 
 .alert {
-  padding: 12px 20px;
-  margin-bottom: 24px;
-  margin-top: -24px;
   border-radius: 0;
   font-size: 14px;
+  -webkit-backdrop-filter: blur(2px);
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 20px;
+  padding-right: 120px;
+  margin-bottom: 0;
 }
 
 .alert-success {
   color: #0f6848;
-  background-color: #d2f4e8;
+  background-color: rgba(210, 244, 232, 0.8);
   border: 1px solid #d2f4e8;
   border-bottom-color: #6dddb3;
 }
 
 .alert-info {
   color: #1c606a;
-  background-color: #d7f1f5;
+  background-color: rgba(215, 241, 245, 0.8);
   border-color: #d7f1f5;
   border-bottom-color: #82d2e0;
 }
 
 .alert-warning {
   color: #806520;
-  background-color: #fdf3d8;
+  background-color: rgba(253, 243, 216, 0.8);
   border-color: #fdf3d8;
   border-bottom-color: #f8da89;
 }
 
 .alert-danger {
   color: #78261f;
-  background-color: #fadbd8;
+  background-color: rgba(250, 219, 216, 0.8);
   border-color: #fadbd8;
   border-bottom-color: #ef8c83;
 }
@@ -2150,6 +2160,30 @@ li#searchIcon.show a {
   font-size: 14px;
   font-weight: 500;
   padding: 3px 6px;
+  background-color: #2cbe4e;
+  color: #fff;
+  white-space: nowrap;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.ticket-detail-closed-sm {
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 6px;
+  background-color: #cb2431;
+  color: #fff;
+  white-space: nowrap;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.ticket-detail-open-sm {
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 11px;
   background-color: #2cbe4e;
   color: #fff;
   white-space: nowrap;

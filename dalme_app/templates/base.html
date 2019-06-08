@@ -132,6 +132,7 @@
         </nav>
         <!-- End of Topbar -->
         {% endblock %}
+        <div class="alert-container">
         {% if messages %}
             {% for message in messages %}
                 <div class="alert {{ message.tags }} alert-dismissable" role="alert">
@@ -140,6 +141,7 @@
                 </div>
             {% endfor %}
         {% endif %}
+      </div>
         <!-- Begin Page Content -->
         {% block content %}{% endblock %}
         </div>
