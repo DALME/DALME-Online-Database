@@ -1060,8 +1060,8 @@ class TicketDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class TicketList(DTListView):
-    breadcrumb = [('System', ''), ('Asynchronous Tasks', '/async_tasks')]
-    list_name = 'async_tasks'
+    breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
+    list_name = 'tickets'
     dt_options = {
         'pageLength': 25,
         'paging': 'true',

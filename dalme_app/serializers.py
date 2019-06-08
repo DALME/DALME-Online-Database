@@ -314,11 +314,11 @@ class TicketSerializer(serializers.ModelSerializer):
             attachments += '<a href="/download/{}" class="task-attachment">File</a>'.format(instance.file.file)
         ret['attachments'] = attachments
         tags = ret.pop('tags', None)
-        if tags is not None:
-            tag_string = ''
-            for tag in tags:
+        tag_string = ''
+        for tag in tags:
+            if tag['tag'] != '0' and tag['tag'] != '':
                 tag_string += '<div class="ticket-tag ticket-{}">{}</div>'.format(tag['tag'], tag['tag'])
-            ret['tags'] = tag_string
+        ret['tags'] = tag_string
         return ret
 
 
