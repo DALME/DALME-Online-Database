@@ -6,7 +6,7 @@
   var task = {
     "title": "{{ task.title }}",
     "task_list": "{{ task.task_list.id }}",
-    "due_date": "{{ task.due_date|date:"Y-m-d" }}",
+    "due_date": "{{ task.due_date|date:'Y-m-d' }}",
     "assigned_to": "{{ task.assigned_to.id }}",
     "description": "{{ task.description }}",
     "workset": "{{ task.workset.id }}",
@@ -14,7 +14,6 @@
     "file": "{{ task.file.id }}"
   }
 </script>
-
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}
@@ -57,9 +56,7 @@
                   {% endif %}
               </div>
             </div>
-            {% if comments %}
-              {% include "includes/comments_box.html" with model='Task' object=task.id %}
-            {% endif %}
+            {% include "includes/comments_box.html" with model='Task' object=task.id %}
           </div>
           <div class="col-md-3">
             <div class="card mb-3">
@@ -130,7 +127,5 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
-{% if comments %}
 <script>$(document).ready(function() { enable_comments('Task', {{ task.id }}); });</script>
-{% endif %}
 {% endblock %}

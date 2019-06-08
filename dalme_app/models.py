@@ -330,6 +330,7 @@ class Source(dalmeUuid):
     attributes = GenericRelation(Attribute, related_query_name='sources')
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
     tags = GenericRelation('Tag')
+    comments = GenericRelation('Comment')
 
     def __str__(self):
         return self.name

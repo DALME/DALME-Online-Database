@@ -49,6 +49,13 @@
           <a class="nav-link" id="editor-tab" data-toggle="tab" href="#tr_editor" role="tab" aria-controls="tr_editor" aria-selected="true" onclick="switch_tab('editor-tab')">Editor</a>
         </li>
         {% endif %}
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="true" onclick="switch_tab('comments-tab')">Comments
+            {% if comments_count > 0 %}
+              <div class="inline-badge">{{ comments_count }}</div>
+            {% endif %}
+          </a>
+        </li>
       </ul>
       {% if workset %}
         {% include "includes/workset_controller.html" with current=workset.current total=workset.total progress=workset.progress name=workset.name description=workset.description %}
@@ -229,8 +236,20 @@
               <div class="spinner-border mt-auto mb-auto"></div>
           </div>
       </div>
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
+      <div class="tab-pane card-body transcription-editor pt-4" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+        <div class="comment-box-container d-flex mb-3">
+          <div class="d-inline-block mr-3"><i class="fa fa-comment-medical img_avatar mt-1 fa-2x"></i></div>
+          <div class="comment-card comment-box d-inline-block">
+            <div class="comment-body p-2">
+              <textarea class="form-control form-control-sm comment-textarea" placeholder="Leave a comment..." id="new_comment_text"></textarea>
+              <div class="comment-tip">Click here for formatting options</div>
+            </div>
+            <button class="btn btn-primary ml-auto d-flex mr-2 mb-2" type="button" onclick="create_comment('Source', '{{ source_id }}')">Comment</button>
+          </div>
+        </div>
+      </div>
     <div class="tab-footer">
       <div id="tab-footer-interface" class="d-flex">
         <small class="text-muted tab-footer-text align-self-start" id="author"></small>
@@ -239,6 +258,7 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
+<script>$(document).ready(function() { enable_comments("Source", "{{ source_id }}"); });</script>
 {% if tables %}
   <script>
     {% for table in tables %}

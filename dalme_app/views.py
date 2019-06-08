@@ -564,6 +564,7 @@ class SourceDetail(DetailView):
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         context['source_id'] = self.object.id
+        context['comments_count'] = self.object.comments.count()
         is_inv = self.object.is_inventory
         has_pages = len(self.object.pages.all()) > 0
         has_children = len(self.object.source_set.all()) > 0
@@ -1047,7 +1048,6 @@ class TicketDetail(DetailView):
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         context['ticket'] = self.object
-        context['comments'] = True
         return context
 
     def get_object(self):
@@ -1094,7 +1094,6 @@ class TasksDetail(DetailView):
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         context['task'] = self.object
-        context['comments'] = True
         return context
 
     def get_object(self):

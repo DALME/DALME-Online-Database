@@ -45,9 +45,7 @@
                     {% endif %}
               </div>
             </div>
-            {% if comments %}
               {% include "includes/comments_box.html" with model='Ticket' object=ticket.id %}
-            {% endif %}
           </div>
           <div class="col-md-3">
             <div class="card mb-3">
@@ -83,7 +81,5 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
-{% if comments %}
 <script>$(document).ready(function() { enable_comments('Ticket', {{ ticket.id }}); });</script>
-{% endif %}
 {% endblock %}

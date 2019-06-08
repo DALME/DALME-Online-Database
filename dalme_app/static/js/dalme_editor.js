@@ -4,6 +4,10 @@ function switch_tab(tab) {
       cleanFooter();
       localStorage.setItem('sourceTab','info-tab');
       break;
+    case 'comments-tab':
+      cleanFooter();
+      localStorage.setItem('sourceTab','comments-tab');
+      break;
     case 'editor-tab':
       startEditor();
       localStorage.setItem('sourceTab','editor-tab');

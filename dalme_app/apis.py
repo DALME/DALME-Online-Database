@@ -977,7 +977,9 @@ class Comments(viewsets.ModelViewSet):
         if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
             model = self.request.GET['model']
             object = self.request.GET['object']
-            obj_instance = eval(model+'.objects.get(pk='+str(object)+')')
+            if type(object) is not str:
+                object = str(object)
+            obj_instance = eval(model+'.objects.get(pk="'+object+'")')
             queryset = obj_instance.comments.all()
         else:
             queryset = self.queryset
@@ -988,7 +990,7 @@ class Comments(viewsets.ModelViewSet):
         result = {}
         data = request.data
         try:
-            content_object = eval(data['model']+'.objects.get(pk='+data['object']+')')
+            content_object = eval(data['model']+'.objects.get(pk="'+data['object']+'")')
             new_comment = content_object.comments.create(body=data['body'])
             serializer = self.get_serializer(new_comment)
             result = serializer.data
