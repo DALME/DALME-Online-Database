@@ -53,10 +53,15 @@
             <div class="card mb-3">
               <div id="ticket_status_box" class="card-body d-flex align-items-center">
                 {% if ticket.status == 0 %}
+                  <div class="ticket-detail-status">This ticket is still open</div>
+                  {% if perms.dalme_app.can_change_ticket %}
                   <button class="btn btn-primary ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ ticket.id }}, $(this).text())">Close</button>
+                  {% endif %}
                 {% else %}
                   <div class="ticket-detail-status">{{ ticket.modification_timestamp|date:"j-M-Y" }} | {{ ticket.modification_username }}</div>
+                  {% if perms.dalme_app.can_change_ticket %}
                   <button class="btn btn-danger ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ ticket.id }}, $(this).text())">Open</button>
+                  {% endif %}
                 {% endif %}
               </div>
             </div>

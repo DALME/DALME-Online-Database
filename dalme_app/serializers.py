@@ -292,7 +292,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class TicketSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, required=False)
-    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
+    creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
 
     class Meta:
         model = Ticket

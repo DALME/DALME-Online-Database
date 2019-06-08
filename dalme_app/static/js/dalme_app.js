@@ -221,6 +221,9 @@ function create_ticket() {
                   url: "/api/attachments/",
                   headers: { 'X-CSRFToken': get_cookie("csrftoken")},
                 },
+                display: function ( fileId ) {
+                  return ticketForm.file('Attachment', fileId ).filename;
+                },
                 dragDrop: 'true',
                 dragDropText: "Drag file here",
                 uploadText: "Choose file..."

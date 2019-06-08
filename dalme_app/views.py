@@ -120,11 +120,6 @@ class DTListView(TemplateView):
         {'extend': 'colvis', 'text': '<i class="fa fa-columns fa-fw"></i>'},
         {'extend': "pageLength"}
     ]
-    dt_editor_buttons = [
-        {'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New'},
-        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected'},
-        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected'},
-    ]
     dte_field_list = None
 
     def get_context_data(self, **kwargs):
@@ -488,12 +483,6 @@ class SourceList(DTListView):
     """ Lists sources """
     dt_editor_options = {'idSrc': '"id"', 'template': '"#inventoryForm"'}
     dte_field_list = ['name', 'short_name', 'type', 'parent', 'is_inventory']
-    dt_editor_buttons = [
-        {'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Source'},
-        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Source Information'},
-        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Source',
-         'formMessage': 'Are you sure you wish to remove this source from the database? This action cannot be undone.'},
-    ]
 
     def get_list_name(self, *args, **kwargs):
         list_name = 'all'
@@ -531,6 +520,17 @@ class SourceList(DTListView):
             if self.request.GET['type'] == 'inventories':
                 module_list = ['filters']
         return module_list
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_source'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Source'})
+        if self.request.user.has_perm('dalme_app.change_source'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Source Information'})
+        if self.request.user.has_perm('dalme_app.delete_source'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Source',
+                                'formMessage': 'Are you sure you wish to remove this source from the database? This action cannot be undone.'})
+        return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
@@ -661,11 +661,17 @@ class UserList(DTListView):
     dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username',
                       'password', 'is_staff', 'is_superuser', 'groups', 'dam_usergroup',
                       'wiki_groups', 'wp_role']
-    dt_editor_buttons = [
-        {'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New User'},
-        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit User Information'},
-        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete User'},
-    ]
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_user'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New User'})
+        if self.request.user.has_perm('dalme_app.change_user'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit User Information'})
+        if self.request.user.has_perm('dalme_app.delete_user'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete User',
+                                'formMessage': 'Are you sure you wish to remove this user from the database? This action cannot be undone.'})
+        return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
@@ -794,7 +800,6 @@ class LanguageList(DTListView):
 class ImageList(DTListView):
     breadcrumb = [('Repository', ''), ('Images', '/images')]
     list_name = 'images'
-    # dt_field_list = ['ref', 'field8', 'field79', 'has_image', 'field12', 'creation_date', 'created_by', 'field3', 'collections', 'field51']
     dt_editor_options = {'idSrc': '"id"'}
     dte_field_list = ['field8', 'field79', 'field12', 'field3', 'collections']
     dt_options = {
@@ -805,22 +810,26 @@ class ImageList(DTListView):
         'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
         'serverSide': 'true',
         'stateSave': 'true',
-        # 'select': { 'style': 'multi', 'selector': 'td:first-child'},
         'select': {'style': 'multi'},
         'deferRender': 'true',
         'rowId': '"id"',
         'language': {'searchPlaceholder': 'Search'},
         # 'order': '[[ 1, "asc" ]]'
         }
-    dt_editor_buttons = [
-        {'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Image Information'},
-        {'action': 'toggle_inline_edit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline', 'className': "inline-edit-toggle"},
-        {'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Image',
-         'formMessage': 'Are you sure you wish to remove this image from the DAM? This action cannot be undone.'},
-        {'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'},
-        {'extend': 'selected', 'action': 'create_source_from_selected()', 'text': '<i class="fa fa-plus-square fa-fw dt_menu_icon"></i> Create Source from Selection'}
-    ]
-    module_list = ['preview', 'filters']
+    module_list = ['filters', 'preview']
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.change_rs_resource'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Image Information'})
+            dte_buttons.append({'action': 'toggle_inline_edit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline', 'className': "inline-edit-toggle"})
+        if self.request.user.has_perm('dalme_app.delete_rs_resource'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Image',
+                                'formMessage': 'Are you sure you wish to remove this image from the DAM? This action cannot be undone.'})
+        if self.request.user.has_perm('dalme_app.add_source'):
+            dte_buttons.append({'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'})
+            dte_buttons.append({'extend': 'selected', 'action': 'create_source_from_selected()', 'text': '<i class="fa fa-plus-square fa-fw dt_menu_icon"></i> Create Source from Selection'})
+        return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
