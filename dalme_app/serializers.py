@@ -147,7 +147,7 @@ class TaskSerializer(serializers.ModelSerializer):
         ret['comment_count'] = instance.comments.count()
         task = '<div class="d-flex align-items-center mb-1"><a href="/tasks/{}" class="task-title">{}</a>'.format(ret['id'], ret['title'])
         if ret['comment_count'] > 0:
-            task += '<div class="align-self-end ml-auto d-flex mr-2"><i class="fas fa-comment fa-lg icon-badge">\
+            task += '<div class="align-self-end ml-auto d-flex mr-2 align-items-center"><i class="fas fa-comment fa-lg icon-badge">\
             </i><span class="icon-badge-count">{}</span></div>'.format(ret['comment_count'])
         task += '</div><div class="task-description">{}</div>'.format(ret['description'])
         ret['task'] = task
