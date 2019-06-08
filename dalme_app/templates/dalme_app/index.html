@@ -2,6 +2,9 @@
 {% load staticfiles i18n %}
 {% block extra_head %}
 <script type="text/javascript" src="{% static 'dalme_helpers/homepage.js' %}"></script>
+<script>
+  var user = { "id": "{{ user.id }}", "username": "{{ user.username }}" }
+</script>
 {% endblock %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}

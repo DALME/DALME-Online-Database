@@ -1,7 +1,7 @@
 function init_tables() {
     table_tickets = $('#dataTables-tickets').DataTable({
           'ajax': {
-            'url': "/api/tickets/?format=json",
+            'url': "/api/tickets/?format=json&filter=creation_username," + user['username'],
             'data': function (data) { return { "data": JSON.stringify( data ) }; }
           },
           serverSide: true,
@@ -21,19 +21,18 @@ function init_tables() {
                 dropup: true,
                 autoClose: true,
                 text: 'Sort',
+                className: 'footer-btn',
                 buttons: [
                   {
                         text: 'Subject',
+                        className: 'footer-btn',
                         action: function () { table_tickets.order([4,'asc']).draw() }
                   },
                   {
                         text: 'Status',
+                        className: 'footer-btn',
                         action: function () { table_tickets.order([5,'asc']).draw() }
-                  },
-                  {
-                        text: 'Comments',
-                        action: function () { table_tickets.order([6,'asc']).draw() }
-                  },
+                  }
                 ]
               }
           ],
@@ -91,7 +90,7 @@ function init_tables() {
     });
     table_worksets = $('#dataTables-worksets').DataTable({
           'ajax': {
-            'url': "/api/worksets/?format=json",
+            'url': "/api/worksets/?format=json&filter=owner," + user['id'],
             'data': function (data) { return { "data": JSON.stringify( data ) }; }
           },
           serverSide: true,
@@ -154,12 +153,12 @@ function init_tables() {
     });
     table_tasks = $('#dataTables-tasks').DataTable({
           'ajax': {
-            'url': "/api/tasks/?format=json",
+            'url': "/api/tasks/?format=json&filter=assigned_to," + user['id'],
             'data': function (data) { return { "data": JSON.stringify( data ) }; }
           },
           serverSide: true,
           responsive: true,
-          dom: "<'sub-card-header pr-2 d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>",
+          dom: "<'sub-card-header pr-2 d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'iB>",
           select: { style: 'single' },
           scrollResize: true,
           scrollY: "40vh",
@@ -168,6 +167,23 @@ function init_tables() {
           scroller: true,
           language: { searchPlaceholder: "Search" },
           rowId: "id",
+          buttons: [
+
+                  {
+                        text: 'Tasks assigned to me',
+                        className: 'footer-btn',
+                        action: function () {
+                          table_tasks.ajax.url("/api/tasks/?format=json&filter=assigned_to," + user['id']).draw();
+                        }
+                  },
+                  {
+                        text: 'Tasks I created',
+                        className: 'footer-btn',
+                        action: function () {
+                          table_tasks.ajax.url("/api/tasks/?format=json&filter=created_by," + user['id']).draw();
+                        }
+                  },
+                ],
           columnDefs: [
                  {
                      title: "Task",
@@ -242,7 +258,7 @@ function init_tables() {
                  },
           ]
     });
-    $('#dataTables-tickets_wrapper').find('.card-header-title').html('<i class="fa fa-ticket-alt fa-fw"></i> Issue Tickets');
+    $('#dataTables-tickets_wrapper').find('.card-header-title').html('<i class="fa fa-ticket-alt fa-fw"></i> My Issue Tickets');
     $('#dataTables-worksets_wrapper').find('.card-header-title').html('<i class="fa fa-layer-group fa-fw"></i> My Worksets');
     $('#dataTables-tasks_wrapper').find('.card-header-title').html('<i class="fa fa-user-check fa-fw"></i> My Tasks');
     fix_dt_search();

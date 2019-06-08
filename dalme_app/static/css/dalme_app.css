@@ -1139,6 +1139,25 @@ div.DTE_Field_Type_textarea textarea {
   border: 1px solid #a5a5a5 !important;
   color: #5d656c !important;
 }
+
+/* dt footer toolbar */
+
+.footer-btn {
+  border: none;
+  background-color: transparent !important;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.footer-btn:hover {
+  color: #224abe !important;
+  text-decoration: none !important;
+}
+
+.btn-group>.btn-group:not(:last-child)>.footer-btn, .btn-group>.footer-btn:not(:last-child) {
+  border-right: 1px solid #a5a5a5 !important;
+}
+
 /* full card toolbar */
 
 .dt-buttons {
