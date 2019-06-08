@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load staticfiles i18n %}
 {% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/luminous-lightbox/2.3.2/luminous-basic.min.css" integrity="sha256-tPW9wLkspLEhKo1rCAUlqiMvw30PPoyOatV5gL8a+/M=" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/luminous-lightbox/2.3.2/luminous.min.js" integrity="sha256-JtowJgZIxtr4WObMQMDqCojFv0TMRb438K2bLmjYS8Q=" crossorigin="anonymous"></script>
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}
@@ -81,5 +83,9 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
-<script>$(document).ready(function() { enable_comments('Ticket', {{ ticket.id }}); });</script>
+<script>
+  $(document).ready(function() {
+    enable_comments('Ticket', {{ ticket.id }});
+    new Luminous(document.querySelector('.attachment-file-image'), { sourceAttribute: "src" });
+  });</script>
 {% endblock %}
