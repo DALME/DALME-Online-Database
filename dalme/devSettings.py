@@ -45,14 +45,20 @@ INSTALLED_APPS = [
     #'treebeard',
     #'sekizai',
     'django_celery_results',
-    'allaccess.apps.AllAccessConfig',
+    # 'allaccess.apps.AllAccessConfig',
     #'todo',
     #'debug_toolbar',
     #'crispy_forms',
+    #'oauth2_provider',
+    # 'corsheaders',
     'rest_framework',
+    'oidc_provider',
+    'storages'
 ]
 
 MIDDLEWARE = [
+    # 'corsheaders.middleware.CorsMiddleware',
+    #'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.middleware.security.SecurityMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -93,6 +99,7 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 #authentication backends
 AUTHENTICATION_BACKENDS = [
     #'allaccess.backends.AuthorizedServiceBackend',
+    #'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend'
 ]
 
@@ -103,9 +110,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 awsauth = AWS4Auth(AWS_ACCESS_ID,AWS_ACCESS_KEY,AWS_REGION,'es')
-
+OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
+OIDC_IDTOKEN_INCLUDE_CLAIMS = True
 #authentication settings
-LOGIN_URL = '/accounts/login/dalme_wp/'
+#LOGIN_URL = '/accounts/login/dalme_wp/'
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 #LOGIN_REDIRECT_URL = 'https://db.dalme.org'
@@ -114,6 +123,11 @@ LOGOUT_REDIRECT_URL = 'https://dalme.org'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
+# OAUTH2_PROVIDER = {
+#     'SCOPES': {'read': 'Read scope', 'write': 'Write scope'}
+# }
+
 
 DATABASE_ROUTERS = ['dalme_app.db_routers.ModelDatabaseRouter']
 
@@ -211,6 +225,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -232,15 +247,18 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Media files location
-
+# Media files
+DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
+AWS_DEFAULT_ACL = None
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
-MEDIA_URL = '/media/'
+# MEDIA_ROOT = '/Users/gabep/Repos/DALME-Online-Database/media/'
+MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
+# MEDIA_URL = '/media/'
 
 # Extra places for collectstatic to find static files.
-STATICFILES_DIRS = [
-    os.path.join(PROJECT_ROOT, 'static'),
-]
+# STATICFILES_DIRS = [
+#     os.path.join(PROJECT_ROOT, 'static'),
+# ]
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 

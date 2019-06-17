@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
 #from allaccess.views import OAuthRedirect
 from rest_framework import routers
-from dalme_app import views, apis
+from dalme_app import apis
 
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
@@ -32,11 +32,15 @@ router.register(r'cities', apis.Cities, basename='cities')
 router.register(r'attachments', apis.Attachments, basename='attachments')
 router.register(r'tickets', apis.Tickets, basename='tickets')
 router.register(r'comments', apis.Comments, basename='comments')
+# router.register(r'userinfo', apis.OauthUser, basename='userinfo')
 
 urlpatterns = [
+    #path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),
+    #re_path(r'^accounts/login/dalme_wp/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('django_admin/', admin.site.urls),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),

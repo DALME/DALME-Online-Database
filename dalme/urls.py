@@ -5,9 +5,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
-from allaccess.views import OAuthRedirect
+# from allaccess.views import OAuthRedirect
 from rest_framework import routers
-from dalme_app import views, apis
+from dalme_app import apis
 
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
@@ -36,8 +36,10 @@ router.register(r'comments', apis.Comments, basename='comments')
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('accounts/login/<slug:provider>/', OAuthRedirect.as_view(), name='allaccess-login'),
-    path('accounts/callback/<slug:provider>/', views.OAuthCallback_WP.as_view(provider_id='ID'), name='allaccess-callback'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),
+    # path('accounts/login/<slug:provider>/', OAuthRedirect.as_view(), name='allaccess-login'),
+    # path('accounts/callback/<slug:provider>/', views.OAuthCallback_WP.as_view(provider_id='ID'), name='allaccess-callback'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('django_admin/', admin.site.urls),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),

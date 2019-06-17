@@ -27,8 +27,9 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'haystack',
     'django_celery_results',
-    'allaccess.apps.AllAccessConfig',
     'rest_framework',
+    'oidc_provider',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -40,6 +41,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'dalme_app.middleware.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'dalme_app.middleware.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -64,7 +66,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dalme.wsgi.application'
 
-AUTHENTICATION_BACKENDS = ['allaccess.backends.AuthorizedServiceBackend', ]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
@@ -73,8 +77,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
-
-LOGIN_URL = 'accounts/login/dalme_wp/'
+OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
+OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 

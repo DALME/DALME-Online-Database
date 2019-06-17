@@ -10,7 +10,6 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
-from allaccess.views import OAuthCallback
 from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
                               Source, Workset, TaskList, Task, rs_resource, rs_collection_resource,
@@ -21,21 +20,6 @@ import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-
-
-class OAuthCallback_WP(OAuthCallback):
-    def get_or_create_user(self, provider, access, info):
-        uname = info['user_login']
-        email = info['email']
-        name = info['display_name']
-        # User = get_user_model()
-        try:
-            the_user = User.objects.get(username=uname)
-        except User.DoesNotExist:
-            the_user = User.objects.create_user(uname, email, None)
-            the_user.profile.full_name = name
-            the_user.save()
-        return the_user
 
 
 def SessionUpdate(request):
