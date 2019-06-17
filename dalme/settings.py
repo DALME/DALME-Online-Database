@@ -12,6 +12,16 @@ AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
 AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
 AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
 AWS_REGION = os.environ['AWS_DEFAULT_REGION']
+AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ['EMAIL_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
 
 DEBUG = False
 ALLOWED_HOSTS = ['db.dalme.org']
@@ -156,9 +166,10 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
+AWS_DEFAULT_ACL = None
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
-MEDIA_URL = '/media/'
-STATICFILES_DIRS = [os.path.join(PROJECT_ROOT, 'static'), ]
+MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')

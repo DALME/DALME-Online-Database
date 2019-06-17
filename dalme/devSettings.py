@@ -25,11 +25,25 @@ AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
 AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
 AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
 AWS_REGION = os.environ['AWS_DEFAULT_REGION']
+AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+# email setup
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ['EMAIL_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # Application definition
-ALLOWED_HOSTS = ['127.0.0.1:8000','127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443']
+ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443']
+# CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     'dalme_app.application.DalmeConfig',

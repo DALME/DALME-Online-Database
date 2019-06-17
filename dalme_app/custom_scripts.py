@@ -16,6 +16,8 @@ import operator
 from functools import reduce
 from django.db.models import Q, Count
 from collections import OrderedDict
+from django.core.mail import send_mail
+from django.http import HttpResponse
 
 
 def get_script_menu():
@@ -138,8 +140,13 @@ def import_languages(request):
 
 
 def test_expression2(request):
-    object = Task.objects.get(pk=2)
-    object.comments.create(body="test")
+    send_mail(
+        'Subject, hello G',
+        'Here is the message.',
+        'DALME Project <mail@dalme.org>',
+        ['pizzorno@icloud.com'],
+        fail_silently=False,
+    )
     return 'done'
 
 

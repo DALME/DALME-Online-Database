@@ -36,15 +36,14 @@ def SessionUpdate(request):
 def DownloadAttachment(request, path):
     path_tokens = path.split('/')
     original_filename = path_tokens.pop(-1)
-    file_path = settings.MEDIA_ROOT + '/' + path
-    fp = open(file_path, 'rb')
-    response = HttpResponse(fp.read())
-    fp.close()
+    file_path = settings.MEDIA_URL + path
+    with urllib.request.urlopen(file_path) as fp:
+        response = HttpResponse(fp.read())
     type, encoding = mimetypes.guess_type(original_filename)
     if type is None:
         type = 'application/octet-stream'
     response['Content-Type'] = type
-    response['Content-Length'] = str(os.stat(file_path).st_size)
+    #response['Content-Length'] = str(os.stat(file_path).st_size)
     if encoding is not None:
         response['Content-Encoding'] = encoding
     # To inspect details for the below code, see http://greenbytes.de/tech/tc2231/
