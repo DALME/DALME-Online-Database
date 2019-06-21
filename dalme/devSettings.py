@@ -84,6 +84,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.middleware.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'oidc_provider.middleware.SessionManagementMiddleware',
     #'django.middleware.locale.LocaleMiddleware'
 ]
 
@@ -123,9 +124,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
-awsauth = AWS4Auth(AWS_ACCESS_ID,AWS_ACCESS_KEY,AWS_REGION,'es')
+awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
 OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
 OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+OIDC_SESSION_MANAGEMENT_ENABLE = True
 #authentication settings
 #LOGIN_URL = '/accounts/login/dalme_wp/'
 LOGIN_URL = '/accounts/login/'
@@ -289,8 +291,9 @@ CSRF_COOKIE_SECURE = True
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CELERY_RESULT_BACKEND = 'django-db'
+
 CELERY_BROKER_URL = 'redis://localhost'
+CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {
     'default': {

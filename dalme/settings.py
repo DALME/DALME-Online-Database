@@ -7,24 +7,25 @@ from django.contrib.messages import constants as messages
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-SECRET_KEY = os.environ['SECRET_KEY']
-AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
-AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
-AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
-AWS_REGION = os.environ['AWS_DEFAULT_REGION']
-AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+AWS_ACCESS_ID = os.environ.get('AWS_ACCESS_ID', '')
+AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY', '')
+AWS_ES_ENDPOINT = os.environ.get('AWS_ES_ENDPOINT', '')
+AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
-EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ['EMAIL_USER']
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
 
 DEBUG = False
-ALLOWED_HOSTS = ['db.dalme.org']
+ALLOWED_HOSTS = ['.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
 
 INSTALLED_APPS = [
     'dalme_app.application.DalmeConfig',
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.middleware.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'oidc_provider.middleware.SessionManagementMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'
@@ -89,6 +91,7 @@ AUTH_PASSWORD_VALIDATORS = [
 awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
 OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
 OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+OIDC_SESSION_MANAGEMENT_ENABLE = True
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
@@ -97,33 +100,33 @@ DATABASE_ROUTERS = ['dalme_app.db_routers.ModelDatabaseRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['RDS_DB_NAME'],
-        'USER': os.environ['RDS_USERNAME'],
-        'PASSWORD': os.environ['RDS_PASSWORD'],
-        'HOST': os.environ['RDS_HOSTNAME'],
-        'PORT': os.environ['RDS_PORT'],
+        'NAME': os.environ.get('RDS_DB_NAME', ''),
+        'USER': os.environ.get('RDS_USERNAME', ''),
+        'PASSWORD': os.environ.get('RDS_PASSWORD', ''),
+        'HOST': os.environ.get('RDS_HOSTNAME', ''),
+        'PORT': os.environ.get('RDS_PORT', ''),
         'CONN_MAX_AGE': 3600,
     },
     'dam': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['DAM_DB_NAME'],
-        'USER': os.environ['DAM_USERNAME'],
-        'PASSWORD': os.environ['DAM_PASSWORD'],
-        'HOST': os.environ['DAM_HOSTNAME'],
+        'NAME': os.environ.get('DAM_DB_NAME', ''),
+        'USER': os.environ.get('DAM_USERNAME', ''),
+        'PASSWORD': os.environ.get('DAM_PASSWORD', ''),
+        'HOST': os.environ.get('DAM_HOSTNAME', ''),
     },
     'wiki': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['WIKI_DB_NAME'],
-        'USER': os.environ['WIKI_USERNAME'],
-        'PASSWORD': os.environ['WIKI_PASSWORD'],
-        'HOST': os.environ['WIKI_HOSTNAME'],
+        'NAME': os.environ.get('WIKI_DB_NAME', ''),
+        'USER': os.environ.get('WIKI_USERNAME', ''),
+        'PASSWORD': os.environ.get('WIKI_PASSWORD', ''),
+        'HOST': os.environ.get('WIKI_HOSTNAME', ''),
     },
     'wp': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['WP_DB_NAME'],
-        'USER': os.environ['WP_USERNAME'],
-        'PASSWORD': os.environ['WP_PASSWORD'],
-        'HOST': os.environ['WP_HOSTNAME'],
+        'NAME': os.environ.get('WP_DB_NAME', ''),
+        'USER': os.environ.get('WP_USERNAME', ''),
+        'PASSWORD': os.environ.get('WP_PASSWORD', ''),
+        'HOST': os.environ.get('WP_HOSTNAME', ''),
     },
 }
 
@@ -181,8 +184,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CELERY_RESULT_BACKEND = 'db+mysql:///django-db'
-CELERY_BROKER_URL = 'redis://localhost'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {
     'default': {

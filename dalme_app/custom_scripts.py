@@ -7,7 +7,7 @@ import json
 import pandas as pd
 from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Workset, Task
 from datetime import date
-from dalme_app.async_tasks import update_rs_folio_field
+from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
 from django.contrib.auth.models import User
 from dalme_app.apis import normalize_value

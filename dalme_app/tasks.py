@@ -1,13 +1,11 @@
 from __future__ import absolute_import, unicode_literals
-""" Celery tasks """
 from dalme_app.models import (Page, rs_resource)
-from dalme.celeryapp import app
+from celery import shared_task
 from async_messages import messages
 from django.contrib.auth.models import User
 
 
-# to invoke task, use: task_name.apply_async()
-@app.task
+@shared_task
 def update_rs_folio_field(user_id):
     try:
         pages = Page.objects.all()

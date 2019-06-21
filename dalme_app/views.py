@@ -33,6 +33,10 @@ def SessionUpdate(request):
     return HttpResponse('ok')
 
 
+def HealthCheck(request):
+    return HttpResponse(status=200)
+
+
 def DownloadAttachment(request, path):
     path_tokens = path.split('/')
     original_filename = path_tokens.pop(-1)
