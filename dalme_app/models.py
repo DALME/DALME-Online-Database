@@ -521,7 +521,7 @@ class TaskList(dalmeIntid):
 
 class Task(dalmeIntid):
     title = models.CharField(max_length=140)
-    task_list = models.ForeignKey(TaskList, on_delete=models.CASCADE, null=True)
+    task_list = models.ForeignKey(TaskList, on_delete=models.CASCADE)
     due_date = models.DateField(blank=True, null=True)
     completed = models.BooleanField(default=False)
     completed_date = models.DateField(blank=True, null=True)
