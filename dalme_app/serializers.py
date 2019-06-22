@@ -134,8 +134,8 @@ class WorksetSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y', required=False)
-    completed_date = serializers.DateField(format='%d-%b-%Y', required=False)
-    due_date = serializers.DateField(format='%d-%b-%Y', required=False)
+    completed_date = serializers.DateField(format='%d-%b-%Y', required=False, allow_null=True)
+    due_date = serializers.DateField(format='%d-%b-%Y', required=False, allow_null=True)
 
     class Meta:
         model = Task
