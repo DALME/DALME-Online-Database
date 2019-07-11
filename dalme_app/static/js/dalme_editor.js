@@ -47,7 +47,7 @@ function startEditor() {
           });
       };
       if (folio_array[0].tr_id == 'None') {
-          $(editor_container).html('<div class="mt-auto mb-auto">This folio/page has not been transcribed. Click on Edit to start...</div>');
+          $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
           $(author_container).html('No transcription available');
       } else {
           $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
@@ -130,6 +130,14 @@ function changeEditorMode() {
   }
 }
 
+function changeEditorImage(target) {
+  if (folio_array[target].dam_id == 'None') {
+      $(viewer_container).html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
+  } else {
+      diva.changeObject('/pages/'+folio_array[target].id+'/manifest');
+  }
+}
+
 function changeEditorFolio(target) {
   $(document.body).css('cursor', 'wait');
   if (target != '') {
@@ -137,31 +145,46 @@ function changeEditorFolio(target) {
     var total = folio_array.length;
     var prev = target != 0 ? target - 1 : '';
     var next = target + 1 >= total ? '' : target + 1;
-    $.get("/api/transcriptions/"+folio_array[target].tr_id+"?format=json", function (data) {
-        tr_text = data.transcription;
-        if (editor_mode == 'render') {
-            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
-                $(editor_container).html(text);
-            });
-            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-        } else if (editor_mode == 'xml') {
-            saveEditor();
-            xmleditor.session.setValue(tr_text);
-            xmleditor.session.getUndoManager().reset();
-            updateEditorToolbar();
-        }
-        $(author_container).html('Transcribed by '+data.author);
+    if (folio_array[target].tr_id == 'None') {
+        if (editor_mode == 'xml') { changeEditorMode() };
+        $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
+        $(author_container).html('No transcription available');
         $('#btn_prevFolio').attr('value', prev);
         $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
         $('#folio-menu').find('.current-folio').removeClass('current-folio');
         $('#folio-menu').find('#'+target).addClass('current-folio');
         $('#btn_nextFolio').attr('value', next);
         updateFolioButtons();
-        diva.changeObject('/pages/'+folio_array[target].id+'/manifest');
+        changeEditorImage(target);
         folio_idx = target;
         $(document.body).css('cursor', 'default');
-        //window.dispatchEvent(new Event('resize'));
-    });
+    } else {
+        $.get("/api/transcriptions/"+folio_array[target].tr_id+"?format=json", function (data) {
+            tr_text = data.transcription;
+            if (editor_mode == 'render') {
+                tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+                    $(editor_container).html(text);
+                });
+                $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+            } else if (editor_mode == 'xml') {
+                saveEditor();
+                xmleditor.session.setValue(tr_text);
+                xmleditor.session.getUndoManager().reset();
+                updateEditorToolbar();
+            }
+            $(author_container).html('Transcribed by '+data.author);
+            $('#btn_prevFolio').attr('value', prev);
+            $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
+            $('#folio-menu').find('.current-folio').removeClass('current-folio');
+            $('#folio-menu').find('#'+target).addClass('current-folio');
+            $('#btn_nextFolio').attr('value', next);
+            updateFolioButtons();
+            changeEditorImage(target);
+            folio_idx = target;
+            $(document.body).css('cursor', 'default');
+            //window.dispatchEvent(new Event('resize'));
+        });
+    }
   }
 }
 
