@@ -634,7 +634,7 @@ class Attachment(dalmeUuid):
             icon = 'fa-file'
         if self.type.split('/')[0] == 'image':
             preview = '<div class="attachment-file"><img src="{}" class="attachment-file-image" alt="image">\
-                                   <div class="attachment-file-label">{}</div></div>'.format('/media/'+str(self.file), self.filename)
+                                   <div class="attachment-file-label">{}</div></div>'.format('https://dalme-app-media.s3.amazonaws.com/media/'+str(self.file), self.filename)
         else:
             preview = '<div class="attachment-file"><div class="attachment-file-body"><i class="far {} fa-8x"></i>\
                                    </div><div class="attachment-file-label"><a href="/download/{}">{}</a></div>\
