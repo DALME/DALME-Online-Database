@@ -132,7 +132,13 @@
 <script>
   $(document).ready(function() {
       enable_comments('Task', {{ task.id }});
+  });
+</script>
+{% if task.file %}
+<script>
+  $(document).ready(function() {
       new Luminous(document.querySelector('.attachment-file-image'), { sourceAttribute: "src" });
   });
 </script>
+{% endif %}
 {% endblock %}

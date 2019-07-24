@@ -89,8 +89,13 @@
 {% endblock %}
 {% block extra_scripts %}
 <script>
+  $(document).ready(function() { enable_comments('Ticket', {{ ticket.id }}); });
+</script>
+{% if ticket.file %}
+<script>
   $(document).ready(function() {
-    enable_comments('Ticket', {{ ticket.id }});
     new Luminous(document.querySelector('.attachment-file-image'), { sourceAttribute: "src" });
-  });</script>
+  });
+</script>
+{% endif %}
 {% endblock %}

@@ -309,7 +309,7 @@ class ContentTypes(DTViewSet):
                         new_type = Content_attributes()
                         new_type.content_type = object
                         new_type.attribute_type = Attribute_type.objects.get(id=t)
-                        new_type.save()
+                        new_type.save(update_fields=['content_type', 'attribute_type', 'modification_username', 'modification_timestamp'])
                 if remove_types:
                     q = Q(content_type=object.id)
                     for t in remove_types:
@@ -399,7 +399,7 @@ class DTLists(DTViewSet):
                             new_field = DT_fields()
                             new_field.list = object
                             new_field.field = Attribute_type.objects.get(pk=f)
-                            new_field.save()
+                            new_field.save(update_fields=['list', 'field', 'modification_username', 'modification_timestamp'])
                         except Exception as e:
                             data_dict['error'] = 'The following error occured while trying to update the database: ' + str(e)
                 if remove_fields:
@@ -955,10 +955,10 @@ class Tasks(DTViewSet):
             action = self.request.GET['action']
             if action == 'mark_done':
                 object.completed = True
-                object.save()
+                object.save(update_fields=['completed', 'modification_username', 'modification_timestamp'])
             elif action == 'mark_undone':
                 object.completed = False
-                object.save()
+                object.save(update_fields=['completed', 'modification_username', 'modification_timestamp'])
             result['message'] = 'Update succesful.'
             status = 201
         except Exception as e:
@@ -1015,10 +1015,10 @@ class Tickets(DTViewSet):
             action = self.request.GET['action']
             if action == 'Close':
                 object.status = 1
-                object.save()
+                object.save(update_fields=['status', 'modification_username', 'modification_timestamp'])
             elif action == 'Open':
                 object.status = 0
-                object.save()
+                object.save(update_fields=['status', 'modification_username', 'modification_timestamp'])
             result['username'] = self.request.user.username
             status = 201
         except Exception as e:
@@ -1269,12 +1269,12 @@ class Worksets(DTViewSet):
                 qset[str(seq)]['done'] = True
                 object.current_record = int(seq) + 1
                 object.qset = json.dumps(qset)
-                object.save()
+                object.save(update_fields=['current_record', 'qset', 'modification_username', 'modification_timestamp'])
             elif action == 'mark_undone':
                 qset = json.loads(object.qset)
                 qset[str(seq)].pop('done')
                 object.qset = json.dumps(qset)
-                object.save()
+                object.save(update_fields=['current_record', 'qset', 'modification_username', 'modification_timestamp'])
             result['message'] = 'Update succesful.'
             status = 201
         except Exception as e:
