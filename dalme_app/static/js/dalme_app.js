@@ -344,6 +344,7 @@ function create_comment(model, object) {
         comment += '<b>'+data.user+'</b> commented on '+data.creation_timestamp+'</div>';
         comment += '<div class="comment-body">'+data.body+'</div></div></div>';
         $('#comments-container').append(comment);
+        $('#new_comment_text').val("");
   }).fail(function(jqXHR, textStatus, errorThrown) {
         show_message('danger', 'There was an error saving your comment: '+errorThrown);
   });
