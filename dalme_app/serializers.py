@@ -496,7 +496,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content_type
-        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types', 'has_pages', 'parents')
+        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types', 'has_pages', 'parents', 'has_inventory')
         extra_kwargs = {'name': {'validators': []}}
 
     def to_representation(self, instance):

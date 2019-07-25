@@ -309,7 +309,7 @@ class ContentTypes(DTViewSet):
                         new_type = Content_attributes()
                         new_type.content_type = object
                         new_type.attribute_type = Attribute_type.objects.get(id=t)
-                        new_type.save(update_fields=['content_type', 'attribute_type', 'modification_username', 'modification_timestamp'])
+                        new_type.save()
                 if remove_types:
                     q = Q(content_type=object.id)
                     for t in remove_types:
@@ -399,7 +399,7 @@ class DTLists(DTViewSet):
                             new_field = DT_fields()
                             new_field.list = object
                             new_field.field = Attribute_type.objects.get(pk=f)
-                            new_field.save(update_fields=['list', 'field', 'modification_username', 'modification_timestamp'])
+                            new_field.save()
                         except Exception as e:
                             data_dict['error'] = 'The following error occured while trying to update the database: ' + str(e)
                 if remove_fields:
