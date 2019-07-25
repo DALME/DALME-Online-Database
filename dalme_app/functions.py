@@ -172,13 +172,13 @@ def get_ctype_parents(ids):
     if ',' in ids:
         list_ids = ids.split(',')
         list_names = []
-        for i in list_ids:
-            list_names.append(ctype_dict[i])
+        for j in list_ids:
+            list_names.append(ctype_dict[int(j)])
         result = ', '
         result = result.join(list_names)
     else:
         try:
-            result = ctype_dict[ids]
+            result = ctype_dict[int(ids)]
         except:
             result = ids
     return result
