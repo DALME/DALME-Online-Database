@@ -433,7 +433,7 @@ class ModelLists(DTListView):
     def get_dte_fields(self, _list, *args, **kwargs):
         model = self.kwargs['model']
         if model == 'content_types':
-            dte_fields = ['name', 'short_name', 'content_class', 'description', 'attribute_types', 'has_pages', 'parents']
+            dte_fields = ['name', 'short_name', 'content_class', 'description', 'attribute_types', 'parents', 'has_pages', 'has_inventory']
         elif model == 'attribute_types':
             dte_fields = ['name', 'short_name', 'description', 'data_type', 'source', 'same_as', 'options_list', 'required']
         elif model == 'dt_fields':

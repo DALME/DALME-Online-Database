@@ -169,18 +169,13 @@ def get_page_chain(breadcrumb, current=None):
 
 def get_ctype_parents(ids):
     ctype_dict = {i.id: i.name for i in Content_type.objects.all()}
+    result = []
     if ',' in ids:
         list_ids = ids.split(',')
-        list_names = []
-        for j in list_ids:
-            list_names.append(ctype_dict[int(j)])
-        result = ', '
-        result = result.join(list_names)
     else:
-        try:
-            result = ctype_dict[int(ids)]
-        except:
-            result = ids
+        list_ids = [ids]
+    for j in list_ids:
+        result.append({'id': int(j), 'name': ctype_dict[int(j)]})
     return result
 
 
