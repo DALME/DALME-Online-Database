@@ -268,8 +268,8 @@ class ContentTypes(DTViewSet):
         serializer = self.get_serializer(data=data_dict)
         if serializer.is_valid():
             new_obj = serializer.save()
+            object = Content_type.objects.get(pk=new_obj.id)
             if attribute_types is not None:
-                object = Content_type.objects.get(pk=new_obj.id)
                 if ',' in str(attribute_types):
                     attribute_types = [int(i) for i in attribute_types.split(',')]
                 else:
