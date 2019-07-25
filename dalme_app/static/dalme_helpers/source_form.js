@@ -1,12 +1,17 @@
 function source_form() {
   if (dt_table.ajax.url().split("/")[2] == 'sources') {
-      source_editor = dt_editor;
-      source_editor.on('open.dalme', function(e, mode, action) { change_form(e, action) });
-      source_editor.on('close.dalme', function(e) { change_form(e) });
+    $.get("/api/options/?lists=content_types_opt&format=json", function (option_data) {
+          ct_opt = option_data.content_types_opt;
+          source_editor = dt_editor;
+          source_editor.hide(['parent.value', 'has_inventory']);
+          source_editor.on('open.dalme', function(e, mode, action) { change_form(e, action) });
+          source_editor.on('close.dalme', function(e) { change_form(e) });
+    }, 'json');
   } else if (dt_table.ajax.url().split("/")[2] == 'images') {
-      $.get("/api/options/?lists=content_types_1,parent_sources_13&format=json", function (option_data) {
+      $.get("/api/options/?lists=content_types_opt,content_types_0,parent_sources_13&format=json", function (option_data) {
+            ct_opt = option_data.content_types_opt;
             const type_options = option_data.content_types;
-            const parent_options = option_data.parent_sources;
+            parent_options = option_data.parent_sources;
             source_editor = new $.fn.dataTable.Editor( {
                 ajax: {
                   create: {
@@ -44,6 +49,12 @@ function source_form() {
                             message: "A short name for the source to use in lists, <i>eg: ADBR 3B 57 (Gassini)</i>"
                       },
                       {
+                            name: "type.value",
+                            label: "Type",
+                            type: "selectize",
+                            options: type_options,
+                      },
+                      {
                             name: "parent.value",
                             label: "Parent",
                             type: "selectize",
@@ -51,16 +62,10 @@ function source_form() {
                             message: "Parent record,if applicable, <i>eg: a book for a book chapter, a register for an act, etc.</i>"
                       },
                       {
-                            name: "type.value",
-                            label: "Type",
-                            type: "selectize",
-                            options: type_options,
-                      },
-                      {
-                            name: "is_inventory",
+                            name: "has_inventory",
                             label: "Inventory",
                             type: "checkbox",
-                            options: [{label: "Indicates whether this source should be processed as an inventory.", value: "1"}],
+                            options: [{label: "Indicates whether this source contains an inventory.", value: "1"}],
                       },
                   ]
               });
@@ -85,13 +90,11 @@ function change_form(e, action) {
           init_editor()
       } else if (action == 'create') {
           source_editor.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The source was created succesfully.') });
-          foo = 1;
       };
       source_editor.field('type.value').input().on('change.dalme', change_on_type);
-      source_editor.field('is_inventory').input().on('change.dalme', change_on_inv);
   } else if (e.type == 'close') {
       source_editor.field('type.value').input().off('change.dalme');
-      source_editor.field('is_inventory').input().off('change.dalme');
+      source_editor.hide(['parent.value', 'has_inventory']);
       clear_entries('attributes');
       $('#attribute-formset').collapse('hide');
       clear_entries('pages');
@@ -100,9 +103,11 @@ function change_form(e, action) {
 }
 
 function change_on_type(callback='undefined') {
-    $.get("/api/options/?lists=attribute_types_"+source_editor.get('type.value')+"&extra=1&format=json", function (option_data) {
+    var ctype = source_editor.get('type.value');
+    $.get("/api/options/?lists=parent_sources_"+ctype+",attribute_types_"+ctype+"&extra=1&format=json", function (option_data) {
           atype_choices = option_data.attribute_types.options;
           atype_ref = option_data.attribute_types.ref;
+          parent_options = option_data.parent_sources;
           if ($('#attribute-formset').hasClass('show')) {
               clear_entries('attributes');
           } else {
@@ -110,22 +115,42 @@ function change_on_type(callback='undefined') {
               attribute_formset = 'on';
               $('#attribute-formset').collapse('show');
           };
+          if (ct_opt[ctype]['pages'] == 1) {
+              if (!$('#page-formset').hasClass('show')) {
+                  page_control = {};
+                  page_formset = 'on';
+                  $('#page-formset').collapse('show');
+              }
+          } else {
+              if ($('#page-formset').hasClass('show')) {
+                  clear_entries('pages');
+                  page_formset = 'off';
+                  $('#page-formset').collapse('hide');
+              }
+          };
+          if (ct_opt[ctype]['inv'] == 1) {
+              if (!source_editor.field('has_inventory').displayed()) {
+                source_editor.show('has_inventory');
+              }
+          } else {
+              if (source_editor.field('has_inventory').displayed()) {
+                source_editor.hide('has_inventory');
+              }
+          };
+          if (parent_options != 'n/a') {
+            source_editor.field('parent.value').update(parent_options);
+            if (!source_editor.field('parent.value').displayed()) {
+              source_editor.show('parent.value');
+            }
+          } else {
+            if (source_editor.field('parent.value').displayed()) {
+              source_editor.hide('parent.value');
+            }
+          };
           if (typeof callback !== 'undefined') {
               Function('"use strict";return (' + callback +'())')();
           }
     }, 'json');
-}
-
-function change_on_inv() {
-    if ($('#DTE_Field_is_inventory_0').is(':checked')) {
-        page_control = {};
-        page_formset = 'on';
-        $('#page-formset').collapse('show');
-    } else {
-        clear_entries('pages');
-        page_formset = 'off';
-        $('#page-formset').collapse('hide');
-    };
 }
 
 function clear_entries(e_type) {
@@ -176,7 +201,9 @@ function init_editor() {
               };
               $.get("/api/pages/?filter=sources__source,"+source_editor.ids()+"&format=json", function (page_data) {
                   var p_data = page_data.data;
-                  change_on_inv();
+                  page_control = {};
+                  page_formset = 'on';
+                  $('#page-formset').collapse('show');
                   for (let i = 0, len = p_data.length; i < len; ++i) {
                       var prop_dict = {};
                       for (const prop in p_data[i]) {
@@ -451,9 +478,7 @@ function init_source_editor(para_data) {
     var suggested_fields = para_data.data.suggested_fields
     source_editor.create(false);
     source_editor.set('type.value', 13);
-    source_editor.set('is_inventory', 1);
-    source_editor.field('type.value').disable();
-    source_editor.field('is_inventory').disable();
+    source_editor.set('has_inventory', 1);
     if ('name' in suggested_fields) {
         source_editor.set('name.value', suggested_fields.name);
     } else {
@@ -474,7 +499,9 @@ function init_source_editor(para_data) {
 
 function create_from_images() {
     if (attribute_formset == 'on') {
-        change_on_inv();
+        page_control = {};
+        page_formset = 'on';
+        $('#page-formset').collapse('show');
         let order = 0;
         var pages = []
         for (const prop in img_data) {

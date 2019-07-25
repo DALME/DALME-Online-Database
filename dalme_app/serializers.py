@@ -349,7 +349,7 @@ class SourceSerializer(DynamicSerializer):
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'is_inventory',
+        fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'has_inventory',
                   'attributes', 'no_folios', 'tags')
 
     def to_representation(self, instance):
@@ -496,7 +496,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content_type
-        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types')
+        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types', 'has_pages', 'parents')
         extra_kwargs = {'name': {'validators': []}}
 
     def to_representation(self, instance):
@@ -504,6 +504,8 @@ class ContentTypeSerializer(serializers.ModelSerializer):
         if ret['content_class'] and ret['cont_class']:
             name = ret.pop('cont_class')
             ret['content_class'] = {'name': name, 'value': ret['content_class']}
+        if ret['parents'] is not None:
+            ret['parents'] = functions.get_ctype_parents(ret['parents'])
         return ret
 
 

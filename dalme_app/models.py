@@ -158,6 +158,9 @@ class Content_type(dalmeIntid):
     short_name = models.CharField(max_length=55)
     description = models.TextField()
     attribute_types = models.ManyToManyField(Attribute_type, through='Content_attributes')
+    has_pages = models.BooleanField(default=False, db_index=True)
+    has_inventory = models.BooleanField(default=False)
+    parents = models.CharField(max_length=255, blank=True, default=None, null=True)
 
     def __str__(self):
         return self.name
@@ -326,7 +329,7 @@ class Source(dalmeUuid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    is_inventory = models.BooleanField(default=False, db_index=True)
+    has_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation(Attribute, related_query_name='sources')
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
     tags = GenericRelation('Tag')

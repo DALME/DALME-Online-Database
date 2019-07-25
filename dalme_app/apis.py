@@ -612,10 +612,16 @@ class Options(viewsets.ViewSet):
         return staff_options
 
     def content_types(self, content_class=None, **kwargs):
-        if content_class is not None:
+        if content_class is not None and content_class != 0:
             content_types = [{'label': i.name, 'value': i.id} for i in Content_type.objects.filter(content_class=content_class).order_by('name')]
+        elif content_class == 0:
+            content_types = [{'label': i.name, 'value': i.id} for i in Content_type.objects.filter(content_class=1, has_pages=True).order_by('name')]
         else:
             content_types = [{'label': i.name, 'value': i.id} for i in Content_type.objects.all().order_by('name')]
+        return content_types
+
+    def content_types_opt(self, **kwargs):
+        content_types = {i.id: {'pages': i.has_pages, 'inv': i.has_inventory} for i in Content_type.objects.all()}
         return content_types
 
     def user_worksets(self, **kwargs):
@@ -641,8 +647,16 @@ class Options(viewsets.ViewSet):
 
     def parent_sources(self, source_type=None, **kwargs):
         if source_type is not None:
-            if source_type == 13:
-                parent_sources = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.filter(type=12).order_by('short_name')]
+            parent_types = Content_type.objects.get(pk=source_type).parents
+            if parent_types is not None and ',' in parent_types:
+                list_ids = parent_types.split(',')
+                parent_sources = []
+                for sid in list_ids:
+                    parent_sources += [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.filter(type=sid).order_by('short_name')]
+            elif parent_types is not None:
+                parent_sources = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.filter(type=parent_types).order_by('short_name')]
+            else:
+                parent_sources = 'n/a'
         else:
             parent_sources = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Source.objects.all().order_by('short_name')]
         return parent_sources
@@ -822,7 +836,7 @@ class Sources(DTViewSet):
             queryset = self.queryset
             q_obj = Q()
             if type == 'inventories':
-                q_obj &= Q(is_inventory=True)
+                q_obj &= Q(has_inventory=True)
                 queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages'))
             else:
                 content_types = DT_list.objects.get(short_name=type).content_types.all()
@@ -848,7 +862,7 @@ class Sources(DTViewSet):
     def filter_on_filters(self, *args, **kwargs):
         queryset = kwargs['queryset']
         filters = kwargs['filters']
-        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'is_inventory', 'no_folios', 'tags']
+        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'no_folios', 'tags']
         annotate_dict = {}
         if filters.get('and_list') is not None:
             for filter in filters['and_list']:
@@ -894,7 +908,7 @@ class Sources(DTViewSet):
         else:
             order_column_name = order_column_name_raw
         order_dir = dt_data['order'][0]['dir']
-        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'is_inventory', 'no_folios']
+        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'no_folios']
         if order_column_name not in local_fields:
             att_type = Attribute_type.objects.get(short_name=order_column_name)
             att_type_id = att_type.id
