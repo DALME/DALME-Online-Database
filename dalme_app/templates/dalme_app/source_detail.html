@@ -4,7 +4,7 @@
   {% if has_pages or has_children %}
     <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
   {% endif %}
-  {% if is_inv and has_pages %}
+  {% if has_pages %}
     <link href="https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700,700i&amp;subset=latin-ext" rel="stylesheet">
     <link href="{% static 'css/diva.css' %}" rel="stylesheet">
     <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
@@ -44,7 +44,7 @@
         <li class="nav-item">
           <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" onclick="switch_tab('info-tab')">Information</a>
         </li>
-        {% if is_inv and has_pages %}
+        {% if has_pages %}
         <li class="nav-item">
           <a class="nav-link" id="editor-tab" data-toggle="tab" href="#tr_editor" role="tab" aria-controls="tr_editor" aria-selected="true" onclick="switch_tab('editor-tab')">Editor</a>
         </li>
@@ -147,7 +147,7 @@
                           <td>{{ row.name }}</td>
                           <td>{{ row.short_name }}</td>
                           <td>{{ row.type }}</td>
-                          {% if row.is_inventory == 0 %}
+                          {% if row.has_inventory == 0 %}
                             <td><i class="fa fa-times"></i></td>
                           {% else %}
                             <td><i class="fa fa-check"></i></td>
@@ -204,7 +204,7 @@
         </div>
         {% endif %}
       </div>
-      {% if is_inv and has_pages %}
+      {% if has_pages %}
       <div class="tab-pane card-body p-0 clearfix transcription-editor" id="tr_editor" role="tabpanel" aria-labelledby="editor-tab">
           <div id="viewer-toolbar" class="d-flex">
             <div class="btn-group align-self-start mr-auto" role="group" aria-label="zoom">

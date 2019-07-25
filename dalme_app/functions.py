@@ -167,6 +167,23 @@ def get_page_chain(breadcrumb, current=None):
     return title
 
 
+def get_ctype_parents(ids):
+    ctype_dict = {i.id: i.name for i in Content_type.objects.all()}
+    if ',' in ids:
+        list_ids = ids.split(',')
+        list_names = []
+        for i in list_ids:
+            list_names.append(ctype_dict[i])
+        result = ', '
+        result = result.join(list_names)
+    else:
+        try:
+            result = ctype_dict[ids]
+        except:
+            result = ids
+    return result
+
+
 def get_full_collection_string(t1, t2, t3, user, name):
     full_name = ''
     if name != 'My Collection':
@@ -236,7 +253,7 @@ def get_count(item):
     All other values for `item` return None
     """
     if item == 'inventories':
-        return Source.objects.filter(is_inventory=True).count()
+        return Source.objects.filter(has_inventory=True).count()
     elif item == 'archives':
         return Source.objects.filter(type=19).count()
     elif item == 'sources':

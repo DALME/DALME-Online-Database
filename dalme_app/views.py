@@ -419,7 +419,7 @@ class ModelLists(DTListView):
     def get_dt_fields(self, _list, *args, **kwargs):
         model = self.kwargs['model']
         if model == 'content_types':
-            dt_field_list = ['id', 'name', 'short_name', 'content_class', 'description', 'attribute_types']
+            dt_field_list = ['id', 'name', 'short_name', 'content_class', 'description', 'attribute_types', 'has_pages', 'parents']
         elif model == 'attribute_types':
             dt_field_list = ['id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as',
                              'options_list', 'required']
@@ -433,7 +433,7 @@ class ModelLists(DTListView):
     def get_dte_fields(self, _list, *args, **kwargs):
         model = self.kwargs['model']
         if model == 'content_types':
-            dte_fields = ['name', 'short_name', 'content_class', 'description', 'attribute_types']
+            dte_fields = ['name', 'short_name', 'content_class', 'description', 'attribute_types', 'has_pages', 'parents']
         elif model == 'attribute_types':
             dte_fields = ['name', 'short_name', 'description', 'data_type', 'source', 'same_as', 'options_list', 'required']
         elif model == 'dt_fields':
@@ -469,7 +469,7 @@ class ModelLists(DTListView):
 class SourceList(DTListView):
     """ Lists sources """
     dt_editor_options = {'idSrc': '"id"', 'template': '"#inventoryForm"'}
-    dte_field_list = ['name', 'short_name', 'type', 'parent', 'is_inventory']
+    dte_field_list = ['name', 'short_name', 'type', 'parent', 'has_inventory']
 
     def get_list_name(self, *args, **kwargs):
         list_name = 'all'
@@ -552,17 +552,17 @@ class SourceDetail(DetailView):
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         context['source_id'] = self.object.id
         context['comments_count'] = self.object.comments.count()
-        is_inv = self.object.is_inventory
+        has_inv = self.object.has_inventory
         has_pages = len(self.object.pages.all()) > 0
         has_children = len(self.object.source_set.all()) > 0
-        context['is_inv'] = is_inv
+        context['has_inv'] = has_inv
         context['has_pages'] = has_pages
         context['has_children'] = has_children
         source_data = {
             'Type': self.object.type.name,
             'Name': self.object.name,
             'Short name': self.object.short_name,
-            'Inventory?': functions.format_boolean(is_inv),
+            'Inventory': functions.format_boolean(has_inv),
         }
         if self.object.parent:
             source_data['Parent'] = '<a href="{}">{}</a>'.format('/sources/'+str(self.object.parent.id), self.object.parent.name)
@@ -584,7 +584,7 @@ class SourceDetail(DetailView):
             attribute_data.append(dict)
         context['attribute_data'] = attribute_data
         tables = []
-        if is_inv and has_pages:
+        if has_pages:
             folios = functions.get_editor_folios(self.object)
             context['folio_count'] = folios['folio_count']
             context['folio_menu'] = folios['folio_menu']

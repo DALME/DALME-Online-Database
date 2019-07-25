@@ -270,8 +270,8 @@ def import_transcriptions(request):
                 tag_group='DLS_Lucca_Transcription_Review'
             )
 
-        # update source's is_inventory field
-        source_object.is_inventory = 1
+        # update source's has_inventory field
+        source_object.has_inventory = 1
         source_object.save()
 
     return 'done'
