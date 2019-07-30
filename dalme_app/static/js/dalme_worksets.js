@@ -21,7 +21,7 @@ function ws_next() {
         let url = '/'+workset['endpoint']+'/'+workset['next_id']+'/?workset='+workset['workset_id']+'&seq='+next_seq;
         window.location.href = url;
     }).fail(function(jqXHR, textStatus, errorThrown) {
-        show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+        toastr.error('There was an error communicating with the server: '+errorThrown);
     });
   }
 }
@@ -39,7 +39,7 @@ function ws_mark(action) {
     method: "GET",
     url: "/api/worksets/"+workset['workset_id']+"/set_state/?action="+action+"&seq="+workset['current'],
   }).fail(function(jqXHR, textStatus, errorThrown) {
-    show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+    toastr.error('There was an error communicating with the server: '+errorThrown);
   });
 }
 

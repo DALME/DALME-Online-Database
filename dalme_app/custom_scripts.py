@@ -18,6 +18,7 @@ from django.db.models import Q, Count
 from collections import OrderedDict
 from django.core.mail import send_mail
 from django.http import HttpResponse
+from django.contrib import messages
 
 
 def get_script_menu():
@@ -139,99 +140,14 @@ def import_languages(request):
     return 'okay'
 
 
-def test_expression2(request):
-    send_mail(
-        'Subject, hello G',
-        'Here is the message.',
-        'DALME Project <mail@dalme.org>',
-        ['pizzorno@icloud.com'],
-        fail_silently=False,
-    )
-    return 'done'
-
 
 def test_expression(request):
-    data3 = '{"action":"create","data":{"0":{"title":"some issue","description":"desc","tags":["bug","something"],"url":"https://127.0.0.1.xip.io:8443/models/dt_fields/#","file":"b976cb3c-907e-48b0-b368-ab5e7ab2efd4"}}}'
-    dt_request = json.loads(data3)
-    dt_request.pop('action')
-    rows = dt_request['data']
-    data_list = []
-    for k, v in rows.items():
-        row_values = {}
-        for field, value in v.items():
-            if 'many-count' not in field:
-                if type(value) is list:
-                    if len(value) == 1:
-                        value = normalize_value(value[0])
-                    elif len(value) == 0:
-                        value = 0
-                    else:
-                        value = [normalize_value(i) for i in value]
-                elif type(value) is dict:
-                    # if len(value) == 1 and value.get('value') is not None:
-                    if len(value) == 1:
-                        # value = normalize_value(value['value'])
-                        value = normalize_value(list(value.values())[0])
-                    else:
-                        value = {key: normalize_value(val) for key, val in value.items() if 'many-count' not in key}
-                else:
-                    value = normalize_value(value)
-                row_values[field] = value
-        data_list.append([k, row_values])
-    data_dict = data_list[0][1]
-    foo=bar
-    fields = data_dict.pop('fields', None)
-    if fields is not None:
-        if ',' in str(fields):
-            fields = fields.split(',')
-        else:
-            fields = [fields]
-    fields = [int(i) for i in fields]
-    current_fields = DT_fields.objects.filter(list=1).values_list('field', flat=True)
-    add_fields = list(set(fields3) - set(current_fields))
-    remove_fields = list(set(current_fields) - set(fields3))
-    foo=bar
-    attributes = data_dict.pop('attributes', None)
-    object = Source.objects.get(pk='4bad6531-67fc-4546-a47b-1a7099fa72f0')
-    results = []
-    if attributes is not None:
-        if 'id' in attributes:
-            attributes = [attributes]
-        else:
-            attributes = list(attributes.values())
-        create_attributes = []
-        update_attributes = {}
-        for a in attributes:
-            a_id = a.pop('id')
-            a_type = a.pop('attribute_type')
-            if a_type is not None:
-                a['attribute_type'] = Attribute_type.objects.get(pk=a_type)
-                if a_id is not None:
-                    update_attributes[a_id] = a
-                else:
-                    create_attributes.append(a)
-        if update_attributes:
-            old_attributes = object.attributes.all()
-            results.append(old_attributes)
-            for att in old_attributes:
-                if str(att.id) in update_attributes:
-                    up_att = update_attributes.get(str(att.id))
-                    att_object = Attribute.objects.get(pk=att.id)
-                    # for attr, val in up_att.items():
-                    #     setattr(att_object, attr, val)
-                    # att_object.save()
-                    results.append('to update: '+str(up_att)+str(att_object))
-                else:
-                    # id = att.id
-                    # object.attributes.remove(att)
-                    results.append('to delete: '+ str(att))
-                    # Attribute.objects.get(pk=id).delete()
-        if create_attributes:
-            for new_att in create_attributes:
-                # object.attributes.create(**new_att)
-                results.append('to create: '+str(new_att))
+    results = 'empty'
     return results
 
+def test_expression2(request):
+    messages.info(request, 'This is a test message')
+    return 'done'
 
 def import_transcriptions(request):
     data = []

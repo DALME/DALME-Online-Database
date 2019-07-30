@@ -84,7 +84,7 @@ function edit_task(id) {
                 ]
           });
           editTaskForm.on('submitSuccess', function(e, json, data, action) {
-            show_message('success', 'The task was updated successfully.');
+            toastr.success('The task was updated successfully.');
             location.reload();
           });
           editTaskForm.buttons({
@@ -120,6 +120,6 @@ function task_change_state(task, action) {
               $('.task-d_status').html('Completed: '+ today.toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric' }));
           }
     }).fail(function(jqXHR, textStatus, errorThrown) {
-        show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+        toastr.error('There was an error communicating with the server: '+errorThrown);
     });
 }

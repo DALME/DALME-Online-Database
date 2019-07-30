@@ -86,10 +86,10 @@ function change_form(e, action) {
       $('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-2');
       $('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-10');
       if (action == 'edit') {
-          source_editor.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The source was updated succesfully.') });
+          source_editor.on('submitSuccess', function(e, json, data, action) { toastr.success('The source was updated succesfully.') });
           init_editor()
       } else if (action == 'create') {
-          source_editor.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The source was created succesfully.') });
+          source_editor.on('submitSuccess', function(e, json, data, action) { toastr.success('The source was created succesfully.') });
       };
       source_editor.field('type.value').input().on('change.dalme', change_on_type);
   } else if (e.type == 'close') {

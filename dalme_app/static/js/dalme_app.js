@@ -1,4 +1,25 @@
 /* custom JavaScript functions used by dalme.app */
+function dalme_startup() {
+  $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+  toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": true,
+      "progressBar": true,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": function() { toastr.clear() },
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+  };
+}
+
 function get_cookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
@@ -46,7 +67,7 @@ function create_task_list() {
             ]
         });
         taskListForm.on('submitSuccess', function(e, json, data, action) {
-          show_message('success', 'The task list was created successfully.');
+          toastr.success('The task list was created successfully.');
           if (typeof table_lists != 'undefined') {
             table_lists.ajax.reload();
           }
@@ -137,7 +158,7 @@ function create_task() {
             ]
       });
       taskForm.on('submitSuccess', function(e, json, data, action) {
-        show_message('success', 'The task was created successfully.');
+        toastr.success('The task was created successfully.');
         if (typeof table_tasks != 'undefined') {
           table_tasks.ajax.reload().draw();
         }
@@ -170,7 +191,7 @@ function task_set_state(task, state) {
           }
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
-        show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+        toastr.error('There was an error communicating with the server: '+errorThrown);
     });
 }
 
@@ -231,7 +252,7 @@ function create_ticket() {
           ]
     });
     ticketForm.on('submitSuccess', function(e, json, data, action) {
-      show_message('success', 'The ticket was created successfully.');
+      toastr.success('The ticket was created successfully.');
       if (typeof table_tickets != 'undefined') {
         table_tickets.ajax.reload().draw();
       }
@@ -306,13 +327,6 @@ function get_params(sourceURL) {
     return params;
 }
 
-function show_message(type, text) {
-  var message = '<div class="alert alert-'+type+' alert-dismissable" role="alert">';
-  message += '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>';
-  message += text+'</div>';
-  $('.alert-container').append(message);
-}
-
 function enable_comments(model, object) {
   $.get("/api/comments/?model="+model+"&object="+object+"&format=json", function ( data ) {
         if (data.results.length > 0) {
@@ -346,7 +360,7 @@ function create_comment(model, object) {
         $('#comments-container').append(comment);
         $('#new_comment_text').val("");
   }).fail(function(jqXHR, textStatus, errorThrown) {
-        show_message('danger', 'There was an error saving your comment: '+errorThrown);
+        toastr.error('There was an error saving your comment: '+errorThrown);
   });
 }
 
@@ -370,6 +384,6 @@ function ticket_set_state(id, action) {
             $('#ticket_status_box').find('button').removeClass('btn-danger').addClass('btn-primary').text('Close');
         }
   }).fail(function(jqXHR, textStatus, errorThrown) {
-      show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+      toastr.error('There was an error communicating with the server: '+errorThrown);
   });
 }

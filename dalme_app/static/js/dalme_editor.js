@@ -276,7 +276,7 @@ function saveEditor() {
       }).done(function(data, textStatus, jqXHR) {
           if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
       }).fail(function(jqXHR, textStatus, errorThrown) {
-        show_message('danger', 'There was an error saving the transcription to the server: '+errorThrown);
+        toastr.error('There was an error saving the transcription to the server: '+errorThrown);
       });
     } else {
       var url = "/api/transcriptions/";
@@ -290,7 +290,7 @@ function saveEditor() {
           folio_array[folio]['tr_version'] = data['version'];
           $(author_container).html('Transcribed by '+data['author']);
       }).fail(function(jqXHR, textStatus, errorThrown) {
-        show_message('danger', 'There was an error saving the transcription to the server: '+errorThrown);
+        toastr.error('There was an error saving the transcription to the server: '+errorThrown);
       });
     };
   }
