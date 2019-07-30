@@ -41,6 +41,8 @@
     <link href="{% static 'jquery-ui/jquery-ui.min.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'Editor-1.9.0/js/editor.autoComplete.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" integrity="sha256-R91pD48xW+oHbpJYGn5xR0Q7tMhH4xOrWn1QqMRINtA=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js" integrity="sha256-yNbKY1y6h2rbVcQtf0b8lq4a+xpktyFc3pSYoGAY1qQ=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="{% static 'js/dalme_app.js' %}"></script>
     <link href="{% static 'css/dalme_app.css' %}" rel="stylesheet">
     <script>
@@ -50,7 +52,12 @@
               var _opened = $(".navbar-collapse").hasClass("show");
               if (_opened === true && !clickover.hasClass("navbar-toggler")) { $(".navbar-toggler").click(); }
           });
-          $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+          dalme_startup();
+          {% if messages %}
+              {% for message in messages %}
+                toastr.{{ message.tags }}('{{ message | safe }}');
+              {% endfor %}
+          {% endif %}
       });
     </script>
     {% block extra_head %}{% endblock %}
@@ -132,16 +139,6 @@
         </nav>
         <!-- End of Topbar -->
         {% endblock %}
-        <div class="alert-container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{ message.tags }} alert-dismissable" role="alert">
-                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                  {{ message | safe }}
-                </div>
-            {% endfor %}
-        {% endif %}
-      </div>
         <!-- Begin Page Content -->
         {% block content %}{% endblock %}
         </div>

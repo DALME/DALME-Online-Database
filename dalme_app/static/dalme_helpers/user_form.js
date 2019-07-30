@@ -8,9 +8,9 @@ function change_form(e, action) {
   if (e.type == 'open') {
     if (action == 'edit') {
       toggle_password_button(e);
-      dt_editor.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The user was updated succesfully.') });
+      dt_editor.on('submitSuccess', function(e, json, data, action) { toastr.success('The user was updated succesfully.') });
     } else if (action == 'create') {
-      dt_editor.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The user was created succesfully.') });
+      dt_editor.on('submitSuccess', function(e, json, data, action) { toastr.success('The user was created succesfully.') });
       $(dt_editor.field('user.last_name').node()).find('input').on('change.dalme', function() { suggest_fullname() });
       $(dt_editor.field('user.email').node()).find('input').on('change.dalme', function() { suggest_username() });
     }

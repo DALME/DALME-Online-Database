@@ -51,6 +51,6 @@ function create_source_from_selected() {
     }).done(function(data, textStatus, jqXHR) {
           init_source_editor(data);
     }).fail(function(jqXHR, textStatus, errorThrown) {
-          show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+          toastr.error('There was an error communicating with the server: '+errorThrown);
     });
 }

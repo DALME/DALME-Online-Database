@@ -376,60 +376,59 @@ a {
 }
 
 /* messages and alerts */
-.alert-container {
-  margin-top: -24px;
-  position: absolute;
-  width: 100%;
-  z-index: 100;
+#toast-container > .toast {
+  background-image: none !important;
 }
 
-.alert {
-  border-radius: 0;
-  font-size: 14px;
+#toast-container > div {
   -webkit-backdrop-filter: blur(2px);
-  padding-top: 12px;
-  padding-bottom: 12px;
-  padding-left: 20px;
-  padding-right: 120px;
-  margin-bottom: 0;
+  box-shadow: 0 2px 28px 0 rgba(58,59,69,.25) !important;
+  opacity: .9;
 }
 
-.alert-success {
-  color: #0f6848;
-  background-color: rgba(210, 244, 232, 0.8);
-  border: 1px solid #d2f4e8;
-  border-bottom-color: #6dddb3;
-}
-
-.alert-info {
-  color: #1c606a;
-  background-color: rgba(215, 241, 245, 0.8);
-  border-color: #d7f1f5;
-  border-bottom-color: #82d2e0;
-}
-
-.alert-warning {
-  color: #806520;
-  background-color: rgba(253, 243, 216, 0.8);
-  border-color: #fdf3d8;
-  border-bottom-color: #f8da89;
-}
-
-.alert-danger {
-  color: #78261f;
-  background-color: rgba(250, 219, 216, 0.8);
-  border-color: #fadbd8;
-  border-bottom-color: #ef8c83;
-}
-
-.close {
-  float: right;
+#toast-container > .toast:before {
+  position: fixed;
+  font-family: "Font Awesome 5 Free";
   font-size: 24px;
-  font-weight: 700;
-  line-height: .9;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  opacity: .5;
+  font-weight: 900;
+  line-height: 18px;
+  margin: 3px 5px auto -35px;
+}
+
+#toast-container > .toast-info:before {
+  content: "\f05a";
+}
+
+#toast-container > .toast-warning:before {
+  content: "\f06a";
+}
+
+#toast-container > .toast-error:before {
+  content: "\f057";
+}
+
+#toast-container > .toast-success:before {
+  content: "\f058";
+}
+
+.toast-info {
+  color: #1c606a !important;
+  background-color: rgb(215, 241, 245);
+}
+
+.toast-success {
+  color: #0f6848 !important;
+  background-color: rgb(210, 244, 232);
+}
+
+.toast-warning {
+  color: #806520 !important;
+  background-color: rgb(253, 243, 216);
+}
+
+.toast-error {
+  color: #78261f !important;
+  background-color: rgb(250, 219, 216);
 }
 
 /* Workset controller */

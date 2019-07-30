@@ -332,7 +332,7 @@ function save_filter_set() {
   }).done(function(data, textStatus, jqXHR) {
         save_filter_form(data.data, url_params[2]);
   }).fail(function(jqXHR, textStatus, errorThrown) {
-        show_message('danger', 'There was an error communicating with the server: '+errorThrown);
+        toastr.error('There was an error communicating with the server: '+errorThrown);
   });
 }
 
@@ -353,7 +353,7 @@ function save_filter_form(qset, endpoint) {
                   type: "textarea"
                 }]
     });
-    filterForm.on('submitSuccess', function(e, json, data, action) { show_message('success', 'The workset was saved successfully.') });
+    filterForm.on('submitSuccess', function(e, json, data, action) { toastr.success('The workset was saved successfully.') });
     filterForm.buttons({
       text: "Save",
       className: "btn btn-primary",
