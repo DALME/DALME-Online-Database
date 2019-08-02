@@ -33,7 +33,7 @@ function edit_task(id) {
                       name:  "task_list",
                       type: "selectize",
                       opts: {'placeholder': "Select list"},
-                      message: "Task list to which the task should be added",
+                      fieldInfo: "Task list to which the task should be added",
                       options: lists
                     },
                     {
@@ -52,7 +52,7 @@ function edit_task(id) {
                     {
                       label: "Workset",
                       name:  "workset",
-                      message: "Workset to be used for the task, if applicable",
+                      fieldInfo: "Workset to be used for the task, if applicable",
                       type: "selectize",
                       opts: {'placeholder': "Select workset"},
                       options: worksets
@@ -60,13 +60,13 @@ function edit_task(id) {
                     {
                       label: "URL",
                       name:  "url",
-                      message: "URL related to the task, if applicable",
+                      fieldInfo: "URL related to the task, if applicable",
                       type: "text"
                     },
                     {
                       label: "Attachment",
                       name:  "file",
-                      message: "A file to be attached to the task ",
+                      fieldInfo: "A file to be attached to the task ",
                       type: "upload",
                       ajax: {
                         method: "POST",

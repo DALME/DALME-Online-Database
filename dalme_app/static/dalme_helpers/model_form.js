@@ -227,7 +227,7 @@ function editor_form(action, data) {
                   { label: "Short Name", name:  "short_name" },
                   { label: "Description", name:  "description", type: "textarea" },
                   { label: "API URL", name:  "api_url" },
-                  { label: "Helper/s", name:  "helpers", message: "A comma-separated list of js helpers for this list."},
+                  { label: "Helper/s", name:  "helpers", fieldInfo: "A comma-separated list of js helpers for this list."},
                   { label: "Fields", name:  "fields", type: "selectize", opts: { maxItems: 'null' }, options: data.attribute_types },
                   { label: "Content Types", name:  "content_types", type: "selectize", opts: { maxItems: 'null' }, options: data.content_types }
                 ];

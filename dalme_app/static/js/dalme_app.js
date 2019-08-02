@@ -87,12 +87,12 @@ function create_task_list() {
               {
                 label: "List name",
                 name: "name",
-                message: "Name of the list to be created"
+                fieldInfo: "Name of the list to be created"
               },
               {
                 label: "Group",
                 name:  "group",
-                message: "Group of users that will utilize the list",
+                fieldInfo: "Group of users that will utilize the list",
                 type: "selectize",
                 opts: {'placeholder': "Select user group"},
                 options: groups
@@ -140,7 +140,7 @@ function create_task() {
                   name:  "task_list",
                   type: "selectize",
                   opts: {'placeholder': "Select list"},
-                  message: "Task list to which the task should be added",
+                  fieldInfo: "Task list to which the task should be added",
                   options: lists
                 },
                 {
@@ -159,7 +159,7 @@ function create_task() {
                 {
                   label: "Workset",
                   name:  "workset",
-                  message: "Workset to be used for the task, if applicable",
+                  fieldInfo: "Workset to be used for the task, if applicable",
                   type: "selectize",
                   opts: {'placeholder': "Select workset"},
                   options: worksets
@@ -167,13 +167,13 @@ function create_task() {
                 {
                   label: "URL",
                   name:  "url",
-                  message: "URL related to the task, if applicable",
+                  fieldInfo: "URL related to the task, if applicable",
                   type: "text"
                 },
                 {
                   label: "Attachment",
                   name:  "file",
-                  message: "A file to be attached to the task ",
+                  fieldInfo: "A file to be attached to the task ",
                   type: "upload",
                   ajax: {
                     method: "POST",
@@ -262,13 +262,13 @@ function create_ticket() {
               {
                 label: "URL",
                 name:  "url",
-                message: "A URL related to the ticket, if applicable",
+                fieldInfo: "A URL related to the ticket, if applicable",
                 type: "text"
               },
               {
                 label: "Attachment",
                 name:  "file",
-                message: "A file to be attached to the ticket, <i>e.g. a screenshot</i>",
+                fieldInfo: "A file to be attached to the ticket, <i>e.g. a screenshot</i>",
                 type: "upload",
                 ajax: {
                   method: "POST",

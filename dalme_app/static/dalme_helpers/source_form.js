@@ -40,13 +40,13 @@ function source_form() {
                             name: "name.value",
                             label: "Name",
                             type: "text",
-                            message: "Name of the source, <i>eg: Inventory of Poncius Gassini (ADBR 3B 57)</i>",
+                            fieldInfo: "Name of the source, <i>eg: Inventory of Poncius Gassini (ADBR 3B 57)</i>",
                       },
                       {
                             name: "short_name",
                             label: "Short name",
                             type: "text",
-                            message: "A short name for the source to use in lists, <i>eg: ADBR 3B 57 (Gassini)</i>"
+                            fieldInfo: "A short name for the source to use in lists, <i>eg: ADBR 3B 57 (Gassini)</i>"
                       },
                       {
                             name: "type.value",
@@ -59,7 +59,7 @@ function source_form() {
                             label: "Parent",
                             type: "selectize",
                             options: parent_options,
-                            message: "Parent record,if applicable, <i>eg: a book for a book chapter, a register for an act, etc.</i>"
+                            fieldInfo: "Parent record,if applicable, <i>eg: a book for a book chapter, a register for an act, etc.</i>"
                       },
                       {
                             name: "has_inventory",
@@ -483,12 +483,12 @@ function init_source_editor(para_data) {
         source_editor.set('name.value', suggested_fields.name);
     } else {
         source_editor.field('name.value').input().attr("placeholder", "No suggestion, please enter name manually");
-    }
+    };
     if ('short_name' in suggested_fields) {
         source_editor.set('short_name', suggested_fields.short_name);
     } else {
         source_editor.field('short_name').input().attr("placeholder", "No suggestion, please enter short name manually");
-    }
+    };
     source_editor.buttons({
         text: "Create",
         className: "btn btn-primary",
