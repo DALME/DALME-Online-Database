@@ -260,7 +260,7 @@ class DTListView(TemplateView):
                         else:
                             f_dict['options'] = eval(lf['dte_options'])
                     if lf.get('dte_message') is not None:
-                        f_dict['message'] = lf['dte_message']
+                        f_dict['fieldInfo'] = lf['dte_message']
                     fields.append(f_dict)
             dt_editor['fields'] = fields
             if self.get_dte_options() is not None:

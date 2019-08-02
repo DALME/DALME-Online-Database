@@ -97,7 +97,8 @@ class Attribute_type(dalmeIntid):
     options_list = models.CharField(max_length=255, blank=True, null=True, default=None)
 
     def __str__(self):
-        return self.name + ' ('+self.short_name+')'
+        # return self.name + ' ('+self.short_name+')'
+        return self.name
 
     class Meta:
         ordering = ['id']
