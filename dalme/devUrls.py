@@ -33,6 +33,7 @@ router.register(r'attachments', apis.Attachments, basename='attachments')
 router.register(r'tickets', apis.Tickets, basename='tickets')
 router.register(r'comments', apis.Comments, basename='comments')
 # router.register(r'userinfo', apis.OauthUser, basename='userinfo')
+router.register(r'workflow', apis.WorkflowManager, basename='workflow')
 
 urlpatterns = [
     #path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),

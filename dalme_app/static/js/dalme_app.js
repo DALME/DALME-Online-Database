@@ -20,6 +20,39 @@ function dalme_startup() {
   };
 }
 
+function update_workflow(action, code=0) {
+    $.ajax({
+        method: "GET",
+        url: "/api/workflow/"+source_id+"/change_state/?action="+action+"&code="+code,
+    }).done(function(data, textStatus, jqXHR) {
+        if (action == 'toggle_help') {
+            $('.wf-manager-help').toggleClass("wf-help_flag-on");
+        } else {
+            $('.wf-manager-status-container').html(data['status_html']);
+            $('.wf-manager-info').html(data['mod_html']);
+            if (action == 'stage_done') {
+              $('#' + data['prev_stage_name']).find('i').removeClass('far').removeClass('fa-square').addClass('fas').addClass('fa-check');
+            };
+            if (action == 'begin_stage') {
+              $('#' + data['stage_name']).find('i').removeClass('far').removeClass('fa-square').addClass('fas').addClass('fa-hammer');
+            };
+            if (action == 'change_status') {
+              if (code == 1) {
+                $('#assessment_menu').remove();
+                $('#wf_menu').append('<a id="processing_menu" class="dropdown-item" href="#" onclick="update_workflow(\'change_status\', 2)">\
+                  <i class="fas fa-clipboard-list fa-fw mr-2 text-gray-400"></i> Resume processing</a>');
+              } else {
+                $('#processing_menu').remove();
+                $('#wf_menu').append('<a id="assessment_menu" class="dropdown-item" href="#" onclick="update_workflow(\'change_status\', 1)">\
+                  <i class="fas fa-clipboard-list fa-fw mr-2 text-gray-400"></i> Place under assessment</a>');
+              }
+            }
+        };
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        toastr.error('There was an error communicating with the server: '+errorThrown);
+    });
+}
+
 function get_cookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {

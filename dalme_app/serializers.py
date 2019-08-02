@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
                               rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              Country, City, Tag, Attachment, Ticket, Comment)
+                              Country, City, Tag, Attachment, Ticket, Comment, Workflow)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
@@ -336,6 +336,25 @@ class AttributeSerializer(serializers.ModelSerializer):
         return ret
 
 
+class WorkflowSerializer(serializers.ModelSerializer):
+    """Basic serializer for workflow control"""
+    last_username = serializers.CharField(source='last_user.username', read_only=True, required=False)
+    last_full_name = serializers.CharField(source='last_user.profile.full_name', read_only=True, required=False)
+
+    class Meta:
+        model = Workflow
+        fields = ('status', 'help_flag', 'last_modified', 'last_username', 'last_full_name')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['activity'] = {
+            'timestamp': ret.pop('last_modified'),
+            'user': ret.pop('last_full_name'),
+            'username': ret.pop('last_username')
+        }
+        return ret
+
+
 class SourceSerializer(DynamicSerializer):
     type_name = serializers.StringRelatedField(source='type', read_only=True, required=False)
     type = serializers.PrimaryKeyRelatedField(queryset=Content_type.objects.all())
@@ -346,11 +365,12 @@ class SourceSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True, required=False)
     no_folios = serializers.IntegerField(required=False)
     tags = TagSerializer(many=True, required=False)
+    workflow = WorkflowSerializer(required=False)
 
     class Meta:
         model = Source
         fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'has_inventory',
-                  'attributes', 'no_folios', 'tags')
+                  'attributes', 'no_folios', 'tags', 'workflow')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
