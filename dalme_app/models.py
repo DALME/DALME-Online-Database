@@ -19,9 +19,11 @@ import datetime
 from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
 import django.db.models.options as options
 from django.utils.dateparse import parse_date
+from django.utils import timezone
 import calendar
 import mimetypes
 from django.conf import settings
+from django.dispatch import receiver
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -321,7 +323,7 @@ class Page(dalmeUuid):
 class Source_pages(dalmeIntid):
     source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
-    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
+    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='sources')
 
 
 class Source(dalmeUuid):
@@ -334,6 +336,12 @@ class Source(dalmeUuid):
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
+
+    def save(self, *args, **kwargs):
+        # If source has inventories, create a workflow record
+        if self.completed:
+            self.completed_date = datetime.datetime.now()
+        super(Source, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -349,6 +357,19 @@ class Transcription(dalmeUuid):
 
     def __str__(self):
         return str(self.id)
+
+
+# @receiver(models.signals.post_save, sender=Page)
+# @receiver(models.signals.post_save, sender=Source_pages)
+# @receiver(models.signals.post_save, sender=Transcription)
+# def update_source_modification(sender, instance, created, **kwargs):
+#     if sender == 'Source_pages':
+#         source_id = instance.source.id
+#     elif sender == 'Page':
+#         source_id = instance.sources.source.id
+#     elif sender == 'Transcription':
+#         source_id = instance.source_id
+#     Source.objects.filter(pk=source_id).update(modification_username=get_current_username, modification_timestamp=timezone.now())
 
 
 class Identity_phrase(dalmeUuid):
@@ -471,6 +492,92 @@ class Workset(dalmeIntid):
         total = len(new_qset)
         self.progress = done * 100 / total
         super(Workset, self).save(*args, **kwargs)
+
+
+class Workflow(models.Model):
+    ASSESSING = 1
+    PROCESSING = 2
+    DONE = 3
+    INGESTION = 1
+    TRANSCRIPTION = 2
+    MARKUP = 3
+    REVIEW = 4
+    PARSING = 5
+    WORKFLOW_STATUS = (
+        (ASSESSING, 'assessing'),
+        (PROCESSING, 'processing'),
+        (DONE, 'processed')
+    )
+    PROCESSING_STAGES = (
+        (INGESTION, 'ingestion'),
+        (TRANSCRIPTION, 'transcription'),
+        (MARKUP, 'markup'),
+        (REVIEW, 'review'),
+        (PARSING, 'parsing')
+    )
+
+    source = models.OneToOneField(Source, on_delete=models.CASCADE, related_name='workflow', primary_key=True)
+    wf_status = models.IntegerField(choices=WORKFLOW_STATUS, default=2)
+    stage = models.IntegerField(choices=PROCESSING_STAGES, default=1)
+    last_modified = models.DateTimeField(null=True, blank=True)
+    last_user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
+    help_flag = models.BooleanField(default=False)
+    ingestion_done = models.BooleanField(default=False)
+    transcription_done = models.BooleanField(default=False)
+    markup_done = models.BooleanField(default=False)
+    parsing_done = models.BooleanField(default=False)
+    review_done = models.BooleanField(default=False)
+
+    @property
+    def status(self):
+        stage_dict = dict(self.PROCESSING_STAGES)
+        if 1 <= self.wf_status <= 3:
+            if self.wf_status != 2:
+                status_text = self.get_wf_status_display()
+                status_text_alt = ''
+                css_class = 'tag-wf-' + status_text
+            else:
+                if getattr(self, self.get_stage_display() + '_done'):
+                    status_text = 'awaiting ' + stage_dict[self.stage + 1]
+                    status_text_alt = 'begin ' + stage_dict[self.stage + 1]
+                    css_class = 'tag-wf-awaiting'
+                else:
+                    status_text = self.get_stage_display() + ' in progress'
+                    status_text_alt = ''
+                    css_class = 'tag-wf-in_progress'
+        else:
+            status_text = 'unknown'
+            status_text_alt = ''
+            css_class = 'tag-wf-unknown'
+        return {'text': status_text, 'css_class': css_class, 'text_alt': status_text_alt}
+
+    @property
+    def stage_done(self):
+        if self.wf_status == 2:
+            stage_done = getattr(self, self.get_stage_display() + '_done')
+        else:
+            stage_done = True
+        return stage_done
+
+
+class Work_log(models.Model):
+    id = models.AutoField(primary_key=True, unique=True, db_index=True)
+    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE)
+    event = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
+
+
+@receiver(models.signals.post_save, sender=Source)
+def create_workflow(sender, instance, created, **kwargs):
+    if instance.has_inventory:
+        Workflow.objects.get_or_create(source=instance)
+        Work_log.objects.create(
+            source=instance,
+            event='Source created',
+            timestamp=instance.last_modified,
+            user=instance.last_user
+        )
 
 
 class Tag(dalmeUuid):

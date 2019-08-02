@@ -5,7 +5,7 @@ import re
 import os
 import json
 import pandas as pd
-from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Workset, Task
+from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Workset, Task, Workflow, Work_log
 from datetime import date
 from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
@@ -140,14 +140,24 @@ def import_languages(request):
     return 'okay'
 
 
-
 def test_expression(request):
-    results = 'empty'
-    return results
+    inventories = Source.objects.filter(has_inventory=1)
+    for inv in inventories:
+        mod_user = User.objects.get(username=inv.modification_username)
+        wf_object = Workflow.objects.create(source=inv, last_modified=inv.modification_timestamp, last_user=mod_user)
+        Work_log.objects.create(
+            source=wf_object,
+            event='Source created',
+            timestamp=inv.modification_timestamp,
+            user=mod_user
+        )
+    return 'done'
+
 
 def test_expression2(request):
     messages.info(request, 'This is a test message')
     return 'done'
+
 
 def import_transcriptions(request):
     data = []

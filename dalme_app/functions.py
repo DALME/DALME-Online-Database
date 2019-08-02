@@ -32,6 +32,10 @@ def set_menus(request, context, state):
     return context
 
 
+def update_log(source, message):
+    Work_log.objects.create(source=source, event=message)
+
+
 # module-specific functions
 
 

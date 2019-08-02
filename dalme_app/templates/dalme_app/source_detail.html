@@ -27,12 +27,12 @@
       });
     </script>
   {% endif %}
+  <script type="text/javascript">
   {% if has_pages %}
-    <script type="text/javascript">
-      var folio_list = {{ folio_list | safe }};
-      var source_id = "{{ source_id }}";
-    </script>
+    var folio_list = {{ folio_list | safe }};
   {% endif %}
+    var source_id = "{{ source_id }}";
+  </script>
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}
@@ -85,6 +85,9 @@
             </div>
           </div>
           <div class="col-md-6">
+            {% if has_inv %}
+              {% include "includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
+            {% endif %}
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-info-circle fa-fw"></i> Metadata</div>

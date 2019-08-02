@@ -14,7 +14,7 @@ from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
                               Source, Workset, TaskList, Task, rs_resource, rs_collection_resource,
                               rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, Language,
-                              Attribute_type, Country, rs_collection, Ticket)
+                              Attribute_type, Country, rs_collection, Ticket, Workflow)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
@@ -47,7 +47,7 @@ def DownloadAttachment(request, path):
     if type is None:
         type = 'application/octet-stream'
     response['Content-Type'] = type
-    #response['Content-Length'] = str(os.stat(file_path).st_size)
+    # response['Content-Length'] = str(os.stat(file_path).st_size)
     if encoding is not None:
         response['Content-Encoding'] = encoding
     # To inspect details for the below code, see http://greenbytes.de/tech/tc2231/
@@ -274,27 +274,27 @@ class DTListView(TemplateView):
     def get_filters(self, fields_dict, *args, **kwargs):
         filters = []
         types_w_lookups = ['text', 'date', 'datetime', 'integer']
-        for key, dict in fields_dict.items():
-            if dict['is_filter']:
+        for k, d in fields_dict.items():
+            if d['is_filter']:
                 filter = {}
-                filter['label'] = dict['field__name']
-                filter['field'] = key
-                if dict.get('filter_type') is not None:
-                    filter['type'] = dict['filter_type']
+                filter['label'] = d['field__name']
+                filter['field'] = k
+                if d.get('filter_type') is not None:
+                    filter['type'] = d['filter_type']
                 else:
                     filter['type'] = 'text'
-                if dict.get('filter_lookup') is not None:
-                    filter['lookup'] = dict['filter_lookup']
+                if d.get('filter_lookup') is not None:
+                    filter['lookup'] = d['filter_lookup']
                 if filter['type'] in types_w_lookups:
                     filter['lookups'] = functions.get_filter_lookups(filter['type'])
                 if filter['type'] == 'check' or filter['type'] == 'select':
-                    if dict.get('filter_mode') is not None:
-                        f_mode = dict['filter_mode']
+                    if d.get('filter_mode') is not None:
+                        f_mode = d['filter_mode']
                     else:
                         f_mode = 'complete'
-                    if dict.get('filter_options') is not None:
+                    if d.get('filter_options') is not None:
                         # values = eval(dict['filter_options'])
-                        values = dict['filter_options']
+                        values = d['filter_options']
                         filter = functions.add_filter_options(values, filter, f_mode)
                 filters.append(filter)
         if filters == []:
@@ -558,6 +558,15 @@ class SourceDetail(DetailView):
         context['has_inv'] = has_inv
         context['has_pages'] = has_pages
         context['has_children'] = has_children
+        if has_inv:
+            context['workflow'] = self.object.workflow
+            wf_stages = []
+            for k, v in dict(Workflow.PROCESSING_STAGES).items():
+                current = 0
+                if k == self.object.workflow.stage:
+                    current = 1
+                wf_stages.append([v, getattr(self.object.workflow, v + '_done'), current])
+            context['wf_stages'] = wf_stages
         source_data = {
             'Type': self.object.type.name,
             'Name': self.object.name,
@@ -577,11 +586,11 @@ class SourceDetail(DetailView):
         for a in attributes:
             label = a.attribute_type.name
             value = functions.get_attribute_value(a)
-            dict = {
+            d = {
                 'label': label,
                 'value': value,
             }
-            attribute_data.append(dict)
+            attribute_data.append(d)
         context['attribute_data'] = attribute_data
         tables = []
         if has_pages:
@@ -852,12 +861,12 @@ class ImageDetail(DetailView):
                 value = a.value
                 name = a.resource_type_field.name
                 label = a.resource_type_field.title
-                dict = {
+                d = {
                     'name': name,
                     'label': label,
                     'value': value,
                 }
-                attribute_data.append(dict)
+                attribute_data.append(d)
             context['attribute_data'] = attribute_data
         if rs_collection_resource.objects.filter(resource=self.object.ref).exists():
             collections = []
@@ -870,13 +879,13 @@ class ImageDetail(DetailView):
                         path += ' ≫ '+col.collection.theme2
                         if col.collection.theme3:
                             path += ' ≫ '+col.collection.theme3
-                dict = {
+                d = {
                     'id': col.collection.ref,
                     'name': col.collection.name,
                     'creator': functions.format_user(col.collection.user, 'dam', 'html'),
                     'path': path
                 }
-                collections.append(dict)
+                collections.append(d)
             context['collections'] = collections
             tables.append(['collections', 'fa-th-large', 'Collections'])
         if tables != []:
