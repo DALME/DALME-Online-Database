@@ -575,6 +575,7 @@ class Images(DTViewSet):
                         a_source = i['archivalsource'].split(',')[-1]
                         a_series = i['Series']
                         a_shelf = i['shelfnumber']
+                        a_person = i.get('person', '')
                         s_a_source = ''.join([c for c in a_source if c.isupper()])
                         if len(a_series) > 10:
                             s_a_series = ''.join([c for c in a_series if c.isupper()])
@@ -588,10 +589,12 @@ class Images(DTViewSet):
                     sug_short_name = sug_short_name + ' ('+sur+')'
                     sug_dict = {
                         'name': sug_name,
-                        'short_name': sug_short_name
+                        'short_name': sug_short_name,
                     }
                 else:
                     sug_dict = {}
+                if a_person is not None:
+                    sug_dict['persons'] = a_person
                 result['data'] = {'suggested_fields': sug_dict, 'image_data': img_data}
                 status = 201
             except Exception as e:
@@ -684,14 +687,16 @@ class Options(viewsets.ViewSet):
     def attribute_types(self, content_type=None, **kwargs):
         if content_type is not None:
             qset = Content_attributes.objects.filter(content_type=content_type).order_by('attribute_type__short_name')
-            opt_list = [{'label': i.attribute_type.name+' ('+i.attribute_type.short_name+')', 'value': i.attribute_type.id} for i in qset]
+            # opt_list = [{'label': i.attribute_type.name+' ('+i.attribute_type.short_name+')', 'value': i.attribute_type.id} for i in qset]
+            opt_list = [{'label': i.attribute_type.name, 'value': i.attribute_type.id} for i in qset]
             if self.request.GET.get('extra') is not None:
                 ref_dict = {i.attribute_type.id: [i.attribute_type.data_type, i.attribute_type.options_list] for i in qset}
                 options_list = {'options': opt_list, 'ref': ref_dict}
             else:
                 options_list = opt_list
         else:
-            options_list = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Attribute_type.objects.all().order_by('name')]
+            # options_list = [{'label': i.name+' ('+i.short_name+')', 'value': i.id} for i in Attribute_type.objects.all().order_by('name')]
+            options_list = [{'label': i.name, 'value': i.id} for i in Attribute_type.objects.all().order_by('name')]
         return options_list
 
     def active_staff(self, **kwargs):

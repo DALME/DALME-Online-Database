@@ -220,7 +220,7 @@ function init_editor() {
     }
 }
 
-function add_attribute_set(attribute) {
+function add_attribute_set(attribute, mode) {
     if (att_set == 0) {
       $('#attribute-formset').find('.formset-none').remove();
     };
@@ -232,7 +232,7 @@ function add_attribute_set(attribute) {
                 </div><a class="remove_icon remove_attribute_set" onclick="remove_set(this)"\
                 data-toggle="tooltip" data-placement="top" title="Remove attribute"><i class="fa fa-minus-circle"></i></a></div>'
     $('#attribute-formset').find('.formset-body').append(new_set);
-    if (typeof attribute !== 'undefined') {
+    if (typeof attribute !== 'undefined' && mode !== 'create') {
       source_editor.add({
               name: "attributes."+att_set+".id",
               type: "hidden"
@@ -250,7 +250,9 @@ function add_attribute_set(attribute) {
     attribute_control[set_id] = set_list;
     var container = $("div[data-editor-template='attributes."+att_set+".attribute_type']");
     if (typeof attribute !== 'undefined') {
-      source_editor.field("attributes."+att_set+".id").val(attribute['id']);
+      if (mode !== 'create') {
+        source_editor.field("attributes."+att_set+".id").val(attribute['id']);
+      };
       source_editor.set("attributes."+att_set+".attribute_type", attribute['attribute_type']);
       add_attribute_values(att_set, attribute);
     } else {
@@ -475,7 +477,7 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
 
 function init_source_editor(para_data) {
     img_data = para_data.data.image_data
-    var suggested_fields = para_data.data.suggested_fields
+    suggested_fields = para_data.data.suggested_fields
     source_editor.create(false);
     source_editor.set('type.value', 13);
     source_editor.set('has_inventory', 1);
@@ -499,6 +501,30 @@ function init_source_editor(para_data) {
 
 function create_from_images() {
     if (attribute_formset == 'on') {
+        var default_attributes = [
+          {
+            "attribute_type": 28,
+            "value_STR": "",
+            "attribute_name": "Act type (act_type)",
+            "data_type": "STR",
+            "options_list": ""
+          },
+          {
+            "attribute_type": 29,
+            "value_STR": "",
+            "attribute_name": "Act type phrase (act_type_phrase)",
+            "data_type": "STR",
+            "options_list": ""
+          },
+          {
+            "attribute_type": 37,
+            "value_STR": suggested_fields.persons,
+            "attribute_name": "Named persons (named_persons)",
+            "data_type": "STR",
+            "options_list": ""
+          }
+        ];
+        for (let i = 0, len = default_attributes.length; i < len; ++i) { add_attribute_set(default_attributes[i], 'create'); };
         page_control = {};
         page_formset = 'on';
         $('#page-formset').collapse('show');
