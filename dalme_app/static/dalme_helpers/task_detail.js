@@ -112,12 +112,12 @@ function task_change_state(task, action) {
           switch (action) {
             case 'mark_undone':
               $('#task_'+task).html('<i class="far fa-square fa-lg"></i>');
-              $('.task-d_status').html('Not completed.');
+              $('.task-detail-status').html('Not completed.');
               break;
             case 'mark_done':
               $('#task_'+task).html('<i class="far fa-check-square fa-lg"></i>');
               let today = new Date();
-              $('.task-d_status').html('Completed: '+ today.toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric' }));
+              $('.task-detail-status').html('Completed: '+ today.toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric' }));
           }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         toastr.error('There was an error communicating with the server: '+errorThrown);
