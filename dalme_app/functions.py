@@ -63,7 +63,10 @@ def round_timesince(d):
             d_list[1] = d_list[1] + 's'
         result = str(d_list[0]) + ' ' + str(d_list[1]) + ' ago '
     else:
-        result = d_string + ' ago'
+        if d_string == '0 minutes':
+            result = 'now'
+        else:
+            result = d_string + ' ago'
     return result
 
 
