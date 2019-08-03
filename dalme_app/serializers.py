@@ -349,7 +349,10 @@ class WorkflowSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['activity'] = {
-            'timestamp': functions.round_timesince(datetime.datetime.fromisoformat(ret.pop('last_modified'))),
+            # version of code that needs Python 3.7 to work
+            # 'timestamp': functions.round_timesince(datetime.datetime.fromisoformat(ret.pop('last_modified'))),
+            # version for Python 3.6
+            'timestamp': functions.round_timesince(datetime.datetime.strptime(ret.pop('last_modified'), '%Y-%m-%dT%H:%M:%S.%f%z')),
             'user': ret.pop('last_full_name'),
             'username': ret.pop('last_username')
         }
