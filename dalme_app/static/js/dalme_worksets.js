@@ -44,5 +44,6 @@ function ws_mark(action) {
 }
 
 function ws_show_list() {
-
+  let url = '/'+workset['endpoint']+'/?workset='+workset['workset_id'];
+  window.location.href = url;
 }

@@ -835,6 +835,22 @@ class ImageDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if 'workset' in self.request.GET:
+            workset = Workset.objects.get(pk=self.request.GET['workset'])
+            qset = json.loads(workset.qset)
+            seq = workset.current_record
+            para = {
+                'workset_id': workset.id,
+                'name': workset.name,
+                'description': workset.description,
+                'current': seq,
+                'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
+                'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
+                'total': len(qset),
+                'endpoint': workset.endpoint,
+                'progress': round(workset.progress, 2)
+            }
+            context['workset'] = para
         breadcrumb = [('Repository', ''), ('Images', '/images')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle

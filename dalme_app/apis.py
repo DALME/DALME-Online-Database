@@ -254,6 +254,11 @@ class DTViewSet(viewsets.ModelViewSet):
             filter = self.request.GET['filter'].split(',')
             filter_q = Q(**{filter[0]: filter[1]})
             queryset = self.queryset.filter(filter_q).distinct()
+        elif self.request.GET.get('workset') is not None:
+            ws_data = Workset.objects.get(pk=self.request.GET['workset']).qset
+            qset = json.loads(ws_data)
+            id_list = [j[i]['pk'] for i, j in enumerate(qset)]
+            queryset = self.queryset.filter(pk__in=id_list)
         else:
             queryset = self.queryset
         return queryset
