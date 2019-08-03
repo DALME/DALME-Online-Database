@@ -321,6 +321,14 @@ class Page(dalmeUuid):
             return self.canvas
 
 
+@receiver(models.signals.post_save, sender=Page)
+def update_folio(sender, instance, created, **kwargs):
+    if created:
+        rs_image = rs_resource.objects.get(ref=instance.dam_id)
+        rs_image.field79 = instance.name
+        rs_image.save()
+
+
 class Source_pages(dalmeIntid):
     source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
