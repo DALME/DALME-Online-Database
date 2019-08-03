@@ -338,12 +338,6 @@ class Source(dalmeUuid):
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
 
-    def save(self, *args, **kwargs):
-        # If source has inventories, create a workflow record
-        if self.completed:
-            self.completed_date = datetime.datetime.now()
-        super(Source, self).save(*args, **kwargs)
-
     def __str__(self):
         return self.name
 
@@ -571,14 +565,17 @@ class Work_log(models.Model):
 
 @receiver(models.signals.post_save, sender=Source)
 def create_workflow(sender, instance, created, **kwargs):
-    if instance.has_inventory:
-        Workflow.objects.get_or_create(source=instance)
-        Work_log.objects.create(
-            source=instance,
-            event='Source created',
-            timestamp=instance.last_modified,
-            user=instance.last_user
-        )
+    if created:
+        if instance.has_inventory:
+            wf_object = Workflow.objects.create(
+                source=instance,
+                last_modified=instance.modification_timestamp
+            )
+            Work_log.objects.create(
+                source=wf_object,
+                event='Source created',
+                timestamp=wf_object.last_modified
+            )
 
 
 class Tag(dalmeUuid):
