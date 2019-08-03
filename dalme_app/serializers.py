@@ -117,7 +117,7 @@ class WorksetSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['workset'] = '<div class="workset-title">{}</div><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['name'], ret['description'], ret['endpoint'])
+        ret['workset'] = '<a class="workset-title" href="/worksets/{}">{}</a><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['id'], ret['name'], ret['description'], ret['endpoint'])
         progress = ret['progress']
         angle = round((progress * 360 / 100))
         if angle <= 180:
