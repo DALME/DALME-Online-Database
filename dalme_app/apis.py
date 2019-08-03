@@ -571,6 +571,7 @@ class Images(DTViewSet):
                     img_data[image.ref] = dict
                 sug_name = None
                 sug_short_name = None
+                a_person = None
                 for col in collections_list:
                     if 'Inventory' in col:
                         sug_name = ''.join([i for i in col if not i.isdigit() and i not in ['(', ')', '[', ']']]).strip()
