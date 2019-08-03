@@ -8,6 +8,7 @@ from rest_framework import serializers
 from dalme_app import functions
 import base64
 import textwrap
+import datetime
 
 
 class DynamicSerializer(serializers.ModelSerializer):
@@ -348,7 +349,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['activity'] = {
-            'timestamp': ret.pop('last_modified'),
+            'timestamp': functions.round_timesince(datetime.datetime.fromisoformat(ret.pop('last_modified'))),
             'user': ret.pop('last_full_name'),
             'username': ret.pop('last_username')
         }
