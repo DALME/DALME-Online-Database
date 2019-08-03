@@ -1,4 +1,5 @@
 from django import template
+from dalme_app import functions
 
 register = template.Library()
 
@@ -12,3 +13,8 @@ def relative_url(value, field_name, urlencode=None):
         encoded_querystring = '&'.join(filtered_querystring)
         url = '{}&{}'.format(url, encoded_querystring)
     return url
+
+
+@register.filter
+def htimesince(d):
+    return functions.round_timesince(d)

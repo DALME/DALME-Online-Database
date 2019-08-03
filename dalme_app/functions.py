@@ -7,6 +7,8 @@ from dalme_app.menus import menu_constructor
 import json
 from random import randint
 from dalme_app.models import *
+from django.template import defaultfilters
+import re
 
 # Security and permissions functions
 
@@ -34,6 +36,35 @@ def set_menus(request, context, state):
 
 def update_log(source, message):
     Work_log.objects.create(source=source, event=message)
+
+
+def round_timesince(d):
+    chunks = {
+        'minute': 60,
+        'hour': 24,
+        'day': 30,
+        'week': 4,
+        'month': 12
+    }
+    d_string = defaultfilters.timesince(d)
+    if ',' in d_string:
+        d_list = re.findall(r"[\w\d']+", d_string)
+        for i, j in enumerate(d_list):
+            if j[-1] == 's':
+                d_list[i] = j[:-1]
+        if d_list[3] in ['minute', 'hour']:
+            if int(d_list[2]) / chunks[d_list[3]] >= 0.5:
+                d_list[0] = int(d_list[0]) + 1
+        else:
+            if int(d_list[2]) / chunks[d_list[3]] >= 0.2:
+                d_list[0] = int(d_list[0]) * chunks[d_list[3]] + int(d_list[2])
+                d_list[1] = d_list[3]
+        if int(d_list[0]) > 1:
+            d_list[1] = d_list[1] + 's'
+        result = str(d_list[0]) + ' ' + str(d_list[1]) + ' ago '
+    else:
+        result = d_string + ' ago'
+    return result
 
 
 # module-specific functions
