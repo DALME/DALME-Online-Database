@@ -229,8 +229,7 @@ function add_attribute_set(attribute, mode) {
     var set_list = [];
     var new_set = '<div class="formset-item formset-row" id="'+set_id+'">'
     new_set += '<div class="formset-field-container mr-auto" data-editor-template="attributes.'+att_set+'.attribute_type">\
-                </div><a class="remove_icon remove_attribute_set" onclick="remove_set(this)"\
-                data-toggle="tooltip" data-placement="top" title="Remove attribute"><i class="fa fa-minus-circle"></i></a></div>'
+                </div><a class="remove_icon remove_attribute_set" onclick="remove_set(this)"><i class="fa fa-minus-circle"></i></a></div>'
     $('#attribute-formset').find('.formset-body').append(new_set);
     if (typeof attribute !== 'undefined' && mode !== 'create') {
       source_editor.add({
@@ -279,8 +278,7 @@ function add_page_set(page) {
                 <div class="formset-field-container flex-fill" data-editor-template="pages.'+page_set+'.dam_id"></div>\
                 <div class="util-icon-set"><a class="info_icon" data-toggle="popover" title="DAM Metadata"\
                 data-content="Metadata from the DAM can only be shown if an image id is included in the page record."><i class="fa fa-info-circle"></i></a>\
-                <a class="remove_icon remove_page_set" onclick="remove_set(this)" data-toggle="tooltip" data-placement="top"\
-                title="Remove folio"><i class="fa fa-minus-circle"></i></a></div></fieldset>'
+                <a class="remove_icon remove_page_set" onclick="remove_set(this)"><i class="fa fa-minus-circle"></i></a></div></fieldset>'
     $('#page-formset').find('.formset-body').append(new_set);
     source_editor.add({
             name: "pages."+page_set+".id",
@@ -325,12 +323,20 @@ function add_page_set(page) {
 function remove_set(el) {
   var container = $(el).parents('.formset-row');
   var set_id = $(container).attr('id');
-  if ($(this).hasClass('remove_attribute_set')) {
+  if ($(el).hasClass('remove_attribute_set')) {
       source_editor.clear(attribute_control[set_id]);
       delete attribute_control[set_id];
-  } else if ($(this).hasClass('remove_page_set')) {
+      if (jQuery.isEmptyObject(attribute_control)) {
+        $('#attribute-formset').find('.formset-body').append('<div class="formset-none">No attributes assigned.</div>');
+        att_set = 0;
+      };
+  } else if ($(el).hasClass('remove_page_set')) {
       source_editor.clear(page_control[set_id]);
       delete page_control[set_id];
+      if (jQuery.isEmptyObject(page_control)) {
+        $('#page-formset').find('.formset-body').append('<div class="formset-none">No folios selected.</div>');
+        page_set = 0;
+      };
   };
   $(container).remove();
 }
