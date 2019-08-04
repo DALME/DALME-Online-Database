@@ -28,6 +28,19 @@ function startEditor() {
       edit_mode = 'off';
       folio_array = folio_list;
       folio_idx = 0;
+      tei = new CETEI();
+      tei.addBehaviors({
+        'tei': {
+          'gap': function(e) { e.setAttribute("title", getTitle(e, 'gap')); e.setAttribute("data-toggle", "tooltip"); }, //@reason, @unit, @quantity, @extent
+          'space': function(e) { e.setAttribute("title", getTitle(e, 'space')); e.setAttribute("data-toggle", "tooltip"); }, //@unit, @quantity, @extent
+          'unclear': function(e) { e.setAttribute("title", getTitle(e, 'unclear')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
+          'supplied': function(e) { e.setAttribute("title", getTitle(e, 'supplied')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
+          'add': function(e) { e.setAttribute("title", getTitle(e, 'addition')); e.setAttribute("data-toggle", "tooltip"); }, //@place
+          'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
+          'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
+          'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); } //@resp
+          }
+      });
       if (folio_array[0].dam_id == 'None') {
           $(viewer_container).html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
       } else {
@@ -52,19 +65,6 @@ function startEditor() {
       } else {
           $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
               tr_text = data.transcription;
-              tei = new CETEI();
-              tei.addBehaviors({
-                'tei': {
-                  'gap': function(e) { e.setAttribute("title", getTitle(e, 'gap')); e.setAttribute("data-toggle", "tooltip"); }, //@reason, @unit, @quantity, @extent
-                  'space': function(e) { e.setAttribute("title", getTitle(e, 'space')); e.setAttribute("data-toggle", "tooltip"); }, //@unit, @quantity, @extent
-                  'unclear': function(e) { e.setAttribute("title", getTitle(e, 'unclear')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
-                  'supplied': function(e) { e.setAttribute("title", getTitle(e, 'supplied')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
-                  'add': function(e) { e.setAttribute("title", getTitle(e, 'addition')); e.setAttribute("data-toggle", "tooltip"); }, //@place
-                  'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
-                  'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
-                  'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); } //@resp
-                  }
-              });
               tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
                   $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
               });
