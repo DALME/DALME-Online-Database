@@ -53,6 +53,15 @@ body {
   height: calc(100vh - 72px);
 }
 
+.card-full-pages {
+  height: calc(100vh - 373px);
+}
+
+.empty-card-message {
+  padding: 1em;
+  text-align: center;
+}
+
 .shadow {
   box-shadow: 0 2px 28px 0 rgba(58,59,69,.25) !important;
 }

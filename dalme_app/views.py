@@ -606,13 +606,19 @@ class SourceDetail(DetailView):
             context['tables'] = tables
             context['table_options'] = {
                 'responsive': 'true',
+                #'dom': '\'<"sub-card-header-embed d-flex"B<"#fieldsets.btn-group mr-auto"><"btn-group"f>r><"card-body"t><"sub-card-footer"i>\'',
+                #'dom': '''"<'sub-card-header-embed d-flex'fr><'card-body't>"''',
                 'dom': '''"<'sub-card-header d-flex'<'card-header-title'>fr><'card-body't>"''',
                 'stateSave': 'true',
                 'select': {'style': 'single'},
-                'scrollY': 150,
+                'scrollResize': 'true',
+                'scrollY': '"30vh"',
+                'scrollX': '"100%"',
+                'scrollCollapse': 'true',
                 'deferRender': 'true',
                 'scroller': 'true',
-                'language': '{searchPlaceholder: "Search"}'
+                'language': '{searchPlaceholder: "Search"}',
+                'order': '[[ 2, "asc" ]]'
                 }
         return context
 
