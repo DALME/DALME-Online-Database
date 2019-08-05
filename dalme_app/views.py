@@ -101,7 +101,11 @@ class DTListView(TemplateView):
         'select': {'style': 'single'},
         'deferRender': 'true',
         'rowId': '"id"',
-        'language': {'searchPlaceholder': 'Search'}
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            }
         }
     dt_buttons = [
         {'extend': 'colvis', 'text': '<i class="fa fa-columns fa-fw"></i>'},
@@ -344,6 +348,7 @@ class ModelLists(DTListView):
         'scrollX': '"100%"',
         'deferRender': 'true',
         'scroller': 'true',
+        'processing': 'true',
         'language': {'searchPlaceholder': 'Search'},
         'rowId': '"id"',
     }
@@ -506,6 +511,8 @@ class SourceList(DTListView):
         if 'type' in self.request.GET:
             if self.request.GET['type'] == 'inventories':
                 module_list = ['filters']
+                if functions.check_group(self.request, 'staff'):
+                    module_list.append('workflow')
         return module_list
 
     def get_dte_buttons(self, *args, **kwargs):
@@ -606,8 +613,6 @@ class SourceDetail(DetailView):
             context['tables'] = tables
             context['table_options'] = {
                 'responsive': 'true',
-                #'dom': '\'<"sub-card-header-embed d-flex"B<"#fieldsets.btn-group mr-auto"><"btn-group"f>r><"card-body"t><"sub-card-footer"i>\'',
-                #'dom': '''"<'sub-card-header-embed d-flex'fr><'card-body't>"''',
                 'dom': '''"<'sub-card-header d-flex'<'card-header-title'>fr><'card-body't>"''',
                 'stateSave': 'true',
                 'select': {'style': 'single'},
@@ -752,7 +757,11 @@ class CountryList(DTListView):
         'select': {'style': 'single'},
         'deferRender': 'true',
         'rowId': '"id"',
-        'language': {'searchPlaceholder': 'Search'},
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
         'order': '[[ 1, "asc" ]]'
         }
 
@@ -772,7 +781,11 @@ class CityList(DTListView):
         'select': {'style': 'single'},
         'deferRender': 'true',
         'rowId': '"id"',
-        'language': {'searchPlaceholder': 'Search'},
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
         'order': '[[ 1, "asc" ]]'
         }
 
@@ -794,7 +807,11 @@ class LanguageList(DTListView):
         'select': {'style': 'single'},
         'deferRender': 'true',
         'rowId': '"id"',
-        'language': {'searchPlaceholder': 'Search'}
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            }
         }
 
 
@@ -815,7 +832,11 @@ class ImageList(DTListView):
         'select': {'style': 'multi'},
         'deferRender': 'true',
         'rowId': '"id"',
-        'language': {'searchPlaceholder': 'Search'},
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
         # 'order': '[[ 1, "asc" ]]'
         }
     module_list = ['filters', 'preview']
@@ -1100,7 +1121,11 @@ class TicketList(DTListView):
         'select': {'style': 'single'},
         'deferRender': 'true',
         'rowId': '"id"',
-        'language': {'searchPlaceholder': 'Search'},
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
         'order': '[[ 0, "desc" ]]'
         }
 
