@@ -555,7 +555,6 @@ class Images(DTViewSet):
         result = {}
         if self.request.GET.get('data') is not None:
             try:
-                img_data = {}
                 data = self.request.GET['data']
                 id_list = data.split(',')
                 search_q = Q()
@@ -563,50 +562,45 @@ class Images(DTViewSet):
                     q = Q(**{'ref': i})
                     search_q |= q
                 queryset = self.queryset.filter(search_q)
-                collections_list = []
+                # collections_list = []
+                folios = {}
+                source_data = {}
                 for image in queryset:
-                    dict = {i.resource_type_field.name: i.value for i in image.resource_data.all()
-                            if i.resource_type_field.ref in [76, 77, 80, 99, 78, 3, 29]}
-                    dict['title'] = image.field8
-                    dict['folio'] = image.field79
-                    collections = [i.name for i in image.collections.all() if i.name not in
-                                   ['My Collection', 'Archivio Dummy', 'Archivio', 'All images']]
-                    collections_list = collections_list + collections
-                    dict['collections'] = ' | '.join(collections)
-                    img_data[image.ref] = dict
-                sug_name = None
-                sug_short_name = None
-                a_person = None
-                for col in collections_list:
-                    if 'Inventory' in col:
-                        sug_name = ''.join([i for i in col if not i.isdigit() and i not in ['(', ')', '[', ']']]).strip()
-                        break
-                for f, i in img_data.items():
-                    if 'archivalsource' in i and 'Series' in i and 'shelfnumber' in i:
-                        a_source = i['archivalsource'].split(',')[-1]
-                        a_series = i['Series']
-                        a_shelf = i['shelfnumber']
-                        a_person = i.get('person', '')
-                        s_a_source = ''.join([c for c in a_source if c.isupper()])
-                        if len(a_series) > 10:
-                            s_a_series = ''.join([c for c in a_series if c.isupper()])
-                        else:
-                            s_a_series = a_series
-                        sug_short_name = ' '.join([s_a_source, s_a_series, a_shelf]).strip()
-                        break
-                if sug_name is not None and sug_short_name is not None:
-                    sur = sug_name.split(' ')[-1]
-                    sug_name = sug_name + ' ('+sug_short_name+')'
-                    sug_short_name = sug_short_name + ' ('+sur+')'
-                    sug_dict = {
-                        'name': sug_name,
-                        'short_name': sug_short_name,
-                    }
+                    folios[image.ref] = image.field79
+                    img_data = {i.resource_type_field.name: i.value for i in image.resource_data.all()
+                                if i.resource_type_field.ref in [29, 76, 77, 78, 80, 99]}
+                    img_data['title'] = image.field8
+                    img_data['country'] = image.field3
+                    if 'city' not in source_data and img_data.get('archivalsource', '') != '' and ',' in img_data.get('archivalsource', ''):
+                        img_data['city'] = img_data.get('archivalsource').split(',')[0]
+                        img_data['archive'] = img_data.get('archivalsource').split(',')[1]
+                    if 'collection_title' not in source_data and 'city' in img_data:
+                        collections = image.collections.filter(theme=img_data['city']).exclude(name__icontains='images')
+                        if collections.count() == 1:
+                            img_data['collection_title'] = collections[0].name
+                    for k, v in img_data.items():
+                        if k not in source_data and v not in ['', ' ', None]:
+                            source_data[k] = v
+                if 'archive' in source_data:
+                    short_archive = ''.join([c for c in source_data['archive'] if c.isupper()])
+                if 'Series' in source_data:
+                    short_series = ''.join([c for c in source_data['Series'] if c.isupper()])
+                if 'person' in source_data:
+                    src_title = 'Inventory of ' + source_data['person']
+                    src_title_short = source_data['person'].split()[-1]
+                elif 'collection_title' in source_data:
+                    src_title = source_data['collection_title']
+                    src_title_short = source_data['collection_title'].split()[-1]
+                elif 'title' in source_data:
+                    src_title = source_data['title']
+                    src_title_short = source_data['title'].split()[-1]
                 else:
-                    sug_dict = {}
-                if a_person is not None:
-                    sug_dict['persons'] = a_person
-                result['data'] = {'suggested_fields': sug_dict, 'image_data': img_data}
+                    src_title = ''
+                    src_title_short = ''
+                shelf_number = source_data.get('shelfnumber', '')
+                source_data['name'] = '{} ({} {} {})'.format(src_title, short_archive, short_series, shelf_number)
+                source_data['short_name'] = '{} {} {} ({})'.format(short_archive, short_series, shelf_number, src_title_short)
+                result['data'] = {'source_fields': source_data, 'folios': folios}
                 status = 201
             except Exception as e:
                 result['error'] = str(e)

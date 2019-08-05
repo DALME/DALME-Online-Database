@@ -482,18 +482,18 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
 }
 
 function init_source_editor(para_data) {
-    img_data = para_data.data.image_data
-    suggested_fields = para_data.data.suggested_fields
+    folio_data = para_data.data.folios
+    source_fields = para_data.data.source_fields
     source_editor.create(false);
     source_editor.set('type.value', 13);
     source_editor.set('has_inventory', 1);
-    if ('name' in suggested_fields) {
-        source_editor.set('name.value', suggested_fields.name);
+    if (source_fields.name != '') {
+        source_editor.set('name.value', source_fields.name);
     } else {
         source_editor.field('name.value').input().attr("placeholder", "No suggestion, please enter name manually");
     };
-    if ('short_name' in suggested_fields) {
-        source_editor.set('short_name', suggested_fields.short_name);
+    if (source_fields.short_name != '') {
+        source_editor.set('short_name', source_fields.short_name);
     } else {
         source_editor.field('short_name').input().attr("placeholder", "No suggestion, please enter short name manually");
     };
@@ -521,27 +521,73 @@ function create_from_images() {
             "attribute_name": "Act type phrase (act_type_phrase)",
             "data_type": "STR",
             "options_list": ""
-          },
+          }
+        ];
+        const person_text = 'person' in source_fields ? source_fields.person : '';
+        default_attributes.push(
           {
             "attribute_type": 37,
-            "value_STR": suggested_fields.persons,
-            "attribute_name": "Named persons (named_persons)",
+            "value_STR": person_text,
+            "attribute_name": "Named persons",
             "data_type": "STR",
             "options_list": ""
           }
-        ];
+        );
+        if ('SourceStartDate' in source_fields) {
+          const d_array = get_rsdate_array(source_fields.SourceStartDate);
+          if (d_array) {
+            default_attributes.push(
+              {
+                "attribute_type": 26,
+                "attribute_name": "Start date",
+                "value_DATE_d": d_array.day,
+                "value_DATE_m": d_array.month,
+                "value_DATE_y": d_array.year,
+                "data_type": "DATE",
+                "options_list": ""
+              },
+            );
+          };
+        };
+        if ('SourceEndDate' in source_fields) {
+          const d_array = get_rsdate_array(source_fields.SourceEndDate);
+          if (d_array) {
+              default_attributes.push(
+                {
+                  "attribute_type": 25,
+                  "attribute_name": "End date",
+                  "value_DATE_d": d_array.day,
+                  "value_DATE_m": d_array.month,
+                  "value_DATE_y": d_array.year,
+                  "data_type": "DATE",
+                  "options_list": ""
+                },
+              );
+          };
+        };
+        if ('city' in source_fields) {
+          default_attributes.push(
+            {
+              "attribute_type": 36,
+              "value_STR": source_fields.city,
+              "attribute_name": "City",
+              "data_type": "STR",
+              "options_list": "[{'label': i.name, 'value': i.name} for i in City.objects.all()]"
+            }
+          );
+        };
         for (let i = 0, len = default_attributes.length; i < len; ++i) { add_attribute_set(default_attributes[i], 'create'); };
         page_control = {};
         page_formset = 'on';
         $('#page-formset').collapse('show');
         let order = 0;
         var pages = []
-        for (const prop in img_data) {
-          if (img_data.hasOwnProperty(prop)) {
+        for (const prop in folio_data) {
+          if (folio_data.hasOwnProperty(prop)) {
               add_page_set({
                 'id': 'null',
                 'order': order+1,
-                'name': img_data[prop]['folio'],
+                'name': folio_data[prop],
                 'dam_id': prop
               });
               order = order + 1;
@@ -550,4 +596,19 @@ function create_from_images() {
     } else {
         change_on_type(create_from_images);
     }
+}
+
+function get_rsdate_array(d_string) {
+    var date_array = {};
+    if (d_string.includes('-')) {
+      var date_match = d_string.match(/(\d{4})-(\d{2})-(\d{2})/);
+    } else {
+      var date_match = d_string.match(/(\d{4})/);
+    };
+    if (typeof date_match[0] != 'undefined') {
+      date_array['day'] = typeof date_match[3] === 'undefined' ? '' : date_match[3];
+      date_array['month'] = typeof date_match[2] === 'undefined' ? '' : date_match[2];
+      date_array['year'] = date_match[1];
+    };
+    return date_array;
 }
