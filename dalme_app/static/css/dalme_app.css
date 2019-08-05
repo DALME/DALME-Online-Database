@@ -1649,6 +1649,27 @@ div.DTE_Field_Type_textarea textarea {
 }
 
 /*DataTables general fixes */
+.dataTables_wrapper .dataTables_processing {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  position: absolute;
+  top: 39px !important;
+  left: 0 !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  text-align: center;
+  padding: 1em 1em;
+  z-index: 100;
+  height: calc(100% - 75px);
+}
+
+.dataTables_wrapper .card {
+  border: 0;
+  background-color: rgba(255, 255, 255, 0.78);
+}
+
 div.DTS div.dataTables_scrollBody {
   background: none !important;
 }
@@ -1920,7 +1941,7 @@ li.search-field input.default {
   padding: 0px 5px;
   text-transform: uppercase;
   white-space: nowrap;
-  display: table;
+  display: inline-block;
   margin-bottom: 3px;
 }
 
@@ -2103,6 +2124,68 @@ li.search-field input.default {
   font-weight: 600;
 }
 
+
+/*workflow list menu*/
+
+.wf-dropdown {
+  min-width: 250px;
+}
+
+.dropdown-select {
+  padding-left: 16px;
+  padding-right: 16px;
+  white-space: nowrap;
+  display: block;
+  margin-right: 0;
+  margin-top: 3px;
+  margin-left: 0;
+  margin-bottom: 3px;
+}
+
+.dropdown-item-select {
+  color: #3a3b45;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.dropdown-tag {
+  color: #3a3b45;
+  border-color: #3a3b45;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0px 5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: inline-block;
+  margin-bottom: 3px;
+}
+
+.dropdown-item-select:hover {
+  color: #0361aa;
+  text-decoration: none;
+}
+
+.dropdown-tag:hover {
+  color: #0361aa;
+  text-decoration: none;
+  border-color: #0361aa;
+}
+
+.dropdown-item-select.active {
+  color: #1f7f31;
+  text-decoration: none;
+}
+
+.dropdown-item-select.active {
+  color: #1f7f31;
+  text-decoration: none;
+  border-color: #1f7f31;
+}
+
+
 /*dropdown menus */
 
 .dropdown-menu {
@@ -2121,6 +2204,10 @@ li.search-field input.default {
   box-shadow: 0 2px 28px 0 rgba(58,59,69,.45);
   border: none;
   top: 100%;
+}
+
+.dropdown-divider {
+  border-top: 1px solid #d1d1d1;
 }
 
 .dropdown-item {
@@ -2157,8 +2244,8 @@ li.search-field input.default {
   padding-left: 16px;
   padding-right: 16px;
   white-space: nowrap;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: #376783;
   margin-bottom: 3px;
 }
@@ -2166,6 +2253,7 @@ li.search-field input.default {
 .dropdown-text {
   padding-right: 16px;
   padding-left: 16px;
+  font-weight: 400;
 }
 
 .page-item.active .page-link {

@@ -164,6 +164,8 @@ class DTViewSet(viewsets.ModelViewSet):
                     queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
                 if request.GET.get('filters') is not None:
                     queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
+                if request.GET.get('wf_filter') is not None:
+                    queryset = self.filter_on_workflow(queryset=queryset, wf_query=request.GET['wf_filter'])
                 queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
                 rec_count = queryset.count()
                 data_dict['recordsTotal'] = rec_count
@@ -268,6 +270,9 @@ class DTViewSet(viewsets.ModelViewSet):
 
     def filter_on_filters(self, *args, **kwargs):
         return filter_on_filters(*args, **kwargs)
+
+    def filter_on_workflow(self, *args, **kwargs):
+        return filter_on_workflow(*args, **kwargs)
 
     def get_ordered_queryset(self, *args, **kwargs):
         return get_ordered_queryset(*args, **kwargs)
@@ -1492,6 +1497,50 @@ def filter_on_filters(*args, **kwargs):
     if 'or_list' in filters:
         queryset = queryset.filter(reduce(operator.or_, (Q(**q) for q in filters['or_list']))).distinct()
     return queryset
+
+
+def filter_on_workflow(*args, **kwargs):
+    queryset = kwargs['queryset']
+    wf_query = kwargs['wf_query']
+    query_list = wf_query.split('|')
+    if query_list[0] == 'special':
+        status_list = [1, 2, 3]
+        q_dict = {'workflow__wf_status__in': status_list}
+    elif query_list[0] == 'timedelta':
+        if query_list[1] != 'older':
+            timedelta_dict = {'days': int(query_list[1])}
+            cut_off = timezone.now().date() - datetime.timedelta(**timedelta_dict)
+            q_dict = {'workflow__last_modified__gte': cut_off}
+        else:
+            cut_off = timezone.now().date() - datetime.timedelta(days=365)
+            q_dict = {'workflow__last_modified__lte': cut_off}
+    elif query_list[0] == 'status':
+        stage_dict = dict(Workflow.PROCESSING_STAGES)
+        if query_list[1] == 'awaiting':
+            q_dict = {
+                'workflow__stage': int(query_list[2]) - 1,
+                'workflow__' + stage_dict[int(query_list[2]) - 1] + '_done': True,
+            }
+        elif query_list[1] == 'in_progress':
+            q_dict = {
+                'workflow__stage': int(query_list[2]),
+                'workflow__' + stage_dict[int(query_list[2])] + '_done': False,
+            }
+        elif query_list[1] == 'done':
+            q_dict = {
+                'workflow__' + stage_dict[int(query_list[2])] + '_done': True,
+            }
+        elif query_list[1] == 'not_done':
+            q_dict = {
+                'workflow__' + stage_dict[int(query_list[2])] + '_done': False,
+            }
+    else:
+        if query_list[1].isdigit():
+            value = int(query_list[1])
+        else:
+            value = query_list[1]
+        q_dict = {'workflow__' + query_list[0]: value}
+    return queryset.filter(Q(**q_dict))
 
 
 def get_searchable_fields(**kwargs):

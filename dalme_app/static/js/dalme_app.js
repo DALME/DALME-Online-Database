@@ -44,7 +44,7 @@ function update_workflow(action, code=0) {
               } else {
                 $('#processing_menu').remove();
                 $('#wf_menu').append('<a id="assessment_menu" class="dropdown-item" href="#" onclick="update_workflow(\'change_status\', 1)">\
-                  <i class="fas fa-clipboard-list fa-fw mr-2 text-gray-400"></i> Place under assessment</a>');
+                  <i class="fas fa-clipboard-check fa-fw mr-2 text-gray-400"></i> Place under assessment</a>');
               }
             }
         };

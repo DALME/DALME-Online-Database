@@ -44,7 +44,9 @@ function perform_action(action) {
 function init_module(mod) {
   switch(mod) {
     case 'filters':
-        $('#dataTables-list_filter').parent().prepend('<button class="btn dt-btn buttons-collection" id="btn-filters" data-toggle="collapse" data-target="#filters-container" aria-expanded="false" aria-controls="filters-container" type="button" onclick="this.classList.toggle(\'active\')"><i class="fa fa-filter fa-sm"></i> Filters</button>');
+        $('#dataTables-list_filter').parent().prepend('<button class="btn dt-btn buttons-collection" id="btn-filters" data-toggle="collapse" data-target="#filters-container"\
+                                                      aria-expanded="false" aria-controls="filters-container" type="button" onclick="this.classList.toggle(\'active\')">\
+                                                      <i class="fa fa-filter fa-sm"></i> Filters</button>');
         $('#dataTables-list_filter .form-control')[0].style.borderTopLeftRadius = "0";
         $('#dataTables-list_filter .form-control')[0].style.borderBottomLeftRadius = "0";
         $('#btn-filters').css("margin-right","-1px");
@@ -56,12 +58,83 @@ function init_module(mod) {
         $('.dt-buttons').append('<button class="btn dt-btn buttons-collection" id="btn-preview" onclick="toggle_preview()"><i class="fa fa-eye fa-sm"></i> Preview</button>');
         break;
     case 'fieldsets':
-        var button_html = '<div class="btn-group dropdown"><button class="btn buttons-collection dropdown-toggle" id="fieldsets_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-swatchbook fa-sm"></i> Fieldsets</button><div class="dropdown-menu" aria-labelledby="fieldsets_button">';
+        var button_html = '<div class="btn-group dropdown"><button class="btn buttons-collection dropdown-toggle" id="fieldsets_button" data-toggle="dropdown" aria-haspopup="true"\
+                          aria-expanded="false"><i class="fa fa-swatchbook fa-sm"></i> Fieldsets</button><div class="dropdown-menu" aria-labelledby="fieldsets_button">';
         for (const prop in dt_fieldsets) {
             if (dt_fieldsets.hasOwnProperty(prop)) { button_html += '<a class="dt-button dropdown-item" href="#" onclick="toggle_columns(this)"><span>'+ prop +'</span></a>'; }
         };
         button_html += '</div></div>';
         $('.dt-buttons').append(button_html);
+        break;
+    case 'workflow':
+        var wf_menu = [
+          {'type': 'title', 'text': '<i class="fas fa-poll-h fa-sm mr-1"></i>Status'},
+          {'type': 'message', 'text': 'Show only sources with a specific status'},
+          {'type': 'item', 'text': 'All', 'query': ''},
+          {'type': 'item', 'text': 'Processed', 'query': 'wf_status|3'},
+          {'type': 'item', 'text': 'Under Assessment', 'query': 'wf_status|1'},
+          {'type': 'item', 'text': 'Unknown', 'query': 'special|unknown'},
+          {'type': 'divider'},
+          {'type': 'item', 'text': 'Flagged for help', 'query': 'help_flag|1'},
+          {'type': 'divider'},
+          {'type': 'title', 'text': '<i class="fas fa-sliders-h fa-sm mr-1"></i>Processing Stage'},
+          {'type': 'message', 'text': 'Show only sources in a specific stage of processing (and/or state)'},
+          {'type': 'item-select', 'text': 'Ingestion', 'query': '1'},
+          {'type': 'item-select', 'text': 'Transcription', 'query': '2'},
+          {'type': 'item-select', 'text': 'Markup', 'query': '3'},
+          {'type': 'item-select', 'text': 'Review', 'query': '4'},
+          {'type': 'item-select', 'text': 'Parsing', 'query': '5'},
+          {'type': 'divider'},
+          {'type': 'title', 'text': '<i class="fas fa-history fa-sm mr-1"></i>Activity'},
+          {'type': 'message', 'text': 'Show only sources with activity within a certain time period'},
+          {'type': 'item', 'text': 'Past week', 'query': 'timedelta|7'},
+          {'type': 'item', 'text': 'Past month', 'query': 'timedelta|30'},
+          {'type': 'item', 'text': 'Past three months', 'query': 'timedelta|90'},
+          {'type': 'item', 'text': 'Past year', 'query': 'timedelta|365'},
+          {'type': 'item', 'text': 'More than a year ago', 'query': 'timedelta|older'},
+        ];
+        var button_html = '<div class="btn-group dropdown"><button class="btn buttons-collection dropdown-toggle" id="workflow_button" data-toggle="dropdown" aria-haspopup="true"\
+                          aria-expanded="false"><i class="fa fa-code-branch fa-sm"></i> Workflow</button><div class="dropdown-menu wf-dropdown" aria-labelledby="workflow_button">';
+        for (let i = 0, len = wf_menu.length; i < len; ++i) {
+          switch(wf_menu[i]['type']) {
+            case 'title':
+                button_html += '<div class="dropdown-title">'+ wf_menu[i]['text'] +'</div>';
+                break;
+            case 'message':
+                button_html += '<div class="dropdown-text">'+ wf_menu[i]['text'] +'</div>';
+                break;
+            case 'divider':
+                button_html += '<div class="dropdown-divider"></div>';
+                break;
+            case 'item':
+                button_html += '<a class="dt-button dropdown-item" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'\')">'+ wf_menu[i]['text'] +'</a>';
+                break;
+            case 'item-select':
+                button_html += '<div class="dropdown-select dropdown-item">\
+                                <a class="dt-button dropdown-item-select mr-1" href="#" onclick="workflow_filter(this, \'stage|'+ wf_menu[i]['query'] +'\')">'+ wf_menu[i]['text'] +'</a>\
+                                <a class="dt-button dropdown-tag" href="#" onclick="workflow_filter(this, \'status|awaiting|'+ wf_menu[i]['query'] +'\')">awaiting</a>\
+                                <a class="dt-button dropdown-tag" href="#" onclick="workflow_filter(this, \'status|in_progress|'+ wf_menu[i]['query'] +'\')">in progress</a>\
+                                <a class="dt-button dropdown-item-select" href="#" onclick="workflow_filter(this, \'status|done|'+ wf_menu[i]['query'] +'\')"><i class="far fa-check-circle fa-fw"></i></a>\
+                                <a class="dt-button dropdown-item-select" href="#" onclick="workflow_filter(this, \'status|not_done|'+ wf_menu[i]['query'] +'\')"><i class="far fa-times-circle fa-fw"></i></i></a>\
+                                </div>';
+          };
+        };
+        button_html += '</div></div>';
+        $('.dt-buttons').append(button_html);
+  }
+}
+
+function workflow_filter(menu, query) {
+  $('#workflow_button').find('.active').removeClass('active');
+  $(menu).addClass('active');
+  if (!$(menu).hasClass('dropdown-item')) {
+    $(menu).parent().addClass('active');
+  };
+  if (query != '') {
+    const query_data = '&wf_filter='+query;
+    update_table('workflow_filter', query_data);
+  } else {
+    update_table('workflow_filter');
   }
 }
 
@@ -224,20 +297,25 @@ function reset_filters() {
   $('#filters-container').html('<div id="filter0" class="table-filter"><div class="filter_info">Filters</div><div class="filter_buttons"><button class="btn filters-btn add_filter" type="button"><i class="fa fa-plus fa-sm"></i></button></div></div>');
   filterNum = 0;
   filter_register = { 'filter0': [], };
-  update_table('');
+  update_table('reset_filters');
 }
 
 function apply_filters() {
   const fv = collect_filters();
   const filter_str = '&filters='+fv;
-  update_table(filter_str);
+  update_table('apply_filters', filter_str);
 }
 
-function update_table(filters) {
-  //var dt = $('#dataTables-list').DataTable();
-  var dt_url = remove_param('filters', dt_table.ajax.url())
-  var new_url = dt_url + filters;
-  dt_table.ajax.url(new_url).load();
+function update_table(action, query_data) {
+  if (action == 'workflow_filter') {
+    var url = remove_param('wf_filter', dt_table.ajax.url());
+  } else {
+    var url = remove_param('filters', dt_table.ajax.url());
+  };
+  if (typeof query_data != 'undefined') {
+    url = url + query_data;
+  };
+  dt_table.ajax.url(url).load();
 }
 
 function collect_filters() {
