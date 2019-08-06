@@ -19,6 +19,8 @@ from collections import OrderedDict
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.contrib import messages
+from django.template import defaultfilters
+from django.utils import timezone
 
 
 def get_script_menu():
@@ -155,8 +157,11 @@ def test_expression(request):
 
 
 def test_expression2(request):
-    messages.info(request, 'This is a test message')
-    return 'done'
+    d_string = defaultfilters.timesince(timezone.now())
+    if d_string == '0\xa0minutes':
+        d_string = 'now'
+    foo=bar
+    return d_string
 
 
 def import_transcriptions(request):

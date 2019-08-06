@@ -9,6 +9,7 @@ from random import randint
 from dalme_app.models import *
 from django.template import defaultfilters
 import re
+from django.utils import timezone
 
 # Security and permissions functions
 
@@ -63,7 +64,7 @@ def round_timesince(d):
             d_list[1] = d_list[1] + 's'
         result = str(d_list[0]) + ' ' + str(d_list[1]) + ' ago '
     else:
-        if d_string == '0 minutes':
+        if d_string == '0\xa0minutes':
             result = 'now'
         else:
             result = d_string + ' ago'
@@ -306,6 +307,7 @@ def get_count(item):
 def format_date(value, type):
     if value is not None:
         if type == 'timestamp':
+            value = timezone.localtime(value)
             date_str = value.strftime('%d-%b-%Y@%H:%M')
         elif type == 'attribute':
             if value.value_DATE_d is None or value.value_DATE_m is None or value.value_DATE_y is None:
@@ -313,6 +315,7 @@ def format_date(value, type):
             else:
                 date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
         elif type == 'timestamp-long':
+            value = timezone.localtime(value)
             date_str = value.strftime('%A, %d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " ")
         else:
             date_str = str(value)
