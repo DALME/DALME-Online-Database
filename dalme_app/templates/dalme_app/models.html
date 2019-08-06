@@ -61,7 +61,7 @@ var dt_fieldsets = {{ dt_fieldsets | safe }};
               {% elif k == 'opts' %}
                 opts: {
                   {% for ok, ov in v.items %}
-                    {% if ok == 'plugins' %}
+                    {% if ok == 'plugins' or ok == 'source' %}
                       {{ ok | safe }}: {{ ov | safe }},
                     {% else %}
                       {{ ok | safe }}: "{{ ov | safe }}",
