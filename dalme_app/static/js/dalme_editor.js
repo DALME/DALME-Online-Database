@@ -111,21 +111,20 @@ function changeEditorMode() {
       xmleditor = ace.edit("editor");
       setEditorOptions();
       xmleditor.session.setValue(tr_text);
-      xmleditor.session.on("change.dalme", debounce(saveEditor, 1000));
+      xmleditor.session.on("change", debounce(saveEditor, 1000));
+      xmleditor.session.on("change", updateEditorToolbar);
       setEditorToolbar();
-      $(editor_container).on("input.dalme", updateEditorToolbar);
   } else if (editor_mode == 'xml') {
       editor_mode = 'render';
       saveEditor();
       removeEditorToolbar();
       tr_text = xmleditor.getValue();
-      xmleditor.off("change.dalme");
+      xmleditor.off("change");
       xmleditor.destroy();
       $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
       tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
           $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
       });
-      $(editor_container).off("input.dalme");
       $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
   }
 }
