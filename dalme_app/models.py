@@ -130,7 +130,7 @@ class Attribute(dalmeUuid):
                 date = str(self.value_DATE_y)+'-'+str(self.value_DATE_m)+'-'+str(self.value_DATE_d).zfill(2)
                 pDate = parse_date(date)
                 self.value_DATE = pDate
-                self.value_STR = self.value_DATE.strftime('%d-%B-%Y').lstrip("0").replace(" 0", " ")
+                self.value_STR = self.value_DATE.strftime('%d-%b-%Y').lstrip("0").replace(" 0", " ")
             elif self.value_DATE_m is not None and self.value_DATE_y is not None:
                 self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
             elif self.value_DATE_y is not None:
@@ -332,7 +332,7 @@ def update_folio(sender, instance, created, **kwargs):
 class Source_pages(dalmeIntid):
     source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
-    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='sources')
+    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='source_pages')
 
 
 class Source(dalmeUuid):
@@ -362,17 +362,13 @@ class Transcription(dalmeUuid):
         return str(self.id)
 
 
-# @receiver(models.signals.post_save, sender=Page)
-# @receiver(models.signals.post_save, sender=Source_pages)
-# @receiver(models.signals.post_save, sender=Transcription)
-# def update_source_modification(sender, instance, created, **kwargs):
-#     if sender == 'Source_pages':
-#         source_id = instance.source.id
-#     elif sender == 'Page':
-#         source_id = instance.sources.source.id
-#     elif sender == 'Transcription':
-#         source_id = instance.source_id
-#     Source.objects.filter(pk=source_id).update(modification_username=get_current_username, modification_timestamp=timezone.now())
+@receiver(models.signals.post_save, sender=Transcription)
+def update_source_modification(sender, instance, created, **kwargs):
+    source_id = instance.source_pages.all().first().source.id
+    source = Source.objects.get(pk=source_id)
+    source.modification_timestamp = timezone.now()
+    source.modification_username = get_current_username()
+    source.save()
 
 
 class Identity_phrase(dalmeUuid):
@@ -448,7 +444,6 @@ class City(dalmeIntid):
 
 
 class Language(dalmeIntid):
-
     LANGUAGE_TYPES = (
         ('language', 'language'),
         ('dialect', 'dialect')
@@ -572,18 +567,16 @@ class Work_log(models.Model):
 
 
 @receiver(models.signals.post_save, sender=Source)
-def create_workflow(sender, instance, created, **kwargs):
-    if created:
-        if instance.has_inventory:
-            wf_object = Workflow.objects.create(
-                source=instance,
-                last_modified=instance.modification_timestamp
-            )
-            Work_log.objects.create(
-                source=wf_object,
-                event='Source created',
-                timestamp=wf_object.last_modified
-            )
+def update_workflow(sender, instance, created, **kwargs):
+    if instance.has_inventory:
+        if created:
+            wf_object = Workflow.objects.create(source=instance, last_modified=instance.modification_timestamp)
+            Work_log.objects.create(source=wf_object, event='Source created', timestamp=wf_object.last_modified)
+        else:
+            wf_object = Workflow.objects.get(pk=instance.id)
+            wf_object.last_modified = timezone.now()
+            wf_object.last_user = get_current_user()
+            wf_object.save()
 
 
 class Tag(dalmeUuid):
