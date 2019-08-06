@@ -15,8 +15,8 @@
         "counter": "sources"
       },
       {
-        "text": "Acts & Registers",
-        "link": "/sources?type=acts_and_registers",
+        "text": "Archival Files & Records",
+        "link": "/sources?type=files_and_records",
         "iconClass": "fa-columns",
         "counter": "notarial_sources"
       },

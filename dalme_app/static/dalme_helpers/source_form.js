@@ -511,14 +511,14 @@ function create_from_images() {
           {
             "attribute_type": 28,
             "value_STR": "",
-            "attribute_name": "Act type (act_type)",
+            "attribute_name": "Record type (record_type)",
             "data_type": "STR",
             "options_list": ""
           },
           {
             "attribute_type": 29,
             "value_STR": "",
-            "attribute_name": "Act type phrase (act_type_phrase)",
+            "attribute_name": "Record type phrase (record_type_phrase)",
             "data_type": "STR",
             "options_list": ""
           }
