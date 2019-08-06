@@ -3210,6 +3210,7 @@ li#searchIcon.show a {
   flex-direction: row;
   overflow: hidden;
   position: relative;
+  min-height: 600px;
   /* height: calc(100vh - 114px); */
 }
 
@@ -3475,6 +3476,8 @@ li#searchIcon.show a {
 
 .attribute_list_value {
   font-weight: 400;
+  max-height: 200px;
+  overflow: scroll;
 }
 
 /* colours */
