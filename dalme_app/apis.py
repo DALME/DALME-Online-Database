@@ -385,13 +385,14 @@ class ContentTypes(DTViewSet):
             status = 400
         return Response(result, status)
 
-    def update(self, request, pk=None, format=None):
+    def update(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=pk)
+        partial = kwargs.pop('partial', False)
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
         attribute_types = data_dict.pop('attribute_types', None)
-        serializer = self.get_serializer(object, data=data_dict)
+        serializer = self.get_serializer(object, data=data_dict, partial=partial)
         if serializer.is_valid():
             if attribute_types is not None:
                 if ',' in str(attribute_types):
