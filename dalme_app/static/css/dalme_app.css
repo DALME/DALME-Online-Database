@@ -3448,6 +3448,96 @@ li#searchIcon.show a {
   border-left: 4px solid #1f7f31;
 }
 
+/*tag annotator*/
+
+#tag-menu {
+  border-left: 1px solid #a5a5a5;
+  display: flex;
+  flex-direction: column;
+  padding-left: 0;
+  margin-bottom: 0;
+  height: calc(100vh - 572px); /* panel-bottom-editor_bar-xml_margin = 509-29-10*/
+  /* overflow-y: scroll; */
+}
+
+.tag-menu-container {
+  min-width: 180px;
+}
+
+.tag-menu-form {
+  margin: 0;
+  white-space: nowrap;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.tag-menu-button {
+  width: 100%;
+  background-color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+  border-bottom: 1px solid #a5a5a5;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+}
+
+.tag-menu-button:hover {
+  cursor: pointer;
+  background-color: #c4e1ef;
+  color: #0361aa;
+}
+
+.tag-menu-dropdown input, .tag-menu-dropdown select {
+  display: inline !important;
+  width: auto !important;
+  margin-right: 5px;
+}
+
+.tag-menu-section-head {
+  width: 100%;
+  background-color: #f6f6f6;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid #a5a5a5;
+  padding: 5px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tag-menu-section-head:after {
+    font-family: "Font Awesome 5 Free";
+    content: "\f0d7";
+    float: right;
+}
+.tag-menu-section-head.collapsed:after {
+    content: "\f0d9";
+}
+
+.tag-menu-section-head:hover {
+  cursor: pointer;
+  color: #0361aa;
+}
+
+.tag-tooltip {
+  color: #d1d3e2;
+}
+
+.tooltip a {
+  color: #ccc;
+  text-decoration: none;
+  border-bottom: 1px dotted;
+}
+
+.tooltip a:hover {
+  color: #fff;
+}
+
+
 /*lists */
 .attribute_list {
   font-size: 14px;

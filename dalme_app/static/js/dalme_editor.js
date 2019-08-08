@@ -16,6 +16,61 @@ function switch_tab(tab) {
 
 function startEditor() {
   if (typeof transcriber_state == 'undefined') {
+      tei_tags = [
+        {'section': '', 'id': 'layout_tags', 'title': 'Layout tags', 'expanded': 'true'},
+        {'name': 'Blank space', 'type': 'sc', 'help': 'Mark <b>unusual space</b> in the source text', 'link': '#Blank_Space', 'tag_name': 'space', 'message': 'Description of the <b>extent</b> of the blank, <i>e.g.</i> 7 words', 'attributes': [
+          {'name': 'extent', 'label': 'Extent', 'type': 'text'},
+        ]},
+        {'name': 'Column', 'type': 'sc', 'help': 'Mark the point at which a column of text begins', 'link': '#Columns', 'tag_name': 'cb', 'message': '<b>Number of the column</b> on the page, <i>e.g.</i> 1, 2, etc.', 'attributes': [
+          {'name': 'n', 'label': 'Column number', 'type': 'text'}
+        ]},
+        {'name': 'Hyphenation', 'type': 'w', 'help': 'Wrap a hyphen and indicate its type/function', 'link': '#Hyphenation', 'tag_name': 'pc', 'message': 'Indicates the <b>force</b> of the association between the punctuation mark and its adjacent word. Use <b>strong</b> to mark a hyphen that should be preserved during the tokenisation process, and <b>weak</b> for hyphens that should not be kept, <i>e.g.</i> split words at the end of lines', 'attributes': [
+          {'name': 'force', 'label': 'Force', 'type': 'choice', 'options': ['weak', 'strong']},
+        ]},
+        {'name': 'Note', 'type': 'sc', 'help': 'Add additional comment out of the main textual stream', 'link': '#Marginal_Notes_and_Insertions_via_renvoi', 'tag_name': 'note', 'message': '<b>Type</b> of note, <b>ref</b> if renvoi, and the actual <b>contents</b>', 'attributes': [
+          {'name': 'type', 'label': 'Type', 'type': 'choice', 'options': ['marginal', 'renvoi']},
+          {'name': 'ref', 'label': 'Ref', 'type': 'text'},
+          {'name': 'text', 'label': 'Text', 'type': 'text'},
+        ]},
+        {'section': 'pre-close', 'id': 'format_tags', 'title': 'Format tags', 'expanded': 'false'},
+        {'name': 'Indentation', 'type': 'w', 'help': 'Wrap text with indented horizontal alignment', 'link': '#Indentations.2C_Superscripts.2C_and_Subscripts', 'tag_name': 'hi', 'message': 'Level of <b>indentation</b>', 'attributes': [
+          {'name': 'rend', 'label': 'Level', 'type': 'choice', 'options': ['indent', 'indent1', 'indent2', 'indent3', 'indent4']}
+        ]},
+        {'name': 'Superscript', 'type': 'w', 'help': 'Wrap text with higher vertical alignment', 'link': '#Indentations.2C_Superscripts.2C_and_Subscripts', 'tag_name': 'hi', 'attribute_name': 'rend', 'attribute_value': 'superscript'},
+        {'name': 'Subscript', 'type': 'w', 'help': 'Wrap text with lower vertical alignment', 'link': '#Indentations.2C_Superscripts.2C_and_Subscripts', 'tag_name': 'hi', 'attribute_name': 'rend', 'attribute_value': 'subscript'},
+        {'section': 'pre-close', 'id': 'editorial_tags', 'title': 'Editorial tags', 'expanded': 'false'},
+        {'name': 'Addition', 'type': 'w', 'help': 'Wrap text inserted in the source text', 'link': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations', 'tag_name': 'add', 'message': '<b>Place</b> where the addition is located with reference to the main text', 'attributes': [
+          {'name': 'place', 'label': 'Place', 'type': 'text', 'options': ['above', 'below']},
+        ]},
+        {'name': 'Deletion', 'type': 'w', 'help': 'Wrap text deleted, marked as deleted, or otherwise indicated as superfluous', 'link': '#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations', 'tag_name': 'del', 'message': '<b>Method</b> of deletion used', 'attributes': [
+          {'name': 'rend', 'label': 'Method', 'type': 'text', 'options': ['overstrike']},
+        ]},
+        {'name': 'Expansion', 'type': 'w', 'help': 'Wrap text that has been expanded from an abbreviation', 'link': '#Abbreviations_and_Expansions', 'tag_name': 'expan'},
+        {'name': 'Omission', 'type': 'sc', 'help': 'Mark where material has been omitted in the transcription', 'link': '#Omissions', 'tag_name': 'gap', 'message': '<b>Reason</b> for the omission and <b>extent</b> of the gap <i>e.g.</i> 1 word, 3 paragraphs', 'attributes': [
+          {'name': 'reason', 'label': 'Reason', 'type': 'text', 'options': ['illegible', 'damaged']},
+          {'name': 'extent', 'label': 'Extent', 'type': 'text'},
+        ]},
+        {'name': 'Supplied', 'type': 'w', 'help': 'Wrap text supplied by the transcriber', 'link': '#Supplied_Text', 'tag_name': 'supplied', 'message': '<b>Reason</b> why the text had to be supplied', 'attributes': [
+          {'name': 'reason', 'label': 'Reason', 'type': 'text'}
+        ]},
+        {'name': 'Unclear', 'type': 'w', 'help': 'Wrap text that cannot be transcribed with certainty', 'link': '#Unclear_Text', 'tag_name': 'unclear', 'message': '<b>Reason</b> why the material is hard to transcribe', 'attributes': [
+          {'name': 'reason', 'label': 'Reason', 'type': 'text', 'options': ['illegible', 'damaged', 'ink blot']},
+        ]},
+        {'section': 'pre-close', 'id': 'semantic_tags', 'title': 'Semantic tags', 'expanded': 'false'},
+        {'name': 'Abbreviation', 'type': 'w', 'help': 'Wrap abbreviation', 'link': '#Abbreviations_and_Expansions', 'tag_name': 'abbr', 'message': '<b>Type</b> of abbreviation', 'attributes': [
+          {'name': 'type', 'label': 'Type', 'type': 'text', 'options': ['title', 'initial', 'acronym']},
+        ]},
+        {'name': 'Elision', 'type': 'w', 'help': 'Wrap elided word', 'link': '#Elisions', 'tag_name': 'w', 'attribute_name': 'type', 'attribute_value': 'elision', 'message': 'The <b>non-elided version of the word</b>', 'attributes': [
+          {'name': 'lemma', 'label': 'Word', 'type': 'text'},
+        ]},
+        {'name': 'Named entity', 'type': 'w', 'help': 'Wrap text that refers to a person, place, etc.', 'link': '#Names_.28Persons.2FLocations.29', 'tag_name': 'rs', 'message': '<b>Type</b> of entity and <b>key</b>, <i>i.e.</i> an externally-defined means of identifying the entity, <i>e.g.</i> a database UUID', 'attributes': [
+          {'name': 'type', 'label': 'Type', 'type': 'text', 'options': ['person', 'place', 'organization', 'object']},
+          {'name': 'key', 'label': 'Key', 'type': 'text'},
+        ]},
+        {'name': 'Paraphrase', 'type': 'w', 'help': 'Wrap text that has been paraphrased', 'link': '#Paraphrasing', 'tag_name': 'quote', 'message': '<b>Person responsible</b> for the paraphrased text', 'attributes': [
+          {'name': 'resp', 'label': 'Author', 'type': 'text'},
+        ]},
+      ];
       transcriber_state = 'on';
       footer_content = '...';
       viewer_container = document.getElementById('diva_viewer');
@@ -114,10 +169,12 @@ function changeEditorMode() {
       xmleditor.session.on("change", debounce(saveEditor, 1000));
       xmleditor.session.on("change", updateEditorToolbar);
       setEditorToolbar();
+      setTagMenu('on');
   } else if (editor_mode == 'xml') {
       editor_mode = 'render';
       saveEditor();
       removeEditorToolbar();
+      setTagMenu('off');
       tr_text = xmleditor.getValue();
       xmleditor.off("change");
       xmleditor.destroy();
@@ -325,7 +382,146 @@ function resizeEditor() {
   }
 }
 
+function setTagMenu(action) {
+  if (action == 'on') {
+      if (typeof tag_menu_html == 'undefined') {
+        tag_menu_html = '';
+        for (let i = 0, len = tei_tags.length; i < len; ++i) {
+            let item = tei_tags[i];
+            let att_array = [];
+            if ('section' in item) {
+                if (item.section == 'pre-close') {
+                  tag_menu_html += '</div></div>';
+                };
+                tag_menu_html += `<div class="tag-menu-container"><div class="tag-menu-section-head`;
+                if (item.expanded == 'false') { tag_menu_html += ' collapsed' };
+                tag_menu_html += `" id="heading_${item.id}" data-toggle="collapse" \
+                data-target="#${item.id}" aria-expanded="${item.expanded}" aria-controls="${item.id}">${item.title}</div>\
+                <div id="${item.id}" class="collapse`;
+                if (item.expanded == 'true') { tag_menu_html += ' show' };
+                tag_menu_html += `" aria-labelledby="heading_${item.id}" data-parent="#tag-menu">`;
+            } else {
+                if ('attribute_name' in item) {
+                  att_array.push(item.attribute_name+'|'+item.attribute_value);
+                };
+                if ('attributes' in item) {
+                    let message = item.message;
+                    tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
+                    </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} <a href='https://wiki.dalme.org/DALME_TEI_Schema${item.link}' target='_blank'>See DALME Wiki</a>"></i>\
+                    </div><div class="dropdown-menu tag-menu-dropdown p-2"><div class="tag-menu-form">`;
+                    for (let j = 0, lenj = item.attributes.length; j < lenj; ++j) {
+                      let att = item.attributes[j];
+                      att_array.push(att.name+'|'+att.type+'|'+item.tag_name+'_'+att.name);
+                      if (att.type == 'text') {
+                          tag_menu_html += `<input class="form-control form-control-sm" type="text" id="${item.tag_name+'_'+att.name}" placeholder="${att.label}">`;
+                          if ('options' in att) {
+                            message += 'Common choices: ';
+                            for (let k = 0, lenk = att.options.length; k < lenk; ++k) {
+                              message += `<a href="#" onclick="$(\'#${item.tag_name+'_'+att.name}\').val(\'${att.options[k]}\')">${att.options[k]}</a> `;
+                            };
+                          };
+                      } else if (att.type == 'choice') {
+                          tag_menu_html += `<select class="form-control form-control-sm" id="${item.tag_name+'_'+att.name}">`
+                          tag_menu_html += `<option disabled selected>${att.label}</option>`;
+                          for (let k = 0, lenk = att.options.length; k < lenk; ++k) { tag_menu_html += `<option>${att.options[k]}</option>`; };
+                          tag_menu_html += `</select>`;
+                      };
+                    };
+                    tag_menu_html += `<button type="button" class="btn btn-primary" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')">Add</button>`;
+                    tag_menu_html += `</div><small class="form-text text-muted">${message}</small></div></div>`;
+                } else {
+                    tag_menu_html += `<div class="tag-menu-button" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')"><i class="fas fa-caret-left fa-fw mr-1">\
+                    </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help}"></i></div>`;
+                };
+            }
+        };
+      };
+      tag_menu_html += '</div></div>';
+      $('#tag-menu').show();
+      $('#tag-menu').html(tag_menu_html);
+      $('.tag-tooltip').tooltip({container: 'body', delay: { "show": 100, "hide": 1000 }});
+  } else {
+      $('#tag-menu').html('');
+      $('#tag-menu').hide();
+  }
+}
+
+function addTag(type, tag, att_array) {
+    let tag_attributes = [];
+    if (tag == 'note') { var note_att = {} };
+    if (att_array) {
+      if (att_array.includes('-')) {
+        att_array = att_array.split('-');
+      } else {
+        att_array = [att_array];
+      };
+      for (let i = 0, len = att_array.length; i < len; ++i) {
+          let att = att_array[i].split('|');
+          if (att.length == 2) {
+              tag_attributes.push([att[0], att[1]]);
+          } else {
+              let att_value = '';
+              switch (att[1]) {
+                case 'text':
+                    att_value = $('#'+att[2]).val();
+                    $('#'+att[2]).val('');
+                    break;
+                case 'choice':
+                    att_value = $('#'+att[2]).find('option:selected').text();
+                    $('#'+att[2])[0].selectedIndex = 0;
+              };
+              if (tag == 'note') {
+                note_att[att[0]] = att_value;
+              } else {
+                tag_attributes.push([att[0], att_value]);
+              }
+          }
+      }
+    };
+    if (tag == 'note') {
+      if (note_att['type'] == 'renvoi') {
+        note_ref = `<ref target="#note_${note_att['ref']}"/>`;
+        note_output = `\n\n<note xml:id="note_${note_att['ref']}">${note_att['text']}</note>`;
+        xmleditor.session.insert(xmleditor.getCursorPosition(), note_ref);
+        xmleditor.session.insert({row: xmleditor.session.getLength(), column: 0}, note_output)
+      } else {
+        tag_output = `<note type="${note_att['type']}">${note_att['text']}</note>`;
+        xmleditor.session.insert(xmleditor.getCursorPosition(), tag_output)
+      }
+    } else {
+      tag_output = '<' + tag;
+      if (tag_attributes.length != 0) {
+        for (let i = 0, len = tag_attributes.length; i < len; ++i) {
+          tag_output += ' ' + tag_attributes[i][0] + '="' + tag_attributes[i][1] + '"';
+        }
+      };
+      if (type == 'w') {
+        const range = xmleditor.selection.getRange();
+        tag_output += '>' + xmleditor.getSelectedText() + '</' + tag + '>';
+        xmleditor.session.replace(range, tag_output);
+      } else {
+        tag_output += '/>';
+        xmleditor.session.insert(xmleditor.getCursorPosition(), tag_output)
+      };
+    }
+}
+
+
 /***** Utility functions *********/
+function setKeybindings() {
+  xmleditor.commands.addCommand({
+    name: 'supplied_tag',
+    bindKey: {win: 'Ctrl-P',  mac: 'Command-Option-S'},
+    exec: function(xmleditor) {
+        let txt = xmleditor.getSelectedText();
+        const range = xmleditor.session.getTextRange(xmleditor.getSelectionRange());
+        txt = '<supplied>'+txt+'</supplied>';
+        xmleditor.session.replace(range, txt);
+    },
+    readOnly: false // false if this command should not apply in readOnly mode
+  });
+}
+
 
 function getTitle(e, tag) {
   if (e.hasAttribute("unit") && e.hasAttribute("quantity")) {
@@ -353,18 +549,4 @@ function getTitle(e, tag) {
     }
   };
   return title
-}
-
-function testKeybindings() {
-  xmleditor.commands.addCommand({
-    name: 'supplied_tag',
-    bindKey: {win: 'Ctrl-P',  mac: 'Command-Option-S'},
-    exec: function(xmleditor) {
-        let txt = xmleditor.getSelectedText();
-        const range = xmleditor.session.getTextRange(xmleditor.getSelectionRange());
-        txt = '<supplied>'+txt+'</supplied>';
-        xmleditor.session.replace(range, txt);
-    },
-    readOnly: false // false if this command should not apply in readOnly mode
-  });
 }

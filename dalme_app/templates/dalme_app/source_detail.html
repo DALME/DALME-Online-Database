@@ -227,8 +227,12 @@
               <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
             </div>
           </div>
-          <div id="editor" class="d-flex justify-content-center">
-              <div class="spinner-border mt-auto mb-auto"></div>
+          <div class="d-flex flex-row">
+            <div id="editor" class="d-flex justify-content-center w-100">
+                <div class="spinner-border mt-auto mb-auto"></div>
+            </div>
+            <div id="tag-menu" class="accordion">
+            </div>
           </div>
       </div>
       </div>
@@ -253,7 +257,12 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
-<script>$(document).ready(function() { enable_comments("Source", "{{ source_id }}"); });</script>
+<script>
+  $(document).ready(function() {
+    $('#tag-menu').hide();
+    enable_comments("Source", "{{ source_id }}");
+  });
+</script>
 {% if tables %}
   <script>
     {% for table in tables %}
