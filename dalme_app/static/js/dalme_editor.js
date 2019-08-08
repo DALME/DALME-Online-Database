@@ -117,6 +117,7 @@ function startEditor() {
       if (folio_array[0].tr_id == 'None') {
           $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
           $(author_container).html('No transcription available');
+          tr_text = '';
       } else {
           $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
               tr_text = data.transcription;
@@ -179,9 +180,14 @@ function changeEditorMode() {
       xmleditor.off("change");
       xmleditor.destroy();
       $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
-      tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
-          $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
-      });
+      if (tr_text != '') {
+        tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+            $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
+        });
+      } else {
+        $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
+        $(author_container).html('No transcription available');
+      };
       $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
   }
 }
