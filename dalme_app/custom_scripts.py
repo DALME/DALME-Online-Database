@@ -143,52 +143,16 @@ def import_languages(request):
 
 
 def test_expression(request):
-    sources = Source.objects.filter(type=13, name__startswith='Inventory', creation_username='pizzorno')
-    count = sources.count()
-    # type_rec = Attribute_type.objects.get(pk=28)
-    # type_format = Attribute_type.objects.get(pk=129)
-    for src in sources:
-        # att_auth = Attribute.objects.filter(attribute_type=type_rec, object_id=src.id)
-        # if att_auth.exists():
-        #     obj = att_auth.first()
-        #     obj.value_STR = 'Record of plunder - ' + obj.value_STR
-        # else:
-        #     att_auth = Attribute()
-        #     att_auth.content_object = src
-        #     att_auth.attribute_type = type_rec
-        #     att_auth.value_STR = 'Record of plunder'
-        #     att_auth.save()
-        if src.has_inventory:
-            wf_object = Workflow.objects.get(source=src)
-            wf_object.stage = 3
-            wf_object.ingestion_done = True
-            wf_object.transcription_done = True
-            wf_object.markup_done = True
-            wf_object.last_modified = timezone.now()
-            wf_object.last_user = User.objects.get(pk=1)
-            wf_object.save()
-            wlog_object = Work_log()
-            wlog_object.source = wf_object
-            wlog_object.event = 'Automatic status/stage adjustment during batch processing'
-            wlog_object.timestamp = timezone.now()
-            wlog_object.user = User.objects.get(pk=1)
-            wlog_object.save()
-
-        # for a in att_auth:
-        #     if a.value_STR != 'Court':
-        #         a.delete()
-
-        # att_auth = Attribute()
-        # att_auth.content_object = src
-        # att_auth.attribute_type = type_auth
-        # att_auth.value_STR = 'Court'
-        # att_auth.save()
-        # att_form = Attribute()
-        # att_form.content_object = src
-        # att_form.attribute_type = type_format
-        # att_form.value_STR = 'Register - quarto'
-        # att_form.save()
-    return 'done ' + str(count)
+    # count = Source.objects.filter(attributes__value_STR='Incarceration').count()
+    # instance = Source.objects.get(pk='cf2423a898374e8e9402f761cb2a9459')
+    # if instance.pages:
+    #     for page in instance.pages.all():
+    #         if page.sources:
+    #             for sp in page.sources.all():
+    #                 if sp.transcription:
+    #                     sp.transcription.delete()
+    #         page.delete()
+    return 'done'
 
 
 def test_expression2(request):

@@ -321,14 +321,6 @@ class Page(dalmeUuid):
             return self.canvas
 
 
-@receiver(models.signals.post_save, sender=Page)
-def update_folio(sender, instance, created, **kwargs):
-    if created:
-        rs_image = rs_resource.objects.get(ref=instance.dam_id)
-        rs_image.field79 = instance.name
-        rs_image.save()
-
-
 class Source_pages(dalmeIntid):
     source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
     page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
@@ -360,15 +352,6 @@ class Transcription(dalmeUuid):
 
     def __str__(self):
         return str(self.id)
-
-
-@receiver(models.signals.post_save, sender=Transcription)
-def update_source_modification(sender, instance, created, **kwargs):
-    source_id = instance.source_pages.all().first().source.id
-    source = Source.objects.get(pk=source_id)
-    source.modification_timestamp = timezone.now()
-    source.modification_username = get_current_username()
-    source.save()
 
 
 class Identity_phrase(dalmeUuid):
@@ -564,19 +547,6 @@ class Work_log(models.Model):
     event = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
-
-
-@receiver(models.signals.post_save, sender=Source)
-def update_workflow(sender, instance, created, **kwargs):
-    if instance.has_inventory:
-        if created:
-            wf_object = Workflow.objects.create(source=instance, last_modified=instance.modification_timestamp)
-            Work_log.objects.create(source=wf_object, event='Source created', timestamp=wf_object.last_modified)
-        else:
-            wf_object = Workflow.objects.get(pk=instance.id)
-            wf_object.last_modified = timezone.now()
-            wf_object.last_user = get_current_user()
-            wf_object.save()
 
 
 class Tag(dalmeUuid):
@@ -1071,3 +1041,45 @@ class wp_usermeta(models.Model):
         managed = False
         db_table = 'wp_usermeta'
         in_db = 'wp'
+
+
+# signals management
+@receiver(models.signals.post_save, sender=Transcription)
+def update_source_modification(sender, instance, created, **kwargs):
+    source_id = instance.source_pages.all().first().source.id
+    source = Source.objects.get(pk=source_id)
+    source.modification_timestamp = timezone.now()
+    source.modification_username = get_current_username()
+    source.save()
+
+
+@receiver(models.signals.post_save, sender=Page)
+def update_folio(sender, instance, created, **kwargs):
+    if created:
+        rs_image = rs_resource.objects.get(ref=instance.dam_id)
+        rs_image.field79 = instance.name
+        rs_image.save()
+
+
+@receiver(models.signals.post_save, sender=Source)
+def update_workflow(sender, instance, created, **kwargs):
+    if instance.has_inventory:
+        if created:
+            wf_object = Workflow.objects.create(source=instance, last_modified=instance.modification_timestamp)
+            Work_log.objects.create(source=wf_object, event='Source created', timestamp=wf_object.last_modified)
+        else:
+            wf_object = Workflow.objects.get(pk=instance.id)
+            wf_object.last_modified = timezone.now()
+            wf_object.last_user = get_current_user()
+            wf_object.save()
+
+
+@receiver(models.signals.post_delete, sender=Source)
+def delete_source_dependencies(sender, instance, **kwargs):
+    if instance.pages:
+        for page in instance.pages.all():
+            if page.sources:
+                for sp in page.sources.all():
+                    if sp.transcription:
+                        sp.transcription.delete()
+            page.delete()
