@@ -1074,7 +1074,7 @@ def update_workflow(sender, instance, created, **kwargs):
             wf_object.save()
 
 
-@receiver(models.signals.post_delete, sender=Source)
+@receiver(models.signals.pre_delete, sender=Source)
 def delete_source_dependencies(sender, instance, **kwargs):
     if instance.pages:
         for page in instance.pages.all():
