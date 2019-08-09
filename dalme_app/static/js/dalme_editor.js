@@ -334,7 +334,7 @@ function saveEditor() {
         method: "PUT",
         url: url,
         headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-        data: { 'version': ver, 'transcription': text },
+        data: { 'version': ver, 'transcription': text, 'source': source },
       }).done(function(data, textStatus, jqXHR) {
           if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
       }).fail(function(jqXHR, textStatus, errorThrown) {

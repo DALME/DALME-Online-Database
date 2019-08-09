@@ -1046,11 +1046,12 @@ class wp_usermeta(models.Model):
 # signals management
 @receiver(models.signals.post_save, sender=Transcription)
 def update_source_modification(sender, instance, created, **kwargs):
-    source_id = instance.source_pages.all().first().source.id
-    source = Source.objects.get(pk=source_id)
-    source.modification_timestamp = timezone.now()
-    source.modification_username = get_current_username()
-    source.save()
+    if instance.source_pages.all().exists():
+        source_id = instance.source_pages.all().first().source.id
+        source = Source.objects.get(pk=source_id)
+        source.modification_timestamp = timezone.now()
+        source.modification_username = get_current_username()
+        source.save()
 
 
 @receiver(models.signals.post_save, sender=Page)
