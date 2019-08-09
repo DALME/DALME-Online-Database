@@ -125,7 +125,7 @@ function init_module(mod) {
 }
 
 function workflow_filter(menu, query) {
-  $('#workflow_button').find('.active').removeClass('active');
+  $('.wf-dropdown').find('.active').removeClass('active');
   $(menu).addClass('active');
   if (!$(menu).hasClass('dropdown-item')) {
     $(menu).parent().addClass('active');
