@@ -1014,17 +1014,6 @@ def PageManifest(request, pk):
 
 
 @method_decorator(login_required, name='dispatch')
-class UIRefMain(View):
-    """ Routes requests to UIRef views """
-    def get(self, request, *args, **kwargs):
-        if self.request.GET.get('m') is not None:
-            template = 'UI_reference/'+self.request.GET['m']+'.html'
-            breadcrumb = [('UI Reference', ''), (self.request.GET['m'].capitalize(), template)]
-            view = UIRef.as_view(template_name=template)
-        return view(request, breadcrumb=breadcrumb)
-
-
-@method_decorator(login_required, name='dispatch')
 class WorksetsRedirect(View):
     def get(self, request, *args, **kwargs):
         workset = get_object_or_404(Workset, pk=kwargs['pk'])
@@ -1046,18 +1035,6 @@ class WorksetsRedirect(View):
         # url += '&'.join(['{}={}'.format(key, value) for key, value in para.items()])
         # return redirect('/website/')
         return HttpResponseRedirect(url)
-
-
-class UIRef(TemplateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        breadcrumb = self.kwargs['breadcrumb']
-        sidebar_toggle = self.request.session['sidebar_toggle']
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['sidebar_toggle'] = sidebar_toggle
-        context = functions.set_menus(self.request, context, state)
-        context['page_chain'] = functions.get_page_chain(breadcrumb)
-        return context
 
 
 @method_decorator(login_required, name='dispatch')
