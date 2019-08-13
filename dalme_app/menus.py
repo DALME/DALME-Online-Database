@@ -34,10 +34,12 @@ def sidebar_item(wholeMenu, state, depth=0, text=None, iconClass=None, link=None
     elif divider:
         currentItem = '<hr class="sidebar-divider">'
     else:
+        currentItem = '<li class="nav-item'
+        if text == 'Dashboard':
+            currentItem += ' dash-menu'
         if text in state['breadcrumb']:
-            currentItem = '<li class="nav-item active">'
-        else:
-            currentItem = '<li class="nav-item">'
+            currentItem += ' active'
+        currentItem += '">'
         if children:
             currentItem += '<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{}" aria-expanded="true" \
                             aria-controls="collapse{}">'.format(itemClass, itemClass)
@@ -141,7 +143,7 @@ def dropdown_tasks(wholeMenu, user_id):
         else:
             button += '<span class="badge topbar-badge">{}</span>'.format(counter)
     button += '</a><div class="dropdown-tasks dropdown-menu dropdown-menu-right animated--grow-in" aria-labelledby="tasksDropdown">'
-    button += '<div class="dropdown-tasks-header">Your Tasks <div class="dropdown-task-add" onclick="create_task()">Add New <i class="fa fa-plus fa-fw"></i></div></div>'
+    button += '<div class="dropdown-tasks-header">Your Tasks <div class="dropdown-task-add ml-auto" onclick="create_task()">Add New <i class="fa fa-plus fa-fw"></i></div></div>'
     wholeMenu += button
     wholeMenu += dropmenu
     return wholeMenu
