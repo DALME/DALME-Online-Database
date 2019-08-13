@@ -65,6 +65,7 @@
                 {% endif %}
               </div>
             </div>
+            {% if ticket.url or ticket.file %}
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-paperclip fa-fw"></i> Attachments</div>
@@ -81,6 +82,7 @@
                   {% endif %}
               </div>
             </div>
+            {% endif %}
           </div>
         </div>
       </div>
