@@ -111,9 +111,12 @@ class AsyncTaskSerializer(serializers.ModelSerializer):
 
 
 class WorksetSerializer(serializers.ModelSerializer):
+    owner_username = serializers.CharField(source='owner.username', read_only=True, required=False)
+    owner_full_name = serializers.CharField(source='owner.profile.full_name', read_only=True, required=False)
+
     class Meta:
         model = Workset
-        fields = ('id', 'name', 'description', 'owner', 'endpoint', 'progress')
+        fields = ('id', 'name', 'description', 'owner', 'endpoint', 'progress', 'owner_username', 'owner_full_name', 'creation_timestamp')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -130,6 +133,11 @@ class WorksetSerializer(serializers.ModelSerializer):
         progress_circle = '<div class="pie-wrapper"><span class="label">{}<span class="smaller">%</span></span><div class="pie" {}>'.format(round(progress), pie_style)
         progress_circle += '<div class="left-side half-circle" {}></div><div class="right-side half-circle" {}></div></div></div>'.format(left_style, right_style)
         ret['progress_circle'] = progress_circle
+        ret['owner'] = {
+            'id': ret.pop('owner'),
+            'username': ret.pop('owner_username'),
+            'user': ret.pop('owner_full_name'),
+        }
         return ret
 
 

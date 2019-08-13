@@ -6,6 +6,7 @@ urlpatterns = [
     path('search/', views.DefaultSearch.as_view(), name='search'),
     path('su/', views.SessionUpdate, name='session_update'),
     path('scripts/', views.Scripts.as_view(), name='scripts'),
+    path('worksets/', views.WorksetList.as_view(), name='workset_list'),
     path('worksets/<slug:pk>/', views.WorksetsRedirect.as_view(), name='worksets_redirect'),
     path('models/<model>/', views.ModelLists.as_view(), name='model_lists'),
     path('languages/', views.LanguageList.as_view(), name='language_list'),

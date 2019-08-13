@@ -121,6 +121,7 @@
       {
         "text": "Worksets",
         "link": "/worksets",
+        "iconClass": "fa-layer-group"
       }
     ]
   },

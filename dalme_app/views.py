@@ -1059,26 +1059,48 @@ def PageManifest(request, pk):
 
 
 @method_decorator(login_required, name='dispatch')
+class WorksetList(DTListView):
+    breadcrumb = [('Project', ''), ('Worksets', '/worksets')]
+    list_name = 'worksets'
+    dt_editor_options = {'idSrc': '"id"'}
+    dte_field_list = ['name', 'description', 'owner']
+    dt_options = {
+        'pageLength': 25,
+        'paging': 'true',
+        'responsive': 'true',
+        'fixedHeader': 'true',
+        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': {'style': 'single'},
+        'deferRender': 'true',
+        'rowId': '"id"',
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
+        'order': '[[ 1, "asc" ]]'
+        }
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.change_workset'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Workset Information'})
+        if self.request.user.has_perm('dalme_app.delete_workset'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Workset',
+                                'formMessage': 'Are you sure you wish to remove this workset from the database? This action cannot be undone.'})
+        return dte_buttons
+
+
+@method_decorator(login_required, name='dispatch')
 class WorksetsRedirect(View):
     def get(self, request, *args, **kwargs):
         workset = get_object_or_404(Workset, pk=kwargs['pk'])
         qset = json.loads(workset.qset)
         seq = str(workset.current_record + 1)
         seq_id = qset[seq]['pk']
-        # para = {
-        #     'workset': workset.id,
-        #     'name': workset.name,
-        #     'description': workset.description,
-        #     'current': seq,
-        #     'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
-        #     'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
-        #     'total': len(qset),
-        #     'endpoint': workset.endpoint,
-        #     'progress': round(workset.progress, 2)
-        # }
         url = '/{}/{}/?workset={}'.format(workset.endpoint, seq_id, workset.id)
-        # url += '&'.join(['{}={}'.format(key, value) for key, value in para.items()])
-        # return redirect('/website/')
         return HttpResponseRedirect(url)
 
 
