@@ -750,6 +750,8 @@ class AsyncTaskList(DTListView):
 class CountryList(DTListView):
     breadcrumb = [('System', ''), ('Countries', '/countries')]
     list_name = 'countries'
+    dt_editor_options = {'idSrc': '"id"'}
+    dte_field_list = ['name', 'alpha_3_code', 'alpha_2_code', 'num_code']
     dt_options = {
         'pageLength': 25,
         'paging': 'true',
@@ -768,12 +770,25 @@ class CountryList(DTListView):
             },
         'order': '[[ 1, "asc" ]]'
         }
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_country'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Country'})
+        if self.request.user.has_perm('dalme_app.change_country'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Country Information'})
+        if self.request.user.has_perm('dalme_app.delete_country'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Country',
+                                'formMessage': 'Are you sure you wish to remove this country from the database? This action cannot be undone.'})
+        return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
 class CityList(DTListView):
     breadcrumb = [('System', ''), ('Cities', '/cities')]
     list_name = 'cities'
+    dt_editor_options = {'idSrc': '"id"'}
+    dte_field_list = ['name', 'administrative_region', 'country']
     dt_options = {
         'pageLength': 25,
         'paging': 'true',
@@ -792,6 +807,17 @@ class CityList(DTListView):
             },
         'order': '[[ 1, "asc" ]]'
         }
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_city'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New City'})
+        if self.request.user.has_perm('dalme_app.change_city'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit City Information'})
+        if self.request.user.has_perm('dalme_app.delete_city'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete City',
+                                'formMessage': 'Are you sure you wish to remove this city from the database? This action cannot be undone.'})
+        return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
@@ -817,6 +843,17 @@ class LanguageList(DTListView):
             'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
             }
         }
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_language'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Language'})
+        if self.request.user.has_perm('dalme_app.change_language'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Language Information'})
+        if self.request.user.has_perm('dalme_app.delete_language'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Language',
+                                'formMessage': 'Are you sure you wish to remove this language from the database? This action cannot be undone.'})
+        return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
