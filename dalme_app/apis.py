@@ -988,7 +988,7 @@ class Sources(DTViewSet):
             type = self.request.GET['type']
             queryset = self.queryset
             q_obj = Q()
-            if type == 'inventories':
+            if type == 'records':
                 q_obj &= Q(has_inventory=True)
                 queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages'))
             else:
@@ -1103,7 +1103,7 @@ class Sources(DTViewSet):
             type = self.request.GET['type']
         else:
             type = ''
-        if type != 'inventories':
+        if type != 'records':
             kwargs['fields'] = ['no_folios', 'workflow']
         return serializer_class(*args, **kwargs)
 

@@ -141,10 +141,7 @@ class DTListView(TemplateView):
         return list_name
 
     def get_list(self, list_name, *args, **kwargs):
-        try:
-            _list = DT_list.objects.get(short_name=list_name)
-        except DT_list.DoesNotExist:
-            _list = None
+        _list = get_object_or_404(DT_list, short_name=list_name)
         return _list
 
     def get_fields_dict(self, _list, *args, **kwargs):
@@ -486,8 +483,6 @@ class SourceList(DTListView):
         _type = self.get_list_name()
         if _type == 'all':
             breadcrumb = [('Sources', ''), ('All Sources', '/sources')]
-        elif _type == 'inventories':
-            breadcrumb = [('Repository', ''), ('Inventories', '/sources?type=inventories')]
         else:
             list_label = DT_list.objects.get(short_name=_type).name
             breadcrumb = [('Sources', ''), (list_label, '/sources?type='+_type)]
@@ -509,7 +504,7 @@ class SourceList(DTListView):
     def get_modules(self, *args, **kwargs):
         module_list = None
         if 'type' in self.request.GET:
-            if self.request.GET['type'] == 'inventories':
+            if self.request.GET['type'] == 'records':
                 module_list = ['filters']
                 if functions.check_group(self.request, 'staff'):
                     module_list.append('workflow')
@@ -817,7 +812,7 @@ class LanguageList(DTListView):
 
 @method_decorator(login_required, name='dispatch')
 class ImageList(DTListView):
-    breadcrumb = [('Repository', ''), ('Images', '/images')]
+    breadcrumb = [('DAM Images', '/images')]
     list_name = 'images'
     dt_editor_options = {'idSrc': '"id"'}
     dte_field_list = ['field8', 'field79', 'field12', 'field3', 'collections']
@@ -878,7 +873,7 @@ class ImageDetail(DetailView):
                 'progress': round(workset.progress, 2)
             }
             context['workset'] = para
-        breadcrumb = [('Repository', ''), ('Images', '/images')]
+        breadcrumb = [('DAM Images', '/images')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
@@ -957,7 +952,7 @@ class ImageDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class PageList(DTListView):
-    breadcrumb = [('Repository', ''), ('Pages', '/pages')]
+    breadcrumb = [('Pages', '/pages')]
     list_name = 'pages'
     dt_field_list = ['name', 'dam_id', 'order']
 

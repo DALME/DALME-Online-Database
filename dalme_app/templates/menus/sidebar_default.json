@@ -15,15 +15,21 @@
         "counter": "sources"
       },
       {
-        "text": "Archival Files & Records",
-        "link": "/sources?type=files_and_records",
-        "iconClass": "fa-columns",
+        "text": "Archival Files",
+        "link": "/sources?type=files",
+        "iconClass": "fa-archive",
         "counter": "notarial_sources"
       },
       {
-        "text": "Archives & Collections",
-        "link": "/sources?type=archives_and_collections",
-        "iconClass": "fa-archive",
+        "text": "Records",
+        "link": "/sources?type=records",
+        "iconClass": "fa-list-ol",
+        "permissions": "Staff"
+      },
+      {
+        "text": "Archives",
+        "link": "/sources?type=archives",
+        "iconClass": "fa-landmark",
         "counter": "archives"
       },
       {
@@ -35,30 +41,11 @@
     ]
   },
   {
-    "text": "Repository",
-    "link": "#",
-    "iconClass": "fa-boxes",
-    "itemClass": "repository",
-    "children": [
-      {
-        "text": "Inventories",
-        "link": "/sources?type=inventories",
-        "iconClass": "fa-list-ol",
-        "permissions": "Staff"
-      },
-      {
-        "text": "Images",
-        "link": "/images",
-        "iconClass": "fa-images",
-        "permissions": "Staff"
-      },
-      {
-        "text": "Pages",
-        "link": "/pages",
-        "iconClass": "fa-file",
-        "permissions": "Staff"
-      }
-    ]
+    "text": "DAM Images",
+    "link": "/images",
+    "iconClass": "fa-images",
+    "itemClass": "images",
+    "permissions": "Staff"
   },
   {
     "text": "Lexicon",
@@ -195,6 +182,13 @@
     "link": "/scripts",
     "iconClass": "fa-code",
     "itemClass": "scripts",
+    "permissions": "Developers"
+  },
+  {
+    "text": "Pages",
+    "link": "/pages",
+    "iconClass": "fa-file",
+    "itemClass": "pages",
     "permissions": "Developers"
   }
 ]
