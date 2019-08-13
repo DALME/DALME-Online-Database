@@ -38,8 +38,11 @@
               <div class="card-body pb-3">
                   <div class="d-flex align-items-center">
                     <div class="record-title">{{ task.title }}</div>
+                    {% if perms.dalme_app.can_delete_task %}
+                        <div class="dropdown-task-add ml-auto" onclick="delete_task({{ task.id }})"><i class="fa fa-trash fa-fw"></i></div>
+                    {% endif %}
                     {% if perms.dalme_app.can_change_task %}
-                        <div class="dropdown-task-add" onclick="edit_task({{ task.id }})">Edit <i class="fa fa-pen fa-fw"></i></div>
+                        <div class="dropdown-task-add" onclick="edit_task({{ task.id }})"><i class="fa fa-pen fa-fw"></i></div>
                     {% endif %}
                   </div>
                   <div class="record-title-meta">

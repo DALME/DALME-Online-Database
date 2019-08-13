@@ -104,6 +104,21 @@ function edit_task(id) {
       }, 'json');
 }
 
+function delete_task(id) {
+  var conf = confirm("Are you sure you wish to delete this task?");
+  if (conf == true) {
+    $.ajax({
+      method: "DELETE",
+      url: "/api/tasks/"+id,
+      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+    }).done(function(data, textStatus, jqXHR) {
+      window.location.href = "/tasks";
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      toastr.error('There was an error communicating with the server: '+errorThrown);
+    });
+  }
+}
+
 function task_change_state(task, action) {
     $.ajax({
       method: "GET",
