@@ -29,6 +29,54 @@ from dalme_app import functions
 from django.utils import timezone
 
 
+class Datasets(viewsets.ViewSet):
+    """ API endpoint for generating lists of options for DTE forms """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = Workflow.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        data_dict = {}
+        if self.request.GET.get('id') is not None:
+            try:
+                ds_id = self.request.GET['id']
+                if ds_id == '1':
+                    data_dict = {
+                        'chart': {'type': 'bar'},
+                        'title': {'text': 'Sources worked on per period and per processing stage'},
+                        'yAxis': {'min': 0, 'title': {'text': 'Number of sources'}},
+                        'legend': {'reversed': 'true'},
+                        'plotOptions': {'series': {'stacking': 'normal'}},
+                        'series': []
+                    }
+                    x_dict = {
+                        'Past week': 'timedelta|7',
+                        'Past month': 'timedelta|30',
+                        'Past three months': 'timedelta|90',
+                        'Past year': 'timedelta|365',
+                        'Earlier': 'timedelta|older'
+                    }
+                    y_dict = {
+                        1: 'ingestion',
+                        2: 'transcription',
+                        3: 'markup',
+                        4: 'review',
+                        5: 'parsing',
+                    }
+                    categories = [label for label, query in x_dict.items()]
+                    for stage, name in y_dict.items():
+                        queryset = Source.objects.filter(has_inventory=True, workflow__stage=stage)
+                        src_counts = []
+                        for label, query in x_dict.items():
+                            src_counts.append(filter_on_workflow(queryset=queryset, wf_query=query).count())
+                        data_dict['series'].append({'name': name, 'data': src_counts})
+                    data_dict['xAxis'] = {'categories': categories}
+            except Exception as e:
+                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+        else:
+            data_dict['error'] = 'No dataset id was included in the request.'
+        return Response(data_dict)
+
+
 class WorkflowManager(viewsets.ModelViewSet):
     """ API endpoint for managing the project's workflow """
     permission_classes = (DjangoModelPermissions,)
@@ -569,9 +617,12 @@ class Images(DTViewSet):
                 for image in queryset:
                     folios[image.ref] = image.field79
                     img_data = {i.resource_type_field.name: i.value for i in image.resource_data.all()
-                                if i.resource_type_field.ref in [29, 76, 77, 78, 80, 99]}
+                                if i.resource_type_field.ref in [12, 29, 76, 77, 78, 80, 99]}
                     img_data['title'] = image.field8
                     img_data['country'] = image.field3
+                    theme2 = image.collections.filter(theme2__isnull=False)
+                    if theme2.exists() and 'archive' not in source_data:
+                        img_data['archive'] = theme2[0].theme2
                     if 'city' not in source_data and img_data.get('archivalsource', '') != '' and ',' in img_data.get('archivalsource', ''):
                         img_data['city'] = img_data.get('archivalsource').split(',')[0]
                         img_data['archive'] = img_data.get('archivalsource').split(',')[1]
@@ -582,8 +633,12 @@ class Images(DTViewSet):
                     for k, v in img_data.items():
                         if k not in source_data and v not in ['', ' ', None]:
                             source_data[k] = v
+                short_archive = '<ARCHIVE>'
+                short_series = '<SERIES>'
                 if 'archive' in source_data:
-                    short_archive = ''.join([c for c in source_data['archive'] if c.isupper()])
+                    archive = Source.objects.filter(name=source_data['archive'])
+                    if archive.exists():
+                        short_archive = archive[0].short_name
                 if 'Series' in source_data:
                     short_series = ''.join([c for c in source_data['Series'] if c.isupper()])
                 if 'person' in source_data:

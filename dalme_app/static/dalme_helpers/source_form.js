@@ -444,18 +444,18 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
                         type: "selectize",
                         opts: { placeholder: "month" },
                         options: [
-                          {'label': "January", 'value': 1},
-                          {'label': "February", 'value': 2},
-                          {'label': "March", 'value': 3},
-                          {'label': "April", 'value': 4},
-                          {'label': "May", 'value': 5},
-                          {'label': "June", 'value': 6},
-                          {'label': "July", 'value': 7},
-                          {'label': "August", 'value': 8},
-                          {'label': "September", 'value': 9},
-                          {'label': "October", 'value': 10},
-                          {'label': "November", 'value': 11},
-                          {'label': "December", 'value': 12}
+                          {'label': "January", 'value': '01'},
+                          {'label': "February", 'value': '02'},
+                          {'label': "March", 'value': '03'},
+                          {'label': "April", 'value': '04'},
+                          {'label': "May", 'value': '05'},
+                          {'label': "June", 'value': '06'},
+                          {'label': "July", 'value': '07'},
+                          {'label': "August", 'value': '08'},
+                          {'label': "September", 'value': '09'},
+                          {'label': "October", 'value': '10'},
+                          {'label': "November", 'value': '11'},
+                          {'label': "December", 'value': '12'}
                         ]
                       });
                 source_editor.add({
@@ -533,9 +533,9 @@ function create_from_images() {
             "options_list": ""
           }
         );
-        if ('SourceStartDate' in source_fields) {
-          const d_array = get_rsdate_array(source_fields.SourceStartDate);
-          if (d_array) {
+        if ('SourceStartDate' in source_fields || 'ressourcedate' in source_fields) {
+          const d_array = 'SourceStartDate' in source_fields ? get_rsdate_array(source_fields.SourceStartDate) : get_rsdate_array(source_fields.ressourcedate);
+          if (d_array && d_array.year < 1999) {
             default_attributes.push(
               {
                 "attribute_type": 26,
@@ -600,12 +600,18 @@ function create_from_images() {
 
 function get_rsdate_array(d_string) {
     var date_array = {};
-    if (d_string.includes('-')) {
-      var date_match = d_string.match(/(\d{4})-(\d{2})-(\d{2})/);
-    } else {
-      var date_match = d_string.match(/(\d{4})/);
+    var dashes = (d_string.match(/-/g) || []).length;
+    switch (dashes) {
+      case 2:
+        var date_match = d_string.match(/(\d{4})-(\d{2})-(\d{2})/) || 0;
+        break;
+      case 1:
+        var date_match = d_string.match(/(\d{4})-(\d{2})/) || 0;
+        break;
+      case 0:
+        var date_match = d_string.match(/(\d{4})/) || 0;
     };
-    if (typeof date_match[0] != 'undefined') {
+    if (typeof date_match != 0) {
       date_array['day'] = typeof date_match[3] === 'undefined' ? '' : date_match[3];
       date_array['month'] = typeof date_match[2] === 'undefined' ? '' : date_match[2];
       date_array['year'] = date_match[1];
