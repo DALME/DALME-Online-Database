@@ -346,7 +346,10 @@ class ModelLists(DTListView):
         'deferRender': 'true',
         'scroller': 'true',
         'processing': 'true',
-        'language': {'searchPlaceholder': 'Search'},
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
         'rowId': '"id"',
     }
     dt_buttons = [{'extend': 'colvis', 'text': '<i class="fa fa-columns fa-fw"></i>'}]
@@ -617,7 +620,10 @@ class SourceDetail(DetailView):
                 'scrollCollapse': 'true',
                 'deferRender': 'true',
                 'scroller': 'true',
-                'language': '{searchPlaceholder: "Search"}',
+                'language': {
+                    'searchPlaceholder': 'Search',
+                    'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+                    },
                 'order': '[[ 2, "asc" ]]'
                 }
         return context
@@ -732,7 +738,10 @@ class AsyncTaskList(DTListView):
         'select': {'style': 'single'},
         'deferRender': 'true',
         'rowId': '"id"',
-        'language': {'searchPlaceholder': 'Search'},
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
         'order': '[[ 0, "desc" ]]'
         }
 
@@ -936,7 +945,10 @@ class ImageDetail(DetailView):
                 'scrollY': 150,
                 'deferRender': 'true',
                 'scroller': 'true',
-                'language': '{searchPlaceholder: "Search"}'
+                'language': {
+                    'searchPlaceholder': 'Search',
+                    'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+                    },
                 }
         context['image_url'] = functions.get_dam_preview(self.object.ref)
         return context
@@ -1197,7 +1209,10 @@ class TasksList(TemplateView):
                 'scrollX': '"100%"',
                 'deferRender': 'true',
                 'scroller': 'true',
-                'language': '{searchPlaceholder: "Search"}',
+                'language': {
+                    'searchPlaceholder': 'Search',
+                    'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+                    },
                 'rowId': '"id"',
                 'columnDefs': [
                       {
