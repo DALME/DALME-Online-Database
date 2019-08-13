@@ -891,6 +891,7 @@ class ImageList(DTListView):
             dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Image',
                                 'formMessage': 'Are you sure you wish to remove this image from the DAM? This action cannot be undone.'})
         if self.request.user.has_perm('dalme_app.add_source'):
+            dte_buttons.append({'extend': 'selectAll', 'text': '<i class="fa fa-check-double fa-fw dt_menu_icon"></i> Select All'})
             dte_buttons.append({'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'})
             dte_buttons.append({'extend': 'selected', 'action': 'create_source_from_selected()', 'text': '<i class="fa fa-plus-square fa-fw dt_menu_icon"></i> Create Source from Selection'})
         return dte_buttons
