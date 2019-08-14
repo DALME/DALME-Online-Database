@@ -75,6 +75,7 @@ function startEditor() {
       footer_content = '...';
       viewer_container = document.getElementById('diva_viewer');
       editor_container = document.getElementById('editor');
+      tag_menu = document.getElementById('tag-menu');
       editor_toolbar = document.getElementById('editor-toolbar');
       author_container = document.getElementById('author');
       top_panel = document.getElementsByClassName('panel-top');
@@ -140,6 +141,7 @@ function startEditor() {
               const divTwoPercent = (divTwoHeight-28)/parent.height()*100+"%";
               divTwo.height(divTwoPercent);
               $(editor_container).height(divTwoHeight - 56);
+              $(tag_menu).height(divTwoHeight - 56);
               },
           stop: function (e, ui) {
             const parent = ui.element.parent();
@@ -414,7 +416,7 @@ function setTagMenu(action) {
                     let message = item.message;
                     tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
                     </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} <a href='https://wiki.dalme.org/DALME_TEI_Schema${item.link}' target='_blank'>See DALME Wiki</a>"></i>\
-                    </div><div class="dropdown-menu tag-menu-dropdown p-2"><div class="tag-menu-form">`;
+                    </div><div id="${item.tag_name}_dd" class="dropdown-menu tag-menu-dropdown p-2"><div class="tag-menu-form">`;
                     for (let j = 0, lenj = item.attributes.length; j < lenj; ++j) {
                       let att = item.attributes[j];
                       att_array.push(att.name+'|'+att.type+'|'+item.tag_name+'_'+att.name);
@@ -433,7 +435,7 @@ function setTagMenu(action) {
                           tag_menu_html += `</select>`;
                       };
                     };
-                    tag_menu_html += `<button type="button" class="btn btn-primary" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')">Add</button>`;
+                    tag_menu_html += `<button type="button" class="btn btn-primary dd-button" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')">Add</button>`;
                     tag_menu_html += `</div><small class="form-text text-muted">${message}</small></div></div>`;
                 } else {
                     tag_menu_html += `<div class="tag-menu-button" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')"><i class="fas fa-caret-left fa-fw mr-1">\
@@ -446,6 +448,9 @@ function setTagMenu(action) {
       $('#tag-menu').show();
       $('#tag-menu').html(tag_menu_html);
       $('.tag-tooltip').tooltip({container: 'body', delay: { "show": 100, "hide": 1000 }});
+      $('.tag-menu-dropdown').on('click', function(e) { e.stopPropagation(); });
+      $('.tag-menu-button').on('click', function(e) { $(this).next().toggle(); });
+      $('.dd-button').on('click', function(e) { $(this).parent().parent().toggle(); });
   } else {
       $('#tag-menu').html('');
       $('#tag-menu').hide();
