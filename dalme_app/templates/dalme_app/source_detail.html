@@ -44,7 +44,7 @@
       <!-- tabs -->
       <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" onclick="switch_tab('info-tab')">Information</a>
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" {% if has_pages %} onclick="switch_tab('info-tab')" {% endif %}>Information</a>
         </li>
         {% if has_pages %}
         <li class="nav-item">
@@ -52,9 +52,11 @@
         </li>
         {% endif %}
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="true" onclick="switch_tab('comments-tab')">Comments
+          <a class="nav-link d-flex align-items-center" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="true" {% if has_pages %} onclick="switch_tab('comments-tab')" {% endif %}>Comments
             {% if comments_count > 0 %}
-              <div class="inline-badge">{{ comments_count }}</div>
+              <div id="comment_count" class="inline-badge">{{ comments_count }}</div>
+            {% else %}
+              <div id="comment_count"></div>
             {% endif %}
           </a>
         </li>

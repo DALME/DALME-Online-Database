@@ -392,6 +392,14 @@ function create_comment(model, object) {
         comment += '<div class="comment-body">'+data.body+'</div></div></div>';
         $('#comments-container').append(comment);
         $('#new_comment_text').val("");
+        if ($('#comment_count').length) {
+          if ($('#comment_count').hasClass('inline-badge')) {
+            $('#comment_count').html(parseInt($('#comment_count').text(), 10) + 1)
+          } else {
+            $('#comment_count').html(1);
+            $('#comment_count').addClass('inline-badge');
+          }
+        }
   }).fail(function(jqXHR, textStatus, errorThrown) {
         toastr.error('There was an error saving your comment: '+errorThrown);
   });
