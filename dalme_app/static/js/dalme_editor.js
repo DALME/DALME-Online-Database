@@ -213,6 +213,7 @@ function changeEditorFolio(target) {
         if (editor_mode == 'xml') { changeEditorMode() };
         $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
         $(author_container).html('No transcription available');
+        tr_text = '';
         $('#btn_prevFolio').attr('value', prev);
         $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
         $('#folio-menu').find('.current-folio').removeClass('current-folio');
