@@ -78,13 +78,15 @@ function init_tables() {
                     title: "Status",
                     targets: 5,
                     data: "status",
-                    visible: 0
+                    visible: 0,
+                    searchable: 0
                 },
                 {
                     title: "Comments",
                     targets: 6,
                     data: "comment_count",
-                    visible: 0
+                    visible: 0,
+                    searchable: 0
                 },
           ]
     });
