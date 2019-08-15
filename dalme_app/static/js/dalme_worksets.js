@@ -14,14 +14,20 @@ function init_worksets() {
 function ws_next() {
   if (workset['next_id'] != 'none') {
     $.ajax({
-      method: "GET",
-      url: "/api/worksets/"+workset['workset_id']+"/set_state/?action=mark_done&seq="+workset['current'],
+      method: "PATCH",
+      url: "/api/worksets/"+workset['workset_id']+"/set_state/",
+      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+      data: { "action": "mark_done", "seq": workset['current']}
     }).done(function(data, textStatus, jqXHR) {
         let next_seq = parseInt(workset['current'])+1;
         let url = '/'+workset['endpoint']+'/'+workset['next_id']+'/?workset='+workset['workset_id']+'&seq='+next_seq;
         window.location.href = url;
     }).fail(function(jqXHR, textStatus, errorThrown) {
+      if (errorThrown == "Forbidden") {
+        toastr.error("You do not have the required permissions to change the state of this workset.");
+      } else {
         toastr.error('There was an error communicating with the server: '+errorThrown);
+      }
     });
   }
 }
@@ -36,10 +42,16 @@ function ws_prev() {
 
 function ws_mark(action) {
   $.ajax({
-    method: "GET",
-    url: "/api/worksets/"+workset['workset_id']+"/set_state/?action="+action+"&seq="+workset['current'],
+    method: "PATCH",
+    url: "/api/worksets/"+workset['workset_id']+"/set_state/",
+    headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+    data: { "action": action, "seq": workset['current']}
   }).fail(function(jqXHR, textStatus, errorThrown) {
-    toastr.error('There was an error communicating with the server: '+errorThrown);
+    if (errorThrown == "Forbidden") {
+      toastr.error("You do not have the required permissions to change the state of this workset.");
+    } else {
+      toastr.error('There was an error communicating with the server: '+errorThrown);
+    }
   });
 }
 

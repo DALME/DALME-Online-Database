@@ -121,8 +121,10 @@ function delete_task(id) {
 
 function task_change_state(task, action) {
     $.ajax({
-      method: "GET",
-      url: "/api/tasks/"+task+"/set_state/?action="+action,
+      method: "PATCH",
+      url: "/api/tasks/"+task+"/set_state/",
+      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+      data: { "action": action }
     }).done(function(data, textStatus, jqXHR) {
           switch (action) {
             case 'mark_undone':
@@ -135,6 +137,10 @@ function task_change_state(task, action) {
               $('.task-detail-status').html('Completed: '+ today.toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric' }));
           }
     }).fail(function(jqXHR, textStatus, errorThrown) {
+      if (errorThrown == "Forbidden") {
+        toastr.error("You do not have the required permissions to change the status on this task.");
+      } else {
         toastr.error('There was an error communicating with the server: '+errorThrown);
+      }
     });
 }

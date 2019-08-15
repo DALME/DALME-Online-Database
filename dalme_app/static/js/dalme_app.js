@@ -22,8 +22,10 @@ function dalme_startup() {
 
 function update_workflow(action, code=0) {
     $.ajax({
-        method: "GET",
-        url: "/api/workflow/"+source_id+"/change_state/?action="+action+"&code="+code,
+        method: "PATCH",
+        url: "/api/workflow/"+source_id+"/change_state/",
+        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+        data: { "action": action, "code": code }
     }).done(function(data, textStatus, jqXHR) {
         if (action == 'toggle_help') {
             $('.wf-manager-help').toggleClass("wf-help_flag-on");
@@ -49,7 +51,11 @@ function update_workflow(action, code=0) {
             }
         };
     }).fail(function(jqXHR, textStatus, errorThrown) {
-        toastr.error('There was an error communicating with the server: '+errorThrown);
+        if (errorThrown == "Forbidden") {
+          toastr.error("You do not have the required permissions to change the workflow status on this item.");
+        } else {
+          toastr.error('There was an error communicating with the server: '+errorThrown);
+        }
     });
 }
 
@@ -211,8 +217,10 @@ function task_set_state(task, state) {
       var action = 'mark_done';
     };
     $.ajax({
-      method: "GET",
-      url: "/api/tasks/"+task+"/set_state/?action="+action,
+      method: "PATCH",
+      url: "/api/tasks/"+task+"/set_state/",
+      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+      data: { "action": action }
     }).done(function(data, textStatus, jqXHR) {
         if ( $('#task_'+task).length ) {
           switch (action) {
@@ -224,7 +232,11 @@ function task_set_state(task, state) {
           }
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
+      if (errorThrown == "Forbidden") {
+        toastr.error("You do not have the required permissions to change the status on this task.");
+      } else {
         toastr.error('There was an error communicating with the server: '+errorThrown);
+      }
     });
 }
 
@@ -407,8 +419,10 @@ function create_comment(model, object) {
 
 function ticket_set_state(id, action) {
   $.ajax({
-    method: "GET",
-    url: "/api/tickets/"+id+"/set_state/?action="+action,
+    method: "PATCH",
+    url: "/api/tickets/"+id+"/set_state/",
+    headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+    data: { "action": action }
   }).done(function(data, textStatus, jqXHR) {
         switch (action) {
           case 'Close':
@@ -425,6 +439,10 @@ function ticket_set_state(id, action) {
             $('#ticket_status_box').find('button').removeClass('btn-danger').addClass('btn-primary').text('Close');
         }
   }).fail(function(jqXHR, textStatus, errorThrown) {
+    if (errorThrown == "Forbidden") {
+      toastr.error("You do not have the required permissions to change the status on that ticket.");
+    } else {
       toastr.error('There was an error communicating with the server: '+errorThrown);
+    }
   });
 }

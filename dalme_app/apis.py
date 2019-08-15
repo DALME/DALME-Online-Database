@@ -83,16 +83,16 @@ class WorkflowManager(viewsets.ModelViewSet):
     queryset = Workflow.objects.all()
     serializer_class = WorkflowSerializer
 
-    @action(detail=True)
+    @action(detail=True, methods=['patch'])
     def change_state(self, request, *args, **kwargs):
         result = {}
         object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         try:
-            action = self.request.GET['action']
+            action = self.request.POST['action']
             stage_dict = dict(Workflow.PROCESSING_STAGES)
             status_dict = dict(Workflow.WORKFLOW_STATUS)
             if action == 'stage_done':
-                stage = int(self.request.GET['code'])
+                stage = int(self.request.POST['code'])
                 stage_name = stage_dict[stage]
                 setattr(object, stage_name + '_done', True)
                 object.last_user = request.user
@@ -108,7 +108,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                     result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\',' + str(next_stage) + ')">\
                     begin ' + stage_dict[next_stage] + '</button>'
             elif action == 'begin_stage':
-                stage = int(self.request.GET['code']) + 1
+                stage = int(self.request.POST['code']) + 1
                 stage_name = stage_dict[stage]
                 object.stage = stage
                 object.last_user = request.user
@@ -130,7 +130,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.save()
                 functions.update_log(object, 'help flag set to ' + str(object.help_flag))
             elif action == 'change_status':
-                status = int(self.request.GET['code'])
+                status = int(self.request.POST['code'])
                 prev_status = object.wf_status
                 object.wf_status = status
                 object.last_user = request.user
@@ -1114,12 +1114,12 @@ class Tasks(DTViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
-    @action(detail=True)
+    @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
         result = {}
         object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         try:
-            action = self.request.GET['action']
+            action = self.request.POST['action']
             if action == 'mark_done':
                 object.completed = True
                 object.save(update_fields=['completed', 'modification_username', 'modification_timestamp'])
@@ -1174,12 +1174,12 @@ class Tickets(DTViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
-    @action(detail=True)
+    @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
         result = {}
         object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         try:
-            action = self.request.GET['action']
+            action = self.request.POST['action']
             if action == 'Close':
                 object.status = 1
                 object.save(update_fields=['status', 'modification_username', 'modification_timestamp'])
@@ -1424,13 +1424,13 @@ class Worksets(DTViewSet):
     queryset = Workset.objects.all()
     serializer_class = WorksetSerializer
 
-    @action(detail=True)
+    @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
         result = {}
         object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         try:
-            action = self.request.GET['action']
-            seq = self.request.GET['seq']
+            action = self.request.POST['action']
+            seq = self.request.POST['seq']
             if action == 'mark_done':
                 qset = json.loads(object.qset)
                 qset[str(seq)]['done'] = True
