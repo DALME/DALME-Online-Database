@@ -414,7 +414,7 @@ class WikiGroupSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         for key, value in ret.items():
-            ret[key] = base64.b64decode(value).capitalize()
+            ret[key] = base64.b64decode(value)
         return ret
 
 
@@ -430,8 +430,8 @@ class GroupSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """ Basic serializer for user data """
     groups = GroupSerializer(many=True, required=False)
-    last_login = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
-    date_joined = serializers.DateTimeField(format='%d-%b-%Y@%H:%M')
+    last_login = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
+    date_joined = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
 
     class Meta:
         model = User
@@ -475,16 +475,17 @@ class ProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """ Update profile and user. Assumes there is a user for every profile """
         user_data = validated_data.pop('user')
+        groups = self.initial_data.pop('groups', None)
         super().update(instance, validated_data)
         user = instance.user
         for attr, value in user_data.items():
             setattr(user, attr, value)
         user.save()
-        if self.context.get('groups') is not None:
-            groups = self.context['groups']
+        if groups is not None:
             user.groups.clear()
             for g in groups:
-                user.groups.add(g)
+                grp = Group.objects.get(pk=g)
+                user.groups.add(grp)
         return instance
 
     def create(self, validated_data):
@@ -495,7 +496,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         if self.context.get('groups') is not None:
             groups = self.context['groups']
             for g in groups:
-                user.groups.add(g)
+                grp = Group.objects.get(pk=g)
+                user.groups.add(grp)
         profile = Profile.objects.create(user=user, **validated_data)
         return profile
 

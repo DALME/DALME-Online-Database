@@ -143,9 +143,39 @@ def import_languages(request):
 
 
 def test_expression(request):
-    instance = Source.objects.get(pk='be2589f90c4b409188582e882eb499c2')
-    source_id = instance.source_pages.all().first().source.id
-    return source_id
+    data = '{"action":"create","data":{"0":{"user":{"first_name":"James","last_name":"Tauber","email":"jtauber@eldarion.com","username":"jtauber","password":"nfhJ63hf672","is_staff":[],"is_superuser":[],"groups":[{"id":"4"}],"groups-many-count":1},"full_name":"James Tauber","dam_usergroup":{"value":"2"},"wiki_groups":[{"ug_group":"users"}],"wiki_groups-many-count":1,"wp_role":"something"}}}'
+    res = get_dte_data(data)
+    return res
+
+
+def get_dte_data(request):
+    dt_request = json.loads(request)
+    dt_request.pop('action', None)
+    rows = dt_request['data']
+    data_list = []
+    for k, v in rows.items():
+        row_values = {}
+        for field, value in v.items():
+            if 'many-count' not in field:
+                if type(value) is list:
+                    if len(value) == 1:
+                        value = normalize_value(value[0])
+                    elif len(value) == 0:
+                        value = 0
+                    else:
+                        value = [normalize_value(i) for i in value]
+                elif type(value) is dict:
+                    # if len(value) == 1 and value.get('value') is not None:
+                    if len(value) == 1:
+                        # value = normalize_value(value['value'])
+                        value = normalize_value(list(value.values())[0])
+                    else:
+                        value = {key: normalize_value(val) for key, val in value.items() if 'many-count' not in key}
+                else:
+                    value = normalize_value(value)
+                row_values[field] = value
+        data_list.append([k, row_values])
+    return data_list
 
 
 def test_expression2(request):
