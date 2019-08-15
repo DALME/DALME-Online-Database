@@ -14,13 +14,14 @@ from django.utils import timezone
 # Security and permissions functions
 
 
-def check_group(request, group_name):
-    """ Checks if the current user is a member of the passed group. """
-    if (request.user.groups.filter(name=group_name).exists() or request.user.is_superuser):
-        result = True
+def check_group(request, group_list):
+    """ Checks if the current user is a member of any of the groups in the passed list. """
+    user_groups = [i.name for i in request.user.groups.all()]
+    result = [i for i in user_groups if i in group_list]
+    if result or request.user.is_superuser:
+        return True
     else:
-        result = False
-    return result
+        return False
 
 # General functions
 

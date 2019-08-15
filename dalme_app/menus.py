@@ -25,14 +25,40 @@ def menu_constructor(request, item_constructor, template, state):
     return [_output]
 
 
-def sidebar_item(wholeMenu, state, depth=0, text=None, iconClass=None, link=None, counter=None,
-                 section=None, children=None, divider=None, itemClass=None, blank=None,
+def sidebar_item(wholeMenu, state, dropdown=None, text=None, iconClass=None, link=None, counter=None,
+                 section=None, child=None, divider=None, itemClass=None, close_dropdown=None, blank=None,
                  permissions=None):
     """ creates menu items for the sidebar """
     if section:
         currentItem = '<div class="sidebar-heading">{}</div><hr class="sidebar-divider">'.format(text)
     elif divider:
         currentItem = '<hr class="sidebar-divider">'
+    elif close_dropdown:
+        currentItem = '</li>'
+    elif dropdown:
+        currentItem = '<li class="nav-item'
+        if text in state['breadcrumb']:
+            currentItem += ' active'
+        currentItem += '">'
+        currentItem += '<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{}" aria-expanded="true" \
+                        aria-controls="collapse{}">'.format(itemClass, itemClass)
+        currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
+        currentItem += '<span>{}</span></a>'.format(text)
+        if text in state['breadcrumb'] and state['sidebar'] != 'toggled':
+            currentItem += '<div id="collapse{}" class="collapse show" aria-labelledby="heading{}" \
+                            data-parent="#accordionSidebar">'.format(itemClass, itemClass)
+        else:
+            currentItem += '<div id="collapse{}" class="collapse" aria-labelledby="heading{}" \
+                            data-parent="#accordionSidebar">'.format(itemClass, itemClass)
+        currentItem += '<div class="bg-white py-2 collapse-inner rounded">'
+    elif child:
+        currentItem = '<a class="collapse-item'
+        if text in state['breadcrumb']:
+            currentItem += ' active'
+        currentItem += '" href="{}"'.format(link)
+        if blank:
+            currentItem += ' target="_blank"'
+        currentItem += '><i class="fas fa-fw {}"></i> {}</a>'.format(iconClass, text)
     else:
         currentItem = '<li class="nav-item'
         if text == 'Dashboard':
@@ -40,34 +66,9 @@ def sidebar_item(wholeMenu, state, depth=0, text=None, iconClass=None, link=None
         if text in state['breadcrumb']:
             currentItem += ' active'
         currentItem += '">'
-        if children:
-            currentItem += '<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{}" aria-expanded="true" \
-                            aria-controls="collapse{}">'.format(itemClass, itemClass)
-            currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
-            currentItem += '<span>{}</span></a>'.format(text)
-            if text in state['breadcrumb'] and state['sidebar'] != 'toggled':
-                currentItem += '<div id="collapse{}" class="collapse show" aria-labelledby="heading{}" \
-                                data-parent="#accordionSidebar">'.format(itemClass, itemClass)
-            else:
-                currentItem += '<div id="collapse{}" class="collapse" aria-labelledby="heading{}" \
-                                data-parent="#accordionSidebar">'.format(itemClass, itemClass)
-            currentItem += '<div class="bg-white py-2 collapse-inner rounded">'
-            for child in children:
-                if 'section' in child:
-                    currentItem += '<div class="sidebar-menu-heading">{}</div>'.format(child['text'])
-                else:
-                    currentItem += '<a class="collapse-item'
-                    if child['text'] in state['breadcrumb']:
-                        currentItem += ' active'
-                    currentItem += '" href="{}"'.format(child['link'])
-                    if 'blank' in child:
-                        currentItem += ' target="_blank"'
-                    currentItem += '><i class="fas fa-fw {}"></i> {}</a>'.format(child['iconClass'], child['text'])
-            currentItem += '</div></div></li>'
-        else:
-            currentItem += '<a class="nav-link" href="{}">'.format(link)
-            currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
-            currentItem += '<span>{}</span></a></li>'.format(text)
+        currentItem += '<a class="nav-link" href="{}">'.format(link)
+        currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
+        currentItem += '<span>{}</span></a></li>'.format(text)
     return currentItem
 
 
