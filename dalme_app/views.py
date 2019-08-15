@@ -1098,8 +1098,10 @@ class WorksetsRedirect(View):
     def get(self, request, *args, **kwargs):
         workset = get_object_or_404(Workset, pk=kwargs['pk'])
         qset = json.loads(workset.qset)
-        seq = str(workset.current_record + 1)
-        seq_id = qset[seq]['pk']
+        seq = workset.current_record + 1
+        if seq > len(qset):
+            seq = len(qset)
+        seq_id = qset[str(seq)]['pk']
         url = '/{}/{}/?workset={}'.format(workset.endpoint, seq_id, workset.id)
         return HttpResponseRedirect(url)
 
