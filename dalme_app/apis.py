@@ -1027,7 +1027,7 @@ class Sources(DTViewSet):
             for filter in filters['and_list']:
                 annotate_dict = self.get_annotation(filter, local_fields, annotate_dict)
         if filters.get('or_list') is not None:
-            for filter in filters['and_list']:
+            for filter in filters['or_list']:
                 annotate_dict = self.get_annotation(filter, local_fields, annotate_dict)
         queryset = queryset.annotate(**annotate_dict)
         if filters.get('and_list') is not None:
@@ -1036,9 +1036,10 @@ class Sources(DTViewSet):
                 if 'timedelta' in str(val):
                     cut_off = timezone.now().date() - datetime.timedelta(**{'days': int(val.split('-')[1])})
                     filters['and_list'][i][key] = cut_off
-            queryset = queryset.filter(reduce(operator.and_, (Q(**q) for q in filters['and_list']))).distinct()
+            qf = reduce(operator.and_, (Q(**q) for q in filters['and_list']))
         if filters.get('or_list') is not None:
-            queryset = queryset.filter(reduce(operator.or_, (Q(**q) for q in filters['or_list']))).distinct()
+            qf |= reduce(operator.or_, (Q(**q) for q in filters['or_list']))
+        queryset = queryset.filter(qf).distinct()
         return queryset
 
     def get_annotation(self, filter, local_fields, annotate_dict):
