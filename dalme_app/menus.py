@@ -11,7 +11,7 @@ def menu_constructor(request, item_constructor, template, state):
     """
     user_id = request.user.id
     _output = ''
-    template = os.path.join('dalme_app', 'templates', 'menus', template)
+    template = os.path.join('dalme_app', 'templates', 'json', template)
     with open(template, 'r') as fp:
         menu = json.load(fp)
     for item in menu:

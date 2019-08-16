@@ -1,6 +1,6 @@
 function source_form() {
   if (dt_table.ajax.url().split("/")[2] == 'sources') {
-    $.get("/api/options/?lists=content_types_opt&format=json", function (option_data) {
+    $.get("/api/options/?target=content_types_opt&format=json", function (option_data) {
           ct_opt = option_data.content_types_opt;
           source_editor = dt_editor;
           source_editor.hide(['parent.value', 'has_inventory']);
@@ -8,7 +8,7 @@ function source_form() {
           source_editor.on('close.dalme', function(e) { change_form(e) });
     }, 'json');
   } else if (dt_table.ajax.url().split("/")[2] == 'images') {
-      $.get("/api/options/?lists=content_types_opt,content_types_0,parent_sources_13&format=json", function (option_data) {
+      $.get("/api/options/?target=content_types_opt,content_types_0,parent_sources_13&format=json", function (option_data) {
             ct_opt = option_data.content_types_opt;
             const type_options = option_data.content_types;
             parent_options = option_data.parent_sources;
@@ -104,7 +104,7 @@ function change_form(e, action) {
 
 function change_on_type(callback='undefined') {
     var ctype = source_editor.get('type.value');
-    $.get("/api/options/?lists=parent_sources_"+ctype+",attribute_types_"+ctype+"&extra=1&format=json", function (option_data) {
+    $.get("/api/options/?target=parent_sources_"+ctype+",attribute_types_"+ctype+"&extra=1&format=json", function (option_data) {
           atype_choices = option_data.attribute_types.options;
           atype_ref = option_data.attribute_types.ref;
           parent_options = option_data.parent_sources;
@@ -372,7 +372,7 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
         }
     };
     if (opt) {
-        $.get("/api/options/?lists=attribute_optexp_"+selected+"&format=json", function ( data ) {
+        $.get("/api/options/?target=attribute_optexp_"+selected+"&format=json", function ( data ) {
             var choices = data.attribute_optexp;
             type_container.after('<div class="formset-field-container flex-fill" data-editor-template="attributes.'+id+'.value_'+type+'"></div>');
             source_editor.add({

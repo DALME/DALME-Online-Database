@@ -2,7 +2,7 @@ function task_detail() {
 }
 
 function edit_task(id) {
-      $.get("/api/options/?lists=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
+      $.get("/api/options/?target=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
           const staff = data.active_staff;
           const worksets = data.user_worksets;
           const lists = data.user_task_lists;

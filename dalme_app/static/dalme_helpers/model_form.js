@@ -60,7 +60,7 @@ function add_class_entry() {
     var model_class_name = 'content type'
   };
   if (typeof option_lists !== 'undefined') {
-    $.get("/api/options/?lists="+option_lists+"&format=json", function ( data ) {
+    $.get("/api/options/?target="+option_lists+"&format=json", function ( data ) {
         var model_class_form = editor_form('create', data);
         model_class_form.on('postSubmit.dalme', function(e, json, data, action) {
             if (json.data) {
@@ -108,7 +108,7 @@ function edit_class_entry() {
     var model_class_name = 'content type';
   };
   if (typeof option_lists !== 'undefined') {
-    $.get("/api/options/?lists="+option_lists+"&format=json", function ( data ) {
+    $.get("/api/options/?target="+option_lists+"&format=json", function ( data ) {
         var model_class_form = editor_form('edit', data);
         model_class_form.on('postSubmit.dalme', function(e, json, data, action) {
             if (action == 'edit') {

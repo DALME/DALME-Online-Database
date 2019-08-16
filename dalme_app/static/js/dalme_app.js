@@ -80,7 +80,7 @@ function fix_dt_search() {
 }
 
 function create_task_list() {
-  $.get("/api/options/?lists=user_groups&format=json", function ( data ) {
+  $.get("/api/options/?target=user_groups&format=json", function ( data ) {
       const groups = data.user_groups;
       taskListForm = new $.fn.dataTable.Editor( {
             ajax: {
@@ -120,7 +120,7 @@ function create_task_list() {
 }
 
 function create_task() {
-  $.get("/api/options/?lists=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
+  $.get("/api/options/?target=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
       const staff = data.active_staff;
       const worksets = data.user_worksets;
       const lists = data.user_task_lists;

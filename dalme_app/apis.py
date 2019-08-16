@@ -5,6 +5,7 @@ import datetime
 import json
 import ast
 import operator
+import os
 from functools import reduce
 from rest_framework import viewsets
 from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, WorksetSerializer,
@@ -713,16 +714,16 @@ class Languages(DTViewSet):
 
 
 class Options(viewsets.ViewSet):
-    """ API endpoint for generating lists of options for DTE forms """
+    """ API endpoint for generating data for options in the UI """
     permission_classes = (DjangoModelPermissions,)
     queryset = Workset.objects.none()
 
     def list(self, request, *args, **kwargs):
         data_dict = {}
-        if self.request.GET.get('lists') is not None:
-            lists = self.request.GET['lists'].split(',')
+        if self.request.GET.get('target') is not None:
+            target = self.request.GET['target'].split(',')
             try:
-                for ls in lists:
+                for ls in target:
                     tokens = ls.split('_')
                     if str(tokens[-1]).isdigit():
                         para = tokens.pop(-1)
@@ -732,10 +733,18 @@ class Options(viewsets.ViewSet):
                         options = eval('self.'+ls+'()')
                     data_dict[ls] = options
             except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the options data: ' + str(e)
+                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
         else:
-            data_dict['error'] = 'No options list/s were included in the request.'
+            data_dict['error'] = 'No target was included in the request.'
         return Response(data_dict)
+
+    def json_file(self, **kwargs):
+        if self.request.GET.get('name') is not None:
+            filename = self.request.GET['name']
+            file = os.path.join('dalme_app', 'templates', 'json', filename + '.json')
+        with open(file, 'r') as fp:
+            output = json.load(fp)
+        return output
 
     def attribute_optexp(self, attribute_type=None, **kwargs):
         if attribute_type is not None:
