@@ -213,8 +213,6 @@ class DTViewSet(viewsets.ModelViewSet):
                     queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
                 if request.GET.get('filters') is not None:
                     queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
-                if request.GET.get('wf_filter') is not None:
-                    queryset = self.filter_on_workflow(queryset=queryset, wf_query=request.GET['wf_filter'])
                 queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
                 rec_count = queryset.count()
                 data_dict['recordsTotal'] = rec_count
@@ -997,13 +995,12 @@ class Sources(DTViewSet):
             type = self.request.GET['type']
             queryset = self.queryset
             q_obj = Q()
+            content_types = DT_list.objects.get(short_name=type).content_types.all()
+            for i in content_types:
+                q_obj |= Q(type=i.pk)
             if type == 'records':
-                q_obj &= Q(has_inventory=True)
                 queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages'))
             else:
-                content_types = DT_list.objects.get(short_name=type).content_types.all()
-                for i in content_types:
-                    q_obj |= Q(type=i.pk)
                 queryset = queryset.filter(q_obj)
         else:
             queryset = self.queryset
@@ -1024,7 +1021,7 @@ class Sources(DTViewSet):
     def filter_on_filters(self, *args, **kwargs):
         queryset = kwargs['queryset']
         filters = kwargs['filters']
-        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'no_folios', 'tags']
+        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'no_folios', 'tags', 'workflow']
         annotate_dict = {}
         if filters.get('and_list') is not None:
             for filter in filters['and_list']:
@@ -1034,6 +1031,11 @@ class Sources(DTViewSet):
                 annotate_dict = self.get_annotation(filter, local_fields, annotate_dict)
         queryset = queryset.annotate(**annotate_dict)
         if filters.get('and_list') is not None:
+            for i, f in enumerate(filters['and_list']):
+                (key, val), = f.items()
+                if 'timedelta' in str(val):
+                    cut_off = timezone.now().date() - datetime.timedelta(**{'days': int(val.split('-')[1])})
+                    filters['and_list'][i][key] = cut_off
             queryset = queryset.filter(reduce(operator.and_, (Q(**q) for q in filters['and_list']))).distinct()
         if filters.get('or_list') is not None:
             queryset = queryset.filter(reduce(operator.or_, (Q(**q) for q in filters['or_list']))).distinct()

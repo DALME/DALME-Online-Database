@@ -127,15 +127,51 @@ function init_module(mod) {
 function workflow_filter(menu, query) {
   $('.wf-dropdown').find('.active').removeClass('active');
   $(menu).addClass('active');
-  if (!$(menu).hasClass('dropdown-item')) {
-    $(menu).parent().addClass('active');
-  };
-  if (query != '') {
-    const query_data = '&wf_filter='+query;
-    update_table('workflow_filter', query_data);
+  if (!$(menu).hasClass('dropdown-item')) { $(menu).parent().addClass('active'); };
+  if (query.includes('timedelta')) {
+      if (query == 'timedelta-older') {
+          var val = '{\'workflow__last_modified__lt\': \'timedelta-365\'}';
+      } else {
+          var val = '{\'workflow__last_modified__gte\': \''+query+'\'}';
+      }
+  } else if ($.isNumeric(query.slice(0,1))) {
+      var stage_dict = { '1': 'ingestion', '2': 'transcription', '3': 'markup', '4':'review', '5':'parsing' };
+      var q_list = query.split('-');
+      switch (q_list[1]) {
+          case 'all':
+              var val = '{\'workflow__stage\': '+q_list[0]+'}';
+              break;
+          case 'awaiting':
+              const stage = q_list[0] - 1;
+              var val = '{\'workflow__stage\': '+stage+'},{\'workflow__'+stage_dict[stage]+'_done\': 1}';
+              break;
+          case 'progress':
+              var val = '{\'workflow__stage\': '+q_list[0]+'},{\'workflow__'+stage_dict[q_list[0]]+'_done\': 0}';
+              break;
+          case 'done':
+              var val = '{\'workflow__'+stage_dict[q_list[0]]+'_done\': 1}';
+              break;
+          case 'not_done':
+              var val = '{\'workflow__'+stage_dict[q_list[0]]+'_done\': 0}';
+      }
   } else {
-    update_table('workflow_filter');
-  }
+      switch (query) {
+          case 'processed':
+              var val = '{\'workflow__wf_status\':3}';
+              break;
+          case 'assessing':
+              var val = '{\'workflow__wf_status\':1}';
+              break;
+          case 'help':
+              var val = '{\'workflow__help_flag\':1}';
+      }
+  };
+  if (typeof val != 'undefined') {
+      wf_filters = val;
+  } else {
+      wf_filters = undefined;
+  };
+  apply_filters();
 }
 
 function toggle_inline_edit() {
@@ -297,24 +333,21 @@ function reset_filters() {
   $('#filters-container').html('<div id="filter0" class="table-filter"><div class="filter_info">Filters</div><div class="filter_buttons"><button class="btn filters-btn add_filter" type="button"><i class="fa fa-plus fa-sm"></i></button></div></div>');
   filterNum = 0;
   filter_register = { 'filter0': [], };
-  update_table('reset_filters');
+  apply_filters();
 }
 
 function apply_filters() {
   const fv = collect_filters();
-  const filter_str = '&filters='+fv;
-  update_table('apply_filters', filter_str);
+  if (fv != '{}') {
+    update_table('&filters='+fv);
+  } else {
+    update_table();
+  }
 }
 
-function update_table(action, query_data) {
-  if (action == 'workflow_filter') {
-    var url = remove_param('wf_filter', dt_table.ajax.url());
-  } else {
-    var url = remove_param('filters', dt_table.ajax.url());
-  };
-  if (typeof query_data != 'undefined') {
-    url = url + query_data;
-  };
+function update_table(query_data) {
+  var url = remove_param('filters', dt_table.ajax.url());
+  if (typeof query_data != 'undefined') { url = url + query_data; };
   dt_table.ajax.url(url).load();
 }
 
@@ -334,7 +367,12 @@ function collect_filters() {
     };
   };
   var fv = '{';
-  if (and_list !== '') { fv += '\'and_list\':['+and_list+'],' };
+  if (and_list !== '' || typeof wf_filters != 'undefined') {
+      fv += '\'and_list\':[';
+      if (and_list !== '') { fv += and_list };
+      if (typeof wf_filters != 'undefined') { fv += wf_filters };
+      fv += '],'
+  };
   if (or_list !== '') { fv += '\'or_list\':['+or_list+'],' };
   fv += '}';
   return fv
