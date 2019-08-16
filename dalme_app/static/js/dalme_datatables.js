@@ -67,60 +67,42 @@ function init_module(mod) {
         $('.dt-buttons').append(button_html);
         break;
     case 'workflow':
-        var wf_menu = [
-          {'type': 'title', 'text': '<i class="fas fa-poll-h fa-sm mr-1"></i>Status'},
-          {'type': 'message', 'text': 'Show only sources with a specific status'},
-          {'type': 'item', 'text': 'All', 'query': ''},
-          {'type': 'item', 'text': 'Processed', 'query': 'wf_status|3'},
-          {'type': 'item', 'text': 'Under Assessment', 'query': 'wf_status|1'},
-          {'type': 'item', 'text': 'Unknown', 'query': 'special|unknown'},
-          {'type': 'divider'},
-          {'type': 'item', 'text': 'Flagged for help', 'query': 'help_flag|1'},
-          {'type': 'divider'},
-          {'type': 'title', 'text': '<i class="fas fa-sliders-h fa-sm mr-1"></i>Processing Stage'},
-          {'type': 'message', 'text': 'Show only sources in a specific stage of processing (and/or state)'},
-          {'type': 'item-select', 'text': 'Ingestion', 'query': '1'},
-          {'type': 'item-select', 'text': 'Transcription', 'query': '2'},
-          {'type': 'item-select', 'text': 'Markup', 'query': '3'},
-          {'type': 'item-select', 'text': 'Review', 'query': '4'},
-          {'type': 'item-select', 'text': 'Parsing', 'query': '5'},
-          {'type': 'divider'},
-          {'type': 'title', 'text': '<i class="fas fa-history fa-sm mr-1"></i>Activity'},
-          {'type': 'message', 'text': 'Show only sources with activity within a certain time period'},
-          {'type': 'item', 'text': 'Past week', 'query': 'timedelta|7'},
-          {'type': 'item', 'text': 'Past month', 'query': 'timedelta|30'},
-          {'type': 'item', 'text': 'Past three months', 'query': 'timedelta|90'},
-          {'type': 'item', 'text': 'Past year', 'query': 'timedelta|365'},
-          {'type': 'item', 'text': 'More than a year ago', 'query': 'timedelta|older'},
-        ];
-        var button_html = '<div class="btn-group dropdown"><button class="btn buttons-collection dropdown-toggle" id="workflow_button" data-toggle="dropdown" aria-haspopup="true"\
-                          aria-expanded="false"><i class="fa fa-code-branch fa-sm"></i> Workflow</button><div class="dropdown-menu wf-dropdown" aria-labelledby="workflow_button">';
-        for (let i = 0, len = wf_menu.length; i < len; ++i) {
-          switch(wf_menu[i]['type']) {
-            case 'title':
-                button_html += '<div class="dropdown-title">'+ wf_menu[i]['text'] +'</div>';
-                break;
-            case 'message':
-                button_html += '<div class="dropdown-text">'+ wf_menu[i]['text'] +'</div>';
-                break;
-            case 'divider':
-                button_html += '<div class="dropdown-divider"></div>';
-                break;
-            case 'item':
-                button_html += '<a class="dt-button dropdown-item" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'\')">'+ wf_menu[i]['text'] +'</a>';
-                break;
-            case 'item-select':
-                button_html += '<div class="dropdown-select dropdown-item">\
-                                <a class="dt-button dropdown-item-select mr-1" href="#" onclick="workflow_filter(this, \'stage|'+ wf_menu[i]['query'] +'\')">'+ wf_menu[i]['text'] +'</a>\
-                                <a class="dt-button dropdown-tag" href="#" onclick="workflow_filter(this, \'status|awaiting|'+ wf_menu[i]['query'] +'\')">awaiting</a>\
-                                <a class="dt-button dropdown-tag" href="#" onclick="workflow_filter(this, \'status|in_progress|'+ wf_menu[i]['query'] +'\')">in progress</a>\
-                                <a class="dt-button dropdown-item-select" href="#" onclick="workflow_filter(this, \'status|done|'+ wf_menu[i]['query'] +'\')"><i class="far fa-check-circle fa-fw"></i></a>\
-                                <a class="dt-button dropdown-item-select" href="#" onclick="workflow_filter(this, \'status|not_done|'+ wf_menu[i]['query'] +'\')"><i class="far fa-times-circle fa-fw"></i></i></a>\
-                                </div>';
-          };
-        };
-        button_html += '</div></div>';
-        $('.dt-buttons').append(button_html);
+        $.ajax({
+            method: "GET",
+            url: "/api/options/?target=json_file&name=workflow_menu&format=json"
+        }).done(function(data, textStatus, jqXHR) {
+            var wf_menu = data.json_file;
+            var button_html = '<div class="btn-group dropdown"><button class="btn buttons-collection dropdown-toggle" id="workflow_button" data-toggle="dropdown" aria-haspopup="true"\
+                              aria-expanded="false"><i class="fa fa-code-branch fa-sm"></i> Workflow</button><div class="dropdown-menu wf-dropdown" aria-labelledby="workflow_button">';
+            for (let i = 0, len = wf_menu.length; i < len; ++i) {
+              switch(wf_menu[i]['type']) {
+                case 'title':
+                    button_html += '<div class="dropdown-title">'+ wf_menu[i]['text'] +'</div>';
+                    break;
+                case 'message':
+                    button_html += '<div class="dropdown-text">'+ wf_menu[i]['text'] +'</div>';
+                    break;
+                case 'divider':
+                    button_html += '<div class="dropdown-divider"></div>';
+                    break;
+                case 'item':
+                    button_html += '<a class="dt-button dropdown-item" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'\')">'+ wf_menu[i]['text'] +'</a>';
+                    break;
+                case 'item-select':
+                    button_html += '<div class="dropdown-select dropdown-item">\
+                                    <a class="dt-button dropdown-item-select mr-1" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'-all\')">'+ wf_menu[i]['text'] +'</a>';
+                    if (wf_menu[i]['text'] != 'Ingestion') { button_html += '<a class="dt-button dropdown-tag" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'-awaiting\')">awaiting</a>' };
+                    button_html += '<a class="dt-button dropdown-tag" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'-progress\')">in progress</a>\
+                                    <a class="dt-button dropdown-item-select" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'-done\')"><i class="far fa-check-circle fa-fw"></i></a>\
+                                    <a class="dt-button dropdown-item-select" href="#" onclick="workflow_filter(this, \''+ wf_menu[i]['query'] +'-not_done\')"><i class="far fa-times-circle fa-fw"></i></i></a>\
+                                    </div>';
+              };
+            };
+            button_html += '</div></div>';
+            $('.dt-buttons').append(button_html);
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            toastr.error('The following error occured while attempting to retrieve the data for the Workflow menu: '+errorThrown);
+        });
   }
 }
 
