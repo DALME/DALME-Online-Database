@@ -576,7 +576,7 @@ class SourceDetail(DetailView):
             'Type': self.object.type.name,
             'Name': self.object.name,
             'Short name': self.object.short_name,
-            'Inventory': functions.format_boolean(has_inv),
+            'List': functions.format_boolean(has_inv),
         }
         if self.object.parent:
             source_data['Parent'] = '<a href="{}">{}</a>'.format('/sources/'+str(self.object.parent.id), self.object.parent.name)

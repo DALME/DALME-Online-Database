@@ -63,9 +63,9 @@ function source_form() {
                       },
                       {
                             name: "has_inventory",
-                            label: "Inventory",
+                            label: "List",
                             type: "checkbox",
-                            options: [{label: "Indicates whether this source contains an inventory.", value: "1"}],
+                            options: [{label: "Indicates whether this source contains a list of objects.", value: "1"}],
                       },
                   ]
               });
