@@ -357,35 +357,37 @@ function setTagMenu(action) {
                   let item = tei_tags[i];
                   let att_array = [];
                   if ('section' in item) {
-                      if (item.section == 'pre-close') {
+                      if (item.section == 'close') {
                         tag_menu_html += '</div></div>';
-                      };
-                      tag_menu_html += `<div class="tag-menu-container"><div class="tag-menu-section-head`;
-                      if (item.expanded == 'false') { tag_menu_html += ' collapsed' };
-                      tag_menu_html += `" id="heading_${item.id}" data-toggle="collapse" \
-                      data-target="#${item.id}" aria-expanded="${item.expanded}" aria-controls="${item.id}">${item.title}</div>\
-                      <div id="${item.id}" class="collapse`;
-                      if (item.expanded == 'true') { tag_menu_html += ' show' };
-                      tag_menu_html += `" aria-labelledby="heading_${item.id}" data-parent="#tag-menu">`;
+                      } else {
+                        tag_menu_html += `<div class="tag-menu-container"><div class="tag-menu-section-head collapsed" id="heading_${item.id}" data-toggle="collapse" \
+                        data-target="#${item.id}" aria-expanded="false" aria-controls="${item.id}">${item.section}</div>\
+                        <div id="${item.id}" class="collapse" aria-labelledby="heading_${item.id}" data-parent="#tag-menu">`;
+                      }
                   } else {
                       if ('attribute_name' in item) {
                         att_array.push(item.attribute_name+'|'+item.attribute_value);
                       };
                       if ('attributes' in item) {
-                          let message = item.message;
-                          tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
-                          </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} <a href='https://wiki.dalme.org/DALME_TEI_Schema${item.link}' target='_blank'>See DALME Wiki</a>"></i>\
+                          tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button tag-keep-open" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
+                          </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} \
+                          <a href='https://wiki.dalme.org/DALME_TEI_Schema${item.link}' target='_blank'>See DALME Wiki</a>"></i>\
                           </div><div id="${item.tag_name}_dd" class="dropdown-menu tag-menu-dropdown p-2"><div class="tag-menu-form">`;
+                          let message = '';
                           for (let j = 0, lenj = item.attributes.length; j < lenj; ++j) {
                             let att = item.attributes[j];
+                            message += att.message;
                             att_array.push(att.name+'|'+att.type+'|'+item.tag_name+'_'+att.name);
                             if (att.type == 'text') {
                                 tag_menu_html += `<input class="form-control form-control-sm" type="text" id="${item.tag_name+'_'+att.name}" placeholder="${att.label}">`;
                                 if ('options' in att) {
-                                  message += 'Common choices: ';
+                                  message += ' (<i>e.g.:</i> ';
+                                  let opt_list = [];
                                   for (let k = 0, lenk = att.options.length; k < lenk; ++k) {
-                                    message += `<a href="#" onclick="$(\'#${item.tag_name+'_'+att.name}\').val(\'${att.options[k]}\')">${att.options[k]}</a> `;
+                                    opt_list.push(`<a href="#" onclick="$(\'#${item.tag_name+'_'+att.name}\').val(\'${att.options[k]}\')">${att.options[k]}</a>`);
                                   };
+                                  message += opt_list.join(', ')
+                                  message += ')';
                                 };
                             } else if (att.type == 'choice') {
                                 tag_menu_html += `<select class="form-control form-control-sm" id="${item.tag_name+'_'+att.name}">`
@@ -394,8 +396,18 @@ function setTagMenu(action) {
                                 tag_menu_html += `</select>`;
                             };
                           };
+                          message += '.';
                           tag_menu_html += `<button type="button" class="btn btn-primary dd-button" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')">Add</button>`;
                           tag_menu_html += `</div><small class="form-text text-muted">${message}</small></div></div>`;
+                      } else if ('menu' in item) {
+                          tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
+                          </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} \
+                          <a href='https://wiki.dalme.org/DALME_TEI_Schema${item.link}' target='_blank'>See DALME Wiki</a>"></i>\
+                          </div><div id="${item.tag_name}_dd" class="dropdown-menu">`;
+                          for (let j = 0, lenj = item.menu.length; j < lenj; ++j) {
+                            tag_menu_html += `<a class="dropdown-item" href="#" onclick="addTag('${item.type}', '${item.tag_name}', '${item.attribute}|${item.menu[j]}')">${item.menu[j]}</a>`;
+                          };
+                          tag_menu_html += '</div>';
                       } else {
                           tag_menu_html += `<div class="tag-menu-button" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')"><i class="fas fa-caret-left fa-fw mr-1">\
                           </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help}"></i></div>`;
@@ -407,7 +419,7 @@ function setTagMenu(action) {
               $('#tag-menu').html(tag_menu_html);
               $('.tag-tooltip').tooltip({container: 'body', delay: { "show": 100, "hide": 1000 }});
               $('.tag-menu-dropdown').on('click', function(e) { e.stopPropagation(); });
-              $('.tag-menu-button').on('click', function(e) { $(this).next().toggle(); });
+              $('.tag-keep-open').on('click', function(e) { $(this).next().toggle(); });
               $('.dd-button').on('click', function(e) { $(this).parent().parent().toggle(); });
           }).fail(function(jqXHR, textStatus, errorThrown) {
               toastr.error('The following error occured while attempting to retrieve the data for the tags menu: '+errorThrown);

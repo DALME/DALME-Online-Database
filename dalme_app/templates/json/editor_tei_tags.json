@@ -1,308 +1,68 @@
 [
   {
-    "section": "",
-    "id": "layout_tags",
-    "title": "Layout tags",
-    "expanded": "true"
-  },
-  {
-    "name": "Blank space",
-    "type": "sc",
-    "help": "Mark <b>unusual space</b> in the source text",
-    "link": "#Blank_Space",
-    "tag_name": "space",
-    "message": "Description of the <b>extent</b> of the blank, <i>e.g.</i> 7 words",
-    "attributes": [
-      {
-        "name": "extent",
-        "label": "Extent",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Column",
-    "type": "sc",
-    "help": "Mark the point at which a column of text begins",
-    "link": "#Columns",
-    "tag_name": "cb",
-    "message": "<b>Number of the column</b> on the page, <i>e.g.</i> 1, 2, etc.",
-    "attributes": [
-      {
-        "name": "n",
-        "label": "Column number",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Hyphenation",
-    "type": "w",
-    "help": "Wrap a hyphen and indicate its type/function",
-    "link": "#Hyphenation",
-    "tag_name": "pc",
-    "message": "Indicates the <b>force</b> of the association between the punctuation mark and its adjacent word. Use <b>strong</b> to mark a hyphen that should be preserved during the tokenisation process, and <b>weak</b> for hyphens that should not be kept, <i>e.g.</i> split words at the end of lines",
-    "attributes": [
-      {
-        "name": "force",
-        "label": "Force",
-        "type": "choice",
-        "options": [
-          "weak",
-          "strong"
-        ]
-      }
-    ]
+    "section": "Annotation",
+    "id": "annotation_tags"
   },
   {
     "name": "Note",
     "type": "sc",
-    "help": "Add additional comment out of the main textual stream",
+    "help": "Add additional comment out of the main textual stream.",
     "link": "#Marginal_Notes_and_Insertions_via_renvoi",
     "tag_name": "note",
-    "message": "<b>Type</b> of note, <b>ref</b> if renvoi, and the actual <b>contents</b>",
     "attributes": [
       {
         "name": "type",
         "label": "Type",
         "type": "choice",
+        "message": "<b>Type</b> of note",
         "options": [
           "marginal",
           "renvoi"
         ]
       },
       {
-        "name": "ref",
-        "label": "Ref",
+        "name": "target",
+        "label": "Target",
+        "message": ", <b>target</b> id to be used if renvoi",
         "type": "text"
       },
       {
         "name": "text",
         "label": "Text",
+        "message": ", and the actual <b>text</b> of the note",
         "type": "text"
       }
     ]
   },
   {
-    "section": "pre-close",
-    "id": "format_tags",
-    "title": "Format tags",
-    "expanded": "false"
-  },
-  {
-    "name": "Indentation",
+    "name": "Brace",
     "type": "w",
-    "help": "Wrap text with indented horizontal alignment",
-    "link": "#Indentations.2C_Superscripts.2C_and_Subscripts",
-    "tag_name": "hi",
-    "message": "Level of <b>indentation</b>",
+    "help": "Vertical element used to show groupings of lines that function as a unit.",
+    "link": "#Braces",
+    "tag_name": "seg",
     "attributes": [
+      {
+        "name": "text",
+        "label": "Text",
+        "message": "<b>Text</b> to be associated with the lines",
+        "type": "text"
+      },
       {
         "name": "rend",
-        "label": "Level",
-        "type": "choice",
-        "options": [
-          "indent",
-          "indent1",
-          "indent2",
-          "indent3",
-          "indent4"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Superscript",
-    "type": "w",
-    "help": "Wrap text with higher vertical alignment",
-    "link": "#Indentations.2C_Superscripts.2C_and_Subscripts",
-    "tag_name": "hi",
-    "attribute_name": "rend",
-    "attribute_value": "superscript"
-  },
-  {
-    "name": "Subscript",
-    "type": "w",
-    "help": "Wrap text with lower vertical alignment",
-    "link": "#Indentations.2C_Superscripts.2C_and_Subscripts",
-    "tag_name": "hi",
-    "attribute_name": "rend",
-    "attribute_value": "subscript"
-  },
-  {
-    "section": "pre-close",
-    "id": "editorial_tags",
-    "title": "Editorial tags",
-    "expanded": "false"
-  },
-  {
-    "name": "Addition",
-    "type": "w",
-    "help": "Wrap text inserted in the source text",
-    "link": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
-    "tag_name": "add",
-    "message": "<b>Place</b> where the addition is located with reference to the main text",
-    "attributes": [
-      {
-        "name": "place",
-        "label": "Place",
+        "label": "Rend",
+        "message": ", indication of how the brace is <b>rend</b>ered on the page",
         "type": "text",
         "options": [
-          "above",
-          "below"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Deletion",
-    "type": "w",
-    "help": "Wrap text deleted, marked as deleted, or otherwise indicated as superfluous",
-    "link": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
-    "tag_name": "del",
-    "message": "<b>Method</b> of deletion used",
-    "attributes": [
-      {
-        "name": "rend",
-        "label": "Method",
-        "type": "text",
-        "options": [
-          "overstrike"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Expansion",
-    "type": "w",
-    "help": "Wrap text that has been expanded from an abbreviation",
-    "link": "#Abbreviations_and_Expansions",
-    "tag_name": "expan"
-  },
-  {
-    "name": "Omission",
-    "type": "sc",
-    "help": "Mark where material has been omitted in the transcription",
-    "link": "#Omissions",
-    "tag_name": "gap",
-    "message": "<b>Reason</b> for the omission and <b>extent</b> of the gap <i>e.g.</i> 1 word, 3 paragraphs",
-    "attributes": [
-      {
-        "name": "reason",
-        "label": "Reason",
-        "type": "text",
-        "options": [
-          "illegible",
-          "damaged"
+          "curly bracket",
+          "C-shaped",
+          "line",
+          "L-shaped"
         ]
       },
       {
-        "name": "extent",
-        "label": "Extent",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Supplied",
-    "type": "w",
-    "help": "Wrap text supplied by the transcriber",
-    "link": "#Supplied_Text",
-    "tag_name": "supplied",
-    "message": "<b>Reason</b> why the text had to be supplied",
-    "attributes": [
-      {
-        "name": "reason",
-        "label": "Reason",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Unclear",
-    "type": "w",
-    "help": "Wrap text that cannot be transcribed with certainty",
-    "link": "#Unclear_Text",
-    "tag_name": "unclear",
-    "message": "<b>Reason</b> why the material is hard to transcribe",
-    "attributes": [
-      {
-        "name": "reason",
-        "label": "Reason",
-        "type": "text",
-        "options": [
-          "illegible",
-          "damaged",
-          "ink blot"
-        ]
-      }
-    ]
-  },
-  {
-    "section": "pre-close",
-    "id": "semantic_tags",
-    "title": "Semantic tags",
-    "expanded": "false"
-  },
-  {
-    "name": "Abbreviation",
-    "type": "w",
-    "help": "Wrap abbreviation",
-    "link": "#Abbreviations_and_Expansions",
-    "tag_name": "abbr",
-    "message": "<b>Type</b> of abbreviation",
-    "attributes": [
-      {
-        "name": "type",
-        "label": "Type",
-        "type": "text",
-        "options": [
-          "title",
-          "initial",
-          "acronym"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Elision",
-    "type": "w",
-    "help": "Wrap elided word",
-    "link": "#Elisions",
-    "tag_name": "w",
-    "attribute_name": "type",
-    "attribute_value": "elision",
-    "message": "The <b>non-elided version of the word</b>",
-    "attributes": [
-      {
-        "name": "lemma",
-        "label": "Word",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Named entity",
-    "type": "w",
-    "help": "Wrap text that refers to a person, place, etc.",
-    "link": "#Names_.28Persons.2FLocations.29",
-    "tag_name": "rs",
-    "message": "<b>Type</b> of entity and <b>key</b>, <i>i.e.</i> an externally-defined means of identifying the entity, <i>e.g.</i> a database UUID",
-    "attributes": [
-      {
-        "name": "type",
-        "label": "Type",
-        "type": "text",
-        "options": [
-          "person",
-          "place",
-          "organization",
-          "object"
-        ]
-      },
-      {
-        "name": "key",
-        "label": "Key",
+        "name": "target",
+        "label": "Target",
+        "message": ", and <b>target</b> id to be used to link the brace and the note (<i>e.g.</i> note_01)",
         "type": "text"
       }
     ]
@@ -313,13 +73,299 @@
     "help": "Wrap text that has been paraphrased",
     "link": "#Paraphrasing",
     "tag_name": "quote",
-    "message": "<b>Person responsible</b> for the paraphrased text",
     "attributes": [
       {
         "name": "resp",
         "label": "Author",
+        "message": "<b>Person responsible</b> for the paraphrased text",
         "type": "text"
       }
     ]
+  },
+  {
+    "section": "close"
+  },
+  {
+    "name": "Highlight",
+    "type": "w",
+    "help": "Wrap a word or phrase to mark it as graphically distinct from the surrounding text.",
+    "link": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+    "tag_name": "hi",
+    "attribute": "rend",
+    "menu": [
+      "subscript",
+      "superscript",
+      "underscore",
+      "indent",
+      "indent1",
+      "indent2",
+      "indent3",
+      "indent4"
+    ]
+  },
+  {
+    "section": "Editorial",
+    "id": "editorial_tags"
+  },
+  {
+    "name": "Abbreviation",
+    "type": "w",
+    "help": "Wrap abbreviation",
+    "link": "#Abbreviations_and_Expansions",
+    "tag_name": "abbr",
+    "attributes": [
+      {
+        "name": "type",
+        "label": "Type",
+        "type": "text",
+        "message": "<b>Type</b> of abbreviation",
+        "options": [
+          "title",
+          "initial",
+          "acronym"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Addition",
+    "type": "w",
+    "help": "Wrap text inserted in the source text",
+    "link": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
+    "tag_name": "add",
+    "attributes": [
+      {
+        "name": "place",
+        "label": "Place",
+        "type": "text",
+        "message": "<b>Place</b> where the addition is located with reference to the main text",
+        "options": [
+          "above",
+          "below"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Deletion",
+    "type": "w",
+    "help": "Wrap text deleted, marked as deleted, or otherwise indicated as superfluous.",
+    "link": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
+    "tag_name": "del",
+    "attributes": [
+      {
+        "name": "rend",
+        "label": "Rend",
+        "type": "text",
+        "message": "How the deletion is <b>rend</b>ered on the page",
+        "options": [
+          "overstrike"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Elision",
+    "type": "w",
+    "help": "Wrap elided word.",
+    "link": "#Elisions",
+    "tag_name": "w",
+    "attribute_name": "type",
+    "attribute_value": "elision",
+    "attributes": [
+      {
+        "name": "lemma",
+        "label": "Lemma",
+        "message": "The <b>lemma</b> (<i>i.e.</i> non-elided version of the word)",
+        "type": "text"
+      },
+      {
+        "name": "join",
+        "label": "Join",
+        "type": "choice",
+        "message": ", or the side on which the word should be <b>join</b> another",
+        "options": [
+          "left",
+          "right"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Expansion",
+    "type": "w",
+    "help": "Wrap text that has been expanded from an abbreviation.",
+    "link": "#Abbreviations_and_Expansions",
+    "tag_name": "expan"
+  },
+  {
+    "name": "Hyphenation",
+    "type": "w",
+    "help": "Wrap a hyphen and indicate its type/function.",
+    "link": "#Hyphenation",
+    "tag_name": "pc",
+    "attributes": [
+      {
+        "name": "force",
+        "label": "Force",
+        "type": "choice",
+        "message": "<b>Force</b> of the association: <b>strong</b> for hyphen that should be preserved during tokenisation, <b>weak</b> for hyphen that should not be kept, <i>e.g.</i> split words at the end of lines",
+        "options": [
+          "weak",
+          "strong"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Omission",
+    "type": "sc",
+    "help": "Mark where material has been omitted in the transcription.",
+    "link": "#Omissions",
+    "tag_name": "gap",
+    "attributes": [
+      {
+        "name": "reason",
+        "label": "Reason",
+        "type": "text",
+        "message": "<b>Reason</b> for the omission, including type of content omitted",
+        "options": [
+          "illegible",
+          "damaged",
+          "context, not transcribed"
+        ]
+      },
+      {
+        "name": "extent",
+        "label": "Extent",
+        "message": ", <b>extent</b> of the gap, <i>e.g.</i> 1 word, 3 paragraphs",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "Supplied",
+    "type": "w",
+    "help": "Wrap text supplied by the transcriber",
+    "link": "#Supplied_Text",
+    "tag_name": "supplied",
+    "attributes": [
+      {
+        "name": "reason",
+        "label": "Reason",
+        "message": "<b>Reason</b> why the text had to be supplied",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "Unclear",
+    "type": "w",
+    "help": "Wrap text that cannot be transcribed with certainty.",
+    "link": "#Unclear_Text",
+    "tag_name": "unclear",
+    "attributes": [
+      {
+        "name": "reason",
+        "label": "Reason",
+        "message": "<b>Reason</b> why the material is hard to transcribe",
+        "type": "text",
+        "options": [
+          "illegible",
+          "damaged",
+          "ink blot"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "close"
+  },
+  {
+    "section": "Other",
+    "id": "other_tags"
+  },
+  {
+    "name": "Blank space",
+    "type": "sc",
+    "help": "Mark <b>unusual space</b> in the source text.",
+    "link": "#Blank_Space",
+    "tag_name": "space",
+    "attributes": [
+      {
+        "name": "extent",
+        "label": "Extent",
+        "message": "Description of the <b>extent</b> of the blank, <i>e.g.</i> 7 words",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "Column",
+    "type": "sc",
+    "help": "Mark the point at which a column of text begins.",
+    "link": "#Columns",
+    "tag_name": "cb",
+    "attributes": [
+      {
+        "name": "n",
+        "label": "Number",
+        "message": "<b>Number of the column</b> on the page, <i>e.g.</i> 1, 2, etc",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "Named entity",
+    "type": "w",
+    "help": "Wrap text that refers to a person, place, room, etc.",
+    "link": "#Named_Entities_.28Persons.2FLocations.2FOrganizations.29",
+    "tag_name": "rs",
+    "attributes": [
+      {
+        "name": "type",
+        "label": "Type",
+        "type": "text",
+        "message": "<b>Type</b> of entity",
+        "options": [
+          "object",
+          "organization",
+          "person",
+          "place",
+          "locus"
+        ]
+      },
+      {
+        "name": "key",
+        "label": "Key",
+        "message": ", and <b>key</b> to an externally-defined means of identifying the entity, <i>e.g.</i> a database UUID",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "Leader",
+    "type": "sc",
+    "help": "Typographical mark used to connect items on the page that might be separated by considerable horizontal distance.",
+    "link": "#Leaders",
+    "tag_name": "metamark",
+    "attribute_name": "function",
+    "attribute_value": "leader",
+    "attributes": [
+      {
+        "name": "rend",
+        "label": "Rend",
+        "type": "text",
+        "message": "How the leader is <b>rend</b>ered on the page",
+        "options": [
+          "dots",
+          "line",
+          "dashes"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "close"
   }
 ]
