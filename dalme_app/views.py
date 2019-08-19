@@ -509,7 +509,7 @@ class SourceList(DTListView):
         if 'type' in self.request.GET:
             if self.request.GET['type'] == 'records':
                 module_list = ['filters']
-                if functions.check_group(self.request, ['staff']):
+                if functions.check_group(self.request, ['Staff']):
                     module_list.append('workflow')
         return module_list
 
