@@ -218,9 +218,9 @@
     ]
   },
   {
-    "name": "Omission",
+    "name": "Omission/Gap",
     "type": "sc",
-    "help": "Mark where material has been omitted in the transcription.",
+    "help": "Mark a gap or omission in the transcription.",
     "link": "#Omissions",
     "tag_name": "gap",
     "attributes": [
@@ -228,11 +228,11 @@
         "name": "reason",
         "label": "Reason",
         "type": "text",
-        "message": "<b>Reason</b> for the omission, including type of content omitted",
+        "message": "<b>Reason</b> for the omission/gap, including type of content omitted",
         "options": [
           "illegible",
           "damaged",
-          "context, not transcribed"
+          "context"
         ]
       },
       {
