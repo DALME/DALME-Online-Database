@@ -42,7 +42,9 @@
                   <div class="record-description">{{ ticket.description }}</div>
                     {% if ticket.tags %}
                       {% for t in ticket.tags.all %}
-                        <span class="basic-pill ticket-{{ t.tag }}">{{ t.tag }}</span>
+                        {% if t.tag != '0' %}
+                          <span class="basic-pill ticket-{{ t.tag }}">{{ t.tag }}</span>
+                        {% endif %}
                       {% endfor %}
                     {% endif %}
               </div>
