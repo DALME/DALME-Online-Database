@@ -55,7 +55,7 @@ function startEditor() {
              enableGotoPage: false,
              enableGridIcon: false,
              enableImageTitles: false,
-             enableToolbar: false,
+             enableToolbar: true,
              tileHeight: 1000,
              tileWidth: 1000
           });
@@ -79,6 +79,7 @@ function startEditor() {
           maxHeight: maxHeight,
           minHeight: 200,
           resize: function(e, ui) {
+              diva_state = diva.getState();
               const parent = ui.element.parent();
               const remainingSpace = parent.height() - ui.element.outerHeight();
               const divTwo = ui.element.next();
@@ -91,7 +92,8 @@ function startEditor() {
           stop: function (e, ui) {
             const parent = ui.element.parent();
             ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
-            //window.dispatchEvent(new Event('resize'));
+            // window.dispatchEvent(new Event('resize'));
+            diva.setState(diva_state);
             }
       });
       window.addEventListener('resize', function () { resizeEditor(); }, false);
