@@ -486,7 +486,9 @@ function addTag(type, tag, att_array) {
       tag_output = '<' + tag;
       if (tag_attributes.length != 0) {
         for (let i = 0, len = tag_attributes.length; i < len; ++i) {
-          tag_output += ' ' + tag_attributes[i][0] + '="' + tag_attributes[i][1] + '"';
+          if (tag_attributes[i][1] != '' && tag_attributes[i][1] != 'Join') {
+            tag_output += ' ' + tag_attributes[i][0] + '="' + tag_attributes[i][1] + '"';
+          }
         }
       };
       if (type == 'w') {
