@@ -22,7 +22,12 @@ tei-hi[rend="subscript"] {
   font-size: 90%;
 }
 
+tei-hi[rend="underscore"] {
+  text-decoration: underline;
+}
+
 tei-unclear{
+  color: #6d6d6d;
   text-decoration: underline;
   text-decoration-style: dotted;
 }
@@ -37,6 +42,11 @@ tei-supplied:before {
 
 tei-supplied:after {
   content: "]"
+}
+
+tei-rs {
+  font-style: italic;
+  font-weight: 500;
 }
 
 tei-num[type="cardinal"] {
@@ -60,19 +70,63 @@ tei-gap:before {
   content: "[…]"
 }
 
+tei-gap[reason="context"] {
+  color: #757876;
+  font-weight: 600;
+  font-size: 80%;
+  vertical-align: middle;
+}
+
+tei-gap[reason="context"]:before {
+  content: "[" attr(extent) " of contextual information not transcribed]";
+}
+
 tei-pc[force="weak"] {
   display: none;
 }
 
 tei-cb {
-  display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  margin-right: .5em;
+  display: inline-block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: #757876;
+  font-weight: 600;
+  font-size: 80%;
+  vertical-align: middle;
 }
 
 tei-cb:before {
   content: "[column " attr(n) "]";
+}
+
+tei-seg[type="brace"] {
+  border-left: 2px solid #555;
+  display: inline-block;
+  padding-left: 10px;
+  margin-left: -10px;
+}
+
+tei-metamark[rend="line"] {
+  background-size: 50px 1px;
+  border-bottom: 1px solid #aaa;
+}
+
+tei-metamark[rend="dashes"] {
+  background-size: 50px 1px;
+  background-image: radial-gradient(1px 1px at center, #aaa 10px, transparent 20px);
+}
+
+tei-metamark[rend="dots"] {
+  background-size: 8px 1px;
+  background-image: radial-gradient(1px 1px at center, #aaa 1px, transparent 2px);
+}
+
+tei-metamark[function="leader"] {
+  height: 1px;
+  display: inline-flex;
+  min-width: 40%;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 tei-space:before {
@@ -95,8 +149,19 @@ tei-abbr {
 
 }
 
-tei-w[type="elision"] {
+tei-w[type="elision"][join="right"]:after {
+  color: #757876;
+  content: "︙";
+}
 
+tei-w[type="elision"][join="left"]:before {
+  color: #757876;
+  content: "︙";
+}
+
+tei-w[type="elision"][lemma]:after {
+  color: #757876;
+  content: "["attr(lemma)"]︙";
 }
 
 tei-add:before {
@@ -108,9 +173,17 @@ tei-add:after {
 }
 
 tei-quote {
+  font-size: 14px;
   font-style: italic;
   font-weight: 600;
   color: #757876;
+  background-color: #eee;
+  border: 1px dotted #ccc;
+  padding: 5px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  display: inline-block;
+  width: 100%;
 }
 
 tei-quote:before {
@@ -128,32 +201,49 @@ tei-quote[prev]:before {
   content: "" !important;
 }
 
-tei-note {
-  /*
-  display: block;
-  margin: 1.5em auto 1.5em auto;
-  padding: .5em 1.5em 1.5em 1.5em;
-  border: 1px solid black;
-  border-radius: 15px;
-  width: 325px;
-  position: relative;
-  border: 1px solid #aaaaaa;
+tei-note:not([type]) {
   background: #fafafa;
-  /* reset text-indent for note with <l> ancestors. */
-  /*
-  text-indent: 0;
-  font-size: 85%;
-  text-align: justify;
-  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.25);
-  */
+  padding: 5px 10px;
+  display: inline-block;
+  width: 100%;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+tei-note:not([type]):before {
+  content: attr(id)":";
+  font-weight: 600;
+  color: #757876;
+  margin-right: 5px;
+}
+
+tei-note[type="marginal"] {
+  border: 1px solid #cfd29a;
+  background: #ffffdc;
+  padding: 5px 10px;
+  display: inline-block;
+  font-size: 14px;
+  float: right;
 }
 
 tei-ref {
   color: #5f0000;
   text-decoration: underline;
   cursor: pointer;
+}
+
+tei-ref a {
+  color: #864547;
+  font-size: 50%;
+  vertical-align: super;
+  border: 1px solid #d6999a;
+  background-color: rgb(245, 240, 240);
+  padding: 1px 1px;
+  margin-left: 2px;
+}
+
+tei-ref a:after {
+    content: attr(href);
 }
 
 /* CETEIcean CSS */
@@ -179,22 +269,22 @@ tei-ref {
 }
 
 /* Choice elements */
-tei-choice tei-abbr + tei-expan:before,
+/* tei-choice tei-abbr + tei-expan:before,
 tei-choice tei-expan + tei-abbr:before,
 tei-choice tei-sic + tei-corr:before,
 tei-choice tei-corr + tei-sic:before,
 tei-choice tei-orig + tei-reg:before,
 tei-choice tei-reg + tei-orig:before {
   content: " (";
-}
-tei-choice tei-abbr + tei-expan:after,
+} */
+/* tei-choice tei-abbr + tei-expan:after,
 tei-choice tei-expan + tei-abbr:after,
 tei-choice tei-sic + tei-corr:after,
 tei-choice tei-corr + tei-sic:after,
 tei-choice tei-orig + tei-reg:after,
 tei-choice tei-reg + tei-orig:after {
   content: ")";
-}
+} */
 /* A */
 tei-ab {
   display: block;
@@ -283,9 +373,7 @@ tei-anchor {
 tei-app {
   /* Empty Rule Set */
 }
-tei-app tei-note {
-  display: none;
-}
+
 tei-appInfo {
   display: block;
 }
@@ -1520,10 +1608,7 @@ tei-secl>*:last-child:after {
   content: "]\a\a";
   white-space: pre;
 }
-tei-seg {
-  /* Empty Set Rule */
-  outline: 0px solid transparent;
-}
+
 tei-segmentation {
   /* Empty Rule Set */
 }
