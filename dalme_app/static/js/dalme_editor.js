@@ -39,7 +39,16 @@ function startEditor() {
           'add': function(e) { e.setAttribute("title", getTitle(e, 'addition')); e.setAttribute("data-toggle", "tooltip"); }, //@place
           'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
           'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
-          'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); } //@resp
+          'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); }, //@resp
+          // 'cb': function(e) {
+          //           cnum = e.getAttribute('n');
+          //           if (cnum == 1) {
+          //               const content = '<div class="column-container"><div class="column">';
+          //           } else {
+          //               const content = '</div><div class="column">';
+          //           };
+          //           return content
+          //       },
           }
       });
       if (folio_array[0].dam_id == 'None') {
@@ -442,7 +451,7 @@ function setTagMenu(action) {
 
 function addTag(type, tag, att_array) {
     let tag_attributes = [];
-    if (tag == 'note') { var note_att = {} };
+    if (tag == 'note' || tag == 'seg') { var special_att = {} };
     if (att_array) {
       if (att_array.includes('-')) {
         att_array = att_array.split('-');
@@ -464,26 +473,30 @@ function addTag(type, tag, att_array) {
                     att_value = $('#'+att[2]).find('option:selected').text();
                     $('#'+att[2])[0].selectedIndex = 0;
               };
-              if (tag == 'note') {
-                note_att[att[0]] = att_value;
+              if (tag == 'note' || tag == 'seg') {
+                special_att[att[0]] = att_value;
               } else {
                 tag_attributes.push([att[0], att_value]);
               }
           }
       }
     };
+    if (tag == 'seg') {
+      tag_attributes.push(['target', special_att['target']]);
+      tag_attributes.push(['rend', special_att['rend']]);
+    };
     if (tag == 'note') {
-      if (note_att['type'] == 'renvoi') {
-        note_ref = `<ref target="#note_${note_att['ref']}"/>`;
-        note_output = `\n\n<note xml:id="note_${note_att['ref']}">${note_att['text']}</note>`;
+      if (special_att['type'] == 'renvoi') {
+        const note_ref = `<ref target="#note_${special_att['target']}"/>`;
+        const note_output = `\n\n<note xml:id="${special_att['target']}">${special_att['text']}</note>`;
         xmleditor.session.insert(xmleditor.getCursorPosition(), note_ref);
         xmleditor.session.insert({row: xmleditor.session.getLength(), column: 0}, note_output)
       } else {
-        tag_output = `<note type="${note_att['type']}">${note_att['text']}</note>`;
+        const tag_output = `<note type="${special_att['type']}">${special_att['text']}</note>`;
         xmleditor.session.insert(xmleditor.getCursorPosition(), tag_output)
       }
     } else {
-      tag_output = '<' + tag;
+      var tag_output = '<' + tag;
       if (tag_attributes.length != 0) {
         for (let i = 0, len = tag_attributes.length; i < len; ++i) {
           if (tag_attributes[i][1] != '' && tag_attributes[i][1] != 'Join') {
@@ -498,6 +511,10 @@ function addTag(type, tag, att_array) {
       } else {
         tag_output += '/>';
         xmleditor.session.insert(xmleditor.getCursorPosition(), tag_output)
+      };
+      if (tag == 'seg') {
+        const note_output = `\n\n<note xml:id="${special_att['target']}">${special_att['text']}</note>`;
+        xmleditor.session.insert({row: xmleditor.session.getLength(), column: 0}, note_output)
       };
     }
 }
