@@ -40,6 +40,8 @@
     "help": "Vertical element used to show groupings of lines that function as a unit.",
     "link": "#Braces",
     "tag_name": "seg",
+    "attribute_name": "type",
+    "attribute_value": "brace",
     "attributes": [
       {
         "name": "text",
