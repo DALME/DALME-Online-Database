@@ -18,17 +18,12 @@ function startEditor() {
   if (typeof transcriber_state == 'undefined') {
       transcriber_state = 'on';
       footer_content = '...';
-      viewer_container = document.getElementById('diva_viewer');
-      editor_container = document.getElementById('editor');
-      tag_menu = document.getElementById('tag-menu');
-      editor_toolbar = document.getElementById('editor-toolbar');
-      author_container = document.getElementById('author');
-      top_panel = document.getElementsByClassName('panel-top');
       maxHeight = $(window).height() - 340;
       editor_mode = 'render';
       edit_mode = 'off';
       folio_array = folio_list;
       folio_idx = 0;
+      resetPanelMetrics();
       tei = new CETEI();
       tei.addBehaviors({
         'tei': {
@@ -40,27 +35,19 @@ function startEditor() {
           'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
           'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
           'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); }, //@resp
-          // 'cb': function(e) {
-          //           cnum = e.getAttribute('n');
-          //           if (cnum == 1) {
-          //               const content = '<div class="column-container"><div class="column">';
-          //           } else {
-          //               const content = '</div><div class="column">';
-          //           };
-          //           return content
-          //       },
           }
       });
       if (folio_array[0].dam_id == 'None') {
-          $(viewer_container).html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
+          $('#diva_viewer').html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
       } else {
-          $(viewer_container).empty();
+          $('#diva_viewer').empty();
           diva = new Diva('diva_viewer', {
              objectData: '/pages/'+folio_array[0].id+'/manifest',
              enableAutoTitle: false,
              enableFullscreen: false,
-             enableKeyScroll: true,
-             blockMobileMove: true,
+             enableKeyScroll: false,
+             blockMobileMove: false,
+             enableSpaceScroll: false,
              enableGotoPage: false,
              enableGridIcon: false,
              enableImageTitles: false,
@@ -70,57 +57,75 @@ function startEditor() {
           });
       };
       if (folio_array[0].tr_id == 'None') {
-          $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
-          $(author_container).html('No transcription available');
+          $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
+          $('#author').html('No transcription available');
           tr_text = '';
       } else {
           $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
               tr_text = data.transcription;
               tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
-                  $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
+                  $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
               });
               $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-              $(author_container).html('Transcribed by '+data.author);
+              $('#author').html('Transcribed by '+data.author);
           }, 'json');
       };
-      $(top_panel).resizable({
+      $('.panel-top').resizable({
           handles: {s: '.splitter-horizontal'},
           maxHeight: maxHeight,
           minHeight: 200,
-          resize: function(e, ui) {
-              diva_state = diva.getState();
-              const parent = ui.element.parent();
-              const remainingSpace = parent.height() - ui.element.outerHeight();
-              const divTwo = ui.element.next();
-              const divTwoHeight = (remainingSpace - (divTwo.outerHeight() - divTwo.height()));
-              const divTwoPercent = (divTwoHeight-28)/parent.height()*100+"%";
-              divTwo.height(divTwoPercent);
-              $(editor_container).height(divTwoHeight - 56);
-              $(tag_menu).height(divTwoHeight - 56);
-              },
-          stop: function (e, ui) {
-            const parent = ui.element.parent();
-            ui.element.css({ height: ui.element.height()/parent.height()*100+"%", });
-            // window.dispatchEvent(new Event('resize'));
-            diva.setState(diva_state);
-            }
+          resize: function(e, ui) { resizeEditor(ui.element.outerHeight()); }
       });
-      window.addEventListener('resize', function () { resizeEditor(); }, false);
+      window.addEventListener('resize', function () {
+          if (window_height != $(window).height() || window_width != $(window).width()) {
+              maxHeight = $(window).height() - 340;
+              const c_height = $('#tr_editor').height() - $('#viewer-toolbar').outerHeight();
+              const new_top_height = c_height * ( top_height / container_height * 100 ) / 100;
+              $('.panel-top').height(new_top_height);
+              resizeEditor(new_top_height);
+              if (top_width & 1) {
+                $('#diva_viewer').width(top_width + 1);
+                Diva.Events.publish("PanelSizeDidChange");
+              };
+              if (editor_mode == 'xml') { xmleditor.resize() };
+          }
+      }, false);
       Diva.Events.subscribe('DocumentDidLoad', function () { window.dispatchEvent(new Event('resize')); });
   } else {
-    $(author_container).html(footer_content);
+    $('#author').html(footer_content);
   }
 }
 
+function resizeEditor(top_height) {
+    var diva_height = Math.round(top_height - $('.splitter-horizontal').height() + 3);
+    if (diva_height & 1) { diva_height += 1 };
+    const remainingSpace = $('#tr_editor').height() - top_height - $('#viewer-toolbar').outerHeight();
+    $('.panel-bottom').height(remainingSpace);
+    $('#diva_viewer').height(diva_height);
+    $('#editor').height(remainingSpace - $('#editor-toolbar').outerHeight());
+    $('#tag-menu').height(remainingSpace - $('#editor-toolbar').outerHeight());
+    if (editor_mode == 'xml') { xmleditor.resize() };
+    resetPanelMetrics();
+}
+
+function resetPanelMetrics() {
+  window_height = $(window).height();
+  window_width = $(window).width();
+  container_height = $('#tr_editor').height() - $('#viewer-toolbar').outerHeight();
+  top_height = $('.panel-top').outerHeight();
+  bottom_height = $('.panel-bottom').outerHeight();
+  top_width = $('.panel-top').width();
+}
+
 function cleanFooter() {
-  footer_content = $(author_container).html();
-  $(author_container).html('');
+  footer_content = $('#author').html();
+  $('#author').html('');
 }
 
 function changeEditorMode() {
   if (editor_mode == 'render') {
       editor_mode = 'xml';
-      $(editor_container).empty();
+      $('#editor').empty();
       $('#btn_edit').html('<i class="fa fa-eye fa-fw"></i> View');
       xmleditor = ace.edit("editor");
       setEditorOptions();
@@ -140,11 +145,11 @@ function changeEditorMode() {
       $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
       if (tr_text != '') {
         tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
-            $(editor_container).removeClass("justify-content-center").addClass("justify-content-left").html(text);
+            $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
         });
       } else {
-        $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
-        $(author_container).html('No transcription available');
+        $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
+        $('#editor').html('No transcription available');
       };
       $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
   }
@@ -152,9 +157,10 @@ function changeEditorMode() {
 
 function changeEditorImage(target) {
   if (folio_array[target].dam_id == 'None') {
-      $(viewer_container).html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
+      $('#diva_viewer').html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
   } else {
       diva.changeObject('/pages/'+folio_array[target].id+'/manifest');
+      diva.setZoomLevel(2);
   }
 }
 
@@ -167,8 +173,8 @@ function changeEditorFolio(target) {
     var next = target + 1 >= total ? '' : target + 1;
     if (folio_array[target].tr_id == 'None') {
         if (editor_mode == 'xml') { changeEditorMode() };
-        $(editor_container).html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
-        $(author_container).html('No transcription available');
+        $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
+        $('#author').html('No transcription available');
         tr_text = '';
         $('#btn_prevFolio').attr('value', prev);
         $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
@@ -184,7 +190,7 @@ function changeEditorFolio(target) {
             tr_text = data.transcription;
             if (editor_mode == 'render') {
                 tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
-                    $(editor_container).html(text);
+                    $('#editor').html(text);
                 });
                 $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
             } else if (editor_mode == 'xml') {
@@ -193,7 +199,7 @@ function changeEditorFolio(target) {
                 xmleditor.session.getUndoManager().reset();
                 updateEditorToolbar();
             }
-            $(author_container).html('Transcribed by '+data.author);
+            $('#author').html('Transcribed by '+data.author);
             $('#btn_prevFolio').attr('value', prev);
             $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
             $('#folio-menu').find('.current-folio').removeClass('current-folio');
@@ -203,7 +209,6 @@ function changeEditorFolio(target) {
             changeEditorImage(target);
             folio_idx = target;
             $(document.body).css('cursor', 'default');
-            //window.dispatchEvent(new Event('resize'));
         });
     }
   }
@@ -313,7 +318,7 @@ function saveEditor() {
       }).done(function(data, textStatus, jqXHR) {
           folio_array[folio]['tr_id'] = data['id'];
           folio_array[folio]['tr_version'] = data['version'];
-          $(author_container).html('Transcribed by '+data['author']);
+          $('#author').html('Transcribed by '+data['author']);
       }).fail(function(jqXHR, textStatus, errorThrown) {
         if (errorThrown == "Forbidden") {
           toastr.error("You do not have the required permissions to save this transcription.");
@@ -346,13 +351,6 @@ function undoEditor() {
 function redoEditor() {
   xmleditor.redo();
   updateEditorToolbar();
-}
-
-function resizeEditor() {
-  maxHeight = $(window).height() - 340;
-  if (editor_mode == 'xml') {
-      xmleditor.resize();
-  }
 }
 
 function setTagMenu(action) {
