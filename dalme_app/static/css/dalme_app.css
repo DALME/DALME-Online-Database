@@ -3259,7 +3259,7 @@ li#searchIcon.show a {
 .panel-bottom {
   flex: 1 1 auto;
   height: calc(100vh - 543px); /*topbar+tb-margin+card-header+panel-top+card-margin = 24+24+45+400+16 all -9 adjustment*/
-  padding-top: 4px;
+  /* padding-top: 4px; */
 }
 
 .panel-left {
@@ -3281,8 +3281,8 @@ li#searchIcon.show a {
 
 .splitter-horizontal {
   flex: 0 0 auto;
-  height: 10px !important;
-  background: url(./horizontalgrip.png) center center/33px 6px no-repeat #e8e9ec;
+  height: 15px !important;
+  background: url(./horizontalgrip.png) center 2px/30px 6px no-repeat #e8e9ec;
   cursor: row-resize !important;
   border-top: 1px solid #a5a5a5;
   border-bottom: 1px solid #a5a5a5;
@@ -3290,8 +3290,8 @@ li#searchIcon.show a {
 
 .splitter-vertical {
   flex: 0 0 auto;
-  width: 10px !important;
-  background: url(./verticalgrip.png) center center/6px 33px no-repeat #e8e9ec;
+  width: 15px !important;
+  background: url(./verticalgrip.png) 2px center/6px 30px no-repeat #e8e9ec;
   cursor: col-resize !important;
   border-right: 1px solid #a5a5a5;
   border-left: 1px solid #a5a5a5;
