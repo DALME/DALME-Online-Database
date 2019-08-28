@@ -332,6 +332,7 @@ function full_screen_mode(action) {
         elem.msRequestFullscreen();
       };
     document.getElementById('fullScreenToggle').innerHTML = '<a class="nav-link" href="#" role="button" onclick="full_screen_mode(\'off\')"><i class="fas fa-compress fa-g"></i></a>';
+    window.dispatchEvent(new Event('resize'));
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -343,6 +344,7 @@ function full_screen_mode(action) {
       document.msExitFullscreen();
     };
     document.getElementById("fullScreenToggle").innerHTML = '<a class="nav-link" href="#" role="button" onclick="full_screen_mode(\'on\')"><i class="fas fa-expand fa-g"></i></a>';
+    window.dispatchEvent(new Event('resize'));
   }
 }
 
