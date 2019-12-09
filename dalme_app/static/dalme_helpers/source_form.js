@@ -375,12 +375,22 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
         $.get("/api/options/?target=attribute_optexp_"+selected+"&format=json", function ( data ) {
             var choices = data.attribute_optexp;
             type_container.after('<div class="formset-field-container flex-fill" data-editor-template="attributes.'+id+'.value_'+type+'"></div>');
-            source_editor.add({
-                    label: "Attribute value",
-                    name: "attributes."+id+".value_STR",
-                    type: "selectize",
-                    options: choices
-                  });
+            if (selected == 28) {
+                // This is a horrible hack to deal with the problem of autocompletes,
+                source_editor.add({
+                        label: "Attribute value",
+                        name: "attributes."+id+".value_STR",
+                        type: "autoComplete",
+                        opts: {source: choices}
+                      });
+            } else {
+                source_editor.add({
+                        label: "Attribute value",
+                        name: "attributes."+id+".value_STR",
+                        type: "selectize",
+                        options: choices
+                      });
+            };
             if (typeof attribute !== 'undefined') {
                 source_editor.set("attributes."+id+".value_STR", attribute['value_STR']);
             };
