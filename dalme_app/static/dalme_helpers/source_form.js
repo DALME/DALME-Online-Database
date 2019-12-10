@@ -523,7 +523,7 @@ function create_from_images() {
             "value_STR": "",
             "attribute_name": "Record type (record_type)",
             "data_type": "STR",
-            "options_list": ""
+            "options_list": "list(set(list(Attribute.objects.filter(attribute_type=28).values_list('value_STR', flat=True))))"
           },
           {
             "attribute_type": 29,
