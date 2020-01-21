@@ -377,7 +377,7 @@ class AttributeTypes(DTViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.request.GET.get('content_type') is not None:
+        if self.request.GET.get('filter') is not None and self.request.GET['filter'].split(',')[0] == 'content_type':
             serializer = ContentXAttributeSerializer
         else:
             serializer = self.serializer_class
