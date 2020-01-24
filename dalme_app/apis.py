@@ -109,7 +109,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                     result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\',' + str(next_stage) + ')">\
                     begin ' + stage_dict[next_stage] + '</button>'
             elif action == 'begin_stage':
-                stage = int(self.request.POST['code']) + 1
+                stage = int(self.request.POST['code'])
                 stage_name = stage_dict[stage]
                 object.stage = stage
                 object.last_user = request.user
