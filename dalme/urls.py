@@ -33,6 +33,7 @@ router.register(r'attachments', apis.Attachments, basename='attachments')
 router.register(r'tickets', apis.Tickets, basename='tickets')
 router.register(r'comments', apis.Comments, basename='comments')
 router.register(r'workflow', apis.WorkflowManager, basename='workflow')
+router.register(r'datasets', apis.Datasets, basename='datasets')
 
 urlpatterns = [
     path('api/', include(router.urls)),
