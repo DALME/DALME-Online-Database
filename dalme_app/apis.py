@@ -999,7 +999,8 @@ class Sources(DTViewSet):
             for i in content_types:
                 q_obj |= Q(type=i.pk)
             if type == 'records':
-                queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages'))
+                # queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages'))
+                queryset = queryset.filter(q_obj).annotate(no_folios=Count('pages', filter=Q(pages__source__isnull=False)))
             else:
                 queryset = queryset.filter(q_obj)
         else:
