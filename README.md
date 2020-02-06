@@ -69,6 +69,11 @@ mysql> SELECT username, id FROM auth_user;
 mysql> UPDATE auth_user SET is_superuser = 1 WHERE id = $YOUR_USER_PK;
 ```
 
+Change your local password if you need to.
+```
+$ python manage.py changepassword $YOUR_USERNAME
+```
+
 6. Source the environment settings.
 ```
 source ./env
