@@ -47,23 +47,29 @@ source ~/virtualenvs/dalme/bin/activate
 
 4. Get a copy of the `env` and `db.cnf` files from someone else in the project and place it in the root of the repository's directory.
 
-5. Prime your filesystem for logging:
+5. Prime your filesystem for logging.
 ```
 sudo mkdir /var/log/django && \
   sudo touch /var/log/django/dalme_app.log && \
   sudo chown -R $(whoami) /var/log/django
 ```
 
-6. Restore the db dump and create the application db user:
+6. Source the environment settings.
+```
+source ./env
+```
+
+7. Restore the db dump and create the application db user.
 ```
 $ mysql -u root < path_to_db_dump.sql
 $ mysql -u root
-# Where `$PASSWORD` == `password` found in the `db.cnf` file.
+-- Where `$PASSWORD` == `password` found in the `db.cnf` file.
 mysql> CREATE USER 'dalme_app'@'localhost' IDENTIFIED BY '$PASSWORD';
 mysql> GRANT ALL PRIVILEGES ON ebdb.* TO 'dalme_app'@'localhost';
 mysql> FLUSH PRIVILEGES;
--- While we are in the mysql shell let's set your `User` record (which should already be there) as a local superuser.
--- First find the pk of your row.
+-- While we are in the mysql shell let's set your `User` record (which should
+-- already be in the database dump) as a local superuser.
+-- First find the pk of your row and then update it.
 mysql> USE ebdb;
 mysql> SELECT username, id FROM auth_user;
 mysql> UPDATE auth_user SET is_superuser = 1 WHERE id = $YOUR_USER_PK;
@@ -74,17 +80,14 @@ Change your local password if you need to.
 $ python manage.py changepassword $YOUR_USERNAME
 ```
 
-6. Source the environment settings.
+If you don't already have a record in the database, create one.
 ```
-source ./env
-```
-
-7. Test the local development setup.
-python manage.py runserver
-```
-
-8. If you don't already have a user account, you can create one with:
 python manage.py createsuperuser
+```
+
+8. Test the local development setup.
+```
+python manage.py runserver
 ```
 
 If you create a new terminal to do this, you'll need to make sure that you're in your environment with `source ~/virtualenvs/dalme/bin/activate`.
