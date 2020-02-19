@@ -1,0 +1,54 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load static %}
+
+{% block styles %}
+  {{ block.super }}
+  <link href="{% static 'css/diva.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block title %}{{ source.name }}{% endblock %}
+
+{% block header %}
+  {% include "dalme_public/includes/_source_header.html" %}
+{% endblock %}
+
+{% block side_column %}
+  {% include "dalme_public/includes/_source_metadata.html" %}
+  {% include "dalme_public/includes/_source_related.html" %}
+{% endblock %}
+
+{% block main_column %}
+  {% include "dalme_public/includes/_source_canvas.html" %}
+  {% include "dalme_public/includes/_source_transcription.html" %}
+{% endblock %}
+
+{% block js_footer %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
+  <script>
+    var uid = '{{ uid|safe }}';
+    var pageId = '{{ page_id|safe }}';
+    if (!pageId) {
+      var warning = 'There is no image associated with this folio/page.';
+      document.getElementById('diva_viewer')
+        .html(`<div class="">${warning}</div>`);
+    } else {
+      diva = new Diva('diva_viewer', {
+        objectData: `/pages/${pageId}/manifest`,
+        enableAutoTitle: false,
+        enableFullscreen: false,
+        enableKeyScroll: false,
+        blockMobileMove: false,
+        enableSpaceScroll: false,
+        enableGotoPage: false,
+        enableGridIcon: false,
+        enableGridControls: false,
+        enableImageTitles: false,
+        enableToolbar: true,
+        tileHeight: 1000,
+        tileWidth: 1000,
+        zoomLevel: 3,
+      });
+    }
+  </script>
+{% endblock %}

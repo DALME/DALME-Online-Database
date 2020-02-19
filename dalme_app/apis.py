@@ -754,7 +754,7 @@ class Options(viewsets.ViewSet):
     def json_file(self, **kwargs):
         if self.request.GET.get('name') is not None:
             filename = self.request.GET['name']
-            file = os.path.join('dalme_app', 'templates', 'json', filename + '.json')
+            file = os.path.join('templates', 'json', filename + '.json')
         with open(file, 'r') as fp:
             output = json.load(fp)
         return output

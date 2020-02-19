@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css?family=Merriweather:300,300i,400,400i,700,700i,900,900i&display=swap&subset=latin-ext');
+
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style-type: none;
+}
+
+/* Utilities */
+.u-flex {
+  display: flex;
+}
+
+/* Site */
+body {
+  font-family: 'Merriweather', serif;
+  min-height: 100vh;
+}
+
+nav {
+  background: #23476a;
+  color: #999;
+  z-index: 100;
+}
+
+.nav-menu {
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 1em;
+}
+
+img.logo {
+  background: #fff;
+  height: 1.6rem;
+  margin: 0.5em 0;
+}
+
+.nav-logo > a {
+  justify-content:center;
+  align-items:center;
+  color: #fff;
+  font-size: 1.6rem;
+  text-decoration: none;
+}
+
+.nav-logo p {
+  margin-left: 0.33em;
+}
+
+ul > li:nth-child(2) {
+  margin-left: auto;
+}
+
+ul > li:not(:first-child) {
+  padding-right: 3em;
+}
+
+header.source-header {
+  padding: 2em 4em;
+  background: #369;
+}
+
+header.source-header h1 {
+  margin: 0;
+  font-size: 36pt;
+  color: #fff;
+}
+
+article {
+  margin: 2em 4em;
+}
+
+.side-column {
+  flex-grow: 1;
+  margin-right: 4em;
+  max-width: 20%;
+}
+
+.side-column > aside {
+  background: #eeeecb;
+  padding: 1em;
+}
+
+.side-column h3, h4 {
+  color: #346599;
+}
+
+.side-column h4 {
+  margin: 0.66em 0 0.165em 0;
+}
+
+.side-column aside:first-child  {
+  margin-bottom: 1em;
+}
+
+.main-column {
+  flex-grow: 2;
+}
+
+.main-column > section {
+  flex-grow: 1;
+  width: 50%;
+}
+
+.side-column,
+.source-metadata,
+.source-related,
+.source-canvas,
+.source-transcription {
+  flex-direction: column;
+}
+
+.source-transcription {
+  flex-direction: column;
+  padding: 0 1em;
+}
+
+.source-transcription > h2 {
+  margin-left: auto
+}
+
+.source-transcription > div {
+  margin: 1em 0;
+}
+
+.source-transcription p {
+  margin-bottom: 1em;
+}

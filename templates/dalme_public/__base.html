@@ -1,0 +1,41 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    {% block meta %}
+      <meta charset="utf-8"/>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+      <meta name="description" content=""/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    {% endblock %}
+    <title>
+      {% block title %}DALME{% endblock %}
+    </title>
+    {% block styles %}
+      <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public.css' %}" />
+    {% endblock %}
+  </head>
+
+  <body id="body">
+    <header role="banner">
+      {% block nav %}
+        {% include "dalme_public/includes/_nav.html" %}
+      {% endblock %}
+    </header>
+
+    <main id="main" class="main" role="main">
+      <div class="main-container">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <footer role="contentinfo">
+      {% block footer %}
+        {% include "dalme_public/includes/_footer.html" %}
+      {% endblock %}
+      {% block js_footer %}
+      {% endblock %}
+    </footer>
+  </body>
+</html>

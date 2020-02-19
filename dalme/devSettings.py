@@ -41,7 +41,6 @@ ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io',
 CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
-    'dalme_app.application.DalmeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,7 +64,12 @@ INSTALLED_APPS = [
     'rest_framework',
     #'oidc_provider',
     'storages'
+
+    'dalme_app.application.DalmeConfig',
+    'dalme_public.application.DalmePublicConfig',
 ]
+if DEBUG:
+    INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
     # 'corsheaders.middleware.CorsMiddleware',

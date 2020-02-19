@@ -33,7 +33,6 @@ DEBUG = False
 ALLOWED_HOSTS = ['.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
 
 INSTALLED_APPS = [
-    'dalme_app.application.DalmeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,6 +45,10 @@ INSTALLED_APPS = [
     'django_celery_results',
     'rest_framework',
     'storages'
+    'storages',
+
+    'dalme_app.application.DalmeConfig',
+    'dalme_public.application.DalmePublicConfig',
 ]
 
 MIDDLEWARE = [
