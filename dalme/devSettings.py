@@ -69,7 +69,9 @@ INSTALLED_APPS = [
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
 ]
-if DEBUG:
+
+ENABLE_DJANGO_EXTENSIONS = bool(int(os.environ.get("ENABLE_DJANGO_EXTENSIONS", "1")))
+if DEBUG and ENABLE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
