@@ -20,6 +20,10 @@ ul {
   display: flex;
 }
 
+.u-grid {
+  display: grid;
+}
+
 /* Site */
 body {
   font-family: 'Merriweather', serif;
@@ -27,9 +31,23 @@ body {
 }
 
 nav {
-  background: #23476a;
-  color: #999;
+  color: #f2e4e4;
   z-index: 100;
+  background-color: #2f333c;
+  background-image: linear-gradient(59deg, #11587c 24.62%, #1b1b1b);
+  background-size: cover;
+}
+
+nav a, nav a:visited {
+  color: #f2e4e4;
+}
+
+.nav-logo a, .nav-logo a:visited {
+  color: #fff;
+}
+
+main a, main a:visited {
+  color: #0361aa;
 }
 
 .nav-menu {
@@ -40,7 +58,7 @@ nav {
 
 img.logo {
   background: #fff;
-  height: 1.6rem;
+  height: 1.6em;
   margin: 0.5em 0;
 }
 
@@ -53,14 +71,20 @@ img.logo {
 }
 
 .nav-logo p {
-  margin-left: 0.33em;
+  font-family: Academy Engraved LET;
+  font-size: 27px;
+  margin-left: 1rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .05rem;
 }
 
-ul > li:nth-child(2) {
+nav ul > li:nth-child(2) {
   margin-left: auto;
 }
 
-ul > li:not(:first-child) {
+nav ul > li:not(:first-child) {
   padding-right: 3em;
 }
 
@@ -102,6 +126,14 @@ article {
   margin-bottom: 1em;
 }
 
+.source-related p:first-of-type {
+  margin: 0.66em 0 0.165em 0;
+}
+
+.source-related p {
+  margin: 0.33em 0 0.165em 0;
+}
+
 .main-column {
   flex-grow: 2;
 }
@@ -134,4 +166,43 @@ article {
 
 .source-transcription p {
   margin-bottom: 1em;
+}
+
+.source-list {
+  border-collapse: collapse;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  min-width: 100%;
+}
+
+.source-list-pagination {
+  margin-top: 0.66em;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.step-links > span {
+  margin: 0 1em;
+}
+
+.source-list-row {
+  margin-bottom: 1em;
+}
+
+.source-list-row.header {
+  font-weight: bold;
+}
+
+.source-list thead, tbody, tr {
+  display: contents;
+}
+
+.source-list th, td {
+  border: 1px solid #e8e8e9;
+  padding: 0.4em 0.66em;
+}
+
+.source-list th {
+  position: sticky;
+  top: 0;
+  text-align: left;
 }

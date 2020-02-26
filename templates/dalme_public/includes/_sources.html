@@ -1,0 +1,24 @@
+<table class="u-grid source-list">
+  <thead>
+    <tr>
+      <th><strong>Name</strong></th>
+      <th><strong>Short Name<strong></th>
+      <th><strong>Type</strong></th>
+      <th><strong>Parent</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for source in page_obj %}
+      <tr>
+        <td>
+          <a href="{% url 'dalme_public:source_detail' pk=source.pk %}">
+            {{ source.name }}
+          </a>
+        </td>
+        <td>{{ source.short_name }}</td>
+        <td>{{ source.type.name }}</td>
+        <td>{% if source.parent %}{{ source.parent }}{% endif %}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
