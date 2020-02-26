@@ -415,3 +415,6 @@ if "LOG_TO_STDOUT" in os.environ:
             },
         },
     }
+
+if "HEROKU_APP_NAME" in os.environ:
+    ALLOWED_HOSTS = ["*"]
