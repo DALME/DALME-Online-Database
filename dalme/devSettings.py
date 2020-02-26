@@ -395,3 +395,21 @@ MESSAGE_TAGS = {
 
 #django-crispy_forms settings
 #CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+if "LOG_TO_STDOUT" in os.environ:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
