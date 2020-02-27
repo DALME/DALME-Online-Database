@@ -28,6 +28,12 @@ ul {
 body {
   font-family: 'Merriweather', serif;
   min-height: 100vh;
+  flex-direction: column;
+}
+
+.main {
+  margin-bottom: 4em;
+  flex: 1 0 auto;
 }
 
 nav {
@@ -208,7 +214,8 @@ article {
 
 footer {
   bottom: 0;
-  width: 100%;
+  width:100vw;
+  margin-bottom:0;
 }
 
 footer > div {
