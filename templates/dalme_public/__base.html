@@ -31,11 +31,10 @@
     </main>
 
     <footer role="contentinfo">
-      {% block footer %}
-        {% include "dalme_public/includes/_footer.html" %}
-      {% endblock %}
-      {% block js_footer %}
-      {% endblock %}
+      {% include "dalme_public/includes/_footer.html" %}
     </footer>
+
+    {% block js_foot %}{% endblock %}
+
   </body>
 </html>

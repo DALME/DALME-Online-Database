@@ -48,6 +48,6 @@ class SourceDetail(DetailView):
 
         context.update({
             'parent': self.object.parent,
-            'type': self.object.type
+            'type': self.object.type,
         })
         return context

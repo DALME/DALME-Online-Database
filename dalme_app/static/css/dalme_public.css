@@ -202,7 +202,17 @@ article {
 }
 
 .source-list th {
-  position: sticky;
-  top: 0;
   text-align: left;
+}
+
+footer {
+  bottom: 0;
+  width: 100%;
+}
+
+footer > div {
+  color: #696969;
+  background: #ececec;
+  flex-direction: row;
+  padding: 2em 1.5em;
 }
