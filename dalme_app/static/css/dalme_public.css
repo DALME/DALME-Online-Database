@@ -36,6 +36,7 @@ nav {
   background-color: #2f333c;
   background-image: linear-gradient(59deg, #11587c 24.62%, #1b1b1b);
   background-size: cover;
+  top: 1;
 }
 
 nav a, nav a:visited {
