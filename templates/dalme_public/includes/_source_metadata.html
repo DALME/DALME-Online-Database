@@ -4,6 +4,8 @@
   <p>{{ source.name }}</p>
   <h4>Record Type</h4>
   <p>{{ type.name }}</p>
-  <h4>Archive</h4>
-  <p>{{ parent.name }}</p>
+  {% if parent.name %}
+    <h4>Archive</h4>
+    <p>{{ parent.name }}</p>
+  {% endif %}
 </aside>

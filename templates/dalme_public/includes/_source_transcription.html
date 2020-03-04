@@ -1,12 +1,1 @@
-<section class="source-transcription u-flex">
-  <h2>{{ page.name }}</h2>
-  <div>
-    {% if transcription %}
-      {% for line in transcription %}
-        <p>{{ line|safe }}</p>
-      {% endfor %}
-    {% else %}
-      <h3>There is no transcription associated with this folio/page.</h3>
-    {% endif %}
-  </div>
-</section>
+<section id="tei-transcription" class="source-transcription"></section>

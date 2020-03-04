@@ -4,6 +4,7 @@
 {% block styles %}
   {{ block.super }}
   <link href="{% static 'css/diva.css' %}" rel="stylesheet">
+  <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block title %}{{ source.name }}{% endblock %}
@@ -25,15 +26,70 @@
 {% block js_foot %}
   {{ block.super }}
   <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
   <script>
-    var uid = '{{ uid|safe }}';
-    var pageId = '{{ page_id|safe }}';
-    if (!pageId) {
-      var warning = 'There is no image associated with this folio/page.';
-      document.getElementById('diva_viewer')
-        .html(`<div class="">${warning}</div>`);
+    // TODO: This is duped from dalme_editor.js.
+    // We need to rethink the entire JS situation.
+    function getTitle(e, tag) {
+      if (e.hasAttribute("unit") && e.hasAttribute("quantity")) {
+        var extent = 'extent ' + e.getAttribute("quantity") + ' ' + e.getAttribute("unit");
+      } else if (e.hasAttribute("extent")) {
+        var extent = 'extent ' + e.getAttribute("extent");
+      };
+      if (e.hasAttribute("reason")) { var reason = e.getAttribute("reason") };
+      if (e.hasAttribute("type")) { var type = e.getAttribute("type") };
+      if (e.hasAttribute("lemma")) { var lemma = '"' + e.getAttribute("lemma") + '"' };
+      if (e.hasAttribute("resp")) { var resp = ' by ' + e.getAttribute("resp") };
+      if (tag == 'word' && type && lemma) {
+        var title = type + ': ' + lemma;
+      } else {
+        var title = tag;
+        if (extent) {
+          title = title + ': ' + extent;
+          if (reason) { title = title + ', ' + reason; };
+        } else if (reason) {
+          title = title + ': ' + reason;
+        } else if (type) {
+          title = title + ': ' + type;
+        } else if (resp) {
+          title = title + resp;
+        }
+      };
+      return title;
+    };
+    var tei = new CETEI();
+    tei.addBehaviors({
+      'tei': {
+        'gap': function(e) { e.setAttribute("title", getTitle(e, 'gap')); e.setAttribute("data-toggle", "tooltip"); }, //@reason, @unit, @quantity, @extent
+        'space': function(e) { e.setAttribute("title", getTitle(e, 'space')); e.setAttribute("data-toggle", "tooltip"); }, //@unit, @quantity, @extent
+        'unclear': function(e) { e.setAttribute("title", getTitle(e, 'unclear')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
+        'supplied': function(e) { e.setAttribute("title", getTitle(e, 'supplied')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
+        'add': function(e) { e.setAttribute("title", getTitle(e, 'addition')); e.setAttribute("data-toggle", "tooltip"); }, //@place
+        'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
+        'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
+        'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); }, //@resp
+      }
+    });
+    var node = document.getElementById('tei-transcription');
+    var transcription = '{{ transcription|escapejs }}';
+    if (transcription === 'None') {
+      var warning = 'There is no transcription associated with this folio/page.';
+      node.innerHTML = `<div><strong>${warning}</strong></div>`;
     } else {
-      diva = new Diva('diva_viewer', {
+      var html = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+transcription+'</body></text></TEI>';
+      tei.makeHTML5(html, function(data) {
+        node.appendChild(data);
+      });
+    };
+  </script>
+  <script>
+    var pageId = '{{ page_id|safe }}';
+    if (pageId === 'False') {
+      var warning = 'There is no image associated with this folio/page.';
+      var node = document.getElementById('diva_viewer')
+      node.innerHTML = `<div class="renderer-warning"><strong>${warning}</strong></div>`;
+    } else {
+      new Diva('diva_viewer', {
         objectData: `/pages/${pageId}/manifest`,
         enableAutoTitle: false,
         enableFullscreen: false,
