@@ -161,7 +161,7 @@ header.source-header h1 {
 }
 
 .renderer-warning {
-  padding-bottom: 1em;
+  padding: 1em 0;
 }
 
 .source-list {

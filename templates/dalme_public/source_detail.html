@@ -32,14 +32,24 @@
     // We need to rethink the entire JS situation.
     function getTitle(e, tag) {
       if (e.hasAttribute("unit") && e.hasAttribute("quantity")) {
-        var extent = 'extent ' + e.getAttribute("quantity") + ' ' + e.getAttribute("unit");
+        var quantity = e.getAttribute("quantity");
+        var unit = e.getAttribute("unit");
+        var extent = 'extent ' + quantity + unit;
       } else if (e.hasAttribute("extent")) {
         var extent = 'extent ' + e.getAttribute("extent");
       };
-      if (e.hasAttribute("reason")) { var reason = e.getAttribute("reason") };
-      if (e.hasAttribute("type")) { var type = e.getAttribute("type") };
-      if (e.hasAttribute("lemma")) { var lemma = '"' + e.getAttribute("lemma") + '"' };
-      if (e.hasAttribute("resp")) { var resp = ' by ' + e.getAttribute("resp") };
+      if (e.hasAttribute("reason")) {
+        var reason = e.getAttribute("reason")
+      };
+      if (e.hasAttribute("type")) {
+        var type = e.getAttribute("type")
+      };
+      if (e.hasAttribute("lemma")) {
+        var lemma = '"' + e.getAttribute("lemma") + '"'
+      };
+      if (e.hasAttribute("resp")) {
+        var resp = ' by ' + e.getAttribute("resp")
+      };
       if (tag == 'word' && type && lemma) {
         var title = type + ': ' + lemma;
       } else {
@@ -60,21 +70,45 @@
     var tei = new CETEI();
     tei.addBehaviors({
       'tei': {
-        'gap': function(e) { e.setAttribute("title", getTitle(e, 'gap')); e.setAttribute("data-toggle", "tooltip"); }, //@reason, @unit, @quantity, @extent
-        'space': function(e) { e.setAttribute("title", getTitle(e, 'space')); e.setAttribute("data-toggle", "tooltip"); }, //@unit, @quantity, @extent
-        'unclear': function(e) { e.setAttribute("title", getTitle(e, 'unclear')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
-        'supplied': function(e) { e.setAttribute("title", getTitle(e, 'supplied')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
-        'add': function(e) { e.setAttribute("title", getTitle(e, 'addition')); e.setAttribute("data-toggle", "tooltip"); }, //@place
-        'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
-        'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
-        'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); }, //@resp
+        'gap': function(e) {
+          e.setAttribute("title", getTitle(e, 'gap'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@reason, @unit, @quantity, @extent
+        'space': function(e) {
+          e.setAttribute("title", getTitle(e, 'space'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@unit, @quantity, @extent
+        'unclear': function(e) {
+          e.setAttribute("title", getTitle(e, 'unclear'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@reason
+        'supplied': function(e) {
+          e.setAttribute("title", getTitle(e, 'supplied'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@reason
+        'add': function(e) {
+          e.setAttribute("title", getTitle(e, 'addition'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@place
+        'abbr': function(e) {
+          e.setAttribute("title", getTitle(e, 'abbreviation'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@type
+        'w': function(e) {
+          e.setAttribute("title", getTitle(e, 'word'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@type, @lemma
+        'quote': function(e) {
+          e.setAttribute("title", getTitle(e, 'quote'));
+          e.setAttribute("data-toggle", "tooltip");
+        }, //@resp
       }
     });
     var node = document.getElementById('tei-transcription');
     var transcription = '{{ transcription|escapejs }}';
     if (transcription === 'None') {
       var warning = 'There is no transcription associated with this folio/page.';
-      node.innerHTML = `<div><strong>${warning}</strong></div>`;
+      node.innerHTML = `<div class="renderer-warning"><strong>${warning}</strong></div>`;
     } else {
       var html = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+transcription+'</body></text></TEI>';
       tei.makeHTML5(html, function(data) {
