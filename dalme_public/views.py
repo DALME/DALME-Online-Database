@@ -42,7 +42,8 @@ class SourceDetail(DetailView):
             source_page = Source_pages.objects.get(source=self.object.id, page=page.id)
             if source_page:
                 transcription = source_page.transcription
-                context.update({'transcription': transcription.transcription or ''})
+                if transcription:
+                    context.update({'transcription': transcription.transcription})
 
         context.update({
             'parent': self.object.parent,
