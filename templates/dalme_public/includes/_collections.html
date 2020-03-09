@@ -1,0 +1,9 @@
+<h2>Our Collections</h2>
+
+<p>DALME currently houses two collections, both of which include a preliminary array of sets.</p>
+
+{% for collection in object_list %}
+  <section>
+    <h3><a>{{ collection.name }}</a></h3>
+  </section>
+{% endfor %}

@@ -108,6 +108,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 #'sekizai.context_processors.sekizai',
                 'dalme_public.context_processors.year',
+                'dalme_public.context_processors.project',
             ],
             'debug': DEBUG,
         },

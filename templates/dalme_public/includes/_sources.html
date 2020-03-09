@@ -1,10 +1,13 @@
+{% load dalme_public_tags %}
+
 <table class="u-grid source-list">
   <thead>
     <tr>
       <th><strong>Name</strong></th>
-      <th><strong>Short Name<strong></th>
       <th><strong>Type</strong></th>
-      <th><strong>Parent</strong></th>
+      <th><strong>Date</strong></th>
+      <th><strong>Transcription</strong></th>
+      <th><strong>Image</strong></th>
     </tr>
   </thead>
   <tbody>
@@ -15,9 +18,20 @@
             {{ source.name }}
           </a>
         </td>
-        <td>{{ source.short_name }}</td>
-        <td>{{ source.type.name }}</td>
-        <td>{% if source.parent %}{{ source.parent }}{% endif %}</td>
+        <td>{% get_source_type source %}</td>
+        <td>{% get_source_date source %}</td>
+        {% source_has_transcription source as has_transcription %}
+        {% if has_transcription %}
+          <td><i class="fa fa-check"></i></td>
+        {% else %}
+          <td><i class="fa fa-times"></i></td>
+        {% endif %}
+        {% source_has_image source as has_image %}
+        {% if has_image %}
+          <td><i class="fa fa-check"></i></td>
+        {% else %}
+          <td><i class="fa fa-times"></i></td>
+        {% endif %}
       </tr>
     {% endfor %}
   </tbody>

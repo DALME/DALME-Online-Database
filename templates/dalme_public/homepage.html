@@ -1,0 +1,19 @@
+{% extends "dalme_public/layouts/__twin_side_columns.html" %}
+
+{% block title %}DALME{% endblock %}
+
+{% block header %}
+  {% with project as header_text %}
+    {% include "dalme_public/includes/_source_header.html" %}
+  {% endwith %}
+{% endblock %}
+
+{% block left_side_column %}
+{% endblock %}
+
+{% block main_column %}
+    {% include "dalme_public/includes/_dalme_intro.html" %}
+{% endblock %}
+
+{% block right_side_column %}
+{% endblock %}

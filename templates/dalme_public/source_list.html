@@ -3,6 +3,10 @@
 {% block title %}Resource List{% endblock %}
 
 {% block main_column %}
-  {% include "dalme_public/includes/_sources.html" %}
-  {% include "dalme_public/includes/_pagination.html" %}
+  {% if page_obj %}
+    {% include "dalme_public/includes/_sources.html" %}
+    {% include "dalme_public/includes/_pagination.html" %}
+  {% else %}
+    <p><strong>No resources found.</strong></p>
+  {% endif %}
 {% endblock %}

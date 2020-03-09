@@ -35,7 +35,11 @@ body {
   flex: 1 0 auto;
 }
 
-nav {
+main a,
+main a:visited {
+  color: #0}
+
+nav.header-nav {
   color: #f2e4e4;
   z-index: 100;
   background-color: #2f333c;
@@ -44,32 +48,14 @@ nav {
   top: 1;
 }
 
-nav a, nav a:visited {
+nav.header-nav a,
+nav.header-nav a:visited {
   color: #f2e4e4;
 }
 
-.nav-logo a, .nav-logo a:visited {
+nav.header-nav .nav-logo a,
+nav.header-nav .nav-logo a:visited {
   color: #fff;
-}
-
-main a, main a:visited {
-  color: #0361aa;
-}
-
-.nav-menu {
-  flex-direction: row;
-  align-items: center;
-  flex-wrap: wrap;
-  margin: 0 1em;
-}
-
-img.logo {
-  background: #fff;
-  height: 1.6em;
-  margin: 0.5em 0;
-}
-
-.nav-logo > a {
   flex-direction: row;
   justify-content:center;
   align-items:center;
@@ -78,7 +64,7 @@ img.logo {
   text-decoration: none;
 }
 
-.nav-logo p {
+nav.header-nav .nav-logo p {
   font-family: Academy Engraved LET;
   font-size: 27px;
   margin-left: 1rem;
@@ -88,16 +74,49 @@ img.logo {
   letter-spacing: .05rem;
 }
 
-nav ul > li:nth-child(2) {
+nav.header-nav .nav-menu {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 1em;
+}
+
+nav.header-nav img.logo {
+  background: #fff;
+  height: 1.6em;
+  margin: 0.5em 0;
+}
+
+nav.header-nav ul > li:nth-child(2) {
   margin-left: auto;
 }
 
-nav ul > li:not(:first-child) {
+nav.header-nav ul > li:not(:first-child) {
   padding-right: 3em;
 }
 
 header.source-header {
   background: #369;
+}
+
+/* TODO: Update image for each archive by set_name on class. */
+header.source-header.florence {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url(https://cache.marriott.com/marriottassets/destinations/hero/florence-it-destination.jpg);
+  background-position: right center;
+}
+
+header.source-header > .wrapper {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+header .collection {
+  font-style: italic;
+}
+
+header .collection a {
+  color: #eeeecc;
+  text-shadow: 1px 1px 0px #000;
 }
 
 header.source-header h1 {
@@ -107,6 +126,10 @@ header.source-header h1 {
   color: #fff;
 }
 
+.main-container article {
+  margin-bottom: 2em;
+}
+
 .side-column {
   flex-direction: column;
   flex: 0 0 calc(100% / 3 * 0.5);
@@ -114,7 +137,7 @@ header.source-header h1 {
 
 .side-column > aside {
   background: #eeeecb;
-  padding: 1em;
+  padding: 0.66em 1em;
 }
 
 .side-column h3, h4 {
@@ -126,30 +149,47 @@ header.source-header h1 {
 }
 
 .source-related {
-  margin-left: 0;
-  width: auto;
-}
-
-.source-related p:first-of-type {
-  margin: 0.66em 0 0.165em 0;
+  background: #eeeecb;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 0.66em;
+  width: 100%;
 }
 
 .source-related p {
-  margin: 0.33em 0 0.165em 0;
+  padding: 0.66em;
 }
 
 .main-column {
+  flex-direction: column;
   flex-grow: 1;
-  margin: 1em;
+  margin: 0 1em;
 }
 
-.main-column > section {
+.viewers-container {
+  flex-direction: column;
+}
+
+.viewers-container > section {
   width: 100%;
 }
 
+.source-list-nav,
 .source-metadata {
-  margin-bottom: 0;
+  margin-bottom: 0.5em;
   width: 100%;
+}
+
+.source-list-nav > nav {
+  text-align: end;
+}
+
+.source-transcription {
+  padding: 1.8em 3em;
+}
+
+.source-transcription.empty {
+  padding: 0;
 }
 
 .source-transcription > h2 {
@@ -166,8 +206,9 @@ header.source-header h1 {
 
 .source-list {
   border-collapse: collapse;
-  grid-template-columns: 2fr 1fr 1fr 2fr;
+  grid-template-columns: 2fr 1fr 1fr 0.25fr 0.25fr;
   min-width: 100%;
+  margin-top: 2em;
 }
 
 .source-list-pagination {
@@ -201,6 +242,10 @@ header.source-header h1 {
   text-align: left;
 }
 
+.source-list .fa {
+  font-size: 0.8rem;
+}
+
 footer {
   margin: 0;
 }
@@ -222,28 +267,11 @@ footer > div {
   header.source-header h1 {
     padding: 0;
   }
-
-  .source-metadata {
-    margin-bottom: 1em;
-  }
 }
 
 @media only screen and (min-width: 900px) {
   header.source-header {
     padding: 2em 2em;
-  }
-
-  .side-column {
-    flex-direction: row;
-  }
-
-  .source-related {
-    margin-left: auto;
-    width: 25%;
-  }
-
-  .source-metadata {
-    margin-bottom: 0em;
   }
 }
 
@@ -263,16 +291,18 @@ footer > div {
 
   .main-column {
     margin: 0;
+  }
+
+  .viewers-container {
     flex-direction: row;
   }
 
-  .main-column > section {
+  .viewers-container > section {
     width: 50%;
   }
 
-  .source-related {
-    margin-left: 0;
-    width: auto;
+  .source-list-nav > nav {
+    text-align: start;
   }
 
   .side-column {
@@ -280,14 +310,11 @@ footer > div {
     margin-right: 4em;
   }
 
+  .source-list-nav,
   .source-metadata {
     margin-bottom: 1em;
   }
 
-  .source-transcription,
-  .source-viewer > .renderer-warning {
-    padding: 1.8em 3em;
-  }
 }
 
 @media only screen and (min-width: 1800px) {

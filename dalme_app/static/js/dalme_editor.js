@@ -61,6 +61,7 @@ function startEditor() {
           $('#author').html('No transcription available');
           tr_text = '';
       } else {
+          debugger;
           $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
               tr_text = data.transcription;
               tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {

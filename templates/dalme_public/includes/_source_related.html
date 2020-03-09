@@ -1,18 +1,17 @@
-<aside class="source-related u-flex">
-  <h3>Related Pages</h3>
-  {% if related|length_is:"0" or related|length_is:"1" %}
-    <p>No related pages.</p>
-  {% else %}
-    {% for related_page, parameter in related %}
-      {% if related_page.pk == page.pk %}
-        <p>{{ page.name }} (current page)</p>
-      {% else %}
-        <p>
-          <a href="{% url 'dalme_public:source_detail' pk=source.pk %}{{ parameter }}" />
-            {{ related_page.name }}
-          </a>
-        </p>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-</aside>
+  <nav class="source-related u-flex">
+    {% if related|length < 1 %}
+      <p>No related pages.</p>
+    {% else %}
+      {% for related_page, parameter in related %}
+        {% if related_page.pk == page.pk %}
+          <p>{{ page.name }}</p>
+        {% else %}
+          <p>
+            <a href="{% url 'dalme_public:source_detail' pk=source.pk %}{{ parameter }}" />
+              {{ related_page.name }}
+            </a>
+          </p>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </nav>
