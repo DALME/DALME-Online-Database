@@ -1,5 +1,5 @@
   <nav class="source-related u-flex">
-    {% if related|length < 1 %}
+    {% if related|length == 1 %}
       <p>No related pages.</p>
     {% else %}
       {% for related_page, parameter in related %}

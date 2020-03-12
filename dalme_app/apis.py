@@ -1,5 +1,3 @@
-from django.contrib.auth.models import User
-from django.db.models import Q, Count
 import uuid
 import datetime
 import json
@@ -7,30 +5,31 @@ import ast
 import operator
 import os
 from functools import reduce
+
+from django_celery_results.models import TaskResult
+from django.db.models.expressions import RawSQL
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
+from passlib.apps import phpass_context
 from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.permissions import DjangoModelPermissions, IsAuthenticatedOrReadOnly
+
+from dalme_app import functions
 from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, TaskSerializer,
                                    TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
-                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer, CommentSerializer, WorkflowSerializer,
-                                   SetSerializer, RightsSerializer)
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer, CommentSerializer,
+                                   WorkflowSerializer, SetSerializer, RightsSerializer)
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, LanguageReference,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
                               wiki_user_groups, wp_users, wp_usermeta, Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy)
-from django_celery_results.models import TaskResult
-from django.db.models.expressions import RawSQL
-from rest_framework.permissions import DjangoModelPermissions
-from django.shortcuts import get_object_or_404
-from passlib.apps import phpass_context
-from dalme_app import functions
-from django.utils import timezone
-from dalme_app.access_policies import SourceAccessPolicy
-from dalme_app.utils import IsOwnerOrReadOnly
 
 
 class Datasets(viewsets.ViewSet):
@@ -1334,7 +1333,7 @@ class Attachments(viewsets.ModelViewSet):
 
 class Transcriptions(viewsets.ModelViewSet):
     """ API endpoint for managing transcriptions """
-    permission_classes = (DjangoModelPermissions,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Transcription.objects.all()
     serializer_class = TranscriptionSerializer
 
