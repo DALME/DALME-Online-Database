@@ -148,26 +148,71 @@ header.source-header h1 {
   margin: 0.66em 0 0.165em 0;
 }
 
+.source-related-container {
+  flex-direction: row;
+  margin-bottom: 0.66em;
+}
+
 .source-related {
   background: #eeeecb;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(4em, 1fr) );
+}
+
+.source-related-pagination {
+  background: #eeeecb;
+  padding: 0.66em;
+  align-items: center;
+  justify-content: center;
+}
+
+.source-related-pagination.previous {
+  margin-right: 0.33em;
+}
+
+.source-related-pagination.next {
+  margin-left: 0.33em;
+}
+
+.no-related,
+.related-link {
+  align-items: center;
+  justify-content: center;
+  padding: 0.66em;
+}
+
+.related-name {
+  text-align: center;
+}
+
+.related-icons {
   flex-direction: row;
-  flex-wrap: wrap;
-  margin-bottom: 0.66em;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.33em;
   width: 100%;
 }
 
-.source-related p {
-  padding: 0.66em;
+.related-icons .fa-file-alt {
+  margin-left: 0.33em;
+}
+
+.related-icon {
+  color: #616161;
+}
+
+.related-icon.missing {
+  color: #d2d2d2;
 }
 
 .main-column {
   flex-direction: column;
   flex-grow: 1;
-  margin: 0 1em;
 }
 
 .viewers-container {
   flex-direction: column;
+  margin: 0 1em;
 }
 
 .viewers-container > section {
@@ -201,7 +246,7 @@ header.source-header h1 {
 }
 
 .renderer-warning {
-  padding: 1em 0;
+  padding: 3em;
 }
 
 .source-list {
@@ -234,7 +279,6 @@ header.source-header h1 {
 }
 
 .source-list th, td {
-  border: 1px solid #e8e8e9;
   padding: 0.4em 0.66em;
 }
 
@@ -295,6 +339,7 @@ footer > div {
 
   .viewers-container {
     flex-direction: row;
+    margin: 0;
   }
 
   .viewers-container > section {

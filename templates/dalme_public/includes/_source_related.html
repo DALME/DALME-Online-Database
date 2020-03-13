@@ -1,17 +1,47 @@
-  <nav class="source-related u-flex">
-    {% if related|length == 1 %}
-      <p>No related pages.</p>
-    {% else %}
+{% load dalme_public_tags %}
+
+<div class="source-related-container u-flex">
+  {% if has_related %}
+    <div class="source-related-pagination u-flex previous">
+      {% if previous %}
+        <a href="{% url 'dalme_public:source_detail' pk=source.pk %}{{ previous }}">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      {% else %}
+        <i class="fas fa-chevron-left"></i>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <nav class="source-related{% if has_related %} u-grid{% endif %}">
+    {% if has_related %}
       {% for related_page, parameter in related %}
-        {% if related_page.pk == page.pk %}
-          <p>{{ page.name }}</p>
-        {% else %}
-          <p>
+        <div class="related-link u-flex">
+          {% if related_page.pk == page.pk %}
+            <p class="related-name">{{ page.name }}</p>
+            {% annotate_related_page page %}
+          {% else %}
             <a href="{% url 'dalme_public:source_detail' pk=source.pk %}{{ parameter }}" />
-              {{ related_page.name }}
+              <p class="related-name">{{ related_page.name }}</p>
+              {% annotate_related_page related_page %}
             </a>
-          </p>
-        {% endif %}
+          {% endif %}
+        </div>
       {% endfor %}
+    {% else %}
+      <p class="no-related">No related pages.</p>
     {% endif %}
   </nav>
+
+  {% if has_related %}
+    <div class="source-related-pagination u-flex next">
+      {% if next %}
+        <a href="{% url 'dalme_public:source_detail' pk=source.pk %}{{ next }}">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      {% else %}
+        <i class="fas fa-chevron-right"></i>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>

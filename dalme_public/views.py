@@ -36,11 +36,6 @@ class SourceDetail(DetailView):
     model = Source
     template_name = 'dalme_public/source_detail.html'
 
-    def get_object(self, queryset=None):
-        if not hasattr(self, '_object'):
-            self._object = super().get_object()
-        return self._object
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -59,10 +54,19 @@ class SourceDetail(DetailView):
             'page_id': getattr(page, 'pk', False),
         })
 
-        related = [
-            (page, f"?page={idx}") for idx, page in enumerate(page_qs, 1)
-        ]
-        context.update({'related': related})
+        related = [(page, f"?page={idx}") for idx, page in enumerate(page_qs, 1)]
+        has_related = len(related) > 1
+        context.update({
+            'related': related,
+            'has_related': has_related,
+        })
+        if has_related:
+            position = list(page_qs).index(page) + 1
+            is_last = position == page_qs.count()
+            context.update({
+                'previous': None if position == 1 else f"?page={position - 1}",
+                'next': None if is_last else f"?page={position + 1}",
+            })
 
         context.update({'transcription_id': None})
         if page:

@@ -12,11 +12,16 @@ def get_source_date(source):
     }
     start_date = dates.get('start_date', '')
     end_date = dates.get('end_date', '')
-    if not start_date and not end_date:
-        return 'No date'
+
+    if start_date and not end_date:
+        return str(start_date)
+    if end_date and not start_date:
+        return str(end_date)
+    if start_date == end_date:
+        return str(start_date)
     if start_date and end_date:
         return f'{start_date} to {end_date}'
-    return str(start_date) or str(end_date)
+    return ''
 
 
 @register.simple_tag
@@ -44,3 +49,15 @@ def source_has_image(source):
         source_page.page.dam_id
         for source_page in source.source_pages_set.all()
     )
+
+
+@register.inclusion_tag('dalme_public/inclusion/_annotated_related_page.html')
+def annotate_related_page(page):
+    source_page = page.sources.first()
+    has_transcription = (
+        source_page is not None and source_page.transcription is not None
+    )
+    return {
+        'has_image': page.dam_id is not None,
+        'has_transcription': has_transcription,
+    }
