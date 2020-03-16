@@ -1,6 +1,6 @@
 {% extends "dalme_public/layouts/__twin_side_columns.html" %}
 
-{% block title %}Collection{% endblock %}
+{% block title %}{{ object.name }} &mdash; {{ block.super }}{% endblock %}
 
 {% block header %}
   {% with object.name as header_text %}
@@ -12,6 +12,12 @@
 {% endblock %}
 
 {% block main_column %}
+  <div class="public-content">
+    {% with object.description as description %}
+      {% include "dalme_public/includes/_description.html" %}
+    {% endwith %}
+    {% include "dalme_public/includes/_sets.html" %}
+  </div>
 {% endblock %}
 
 {% block right_side_column %}

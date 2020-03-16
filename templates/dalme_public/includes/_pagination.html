@@ -1,17 +1,23 @@
 <div class="source-list-pagination u-flex">
   <span class="step-links">
     {% if page_obj.has_previous %}
-      <a href="?page=1">&laquo; first</a>
-      <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+      <a href="?page=1" class="step-first">&laquo;</a>
+      <a href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
+    {% else %}
+      <span class="step-first inactive">&laquo;</span>
+      <span class="inactive">&lsaquo;</span>
     {% endif %}
 
     <span class="current">
-      Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
     </span>
 
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">next</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      <a href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}" class="step-last">&raquo;</a>
+    {% else %}
+      <span class="inactive">&rsaquo;</span>
+      <span class="inactive" class="step-first inactive">&raquo;</span>
     {% endif %}
   </span>
 </div>

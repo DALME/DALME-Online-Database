@@ -1,19 +1,53 @@
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import DetailView, ListView
 
 from dalme_app.models import Source, Source_pages
-from dalme_public.models import Collection, Set
+from dalme_public.models import Collection, HomePage, Set
 
 
-class HomePage(TemplateView):
+
+def _get_random_source():
+    # TODO: Temporary for stubbing data in templates.
+    import random
+    qs = Source.objects.exclude(type__name__in=['Archive', 'File unit'])
+    qs = qs.exclude(attributes__value_STR__contains='Inventory')
+    return qs[random.randrange(0, qs.count() - 1)]
+
+
+def _get_random_inventory():
+    # TODO: Temporary for stubbing data in templates.
+    import random
+    qs = Source.objects.filter(attributes__value_STR__contains='Inventory')
+    return qs[random.randrange(0, qs.count() - 1)]
+
+
+class PublicHome(DetailView):
+    model = HomePage
     template_name = 'dalme_public/homepage.html'
+
+    def get_object(self):
+        return HomePage.get_solo()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'collections': self.object.collections.all(),
+            'object_of_the_month': _get_random_source(),
+            'inventory_of_the_month': _get_random_inventory(),
+        })
+        return context
 
 
 class CollectionDetail(DetailView):
     model = Collection
     template_name = 'dalme_public/collection_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'sets': self.object.sets.all()})
+        return context
 
 
 class SetDetail(DetailView):

@@ -18,3 +18,4 @@ boto3==1.9.170
 redis==3.4.1
 djangosaml2idp==0.7.2
 drf-access-policy==0.6.1
+django-solo==1.1.3

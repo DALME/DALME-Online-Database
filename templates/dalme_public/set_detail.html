@@ -1,18 +1,42 @@
 {% extends "dalme_public/layouts/__twin_side_columns.html" %}
 
-{% block title %}Set{% endblock %}
+{% block title %}{{ object.name }} &mdash; {{ block.super }}{% endblock %}
 
 {% block header %}
-  {% with set.name as set_name %}
-    {% include "dalme_public/includes/_set_source_header.html" %}
-  {% endwith %}
+  {% include "dalme_public/includes/_set_source_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
+  {% include "dalme_public/includes/_by_numbers.html" %}
+  {% include "dalme_public/includes/_micro_essays.html" %}
 {% endblock %}
 
 {% block main_column %}
+  <div class="public-content">
+    {{ object.description|linebreaks }}
+  </div>
 {% endblock %}
 
 {% block right_side_column %}
+  {% include "dalme_public/includes/_browse_inventories.html" %}
+  {% include "dalme_public/includes/_by_year.html" %}
+  {% include "dalme_public/includes/_by_gender.html" %}
+  {% include "dalme_public/includes/_by_status.html" %}
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.public-content p').each(function() {
+        var text = $(this).text().trim().split(".");
+        var first = text.shift();
+        var annotated = text.length > 0
+          ? `<span class='first-word'>${first}.</span>`
+          : first;
+        $(this).html(annotated + text.join("."));
+      });
+    });
+  </script>
 {% endblock %}

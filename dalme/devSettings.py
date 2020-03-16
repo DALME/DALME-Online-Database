@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'rest_framework',
     #'oidc_provider',
     'storages'
+    'solo',
 
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',

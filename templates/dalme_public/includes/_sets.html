@@ -1,0 +1,9 @@
+{% for set in sets %}
+  <ul class="set-list u-flex">
+    <li class="set-card">
+      <a href="{% url 'dalme_public:set_detail' collection_pk=set.collection.pk pk=set.pk %}">
+        {{ set.name }}
+      </a>
+    </li>
+  </ul>
+{% endfor %}

@@ -1,16 +1,32 @@
 from django.db import models
 
+from solo.models import SingletonModel
+
 
 class ContentPage(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
 
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return self.name
+
+
+class HomePage(ContentPage, SingletonModel):
+    class Meta:
+        verbose_name = "Home"
+
 
 class Collection(ContentPage):
-    pass
+    home = models.ForeignKey(
+        'dalme_public.HomePage',
+        related_name='collections',
+        blank=False,
+        null=False,
+        on_delete=models.CASCADE
+    )
 
 
 class Set(ContentPage):
@@ -21,3 +37,7 @@ class Set(ContentPage):
         null=False,
         on_delete=models.CASCADE
     )
+
+
+class MicroEssay:
+    pass

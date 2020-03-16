@@ -1,6 +1,6 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
 
-{% block title %}Resource List{% endblock %}
+{% block title %}Resource List &mdash; {{ block.super }}{% endblock %}
 
 {% block main_column %}
   {% if page_obj %}

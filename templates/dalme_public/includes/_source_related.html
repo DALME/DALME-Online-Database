@@ -16,17 +16,19 @@
   <nav class="source-related{% if has_related %} u-grid{% endif %}">
     {% if has_related %}
       {% for related_page, parameter in related %}
-        <div class="related-link u-flex">
-          {% if related_page.pk == page.pk %}
+        {% if related_page.pk == page.pk %}
+          <div class="related-link u-flex active">
             <p class="related-name">{{ page.name }}</p>
             {% annotate_related_page page %}
-          {% else %}
+          </div>
+        {% else %}
+          <div class="related-link u-flex">
             <a href="{% url 'dalme_public:source_detail' pk=source.pk %}{{ parameter }}" />
               <p class="related-name">{{ related_page.name }}</p>
               {% annotate_related_page related_page %}
             </a>
-          {% endif %}
-        </div>
+          </div>
+        {% endif %}
       {% endfor %}
     {% else %}
       <p class="no-related">No related pages.</p>
