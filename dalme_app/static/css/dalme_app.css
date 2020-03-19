@@ -2091,6 +2091,7 @@ li.search-field input.default {
   margin-top: auto;
   margin-bottom: auto;
   margin-left: auto;
+  margin-right: auto;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -2105,10 +2106,9 @@ li.search-field input.default {
   text-decoration: underline;
 }
 
-.wf-manager-help {
+.wf-manager-flag {
   border: 0;
   border-left: 1px solid #a5a5a5 !important;
-  margin-left: auto;
   background-color: #e8e9ec;
   padding-left: 10px;
   padding-right: 10px;
@@ -2122,7 +2122,11 @@ li.search-field input.default {
   color: #a34848;
 }
 
-.wf-manager-help_text {
+.wf-public_flag-on {
+  color: #337433;
+}
+
+.wf-manager-flag_text {
   font-weight: 800;
   font-size: 11px;
   display: inline-block;

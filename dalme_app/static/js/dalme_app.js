@@ -28,7 +28,9 @@ function update_workflow(action, code=0) {
         data: { "action": action, "code": code }
     }).done(function(data, textStatus, jqXHR) {
         if (action == 'toggle_help') {
-            $('.wf-manager-help').toggleClass("wf-help_flag-on");
+            $('#wf-manager-help').toggleClass("wf-help_flag-on");
+        } else if (action == 'toggle_public') {
+            $('#wf-manager-public').toggleClass("wf-public_flag-on");
         } else {
             $('.wf-manager-status-container').html(data['status_html']);
             $('.wf-manager-info').html(data['mod_html']);

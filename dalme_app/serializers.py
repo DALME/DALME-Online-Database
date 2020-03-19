@@ -352,7 +352,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workflow
-        fields = ('status', 'help_flag', 'last_modified', 'last_username', 'last_full_name')
+        fields = ('status', 'help_flag', 'is_public', 'last_modified', 'last_username', 'last_full_name')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

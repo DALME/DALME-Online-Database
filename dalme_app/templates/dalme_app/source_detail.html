@@ -69,6 +69,13 @@
     <div class="tab-content h-100">
       <div class="tab-pane card-body active transcription-editor" id="info" role="tabpanel" aria-labelledby="info-tab">
         <div class="row">
+          <div class="col-md-12">
+            {% if has_inv %}
+              {% include "includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="row">
           <div class="col-md-6">
             <div class="card mb-3">
               <div class="sub-card-header">
@@ -110,9 +117,6 @@
             </div>
           </div>
           <div class="col-md-6">
-            {% if has_inv %}
-              {% include "includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
-            {% endif %}
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-info-circle fa-fw"></i> Metadata</div>

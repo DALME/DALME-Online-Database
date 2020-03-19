@@ -130,6 +130,15 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_modified = timezone.now()
                 object.save()
                 functions.update_log(object, 'help flag set to ' + str(object.help_flag))
+            elif action == 'toggle_public':
+                if object.is_public:
+                    object.is_public = False
+                else:
+                    object.is_public = True
+                object.last_user = request.user
+                object.last_modified = timezone.now()
+                object.save()
+                functions.update_log(object, 'public flag set to ' + str(object.is_public))
             elif action == 'change_status':
                 status = int(self.request.POST['code'])
                 prev_status = object.wf_status

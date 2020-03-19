@@ -146,6 +146,9 @@ function workflow_filter(menu, query) {
               break;
           case 'help':
               var val = '{\'workflow__help_flag\':1}';
+              break;
+          case 'public':
+              var val = '{\'workflow__is_public\':1}';
       }
   };
   if (typeof val != 'undefined') {

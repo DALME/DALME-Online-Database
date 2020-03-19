@@ -508,6 +508,7 @@ class Workflow(models.Model):
     markup_done = models.BooleanField(default=False)
     parsing_done = models.BooleanField(default=False)
     review_done = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False)
 
     @property
     def status(self):

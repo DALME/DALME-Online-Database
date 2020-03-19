@@ -1,7 +1,7 @@
 {% load template_helpers %}
 <div class="wf-manager-container">
   <div class="wf-manager-title">
-    <i class="fa fa-code-branch fa-fw"></i> Workflow
+    <i class="fa fa-code-branch fa-fw"></i> Workflow Manager
   </div>
   <div class="wf-manager-controls">
     <div class="wf-manager-status-container">
@@ -17,8 +17,11 @@
     <div class="wf-manager-info">
       <i class="far fa-history fa-fw"></i> {{ workflow.last_modified|htimesince }} | <a href="/users/{{ workflow.last_user.username }}">{{ workflow.last_user.profile.full_name }}</a>
     </div>
-    <button class="wf-manager-help {% if workflow.help_flag %}wf-help_flag-on{% endif %}" role="button" onclick="update_workflow('toggle_help')">
-        <i class="fa fa-flag fa-fw"></i><div class="wf-manager-help_text">Help</div>
+    <button id="wf-manager-public" class="wf-manager-flag {% if workflow.is_public %}wf-public_flag-on{% endif %}" role="button" onclick="update_workflow('toggle_public')">
+        <i class="fa fa-atlas fa-fw"></i><div class="wf-manager-flag_text">Public</div>
+    </button>
+    <button id="wf-manager-help" class="wf-manager-flag {% if workflow.help_flag %}wf-help_flag-on{% endif %}" role="button" onclick="update_workflow('toggle_help')">
+        <i class="fa fa-flag fa-fw"></i><div class="wf-manager-flag_text">Help</div>
     </button>
     <button class="wf-manager-menu" id="workflow-menu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <i class="fa fa-bars fa-fw"></i>

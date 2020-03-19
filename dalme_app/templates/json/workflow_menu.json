@@ -31,6 +31,11 @@
     "query": "help"
   },
   {
+    "type": "item",
+    "text": "Flagged for publication",
+    "query": "public"
+  },
+  {
     "type": "divider"
   },
   {
