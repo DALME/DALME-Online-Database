@@ -830,6 +830,7 @@ table.dataTable tbody tr.selected a, table.dataTable tbody td.selected a {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   color: #376783;
+  display: flex;
 }
 
 .sub-card-header-embed {
@@ -871,6 +872,32 @@ table.dataTable tbody tr.selected a, table.dataTable tbody td.selected a {
   border-top: 1px solid #a5a5a5;
   align-items: center;
   display: flex;
+}
+
+.sub-card-button {
+  border: 0;
+  border: 1px solid #376783;
+  border-radius: 3px;
+  background-color: #e3f0f5;
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  align-items: center;
+  color: #376783;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  margin-right: 3px;
+  line-height: 1;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.sub-card-button:hover {
+  background-color: #376783;
+  color: #e3f0f5;
 }
 
 .card-header-title {
@@ -3234,6 +3261,15 @@ li#searchIcon.show a {
 }
 
 /* source viewers/editors */
+
+#descriptionEditor {
+  min-height: 200px;
+}
+
+#descriptionEditorToolbar {
+  align-items: center;
+  display: flex;
+}
 
 .transcription-editor {
   display: flex;

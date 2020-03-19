@@ -561,3 +561,50 @@ function getTitle(e, tag) {
   };
   return title
 }
+
+function editDescription() {
+  initial_description_text = $('#descriptionEditor').text();
+  if (initial_description_text == 'No description.') {
+      $('#descriptionEditor').removeClass('empty-card-message');
+  }
+  $('#descriptionEditor').attr('contenteditable', true);
+  $('#descriptionEditorToolbar').html('<button class="sub-card-button" role="button" onclick="saveDescription()">Save</button>\
+  <button class="sub-card-button" role="button" onclick="cancelDescription()">Cancel</button>');
+}
+
+function cancelDescription() {
+  if (confirm("Cancel the editing session? All your changes will be lost.")) {
+    $('#descriptionEditorToolbar').html('<button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>');
+    $('#descriptionEditor').text(initial_description_text);
+    $('#descriptionEditor').attr('contenteditable', false);
+    if (initial_description_text == 'No description.') {
+        $('#descriptionEditor').addClass('empty-card-message');
+    }
+  }
+}
+
+function saveDescription() {
+  var description_text = $('#descriptionEditor').text();
+  if (description_text !== initial_description_text) {
+    if (confirm("Save changes and exit? This action cannot be undone.")) {
+      var action = 'update'
+      if (initial_description_text == 'No description.') { action = 'create' }
+      $.ajax({
+        method: "PATCH",
+        url: "/api/sources/"+source_id+"/change_description/",
+        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+        data: { "action": action, "description": description_text }
+      }).done(function(data, textStatus, jqXHR) {
+          toastr.success("The description was updated.");
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        if (errorThrown == "Forbidden") {
+          toastr.error("You do not have the required permissions to modify this description.");
+        } else {
+          toastr.error('There was an error saving the description to the server: '+errorThrown);
+        }
+      });
+      $('#descriptionEditorToolbar').html('<button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>');
+      $('#descriptionEditor').attr('contenteditable', false);
+    }
+  }
+}

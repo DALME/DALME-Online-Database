@@ -845,6 +845,27 @@ class Sources(DTViewSet):
     serializer_class = SourceSerializer
     display_fields = ['name', 'type', 'parent']
 
+    @action(detail=True, methods=['patch'])
+    def change_description(self, request, *args, **kwargs):
+        result = {}
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        try:
+            action = self.request.POST['action']
+            desc_text = self.request.POST['description']
+            desc_att_obj = Attribute_type.objects.get(pk=79)
+            if action == 'update':
+                att_obj = Attribute.objects.filter(object_id=object.id, attribute_type=desc_att_obj)[0]
+                att_obj.value_TXT = desc_text
+                att_obj.save(update_fields=['value_TXT', 'modification_username', 'modification_timestamp'])
+            elif action == 'create':
+                object.attributes.create(attribute_type=desc_att_obj, value_TXT=desc_text)
+            result['message'] = 'Update succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
     def create(self, request, *args, **kwargs):
         result = {}
         data_dict = get_dte_data(request)

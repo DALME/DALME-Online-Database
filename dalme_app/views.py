@@ -591,11 +591,14 @@ class SourceDetail(DetailView):
         for a in attributes:
             label = a.attribute_type.name
             value = functions.get_attribute_value(a)
-            d = {
-                'label': label,
-                'value': value,
-            }
-            attribute_data.append(d)
+            if label == 'Description':
+                context['description'] = value
+            else:
+                d = {
+                    'label': label,
+                    'value': value,
+                }
+                attribute_data.append(d)
         context['attribute_data'] = attribute_data
         tables = []
         if has_pages:

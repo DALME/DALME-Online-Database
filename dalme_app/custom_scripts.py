@@ -10,7 +10,7 @@ from datetime import date
 from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
 from django.contrib.auth.models import User
-from dalme_app.apis import normalize_value
+from dalme_app.apis import normalize_value, filter_on_workflow
 from django.db.models.expressions import RawSQL
 import operator
 from functools import reduce
@@ -39,6 +39,11 @@ def get_script_menu():
             "name": "import_languages",
             "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
             "type": "warning"
+        },
+        {
+            "name": "replace_in_transcription",
+            "description": "Search and replace in transcriptions.",
+            "type": "danger"
         },
         {
             "name": "test_expression",
@@ -143,39 +148,34 @@ def import_languages(request):
 
 
 def test_expression(request):
-    data = '{"action":"create","data":{"0":{"user":{"first_name":"James","last_name":"Tauber","email":"jtauber@eldarion.com","username":"jtauber","password":"nfhJ63hf672","is_staff":[],"is_superuser":[],"groups":[{"id":"4"}],"groups-many-count":1},"full_name":"James Tauber","dam_usergroup":{"value":"2"},"wiki_groups":[{"ug_group":"users"}],"wiki_groups-many-count":1,"wp_role":"something"}}}'
-    res = get_dte_data(data)
-    return res
+    inventories = Source.objects.filter(type=13)
+    count = 0
+    desc_att_obj = Attribute_type.objects.get(pk=79)
+    for inv in inventories:
+        inv_attributes = inv.attributes.all()
+        has_comments = inv_attributes.filter(attribute_type=35).exists()
+        has_city = inv_attributes.filter(attribute_type=36).exists()
+        if has_comments:
+            count = count + 1
+            comm_obj = inv_attributes.filter(attribute_type=35)[0]
+            comment_text = comm_obj.value_TXT
+            last_user = inv.modification_username
+            if last_user == 'pizzorno':
+                last_user = 'smail'
+            created = inv.creation_timestamp
+            if has_city:
+                inv_city = inv_attributes.filter(attribute_type=36)[0].value_STR
+            else:
+                inv_city = 'Akron'
 
+            if inv_city == 'Marseille':
+                inv.attributes.create(attribute_type=desc_att_obj, value_TXT=comment_text)
+            else:
+                inv.comments.create(body=comment_text, creation_username=last_user, modification_username=last_user, creation_timestamp=created, modification_timestamp=created)
 
-def get_dte_data(request):
-    dt_request = json.loads(request)
-    dt_request.pop('action', None)
-    rows = dt_request['data']
-    data_list = []
-    for k, v in rows.items():
-        row_values = {}
-        for field, value in v.items():
-            if 'many-count' not in field:
-                if type(value) is list:
-                    if len(value) == 1:
-                        value = normalize_value(value[0])
-                    elif len(value) == 0:
-                        value = 0
-                    else:
-                        value = [normalize_value(i) for i in value]
-                elif type(value) is dict:
-                    # if len(value) == 1 and value.get('value') is not None:
-                    if len(value) == 1:
-                        # value = normalize_value(value['value'])
-                        value = normalize_value(list(value.values())[0])
-                    else:
-                        value = {key: normalize_value(val) for key, val in value.items() if 'many-count' not in key}
-                else:
-                    value = normalize_value(value)
-                row_values[field] = value
-        data_list.append([k, row_values])
-    return data_list
+            inv.attributes.remove(comm_obj)
+
+    return count
 
 
 def test_expression2(request):
@@ -184,6 +184,19 @@ def test_expression2(request):
         d_string = 'now'
     foo=bar
     return d_string
+
+
+def replace_in_transcription(request):
+    inventories = Source.objects.filter(type=13, short_name__contains='FF 1009', creation_username='pizzorno', modification_username='pizzorno')
+    for inv in inventories:
+        if inv.pages:
+            for fol in inv.pages.all():
+                if fol.sources.first().transcription:
+                    tr_id = fol.sources.first().transcription.id
+                    text = fol.sources.first().transcription.transcription
+                    text = text.replace('<gap reason=\'not transcribed\' extent=\'unknown\'/>', '<metamark function="leader" rend="dashes"/>')
+                    tr = Transcription.objects.filter(pk=tr_id).update(transcription=text)
+    return 'cool'
 
 
 def import_transcriptions(request):

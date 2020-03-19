@@ -115,6 +115,21 @@
                 {% endif %}
               </div>
             </div>
+            <div class="card mb-3">
+              <div class="sub-card-header">
+                <div class="card-header-title"><i class="fa fa-align-left fa-fw"></i> Description</div>
+                <div id="descriptionEditorToolbar">
+                  <button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>
+                </div>
+              </div>
+              <div class="card-body">
+                {% if description %}
+                  <div id="descriptionEditor">{{ description }}</div>
+                {% else %}
+                  <div id="descriptionEditor" class="empty-card-message">No description.</div>
+                {% endif %}
+              </div>
+            </div>
           </div>
           <div class="col-md-6">
             <div class="card mb-3">
