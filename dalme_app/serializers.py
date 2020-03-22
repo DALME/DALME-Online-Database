@@ -389,9 +389,21 @@ class SourceSerializer(DynamicSerializer):
         ret = super().to_representation(instance)
         attributes = ret.pop('attributes')
         new_att = {}
+        dates = {}
         for i in attributes:
             (k, v), = i.items()
-            new_att[k] = v
+            if k == 'start_date' or k == 'end_date':
+                dates[k] = v
+            else:
+                new_att[k] = v
+        if dates:
+            if 'start_date' in dates:
+                if 'end_date' in dates:
+                    new_att['date'] = functions.get_date_range(dates['start_date'], dates['end_date'])
+                else:
+                    new_att['date'] = dates['start_date']
+            else:
+                new_att['date'] = dates['end_date']
         ret['attributes'] = new_att
         ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id'], 'value': ret['name']}
         parent_name = ret.pop('parent_name', None)
