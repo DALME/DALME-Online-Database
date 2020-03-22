@@ -1,5 +1,6 @@
 from django import template
 
+
 register = template.Library()
 
 
@@ -27,12 +28,15 @@ def get_source_date(source):
 @register.simple_tag
 def get_source_type(source):
     try:
-        return next(
-            str(attr) for attr in source.attributes.all()
-            if attr.attribute_type.short_name == 'record_type'
-        )
-    except StopIteration:
-        return ''
+        return source.source_type
+    except AttributeError:
+        try:
+            return next(
+                str(attr) for attr in source.attributes.all()
+                if attr.attribute_type.short_name == 'record_type'
+            )
+        except StopIteration:
+            return None
 
 
 @register.simple_tag
@@ -61,3 +65,13 @@ def annotate_related_page(page):
         'has_image': page.dam_id is not None,
         'has_transcription': has_transcription,
     }
+
+
+@register.simple_tag(takes_context=True)
+def param_replace(context, **kwargs):
+    ctx = context['request'].GET.copy()
+    for key, value in kwargs.items():
+        ctx[key] = value
+    for key in [key for key, value in ctx.items() if not value]:
+        del ctx[key]
+    return ctx.urlencode()

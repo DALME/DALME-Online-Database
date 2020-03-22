@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     #'oidc_provider',
     'storages'
     'solo',
+    'django_filters',
 
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',

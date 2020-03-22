@@ -1,9 +1,11 @@
+from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
 
 from dalme_app.models import Source, Source_pages
+from dalme_public.filters import SourceFilter
 from dalme_public.models import Collection, HomePage, Set
 
 
@@ -59,11 +61,36 @@ class SourceList(ListView):
     model = Source
     template_name = 'dalme_public/source_list.html'
     paginate_by = 25
+    filterset_class = SourceFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request = self.request.GET.copy()
+
+        has_filter = any(
+            field in self.request.GET
+            for field in ['page', *self.filterset.filters.keys()]
+        )
+        context.update({"filterset": self.filterset, 'has_filter': has_filter})
+        return context
 
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).exclude(
+        qs = super().get_queryset(*args, **kwargs).exclude(
             type__name__in=['Archive', 'File unit']
         )
+        self.filterset = self.filterset_class(self.request.GET, queryset=qs)
+        qs = self.filterset.qs.distinct()
+        if self.filterset.annotated:
+            # Currently necessary because of the inability to eliminate dupes
+            # when ordering across the Source - Attribute traversal.
+            seen = set()
+            filtered = []
+            for source in qs:
+                if source.pk not in seen:
+                    filtered.append(source)
+                    seen.add(source.pk)
+            qs = filtered
+        return qs
 
 
 class SourceDetail(DetailView):

@@ -1,8 +1,10 @@
+{% load dalme_public_tags %}
+
 <div class="source-list-pagination u-flex">
   <span class="step-links">
     {% if page_obj.has_previous %}
-      <a href="?page=1" class="step-first">&laquo;</a>
-      <a href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
+      <a href="?{% param_replace page=1 %}" class="step-first">&laquo;</a>
+      <a href="?{% param_replace page=page_obj.previous_page_number %}">&lsaquo;</a>
     {% else %}
       <span class="step-first inactive">&laquo;</span>
       <span class="inactive">&lsaquo;</span>
@@ -13,8 +15,8 @@
     </span>
 
     {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}" class="step-last">&raquo;</a>
+      <a href="?{% param_replace page=page_obj.next_page_number %}">&rsaquo;</a>
+      <a href="?{% param_replace page=paginator.num_pages %}" class="step-last">&raquo;</a>
     {% else %}
       <span class="inactive">&rsaquo;</span>
       <span class="inactive" class="step-first inactive">&raquo;</span>

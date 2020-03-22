@@ -1,6 +1,10 @@
-{% extends "dalme_public/layouts/__single_column.html" %}
+{% extends "dalme_public/layouts/__left_side_column.html" %}
 
 {% block title %}Resource List &mdash; {{ block.super }}{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_filters.html" %}
+{% endblock %}
 
 {% block main_column %}
   {% if page_obj %}
