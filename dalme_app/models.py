@@ -658,7 +658,7 @@ class Task(dalmeIntid):
     assigned_to = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name="task_assigned_to")
     description = models.TextField(blank=True, null=True)
     priority = models.PositiveIntegerField(blank=True, null=True)
-    workset = models.ForeignKey(Workset, on_delete=models.PROTECT, null=True)
+    workset = models.ForeignKey(Set, on_delete=models.PROTECT, null=True)
     position = models.CharField(max_length=255, blank=True, default=None)
     url = models.CharField(max_length=255, null=True, default=None)
     file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
