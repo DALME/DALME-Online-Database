@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
-                              DT_fields, Page, Source_pages, Source, Transcription, Language, Workset,
+                              DT_fields, Page, Source_pages, Source, Transcription, Language,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
                               wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content)
@@ -717,7 +717,7 @@ class Languages(DTViewSet):
 class Options(viewsets.ViewSet):
     """ API endpoint for generating data for options in the UI """
     permission_classes = (DjangoModelPermissions,)
-    queryset = Workset.objects.none()
+    queryset = Set.objects.none()
 
     def list(self, request, *args, **kwargs):
         data_dict = {}

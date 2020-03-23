@@ -504,27 +504,6 @@ class AttributeReference(dalmeUuid):
     term_type = models.CharField(max_length=55, blank=True, default=None)
 
 
-class Workset(dalmeIntid):
-    name = models.CharField(max_length=55)
-    description = models.TextField()
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
-    qset = models.TextField()
-    endpoint = models.CharField(max_length=55)
-    progress = models.FloatField(default=0)
-    current_record = models.IntegerField(default=1)
-    tags = GenericRelation('Tag')
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        new_qset = json.loads(self.qset)
-        done = sum(1 for value in new_qset.values() if 'done' in value)
-        total = len(new_qset)
-        self.progress = done * 100 / total
-        super(Workset, self).save(*args, **kwargs)
-
-
 class Workflow(models.Model):
     ASSESSING = 1
     PROCESSING = 2

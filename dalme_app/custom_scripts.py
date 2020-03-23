@@ -5,7 +5,7 @@ import re
 import os
 import json
 import pandas as pd
-from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Workset, Task, Workflow, Work_log, Set, Set_x_content
+from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Task, Workflow, Work_log, Set, Set_x_content
 from datetime import date
 from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
@@ -179,30 +179,32 @@ def test_expression(request):
 
 
 def test_expression2(request):
-    worksets = Workset.objects.all()
-    for ws in worksets:
-        set_para = {
-            'name': ws.name,
-            'set_type': 4,
-            'endpoint': ws.endpoint,
-            'owner': ws.owner,
-            'set_permissions': 2,
-            'description': ws.description,
-        }
-        new_set = Set(**set_para)
-        new_set.save()
-        set_object = Set.objects.get(pk=new_set.id)
-        old_qset = json.loads(ws.qset)
-        new_members = []
-        for k, v in old_qset.items():
-            if Source.objects.filter(pk=v['pk']).exists():
-                source_object = Source.objects.get(pk=v['pk'])
-                new_entry = Set_x_content()
-                new_entry.set_id = set_object
-                new_entry.content_object = source_object
-                new_entry.workset_done = v.get('done', False)
-                new_members.append(new_entry)
-        Set_x_content.objects.bulk_create(new_members)
+    # worksets = Workset.objects.all()
+    # set_names = [i.name for i in Set.objects.all()]
+    # for ws in worksets:
+    #     if ws.name not in set_names:
+    #         set_para = {
+    #             'name': ws.name,
+    #             'set_type': 4,
+    #             'endpoint': ws.endpoint,
+    #             'owner': ws.owner,
+    #             'set_permissions': 2,
+    #             'description': ws.description,
+    #         }
+    #         new_set = Set(**set_para)
+    #         new_set.save()
+    #         set_object = Set.objects.get(pk=new_set.id)
+    #         old_qset = json.loads(ws.qset)
+    #         new_members = []
+    #         for k, v in old_qset.items():
+    #             if Source.objects.filter(pk=v['pk']).exists():
+    #                 source_object = Source.objects.get(pk=v['pk'])
+    #                 new_entry = Set_x_content()
+    #                 new_entry.set_id = set_object
+    #                 new_entry.content_object = source_object
+    #                 new_entry.workset_done = v.get('done', False)
+    #                 new_members.append(new_entry)
+    #         Set_x_content.objects.bulk_create(new_members)
     return 'done'
 
 
