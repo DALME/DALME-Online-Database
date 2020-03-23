@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
-                              DT_list, DT_fields, Page, Source, Workset, TaskList, Task, wiki_user_groups,
+                              DT_list, DT_fields, Page, Source, TaskList, Task, wiki_user_groups,
                               rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              Country, City, Tag, Attachment, Ticket, Comment, Workflow)
+                              Country, City, Tag, Attachment, Ticket, Comment, Workflow, Set)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
@@ -110,33 +110,46 @@ class AsyncTaskSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class WorksetSerializer(serializers.ModelSerializer):
+class SetSerializer(serializers.ModelSerializer):
     owner_username = serializers.CharField(source='owner.username', read_only=True, required=False)
     owner_full_name = serializers.CharField(source='owner.profile.full_name', read_only=True, required=False)
+    progress = serializers.ReadOnlyField(source='workset_progress', read_only=True, required=False)
+    set_type_name = serializers.CharField(source='get_set_type_display', required=False)
+    set_permissions_name = serializers.CharField(source='get_set_permissions_display', required=False)
 
     class Meta:
-        model = Workset
-        fields = ('id', 'name', 'description', 'owner', 'endpoint', 'progress', 'owner_username', 'owner_full_name', 'creation_timestamp')
+        model = Set
+        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'set_permissions', 'set_permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp')
+        extra_kwargs = {'set_type_label': {'required': False}, 'set_permissions_label': {'required': False}}
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['workset'] = '<a class="workset-title" href="/worksets/{}">{}</a><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['id'], ret['name'], ret['description'], ret['endpoint'])
-        progress = ret['progress']
-        angle = round((progress * 360 / 100))
-        if angle <= 180:
-            right_style = 'style="display:none;"'
-            pie_style = ''
-        else:
-            right_style = 'style="transform:rotate(180deg);"'
-            pie_style = 'style="clip:rect(auto, auto, auto, auto);"'
-        left_style = 'style="transform:rotate(' + str(angle) + 'deg);"'
-        progress_circle = '<div class="pie-wrapper"><span class="label">{}<span class="smaller">%</span></span><div class="pie" {}>'.format(round(progress), pie_style)
-        progress_circle += '<div class="left-side half-circle" {}></div><div class="right-side half-circle" {}></div></div></div>'.format(left_style, right_style)
-        ret['progress_circle'] = progress_circle
+        if ret['set_type'] == 4:
+            ret['workset'] = '<a class="workset-title" href="/sets/{}">{}</a><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['id'], ret['name'], ret['description'], ret['endpoint'])
+            progress = ret['progress']
+            angle = round((progress * 360 / 100))
+            if angle <= 180:
+                right_style = 'style="display:none;"'
+                pie_style = ''
+            else:
+                right_style = 'style="transform:rotate(180deg);"'
+                pie_style = 'style="clip:rect(auto, auto, auto, auto);"'
+            left_style = 'style="transform:rotate(' + str(angle) + 'deg);"'
+            progress_circle = '<div class="pie-wrapper"><span class="label">{}<span class="smaller">%</span></span><div class="pie" {}>'.format(round(progress), pie_style)
+            progress_circle += '<div class="left-side half-circle" {}></div><div class="right-side half-circle" {}></div></div></div>'.format(left_style, right_style)
+            ret['progress_circle'] = progress_circle
         ret['owner'] = {
             'id': ret.pop('owner'),
             'username': ret.pop('owner_username'),
             'user': ret.pop('owner_full_name'),
+        }
+        ret['set_type'] = {
+            'name': ret.pop('set_type_name'),
+            'value': ret.pop('set_type')
+        }
+        ret['set_permissions'] = {
+            'name': ret.pop('set_permissions_name'),
+            'value': ret.pop('set_permissions')
         }
         return ret
 
@@ -163,8 +176,8 @@ class TaskSerializer(serializers.ModelSerializer):
         attachments = ''
         attachments_detail = ''
         if ret['workset'] is not None:
-            attachments += '<a href="/worksets/{}" class="task-attachment">Workset</a>'.format(ret['workset'])
-            attachments_detail += '<a href="/worksets/{}" class="task-attachment">Workset: {}</a>'.format(ret['workset'], instance.workset.name)
+            attachments += '<a href="/sets/{}" class="task-attachment">Workset</a>'.format(ret['workset'])
+            attachments_detail += '<a href="/sets/{}" class="task-attachment">Workset: {}</a>'.format(ret['workset'], instance.workset.name)
         if ret['url'] is not None:
             attachments += '<a href="{}" class="task-attachment">URL</a>'.format(ret['url'])
             attachments_detail += '<a href="{}" class="task-attachment">URL: {}</a>'.format(ret['url'], textwrap.shorten(instance.url, width=35, placeholder="..."))

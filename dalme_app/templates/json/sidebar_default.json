@@ -122,8 +122,8 @@
     "permissions": ["Users", "Staff", "Administrators", "Developers"]
   },
   {
-    "text": "Worksets",
-    "link": "/worksets",
+    "text": "Sets",
+    "link": "/sets",
     "iconClass": "fa-layer-group",
     "child": true,
     "permissions": ["Users", "Staff", "Administrators", "Developers"]

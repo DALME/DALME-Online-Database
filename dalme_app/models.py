@@ -1,8 +1,3 @@
-"""
-This file defines all of the models used in the application. These models are
-used to create database entries, and can be used in other functions to access
-and iterate through data in the database without writing SQL statements.
-"""
 from django.contrib.auth.models import User, Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -22,7 +17,8 @@ from django.utils.dateparse import parse_date
 from django.utils import timezone
 import calendar
 import mimetypes
-from django.conf import settings
+import uuid
+# from django.conf import settings
 from django.dispatch import receiver
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
@@ -71,9 +67,8 @@ class Profile(models.Model):
         dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
         return dam_ug
 
+
 # DALME data store
-
-
 class Agent(dalmeUuid):
     type = models.IntegerField()
     tags = GenericRelation('Tag')
@@ -337,6 +332,7 @@ class Source(dalmeUuid):
     pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
+    sets = GenericRelation('Set_x_content')
 
     def __str__(self):
         return self.name
@@ -397,7 +393,61 @@ class Identity_phrase_x_entity(dalmeBasic):
     identity_phrase_id = models.ForeignKey('Identity_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
     entity_id = models.UUIDField(db_index=True)
 
+
 # app management models
+class Set(dalmeUuid):
+    CORPUS = 1  # a set representing a coherent body of materials defined by a project or sub-project
+    COLLECTION = 2  # a generic set defined by a user for any purpose -- collections could potentially by qualified by other terms
+    DATASET = 3  # a set defined for analytical purposes
+    WORKSET = 4  # a set defined as part of a project's workflow for the purpose of systematically performing a well-defined task to its members
+    PRIVATE = 1  # only owner can view set
+    VIEW = 2  # others can view the set
+    ADD = 3  # others can view the set and add members
+    DELETE = 4  # others can view the set and add and delete members
+    SET_TYPES = (
+        (CORPUS, 'Corpus'),
+        (COLLECTION, 'Collection'),
+        (DATASET, 'Dataset'),
+        (WORKSET, 'Workset')
+    )
+    SET_PERMISSIONS = [
+        (PRIVATE, 'Private'),
+        (VIEW, 'Others: view'),
+        (ADD, 'Others: view|add'),
+        (DELETE, 'Others: view|add|delete')
+    ]
+
+    name = models.CharField(max_length=255)
+    set_type = models.IntegerField(choices=SET_TYPES)
+    endpoint = models.CharField(max_length=55)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
+    set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
+    description = models.TextField()
+    tags = GenericRelation('Tag')
+
+    def __str__(self):
+        return self.name + ' (' + self.set_type + ')'
+
+    @property
+    def workset_progress(self):
+        done = self.members.filter(workset_done=True).count()
+        total = self.members.count()
+        if total != 0:
+            return done * 100 / total
+        else:
+            return 0
+
+
+class Set_x_content(dalmeBasic):
+    set_id = models.ForeignKey(Set, on_delete=models.CASCADE, related_name='members')
+    content_object = GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField(default=uuid.uuid4, db_index=True)
+    workset_done = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('content_type', 'object_id', 'set_id')
+        ordering = ['set_id', 'id']
 
 
 class Country(dalmeIntid):
@@ -423,7 +473,7 @@ class City(dalmeIntid):
 
     class Meta:
         ordering = ['country', 'name']
-        unique_together = ("name", "administrative_region")
+        unique_together = ('name', 'administrative_region')
 
 
 class Language(dalmeIntid):
@@ -572,14 +622,13 @@ class Tag(dalmeUuid):
     tag_group = models.CharField(max_length=255, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = object_id = models.CharField(max_length=55, null=True, db_index=True)
+    object_id = models.CharField(max_length=55, null=True, db_index=True)
 
     def __str__(self):
         return self.tag
 
+
 # task management
-
-
 class TaskList(dalmeIntid):
     name = models.CharField(max_length=60)
     slug = models.SlugField(default="")
@@ -729,9 +778,8 @@ class Attachment(dalmeUuid):
         self.type = type
         super(Attachment, self).save(*args, **kwargs)
 
+
 # unmanaged models from DAM
-
-
 class rs_resource(models.Model):
 
     ref = models.IntegerField(primary_key=True)
@@ -947,9 +995,8 @@ class rs_resource_type_field(models.Model):
         db_table = 'resource_type_field'
         in_db = 'dam'
 
+
 # unmanaged models from WIKI
-
-
 class wiki_user(models.Model):
     user_id = models.IntegerField(primary_key=True)
     user_name = models.BinaryField(max_length=255, unique=True)

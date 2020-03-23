@@ -92,7 +92,7 @@
                             <div class="attachment-container-label">Endpoint: {{ task.workset.endpoint }}</div>
                         </div>
                         <div class="p-2">
-                            <a href="/worksets/{{ task.workset.id }}" class="workset-title">{{ task.workset.name }}</a>
+                            <a href="/sets/{{ task.workset.id }}" class="workset-title">{{ task.workset.name }}</a>
                             {% widthratio task.workset.progress 100 360 as angle %}
                             {% if angle|add:"0" <= 180 %}
                               <div class="pie-wrapper">

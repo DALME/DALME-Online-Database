@@ -8,11 +8,12 @@ import operator
 import os
 from functools import reduce
 from rest_framework import viewsets
-from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, WorksetSerializer,
-                                   TaskSerializer, TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
+from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, TaskSerializer,
+                                   TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
-                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer, CommentSerializer, WorkflowSerializer)
+                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer, CommentSerializer, WorkflowSerializer,
+                                   SetSerializer)
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
@@ -20,7 +21,7 @@ from dalme_app.models import (Profile, Attribute_type, Content_class, Content_ty
                               DT_fields, Page, Source_pages, Source, Transcription, Language, Workset,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
                               wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City, Attachment, Ticket, Tag,
-                              Comment, Workflow)
+                              Comment, Workflow, Set, Set_x_content)
 from django_celery_results.models import TaskResult
 from django.db.models.expressions import RawSQL
 from rest_framework.permissions import DjangoModelPermissions
@@ -194,13 +195,8 @@ class DTViewSet(viewsets.ModelViewSet):
                 if request.GET.get('filters') is not None:
                     queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
                 queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-                count = 1
-                resp_data = {}
-                for obj in queryset:
-                    obj_dict = {'pk': obj.pk}
-                    resp_data[count] = obj_dict
-                    count = count + 1
-                data_dict['data'] = resp_data
+                query_list = list(queryset.values_list('id', flat=True))
+                data_dict['data'] = query_list
             except Exception as e:
                 data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
         else:
@@ -313,10 +309,8 @@ class DTViewSet(viewsets.ModelViewSet):
             filter_q = Q(**{filter[0]: filter[1]})
             queryset = self.queryset.filter(filter_q).distinct()
         elif self.request.GET.get('workset') is not None:
-            ws_data = Workset.objects.get(pk=self.request.GET['workset']).qset
-            qset = json.loads(ws_data)
-            id_list = [j[i]['pk'] for i, j in enumerate(qset)]
-            queryset = self.queryset.filter(pk__in=id_list)
+            ws_id = self.request.GET['workset']
+            queryset = self.queryset.filter(sets__set_id=ws_id)
         else:
             queryset = self.queryset
         return queryset
@@ -794,7 +788,7 @@ class Options(viewsets.ViewSet):
         return content_types
 
     def user_worksets(self, **kwargs):
-        worksets_options = [{'label': i.name, 'value': i.id} for i in Workset.objects.filter(owner=str(self.request.user.id)).order_by('name')]
+        worksets_options = [{'label': i.name, 'value': i.id} for i in Set.objects.filter(owner=str(self.request.user.id)).order_by('name')]
         return worksets_options
 
     def user_groups(self, **kwargs):
@@ -1470,30 +1464,26 @@ class Users(DTViewSet):
         return Response(result, status)
 
 
-class Worksets(DTViewSet):
-    """ API endpoint for managing worksets """
+class Sets(DTViewSet):
+    """ API endpoint for managing sets """
     permission_classes = (DjangoModelPermissions,)
-    queryset = Workset.objects.all()
-    serializer_class = WorksetSerializer
+    queryset = Set.objects.all()
+    serializer_class = SetSerializer
 
     @action(detail=True, methods=['patch'])
-    def set_state(self, request, *args, **kwargs):
+    def workset_state(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         try:
             action = self.request.POST['action']
-            seq = self.request.POST['seq']
+            target = self.request.POST['target']
+            set_id = kwargs.get('pk')
+            object = Set_x_content.objects.get(set_id=set_id, object_id=target)
             if action == 'mark_done':
-                qset = json.loads(object.qset)
-                qset[str(seq)]['done'] = True
-                object.current_record = int(seq) + 1
-                object.qset = json.dumps(qset)
-                object.save(update_fields=['current_record', 'qset', 'modification_username', 'modification_timestamp'])
+                mark = True
             elif action == 'mark_undone':
-                qset = json.loads(object.qset)
-                qset[str(seq)].pop('done')
-                object.qset = json.dumps(qset)
-                object.save(update_fields=['current_record', 'qset', 'modification_username', 'modification_timestamp'])
+                mark = False
+            object.workset_done = mark
+            object.save(update_fields=['workset_done', 'modification_username', 'modification_timestamp'])
             result['message'] = 'Update succesful.'
             status = 201
         except Exception as e:
@@ -1503,24 +1493,48 @@ class Worksets(DTViewSet):
 
     def create(self, request, format=None):
         data = request.data
-        data_dict = {
-            'name': data['data[0][name]'],
-            'description': data['data[0][description]'],
-            'qset': data['qset'],
-            'endpoint': data['endpoint'],
-        }
-        serializer = WorksetSerializer(data=data_dict)
-        if serializer.is_valid():
-            new_obj = Workset(**data_dict)
-            new_obj.save()
-            object = Workset.objects.get(pk=new_obj.id)
-            serializer = WorksetSerializer(object)
-            result = serializer.data
-            status = 201
+        set_type = data['type']
+        if int(set_type) == 4:
+            member_list = json.loads(data['qset'])
+            set_para = {
+                'name': data['data[0][name]'],
+                'description': data['data[0][description]'],
+                'set_permissions': data['data[0][set_permissions]'],
+                'set_type': 4,
+                'endpoint': data['endpoint']
+            }
+            serializer = SetSerializer(data=set_para)
+            if serializer.is_valid():
+                new_set = Set(**set_para)
+                new_set.save()
+                set_object = Set.objects.get(pk=new_set.id)
+                new_members = []
+                for i in member_list:
+                    source_object = Source.objects.get(pk=i)
+                    new_entry = Set_x_content()
+                    new_entry.set_id = set_object
+                    new_entry.content_object = source_object
+                    new_members.append(new_entry)
+                Set_x_content.objects.bulk_create(new_members)
+                serializer = SetSerializer(set_object)
+                result = serializer.data
+                status = 201
+            else:
+                result = get_error_array(serializer.errors)
+                status = 400
         else:
-            result = get_error_array(serializer.errors)
+            result = {'error': 'Invalid set type.'}
             status = 400
+
         return Response(result, status)
+
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('type') is not None:
+            type = int(self.request.GET['type'])
+            queryset = self.queryset.filter(set_type=type)
+        else:
+            queryset = self.queryset
+        return queryset
 
 
 """ GENERALIZED FUNCTIONS """

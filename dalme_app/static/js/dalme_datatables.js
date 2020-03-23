@@ -441,20 +441,34 @@ function save_filter_form(qset, endpoint) {
     filterForm = new $.fn.dataTable.Editor( {
           ajax: {
             method: "POST",
-            url: "/api/worksets/",
+            url: "/api/sets/",
             headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-            data: { 'qset': JSON.stringify(qset), 'endpoint': endpoint },
+            data: { 'qset': JSON.stringify(qset), 'endpoint': endpoint, 'type': 4 },
           },
-          fields: [{
+          fields: [
+                {
                   label: "Name:",
                   name:  "name"
-                }, {
+                },
+                {
                   label: "Description:",
                   name:  "description",
                   type: "textarea"
-                }]
+                },
+                {
+                  label: "Permissions:",
+                  name:  "set_permissions",
+                  type: "selectize",
+                  options: [
+                    { label: "Private", value: "1" },
+                    { label: "Others: view", value: "2" },
+                    { label: "Others: view|add", value: "3" },
+                    { label: "Others: view|add|delete", value: "4" },
+                  ],
+                }
+          ]
     });
-    filterForm.on('submitSuccess', function(e, json, data, action) { toastr.success('The workset was saved successfully.') });
+    filterForm.on('submitSuccess', function(e, json, data, action) { toastr.success('The set was saved successfully.') });
     filterForm.buttons({
       text: "Save",
       className: "btn btn-primary",

@@ -15,12 +15,11 @@ function ws_next() {
   if (workset['next_id'] != 'none') {
     $.ajax({
       method: "PATCH",
-      url: "/api/worksets/"+workset['workset_id']+"/set_state/",
+      url: "/api/sets/"+workset['workset_id']+"/workset_state/",
       headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-      data: { "action": "mark_done", "seq": workset['current']}
+      data: { "action": "mark_done", "target": workset['current_id']}
     }).done(function(data, textStatus, jqXHR) {
-        let next_seq = parseInt(workset['current'])+1;
-        let url = '/'+workset['endpoint']+'/'+workset['next_id']+'/?workset='+workset['workset_id']+'&seq='+next_seq;
+        let url = '/'+workset['endpoint']+'/'+workset['next_id']+'/?set='+workset['workset_id'];
         window.location.href = url;
     }).fail(function(jqXHR, textStatus, errorThrown) {
       if (errorThrown == "Forbidden") {
@@ -34,8 +33,7 @@ function ws_next() {
 
 function ws_prev() {
   if (workset['prev_id'] != 'none') {
-      let prev_seq = parseInt(workset['current'])-1;
-      let url = '/'+workset['endpoint']+'/'+workset['prev_id']+'/?workset='+workset['workset_id']+'&seq='+prev_seq;
+      let url = '/'+workset['endpoint']+'/'+workset['prev_id']+'/?set='+workset['workset_id'];
       window.location.href = url;
   }
 }
@@ -43,9 +41,9 @@ function ws_prev() {
 function ws_mark(action) {
   $.ajax({
     method: "PATCH",
-    url: "/api/worksets/"+workset['workset_id']+"/set_state/",
+    url: "/api/sets/"+workset['workset_id']+"/workset_state/",
     headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-    data: { "action": action, "seq": workset['current']}
+    data: { "action": action, "target": workset['current_id']}
   }).fail(function(jqXHR, textStatus, errorThrown) {
     if (errorThrown == "Forbidden") {
       toastr.error("You do not have the required permissions to change the state of this workset.");
@@ -56,6 +54,6 @@ function ws_mark(action) {
 }
 
 function ws_show_list() {
-  let url = '/'+workset['endpoint']+'/?workset='+workset['workset_id'];
+  let url = '/'+workset['endpoint']+'/?set='+workset['workset_id'];
   window.location.href = url;
 }

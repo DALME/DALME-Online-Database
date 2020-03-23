@@ -92,7 +92,7 @@ function init_tables() {
     });
     table_worksets = $('#dataTables-worksets').DataTable({
           'ajax': {
-            'url': "/api/worksets/?format=json&filter=owner," + user['id'],
+            'url': "/api/sets/?format=json&type=4&filter=owner," + user['id'],
             'data': function (data) { return { "data": JSON.stringify( data ) }; }
           },
           serverSide: true,

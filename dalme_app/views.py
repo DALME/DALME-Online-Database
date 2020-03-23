@@ -12,7 +12,7 @@ from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
-                              Source, Workset, TaskList, Task, rs_resource, rs_collection_resource,
+                              Source, Set, TaskList, Task, rs_resource, rs_collection_resource,
                               rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, Language,
                               Attribute_type, Country, rs_collection, Ticket, Workflow)
 from haystack.generic_views import SearchView
@@ -531,20 +531,29 @@ class SourceDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'workset' in self.request.GET:
-            workset = Workset.objects.get(pk=self.request.GET['workset'])
-            qset = json.loads(workset.qset)
-            seq = workset.current_record
+        if 'set' in self.request.GET:
+            workset = Set.objects.get(pk=self.request.GET['set'])
+            members = Source.objects.filter(sets__set_id=workset.id)
+            current_index = (*members,).index(self.object)
+            try:
+                previous_id = str(members[current_index - 1].id)
+            except (IndexError, AssertionError):
+                previous_id = 'none'
+            try:
+                next_id = str(members[current_index + 1].id)
+            except (IndexError, AssertionError):
+                next_id = 'none'
             para = {
-                'workset_id': workset.id,
+                'workset_id': str(workset.id),
                 'name': workset.name,
                 'description': workset.description,
-                'current': seq,
-                'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
-                'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
-                'total': len(qset),
+                'current': current_index + 1,
+                'current_id': str(self.object.id),
+                'prev_id': previous_id,
+                'next_id': next_id,
+                'total': members.count(),
                 'endpoint': workset.endpoint,
-                'progress': round(workset.progress, 2)
+                'progress': round(workset.workset_progress, 2)
             }
             context['workset'] = para
         breadcrumb = self.get_breadcrumb()
@@ -907,22 +916,6 @@ class ImageDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'workset' in self.request.GET:
-            workset = Workset.objects.get(pk=self.request.GET['workset'])
-            qset = json.loads(workset.qset)
-            seq = workset.current_record
-            para = {
-                'workset_id': workset.id,
-                'name': workset.name,
-                'description': workset.description,
-                'current': seq,
-                'prev_id': qset.get(str(int(seq)-1), {}).get('pk', "none"),
-                'next_id': qset.get(str(int(seq)+1), {}).get('pk', "none"),
-                'total': len(qset),
-                'endpoint': workset.endpoint,
-                'progress': round(workset.progress, 2)
-            }
-            context['workset'] = para
         breadcrumb = [('DAM Images', '/images')]
         sidebar_toggle = self.request.session['sidebar_toggle']
         context['sidebar_toggle'] = sidebar_toggle
@@ -1062,11 +1055,11 @@ def PageManifest(request, pk):
 
 
 @method_decorator(login_required, name='dispatch')
-class WorksetList(DTListView):
-    breadcrumb = [('Project', ''), ('Worksets', '/worksets')]
-    list_name = 'worksets'
+class SetList(DTListView):
+    breadcrumb = [('Project', ''), ('Sets', '/sets')]
+    list_name = 'sets'
     dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'description', 'owner']
+    dte_field_list = ['name', 'set_type', 'description', 'set_permissions', 'owner']
     dt_options = {
         'pageLength': 25,
         'paging': 'true',
@@ -1088,24 +1081,24 @@ class WorksetList(DTListView):
 
     def get_dte_buttons(self, *args, **kwargs):
         dte_buttons = []
-        if self.request.user.has_perm('dalme_app.change_workset'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Workset Information'})
-        if self.request.user.has_perm('dalme_app.delete_workset'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Workset',
-                                'formMessage': 'Are you sure you wish to remove this workset from the database? This action cannot be undone.'})
+        if self.request.user.has_perm('dalme_app.change_set'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Set Information'})
+        if self.request.user.has_perm('dalme_app.delete_set'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Set',
+                                'formMessage': 'Are you sure you wish to remove this set from the database? This action cannot be undone.'})
         return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
-class WorksetsRedirect(View):
+class SetsRedirect(View):
     def get(self, request, *args, **kwargs):
-        workset = get_object_or_404(Workset, pk=kwargs['pk'])
-        qset = json.loads(workset.qset)
-        seq = workset.current_record + 1
-        if seq > len(qset):
-            seq = len(qset)
-        seq_id = qset[str(seq)]['pk']
-        url = '/{}/{}/?workset={}'.format(workset.endpoint, seq_id, workset.id)
+        workset = get_object_or_404(Set, pk=kwargs['pk'])
+        members = Source.objects.filter(sets__set_id=workset.id)
+        try:
+            current = members.filter(sets__workset_done=False)[0]
+        except IndexError:
+            current = members[-1]
+        url = '/{}/{}/?set={}'.format(workset.endpoint, current.id, workset.id)
         return HttpResponseRedirect(url)
 
 
