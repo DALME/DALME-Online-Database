@@ -64,11 +64,13 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
     def filter(self, qs, value):
         qs = super().filter(qs, value)
 
-        if date := self.get_value('date', value):
+        date = self.get_value('date', value)
+        if date:
             self.parent.annotated = True
             raise NotImplementedError()
 
-        if source_type := self.get_value('source_type', value):
+        source_type = self.get_value('source_type', value)
+        if source_type:
             self.parent.annotated = True
             # TODO: Still looking for a solution to the 'distinct' issue.
             # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#distinct
