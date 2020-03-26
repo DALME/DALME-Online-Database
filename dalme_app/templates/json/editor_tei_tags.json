@@ -233,9 +233,10 @@
         "type": "text",
         "message": "<b>Reason</b> for the omission/gap, including type of content omitted",
         "options": [
-          "illegible",
-          "damaged",
-          "context"
+          "damage",
+          "script",
+          "ink",
+          "image"
         ]
       },
       {
@@ -257,7 +258,13 @@
         "name": "reason",
         "label": "Reason",
         "message": "<b>Reason</b> why the text had to be supplied",
-        "type": "text"
+        "type": "text",
+        "options": [
+          "damage",
+          "script",
+          "ink",
+          "image"
+        ]
       }
     ]
   },
@@ -274,9 +281,10 @@
         "message": "<b>Reason</b> why the material is hard to transcribe",
         "type": "text",
         "options": [
-          "illegible",
-          "damaged",
-          "ink blot"
+          "damage",
+          "script",
+          "ink",
+          "image"
         ]
       }
     ]
