@@ -304,6 +304,7 @@ def get_count(item):
     else:
         return None
 
+
 # formatting functions
 def format_date(value, type):
     if value is not None:
@@ -314,10 +315,10 @@ def format_date(value, type):
             if value.value_DATE_d is None or value.value_DATE_m is None or value.value_DATE_y is None:
                 date_str = value.value_STR
             else:
-                date_str = value.value_DATE.strftime('%A, %d %B, %Y').lstrip("0").replace(" 0", " ")
+                date_str = value.value_DATE.strftime('%d %B, %Y').lstrip("0").replace(" 0", " ")
         elif type == 'timestamp-long':
             value = timezone.localtime(value)
-            date_str = value.strftime('%A, %d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " ")
+            date_str = value.strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " ")
         else:
             date_str = str(value)
     else:
