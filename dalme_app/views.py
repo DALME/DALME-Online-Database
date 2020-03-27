@@ -569,9 +569,13 @@ class SourceDetail(DetailView):
         has_inv = self.object.has_inventory
         has_pages = len(self.object.pages.all()) > 0
         has_children = len(self.object.source_set.all()) > 0
+        has_agents = len(self.object.agents) > 0
+        has_places = len(self.object.places) > 0
         context['has_inv'] = has_inv
         context['has_pages'] = has_pages
         context['has_children'] = has_children
+        context['has_agents'] = has_agents
+        context['has_places'] = has_places
         if has_inv:
             context['workflow'] = self.object.workflow
             wf_stages = []
@@ -595,30 +599,31 @@ class SourceDetail(DetailView):
             'Created': functions.format_rct(self.object.creation_username, self.object.creation_timestamp),
             'Modified': functions.format_rct(self.object.modification_username, self.object.modification_timestamp),
         }
-        attribute_data = []
-        attributes = self.object.attributes.all().select_related('attribute_type')
-        for a in attributes:
-            label = a.attribute_type.name
-            value = functions.get_attribute_value(a)
-            if label == 'Description':
-                context['description'] = value
-            else:
-                d = {
-                    'label': label,
-                    'value': value,
-                }
-                attribute_data.append(d)
-        context['attribute_data'] = attribute_data
+        attribute_data = self.process_attributes(self.object.attributes.all().select_related('attribute_type'))
+        if attribute_data.get('description', None) is not None:
+            context['description'] = attribute_data['description']
+        context['attribute_data'] = attribute_data['attributes']
+        context['inherited_data'] = self.process_attributes(self.object.inherited.all().select_related('attribute_type'))['attributes']
         tables = []
         if has_pages:
+            title = 'Pages (' + str(len(self.object.pages.all())) + ')'
             folios = functions.get_editor_folios(self.object)
             context['folio_count'] = folios['folio_count']
             context['folio_menu'] = folios['folio_menu']
             context['folio_list'] = folios['folio_list']
-            tables.append(['pages', 'fa-book-open', 'Pages'])
+            tables.append(['pages', 'fa-book-open', title])
         if has_children:
+            title = 'Children (' + str(len(self.object.source_set.all())) + ')'
             context['children'] = self.object.source_set.all().order_by('name')
-            tables.append(['children', 'fa-sitemap', 'Children'])
+            tables.append(['children', 'fa-sitemap', title])
+        if has_agents:
+            title = 'Agents (' + str(len(self.object.agents)) + ')'
+            context['agents'] = self.object.agents.all().select_related('content_type')
+            tables.append(['agents', 'fa-user-friends', title])
+        if has_places:
+            title = 'Places (' + str(len(self.object.places)) + ')'
+            context['places'] = self.object.places.all().select_related('content_type')
+            tables.append(['places', 'fa-map-marker-alt', title])
         if tables != []:
             context['tables'] = tables
             context['table_options'] = {
@@ -636,9 +641,21 @@ class SourceDetail(DetailView):
                     'searchPlaceholder': 'Search',
                     'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
                     },
-                'order': '[[ 2, "asc" ]]'
                 }
         return context
+
+    def process_attributes(self, qset):
+        result = {}
+        attributes = []
+        for a in qset:
+            label = a.attribute_type.name
+            value = functions.get_attribute_value(a)
+            if label == 'Description':
+                result['description'] = value
+            else:
+                attributes.append({'label': label, 'value': value})
+        result['attributes'] = attributes
+        return result
 
     def get_breadcrumb(self, *args, **kwargs):
         try:

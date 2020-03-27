@@ -117,21 +117,25 @@
             </div>
             <div class="card mb-3">
               <div class="sub-card-header">
-                <div class="card-header-title"><i class="fa fa-align-left fa-fw"></i> Description</div>
-                <div id="descriptionEditorToolbar">
-                  <button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>
-                </div>
+                <div class="card-header-title"><i class="fa fa-dna fa-fw"></i> Inherited Attributes</div>
               </div>
-              <div class="card-body">
-                {% if description %}
-                  <div id="descriptionEditor">{{ description }}</div>
+              <div class="card-body attribute_list">
+                {% if inherited_data %}
+                  {% for i in inherited_data %}
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right">
+                        <span class="attribute_list_label">{{ i.label }}</span>
+                      </div>
+                      <div class="col-sm-9">
+                        <span class="attribute_list_value">{{ i.value | safe }}</span>
+                      </div>
+                  </div>
+                  {% endfor %}
                 {% else %}
-                  <div id="descriptionEditor" class="empty-card-message">No description.</div>
+                  <div class="empty-card-message">No attributes assigned.</div>
                 {% endif %}
               </div>
             </div>
-          </div>
-          <div class="col-md-6">
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-info-circle fa-fw"></i> Metadata</div>
@@ -149,9 +153,26 @@
                   {% endfor %}
               </div>
             </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card mb-3">
+              <div class="sub-card-header">
+                <div class="card-header-title"><i class="fa fa-align-left fa-fw"></i> Description</div>
+                <div id="descriptionEditorToolbar">
+                  <button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>
+                </div>
+              </div>
+              <div class="card-body">
+                {% if description %}
+                  <div id="descriptionEditor">{{ description }}</div>
+                {% else %}
+                  <div id="descriptionEditor" class="empty-card-message">No description.</div>
+                {% endif %}
+              </div>
+            </div>
             {% if has_children %}
-                <div class="card mb-3 card-full-pages">
-                    <div class="table-responsive dt-embed h-100">
+                <div class="card mb-3 pb-3 card-detail-list">
+                    <div class="table-responsive dt-embed">
                       <table class="table c_stripe responsive" id="dataTables-children" width="100%">
                         <thead>
                           <tr>
@@ -182,8 +203,8 @@
                 </div>
             {% endif %}
             {% if has_pages %}
-                <div class="card mb-3 card-full-pages">
-                    <div class="table-responsive dt-embed h-100">
+                <div class="card mb-3 pb-3 card-detail-list">
+                    <div class="table-responsive dt-embed">
                       <table class="table c_stripe responsive" id="dataTables-pages" width="100%">
                         <thead>
                           <tr>
@@ -210,6 +231,50 @@
                               {% else %}
                                 <td><i class="fa fa-check"></i></td>
                               {% endif %}
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+            {% endif %}
+            {% if has_agents %}
+                <div class="card mb-3 pb-3 card-detail-list">
+                    <div class="table-responsive dt-embed">
+                      <table class="table c_stripe responsive" id="dataTables-agents" width="100%">
+                        <thead>
+                          <tr>
+                            <th>Standard Name</th>
+                            <th>Type</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for row in agents %}
+                            <tr>
+                              <td>{{ row.content_object.std_name }}</td>
+                              <td>{{ row.content_object.type }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+            {% endif %}
+            {% if has_places %}
+                <div class="card mb-3 pb-3 card-detail-list">
+                    <div class="table-responsive dt-embed">
+                      <table class="table c_stripe responsive" id="dataTables-places" width="100%">
+                        <thead>
+                          <tr>
+                            <th>Standard Name</th>
+                            <th>Type</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for row in places %}
+                            <tr>
+                              <td>{{ row.content_object.std_name }}</td>
+                              <td>{{ row.content_object.type }}</td>
                             </tr>
                           {% endfor %}
                         </tbody>

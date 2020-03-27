@@ -70,7 +70,11 @@ class Profile(models.Model):
 
 # DALME data store
 class Agent(dalmeUuid):
-    type = models.IntegerField()
+    std_name = models.CharField(max_length=255)
+    type = models.IntegerField(db_index=True)
+    attributes = GenericRelation('Attribute')
+    instances = GenericRelation('Identity_phrase')
+    notes = models.TextField()
     tags = GenericRelation('Tag')
 
 
@@ -284,7 +288,10 @@ class Object_attribute(dalmeBasic):
 
 
 class Place(dalmeUuid):
+    std_name = models.CharField(max_length=255)
     type = models.IntegerField(db_index=True)
+    attributes = GenericRelation('Attribute')
+    instances = GenericRelation('Identity_phrase')
     tags = GenericRelation('Tag')
 
 
@@ -362,6 +369,14 @@ class Source(dalmeUuid):
             else:
                 return r1_inherited
 
+    @property
+    def agents(self):
+        return self.identity_phrases.filter(content_type=104)
+
+    @property
+    def places(self):
+        return self.identity_phrases.filter(content_type=115)
+
 
 class Transcription(dalmeUuid):
     transcription = models.TextField(blank=True, default=None)
@@ -373,8 +388,12 @@ class Transcription(dalmeUuid):
 
 
 class Identity_phrase(dalmeUuid):
-    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
     phrase = models.TextField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField(null=True, db_index=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+    source_id = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='identity_phrases')
+    attributes = GenericRelation(Attribute)
 
     def __str__(self):
         return self.phrase
@@ -409,11 +428,6 @@ class Token(dalmeUuid):
 
     def __str__(self):
         return self.raw_token
-
-
-class Identity_phrase_x_entity(dalmeBasic):
-    identity_phrase_id = models.ForeignKey('Identity_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
-    entity_id = models.UUIDField(db_index=True)
 
 
 # app management models

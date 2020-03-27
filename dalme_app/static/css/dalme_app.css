@@ -73,6 +73,10 @@ body {
   height: calc(100vh - 373px);
 }
 
+.card-detail-list {
+  max-height: 200px;
+}
+
 .empty-card-message {
   padding: 1em;
   text-align: center;
