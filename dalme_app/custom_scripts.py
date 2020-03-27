@@ -205,7 +205,9 @@ def test_expression2(request):
     #                 new_entry.workset_done = v.get('done', False)
     #                 new_members.append(new_entry)
     #         Set_x_content.objects.bulk_create(new_members)
-    return 'done'
+    record = Source.objects.get(pk='bc3a2c32639e44d6b5a21829b42ae0b5')
+    result = {i.attribute_type.name: i.value_STR for i in record.inherited}
+    return result
 
 
 def replace_in_transcription(request):

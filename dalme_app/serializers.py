@@ -389,6 +389,7 @@ class SourceSerializer(DynamicSerializer):
     parent = serializers.PrimaryKeyRelatedField(queryset=Source.objects.all(), allow_null=True)
     parent_name = serializers.StringRelatedField(source='parent', read_only=True, required=False)
     attributes = AttributeSerializer(many=True, required=False)
+    inherited = AttributeSerializer(many=True, required=False)
     no_folios = serializers.IntegerField(required=False)
     tags = TagSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
@@ -396,28 +397,12 @@ class SourceSerializer(DynamicSerializer):
     class Meta:
         model = Source
         fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'has_inventory',
-                  'attributes', 'no_folios', 'tags', 'workflow')
+                  'attributes', 'inherited', 'no_folios', 'tags', 'workflow')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        attributes = ret.pop('attributes')
-        new_att = {}
-        dates = {}
-        for i in attributes:
-            (k, v), = i.items()
-            if k == 'start_date' or k == 'end_date':
-                dates[k] = v
-            else:
-                new_att[k] = v
-        if dates:
-            if 'start_date' in dates:
-                if 'end_date' in dates:
-                    new_att['date'] = functions.get_date_range(dates['start_date'], dates['end_date'])
-                else:
-                    new_att['date'] = dates['start_date']
-            else:
-                new_att['date'] = dates['end_date']
-        ret['attributes'] = new_att
+        ret['attributes'] = self.process_attributes(ret.pop('attributes'))
+        ret['inherited'] = self.process_attributes(ret.pop('inherited'))
         ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id'], 'value': ret['name']}
         parent_name = ret.pop('parent_name', None)
         if parent_name is not None:
@@ -427,6 +412,25 @@ class SourceSerializer(DynamicSerializer):
         type_name = ret.pop('type_name')
         ret['type'] = {'name': type_name, 'value': ret['type']}
         return ret
+
+    def process_attributes(self, qset):
+        result = {}
+        dates = {}
+        for i in qset:
+            (k, v), = i.items()
+            if k == 'start_date' or k == 'end_date':
+                dates[k] = v
+            else:
+                result[k] = v
+        if dates:
+            if 'start_date' in dates:
+                if 'end_date' in dates:
+                    result['date'] = functions.get_date_range(dates['start_date'], dates['end_date'])
+                else:
+                    result['date'] = dates['start_date']
+            else:
+                result['date'] = dates['end_date']
+        return result
 
 
 class WikiGroupSerializer(serializers.ModelSerializer):
@@ -556,7 +560,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content_type
-        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types', 'has_pages', 'parents', 'has_inventory')
+        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types', 'has_pages', 'parents', 'has_inventory', 'r1_inheritance', 'r2_inheritance')
         extra_kwargs = {'name': {'validators': []}}
 
     def to_representation(self, instance):

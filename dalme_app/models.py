@@ -159,12 +159,23 @@ class Content_type(dalmeIntid):
     has_pages = models.BooleanField(default=False, db_index=True)
     has_inventory = models.BooleanField(default=False)
     parents = models.CharField(max_length=255, blank=True, default=None, null=True)
+    r1_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
+    r2_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['id']
+
+    @property
+    def inheritance(self):
+        inheritance = {}
+        if self.r1_inheritance:
+            inheritance['r1'] = self.r1_inheritance.split(',')
+        if self.r2_inheritance:
+            inheritance['r2'] = self.r2_inheritance.split(',')
+        return inheritance
 
 
 class Content_attributes(dalmeIntid):
@@ -339,6 +350,17 @@ class Source(dalmeUuid):
 
     def get_absolute_url(self):
         return reverse('source_detail', kwargs={'pk': self.pk})
+
+    @property
+    def inherited(self):
+        inheritance = self.type.inheritance
+        if self.parent and inheritance.get('r1', None) is not None:
+            r1_inherited = self.parent.attributes.filter(attribute_type__in=inheritance['r1'])
+            if self.parent.parent and inheritance.get('r2', None) is not None:
+                r2_inherited = self.parent.inherited.filter(attribute_type__in=inheritance['r2'])
+                return r1_inherited | r2_inherited
+            else:
+                return r1_inherited
 
 
 class Transcription(dalmeUuid):
