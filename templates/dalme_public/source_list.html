@@ -14,3 +14,23 @@
     <p><strong>No resources found.</strong></p>
   {% endif %}
 {% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    $(function() {
+      $('form.filter-form').submit(function() {
+        var input = $(this).find(':input:empty');
+        var selects = $(this).find('select');
+        input.prop('disabled', true);
+        $.each(selects, function(i, select) {
+          if (!select.value) {
+            $(select).prop('disabled', true);
+          }
+        });
+        return true;
+      });
+    });
+  </script>
+{% endblock %}

@@ -11,11 +11,11 @@ class SetAliasPage(models.Model):
 
     @property
     def description(self):
-        return self.source_set.description
+        return self.source_set.description if self.source_set else ''
 
     @property
     def alias_type(self):
-        return self.source_set.source_type
+        return self.source_set.set_type if self.source_set else None
 
     @property
     def sources(self):

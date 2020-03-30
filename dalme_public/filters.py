@@ -38,11 +38,17 @@ def _source_type_choices():
 
 
 def _collection_choices():
-    return enumerate(Collection.objects.all())
+    return [
+        (collection.pk, collection.name)
+        for collection in Collection.objects.all().order_by('name')
+    ]
 
 
 def _dataset_choices():
-    return enumerate(Set.objects.all())
+    return [
+        (dataset.pk, dataset.name)
+        for dataset in Set.objects.all().order_by('name')
+    ]
 
 
 class SourceOrderingFilter(django_filters.OrderingFilter):
@@ -108,16 +114,18 @@ class SourceFilter(django_filters.FilterSet):
     source_type = django_filters.MultipleChoiceFilter(
         label='Type',
         choices=_source_type_choices,
-        method='filter_type',
+        method='filter_type'
     )
-    # collection = django_filters.MultipleChoiceFilter(
-    #     label='Collection',
-    #     choices=_collection_choices
-    # )
-    # dataset = django_filters.MultipleChoiceFilter(
-    #     label='Set',
-    #     choices=_dataset_choices
-    # )
+    collection = django_filters.ChoiceFilter(
+        label='Collection',
+        choices=_collection_choices,
+        method='filter_collection'
+    )
+    dataset = django_filters.ChoiceFilter(
+        label='Set',
+        choices=_dataset_choices,
+        method='filter_dataset'
+    )
     has_image = django_filters.BooleanFilter(
         label='Has Image', method='filter_image'
     )
@@ -145,10 +153,19 @@ class SourceFilter(django_filters.FilterSet):
         return queryset.filter(**{'attributes__value_STR__in': source_types})
 
     def filter_collection(self, queryset, name, value):
-        raise NotImplementedError()
+        try:
+            collection = Collection.objects.get(pk=value)
+        except Collection.DoesNotExist:
+            return queryset.none()
+        source_sets = [dataset.source_set for dataset in collection.sets.all()]
+        return queryset.filter(sets__in=source_sets)
 
-    def filter_set(self, queryset, name, value):
-        raise NotImplementedError()
+    def filter_dataset(self, queryset, name, value):
+        try:
+            dataset = Set.objects.get(pk=value)
+        except Set.DoesNotExist:
+            return queryset.none()
+        return queryset.filter(sets__in=[dataset.source_set])
 
     def filter_image(self, queryset, name, value):
         return queryset.exclude(source_pages__page__dam_id__isnull=value)

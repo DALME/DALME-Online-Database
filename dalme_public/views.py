@@ -65,7 +65,6 @@ class SourceList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        request = self.request.GET.copy()
 
         has_filter = any(
             field in self.request.GET
@@ -77,7 +76,7 @@ class SourceList(ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs).exclude(
             type__name__in=['Archive', 'File unit']
-        )
+        ).order_by('name')
         self.filterset = self.filterset_class(self.request.GET, queryset=qs)
         qs = self.filterset.qs.distinct()
         if self.filterset.annotated:
