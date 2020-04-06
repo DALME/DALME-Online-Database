@@ -1,28 +1,19 @@
 from django import template
 
+from dalme_app.serializers import SourceSerializer
+
 
 register = template.Library()
 
 
+# TODO: Combine these two into one call to serialize?
 @register.simple_tag
 def get_source_date(source):
-    dates = {
-        attr.attribute_type.short_name: attr
-        for attr in source.attributes.all()
-        if attr.attribute_type.short_name in ('start_date', 'end_date')
-    }
-    start_date = dates.get('start_date', '')
-    end_date = dates.get('end_date', '')
-
-    if start_date and not end_date:
-        return str(start_date)
-    if end_date and not start_date:
-        return str(end_date)
-    if start_date == end_date:
-        return str(start_date)
-    if start_date and end_date:
-        return f'{start_date} to {end_date}'
-    return ''
+    # try:
+    #     return source.date
+    # except AttributeError:
+    data = SourceSerializer().to_representation(source)
+    return data['attributes'].get('date')
 
 
 @register.simple_tag
@@ -30,13 +21,8 @@ def get_source_type(source):
     try:
         return source.source_type
     except AttributeError:
-        try:
-            return next(
-                str(attr) for attr in source.attributes.all()
-                if attr.attribute_type.short_name == 'record_type'
-            )
-        except StopIteration:
-            return None
+        data = SourceSerializer().to_representation(source)
+        return data['attributes'].get('record_type')
 
 
 @register.simple_tag

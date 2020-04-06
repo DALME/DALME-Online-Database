@@ -4,7 +4,13 @@
     {% for field in filterset.form %}
       <div class="field-container u-flex">
         <h4>{{ field.label_tag }}</h4>
-        {{ field }}
+        {% if field.name == 'date_range' %}
+          <div class="date-field-container u-flex">
+            {{ field }}
+          </div>
+        {% else %}
+          {{ field }}
+        {% endif %}
       </div>
     {% endfor %}
     <button class="submit-filter" type="submit" />Submit</button>

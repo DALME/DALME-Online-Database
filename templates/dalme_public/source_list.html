@@ -21,12 +21,9 @@
   <script type="text/javascript">
     $(function() {
       $('form.filter-form').submit(function() {
-        var input = $(this).find(':input:empty');
-        var selects = $(this).find('select');
-        input.prop('disabled', true);
-        $.each(selects, function(i, select) {
-          if (!select.value) {
-            $(select).prop('disabled', true);
+        $.each($(this).find('input,select'), function(i, field) {
+          if (!field.value) {
+            $(field).prop('disabled', true);
           }
         });
         return true;

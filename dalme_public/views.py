@@ -68,7 +68,12 @@ class SourceList(ListView):
 
         has_filter = any(
             field in self.request.GET
-            for field in ['page', *self.filterset.filters.keys()]
+            for field in [
+                'page',
+                'date_range_after',
+                'date_range_before',
+                *self.filterset.filters.keys()
+            ]
         )
         context.update({"filterset": self.filterset, 'has_filter': has_filter})
         return context

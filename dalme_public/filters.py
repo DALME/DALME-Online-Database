@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django import forms
 from django.db.models import Case, F, Q, When
 from django.forms.widgets import NullBooleanSelect
 
@@ -7,6 +10,7 @@ from dalme_app.models import Attribute, Source
 from dalme_public.models import Collection, Set
 
 
+DATERANGE_FORMATS = ('%Y', '%b-%Y', '%d-%b-%Y',)
 BOOLEAN_CHOICES = [('', '---------'), ('true', 'Yes'), ('false', 'No')]
 
 
@@ -32,11 +36,6 @@ def _map_source_types():
         ).values('value_STR').distinct())
     }
 
-def _source_type_choices():
-    type_map = _map_source_types()
-    return sorted(list(type_map.items()), key=lambda choice: choice[1])
-
-
 def _collection_choices():
     return [
         (collection.pk, collection.name)
@@ -51,14 +50,34 @@ def _dataset_choices():
     ]
 
 
+def _source_type_choices():
+    type_map = _map_source_types()
+    return sorted(list(type_map.items()), key=lambda choice: choice[1])
+
+
+def _year_choices():
+    raise NotImplementedError()
+
+
+class CustomDateRangeField(django_filters.fields.DateRangeField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            field.input_formats = [DATERANGE_FORMATS]
+
+
+class CustomDateFromToRangeFilter(django_filters.DateFromToRangeFilter):
+    field_class = CustomDateRangeField
+
+
 class SourceOrderingFilter(django_filters.OrderingFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.extra['choices'] += [
             ('source_type', 'Type'),
             ('-source_type', 'Type (descending)'),
-            # ('date', 'Date'),
-            # ('-date', 'Date (descending)'),
+            ('date', 'Date'),
+            ('-date', 'Date (descending)'),
         ]
 
     @staticmethod
@@ -67,23 +86,55 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
             return False
         return next((v for v in value if v and v.endswith(field)), False)
 
+    @staticmethod
+    def annotate_dates(queryset):
+        return queryset.annotate(
+            start_date=Case(
+                When(
+                    attributes__attribute_type__short_name='start_date',
+                    then=F('attributes__value_DATE')
+                ),
+                default=None
+            )
+        ).annotate(
+            end_date=Case(
+                When(
+                    attributes__attribute_type__short_name='end_date',
+                    then=F('attributes__value_DATE')
+                ),
+                default=None
+            )
+        ).distinct()
+
     def filter(self, qs, value):
         qs = super().filter(qs, value)
 
+        # TODO: Still looking for a solution to the 'distinct' issue.
+        # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#distinct
+        # Perhaps, as long as we filter for these annotated object last, we can
+        # cast the results to `values` and the distinct comparison will
+        # succeed. In any case, for now any duplicates that remain here are
+        # eliminated on the view itself before template render time.
         date = self.get_value('date', value)
         if date:
             self.parent.annotated = True
-            raise NotImplementedError()
+            # TODO: It's not perfect, but probably as good as we are going
+            # to get without going deep into date data normalization.
+            qs = self.annotate_dates(qs)
+            if not date.startswith('-'):
+                qs = qs.order_by(
+                    F('start_date').asc(nulls_last=True),
+                    F('end_date').asc(nulls_last=True),
+                )
+            else:
+                qs = qs.order_by(
+                    F('start_date').desc(nulls_first=True),
+                    F('end_date').desc(nulls_first=True)
+                )
 
         source_type = self.get_value('source_type', value)
         if source_type:
             self.parent.annotated = True
-            # TODO: Still looking for a solution to the 'distinct' issue.
-            # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#distinct
-            # Perhaps, as long as we filter for source_type last, we can cast
-            # the results to `values` and the distinct comparison will succeed.
-            # In any case, for now any duplicates that remain here are
-            # eliminated on the view itself before template render time.
             qs = qs.annotate(
                 source_type=Case(
                     When(
@@ -101,6 +152,39 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
         return qs
 
 
+class SourceFilterForm(forms.Form):
+    def clean(self):
+        cleaned_data = super().clean()
+
+        cleaned_data['date_range'] = {}
+        date_keys = ['date_range_after', 'date_range_before']
+        if any(key in self.data.keys() for key in date_keys):
+            for date_key in date_keys:
+                if self.data.get(date_key):
+                    date = None
+                    for fmt in DATERANGE_FORMATS:
+                        value = self.data[date_key]
+                        try:
+                            date = datetime.strptime(value, fmt)
+                            break
+                        except ValueError:
+                            self.add_error(
+                                'date_range',
+                                f'Value: {value} is not a valid date.'
+                            )
+                    if date:
+                        cleaned_data['date_range'][date_key] = date
+
+        after = cleaned_data['date_range'].get('date_range_after')
+        before = cleaned_data['date_range'].get('date_range_before')
+        if (after and before) and after > before:
+            self.add_error(
+                'date_range',
+                f'The "after" value cannot be greater than the "before" value.'
+            )
+        return cleaned_data
+
+
 class SourceFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.annotated = False
@@ -115,6 +199,13 @@ class SourceFilter(django_filters.FilterSet):
         label='Type',
         choices=_source_type_choices,
         method='filter_type'
+    )
+    date_range = CustomDateFromToRangeFilter(
+        label='Date Range',
+        widget=django_filters.widgets.DateRangeWidget(
+            attrs={'placeholder': '%Y or %b-%Y or %d-%b-%Y'}
+        ),
+        method='filter_date_range'
     )
     collection = django_filters.ChoiceFilter(
         label='Collection',
@@ -139,7 +230,17 @@ class SourceFilter(django_filters.FilterSet):
 
     class Meta:
         model = Source
-        fields = ['name']
+        form = SourceFilterForm
+        fields = [
+            'name',
+            'source_type',
+            'date_range',
+            'collection',
+            'dataset',
+            'has_image',
+            'has_transcription',
+            'order_by',
+        ]
 
     def filter_type(self, queryset, name, value):
         # Now we can re-use the type map when a request comes in for filtering.
@@ -152,10 +253,25 @@ class SourceFilter(django_filters.FilterSet):
                 continue
         return queryset.filter(**{'attributes__value_STR__in': source_types})
 
+    def filter_date_range(self, queryset, name, value):
+        queryset = queryset.filter(
+            attributes__attribute_type__short_name__endswith='_date'
+        ).distinct()
+
+        after = value.get('date_range_after')
+        before = value.get('date_range_before')
+        if after:
+            queryset = queryset.filter(attributes__value_DATE__gte=after)
+        if before:
+            queryset = queryset.filter( attributes__value_DATE__lte=before)
+
+        return queryset
+
     def filter_collection(self, queryset, name, value):
         try:
             collection = Collection.objects.get(pk=value)
         except Collection.DoesNotExist:
+            # TODO: Strict mode: on/off - none/pass through
             return queryset.none()
         source_sets = [dataset.source_set for dataset in collection.sets.all()]
         return queryset.filter(sets__in=source_sets)
@@ -164,6 +280,7 @@ class SourceFilter(django_filters.FilterSet):
         try:
             dataset = Set.objects.get(pk=value)
         except Set.DoesNotExist:
+            # TODO: Strict mode: on/off - none/pass through
             return queryset.none()
         return queryset.filter(sets__in=[dataset.source_set])
 
