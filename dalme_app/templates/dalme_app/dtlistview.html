@@ -75,7 +75,24 @@
                     {% endfor %}
                   ],
                 {% else %}
-                  {{ k | safe }}: "{{ v | safe }}",
+                  {% if v == 'upload' %}
+                    type: "upload",
+                    ajax: {
+                      method: "POST",
+                      url: "/api/attachments/",
+                      headers: { 'X-CSRFToken': get_cookie("csrftoken")},
+                    },
+                    display: function ( file ) {
+                      // return dt_editor.file('Attachment', file_id ).filename;
+                      return file.filename
+                    },
+                    clearText: "Remove File",
+                    dragDrop: 'true',
+                    dragDropText: "Drag file here",
+                    uploadText: "Choose file..."
+                  {% else %}
+                    {{ k | safe }}: "{{ v | safe }}",
+                  {% endif %}
                 {% endif %}
               {% endfor %}
             },

@@ -305,6 +305,11 @@ class Page(dalmeUuid):
     def __str__(self):
         return self.name
 
+    def get_rights(self):
+        if self.sources.all()[0].source.parent.parent.attributes.filter(attribute_type=144).exists():
+            rpo = RightsPolicy.objects.get(pk=json.loads(self.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR)['id'])
+            return {'status': rpo.get_rights_status_display(), 'display_notice': rpo.notice_display, 'notice': json.loads(rpo.rights_notice)}
+
     def get_absolute_url(self):
         return reverse('page_detail', kwargs={'pk': self.pk})
 
@@ -743,18 +748,36 @@ class Comment(dalmeIntid):
     def __str__(self):
         return self.snippet
 
+    class Meta:
+        ordering = ['creation_timestamp']
 
-class Attachment(dalmeUuid):
-    file = models.FileField(upload_to='attachments/%Y/%m/')
-    type = models.CharField(max_length=255, null=True)
 
-    @property
-    def filename(self):
-        return os.path.basename(self.file.name)
+class RightsPolicy(dalmeUuid):
+    COPYRIGHTED = 1
+    ORPHANED = 2
+    OWNED = 3
+    PUBLIC_DOMAIN = 4
+    UNKNOWN = 5
+    RIGHTS_STATUS = (
+        (COPYRIGHTED, 'Copyrighted'),
+        (ORPHANED, 'Orphaned'),
+        (OWNED, 'Owned'),
+        (PUBLIC_DOMAIN, 'Public Domain'),
+        (UNKNOWN, 'Unknown'),
+    )
+    name = models.CharField(max_length=100)
+    rights_status = models.IntegerField(choices=RIGHTS_STATUS, default=5)
+    rights = models.TextField(blank=True, default=None)
+    rights_notice = models.TextField(blank=True, default=None)
+    licence = models.TextField(blank=True, null=True, default=None)
+    rights_holder = models.CharField(max_length=255, null=True, default=None)
+    notice_display = models.BooleanField(default=False)
+    attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
 
-    def extension(self):
-        name, extension = os.path.splitext(self.file.name)
-        return extension
+    def get_url(self):
+        return '/rights/' + str(self.id)
+
+
 
     def preview(self):
         icon_type_dict = {

@@ -1,14 +1,15 @@
 from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, TaskList, Task, wiki_user_groups,
-                              rs_resource, Language, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              Country, City, Tag, Attachment, Ticket, Comment, Workflow, Set)
+                              rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
+                              CountryReference, CityReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
 import base64
 import textwrap
 import datetime
+import json
 
 
 class DynamicSerializer(serializers.ModelSerializer):
@@ -101,6 +102,41 @@ class CitySerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         country_name = ret.pop('country_name')
         ret['country'] = {'name': country_name, 'value': ret['country']}
+        return ret
+
+
+class RightsSerializer(serializers.ModelSerializer):
+    rights_status_name = serializers.ChoiceField(choices=RightsPolicy.RIGHTS_STATUS, source='get_rights_status_display', required=False)
+    url = serializers.ReadOnlyField(source='get_url', read_only=True, required=False)
+
+    class Meta:
+        model = RightsPolicy
+        fields = ('id', 'name', 'url', 'rights_holder', 'rights_status', 'rights_status_name', 'rights', 'notice_display', 'rights_notice', 'licence', 'attachments')
+        extra_kwargs = {
+                        'rights_notice': {'required': False},
+                        'licence': {'required': False},
+                        'attachments': {'required': False}
+                        }
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if ret['attachments'] is not None:
+            a_pill = '<a href="/download/{}" class="task-attachment">File</a>'.format(instance.attachments.file)
+            ret['attachments'] = {
+                'pill': a_pill,
+                'file': {
+                    'file_id': ret.pop('attachments'),
+                    'filename': instance.attachments.filename
+                }
+            }
+        ret['name'] = {
+            'name': ret.pop('name'),
+            'url': ret.pop('url')
+        }
+        ret['rights_status'] = {
+            'name': ret.pop('rights_status_name'),
+            'value': ret.pop('rights_status')
+        }
         return ret
 
 
@@ -297,7 +333,7 @@ class SimpleAttributeSerializer(serializers.ModelSerializer):
             ret.pop('value_DATE_y')
         if instance.attribute_type.data_type != 'TXT':
             ret.pop('value_TXT')
-        if instance.attribute_type.data_type != 'STR' and instance.attribute_type.data_type != 'INT':
+        if instance.attribute_type.data_type != 'STR' and instance.attribute_type.data_type != 'INT' and instance.attribute_type.data_type != 'UUID':
             ret.pop('value_STR')
         return ret
 
@@ -353,7 +389,16 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         label = instance.attribute_type.short_name
-        value = str(instance)
+        if instance.attribute_type.data_type == 'UUID':
+            data = json.loads(instance.value_STR)
+            object = eval('{}.objects.get(pk="{}")'.format(data['class'], data['id']))
+            value = {
+                'name': object.name,
+                'url': object.get_url(),
+                'value': instance.value_STR
+            }
+        else:
+            value = str(instance)
         ret = {label: value}
         return ret
 
@@ -402,7 +447,8 @@ class SourceSerializer(DynamicSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['attributes'] = self.process_attributes(ret.pop('attributes'))
-        ret['inherited'] = self.process_attributes(ret.pop('inherited'))
+        if ret['inherited'] is not None:
+            ret['inherited'] = self.process_attributes(ret.pop('inherited'))
         ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id'], 'value': ret['name']}
         parent_name = ret.pop('parent_name', None)
         if parent_name is not None:

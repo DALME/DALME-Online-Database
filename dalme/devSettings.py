@@ -43,7 +43,7 @@ DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
 DEBUG = True
 # Application definition
 ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443']
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     'dalme_app.application.DalmeConfig',
@@ -65,7 +65,7 @@ INSTALLED_APPS = [
     #'debug_toolbar',
     #'crispy_forms',
     #'oauth2_provider',
-    # 'corsheaders',
+    'corsheaders',
     'rest_framework',
     'oidc_provider',
     'storages'

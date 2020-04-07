@@ -140,6 +140,10 @@ def get_attribute_value(attribute):
     dt = attribute.attribute_type.data_type
     if dt == 'DATE':
         value = format_date(attribute, 'attribute')
+    elif dt == 'UUID':
+        val_data = json.loads(attribute.value_STR)
+        object = eval('{}.objects.get(pk="{}")'.format(val_data['class'], val_data['id']))
+        value = '<a href="{}">{}</a>'.format(object.get_url(), object.name)
     else:
         value = eval('attribute.value_'+dt)
     return value

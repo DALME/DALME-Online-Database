@@ -13,15 +13,14 @@ from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, Langua
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
                                    CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer, CommentSerializer, WorkflowSerializer,
-                                   SetSerializer)
+                                   SetSerializer, RightsSerializer)
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, Language,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
-                              wiki_user_groups, wp_users, wp_usermeta, Attribute, Country, City, Attachment, Ticket, Tag,
-                              Comment, Workflow, Set, Set_x_content)
+                              Comment, Workflow, Set, Set_x_content, RightsPolicy)
 from django_celery_results.models import TaskResult
 from django.db.models.expressions import RawSQL
 from rest_framework.permissions import DjangoModelPermissions
@@ -73,7 +72,7 @@ class Datasets(viewsets.ViewSet):
                         data_dict['series'].append({'name': name, 'data': src_counts})
                     data_dict['xAxis'] = {'categories': categories}
             except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+                data_dict['error'] = 'The following error occured while trying to fetch the dataset: ' + str(e)
         else:
             data_dict['error'] = 'No dataset id was included in the request.'
         return Response(data_dict)
@@ -212,23 +211,23 @@ class DTViewSet(viewsets.ModelViewSet):
             else:
                 search_dict = {}
             queryset = self.get_queryset()
-            try:
-                data_dict['draw'] = int(dt_data.get('draw'))  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-                if dt_data['search']['value']:
-                    queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-                if request.GET.get('filters') is not None:
-                    queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
-                queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-                rec_count = queryset.count()
-                data_dict['recordsTotal'] = rec_count
-                data_dict['recordsFiltered'] = rec_count
-                # filter the queryset for the current page
-                queryset = queryset[dt_data.get('start'):dt_data.get('start')+dt_data.get('length')]
-                serializer = self.get_serializer(queryset, many=True)
-                data = serializer.data
-                data_dict['data'] = data
-            except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+            # try:
+            data_dict['draw'] = int(dt_data.get('draw'))  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+            if dt_data['search']['value']:
+                queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+            if request.GET.get('filters') is not None:
+                queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
+            queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+            rec_count = queryset.count()
+            data_dict['recordsTotal'] = rec_count
+            data_dict['recordsFiltered'] = rec_count
+            # filter the queryset for the current page
+            queryset = queryset[dt_data.get('start'):dt_data.get('start')+dt_data.get('length')]
+            serializer = self.get_serializer(queryset, many=True)
+            data = serializer.data
+            data_dict['data'] = data
+            # except Exception as e:
+            #     data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
         else:
             queryset = self.get_queryset()
             try:
@@ -236,7 +235,7 @@ class DTViewSet(viewsets.ModelViewSet):
                 data = serializer.data
                 data_dict['data'] = data
             except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+                data_dict['error'] = 'The following error occured while trying to serialize the data: ' + str(e)
         return Response(data_dict)
 
     def retrieve(self, request, pk=None):
@@ -362,6 +361,13 @@ class Cities(DTViewSet):
     permission_classes = (DjangoModelPermissions,)
     queryset = City.objects.all()
     serializer_class = CitySerializer
+
+
+class Rights(DTViewSet):
+    """ API endpoint for managing rights policies """
+    permission_classes = (DjangoModelPermissions,)
+    queryset = RightsPolicy.objects.all()
+    serializer_class = RightsSerializer
 
 
 class AttributeTypes(DTViewSet):
@@ -734,7 +740,7 @@ class Options(viewsets.ViewSet):
                         options = eval('self.'+ls+'()')
                     data_dict[ls] = options
             except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+                data_dict['error'] = 'The following error occured while trying to fetch the options data: ' + str(e)
         else:
             data_dict['error'] = 'No target was included in the request.'
         return Response(data_dict)
@@ -830,6 +836,18 @@ class Pages(DTViewSet):
     permission_classes = (DjangoModelPermissions,)
     queryset = Page.objects.all()
     serializer_class = PageSerializer
+
+    @action(detail=True, methods=['post', 'get'])
+    def get_rights(self, request, *args, **kwargs):
+        result = {}
+        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        try:
+            result['rights'] = object.get_rights()
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
 
 
 class Sources(DTViewSet):

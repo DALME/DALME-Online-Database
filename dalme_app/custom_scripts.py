@@ -5,7 +5,7 @@ import re
 import os
 import json
 import pandas as pd
-from dalme_app.models import AttributeReference, Language, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Task, Workflow, Work_log, Set, Set_x_content
+from dalme_app.models import Page, AttributeReference, LanguageReference, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Task, Workflow, Work_log, Set, Set_x_content, RightsPolicy
 from datetime import date
 from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
@@ -21,6 +21,7 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.template import defaultfilters
 from django.utils import timezone
+from django.forms.models import model_to_dict
 
 
 def get_script_menu():
@@ -205,10 +206,18 @@ def test_expression2(request):
     #                 new_entry.workset_done = v.get('done', False)
     #                 new_members.append(new_entry)
     #         Set_x_content.objects.bulk_create(new_members)
-    record = Source.objects.get(pk='bc3a2c32639e44d6b5a21829b42ae0b5')
-    result = {i.attribute_type.name: i.value_STR for i in record.inherited}
-    return result
-
+    # result = record.source_pages.all().select_related('transcription')
+    # eps = [i.transcription.entity_phrases.filter(content_type=115) for i in result]
+    # eps = [i.transcription.entity_phrases.filter(content_type=104) for i in record.source_pages.all().select_related('transcription')]
+    # result2 = eps[0].union(*eps[1:])
+    #return record.agents[0].relations.all()[0].target_object.std_name
+    record = Page.objects.get(pk='44c79e6a8a4b4b50aa7a1b9d6bb61134')
+    # pol = record.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR
+    # pol2 = json.loads(pol)['id']
+    # rights_obj = RightsPolicy.objects.get(pk=pol2)
+    # # return model_to_dict(rights_obj, fields=['rights_status', 'notice_display', 'rights_notice'])
+    # ret_dict = {'status': rights_obj.get_rights_status_display(), 'display_notice': rights_obj.notice_display, 'notice': json.loads(rights_obj.rights_notice)}
+    return record.get_rights()['notice']['@ita']
 
 def replace_in_transcription(request):
     inventories = Source.objects.filter(type=13, short_name__contains='FF 1009', creation_username='pizzorno', modification_username='pizzorno')

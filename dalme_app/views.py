@@ -14,7 +14,7 @@ from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
                               Source, Set, TaskList, Task, rs_resource, rs_collection_resource,
                               rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, Language,
-                              Attribute_type, Country, rs_collection, Ticket, Workflow)
+                              Attribute_type, CountryReference, rs_collection, Ticket, Workflow, RightsPolicy)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
@@ -847,6 +847,87 @@ class CityList(DTListView):
             dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete City',
                                 'formMessage': 'Are you sure you wish to remove this city from the database? This action cannot be undone.'})
         return dte_buttons
+
+
+@method_decorator(login_required, name='dispatch')
+class RightsList(DTListView):
+    breadcrumb = [('Project', ''), ('Rights Policies', '/rights')]
+    list_name = 'rights'
+    dt_editor_options = {'idSrc': '"id"'}
+    dte_field_list = ['name', 'rights_holder', 'rights_status', 'rights', 'notice_display', 'rights_notice', 'licence', 'attachments']
+    dt_options = {
+        'pageLength': 25,
+        'paging': 'true',
+        'responsive': 'true',
+        'fixedHeader': 'true',
+        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+        'serverSide': 'true',
+        'stateSave': 'true',
+        'select': {'style': 'single'},
+        'deferRender': 'true',
+        'rowId': '"id"',
+        'processing': 'true',
+        'language': {
+            'searchPlaceholder': 'Search',
+            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+            },
+        'order': '[[ 1, "asc" ]]'
+        }
+
+    def get_dte_buttons(self, *args, **kwargs):
+        dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_rightspolicy'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Policy'})
+        if self.request.user.has_perm('dalme_app.change_rightspolicy'):
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Policy Information'})
+        if self.request.user.has_perm('dalme_app.delete_rightspolicy'):
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Policy',
+                                'formMessage': 'Are you sure you wish to remove this policy from the database? This action cannot be undone.'})
+        return dte_buttons
+
+
+@method_decorator(login_required, name='dispatch')
+class RightsDetail(DetailView):
+    model = RightsPolicy
+    template_name = 'dalme_app/generic_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = [('Project', ''), ('Rights Policies', '/rights')]
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context = functions.set_menus(self.request, context, state)
+        page_title = 'Policy: ' + self.object.name
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['object_class'] = 'Rights Policy'
+        context['object_icon'] = 'fas fa-copyright'
+        if self.object.notice_display:
+            notice_disp = '<i class="fas fa-check-square"></i>'
+        else:
+            notice_disp = '<i class="far fa-square"></i>'
+        context['attribute_dictionaries'] = ['Rights Notice']
+        context['object_attributes'] = {
+            'ID': self.object.id,
+            'Name': self.object.name,
+            'Rights Holder': self.object.rights_holder,
+            'Rights Status': self.object.get_rights_status_display(),
+            'Rights': self.object.rights,
+            'Notice Display': notice_disp,
+            'Rights Notice': json.loads(self.object.rights_notice),
+            'Licence': self.object.licence,
+            'Attachment': self.object.attachments.filename
+        }
+        return context
+
+    def get_object(self):
+        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
+        try:
+            object = RightsPolicy.objects.get(pk=self.kwargs['pk'])
+            return object
+        except ObjectDoesNotExist:
+            raise Http404
 
 
 @method_decorator(login_required, name='dispatch')

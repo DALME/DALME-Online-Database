@@ -115,11 +115,11 @@
     "permissions": ["Users", "Staff", "Administrators", "Developers"]
   },
   {
-    "text": "Tasks",
-    "link": "/tasks",
-    "iconClass": "fa-tasks",
+    "text": "Rights Policies",
+    "link": "/rights",
+    "iconClass": "fa-copyright",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": ["Staff", "Administrators", "Developers"]
   },
   {
     "text": "Sets",
