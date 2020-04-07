@@ -620,11 +620,11 @@ class SourceDetail(DetailView):
             tables.append(['children', 'fa-sitemap', title])
         if has_agents:
             title = 'Agents (' + str(len(self.object.agents)) + ')'
-            context['agents'] = self.object.agents.all().select_related('content_type')
+            context['agents'] = self.object.agents
             tables.append(['agents', 'fa-user-friends', title])
         if has_places:
             title = 'Places (' + str(len(self.object.places)) + ')'
-            context['places'] = self.object.places.all().select_related('content_type')
+            context['places'] = self.object.places
             tables.append(['places', 'fa-map-marker-alt', title])
         if tables != []:
             context['tables'] = tables

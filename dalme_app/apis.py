@@ -885,6 +885,12 @@ class Sources(DTViewSet):
             status = 400
         return Response(result, status)
 
+    # @action(detail=True, methods=['post'])
+    # def add_identity_phrase(self, request, *args, **kwargs):
+    #     result = {}
+    #     object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+    #     try:
+
     def create(self, request, *args, **kwargs):
         result = {}
         data_dict = get_dte_data(request)

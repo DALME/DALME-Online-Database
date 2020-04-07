@@ -608,3 +608,40 @@ function saveDescription() {
     }
   }
 }
+
+// function create_named_entity() {
+//     namedEntityForm = new $.fn.dataTable.Editor( {
+//           ajax: {
+//             method: "POST",
+//             url: "/api/tasklists/",
+//             headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+//             data: function (data) { return { "data": JSON.stringify( data ) }; }
+//           },
+//           fields: [
+//             {
+//               label: "List name",
+//               name: "name",
+//               fieldInfo: "Name of the list to be created"
+//             },
+//             {
+//               label: "Group",
+//               name:  "group",
+//               fieldInfo: "Group of users that will utilize the list",
+//               type: "selectize",
+//               opts: {'placeholder': "Select user group"},
+//               options: groups
+//             },
+//           ]
+//       });
+//       namedEntityForm.on('submitSuccess', function(e, json, data, action) {
+//         toastr.success('The task list was created successfully.');
+//         if (typeof table_lists != 'undefined') {
+//           table_lists.ajax.reload();
+//         }
+//       });
+//       namedEntityForm.buttons({
+//         text: "Create",
+//         className: "btn btn-primary",
+//         action: function () { this.submit(); }
+//       }).title('Create New Task List').create();
+// }
