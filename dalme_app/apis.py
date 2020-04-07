@@ -198,7 +198,7 @@ class DTViewSet(viewsets.ModelViewSet):
                 query_list = list(queryset.values_list('id', flat=True))
                 data_dict['data'] = query_list
             except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+                data_dict['error'] = 'The following error occured while trying to fetch the set: ' + str(e)
         else:
             data_dict['error'] = 'There was no data in the request.'
         return Response(data_dict)

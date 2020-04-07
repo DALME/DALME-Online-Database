@@ -85,9 +85,6 @@
     ]
   },
   {
-    "section": "close"
-  },
-  {
     "name": "Highlight",
     "type": "w",
     "help": "Wrap a word or phrase to mark it as graphically distinct from the surrounding text.",
@@ -105,6 +102,9 @@
       "indent3",
       "indent4"
     ]
+  },
+  {
+    "section": "close"
   },
   {
     "section": "Editorial",

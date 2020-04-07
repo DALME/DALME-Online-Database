@@ -103,28 +103,12 @@
                   {% for i in attribute_data %}
                   <div class="form-row">
                       <div class="col-sm-3 text-right">
-                        <span class="attribute_list_label">{{ i.label }}</span>
-                      </div>
-                      <div class="col-sm-9">
-                        <span class="attribute_list_value">{{ i.value | safe }}</span>
-                      </div>
-                  </div>
-                  {% endfor %}
-                {% else %}
-                  <div class="empty-card-message">No attributes assigned.</div>
-                {% endif %}
-              </div>
-            </div>
-            <div class="card mb-3">
-              <div class="sub-card-header">
-                <div class="card-header-title"><i class="fa fa-dna fa-fw"></i> Inherited Attributes</div>
-              </div>
-              <div class="card-body attribute_list">
-                {% if inherited_data %}
-                  {% for i in inherited_data %}
-                  <div class="form-row">
-                      <div class="col-sm-3 text-right">
-                        <span class="attribute_list_label">{{ i.label }}</span>
+                        <span class="attribute_list_label">
+                            {{ i.label }}
+                            {% if i.icon %}
+                              <i class="{{ i.icon }} text-muted"></i>
+                            {% endif %}
+                        </span>
                       </div>
                       <div class="col-sm-9">
                         <span class="attribute_list_value">{{ i.value | safe }}</span>
@@ -155,6 +139,7 @@
             </div>
           </div>
           <div class="col-md-6">
+            {% if source_data.Type == 'Record' %}
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-align-left fa-fw"></i> Description</div>
@@ -170,8 +155,9 @@
                 {% endif %}
               </div>
             </div>
+            {% endif %}
             {% if has_children %}
-                <div class="card mb-3 pb-3 card-detail-list">
+                <div class="card mb-3 pb-3">
                     <div class="table-responsive dt-embed">
                       <table class="table c_stripe responsive" id="dataTables-children" width="100%">
                         <thead>
@@ -251,8 +237,8 @@
                         <tbody>
                           {% for row in agents %}
                             <tr>
-                              <td>{{ row.content_object.std_name }}</td>
-                              <td>{{ row.content_object.type }}</td>
+                              <td>{{ row.std_name }}</td>
+                              <td>{{ row.get_type_display }}</td>
                             </tr>
                           {% endfor %}
                         </tbody>
@@ -273,8 +259,8 @@
                         <tbody>
                           {% for row in places %}
                             <tr>
-                              <td>{{ row.content_object.std_name }}</td>
-                              <td>{{ row.content_object.type }}</td>
+                              <td>{{ row.std_name }}</td>
+                              <td>{{ row.get_type_display }}</td>
                             </tr>
                           {% endfor %}
                         </tbody>
