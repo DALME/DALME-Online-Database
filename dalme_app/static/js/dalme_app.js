@@ -450,3 +450,25 @@ function ticket_set_state(id, action) {
     }
   });
 }
+
+function delete_set_members(table) {
+    const confirmation = confirm("Are you sure you want to remove these records from the set? This action cannot be undone.")
+    if (confirmation) {
+        var selected = table.rows( { selected: true } ).data();
+        var sel_ids = []
+        for (let i = 0, len = selected.length; i < len; ++i) {
+          sel_ids.push(selected[i][0]);
+        };
+        $.ajax({
+          method: "PATCH",
+          url: "/api/sets/"+set_id+"/remove_members/",
+          headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+          data: { "members": JSON.stringify(sel_ids) }
+        }).done(function(data, textStatus, jqXHR) {
+          table.rows( { selected: true } ).remove().draw();
+          toastr.success('The set was updated successfully.')
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          toastr.error('There was an error communicating with the server: '+errorThrown);
+        });
+    }
+}

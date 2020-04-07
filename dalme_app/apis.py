@@ -180,7 +180,7 @@ class DTViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoModelPermissions,)
 
     @action(detail=False)
-    def get_workset(self, request, *args, **kwargs):
+    def get_set(self, request, *args, **kwargs):
         data_dict = {}
         if request.GET.get('data') is not None:
             dt_data = json.loads(request.GET['data'])
@@ -797,6 +797,12 @@ class Options(viewsets.ViewSet):
     def user_worksets(self, **kwargs):
         worksets_options = [{'label': i.name, 'value': i.id} for i in Set.objects.filter(owner=str(self.request.user.id)).order_by('name')]
         return worksets_options
+
+    def available_sets(self, **kwargs):
+        filters = Q(owner=str(self.request.user.id))
+        filters |= Q(set_permissions__in=[3, 4])
+        sets = [{'label': '{} ({})'.format(i.name, i.get_set_type_display()), 'value': i.id} for i in Set.objects.filter(filters).distinct().order_by('name')]
+        return sets
 
     def user_groups(self, **kwargs):
         user_groups = [{'label': i.name, 'value': i.id} for i in self.request.user.groups.all().order_by('name')]
@@ -1489,6 +1495,44 @@ class Sets(DTViewSet):
     queryset = Set.objects.all()
     serializer_class = SetSerializer
 
+    @action(detail=False, methods=['post'])
+    def add_members(self, request, *args, **kwargs):
+        result = {}
+        try:
+            data = request.data
+            members = json.loads(data['qset'])
+            set_id = data['data[0][set]']
+            object = self.queryset.get(pk=set_id)
+            new_members = []
+            for i in members:
+                source_object = Source.objects.get(pk=i)
+                new_entry = Set_x_content()
+                new_entry.set_id = object
+                new_entry.content_object = source_object
+                new_members.append(new_entry)
+            Set_x_content.objects.bulk_create(new_members)
+            result['message'] = 'Action succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
+    @action(detail=True, methods=['patch'])
+    def remove_members(self, request, *args, **kwargs):
+        result = {}
+        try:
+            set_id = kwargs.get('pk')
+            members = json.loads(self.request.POST['members'])
+            member_objects = Set_x_content.objects.filter(set_id=set_id, object_id__in=members)
+            member_objects.delete()
+            result['message'] = 'Action succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
     @action(detail=True, methods=['patch'])
     def workset_state(self, request, *args, **kwargs):
         result = {}
@@ -1512,37 +1556,32 @@ class Sets(DTViewSet):
 
     def create(self, request, format=None):
         data = request.data
-        set_type = data['type']
-        if int(set_type) == 4:
-            member_list = json.loads(data['qset'])
-            set_para = {
-                'name': data['data[0][name]'],
-                'description': data['data[0][description]'],
-                'set_permissions': data['data[0][set_permissions]'],
-                'set_type': 4,
-                'endpoint': data['endpoint']
-            }
-            serializer = SetSerializer(data=set_para)
-            if serializer.is_valid():
-                new_set = Set(**set_para)
-                new_set.save()
-                set_object = Set.objects.get(pk=new_set.id)
-                new_members = []
-                for i in member_list:
-                    source_object = Source.objects.get(pk=i)
-                    new_entry = Set_x_content()
-                    new_entry.set_id = set_object
-                    new_entry.content_object = source_object
-                    new_members.append(new_entry)
-                Set_x_content.objects.bulk_create(new_members)
-                serializer = SetSerializer(set_object)
-                result = serializer.data
-                status = 201
-            else:
-                result = get_error_array(serializer.errors)
-                status = 400
+        member_list = json.loads(data['qset'])
+        set_para = {
+            'name': data['data[0][name]'],
+            'description': data['data[0][description]'],
+            'set_permissions': data['data[0][set_permissions]'],
+            'set_type': data['data[0][set_type]'],
+            'endpoint': data['endpoint']
+        }
+        serializer = SetSerializer(data=set_para)
+        if serializer.is_valid():
+            new_set = Set(**set_para)
+            new_set.save()
+            set_object = Set.objects.get(pk=new_set.id)
+            new_members = []
+            for i in member_list:
+                source_object = Source.objects.get(pk=i)
+                new_entry = Set_x_content()
+                new_entry.set_id = set_object
+                new_entry.content_object = source_object
+                new_members.append(new_entry)
+            Set_x_content.objects.bulk_create(new_members)
+            serializer = SetSerializer(set_object)
+            result = serializer.data
+            status = 201
         else:
-            result = {'error': 'Invalid set type.'}
+            result = get_error_array(serializer.errors)
             status = 400
 
         return Response(result, status)

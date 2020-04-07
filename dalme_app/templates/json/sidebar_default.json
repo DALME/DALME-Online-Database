@@ -124,7 +124,14 @@
   {
     "text": "Sets",
     "link": "/sets",
-    "iconClass": "fa-layer-group",
+    "iconClass": "fa-folder",
+    "child": true,
+    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+  },
+  {
+    "text": "Tasks",
+    "link": "/tasks",
+    "iconClass": "fa-tasks",
     "child": true,
     "permissions": ["Users", "Staff", "Administrators", "Developers"]
   },

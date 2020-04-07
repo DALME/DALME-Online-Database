@@ -234,7 +234,7 @@ function add_filter(event) {
     $(this).html('<i class="fa fa-minus fa-sm"></i>');
     $(this).removeClass('add_filter');
     $(this).addClass('remove_filter');
-    $(this).parent().prepend('<button class="btn filters-btn" onclick="save_filter_set()">Save</button><button class="btn filters-btn" onclick="apply_filters()">Apply</button>');
+    $(this).parent().prepend('<button class="btn filters-btn" onclick="save_set(\"create\")">Save</button><button class="btn filters-btn" onclick="apply_filters()">Apply</button>');
   } else {
     var op_select = create_select(filters, next_id, 'operator');
     nextHtml += op_select;
@@ -424,56 +424,96 @@ function get_filter_values(filter_id, dict, filtervalues) {
   return filtervalues
 }
 
-function save_filter_set() {
+function save_set(type) {
   var url_params = dt_table.ajax.url().split("/");
   $.ajax({
     method: "GET",
-    url: "/"+url_params[1]+"/"+url_params[2]+"/get_workset/"+url_params[3],
+    url: "/"+url_params[1]+"/"+url_params[2]+"/get_set/"+url_params[3],
     data: dt_table.ajax.params()
   }).done(function(data, textStatus, jqXHR) {
-        save_filter_form(data.data, url_params[2]);
+      if (type === 'add') {
+          $.ajax({
+              method: "GET",
+              url: "/api/options/?target=available_sets&format=json"
+          }).done(function(options_data, textStatus, jqXHR) {
+              set_form(type, data.data, url_params[2], options_data.available_sets);
+          }).fail(function(jqXHR, textStatus, errorThrown) {
+              toastr.error('There was an error communicating with the server: '+errorThrown);
+          });
+      } else {
+          set_form(type, data.data, url_params[2]);
+      }
   }).fail(function(jqXHR, textStatus, errorThrown) {
         toastr.error('There was an error communicating with the server: '+errorThrown);
   });
 }
 
-function save_filter_form(qset, endpoint) {
+function set_form(type, qset, endpoint, options=[]) {
+    if (type === 'add') {
+      var fields = [
+          {
+            label: "Set",
+            name: "set",
+            type: "selectize",
+            opts: {'placeholder': "Select set"},
+            fieldInfo: "Set to which the records should be added",
+            options: options
+          },
+      ];
+      var title = 'Add to Set';
+      var url = '/api/sets/add_members/';
+  } else {
+      var fields = [
+            {
+              label: "Name:",
+              name:  "name"
+            },
+            {
+              label: "Type",
+              name: "set_type",
+              type: "selectize",
+              options: [
+                { label: "Corpus", value: "1" },
+                { label: "Collection", value: "2" },
+                { label: "Dataset", value: "3" },
+                { label: "Workset", value: "4" },
+              ],
+            },
+            {
+              label: "Description:",
+              name:  "description",
+              type: "textarea"
+            },
+            {
+              label: "Permissions:",
+              name:  "set_permissions",
+              type: "selectize",
+              options: [
+                { label: "Private", value: "1" },
+                { label: "Others: view", value: "2" },
+                { label: "Others: view|add", value: "3" },
+                { label: "Others: view|add|delete", value: "4" },
+              ],
+            }
+        ];
+        var title = 'Create New Set';
+        var url = '/api/sets/';
+    };
     filterForm = new $.fn.dataTable.Editor( {
           ajax: {
             method: "POST",
-            url: "/api/sets/",
+            url: url,
             headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-            data: { 'qset': JSON.stringify(qset), 'endpoint': endpoint, 'type': 4 },
+            data: { 'qset': JSON.stringify(qset), 'endpoint': endpoint },
           },
-          fields: [
-                {
-                  label: "Name:",
-                  name:  "name"
-                },
-                {
-                  label: "Description:",
-                  name:  "description",
-                  type: "textarea"
-                },
-                {
-                  label: "Permissions:",
-                  name:  "set_permissions",
-                  type: "selectize",
-                  options: [
-                    { label: "Private", value: "1" },
-                    { label: "Others: view", value: "2" },
-                    { label: "Others: view|add", value: "3" },
-                    { label: "Others: view|add|delete", value: "4" },
-                  ],
-                }
-          ]
+          fields: fields
     });
     filterForm.on('submitSuccess', function(e, json, data, action) { toastr.success('The set was saved successfully.') });
     filterForm.buttons({
       text: "Save",
       className: "btn btn-primary",
       action: function () { this.submit(); }
-    }).title('Create New Workset').create();
+    }).title(title).create({ focus: null });
 }
 
 /*** utility functions for creating specific filter types ***/

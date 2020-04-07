@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block extra_head %}
+{% endblock %}
+{% block extra_dropdowns %}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card shadow mb-3">
+    <div class="card-header card-tabs-header">
+      <!-- tabs -->
+      <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
+        </li>
+      </ul>
+    </div>
+    <!-- Tab panes -->
+    <div class="tab-content h-100">
+      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
+        <div class="row">
+          <div class="col-md-8">
+              <div class="card mb-3">
+                <div class="sub-card-header">
+                  <div class="card-header-title"><i class="{{ object_icon }} fa-fw"></i> {{ object_class }}</div>
+                </div>
+                <div class="card-body attribute_list">
+                    {% for k,v in object_attributes.items %}
+                      <div class="form-row">
+                          <div class="col-sm-3 text-right">
+                            <span class="attribute_list_label">{{ k }}</span>
+                          </div>
+                          <div class="col-sm-9">
+                            <span class="attribute_list_value">{{ v | safe }}</span>
+                          </div>
+                      </div>
+                    {% endfor %}
+                </div>
+              </div>
+              {% if members %}
+              <div class="card mb-3">
+                <div class="table-responsive dt-embed">
+                  <table class="table table-hover compact" id="dataTables-members" width="100%">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for row in members %}
+                        <tr>
+                          <td>{{ row.content_object.id }}</td>
+                          <td>{{ row.content_object.name }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+            {% endif %}
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-3">
+              <div class="img-placeholder d-flex justify-content-center align-items-center">
+                <i class="d-block {{ object_icon }} fa-4x mt-5 mb-5"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-footer">
+        <div id="tab-footer-interface" class="clearfix">
+          <small class="text-muted float-left tab-footer-text"></small>
+        </div>
+      </div>
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+{% if tables %}
+<script>
+$(document).ready(function() {
+    var table_members = $('#dataTables-members').DataTable({
+        {% if table_options %}
+          {% for key,value in table_options.items %}
+            {{ key | safe }}: {{ value | safe }},
+          {% endfor %}
+        {% endif %}
+    });
+    $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa {{ tables.1 }} fa-fw"></i> {{ tables.2 }}');
+    fix_dt_search();
+    set_id = {{ object_attributes.id }};
+});
+</script>
+{% endif %}
+{% endblock %}

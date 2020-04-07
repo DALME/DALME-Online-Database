@@ -486,6 +486,8 @@ class Set(dalmeUuid):
 
     name = models.CharField(max_length=255)
     set_type = models.IntegerField(choices=SET_TYPES)
+    is_public = models.BooleanField(default=False)
+    has_landing = models.BooleanField(default=False)
     endpoint = models.CharField(max_length=55)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
     set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
@@ -503,6 +505,10 @@ class Set(dalmeUuid):
             return done * 100 / total
         else:
             return 0
+
+    @property
+    def get_member_count(self):
+        return self.members.count()
 
 
 class Set_x_content(dalmeBasic):

@@ -261,7 +261,7 @@ function init_tables() {
           ]
     });
     $('#dataTables-tickets_wrapper').find('.card-header-title').html('<i class="fa fa-ticket-alt fa-fw"></i> My Issue Tickets');
-    $('#dataTables-worksets_wrapper').find('.card-header-title').html('<i class="fa fa-layer-group fa-fw"></i> My Worksets');
+    $('#dataTables-worksets_wrapper').find('.card-header-title').html('<i class="fa fa-folder fa-fw"></i> My Worksets');
     $('#dataTables-tasks_wrapper').find('.card-header-title').html('<i class="fa fa-user-check fa-fw"></i> My Tasks');
     fix_dt_search();
     table_tasks.on('select', function ( e, dt, type, indexes ) {

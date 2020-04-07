@@ -516,12 +516,14 @@ class SourceList(DTListView):
     def get_dte_buttons(self, *args, **kwargs):
         dte_buttons = []
         if self.request.user.has_perm('dalme_app.add_source'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Source'})
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New Source', 'formTitle': 'Create New Source'})
         if self.request.user.has_perm('dalme_app.change_source'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Source Information'})
+            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected Source', 'formTitle': 'Edit Source Information'})
         if self.request.user.has_perm('dalme_app.delete_source'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Source',
+            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected Source', 'formTitle': 'Delete Source',
                                 'formMessage': 'Are you sure you wish to remove this source from the database? This action cannot be undone.'})
+        dte_buttons.append({'action': 'save_set("create")', 'text': '<i class="fa fa-folder fa-fw dt_menu_icon"></i> Create New Set'})
+        dte_buttons.append({'action': 'save_set("add")', 'text': '<i class="fa fa-folder-plus fa-fw dt_menu_icon"></i> Add Sources to Set...'})
         return dte_buttons
 
 
@@ -567,10 +569,10 @@ class SourceDetail(DetailView):
         context['source_id'] = self.object.id
         context['comments_count'] = self.object.comments.count()
         has_inv = self.object.has_inventory
-        has_pages = len(self.object.pages.all()) > 0
-        has_children = len(self.object.source_set.all()) > 0
-        has_agents = len(self.object.agents) > 0
-        has_places = len(self.object.places) > 0
+        has_pages = self.object.pages.all().exists()
+        has_children = self.object.source_set.all().exists()
+        has_agents = self.object.agents is not None and len(self.object.agents) > 0
+        has_places = self.object.places is not None and len(self.object.places) > 0
         context['has_inv'] = has_inv
         context['has_pages'] = has_pages
         context['has_children'] = has_children
@@ -1157,7 +1159,7 @@ class SetList(DTListView):
     breadcrumb = [('Project', ''), ('Sets', '/sets')]
     list_name = 'sets'
     dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'set_type', 'description', 'set_permissions', 'owner']
+    dte_field_list = ['name', 'set_type', 'is_public', 'has_landing', 'description', 'owner', 'set_permissions']
     dt_options = {
         'pageLength': 25,
         'paging': 'true',
@@ -1185,6 +1187,74 @@ class SetList(DTListView):
             dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Set',
                                 'formMessage': 'Are you sure you wish to remove this set from the database? This action cannot be undone.'})
         return dte_buttons
+
+
+@method_decorator(login_required, name='dispatch')
+class SetsDetail(DetailView):
+    model = RightsPolicy
+    template_name = 'dalme_app/set_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = [('Project', ''), ('Sets', '/sets')]
+        sidebar_toggle = self.request.session['sidebar_toggle']
+        context['sidebar_toggle'] = sidebar_toggle
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context = functions.set_menus(self.request, context, state)
+        page_title = self.object.name
+        context['page_title'] = page_title
+        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['object_class'] = 'Set'
+        context['object_icon'] = 'fas fa-folder'
+        if self.object.is_public:
+            public = '<i class="fas fa-check-square"></i>'
+        else:
+            public = '<i class="far fa-square"></i>'
+        if self.object.has_landing:
+            landing = '<i class="fas fa-check-square"></i>'
+        else:
+            landing = '<i class="far fa-square"></i>'
+        context['object_attributes'] = {
+            'ID': self.object.id,
+            'Name': self.object.name,
+            'Type': self.object.get_set_type_display(),
+            'Public': public,
+            'Landing': landing,
+            'Endpoint': '<span class="text-capitalize">{}</span>'.format(self.object.endpoint),
+            'Owner': '<a href="/user/{}">{} ({})</a>'.format(self.object.owner.id, self.object.owner.profile.full_name, self.object.owner.username),
+            'Permissions': self.object.get_set_permissions_display(),
+            'Description': self.object.description,
+            'Progress': str(self.object.workset_progress) + '%',
+        }
+        members = self.object.members.all()
+        context['members'] = members
+        tables = ['members', 'fa-plus-square', 'Set Members ({})'.format(members.count())]
+        if tables != []:
+            context['tables'] = tables
+            context['table_options'] = {
+                'responsive': 'true',
+                'dom': '''"<'sub-card-header d-flex'<'card-header-title'>Bfr><'card-body't>"''',
+                'stateSave': 'true',
+                'select': {'style': 'multi'},
+                'scrollY': '''"calc(100vh - 600px)"''',
+                'deferRender': 'true',
+                'scroller': 'true',
+                'rowId': '"id"',
+                'language': {
+                    'searchPlaceholder': 'Search',
+                    'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+                },
+                'buttons': "[{text: '<i class=\"fa fa-trash-alt fa-fw\"></i>', action: function (e, dt, node, config) {delete_set_members(dt)}, className: \"align-self-end\"}]"
+            }
+        return context
+
+    def get_object(self):
+        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
+        try:
+            object = Set.objects.get(pk=self.kwargs['pk'])
+            return object
+        except ObjectDoesNotExist:
+            raise Http404
 
 
 @method_decorator(login_required, name='dispatch')

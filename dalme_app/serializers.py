@@ -152,16 +152,17 @@ class SetSerializer(serializers.ModelSerializer):
     progress = serializers.ReadOnlyField(source='workset_progress', read_only=True, required=False)
     set_type_name = serializers.CharField(source='get_set_type_display', required=False)
     set_permissions_name = serializers.CharField(source='get_set_permissions_display', required=False)
+    member_count = serializers.ReadOnlyField(source='get_member_count', read_only=True, required=False)
 
     class Meta:
         model = Set
-        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'set_permissions', 'set_permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp')
+        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'set_permissions', 'set_permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count')
         extra_kwargs = {'set_type_label': {'required': False}, 'set_permissions_label': {'required': False}}
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if ret['set_type'] == 4:
-            ret['workset'] = '<a class="workset-title" href="/sets/{}">{}</a><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['id'], ret['name'], ret['description'], ret['endpoint'])
+            ret['workset'] = '<a class="workset-title" href="/sets/go/{}">{}</a><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['id'], ret['name'], ret['description'], ret['endpoint'])
             progress = ret['progress']
             angle = round((progress * 360 / 100))
             if angle <= 180:
