@@ -601,11 +601,10 @@ class SourceDetail(DetailView):
             'Created': functions.format_rct(self.object.creation_username, self.object.creation_timestamp),
             'Modified': functions.format_rct(self.object.modification_username, self.object.modification_timestamp),
         }
-        attribute_data = self.process_attributes(self.object.attributes.all().select_related('attribute_type'))
+        attribute_data = self.get_attributes()
         if attribute_data.get('description', None) is not None:
             context['description'] = attribute_data['description']
         context['attribute_data'] = attribute_data['attributes']
-        context['inherited_data'] = self.process_attributes(self.object.inherited.all().select_related('attribute_type'))['attributes']
         tables = []
         if has_pages:
             title = 'Pages (' + str(len(self.object.pages.all())) + ')'
@@ -646,16 +645,24 @@ class SourceDetail(DetailView):
                 }
         return context
 
-    def process_attributes(self, qset):
+    def get_attributes(self):
         result = {}
         attributes = []
-        for a in qset:
-            label = a.attribute_type.name
-            value = functions.get_attribute_value(a)
-            if label == 'Description':
-                result['description'] = value
-            else:
-                attributes.append({'label': label, 'value': value})
+        if self.object.attributes is not None:
+            for a in self.object.attributes.all():
+                label = a.attribute_type.name
+                # value = functions.get_attribute_value(a)
+                value = str(a)
+                if label == 'Description':
+                    result['description'] = value
+                else:
+                    attributes.append({'label': label, 'value': value})
+        if self.object.inherited is not None:
+            for a in self.object.inherited.all():
+                label = a.attribute_type.name
+                # value = functions.get_attribute_value(a)
+                value = str(a)
+                attributes.append({'label': label, 'value': value, 'icon': 'fa fa-dna fa-xs'})
         result['attributes'] = attributes
         return result
 
