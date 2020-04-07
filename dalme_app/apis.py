@@ -18,8 +18,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
-                              DT_fields, Page, Source_pages, Source, Transcription, Language,
+                              DT_fields, Page, Source_pages, Source, Transcription, LanguageReference,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
+                              wiki_user_groups, wp_users, wp_usermeta, Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy)
 from django_celery_results.models import TaskResult
 from django.db.models.expressions import RawSQL
@@ -352,14 +353,14 @@ class AsynchronousTasks(DTViewSet):
 class Countries(DTViewSet):
     """ API endpoint for managing countries """
     permission_classes = (DjangoModelPermissions,)
-    queryset = Country.objects.all()
+    queryset = CountryReference.objects.all()
     serializer_class = CountrySerializer
 
 
 class Cities(DTViewSet):
     """ API endpoint for managing cities """
     permission_classes = (DjangoModelPermissions,)
-    queryset = City.objects.all()
+    queryset = CityReference.objects.all()
     serializer_class = CitySerializer
 
 
@@ -716,7 +717,7 @@ class Images(DTViewSet):
 class Languages(DTViewSet):
     """ API endpoint for managing languages """
     permission_classes = (DjangoModelPermissions,)
-    queryset = Language.objects.all()
+    queryset = LanguageReference.objects.all()
     serializer_class = LanguageSerializer
 
 

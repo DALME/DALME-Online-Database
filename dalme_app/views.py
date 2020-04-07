@@ -13,7 +13,7 @@ from django.views.generic.base import TemplateView
 from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
                               Source, Set, TaskList, Task, rs_resource, rs_collection_resource,
-                              rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, Language,
+                              rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, LanguageReference,
                               Attribute_type, CountryReference, rs_collection, Ticket, Workflow, RightsPolicy)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
@@ -839,11 +839,11 @@ class CityList(DTListView):
 
     def get_dte_buttons(self, *args, **kwargs):
         dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_city'):
+        if self.request.user.has_perm('dalme_app.add_cityreference'):
             dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New City'})
-        if self.request.user.has_perm('dalme_app.change_city'):
+        if self.request.user.has_perm('dalme_app.change_cityreference'):
             dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit City Information'})
-        if self.request.user.has_perm('dalme_app.delete_city'):
+        if self.request.user.has_perm('dalme_app.delete_cityreference'):
             dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete City',
                                 'formMessage': 'Are you sure you wish to remove this city from the database? This action cannot be undone.'})
         return dte_buttons

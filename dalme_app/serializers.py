@@ -74,7 +74,7 @@ class LanguageSerializer(serializers.ModelSerializer):
     parent_name = serializers.StringRelatedField(source='parent')
 
     class Meta:
-        model = Language
+        model = LanguageReference
         fields = ('id', 'glottocode', 'iso6393', 'name', 'type', 'parent', 'parent_name')
 
     def to_representation(self, instance):
@@ -87,7 +87,7 @@ class LanguageSerializer(serializers.ModelSerializer):
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Country
+        model = CountryReference
         fields = ('id', 'name', 'alpha_2_code', 'alpha_3_code', 'num_code')
 
 
@@ -95,7 +95,7 @@ class CitySerializer(serializers.ModelSerializer):
     country_name = serializers.StringRelatedField(source='country')
 
     class Meta:
-        model = City
+        model = CityReference
         fields = ('id', 'name', 'administrative_region', 'country', 'country_name')
 
     def to_representation(self, instance):

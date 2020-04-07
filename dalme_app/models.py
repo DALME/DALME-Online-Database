@@ -34,48 +34,47 @@ def rs_api_query(endpoint, user, key, **kwargs):
     return R
 
 
-class Profile(models.Model):
-    """
-    One-to-one extension of user model to accomodate additional user related
-    data, including permissions of associated accounts on other platforms.
-    """
+# ->**************************************    DATA STORE   **************************************
 
-    WP_ROLE = (
-        ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber'),
-        ('a:1:{s:11:"contributor";b:1;}', 'Contributor'),
-        ('a:1:{s:6:"author";b:1;}', 'Author'),
-        ('a:1:{s:6:"editor";b:1;}', 'Editor'),
-        ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
-    )
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    full_name = models.CharField(max_length=50, blank=True)
-    dam_user = models.IntegerField(null=True)
-    wiki_user = models.IntegerField(null=True)
-    wp_user = models.IntegerField(null=True)
-    wp_role = models.CharField(max_length=50, blank=True, choices=WP_ROLE, default='a:1:{s:10:"subscriber";b:1;}')
-    profile_image = models.CharField(max_length=255, blank=True)
+# ->Content and Attributes
+class Content_class(dalmeIntid):
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=55, unique=True)
+    description = models.TextField()
 
     def __str__(self):
-        return self.user.username
+        return self.name
 
-    def get_dam_usergroup(self):
-        dam_ug = rs_user.objects.get(ref=self.dam_user).usergroup
-        return dam_ug
-
-    def get_dam_usergroup_display(self):
-        dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
-        return dam_ug
+    class Meta:
+        ordering = ['id']
 
 
-# DALME data store
-class Agent(dalmeUuid):
-    std_name = models.CharField(max_length=255)
-    type = models.IntegerField(db_index=True)
-    attributes = GenericRelation('Attribute')
-    instances = GenericRelation('Identity_phrase')
-    notes = models.TextField()
-    tags = GenericRelation('Tag')
+class Content_type(dalmeIntid):
+    content_class = models.ForeignKey('Content_class', to_field='id', db_index=True, on_delete=models.PROTECT)
+    name = models.CharField(max_length=255, unique=True)
+    short_name = models.CharField(max_length=55)
+    description = models.TextField()
+    attribute_types = models.ManyToManyField('Attribute_type', through='Content_attributes')
+    has_pages = models.BooleanField(default=False, db_index=True)
+    has_inventory = models.BooleanField(default=False)
+    parents = models.CharField(max_length=255, blank=True, default=None, null=True)
+    r1_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
+    r2_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['id']
+
+    @property
+    def inheritance(self):
+        inheritance = {}
+        if self.r1_inheritance:
+            inheritance['r1'] = self.r1_inheritance.split(',')
+        if self.r2_inheritance:
+            inheritance['r2'] = self.r2_inheritance.split(',')
+        return inheritance
 
 
 class Attribute_type(dalmeIntid):
@@ -84,7 +83,8 @@ class Attribute_type(dalmeIntid):
         ('DATE', 'DATE (date)'),
         ('INT', 'INT (integer)'),
         ('STR', 'STR (string)'),
-        ('TXT', 'TXT (text)')
+        ('TXT', 'TXT (text)'),
+        ('UUID', 'UUID (DALME record)')
     )
 
     name = models.CharField(max_length=255)
@@ -119,6 +119,10 @@ class Attribute(dalmeUuid):
     def __str__(self):
         if self.attribute_type.data_type == 'DATE':
             str_val = self.value_STR
+        elif self.attribute_type.data_type == 'UUID':
+            val_data = json.loads(self.value_STR)
+            object = eval('{}.objects.get(pk="{}")'.format(val_data['class'], val_data['id']))
+            str_val = '<a href="{}">{}</a>'.format(object.get_url(), object.name)
         else:
             str_val = str(eval('self.value_' + self.attribute_type.data_type))
         return str_val
@@ -137,58 +141,732 @@ class Attribute(dalmeUuid):
         super().save(*args, **kwargs)
 
 
-class Concept(dalmeUuid):
-    getty_id = models.IntegerField(db_index=True)
-    tags = GenericRelation('Tag')
-
-
-class Content_class(dalmeIntid):
-    name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55, unique=True)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['id']
-
-
-class Content_type(dalmeIntid):
-    content_class = models.ForeignKey('Content_class', to_field='id', db_index=True, on_delete=models.PROTECT)
-    name = models.CharField(max_length=255, unique=True)
-    short_name = models.CharField(max_length=55)
-    description = models.TextField()
-    attribute_types = models.ManyToManyField(Attribute_type, through='Content_attributes')
-    has_pages = models.BooleanField(default=False, db_index=True)
-    has_inventory = models.BooleanField(default=False)
-    parents = models.CharField(max_length=255, blank=True, default=None, null=True)
-    r1_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
-    r2_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['id']
-
-    @property
-    def inheritance(self):
-        inheritance = {}
-        if self.r1_inheritance:
-            inheritance['r1'] = self.r1_inheritance.split(',')
-        if self.r2_inheritance:
-            inheritance['r2'] = self.r2_inheritance.split(',')
-        return inheritance
-
-
 class Content_attributes(dalmeIntid):
     content_type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='attribute_type_list')
     attribute_type = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='content_types')
     order = models.IntegerField(db_index=True, null=True)
     required = models.BooleanField(default=False)
+# <-
 
 
+# -> Source Management
+class Source(dalmeUuid):
+    type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=55)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    has_inventory = models.BooleanField(default=False, db_index=True)
+    attributes = GenericRelation('Attribute', related_query_name='sources')
+    pages = models.ManyToManyField('Page', db_index=True, through='Source_pages')
+    tags = GenericRelation('Tag')
+    comments = GenericRelation('Comment')
+    sets = GenericRelation('Set_x_content')
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('source_detail', kwargs={'pk': self.pk})
+
+    @property
+    def inherited(self):
+        inheritance = self.type.inheritance
+        if self.parent and inheritance.get('r1', None) is not None:
+            r1_inherited = self.parent.attributes.filter(attribute_type__in=inheritance['r1'])
+            if self.parent.parent and inheritance.get('r2', None) is not None:
+                r2_inherited = self.parent.inherited.filter(attribute_type__in=inheritance['r2'])
+                return r1_inherited | r2_inherited
+            else:
+                return r1_inherited
+
+    @property
+    def agents(self):
+        ep_list = [i.transcription.entity_phrases.filter(content_type=104) for i in self.source_pages.all().select_related('transcription') if i.transcription]
+        if len(ep_list) > 0:
+            return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+
+    @property
+    def places(self):
+        ep_list = [i.transcription.entity_phrases.filter(content_type=115) for i in self.source_pages.all().select_related('transcription') if i.transcription]
+        if len(ep_list) > 0:
+            return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+
+    @property
+    def objects(self):
+        ep_list = [i.transcription.entity_phrases.filter(content_type=118) for i in self.source_pages.all().select_related('transcription') if i.transcription]
+        if len(ep_list) > 0:
+            return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+
+
+@receiver(models.signals.post_save, sender=Source)
+def update_workflow(sender, instance, created, **kwargs):
+    if instance.has_inventory:
+        if created:
+            wf_object = Workflow.objects.create(source=instance, last_modified=instance.modification_timestamp)
+            Work_log.objects.create(source=wf_object, event='Source created', timestamp=wf_object.last_modified)
+        else:
+            wf_object = Workflow.objects.get(pk=instance.id)
+            wf_object.last_modified = timezone.now()
+            wf_object.last_user = get_current_user()
+            wf_object.save()
+
+
+@receiver(models.signals.pre_delete, sender=Source)
+def delete_source_dependencies(sender, instance, **kwargs):
+    if instance.pages:
+        for page in instance.pages.all():
+            if page.sources:
+                for sp in page.sources.all():
+                    if sp.transcription:
+                        sp.transcription.delete()
+            page.delete()
+
+
+class Page(dalmeUuid):
+    name = models.CharField(max_length=55)
+    dam_id = models.IntegerField(db_index=True, null=True)
+    order = models.IntegerField(db_index=True)
+    canvas = models.TextField(null=True)
+    tags = GenericRelation('Tag')
+
+    def __str__(self):
+        return self.name
+
+    def get_rights(self):
+        if self.sources.all()[0].source.parent.parent.attributes.filter(attribute_type=144).exists():
+            rpo = RightsPolicy.objects.get(pk=json.loads(self.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR)['id'])
+            return {'status': rpo.get_rights_status_display(), 'display_notice': rpo.notice_display, 'notice': json.loads(rpo.rights_notice)}
+
+    def get_absolute_url(self):
+        return reverse('page_detail', kwargs={'pk': self.pk})
+
+    def get_canvas(self):
+        if not self.canvas:
+            api_params = {
+                "function": "get_resource_data",
+                "param1": self.dam_id
+            }
+            page_meta = rs_api_query(
+                "https://dam.dalme.org/api/?",
+                os.environ['DAM_API_USER'],
+                os.environ['DAM_API_KEY'],
+                **api_params
+            )
+            page_meta_obj = page_meta.json()
+            if type(page_meta_obj) == list:
+                folio = page_meta_obj[0]['field79']
+            elif type(page_meta_obj) == dict:
+                folio = page_meta_obj['field79']
+            canvas = requests.get(
+                "https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id, folio)
+            )
+            self.canvas = canvas.text
+            return canvas.text
+        else:
+            return self.canvas
+
+
+@receiver(models.signals.post_save, sender=Page)
+def update_folio(sender, instance, created, **kwargs):
+    if created:
+        rs_image = rs_resource.objects.get(ref=instance.dam_id)
+        rs_image.field79 = instance.name
+        rs_image.save()
+
+
+class Source_pages(dalmeIntid):
+    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE,  related_name='source_pages')
+    page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
+    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='source_pages')
+
+
+class Transcription(dalmeUuid):
+    transcription = models.TextField(blank=True, default=None)
+    author = models.CharField(max_length=255, default=get_current_username)
+    version = models.IntegerField(null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+
+@receiver(models.signals.post_save, sender=Transcription)
+def update_source_modification(sender, instance, created, **kwargs):
+    if instance.source_pages.all().exists():
+        source_id = instance.source_pages.all().first().source.id
+        source = Source.objects.get(pk=source_id)
+        source.modification_timestamp = timezone.now()
+        source.modification_username = get_current_username()
+        source.save()
+
+
+class Entity_phrase(dalmeUuid):
+    AGENT = 1
+    OBJECT = 2
+    PLACE = 3
+    ENTITY_TYPES = (
+        (AGENT, 'Agent'),
+        (OBJECT, 'Object'),
+        (PLACE, 'Place'),
+    )
+
+    phrase = models.TextField(blank=True)
+    type = models.IntegerField(choices=ENTITY_TYPES)
+    transcription_id = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='entity_phrases')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField(null=True, db_index=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return self.phrase
+# <-
+
+
+# -> Entities and Relationships
+class Agent(dalmeUuid):
+    PERSON = 1
+    ORGANIZATION = 2
+    AGENT_TYPES = (
+        (PERSON, 'Person'),
+        (ORGANIZATION, 'Organization'),
+    )
+
+    std_name = models.CharField(max_length=255)
+    type = models.IntegerField(choices=AGENT_TYPES)
+    attributes = GenericRelation('Attribute')
+    instances = GenericRelation('Entity_phrase')
+    relations = GenericRelation('Relationship', content_type_field='source_content_type', object_id_field='source_object_id')
+    notes = models.TextField()
+    tags = GenericRelation('Tag')
+
+
+class Object(dalmeUuid):
+    concept = models.ForeignKey('Concept', db_index=True, on_delete=models.CASCADE)
+    instances = GenericRelation('Entity_phrase')
+    tags = GenericRelation('Tag')
+
+
+class Object_attribute(dalmeUuid):
+    object = models.ForeignKey('Object', db_index=True, on_delete=models.CASCADE)
+    attribute_concept = models.ForeignKey('Concept', db_index=True, on_delete=models.CASCADE)
+
+
+class Place(dalmeUuid):
+    std_name = models.CharField(max_length=255)
+    type = models.IntegerField(db_index=True)
+    attributes = GenericRelation('Attribute')
+    instances = GenericRelation('Entity_phrase')
+    tags = GenericRelation('Tag')
+
+
+class Relationship(dalmeUuid):
+    source_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, related_name='relationship_sources')
+    source_object_id = models.UUIDField(null=True, db_index=True)
+    source_object = GenericForeignKey('source_content_type', 'source_object_id')
+    target_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, related_name='relationship_targets')
+    target_object_id = models.UUIDField(null=True, db_index=True)
+    target_object = GenericForeignKey('target_content_type', 'target_object_id')
+    attributes = GenericRelation('Attribute')
+    scope = models.ForeignKey('Scope', on_delete=models.CASCADE, null=True)
+    notes = models.TextField(blank=True)
+
+
+class Scope(dalmeUuid):
+    TEMPORAL = 1  # relationship applies only during a certain timeframe. Defined by start and end dates, start + duration, ...
+    SPATIAL = 2  # relationship applies only within a certain spatial/geographical area. Defined by place id (e.g. a house, a city, a country), shapefile, polygon geometry, ...
+    LINGUISTIC = 3  # relationship applies only for a language or dialect. Defined by language id.
+    CONTEXT = 4  # relationship applies only in a context identified by a DALME id (e.g. a source or a page)
+    SCOPE_TYPES = (
+        (TEMPORAL, 'Temporal'),
+        (SPATIAL, 'Spatial'),
+        (LINGUISTIC, 'Linguistic'),
+        (CONTEXT, 'Context')
+    )
+
+    type = models.IntegerField(choices=SCOPE_TYPES)
+    range = models.TextField()  # a JSON object that contains the scope parameters, depending on its type
+# <-
+
+
+# -> Language Processing
+class Concept(dalmeUuid):
+    getty_id = models.IntegerField(db_index=True)
+    tags = GenericRelation('Tag')
+
+
+class Headword(dalmeUuid):
+    word = models.CharField(max_length=55)
+    full_lemma = models.CharField(max_length=255)
+    concept_id = models.ForeignKey('Concept', to_field='id', db_index=True, on_delete=models.PROTECT)
+    tags = GenericRelation('Tag')
+
+    def __str__(self):
+        return self.word
+
+
+class Token(dalmeUuid):
+    object_phrase_id = models.ForeignKey('Entity_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
+    wordform_id = models.ForeignKey('Wordform', to_field='id', db_index=True, on_delete=models.PROTECT)
+    raw_token = models.CharField(max_length=255)
+    clean_token = models.CharField(max_length=55)
+    order = models.IntegerField(db_index=True)
+    flags = models.CharField(max_length=10)
+    tags = GenericRelation('Tag')
+
+    def __str__(self):
+        return self.raw_token
+
+
+class Wordform(dalmeUuid):
+    normalized_form = models.CharField(max_length=55)
+    pos = models.CharField(max_length=255)
+    headword_id = models.ForeignKey('Headword', to_field='id', db_index=True, on_delete=models.PROTECT)
+    tags = GenericRelation('Tag')
+
+    def __str__(self):
+        return self.normalized_form
+# <-
+
+
+# ->User Profiles and Sets
+class Profile(models.Model):
+    """
+    One-to-one extension of user model to accomodate additional user related
+    data, including permissions of associated accounts on other platforms.
+    """
+
+    WP_ROLE = (
+        ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber'),
+        ('a:1:{s:11:"contributor";b:1;}', 'Contributor'),
+        ('a:1:{s:6:"author";b:1;}', 'Author'),
+        ('a:1:{s:6:"editor";b:1;}', 'Editor'),
+        ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
+    )
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    full_name = models.CharField(max_length=50, blank=True)
+    dam_user = models.IntegerField(null=True)
+    wiki_user = models.IntegerField(null=True)
+    wp_user = models.IntegerField(null=True)
+    wp_role = models.CharField(max_length=50, blank=True, choices=WP_ROLE, default='a:1:{s:10:"subscriber";b:1;}')
+    profile_image = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+    def get_dam_usergroup(self):
+        dam_ug = rs_user.objects.get(ref=self.dam_user).usergroup
+        return dam_ug
+
+    def get_dam_usergroup_display(self):
+        dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
+        return dam_ug
+
+
+class Set(dalmeUuid):
+    CORPUS = 1  # a set representing a coherent body of materials defined by a project or sub-project
+    COLLECTION = 2  # a generic set defined by a user for any purpose -- collections could potentially by qualified by other terms
+    DATASET = 3  # a set defined for analytical purposes
+    WORKSET = 4  # a set defined as part of a project's workflow for the purpose of systematically performing a well-defined task to its members
+    PRIVATE = 1  # only owner can view set
+    VIEW = 2  # others can view the set
+    ADD = 3  # others can view the set and add members
+    DELETE = 4  # others can view the set and add and delete members
+    SET_TYPES = (
+        (CORPUS, 'Corpus'),
+        (COLLECTION, 'Collection'),
+        (DATASET, 'Dataset'),
+        (WORKSET, 'Workset')
+    )
+    SET_PERMISSIONS = [
+        (PRIVATE, 'Private'),
+        (VIEW, 'Others: view'),
+        (ADD, 'Others: view|add'),
+        (DELETE, 'Others: view|add|delete')
+    ]
+
+    name = models.CharField(max_length=255)
+    set_type = models.IntegerField(choices=SET_TYPES)
+    endpoint = models.CharField(max_length=55)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
+    set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
+    description = models.TextField()
+    tags = GenericRelation('Tag')
+
+    def __str__(self):
+        return self.name + ' (' + self.set_type + ')'
+
+    @property
+    def workset_progress(self):
+        done = self.members.filter(workset_done=True).count()
+        total = self.members.count()
+        if total != 0:
+            return done * 100 / total
+        else:
+            return 0
+
+
+class Set_x_content(dalmeBasic):
+    set_id = models.ForeignKey(Set, on_delete=models.CASCADE, related_name='members')
+    content_object = GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.UUIDField(default=uuid.uuid4, db_index=True)
+    workset_done = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('content_type', 'object_id', 'set_id')
+        ordering = ['set_id', 'id']
+# <-
+# <-
+
+# ->**************************************    REFERENCE DATASETS    **************************************
+
+
+class AttributeReference(dalmeUuid):
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=55)
+    description = models.TextField()
+    data_type = models.CharField(max_length=15)
+    source = models.CharField(max_length=255)
+    term_type = models.CharField(max_length=55, blank=True, default=None)
+
+
+class CityReference(dalmeIntid):
+    name = models.CharField(max_length=255)
+    administrative_region = models.CharField(max_length=255)
+    country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name + '(' + self.country.name + ')'
+
+    class Meta:
+        ordering = ['country', 'name']
+        unique_together = ('name', 'administrative_region')
+
+
+class CountryReference(dalmeIntid):
+    name = models.CharField(max_length=255, unique=True)
+    alpha_3_code = models.CharField(max_length=3)
+    alpha_2_code = models.CharField(max_length=2)
+    num_code = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+
+
+class LanguageReference(dalmeIntid):
+    LANGUAGE_TYPES = (
+        ('language', 'language'),
+        ('dialect', 'dialect')
+    )
+
+    glottocode = models.CharField(max_length=25, unique=True)
+    iso6393 = models.CharField(max_length=25, unique=True, blank=True, null=True, default=None)
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=15, choices=LANGUAGE_TYPES)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name+' ('+self.glottocode+')'
+
+    class Meta:
+        ordering = ["name"]
+# <-
+
+# ->**************************************    APPLICATION MANAGEMENT    **************************************
+
+
+# -> Workflow
+class Workflow(models.Model):
+    ASSESSING = 1
+    PROCESSING = 2
+    DONE = 3
+    INGESTION = 1
+    TRANSCRIPTION = 2
+    MARKUP = 3
+    REVIEW = 4
+    PARSING = 5
+    WORKFLOW_STATUS = (
+        (ASSESSING, 'assessing'),
+        (PROCESSING, 'processing'),
+        (DONE, 'processed')
+    )
+    PROCESSING_STAGES = (
+        (INGESTION, 'ingestion'),
+        (TRANSCRIPTION, 'transcription'),
+        (MARKUP, 'markup'),
+        (REVIEW, 'review'),
+        (PARSING, 'parsing')
+    )
+
+    source = models.OneToOneField(Source, on_delete=models.CASCADE, related_name='workflow', primary_key=True)
+    wf_status = models.IntegerField(choices=WORKFLOW_STATUS, default=2)
+    stage = models.IntegerField(choices=PROCESSING_STAGES, default=1)
+    last_modified = models.DateTimeField(null=True, blank=True)
+    last_user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
+    help_flag = models.BooleanField(default=False)
+    ingestion_done = models.BooleanField(default=False)
+    transcription_done = models.BooleanField(default=False)
+    markup_done = models.BooleanField(default=False)
+    parsing_done = models.BooleanField(default=False)
+    review_done = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False)
+
+    @property
+    def status(self):
+        stage_dict = dict(self.PROCESSING_STAGES)
+        if 1 <= self.wf_status <= 3:
+            if self.wf_status != 2:
+                status_text = self.get_wf_status_display()
+                status_text_alt = ''
+                css_class = 'tag-wf-' + status_text
+            else:
+                if getattr(self, self.get_stage_display() + '_done'):
+                    status_text = 'awaiting ' + stage_dict[self.stage + 1]
+                    status_text_alt = 'begin ' + stage_dict[self.stage + 1]
+                    css_class = 'tag-wf-awaiting'
+                else:
+                    status_text = self.get_stage_display() + ' in progress'
+                    status_text_alt = ''
+                    css_class = 'tag-wf-in_progress'
+        else:
+            status_text = 'unknown'
+            status_text_alt = ''
+            css_class = 'tag-wf-unknown'
+        return {'text': status_text, 'css_class': css_class, 'text_alt': status_text_alt}
+
+    @property
+    def stage_done(self):
+        if self.wf_status == 2:
+            stage_done = getattr(self, self.get_stage_display() + '_done')
+        else:
+            stage_done = True
+        return stage_done
+
+
+class Work_log(models.Model):
+    id = models.AutoField(primary_key=True, unique=True, db_index=True)
+    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE)
+    event = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
+# <-
+
+
+# ->Tasks and Tickets
+class Attachment(dalmeUuid):
+    file = models.FileField(upload_to='attachments/%Y/%m/')
+    type = models.CharField(max_length=255, null=True)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
+
+    def extension(self):
+        name, extension = os.path.splitext(self.file.name)
+        return extension
+
+    def preview(self):
+        icon_type_dict = {
+            'application/msword': 'fa-file-word',
+            'text/csv': 'fa-file-csv',
+            'application/pdf': 'fa-file-pdf',
+            'application/zip': 'fa-file-archive',
+            'application/vnd.ms-excel': 'fa-file-excel'
+        }
+        icon_class_dict = {
+            'audio': 'fa-file-audio',
+            'video': 'fa-file-video',
+            'image': 'fa-file-image',
+            'text': 'fa-file-alt',
+        }
+        if icon_type_dict.get(self.type) is not None:
+            icon = icon_type_dict.get(self.type)
+        elif icon_class_dict.get(self.type.split('/')[0]) is not None:
+            icon = icon_class_dict.get(self.type.split('/')[0])
+        else:
+            icon = 'fa-file'
+        if self.type.split('/')[0] == 'image':
+            preview = '<div class="attachment-file"><img src="{}" class="attachment-file-image" alt="image">\
+                                   <div class="attachment-file-label">{}</div></div>'.format('https://dalme-app-media.s3.amazonaws.com/media/'+str(self.file), self.filename)
+        else:
+            preview = '<div class="attachment-file"><div class="attachment-file-body"><i class="far {} fa-8x"></i>\
+                                   </div><div class="attachment-file-label"><a href="/download/{}">{}</a></div>\
+                                   </div>'.format(icon, self.file, self.filename)
+        return preview
+
+    def __str__(self):
+        return self.file.name
+
+    def save(self, *args, **kwargs):
+        type, encoding = mimetypes.guess_type(str(self.file).split('/').pop(-1))
+        self.type = type
+        super(Attachment, self).save(*args, **kwargs)
+
+
+class Task(dalmeIntid):
+    title = models.CharField(max_length=140)
+    task_list = models.ForeignKey('TaskList', on_delete=models.CASCADE)
+    due_date = models.DateField(blank=True, null=True)
+    completed = models.BooleanField(default=False)
+    completed_date = models.DateField(blank=True, null=True)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name="task_created_by", default=get_current_user)
+    assigned_to = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name="task_assigned_to")
+    description = models.TextField(blank=True, null=True)
+    priority = models.PositiveIntegerField(blank=True, null=True)
+    workset = models.ForeignKey('Set', on_delete=models.PROTECT, null=True)
+    position = models.CharField(max_length=255, blank=True, default=None)
+    url = models.CharField(max_length=255, null=True, default=None)
+    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = GenericRelation('Comment', related_query_name='tasks')
+
+    # Has due date for an instance of this object passed?
+    def overdue_status(self):
+        '''Returns whether the Tasks's due date has passed or not.'''
+        if self.due_date and datetime.date.today() > self.due_date:
+            return True
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse("/tasks/", kwargs={"task_id": self.id})
+
+    # Auto-set the Task creation / completed date
+    def save(self, **kwargs):
+        # If Task is being marked complete, set the completed_date
+        if self.completed:
+            self.completed_date = datetime.datetime.now()
+        super(Task, self).save()
+
+    class Meta:
+        ordering = ["priority", "creation_timestamp"]
+
+
+class TaskList(dalmeIntid):
+    name = models.CharField(max_length=60)
+    slug = models.SlugField(default="")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="task_list_group")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Task Lists"
+        # Prevents (at the database level) creation of two lists with the same slug in the same group
+        unique_together = ("group", "slug")
+
+    def save(self, **kwargs):
+        self.slug = '_'.join(self.name.lower().split())
+        super(TaskList, self).save()
+
+
+class Ticket(dalmeIntid):
+    OPEN = 0
+    CLOSED = 1
+    STATUS = (
+        (OPEN, 'Open'),
+        (CLOSED, 'Closed')
+    )
+
+    subject = models.CharField(max_length=140)
+    description = models.TextField(blank=True, null=True)
+    status = models.IntegerField(choices=STATUS, default=0)
+    tags = GenericRelation('Tag')
+    url = models.CharField(max_length=255, null=True, default=None)
+    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = GenericRelation('Comment')
+
+    @property
+    def creation_name(self):
+        return User.objects.get(username=self.creation_username).profile.full_name
+
+    def __str__(self):
+        return str(self.id) + ' - ' + self.title + ' ('+self.get_status_display+')'
+
+    class Meta:
+        ordering = ["status", "creation_timestamp"]
+# <-
+
+
+# ->Data annotation: Comments, Tags, Rights
+class Comment(dalmeIntid):
+    content_object = GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.CharField(max_length=55, null=True, db_index=True)
+    body = models.TextField(blank=True, null=True, default=None)
+
+    @property
+    def snippet(self):
+        body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
+        return "{author} - {snippet}...".format(author=self.creation_username, snippet=body_snippet)
+
+    def __str__(self):
+        return self.snippet
+
+    class Meta:
+        ordering = ['creation_timestamp']
+
+
+class RightsPolicy(dalmeUuid):
+    COPYRIGHTED = 1
+    ORPHANED = 2
+    OWNED = 3
+    PUBLIC_DOMAIN = 4
+    UNKNOWN = 5
+    RIGHTS_STATUS = (
+        (COPYRIGHTED, 'Copyrighted'),
+        (ORPHANED, 'Orphaned'),
+        (OWNED, 'Owned'),
+        (PUBLIC_DOMAIN, 'Public Domain'),
+        (UNKNOWN, 'Unknown'),
+    )
+    name = models.CharField(max_length=100)
+    rights_status = models.IntegerField(choices=RIGHTS_STATUS, default=5)
+    rights = models.TextField(blank=True, default=None)
+    rights_notice = models.TextField(blank=True, default=None)
+    licence = models.TextField(blank=True, null=True, default=None)
+    rights_holder = models.CharField(max_length=255, null=True, default=None)
+    notice_display = models.BooleanField(default=False)
+    attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+
+    def get_url(self):
+        return '/rights/' + str(self.id)
+
+
+class Tag(dalmeUuid):
+    WORKFLOW = 'WF'  # type of tags used to keep track of general DALME workflow
+    CONTROL = 'C'  # general purpose control tags
+    TICKET = 'T'  # tags for issue ticket management
+    TAG_TYPES = (
+        (WORKFLOW, 'Workflow'),
+        (CONTROL, 'Control'),
+        (TICKET, 'Ticket')
+    )
+    TICKET_TAGS = (
+        ('bug', 'bug'),
+        ('feature', 'feature'),
+        ('documentation', 'documentation'),
+        ('question', 'question'),
+        ('content', 'content')
+    )
+
+    tag_type = models.CharField(max_length=2, choices=TAG_TYPES)
+    tag = models.CharField(max_length=55, null=True, default=None)
+    tag_group = models.CharField(max_length=255, null=True, default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.CharField(max_length=55, null=True, db_index=True)
+
+    def __str__(self):
+        return self.tag
+# <
+
+
+# -> DataTables
 class DT_list(dalmeIntid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55, unique=True)
@@ -264,560 +942,13 @@ class DT_fields(dalmeIntid):
     class Meta:
         unique_together = ("list", "field")
         ordering = ['order']
+# <-
+# <-
 
+# ->**************************************    EXTERNAL UNMANAGED MODELS    **************************************
 
-class Headword(dalmeUuid):
-    word = models.CharField(max_length=55)
-    full_lemma = models.CharField(max_length=255)
-    concept_id = models.ForeignKey('Concept', to_field='id', db_index=True, on_delete=models.PROTECT)
-    tags = GenericRelation('Tag')
 
-    def __str__(self):
-        return self.word
-
-
-class Object(dalmeUuid):
-    concept_id = models.UUIDField(db_index=True)
-    object_phrase_id = models.ForeignKey('Object_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
-    tags = GenericRelation('Tag')
-
-
-class Object_attribute(dalmeBasic):
-    object_id = models.ForeignKey('Object', to_field='id', db_index=True, on_delete=models.CASCADE)
-    concept_id = models.UUIDField(db_index=True)
-
-
-class Place(dalmeUuid):
-    std_name = models.CharField(max_length=255)
-    type = models.IntegerField(db_index=True)
-    attributes = GenericRelation('Attribute')
-    instances = GenericRelation('Identity_phrase')
-    tags = GenericRelation('Tag')
-
-
-class Page(dalmeUuid):
-    name = models.CharField(max_length=55)
-    dam_id = models.IntegerField(db_index=True, null=True)
-    order = models.IntegerField(db_index=True)
-    canvas = models.TextField(null=True)
-    tags = GenericRelation('Tag')
-
-    def __str__(self):
-        return self.name
-
-    def get_rights(self):
-        if self.sources.all()[0].source.parent.parent.attributes.filter(attribute_type=144).exists():
-            rpo = RightsPolicy.objects.get(pk=json.loads(self.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR)['id'])
-            return {'status': rpo.get_rights_status_display(), 'display_notice': rpo.notice_display, 'notice': json.loads(rpo.rights_notice)}
-
-    def get_absolute_url(self):
-        return reverse('page_detail', kwargs={'pk': self.pk})
-
-    def get_canvas(self):
-        if not self.canvas:
-            api_params = {
-                "function": "get_resource_data",
-                "param1": self.dam_id
-            }
-            page_meta = rs_api_query(
-                "https://dam.dalme.org/api/?",
-                os.environ['DAM_API_USER'],
-                os.environ['DAM_API_KEY'],
-                **api_params
-            )
-            page_meta_obj = page_meta.json()
-            if type(page_meta_obj) == list:
-                folio = page_meta_obj[0]['field79']
-            elif type(page_meta_obj) == dict:
-                folio = page_meta_obj['field79']
-            canvas = requests.get(
-                "https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id, folio)
-            )
-            self.canvas = canvas.text
-            return canvas.text
-        else:
-            return self.canvas
-
-
-class Source_pages(dalmeIntid):
-    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE)
-    page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
-    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='source_pages')
-
-
-class Source(dalmeUuid):
-    type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
-    name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55)
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    has_inventory = models.BooleanField(default=False, db_index=True)
-    attributes = GenericRelation(Attribute, related_query_name='sources')
-    pages = models.ManyToManyField(Page, db_index=True, through='Source_pages')
-    tags = GenericRelation('Tag')
-    comments = GenericRelation('Comment')
-    sets = GenericRelation('Set_x_content')
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('source_detail', kwargs={'pk': self.pk})
-
-    @property
-    def inherited(self):
-        inheritance = self.type.inheritance
-        if self.parent and inheritance.get('r1', None) is not None:
-            r1_inherited = self.parent.attributes.filter(attribute_type__in=inheritance['r1'])
-            if self.parent.parent and inheritance.get('r2', None) is not None:
-                r2_inherited = self.parent.inherited.filter(attribute_type__in=inheritance['r2'])
-                return r1_inherited | r2_inherited
-            else:
-                return r1_inherited
-
-    @property
-    def agents(self):
-        return self.identity_phrases.filter(content_type=104)
-
-    @property
-    def places(self):
-        return self.identity_phrases.filter(content_type=115)
-
-
-class Transcription(dalmeUuid):
-    transcription = models.TextField(blank=True, default=None)
-    author = models.CharField(max_length=255, default=get_current_username)
-    version = models.IntegerField(null=True)
-
-    def __str__(self):
-        return str(self.id)
-
-
-class Identity_phrase(dalmeUuid):
-    phrase = models.TextField()
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = models.UUIDField(null=True, db_index=True)
-    content_object = GenericForeignKey('content_type', 'object_id')
-    source_id = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='identity_phrases')
-    attributes = GenericRelation(Attribute)
-
-    def __str__(self):
-        return self.phrase
-
-
-class Object_phrase(dalmeUuid):
-    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.CASCADE)
-    phrase = models.TextField()
-
-    def __str__(self):
-        return self.phrase
-
-
-class Wordform(dalmeUuid):
-    normalized_form = models.CharField(max_length=55)
-    pos = models.CharField(max_length=255)
-    headword_id = models.ForeignKey('Headword', to_field='id', db_index=True, on_delete=models.PROTECT)
-    tags = GenericRelation('Tag')
-
-    def __str__(self):
-        return self.normalized_form
-
-
-class Token(dalmeUuid):
-    object_phrase_id = models.ForeignKey('Object_phrase', to_field='id', db_index=True, on_delete=models.CASCADE)
-    wordform_id = models.ForeignKey('Wordform', to_field='id', db_index=True, on_delete=models.PROTECT)
-    raw_token = models.CharField(max_length=255)
-    clean_token = models.CharField(max_length=55)
-    order = models.IntegerField(db_index=True)
-    flags = models.CharField(max_length=10)
-    tags = GenericRelation('Tag')
-
-    def __str__(self):
-        return self.raw_token
-
-
-# app management models
-class Set(dalmeUuid):
-    CORPUS = 1  # a set representing a coherent body of materials defined by a project or sub-project
-    COLLECTION = 2  # a generic set defined by a user for any purpose -- collections could potentially by qualified by other terms
-    DATASET = 3  # a set defined for analytical purposes
-    WORKSET = 4  # a set defined as part of a project's workflow for the purpose of systematically performing a well-defined task to its members
-    PRIVATE = 1  # only owner can view set
-    VIEW = 2  # others can view the set
-    ADD = 3  # others can view the set and add members
-    DELETE = 4  # others can view the set and add and delete members
-    SET_TYPES = (
-        (CORPUS, 'Corpus'),
-        (COLLECTION, 'Collection'),
-        (DATASET, 'Dataset'),
-        (WORKSET, 'Workset')
-    )
-    SET_PERMISSIONS = [
-        (PRIVATE, 'Private'),
-        (VIEW, 'Others: view'),
-        (ADD, 'Others: view|add'),
-        (DELETE, 'Others: view|add|delete')
-    ]
-
-    name = models.CharField(max_length=255)
-    set_type = models.IntegerField(choices=SET_TYPES)
-    endpoint = models.CharField(max_length=55)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
-    set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
-    description = models.TextField()
-    tags = GenericRelation('Tag')
-
-    def __str__(self):
-        return self.name + ' (' + self.set_type + ')'
-
-    @property
-    def workset_progress(self):
-        done = self.members.filter(workset_done=True).count()
-        total = self.members.count()
-        if total != 0:
-            return done * 100 / total
-        else:
-            return 0
-
-
-class Set_x_content(dalmeBasic):
-    set_id = models.ForeignKey(Set, on_delete=models.CASCADE, related_name='members')
-    content_object = GenericForeignKey('content_type', 'object_id')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = models.UUIDField(default=uuid.uuid4, db_index=True)
-    workset_done = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ('content_type', 'object_id', 'set_id')
-        ordering = ['set_id', 'id']
-
-
-class Country(dalmeIntid):
-    name = models.CharField(max_length=255, unique=True)
-    alpha_3_code = models.CharField(max_length=3)
-    alpha_2_code = models.CharField(max_length=2)
-    num_code = models.IntegerField()
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ["name"]
-
-
-class City(dalmeIntid):
-    name = models.CharField(max_length=255)
-    administrative_region = models.CharField(max_length=255)
-    country = models.ForeignKey('Country', on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name + '(' + self.country.name + ')'
-
-    class Meta:
-        ordering = ['country', 'name']
-        unique_together = ('name', 'administrative_region')
-
-
-class Language(dalmeIntid):
-    LANGUAGE_TYPES = (
-        ('language', 'language'),
-        ('dialect', 'dialect')
-    )
-
-    glottocode = models.CharField(max_length=25, unique=True)
-    iso6393 = models.CharField(max_length=25, unique=True, blank=True, null=True, default=None)
-    name = models.CharField(max_length=255)
-    type = models.CharField(max_length=15, choices=LANGUAGE_TYPES)
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name+' ('+self.glottocode+')'
-
-    class Meta:
-        ordering = ["name"]
-
-
-class AttributeReference(dalmeUuid):
-    name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55)
-    description = models.TextField()
-    data_type = models.CharField(max_length=15)
-    source = models.CharField(max_length=255)
-    term_type = models.CharField(max_length=55, blank=True, default=None)
-
-
-class Workflow(models.Model):
-    ASSESSING = 1
-    PROCESSING = 2
-    DONE = 3
-    INGESTION = 1
-    TRANSCRIPTION = 2
-    MARKUP = 3
-    REVIEW = 4
-    PARSING = 5
-    WORKFLOW_STATUS = (
-        (ASSESSING, 'assessing'),
-        (PROCESSING, 'processing'),
-        (DONE, 'processed')
-    )
-    PROCESSING_STAGES = (
-        (INGESTION, 'ingestion'),
-        (TRANSCRIPTION, 'transcription'),
-        (MARKUP, 'markup'),
-        (REVIEW, 'review'),
-        (PARSING, 'parsing')
-    )
-
-    source = models.OneToOneField(Source, on_delete=models.CASCADE, related_name='workflow', primary_key=True)
-    wf_status = models.IntegerField(choices=WORKFLOW_STATUS, default=2)
-    stage = models.IntegerField(choices=PROCESSING_STAGES, default=1)
-    last_modified = models.DateTimeField(null=True, blank=True)
-    last_user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
-    help_flag = models.BooleanField(default=False)
-    ingestion_done = models.BooleanField(default=False)
-    transcription_done = models.BooleanField(default=False)
-    markup_done = models.BooleanField(default=False)
-    parsing_done = models.BooleanField(default=False)
-    review_done = models.BooleanField(default=False)
-    is_public = models.BooleanField(default=False)
-
-    @property
-    def status(self):
-        stage_dict = dict(self.PROCESSING_STAGES)
-        if 1 <= self.wf_status <= 3:
-            if self.wf_status != 2:
-                status_text = self.get_wf_status_display()
-                status_text_alt = ''
-                css_class = 'tag-wf-' + status_text
-            else:
-                if getattr(self, self.get_stage_display() + '_done'):
-                    status_text = 'awaiting ' + stage_dict[self.stage + 1]
-                    status_text_alt = 'begin ' + stage_dict[self.stage + 1]
-                    css_class = 'tag-wf-awaiting'
-                else:
-                    status_text = self.get_stage_display() + ' in progress'
-                    status_text_alt = ''
-                    css_class = 'tag-wf-in_progress'
-        else:
-            status_text = 'unknown'
-            status_text_alt = ''
-            css_class = 'tag-wf-unknown'
-        return {'text': status_text, 'css_class': css_class, 'text_alt': status_text_alt}
-
-    @property
-    def stage_done(self):
-        if self.wf_status == 2:
-            stage_done = getattr(self, self.get_stage_display() + '_done')
-        else:
-            stage_done = True
-        return stage_done
-
-
-class Work_log(models.Model):
-    id = models.AutoField(primary_key=True, unique=True, db_index=True)
-    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE)
-    event = models.CharField(max_length=255)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
-
-
-class Tag(dalmeUuid):
-    WORKFLOW = 'WF'  # type of tags used to keep track of general DALME workflow
-    CONTROL = 'C'  # general purpose control tags
-    TICKET = 'T'  # tags for issue ticket management
-    TAG_TYPES = (
-        (WORKFLOW, 'Workflow'),
-        (CONTROL, 'Control'),
-        (TICKET, 'Ticket')
-    )
-    TICKET_TAGS = (
-        ('bug', 'bug'),
-        ('feature', 'feature'),
-        ('documentation', 'documentation'),
-        ('question', 'question'),
-        ('content', 'content')
-    )
-
-    tag_type = models.CharField(max_length=2, choices=TAG_TYPES)
-    tag = models.CharField(max_length=55, null=True, default=None)
-    tag_group = models.CharField(max_length=255, null=True, default=None)
-    content_object = GenericForeignKey('content_type', 'object_id')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = models.CharField(max_length=55, null=True, db_index=True)
-
-    def __str__(self):
-        return self.tag
-
-
-# task management
-class TaskList(dalmeIntid):
-    name = models.CharField(max_length=60)
-    slug = models.SlugField(default="")
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="task_list_group")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ["name"]
-        verbose_name_plural = "Task Lists"
-        # Prevents (at the database level) creation of two lists with the same slug in the same group
-        unique_together = ("group", "slug")
-
-    def save(self, **kwargs):
-        self.slug = '_'.join(self.name.lower().split())
-        super(TaskList, self).save()
-
-
-class Task(dalmeIntid):
-    title = models.CharField(max_length=140)
-    task_list = models.ForeignKey(TaskList, on_delete=models.CASCADE)
-    due_date = models.DateField(blank=True, null=True)
-    completed = models.BooleanField(default=False)
-    completed_date = models.DateField(blank=True, null=True)
-    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name="task_created_by", default=get_current_user)
-    assigned_to = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name="task_assigned_to")
-    description = models.TextField(blank=True, null=True)
-    priority = models.PositiveIntegerField(blank=True, null=True)
-    workset = models.ForeignKey(Set, on_delete=models.PROTECT, null=True)
-    position = models.CharField(max_length=255, blank=True, default=None)
-    url = models.CharField(max_length=255, null=True, default=None)
-    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-    comments = GenericRelation('Comment', related_query_name='tasks')
-
-    # Has due date for an instance of this object passed?
-    def overdue_status(self):
-        '''Returns whether the Tasks's due date has passed or not.'''
-        if self.due_date and datetime.date.today() > self.due_date:
-            return True
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return reverse("/tasks/", kwargs={"task_id": self.id})
-
-    # Auto-set the Task creation / completed date
-    def save(self, **kwargs):
-        # If Task is being marked complete, set the completed_date
-        if self.completed:
-            self.completed_date = datetime.datetime.now()
-        super(Task, self).save()
-
-    class Meta:
-        ordering = ["priority", "creation_timestamp"]
-
-
-class Ticket(dalmeIntid):
-    OPEN = 0
-    CLOSED = 1
-    STATUS = (
-        (OPEN, 'Open'),
-        (CLOSED, 'Closed')
-    )
-
-    subject = models.CharField(max_length=140)
-    description = models.TextField(blank=True, null=True)
-    status = models.IntegerField(choices=STATUS, default=0)
-    tags = GenericRelation('Tag')
-    url = models.CharField(max_length=255, null=True, default=None)
-    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-    comments = GenericRelation('Comment')
-
-    @property
-    def creation_name(self):
-        return User.objects.get(username=self.creation_username).profile.full_name
-
-    def __str__(self):
-        return str(self.id) + ' - ' + self.title + ' ('+self.get_status_display+')'
-
-    class Meta:
-        ordering = ["status", "creation_timestamp"]
-
-
-class Comment(dalmeIntid):
-    content_object = GenericForeignKey('content_type', 'object_id')
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    object_id = models.CharField(max_length=55, null=True, db_index=True)
-    body = models.TextField(blank=True, null=True, default=None)
-
-    @property
-    def snippet(self):
-        body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
-        return "{author} - {snippet}...".format(author=self.creation_username, snippet=body_snippet)
-
-    def __str__(self):
-        return self.snippet
-
-    class Meta:
-        ordering = ['creation_timestamp']
-
-
-class RightsPolicy(dalmeUuid):
-    COPYRIGHTED = 1
-    ORPHANED = 2
-    OWNED = 3
-    PUBLIC_DOMAIN = 4
-    UNKNOWN = 5
-    RIGHTS_STATUS = (
-        (COPYRIGHTED, 'Copyrighted'),
-        (ORPHANED, 'Orphaned'),
-        (OWNED, 'Owned'),
-        (PUBLIC_DOMAIN, 'Public Domain'),
-        (UNKNOWN, 'Unknown'),
-    )
-    name = models.CharField(max_length=100)
-    rights_status = models.IntegerField(choices=RIGHTS_STATUS, default=5)
-    rights = models.TextField(blank=True, default=None)
-    rights_notice = models.TextField(blank=True, default=None)
-    licence = models.TextField(blank=True, null=True, default=None)
-    rights_holder = models.CharField(max_length=255, null=True, default=None)
-    notice_display = models.BooleanField(default=False)
-    attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-
-    def get_url(self):
-        return '/rights/' + str(self.id)
-
-
-
-    def preview(self):
-        icon_type_dict = {
-            'application/msword': 'fa-file-word',
-            'text/csv': 'fa-file-csv',
-            'application/pdf': 'fa-file-pdf',
-            'application/zip': 'fa-file-archive',
-            'application/vnd.ms-excel': 'fa-file-excel'
-        }
-        icon_class_dict = {
-            'audio': 'fa-file-audio',
-            'video': 'fa-file-video',
-            'image': 'fa-file-image',
-            'text': 'fa-file-alt',
-        }
-        if icon_type_dict.get(self.type) is not None:
-            icon = icon_type_dict.get(self.type)
-        elif icon_class_dict.get(self.type.split('/')[0]) is not None:
-            icon = icon_class_dict.get(self.type.split('/')[0])
-        else:
-            icon = 'fa-file'
-        if self.type.split('/')[0] == 'image':
-            preview = '<div class="attachment-file"><img src="{}" class="attachment-file-image" alt="image">\
-                                   <div class="attachment-file-label">{}</div></div>'.format('https://dalme-app-media.s3.amazonaws.com/media/'+str(self.file), self.filename)
-        else:
-            preview = '<div class="attachment-file"><div class="attachment-file-body"><i class="far {} fa-8x"></i>\
-                                   </div><div class="attachment-file-label"><a href="/download/{}">{}</a></div>\
-                                   </div>'.format(icon, self.file, self.filename)
-        return preview
-
-    def __str__(self):
-        return self.file.name
-
-    def save(self, *args, **kwargs):
-        type, encoding = mimetypes.guess_type(str(self.file).split('/').pop(-1))
-        self.type = type
-        super(Attachment, self).save(*args, **kwargs)
-
-
-# unmanaged models from DAM
+# -> ResourceSpace
 class rs_resource(models.Model):
 
     ref = models.IntegerField(primary_key=True)
@@ -1032,9 +1163,10 @@ class rs_resource_type_field(models.Model):
         managed = False
         db_table = 'resource_type_field'
         in_db = 'dam'
+# <-
 
 
-# unmanaged models from WIKI
+# -> MediaWiki
 class wiki_user(models.Model):
     user_id = models.IntegerField(primary_key=True)
     user_name = models.BinaryField(max_length=255, unique=True)
@@ -1096,9 +1228,10 @@ class wiki_page(models.Model):
         managed = False
         db_table = 'page'
         in_db = 'wiki'
+# <-
 
 
-# unmanaged models from WORDPRESS
+# -> Wordpress
 class wp_users(models.Model):
     ID = models.IntegerField(primary_key=True)
     user_login = models.CharField(max_length=60, unique=True)
@@ -1127,46 +1260,5 @@ class wp_usermeta(models.Model):
         managed = False
         db_table = 'wp_usermeta'
         in_db = 'wp'
-
-
-# signals management
-@receiver(models.signals.post_save, sender=Transcription)
-def update_source_modification(sender, instance, created, **kwargs):
-    if instance.source_pages.all().exists():
-        source_id = instance.source_pages.all().first().source.id
-        source = Source.objects.get(pk=source_id)
-        source.modification_timestamp = timezone.now()
-        source.modification_username = get_current_username()
-        source.save()
-
-
-@receiver(models.signals.post_save, sender=Page)
-def update_folio(sender, instance, created, **kwargs):
-    if created:
-        rs_image = rs_resource.objects.get(ref=instance.dam_id)
-        rs_image.field79 = instance.name
-        rs_image.save()
-
-
-@receiver(models.signals.post_save, sender=Source)
-def update_workflow(sender, instance, created, **kwargs):
-    if instance.has_inventory:
-        if created:
-            wf_object = Workflow.objects.create(source=instance, last_modified=instance.modification_timestamp)
-            Work_log.objects.create(source=wf_object, event='Source created', timestamp=wf_object.last_modified)
-        else:
-            wf_object = Workflow.objects.get(pk=instance.id)
-            wf_object.last_modified = timezone.now()
-            wf_object.last_user = get_current_user()
-            wf_object.save()
-
-
-@receiver(models.signals.pre_delete, sender=Source)
-def delete_source_dependencies(sender, instance, **kwargs):
-    if instance.pages:
-        for page in instance.pages.all():
-            if page.sources:
-                for sp in page.sources.all():
-                    if sp.transcription:
-                        sp.transcription.delete()
-            page.delete()
+# <-
+# <-
