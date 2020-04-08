@@ -970,6 +970,8 @@ class Sources(DTViewSet):
                             # Attribute.objects.get(pk=id).delete()
                 if create_attributes:
                     for new_att in create_attributes:
+                        if new_att.get('value_UUID', None) is not None:
+                            new_att['value_STR'] = new_att.pop('value_UUID')
                         object.attributes.create(**new_att)
             if pages is not None:
                 create_pages = []
