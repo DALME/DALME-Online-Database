@@ -156,7 +156,7 @@ class SetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Set
-        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'set_permissions', 'set_permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count')
+        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'set_permissions', 'set_permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count', 'is_public', 'has_landing')
         extra_kwargs = {'set_type_label': {'required': False}, 'set_permissions_label': {'required': False}}
 
     def to_representation(self, instance):

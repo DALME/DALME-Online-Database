@@ -6,8 +6,8 @@
   var set = {
     "name": "{{ set.name }}",
     "set_type": "{{ set.set_type }}",
-    "is_public": "{{ set.is_public }}",
-    "has_landing": "{{ set.has_landing }}",
+    "is_public": {{ set.is_public|lower|safe }},
+    "has_landing": {{ set.has_landing|lower|safe }},
     "owner": "{{ set.owner.id }}",
     "set_permissions": "{{ set.set_permissions }}",
     "description": "{{ set.description }}"
@@ -64,7 +64,7 @@
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Public</span></div>
                       <div class="col-sm-9">
                         <span class="attribute_list_value">
-                          {% if set.is_public %}
+                          {% if set.is_public == 1 %}
                             <i class="fas fa-check-square"></i>
                           {% else %}
                             <i class="far fa-square"></i>
@@ -76,7 +76,7 @@
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Landing</span></div>
                       <div class="col-sm-9">
                         <span class="attribute_list_value">
-                          {% if set.has_landing %}
+                          {% if set.has_landing == 1 %}
                             <i class="fas fa-check-square"></i>
                           {% else %}
                             <i class="far fa-square"></i>

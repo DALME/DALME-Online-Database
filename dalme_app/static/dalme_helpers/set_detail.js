@@ -37,7 +37,7 @@ function edit_set(id) {
                       name:  "is_public",
                       type: "checkbox",
                       options: [
-                        {label: "Set featured in the public-facing website.", value: "1"}
+                        {label: "Set featured in the public-facing website.", value: true}
                       ],
                     },
                     {
@@ -45,7 +45,7 @@ function edit_set(id) {
                       name:  "has_landing",
                       type: "checkbox",
                       options: [
-                        {label: "Set has a landing page on the public-facing website.", value: "1"}
+                        {label: "Set has a landing page on the public-facing website.", value: true}
                       ],
                     },
                     {
