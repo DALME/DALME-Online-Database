@@ -492,7 +492,7 @@ class Set(dalmeUuid):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
     set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
     description = models.TextField()
-    tags = GenericRelation('Tag')
+    comments = GenericRelation('Comment')
 
     def __str__(self):
         return self.name + ' (' + self.set_type + ')'
@@ -838,6 +838,7 @@ class RightsPolicy(dalmeUuid):
     rights_holder = models.CharField(max_length=255, null=True, default=None)
     notice_display = models.BooleanField(default=False)
     attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = GenericRelation('Comment')
 
     def get_url(self):
         return '/rights/' + str(self.id)

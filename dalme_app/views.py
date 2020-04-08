@@ -912,6 +912,7 @@ class RightsDetail(DetailView):
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
         context['object_class'] = 'Rights Policy'
         context['object_icon'] = 'fas fa-copyright'
+        context['comments'] = 'RightsPolicy'
         if self.object.notice_display:
             notice_disp = '<i class="fas fa-check-square"></i>'
         else:
@@ -1233,6 +1234,7 @@ class SetsDetail(DetailView):
             'Description': self.object.description,
             'Progress': str(self.object.workset_progress) + '%',
         }
+        context['comments_count'] = self.object.comments.count()
         members = self.object.members.all()
         context['members'] = members
         tables = ['members', 'fa-plus-square', 'Set Members ({})'.format(members.count())]

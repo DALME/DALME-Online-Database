@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% load static i18n %}
 {% block extra_head %}
+<script>
+  object_id = "{{ object_attributes.ID }}"
+</script>
 {% if workset %}
   <script type="text/javascript" src="{% static 'js/dalme_worksets.js' %}"></script>
   <script type="text/javascript">
@@ -55,8 +58,9 @@
                           </div>
                       </div>
                     {% endfor %}
-                </div>
-              </div>
+                    {% if comments %}
+                      {% include "includes/comments_box.html" with model=comments object=object_attributes.ID %}
+                    {% endif %}
           </div>
           <div class="col-md-4">
             <div class="card mb-3">
@@ -75,4 +79,11 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
+{% if comments %}
+  <script>
+    $(document).ready(function() {
+      enable_comments("{{ comments }}", object_id);
+    });
+  </script>
+{% endif %}
 {% endblock %}

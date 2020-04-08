@@ -12,28 +12,88 @@
         <li class="nav-item">
           <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="true" {% if has_pages %} onclick="switch_tab('comments-tab')" {% endif %}>Comments
+            {% if comments_count > 0 %}
+              <div id="comment_count" class="inline-badge">{{ comments_count }}</div>
+            {% else %}
+              <div id="comment_count"></div>
+            {% endif %}
+          </a>
+        </li>
       </ul>
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
+      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab" data-editor-id="{{ set.id }}">
         <div class="row">
           <div class="col-md-8">
               <div class="card mb-3">
                 <div class="sub-card-header">
-                  <div class="card-header-title"><i class="{{ object_icon }} fa-fw"></i> {{ object_class }}</div>
+                  <div class="card-header-title"><i class="fas fa-folder fa-fw"></i> Set</div>
+                  <div id="descriptionEditorToolbar">
+                    <button class="sub-card-button" role="button" onclick="edit_set('{{ set.id }}')">Edit</button>
+                  </div>
                 </div>
                 <div class="card-body attribute_list">
-                    {% for k,v in object_attributes.items %}
-                      <div class="form-row">
-                          <div class="col-sm-3 text-right">
-                            <span class="attribute_list_label">{{ k }}</span>
-                          </div>
-                          <div class="col-sm-9">
-                            <span class="attribute_list_value">{{ v | safe }}</span>
-                          </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">ID</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.id }}</span></div>
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Name</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.name }}</span></div>
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Type</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.get_set_type_display }}</span></div>
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Public</span></div>
+                      <div class="col-sm-9">
+                        <span class="attribute_list_value">
+                          {% if set.is_public %}
+                            <i class="fas fa-check-square"></i>
+                          {% else %}
+                            <i class="far fa-square"></i>
+                          {% endif %}
+                        </span>
                       </div>
-                    {% endfor %}
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Landing</span></div>
+                      <div class="col-sm-9">
+                        <span class="attribute_list_value">
+                          {% if set.has_landing %}
+                            <i class="fas fa-check-square"></i>
+                          {% else %}
+                            <i class="far fa-square"></i>
+                          {% endif %}
+                        </span>
+                      </div>
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Endpoint</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.endpoint|title }}</span></div>
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Owner</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value"><a href="/users/{{ set.owner.username }}">{{ set.owner.profile.full_name }} ({{ set.owner.username }})</a></span></div>
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Permissions</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.get_set_permissions_display }}</span></div>
+                  </div>
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">Description</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.description }}</span></div>
+                  </div>
+                  {% if set.set_type == 4 %}
+                    <div class="form-row">
+                        <div class="col-sm-3 text-right"><span class="attribute_list_label">Progress</span></div>
+                        <div class="col-sm-9"><span class="attribute_list_value">{{ set.workset_progress }}%</span></div>
+                    </div>
+                  {% endif %}
                 </div>
               </div>
               {% if members %}
@@ -62,9 +122,21 @@
           <div class="col-md-4">
             <div class="card mb-3">
               <div class="img-placeholder d-flex justify-content-center align-items-center">
-                <i class="d-block {{ object_icon }} fa-4x mt-5 mb-5"></i>
+                <i class="d-block fas fa-folder fa-4x mt-5 mb-5"></i>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane card-body transcription-editor pt-4" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+        <div class="comment-box-container d-flex mb-3">
+          <div class="d-inline-block mr-3"><i class="fa fa-comment-medical img_avatar mt-1 fa-2x"></i></div>
+          <div class="comment-card comment-box d-inline-block">
+            <div class="comment-body p-2">
+              <textarea class="form-control form-control-sm comment-textarea" placeholder="Leave a comment..." id="new_comment_text"></textarea>
+              <div class="comment-tip">Click here for formatting options</div>
+            </div>
+            <button class="btn btn-primary ml-auto d-flex mr-2 mb-2" type="button" onclick="create_comment('Set', '{{ set.id }}')">Comment</button>
           </div>
         </div>
       </div>
@@ -76,6 +148,12 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
+<script>
+  $(document).ready(function() {
+    $('#tag-menu').hide();
+    enable_comments("Set", "{{ set.id }}");
+  });
+</script>
 {% if tables %}
 <script>
 $(document).ready(function() {
