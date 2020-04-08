@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime
 
 from django import forms
@@ -166,22 +167,25 @@ class SourceFilterForm(forms.Form):
                         value = self.data[date_key]
                         try:
                             date = datetime.strptime(value, fmt)
-                            break
                         except ValueError:
+                            # Prevent reversion back to self.cleaned_data.
+                            cleaned_data = copy.deepcopy(cleaned_data)
                             self.add_error(
                                 'date_range',
-                                f'Value: {value} is not a valid date.'
+                                f'Value: {value} is not a valid date format.'
                             )
+                            break
                     if date:
                         cleaned_data['date_range'][date_key] = date
 
-        after = cleaned_data['date_range'].get('date_range_after')
-        before = cleaned_data['date_range'].get('date_range_before')
-        if (after and before) and after > before:
-            self.add_error(
-                'date_range',
-                f'The "after" value cannot be greater than the "before" value.'
-            )
+            after = cleaned_data['date_range'].get('date_range_after')
+            before = cleaned_data['date_range'].get('date_range_before')
+            if (after and before) and after > before:
+                self.add_error(
+                    'date_range',
+                    f'The "after" value cannot be greater than the "before" value.'
+                )
+
         return cleaned_data
 
 
