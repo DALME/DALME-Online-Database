@@ -1212,28 +1212,7 @@ class SetsDetail(DetailView):
         page_title = self.object.name
         context['page_title'] = page_title
         context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
-        context['object_class'] = 'Set'
-        context['object_icon'] = 'fas fa-folder'
-        if self.object.is_public:
-            public = '<i class="fas fa-check-square"></i>'
-        else:
-            public = '<i class="far fa-square"></i>'
-        if self.object.has_landing:
-            landing = '<i class="fas fa-check-square"></i>'
-        else:
-            landing = '<i class="far fa-square"></i>'
-        context['object_attributes'] = {
-            'ID': self.object.id,
-            'Name': self.object.name,
-            'Type': self.object.get_set_type_display(),
-            'Public': public,
-            'Landing': landing,
-            'Endpoint': '<span class="text-capitalize">{}</span>'.format(self.object.endpoint),
-            'Owner': '<a href="/user/{}">{} ({})</a>'.format(self.object.owner.id, self.object.owner.profile.full_name, self.object.owner.username),
-            'Permissions': self.object.get_set_permissions_display(),
-            'Description': self.object.description,
-            'Progress': str(self.object.workset_progress) + '%',
-        }
+        context['set'] = self.object
         context['comments_count'] = self.object.comments.count()
         members = self.object.members.all()
         context['members'] = members
@@ -1253,7 +1232,7 @@ class SetsDetail(DetailView):
                     'searchPlaceholder': 'Search',
                     'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
                 },
-                'buttons': "[{text: '<i class=\"fa fa-trash-alt fa-fw\"></i>', action: function (e, dt, node, config) {delete_set_members(dt)}, className: \"align-self-end\"}]"
+                'buttons': "[{text: '<i class=\"fa fa-trash-alt fa-fw\"></i>', action: function (e, dt, node, config) {delete_set_members(dt, \"" + str(self.object.id) + "\")}, className: \"align-self-end\"}]"
             }
         return context
 

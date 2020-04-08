@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% load static i18n %}
 {% block extra_head %}
+<script type="text/javascript" src="{% static 'dalme_helpers/set_detail.js' %}"></script>
+<script>
+  var set = {
+    "name": "{{ set.name }}",
+    "set_type": "{{ set.set_type }}",
+    "is_public": "{{ set.is_public }}",
+    "has_landing": "{{ set.has_landing }}",
+    "owner": "{{ set.owner.id }}",
+    "set_permissions": "{{ set.set_permissions }}",
+    "description": "{{ set.description }}"
+  }
+</script>
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}
@@ -166,7 +178,6 @@ $(document).ready(function() {
     });
     $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa {{ tables.1 }} fa-fw"></i> {{ tables.2 }}');
     fix_dt_search();
-    set_id = {{ object_attributes.id }};
 });
 </script>
 {% endif %}
