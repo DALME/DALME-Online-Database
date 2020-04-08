@@ -47,7 +47,7 @@
                           <div class="col-sm-9">
                             {% if k in attribute_dictionaries %}
                               {% for ak, av in v.items %}
-                              <div class="mb-1">
+                              <div class="border border-secondary p-2 mb-1 dotted-border">
                                 <span class="font-weight-bold">{{ ak }}:</span>
                                 <span class="attribute_list_value">{{ av | safe }}</span>
                               </div>

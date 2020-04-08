@@ -234,7 +234,7 @@ function add_filter(event) {
     $(this).html('<i class="fa fa-minus fa-sm"></i>');
     $(this).removeClass('add_filter');
     $(this).addClass('remove_filter');
-    $(this).parent().prepend('<button class="btn filters-btn" onclick="save_set(\"create\")">Save</button><button class="btn filters-btn" onclick="apply_filters()">Apply</button>');
+    $(this).parent().prepend('<button class="btn filters-btn" onclick="apply_filters()">Apply</button>');
   } else {
     var op_select = create_select(filters, next_id, 'operator');
     nextHtml += op_select;

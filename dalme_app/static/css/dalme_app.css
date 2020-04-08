@@ -31,6 +31,10 @@ body {
   color: #2a6eb9;
 }
 
+.dotted-border {
+    border-style: dotted !important;
+}
+
 .dash-menu {
   margin-top: 10px;
   border-top: 1px solid rgb(77, 87, 106);
@@ -120,6 +124,10 @@ tei-TEI {
 .img-placeholder {
   height: 80vh;
   /* background-color: #8a8a8a; */
+  color: #c8c8c8;
+}
+
+.placeholder {
   color: #c8c8c8;
 }
 

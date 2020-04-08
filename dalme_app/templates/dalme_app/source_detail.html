@@ -151,7 +151,12 @@
                 {% if description %}
                   <div id="descriptionEditor">{{ description }}</div>
                 {% else %}
-                  <div id="descriptionEditor" class="empty-card-message">No description.</div>
+                  <div class="placeholder d-flex justify-content-center align-items-center">
+                    <div class="d-block fa-stack mt-5 mb-5">
+                      <i class="d-block fas fa-align-left fa-stack-2x"></i>
+                      <i class="d-block fas fa-slash fa-stack-2x"></i>
+                    </div>
+                  </div>
                 {% endif %}
               </div>
             </div>
