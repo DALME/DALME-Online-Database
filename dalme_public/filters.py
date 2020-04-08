@@ -157,6 +157,8 @@ class SourceFilterForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
+        # TODO: See if we can localize this in clean_date_range.
+        self.errors['date_range'] = self.error_class()
         cleaned_data['date_range'] = {}
         date_keys = ['date_range_after', 'date_range_before']
         if any(key in self.data.keys() for key in date_keys):
@@ -168,14 +170,16 @@ class SourceFilterForm(forms.Form):
                         try:
                             date = datetime.strptime(value, fmt)
                         except ValueError:
-                            # Prevent reversion back to self.cleaned_data.
-                            cleaned_data = copy.deepcopy(cleaned_data)
-                            self.add_error(
-                                'date_range',
-                                f'Value: {value} is not a valid date format.'
-                            )
-                            break
-                    if date:
+                            continue
+                    if not date:
+                        # "Note that Form.add_error() automatically removes
+                        # the relevant field from cleaned_data."
+                        date_range = cleaned_data.pop('date_range')
+                        self.add_error(
+                            'date_range', f'{value} is not a valid date.'
+                        )
+                        cleaned_data['date_range'] = date_range
+                    else:
                         cleaned_data['date_range'][date_key] = date
 
             after = cleaned_data['date_range'].get('date_range_after')

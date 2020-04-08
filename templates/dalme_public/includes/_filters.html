@@ -5,6 +5,7 @@
       <div class="field-container u-flex">
         <h4>{{ field.label_tag }}</h4>
         {% if field.name == 'date_range' %}
+          {{ field.errors }}
           <div class="date-field-container u-flex">
             {{ field }}
           </div>

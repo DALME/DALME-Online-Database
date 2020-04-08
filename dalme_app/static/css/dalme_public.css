@@ -400,6 +400,16 @@ footer > div {
   margin-top: 0.66em;
 }
 
+.errorlist {
+  color: red;
+  font-size: 0.85rem;
+  padding: 0 0.16em 0.16em 0.166em;
+}
+
+.errorlist > li:last-child {
+  padding-top: 0.33em
+}
+
 /* Media Queries */
 @media only screen and (min-width: 600px) {
   header.source-header {
