@@ -12,16 +12,16 @@
   </thead>
   <tbody>
     {% for source in page_obj %}
+      {% get_source_data source as source_data %}
       <tr>
         <td>
           <a href="{% url 'dalme_public:source_detail' pk=source.pk %}">
             {{ source.name }}
           </a>
         </td>
-        <td>{% get_source_type source %}</td>
-        <td>{% get_source_date source %}</td>
-        {% source_has_transcription source as has_transcription %}
-        {% if has_transcription %}
+        <td>{{ source_data.source_type }}</td>
+        <td>{{ source_data.source_date }}</td>
+        {% if source_data.has_transcription %}
           <td><i class="fa fa-check"></i></td>
         {% else %}
           <td><i class="fa fa-times"></i></td>

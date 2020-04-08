@@ -6,31 +6,22 @@ from dalme_app.serializers import SourceSerializer
 register = template.Library()
 
 
-# TODO: Combine these two into one call to serialize?
+
 @register.simple_tag
-def get_source_date(source):
-    # try:
-    #     return source.date
-    # except AttributeError:
+def get_source_data(source):
     data = SourceSerializer().to_representation(source)
-    return data['attributes'].get('date')
-
-
-@register.simple_tag
-def get_source_type(source):
     try:
-        return source.source_type
+        source_type = source.source_type
     except AttributeError:
-        data = SourceSerializer().to_representation(source)
-        return data['attributes'].get('record_type')
-
-
-@register.simple_tag
-def source_has_transcription(source):
-    return any(
-        source_page.transcription
-        for source_page in source.source_pages_set.all()
-    )
+        source_type = data['attributes'].get('record_type')
+    return {
+        'source_type': source_type,
+        'source_date': data['attributes'].get('date'),
+        'has_transcription': any(
+            source_page.transcription
+            for source_page in source.source_pages_set.all()
+        ),
+    }
 
 
 @register.simple_tag

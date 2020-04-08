@@ -1,13 +1,13 @@
 {% load dalme_public_tags %}
 
+{% get_source_data source as source_data %}
 <aside class="source-metadata u-flex">
   <h3>Record Details</h3>
   <h4>Name</h4>
   <p>{{ source.name }}</p>
-  {% get_source_type source as source_type %}
-  {% if source_type %}
+  {% if source_data.source_type %}
     <h4>Record Type</h4>
-    <p>{{ source_type }}</p>
+    <p>{{ source_data.source_type }}</p>
   {% endif %}
   {% if parent.name %}
     <h4>Archive</h4>
