@@ -386,15 +386,15 @@ function add_attribute_values(att_set=undefined, attribute=undefined) {
             } else {
                 source_editor.add({
                         label: "Attribute value",
-                        name: "attributes."+id+".value_STR",
+                        name: "attributes."+id+".value_"+type,
                         type: "selectize",
                         options: choices
                       });
             };
             if (typeof attribute !== 'undefined') {
-                source_editor.set("attributes."+id+".value_STR", attribute['value_STR']);
+                source_editor.set("attributes."+id+".value_"+type, attribute['value_STR']);
             };
-            attribute_control[set_id].push("attributes."+id+".value_STR");
+            attribute_control[set_id].push("attributes."+id+".value_"+type);
             $("div[data-editor-template='attributes."+id+".value_"+type+"']").find('label').remove();
         }, 'json');
     } else {
