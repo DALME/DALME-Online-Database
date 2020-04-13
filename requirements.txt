@@ -20,3 +20,4 @@ djangosaml2idp==0.7.2
 drf-access-policy==0.6.1
 django-solo==1.1.3
 django-filter==2.2.0
+django-cors-headers==3.2.1
