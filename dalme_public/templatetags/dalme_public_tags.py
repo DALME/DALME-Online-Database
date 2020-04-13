@@ -19,7 +19,7 @@ def get_source_data(source):
         'source_date': data['attributes'].get('date'),
         'has_transcription': any(
             source_page.transcription
-            for source_page in source.source_pages_set.all()
+            for source_page in source.source_pages.all()
         ),
     }
 
@@ -28,7 +28,7 @@ def get_source_data(source):
 def source_has_image(source):
     return any(
         source_page.page.dam_id
-        for source_page in source.source_pages_set.all()
+        for source_page in source.source_pages.all()
     )
 
 
