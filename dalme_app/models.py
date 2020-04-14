@@ -563,7 +563,7 @@ class Set(dalmeUuid):
     stat_text = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}({self.set_type})'
 
     @property
     def workset_progress(self):
