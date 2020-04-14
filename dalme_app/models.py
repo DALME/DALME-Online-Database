@@ -634,7 +634,7 @@ class CityReference(dalmeIntid):
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.name + '(' + self.country.name + ')'
+        return f'{self.name}({self.country.name})'
 
     class Meta:
         ordering = ['country', 'name']

@@ -279,18 +279,20 @@ class SourceFilter(django_filters.FilterSet):
         try:
             collection = Collection.objects.get(pk=value)
         except Collection.DoesNotExist:
-            # TODO: Strict mode: on/off - none/pass through
             return queryset.none()
-        source_sets = [dataset.source_set for dataset in collection.sets.all()]
-        return queryset.filter(sets__in=source_sets)
+        return queryset.filter(
+            sets__set_id__in=[
+                dataset.source_set.pk
+                for dataset in collection.sets.all()
+            ]
+        )
 
     def filter_dataset(self, queryset, name, value):
         try:
             dataset = Set.objects.get(pk=value)
         except Set.DoesNotExist:
-            # TODO: Strict mode: on/off - none/pass through
             return queryset.none()
-        return queryset.filter(sets__in=[dataset.source_set])
+        return queryset.filter(sets__set_id=dataset.source_set.pk)
 
     def filter_image(self, queryset, name, value):
         return queryset.exclude(source_pages__page__dam_id__isnull=value)
