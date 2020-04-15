@@ -1,5 +1,8 @@
 <aside class="source-rights u-flex">
-  <h3>{{ rights.status }}</h3>
+  <h4>
+    <span class="symbol">&copy;</span>
+    <span>{{ rights.status }}</span>
+  </h4>
   <div class="u-flex">
     {% if rights.notice %}
       {% for notice in rights.notice.values %}

@@ -420,6 +420,25 @@ footer > div {
   padding-top: 0.33em
 }
 
+.source-rights {
+  background: #eeeecb;
+  margin-top: 1em;
+  padding: 1em;
+}
+
+.source-rights .symbol {
+  vertical-align: middle;
+}
+
+.source-rights h4 {
+  margin-bottom: 0.165em;
+}
+
+.source-rights p {
+  font-size: 0.9rem;
+  margin-top: 0.165em;
+}
+
 /* Media Queries */
 @media only screen and (min-width: 600px) {
   header.source-header {
