@@ -84,6 +84,7 @@ class SourceList(ListView):
         ).order_by('name')
         self.filterset = self.filterset_class(self.request.GET, queryset=qs)
         qs = self.filterset.qs.distinct()
+
         if self.filterset.annotated:
             # Currently necessary because of the inability to eliminate dupes
             # when ordering across the Source - Attribute traversal.
@@ -94,6 +95,7 @@ class SourceList(ListView):
                     filtered.append(source)
                     seen.add(source.pk)
             qs = filtered
+
         return qs
 
 

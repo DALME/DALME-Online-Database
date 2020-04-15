@@ -12,7 +12,7 @@ from dalme_public.models import Collection, Set
 
 
 DATERANGE_FORMATS = ('%Y', '%b-%Y', '%d-%b-%Y',)
-BOOLEAN_CHOICES = [('', '---------'), ('true', 'Yes'), ('false', 'No')]
+BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 
 
 def _map_source_types():
@@ -150,9 +150,6 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
 
 
 class SourceFilterForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def clean(self):
         cleaned_data = super().clean()
 
@@ -197,8 +194,6 @@ class SourceFilter(django_filters.FilterSet):
         super().__init__(*args, **kwargs)
         for definition in self.filters.values():
             definition.field.label_suffix = ''
-            if isinstance(definition.field.widget, NullBooleanSelect):
-                definition.field.widget.choices = BOOLEAN_CHOICES
 
     name = django_filters.CharFilter(label='Name', lookup_expr='icontains')
     source_type = django_filters.MultipleChoiceFilter(
@@ -223,11 +218,11 @@ class SourceFilter(django_filters.FilterSet):
         choices=_dataset_choices,
         method='filter_dataset'
     )
-    has_image = django_filters.BooleanFilter(
-        label='Has Image', method='filter_image'
+    has_image = django_filters.ChoiceFilter(
+        label='Has Image', method='filter_image', choices=BOOLEAN_CHOICES
     )
-    has_transcription = django_filters.BooleanFilter(
-        label='Has Transcription', method='filter_transcription'
+    has_transcription = django_filters.ChoiceFilter(
+        label='Has Transcription', method='filter_transcription', choices=BOOLEAN_CHOICES
     )
 
     order_by = SourceOrderingFilter(
