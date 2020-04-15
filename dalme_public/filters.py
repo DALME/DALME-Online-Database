@@ -126,7 +126,7 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
             else:
                 qs = qs.order_by(
                     F('start_date').desc(nulls_first=True),
-                    F('end_date').desc(nulls_first=True)
+                    F('end_date').desc(nulls_last=True)
                 )
 
         source_type = self.get_value('source_type', value)
@@ -240,8 +240,8 @@ class SourceFilter(django_filters.FilterSet):
             'date_range',
             'collection',
             'dataset',
-            'has_image',
             'has_transcription',
+            'has_image',
             'order_by',
         ]
 
