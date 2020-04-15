@@ -56,10 +56,6 @@ def _source_type_choices():
     return sorted(list(type_map.items()), key=lambda choice: choice[1])
 
 
-def _year_choices():
-    raise NotImplementedError()
-
-
 class CustomDateRangeField(django_filters.fields.DateRangeField):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
