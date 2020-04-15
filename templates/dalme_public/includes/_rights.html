@@ -2,7 +2,7 @@
   <h3>{{ rights.status }}</h3>
   <div class="u-flex">
     {% if rights.notice %}
-      {% for notice in rights.notice.items %}
+      {% for notice in rights.notice.values %}
         <p>{{ notice }}</p>
       {% endfor %}
     {% endif %}

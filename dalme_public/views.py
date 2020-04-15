@@ -117,7 +117,6 @@ class SourceDetail(DetailView):
         context.update({
             'page': page,
             'page_id': getattr(page, 'pk', False),
-            'rights': page.get_rights(),
         })
 
         related = [(page, f"?page={idx}") for idx, page in enumerate(page_qs, 1)]
@@ -136,6 +135,7 @@ class SourceDetail(DetailView):
 
         context.update({'transcription_id': None})
         if page:
+            context.update({'rights': page.get_rights()})
             source_page = Source_pages.objects.get(source=self.object.id, page=page.id)
             if source_page:
                 transcription = source_page.transcription

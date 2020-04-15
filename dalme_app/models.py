@@ -291,9 +291,25 @@ class Page(dalmeUuid):
         return self.name
 
     def get_rights(self):
-        if self.sources.all()[0].source.parent.parent.attributes.filter(attribute_type=144).exists():
-            rpo = RightsPolicy.objects.get(pk=json.loads(self.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR)['id'])
-            return {'status': rpo.get_rights_status_display(), 'display_notice': rpo.notice_display, 'notice': json.loads(rpo.rights_notice)}
+        try:
+            source = self.sources.first().source
+            exists = source.parent.parent.attributes.filter(
+                attribute_type=144
+            ).exists()
+        except AttributeError:
+            return None
+
+        if exists:
+            rpo = RightsPolicy.objects.get(
+                pk=json.loads(
+                    source.parent.parent.attributes.get(attribute_type=144).value_STR
+                )['id'])
+            return {
+                'status': rpo.get_rights_status_display(),
+                'display_notice': rpo.notice_display,
+                'notice': json.loads(rpo.rights_notice)
+            }
+        return None
 
     def get_absolute_url(self):
         return reverse('page_detail', kwargs={'pk': self.pk})
