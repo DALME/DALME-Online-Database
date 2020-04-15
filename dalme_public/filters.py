@@ -157,7 +157,6 @@ class SourceFilterForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        # TODO: See if we can localize this in clean_date_range.
         self.errors['date_range'] = self.error_class()
         cleaned_data['date_range'] = {}
         date_keys = ['date_range_after', 'date_range_before']
