@@ -13,6 +13,7 @@
 
 {% block main_column %}
   <div class="public-content">
+    <h3>{{ object.source_set.description|linebreaks }}</h3>
     {{ object.description|linebreaks }}
   </div>
 {% endblock %}
