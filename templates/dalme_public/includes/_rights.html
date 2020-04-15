@@ -1,0 +1,10 @@
+<aside class="source-rights u-flex">
+  <h3>{{ rights.status }}</h3>
+  <div class="u-flex">
+    {% if rights.notice %}
+      {% for notice in rights.notice.items %}
+        <p>{{ notice }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+</aside>

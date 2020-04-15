@@ -150,6 +150,9 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
 
 
 class SourceFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
 

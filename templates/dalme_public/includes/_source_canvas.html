@@ -1,3 +1,6 @@
 <section id="source-canvas" class="source-canvas">
   <div id="diva_viewer" class="source-viewer"></div>
+  {% if rights.display_notice %}
+    {% include "dalme_public/includes/_rights.html" %}
+  {% endif %}
 </section>

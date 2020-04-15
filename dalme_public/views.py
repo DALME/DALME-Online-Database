@@ -117,6 +117,7 @@ class SourceDetail(DetailView):
         context.update({
             'page': page,
             'page_id': getattr(page, 'pk', False),
+            'rights': page.get_rights(),
         })
 
         related = [(page, f"?page={idx}") for idx, page in enumerate(page_qs, 1)]
