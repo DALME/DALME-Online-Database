@@ -60,7 +60,6 @@ nav.secondary ul li a {
   font-size: 1.1rem;
   text-decoration: none;
   color: #000;
-
 }
 nav.secondary ul li a.active {
   font-weight: bold;

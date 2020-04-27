@@ -1,0 +1,8 @@
+{% load wagtailimages_tags %}
+
+<!-- TODO: Temporary until we can render the full carousel. -->
+{% if page.main_image %}
+  <div class="main-image">
+    {% image page.main_image width-1500 %}
+  </div>
+{% endif %}

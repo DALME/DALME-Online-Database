@@ -1,10 +1,12 @@
 {% extends "dalme_public/__base.html" %}
 
 {% block content %}
+  {% block header %}{% endblock %}
+
   <article class="u-flex">
-    <aside class="side-column left u-flex">
+    <div class="side-column left u-flex">
       {% block left_side_column %}{% endblock %}
-    </aside>
+    </div>
 
     <div class="main-column u-flex">
       {% block main_column %}{% endblock %}

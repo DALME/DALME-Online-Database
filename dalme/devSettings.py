@@ -60,6 +60,21 @@ INSTALLED_APPS = [
     'storages'
     'solo',
     'django_filters',
+    'modelcluster',
+    'taggit',
+
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
+    'wagtailmodelchooser',
 
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
@@ -84,7 +99,8 @@ MIDDLEWARE = [
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'oidc_provider.middleware.SessionManagementMiddleware',
-    #'django.middleware.locale.LocaleMiddleware'
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 
@@ -448,3 +464,6 @@ if "LOG_TO_STDOUT" in os.environ:
 
 if "HEROKU_APP_NAME" in os.environ:
     ALLOWED_HOSTS = ["*"]
+
+WAGTAIL_SITE_NAME = 'DALME'
+WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'

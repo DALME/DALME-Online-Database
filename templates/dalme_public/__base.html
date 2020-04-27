@@ -1,4 +1,4 @@
-{% load static %}
+{% load static dalme_public_tags wagtailimages_tags wagtailuserbar %}
 
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
@@ -14,28 +14,36 @@
     </title>
     {% block styles %}
       <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public.css' %}" />
-      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     {% endblock %}
   </head>
 
-  <body id="body" class="u-flex">
-    <header role="banner">
-      {% block nav %}
-        {% include "dalme_public/includes/_nav.html" %}
-      {% endblock %}
-    </header>
+  {% with page.get_verbose_name|lower as page_name %}
+    <body id="body" class="{{ page_name }} u-flex">
+      {% image page.header_image original as header_image %}
+      <header
+        class="{{ page_name }}"
+        role="banner"
+        {% if header_image %}
+          {% get_header_image_styles header_image as styles %}
+          style="{{ styles }}"
+        {% endif %}>
+          {% include "dalme_public/includes/_nav.html" %}
+          {% block header_extra %}{% endblock %}
+      </header>
 
-    <main id="main" class="main" role="main">
-      <div class="main-container">
+      <main id="main" class="{{ page_name }}" role="main">
         {% block content %}{% endblock %}
-      </div>
-    </main>
+      </main>
 
-    <footer class="u-flex" role="contentinfo">
-      {% include "dalme_public/includes/_footer.html" %}
-    </footer>
+      <footer class="u-flex">
+        {% include "dalme_public/includes/_footer.html" %}
+      </footer>
 
-    {% block js_foot %}{% endblock %}
+      {% block js_foot %}
+        <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
+      {% endblock %}
+    </body>
+  {% endwith %}
 
-  </body>
+  {% wagtailuserbar 'bottom-right' %}
 </html>

@@ -1,0 +1,15 @@
+{% load dalme_public_tags wagtailcore_tags %}
+
+{% get_features_nav as nav %}
+<nav class="features">
+  <ul>
+    <h3 class="u-small-caps-heading">FEATURES</h3>
+    {% for tab in nav %}
+      <li>
+        <a href="{% pageurl tab %}" {% if tab == page %}class="active"{% endif %}>
+          {{ tab.specific.title_switch|title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

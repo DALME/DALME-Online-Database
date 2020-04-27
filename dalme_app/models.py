@@ -22,6 +22,7 @@ import uuid
 # from django.conf import settings
 from django.dispatch import receiver
 from collections import Counter
+from wagtail.search import index
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -152,7 +153,7 @@ class Content_attributes(dalmeIntid):
 
 
 # -> Source Management
-class Source(dalmeUuid):
+class Source(index.Indexed, dalmeUuid):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
@@ -163,6 +164,11 @@ class Source(dalmeUuid):
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
     sets = GenericRelation('Set_x_content', related_query_name='source')
+
+    search_fields = [
+        index.FilterField('id', partial_match=True, boost=10),
+        index.SearchField('name', partial_match=True, boost=10),
+    ]
 
     def __str__(self):
         return self.name

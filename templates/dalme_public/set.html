@@ -1,0 +1,67 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags static %}
+
+{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_at_a_glance.html" %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  {% if page.main_image %}
+    <div class="main-image">
+      {% image page.main_image fill-1000x330 %}
+      {% if page.main_image.caption %}
+        <p>page.main_image.caption<p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="content">
+    <div class="intro u-flex">
+      {{ page.body|richtext }}
+      {% include "dalme_public/includes/_browse_nav.html" %}
+    </div>
+
+    {% with page.subsections as subsections %}
+      {% if subsections %}
+        <div class="subsections">
+          {% for subsection in subsections %}
+            <section data-collapsed="true">
+              <div class="subheading u-flex">
+                <h3 class="u-small-caps-heading">
+                  {{ subsection.value.bound_blocks.heading|upper }}
+                </h3>
+                <i id="handle" class="fa fa-caret-left" aria-hidden="true"></i>
+              </div>
+              {{ subsection.value.bound_blocks.body.value|richtext }}
+            </section>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+  </div>
+{% endblock %}
+
+
+{% block js_foot %}
+  {{ block.super }}
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script>
+    $('body').on('click', '#handle', function(e) {
+      const target = $(e.target);
+      target.hasClass('fa-caret-left')
+        ? target.removeClass('fa-caret-left').addClass('fa-caret-down')
+        : target.removeClass('fa-caret-down').addClass('fa-caret-left');
+      target.closest('section').attr('data-collapsed', function(index, attr) {
+        return attr === 'true' ? 'false' : 'true';
+      });
+    });
+  </script>
+{% endblock %}

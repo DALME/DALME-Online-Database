@@ -1,0 +1,38 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_breadcrumbs.html" %}
+  <div class="title u-flex">
+    <h1>{{ page.title }}</h1>
+    <h2>
+      {% with page.get_parent as parent %}
+        <a href="{% pageurl parent %}">{{ parent.title }}</a>
+      {% endwith %}
+    </h2>
+  </div>
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_about_nav.html" %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  {% if page.main_image %}
+    <div class="main-image">
+      {% image page.main_image original %}
+    </div>
+  {% endif %}
+
+  <div class="content">
+    {% if page.inline_image %}
+      <div class="u-float-right">
+        {% image page.inline_image width-150 %}
+      </div>
+    {% endif %}
+    {{ page.body|richtext }}
+  </div>
+{% endblock %}

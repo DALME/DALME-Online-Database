@@ -1,12 +1,7 @@
 {% extends "dalme_public/__base.html" %}
 
 {% block content %}
-  {% block header %}{% endblock %}
-
-  <article>
-    <div class="main-column">
-      {% block main_column %}{% endblock %}
-    </div>
+  <article class="main-column u-flex">
+    {% block main_column %}{% endblock %}
   </article>
-
 {% endblock %}

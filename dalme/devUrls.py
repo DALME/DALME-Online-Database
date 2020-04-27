@@ -5,10 +5,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
-# from allaccess.views import OAuthRedirect
+
 from rest_framework import routers
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.core import urls as wagtail_urls
+from wagtail.documents import urls as wagtaildocs_urls
+
 from dalme_app import apis
 from dalme_app import web_apis
+
 
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
@@ -55,9 +60,13 @@ urlpatterns = [
     path('django_admin/', admin.site.urls),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),
 
-    re_path(r'^', include('dalme_app.urls')),
-    re_path(r'public/', include('dalme_public.urls')),
+    path('', include('dalme_app.urls')),
 
+    # Public URLs.
+    # Wagtail didn't like being namespaced so leave at top-level it for now.
+    path('cms/', include(wagtailadmin_urls)),
+    path('public/', include(wagtail_urls)),
+    path('documents/', include(wagtaildocs_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

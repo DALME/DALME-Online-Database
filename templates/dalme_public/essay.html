@@ -1,0 +1,33 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+  {% include "dalme_public/includes/_essay_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="metadata u-flex">
+    <!-- TODO: Will make this dyamic when the publishing mechanism is developed -->
+    <span>May 2020</span>
+    <span>by {{ page.author }}</span>
+  </div>
+
+  {% if page.alt_image %}
+    <div class="main-image">
+      <!-- TODO: Will replace this with an includes once we know more about feature images requirements. -->
+      {% image page.alt_image height-400 %}
+    </div>
+  {% endif %}
+
+  <div class="content">
+    {% include "dalme_public/includes/_record_detail.html" %}
+    {{ page.body|richtext }}
+  </div>
+{% endblock %}

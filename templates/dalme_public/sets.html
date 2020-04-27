@@ -1,0 +1,35 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags static %}
+
+{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    <div class="intro u-flex">
+      {{ sets.body|richtext }}
+    </div>
+
+    {% with page.get_children as sets %}
+      {% if sets %}
+        <div class="sets u-flex">
+          {% for set in sets %}
+            <section>
+              <h3>{{ set.title }}</h3>
+              {{ set.description|richtext }}
+            </section>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No sets currently defined.</p>
+      {% endif %}
+    {% endwith %}
+  </div>
+{% endblock %}

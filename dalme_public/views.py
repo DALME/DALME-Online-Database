@@ -6,7 +6,7 @@ from django.views.generic import DetailView, ListView
 
 from dalme_app.models import Source, Source_pages
 from dalme_public.filters import SourceFilter
-from dalme_public.models import Collection, HomePage, Set
+from dalme_public.models import Collection, Home, Set
 
 
 
@@ -26,7 +26,7 @@ def _get_random_inventory():
 
 
 class PublicHome(DetailView):
-    model = HomePage
+    model = Home
     template_name = 'dalme_public/homepage.html'
 
     def get_object(self):

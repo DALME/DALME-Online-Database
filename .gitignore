@@ -1,7 +1,9 @@
 env
+devEnv
 venv
 *.pyc
 staticfiles
+media
 www
 .env
 db.cnf
