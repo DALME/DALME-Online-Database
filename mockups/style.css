@@ -1,0 +1,223 @@
+body {
+  font-family: "Helvetica";  /* temp */
+}
+
+header.about {
+  background-image: linear-gradient(300deg,rgba(64, 64, 93, 0.8), rgba(108, 150, 159, 0.8)), url('IMG_2214.jpg');
+  background-position: 30% 40%;
+  background-size: 140%;
+}
+header.marseille {
+  background-image: linear-gradient(300deg,rgba(62, 59, 94, 0.8), rgba(157, 118, 89, 0.8)), url('f21cd87371e6e640fa6d733f28684d69.png');
+  background-position: 30% 25%;
+  background-size: 120%;
+}
+header {
+  color: #FFF;
+}
+header a {
+  color: #FFF;
+  text-decoration: none;
+}
+header hgroup {
+  text-shadow: 0 0 12pt rgba(0, 0, 0, 0.6);
+}
+header hgroup h1 {
+  font-size: 2rem;
+}
+header hgroup h2 {
+  font-size: 1.4rem;
+  font-family: "PT Serif";
+  font-style: italic;
+  font-weight: normal;
+}
+nav.primary .home {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+nav.primary ul li a {
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+nav.primary ul li a.active {
+  border-bottom: 3px solid rgb(49, 162, 249);
+}
+
+
+nav.breadcrumbs {
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+nav.breadcrumbs ul li a {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #DDD;
+}
+
+nav.secondary ul li a {
+  font-size: 1.1rem;
+  text-decoration: none;
+  color: #000;
+
+}
+nav.secondary ul li a.active {
+  font-weight: bold;
+  border-bottom: 2px solid rgb(49, 162, 249);
+}
+
+.glance h3 {
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.2rem;
+}
+.glance section:not(:last-child) {
+  border-bottom: 1px solid #CCC;
+}
+.glance section h4 {
+  white-space: nowrap;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: #999;
+}
+.glance section p {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+.glance .value1 {
+  font-weight: bold;
+  color: #FFF;
+  background: #555;
+  max-width: 10rem;
+  padding: 0.3rem 0.5rem 0.2rem;
+  margin: 0 0 0 auto;
+}
+.glance .value2 {
+  font-weight: bold;
+  color: #FFF;
+  background: #888;
+  max-width: 10rem;
+  padding: 0.3rem 0.5rem 0.2rem;
+  margin: 0 0 0 auto;
+}
+.glance .language {
+  color: #555;
+  background: #CCC;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.5rem 0.2rem;
+  border-radius: 1rem;
+  white-space: nowrap;
+  max-width: 10rem;
+  margin: 0.5rem 0 0.5rem auto;
+}
+.glance .language .code {
+  font-weight: bold;
+  border-left: 1px solid #999;
+  background: #DDD;
+  padding: 0.3rem 0.5rem 0.2rem;
+  margin-right: -0.5rem;
+  margin-left: 0.3rem;
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+}
+
+nav.features h3 {
+  border-bottom: 1px solid #CCC;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.2rem;
+}
+nav.features ul li {
+  border-bottom: 1px solid #CCC;
+}
+nav.features ul li a {
+  color: #000;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+main .caption {
+  font-family: Helvetica;  /* temp */
+  font-size: 0.9rem;
+  color: #999;
+  text-align: right;
+  margin-bottom: 1rem;
+}
+
+nav.browse {
+  font-family: Helvetica;  /* temp */
+  border-left: 1px solid #999;
+}
+nav.browse h3 {
+  border-bottom: 1px solid #CCC;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.2rem;
+}
+nav.browse ul li {
+  border-bottom: 1px solid #CCC;
+}
+nav.browse ul li a {
+  color: #000;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+main {
+  border-left: 1px solid black;
+  font-family: "PT Serif";
+  font-size: 1.1rem;
+}
+
+main section {
+  clear: right;
+  border-top: 1px solid #CCC;
+}
+main section:last-child {
+  border-bottom: 1px solid #CCC;
+}
+main section h4 {
+  color: #666;
+  font-family: Helvetica;  /* temp */
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.1rem;
+}
+main section h4 span:nth-child(2) {
+  width: 1rem;
+  text-align: center;
+}
+main section p {
+  font-size: 0.9rem;
+  margin: 1rem;
+}
+
+.big-d {
+  background-image: url('MedMsInitD1-nobg.png');
+  background-size: cover;
+}
+footer {
+  background: #333;
+  color: #FFF;
+  box-shadow: 0 0 10px #000;
+}
+nav.footer ul li a {
+  color: #FFF;
+  text-decoration: none;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+.copyright {
+  font-size: 0.75rem;
+}
+.social {
+  background: #000;
+  color: #CCC;
+}
+.marseille-collection {
+  background-image: url('france-marseille-medievale-jc-golvin.jpg');
+  background-position-y: 60%;
+  background-size: cover;
+}
