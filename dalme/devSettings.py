@@ -431,20 +431,5 @@ if "LOG_TO_STDOUT" in os.environ:
         },
     }
 
-
-STORAGE_KEY_PREFIX = os.environ.get("STORAGE_KEY_PREFIX", "")
-
-def get_prefixed_envvar(key):
-    if STORAGE_KEY_PREFIX:
-        key = f"{STORAGE_KEY_PREFIX}_{key}"
-    return os.environ[key]
-
-
 if "HEROKU_APP_NAME" in os.environ:
     ALLOWED_HOSTS = ["*"]
-
-if "BUCKETEER_AWS_ACCESS_KEY_ID" in os.environ:
-    AWS_ACCESS_KEY_ID = get_prefixed_envvar("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = get_prefixed_envvar("AWS_SECRET_ACCESS_KEY")
-    AWS_STORAGE_BUCKET_NAME = get_prefixed_envvar("BUCKET_NAME")
-    AWS_S3_CUSTOM_DOMAIN = "%s.s3.amazonaws.com" % AWS_STORAGE_BUCKET_NAME
