@@ -16,13 +16,6 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
-AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
-AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
-AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
-AWS_REGION = os.environ['AWS_DEFAULT_REGION']
-AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
 # email setup
 EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
@@ -133,10 +126,10 @@ AUTH_PASSWORD_VALIDATORS = [
     # {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
-awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
-#OIDC_USERINFO = 'dalme_app.utils.oidc_userinfo'
-#OIDC_IDTOKEN_INCLUDE_CLAIMS = True
-#OIDC_SESSION_MANAGEMENT_ENABLE = True
+OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
+OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+OIDC_SESSION_MANAGEMENT_ENABLE = True
+
 #authentication settings
 #LOGIN_URL = '/accounts/login/dalme_wp/'
 LOGIN_URL = '/accounts/login/'
@@ -266,8 +259,20 @@ DATABASES['default'].update(db_from_env)
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': AWS_ES_ENDPOINT,
+        'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'haystack',
+    },
+}
+if 'AWS_ES_ENDPOINT' in os.environ:
+    AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
+    awsauth = AWS4Auth(
+        os.environ['AWS_ACCESS_KEY_ID'],
+        os.environ['AWS_SECRET_ACCESS_KEY'],
+        os.environ['AWS_DEFAULT_REGION'],
+        'es'
+    )
+    HAYSTACK_CONNECTIONS["default"].update({
+        'URL': AWS_ES_ENDPOINT,
         'KWARGS': {
             'port': 443,
             'http_auth': awsauth,
@@ -275,8 +280,7 @@ HAYSTACK_CONNECTIONS = {
             'verify_certs': True,
             'connection_class': elasticsearch.RequestsHttpConnection,
         }
-    },
-}
+    })
 
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
