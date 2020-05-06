@@ -13,7 +13,8 @@ elasticsearch>=2.0.0,<3.0.0
 requests-aws4auth==0.9
 passlib==1.7.1
 django-async-messages==0.3.1
-django-storages==1.7.1
+django-oidc-provider==0.7.0
+django-storages==1.9.1
 boto3==1.9.170
 redis==3.4.1
 djangosaml2idp==0.7.2
