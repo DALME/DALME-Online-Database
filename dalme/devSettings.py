@@ -282,6 +282,21 @@ if 'AWS_ES_ENDPOINT' in os.environ:
         }
     })
 
+if 'SEARCHBOX_SSL_URL' in os.environ:
+    from urllib.parse import urlparse
+    es = urlparse(os.environ['SEARCHBOX_SSL_URL'])
+    port = es.port or 443
+    HAYSTACK_CONNECTIONS['default'].update({
+        'URL': es.scheme + '://' + es.hostname + ':' + str(port),
+        'KWARGS': {
+            'http_auth': es.username + ':' + es.password,
+            'use_ssl': True,
+            'verify_certs': True,
+            'connection_class': elasticsearch.RequestsHttpConnection,
+        }
+    })
+
+
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 REST_FRAMEWORK = {
