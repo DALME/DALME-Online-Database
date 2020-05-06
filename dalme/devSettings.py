@@ -307,12 +307,12 @@ USE_L10N = True
 USE_TZ = True
 
 # Media files
-DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
-AWS_DEFAULT_ACL = None
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
-# MEDIA_ROOT = '/Users/gabep/Repos/DALME-Online-Database/media/'
-MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
-# MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
+    DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
+    MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
+    AWS_DEFAULT_ACL = None
 
 # Extra places for collectstatic to find static files.
 # STATICFILES_DIRS = [
