@@ -64,6 +64,7 @@ INSTALLED_APPS = [
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
+    'wagtail.contrib.routable_page',
     'wagtail.embeds',
     'wagtail.sites',
     'wagtail.users',
@@ -238,7 +239,8 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'OPTIONS': {
-                'read_default_file': os.path.join(BASE_DIR, 'db.cnf')
+                'read_default_file': os.path.join(BASE_DIR, 'db.cnf'),
+                'sql_mode': 'traditional',
             },
             'TEST': {
                 'NAME': 'dalme_app_test',

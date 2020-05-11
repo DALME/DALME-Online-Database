@@ -60,6 +60,7 @@ class SourceDetail(DetailView):
 
         page_qs = self.object.pages.all().order_by('order')
 
+        # TODO: Refactor this to use the API as much as possible.
         if self.request.GET.get('page'):
             index = int(self.request.GET.get('page')) - 1
             try:

@@ -14,10 +14,10 @@
 
 {% block main_column %}
   {% if page.main_image %}
-    <div class="main-image">
+    <div class="main-image u-flex">
       {% image page.main_image fill-1000x330 %}
       {% if page.main_image.caption %}
-        <p>page.main_image.caption<p>
+        <p class="caption">{{ page.main_image.caption }}</p>
       {% endif %}
     </div>
   {% endif %}
@@ -25,7 +25,11 @@
   <div class="content">
     <div class="intro u-flex">
       {{ page.body|richtext }}
-      {% include "dalme_public/includes/_browse_nav.html" %}
+      <nav class="browse">
+        <div class="u-button">
+          <a href="{% pageurl page %}inventories/?collection={{ page.collection.pk }}&set={{ page.pk }}">Browse</a>
+        </div>
+      </nav>
     </div>
 
     {% with page.subsections as subsections %}

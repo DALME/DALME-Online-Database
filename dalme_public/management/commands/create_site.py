@@ -28,6 +28,11 @@ HOME_DATA = {
     'show_in_menus': True,
 }
 
+INVENTORIES_DATA = {
+    'title': 'Inventories',
+    'show_in_menus': False,
+}
+
 ABOUT_DATA = {
     'title': 'About the Project',
     'short_title': 'About',

@@ -1,0 +1,21 @@
+{% load wagtailcore_tags %}
+
+{% include "dalme_public/includes/_breadcrumbs.html" %}
+<div class="title u-flex collapsible">
+  <h1>{{ title }}</h1>
+  <span><i id="handle" class="fas fa-chevron-down"></i></span>
+</div>
+<div class="description u-flex" data-collapsed="false">
+  <p>
+    {% if data.attributes.description %}
+      {{ data.attributes.description }}
+    {% else %}
+      No description currently available.
+    {% endif %}
+  </p>
+  <ul class="u-flex">
+    <li>{{ data.short_name }}</li>
+    <li>{{ data.attributes.date }}</li>
+    <li>{{ data.attributes.city }}</li>
+  <ul>
+</div>

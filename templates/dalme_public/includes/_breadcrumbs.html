@@ -3,25 +3,26 @@
 {% get_breadcrumbs_nav as nav %}
 <nav class="breadcrumbs u-flex">
   <ul>
-    {% for ancestor in nav %}
-      {% if not ancestor.is_root %}
-        {% if forloop.counter0 == 1 %}
-          <li class="home">
-            <a href="{% pageurl ancestor %}">
-              <i class="fas fa-home"></i>
+    {% for crumb in nav %}
+      {% if forloop.counter0 == 0 %}
+        <li class="home">
+          <a href="{{ crumb.url }}">
+            <i class="fas fa-home"></i>
+          </a>
+        </li>
+      {% else %}
+        {% if not crumb.active %}
+          <li>
+            <a href="{{ crumb.url }}">
+              {{ crumb.title }}
             </a>
           </li>
         {% else %}
-          <li>
-            <a href="{% pageurl ancestor %}">
-              {{ ancestor.title_switch }}
-            </a>
+          <li class="active">
+            {{ crumb.title }}
           </li>
         {% endif %}
       {% endif %}
     {% endfor %}
-    <li class="active">
-      {{ page.title_switch }}
-    </li>
   </ul>
 </nav>

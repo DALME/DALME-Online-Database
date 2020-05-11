@@ -32,6 +32,8 @@ from dalme_app.models import (Profile, Attribute_type, Content_class, Content_ty
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
                               wiki_user_groups, wp_users, wp_usermeta, Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy)
+from dalme_app.access_policies import SourceAccessPolicy
+from dalme_app.utils import IsOwnerOrReadOnly
 
 
 class Datasets(viewsets.ViewSet):
@@ -846,6 +848,7 @@ class Options(viewsets.ViewSet):
 
 class Pages(DTViewSet):
     """ API endpoint for managing pages """
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Page.objects.all()
     serializer_class = PageSerializer
 

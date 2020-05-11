@@ -31,7 +31,8 @@
           {% block header_extra %}{% endblock %}
       </header>
 
-      <main id="main" class="{{ page_name }}" role="main">
+      <main
+        id="main" class="{{ page_name }}{% if inventories or inventory %} inventories{% endif %}" role="main">
         {% block content %}{% endblock %}
       </main>
 

@@ -85,6 +85,11 @@ If you don't already have a record in the database, create one.
 python manage.py createsuperuser
 ```
 
+8. Build the CMS tree.
+```
+python manage.py create_site
+```
+
 8. Test the local development setup.
 ```
 python manage.py runserver

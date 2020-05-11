@@ -1,9 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.shortcuts import redirect
+from django.db.models import Count, F, Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect
+from django.template.response import TemplateResponse
 
 from modelcluster.fields import ParentalKey
 
+from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.core import blocks, hooks
 from wagtail.core.models import Orderable, Page
 from wagtail.core.fields import RichTextField, StreamField
@@ -16,6 +20,11 @@ from wagtailmodelchooser import register_model_chooser, Chooser
 from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
 from dalme_app.models import Set as DALMESet, Source
+from dalme_app.serializers import SourceSerializer
+
+
+# https://github.com/django/django/blob/master/django/urls/converters.py#L26
+UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 
 @hooks.register('before_serve_page')
@@ -290,7 +299,7 @@ class Collection(DALMEPage):
     ]
 
 
-class Set(DALMEPage):
+class Set(RoutablePageMixin, DALMEPage):
     set_type = DALMESet.COLLECTION
     source_set = models.ForeignKey(
         'dalme_app.Set',
@@ -322,6 +331,51 @@ class Set(DALMEPage):
         StreamFieldPanel('subsections'),
     ]
 
+    @route(r'^inventories/$', name='inventories')
+    def inventories(self, request):
+        context = self.get_context(request)
+        context.update({
+            'inventories': True,
+            'set_id': self.source_set.id,
+        })
+        return TemplateResponse(
+          request, 'dalme_public/inventories.html', context
+        )
+
+    @route(rf'^inventories/({UUID_RE})/$', name='inventory')
+    def inventory(self, request, pk):
+        qs = Source.objects.filter(pk=pk)
+        if not qs.exists():
+            raise Http404()
+
+        qs = qs.annotate(
+            no_folios=Count('pages', filter=Q(pages__source__isnull=False))
+        )
+        source = qs.first()
+        pages = source.source_pages.all().values(
+            pageId=F('page__pk'),
+            pageName=F('page__name'),
+            transcriptionId=F('transcription__pk')
+        )
+
+        context = self.get_context(request)
+        context.update({
+            'inventory': True,
+            'set_id': self.source_set.id,
+            'title': source.name,
+            'data': {
+                'folios': list(pages),
+                **SourceSerializer(source).data,
+            },
+        })
+        return TemplateResponse(
+          request, 'dalme_public/inventory.html', context
+        )
+
+    @property
+    def collection(self):
+        return self.get_parent()
+
     @property
     def alias_type(self):
         try:
@@ -331,9 +385,7 @@ class Set(DALMEPage):
 
     @property
     def sources(self):
-        if self.source_set:
-            return self.source_set.members.all()
-        return Source.objects.none()
+        return self.source_set.members.all()
 
     def clean(self):
         if self.alias_type is not None and self.set_type != self.alias_type:

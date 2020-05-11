@@ -13,6 +13,8 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from dalme_app import apis
 from dalme_app import web_apis
+from dalme_public import views
+from dalme_public import urls as dalme_public_urls
 
 
 router = routers.DefaultRouter()
@@ -51,6 +53,7 @@ urlpatterns = [
     # path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('api/', include(router.urls)),
     path('web-api/', include(web_router.urls)),
+    path('api/public/', include(dalme_public_urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),

@@ -1,0 +1,393 @@
+{% extends "dalme_public/layouts/__single_column.html" %}
+{% load static %}
+
+{% block title %}{{ data.short_name }} &mdash; {{ block.super }}{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link href="{% static 'css/diva.css' %}" rel="stylesheet">
+  <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_collapsible_header.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div id="app" class="app inventory-detail">
+    <nav>
+      <ul class="u-flex">
+        <li class="zoom out" @click="handleZoomOut">
+          <i class="fa fa-search-minus" aria-hidden="true"></i>
+        </li>
+
+        <li class="zoom in" @click="handleZoomIn">
+          <i class="fa fa-search-plus" aria-hidden="true"></i>
+        </li>
+
+        <li class="pagination previous right" @click="handleFolioPrevious">
+          <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        </li>
+
+        <li class="pagination current" @click="toggleFolioSelect" v-on-clickaway="hideFolioSelect">
+          <span>${folioInfo}</span>
+          <i v-if="hasMultipleFolios" class="fa fa-chevron-down" aria-hidden="true"></i>
+        </li>
+        <ul class="folio-selector" v-if="folioSelect">
+          <template v-for="(folio, index) in sourceData.folios">
+            <li v-if="index === folioIndex" :key="index" class="inactive">
+              Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})
+            </li>
+            <li v-else :key="index" @click="handleFolioSelect(index)">
+              Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})
+            </li>
+          </template>
+        </ul>
+
+        <li class="pagination next" @click="handleFolioNext">
+          <i class="fa fa-chevron-right" aria-hidden="true"></i>
+        </li>
+
+        <li class="hamburger" @click="handleFlipView">
+          <i class="fa fa-bars" aria-hidden="true"></i>
+        </li>
+
+      </ul>
+    </nav>
+  </div>
+  <div class="folios vertical-split u-flex">
+    <section class="folio">
+      <div id="diva_viewer"></div>
+      <div id="folio-rights" class="folio-rights u-flex"></div>
+    </section>
+    <section id="transcription" class="transcription"></section>
+  </div>
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
+  {{ data|json_script:"source-data" }}
+
+  <script>
+    $(document).ready(function() {
+      const getTitle = (e, tag) => {
+        if (e.hasAttribute("unit") && e.hasAttribute("quantity")) {
+          var quantity = e.getAttribute("quantity");
+          var unit = e.getAttribute("unit");
+          var extent = 'extent ' + quantity + unit;
+        } else if (e.hasAttribute("extent")) {
+          var extent = 'extent ' + e.getAttribute("extent");
+        };
+        if (e.hasAttribute("reason")) {
+          var reason = e.getAttribute("reason")
+        };
+        if (e.hasAttribute("type")) {
+          var type = e.getAttribute("type")
+        };
+        if (e.hasAttribute("lemma")) {
+          var lemma = '"' + e.getAttribute("lemma") + '"'
+        };
+        if (e.hasAttribute("resp")) {
+          var resp = ' by ' + e.getAttribute("resp")
+        };
+        if (tag == 'word' && type && lemma) {
+          var title = type + ': ' + lemma;
+        } else {
+          var title = tag;
+          if (extent) {
+            title = title + ': ' + extent;
+            if (reason) { title = title + ', ' + reason; };
+          } else if (reason) {
+            title = title + ': ' + reason;
+          } else if (type) {
+            title = title + ': ' + type;
+          } else if (resp) {
+            title = title + resp;
+          }
+        };
+        return title;
+      };
+
+      const teiBehaviours = {
+        'tei': {
+          'gap': function(e) {
+            e.setAttribute("title", getTitle(e, 'gap'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@reason, @unit, @quantity, @extent
+          'space': function(e) {
+            e.setAttribute("title", getTitle(e, 'space'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@unit, @quantity, @extent
+          'unclear': function(e) {
+            e.setAttribute("title", getTitle(e, 'unclear'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@reason
+          'supplied': function(e) {
+            e.setAttribute("title", getTitle(e, 'supplied'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@reason
+          'add': function(e) {
+            e.setAttribute("title", getTitle(e, 'addition'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@place
+          'abbr': function(e) {
+            e.setAttribute("title", getTitle(e, 'abbreviation'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@type
+          'w': function(e) {
+            e.setAttribute("title", getTitle(e, 'word'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@type, @lemma
+          'quote': function(e) {
+            e.setAttribute("title", getTitle(e, 'quote'));
+            e.setAttribute("data-toggle", "tooltip");
+          }, //@resp
+        }
+      };
+
+      const renderImage = ({ pageId, zoomLevel }) => {
+        const node = $('#diva_viewer');
+        node.empty();
+        if (!pageId) {
+          const warning = 'No image available for this folio.';
+          node.innerHTML = `<div class="warning">${warning}</div>`;
+        } else {
+          window.folio = new Diva('diva_viewer', {
+            objectData: `/pages/${pageId}/manifest`,
+            enableAutoTitle: false,
+            enableFullscreen: false,
+            enableKeyScroll: false,
+            blockMobileMove: false,
+            enableSpaceScroll: false,
+            enableGotoPage: false,
+            enableGridIcon: false,
+            enableGridControls: false,
+            enableImageTitles: false,
+            enableToolbar: false,
+            adaptivePadding: 0,
+            fixedPadding: 0,
+            zoomLevel: zoomLevel,
+          });
+        }
+      };
+
+      const renderRights = pageId => {
+        const node = $('#folio-rights');
+        node.empty();
+        if (pageId) {
+          const endpoint = `/api/rights/?pk=${pageId}`;
+          $.get(endpoint, function(data) {
+            if (data.data.length) {
+              const [rights] = data.data;
+              if (rights.notice_display) {
+                let notice = '';
+                Object.values(JSON.parse(rights.rights_notice))
+                  .map(value => notice += `<p>${value}</p>`);
+                node.html(`
+                  <h4 class="u-flex">
+                    &copy; ${rights.rights_status.name}
+                  </h4>
+                  <p>${rights.rights_holder}</p>
+                  <p>${rights.rights}</p>
+                  ${notice}
+                  `.trim()
+                );
+              }
+            }
+          }, 'json');
+        }
+      };
+
+      const renderTranscription = transcriptionId => {
+        const node = $('#transcription');
+        node.empty();
+        if (!transcriptionId) {
+          const warning = 'This folio has not been transcribed.'
+          node.innerHTML = `<div class="warning">${warning}</div>`;
+        } else {
+          const endpoint = `/api/transcriptions/${transcriptionId}?format=json`;
+          const tei = new CETEI();
+          tei.addBehaviors(teiBehaviours);
+          $.get(endpoint, function(data) {
+            const tr_text = data.transcription;
+            const tei_block = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>${tr_text}</body></text></TEI>`;
+            tei.makeHTML5(tei_block, function(text) {
+              node.addClass("justify-content-left").html(text);
+            });
+          }, 'json');
+        };
+      };
+
+      window.eventBus = new Vue();
+      window.eventBus.$on('renderFolio', data => {
+        renderImage(data);
+        renderRights(data.pageId);
+        renderTranscription(data.transcriptionId);
+      });
+      window.eventBus.$on('zoomIn', () => {
+        if (window.folio) {
+          window.folio.zoomIn();
+        }
+      });
+      window.eventBus.$on('zoomOut', () => {
+        if (window.folio) {
+          window.folio.zoomOut();
+        }
+      });
+      window.eventBus.$on('flipView', () => {
+        const node = $('.folios');
+        if (node.hasClass('vertical-split')) {
+          node.removeClass('vertical-split').addClass('horizontal-split');
+        } else {
+          node.removeClass('horizontal-split').addClass('vertical-split');
+        }
+      });
+
+      const app = new Vue({
+        el: '#app',
+        delimiters: ['${', '}'],
+        directives: {
+          onClickaway: window.VueClickaway.directive,
+        },
+        mounted() {
+          window.eventBus.$emit('renderFolio', this.eventData);
+        },
+        data: {
+          folioIndex: 0,
+          zoomLevel: 2,
+          folioSelect: false,
+          date: 0,
+        },
+        computed: {
+          sourceData() {
+            const node = document.getElementById('source-data');
+            return JSON.parse(node.textContent);
+          },
+          hasFolios() {
+            return this.folioCount > 0;
+          },
+          hasMultipleFolios() {
+            return this.folioCount > 1;
+          },
+          hasPrevious() {
+            return this.folioIndex + 1 > 1;
+          },
+          hasNext() {
+            return this.folioIndex + 1 < this.sourceData.folios.length;
+          },
+          folioCount() {
+            return this.sourceData.no_folios;
+          },
+          folioId() {
+            return this.hasFolios
+              ? this.sourceData.folios[this.folioIndex].pageId
+              : null;
+          },
+          folioName() {
+            return this.hasFolios
+              ? this.sourceData.folios[this.folioIndex].pageName
+              : null;
+          },
+          transcriptionId() {
+            return this.hasFolios
+              ? this.sourceData.folios[this.folioIndex].transcriptionId
+              : null;
+          },
+          currentFolio() {
+            const index = `${this.folioIndex + 1}/${this.folioCount}`;
+            return `Folio ${this.folioName} (${index})`;
+          },
+          folioInfo() {
+            return this.hasFolios ? this.currentFolio : 'No folios';
+          },
+          eventData() {
+            return {
+              pageId: this.folioId,
+              transcriptionId: this.transcriptionId,
+              zoomLevel: this.zoomLevel,
+            };
+          },
+        },
+        methods: {
+          updateURL() {
+            // TODO: Implement this.
+          },
+          handleZoomIn() {
+            // Keep track of the zoom level so it persists between page loads,
+            // but there's no need to pass it to the viewer via the event.
+            if (this.zoomLevel > 0) {
+              this.zoomLevel = --this.zoomLevel;
+              window.eventBus.$emit('zoomIn');
+              this.$nextTick(() => { this.updateURL(); });
+            }
+          },
+          handleZoomOut() {
+            if (this.zoomLevel < 4) {
+              this.zoomLevel = ++this.zoomLevel;
+              window.eventBus.$emit('zoomOut');
+              this.$nextTick(() => { this.updateURL(); });
+            }
+          },
+          handleFolioPrevious() {
+            if (this.hasPrevious) {
+              this.folioIndex = --this.folioIndex;
+              window.eventBus.$emit('renderFolio', this.eventData);
+              this.$nextTick(() => { this.updateURL() });
+            }
+          },
+          handleFolioNext() {
+            if (this.hasNext) {
+              this.folioIndex = ++this.folioIndex;
+              window.eventBus.$emit('renderFolio', this.eventData);
+              this.$nextTick(() => { this.updateURL(); });
+            }
+          },
+          handleFolioSelect(index) {
+            if (this.folioIndex !== index) {
+              this.folioIndex = index;
+              window.eventBus.$emit('renderFolio', this.eventData);
+              this.folioSelect = false;
+              this.$nextTick(() => {
+                this.updateURL();
+              });
+            }
+          },
+          toggleFolioSelect() {
+            if (this.hasMultipleFolios) {
+              this.folioSelect = !this.folioSelect;
+            }
+          },
+          hideFolioSelect(e) {
+            if (!e.target.closest('.folio-selector')) {
+              this.folioSelect = false;
+            }
+          },
+          handleFlipView() {
+            window.eventBus.$emit('flipView');
+            this.$nextTick(() => {
+              this.updateURL();
+              window.eventBus.$emit('renderFolio', this.eventData);
+            });
+          },
+        },
+      });
+
+      $('body').on('click', '#handle', function(e) {
+        const target = $(e.target);
+        target.hasClass('fa-chevron-down')
+          ? target.removeClass('fa-chevron-down').addClass('fa-chevron-left')
+          : target.removeClass('fa-chevron-left').addClass('fa-chevron-down');
+        $('div.description')
+          .attr('data-collapsed', function(index, attr) {
+            return attr === 'true' ? 'false' : 'true';
+          });
+      });
+
+    });
+  </script>
+{% endblock %}
