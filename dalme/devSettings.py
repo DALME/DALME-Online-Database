@@ -56,9 +56,8 @@ INSTALLED_APPS = [
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
-    #'oidc_provider',
-    'storages'
-    'solo',
+    # 'oidc_provider',
+    'storages',
     'django_filters',
     'modelcluster',
     'taggit',

@@ -9,54 +9,6 @@ from dalme_public.filters import SourceFilter
 from dalme_public.models import Collection, Home, Set
 
 
-
-def _get_random_source():
-    # TODO: Temporary for stubbing data in templates.
-    import random
-    qs = Source.objects.exclude(type__name__in=['Archive', 'File unit'])
-    qs = qs.exclude(attributes__value_STR__contains='Inventory')
-    return qs[random.randrange(0, qs.count() - 1)]
-
-
-def _get_random_inventory():
-    # TODO: Temporary for stubbing data in templates.
-    import random
-    qs = Source.objects.filter(attributes__value_STR__contains='Inventory')
-    return qs[random.randrange(0, qs.count() - 1)]
-
-
-class PublicHome(DetailView):
-    model = Home
-    template_name = 'dalme_public/homepage.html'
-
-    def get_object(self):
-        return HomePage.get_solo()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'collections': self.object.collections.all(),
-            'object_of_the_month': _get_random_source(),
-            'inventory_of_the_month': _get_random_inventory(),
-        })
-        return context
-
-
-class CollectionDetail(DetailView):
-    model = Collection
-    template_name = 'dalme_public/collection_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({'datasets': self.object.sets.all()})
-        return context
-
-
-class SetDetail(DetailView):
-    model = Set
-    template_name = 'dalme_public/set_detail.html'
-
-
 class SourceList(ListView):
     model = Source
     template_name = 'dalme_public/source_list.html'
