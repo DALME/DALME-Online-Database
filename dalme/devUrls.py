@@ -13,7 +13,6 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from dalme_app import apis
 from dalme_app import web_apis
-from dalme_public import views
 from dalme_public import urls as dalme_public_urls
 
 

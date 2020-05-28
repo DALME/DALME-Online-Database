@@ -1,14 +1,23 @@
 import copy
-from datetime import datetime
+import itertools
 
-from django import forms
 from django.db.models import Case, F, Q, When
 from django.forms.widgets import NullBooleanSelect
 
 import django_filters
 
+from wagtail.core.models import Page
+
 from dalme_app.models import Attribute, Source
-from dalme_public.models import Collection, Set
+from dalme_public import forms
+from dalme_public.models import (
+    Collection,
+    Features,
+    Essay,
+    FeaturedInventory,
+    FeaturedObject,
+    Set
+)
 
 
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
@@ -43,7 +52,7 @@ def collection_choices():
     ]
 
 
-def dataset_choices():
+def set_choices():
     return [
         (dataset.pk, dataset.title)
         for dataset in Set.objects.all().order_by('title')
@@ -138,37 +147,6 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
         return qs
 
 
-class SourceFilterForm(forms.Form):
-    def clean(self):
-        cleaned_data = super().clean()
-
-        date_range = self.data.get('date_range')
-        if date_range:
-            try:
-                after, before = date_range.split(',')
-            except ValueError:
-                self.add_error(
-                    'date_range', f'Incorrect date format, should be: %Y,%Y'
-                )
-            after = f'{after}-01-01'
-            before = f'{before}-12-31'
-
-            try:
-                after, before = [
-                    datetime.strptime(value, '%Y-%m-%d')
-                    for value in [after, before]
-                ]
-            except ValueError:
-                self.add_error(
-                    'date_range',
-                    f'Malformed date value for an element of: {date_range}'
-                )
-
-            cleaned_data['date_range'] = [after, before]
-
-        return cleaned_data
-
-
 class SourceFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.annotated = False
@@ -191,10 +169,10 @@ class SourceFilter(django_filters.FilterSet):
         choices=collection_choices,
         method='filter_collection'
     )
-    dataset = django_filters.ChoiceFilter(
+    set = django_filters.ChoiceFilter(
         label='Set',
-        choices=dataset_choices,
-        method='filter_dataset'
+        choices=set_choices,
+        method='filter_set'
     )
     has_image = django_filters.ChoiceFilter(
         label='Has Image', method='filter_image', choices=BOOLEAN_CHOICES
@@ -209,13 +187,13 @@ class SourceFilter(django_filters.FilterSet):
 
     class Meta:
         model = Source
-        form = SourceFilterForm
+        form = forms.SourceFilterForm
         fields = [
             'name',
             'source_type',
             'date_range',
             'collection',
-            'dataset',
+            'set',
             'has_transcription',
             'has_image',
             'order_by',
@@ -253,11 +231,11 @@ class SourceFilter(django_filters.FilterSet):
         return queryset.filter(
             sets__set_id__in=[
                 dataset.specific.source_set.pk
-                for dataset in collection.get_children()
+                for dataset in collection.sets.all()
             ]
         )
 
-    def filter_dataset(self, queryset, name, value):
+    def filter_set(self, queryset, name, value):
         try:
             dataset = Set.objects.get(pk=value)
         except Set.DoesNotExist:
@@ -271,3 +249,38 @@ class SourceFilter(django_filters.FilterSet):
     def filter_transcription(self, queryset, name, value):
         value = True if value == 'true' else False
         return queryset.exclude(source_pages__transcription__isnull=value)
+
+
+class FeaturedFilter(django_filters.FilterSet):
+    @property
+    def qs(self):
+        qs = super().qs
+
+        kind = self.data.get('kind')
+        if kind:
+            model = {
+                'essay': Essay,
+                'inventory': FeaturedInventory,
+                'object': FeaturedObject,
+            }.get(kind)
+            if model:
+                qs = [page for page in qs if isinstance(page, model)]
+
+        order = self.data.get('order_by', 'date')
+        if order == 'date':
+            qs = sorted(qs, key=lambda obj: obj.first_published_at)
+            grouped = [
+                (key, list(values))
+                for key, values in itertools.groupby(
+                    qs, key=lambda obj: obj.first_published_at.year
+                )
+            ]
+        else:
+            qs = sorted(qs, key=lambda obj: obj.owner.last_name)
+            grouped = [
+                (key, list(values))
+                for key, values in itertools.groupby(
+                    qs, key=lambda obj: f'{obj.author}'
+                )
+            ]
+        return grouped

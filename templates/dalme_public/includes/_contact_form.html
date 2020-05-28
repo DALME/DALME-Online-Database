@@ -1,0 +1,33 @@
+<form role="form" action="" method="post" class="contact-form u-flex">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {{ form.source.errors }}
+  {{ form.source }}
+
+  <div class="field sender u-flex">
+    <div class="name">
+      <h4 class="label">{{ form.name.label_tag }}</h4>
+      {{ form.name.errors }}
+      {{ form.name }}
+    </div>
+    <div class="email">
+      <h4 class="label">{{ form.email.label_tag }}</h4>
+      {{ form.email.errors }}
+      {{ form.email }}
+    </div>
+  </div>
+
+  <div class="field subject">
+    <h4 class="label">{{ form.subject.label_tag }}</h4>
+    {{ form.subject.errors }}
+    {{ form.subject }}
+  </div>
+
+  <div class="field message">
+    <h4 class="label">{{ form.message.label_tag }}</h4>
+    {{ form.message.errors }}
+    {{ form.message }}
+  </div>
+
+  <button class="u-button" type="submit">Send</button>
+</form>

@@ -1,19 +1,26 @@
+import textwrap
+
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, F, Q
-from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.response import TemplateResponse
 
-from modelcluster.fields import ParentalKey
+from bs4 import BeautifulSoup as BSoup
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from modelcluster.models import ClusterableModel
 
+from wagtail.admin.edit_handlers import (
+    FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel
+)
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.core import blocks, hooks
 from wagtail.core.models import Orderable, Page
 from wagtail.core.fields import RichTextField, StreamField
-from wagtail.admin.edit_handlers import (
-    FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel
-)
+from wagtail.embeds.blocks import EmbedBlock
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.models import Image, AbstractImage, AbstractRendition
 from wagtailmodelchooser import register_model_chooser, Chooser
@@ -21,17 +28,27 @@ from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
 from dalme_app.models import Set as DALMESet, Source
 from dalme_app.serializers import SourceSerializer
+from dalme_public import forms
+from dalme_public.blocks import (
+    DocumentBlock,
+    ExternalResourceBlock,
+    IFrameBlock,
+    PersonBlock,
+    SubsectionBlock,
+)
 
 
-# https://github.com/django/django/blob/master/django/urls/converters.py#L26
+# https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 
 @hooks.register('before_serve_page')
-def redirect_root(page, request, serve_args, serve_kwargs):
+def redirects(page, request, serve_args, serve_kwargs):
     if page.is_root():
-        home = page.get_children().first()
+        home = page.get_children().live().first()
         return redirect(home.url, permanent=False)
+    if page._meta.label == 'dalme_public.Section':
+        return redirect(page.get_children().live().first().url, permanent=False)
 
 
 @register_model_chooser
@@ -62,7 +79,6 @@ class CustomRendition(AbstractRendition):
             ('image', 'filter_spec', 'focal_point_key'),
         )
 
-
 class CarouselMixin(Orderable):
     carousel_image = models.ForeignKey(
         'dalme_public.DALMEImage',
@@ -75,32 +91,50 @@ class CarouselMixin(Orderable):
     panels = [ImageChooserPanel('carousel_image')]
 
 
-class SubsectionBlock(blocks.StructBlock):
-    heading = blocks.CharBlock()
-    body = blocks.RichTextBlock()
-
-    class Meta:
-        icon = 'arrow-right'
-
-
 class DALMEPage(Page):
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name='+',
+        help_text='The image that will display in the header.'
     )
-    body = RichTextField()
     short_title = models.CharField(
         max_length=63,
         null=True,
         blank=True,
         help_text='An optional short title that will be displayed in certain contexts.'
     )
+    body = StreamField([
+        ('main_image', ImageChooserBlock()),
+        ('inline_image', ImageChooserBlock()),   # pull left and right?
+        ('text', blocks.RichTextBlock()),
+        ('heading', blocks.CharBlock()),
+        ('pullquote', blocks.RichTextBlock(icon='openquote')),
+        ('document', DocumentBlock()),
+        ('person', PersonBlock()),
+        ('external_resource', ExternalResourceBlock()),
+        ('embed', EmbedBlock(icon='media')),
+        ('iframe', IFrameBlock()),
+        ('subsection', SubsectionBlock()),
+    ])
 
     class Meta:
         abstract = True
+
+    @property
+    def main_image(self):
+        try:
+            return self.carousel.first().carousel_image
+        except AttributeError:
+            try:
+                return next(
+                    field for field in self.body
+                    if field.block.name == 'main_image'
+                ).value
+            except StopIteration:
+                return None
 
     @property
     def title_switch(self):
@@ -113,52 +147,95 @@ class DALMEPage(Page):
             return self.title
 
 
+class FeaturedPage(DALMEPage):
+    @property
+    def author(self):
+        return f'{self.owner.first_name} {self.owner.last_name}'
+
+    @property
+    def nav_title(self):
+        return self._meta.verbose_name_plural
+
+    @property
+    def snippet(self):
+        try:
+            text = next(
+                field for field in self.body
+                if field.block.name == 'text'
+            )
+        except StopIteration:
+            return ''
+        return textwrap.shorten(
+            BSoup(text.value.source, 'html.parser').get_text(),
+            width=300,
+            placeholder=' [...]'
+        )
+
+    class Meta:
+        abstract = True
+
+
 class Home(DALMEPage):
     subpage_types = [
-        'dalme_public.Flat',
+        'dalme_public.Section',
         'dalme_public.Features',
         'dalme_public.Collections'
     ]
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
-        FieldPanel('body', classname='full'),
+        StreamFieldPanel('body'),
     ]
 
     def get_context(self, request):
         context = super().get_context(request)
-        context['featured_object'] = FeaturedObject.objects.live().first()
-        context['featured_inventory'] = FeaturedInventory.objects.live().first()
-        context['essay'] = Essay.objects.live().first()
+        context['featured_object'] = FeaturedObject.objects.live().last()
+        context['featured_inventory'] = FeaturedInventory.objects.live().last()
+        context['essay'] = Essay.objects.live().last()
         return context
 
 
-class Flat(DALMEPage):
-    main_image = models.ForeignKey(
-        'dalme_public.DALMEImage',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+'
-    )
-    inline_image = models.ForeignKey(
-        'dalme_public.DALMEImage',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+'
-    )
-
+class Section(DALMEPage):
     parent_page_types = ['dalme_public.Home']
     subpage_types = ['dalme_public.Flat']
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
-        ImageChooserPanel('main_image'),
-        ImageChooserPanel('inline_image'),
         FieldPanel('short_title'),
-        FieldPanel('body', classname='full'),
     ]
+
+
+class Flat(DALMEPage):
+    show_contact_form = models.BooleanField(
+        default=False,
+        help_text='Check this box to show a contact form on the page.'
+    )
+
+    parent_page_types = ['dalme_public.Section']
+    subpage_types = []
+
+    content_panels = DALMEPage.content_panels + [
+        ImageChooserPanel('header_image'),
+        FieldPanel('title'),
+        FieldPanel('short_title'),
+        FieldPanel('show_contact_form'),
+        StreamFieldPanel('body'),
+    ]
+
+    def serve(self, request):
+        if self.show_contact_form:
+            form = forms.ContactForm(label_suffix='')
+            if request.method == 'POST':
+                form = forms.ContactForm(request.POST, label_suffix='')
+                if form.is_valid():
+                    form.save()
+                    messages.success(
+                        request, 'Your message has been delivered.'
+                    )
+                    return HttpResponseRedirect(self.url)
+            return render(
+                request, 'dalme_public/flat.html', {'page': self, 'form': form}
+            )
+        return super().serve(request)
 
 
 class Features(DALMEPage):
@@ -172,25 +249,26 @@ class Features(DALMEPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         FieldPanel('short_title'),
-        FieldPanel('body', classname='full'),
+        StreamFieldPanel('body'),
     ]
 
-
-class FeaturedMixin:
-    @property
-    def author(self):
-        return f'{self.owner.first_name} {self.owner.last_name}'
+    def get_context(self, request):
+        from dalme_public.filters import FeaturedFilter
+        context = super().get_context(request)
+        filtered = FeaturedFilter(
+            request.GET,
+            queryset=self.get_children().live().specific()
+        )
+        context['featured'] = filtered.qs
+        return context
 
 
 class FeaturedObjectCarousel(CarouselMixin):
-    page = ParentalKey(
-        'dalme_public.FeaturedObject', related_name='carousel'
-    )
+    page = ParentalKey('dalme_public.FeaturedObject', related_name='carousel')
 
 
-class FeaturedObject(FeaturedMixin, DALMEPage):
+class FeaturedObject(FeaturedPage):
     short_title = 'Object'
-    phrase = RichTextField(null=True, blank=True)
     source = models.ForeignKey(
         'dalme_app.Source',
         related_name='featured_objects',
@@ -203,36 +281,24 @@ class FeaturedObject(FeaturedMixin, DALMEPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         ModelChooserPanel('source'),
-        FieldPanel('phrase', classname='full'),
-        FieldPanel('body', classname='full'),
         MultiFieldPanel(
-            [InlinePanel('carousel', min_num=1, label='Image')],
+            [InlinePanel('carousel', label='Image')],
             heading='Carousel Images',
-        )
+        ),
+        StreamFieldPanel('body'),
     ]
 
-    @property
-    def main_image(self):
-        try:
-            return self.carousel.first().carousel_image
-        except AttributeError:
-            return None
+    class Meta:
+        verbose_name = 'Object'
+        verbose_name_plural = 'Objects'
 
 
-class FeaturedInventory(FeaturedMixin, DALMEPage):
+class FeaturedInventory(FeaturedPage):
     short_title = 'Inventory'
     source = models.ForeignKey(
         'dalme_app.Source',
         related_name='featured_inventories',
         on_delete=models.PROTECT
-    )
-    alt_image = models.ForeignKey(
-        'dalme_public.DALMEImage',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
-        help_text='An alternate image taking priority over any on the Source.'
     )
 
     parent_page_types = ['dalme_public.Features']
@@ -241,12 +307,15 @@ class FeaturedInventory(FeaturedMixin, DALMEPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         ModelChooserPanel('source'),
-        ImageChooserPanel('alt_image'),
-        FieldPanel('body', classname='full'),
+        StreamFieldPanel('body'),
     ]
 
+    class Meta:
+        verbose_name = 'Inventory'
+        verbose_name_plural = 'Inventories'
 
-class Essay(FeaturedMixin, DALMEPage):
+
+class Essay(FeaturedPage):
     short_title = 'Essay'
     source = models.ForeignKey(
         'dalme_app.Source',
@@ -255,47 +324,47 @@ class Essay(FeaturedMixin, DALMEPage):
         blank=True,
         on_delete=models.PROTECT,
     )
-    alt_image = models.ForeignKey(
-        'dalme_public.DALMEImage',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
-        help_text='An alternate image taking priority over any on the Source.'
-    )
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
-        FieldPanel('source', classname='full'),
-        ImageChooserPanel('alt_image'),
-        FieldPanel('body', classname='full'),
+        FieldPanel('source'),
+        StreamFieldPanel('body'),
+    ]
+
+    class Meta:
+        verbose_name = 'Mini Essay'
+        verbose_name_plural = 'Mini Essays'
+
+
+class Collection(Orderable, ClusterableModel):
+    title = models.CharField(max_length=255)
+    description = RichTextField()
+
+    page = ParentalKey('dalme_public.Collections', related_name='collections')
+    sets = ParentalManyToManyField('dalme_public.Set')
+
+    panels = [
+        FieldPanel('title'),
+        FieldPanel('description'),
+        FieldPanel('sets')
     ]
 
 
 class Collections(DALMEPage):
     parent_page_types = ['dalme_public.Home']
-    subpage_types = ['dalme_public.Collection']
-
-    content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
-        FieldPanel('short_title'),
-        FieldPanel('body', classname='full'),
-    ]
-
-
-class Collection(DALMEPage):
-    description = RichTextField()
-
-    parent_page_types = ['dalme_public.Collections']
     subpage_types = ['dalme_public.Set']
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
-        FieldPanel('description', classname='full'),
-        FieldPanel('body', classname='full'),
+        FieldPanel('short_title'),
+        StreamFieldPanel('body'),
+        MultiFieldPanel(
+            [InlinePanel('collections', min_num=1, label='Collection')],
+            heading='Collections',
+        ),
     ]
 
 
@@ -307,28 +376,13 @@ class Set(RoutablePageMixin, DALMEPage):
         on_delete=models.PROTECT
     )
 
-    main_image = models.ForeignKey(
-        'dalme_public.DALMEImage',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+'
-    )
-    description = RichTextField()
-    subsections = StreamField([
-        ('subsection', SubsectionBlock())
-    ])
-
-    parent_page_types = ['dalme_public.Collection']
+    parent_page_types = ['dalme_public.Collections']
     subpage_types = []
 
     content_panels = DALMEPage.content_panels + [
-        FieldPanel('source_set', classname='full'),
+        FieldPanel('source_set'),
         ImageChooserPanel('header_image'),
-        ImageChooserPanel('main_image'),
-        FieldPanel('description', classname='full'),
-        FieldPanel('body', classname='full'),
-        StreamFieldPanel('subsections'),
+        StreamFieldPanel('body'),
     ]
 
     @route(r'^inventories/$', name='inventories')
@@ -373,8 +427,8 @@ class Set(RoutablePageMixin, DALMEPage):
         )
 
     @property
-    def collection(self):
-        return self.get_parent()
+    def count(self):
+        return self.source_set.get_member_count
 
     @property
     def alias_type(self):

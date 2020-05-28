@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from dalme_app.models import Attribute, Source, Source_pages
 from dalme_app.serializers import SourceSerializer
 from dalme_public.filters import (
-    collection_choices, dataset_choices, source_type_choices, SourceFilter
+    collection_choices, set_choices, source_type_choices, SourceFilter
 )
 from dalme_public.models import Collection, Set
 
@@ -112,7 +112,7 @@ class FilterChoices(View):
             for collection in Collection.objects.all().order_by('title')
         ]
 
-    def dataset_choices(self):
+    def set_choices(self):
         return [
             {'id': dataset.pk, 'label': dataset.title}
             for dataset in Set.objects.all().order_by('title')
@@ -131,7 +131,7 @@ class FilterChoices(View):
     def methods(self):
         return {
             'collectionChoices': self.collection_choices,
-            'setChoices': self.dataset_choices,
+            'setChoices': self.set_choices,
             'sourceTypeChoices': self.source_type_choices,
         }
 

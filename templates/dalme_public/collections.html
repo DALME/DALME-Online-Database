@@ -13,21 +13,27 @@
 
 {% block main_column %}
   <div class="content">
-    <div class="intro u-flex">
-      {{ page.body|richtext }}
-    </div>
+    {{ page.body }}
 
-    {% with page.get_children as collections %}
-      {% if collections %}
+    {% with page.collections.all as sections %}
+      {% if sections %}
         <div class="collections-container u-flex">
-          {% for collection in collections %}
-            <section>
-              <div class="subheading u-flex">
-                <a href="{% pageurl collection %}">
-                  <h3 class="u-small-caps-heading">{{ collection.title }}</h3>
-                </a>
+          {% for collection in sections %}
+            <section class="collection">
+              <div class="u-subsection u-flex" data-collapsed="true">
+                <h3>{{ collection.title }}</h3>
+                <i id="handle" class="fas fa-caret-left collection"></i>
               </div>
-              {{ collection.specific.description|richtext }}
+              {{ collection.description|richtext }}
+              <h4>Collections</h4>
+              <ul class="sets">
+                {% for set in collection.sets.all %}
+                  <li class="u-flex">
+                    <a href="{% pageurl set %}">{{ set.title }}</a>
+                    <span class="count">1257–1444 | {{ set.count }} Records</span>
+                  </li>
+                {% endfor %}
+              </ul>
             </section>
           {% endfor %}
         </div>

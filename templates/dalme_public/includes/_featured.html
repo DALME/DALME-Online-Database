@@ -5,28 +5,33 @@
 
     <div class="u-flex">
       {% if featured_object or featured_inventory %}
+
         {% if featured_object %}
           <div class="monthly source u-flex">
-            {% image featured_object.main_image fill-200x200 %}
+            {% if featured_object.main_image %}
+              {% image featured_object.main_image fill-200x200 %}
+            {% endif %}
             <div class="u-flex">
               <a href="{% pageurl featured_object %}">
                 <h3>{{ featured_object.title }}</h3>
               </a>
               <h4>Object of the Month</h4>
-              {{ featured_object.body|truncatewords:40|richtext }}
+              <p>{{ featured_object.snippet }}</p>
             </div>
           </div>
         {% endif %}
 
         {% if featured_inventory %}
           <div class="monthly source u-flex">
-            {% image featured_inventory.alt_image fill-200x200 %}
+            {% if featured_inventory.main_image %}
+              {% image featured_inventory.main_image fill-200x200 %}
+            {% endif %}
             <div class="u-flex">
               <a href="{% pageurl featured_inventory %}">
                 <h3>{{ featured_inventory.title }}</h3>
               </a>
               <h4>Inventory of the Month</h4>
-              {{ featured_inventory.body|truncatewords:40|richtext }}
+              <p>{{ featured_inventory.snippet }}</p>
             </div>
           </div>
         {% endif %}
@@ -35,9 +40,11 @@
 
     {% if essay %}
       <div class="monthly essay u-flex">
-        {% image essay.alt_image fill-500x500 %}
+        {% if essay.main_image %}
+          {% image essay.main_image fill-400x230-c100 %}
+        {% endif %}
         <h4>{{ essay.title }}</h4>
-        {{ essay.body|truncatewords:30|richtext }}
+        <p>{{ essay.snippet }}</p>
         <button class="u-button">
           <a href="{% pageurl essay %}">READ MORE</a>
         </button>

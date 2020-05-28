@@ -8,26 +8,18 @@
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "dalme_public/includes/_features_nav.html" %}
+  {% include "dalme_public/includes/_features_back.html" %}
   {% include "dalme_public/includes/_essay_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
   <div class="metadata u-flex">
-    <!-- TODO: Will make this dyamic when the publishing mechanism is developed -->
-    <span>May 2020</span>
+    <span>{{ page.first_published_at.date }}</span>
     <span>by {{ page.author }}</span>
   </div>
 
-  {% if page.alt_image %}
-    <div class="main-image">
-      <!-- TODO: Will replace this with an includes once we know more about feature images requirements. -->
-      {% image page.alt_image height-400 %}
-    </div>
-  {% endif %}
-
   <div class="content">
     {% include "dalme_public/includes/_record_detail.html" %}
-    {{ page.body|richtext }}
+    {{ page.body }}
   </div>
 {% endblock %}

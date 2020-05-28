@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block main_column %}
+  <!-- TODO: main image block with its own template -->
   {% if page.main_image %}
     <div class="main-image u-flex">
       {% image page.main_image fill-1000x330 %}
@@ -22,50 +23,21 @@
     </div>
   {% endif %}
 
-  <div class="content">
-    <div class="intro u-flex">
-      {{ page.body|richtext }}
+  <div class="content u-flex">
+    <section>
       <nav class="browse">
         <div class="u-button">
-          <a href="{% pageurl page %}inventories/?collection={{ page.collection.pk }}&set={{ page.pk }}">Browse</a>
+          <a href="{% pageurl page %}inventories/?set={{ page.pk }}">Browse</a>
         </div>
       </nav>
-    </div>
-
-    {% with page.subsections as subsections %}
-      {% if subsections %}
-        <div class="subsections">
-          {% for subsection in subsections %}
-            <section data-collapsed="true">
-              <div class="subheading u-flex">
-                <h3 class="u-small-caps-heading">
-                  {{ subsection.value.bound_blocks.heading|upper }}
-                </h3>
-                <i id="handle" class="fa fa-caret-left" aria-hidden="true"></i>
-              </div>
-              {{ subsection.value.bound_blocks.body.value|richtext }}
-            </section>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-
+      {% for block in page.body %}
+        {% if forloop.counter0 == 0 and block.block_type == 'main_image' %}
+        {% else %}
+          <div class="block-{{ block.block_type }}">
+            {% include_block block %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </section>
   </div>
-{% endblock %}
-
-
-{% block js_foot %}
-  {{ block.super }}
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script>
-    $('body').on('click', '#handle', function(e) {
-      const target = $(e.target);
-      target.hasClass('fa-caret-left')
-        ? target.removeClass('fa-caret-left').addClass('fa-caret-down')
-        : target.removeClass('fa-caret-down').addClass('fa-caret-left');
-      target.closest('section').attr('data-collapsed', function(index, attr) {
-        return attr === 'true' ? 'false' : 'true';
-      });
-    });
-  </script>
 {% endblock %}

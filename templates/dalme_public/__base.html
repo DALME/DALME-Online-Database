@@ -18,7 +18,8 @@
   </head>
 
   {% with page.get_verbose_name|lower as page_name %}
-    <body id="body" class="{{ page_name }} u-flex">
+    <body id="body" class="{{ page_name }} u-flex u-type-sans">
+      {% block banner %}{% endblock %}
       {% image page.header_image original as header_image %}
       <header
         class="{{ page_name }}"
@@ -42,6 +43,63 @@
 
       {% block js_foot %}
         <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script>
+          // Subsections initialize.
+          const subsections = $('.block-subsection');
+          $.each(subsections, function(index, value) {
+            const subsection = $(value);
+            const nextSubsection = subsection.nextAll('.block-subsection:first');
+            if (subsection.find('i').hasClass('fa-caret-left')) {
+              nextSubsection.length
+                ? subsection.nextUntil(nextSubsection).hide()
+                : subsection.nextAll().hide();
+            }
+          });
+
+          // Collections initialize.
+          const collections = $('section.collection');
+          $.each(collections, function(index, value) {
+            const collection = $(value);
+            if (collection.find('i').hasClass('fa-caret-left')) {
+              collection.children().not('.u-subsection').hide();
+            }
+          });
+
+          $('body').on('click', '#handle', function(e) {
+            const target = $(e.target);
+            target.hasClass('fa-caret-left')
+              ? target.removeClass('fa-caret-left').addClass('fa-caret-down')
+              : target.removeClass('fa-caret-down').addClass('fa-caret-left');
+            target.closest('section').attr('data-collapsed', function(index, attr) {
+              return attr === 'true' ? 'false' : 'true';
+            });
+
+            // Subsections collapsing logic.
+            if (target.hasClass('subsection')) {
+              const subsection = $(target).closest('.block-subsection');
+              const nextSubsection = subsection.nextAll('.block-subsection:first');
+              if (target.hasClass('fa-caret-left')) {
+                nextSubsection.length
+                  ? subsection.nextUntil(nextSubsection).hide()
+                  : subsection.nextAll().hide();
+              } else {
+                nextSubsection.length
+                  ? subsection.nextUntil(nextSubsection).show()
+                  : subsection.nextAll().show();
+              }
+            }
+
+            // Collections collapsing logic.
+            if (target.hasClass('collection')) {
+              const collection = $(target).closest('section.collection');
+              const nodes = collection.children().not('.u-subsection');
+              target.hasClass('fa-caret-left')
+                ? nodes.hide()
+                : nodes.show();
+            }
+          });
+        </script>
       {% endblock %}
     </body>
   {% endwith %}

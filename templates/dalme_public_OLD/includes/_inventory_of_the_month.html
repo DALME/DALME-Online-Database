@@ -1,8 +1,0 @@
-{% with inventory_of_the_month as object %}
-  <aside class="u-flex">
-    <h3>Inventory Of The Month</h3>
-    <p class="curated-source">
-      <a href="{% url 'dalme_public:source_detail' pk=object.pk %}">{{ object.name }}</a>
-    </p>
-  </aside>
-{% endwith %}

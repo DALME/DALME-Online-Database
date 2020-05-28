@@ -8,26 +8,34 @@
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "dalme_public/includes/_features_nav.html" %}
+  {% include "dalme_public/includes/_features_back.html" %}
+  {% include "dalme_public/includes/_record_detail.html" %}
   {% include "dalme_public/includes/_inventory_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
   <div class="metadata u-flex">
-    <!-- TODO: Will make this dyamic when the publishing mechanism is developed -->
-    <span>May 2020</span>
+    <span>{{ page.first_published_at.date }}</span>
     <span>by {{ page.author }}</span>
   </div>
 
-  <div class="content">
-    {% if page.alt_image %}
-      <div class="main-image u-float-left">
-        <!-- TODO: Will replace this with an includes once we know more about feature images requirements. -->
-        {% image page.alt_image height-400 %}
-      </div>
-    {% endif %}
-    {% include "dalme_public/includes/_record_detail.html" %}
-    {{ page.body|richtext }}
-  </div>
+  {% if page.main_image %}
+    <div class="main-image u-flex">
+      {% image page.main_image fill-1000x500 %}
+      {% if page.main_image.caption %}
+        <p class="caption">{{ page.main_image.caption }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
 
+  <div class="content">
+    {% for block in page.body %}
+      {% if forloop.counter0 == 0 %}
+      {% else %}
+        <div class="block-{{ block.block_type }}">
+          {% include_block block %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
 {% endblock %}

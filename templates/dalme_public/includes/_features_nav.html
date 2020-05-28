@@ -6,8 +6,9 @@
     <h3 class="u-small-caps-heading">FEATURES</h3>
     {% for tab in nav %}
       <li>
-        <a href="{% pageurl tab %}" {% if tab == page %}class="active"{% endif %}>
-          {{ tab.specific.title_switch|title }}
+        {% get_features_nav_q tab as params %}
+        <a href="{% pageurl tab.get_parent %}{{ params }}" {% if tab == page %}class="active"{% endif %}>
+          {{ tab.specific.nav_title }}
         </a>
       </li>
     {% endfor %}

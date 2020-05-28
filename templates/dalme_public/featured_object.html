@@ -8,30 +8,26 @@
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "dalme_public/includes/_features_nav.html" %}
+  {% include "dalme_public/includes/_features_back.html" %}
+  {% include "dalme_public/includes/_record_detail.html" %}
   {% include "dalme_public/includes/_object_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
   <div class="metadata u-flex">
-    <!-- TODO: Will make this dyamic when the publishing mechanism is developed -->
-    <span>May 2020</span>
+    <span>{{ page.first_published_at.date }}</span>
     <span>by {{ page.author }}</span>
   </div>
 
   {% if page.carousel %}
-    <div class="main-image carousel">
-      {% include "dalme_public/includes/_carousel.html" %}
-    </div>
+    {% include "dalme_public/includes/_carousel.html" %}
   {% endif %}
 
   <div class="content">
-    {% include "dalme_public/includes/_record_detail.html" %}
-    <div class="phrase">
-      <h4>Phrase</h4>
-      {{ page.phrase|richtext }}
-    </div>
-    {{ page.body|richtext }}
+    {{ page.body }}
   </div>
+{% endblock %}
 
+{% block js_foot %}
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js" crossorigin="anonymous"></script> -->
 {% endblock %}

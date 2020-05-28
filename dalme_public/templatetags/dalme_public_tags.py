@@ -13,7 +13,7 @@ def get_nav():
     home = Home.objects.first()
     return [
         page.specific for page in
-        (home, *home.get_children().filter(show_in_menus=True))
+        (home, *home.get_children().live().filter(show_in_menus=True))
     ]
 
 
@@ -58,15 +58,15 @@ def get_breadcrumbs_nav(context):
     return breadcrumbs
 
 
-@register.simple_tag
-def get_about_nav():
-    return Flat.objects.all()
+@register.simple_tag(takes_context=True)
+def get_flat_nav(context):
+    return [page.specific for page in context['page'].get_siblings().live()]
 
 
 @register.simple_tag
 def get_features_nav():
     features = Features.objects.first()
-    return features.get_children() if features else []
+    return features.get_children().live().reverse() if features else []
 
 
 @register.simple_tag
@@ -98,3 +98,25 @@ def get_source_details(context):
     return None if not source else {
         'name': source.name,
     }
+
+
+@register.simple_tag(takes_context=True)
+def get_features_filter_q(context, key, value):
+    # TODO: Done in a rush, can definitely be improved.
+    params = f'?{key}={value}' if value != 'all' else ''
+    for param_key, param_value in context['request'].GET.items():
+        if param_key != key:
+            if not params:
+                params += f'?{param_key}={param_value}'
+            else:
+                params += f'&{param_key}={param_value}'
+    return params
+
+
+@register.simple_tag()
+def get_features_nav_q(tab):
+    return {
+        'mini essays': '?kind=essay',
+        'inventories': '?kind=inventory',
+        'objects': '?kind=object',
+    }[tab.specific.nav_title.casefold()]

@@ -1,8 +1,0 @@
-{% with object.collection as collection %}
-  <header class="source-header u-flex {{ object.name|lower }}">
-    <h2 class="collection">
-      <a href="{% url 'dalme_public:collection_detail' pk=collection.pk %}">{{ collection.name }}</a>
-    </h2>
-    <h1>{{ object.name }}</h1>
-  </header>
-{% endwith %}

@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
-{% load wagtailcore_tags wagtailimages_tags static %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 {% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
 
@@ -8,13 +8,26 @@
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "dalme_public/includes/_features_nav.html" %}
+  {% include "dalme_public/includes/_features_filter.html" %}
 {% endblock %}
-
 
 {% block main_column %}
   <div class="content">
-    <h2>Stubbed until final mockups/further discussion on 2020.05.07</h2>
+    {{ page.body }}
+    {% for key, features in featured %}
+      <h3 class="featured-group-key">{{ key|title }}</h3>
+      <ul class="featured-group u-flex">
+        {% for feature in features %}
+          <li class="featured-panel">
+            <a href="{% pageurl feature %}">
+              {% if feature.main_image %}
+                {% image feature.main_image fill-350x200 %}
+              {% endif %}
+              <p>{{ feature.title }}</p>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
   </div>
-
 {% endblock %}
