@@ -21,8 +21,10 @@ select {
   background: #fff;
 }
 img {
+  display: block;
   height: auto;
   max-width: 100%;
+  margin: 0 auto;
 }
 
 /* Utilities */
@@ -61,7 +63,7 @@ img {
 
 .u-small-caps-heading {
   color: #636363;
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 600;
   padding: 0.4rem 0;
   letter-spacing: 0.3rem;
@@ -84,6 +86,11 @@ img {
   align-self: center;
 }
 
+.u-bottom-to-top {
+  writing-mode: tb-rl;
+  transform: rotate(180deg);
+}
+
 /* Layout */
 html, body {
   height: 100%;
@@ -97,7 +104,12 @@ body {
   width: 100%;
 }
 .content {
+  display: flex;
+  flex-flow: row wrap;
   padding: 0 2rem 4rem 2rem;
+}
+.content > * {
+  width: 100%;
 }
 
 main {
@@ -294,7 +306,7 @@ header .title.collapsible {
 header .title.collapsible h1 {
   font-size: 1.5rem;
 }
-header .collapsible span {
+header .collapsible i {
   margin-left: auto;
 }
 
@@ -303,8 +315,9 @@ aside.side-column {
   text-align: right;
   padding: 0 2rem;
 }
+aside.side-column a,
 aside.side-column a:visited {
-  color: #000;
+  color: #636363;
 }
 nav.secondary {
   width: 10rem;
@@ -354,11 +367,50 @@ nav.features ul li a {
   font-size: 0.9rem;
 }
 .record-detail {
-  padding-left: 1.5rem;
-  width: 17.5rem;
+  flex-direction: column;
+  margin-top: 5rem;
+  width: 15rem;
 }
 .record-detail ul {
-  padding: 0 0 2rem 1.75rem;
+  padding-top: 0.5rem;
+}
+.record-detail ul li {
+  padding-bottom: 0.5rem;
+}
+
+.featured-object-nav {
+  flex-direction: row;
+  margin: 5rem 0 0 0;
+  padding: 0;
+  min-width: 15rem;
+}
+.featured-object-nav .year {
+  color: #d8d7d8;
+  letter-spacing: 7px;
+}
+.featured-object-nav h4 {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+.featured-object-nav > div > div:not(:last-child) {
+  font-size: 1.3rem;
+  margin-left: auto;
+  text-align: start;
+}
+.featured-object-nav > div > div:not(:first-child) {
+  flex-direction: column;
+  margin-left: auto;
+}
+.featured-object-nav ul {
+  margin: 0 0 0 1rem;
+  width: 100%;
+}
+.featured-object-nav li {
+  border-top: 1px dotted #636363;
+  padding: 0.3rem 0;
+}
+.featured-object-nav li:last-child {
+  border-bottom: 1px dotted #636363;
 }
 
 nav.browse {
@@ -526,7 +578,6 @@ section.featured > div:last-child {
 
 .main-image {
   flex-direction: column;
-  padding: 0 2rem 1rem 2rem;
 }
 .main-image .caption {
   color: #aaa;
@@ -633,6 +684,9 @@ body.set .description.collapsible {
 .collections-container > .collection > div {
   width: 100%;
 }
+.collections-container > .collection .rich-text {
+  font-family: "PT Serif", serif;
+}
 .collections-container .sets li {
   color: #5e5e5e;
   border-top: 1px dotted #636363;
@@ -647,7 +701,6 @@ body.set .description.collapsible {
 .collections-container .sets .count {
   margin-left: auto;
 }
-
 
 i.active {
   cursor: pointer;
@@ -898,11 +951,8 @@ nav.secondary.features-filter ul {
   border-bottom: 1px dotted #636363;
   margin-bottom: 1rem;
 }
-.featured-panel {
-  border: 1px solid #d7d7d7;
-  box-shadow: 0 0 5px #d7d7d7;
-}
 .featured-group {
+  flex-wrap: wrap;
   margin-bottom: 2rem;
 }
 .featured-group > .featured-panel:not(:last-child) {
@@ -913,10 +963,17 @@ nav.secondary.features-filter ul {
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
 }
+.featured-panel {
+  background: #000;
+  border: 1px solid #d7d7d7;
+  box-shadow: 0 0 5px #d7d7d7;
+  margin: 0 1rem 1rem 0;
+}
 .featured-panel p {
-  text-align: center;
+  background: #fff;
   margin: 0;
   padding: 0.5rem 1rem;
+  text-align: center;
 }
 
 .features-back {
@@ -958,6 +1015,13 @@ nav.secondary.features-filter ul {
 
 .block-main_image {
   padding-bottom: 1rem;
+}
+
+.block-carousel {
+  padding-bottom: 1rem;
+}
+.block-carousel .carousel-inner {
+  background: #000;
 }
 
 .block-inline_image {
@@ -1002,13 +1066,18 @@ nav.secondary.features-filter ul {
 }
 
 .block-person {
-  display: inline-block;
+  width: 50%;
   font-family: "PT Serif", serif;
-  min-width: 49%;
   padding: 1rem;
 }
 .block-person > div {
-  flex-direction: column;
+  flex-direction: row;
+}
+.block-person .headshot {
+  margin-right: 1rem;
+}
+.block-person img {
+  margin: 0;
 }
 .block-person h4 {
   font-style: italic;
@@ -1084,8 +1153,8 @@ div.description[data-collapsed='true'] {
 
 @media only screen and (min-width: 1200px) {
   body {
-    width: 110rem;
-    margin: 0 auto;
+    width: 110rem!important;
+    margin: 0 auto!important;
   }
   section.featured {
     flex-direction: row;
@@ -1094,7 +1163,7 @@ div.description[data-collapsed='true'] {
 
 @media only screen and (min-width: 1800px) {
   body {
-    width: 80rem;
-    margin: 0 auto;
+    width: 80rem!important;
+    margin: 0 auto!important;
   }
 }

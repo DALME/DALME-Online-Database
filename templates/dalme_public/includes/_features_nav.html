@@ -1,16 +1,25 @@
 {% load dalme_public_tags wagtailcore_tags %}
 
-{% get_features_nav as nav %}
 <nav class="features">
   <ul>
     <h3 class="u-small-caps-heading">FEATURES</h3>
-    {% for tab in nav %}
-      <li>
-        {% get_features_nav_q tab as params %}
-        <a href="{% pageurl tab.get_parent %}{{ params }}" {% if tab == page %}class="active"{% endif %}>
-          {{ tab.specific.nav_title }}
-        </a>
-      </li>
-    {% endfor %}
+    <li>
+      {% get_features_nav_q 'essays' as params %}
+      <a href="{% get_features_url %}{{ params }}">
+        Essays
+      </a>
+    </li>
+    <li>
+      {% get_features_nav_q 'inventories' as params %}
+      <a href="{% get_features_url %}{{ params }}">
+        Inventories
+      </a>
+    </li>
+    <li>
+      {% get_features_nav_q 'objects' as params %}
+      <a href="{% get_features_url %}{{ params }}">
+        Objects
+      </a>
+    </li>
   </ul>
 </nav>

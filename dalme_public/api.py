@@ -1,21 +1,18 @@
+import datetime
+
 from django.core.paginator import InvalidPage
 from django.db.models import Q, Count
-from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
+from django.http import JsonResponse
 from django.views import View
-from django.views.generic import DetailView, ListView
 
 from rest_framework import pagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from dalme_app.models import Attribute, Source, Source_pages
+from dalme_app.models import Attribute, Source
 from dalme_app.serializers import SourceSerializer
-from dalme_public.filters import (
-    collection_choices, set_choices, source_type_choices, SourceFilter
-)
+from dalme_public.filters import SourceFilter
 from dalme_public.models import Collection, Set
 
 
@@ -54,7 +51,7 @@ class DALMEPagination(pagination.PageNumberPagination):
 
         try:
             self.page = paginator.page(page_number)
-        except InvalidPage as exc:
+        except InvalidPage:
             self.page = paginator.page(1)
 
         if paginator.num_pages > 1 and self.template is not None:
@@ -73,6 +70,7 @@ class SourceList(ListAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self, *args, **kwargs):
+        # TODO: Integrate visible flag here
         qs = super().get_queryset(*args, **kwargs).exclude(
             type__name__in=['Archive', 'File unit']
         ).order_by('name')
@@ -93,6 +91,15 @@ class SourceList(ListAPIView):
                     filtered.append(source)
                     seen.add(source.pk)
             qs = filtered
+
+            order_by = self.request.GET.get('order_by')
+            if order_by.endswith('date'):
+                maxdate = datetime.date(datetime.MAXYEAR, 1, 1)
+                qs = sorted(qs, key=lambda item: item.source_date or maxdate)
+            if order_by.endswith('source_type'):
+                qs = sorted(qs, key=lambda item: item.source_type or '')
+            if order_by.startswith('-'):
+                qs.reverse()
 
         return qs
 
@@ -123,9 +130,9 @@ class FilterChoices(View):
             attribute_type__short_name='record_type'
         ).values('value_STR').distinct()
         return sorted([
-            {'id': str(idx), 'label': attr['value_STR']} for idx, attr in enumerate(types)],
-            key=lambda choice: choice['label']
-        )
+            {'id': str(idx), 'label': attr['value_STR']}
+            for idx, attr in enumerate(types)
+        ], key=lambda choice: choice['label'])
 
     @property
     def methods(self):

@@ -17,11 +17,11 @@
   <div id="app" class="app inventory-detail">
     <nav>
       <ul class="u-flex">
-        <li class="zoom out" @click="handleZoomOut">
+        <li :id=`diva-${divaId}-zoom-out-button` class="zoom out" @click="handleZoomOut">
           <i class="fa fa-search-minus" aria-hidden="true"></i>
         </li>
 
-        <li class="zoom in" @click="handleZoomIn">
+        <li :id=`diva-${divaId}-zoom-in-button` class="zoom in" @click="handleZoomIn">
           <i class="fa fa-search-plus" aria-hidden="true"></i>
         </li>
 
@@ -194,7 +194,6 @@
                   </h4>
                   <p>${rights.rights_holder}</p>
                   <p>${rights.rights}</p>
-                  ${notice}
                   `.trim()
                 );
               }
@@ -224,10 +223,12 @@
       };
 
       window.eventBus = new Vue();
-      window.eventBus.$on('renderFolio', data => {
+      window.eventBus.$on('renderFolio', (data, everything = true) => {
         renderImage(data);
-        renderRights(data.pageId);
-        renderTranscription(data.transcriptionId);
+        if (everything) {
+          renderRights(data.pageId);
+          renderTranscription(data.transcriptionId);
+        }
       });
       window.eventBus.$on('zoomIn', () => {
         if (window.folio) {
@@ -262,6 +263,7 @@
           zoomLevel: 2,
           folioSelect: false,
           date: 0,
+          divaId: 1,
         },
         computed: {
           sourceData() {
@@ -317,6 +319,9 @@
           updateURL() {
             // TODO: Implement this.
           },
+          incrementDivaId() {
+            this.divaId += 1;
+          },
           handleZoomIn() {
             // Keep track of the zoom level so it persists between page loads,
             // but there's no need to pass it to the viewer via the event.
@@ -337,6 +342,7 @@
             if (this.hasPrevious) {
               this.folioIndex = --this.folioIndex;
               window.eventBus.$emit('renderFolio', this.eventData);
+              this.incrementDivaId();
               this.$nextTick(() => { this.updateURL() });
             }
           },
@@ -344,6 +350,7 @@
             if (this.hasNext) {
               this.folioIndex = ++this.folioIndex;
               window.eventBus.$emit('renderFolio', this.eventData);
+              this.incrementDivaId();
               this.$nextTick(() => { this.updateURL(); });
             }
           },
@@ -351,11 +358,20 @@
             if (this.folioIndex !== index) {
               this.folioIndex = index;
               window.eventBus.$emit('renderFolio', this.eventData);
+              this.incrementDivaId();
               this.folioSelect = false;
               this.$nextTick(() => {
                 this.updateURL();
               });
             }
+          },
+          handleFlipView() {
+            window.eventBus.$emit('flipView');
+            window.eventBus.$emit('renderFolio', this.eventData, false);
+            this.incrementDivaId();
+            this.$nextTick(() => {
+              this.updateURL();
+            });
           },
           toggleFolioSelect() {
             if (this.hasMultipleFolios) {
@@ -367,22 +383,15 @@
               this.folioSelect = false;
             }
           },
-          handleFlipView() {
-            window.eventBus.$emit('flipView');
-            this.$nextTick(() => {
-              this.updateURL();
-              window.eventBus.$emit('renderFolio', this.eventData);
-            });
-          },
         },
       });
 
-      // TODO: Move to __base
       $('body').on('click', '#handle', function(e) {
         const target = $(e.target);
-        target.hasClass('fa-chevron-down')
-          ? target.removeClass('fa-chevron-down').addClass('fa-chevron-left')
-          : target.removeClass('fa-chevron-left').addClass('fa-chevron-down');
+        const icon = target.find('i');
+        icon.hasClass('fa-chevron-down')
+          ? icon.removeClass('fa-chevron-down').addClass('fa-chevron-left')
+          : icon.removeClass('fa-chevron-left').addClass('fa-chevron-down');
         $('div.description')
           .attr('data-collapsed', function(index, attr) {
             return attr === 'true' ? 'false' : 'true';

@@ -13,30 +13,29 @@
 {% endblock %}
 
 {% block main_column %}
-  <!-- TODO: main image block with its own template -->
-  {% if page.main_image %}
-    <div class="main-image u-flex">
-      {% image page.main_image fill-1000x330 %}
-      {% if page.main_image.caption %}
-        <p class="caption">{{ page.main_image.caption }}</p>
-      {% endif %}
-    </div>
-  {% endif %}
-
   <div class="content u-flex">
     <section>
-      <nav class="browse">
-        <div class="u-button">
-          <a href="{% pageurl page %}inventories/?set={{ page.pk }}">Browse</a>
-        </div>
-      </nav>
       {% for block in page.body %}
-        {% if forloop.counter0 == 0 and block.block_type == 'main_image' %}
+        {% if not page.main_image %}
+          {% if forloop.counter0 == 0 %}
+            <nav class="browse">
+              <div class="u-button">
+                <a href="{% pageurl page %}inventories/?set={{ page.pk }}">Browse</a>
+              </div>
+            </nav>
+          {% endif %}
         {% else %}
-          <div class="block-{{ block.block_type }}">
-            {% include_block block %}
-          </div>
+          {% if forloop.counter0 == 1 %}
+            <nav class="browse">
+              <div class="u-button">
+                <a href="{% pageurl page %}inventories/?set={{ page.pk }}">Browse</a>
+              </div>
+            </nav>
+          {% endif %}
         {% endif %}
+        <div class="block-{{ block.block_type }}">
+          {% include_block block %}
+        </div>
       {% endfor %}
     </section>
   </div>

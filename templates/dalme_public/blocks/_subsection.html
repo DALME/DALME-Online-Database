@@ -1,4 +1,4 @@
-<div class="u-subsection u-flex" data-collapsed="{{ value.collapsed|yesno:"true,false" }}">
+<div id="handle" class="u-subsection u-flex" data-collapsed="{{ value.collapsed|yesno:"true,false" }}">
   <h3>{{ value.subsection }}</h3>
-  <i id="handle" class="fas {% if value.collapsed %}fa-caret-left{% else %}fa-caret-down{% endif %} subsection"></i>
+  <i class="fas {% if value.collapsed %}fa-caret-left{% else %}fa-caret-down{% endif %} subsection"></i>
 </div>

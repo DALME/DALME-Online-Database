@@ -7,33 +7,33 @@
       {% if featured_object or featured_inventory %}
 
         {% if featured_object %}
-          <div class="monthly source u-flex">
-            {% if featured_object.main_image %}
-              {% image featured_object.main_image fill-200x200 %}
-            {% endif %}
-            <div class="u-flex">
-              <a href="{% pageurl featured_object %}">
+          <a href="{% pageurl featured_object %}">
+            <div class="monthly source u-flex">
+              {% if featured_object.main_image %}
+                {% image featured_object.main_image fill-200x200 %}
+              {% endif %}
+              <div class="u-flex">
                 <h3>{{ featured_object.title }}</h3>
-              </a>
-              <h4>Object of the Month</h4>
-              <p>{{ featured_object.snippet }}</p>
+                <h4>Object of the Month</h4>
+                <p>{{ featured_object.snippet }}</p>
+              </div>
             </div>
-          </div>
+          </a>
         {% endif %}
 
         {% if featured_inventory %}
-          <div class="monthly source u-flex">
-            {% if featured_inventory.main_image %}
-              {% image featured_inventory.main_image fill-200x200 %}
-            {% endif %}
-            <div class="u-flex">
-              <a href="{% pageurl featured_inventory %}">
+          <a href="{% pageurl featured_inventory %}">
+            <div class="monthly source u-flex">
+              {% if featured_inventory.main_image %}
+                {% image featured_inventory.main_image fill-200x200 %}
+              {% endif %}
+              <div class="u-flex">
                 <h3>{{ featured_inventory.title }}</h3>
-              </a>
-              <h4>Inventory of the Month</h4>
-              <p>{{ featured_inventory.snippet }}</p>
+                <h4>Inventory of the Month</h4>
+                <p>{{ featured_inventory.snippet }}</p>
+              </div>
             </div>
-          </div>
+          </a>
         {% endif %}
       {% endif %}
     </div>

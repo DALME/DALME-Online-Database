@@ -1,7 +1,10 @@
+from calendar import month_name
+
 from django import template
 
+from dalme_app.serializers import SourceSerializer
 from dalme_public.models import (
-    FeaturedObject, FeaturedInventory, Features, Flat, Home
+    Essay, FeaturedObject, FeaturedInventory, Features, Home
 )
 
 
@@ -42,7 +45,7 @@ def get_breadcrumbs_nav(context):
             *breadcrumbs,
             {
                 'title': 'Inventories',
-                'url': f'{page.url}inventories/?collection={collection.pk}&set={page.pk}',
+                'url': f'{page.url}inventories/?collection={collection.pk}&set={page.pk}',  # noqa
                 'active': True if inventories else False,
             },
         ]
@@ -61,12 +64,6 @@ def get_breadcrumbs_nav(context):
 @register.simple_tag(takes_context=True)
 def get_flat_nav(context):
     return [page.specific for page in context['page'].get_siblings().live()]
-
-
-@register.simple_tag
-def get_features_nav():
-    features = Features.objects.first()
-    return features.get_children().live().reverse() if features else []
 
 
 @register.simple_tag
@@ -95,14 +92,34 @@ def get_header_image_styles(header_image):
 def get_source_details(context):
     page = context['page']
     source = page.source
-    return None if not source else {
-        'name': source.name,
+    source_set = page.source_set
+
+    if source:
+        data = SourceSerializer(source).data
+        name = data['name']['name']
+        short_name = data['short_name']
+        date = data['attributes']['date']
+        city = data['attributes']['city']
+
+    url = None
+    if source and source_set:
+        stem = 'public/DALME/collections'
+        public_set = source_set.public_sets.first()
+        url = f'/{stem}/{public_set.slug}/inventories/{source.pk}'
+
+    return {
+        'source': source,
+        'source_set': source_set,
+        'name': name,
+        'short_name': short_name,
+        'date': date,
+        'city': city,
+        'url': url,
     }
 
 
 @register.simple_tag(takes_context=True)
 def get_features_filter_q(context, key, value):
-    # TODO: Done in a rush, can definitely be improved.
     params = f'?{key}={value}' if value != 'all' else ''
     for param_key, param_value in context['request'].GET.items():
         if param_key != key:
@@ -114,9 +131,47 @@ def get_features_filter_q(context, key, value):
 
 
 @register.simple_tag()
-def get_features_nav_q(tab):
+def get_features_url():
+    return Features.objects.first().url
+
+
+@register.simple_tag()
+def get_features_nav_q(key):
     return {
-        'mini essays': '?kind=essay',
+        'essays': '?kind=essay',
         'inventories': '?kind=inventory',
         'objects': '?kind=object',
-    }[tab.specific.nav_title.casefold()]
+    }[key]
+
+
+@register.simple_tag()
+def get_recent_objects():
+    objs = reversed(
+        FeaturedObject.objects.live().order_by(
+            '-first_published_at'
+        )[:3]
+    )
+    return [
+        {'url': obj.url, 'month': month_name[obj.first_published_at.month]}
+        for obj in objs
+    ]
+
+
+@register.simple_tag()
+def get_recent_inventories():
+    objs = reversed(
+        FeaturedInventory.objects.live().order_by('-first_published_at')[:3]
+    )
+    return [
+        {'url': obj.url, 'month': month_name[obj.first_published_at.month]}
+        for obj in objs
+    ]
+
+
+@register.simple_tag()
+def get_recent_essays():
+    objs = reversed(Essay.objects.live().order_by('-first_published_at')[:3])
+    return [
+        {'url': obj.url, 'month': month_name[obj.first_published_at.month]}
+        for obj in objs
+    ]

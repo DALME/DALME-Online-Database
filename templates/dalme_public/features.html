@@ -18,14 +18,14 @@
       <h3 class="featured-group-key">{{ key|title }}</h3>
       <ul class="featured-group u-flex">
         {% for feature in features %}
-          <li class="featured-panel">
-            <a href="{% pageurl feature %}">
+          <a href="{% pageurl feature %}">
+            <li class="featured-panel">
               {% if feature.main_image %}
-                {% image feature.main_image fill-350x200 %}
+                {% image feature.main_image height-200 %}
               {% endif %}
               <p>{{ feature.title }}</p>
-            </a>
-          </li>
+            </li>
+          </a>
         {% endfor %}
       </ul>
     {% endfor %}

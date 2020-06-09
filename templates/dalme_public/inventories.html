@@ -294,10 +294,10 @@
         },
         toggleDateOrder() {
           this.dateOrder = this.dateOrder
-            ? this.dateOrder === 'name'
-              ? this.dateOrder = '-name'
-              : this.dateOrder = 'name'
-            : this.dateOrder = '-name';
+            ? this.dateOrder === 'date'
+              ? this.dateOrder = '-date'
+              : this.dateOrder = 'date'
+            : this.dateOrder = '-date'
           this.filterData('order_by', this.dateOrder);
         },
         destructureParams() {

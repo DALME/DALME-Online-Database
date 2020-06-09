@@ -26,4 +26,4 @@ django-solo==1.1.3
 django-filter==2.2.0
 django-cors-headers==3.2.1
 wagtail==2.9
-wagtail-modelchooser==2.3.2
+wagtail-modelchooser==2.3.3

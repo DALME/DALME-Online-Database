@@ -1,8 +1,5 @@
-from wagtail.core import blocks, hooks
-from wagtail.core.models import Orderable, Page
-from wagtail.core.fields import RichTextField, StreamField
+from wagtail.core import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
 
 
@@ -35,11 +32,18 @@ class IFrameBlock(blocks.RawHTMLBlock):
         icon = 'code'
 
 
+class MainImageBlock(ImageChooserBlock):
+    class Meta:
+        icon = 'image'
+        template = 'dalme_public/blocks/_main_image.html'
+
+
 class PersonBlock(blocks.StructBlock):
     name = blocks.CharBlock()
     job = blocks.CharBlock()
     institution = blocks.CharBlock()
     url = blocks.URLBlock(required=False)
+    photo = ImageChooserBlock(required=False)
 
     class Meta:
         icon = 'user'

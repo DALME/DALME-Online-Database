@@ -8,6 +8,18 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
       <meta name="description" content=""/>
       <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <link rel="apple-touch-icon" sizes="180x180" href="{% static '/icons/apple-touch-icon.png' %}">
+      <link rel="icon" type="image/png" sizes="32x32" href="{% static '/icons/favicon-32x32.png' %}">
+      <link rel="icon" type="image/png" sizes="16x16" href="{% static '/icons/favicon-16x16.png' %}">
+      <link rel="manifest" href="{% static '/icons/site.webmanifest' %}">
+      <link rel="mask-icon" href="{% static '/icons/safari-pinned-tab.svg' %}" color="#912643">
+      <link rel="shortcut icon" href="{% static '/icons/favicon.ico' %}">
+      <meta name="apple-mobile-web-app-title" content="DALME">
+      <meta name="application-name" content="DALME">
+      <meta name="msapplication-TileColor" content="#b91d47">
+      <meta name="msapplication-TileImage" content="{% static '/icons/mstile-144x144.png' %}">
+      <meta name="msapplication-config" content="{% static '/icons/browserconfig.xml' %}">
+      <meta name="theme-color" content="#ffffff">
     {% endblock %}
     <title>
       {% block title %}DALME{% endblock %}
@@ -45,59 +57,70 @@
         <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script>
-          // Subsections initialize.
-          const subsections = $('.block-subsection');
-          $.each(subsections, function(index, value) {
-            const subsection = $(value);
-            const nextSubsection = subsection.nextAll('.block-subsection:first');
-            if (subsection.find('i').hasClass('fa-caret-left')) {
-              nextSubsection.length
-                ? subsection.nextUntil(nextSubsection).hide()
-                : subsection.nextAll().hide();
-            }
-          });
-
-          // Collections initialize.
-          const collections = $('section.collection');
-          $.each(collections, function(index, value) {
-            const collection = $(value);
-            if (collection.find('i').hasClass('fa-caret-left')) {
-              collection.children().not('.u-subsection').hide();
-            }
-          });
-
-          $('body').on('click', '#handle', function(e) {
-            const target = $(e.target);
-            target.hasClass('fa-caret-left')
-              ? target.removeClass('fa-caret-left').addClass('fa-caret-down')
-              : target.removeClass('fa-caret-down').addClass('fa-caret-left');
-            target.closest('section').attr('data-collapsed', function(index, attr) {
-              return attr === 'true' ? 'false' : 'true';
-            });
-
-            // Subsections collapsing logic.
-            if (target.hasClass('subsection')) {
-              const subsection = $(target).closest('.block-subsection');
+          $(document).ready(function() {
+            // Subsections initialize.
+            const subsections = $('.block-subsection');
+            $.each(subsections, function(index, value) {
+              const subsection = $(value);
               const nextSubsection = subsection.nextAll('.block-subsection:first');
-              if (target.hasClass('fa-caret-left')) {
+              if (subsection.find('i').hasClass('fa-caret-left')) {
                 nextSubsection.length
                   ? subsection.nextUntil(nextSubsection).hide()
                   : subsection.nextAll().hide();
-              } else {
-                nextSubsection.length
-                  ? subsection.nextUntil(nextSubsection).show()
-                  : subsection.nextAll().show();
               }
-            }
+            });
 
-            // Collections collapsing logic.
-            if (target.hasClass('collection')) {
-              const collection = $(target).closest('section.collection');
-              const nodes = collection.children().not('.u-subsection');
-              target.hasClass('fa-caret-left')
-                ? nodes.hide()
-                : nodes.show();
-            }
+            // Collections initialize.
+            const collections = $('section.collection');
+            $.each(collections, function(index, value) {
+              const collection = $(value);
+              if (collection.find('i').hasClass('fa-caret-left')) {
+                collection.children().not('.u-subsection').hide();
+              }
+            });
+
+            $('body').on('click', '#handle', function(e) {
+              const target = $(e.target);
+              let icon = null;
+              if (e.target.localName === 'div') {
+                icon = target.find('i');
+              } else if (e.target.localName === 'h3') {
+                icon = target.next();
+              } else {
+                icon = target;
+              }
+
+              // Collections.
+              icon.hasClass('fa-caret-left')
+                ? icon.removeClass('fa-caret-left').addClass('fa-caret-down')
+                : icon.removeClass('fa-caret-down').addClass('fa-caret-left');
+              icon.closest('section')
+                .attr('data-collapsed', function(index, attr) {
+                  return attr === 'true' ? 'false' : 'true';
+                });
+              if (icon.hasClass('collection')) {
+                const collection = $(icon).closest('section.collection');
+                const nodes = collection.children().not('.u-subsection');
+                icon.hasClass('fa-caret-left')
+                  ? nodes.hide()
+                  : nodes.show();
+              }
+
+              // Subsections collapsing logic.
+              if (icon.hasClass('subsection')) {
+                const subsection = $(icon).closest('.block-subsection');
+                const nextSubsection = subsection.nextAll('.block-subsection:first');
+                if (icon.hasClass('fa-caret-left')) {
+                  nextSubsection.length
+                    ? subsection.nextUntil(nextSubsection).hide()
+                    : subsection.nextAll().hide();
+                } else {
+                  nextSubsection.length
+                    ? subsection.nextUntil(nextSubsection).show()
+                    : subsection.nextAll().show();
+                }
+              }
+            });
           });
         </script>
       {% endblock %}

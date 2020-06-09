@@ -1,18 +1,13 @@
-import copy
 import itertools
 
-from django.db.models import Case, F, Q, When
-from django.forms.widgets import NullBooleanSelect
+from django.db.models import OuterRef, Subquery
 
 import django_filters
-
-from wagtail.core.models import Page
 
 from dalme_app.models import Attribute, Source
 from dalme_public import forms
 from dalme_public.models import (
     Collection,
-    Features,
     Essay,
     FeaturedInventory,
     FeaturedObject,
@@ -44,6 +39,7 @@ def _map_source_types():
             attribute_type__short_name='record_type'
         ).values('value_STR').distinct())
     }
+
 
 def collection_choices():
     return [
@@ -81,68 +77,51 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
         return next((v for v in value if v and v.endswith(field)), False)
 
     @staticmethod
-    def annotate_dates(queryset):
-        return queryset.annotate(
-            start_date=Case(
-                When(
-                    attributes__attribute_type__short_name='start_date',
-                    then=F('attributes__value_DATE')
-                ),
-                default=None
-            )
-        ).annotate(
-            end_date=Case(
-                When(
-                    attributes__attribute_type__short_name='end_date',
-                    then=F('attributes__value_DATE')
-                ),
-                default=None
-            )
+    def annotate_dates(qs):
+        # TODO: These results are not 100% correct. Some end up incorrectly
+        # annotated with None because certain start_date attributes objects do
+        # have a value_STR but don't have a value_DATE. This could be fixed
+        # with a data migration. To see those rows, call the following.
+        # Attribute.objects.filter(
+        #     attribute_type_id=26, value_DATE__isnull=True
+        # )
+        start_dates = Attribute.objects.filter(
+            sources=OuterRef('pk'),
+            attribute_type__short_name='start_date'
+        )
+        return qs.annotate(
+            source_date=Subquery(start_dates.values('value_DATE')[:1])
+        ).distinct()
+
+    @staticmethod
+    def annotate_source_type(qs):
+        record_types = Attribute.objects.filter(
+            sources=OuterRef('pk'),
+            attribute_type__short_name='record_type'
+        )
+        return qs.annotate(
+            source_type=Subquery(record_types.values('value_STR')[:1])
         ).distinct()
 
     def filter(self, qs, value):
-        qs = super().filter(qs, value)
-
+        qs = super().filter(qs, value=list())
         # TODO: Still looking for a solution to the 'distinct' issue.
         # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#distinct
-        # Perhaps, as long as we filter for these annotated object last, we can
-        # cast the results to `values` and the distinct comparison will
-        # succeed. In any case, for now any duplicates that remain here are
-        # eliminated on the endpoint itself before going down the wire.
+        # This is a bit of a hack. For now any duplicates that remain here
+        # after filtering are eliminated on the endpoint itself before going
+        # down the wire. Similarly we tried sorting here but it was sub-optimal
+        # and we get better results by casting to a list and ordering that.
+        # But, as the order_by must return a qs, we just annotate here and
+        # return it and then do the ordering on the SourceList itself.
         date = self.get_value('date', value)
         if date:
             self.parent.annotated = True
-            # TODO: It's not perfect, but probably as good as we are going
-            # to get without going deep into date data normalization.
             qs = self.annotate_dates(qs)
-            if date.startswith('-'):
-                qs = qs.order_by(
-                    F('start_date').desc(nulls_first=True),
-                    F('end_date').desc(nulls_last=True)
-                )
-            else:
-                qs = qs.order_by(
-                    F('start_date').asc(nulls_last=True),
-                    F('end_date').asc(nulls_last=True),
-                )
 
         source_type = self.get_value('source_type', value)
         if source_type:
             self.parent.annotated = True
-            # TODO: This isn't right I don't think!!
-            qs = qs.annotate(
-                source_type=Case(
-                    When(
-                        attributes__attribute_type__short_name='record_type',
-                        then=F('attributes__value_STR')
-                    ),
-                    default=None
-                )
-            ).distinct()
-            if source_type.startswith('-'):
-                qs = qs.order_by(F('source_type').desc(nulls_first=True))
-            else:
-                qs = qs.order_by(F('source_type').asc(nulls_last=True))
+            qs = self.annotate_source_type(qs)
 
         return qs
 
@@ -178,7 +157,9 @@ class SourceFilter(django_filters.FilterSet):
         label='Has Image', method='filter_image', choices=BOOLEAN_CHOICES
     )
     has_transcription = django_filters.ChoiceFilter(
-        label='Has Transcription', method='filter_transcription', choices=BOOLEAN_CHOICES
+        label='Has Transcription',
+        method='filter_transcription',
+        choices=BOOLEAN_CHOICES
     )
 
     order_by = SourceOrderingFilter(

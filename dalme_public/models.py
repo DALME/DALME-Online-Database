@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, F, Q
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.template.response import TemplateResponse
 
 from bs4 import BeautifulSoup as BSoup
@@ -32,7 +32,7 @@ from dalme_public import forms
 from dalme_public.blocks import (
     DocumentBlock,
     ExternalResourceBlock,
-    IFrameBlock,
+    MainImageBlock,
     PersonBlock,
     SubsectionBlock,
 )
@@ -48,7 +48,8 @@ def redirects(page, request, serve_args, serve_kwargs):
         home = page.get_children().live().first()
         return redirect(home.url, permanent=False)
     if page._meta.label == 'dalme_public.Section':
-        return redirect(page.get_children().live().first().url, permanent=False)
+        url = page.get_children().live().first().url
+        return redirect(url, permanent=False)
 
 
 @register_model_chooser
@@ -58,9 +59,16 @@ class SourceChooser(Chooser):
     def get_queryset(self, request):
         qs = super().get_queryset(request).order_by('name')
         if request.GET.get('q'):
-            # TODO: OR this with an ID filter
             qs = qs.filter(name__icontains=request.GET['q'])
         return qs
+
+
+class SetFieldPanel(FieldPanel):
+    def on_form_bound(self):
+        qs = DALMESet.objects.filter(set_type=DALMESet.COLLECTION)
+        self.form.fields['source_set'].queryset = qs
+        self.form.fields['source_set'].empty_label = '--------'
+        super().on_form_bound()
 
 
 class DALMEImage(AbstractImage):
@@ -78,6 +86,7 @@ class CustomRendition(AbstractRendition):
         unique_together = (
             ('image', 'filter_spec', 'focal_point_key'),
         )
+
 
 class CarouselMixin(Orderable):
     carousel_image = models.ForeignKey(
@@ -104,10 +113,11 @@ class DALMEPage(Page):
         max_length=63,
         null=True,
         blank=True,
-        help_text='An optional short title that will be displayed in certain contexts.'
+        help_text='An optional short title that will be displayed in certain contexts.'  # noqa
     )
+
     body = StreamField([
-        ('main_image', ImageChooserBlock()),
+        ('main_image', MainImageBlock()),
         ('inline_image', ImageChooserBlock()),   # pull left and right?
         ('text', blocks.RichTextBlock()),
         ('heading', blocks.CharBlock()),
@@ -116,7 +126,7 @@ class DALMEPage(Page):
         ('person', PersonBlock()),
         ('external_resource', ExternalResourceBlock()),
         ('embed', EmbedBlock(icon='media')),
-        ('iframe', IFrameBlock()),
+        ('html', blocks.RawHTMLBlock()),
         ('subsection', SubsectionBlock()),
     ])
 
@@ -148,13 +158,21 @@ class DALMEPage(Page):
 
 
 class FeaturedPage(DALMEPage):
-    @property
-    def author(self):
-        return f'{self.owner.first_name} {self.owner.last_name}'
+    alternate_author = models.CharField(
+        max_length=127,
+        null=True,
+        blank=True,
+        help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.'  # noqa
+    )
+
+    class Meta:
+        abstract = True
 
     @property
-    def nav_title(self):
-        return self._meta.verbose_name_plural
+    def author(self):
+        if self.alternate_author:
+            return self.alternate_author
+        return f'{self.owner.first_name} {self.owner.last_name}'
 
     @property
     def snippet(self):
@@ -171,8 +189,29 @@ class FeaturedPage(DALMEPage):
             placeholder=' [...]'
         )
 
-    class Meta:
-        abstract = True
+    def resolve_source_url(self):
+        raise NotImplementedError()
+
+    def clean(self):
+        if self.source_set and not self.source:
+            raise ValidationError(
+                'You must specify a source in order to also specify a source set.'  # noqa
+            )
+        if self.source_set:
+            try:
+                # TODO: There must be a better way to determine Set membership
+                # than this but the (bi-directional) generic relations make it
+                # tough.
+                next(
+                    source.content_object
+                    for source in self.source_set.members.all()
+                    if source.content_object.pk == self.source.pk
+                )
+            except StopIteration:
+                raise ValidationError(
+                    f'{self.source} is not a member of: {self.source_set}'
+                )
+        return super().clean()
 
 
 class Home(DALMEPage):
@@ -189,9 +228,16 @@ class Home(DALMEPage):
 
     def get_context(self, request):
         context = super().get_context(request)
-        context['featured_object'] = FeaturedObject.objects.live().last()
-        context['featured_inventory'] = FeaturedInventory.objects.live().last()
-        context['essay'] = Essay.objects.live().last()
+
+        objects = FeaturedObject.objects.live().order_by('-first_published_at')
+        inventories = FeaturedInventory.objects.live().order_by(
+            '-first_published_at'
+        )
+        essays = Essay.objects.live().order_by('-first_published_at')
+
+        context['featured_object'] = objects.last()
+        context['featured_inventory'] = inventories.last()
+        context['essay'] = essays.last()
         return context
 
 
@@ -257,7 +303,9 @@ class Features(DALMEPage):
         context = super().get_context(request)
         filtered = FeaturedFilter(
             request.GET,
-            queryset=self.get_children().live().specific()
+            queryset=self.get_children().live().specific().order_by(
+                '-first_published_at'
+            )
         )
         context['featured'] = filtered.qs
         return context
@@ -274,6 +322,14 @@ class FeaturedObject(FeaturedPage):
         related_name='featured_objects',
         on_delete=models.PROTECT
     )
+    source_set = models.ForeignKey(
+        'dalme_app.Set',
+        related_name='featured_objects',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        help_text='Optional, select a particular public set for the source associated with this object. The source must be a member of the set chosen or the page will not validate.'  # noqa
+    )
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
@@ -281,6 +337,8 @@ class FeaturedObject(FeaturedPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         ModelChooserPanel('source'),
+        SetFieldPanel('source_set'),
+        FieldPanel('alternate_author'),
         MultiFieldPanel(
             [InlinePanel('carousel', label='Image')],
             heading='Carousel Images',
@@ -300,6 +358,14 @@ class FeaturedInventory(FeaturedPage):
         related_name='featured_inventories',
         on_delete=models.PROTECT
     )
+    source_set = models.ForeignKey(
+        'dalme_app.Set',
+        related_name='featured_inventories',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.'  # noqa
+    )
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
@@ -307,6 +373,8 @@ class FeaturedInventory(FeaturedPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         ModelChooserPanel('source'),
+        SetFieldPanel('source_set'),
+        FieldPanel('alternate_author'),
         StreamFieldPanel('body'),
     ]
 
@@ -324,6 +392,14 @@ class Essay(FeaturedPage):
         blank=True,
         on_delete=models.PROTECT,
     )
+    source_set = models.ForeignKey(
+        'dalme_app.Set',
+        related_name='essays',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        help_text='Optional, select a particular public set for the source associated with this essay. The source must be a member of the set chosen or the page will not validate.'  # noqa
+    )
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
@@ -331,6 +407,8 @@ class Essay(FeaturedPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         FieldPanel('source'),
+        SetFieldPanel('source_set'),
+        FieldPanel('alternate_author'),
         StreamFieldPanel('body'),
     ]
 
@@ -349,7 +427,7 @@ class Collection(Orderable, ClusterableModel):
     panels = [
         FieldPanel('title'),
         FieldPanel('description'),
-        FieldPanel('sets')
+        FieldPanel('sets'),
     ]
 
 
@@ -377,10 +455,10 @@ class Set(RoutablePageMixin, DALMEPage):
     )
 
     parent_page_types = ['dalme_public.Collections']
-    subpage_types = []
+    subpage_types = ['dalme_public.Flat']
 
     content_panels = DALMEPage.content_panels + [
-        FieldPanel('source_set'),
+        SetFieldPanel('source_set'),
         ImageChooserPanel('header_image'),
         StreamFieldPanel('body'),
     ]

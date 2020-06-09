@@ -1,11 +1,20 @@
+{% load wagtailimages_tags %}
+
 <div class="u-flex">
-  {% if value.url %}
-    <h4>
-      <a href="{{ value.url }}">{{ value.name }}</a>
-    </h4>
-  {% else %}
-    <h4>{{ value.name }}</h4>
+  {% if value.photo %}
+    <div class="headshot">
+      {% image value.photo fill-125x125 %}
+    </div>
   {% endif %}
-  <p class="u-type-sans">{{ value.job }}</p>
-  <p class="u-type-sans">{{ value.institution }}</p>
+  <div class="person">
+    {% if value.url %}
+      <h4>
+        <a href="{{ value.url }}">{{ value.name }}</a>
+      </h4>
+    {% else %}
+      <h4>{{ value.name }}</h4>
+    {% endif %}
+    <p class="u-type-sans">{{ value.job }}</p>
+    <p class="u-type-sans">{{ value.institution }}</p>
+  </div>
 </div>

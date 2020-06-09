@@ -19,10 +19,10 @@
       {% if sections %}
         <div class="collections-container u-flex">
           {% for collection in sections %}
-            <section class="collection">
-              <div class="u-subsection u-flex" data-collapsed="true">
+            <section class="collection u">
+              <div id="handle" class="u-subsection u-flex" data-collapsed="true">
                 <h3>{{ collection.title }}</h3>
-                <i id="handle" class="fas fa-caret-left collection"></i>
+                <i class="fas fa-caret-left collection"></i>
               </div>
               {{ collection.description|richtext }}
               <h4>Collections</h4>

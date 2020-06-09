@@ -24,6 +24,7 @@ from django.dispatch import receiver
 from collections import Counter
 from wagtail.search import index
 
+
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 
@@ -166,8 +167,7 @@ class Source(index.Indexed, dalmeUuid):
     sets = GenericRelation('Set_x_content', related_query_name='source')
 
     search_fields = [
-        index.FilterField('id', partial_match=True, boost=10),
-        index.SearchField('name', partial_match=True, boost=10),
+        index.FilterField('name'),
     ]
 
     def __str__(self):

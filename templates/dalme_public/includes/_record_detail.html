@@ -1,11 +1,20 @@
 {% load dalme_public_tags %}
 
-{% get_source_details as source %}
-{% if source %}
-  <div class="record-detail">
+{% get_source_details as source_data %}
+{% if source_data.source %}
+  <div class="record-detail u-flex">
+    <h4 class="u-small-caps-heading">RECORD</h4>
     <ul>
-      <h4 class="u-small-caps-heading">RECORD</h4>
-      <li>{{ source.name }}</li>
+      {% if source_data.source_set %}
+      <a href="{{ source_data.url }}">
+        <li>{{ source_data.name }}</li>
+      </a>
+      {% else %}
+        <li>{{ source_data.name }}</li>
+      {% endif %}
+      <li>{{ source_data.short_name }}</li>
+      <li>{{ source_data.city }}</li>
+      <li>{{ source_data.date }}</li>
     </ul>
   </div>
 {% endif %}
