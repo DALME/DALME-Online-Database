@@ -8,6 +8,7 @@ from django.http import HttpResponse
 # from allaccess.views import OAuthRedirect
 from rest_framework import routers
 from dalme_app import apis
+from dalme_app import web_apis
 
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
@@ -36,8 +37,12 @@ router.register(r'workflow', apis.WorkflowManager, basename='workflow')
 router.register(r'datasets', apis.Datasets, basename='datasets')
 router.register(r'rights', apis.Rights, basename='rights')
 
+web_router = routers.DefaultRouter()
+web_router.register(r'records', web_apis.Records, basename='records')
+
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('web-api/', include(web_router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),

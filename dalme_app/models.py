@@ -169,6 +169,13 @@ class Source(dalmeUuid):
         return reverse('source_detail', kwargs={'pk': self.pk})
 
     @property
+    def is_public(self):
+        try:
+            return self.workflow.is_public
+        except:
+            return 0
+
+    @property
     def inherited(self):
         inheritance = self.type.inheritance
         if self.parent and inheritance.get('r1', None) is not None:
@@ -495,7 +502,7 @@ class Set(dalmeUuid):
     comments = GenericRelation('Comment')
 
     def __str__(self):
-        return self.name + ' (' + self.set_type + ')'
+        return self.name
 
     @property
     def workset_progress(self):
@@ -521,6 +528,7 @@ class Set_x_content(dalmeBasic):
     class Meta:
         unique_together = ('content_type', 'object_id', 'set_id')
         ordering = ['set_id', 'id']
+
 # <-
 # <-
 

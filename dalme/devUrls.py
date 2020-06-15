@@ -5,9 +5,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
-#from allaccess.views import OAuthRedirect
+# from allaccess.views import OAuthRedirect
 from rest_framework import routers
 from dalme_app import apis
+from dalme_app import web_apis
 
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
@@ -37,13 +38,17 @@ router.register(r'workflow', apis.WorkflowManager, basename='workflow')
 router.register(r'datasets', apis.Datasets, basename='datasets')
 router.register(r'rights', apis.Rights, basename='rights')
 
+web_router = routers.DefaultRouter()
+web_router.register(r'records', web_apis.Records, basename='records')
+
 urlpatterns = [
-    #path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    # path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('api/', include(router.urls)),
+    path('web-api/', include(web_router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('openid/', include('oidc_provider.urls', namespace='oidc_provider')),
-    #re_path(r'^accounts/login/dalme_wp/', auth_views.LoginView.as_view(), name='login'),
+    # re_path(r'^accounts/login/dalme_wp/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('django_admin/', admin.site.urls),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),
