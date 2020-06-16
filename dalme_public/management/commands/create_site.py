@@ -8,7 +8,7 @@ from wagtail.core.rich_text import RichText
 
 from dalme_app.models import Source
 from dalme_public.models import (
-    Collection,
+    Corpus,
     Collections,
     Essay,
     FeaturedInventory,
@@ -184,7 +184,7 @@ COLLECTIONS_DATA = {
     'show_in_menus': True,
 }
 
-COLLECTION_DATA = {
+CORPUS_DATA = {
     'title': 'The Secular Household of Late Medieval Europe',
     'description': RichText('<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.</p>'),
 }
@@ -220,10 +220,10 @@ class Command(BaseCommand):
         self.collections = None
         self.sets = None
 
-    def create_collections(self):
+    def create_corpora(self):
         marseille = Set.objects.first()
-        Collection.objects.create(
-            sets=[marseille], page_id=self.collections.pk, **COLLECTION_DATA
+        Corpus.objects.create(
+            sets=[marseille], page_id=self.collections.pk, **CORPUS_DATA
         )
 
     def create_set_pages(self):
@@ -290,7 +290,7 @@ class Command(BaseCommand):
         self.create_feature_pages()
         self.create_collections_page()
         self.create_set_pages()
-        self.create_collections()
+        self.create_corpora()
         self.create_about_section()
 
         for page in Page.objects.all():

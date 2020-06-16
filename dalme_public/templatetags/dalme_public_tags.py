@@ -39,13 +39,13 @@ def get_breadcrumbs_nav(context):
     inventories = context.get('inventories')
     inventory = context.get('inventory')
     if inventories or inventory:
-        collection = page.get_parent()
+        corpus = page.get_parent()
         breadcrumbs[-1].update({'active': False})
         breadcrumbs = [
             *breadcrumbs,
             {
                 'title': 'Inventories',
-                'url': f'{page.url}inventories/?collection={collection.pk}&set={page.pk}',  # noqa
+                'url': f'{page.url}inventories/?corpus={corpus.pk}&set={page.pk}',  # noqa
                 'active': True if inventories else False,
             },
         ]
@@ -103,7 +103,7 @@ def get_source_details(context):
 
     url = None
     if source and source_set:
-        stem = 'public/DALME/collections'
+        stem = 'public/DALME/corpora'
         public_set = source_set.public_sets.first()
         url = f'/{stem}/{public_set.slug}/inventories/{source.pk}'
 

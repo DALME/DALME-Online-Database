@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from dalme_app.models import Attribute, Source
 from dalme_app.serializers import SourceSerializer
 from dalme_public.filters import SourceFilter
-from dalme_public.models import Collection, Set
+from dalme_public.models import Corpus, Set
 
 
 class DALMEPagination(pagination.PageNumberPagination):
@@ -113,10 +113,10 @@ class SourceDetail(RetrieveAPIView):
 
 
 class FilterChoices(View):
-    def collection_choices(self):
+    def corpus_choices(self):
         return [
-            {'id': collection.pk, 'label': collection.title}
-            for collection in Collection.objects.all().order_by('title')
+            {'id': corpus.pk, 'label': corpus.title}
+            for corpus in Corpus.objects.all().order_by('title')
         ]
 
     def set_choices(self):
@@ -137,7 +137,7 @@ class FilterChoices(View):
     @property
     def methods(self):
         return {
-            'collectionChoices': self.collection_choices,
+            'corpusChoices': self.corpus_choices,
             'setChoices': self.set_choices,
             'sourceTypeChoices': self.source_type_choices,
         }

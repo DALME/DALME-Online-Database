@@ -128,7 +128,7 @@ class DALMEPage(Page):
         ('embed', EmbedBlock(icon='media')),
         ('html', blocks.RawHTMLBlock()),
         ('subsection', SubsectionBlock()),
-    ])
+    ], null=True)
 
     class Meta:
         abstract = True
@@ -417,11 +417,11 @@ class Essay(FeaturedPage):
         verbose_name_plural = 'Mini Essays'
 
 
-class Collection(Orderable, ClusterableModel):
+class Corpus(Orderable, ClusterableModel):
     title = models.CharField(max_length=255)
     description = RichTextField()
 
-    page = ParentalKey('dalme_public.Collections', related_name='collections')
+    page = ParentalKey('dalme_public.Collections', related_name='corpora')
     sets = ParentalManyToManyField('dalme_public.Set')
 
     panels = [
@@ -440,8 +440,8 @@ class Collections(DALMEPage):
         FieldPanel('short_title'),
         StreamFieldPanel('body'),
         MultiFieldPanel(
-            [InlinePanel('collections', min_num=1, label='Collection')],
-            heading='Collections',
+            [InlinePanel('corpora', min_num=1, label='Corpus')],
+            heading='Corpora',
         ),
     ]
 

@@ -7,7 +7,7 @@ import django_filters
 from dalme_app.models import Attribute, Source
 from dalme_public import forms
 from dalme_public.models import (
-    Collection,
+    Corpus,
     Essay,
     FeaturedInventory,
     FeaturedObject,
@@ -41,10 +41,10 @@ def _map_source_types():
     }
 
 
-def collection_choices():
+def corpus_choices():
     return [
-        (collection.pk, collection.title)
-        for collection in Collection.objects.all().order_by('title')
+        (corpus.pk, corpus.title)
+        for corpus in Corpus.objects.all().order_by('title')
     ]
 
 
@@ -143,10 +143,10 @@ class SourceFilter(django_filters.FilterSet):
         label='Date Range',
         method='filter_date_range'
     )
-    collection = django_filters.ChoiceFilter(
-        label='Collection',
-        choices=collection_choices,
-        method='filter_collection'
+    corpus = django_filters.ChoiceFilter(
+        label='Corpus',
+        choices=corpus_choices,
+        method='filter_corpus'
     )
     set = django_filters.ChoiceFilter(
         label='Set',
@@ -173,7 +173,7 @@ class SourceFilter(django_filters.FilterSet):
             'name',
             'source_type',
             'date_range',
-            'collection',
+            'corpus',
             'set',
             'has_transcription',
             'has_image',
@@ -204,15 +204,15 @@ class SourceFilter(django_filters.FilterSet):
 
         return queryset
 
-    def filter_collection(self, queryset, name, value):
+    def filter_corpus(self, queryset, name, value):
         try:
-            collection = Collection.objects.get(pk=value)
-        except Collection.DoesNotExist:
+            corpus = Corpus.objects.get(pk=value)
+        except Corpus.DoesNotExist:
             return queryset.none()
         return queryset.filter(
             sets__set_id__in=[
                 dataset.specific.source_set.pk
-                for dataset in collection.sets.all()
+                for dataset in corpus.sets.all()
             ]
         )
 
