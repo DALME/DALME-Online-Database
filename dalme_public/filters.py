@@ -7,11 +7,11 @@ import django_filters
 from dalme_app.models import Attribute, Source
 from dalme_public import forms
 from dalme_public.models import (
+    Collection,
     Corpus,
     Essay,
     FeaturedInventory,
     FeaturedObject,
-    Set
 )
 
 
@@ -48,10 +48,10 @@ def corpus_choices():
     ]
 
 
-def set_choices():
+def collection_choices():
     return [
-        (dataset.pk, dataset.title)
-        for dataset in Set.objects.all().order_by('title')
+        (collection.pk, collection.title)
+        for collection in Collection.objects.all().order_by('title')
     ]
 
 
@@ -148,10 +148,10 @@ class SourceFilter(django_filters.FilterSet):
         choices=corpus_choices,
         method='filter_corpus'
     )
-    set = django_filters.ChoiceFilter(
-        label='Set',
-        choices=set_choices,
-        method='filter_set'
+    collection = django_filters.ChoiceFilter(
+        label='Collection',
+        choices=collection_choices,
+        method='filter_collection'
     )
     has_image = django_filters.ChoiceFilter(
         label='Has Image', method='filter_image', choices=BOOLEAN_CHOICES
@@ -174,7 +174,7 @@ class SourceFilter(django_filters.FilterSet):
             'source_type',
             'date_range',
             'corpus',
-            'set',
+            'collection',
             'has_transcription',
             'has_image',
             'order_by',
@@ -210,18 +210,18 @@ class SourceFilter(django_filters.FilterSet):
         except Corpus.DoesNotExist:
             return queryset.none()
         return queryset.filter(
-            sets__set_id__in=[
-                dataset.specific.source_set.pk
-                for dataset in corpus.sets.all()
+            collections__set_id__in=[
+                collection.specific.source_set.pk
+                for collection in corpus.collections.all()
             ]
         )
 
-    def filter_set(self, queryset, name, value):
+    def filter_collection(self, queryset, name, value):
         try:
-            dataset = Set.objects.get(pk=value)
-        except Set.DoesNotExist:
+            collection = Collection.objects.get(pk=value)
+        except Collection.DoesNotExist:
             return queryset.none()
-        return queryset.filter(sets__set_id=dataset.source_set.pk)
+        return queryset.filter(collections__set_id=collection.source_set.pk)
 
     def filter_image(self, queryset, name, value):
         value = True if value == 'true' else False

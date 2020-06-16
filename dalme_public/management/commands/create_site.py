@@ -9,6 +9,7 @@ from wagtail.core.rich_text import RichText
 from dalme_app.models import Source
 from dalme_public.models import (
     Corpus,
+    Collection,
     Collections,
     Essay,
     FeaturedInventory,
@@ -16,7 +17,6 @@ from dalme_public.models import (
     Features,
     Flat,
     Home,
-    Set,
     Section,
 )
 
@@ -189,7 +189,7 @@ CORPUS_DATA = {
     'description': RichText('<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.</p>'),
 }
 
-MARSEILLE_SET = {
+MARSEILLE_COLLECTION = {
     'source_set_id': '77d709a6-6b87-4116-9c46-d6dd8468129e',
     'title': 'Marseille and its Environs',
     'body': [
@@ -207,7 +207,7 @@ MARSEILLE_SET = {
     ],
 }
 
-SET_DATA = [MARSEILLE_SET]
+COLLECTION_DATA = [MARSEILLE_COLLECTION]
 
 
 class Command(BaseCommand):
@@ -218,17 +218,17 @@ class Command(BaseCommand):
         self.home = None
         self.features = None
         self.collections = None
-        self.sets = None
+        self.collections = None
 
     def create_corpora(self):
-        marseille = Set.objects.first()
+        marseille = Collection.objects.first()
         Corpus.objects.create(
-            sets=[marseille], page_id=self.collections.pk, **CORPUS_DATA
+            collections=[marseille], page_id=self.collections.pk, **CORPUS_DATA
         )
 
-    def create_set_pages(self):
-        for data in SET_DATA:
-            self.collections.add_child(instance=Set(**data))
+    def create_collection_pages(self):
+        for data in COLLECTION_DATA:
+            self.collections.add_child(instance=Collection(**data))
 
     def create_collections_page(self):
         self.collections = self.home.add_child(
@@ -289,7 +289,7 @@ class Command(BaseCommand):
         self.create_features_page()
         self.create_feature_pages()
         self.create_collections_page()
-        self.create_set_pages()
+        self.create_collection_pages()
         self.create_corpora()
         self.create_about_section()
 

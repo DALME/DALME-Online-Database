@@ -422,18 +422,18 @@ class Corpus(Orderable, ClusterableModel):
     description = RichTextField()
 
     page = ParentalKey('dalme_public.Collections', related_name='corpora')
-    sets = ParentalManyToManyField('dalme_public.Set')
+    collections = ParentalManyToManyField('dalme_public.Collection')
 
     panels = [
         FieldPanel('title'),
         FieldPanel('description'),
-        FieldPanel('sets'),
+        FieldPanel('collections'),
     ]
 
 
 class Collections(DALMEPage):
     parent_page_types = ['dalme_public.Home']
-    subpage_types = ['dalme_public.Set']
+    subpage_types = ['dalme_public.Collection']
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
@@ -446,11 +446,11 @@ class Collections(DALMEPage):
     ]
 
 
-class Set(RoutablePageMixin, DALMEPage):
+class Collection(RoutablePageMixin, DALMEPage):
     set_type = DALMESet.COLLECTION
     source_set = models.ForeignKey(
         'dalme_app.Set',
-        related_name='public_sets',
+        related_name='public_collections',
         on_delete=models.PROTECT
     )
 

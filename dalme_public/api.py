@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from dalme_app.models import Attribute, Source
 from dalme_app.serializers import SourceSerializer
 from dalme_public.filters import SourceFilter
-from dalme_public.models import Corpus, Set
+from dalme_public.models import Corpus, Collection
 
 
 class DALMEPagination(pagination.PageNumberPagination):
@@ -70,7 +70,8 @@ class SourceList(ListAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self, *args, **kwargs):
-        # TODO: Integrate visible flag here
+        # TODO: Integrate visible flag here?
+        # Or get rid of this and just filter on the frontend?
         qs = super().get_queryset(*args, **kwargs).exclude(
             type__name__in=['Archive', 'File unit']
         ).order_by('name')
@@ -119,10 +120,10 @@ class FilterChoices(View):
             for corpus in Corpus.objects.all().order_by('title')
         ]
 
-    def set_choices(self):
+    def collection_choices(self):
         return [
-            {'id': dataset.pk, 'label': dataset.title}
-            for dataset in Set.objects.all().order_by('title')
+            {'id': collection.pk, 'label': collection.title}
+            for collection in Collection.objects.all().order_by('title')
         ]
 
     def source_type_choices(self):
@@ -138,7 +139,7 @@ class FilterChoices(View):
     def methods(self):
         return {
             'corpusChoices': self.corpus_choices,
-            'setChoices': self.set_choices,
+            'collectionChoices': self.collection_choices,
             'sourceTypeChoices': self.source_type_choices,
         }
 

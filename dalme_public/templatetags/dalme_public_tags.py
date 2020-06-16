@@ -45,7 +45,7 @@ def get_breadcrumbs_nav(context):
             *breadcrumbs,
             {
                 'title': 'Inventories',
-                'url': f'{page.url}inventories/?corpus={corpus.pk}&set={page.pk}',  # noqa
+                'url': f'{page.url}inventories/?corpus={corpus.pk}&collection={page.pk}',  # noqa
                 'active': True if inventories else False,
             },
         ]
@@ -104,8 +104,8 @@ def get_source_details(context):
     url = None
     if source and source_set:
         stem = 'public/DALME/corpora'
-        public_set = source_set.public_sets.first()
-        url = f'/{stem}/{public_set.slug}/inventories/{source.pk}'
+        collection = source_set.public_collections.first()
+        url = f'/{stem}/{collection.slug}/inventories/{source.pk}'
 
     return {
         'source': source,
