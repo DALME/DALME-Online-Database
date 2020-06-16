@@ -31,18 +31,18 @@
         <div class="filter-panel" v-if="showFilters">
           <form method="get" class="filter-form u-flex">
 
-            <div class="label">Collection</div>
+            <div class="label">Corpus</div>
             <v-select
               :options="choices.corpusChoices"
-              @input="setCollection"
-              v-model="collection">
+              @input="setCorpus"
+              v-model="corpus">
             </v-select>
 
-            <div class="label">Set</div>
+            <div class="label">Collection</div>
             <v-select
               :options="choices.collectionChoices"
-              @input="setSet"
-              v-model="set">
+              @input="setCollection"
+              v-model="collection">
             </v-select>
 
             <div class="label">Record Type</div>
@@ -117,7 +117,6 @@
               </span>
             </template>
           </template>
-
         </div>
       </template>
     </section>
@@ -182,8 +181,8 @@
         currentPage: null,
         search: null,
         showFilters: false,
+        corpus: null,
         collection: null,
-        set: null,
         sourceType: null,
         date: [1200, 1500],
         hasImage: null,
@@ -217,8 +216,8 @@
         },
         isFiltered() {
           return [
+            this.corpus,
             this.collection,
-            this.set,
             this.sourceType,
             this.date,
             this.hasImage,
@@ -258,13 +257,13 @@
         sourceHasFolio(source) {
           return source.no_folios > 0;
         },
+        setCorpus() {
+          const value = this.corpus ? this.corpus.id : null;
+          this.filterData('corpus', value);
+        },
         setCollection() {
           const value = this.collection ? this.collection.id : null;
           this.filterData('collection', value);
-        },
-        setSet() {
-          const value = this.set ? this.set.id : null;
-          this.filterData('set', value);
         },
         setSourceType() {
           const value = this.sourceType ? this.sourceType.id : null;
@@ -304,7 +303,7 @@
           let params = {};
           this.currentParams.forEach((value, key) => {
             const camelized = key.replace(/(_\w)/g, k => k[1].toUpperCase());
-            if (['collection', 'set', 'source_type'].includes(key)) {
+            if (['collection', 'corpus', 'source_type'].includes(key)) {
               value = this.choices[`${camelized}Choices`]
                 .filter(item => {
                   return key === 'source_type'

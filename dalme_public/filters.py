@@ -210,7 +210,7 @@ class SourceFilter(django_filters.FilterSet):
         except Corpus.DoesNotExist:
             return queryset.none()
         return queryset.filter(
-            collections__set_id__in=[
+            sets__set_id__in=[
                 collection.specific.source_set.pk
                 for collection in corpus.collections.all()
             ]
@@ -221,7 +221,7 @@ class SourceFilter(django_filters.FilterSet):
             collection = Collection.objects.get(pk=value)
         except Collection.DoesNotExist:
             return queryset.none()
-        return queryset.filter(collections__set_id=collection.source_set.pk)
+        return queryset.filter(sets__set_id=collection.source_set.pk)
 
     def filter_image(self, queryset, name, value):
         value = True if value == 'true' else False

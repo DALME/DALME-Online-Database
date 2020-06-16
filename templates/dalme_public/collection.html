@@ -20,7 +20,7 @@
           {% if forloop.counter0 == 0 %}
             <nav class="browse">
               <div class="u-button">
-                <a href="{% pageurl page %}inventories/?set={{ page.pk }}">Browse</a>
+                <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse</a>
               </div>
             </nav>
           {% endif %}
@@ -28,7 +28,7 @@
           {% if forloop.counter0 == 1 %}
             <nav class="browse">
               <div class="u-button">
-                <a href="{% pageurl page %}inventories/?set={{ page.pk }}">Browse</a>
+                <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse</a>
               </div>
             </nav>
           {% endif %}

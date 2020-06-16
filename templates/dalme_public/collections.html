@@ -15,22 +15,22 @@
   <div class="content">
     {{ page.body }}
 
-    {% with page.collections.all as sections %}
-      {% if sections %}
-        <div class="collections-container u-flex">
-          {% for collection in sections %}
-            <section class="collection u">
+    {% with page.corpora.all as corpora %}
+      {% if corpora %}
+        <div class="corpora-container u-flex">
+          {% for corpus in corpora %}
+            <section class="corpus">
               <div id="handle" class="u-subsection u-flex" data-collapsed="true">
-                <h3>{{ collection.title }}</h3>
-                <i class="fas fa-caret-left collection"></i>
+                <h3>{{ corpus.title }}</h3>
+                <i class="fas fa-caret-left corpus"></i>
               </div>
-              {{ collection.description|richtext }}
+              {{ corpus.description|richtext }}
               <h4>Collections</h4>
-              <ul class="sets">
-                {% for set in collection.sets.all %}
+              <ul class="collections">
+                {% for collection in corpus.collections.all %}
                   <li class="u-flex">
-                    <a href="{% pageurl set %}">{{ set.title }}</a>
-                    <span class="count">1257–1444 | {{ set.count }} Records</span>
+                    <a href="{% pageurl collection %}">{{ collection.title }}</a>
+                    <span class="count">1257–1444 | {{ collection.count }} Records</span>
                   </li>
                 {% endfor %}
               </ul>
@@ -38,7 +38,7 @@
           {% endfor %}
         </div>
       {% else %}
-        <p>No collections currently defined.</p>
+        <p>No corpora currently defined.</p>
       {% endif %}
     {% endwith %}
   </div>

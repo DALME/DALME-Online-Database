@@ -98,8 +98,8 @@
                 .attr('data-collapsed', function(index, attr) {
                   return attr === 'true' ? 'false' : 'true';
                 });
-              if (icon.hasClass('collection')) {
-                const collection = $(icon).closest('section.collection');
+              if (icon.hasClass('corpus')) {
+                const collection = $(icon).closest('section.corpus');
                 const nodes = collection.children().not('.u-subsection');
                 icon.hasClass('fa-caret-left')
                   ? nodes.hide()

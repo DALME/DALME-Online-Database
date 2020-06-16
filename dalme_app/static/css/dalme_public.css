@@ -172,8 +172,7 @@ main.home {
 }
 
 main.collections section p,
-main.collection section p,
-main.set section p {
+main.collection section p {
   margin: 1rem 0 1.5rem 0;
 }
 
@@ -663,42 +662,42 @@ main.inventories > article {
   border: 0;
 }
 
-body.set .title {
+body.collection .title {
   background: #c0c8d294;
   color: #fff;
 }
-body.set .title.collapsible,
-body.set .description.collapsible {
+body.collection .title.collapsible,
+body.collection .description.collapsible {
   background: #c0c8d294;
   color: #222122;
 }
 
-.collections-container {
+.corpora-container {
   flex-direction: column;
 }
-.collections-container h4 {
+.corpora-container h4 {
   color: unset;
   margin: 1rem 0;
 }
-.collections-container > .collection,
-.collections-container > .collection > div {
+.corpora-container > .corpus,
+.corpora-container > .corpus > div {
   width: 100%;
 }
-.collections-container > .collection .rich-text {
+.corpora-container > .corpus .rich-text {
   font-family: "PT Serif", serif;
 }
-.collections-container .sets li {
+.corpora-container .collections li {
   color: #5e5e5e;
   border-top: 1px dotted #636363;
   padding: 1rem 0;
 }
-.collections-container .sets li:last-child {
+.corpora-container .collections li:last-child {
   border-bottom: 1px dotted #636363;
 }
-.collections-container .sets a {
+.corpora-container .collections a {
   color: #255e8c
 }
-.collections-container .sets .count {
+.corpora-container .collections .count {
   margin-left: auto;
 }
 
