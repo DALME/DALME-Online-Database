@@ -265,3 +265,7 @@ class FeaturedFilter(django_filters.FilterSet):
                 )
             ]
         return grouped
+
+
+class CollectionsFilter(django_filters.FilterSet):
+    pass

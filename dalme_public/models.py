@@ -23,6 +23,7 @@ from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.models import Image, AbstractImage, AbstractRendition
+from wagtail.snippets.models import register_snippet
 from wagtailmodelchooser import register_model_chooser, Chooser
 from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
@@ -100,6 +101,15 @@ class CarouselMixin(Orderable):
     panels = [ImageChooserPanel('carousel_image')]
 
 
+@register_snippet
+class Footer(models.Model):
+    pages = StreamField([
+        ('page', blocks.PageChooserBlock()),
+    ])
+
+    panels = [StreamFieldPanel('pages')]
+
+
 class DALMEPage(Page):
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
@@ -122,6 +132,7 @@ class DALMEPage(Page):
         ('text', blocks.RichTextBlock()),
         ('heading', blocks.CharBlock()),
         ('pullquote', blocks.RichTextBlock(icon='openquote')),
+        ('page', blocks.PageChooserBlock()),
         ('document', DocumentBlock()),
         ('person', PersonBlock()),
         ('external_resource', ExternalResourceBlock()),
@@ -215,6 +226,10 @@ class FeaturedPage(DALMEPage):
 
 
 class Home(DALMEPage):
+    sponsors = StreamField([
+        ('sponsors', ImageChooserBlock()),
+    ], null=True)
+
     subpage_types = [
         'dalme_public.Section',
         'dalme_public.Features',
@@ -224,6 +239,7 @@ class Home(DALMEPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         StreamFieldPanel('body'),
+        StreamFieldPanel('sponsors'),
     ]
 
     def get_context(self, request):

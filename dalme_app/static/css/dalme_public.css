@@ -150,6 +150,9 @@ main .main-column {
   flex-direction: column;
 }
 
+main.home {
+  background: #e8e8e8;
+}
 body.home main p {
   line-height: 1.5;
   color: #636363;
@@ -166,9 +169,6 @@ body.home section.featured h4 {
 body.home section.featured > div:first-child {
   background: transparent;
   flex-direction: column;
-}
-main.home {
-  background: #e8e8e8;
 }
 
 main.collections section p,

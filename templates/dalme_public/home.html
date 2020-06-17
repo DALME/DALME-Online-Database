@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
-{% load wagtailcore_tags static %}
+{% load wagtailcore_tags wagtailimages_tags static %}
 
 {% block header_extra %}
   <div class="title u-flex u-type-serif">
@@ -30,20 +30,18 @@
       </div>
   </section>
 
-  <section class="support u-flex">
-    <h2 class="u-lozenge">SUPPORT</h2>
-    <p>We are grateful to the following organizations for supporting the project.</p>
-    <div class="support-logos u-flex">
-      <div class="u-flex">
-        <img src="{% static "images/support_logos/SOHP_no_background.png" %}" alt="SOHP">
+  {% if page.sponsors %}
+    <section class="support u-flex">
+      <h2 class="u-lozenge">SUPPORT</h2>
+      <p>We are grateful to the following organizations for supporting the project.</p>
+      <div class="support-logos u-flex">
+        {% for sponsor in page.sponsors %}
+          <div class="u-flex">
+            {{ sponsor }}
+          </div>
+        {% endfor %}
       </div>
-      <div class="u-flex">
-        <img src="{% static "images/support_logos/IAS_no_background.png" %}" alt="IAS">
-      </div>
-      <div class="u-flex">
-        <img src="{% static "images/support_logos/ACLS_no_background.png" %}" alt="ACLS">
-      </div>
-    </div>
-  </section>
+    </section>
+  {% endif %}
 
 {% endblock %}

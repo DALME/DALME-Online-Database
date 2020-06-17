@@ -7,7 +7,8 @@ class DocumentBlock(blocks.StructBlock):
     title = blocks.CharBlock()
     abstract = blocks.CharBlock()
     version = blocks.FloatBlock()
-    document = DocumentChooserBlock()
+    document = DocumentChooserBlock(required=False)
+    url = blocks.URLBlock(required=False)
     date = blocks.DateBlock()
 
     class Meta:

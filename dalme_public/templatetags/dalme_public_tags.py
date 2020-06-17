@@ -4,11 +4,22 @@ from django import template
 
 from dalme_app.serializers import SourceSerializer
 from dalme_public.models import (
-    Essay, FeaturedObject, FeaturedInventory, Features, Home
+    Essay, FeaturedObject, FeaturedInventory, Features, Footer, Home
 )
 
 
 register = template.Library()
+
+
+@register.inclusion_tag(
+    'dalme_public/includes/_footer.html', takes_context=True
+)
+def footer(context):
+    return {
+        'footer': Footer.objects.first(),
+        'year': context['year'],
+        'project': context['project'],
+    }
 
 
 @register.simple_tag

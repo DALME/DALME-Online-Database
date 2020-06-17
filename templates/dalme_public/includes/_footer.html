@@ -1,9 +1,13 @@
+{% load dalme_public_tags wagtailcore_tags %}
+
 <nav class="footer">
-  <ul>
-    <li><a href="#">About Us</a></li>
-    <li><a href="#">Privacy</a></li>
-    <li><a href="#">Get in Touch</a></li>
-  </ul>
+  {% if footer %}
+    <ul>
+      {% for page in footer.pages %}
+        <li>{{ page }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 </nav>
 <div class="copyright">
   Copyright &copy; {{ year }} {{ project }}
