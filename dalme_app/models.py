@@ -174,7 +174,7 @@ class Source(dalmeUuid):
         try:
             return self.workflow.is_public
         except:
-            return 0
+            return False
 
     @property
     def inherited(self):
@@ -204,6 +204,36 @@ class Source(dalmeUuid):
         ep_list = [i.transcription.entity_phrases.filter(content_type=118) for i in self.source_pages.all().select_related('transcription') if i.transcription]
         if len(ep_list) > 0:
             return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+
+    @property
+    def has_images(self):
+        if self.pages.exclude(dam_id__isnull=True).count() > 0:
+            return True
+        else:
+            return False
+
+    @property
+    def has_transcriptions(self):
+        if self.source_pages.all().select_related('transcription').exists():
+            return True
+        else:
+            return False
+
+    @property
+    def get_credit_line(self):
+        try:
+            editor = User.objects.get(username=self.creation_username).profile.full_name
+            contributors = [i.user.profile.full_name for i in self.workflow.work_log.all() if i.user.profile.full_name != editor]
+            if len(contributors) == 0:
+                credit_line = 'Edited by {}.'.format(editor)
+            elif len(contributors) == 1:
+                credit_line = 'Edited by {}, with contributions by {}.'.format(editor, contributors[0])
+            else:
+                contributors_list = "{}, and {}".format(", ".join(contributors[:-1]),  contributors[-1])
+                credit_line = 'Edited by {}, with contributions by {}.'.format(editor, contributors_list)
+            return credit_line
+        except Exception as e:
+            return str(e)
 
 
 @receiver(models.signals.post_save, sender=Source)
@@ -677,7 +707,7 @@ class Workflow(models.Model):
 
 class Work_log(models.Model):
     id = models.AutoField(primary_key=True, unique=True, db_index=True)
-    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE)
+    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE, related_name="work_log")
     event = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
