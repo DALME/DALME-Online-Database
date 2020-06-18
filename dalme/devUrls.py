@@ -40,6 +40,7 @@ router.register(r'rights', apis.Rights, basename='rights')
 
 web_router = routers.DefaultRouter()
 web_router.register(r'records', web_apis.Records, basename='records')
+web_router.register(r'collections', web_apis.Collections, basename='collections')
 
 urlpatterns = [
     # path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),

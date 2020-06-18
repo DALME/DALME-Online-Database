@@ -20,6 +20,7 @@ import mimetypes
 import uuid
 # from django.conf import settings
 from django.dispatch import receiver
+from collections import Counter
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -160,7 +161,7 @@ class Source(dalmeUuid):
     pages = models.ManyToManyField('Page', db_index=True, through='Source_pages')
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
-    sets = GenericRelation('Set_x_content')
+    sets = GenericRelation('Set_x_content', related_query_name='source')
 
     def __str__(self):
         return self.name
@@ -517,6 +518,19 @@ class Set(dalmeUuid):
     def get_member_count(self):
         return self.members.count()
 
+    @property
+    def get_public_member_count(self):
+        return self.members.filter(source__workflow__is_public=True).count()
+
+    @property
+    def get_languages(self):
+        return [[LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15).values_list('source__attributes__value_STR', flat=True))]
+
+    @property
+    def get_time_coverage(self):
+        years = self.members.filter(source__attributes__attribute_type=26).order_by('source__attributes__value_DATE_y').values_list('source__attributes__value_DATE_y', flat=True)
+        return dict(Counter(years))
+
 
 class Set_x_content(dalmeBasic):
     set_id = models.ForeignKey(Set, on_delete=models.CASCADE, related_name='members')
@@ -528,6 +542,7 @@ class Set_x_content(dalmeBasic):
     class Meta:
         unique_together = ('content_type', 'object_id', 'set_id')
         ordering = ['set_id', 'id']
+
 
 # <-
 # <-

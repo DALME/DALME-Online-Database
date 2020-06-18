@@ -95,3 +95,10 @@ class RecordSerializer(serializers.ModelSerializer):
             else:
                 result['date'] = dates['end_date']
         return result
+
+
+class CollectionSerializer(serializers.ModelSerializer):
+    """ Collections serializer for web frontend """
+    class Meta:
+        model = Set
+        fields = '__all__'
