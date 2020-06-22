@@ -1,0 +1,48 @@
+<div class="at-a-glance">
+  <ul>
+    <h3 class="u-small-caps-heading">AT A GLANCE</h3>
+
+    <li class="inventories">
+      <h5>Inventories</h5>
+      <p>{{ stats.inventories }}</p>
+    </li>
+
+    {% if stats.languages %}
+      <li class="languages u-flex">
+        <h5>Languages</h5>
+        {% for lang in stats.languages %}
+          <li class="lang-lozenge">
+            <span>{{ lang.0|title }}</span>
+            <span>|</span>
+            <span>{{ lang.1|upper }}</span>
+          </li>
+        {% endfor %}
+      </li>
+    {% else %}
+      <!-- TODO: Remove this stub after demo -->
+      <li class="languages u-flex">
+        <h5>Languages</h5>
+        <div class="lang-lozenge">
+          <span>Latin</span>
+          <span>|</span>
+          <span>LAT</span>
+        </div>
+        <div class="lang-lozenge">
+          <span>Old Provençal</span>
+          <span>|</span>
+          <span>PRO</span>
+        </div>
+      </li>
+    {% endif %}
+
+    <li id="histogram" class="histogram">
+      <h5>Temporal Coverage</h5>
+    </li>
+
+    <li class="status-groups">
+      <h5>Status Groups Represented</h5>
+      <p>{{ stats.status }}</p>
+    </li>
+  </ul>
+
+</div>

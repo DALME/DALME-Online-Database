@@ -16,15 +16,7 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "dalme_public/includes/_breadcrumbs.html" %}
-  <div class="title u-flex u-type-serif">
-    <h1>{{ page.title }}</h1>
-    <h2>
-      {% with page.get_parent.get_parent as home %}
-        <a href="{% pageurl home %}">{{ home.title }}</a>
-      {% endwith %}
-    </h2>
-  </div>
+  {% include "dalme_public/includes/_flat_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}

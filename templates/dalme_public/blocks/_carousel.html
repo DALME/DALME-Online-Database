@@ -1,6 +1,6 @@
 {% load wagtailimages_tags %}
 
-{% with page.carousel.all as slides %}
+{% with value as slides %}
   <div id="carousel" class="carousel block-carousel" data-ride="carousel">
     {% if slides|length > 1 %}
       <ul class="carousel-indicators">
@@ -18,11 +18,11 @@
       {% for slide in slides %}
         {% if forloop.counter0 == 0 %}
           <div class="carousel-item active">
-            {% image slide.carousel_image height-400 %}
+            {% image slide height-400 %}
           </div>
         {% else %}
           <div class="carousel-item">
-            {% image slide.carousel_image height-400 %}
+            {% image slide height-400 %}
           </div>
         {% endif %}
       {% endfor %}

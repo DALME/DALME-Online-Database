@@ -1,22 +1,29 @@
 {% load wagtailcore_tags %}
 
 {% include "dalme_public/includes/_breadcrumbs.html" %}
+
 <div id="handle" class="title collapsible u-flex u-type-serif">
   <h1>{{ title }}</h1>
   <i class="fas fa-chevron-down"></i>
 </div>
+
 <div class="description collapsible u-flex u-type-serif" data-collapsed="false">
-  <p>
-    {% if data.attributes.description %}
-      {{ data.attributes.description }}
-    {% else %}
-      No description currently available.
-    {% endif %}
-  </p>
-  <ul class="u-flex u-type-sans">
-    <li>{{ data.short_name }}</li>
-    <li>{{ data.attributes.date }}</li>
-    <li>{{ data.attributes.city }}</li>
-    <li>{{ data.folios|length }} Folios</li>
-  <ul>
+  <div class="u-flex">
+    <p>
+      {% if data.description %}
+        {{ data.description }}
+      {% else %}
+        No description currently available.
+      {% endif %}
+    </p>
+    <ul class="u-flex u-type-sans">
+      <li>{{ data.short_name }}</li>
+      <li>{{ data.date }}</li>
+      <li>{{ data.city }}</li>
+      <li>{{ data.folios|length }} Folios</li>
+    <ul>
+  </div>
+  <div class="credit u-type-sans">
+    <p>{{ data.get_credit_line }}</p>
+  </div>
 </div>

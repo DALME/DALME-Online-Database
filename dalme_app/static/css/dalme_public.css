@@ -300,7 +300,6 @@ header.home > div > div {
 header .title.collapsible {
   font-style: italic;
   flex-direction: row;
-  padding: 1rem 4rem;
 }
 header .title.collapsible h1 {
   font-size: 1.5rem;
@@ -308,22 +307,39 @@ header .title.collapsible h1 {
 header .collapsible i {
   margin-left: auto;
 }
+header .description.collapsible {
+  flex-direction: column;
+}
+header .description.collapsible .credit {
+  color: #5e5e5e;
+  padding: 1rem 0 0.5rem 0;
+  width: 100%;
+}
+header .description.collapsible .credit p {
+  max-width: unset;
+}
 
 aside.side-column {
   flex-direction: column;
   text-align: right;
   padding: 0 2rem;
 }
+aside.side-column > *:last-child:not(:first-child) {
+  margin-top: 10rem;
+}
 aside.side-column a,
 aside.side-column a:visited {
   color: #636363;
 }
+aside.side-column h3 {
+  font-size: 0.9rem;
+}
+
 nav.secondary {
   width: 10rem;
 }
 nav.secondary ul {
   list-style-type: none;
-  margin: 0 0 8rem 0;
   padding: 0;
 }
 nav.secondary ul li {
@@ -346,16 +362,13 @@ nav.features ul {
   list-style-type: none;
   margin: 0;
 }
-nav.features h3 {
-  padding: 0 0 0.5rem 1rem;
-}
 nav.features ul li {
   white-space: nowrap;
   padding: 0.5rem 0;
 }
 nav.features h3 {
   border-bottom: 1px solid #ccc;
-  font-size: 0.9rem;
+  padding: 0 0 0.5rem 1rem;
 }
 nav.features ul li {
   border-bottom: 1px solid #ccc;
@@ -663,13 +676,13 @@ main.inventories > article {
 }
 
 body.collection .title {
-  background: #c0c8d294;
   color: #fff;
 }
-body.collection .title.collapsible,
-body.collection .description.collapsible {
+body.collection .collapsible,
+body.collection .collapsible {
   background: #c0c8d294;
   color: #222122;
+  padding: 1rem 4rem;
 }
 
 .corpora-container {
@@ -699,6 +712,22 @@ body.collection .description.collapsible {
 }
 .corpora-container .collections .count {
   margin-left: auto;
+}
+
+.collections-filter ul {
+  flex-direction: column;
+}
+nav.collections-filter ul li {
+  margin-bottom: 1rem;
+}
+.collections-filter input {
+  border: 0;
+  border-bottom: 1px solid #ccc;
+  margin-right: 1rem;
+  font-size: 1rem;
+  padding: 0 0 0.3rem 0.3rem;
+  outline: none;
+  width: 100%;
 }
 
 i.active {
@@ -977,6 +1006,91 @@ nav.secondary.features-filter ul {
 
 .features-back {
   margin-bottom: 1rem;
+}
+
+.at-a-glance p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+.at-a-glance h5 {
+  color: #a6a6a6;
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+}
+.at-a-glance .languages {
+  flex-direction: column;
+  align-items: flex-end;
+}
+.at-a-glance ul li {
+  border-bottom: 1px dotted #636363;
+  padding: 0.75rem 0;
+}
+.at-a-glance ul li:first-of-type {
+  padding-top: 0;
+}
+.at-a-glance .lang-lozenge {
+  background: #d6d5d5;
+  color: #636363;
+  border: 1px solid #636363;
+  border-radius: 1.5rem;
+  font-size: 0.9rem;
+  padding: 0.1rem 0.3rem;
+  width: fit-content;
+}
+.at-a-glance .lang-lozenge:not(:first-child) {
+  margin-top: 0.3rem;
+}
+
+.histogram path.domain {
+  display: none;
+}
+.histogram .tick {
+  display: none;
+}
+.histogram .tick line {
+  display: none;
+}
+.at-a-glance .histogram {
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.popup-histogram {
+  background: #5e5e5e;
+  border-radius: 1rem;
+  box-shadow: 0 0 5px #7b7b7b;
+  padding: 1rem;
+  position: absolute;
+  top: 38rem;
+  left: 62rem;
+}
+.popup-histogram:before,
+.popup-histogram:after {
+	bottom: 100%;
+	right: 80%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+.popup-histogram:before {
+	border-bottom-color: #5e5e5e;
+	border-width: 31px;
+	margin-left: -31px;
+}
+.popup-histogram:after {
+	border-bottom-color: #5e5e5e;
+	border-width: 30px;
+	margin-left: -30px;
+}
+.popup-histogram path.domain {
+  display: none;
+}
+.popup-histogram .tick line {
+  display: none;
 }
 
 /* Streamfield */

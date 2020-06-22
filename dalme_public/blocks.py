@@ -3,6 +3,12 @@ from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
 
 
+class CarouselBlock(blocks.ListBlock):
+    class Meta:
+        icon = 'cogs'
+        template = 'dalme_public/blocks/_carousel.html'
+
+
 class DocumentBlock(blocks.StructBlock):
     title = blocks.CharBlock()
     abstract = blocks.CharBlock()
@@ -49,6 +55,15 @@ class PersonBlock(blocks.StructBlock):
     class Meta:
         icon = 'user'
         template = 'dalme_public/blocks/_person.html'
+
+
+class SponsorBlock(blocks.StructBlock):
+    logo = ImageChooserBlock()
+    url = blocks.URLBlock()
+
+    class Meta:
+        icon = 'user'
+        template = 'dalme_public/blocks/_sponsor.html'
 
 
 class SubsectionBlock(blocks.StructBlock):

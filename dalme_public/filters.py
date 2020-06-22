@@ -78,10 +78,11 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
 
     @staticmethod
     def annotate_dates(qs):
-        # TODO: These results are not 100% correct. Some end up incorrectly
+        # These results are not 100% perfect. Some end up incorrectly
         # annotated with None because certain start_date attributes objects do
         # have a value_STR but don't have a value_DATE. This could be fixed
-        # with a data migration. To see those rows, call the following.
+        # with a data migration adding in the missing datetime values to the
+        # objects. To see the rows in question, call the following.
         # Attribute.objects.filter(
         #     attribute_type_id=26, value_DATE__isnull=True
         # )
@@ -105,14 +106,9 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
 
     def filter(self, qs, value):
         qs = super().filter(qs, value=list())
-        # TODO: Still looking for a solution to the 'distinct' issue.
+        # For now any duplicates that remain here after filtering are
+        # eliminated on the endpoint itself before going down the wire.
         # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#distinct
-        # This is a bit of a hack. For now any duplicates that remain here
-        # after filtering are eliminated on the endpoint itself before going
-        # down the wire. Similarly we tried sorting here but it was sub-optimal
-        # and we get better results by casting to a list and ordering that.
-        # But, as the order_by must return a qs, we just annotate here and
-        # return it and then do the ordering on the SourceList itself.
         date = self.get_value('date', value)
         if date:
             self.parent.annotated = True

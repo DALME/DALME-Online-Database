@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from dalme_app.models import Attribute, Source
-from dalme_app.serializers import SourceSerializer
+from dalme_app.web_serializers import RecordSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
 
@@ -64,17 +64,13 @@ class DALMEPagination(pagination.PageNumberPagination):
 class SourceList(ListAPIView):
     model = Source
     queryset = Source.objects.all()
-    serializer_class = SourceSerializer
+    serializer_class = RecordSerializer
     pagination_class = DALMEPagination
     filterset_class = SourceFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self, *args, **kwargs):
-        # TODO: Integrate visible flag here?
-        # Or get rid of this and just filter on the frontend?
-        qs = super().get_queryset(*args, **kwargs).exclude(
-            type__name__in=['Archive', 'File unit']
-        ).order_by('name')
+        qs = super().get_queryset(*args, **kwargs).order_by('name')
 
         self.filterset = self.filterset_class(self.request.GET, queryset=qs)
         qs = self.filterset.qs.distinct()
@@ -108,7 +104,7 @@ class SourceList(ListAPIView):
 class SourceDetail(RetrieveAPIView):
     model = Source
     queryset = Source.objects.all()
-    serializer_class = SourceSerializer
+    serializer_class = RecordSerializer
     lookup_url_kwarg = 'pk'
     permission_classes = (IsAuthenticatedOrReadOnly,)
 

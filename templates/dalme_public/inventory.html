@@ -316,9 +316,6 @@
           },
         },
         methods: {
-          updateURL() {
-            // TODO: Implement this.
-          },
           incrementDivaId() {
             this.divaId += 1;
           },
@@ -328,14 +325,12 @@
             if (this.zoomLevel > 0) {
               this.zoomLevel = --this.zoomLevel;
               window.eventBus.$emit('zoomIn');
-              this.$nextTick(() => { this.updateURL(); });
             }
           },
           handleZoomOut() {
             if (this.zoomLevel < 4) {
               this.zoomLevel = ++this.zoomLevel;
               window.eventBus.$emit('zoomOut');
-              this.$nextTick(() => { this.updateURL(); });
             }
           },
           handleFolioPrevious() {
@@ -343,7 +338,6 @@
               this.folioIndex = --this.folioIndex;
               window.eventBus.$emit('renderFolio', this.eventData);
               this.incrementDivaId();
-              this.$nextTick(() => { this.updateURL() });
             }
           },
           handleFolioNext() {
@@ -351,7 +345,6 @@
               this.folioIndex = ++this.folioIndex;
               window.eventBus.$emit('renderFolio', this.eventData);
               this.incrementDivaId();
-              this.$nextTick(() => { this.updateURL(); });
             }
           },
           handleFolioSelect(index) {
@@ -360,18 +353,12 @@
               window.eventBus.$emit('renderFolio', this.eventData);
               this.incrementDivaId();
               this.folioSelect = false;
-              this.$nextTick(() => {
-                this.updateURL();
-              });
             }
           },
           handleFlipView() {
             window.eventBus.$emit('flipView');
             window.eventBus.$emit('renderFolio', this.eventData, false);
             this.incrementDivaId();
-            this.$nextTick(() => {
-              this.updateURL();
-            });
           },
           toggleFolioSelect() {
             if (this.hasMultipleFolios) {

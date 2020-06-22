@@ -1,0 +1,14 @@
+{% load wagtailcore_tags %}
+
+<nav class="secondary collections-filter">
+  <ul class="u-flex">
+    <li>
+      <form method="get">
+        <input id="search" type="search" name="q" placeholder="Search">
+      </form>
+    </li>
+    <li>
+      <a href="{% pageurl page %}">Browse All</a>
+    </li>
+  </ul>
+</nav>

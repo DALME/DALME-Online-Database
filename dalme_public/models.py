@@ -28,19 +28,38 @@ from wagtailmodelchooser import register_model_chooser, Chooser
 from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
 from dalme_app.models import Set as DALMESet, Source
-from dalme_app.serializers import SourceSerializer
+from dalme_app.web_serializers import RecordSerializer
 from dalme_public import forms
 from dalme_public.blocks import (
+    CarouselBlock,
     DocumentBlock,
     ExternalResourceBlock,
     MainImageBlock,
     PersonBlock,
+    SponsorBlock,
     SubsectionBlock,
 )
 
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+
+
+# TODO: Leaving these here unused until migrations issue is resolved.
+class CarouselMixin(Orderable):
+    carousel_image = models.ForeignKey(
+        'dalme_public.DALMEImage',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+
+    panels = [ImageChooserPanel('carousel_image')]
+
+
+class FeaturedObjectCarousel(CarouselMixin):
+    page = ParentalKey('dalme_public.FeaturedObject', related_name='carousel')
 
 
 @hooks.register('before_serve_page')
@@ -89,18 +108,6 @@ class CustomRendition(AbstractRendition):
         )
 
 
-class CarouselMixin(Orderable):
-    carousel_image = models.ForeignKey(
-        'dalme_public.DALMEImage',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="+",
-    )
-
-    panels = [ImageChooserPanel('carousel_image')]
-
-
 @register_snippet
 class Footer(models.Model):
     pages = StreamField([
@@ -108,6 +115,13 @@ class Footer(models.Model):
     ])
 
     panels = [StreamFieldPanel('pages')]
+
+    def __str__(self):
+        return "Site Footer"
+
+    def clean(self):
+        if self._meta.model.objects.exists():
+            raise ValidationError('The site can only have one footer.')
 
 
 class DALMEPage(Page):
@@ -128,7 +142,8 @@ class DALMEPage(Page):
 
     body = StreamField([
         ('main_image', MainImageBlock()),
-        ('inline_image', ImageChooserBlock()),   # pull left and right?
+        ('carousel', CarouselBlock(ImageChooserBlock())),
+        ('inline_image', ImageChooserBlock()),
         ('text', blocks.RichTextBlock()),
         ('heading', blocks.CharBlock()),
         ('pullquote', blocks.RichTextBlock(icon='openquote')),
@@ -147,15 +162,15 @@ class DALMEPage(Page):
     @property
     def main_image(self):
         try:
-            return self.carousel.first().carousel_image
-        except AttributeError:
-            try:
-                return next(
-                    field for field in self.body
-                    if field.block.name == 'main_image'
-                ).value
-            except StopIteration:
-                return None
+            field = next(
+                field for field in self.body
+                if field.block.name in ['carousel', 'main_image']
+            )
+        except StopIteration:
+            return None
+        if field.block.name == 'main_image':
+            return field.value
+        breakpoint()
 
     @property
     def title_switch(self):
@@ -204,6 +219,17 @@ class FeaturedPage(DALMEPage):
         raise NotImplementedError()
 
     def clean(self):
+        if self.go_live_at:
+            qs = self._meta.model.objects.filter(
+                go_live_at=self.go_live_at
+            ).exclude(pk=self.pk)
+            if qs.exists():
+                model = self._meta.label.split('.')[-1]
+                title = qs.first().title
+                raise ValidationError(
+                    f'{model}: {title} is already scheduled for publication at: {self.go_live_at}'  # noqa
+                )
+
         if self.source_set and not self.source:
             raise ValidationError(
                 'You must specify a source in order to also specify a source set.'  # noqa
@@ -227,7 +253,7 @@ class FeaturedPage(DALMEPage):
 
 class Home(DALMEPage):
     sponsors = StreamField([
-        ('sponsors', ImageChooserBlock()),
+        ('sponsors', SponsorBlock()),
     ], null=True)
 
     subpage_types = [
@@ -272,12 +298,11 @@ class Flat(DALMEPage):
         help_text='Check this box to show a contact form on the page.'
     )
 
-    parent_page_types = ['dalme_public.Section']
+    parent_page_types = ['dalme_public.Section', 'dalme_public.Collection']
     subpage_types = []
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
-        FieldPanel('title'),
         FieldPanel('short_title'),
         FieldPanel('show_contact_form'),
         StreamFieldPanel('body'),
@@ -327,10 +352,6 @@ class Features(DALMEPage):
         return context
 
 
-class FeaturedObjectCarousel(CarouselMixin):
-    page = ParentalKey('dalme_public.FeaturedObject', related_name='carousel')
-
-
 class FeaturedObject(FeaturedPage):
     short_title = 'Object'
     source = models.ForeignKey(
@@ -355,10 +376,6 @@ class FeaturedObject(FeaturedPage):
         ModelChooserPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
-        MultiFieldPanel(
-            [InlinePanel('carousel', label='Image')],
-            heading='Carousel Images',
-        ),
         StreamFieldPanel('body'),
     ]
 
@@ -438,13 +455,18 @@ class Corpus(Orderable, ClusterableModel):
     description = RichTextField()
 
     page = ParentalKey('dalme_public.Collections', related_name='corpora')
-    collections = ParentalManyToManyField('dalme_public.Collection')
+    collections = ParentalManyToManyField(
+        'dalme_public.Collection', related_name='corpora'
+    )
 
     panels = [
         FieldPanel('title'),
         FieldPanel('description'),
         FieldPanel('collections'),
     ]
+
+    def __str__(self):
+        return self.title
 
 
 class Collections(DALMEPage):
@@ -460,6 +482,31 @@ class Collections(DALMEPage):
             heading='Corpora',
         ),
     ]
+
+    def get_context(self, request):
+        context = super().get_context(request)
+        if request.GET.get('q'):
+            corpora = []
+            cls = self._meta.model.collection.related.related_model
+            qs = cls.objects.filter(title__icontains=request.GET['q'])
+            for collection in qs:
+                for corpus in collection.corpora.all():
+                    try:
+                        data = next(
+                            item for item in corpora if item[0] == corpus
+                        )
+                    except StopIteration:
+                        corpora.append([corpus, [collection]])
+                    else:
+                        data[1].append(collection)
+        else:
+            corpora = [
+                (corpus, corpus.collections.all())
+                for corpus in self.corpora.all()
+            ]
+
+        context['corpora'] = corpora
+        return context
 
 
 class Collection(RoutablePageMixin, DALMEPage):
@@ -513,12 +560,22 @@ class Collection(RoutablePageMixin, DALMEPage):
             'title': source.name,
             'data': {
                 'folios': list(pages),
-                **SourceSerializer(source).data,
+                **RecordSerializer(source).data,
             },
         })
         return TemplateResponse(
           request, 'dalme_public/inventory.html', context
         )
+
+    @property
+    def stats(self):
+        status = 'Extensive range, with numerous inventories of artisans and low-status individuals.'  # noqa
+        return {
+            'inventories': self.source_set.get_public_member_count,
+            'languages': self.source_set.get_languages,
+            'coverage': self.source_set.get_time_coverage,
+            'status': status,
+        }
 
     @property
     def count(self):

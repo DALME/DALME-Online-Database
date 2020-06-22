@@ -104,18 +104,16 @@
           <span class="heading"></span>
 
           <template v-for="(inventory, index) in inventories" :key="index">
-            <template v-if="sourceIsPublic(inventory)">
-              <span>
-                <a :href="inventoryUrl(inventory)">${inventory.name.value}</a>
-                <span class="short-name">${inventory.short_name}</span>
-              </span>
-              <span>${inventory.attributes.record_type}</span>
-              <span>${inventory.attributes.date}</span>
-              <span class="icons">
-                <i v-if="sourceHasInventory(inventory)" class="fas fa-pen-nib"></i>
-                <i v-if="sourceHasFolio(inventory)" class="fas fa-camera"></i>
-              </span>
-            </template>
+            <span>
+              <a :href="inventoryUrl(inventory)">${inventory.name}</a>
+              <span class="short-name">${inventory.short_name}</span>
+            </span>
+            <span>${inventory.record_type}</span>
+            <span>${inventory.date}</span>
+            <span class="icons">
+              <i v-if="inventory.has_images" class="fas fa-pen-nib"></i>
+              <i v-if="inventory.has_transcriptions" class="fas fa-camera"></i>
+            </span>
           </template>
         </div>
       </template>
@@ -158,7 +156,7 @@
   <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
   <script>
     Vue.component('v-select', VueSelect.VueSelect);
-    var app = new Vue({
+    const app = new Vue({
       el: '#app',
       delimiters: ['${', '}'],
       created() {
@@ -247,16 +245,6 @@
         },
       },
       methods: {
-        sourceIsPublic(source) {
-          // TODO: Where is the flag??
-          return true;
-        },
-        sourceHasInventory(source) {
-          return source.has_inventory;
-        },
-        sourceHasFolio(source) {
-          return source.no_folios > 0;
-        },
         setCorpus() {
           const value = this.corpus ? this.corpus.id : null;
           this.filterData('corpus', value);
@@ -331,7 +319,7 @@
           fetch(url || `${this.endpoint}/?${this.currentParams.toString()}`)
             .then(response => response.json())
             .then(data => {
-              this.inventories = data.results;
+              this.inventories = data.results.filter(source => source.is_public);
               this.next = data.next;
               this.previous = data.previous;
               this.count = data.count;

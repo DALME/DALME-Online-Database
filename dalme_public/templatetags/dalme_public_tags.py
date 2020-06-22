@@ -2,7 +2,7 @@ from calendar import month_name
 
 from django import template
 
-from dalme_app.serializers import SourceSerializer
+from dalme_app.web_serializers import RecordSerializer
 from dalme_public.models import (
     Essay, FeaturedObject, FeaturedInventory, Features, Footer, Home
 )
@@ -20,6 +20,11 @@ def footer(context):
         'year': context['year'],
         'project': context['project'],
     }
+
+
+@register.filter
+def classname(obj):
+    return obj.specific.__class__.__name__
 
 
 @register.simple_tag
@@ -106,11 +111,11 @@ def get_source_details(context):
     source_set = page.source_set
 
     if source:
-        data = SourceSerializer(source).data
-        name = data['name']['name']
+        data = RecordSerializer(source).data
+        name = data['name']
         short_name = data['short_name']
-        date = data['attributes']['date']
-        city = data['attributes']['city']
+        date = data['date']
+        city = data['city']
 
     url = None
     if source and source_set:
@@ -186,3 +191,9 @@ def get_recent_essays():
         {'url': obj.url, 'month': month_name[obj.first_published_at.month]}
         for obj in objs
     ]
+
+
+@register.simple_tag()
+def collection_date_range(collection):
+    years = sorted(collection.source_set.get_time_coverage.keys())
+    return f'{years[0]} - {years[-1]}'
