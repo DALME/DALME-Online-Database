@@ -1175,6 +1175,7 @@ nav.secondary.features-filter ul {
   flex-direction: column;
   font-size: 1.5rem;
   border-left: 1px dotted #636363;
+  margin-left: auto;
   padding: 0 1.5rem;
 }
 
