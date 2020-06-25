@@ -45,23 +45,6 @@ from dalme_public.blocks import (
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 
-# TODO: Leaving these here unused until migrations issue is resolved.
-class CarouselMixin(Orderable):
-    carousel_image = models.ForeignKey(
-        'dalme_public.DALMEImage',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="+",
-    )
-
-    panels = [ImageChooserPanel('carousel_image')]
-
-
-class FeaturedObjectCarousel(CarouselMixin):
-    page = ParentalKey('dalme_public.FeaturedObject', related_name='carousel')
-
-
 @hooks.register('before_serve_page')
 def redirects(page, request, serve_args, serve_kwargs):
     if page.is_root():
