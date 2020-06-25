@@ -153,7 +153,10 @@ class DALMEPage(Page):
             return None
         if field.block.name == 'main_image':
             return field.value
-        breakpoint()
+        try:
+            return field.value[0]
+        except IndexError:
+            return None
 
     @property
     def title_switch(self):
