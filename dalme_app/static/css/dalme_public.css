@@ -148,6 +148,7 @@ main section h4 span:nth-child(2) {
 main .main-column {
   border-left: 1px solid #aaa;
   flex-direction: column;
+  width: 100%;
 }
 
 main.home {
@@ -301,6 +302,7 @@ header.home > div > div {
 header .title.collapsible {
   font-style: italic;
   flex-direction: row;
+  padding: 1.5rem 4rem;
 }
 header .title.collapsible h1 {
   font-size: 1.5rem;
@@ -578,15 +580,15 @@ section.featured > div:last-child {
 }
 .support-logos {
   margin: 0 4rem 2rem 4rem;
+  flex-wrap: wrap;
 }
 .support-logos > div {
   align-items: center;
   border: 1px solid #dee2e3;
   justify-content: center;
+  margin: 1rem 0.5rem 0 0.5rem;
   padding: 1rem 2rem;
-}
-.support-logos > div:not(:first-child):not(:last-child) {
-  margin: 0 1rem
+  flex: 1 1 30%;
 }
 
 .main-image {
@@ -657,8 +659,14 @@ header .description {
   flex-direction: row;
   padding: 1rem 4rem;
 }
+header .description > div {
+  width: 100%;
+}
 header .description p {
-  max-width: 60%;
+  width: 60%;
+}
+header .credit p {
+  width: 100%;
 }
 header .description ul {
   color: #5e5e5e;
@@ -758,6 +766,9 @@ i.inactive {
   cursor: pointer;
   padding: 0.75rem 1rem 0.75rem 1rem;
 }
+.app nav li.inactive {
+  cursor: default;
+}
 .app nav li.search {
   cursor: text;
 }
@@ -821,8 +832,10 @@ i.inactive {
   color: #aaa;
   padding-left: 0.33rem;
 }
-.inventories .folios {
-  padding: 0 4rem;
+
+.folios {
+  margin: 0 4rem;
+  overflow: hidden;
 }
 .folios > section {
   border-bottom: 1px solid #6b6b6b;
@@ -830,20 +843,71 @@ i.inactive {
 .folios.vertical-split {
   flex-direction: row;
 }
+.folios.horizontal-split {
+  flex-direction: column;
+}
 .folios.vertical-split .diva-viewer-canvas {
   position: absolute;
   top: 0;
   left: 0;
 }
-.folios.horizontal-split {
-  flex-direction: column;
+.folios section.folio {
+  flex: 0 0 auto;
 }
 .folios.vertical-split > section {
+  border-bottom: 1px solid #6b6b6b;
+}
+.folios.horizontal-split > section.folio {
+  border-bottom: none;
+}
+.folios.vertical-split section.folio {
   width: 50%;
+  max-width: 98.5%;
 }
-section.folio {
-  justify-content: center!important;
+.folios.horizontal-split section.folio {
+  width: 100%;
+  max-height: fit-content;
 }
+.folios .resize-handle {
+  border-bottom: 1px solid #6b6b6b;
+  flex: 0 0 auto;
+  z-index: 1;
+}
+.folios.horizontal-split .resize-handle {
+  border-bottom: 1px solid #6b6b6b;
+  border-top: 1px solid #6b6b6b;
+}
+.folios.vertical-split .resize-handle {
+  background: url(./verticalgrip.png) 3px center/7px 30px no-repeat #e8e9ec;
+  cursor: col-resize;
+  width: 1rem;
+}
+.folios.horizontal-split .resize-handle {
+  background: url(./horizontalgrip.png) center 3px/30px 7px no-repeat #e8e9ec;
+  cursor: row-resize;
+  height: 1rem;
+}
+.folios section.transcription {
+  background: #fff;
+  flex: 1 1 auto;
+  z-index: 1;
+}
+
+.folio-rights {
+  flex-direction: column;
+}
+.folios .folio-rights h4 {
+  margin: 0.7rem 0 0.4rem 0;
+}
+.folios .folio-rights p {
+  font-size: 0.9rem;
+  margin: 0;
+  padding-right: 2rem;
+}
+.folios .folio-rights p:last-child {
+  margin-bottom: 1rem;
+}
+
 /* TODO: Filter positioning needs work for different viewpoints. */
 .filter-panel {
   transform: translate(117%, 20%);
@@ -907,20 +971,6 @@ section.folio {
 }
 .filter-form .asset {
   padding-top: 1rem;
-}
-
-.folio-rights {
-  flex-direction: column;
-}
-.folios .folio-rights h4 {
-  margin: 0.7rem 0 0.4rem 0;
-}
-.folios .folio-rights p {
-  font-size: 0.9rem;
-  margin: 0;
-}
-.folios .folio-rights p:last-child {
-  margin-bottom: 1rem;
 }
 
 .messages li {
@@ -1267,18 +1317,11 @@ div.description[data-collapsed='true'] {
 }
 
 @media only screen and (min-width: 1200px) {
-  body {
-    width: 110rem!important;
-    margin: 0 auto!important;
-  }
-  section.featured {
-    flex-direction: row;
-  }
 }
 
 @media only screen and (min-width: 1800px) {
   body {
-    width: 80rem!important;
-    margin: 0 auto!important;
+    margin: 0 auto;
+    width: 80rem;
   }
 }

@@ -30,7 +30,9 @@
               {% for collection in collections %}
                 <li class="u-flex">
                   <a href="{% pageurl collection %}">{{ collection.title }}</a>
-                  <span class="count">{% collection_date_range collection %} | {{ collection.count }} Records</span>
+                  <span class="count">
+                    {% collection_date_range collection %} | {{ collection.count }} Records
+                  </span>
                 </li>
               {% endfor %}
             </ul>

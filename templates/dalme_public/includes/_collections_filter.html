@@ -1,14 +1,16 @@
-{% load wagtailcore_tags %}
+{% load wagtailroutablepage_tags %}
 
 <nav class="secondary collections-filter">
   <ul class="u-flex">
     <li>
-      <form method="get">
-        <input id="search" type="search" name="q" placeholder="Search">
+      <form method="get" action="{% routablepageurl page.specific 'unscoped_inventories' %}">
+        <input id="search" type="search" name="name" placeholder="Search">
       </form>
     </li>
     <li>
-      <a href="{% pageurl page %}">Browse All</a>
+      <a href="{% routablepageurl page.specific 'unscoped_inventories' %}">
+        Browse All
+      </a>
     </li>
   </ul>
 </nav>

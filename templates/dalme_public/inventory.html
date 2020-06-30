@@ -25,13 +25,20 @@
           <i class="fa fa-search-plus" aria-hidden="true"></i>
         </li>
 
-        <li class="pagination previous right" @click="handleFolioPrevious">
-          <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        <li
+          class="pagination previous right"
+          v-bind:class="{ inactive: !hasMultipleFolios }"
+          @click="handleFolioPrevious">
+            <i class="fa fa-chevron-left" aria-hidden="true"></i>
         </li>
 
-        <li class="pagination current" @click="toggleFolioSelect" v-on-clickaway="hideFolioSelect">
-          <span>${folioInfo}</span>
-          <i v-if="hasMultipleFolios" class="fa fa-chevron-down" aria-hidden="true"></i>
+        <li
+          class="pagination current"
+          v-bind:class="{ inactive: !hasMultipleFolios }"
+          @click="toggleFolioSelect"
+          v-on-clickaway="hideFolioSelect">
+            <span>${folioInfo}</span>
+            <i v-if="hasMultipleFolios" class="fa fa-chevron-down" aria-hidden="true"></i>
         </li>
         <ul class="folio-selector" v-if="folioSelect">
           <template v-for="(folio, index) in sourceData.folios">
@@ -44,8 +51,11 @@
           </template>
         </ul>
 
-        <li class="pagination next" @click="handleFolioNext">
-          <i class="fa fa-chevron-right" aria-hidden="true"></i>
+        <li
+          class="pagination next"
+          v-bind:class="{ inactive: !hasMultipleFolios }"
+          @click="handleFolioNext">
+            <i class="fa fa-chevron-right" aria-hidden="true"></i>
         </li>
 
         <li class="hamburger" @click="handleFlipView">
@@ -60,6 +70,7 @@
       <div id="diva_viewer"></div>
       <div id="folio-rights" class="folio-rights u-flex"></div>
     </section>
+    <div id="resize-handle" class="resize-handle"></div>
     <section id="transcription" class="transcription"></section>
   </div>
 {% endblock %}
@@ -71,37 +82,46 @@
   <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
   {{ data|json_script:"source-data" }}
 
   <script>
     $(document).ready(function() {
       const getTitle = (e, tag) => {
-        if (e.hasAttribute("unit") && e.hasAttribute("quantity")) {
-          var quantity = e.getAttribute("quantity");
-          var unit = e.getAttribute("unit");
-          var extent = 'extent ' + quantity + unit;
-        } else if (e.hasAttribute("extent")) {
-          var extent = 'extent ' + e.getAttribute("extent");
+        let extent = null;
+        let reason = null;
+        let type = null;
+        let lemma = null;
+        let resp = null;
+        let title = null;
+        if (e.hasAttribute('unit') && e.hasAttribute('quantity')) {
+           quantity = e.getAttribute('quantity');
+          let unit = e.getAttribute('unit');
+          extent = 'extent ' + quantity + unit;
+        } else if (e.hasAttribute('extent')) {
+          extent = 'extent ' + e.getAttribute('extent');
         };
-        if (e.hasAttribute("reason")) {
-          var reason = e.getAttribute("reason")
+        if (e.hasAttribute('reason')) {
+          reason = e.getAttribute('reason')
         };
-        if (e.hasAttribute("type")) {
-          var type = e.getAttribute("type")
+        if (e.hasAttribute('type')) {
+          type = e.getAttribute('type')
         };
-        if (e.hasAttribute("lemma")) {
-          var lemma = '"' + e.getAttribute("lemma") + '"'
+        if (e.hasAttribute('lemma')) {
+          lemma = '' + e.getAttribute('lemma') + ''
         };
-        if (e.hasAttribute("resp")) {
-          var resp = ' by ' + e.getAttribute("resp")
+        if (e.hasAttribute('resp')) {
+          resp = ' by ' + e.getAttribute('resp')
         };
         if (tag == 'word' && type && lemma) {
-          var title = type + ': ' + lemma;
+          title = type + ': ' + lemma;
         } else {
-          var title = tag;
+          title = tag;
           if (extent) {
             title = title + ': ' + extent;
-            if (reason) { title = title + ', ' + reason; };
+            if (reason) {
+              title = title + ', ' + reason;
+            };
           } else if (reason) {
             title = title + ': ' + reason;
           } else if (type) {
@@ -116,36 +136,36 @@
       const teiBehaviours = {
         'tei': {
           'gap': function(e) {
-            e.setAttribute("title", getTitle(e, 'gap'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'gap'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@reason, @unit, @quantity, @extent
           'space': function(e) {
-            e.setAttribute("title", getTitle(e, 'space'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'space'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@unit, @quantity, @extent
           'unclear': function(e) {
-            e.setAttribute("title", getTitle(e, 'unclear'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'unclear'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@reason
           'supplied': function(e) {
-            e.setAttribute("title", getTitle(e, 'supplied'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'supplied'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@reason
           'add': function(e) {
-            e.setAttribute("title", getTitle(e, 'addition'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'addition'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@place
           'abbr': function(e) {
-            e.setAttribute("title", getTitle(e, 'abbreviation'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'abbreviation'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@type
           'w': function(e) {
-            e.setAttribute("title", getTitle(e, 'word'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'word'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@type, @lemma
           'quote': function(e) {
-            e.setAttribute("title", getTitle(e, 'quote'));
-            e.setAttribute("data-toggle", "tooltip");
+            e.setAttribute('title', getTitle(e, 'quote'));
+            e.setAttribute('data-toggle', 'tooltip');
           }, //@resp
         }
       };
@@ -216,7 +236,7 @@
             const tr_text = data.transcription;
             const tei_block = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>${tr_text}</body></text></TEI>`;
             tei.makeHTML5(tei_block, function(text) {
-              node.addClass("justify-content-left").html(text);
+              node.addClass('justify-content-left').html(text);
             });
           }, 'json');
         };
@@ -240,13 +260,59 @@
           window.folio.zoomOut();
         }
       });
-      window.eventBus.$on('flipView', () => {
+      window.eventBus.$on('flipView', data => {
         const node = $('.folios');
         if (node.hasClass('vertical-split')) {
           node.removeClass('vertical-split').addClass('horizontal-split');
+          node.find('.folio')
+            .resizable('destroy')
+            .resizableSafe({
+              handleSelector: '#resize-handle',
+              resizeWidth: false,
+              onDragEnd: function() {
+                Diva.Events.publish('PanelSizeDidChange');
+                window.folio.destroy();
+                renderImage(data);
+              },
+            })
+            .css({ width: '' });
         } else {
           node.removeClass('horizontal-split').addClass('vertical-split');
+          node.find('.folio')
+            .resizable('destroy')
+            .resizableSafe({
+              handleSelector: '#resize-handle',
+              resizeHeight: false,
+              onDragEnd: function() {
+                Diva.Events.publish('PanelSizeDidChange');
+                window.folio.destroy();
+                renderImage(data);
+              },
+            })
+            .css({ height: '' });
         }
+      });
+
+      $('.folio').resizableSafe({
+        handleSelector: '#resize-handle',
+        resizeHeight: false,
+        onDragEnd: function() {
+          Diva.Events.publish('PanelSizeDidChange');
+          window.folio.destroy();
+          renderImage(data);
+        }
+      });
+
+      $('body').on('click', '#collapsible-handle', function(e) {
+        const target = $(e.target).closest('div.title');
+        const icon = target.find('i');
+        icon.hasClass('fa-chevron-down')
+          ? icon.removeClass('fa-chevron-down').addClass('fa-chevron-left')
+          : icon.removeClass('fa-chevron-left').addClass('fa-chevron-down');
+        $('div.description')
+          .attr('data-collapsed', function(index, attr) {
+            return attr === 'true' ? 'false' : 'true';
+          });
       });
 
       const app = new Vue({
@@ -356,7 +422,7 @@
             }
           },
           handleFlipView() {
-            window.eventBus.$emit('flipView');
+            window.eventBus.$emit('flipView', this.eventData);
             window.eventBus.$emit('renderFolio', this.eventData, false);
             this.incrementDivaId();
           },
@@ -371,18 +437,6 @@
             }
           },
         },
-      });
-
-      $('body').on('click', '#handle', function(e) {
-        const target = $(e.target);
-        const icon = target.find('i');
-        icon.hasClass('fa-chevron-down')
-          ? icon.removeClass('fa-chevron-down').addClass('fa-chevron-left')
-          : icon.removeClass('fa-chevron-left').addClass('fa-chevron-down');
-        $('div.description')
-          .attr('data-collapsed', function(index, attr) {
-            return attr === 'true' ? 'false' : 'true';
-          });
       });
 
     });

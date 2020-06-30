@@ -1,4 +1,4 @@
-{% load dalme_public_tags %}
+{% load dalme_public_tags wagtailroutablepage_tags %}
 
 {% get_source_details as source_data %}
 {% if source_data.source %}
@@ -10,7 +10,9 @@
         <li>{{ source_data.name }}</li>
       </a>
       {% else %}
-        <li>{{ source_data.name }}</li>
+        <a href="{% routablepageurl source_data.collections.specific 'unscoped_inventory' source_data.source.pk %}">
+          <li>{{ source_data.name }}</li>
+        </a>
       {% endif %}
       <li>{{ source_data.short_name }}</li>
       <li>{{ source_data.city }}</li>

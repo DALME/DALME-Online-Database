@@ -4,7 +4,13 @@ from django import template
 
 from dalme_app.web_serializers import RecordSerializer
 from dalme_public.models import (
-    Essay, FeaturedObject, FeaturedInventory, Features, Footer, Home
+    Collections,
+    Essay,
+    FeaturedObject,
+    FeaturedInventory,
+    Features,
+    Footer,
+    Home,
 )
 
 
@@ -119,7 +125,7 @@ def get_source_details(context):
 
     url = None
     if source and source_set:
-        stem = 'public/DALME/corpora'
+        stem = 'public/DALME/collections'
         collection = source_set.public_collections.first()
         url = f'/{stem}/{collection.slug}/inventories/{source.pk}'
 
@@ -131,6 +137,7 @@ def get_source_details(context):
         'date': date,
         'city': city,
         'url': url,
+        'collections': Collections.objects.first(),
     }
 
 

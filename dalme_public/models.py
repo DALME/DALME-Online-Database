@@ -220,6 +220,7 @@ class FeaturedPage(DALMEPage):
             raise ValidationError(
                 'You must specify a source in order to also specify a source set.'  # noqa
             )
+
         if self.source_set:
             try:
                 # TODO: There must be a better way to determine Set membership
@@ -455,7 +456,7 @@ class Corpus(Orderable, ClusterableModel):
         return self.title
 
 
-class Collections(DALMEPage):
+class Collections(RoutablePageMixin, DALMEPage):
     parent_page_types = ['dalme_public.Home']
     subpage_types = ['dalme_public.Collection']
 
@@ -468,6 +469,43 @@ class Collections(DALMEPage):
             heading='Corpora',
         ),
     ]
+
+    @route(r'^inventories/$', name='unscoped_inventories')
+    def inventories(self, request):
+        context = self.get_context(request)
+        context.update({'inventories': True})
+        return TemplateResponse(
+          request, 'dalme_public/inventories.html', context
+        )
+
+    @route(rf'^inventories/({UUID_RE})/$', name='unscoped_inventory')
+    def inventory(self, request, pk):
+        qs = Source.objects.filter(pk=pk)
+        if not qs.exists():
+            raise Http404()
+
+        qs = qs.annotate(
+            no_folios=Count('pages', filter=Q(pages__source__isnull=False))
+        )
+        source = qs.first()
+        pages = source.source_pages.all().values(
+            pageId=F('page__pk'),
+            pageName=F('page__name'),
+            transcriptionId=F('transcription__pk')
+        )
+
+        context = self.get_context(request)
+        context.update({
+            'inventory': True,
+            'title': source.name,
+            'data': {
+                'folios': list(pages),
+                **RecordSerializer(source).data,
+            },
+        })
+        return TemplateResponse(
+          request, 'dalme_public/inventory.html', context
+        )
 
     def get_context(self, request):
         context = super().get_context(request)
@@ -565,7 +603,7 @@ class Collection(RoutablePageMixin, DALMEPage):
 
     @property
     def count(self):
-        return self.source_set.get_member_count
+        return self.source_set.get_public_member_count
 
     @property
     def alias_type(self):

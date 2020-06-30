@@ -71,12 +71,14 @@ class SourceList(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs).order_by('name')
+        qs = qs.filter(
+            type=13, workflow__is_public=True
+        ).annotate(
+            no_folios=Count('pages', filter=Q(pages__source__isnull=False))
+        )
 
         self.filterset = self.filterset_class(self.request.GET, queryset=qs)
         qs = self.filterset.qs.distinct()
-        qs = qs.annotate(
-            no_folios=Count('pages', filter=Q(pages__source__isnull=False))
-        )
 
         if self.filterset.annotated:
             # Currently necessary because of the inability to eliminate dupes
