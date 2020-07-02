@@ -926,7 +926,7 @@ i.inactive {
   box-shadow: 0 0 5px #7b7b7b;
   padding: 2rem;
   position: absolute;
-  z-index: 1;
+  z-index: 2;
 }
 .folio-selector:before,
 .folio-selector:after,
