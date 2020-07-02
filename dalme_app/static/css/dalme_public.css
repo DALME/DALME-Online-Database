@@ -162,6 +162,7 @@ body.home main .main-column {
   border-left: 0;
 }
 body.home section.featured {
+  flex-direction: row;
   font-size: 0.8rem;
 }
 body.home section.featured h4 {
