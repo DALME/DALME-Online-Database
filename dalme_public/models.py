@@ -186,8 +186,7 @@ class FeaturedPage(DALMEPage):
             return self.alternate_author
         return f'{self.owner.first_name} {self.owner.last_name}'
 
-    @property
-    def snippet(self):
+    def snippet(self, width=200):
         try:
             text = next(
                 field for field in self.body
@@ -197,7 +196,7 @@ class FeaturedPage(DALMEPage):
             return ''
         return textwrap.shorten(
             BSoup(text.value.source, 'html.parser').get_text(),
-            width=300,
+            width=width,
             placeholder=' [...]'
         )
 

@@ -58,6 +58,15 @@
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script>
           $(document).ready(function() {
+            $('body').on('click', '#hamburger', function(e) {
+              const menu = $(e.target).closest('nav').find('ul');
+              if (menu.css('display') === 'none') {
+                menu.css({ display: 'flex' })
+              } else {
+                menu.css({ display: 'none' })
+              }
+            });
+
             // Subsections initialize.
             const subsections = $('.block-subsection');
             $.each(subsections, function(index, value) {

@@ -1,4 +1,4 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load dalme_public_tags wagtailcore_tags wagtailimages_tags %}
 
 {% if featured_object or featured_inventory or featured_essay %}
   <section class="featured u-flex">
@@ -8,14 +8,14 @@
 
         {% if featured_object %}
           <a href="{% pageurl featured_object %}">
-            <div class="monthly source u-flex">
+            <div class="monthly source object u-flex">
               {% if featured_object.main_image %}
-                {% image featured_object.main_image fill-200x200 %}
+                {% image featured_object.main_image fill-225x225 %}
               {% endif %}
               <div class="u-flex">
                 <h3>{{ featured_object.title }}</h3>
                 <h4>Object of the Month</h4>
-                <p>{{ featured_object.snippet }}</p>
+                <p>{% get_snippet featured_object 400 %}</p>
               </div>
             </div>
           </a>
@@ -25,12 +25,12 @@
           <a href="{% pageurl featured_inventory %}">
             <div class="monthly source u-flex">
               {% if featured_inventory.main_image %}
-                {% image featured_inventory.main_image fill-200x200 %}
+                {% image featured_inventory.main_image fill-225x225 %}
               {% endif %}
               <div class="u-flex">
                 <h3>{{ featured_inventory.title }}</h3>
                 <h4>Inventory of the Month</h4>
-                <p>{{ featured_inventory.snippet }}</p>
+                <p>{% get_snippet featured_object 400 %}</p>
               </div>
             </div>
           </a>
@@ -41,13 +41,15 @@
     {% if essay %}
       <div class="monthly essay u-flex">
         {% if essay.main_image %}
-          {% image essay.main_image fill-400x230-c100 %}
+          {% image essay.main_image fill-400x250 %}
         {% endif %}
-        <h4>{{ essay.title }}</h4>
-        <p>{{ essay.snippet }}</p>
-        <button class="u-button">
-          <a href="{% pageurl essay %}">READ MORE</a>
-        </button>
+        <div class="u-flex">
+          <h4>{{ essay.title }}</h4>
+          <p>{% get_snippet essay 300 %}</p>
+          <button class="u-button">
+            <a href="{% pageurl essay %}">READ MORE</a>
+          </button>
+        </div>
       </div>
     {% endif %}
 

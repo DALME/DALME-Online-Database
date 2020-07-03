@@ -1,8 +1,8 @@
 {% load dalme_public_tags wagtailcore_tags %}
 
 {% get_flat_nav as nav %}
-<nav class="secondary">
-  <ul>
+<nav class="secondary flat-nav">
+  <ul class="u-flex">
     {% for tab in nav %}
       <li>
         <a href="{% pageurl tab %}" {% if tab == page %}class="active"{% endif %}>

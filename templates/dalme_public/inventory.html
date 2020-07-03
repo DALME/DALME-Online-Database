@@ -17,19 +17,15 @@
   <div id="app" class="app inventory-detail">
     <nav>
       <ul class="u-flex">
-        <li :id=`diva-${divaId}-zoom-out-button` class="zoom out" @click="handleZoomOut">
-          <i class="fa fa-search-minus" aria-hidden="true"></i>
-        </li>
-
-        <li :id=`diva-${divaId}-zoom-in-button` class="zoom in" @click="handleZoomIn">
-          <i class="fa fa-search-plus" aria-hidden="true"></i>
+        <li class="hamburger" @click="handleFlipView">
+          <i class="fa fa-bars" aria-hidden="true"></i>
         </li>
 
         <li
-          class="pagination previous right"
+          class="pagination next"
           v-bind:class="{ inactive: !hasMultipleFolios }"
-          @click="handleFolioPrevious">
-            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+          @click="handleFolioNext">
+            <i class="fa fa-chevron-right" aria-hidden="true"></i>
         </li>
 
         <li
@@ -40,7 +36,7 @@
             <span>${folioInfo}</span>
             <i v-if="hasMultipleFolios" class="fa fa-chevron-down" aria-hidden="true"></i>
         </li>
-        <ul class="folio-selector" v-if="folioSelect">
+        <ul class="folio-selector u-flex" v-if="folioSelect">
           <template v-for="(folio, index) in sourceData.folios">
             <li v-if="index === folioIndex" :key="index" class="inactive">
               Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})
@@ -52,20 +48,24 @@
         </ul>
 
         <li
-          class="pagination next"
+          class="pagination previous right"
           v-bind:class="{ inactive: !hasMultipleFolios }"
-          @click="handleFolioNext">
-            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+          @click="handleFolioPrevious">
+            <i class="fa fa-chevron-left" aria-hidden="true"></i>
         </li>
 
-        <li class="hamburger" @click="handleFlipView">
-          <i class="fa fa-bars" aria-hidden="true"></i>
+        <li :id=`diva-${divaId}-zoom-in-button` class="zoom in" @click="handleZoomIn">
+          <i class="fa fa-search-plus" aria-hidden="true"></i>
+        </li>
+
+        <li :id=`diva-${divaId}-zoom-out-button` class="zoom out" @click="handleZoomOut">
+          <i class="fa fa-search-minus" aria-hidden="true"></i>
         </li>
 
       </ul>
     </nav>
   </div>
-  <div class="folios vertical-split u-flex">
+  <div class="folios u-flex">
     <section class="folio">
       <div id="diva_viewer"></div>
       <div id="folio-rights" class="folio-rights u-flex"></div>
@@ -79,7 +79,8 @@
   {{ block.super }}
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
+  <!-- <script type="text/javascript" src="{% static 'js/diva.js' %}"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
@@ -87,6 +88,12 @@
 
   <script>
     $(document).ready(function() {
+
+      const splitter = $('div.folios');
+      $(window).width() <= 600
+        ? splitter.addClass('horizontal-split')
+        : splitter.addClass('vertical-split')
+
       const getTitle = (e, tag) => {
         let extent = null;
         let reason = null;
@@ -295,7 +302,8 @@
 
       $('.folio').resizableSafe({
         handleSelector: '#resize-handle',
-        resizeHeight: false,
+        resizeHeight: $('.vertical-split').length ? false : true,
+        resizeWidth: $('.vertical-split').length ? true : false,
         onDragEnd: function() {
           Diva.Events.publish('PanelSizeDidChange');
           window.folio.destroy();

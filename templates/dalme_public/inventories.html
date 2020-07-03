@@ -17,6 +17,10 @@
   <div id="app" class="app inventory-list">
     <nav>
       <ul class="u-flex">
+        <li class="filter right" @click="toggleFilters" v-on-clickaway="hideFilters">
+          <span>Filter</span>
+          <i class="fa fa-sort" aria-hidden="true"></i>
+        </li>
         <li class="search">
           <input
             type="search"
@@ -24,10 +28,6 @@
             v-model="search"
             :value="search"
           >
-        </li>
-        <li class="filter right" @click="toggleFilters" v-on-clickaway="hideFilters">
-          <span>Filter</span>
-          <i class="fa fa-sort" aria-hidden="true"></i>
         </li>
         <div class="filter-panel" v-if="showFilters">
           <form method="get" class="filter-form u-flex">
@@ -91,7 +91,7 @@
       <p v-if="spinner">Fetching sources...</p>
       <template v-else>
         <p v-if="noResults">No inventories found.</p>
-        <div v-else class="u-grid">
+        <div v-else class="u-grid inventories">
           <span class="heading">
             <strong @click="toggleNameOrder" >Name</strong>
           </span>
@@ -105,13 +105,13 @@
           <span class="heading"></span>
 
           <template v-for="(inventory, index) in inventories" :key="index">
-            <span>
+            <span class="inventory-field">
               <a :href="inventoryUrl(inventory)">${inventory.name}</a>
               <span class="short-name">${inventory.short_name}</span>
             </span>
-            <span>${inventory.record_type}</span>
-            <span>${inventory.date}</span>
-            <span class="icons">
+            <span class="inventory-field">${inventory.record_type}</span>
+            <span class="inventory-field">${inventory.date}</span>
+            <span class="inventory-field icons">
               <i v-if="inventory.has_images" class="fas fa-pen-nib"></i>
               <i v-if="inventory.has_transcriptions" class="fas fa-camera"></i>
             </span>

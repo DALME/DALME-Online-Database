@@ -102,12 +102,23 @@ def get_inventory_nav():
     )[:3])
 
 
-@register.simple_tag
-def get_header_image_styles(header_image):
-    colour = 'rgba(59, 103, 130, 0.6)'
-    gradient = f'linear-gradient({colour}, {colour})'
-    background = f'{gradient}, url({header_image.url})'
-    return f'background: {background}; background-size: cover;'
+@register.simple_tag(takes_context=True)
+def get_header_image_styles(context, header_image):
+    gradients = {
+        'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',
+        'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(58, 74, 60, 1) 100%',  # noqa
+        'features': '125deg, rgba(99, 98, 58, 0.7) 0%, rgba(80, 41, 43, 1) 100%',  # noqa
+        'collections': '125deg, rgba(95, 81, 111, 0.7) 0%, rgba(23, 62, 101, 1) 100%',  # noqa
+        'about': '125deg, rgba(155, 149, 76, 0.7) 0%, rgba(63, 73, 54, 1) 100%',  # noqa
+        'generic': '59deg, #11587c 54.62%, #1b1b1b',
+    }
+    key = context['page'].slug
+    if key not in gradients.keys():
+        key = context['page'].get_parent().slug
+    value = gradients.get(key, gradients['generic'])
+    gradient = f'linear-gradient({value})'
+    background_image = f'background-image: {gradient}, url({header_image.url})'
+    return f'{background_image}; background-size: cover; width: 100%;'
 
 
 @register.simple_tag(takes_context=True)
@@ -204,3 +215,8 @@ def get_recent_essays():
 def collection_date_range(collection):
     years = sorted(collection.source_set.get_time_coverage.keys())
     return f'{years[0]} - {years[-1]}'
+
+
+@register.simple_tag()
+def get_snippet(obj, width):
+    return obj.snippet(width)

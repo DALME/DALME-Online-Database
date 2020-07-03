@@ -109,7 +109,7 @@
         const popup = $('body').find('#popup-histogram');
         if (!popup.length) {
           const title = 'Records per year';
-          $('main > article').append(
+          $('#histogram').after(
             '<div id="popup-histogram" class="popup-histogram"></div>'
           );
           renderHistogram('#popup-histogram', 400, 150, '#56c1fe', title, 20);

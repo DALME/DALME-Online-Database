@@ -2,10 +2,13 @@
 
 {% get_nav as nav %}
 <nav class="primary u-flex">
-  <div class="home">
-    <a href="{% pageurl nav.0 %}">DALME</a>
+  <div class="u-flex">
+    <div class="home">
+      <a href="{% pageurl nav.0 %}">DALME</a>
+    </div>
+    <i id="hamburger" class="fa fa-bars hamburger"></i>
   </div>
-  <ul>
+  <ul class="u-flex">
     {% for tab in nav %}
       <li>
         {% if forloop.counter == 1 %}
