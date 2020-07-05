@@ -4,7 +4,8 @@ are used to more easily associate common data points with those models, things l
 timestamps and unique IDs.
 """
 from django.db import models
-from dalme_app.middleware import get_current_username
+from django.contrib.auth.models import User
+from dalme_app.utils import (get_current_username, get_current_user)
 import uuid
 
 

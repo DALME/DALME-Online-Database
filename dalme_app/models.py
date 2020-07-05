@@ -3,7 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
-from dalme_app.middleware import get_current_user, get_current_username
+from dalme_app.utils import get_current_user, get_current_username
 import os
 import json
 import requests
