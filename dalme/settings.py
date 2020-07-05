@@ -3,10 +3,12 @@ import dj_database_url
 import elasticsearch
 from requests_aws4auth import AWS4Auth
 from django.contrib.messages import constants as messages
+import saml2
+from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
+from saml2.sigver import get_xmlsec_binary
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 AWS_ACCESS_ID = os.environ.get('AWS_ACCESS_ID', '')
@@ -16,6 +18,9 @@ AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+
+SAML_CERT = os.environ.get('SAML_CERT', '')
+SAML_KEY = os.environ.get('SAML_KEY', '')
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
 EMAIL_PORT = 587
@@ -37,9 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'haystack',
+    'djangosaml2idp',
     'django_celery_results',
     'rest_framework',
-    'oidc_provider',
     'storages'
 ]
 
@@ -50,11 +55,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'dalme_app.middleware.CurrentUserMiddleware',
+    'dalme_app.utils.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'dalme_app.middleware.AsyncMiddleware',
+    'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'oidc_provider.middleware.SessionManagementMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'
@@ -89,14 +93,46 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
-OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
-OIDC_IDTOKEN_INCLUDE_CLAIMS = True
-OIDC_SESSION_MANAGEMENT_ENABLE = True
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 
-DATABASE_ROUTERS = ['dalme_app.db_routers.ModelDatabaseRouter']
+SAML_IDP_CONFIG = {
+    'xmlsec_binary': get_xmlsec_binary(['/opt/local/bin', '/usr/bin/xmlsec1']),
+    'entityid': 'https://db.dalme.org/idp/metadata',
+    'description': 'DALME SAML IDP Setup',
+    'service': {
+        'idp': {
+            'name': 'DALME SAML Identity Provider',
+            'endpoints': {
+                'single_sign_on_service': [
+                    ('https://db.dalme.org/idp/sso/post/', saml2.BINDING_HTTP_POST),
+                    ('https://db.dalme.org/idp/sso/redirect/', saml2.BINDING_HTTP_REDIRECT),
+                ],
+                "single_logout_service": [
+                    ("https://db.dalme.org/idp/slo/post/", saml2.BINDING_HTTP_POST),
+                    ("https://db.dalme.org/idp/slo/redirect/", saml2.BINDING_HTTP_REDIRECT)
+                ],
+            },
+            'name_id_format': [NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED],
+            'sign_response': True,
+            'sign_assertion': True,
+            'want_authn_requests_signed': False,
+        },
+    },
+
+    # Signing
+    'key_file': SAML_KEY,
+    'cert_file': SAML_CERT,
+    # Encryption
+    'encryption_keypairs': [{
+        'key_file': SAML_KEY,
+        'cert_file': SAML_CERT,
+    }],
+    'valid_for': 365 * 24,
+}
+
+DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

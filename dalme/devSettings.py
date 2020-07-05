@@ -1,16 +1,11 @@
-"""
-For more information on this file, see
-https://docs.djangoproject.com/en/1.10/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.10/ref/settings/
-"""
-
 import os
 import dj_database_url
 import elasticsearch
 from requests_aws4auth import AWS4Auth
 from django.contrib.messages import constants as messages
+import saml2
+from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
+from saml2.sigver import get_xmlsec_binary
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -65,9 +60,10 @@ INSTALLED_APPS = [
     #'debug_toolbar',
     #'crispy_forms',
     #'oauth2_provider',
+    'djangosaml2idp',
     'corsheaders',
     'rest_framework',
-    'oidc_provider',
+    #'oidc_provider',
     'storages'
 ]
 
@@ -81,11 +77,11 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'dalme_app.middleware.CurrentUserMiddleware',
+    'dalme_app.utils.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'dalme_app.middleware.AsyncMiddleware',
+    'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'oidc_provider.middleware.SessionManagementMiddleware',
+    #'oidc_provider.middleware.SessionManagementMiddleware',
     #'django.middleware.locale.LocaleMiddleware'
 ]
 
@@ -126,16 +122,16 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
-OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
-OIDC_IDTOKEN_INCLUDE_CLAIMS = True
-OIDC_SESSION_MANAGEMENT_ENABLE = True
+#OIDC_USERINFO = 'dalme_app.utils.oidc_userinfo'
+#OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+#OIDC_SESSION_MANAGEMENT_ENABLE = True
 #authentication settings
 #LOGIN_URL = '/accounts/login/dalme_wp/'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 #LOGIN_REDIRECT_URL = 'https://db.dalme.org'
-
+BASE_URL = 'https://127.0.0.1.xip.io:8443/idp'
 #SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # Database
@@ -145,8 +141,44 @@ LOGOUT_REDIRECT_URL = 'https://dalme.org'
 #     'SCOPES': {'read': 'Read scope', 'write': 'Write scope'}
 # }
 
+SAML_IDP_CONFIG = {
+    'debug': DEBUG,
+    'xmlsec_binary': get_xmlsec_binary(['/opt/local/bin', '/usr/bin/xmlsec1']),
+    'entityid': '%s/metadata' % BASE_URL,
+    'description': 'DALME SAML Identity Provider Setup',
+    'service': {
+        'idp': {
+            'name': 'DALME SAML Identity Provider',
+            'endpoints': {
+                'single_sign_on_service': [
+                    ('https://127.0.0.1.xip.io:8443/idp/sso/post/', saml2.BINDING_HTTP_POST),
+                    ('https://127.0.0.1.xip.io:8443/idp/sso/redirect/', saml2.BINDING_HTTP_REDIRECT),
+                ],
+                "single_logout_service": [
+                    ("https://127.0.0.1.xip.io:8443/idp/slo/post/", saml2.BINDING_HTTP_POST),
+                    ("https://127.0.0.1.xip.io:8443/idp/slo/redirect/", saml2.BINDING_HTTP_REDIRECT)
+                ],
+            },
+            'name_id_format': [NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED],
+            'sign_response': True,
+            'sign_assertion': True,
+            'want_authn_requests_signed': False,
+        },
+    },
 
-DATABASE_ROUTERS = ['dalme_app.db_routers.ModelDatabaseRouter']
+    # Signing
+    'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
+    'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
+    # Encryption
+    'encryption_keypairs': [{
+        'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
+        'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
+    }],
+    'valid_for': 365 * 24,
+}
+
+
+DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
 
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
@@ -247,7 +279,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
 }
 
 
@@ -315,7 +347,14 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/django/dalme_app.log'
         },
+        # 'console': {
+        #     'class': 'logging.StreamHandler',
+        # },
     },
+    # 'root': {
+    #    'handlers': ['console'],
+    #    'level': 'DEBUG',
+    # },
     'loggers': {
         'django': {
             'handlers': ['file'],
@@ -345,6 +384,9 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'error',
 }
+
+
+
 
 #django-crispy_forms settings
 #CRISPY_TEMPLATE_PACK = 'bootstrap4'
