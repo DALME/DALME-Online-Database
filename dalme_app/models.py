@@ -173,7 +173,7 @@ class Source(dalmeUuid):
     def is_public(self):
         try:
             return self.workflow.is_public
-        except:
+        except Workflow.DoesNotExist:
             return False
 
     @property
@@ -223,7 +223,12 @@ class Source(dalmeUuid):
     def get_credit_line(self):
         try:
             editor = User.objects.get(username=self.creation_username).profile.full_name
-            contributors = [i.user.profile.full_name for i in self.workflow.work_log.all() if i.user.profile.full_name != editor]
+            contributors = [i.user.profile.full_name for i in self.workflow.work_log.all()]
+            tr_cr = [User.objects.get(username=i.creation_username).profile.full_name for i in self.source_pages.all().select_related('transcription')]
+            contributors = contributors + tr_cr
+            tr_mod = [User.objects.get(username=i.modification_username).profile.full_name for i in self.source_pages.all().select_related('transcription')]
+            contributors = contributors + tr_mod
+            contributors = [i for i in contributors if i != editor]
             if len(contributors) == 0:
                 credit_line = 'Edited by {}.'.format(editor)
             elif len(contributors) == 1:
@@ -527,7 +532,7 @@ class Set(dalmeUuid):
     is_public = models.BooleanField(default=False)
     has_landing = models.BooleanField(default=False)
     endpoint = models.CharField(max_length=55)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
+    owner_local = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
     set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
     description = models.TextField()
     comments = GenericRelation('Comment')

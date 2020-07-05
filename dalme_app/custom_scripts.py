@@ -5,7 +5,7 @@ import re
 import os
 import json
 import pandas as pd
-from dalme_app.models import Page, AttributeReference, LanguageReference, Attribute, Transcription, Source, Attribute_type, DT_fields, Tag, Task, Workflow, Work_log, Set, Set_x_content, RightsPolicy
+from dalme_app.models import *
 from datetime import date
 from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
@@ -44,6 +44,11 @@ def get_script_menu():
         {
             "name": "replace_in_transcription",
             "description": "Search and replace in transcriptions.",
+            "type": "danger"
+        },
+        {
+            "name": "fix_workflow",
+            "description": "Ensures that there is a workflow record for every source with a list.",
             "type": "danger"
         },
         {
@@ -148,6 +153,18 @@ def import_languages(request):
     return 'okay'
 
 
+def fix_workflow(request):
+    inventories = Source.objects.filter(has_inventory=True)
+    lst = []
+    lst.append(inventories.count())
+    for i in inventories:
+        try:
+            lst.append(i.workflow.wf_status)
+        except Workflow.DoesNotExist:
+            lst.append(i.id)
+    return lst
+
+
 def test_expression(request):
     inventories = Source.objects.filter(type=13)
     count = 0
@@ -182,12 +199,19 @@ def test_expression(request):
 def test_expression2(request):
     # Authority = 128
     # Format = 129
-    for row in Attribute.objects.filter(attribute_type__in=[128, 129]).reverse():
-        if Attribute.objects.filter(object_id=row.object_id, attribute_type=row.attribute_type).count() > 1:
-            row.delete()
-    return 'done'
+    # for row in Attribute.objects.filter(attribute_type__in=[128, 129]).reverse():
+    #     if Attribute.objects.filter(object_id=row.object_id, attribute_type=row.attribute_type).count() > 1:
+    #         row.delete()
 
-
+    records = Attribute_type.objects.all()
+    for s in records:
+        c_user = User.objects.get(username=s.creation_username)
+        m_user = User.objects.get(username=s.modification_username)
+        s.creation_user = c_user
+        s.owner = c_user
+        s.modification_user = m_user
+        s.save()
+    return 'Done'
 
 # REMOVE DUPLICATES
 # def test_expression2(request):
@@ -229,7 +253,7 @@ def test_expression2(request):
     # eps = [i.transcription.entity_phrases.filter(content_type=115) for i in result]
     # eps = [i.transcription.entity_phrases.filter(content_type=104) for i in record.source_pages.all().select_related('transcription')]
     # result2 = eps[0].union(*eps[1:])
-    #return record.agents[0].relations.all()[0].target_object.std_name
+    # return record.agents[0].relations.all()[0].target_object.std_name
     # record = Page.objects.get(pk='44c79e6a8a4b4b50aa7a1b9d6bb61134')
     # pol = record.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR
     # pol2 = json.loads(pol)['id']
@@ -237,6 +261,7 @@ def test_expression2(request):
     # # return model_to_dict(rights_obj, fields=['rights_status', 'notice_display', 'rights_notice'])
     # ret_dict = {'status': rights_obj.get_rights_status_display(), 'display_notice': rights_obj.notice_display, 'notice': json.loads(rights_obj.rights_notice)}
     # return record.get_rights()['notice']['@ita']
+
 
 def replace_in_transcription(request):
     inventories = Source.objects.filter(type=13, short_name__contains='FF 1009', creation_username='pizzorno', modification_username='pizzorno')

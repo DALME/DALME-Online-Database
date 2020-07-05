@@ -29,6 +29,8 @@ from django.shortcuts import get_object_or_404
 from passlib.apps import phpass_context
 from dalme_app import functions
 from django.utils import timezone
+from dalme_app.access_policies import SourceAccessPolicy
+from dalme_app.utils import IsOwnerOrReadOnly
 
 
 class Datasets(viewsets.ViewSet):
@@ -88,7 +90,9 @@ class WorkflowManager(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'])
     def change_state(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        #object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        #self.check_object_permissions(request, object)
+        object = self.get_object()
         try:
             action = self.request.POST['action']
             stage_dict = dict(Workflow.PROCESSING_STAGES)
@@ -177,7 +181,12 @@ class WorkflowManager(viewsets.ModelViewSet):
 class DTViewSet(viewsets.ModelViewSet):
     """ Generic viewset for managing communication with DataTables.
     Should be subclassed for specific API endpoints. """
-    permission_classes = (DjangoModelPermissions,)
+
+    @action(detail=True, methods=['post'])
+    def has_permission(self, request, pk=None):
+        object = self.get_object()
+        self.check_object_permissions(self.request, object)
+        return Response(200)
 
     @action(detail=False)
     def get_set(self, request, *args, **kwargs):
@@ -239,10 +248,10 @@ class DTViewSet(viewsets.ModelViewSet):
                 data_dict['error'] = 'The following error occured while trying to serialize the data: ' + str(e)
         return Response(data_dict)
 
-    def retrieve(self, request, pk=None):
-        object = get_object_or_404(self.queryset, pk=pk)
-        serializer = self.get_serializer(object)
-        return Response(serializer.data)
+    # def retrieve(self, request, pk=None):
+    #     object = get_object_or_404(self.queryset, pk=pk)
+    #     serializer = self.get_serializer(object)
+    #     return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         result = {}
@@ -269,7 +278,9 @@ class DTViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         result = {}
         partial = kwargs.pop('partial', False)
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
         serializer = self.get_serializer(object, data=data_dict, partial=partial)
@@ -293,6 +304,7 @@ class DTViewSet(viewsets.ModelViewSet):
                 object_ids = [kwargs.get('pk')]
             for obj in object_ids:
                 object = get_object_or_404(self.queryset, pk=obj)
+                self.check_object_permissions(request, object)
                 try:
                     object.delete()
                     result['result'] = 'success'
@@ -345,35 +357,30 @@ class DTViewSet(viewsets.ModelViewSet):
 
 class AsynchronousTasks(DTViewSet):
     """ API endpoint for managing asynchronous tasks """
-    permission_classes = (DjangoModelPermissions,)
     queryset = TaskResult.objects.all()
     serializer_class = AsyncTaskSerializer
 
 
 class Countries(DTViewSet):
     """ API endpoint for managing countries """
-    permission_classes = (DjangoModelPermissions,)
     queryset = CountryReference.objects.all()
     serializer_class = CountrySerializer
 
 
 class Cities(DTViewSet):
     """ API endpoint for managing cities """
-    permission_classes = (DjangoModelPermissions,)
     queryset = CityReference.objects.all()
     serializer_class = CitySerializer
 
 
 class Rights(DTViewSet):
     """ API endpoint for managing rights policies """
-    permission_classes = (DjangoModelPermissions,)
     queryset = RightsPolicy.objects.all()
     serializer_class = RightsSerializer
 
 
 class AttributeTypes(DTViewSet):
     """ API endpoint for managing attribute types """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Attribute_type.objects.all()
     serializer_class = AttributeTypeSerializer
 
@@ -396,21 +403,18 @@ class AttributeTypes(DTViewSet):
 
 class Attributes(DTViewSet):
     """ API endpoint for managing attributes """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Attribute.objects.all().order_by('attribute_type')
     serializer_class = SimpleAttributeSerializer
 
 
 class ContentClasses(DTViewSet):
     """ API endpoint for managing content classes """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Content_class.objects.all()
     serializer_class = ContentClassSerializer
 
 
 class ContentTypes(DTViewSet):
     """ API endpoint for managing content types """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Content_type.objects.all()
     serializer_class = ContentTypeSerializer
 
@@ -445,7 +449,9 @@ class ContentTypes(DTViewSet):
     def update(self, request, *args, **kwargs):
         result = {}
         partial = kwargs.pop('partial', False)
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
         attribute_types = data_dict.pop('attribute_types', None)
@@ -482,14 +488,12 @@ class ContentTypes(DTViewSet):
 
 class DTFields(DTViewSet):
     """ API endpoint for managing DataTables list field attributes """
-    permission_classes = (DjangoModelPermissions,)
     queryset = DT_fields.objects.all()
     serializer_class = DTFieldsSerializer
 
 
 class DTLists(DTViewSet):
     """ API endpoint for managing DataTables lists """
-    permission_classes = (DjangoModelPermissions,)
     queryset = DT_list.objects.all()
     serializer_class = DTListsSerializer
 
@@ -533,7 +537,9 @@ class DTLists(DTViewSet):
     def update(self, request, *args, **kwargs):
         result = {}
         partial = kwargs.pop('partial', False)
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
         fields = data_dict.pop('fields', None)
@@ -591,7 +597,6 @@ class DTLists(DTViewSet):
 
 class Images(DTViewSet):
     """ API endpoint for managing DAM images """
-    permission_classes = (DjangoModelPermissions,)
     queryset = rs_resource.objects.filter(resource_type=1, archive=0, ref__gte=0)
     serializer_class = RSImageSerializer
     search_dict = {'collections': 'collections__name'}
@@ -678,7 +683,9 @@ class Images(DTViewSet):
     def update(self, request, *args, **kwargs):
         result = {}
         partial = kwargs.pop('partial', False)
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
         collections = data_dict.pop('collections', None)
@@ -716,14 +723,12 @@ class Images(DTViewSet):
 
 class Languages(DTViewSet):
     """ API endpoint for managing languages """
-    permission_classes = (DjangoModelPermissions,)
     queryset = LanguageReference.objects.all()
     serializer_class = LanguageSerializer
 
 
 class Options(viewsets.ViewSet):
     """ API endpoint for generating data for options in the UI """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Set.objects.none()
 
     def list(self, request, *args, **kwargs):
@@ -840,14 +845,15 @@ class Options(viewsets.ViewSet):
 
 class Pages(DTViewSet):
     """ API endpoint for managing pages """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Page.objects.all()
     serializer_class = PageSerializer
 
     @action(detail=True, methods=['post', 'get'])
     def get_rights(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         try:
             result['rights'] = object.get_rights()
             status = 201
@@ -859,7 +865,7 @@ class Pages(DTViewSet):
 
 class Sources(DTViewSet):
     """ API endpoint for managing sources """
-    permission_classes = (DjangoModelPermissions,)
+    permission_classes = (SourceAccessPolicy, IsOwnerOrReadOnly,)
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
     display_fields = ['name', 'type', 'parent']
@@ -867,7 +873,9 @@ class Sources(DTViewSet):
     @action(detail=True, methods=['patch'])
     def change_description(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         try:
             action = self.request.POST['action']
             desc_text = self.request.POST['description']
@@ -935,7 +943,9 @@ class Sources(DTViewSet):
     def update(self, request, *args, **kwargs):
         result = {}
         partial = kwargs.pop('partial', False)
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
         validated_extra = self.validate_extra(data_dict.pop('attributes', None), data_dict.pop('pages', None))
@@ -1180,14 +1190,15 @@ class Sources(DTViewSet):
 
 class Tasks(DTViewSet):
     """ API endpoint for managing tasks """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         try:
             action = self.request.POST['action']
             if action == 'mark_done':
@@ -1240,14 +1251,15 @@ class Comments(viewsets.ModelViewSet):
 
 class Tickets(DTViewSet):
     """ API endpoint for managing issue tickets """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
         result = {}
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         try:
             action = self.request.POST['action']
             if action == 'Close':
@@ -1295,7 +1307,6 @@ class Tickets(DTViewSet):
 
 class TaskLists(DTViewSet):
     """ API endpoint for managing tasks lists """
-    permission_classes = (DjangoModelPermissions,)
     queryset = TaskList.objects.all().annotate(task_count=Count('task'))
     serializer_class = TaskListSerializer
 
@@ -1375,7 +1386,6 @@ class Transcriptions(viewsets.ModelViewSet):
 
 class Users(DTViewSet):
     """ API endpoint for managing users """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
@@ -1430,7 +1440,9 @@ class Users(DTViewSet):
     def update(self, request, *args, **kwargs):
         result = {}
         partial = kwargs.pop('partial', False)
-        object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
+        object = self.get_object()
         display_fields = ['dam_usergroup', 'wp_role']
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
@@ -1499,7 +1511,6 @@ class Users(DTViewSet):
 
 class Sets(DTViewSet):
     """ API endpoint for managing sets """
-    permission_classes = (DjangoModelPermissions,)
     queryset = Set.objects.all()
     serializer_class = SetSerializer
 
@@ -1514,10 +1525,11 @@ class Sets(DTViewSet):
             new_members = []
             for i in members:
                 source_object = Source.objects.get(pk=i)
-                new_entry = Set_x_content()
-                new_entry.set_id = object
-                new_entry.content_object = source_object
-                new_members.append(new_entry)
+                if not Set_x_content.objects.filter(set_id=set_id, object_id=source_object).exists():
+                    new_entry = Set_x_content()
+                    new_entry.set_id = object
+                    new_entry.content_object = source_object
+                    new_members.append(new_entry)
             Set_x_content.objects.bulk_create(new_members)
             result['message'] = 'Action succesful.'
             status = 201

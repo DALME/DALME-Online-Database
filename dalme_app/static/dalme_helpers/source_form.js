@@ -6,6 +6,21 @@ function source_form() {
           source_editor.hide(['parent.value', 'has_inventory']);
           source_editor.on('open.dalme', function(e, mode, action) { change_form(e, action) });
           source_editor.on('close.dalme', function(e) { change_form(e) });
+          source_editor.on('initEdit', function(e, node, data, items, type) {
+              return new Promise(function (resolve, reject) {
+                  $.ajax({
+                      method: "POST",
+                      url: "/api/sources/" + data.id + "/has_permission/",
+                      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+                  }).done(function(data, textStatus, jqXHR) {
+                      resolve();
+                  }).fail(function(jqXHR, textStatus, errorThrown) {
+                      source_editor.on('preOpen', function(e, mode, action) { return false });
+                      toastr.error(jqXHR.responseJSON.detail);
+                      resolve();
+                  });
+              });
+          });
     }, 'json');
   } else if (dt_table.ajax.url().split("/")[2] == 'images') {
       $.get("/api/options/?target=content_types_opt,content_types_0,parent_sources_13&format=json", function (option_data) {
@@ -72,7 +87,8 @@ function source_form() {
               source_editor.on('open.dalme', function( e, mode, action ) { change_form(e, action) });
               source_editor.on('close.dalme', function( e ) { change_form(e) });
           }, 'json');
-      }
+      };
+      change_form('open');
 }
 
 function change_form(e, action) {
@@ -87,9 +103,17 @@ function change_form(e, action) {
       $('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-10');
       if (action == 'edit') {
           source_editor.on('submitSuccess', function(e, json, data, action) { toastr.success('The source was updated succesfully.') });
+          source_editor.on('submitUnsuccessful', function(e, json) {
+              source_editor.close();
+              toastr.error(json.detail)
+          });
           init_editor()
       } else if (action == 'create') {
           source_editor.on('submitSuccess', function(e, json, data, action) { toastr.success('The source was created succesfully.') });
+          source_editor.on('submitUnsuccessful', function(e, json) {
+              source_editor.close();
+              toastr.error(json.detail)
+          });
       };
       source_editor.field('type.value').input().on('change.dalme', change_on_type);
   } else if (e.type == 'close') {
