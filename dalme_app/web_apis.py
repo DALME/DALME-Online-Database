@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from dalme_app.web_serializers import (RecordSerializer, CollectionSerializer)
-from dalme_app.models import (Source, Set, Set_x_content)
+from dalme_app.models import (Source, Set)
 from rest_framework.permissions import DjangoModelPermissions
 from django.db.models import Q, Count
 from rest_framework.response import Response
@@ -38,7 +38,7 @@ class Collections(viewsets.ModelViewSet):
                 'data': object.get_public_member_count
             })
             data.append({
-                'label': 'Languages',
+                'label': 'Language(s)',
                 'type': 'pill',
                 'data': object.get_languages
             })
@@ -52,13 +52,8 @@ class Collections(viewsets.ModelViewSet):
                 'type': 'text',
                 'data': 'Extensive range, with numerous inventories of artisans and low-status individuals.'
             })
-
-
             result['data'] = data
             status = 201
-
-
-
         except Exception as e:
             result['error'] = str(e)
             status = 400

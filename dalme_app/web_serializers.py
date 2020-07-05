@@ -1,10 +1,8 @@
-from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
-                              DT_list, DT_fields, Page, Source, TaskList, Task, wiki_user_groups,
-                              rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              CountryReference, CityReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy, Set_x_content)
+from dalme_app.models import (Source, Attribute, Set, Set_x_content)
 from rest_framework import serializers
 from dalme_app import functions
 import json
+import random
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -16,6 +14,8 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         label = instance.attribute_type.short_name
+        if label == 'language':
+            label = label + '_' + str(random.randint(0, 99))
         if instance.attribute_type.data_type == 'UUID':
             data = json.loads(instance.value_STR)
             object = eval('{}.objects.get(pk="{}")'.format(data['class'], data['id']))
