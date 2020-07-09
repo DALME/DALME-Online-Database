@@ -827,6 +827,9 @@ i.inactive {
 .app nav li:not(:last-child) {
   border-right: 1px solid #6b6b6b;
 }
+.app nav li.zoom.out {
+  border-right: 1px solid #6b6b6b;
+}
 .app nav .folio-selector li {
   border-right: none;
 }
