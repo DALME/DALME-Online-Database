@@ -824,8 +824,11 @@ i.inactive {
 .app nav li.search {
   cursor: text;
 }
-.app nav li:not(:last-child) {
+.app nav li:not(:first-child) {
   border-right: 1px solid #6b6b6b;
+}
+.app nav li.pagination.next {
+  border-right: 0;
 }
 .app nav li.zoom.out {
   border-right: 1px solid #6b6b6b;
@@ -1582,6 +1585,10 @@ div.description[data-collapsed='true'] {
   }
   .app.inventory-detail .hamburger {
     display: list-item;
+  }
+
+  .app nav li.pagination.next {
+    border-right: 1px solid #6b6b6b;
   }
 
   .filter-panel {
