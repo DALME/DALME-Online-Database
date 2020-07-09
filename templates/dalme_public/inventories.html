@@ -106,8 +106,9 @@
 
           <template v-for="(inventory, index) in inventories" :key="index">
             <span class="inventory-field">
-              <a :href="inventoryUrl(inventory)">${inventory.name}</a>
-              <span class="short-name">${inventory.short_name}</span>
+              <a :href="inventoryUrl(inventory)">
+                ${inventory.name}<span class="short-name"> ${inventory.short_name}</span>
+              </a>
             </span>
             <span class="inventory-field">${inventory.record_type}</span>
             <span class="inventory-field">${inventory.date}</span>
