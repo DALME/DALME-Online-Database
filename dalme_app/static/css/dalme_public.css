@@ -278,7 +278,7 @@ header hgroup {
   text-shadow: 0 0 12pt rgba(0, 0, 0, 0.6);
 }
 header .title {
-  padding: 2rem;
+  padding: 1rem;
 }
 header .title h1, header .title h2, header .title span {
   text-shadow: 0 0 12pt rgba(0, 0, 0, 0.6);
@@ -995,7 +995,7 @@ section.transcription {
   background: #fff;
   border: 1px solid #6b6b6b;
   margin-top: 3rem;
-  padding: 2rem;
+  padding: 1rem;
   position: absolute;
   width: 100%;
   z-index: 2;
@@ -1383,6 +1383,9 @@ div.description[data-collapsed='true'] {
     transform: translate(0, -4.25rem);
   }
 
+  header .title {
+    padding: 2rem;
+  }
   header .title h2 {
     display: block;
   }
@@ -1604,6 +1607,7 @@ div.description[data-collapsed='true'] {
   .filter-panel {
     border-radius: 0.5rem;
     box-shadow: 0 0 5px #7b7b7b;
+    padding: 2rem;
   }
   .folio-selector:before,
   .folio-selector:after,
