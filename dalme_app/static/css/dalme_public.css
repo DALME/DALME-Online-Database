@@ -1553,7 +1553,7 @@ div.description[data-collapsed='true'] {
   main.object .content,
   main.inventory > .content,
   main.essay > .content {
-    padding: 0 1rem 4rem 1rem;
+    padding: 0 3rem 4rem 3rem;
   }
 
   .metadata {
