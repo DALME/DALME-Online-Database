@@ -131,8 +131,8 @@ def get_source_details(context):
         data = RecordSerializer(source).data
         name = data['name']
         short_name = data['short_name']
-        date = data['date']
-        city = data['city']
+        date = data.get('date')
+        city = data.get('city')
 
     url = None
     if source and source_set:
