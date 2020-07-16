@@ -1324,6 +1324,27 @@ nav.secondary.features-filter ul {
   text-align: center;
 }
 
+/* TEI */
+section.transcription {
+  overflow-x: auto;
+}
+tei-text > tei-body {
+  white-space: pre;
+}
+tei-quote {
+  white-space: normal;
+}
+tei-hi[rend=indent1] {
+  padding-left: 1em;
+}
+tei-hi[rend=underline] {
+  text-decoration: underline;
+}
+tei-hi[rend=center] {
+  display: block;
+  text-align: center;
+}
+
 /* 3rd Party Overrides */
 div.diva-outer {
   background: #2d2d2d;
@@ -1331,9 +1352,6 @@ div.diva-outer {
 }
 div.diva-wrapper {
   min-height: 60vh;
-}
-tei-TEI {
-  display: flex;
 }
 input.vs__search {
   display: none;
