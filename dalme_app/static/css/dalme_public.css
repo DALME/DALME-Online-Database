@@ -1410,6 +1410,9 @@ div.description[data-collapsed='true'] {
   header.home .title {
     display: flex;
   }
+  header .description p {
+    margin-right: 5rem;
+  }
 
   .statement  {
     display: block;
