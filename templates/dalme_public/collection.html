@@ -43,10 +43,16 @@
 
 {% block js_foot %}
   {{ block.super }}
+  {{ page.url|json_script:"page-url" }}
+  {{ page.pk|json_script:"page-pk" }}
   {{ page.stats.coverage|json_script:"histogram-stats" }}
   <script src="https://d3js.org/d3.v4.js"></script>
   <script>
     $(document).ready(function() {
+      const pageData = {
+        url: JSON.parse(document.getElementById('page-url').textContent),
+        pk: JSON.parse(document.getElementById('page-pk').textContent),
+      }
       const getData = () => JSON.parse(
         document.getElementById('histogram-stats').textContent
       );
@@ -57,14 +63,13 @@
         const margin = { top: 0, right: 0, bottom: bottom, left: 0 },
             width = w - margin.left - margin.right,
             height = h - margin.top - margin.bottom;
-
+        const translation = 'translate(' + margin.left + ',' + margin.top + ')';
         const svg = d3.select(nodeId)
           .append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
           .append('g')
-            .attr('transform',
-                  'translate(' + margin.left + ',' + margin.top + ')');
+            .attr('transform', translation);
         svg.append('text')
           .attr('x', 0)
           .attr('y', 10)
@@ -94,15 +99,33 @@
         svg.append('g')
           .call(d3.axisLeft(y));
 
-        svg.selectAll('histogram')
-          .data(data)
-          .enter()
-          .append('rect')
-            .attr('x', function(d) { return x(d.year); })
-            .attr('y', function(d) { return y(d.count); })
-            .attr('width', x.bandwidth())
-            .attr('height', function(d) { return height - y(d.count); })
-            .attr('fill', fill)
+        const collectionURL = `${pageData.url}inventories/?collection=${ pageData.pk }`;
+        if ($('body').find('#popup-histogram').length) {;
+          svg.selectAll('histogram')
+            .data(data)
+            .enter()
+            .append('a')
+              .attr('xlink:href', function(d) {
+                return `${collectionURL}&date_range=${d.year}%2C${d.year}`
+              })
+              .append('rect')
+                .attr('x', function(d) { return x(d.year); })
+                .attr('y', function(d) { return y(d.count); })
+                .attr('width', x.bandwidth())
+                .attr('height', function(d) { return height - y(d.count); })
+                .attr('fill', fill)
+        } else {
+          svg.selectAll('histogram')
+            .data(data)
+            .enter()
+            .append('rect')
+              .attr('x', function(d) { return x(d.year); })
+              .attr('y', function(d) { return y(d.count); })
+              .attr('width', x.bandwidth())
+              .attr('height', function(d) { return height - y(d.count); })
+              .attr('fill', fill)
+        }
+
         };
 
       $('body').on('click', '#histogram', function() {
@@ -117,6 +140,24 @@
           popup.remove();
         }
       });
+
+      $('body').on('mouseenter', '.popup-histogram a rect', function() {
+        const link = $(this).closest('a');
+        const year = link.attr('href').split('%2C').pop();
+        d3.select('.popup-histogram > svg > g')
+          .insert('text')
+          .text(year)
+          .attr('id', 'year-zoom')
+          .attr('x', 0)
+          .attr('y', 40)
+          .attr('style', 'font-size: 24px; fill: rgb(168, 168, 168);');
+      });
+
+      $('body').on('mouseleave', '.popup-histogram a rect', function() {
+        if ($('#year-zoom').length) {
+          $('#year-zoom').remove();
+        }
+      })
 
       renderHistogram('#histogram', 150, 40, '#d6d5d5');
     });

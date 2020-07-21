@@ -1,3 +1,4 @@
+import calendar
 import itertools
 
 from django.db.models import OuterRef, Subquery
@@ -64,6 +65,8 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.extra['choices'] += [
+            ('name', 'Name'),
+            ('-name', 'Name (descending)'),
             ('source_type', 'Type'),
             ('-source_type', 'Type (descending)'),
             ('date', 'Date'),
@@ -119,6 +122,10 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
             self.parent.annotated = True
             qs = self.annotate_source_type(qs)
 
+        name = self.get_value('name', value)
+        if name:
+            qs = qs.order_by(name)
+
         return qs
 
 
@@ -158,9 +165,7 @@ class SourceFilter(django_filters.FilterSet):
         choices=BOOLEAN_CHOICES
     )
 
-    order_by = SourceOrderingFilter(
-        fields=(('name', 'name'),)
-    )
+    order_by = SourceOrderingFilter()
 
     class Meta:
         model = Source
@@ -249,7 +254,9 @@ class FeaturedFilter(django_filters.FilterSet):
             grouped = [
                 (key, list(values))
                 for key, values in itertools.groupby(
-                    qs, key=lambda obj: obj.first_published_at.year
+                    qs, key=lambda obj: calendar.month_name[
+                        obj.first_published_at.month
+                    ]
                 )
             ]
         else:
@@ -261,7 +268,3 @@ class FeaturedFilter(django_filters.FilterSet):
                 )
             ]
         return grouped
-
-
-class CollectionsFilter(django_filters.FilterSet):
-    pass

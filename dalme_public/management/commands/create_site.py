@@ -189,8 +189,10 @@ CORPUS_DATA = {
     'description': RichText('<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore.</p>'),
 }
 
+
 MARSEILLE_COLLECTION = {
     'source_set_id': '77d709a6-6b87-4116-9c46-d6dd8468129e',
+    # 'source_set_id': '48c50e13-d5e4-46f4-9630-f6e323d3d2f9',
     'title': 'Marseille and its Environs',
     'body': [
         ('text', RichText('<p>The records from the city of Marseille constitute the oldest and currently the richest set of inventories in the entire DALME collection. The initial set was identified by Dan Smail in archival work dating from the 1990s and was substantially enlarged by Nathan Melson in 2011–12. Additional inventories were collected in 2018, including a set of inventories previously transcribed and published by Christine Barnel.</p>')),

@@ -12,7 +12,7 @@ class CarouselBlock(blocks.ListBlock):
 class DocumentBlock(blocks.StructBlock):
     title = blocks.CharBlock()
     abstract = blocks.CharBlock()
-    version = blocks.FloatBlock()
+    version = blocks.FloatBlock(required=False)
     document = DocumentChooserBlock(required=False)
     url = blocks.URLBlock(required=False)
     date = blocks.DateBlock()
@@ -20,6 +20,15 @@ class DocumentBlock(blocks.StructBlock):
     class Meta:
         icon = 'doc-full'
         template = 'dalme_public/blocks/_document.html'
+
+
+class FooterPageChooserBlock(blocks.StructBlock):
+    title = blocks.CharBlock()
+    page = blocks.PageChooserBlock()
+
+    class Meta:
+        icon = 'doc-full'
+        template = 'dalme_public/blocks/_footer_page.html'
 
 
 class ExternalResourceBlock(blocks.StructBlock):
@@ -31,12 +40,6 @@ class ExternalResourceBlock(blocks.StructBlock):
     class Meta:
         icon = 'link'
         template = 'dalme_public/blocks/_external_resource.html'
-
-
-class IFrameBlock(blocks.RawHTMLBlock):
-    class Meta:
-        label = 'Iframe'
-        icon = 'code'
 
 
 class MainImageBlock(ImageChooserBlock):
@@ -55,6 +58,15 @@ class PersonBlock(blocks.StructBlock):
     class Meta:
         icon = 'user'
         template = 'dalme_public/blocks/_person.html'
+
+
+class SocialBlock(blocks.StructBlock):
+    fa_icon = blocks.CharBlock()
+    url = blocks.URLBlock()
+
+    class Meta:
+        icon = 'group'
+        template = 'dalme_public/blocks/_social.html'
 
 
 class SponsorBlock(blocks.StructBlock):

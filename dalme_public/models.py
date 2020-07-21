@@ -13,10 +13,15 @@ from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
 
 from wagtail.admin.edit_handlers import (
-    FieldPanel, InlinePanel, MultiFieldPanel, StreamFieldPanel
+    FieldPanel,
+    InlinePanel,
+    MultiFieldPanel,
+    PageChooserPanel,
+    StreamFieldPanel,
 )
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.core import blocks, hooks
+
 from wagtail.core.models import Orderable, Page
 from wagtail.core.fields import RichTextField, StreamField
 from wagtail.embeds.blocks import EmbedBlock
@@ -34,8 +39,10 @@ from dalme_public.blocks import (
     CarouselBlock,
     DocumentBlock,
     ExternalResourceBlock,
+    FooterPageChooserBlock,
     MainImageBlock,
     PersonBlock,
+    SocialBlock,
     SponsorBlock,
     SubsectionBlock,
 )
@@ -93,11 +100,15 @@ class CustomRendition(AbstractRendition):
 
 @register_snippet
 class Footer(models.Model):
-    pages = StreamField([
-        ('page', blocks.PageChooserBlock()),
-    ])
+    pages = StreamField([('page', FooterPageChooserBlock())], null=True)
+    copyright = models.CharField(max_length=255, blank=True, null=True)
+    social = StreamField([('social', SocialBlock())], null=True)
 
-    panels = [StreamFieldPanel('pages')]
+    panels = [
+        StreamFieldPanel('pages'),
+        FieldPanel('copyright'),
+        StreamFieldPanel('social'),
+    ]
 
     def __str__(self):
         return "Site Footer"
@@ -120,7 +131,7 @@ class DALMEPage(Page):
         max_length=63,
         null=True,
         blank=True,
-        help_text='An optional short title that will be displayed in certain contexts.'  # noqa
+        help_text='An optional short title that will be displayed in certain space constrained contexts.'  # noqa
     )
 
     body = StreamField([
@@ -238,9 +249,14 @@ class FeaturedPage(DALMEPage):
 
 
 class Home(DALMEPage):
-    sponsors = StreamField([
-        ('sponsors', SponsorBlock()),
-    ], null=True)
+    learn_more_page = models.ForeignKey(
+        'wagtailcore.Page',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+    sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
 
     subpage_types = [
         'dalme_public.Section',
@@ -250,6 +266,7 @@ class Home(DALMEPage):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        PageChooserPanel('learn_more_page'),
         StreamFieldPanel('body'),
         StreamFieldPanel('sponsors'),
     ]
@@ -508,6 +525,8 @@ class Collections(RoutablePageMixin, DALMEPage):
 
     def get_context(self, request):
         context = super().get_context(request)
+
+        # TODO: Is this stale? Where's the collection search logic?
         if request.GET.get('q'):
             corpora = []
             cls = self._meta.model.collection.related.related_model
@@ -592,6 +611,7 @@ class Collection(RoutablePageMixin, DALMEPage):
 
     @property
     def stats(self):
+        # TODO: Remove this stub.
         status = 'Extensive range, with numerous inventories of artisans and low-status individuals.'  # noqa
         return {
             'inventories': self.source_set.get_public_member_count,

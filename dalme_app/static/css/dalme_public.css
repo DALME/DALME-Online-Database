@@ -26,6 +26,11 @@ img {
   max-width: 100%;
   margin: 0 auto;
 }
+input[type=search]{
+   -moz-appearance: none;/* older firefox */
+   -webkit-appearance: none; /* safari, chrome, edge and ie mobile */
+   appearance: none; /* rest */
+}
 
 /* Utilities */
 .u-flex {
@@ -110,6 +115,16 @@ body {
 .content > * {
   width: 100%;
 }
+.content p a {
+  color: text;
+  text-decoration: none;
+  border-bottom: 1px dotted black;
+}
+.content p a:hover {
+  color: #1152e6;
+  border-bottom: 1px dotted #1152e6;
+}
+
 
 main {
   flex: 5;
@@ -177,6 +192,7 @@ body.home section.featured > div:first-child {
   flex-direction: column;
 }
 body.home section.featured img {
+  flex-shrink: 0;
   height: auto;
 }
 
@@ -570,7 +586,6 @@ nav.browse a {
 }
 .support-logos {
   flex-direction: column;
-  flex-wrap: wrap;
 }
 .support-logos > div {
   align-items: center;
@@ -739,6 +754,16 @@ header .credit {
 
 main.inventories > article {
   border: 0;
+}
+
+.order-icon {
+  color: #636363;
+  font-size: 0.9rem;
+  margin-left: 0.25rem;
+}
+
+.v-spinner {
+  margin: 3rem auto 0 auto
 }
 
 .corpora-container {
@@ -1181,6 +1206,9 @@ nav.secondary.features-filter ul {
 }
 .popup-histogram .tick line {
   display: none;
+}
+.popup-histogram .tick text {
+  cursor: default;
 }
 
 /* Streamfield */
@@ -1733,6 +1761,7 @@ div.description[data-collapsed='true'] {
   .support-logos {
     flex-direction: row;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
   }
 
   .monthly.essay {

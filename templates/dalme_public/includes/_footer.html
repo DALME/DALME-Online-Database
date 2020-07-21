@@ -1,19 +1,27 @@
 {% load dalme_public_tags wagtailcore_tags %}
 
-<nav class="footer">
-  {% if footer %}
+{% if footer.pages %}
+  <nav class="footer">
     <ul>
-      {% for page in footer.pages %}
-        <li>{{ page }}</li>
+      {% for block in footer.pages %}
+        {{ block }}
       {% endfor %}
     </ul>
-  {% endif %}
-</nav>
+  </nav>
+{% endif %}
+
 <div class="copyright">
-  Copyright &copy; {{ year }} {{ project }}
+  {% if footer.copyright %}
+    {{ footer.copyright }} {{ year }}
+  {% else %}
+    Copyright &copy; {{ year }} {{ project }}
+  {% endif %}
 </div>
-<div class="social">
-  <i class="fab fa-facebook-square"></i>
-  <i class="fab fa-twitter-square"></i>
-  <i class="fab fa-google-plus-square"></i>
-</div>
+
+{% if footer.social %}
+  <div class="social">
+    {% for block in footer.social %}
+      {{ block }}
+    {% endfor %}
+  </div>
+{% endif %}
