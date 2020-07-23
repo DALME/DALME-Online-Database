@@ -525,29 +525,10 @@ class Collections(RoutablePageMixin, DALMEPage):
 
     def get_context(self, request):
         context = super().get_context(request)
-
-        # TODO: Is this stale? Where's the collection search logic?
-        if request.GET.get('q'):
-            corpora = []
-            cls = self._meta.model.collection.related.related_model
-            qs = cls.objects.filter(title__icontains=request.GET['q'])
-            for collection in qs:
-                for corpus in collection.corpora.all():
-                    try:
-                        data = next(
-                            item for item in corpora if item[0] == corpus
-                        )
-                    except StopIteration:
-                        corpora.append([corpus, [collection]])
-                    else:
-                        data[1].append(collection)
-        else:
-            corpora = [
-                (corpus, corpus.collections.all())
-                for corpus in self.corpora.all()
-            ]
-
-        context['corpora'] = corpora
+        context['corpora'] = [
+            (corpus, corpus.collections.all())
+            for corpus in self.corpora.all()
+        ]
         return context
 
 
