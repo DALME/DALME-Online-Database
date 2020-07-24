@@ -10,11 +10,16 @@
   </div>
   <ul class="u-flex">
     {% for tab in nav %}
+      {% nav_active tab as active %}
       <li>
         {% if forloop.counter == 1 %}
-          <a href="{% pageurl tab %}">HOME</a>
+         <a {% if active %}class="active" {% endif %}href="{% pageurl tab %}">
+           HOME
+         </a>
         {% else %}
-          <a href="{% pageurl tab %}">{{ tab.title_switch|upper }}</a>
+          <a {% if active %}class="active" {% endif %}href="{% pageurl tab %}">
+            {{ tab.title_switch|upper }}
+          </a>
         {% endif %}
       </li>
     {% endfor %}

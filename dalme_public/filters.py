@@ -250,15 +250,25 @@ class FeaturedFilter(django_filters.FilterSet):
 
         order = self.data.get('order_by', 'date')
         if order == 'date':
+            grouped = []
+            # TODO: Reverse the years?
             qs = sorted(qs, key=lambda obj: obj.first_published_at)
-            grouped = [
+            by_year = [
                 (key, list(values))
                 for key, values in itertools.groupby(
-                    qs, key=lambda obj: calendar.month_name[
-                        obj.first_published_at.month
-                    ]
+                    qs, key=lambda obj: obj.first_published_at.year
                 )
             ]
+            for year, values in by_year:
+                by_month = [
+                    (key, reversed(list(values)))
+                    for key, values in itertools.groupby(
+                        values, key=lambda obj: calendar.month_name[
+                            obj.first_published_at.month
+                        ]
+                    )
+                ]
+                grouped.append((year, by_month))
         else:
             qs = sorted(qs, key=lambda obj: obj.owner.last_name)
             grouped = [
@@ -267,4 +277,5 @@ class FeaturedFilter(django_filters.FilterSet):
                     qs, key=lambda obj: f'{obj.author}'
                 )
             ]
+
         return grouped

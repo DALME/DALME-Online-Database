@@ -10,13 +10,16 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from dalme_app.models import Attribute, Source
+from dalme_app.functions import get_dam_preview
+from dalme_app.models import Attribute, Source, rs_resource
 from dalme_app.web_serializers import RecordSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
 
 
 class DALMEPagination(pagination.PageNumberPagination):
+    page_size = 24
+
     def get_next_link(self):
         if not self.page.has_next():
             return None
@@ -28,16 +31,6 @@ class DALMEPagination(pagination.PageNumberPagination):
             return None
         page_number = self.page.previous_page_number()
         return page_number
-
-    def get_paginated_response(self, data):
-        return Response({
-            'results': data,
-            'next': self.get_next_link(),
-            'previous': self.get_previous_link(),
-            'count': self.page.paginator.count,
-            'totalPages': self.page.paginator.num_pages,
-            'currentPage': self.page.number,
-        })
 
     def paginate_queryset(self, queryset, request, view=None):
         page_size = self.get_page_size(request)
@@ -60,11 +53,43 @@ class DALMEPagination(pagination.PageNumberPagination):
         self.request = request
         return list(self.page)
 
+    def get_paginated_response(self, data):
+        return Response({
+            'results': data,
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'count': self.page.paginator.count,
+            'totalPages': self.page.paginator.num_pages,
+            'currentPage': self.page.number,
+        })
+
+
+class PublicRecordSerializer(RecordSerializer):
+    @staticmethod
+    def get_image(instance):
+        page = instance.pages.exclude(dam_id__isnull=True).first()
+        if page:
+            resource = rs_resource.objects.get(ref=page.dam_id)
+            return get_dam_preview(resource.ref)
+        return None
+
+    @staticmethod
+    def get_transcription_count(instance):
+        return instance.source_pages.all().select_related('transcription').count()  # noqa
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.update({
+            'image': self.get_image(instance),
+            'transcription_count':  self.get_transcription_count(instance),
+        })
+        return data
+
 
 class SourceList(ListAPIView):
     model = Source
     queryset = Source.objects.all()
-    serializer_class = RecordSerializer
+    serializer_class = PublicRecordSerializer
     pagination_class = DALMEPagination
     filterset_class = SourceFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)

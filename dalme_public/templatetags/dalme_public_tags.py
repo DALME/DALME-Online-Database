@@ -43,6 +43,18 @@ def get_nav():
 
 
 @register.simple_tag(takes_context=True)
+def nav_active(context, tab):
+    page = context['page'].specific
+    tab = tab.specific
+    if page == tab:
+        return True
+    if not isinstance(tab, Home):
+        if page in [desc.specific for desc in tab.get_descendants()]:
+            return True
+    return False
+
+
+@register.simple_tag(takes_context=True)
 def get_breadcrumbs_nav(context):
     page = context['page']
     ancestors = [

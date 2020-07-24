@@ -2,7 +2,10 @@
   <div class="metadata">
     <div class="u-flex">
       <h4>{{ value.title }}</h4>
-      <span>{{ value.date }} | V{{value.version}}</span>
+      <span>{{ value.date }}</span>
+      {% if value.version %}
+        <span>V{{value.version}}</span>
+      {% endif %}
     </div>
     <p>{{ value.abstract }}</p>
   </div>
