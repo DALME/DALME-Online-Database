@@ -70,20 +70,33 @@ class PublicRecordSerializer(RecordSerializer):
         page = instance.pages.exclude(dam_id__isnull=True).first()
         if page:
             resource = rs_resource.objects.get(ref=page.dam_id)
-            return get_dam_preview(resource.ref)
+            return resource.ref
         return None
 
     @staticmethod
     def get_transcription_count(instance):
+        # TODO: Need Gabe's update
         return instance.source_pages.all().select_related('transcription').count()  # noqa
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data.update({
-            'image': self.get_image(instance),
+            'image_ref': self.get_image(instance),
             'transcription_count':  self.get_transcription_count(instance),
         })
         return data
+
+
+class Thumbnail(View):
+    def get_data(self):
+        try:
+            thumbnail = get_dam_preview(self.request.GET['image_ref'])
+        except KeyError:
+            thumbnail = None
+        return {'image_url': thumbnail}
+
+    def get(self, request):
+        return JsonResponse(self.get_data())
 
 
 class SourceList(ListAPIView):

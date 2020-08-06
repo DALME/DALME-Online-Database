@@ -181,7 +181,7 @@
         <template v-if="mode === 'detail'">
           <template v-for="(partition, index) in partitionedInventories" :key="index">
             <div class="grid-row-wrapper detail u-contents">
-              <template v-for="(inventory, index) in partition" :key="index">
+              <template v-for="inventory in partition" :key="inventory.id">
                 <a
                   class="inventory-detail u-flex"
                   :href="inventoryUrl(inventory)"
@@ -278,6 +278,7 @@
       data: {
         fetching: false,
         inventories: null,
+        thumbnails: {},
         next: null,
         previous: null,
         count: null,
@@ -300,6 +301,7 @@
         windowWidth: window.innerWidth,
       },
       watch: {
+        inventories: 'fetchThumbnails',
         search: debounce(function() {
           this.filterData('name', this.search)
         }, 250),
@@ -340,6 +342,9 @@
         choicesEndpoint() {
           return '/api/public/choices';
         },
+        thumbnailEndpoint() {
+          return '/api/public/thumbnails';
+        },
         spinner() {
           return (this.inventories === null) || this.fetching == true;
         },
@@ -366,6 +371,20 @@
         },
       },
       methods: {
+        inventoryDetailStyle(inventory) {
+          let blue = 'linear-gradient(to top, rgba(238,248,254,1) 0%, rgba(238,248,254,0) 100%)';
+          let white = 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)';
+          const thumbnail = Object.keys(this.thumbnails).length
+            ? this.thumbnails[inventory.id]
+            : null;
+          if (thumbnail) {
+            blue = `${blue}, url("${thumbnail}")`;
+            white = `${white}, url("${thumbnail}")`;
+          }
+          return this.inventoryDetailHover === inventory.id
+            ? { background: blue }
+            : { background: white };
+        },
         onResize(e) {
           this.windowWidth = window.innerWidth;
           if (this.windowWidth < 900) {
@@ -374,13 +393,6 @@
         },
         toggleHover(uid = false) {
           this.inventoryDetailHover = uid;
-        },
-        inventoryDetailStyle(inventory) {
-          const blue = `linear-gradient(to top, rgba(238,248,254,1) 0%, rgba(238,248,254,0) 100%), url("${inventory.image}")`;
-          const white = `linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%), url("${inventory.image}")`;
-          return this.inventoryDetailHover && this.inventoryDetailHover === inventory.id
-            ? { background: blue }
-            : { background: white };
         },
         truncate(str, max = 25) {
           const array = str.trim().split(' ');
@@ -478,6 +490,20 @@
               this.currentPage = data.currentPage;
               this.fetching = false;
             });
+        },
+        async fetchThumbnails() {
+          const inventories = this.inventories.filter(inventory =>
+            inventory.image_ref !== null && !(inventory.id in this.thumbnails)
+          );
+          await Promise.all(inventories.map(inventory => {
+            fetch(`${this.thumbnailEndpoint}/?image_ref=${inventory.image_ref}`)
+              .then(response => response.json())
+              .then(data => {
+                this.thumbnails[inventory.id] = data.image_url;
+                // Not ideal.
+                this.$forceUpdate();
+              })
+            }));
         },
         setParam(key, value) {
           let params = this.currentParams;
