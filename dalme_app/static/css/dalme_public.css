@@ -1798,7 +1798,7 @@ div.description[data-collapsed='true'] {
   main.object > article,
   main.inventory > article,
   main.essay > article {
-    flex-direction: row;
+    flex-direction: column;
   }
   main.object .content,
   main.inventory > .content,
@@ -2033,8 +2033,12 @@ div.description[data-collapsed='true'] {
 
 @media only screen and (min-width: 1200px) {
   main {
-    width: 80rem;
     margin: 0 auto;
+    width: 80rem;
+  }
+  main.inventory {
+    margin: 0 4rem;
+    width: auto;
   }
   body.home {
     width: 80rem;
@@ -2044,8 +2048,11 @@ div.description[data-collapsed='true'] {
   header .title > .title-wrapper,
   header .description > div,
   header .description .credit  {
-    margin: 0 auto;
-    width: 80rem;
+    width: 100%;
+  }
+  header .description > div > p {
+    margin-right: auto;
+    width: 40%;
   }
 
   .app {

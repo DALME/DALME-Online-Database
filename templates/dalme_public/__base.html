@@ -45,7 +45,7 @@
       </header>
 
       <main
-        id="main" class="{{ page_name }}{% if inventories or inventory %} inventories{% endif %}" role="main">
+        id="main" class="{{ page_name }}{% if inventories or inventory %} inventories{% endif %}{% if inventory %} inventory{% endif %}" role="main">
         {% block content %}{% endblock %}
       </main>
 
