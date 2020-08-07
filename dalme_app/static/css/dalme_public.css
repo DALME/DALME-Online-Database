@@ -1376,11 +1376,13 @@ nav.secondary.features-filter ul {
 .histogram path.domain {
   display: none;
 }
-.histogram .tick {
-  display: none;
-}
+.histogram .tick,
 .histogram .tick line {
   display: none;
+}
+.histogram .popup-histogram .tick,
+.histogram .popup-histogram .tick line {
+  display: inline;
 }
 .at-a-glance .histogram {
   cursor: pointer;
@@ -1742,6 +1744,7 @@ div.description[data-collapsed='true'] {
   .popup-histogram {
     align-self: auto;
     border-radius: 1rem;
+    margin-top: 0;
     overflow: initial;
     transform: initial;
     width: auto;

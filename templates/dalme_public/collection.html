@@ -100,7 +100,7 @@
           .call(d3.axisLeft(y));
 
         const collectionURL = `${pageData.url}inventories/?collection=${ pageData.pk }`;
-        if ($('body').find('#popup-histogram').length) {;
+        if ($('body').find('#popup-histogram').length) {
           svg.selectAll('histogram')
             .data(data)
             .enter()
@@ -125,16 +125,16 @@
               .attr('height', function(d) { return height - y(d.count); })
               .attr('fill', fill)
         }
-
-        };
+      };
 
       $('body').on('click', '#histogram', function() {
         const popup = $('body').find('#popup-histogram');
         if (!popup.length) {
           const title = 'Records per year';
-          $('#histogram').after(
-            '<div id="popup-histogram" class="popup-histogram"></div>'
-          );
+          const node = '<div id="popup-histogram" class="popup-histogram"></div>';
+          $(window).width() >= 600
+            ? $('#histogram').append(node)
+            : $('#histogram').after(node);
           renderHistogram('#popup-histogram', 400, 150, '#56c1fe', title, 20);
         } else {
           popup.remove();
