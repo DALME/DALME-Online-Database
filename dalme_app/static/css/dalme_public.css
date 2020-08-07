@@ -242,7 +242,8 @@ nav.primary ul {
   width: 100%;
 }
 nav.primary ul li {
-  display: inline-block;
+  display: flex;
+  align-self: flex-end;
 }
 nav.primary ul li a {
   display: block;
@@ -413,7 +414,6 @@ nav.features ul li a {
 }
 
 main.object > article,
-main.inventory > article,
 main.essay > article {
   flex-direction: column-reverse;
 }
