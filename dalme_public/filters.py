@@ -1,7 +1,7 @@
 import calendar
 import itertools
 
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Q, Subquery
 
 import django_filters
 
@@ -81,21 +81,12 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
 
     @staticmethod
     def annotate_dates(qs):
-        # These results are not 100% perfect. Some end up incorrectly
-        # annotated with None because certain start_date attributes objects do
-        # have a value_STR but don't have a value_DATE. This could be fixed
-        # with a data migration adding in the missing datetime values to the
-        # objects. To see the rows in question, call the following.
-        # Attribute.objects.filter(
-        #     attribute_type_id=26, value_DATE__isnull=True
-        # )
-        start_dates = Attribute.objects.filter(
-            sources=OuterRef('pk'),
-            attribute_type__short_name='start_date'
+        dates = Attribute.objects.filter(
+            Q(sources=OuterRef('pk'), attribute_type__short_name='start_date')
+            | Q(sources=OuterRef('pk'), attribute_type__short_name='end_date')
         )
-        return qs.annotate(
-            source_date=Subquery(start_dates.values('value_DATE')[:1])
-        ).distinct()
+        qs = qs.annotate(source_date=Subquery(dates.values('value_DATE')[:1]))
+        return qs.distinct()
 
     @staticmethod
     def annotate_source_type(qs):
