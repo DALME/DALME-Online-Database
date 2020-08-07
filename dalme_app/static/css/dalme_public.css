@@ -118,7 +118,7 @@ body {
   width: 100%;
 }
 .content {
-  padding: 0 1rem 4rem 1rem;
+  padding: 0 1rem 1rem 1rem;
 }
 .content > * {
   width: 100%;
@@ -143,9 +143,15 @@ main.collection.inventories,
 main.collections.inventories {
   padding-top: 0;
 }
+
 main > article {
   height: 100%;
   flex-direction: column;
+}
+main.object > article,
+main.features > article,
+main.essay > article {
+  flex-direction: column-reverse;
 }
 
 main p {
@@ -413,10 +419,6 @@ nav.features ul li a {
   font-size: 0.9rem;
 }
 
-main.object > article,
-main.essay > article {
-  flex-direction: column-reverse;
-}
 main.object .content,
 main.inventory > .content,
 main.essay > .content {
@@ -1621,7 +1623,16 @@ div.description[data-collapsed='true'] {
     padding-top: 1rem;
   }
 
+  .content {
+    padding: 0 1rem 4rem 1rem;
+  }
+
   main > article {
+    flex-direction: row;
+  }
+  main.object > article,
+  main.features > article,
+  main.essay > article {
     flex-direction: row;
   }
 
@@ -1799,11 +1810,6 @@ div.description[data-collapsed='true'] {
     margin: 5rem 0 0 0;
   }
 
-  main.object > article,
-  main.inventory > article,
-  main.essay > article {
-    flex-direction: column;
-  }
   main.object .content,
   main.inventory > .content,
   main.essay > .content {
