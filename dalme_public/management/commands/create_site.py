@@ -1,6 +1,5 @@
 import datetime
 
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from wagtail.core.models import Page, Site
@@ -298,10 +297,5 @@ class Command(BaseCommand):
         for page in Page.objects.all():
             if not page.is_root():
                 page.specific.save_revision().publish()
-
-        # TODO: Remove this!
-        user = User.objects.get(username='jhrr')
-        user.is_superuser = True
-        user.save()
 
         self.stdout.write(self.style.SUCCESS('Created DALME'))
