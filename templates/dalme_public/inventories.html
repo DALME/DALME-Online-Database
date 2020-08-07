@@ -43,28 +43,28 @@
         <div class="filter-panel" v-if="showFilters && inventories">
           <form method="get" class="filter-form u-flex">
 
-            <div class="label">Corpus</div>
+            <label class="label">Corpus</label>
             <v-select
               :options="choices.corpusChoices"
               @input="setCorpus"
               v-model="corpus">
             </v-select>
 
-            <div class="label">Collection</div>
+            <label class="label">Collection</label>
             <v-select
               :options="choices.collectionChoices"
               @input="setCollection"
               v-model="collection">
             </v-select>
 
-            <div class="label">Record Type</div>
+            <label class="label">Record Type</label>
             <v-select
               :options="choices.sourceTypeChoices"
               @input="setSourceType"
               v-model="sourceType">
             </v-select>
 
-            <div class="label">Date</div>
+            <label class="label">Date</label>
             <vue-slider
               ref="slider"
               v-model="date"
@@ -75,7 +75,7 @@
             >
             </vue-slider>
 
-            <div class="label">Assets</div>
+            <label class="label">Assets</label>
             <div class="asset u-flex">
               <input
                 type="checkbox"
