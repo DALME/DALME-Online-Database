@@ -213,6 +213,20 @@ class Source(dalmeUuid):
             return False
 
     @property
+    def no_folios(self):
+        if self.pages.all().exists():
+            return self.pages.all().count()
+        else:
+            return 0
+
+    @property
+    def no_transcriptions(self):
+        if self.source_pages.exclude(transcription__count_ignore=True).exists():
+            return self.source_pages.exclude(transcription__count_ignore=True).count()
+        else:
+            return 0
+
+    @property
     def has_transcriptions(self):
         if self.source_pages.all().select_related('transcription').exists():
             return True

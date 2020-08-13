@@ -203,15 +203,23 @@ def test_expression2(request):
     #     if Attribute.objects.filter(object_id=row.object_id, attribute_type=row.attribute_type).count() > 1:
     #         row.delete()
 
-    records = Attribute_type.objects.all()
-    for s in records:
-        c_user = User.objects.get(username=s.creation_username)
-        m_user = User.objects.get(username=s.modification_username)
-        s.creation_user = c_user
-        s.owner = c_user
-        s.modification_user = m_user
-        s.save()
-    return 'Done'
+    # records = Attribute_type.objects.all()
+    # for s in records:
+    #     c_user = User.objects.get(username=s.creation_username)
+    #     m_user = User.objects.get(username=s.modification_username)
+    #     s.creation_user = c_user
+    #     s.owner = c_user
+    #     s.modification_user = m_user
+    #     s.save()
+
+    inv = Source.objects.get(id='7c7efca6-c324-452a-9a21-0e84f55a386f')
+    # if inv.source_pages.all().select_related('transcription').exists():
+    #     result = 'cool'
+    # else:
+    #     result = 'fail'
+    # return result
+    res = inv.source_pages.exclude(transcription__version__lt=1).count()
+    return res
 
 # REMOVE DUPLICATES
 # def test_expression2(request):
