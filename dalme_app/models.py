@@ -9,6 +9,7 @@ import json
 import requests
 import hashlib
 import textwrap
+import xml.etree.ElementTree as et
 from urllib.parse import urlencode
 import datetime
 from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
@@ -341,9 +342,17 @@ class Transcription(dalmeUuid):
     transcription = models.TextField(blank=True, default=None)
     author = models.CharField(max_length=255, default=get_current_username)
     version = models.IntegerField(null=True)
+    count_ignore = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
+
+    def save(self, **kwargs):
+        # set count_ignore flag
+        tr_tree = et.fromstring('<xml>' + self.transcription + '</xml>')
+        if len(tr_tree) == 1 and tr_tree[0].tag in ['quote', 'gap', 'mute'] or len(tr_tree) == 0:
+            self.count_ignore = True
+        super(Task, self).save()
 
 
 @receiver(models.signals.post_save, sender=Transcription)
