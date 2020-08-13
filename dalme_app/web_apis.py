@@ -48,9 +48,9 @@ class Collections(viewsets.ModelViewSet):
                 'data': object.get_time_coverage
             })
             data.append({
-                'label': 'Status Groups Represented',
+                'label': object.stat_title,
                 'type': 'text',
-                'data': 'Extensive range, with numerous inventories of artisans and low-status individuals.'
+                'data': object.stat_text
             })
             result['data'] = data
             status = 201

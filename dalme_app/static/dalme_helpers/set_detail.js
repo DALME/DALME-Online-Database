@@ -70,6 +70,15 @@ function edit_set(id) {
                       label: "Description:",
                       name:  "description",
                       type: "textarea"
+                    },
+                    {
+                      label: "Stat Title:",
+                      name:  "stat_title"
+                    },
+                    {
+                      label: "Stat Text:",
+                      name:  "stat_text",
+                      type: "textarea"
                     }
                   ]
           });

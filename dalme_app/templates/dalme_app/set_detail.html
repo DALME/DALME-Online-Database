@@ -10,7 +10,9 @@
     "has_landing": {{ set.has_landing|lower|safe }},
     "owner": "{{ set.owner.id }}",
     "set_permissions": "{{ set.set_permissions }}",
-    "description": "{{ set.description }}"
+    "description": "{{ set.description }}",
+    "stat_title": "{{ set.stat_title }}",
+    "stat_text": "{{ set.stat_text }}"
   }
 </script>
 {% endblock %}
@@ -104,6 +106,16 @@
                     <div class="form-row">
                         <div class="col-sm-3 text-right"><span class="attribute_list_label">Progress</span></div>
                         <div class="col-sm-9"><span class="attribute_list_value">{{ set.workset_progress }}%</span></div>
+                    </div>
+                  {% endif %}
+                  {% if set.set_type == 2 %}
+                    <div class="form-row">
+                        <div class="col-sm-3 text-right"><span class="attribute_list_label">Stat Title</span></div>
+                        <div class="col-sm-9"><span class="attribute_list_value">{{ set.stat_title }}</span></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-sm-3 text-right"><span class="attribute_list_label">Stat Text</span></div>
+                        <div class="col-sm-9"><span class="attribute_list_value">{{ set.stat_text }}</span></div>
                     </div>
                   {% endif %}
                 </div>
