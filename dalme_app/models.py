@@ -587,8 +587,17 @@ class Set(dalmeUuid):
         return [[LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15).values_list('source__attributes__value_STR', flat=True))]
 
     @property
+    def get_public_languages(self):
+        return [[LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15, source__workflow__is_public=True).values_list('source__attributes__value_STR', flat=True))]
+
+    @property
     def get_time_coverage(self):
         years = self.members.filter(source__attributes__attribute_type=26).order_by('source__attributes__value_DATE_y').values_list('source__attributes__value_DATE_y', flat=True)
+        return dict(Counter(years))
+
+    @property
+    def get_public_time_coverage(self):
+        years = self.members.filter(source__attributes__attribute_type=26, source__workflow__is_public=True).order_by('source__attributes__value_DATE_y').values_list('source__attributes__value_DATE_y', flat=True)
         return dict(Counter(years))
 
 

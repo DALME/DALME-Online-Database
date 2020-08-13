@@ -40,12 +40,12 @@ class Collections(viewsets.ModelViewSet):
             data.append({
                 'label': 'Language(s)',
                 'type': 'pill',
-                'data': object.get_languages
+                'data': object.get_public_languages
             })
             data.append({
                 'label': 'Coverage',
                 'type': 'histogram',
-                'data': object.get_time_coverage
+                'data': object.get_public_time_coverage
             })
             data.append({
                 'label': object.stat_title,
