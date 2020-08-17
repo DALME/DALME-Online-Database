@@ -1,7 +1,6 @@
 import datetime
 
 from django.core.paginator import InvalidPage
-from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.views import View
 
@@ -109,11 +108,7 @@ class SourceList(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs).order_by('name')
-        qs = qs.filter(
-            type=13, workflow__is_public=True
-        ).annotate(
-            no_folios=Count('pages', filter=Q(pages__source__isnull=False))
-        )
+        qs = qs.filter(type=13, workflow__is_public=True)
 
         self.filterset = self.filterset_class(self.request.GET, queryset=qs)
         qs = self.filterset.qs.distinct()
