@@ -8,6 +8,7 @@ from django.http import HttpResponse
 # from allaccess.views import OAuthRedirect
 from rest_framework import routers
 from dalme_app import apis
+from maintenance_mode import urls as maintenance_mode_urls
 
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
@@ -37,6 +38,7 @@ router.register(r'datasets', apis.Datasets, basename='datasets')
 router.register(r'rights', apis.Rights, basename='rights')
 
 urlpatterns = [
+    path('maintenance-mode/', include(maintenance_mode_urls)),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),

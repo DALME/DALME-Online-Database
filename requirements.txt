@@ -17,3 +17,4 @@ django-oidc-provider==0.7.0
 django-storages==1.7.1
 boto3==1.9.170
 redis==3.4.1
+django-maintenance-mode==0.14.0

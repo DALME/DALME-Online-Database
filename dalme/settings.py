@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'haystack',
     'django_celery_results',
+    'maintenance_mode',
     'rest_framework',
     'oidc_provider',
     'storages'
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.middleware.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'oidc_provider.middleware.SessionManagementMiddleware',
 ]
 
