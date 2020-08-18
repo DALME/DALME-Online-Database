@@ -581,8 +581,8 @@ class Set(dalmeUuid):
     set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
     description = models.TextField()
     comments = GenericRelation('Comment')
-    stat_title = models.CharField(max_length=25, null=True)
-    stat_text = models.CharField(max_length=255, null=True)
+    stat_title = models.CharField(max_length=25, null=True, blank=True)
+    stat_text = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f'{self.name}({self.set_type})'
