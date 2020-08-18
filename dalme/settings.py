@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'storages'
     'storages',
 
+    'maintenance_mode',
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
 ]
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'maintenance_mode.middleware.MaintenanceModeMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'

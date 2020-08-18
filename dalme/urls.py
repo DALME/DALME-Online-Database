@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from rest_framework import routers
 from dalme_app import apis
 from dalme_app import web_apis
+from maintenance_mode import urls as maintenance_mode_urls
 
 router = routers.DefaultRouter()
 router.register(r'sources', apis.Sources, basename='sources')
@@ -41,6 +42,7 @@ web_router.register(r'records', web_apis.Records, basename='records')
 web_router.register(r'collections', web_apis.Collections, basename='collections')
 
 urlpatterns = [
+    path('maintenance-mode/', include(maintenance_mode_urls)),
     path('api/', include(router.urls)),
     path('web-api/', include(web_router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),

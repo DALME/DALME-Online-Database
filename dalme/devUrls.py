@@ -5,15 +5,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
-
 from rest_framework import routers
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.core import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
-
 from dalme_app import apis
 from dalme_app import web_apis
 from dalme_public import urls as dalme_public_urls
+from maintenance_mode import urls as maintenance_mode_urls
 
 
 router = routers.DefaultRouter()
@@ -50,6 +49,7 @@ web_router.register(r'collections', web_apis.Collections, basename='collections'
 
 urlpatterns = [
     # path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('maintenance-mode/', include(maintenance_mode_urls)),
     path('api/', include(router.urls)),
     path('web-api/', include(web_router.urls)),
     path('api/public/', include(dalme_public_urls)),

@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'modelcluster',
     'taggit',
 
+    'maintenance_mode',
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.contrib.routable_page',
@@ -99,6 +100,7 @@ MIDDLEWARE = [
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'oidc_provider.middleware.SessionManagementMiddleware',
+    'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
