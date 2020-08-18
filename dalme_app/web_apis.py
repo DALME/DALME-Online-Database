@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from dalme_app.web_serializers import (RecordSerializer, CollectionSerializer)
-from dalme_app.models import (Source, Set)
+from dalme_app.models import Source, Set
 from rest_framework.permissions import DjangoModelPermissions
 from django.db.models import Q, Count
 from rest_framework.response import Response
@@ -11,7 +11,11 @@ from django.shortcuts import get_object_or_404
 class Records(viewsets.ModelViewSet):
     """ API endpoint for managing records for the web frontend """
     permission_classes = (DjangoModelPermissions,)
-    queryset = Source.objects.filter(type=13, workflow__is_public=True).annotate(no_folios=Count('pages', filter=Q(pages__source__isnull=False)))
+    queryset = Source.objects.filter(
+        type=13, workflow__is_public=True
+    ).annotate(
+        no_folios=Count('pages', filter=Q(pages__source__isnull=False))
+    )
     serializer_class = RecordSerializer
 
 
@@ -57,4 +61,5 @@ class Collections(viewsets.ModelViewSet):
         except Exception as e:
             result['error'] = str(e)
             status = 400
+
         return Response(result, status)

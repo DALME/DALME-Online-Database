@@ -9,11 +9,6 @@ from dalme_app.utils import (get_current_username, get_current_user)
 import uuid
 
 
-def make_uuid():
-    the_id = uuid.uuid4().hex
-    return the_id
-
-
 class dalmeBasic(models.Model):
     """ Model template with timestamps, but no pre-defined ID """
     creation_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)

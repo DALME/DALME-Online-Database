@@ -1,0 +1,24 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_features_back.html" %}
+  {% include "dalme_public/includes/_essay_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="metadata u-flex">
+    <span>{{ page.first_published_at.date }}</span>
+    <span>by {{ page.author }}</span>
+  </div>
+
+  <div class="content">
+    {{ page.body }}
+  </div>
+{% endblock %}

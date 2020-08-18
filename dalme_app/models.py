@@ -22,6 +22,8 @@ import uuid
 # from django.conf import settings
 from django.dispatch import receiver
 from collections import Counter
+from wagtail.search import index
+
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -152,7 +154,7 @@ class Content_attributes(dalmeIntid):
 
 
 # -> Source Management
-class Source(dalmeUuid):
+class Source(index.Indexed, dalmeUuid):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
@@ -163,6 +165,10 @@ class Source(dalmeUuid):
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
     sets = GenericRelation('Set_x_content', related_query_name='source')
+
+    search_fields = [
+        index.FilterField('name'),
+    ]
 
     def __str__(self):
         return self.name
@@ -291,9 +297,25 @@ class Page(dalmeUuid):
         return self.name
 
     def get_rights(self):
-        if self.sources.all()[0].source.parent.parent.attributes.filter(attribute_type=144).exists():
-            rpo = RightsPolicy.objects.get(pk=json.loads(self.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR)['id'])
-            return {'status': rpo.get_rights_status_display(), 'display_notice': rpo.notice_display, 'notice': json.loads(rpo.rights_notice)}
+        try:
+            source = self.sources.first().source
+            exists = source.parent.parent.attributes.filter(
+                attribute_type=144
+            ).exists()
+        except AttributeError:
+            return None
+
+        if exists:
+            rpo = RightsPolicy.objects.get(
+                pk=json.loads(
+                    source.parent.parent.attributes.get(attribute_type=144).value_STR
+                )['id'])
+            return {
+                'status': rpo.get_rights_status_display(),
+                'display_notice': rpo.notice_display,
+                'notice': json.loads(rpo.rights_notice)
+            }
+        return None
 
     def get_absolute_url(self):
         return reverse('page_detail', kwargs={'pk': self.pk})
@@ -563,7 +585,7 @@ class Set(dalmeUuid):
     stat_text = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}({self.set_type})'
 
     @property
     def workset_progress(self):
@@ -634,7 +656,7 @@ class CityReference(dalmeIntid):
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.name + '(' + self.country.name + ')'
+        return f'{self.name}({self.country.name})'
 
     class Meta:
         ordering = ['country', 'name']

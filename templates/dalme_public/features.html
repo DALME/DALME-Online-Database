@@ -1,0 +1,51 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_features_filter.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    {{ page.body }}
+    {% for key, features in featured %}
+      <h3 class="featured-group-key">{{ key|title }}</h3>
+      {% if not request.GET.order_by or request.GET.order_by == 'date' %}
+        {% for subkey, subfeatures in features %}
+          <h4 class="featured-group-key">{{ subkey|title }}</h3>
+          <ul class="featured-group u-flex">
+            {% for subfeature in subfeatures %}
+              <a href="{% pageurl subfeature %}">
+                <li class="featured-panel">
+                  {% if subfeature.main_image %}
+                    {% image subfeature.main_image height-200 %}
+                  {% endif %}
+                  <p>{{ subfeature.title }}</p>
+                </li>
+              </a>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      {% else %}
+        <ul class="featured-group u-flex">
+          {% for feature in features %}
+            <a href="{% pageurl feature %}">
+              <li class="featured-panel">
+                {% if feature.main_image %}
+                  {% image feature.main_image height-200 %}
+                {% endif %}
+                <p>{{ feature.title }}</p>
+              </li>
+            </a>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}

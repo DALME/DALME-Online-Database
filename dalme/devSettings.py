@@ -16,21 +16,14 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
-AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
-AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
-AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
-AWS_REGION = os.environ['AWS_DEFAULT_REGION']
-AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
 # email setup
-EMAIL_HOST = os.environ['EMAIL_HOST']
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ['EMAIL_USER']
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'dalme@example.com'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+EMAIL_PORT = 1025
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -41,7 +34,6 @@ ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io',
 CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
-    'dalme_app.application.DalmeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -63,9 +55,34 @@ INSTALLED_APPS = [
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
-    #'oidc_provider',
-    'storages'
+    # 'oidc_provider',
+    'storages',
+    'django_filters',
+    'modelcluster',
+    'taggit',
+
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.contrib.routable_page',
+    'wagtail.contrib.styleguide',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
+    'wagtailmodelchooser',
+
+    'dalme_app.application.DalmeConfig',
+    'dalme_public.application.DalmePublicConfig',
 ]
+
+ENABLE_DJANGO_EXTENSIONS = bool(int(os.environ.get("ENABLE_DJANGO_EXTENSIONS", "1")))
+if DEBUG and ENABLE_DJANGO_EXTENSIONS:
+    INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
     # 'corsheaders.middleware.CorsMiddleware',
@@ -82,7 +99,8 @@ MIDDLEWARE = [
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'oidc_provider.middleware.SessionManagementMiddleware',
-    #'django.middleware.locale.LocaleMiddleware'
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 
@@ -100,6 +118,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 #'sekizai.context_processors.sekizai',
+                'dalme_public.context_processors.year',
+                'dalme_public.context_processors.project',
             ],
             'debug': DEBUG,
         },
@@ -116,15 +136,16 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    # {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    # {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    # {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    # {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
-awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
-#OIDC_USERINFO = 'dalme_app.utils.oidc_userinfo'
-#OIDC_IDTOKEN_INCLUDE_CLAIMS = True
-#OIDC_SESSION_MANAGEMENT_ENABLE = True
+
+OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
+OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+OIDC_SESSION_MANAGEMENT_ENABLE = True
+
 #authentication settings
 #LOGIN_URL = '/accounts/login/dalme_wp/'
 LOGIN_URL = '/accounts/login/'
@@ -218,7 +239,8 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'OPTIONS': {
-                'read_default_file': os.path.join(BASE_DIR, 'db.cnf')
+                'read_default_file': os.path.join(BASE_DIR, 'db.cnf'),
+                'sql_mode': 'traditional',
             },
             'TEST': {
                 'NAME': 'dalme_app_test',
@@ -251,13 +273,23 @@ else:
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
-
-
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': AWS_ES_ENDPOINT,
+        'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'haystack',
+    },
+}
+if 'AWS_ES_ENDPOINT' in os.environ:
+    AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
+    awsauth = AWS4Auth(
+        os.environ['AWS_ACCESS_KEY_ID'],
+        os.environ['AWS_SECRET_ACCESS_KEY'],
+        os.environ['AWS_DEFAULT_REGION'],
+        'es'
+    )
+    HAYSTACK_CONNECTIONS["default"].update({
+        'URL': AWS_ES_ENDPOINT,
         'KWARGS': {
             'port': 443,
             'http_auth': awsauth,
@@ -265,8 +297,22 @@ HAYSTACK_CONNECTIONS = {
             'verify_certs': True,
             'connection_class': elasticsearch.RequestsHttpConnection,
         }
-    },
-}
+    })
+
+if 'SEARCHBOX_SSL_URL' in os.environ:
+    from urllib.parse import urlparse
+    es = urlparse(os.environ['SEARCHBOX_SSL_URL'])
+    port = es.port or 443
+    HAYSTACK_CONNECTIONS['default'].update({
+        'URL': es.scheme + '://' + es.hostname + ':' + str(port),
+        'KWARGS': {
+            'http_auth': es.username + ':' + es.password,
+            'use_ssl': True,
+            'verify_certs': True,
+            'connection_class': elasticsearch.RequestsHttpConnection,
+        }
+    })
+
 
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
@@ -297,12 +343,19 @@ USE_L10N = True
 USE_TZ = True
 
 # Media files
-DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
-AWS_DEFAULT_ACL = None
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
-# MEDIA_ROOT = '/Users/gabep/Repos/DALME-Online-Database/media/'
-MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
-# MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
+    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+    DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
+
+    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
+
+    AWS_DEFAULT_ACL = None
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
 # Extra places for collectstatic to find static files.
 # STATICFILES_DIRS = [
@@ -318,11 +371,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 SITE_ID = 1
 
 #HTTPS/SSL settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 CELERY_BROKER_URL = 'redis://localhost'
@@ -390,3 +444,27 @@ MESSAGE_TAGS = {
 
 #django-crispy_forms settings
 #CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+if "LOG_TO_STDOUT" in os.environ:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
+
+if "HEROKU_APP_NAME" in os.environ:
+    ALLOWED_HOSTS = ["*"]
+
+WAGTAIL_SITE_NAME = 'DALME'
+WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'

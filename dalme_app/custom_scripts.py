@@ -126,7 +126,7 @@ def update_folios_in_dam(request):
 
 
 def import_languages(request):
-    file = os.path.join('dalme_app', 'templates', 'menus', 'uk.json')
+    file = os.path.join('templates', 'menus', 'uk.json')
     with open(file, 'r') as fp:
         text = json.load(fp)
         for item in text:

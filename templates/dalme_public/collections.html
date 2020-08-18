@@ -1,0 +1,46 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load dalme_public_tags wagtailcore_tags wagtailimages_tags static %}
+
+{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_collections_filter.html" %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    {{ page.body }}
+
+    {% if corpora %}
+      <div id="corpora" class="corpora-container u-flex">
+        {% for corpus, collections in corpora %}
+          <section class="corpus">
+            <div id="handle" class="u-subsection u-flex" data-collapsed="false">
+              <h3>{{ corpus.title }}</h3>
+              <i class="fas fa-caret-down corpus"></i>
+            </div>
+            {{ corpus.description|richtext }}
+            <h4>Collections</h4>
+            <ul class="collections">
+              {% for collection in collections %}
+                <li class="u-flex">
+                  <a href="{% pageurl collection %}">{{ collection.title }}</a>
+                  <span class="count">
+                    {% collection_date_range collection %} | {{ collection.count }} Records
+                  </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </section>
+        {% endfor %}
+      </div>
+    {% else %}
+      <h4>No corpora or collections found.</h4>
+    {% endif %}
+  </div>
+{% endblock %}

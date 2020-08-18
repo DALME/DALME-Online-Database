@@ -1,0 +1,564 @@
+{% extends "dalme_public/layouts/__single_column.html" %}
+{% load static %}
+
+{% block title %}Inventories &mdash; {{ block.super }}{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css">
+{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_breadcrumbs.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div id="app" class="app inventory-list">
+    <nav>
+      <ul class="u-flex">
+        <li class="filter" @click="toggleFilters" v-on-clickaway="hideFilters">
+          <span>Filter</span>
+          <i class="fa fa-sort" aria-hidden="true"></i>
+        </li>
+
+        <li v-if="showModes" id="compact" class="mode compact" @click="setMode">
+          <i class="fa fa-minus" aria-hidden="true"></i>
+        </li>
+        <li v-if="showModes" id="wide" class="mode wide" @click="setMode">
+          <i class="fa fa-bars" aria-hidden="true"></i>
+        </li>
+        <li v-if="showModes" id="detail" class="right mode detail" @click="setMode">
+          <i class="fa fa-th-large" aria-hidden="true"></i>
+        </li>
+
+        <li class="search">
+          <input
+            type="search"
+            placeholder="Search by name"
+            v-model="search"
+            :value="search"
+          >
+        </li>
+        <div class="filter-panel" v-if="showFilters && inventories">
+          <form method="get" class="filter-form u-flex">
+
+            <label class="label">Corpus</label>
+            <v-select
+              :options="choices.corpusChoices"
+              @input="setCorpus"
+              v-model="corpus">
+            </v-select>
+
+            <label class="label">Collection</label>
+            <v-select
+              :options="choices.collectionChoices"
+              @input="setCollection"
+              v-model="collection">
+            </v-select>
+
+            <label class="label">Record Type</label>
+            <v-select
+              :options="choices.sourceTypeChoices"
+              @input="setSourceType"
+              v-model="sourceType">
+            </v-select>
+
+            <label class="label">Date</label>
+            <vue-slider
+              ref="slider"
+              v-model="date"
+              lazy="true"
+              stop-propagation="true"
+              :min="dateMin"
+              :max="dateMax"
+            >
+            </vue-slider>
+
+            <label class="label">Assets</label>
+            <div class="asset u-flex">
+              <input
+                type="checkbox"
+                id="imageCheckbox"
+                @input="setHasImage"
+                v-model="hasImage">
+              <label for="checkbox">Image</label>
+            </div>
+            <div class="asset u-flex">
+              <input
+                type="checkbox"
+                id="transcriptionCheckbox"
+                @input="setHasTranscription"
+                v-model="hasTranscription">
+              <label for="checkbox">Transcription</label>
+            </div>
+
+          </form>
+        </div>
+      </ul>
+    </nav>
+
+    <beat-loader v-if="spinner" :loading="spinner" color="#aaa"></beat-loader>
+    <section v-else class="inventory-container" :class="mode">
+      <template v-if="mode === 'compact'">
+        <p v-if="noResults">No inventories found.</p>
+        <div v-else class="u-grid inventories">
+          <div class="grid-row-wrapper compact u-contents">
+            <span class="heading first">
+              <strong @click="toggleNameOrder" >Name</strong>
+              <template v-if="nameOrder">
+                <i v-if="nameOrder.includes('-')" class="fa fa-chevron-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-chevron-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <span class="heading">
+              <strong @click="toggleSourceTypeOrder">Type</strong>
+              <template v-if="sourceTypeOrder">
+                <i v-if="sourceTypeOrder.includes('-')" class="fa fa-chevron-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-chevron-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <span class="heading">
+              <strong @click="toggleDateOrder">Date</strong>
+              <template v-if="dateOrder">
+                <i v-if="dateOrder.includes('-')" class="fa fa-chevron-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-chevron-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <!-- Placeholder element to regulate the grid. -->
+            <span class="heading last"></span>
+          </div>
+
+          <template v-for="(inventory, index) in inventories" :key="index">
+            <div class="grid-row-wrapper compact u-contents">
+              <span class="inventory-field name">
+                <a :href="inventoryUrl(inventory)">
+                  ${inventory.name}<span class="short-name"> ${inventory.short_name}</span>
+                </a>
+              </span>
+              <span class="inventory-field record-type">${inventory.record_type}</span>
+              <span class="inventory-field date">${inventory.date}</span>
+              <span class="inventory-field icons">
+                <i v-if="inventory.has_images" class="fas fa-pen-nib"></i>
+                <i v-if="inventory.has_transcriptions" class="fas fa-camera"></i>
+              </span>
+            </div>
+          </template>
+        </template>
+
+        <template v-if="mode === 'wide'">
+          <div class="u-flex inventory-wide" v-for="(inventory, index) in inventories" :key="index">
+            <div class="u-flex inventory-details">
+              <a :href="inventoryUrl(inventory)">${inventory.name}</a>
+              <div>
+                ${componentInstance.truncate(inventory.description)}
+                <span class="u-ellipsis"> [...]</span>
+              </div>
+            </div>
+            <div class="u-flex inventory-metadata">
+              <span class="short-name">${inventory.short_name}</span>
+              <span class="city">${inventory.city} | ${inventory.date}</span>
+              <span class="folios" v-if="inventory.no_folios > 1">${inventory.no_folios} Folios</span>
+              <span class="folios" v-else>${inventory.no_folios} Folio</span>
+            </div>
+            <div class="u-flex icons">
+              <div class="u-flex first">
+                <i v-if="inventory.has_images" class="fas fa-pen-nib pen"></i>
+                <span class="icon-count" :class="inventory.transcription_count === 0 ? 'zero' : ''">
+                  ${inventory.transcription_count}
+                </span>
+              </div>
+              <div class="u-flex second">
+                <i v-if="inventory.has_transcriptions" class="fas fa-camera camera"></i>
+                <span class="icon-count" :class="inventory.no_folios === 0 ? 'zero' : ''">
+                  ${inventory.no_folios}
+                </span>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template v-if="mode === 'detail'">
+          <template v-for="(partition, index) in partitionedInventories" :key="index">
+            <div class="grid-row-wrapper detail u-contents">
+              <template v-for="inventory in partition" :key="inventory.id">
+                <a
+                  class="inventory-detail u-flex"
+                  :href="inventoryUrl(inventory)"
+                  v-bind:style="inventoryDetailStyle(inventory)"
+                  v-on:mouseover="toggleHover(inventory.id)"
+                  v-on:mouseleave="toggleHover">
+                    <div class="u-flex top">
+                      <p>${inventory.name}</p>
+                      <div class="u-flex icons">
+                        <div class="u-flex first">
+                          <i v-if="inventory.has_images" class="fas fa-pen-nib pen"></i>
+                          <span class="icon-count" :class="inventory.transcription_count === 0 ? 'zero' : ''">
+                            ${inventory.transcription_count}
+                          </span>
+                        </div>
+                        <div class="u-flex second">
+                          <i v-if="inventory.has_transcriptions" class="fas fa-camera camera"></i>
+                          <span class="icon-count" :class="inventory.no_folios === 0 ? 'zero' : ''">
+                            ${inventory.no_folios}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="u-flex bottom">
+                      <span class="short-name">${inventory.short_name}</span>
+                      <span class="city">${inventory.city} | ${inventory.date}</span>
+                    </div>
+
+                    <div class="modal-description" v-if="inventoryDetailHover === inventory.id">
+                      ${componentInstance.truncate(inventory.description, 35)} [...]
+                    </div>
+                </a>
+              </template>
+            </div>
+          </template>
+        </template>
+    </section>
+
+    <div v-if="!spinner" class="pagination u-flex">
+      <span class="step-links">
+        <template v-if="previous">
+          <i class="fas fa-angle-double-left step-first active" @click="handleFirstPage"></i>
+          <i class="fas fa-angle-left active" @click="handlePreviousPage"></i>
+        </template>
+        <template v-else>
+          <i class="fas fa-angle-double-left step-first inactive"></i>
+          <i class="fas fa-angle-left inactive"></i>
+        </template>
+
+        <span class="current">${currentPageInfo}</span>
+
+        <template v-if="next">
+          <i class="fas fa-angle-right active" @click="handleNextPage"></i>
+          <i class="fas fa-angle-double-right step-last active" @click="handleLastPage"></i>
+        </template>
+        <template v-else>
+          <i class="fas fa-angle-right inactive"></i>
+          <i class="fas fa-angle-double-right step-last inactive"></i>
+        </template>
+      </span>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script src="https://unpkg.com/vue-select@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
+  <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
+  <script>
+    Vue.component('v-select', VueSelect.VueSelect);
+    Vue.component('beat-loader', VueSpinner.BeatLoader);
+    const app = new Vue({
+      el: '#app',
+      delimiters: ['${', '}'],
+      created() {
+        this.fetchData();
+        this.fetchChoices();
+        window.componentInstance = this;
+        window.addEventListener('resize', this.onResize);
+      },
+      components: {
+        'vue-slider': window['vue-slider-component'],
+      },
+      directives: {
+        onClickaway: window.VueClickaway.directive,
+      },
+      data: {
+        fetching: false,
+        inventories: null,
+        thumbnails: {},
+        next: null,
+        previous: null,
+        count: null,
+        totalPages: null,
+        currentPage: null,
+        search: new URLSearchParams(window.location.search).get('name'),
+        showFilters: false,
+        corpus: null,
+        mode: 'compact',
+        collection: null,
+        sourceType: null,
+        date: [1200, 1500],
+        hasImage: null,
+        hasTranscription: null,
+        nameOrder: null,
+        sourceTypeOrder: null,
+        dateOrder: null,
+        choices: {},
+        inventoryDetailHover: false,
+        windowWidth: window.innerWidth,
+      },
+      watch: {
+        inventories: 'fetchThumbnails',
+        search: debounce(function() {
+          this.filterData('name', this.search)
+        }, 250),
+        date: debounce(function() {
+          const [min, max] = this.date;
+          if (min === this.dateMin && max === this.dateMax) {
+            const params = this.setParam('date_range', null).toString();
+            this.updateURL(params);
+            this.fetchData();
+          } else {
+            this.filterData('date_range', this.date);
+          }
+        }, 250),
+      },
+      computed: {
+        showModes() {
+          return this.windowWidth >= 900;
+        },
+        dateMin() {
+          return 1200;
+        },
+        dateMax() {
+          return 1500;
+        },
+        isFiltered() {
+          return [
+            this.corpus,
+            this.collection,
+            this.sourceType,
+            this.date,
+            this.hasImage,
+            this.hasTranscription
+          ].some(value => value);
+        },
+        endpoint() {
+          return '/api/public/sources';
+        },
+        choicesEndpoint() {
+          return '/api/public/choices';
+        },
+        thumbnailEndpoint() {
+          return '/api/public/thumbnails';
+        },
+        spinner() {
+          return (this.inventories === null) || this.fetching == true;
+        },
+        noResults() {
+          return Array.isArray(this.inventories) && !this.inventories.length;
+        },
+        currentPageInfo() {
+          return `Showing page ${this.currentPage} of ${this.totalPages}`;
+        },
+        url() {
+          return location.protocol + '//' + location.host + location.pathname;
+        },
+        currentParams() {
+          return new URLSearchParams(window.location.search);
+        },
+        partitionedInventories() {
+          const partition = 3;
+          return this.inventories
+            ? Array(Math.ceil(this.inventories.length / partition))
+                .fill()
+                .map((_, index) => index * partition)
+                .map(begin => this.inventories.slice(begin, begin + partition))
+            : null;
+        },
+      },
+      methods: {
+        inventoryDetailStyle(inventory) {
+          let blue = 'linear-gradient(to top, rgba(238,248,254,1) 0%, rgba(238,248,254,0) 100%)';
+          let white = 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)';
+          const thumbnail = Object.keys(this.thumbnails).length
+            ? this.thumbnails[inventory.id]
+            : null;
+          if (thumbnail) {
+            blue = `${blue}, url("${thumbnail}")`;
+            white = `${white}, url("${thumbnail}")`;
+          }
+          return this.inventoryDetailHover === inventory.id
+            ? { background: blue }
+            : { background: white };
+        },
+        onResize(e) {
+          this.windowWidth = window.innerWidth;
+          if (this.windowWidth < 900) {
+            this.mode = 'compact';
+          }
+        },
+        toggleHover(uid = false) {
+          this.inventoryDetailHover = uid;
+        },
+        truncate(str, max = 25) {
+          const array = str.trim().split(' ');
+          const ellipsis = array.length > max ? ' [...]' : '';
+          return array.slice(0, max).join(' ');
+        },
+        setMode(e) {
+          this.mode = e.currentTarget.id;
+        },
+        setCorpus() {
+          const value = this.corpus ? this.corpus.id : null;
+          this.filterData('corpus', value);
+        },
+        setCollection() {
+          const value = this.collection ? this.collection.id : null;
+          this.filterData('collection', value);
+        },
+        setSourceType() {
+          const value = this.sourceType ? this.sourceType.id : null;
+          this.filterData('source_type', value);
+        },
+        setHasImage() {
+          this.filterData('has_image', !this.hasImage);
+        },
+        setHasTranscription() {
+          this.filterData('has_transcription', !this.hasTranscription);
+        },
+        toggleNameOrder() {
+          this.sourceTypeOrder = null;
+          this.dateOrder = null;
+          this.nameOrder = this.nameOrder
+            ? this.nameOrder === 'name'
+              ? this.nameOrder = '-name'
+              : this.nameOrder = 'name'
+            : this.nameOrder = '-name';
+          this.filterData('order_by', this.nameOrder);
+        },
+        toggleSourceTypeOrder() {
+          this.nameOrder = null;
+          this.dateOrder = null;
+          this.sourceTypeOrder = this.sourceTypeOrder
+            ? this.sourceTypeOrder === 'source_type'
+              ? this.sourceTypeOrder = '-source_type'
+              : this.sourceTypeOrder = 'source_type'
+            : this.sourceTypeOrder = '-source_type';
+          this.filterData('order_by', this.sourceTypeOrder);
+        },
+        toggleDateOrder() {
+          this.nameOrder = null;
+          this.sourceTypeOrder = null;
+          this.dateOrder = this.dateOrder
+            ? this.dateOrder === 'date'
+              ? this.dateOrder = '-date'
+              : this.dateOrder = 'date'
+            : this.dateOrder = '-date'
+          this.filterData('order_by', this.dateOrder);
+        },
+        destructureParams() {
+          let params = {};
+          this.currentParams.forEach((value, key) => {
+            const camelized = key.replace(/(_\w)/g, k => k[1].toUpperCase());
+            if (['collection', 'corpus', 'source_type'].includes(key)) {
+              value = this.choices[`${camelized}Choices`]
+                .filter(item => {
+                  return key === 'source_type'
+                    ? item.id == value
+                    : item.id === parseInt(value);
+                });
+            }
+            return params[camelized] = typeof value === 'object' ? value[0] : value;
+          });
+          return params;
+        },
+        fetchChoices() {
+          fetch(this.choicesEndpoint)
+            .then(response => response.json())
+            .then(data => {
+              this.choices = data;
+              const params = this.destructureParams();
+              for (let [key, value] of Object.entries(params)) {
+                this[key] = value;
+              }
+            });
+        },
+        fetchData(url = null) {
+          this.fetching = true;
+          fetch(url || `${this.endpoint}/?${this.currentParams.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+              this.inventories = data.results;
+              this.next = data.next;
+              this.previous = data.previous;
+              this.count = data.count;
+              this.totalPages = data.totalPages;
+              this.currentPage = data.currentPage;
+              this.fetching = false;
+            });
+        },
+        async fetchThumbnails() {
+          const inventories = this.inventories.filter(inventory =>
+            inventory.image_ref !== null && !(inventory.id in this.thumbnails)
+          );
+          await Promise.all(inventories.map(inventory => {
+            fetch(`${this.thumbnailEndpoint}/?image_ref=${inventory.image_ref}`)
+              .then(response => response.json())
+              .then(data => {
+                this.thumbnails[inventory.id] = data.image_url;
+                // Not ideal.
+                this.$forceUpdate();
+              })
+            }));
+        },
+        setParam(key, value) {
+          let params = this.currentParams;
+          if (!value) {
+            params.delete(key);
+          } else {
+            params.set(key, value);
+          }
+          return params;
+        },
+        updateURL(params) {
+          const url = params ? `${this.url}?${params}` : this.url;
+          window.history.pushState(null, null, url);
+        },
+        filterData(key, value) {
+          const params = this.setParam(key, value).toString();
+          this.fetchData(`${this.endpoint}/?${params}`);
+          this.updateURL(params);
+        },
+        inventoryUrl(inventory) {
+          return `${location.pathname}${inventory.id}`;
+        },
+        toggleFilters() {
+          this.showFilters = !this.showFilters;
+        },
+        hideFilters(e) {
+          if (!e.target.closest('.filter-panel')) {
+            this.showFilters = false;
+          }
+        },
+        handleFirstPage() {
+          const params = this.setParam('page', 1).toString();
+          this.fetchData(`${this.endpoint}/?${params}`);
+          this.updateURL(params);
+        },
+        handlePreviousPage() {
+          if (this.previous) {
+            const params = this.setParam('page', this.previous).toString();
+            this.fetchData(`${this.endpoint}/?${params}`);
+            this.updateURL(params);
+          }
+        },
+        handleNextPage() {
+          if (this.next) {
+            const params = this.setParam('page', this.next).toString();
+            this.fetchData(`${this.endpoint}/?${params}`);
+            this.updateURL(params);
+          }
+        },
+        handleLastPage() {
+          const params = this.setParam('page', this.totalPages).toString();
+          this.fetchData(`${this.endpoint}/?${params}`);
+          this.updateURL(params);
+        },
+      },
+    });
+  </script>
+{% endblock %}
