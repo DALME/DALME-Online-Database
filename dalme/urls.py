@@ -6,8 +6,12 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
 from rest_framework import routers
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.core import urls as wagtail_urls
+from wagtail.documents import urls as wagtaildocs_urls
 from dalme_app import apis
 from dalme_app import web_apis
+from dalme_public import urls as dalme_public_urls
 from maintenance_mode import urls as maintenance_mode_urls
 
 router = routers.DefaultRouter()
@@ -45,6 +49,7 @@ urlpatterns = [
     path('maintenance-mode/', include(maintenance_mode_urls)),
     path('api/', include(router.urls)),
     path('web-api/', include(web_router.urls)),
+    path('api/public/', include(dalme_public_urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),
@@ -52,4 +57,8 @@ urlpatterns = [
     path('django_admin/', admin.site.urls),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),
     re_path(r'^', include('dalme_app.urls')),
+    # Public URLs. Wagtail didn't like being namespaced so leave at top-level for now.
+    path('cms/', include(wagtailadmin_urls)),
+    path('public/', include(wagtail_urls)),
+    path('documents/', include(wagtaildocs_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

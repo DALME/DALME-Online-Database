@@ -41,13 +41,29 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'haystack',
-    'djangosaml2idp',
     'django_celery_results',
+    'djangosaml2idp',
+    'corsheaders',
     'rest_framework',
-    'storages'
     'storages',
-
+    'django_filters',
+    'modelcluster',
+    'taggit',
     'maintenance_mode',
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.contrib.routable_page',
+    'wagtail.contrib.styleguide',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
+    'wagtailmodelchooser',
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
 ]
@@ -64,6 +80,8 @@ MIDDLEWARE = [
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'
@@ -79,6 +97,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'dalme_public.context_processors.year',
+                'dalme_public.context_processors.project',
             ],
             'debug': DEBUG,
         },
@@ -90,6 +110,7 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
@@ -138,6 +159,7 @@ SAML_IDP_CONFIG = {
 }
 
 DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -219,6 +241,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 
 SITE_ID = 1
+WAGTAIL_SITE_NAME = 'DALME'
+WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
 
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
