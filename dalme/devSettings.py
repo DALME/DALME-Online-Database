@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     'django_filters',
     'modelcluster',
     'taggit',
-
     'maintenance_mode',
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
@@ -138,15 +137,15 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
-    # {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    # {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    # {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    # {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
-OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
-OIDC_IDTOKEN_INCLUDE_CLAIMS = True
-OIDC_SESSION_MANAGEMENT_ENABLE = True
+# OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
+# OIDC_IDTOKEN_INCLUDE_CLAIMS = True
+# OIDC_SESSION_MANAGEMENT_ENABLE = True
 
 #authentication settings
 #LOGIN_URL = '/accounts/login/dalme_wp/'
@@ -154,7 +153,6 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 #LOGIN_REDIRECT_URL = 'https://db.dalme.org'
-BASE_URL = 'https://127.0.0.1.xip.io:8443/idp'
 #SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # Database
@@ -167,7 +165,7 @@ BASE_URL = 'https://127.0.0.1.xip.io:8443/idp'
 SAML_IDP_CONFIG = {
     'debug': DEBUG,
     'xmlsec_binary': get_xmlsec_binary(['/opt/local/bin', '/usr/bin/xmlsec1']),
-    'entityid': '%s/metadata' % BASE_URL,
+    'entityid': 'https://127.0.0.1.xip.io:8443/idp/metadata',
     'description': 'DALME SAML Identity Provider Setup',
     'service': {
         'idp': {
@@ -285,8 +283,8 @@ HAYSTACK_CONNECTIONS = {
 if 'AWS_ES_ENDPOINT' in os.environ:
     AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
     awsauth = AWS4Auth(
-        os.environ['AWS_ACCESS_KEY_ID'],
-        os.environ['AWS_SECRET_ACCESS_KEY'],
+        os.environ['AWS_ACCESS_ID'],
+        os.environ['AWS_ACCESS_KEY'],
         os.environ['AWS_DEFAULT_REGION'],
         'es'
     )
@@ -348,8 +346,8 @@ USE_TZ = True
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
-    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+    AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
+    AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
     DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
 
     AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
