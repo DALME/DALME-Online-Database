@@ -18,6 +18,7 @@
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}
+
 <div class="container-fluid">
   <div class="card shadow mb-3">
     <div class="card-header card-tabs-header">
@@ -108,7 +109,7 @@
                         <div class="col-sm-9"><span class="attribute_list_value">{{ set.workset_progress }}%</span></div>
                     </div>
                   {% endif %}
-                  {% if set.set_type == 2 %}
+                  {% if set.stat_title is not None %}
                     <div class="form-row">
                         <div class="col-sm-3 text-right"><span class="attribute_list_label">Stat Title</span></div>
                         <div class="col-sm-9"><span class="attribute_list_value">{{ set.stat_title }}</span></div>
