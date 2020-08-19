@@ -3,19 +3,25 @@ import dj_database_url
 import elasticsearch
 from requests_aws4auth import AWS4Auth
 from django.contrib.messages import constants as messages
+import saml2
+from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
+from saml2.sigver import get_xmlsec_binary
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
-AWS_ACCESS_ID = os.environ.get('AWS_ACCESS_ID', '')
-AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY', '')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
 AWS_ES_ENDPOINT = os.environ.get('AWS_ES_ENDPOINT', '')
 AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
+
+SAML_CERT = os.environ.get('SAML_CERT', '')
+SAML_KEY = os.environ.get('SAML_KEY', '')
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
 EMAIL_PORT = 587
@@ -28,7 +34,6 @@ DEBUG = False
 ALLOWED_HOSTS = ['.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
 
 INSTALLED_APPS = [
-    'dalme_app.application.DalmeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,10 +43,31 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'haystack',
     'django_celery_results',
-    'maintenance_mode',
+    'django_celery_beat',
+    'djangosaml2idp',
+    'corsheaders',
     'rest_framework',
-    'oidc_provider',
-    'storages'
+    'storages',
+    'django_filters',
+    'modelcluster',
+    'taggit',
+    'maintenance_mode',
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.contrib.routable_page',
+    'wagtail.contrib.styleguide',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
+    'wagtailmodelchooser',
+    'dalme_app.application.DalmeConfig',
+    'dalme_public.application.DalmePublicConfig',
 ]
 
 MIDDLEWARE = [
@@ -51,12 +77,13 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'dalme_app.middleware.CurrentUserMiddleware',
+    'dalme_app.utils.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'dalme_app.middleware.AsyncMiddleware',
+    'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
-    'oidc_provider.middleware.SessionManagementMiddleware',
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'dalme.urls'
@@ -72,6 +99,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'dalme_public.context_processors.year',
+                'dalme_public.context_processors.project',
             ],
             'debug': DEBUG,
         },
@@ -83,6 +112,7 @@ WSGI_APPLICATION = 'dalme.wsgi.application'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
@@ -90,15 +120,48 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
-OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
-OIDC_IDTOKEN_INCLUDE_CLAIMS = True
-OIDC_SESSION_MANAGEMENT_ENABLE = True
+awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 
-DATABASE_ROUTERS = ['dalme_app.db_routers.ModelDatabaseRouter']
+SAML_IDP_CONFIG = {
+    'xmlsec_binary': get_xmlsec_binary(['/opt/local/bin', '/usr/bin/xmlsec1']),
+    'entityid': 'https://db.dalme.org/idp/metadata',
+    'description': 'DALME SAML IDP Setup',
+    'service': {
+        'idp': {
+            'name': 'DALME SAML Identity Provider',
+            'endpoints': {
+                'single_sign_on_service': [
+                    ('https://db.dalme.org/idp/sso/post/', saml2.BINDING_HTTP_POST),
+                    ('https://db.dalme.org/idp/sso/redirect/', saml2.BINDING_HTTP_REDIRECT),
+                ],
+                "single_logout_service": [
+                    ("https://db.dalme.org/idp/slo/post/", saml2.BINDING_HTTP_POST),
+                    ("https://db.dalme.org/idp/slo/redirect/", saml2.BINDING_HTTP_REDIRECT)
+                ],
+            },
+            'name_id_format': [NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED],
+            'sign_response': True,
+            'sign_assertion': True,
+            'want_authn_requests_signed': False,
+        },
+    },
+
+    # Signing
+    'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
+    'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
+    # Encryption
+    'encryption_keypairs': [{
+        'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
+        'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
+    }],
+    'valid_for': 365 * 24,
+}
+
+DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -180,13 +243,27 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 
 SITE_ID = 1
+WAGTAIL_SITE_NAME = 'DALME'
+WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
 
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = 'sqs://'
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'predefined_queues': {
+        'celery': {
+            'url': AWS_SQS_URL,
+            'access_key_id': AWS_ACCESS_KEY_ID,
+            'secret_access_key': AWS_SECRET_ACCESS_KEY,
+        }
+    }
+}
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {

@@ -1,13 +1,16 @@
 env
+devEnv
 venv
 *.pyc
 staticfiles
+media
 www
 .env
 db.cnf
 db-test.cnf
 *.DS_Store
 data
+*.sql
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
@@ -19,3 +22,8 @@ _extra
 
 #certificate stuff for development server
 ssl-certs
+
+TODO*
+dalme/media
+
+.ebignore

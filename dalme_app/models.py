@@ -3,12 +3,13 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
-from dalme_app.middleware import get_current_user, get_current_username
+from dalme_app.utils import get_current_user, get_current_username
 import os
 import json
 import requests
 import hashlib
 import textwrap
+import lxml.etree as et
 from urllib.parse import urlencode
 import datetime
 from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
@@ -20,6 +21,9 @@ import mimetypes
 import uuid
 # from django.conf import settings
 from django.dispatch import receiver
+from collections import Counter
+from wagtail.search import index
+
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -150,7 +154,7 @@ class Content_attributes(dalmeIntid):
 
 
 # -> Source Management
-class Source(dalmeUuid):
+class Source(index.Indexed, dalmeUuid):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
@@ -160,13 +164,24 @@ class Source(dalmeUuid):
     pages = models.ManyToManyField('Page', db_index=True, through='Source_pages')
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
-    sets = GenericRelation('Set_x_content')
+    sets = GenericRelation('Set_x_content', related_query_name='source')
+
+    search_fields = [
+        index.FilterField('name'),
+    ]
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse('source_detail', kwargs={'pk': self.pk})
+
+    @property
+    def is_public(self):
+        try:
+            return self.workflow.is_public
+        except Workflow.DoesNotExist:
+            return False
 
     @property
     def inherited(self):
@@ -196,6 +211,55 @@ class Source(dalmeUuid):
         ep_list = [i.transcription.entity_phrases.filter(content_type=118) for i in self.source_pages.all().select_related('transcription') if i.transcription]
         if len(ep_list) > 0:
             return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+
+    @property
+    def has_images(self):
+        if self.pages.exclude(dam_id__isnull=True).count() > 0:
+            return True
+        else:
+            return False
+
+    @property
+    def no_folios(self):
+        if self.pages.all().exists():
+            return self.pages.all().count()
+        else:
+            return 0
+
+    @property
+    def no_transcriptions(self):
+        if self.source_pages.exclude(transcription__count_ignore=True).exists():
+            return self.source_pages.exclude(transcription__count_ignore=True).count()
+        else:
+            return 0
+
+    @property
+    def has_transcriptions(self):
+        if self.source_pages.all().select_related('transcription').exists():
+            return True
+        else:
+            return False
+
+    @property
+    def get_credit_line(self):
+        try:
+            editor = self.owner.profile.full_name
+            contributors = [i.user.profile.full_name for i in self.workflow.work_log.all()]
+            tr_cr = [i.creation_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
+            contributors = contributors + tr_cr
+            tr_mod = [i.modification_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
+            contributors = contributors + tr_mod
+            contributors = [i for i in contributors if i != editor]
+            if len(contributors) == 0:
+                credit_line = 'Edited by {}.'.format(editor)
+            elif len(contributors) == 1:
+                credit_line = 'Edited by {}, with contributions by {}.'.format(editor, contributors[0])
+            else:
+                contributors_list = "{}, and {}".format(", ".join(contributors[:-1]),  contributors[-1])
+                credit_line = 'Edited by {}, with contributions by {}.'.format(editor, contributors_list)
+            return credit_line
+        except Exception as e:
+            return str(e)
 
 
 @receiver(models.signals.post_save, sender=Source)
@@ -233,9 +297,25 @@ class Page(dalmeUuid):
         return self.name
 
     def get_rights(self):
-        if self.sources.all()[0].source.parent.parent.attributes.filter(attribute_type=144).exists():
-            rpo = RightsPolicy.objects.get(pk=json.loads(self.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR)['id'])
-            return {'status': rpo.get_rights_status_display(), 'display_notice': rpo.notice_display, 'notice': json.loads(rpo.rights_notice)}
+        try:
+            source = self.sources.first().source
+            exists = source.parent.parent.attributes.filter(
+                attribute_type=144
+            ).exists()
+        except AttributeError:
+            return None
+
+        if exists:
+            rpo = RightsPolicy.objects.get(
+                pk=json.loads(
+                    source.parent.parent.attributes.get(attribute_type=144).value_STR
+                )['id'])
+            return {
+                'status': rpo.get_rights_status_display(),
+                'display_notice': rpo.notice_display,
+                'notice': json.loads(rpo.rights_notice)
+            }
+        return None
 
     def get_absolute_url(self):
         return reverse('page_detail', kwargs={'pk': self.pk})
@@ -284,9 +364,18 @@ class Transcription(dalmeUuid):
     transcription = models.TextField(blank=True, default=None)
     author = models.CharField(max_length=255, default=get_current_username)
     version = models.IntegerField(null=True)
+    count_ignore = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
+
+    def save(self, **kwargs):
+        # set count_ignore flag
+        xml_parser = et.XMLParser(recover=True)
+        tr_tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
+        if len(tr_tree) == 1 and tr_tree[0].tag in ['quote', 'gap', 'mute'] or len(tr_tree) == 0:
+            self.count_ignore = True
+        super(Transcription, self).save()
 
 
 @receiver(models.signals.post_save, sender=Transcription)
@@ -295,7 +384,7 @@ def update_source_modification(sender, instance, created, **kwargs):
         source_id = instance.source_pages.all().first().source.id
         source = Source.objects.get(pk=source_id)
         source.modification_timestamp = timezone.now()
-        source.modification_username = get_current_username()
+        source.modification_user = get_current_user()
         source.save()
 
 
@@ -489,13 +578,15 @@ class Set(dalmeUuid):
     is_public = models.BooleanField(default=False)
     has_landing = models.BooleanField(default=False)
     endpoint = models.CharField(max_length=55)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
+    owner_local = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
     set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
     description = models.TextField()
     comments = GenericRelation('Comment')
+    stat_title = models.CharField(max_length=25, null=True, blank=True)
+    stat_text = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return self.name + ' (' + self.set_type + ')'
+        return f'{self.name}({self.set_type})'
 
     @property
     def workset_progress(self):
@@ -510,6 +601,28 @@ class Set(dalmeUuid):
     def get_member_count(self):
         return self.members.count()
 
+    @property
+    def get_public_member_count(self):
+        return self.members.filter(source__workflow__is_public=True).count()
+
+    @property
+    def get_languages(self):
+        return [[LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15).values_list('source__attributes__value_STR', flat=True))]
+
+    @property
+    def get_public_languages(self):
+        return [[LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15, source__workflow__is_public=True).values_list('source__attributes__value_STR', flat=True))]
+
+    @property
+    def get_time_coverage(self):
+        years = self.members.filter(source__attributes__attribute_type=26).order_by('source__attributes__value_DATE_y').values_list('source__attributes__value_DATE_y', flat=True)
+        return dict(Counter(years))
+
+    @property
+    def get_public_time_coverage(self):
+        years = self.members.filter(source__attributes__attribute_type=26, source__workflow__is_public=True).order_by('source__attributes__value_DATE_y').values_list('source__attributes__value_DATE_y', flat=True)
+        return dict(Counter(years))
+
 
 class Set_x_content(dalmeBasic):
     set_id = models.ForeignKey(Set, on_delete=models.CASCADE, related_name='members')
@@ -521,6 +634,8 @@ class Set_x_content(dalmeBasic):
     class Meta:
         unique_together = ('content_type', 'object_id', 'set_id')
         ordering = ['set_id', 'id']
+
+
 # <-
 # <-
 
@@ -542,7 +657,7 @@ class CityReference(dalmeIntid):
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.name + '(' + self.country.name + ')'
+        return f'{self.name}({self.country.name})'
 
     class Meta:
         ordering = ['country', 'name']
@@ -654,7 +769,7 @@ class Workflow(models.Model):
 
 class Work_log(models.Model):
     id = models.AutoField(primary_key=True, unique=True, db_index=True)
-    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE)
+    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE, related_name="work_log")
     event = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
@@ -788,7 +903,7 @@ class Ticket(dalmeIntid):
 
     @property
     def creation_name(self):
-        return User.objects.get(username=self.creation_username).profile.full_name
+        return self.creation_user.profile.full_name
 
     def __str__(self):
         return str(self.id) + ' - ' + self.title + ' ('+self.get_status_display+')'
@@ -808,7 +923,7 @@ class Comment(dalmeIntid):
     @property
     def snippet(self):
         body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
-        return "{author} - {snippet}...".format(author=self.creation_username, snippet=body_snippet)
+        return "{author} - {snippet}...".format(author=self.creation_user.username, snippet=body_snippet)
 
     def __str__(self):
         return self.snippet

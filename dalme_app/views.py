@@ -75,7 +75,7 @@ class DefaultSearch(SearchView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Search', ''), ('Search Results', '')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -116,7 +116,7 @@ class DTListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = self.get_breadcrumb()
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -357,7 +357,7 @@ class ModelLists(DTListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = self.get_breadcrumb()
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -559,7 +559,7 @@ class SourceDetail(DetailView):
             }
             context['workset'] = para
         breadcrumb = self.get_breadcrumb()
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -598,8 +598,8 @@ class SourceDetail(DetailView):
         context['source_data'] = source_data
         context['source_metadata'] = {
             'ID': str(self.object.id),
-            'Created': functions.format_rct(self.object.creation_username, self.object.creation_timestamp),
-            'Modified': functions.format_rct(self.object.modification_username, self.object.modification_timestamp),
+            'Created': functions.format_rct(self.object.creation_user, self.object.creation_timestamp),
+            'Modified': functions.format_rct(self.object.modification_user, self.object.modification_timestamp),
         }
         attribute_data = self.get_attributes()
         if attribute_data.get('description', None) is not None:
@@ -728,7 +728,7 @@ class UserDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Users', '/users')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -903,7 +903,7 @@ class RightsDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Rights Policies', '/rights')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -1025,7 +1025,7 @@ class ImageDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('DAM Images', '/images')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -1119,7 +1119,7 @@ class PageDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = ['Pages']
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -1141,7 +1141,7 @@ class Index(TemplateView):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Dashboard', '')]
         if self.request.session.get('sidebar_toggle') is not None:
-            sidebar_toggle = self.request.session['sidebar_toggle']
+            sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         else:
             sidebar_toggle = ''
             self.request.session['sidebar_toggle'] = sidebar_toggle
@@ -1205,7 +1205,7 @@ class SetsDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Sets', '/sets')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -1265,7 +1265,7 @@ class Scripts(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Scripts', '')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context = functions.set_menus(self.request, context, state)
@@ -1286,7 +1286,7 @@ class TicketDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -1336,7 +1336,7 @@ class TasksDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Tasks', '/tasks')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context = functions.set_menus(self.request, context, state)
@@ -1361,7 +1361,7 @@ class TasksList(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Tasks', '/tasks')]
-        sidebar_toggle = self.request.session['sidebar_toggle']
+        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context = functions.set_menus(self.request, context, state)

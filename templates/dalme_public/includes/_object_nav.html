@@ -1,0 +1,22 @@
+{% load dalme_public_tags %}
+
+{% get_recent_objects as object_list %}
+{% if object_list %}
+  <div class="featured-object-nav">
+    <h4 class="u-small-caps-heading">Objects</h4>
+    <div class="u-flex">
+      <div class="u-small-caps-heading u-bottom-to-top year">{{ year }}</div>
+      <ul>
+        {% for obj in object_list %}
+          {% if page.url != obj.url %}
+          <a href="{{ obj.url }}">
+            <li>{{ obj.month }}</li>
+          </a>
+          {% else %}
+            <li>{{ obj.month }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,25 @@
+{% load dalme_public_tags wagtailcore_tags %}
+
+<nav class="features">
+  <ul>
+    <h3 class="u-small-caps-heading">FEATURES</h3>
+    <li>
+      {% get_features_nav_q 'essays' as params %}
+      <a href="{% get_features_url %}{{ params }}">
+        Essays
+      </a>
+    </li>
+    <li>
+      {% get_features_nav_q 'inventories' as params %}
+      <a href="{% get_features_url %}{{ params }}">
+        Inventories
+      </a>
+    </li>
+    <li>
+      {% get_features_nav_q 'objects' as params %}
+      <a href="{% get_features_url %}{{ params }}">
+        Objects
+      </a>
+    </li>
+  </ul>
+</nav>

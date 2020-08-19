@@ -1,0 +1,17 @@
+{% load wagtailcore_tags wagtailimages_tags dalme_public_tags %}
+
+{% include "dalme_public/includes/_breadcrumbs.html" %}
+<div class="title u-flex u-type-serif">
+  <h1>{{ page.title }}</h1>
+  <h2>
+    {% with page.get_parent as parent %}
+      {% if parent|classname == 'Collection' %}
+        <a href="{% pageurl parent %}">{{ parent.title }}</a>
+      {% else %}
+        {% with parent.get_parent as home %}
+          <a href="{% pageurl home %}">{{ home.title }}</a>
+        {% endwith %}
+      {% endif %}
+    {% endwith %}
+  </h2>
+</div>

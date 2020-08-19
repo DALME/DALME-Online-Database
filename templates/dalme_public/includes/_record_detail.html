@@ -1,0 +1,26 @@
+{% load dalme_public_tags wagtailroutablepage_tags %}
+
+{% get_source_details as source_data %}
+{% if source_data.source %}
+  <div class="record-detail u-flex">
+    <h4 class="u-small-caps-heading">RECORD</h4>
+    <ul>
+      {% if source_data.source_set %}
+        <a href="{{ source_data.url }}">
+          <li>{{ source_data.name }}</li>
+        </a>
+      {% else %}
+        <a href="{% routablepageurl source_data.collections.specific 'unscoped_inventory' source_data.source.pk %}">
+          <li>{{ source_data.name }}</li>
+        </a>
+      {% endif %}
+      <li>{{ source_data.short_name }}</li>
+      {% if source_data.city %}
+        <li>{{ source_data.city }}</li>
+      {% endif %}
+      {% if source_data.date %}
+        <li>{{ source_data.date }}</li>
+      {% endif %}
+    </ul>
+  </div>
+{% endif %}

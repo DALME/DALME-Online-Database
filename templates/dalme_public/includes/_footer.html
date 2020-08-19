@@ -1,0 +1,27 @@
+{% load dalme_public_tags wagtailcore_tags %}
+
+{% if footer.pages %}
+  <nav class="footer">
+    <ul>
+      {% for block in footer.pages %}
+        {{ block }}
+      {% endfor %}
+    </ul>
+  </nav>
+{% endif %}
+
+<div class="copyright">
+  {% if footer.copyright %}
+    {{ footer.copyright }} {{ year }}
+  {% else %}
+    Copyright &copy; {{ year }} {{ project }}
+  {% endif %}
+</div>
+
+{% if footer.social %}
+  <div class="social">
+    {% for block in footer.social %}
+      {{ block }}
+    {% endfor %}
+  </div>
+{% endif %}
