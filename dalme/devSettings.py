@@ -200,12 +200,12 @@ SAML_IDP_CONFIG = {
     },
 
     # Signing
-    'key_file': SAML_KEY,
-    'cert_file': SAML_CERT,
+    'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
+    'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
     # Encryption
     'encryption_keypairs': [{
-        'key_file': SAML_KEY,
-        'cert_file': SAML_CERT,
+        'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
+        'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
     }],
     'valid_for': 365 * 24,
 }
