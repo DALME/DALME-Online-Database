@@ -11,13 +11,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
-AWS_ACCESS_ID = os.environ.get('AWS_ACCESS_ID', '')
-AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY', '')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
 AWS_ES_ENDPOINT = os.environ.get('AWS_ES_ENDPOINT', '')
 AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 
 SAML_CERT = os.environ.get('SAML_CERT', '')
 SAML_KEY = os.environ.get('SAML_KEY', '')
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'haystack',
     'django_celery_results',
+    'django_celery_beat',
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
@@ -118,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-awsauth = AWS4Auth(AWS_ACCESS_ID, AWS_ACCESS_KEY, AWS_REGION, 'es')
+awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
@@ -249,7 +251,21 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = 'sqs://'
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'predefined_queues': {
+        'dalme-q': {
+            'url': AWS_SQS_URL,
+            'access_key_id': AWS_ACCESS_KEY_ID,
+            'secret_access_key': AWS_SECRET_ACCESS_KEY,
+        }
+    }
+}
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_DEFAULT_QUEUE = 'dalme-q'
+CELERY_RESULT_BACKEND = None # Disabling the results backend
 CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {

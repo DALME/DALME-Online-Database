@@ -15,17 +15,27 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+AWS_ES_ENDPOINT = os.environ.get('AWS_ES_ENDPOINT', '')
+AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
+
+SAML_CERT = os.environ.get('SAML_CERT', '')
+SAML_KEY = os.environ.get('SAML_KEY', '')
 
 # email setup
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'dalme@example.com'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
-EMAIL_PORT = 1025
-
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,18 +50,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'django.contrib.humanize',
-    #'django.contrib.admindocs',
+    # 'django.contrib.humanize',
+    # 'django.contrib.admindocs',
     'django.contrib.sites',
     'haystack',
-    #'treebeard',
-    #'sekizai',
+    # 'treebeard',
+    # 'sekizai',
     'django_celery_results',
+    'django_celery_beat',
     # 'allaccess.apps.AllAccessConfig',
-    #'todo',
-    #'debug_toolbar',
-    #'crispy_forms',
-    #'oauth2_provider',
+    # 'todo',
+    # 'debug_toolbar',
+    # 'crispy_forms',
+    # 'oauth2_provider',
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
@@ -86,9 +97,9 @@ if DEBUG and ENABLE_DJANGO_EXTENSIONS:
 
 MIDDLEWARE = [
     # 'corsheaders.middleware.CorsMiddleware',
-    #'oauth2_provider.middleware.OAuth2TokenMiddleware',
+    # 'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,7 +109,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'oidc_provider.middleware.SessionManagementMiddleware',
+    # 'oidc_provider.middleware.SessionManagementMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
@@ -118,7 +129,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                #'sekizai.context_processors.sekizai',
+                # 'sekizai.context_processors.sekizai',
                 'dalme_public.context_processors.year',
                 'dalme_public.context_processors.project',
             ],
@@ -129,31 +140,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dalme.wsgi.application'
 
-#authentication backends
+# authentication backends
 AUTHENTICATION_BACKENDS = [
-    #'allaccess.backends.AuthorizedServiceBackend',
-    #'oauth2_provider.backends.OAuth2Backend',
+    # 'allaccess.backends.AuthorizedServiceBackend',
+    # 'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend'
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 # OIDC_USERINFO = 'dalme_app.oidc_provider_settings.userinfo'
 # OIDC_IDTOKEN_INCLUDE_CLAIMS = True
 # OIDC_SESSION_MANAGEMENT_ENABLE = True
 
-#authentication settings
-#LOGIN_URL = '/accounts/login/dalme_wp/'
+# authentication settings
+awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
+# LOGIN_URL = '/accounts/login/dalme_wp/'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
-#LOGIN_REDIRECT_URL = 'https://db.dalme.org'
-#SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+# LOGIN_REDIRECT_URL = 'https://db.dalme.org'
+# SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -188,12 +200,12 @@ SAML_IDP_CONFIG = {
     },
 
     # Signing
-    'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
-    'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
+    'key_file': SAML_KEY,
+    'cert_file': SAML_CERT,
     # Encryption
     'encryption_keypairs': [{
-        'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
-        'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
+        'key_file': SAML_KEY,
+        'cert_file': SAML_CERT,
     }],
     'valid_for': 365 * 24,
 }
@@ -276,20 +288,8 @@ DATABASES['default'].update(db_from_env)
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'haystack',
-    },
-}
-if 'AWS_ES_ENDPOINT' in os.environ:
-    AWS_ES_ENDPOINT = os.environ['AWS_ES_ENDPOINT']
-    awsauth = AWS4Auth(
-        os.environ['AWS_ACCESS_ID'],
-        os.environ['AWS_ACCESS_KEY'],
-        os.environ['AWS_DEFAULT_REGION'],
-        'es'
-    )
-    HAYSTACK_CONNECTIONS["default"].update({
         'URL': AWS_ES_ENDPOINT,
+        'INDEX_NAME': 'haystack',
         'KWARGS': {
             'port': 443,
             'http_auth': awsauth,
@@ -297,24 +297,10 @@ if 'AWS_ES_ENDPOINT' in os.environ:
             'verify_certs': True,
             'connection_class': elasticsearch.RequestsHttpConnection,
         }
-    })
+    },
+}
 
-if 'SEARCHBOX_SSL_URL' in os.environ:
-    from urllib.parse import urlparse
-    es = urlparse(os.environ['SEARCHBOX_SSL_URL'])
-    port = es.port or 443
-    HAYSTACK_CONNECTIONS['default'].update({
-        'URL': es.scheme + '://' + es.hostname + ':' + str(port),
-        'KWARGS': {
-            'http_auth': es.username + ':' + es.password,
-            'use_ssl': True,
-            'verify_certs': True,
-            'connection_class': elasticsearch.RequestsHttpConnection,
-        }
-    })
-
-
-#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -328,14 +314,12 @@ REST_FRAMEWORK = {
     ),
 }
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 LANGUAGES = [
     ('en', 'English'),
     ('fr', 'French'),
 ]
-
 LANGUAGE_CODE = 'en'
 TIME_ZONE = 'America/New_York'
 USE_I18N = True
@@ -343,19 +327,10 @@ USE_L10N = True
 USE_TZ = True
 
 # Media files
+DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
+AWS_DEFAULT_ACL = None
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
-    AWS_ACCESS_ID = os.environ['AWS_ACCESS_ID']
-    AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
-    DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
-
-    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
-    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-    MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
-
-    AWS_DEFAULT_ACL = None
-    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
 
 # Extra places for collectstatic to find static files.
 # STATICFILES_DIRS = [
@@ -366,20 +341,36 @@ STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SITE_ID = 1
+WAGTAIL_SITE_NAME = 'DALME'
+WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
 
-#HTTPS/SSL settings
+# HTTPS/SSL settings
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
-
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-
-CELERY_BROKER_URL = 'redis://localhost'
+# CELERY SETUP
+# CELERY_BROKER_URL = "sqs://%s:%s@" % (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+CELERY_BROKER_URL = 'sqs://'
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'predefined_queues': {
+        'dalme-q': {
+            'url': AWS_SQS_URL,
+            'access_key_id': AWS_ACCESS_KEY_ID,
+            'secret_access_key': AWS_SECRET_ACCESS_KEY,
+        }
+    }
+}
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_DEFAULT_QUEUE = 'dalme-q'
+CELERY_RESULT_BACKEND = None # Disabling the results backend
 CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {
@@ -389,8 +380,8 @@ CACHES = {
     }
 }
 
-#setting for Debug Toolbar
-#INTERNAL_IPS = '127.0.0.1.xip.io'
+# setting for Debug Toolbar
+# INTERNAL_IPS = '127.0.0.1.xip.io'
 
 LOGGING = {
     'version': 1,
@@ -421,8 +412,6 @@ LOGGING = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-
-
 # MESSAGE_TAGS = {
 #     messages.DEBUG: 'alert-info',
 #     messages.INFO: 'alert-info',
@@ -439,11 +428,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'error',
 }
 
-
-
-
-#django-crispy_forms settings
-#CRISPY_TEMPLATE_PACK = 'bootstrap4'
+# django-crispy_forms settings
+# CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 if "LOG_TO_STDOUT" in os.environ:
     LOGGING = {
@@ -465,6 +451,3 @@ if "LOG_TO_STDOUT" in os.environ:
 
 if "HEROKU_APP_NAME" in os.environ:
     ALLOWED_HOSTS = ["*"]
-
-WAGTAIL_SITE_NAME = 'DALME'
-WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
