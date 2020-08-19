@@ -63,7 +63,7 @@ class RecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'name', 'short_name', 'is_public', 'parent', 'parent_name', 'no_folios', 'collections',
+        fields = ('id', 'type', 'name', 'short_name', 'is_public', 'parent', 'parent_name', 'no_folios', 'no_transcriptions', 'collections',
                   'attributes', 'inherited', 'has_images', 'has_transcriptions', 'get_credit_line')
 
     def to_representation(self, instance):
