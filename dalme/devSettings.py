@@ -359,7 +359,7 @@ CSRF_COOKIE_SECURE = False
 CELERY_BROKER_URL = 'sqs://'
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'predefined_queues': {
-        'dalme-q': {
+        'celery': {
             'url': AWS_SQS_URL,
             'access_key_id': AWS_ACCESS_KEY_ID,
             'secret_access_key': AWS_SECRET_ACCESS_KEY,
@@ -369,8 +369,7 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_DEFAULT_QUEUE = 'dalme-q'
-CELERY_RESULT_BACKEND = None # Disabling the results backend
+# CELERY_RESULT_BACKEND = None # Disabling the results backend
 CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {
