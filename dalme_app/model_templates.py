@@ -5,16 +5,14 @@ timestamps and unique IDs.
 """
 from django.db import models
 from django.contrib.auth.models import User
-from dalme_app.utils import (get_current_username, get_current_user)
+from dalme_app.utils import get_current_user
 import uuid
 
 
 class dalmeBasic(models.Model):
     """ Model template with timestamps, but no pre-defined ID """
-    creation_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     creation_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_creation", null=True)
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modification_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     modification_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_modification", null=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)
@@ -34,10 +32,8 @@ class dalmeBasic(models.Model):
 class dalmeUuid(models.Model):
     """ Model template with a unique ID assigned by `uuid.uuid4`, resulting in a long, random identifier. """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
-    creation_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     creation_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_creation", null=True)
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modification_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     modification_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_modification", null=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)
@@ -57,10 +53,8 @@ class dalmeUuid(models.Model):
 class dalmeIntid(models.Model):
     """ Model template with a unique ID assigned as a sequential integer """
     id = models.AutoField(primary_key=True, unique=True, db_index=True)
-    creation_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     creation_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_creation", null=True)
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    modification_username = models.CharField(max_length=255, null=True, blank=True, default=get_current_username)
     modification_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_modification", null=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)

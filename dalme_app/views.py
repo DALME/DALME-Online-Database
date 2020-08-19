@@ -598,8 +598,8 @@ class SourceDetail(DetailView):
         context['source_data'] = source_data
         context['source_metadata'] = {
             'ID': str(self.object.id),
-            'Created': functions.format_rct(self.object.creation_username, self.object.creation_timestamp),
-            'Modified': functions.format_rct(self.object.modification_username, self.object.modification_timestamp),
+            'Created': functions.format_rct(self.object.creation_user, self.object.creation_timestamp),
+            'Modified': functions.format_rct(self.object.modification_user, self.object.modification_timestamp),
         }
         attribute_data = self.get_attributes()
         if attribute_data.get('description', None) is not None:

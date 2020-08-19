@@ -350,12 +350,11 @@ def format_user(ref, type, output=None):
             f_user = str(user)
         else:
             f_user = 'User: ' + str(ref)
-    elif type == 'username':
-        user = Profile.objects.get(user__username=ref)
+    elif type == 'user':
         if output == 'html':
-            f_user = '<a href="/users/{}">{}</a>'.format(user.user.username, user.full_name)
+            f_user = '<a href="/users/{}">{}</a>'.format(ref.username, ref.profile.full_name)
         else:
-            f_user = str(user.user.username)
+            f_user = str(ref.username)
     return f_user
 
 
@@ -365,8 +364,8 @@ def format_email(email):
 
 def format_rct(user, timestamp):
     f_timestamp = format_date(timestamp, 'timestamp')
-    f_user = format_user(user, 'username', 'html')
-    record = f_timestamp+' by '+f_user
+    f_user = format_user(user, 'user', 'html')
+    record = f_timestamp + ' by ' + f_user
     return record
 
 

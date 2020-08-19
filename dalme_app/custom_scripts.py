@@ -166,42 +166,25 @@ def fix_workflow(request):
 
 
 def test_expression(request):
-    inventories = Source.objects.filter(type=13)
-    count = 0
-    desc_att_obj = Attribute_type.objects.get(pk=79)
-    for inv in inventories:
-        inv_attributes = inv.attributes.all()
-        has_comments = inv_attributes.filter(attribute_type=35).exists()
-        has_city = inv_attributes.filter(attribute_type=36).exists()
-        if has_comments:
-            count = count + 1
-            comm_obj = inv_attributes.filter(attribute_type=35)[0]
-            comment_text = comm_obj.value_TXT
-            last_user = inv.modification_username
-            if last_user == 'pizzorno':
-                last_user = 'smail'
-            created = inv.creation_timestamp
-            if has_city:
-                inv_city = inv_attributes.filter(attribute_type=36)[0].value_STR
-            else:
-                inv_city = 'Akron'
+    Authority = 128
+    Format = 129
+    for row in Attribute.objects.filter(attribute_type__in=[128, 129]).reverse():
+        if Attribute.objects.filter(object_id=row.object_id, attribute_type=row.attribute_type).count() > 1:
+            row.delete()
 
-            if inv_city == 'Marseille':
-                inv.attributes.create(attribute_type=desc_att_obj, value_TXT=comment_text)
-            else:
-                inv.comments.create(body=comment_text, creation_username=last_user, modification_username=last_user, creation_timestamp=created, modification_timestamp=created)
 
-            inv.attributes.remove(comm_obj)
-
-    return count
-
+def fix_users(records):
+    # records = Attribute.objects.all()
+    for s in records:
+        c_user = User.objects.get(username=s.creation_username)
+        m_user = User.objects.get(username=s.modification_username)
+        s.creation_user = c_user
+        s.owner = c_user
+        s.modification_user = m_user
+        s.save()
 
 def test_expression2(request):
-    # Authority = 128
-    # Format = 129
-    # for row in Attribute.objects.filter(attribute_type__in=[128, 129]).reverse():
-    #     if Attribute.objects.filter(object_id=row.object_id, attribute_type=row.attribute_type).count() > 1:
-    #         row.delete()
+
 
     # records = Attribute_type.objects.all()
     # for s in records:

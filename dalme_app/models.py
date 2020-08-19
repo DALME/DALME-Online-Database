@@ -243,11 +243,11 @@ class Source(index.Indexed, dalmeUuid):
     @property
     def get_credit_line(self):
         try:
-            editor = User.objects.get(username=self.creation_username).profile.full_name
+            editor = self.owner.profile.full_name
             contributors = [i.user.profile.full_name for i in self.workflow.work_log.all()]
-            tr_cr = [User.objects.get(username=i.creation_username).profile.full_name for i in self.source_pages.all().select_related('transcription')]
+            tr_cr = [i.creation_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
             contributors = contributors + tr_cr
-            tr_mod = [User.objects.get(username=i.modification_username).profile.full_name for i in self.source_pages.all().select_related('transcription')]
+            tr_mod = [i.modification_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
             contributors = contributors + tr_mod
             contributors = [i for i in contributors if i != editor]
             if len(contributors) == 0:
@@ -383,7 +383,7 @@ def update_source_modification(sender, instance, created, **kwargs):
         source_id = instance.source_pages.all().first().source.id
         source = Source.objects.get(pk=source_id)
         source.modification_timestamp = timezone.now()
-        source.modification_username = get_current_username()
+        source.modification_user = get_current_user()
         source.save()
 
 
@@ -902,7 +902,7 @@ class Ticket(dalmeIntid):
 
     @property
     def creation_name(self):
-        return User.objects.get(username=self.creation_username).profile.full_name
+        return self.creation_user.profile.full_name
 
     def __str__(self):
         return str(self.id) + ' - ' + self.title + ' ('+self.get_status_display+')'
@@ -922,7 +922,7 @@ class Comment(dalmeIntid):
     @property
     def snippet(self):
         body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
-        return "{author} - {snippet}...".format(author=self.creation_username, snippet=body_snippet)
+        return "{author} - {snippet}...".format(author=self.creation_user.username, snippet=body_snippet)
 
     def __str__(self):
         return self.snippet

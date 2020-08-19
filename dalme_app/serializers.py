@@ -35,10 +35,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        user = Profile.objects.get(user__username=instance.creation_username)
-        ret['user'] = '<a href="/users/{}">{}</a>'.format(user.user.username, user.full_name)
-        if user.profile_image is not None:
-            ret['avatar'] = '<img src="{}" class="img_avatar" alt="avatar">'.format(user.profile_image)
+        # user = Profile.objects.get(user__username=instance.creation_username)
+        ret['user'] = '<a href="/users/{}">{}</a>'.format(instance.creation_user.username, instance.creation_user.profile.full_name)
+        if instance.creation_user.profile.profile_image is not None:
+            ret['avatar'] = '<img src="{}" class="img_avatar" alt="avatar">'.format(instance.creation_user.profile.profile_image)
         else:
             ret['avatar'] = '<i class="fa fa-user-alt-slash img_avatar mt-1 fa-2x"></i>'
         return ret
@@ -225,7 +225,7 @@ class TaskSerializer(serializers.ModelSerializer):
         ret['attachments_detail'] = attachments_detail
         overdue = ret.pop('overdue_status')
         dates = '<div class="task-date">Cre: ' + ret['creation_timestamp'] + '</div>'
-        dates_detail = '<span class="task-date">Created: ' + ret['creation_timestamp'] + ' by '+instance.creation_username+'</span>'
+        dates_detail = '<span class="task-date">Created: ' + ret['creation_timestamp'] + ' by '+instance.creation_user.username+'</span>'
         if ret['due_date'] is not None:
             dates += '<div class="task-date task-'
             dates_detail += '<span class="task-date task-'
@@ -356,7 +356,7 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file',
-                  'creation_username', 'creation_timestamp')
+                  'creation_user', 'creation_timestamp')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

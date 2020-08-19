@@ -1,7 +1,7 @@
 function init_tables() {
     table_tickets = $('#dataTables-tickets').DataTable({
           'ajax': {
-            'url': "/api/tickets/?format=json&filter=creation_username," + user['username'],
+            'url': "/api/tickets/?format=json&filter=creation_user," + user['id'],
             'data': function (data) { return { "data": JSON.stringify( data ) }; }
           },
           serverSide: true,

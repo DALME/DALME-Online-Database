@@ -887,7 +887,7 @@ class Sources(DTViewSet):
             if action == 'update':
                 att_obj = Attribute.objects.filter(object_id=object.id, attribute_type=desc_att_obj)[0]
                 att_obj.value_TXT = desc_text
-                att_obj.save(update_fields=['value_TXT', 'modification_username', 'modification_timestamp'])
+                att_obj.save(update_fields=['value_TXT', 'modification_user', 'modification_timestamp'])
             elif action == 'create':
                 object.attributes.create(attribute_type=desc_att_obj, value_TXT=desc_text)
             result['message'] = 'Update succesful.'
@@ -1203,10 +1203,10 @@ class Tasks(DTViewSet):
             action = self.request.POST['action']
             if action == 'mark_done':
                 object.completed = True
-                object.save(update_fields=['completed', 'modification_username', 'modification_timestamp'])
+                object.save(update_fields=['completed', 'modification_user', 'modification_timestamp'])
             elif action == 'mark_undone':
                 object.completed = False
-                object.save(update_fields=['completed', 'modification_username', 'modification_timestamp'])
+                object.save(update_fields=['completed', 'modification_user', 'modification_timestamp'])
             result['message'] = 'Update succesful.'
             status = 201
         except Exception as e:
@@ -1264,10 +1264,10 @@ class Tickets(DTViewSet):
             action = self.request.POST['action']
             if action == 'Close':
                 object.status = 1
-                object.save(update_fields=['status', 'modification_username', 'modification_timestamp'])
+                object.save(update_fields=['status', 'modification_user', 'modification_timestamp'])
             elif action == 'Open':
                 object.status = 0
-                object.save(update_fields=['status', 'modification_username', 'modification_timestamp'])
+                object.save(update_fields=['status', 'modification_user', 'modification_timestamp'])
             result['username'] = self.request.user.username
             status = 201
         except Exception as e:
@@ -1566,7 +1566,7 @@ class Sets(DTViewSet):
             elif action == 'mark_undone':
                 mark = False
             object.workset_done = mark
-            object.save(update_fields=['workset_done', 'modification_username', 'modification_timestamp'])
+            object.save(update_fields=['workset_done', 'modification_user', 'modification_timestamp'])
             result['message'] = 'Update succesful.'
             status = 201
         except Exception as e:
