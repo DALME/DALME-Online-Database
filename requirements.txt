@@ -19,7 +19,7 @@ kombu==4.6.11
 mysqlclient==2.0.1
 pandas==1.1.0
 passlib==1.7.2
-redis==3.5.3
+pycurl==7.43.0.5
 requests==2.20.1
 requests-aws4auth==1.0
 wagtail==2.10
