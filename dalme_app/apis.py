@@ -1632,11 +1632,11 @@ class Sets(DTViewSet):
         queryset = self.queryset.filter(search_q)
         return queryset
 
-    def get_object(self, pk=None):
-        if pk is None:
-            object = self.queryset.get(pk=self.request.data['data[0][set]'])
+    def get_object(self):
+        if self.kwargs.get('pk') is not None:
+            object = self.queryset.get(pk=self.kwargs.get('pk'))
         else:
-            object = self.queryset.get(pk=pk)
+            object = self.queryset.get(pk=self.request.data['data[0][set]'])
         return object
 
 

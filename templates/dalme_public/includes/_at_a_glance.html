@@ -25,11 +25,12 @@
     <li id="histogram" class="histogram">
       <h5>Temporal Coverage</h5>
     </li>
-
+    {% if stats.other %}
     <li class="status-groups">
-      <h5>Status Groups Represented</h5>
-      <p>{{ stats.status }}</p>
+      <h5>{{ stats.other.label }}</h5>
+      <p>{{ stats.other.text }}</p>
     </li>
+    {% endif %}
 
   </ul>
 </div>
