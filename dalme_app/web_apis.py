@@ -31,11 +31,6 @@ class Collections(viewsets.ModelViewSet):
         object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         try:
             data = []
-            # count of inventories
-            # count of objects
-            # languages represented [full name + abbv]
-            # temporal coverage
-            # status groups represented
             data.append({
                 'label': 'Inventories',
                 'type': 'bar',

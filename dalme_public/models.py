@@ -584,14 +584,17 @@ class Collection(RoutablePageMixin, DALMEPage):
 
     @property
     def stats(self):
-        # TODO: Remove this stub.
-        status = 'Extensive range, with numerous inventories of artisans and low-status individuals.'  # noqa
-        return {
+        stats_dict = {
             'inventories': self.source_set.get_public_member_count,
             'languages': self.source_set.get_languages,
             'coverage': self.source_set.get_time_coverage,
-            'status': status,
         }
+        if self.source_set.stat_title is not None:
+            stats_dict['other'] = {
+                    'label': self.source_set.stat_title,
+                    'text': self.source_set.stat_text
+                }
+        return stats_dict
 
     @property
     def count(self):
