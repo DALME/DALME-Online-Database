@@ -150,12 +150,12 @@ SAML_IDP_CONFIG = {
     },
 
     # Signing
-    'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
-    'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
+    'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
+    'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
     # Encryption
     'encryption_keypairs': [{
-        'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
-        'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
+        'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
+        'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
     }],
     'valid_for': 365 * 24,
 }
