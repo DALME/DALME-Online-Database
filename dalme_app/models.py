@@ -248,7 +248,7 @@ class Source(index.Indexed, dalmeUuid):
             tr_cr = [i.creation_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
             contributors = contributors + tr_cr
             tr_mod = [i.modification_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
-            contributors = contributors + tr_mod
+            contributors = list(set(contributors + tr_mod))
             contributors = [i for i in contributors if i != editor]
             if len(contributors) == 0:
                 credit_line = 'Edited by {}.'.format(editor)
