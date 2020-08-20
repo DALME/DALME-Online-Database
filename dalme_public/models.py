@@ -499,10 +499,6 @@ class Collections(RoutablePageMixin, DALMEPage):
         qs = Source.objects.filter(pk=pk)
         if not qs.exists():
             raise Http404()
-
-        qs = qs.annotate(
-            no_folios=Count('pages', filter=Q(pages__source__isnull=False))
-        )
         source = qs.first()
         pages = source.source_pages.all().values(
             pageId=F('page__pk'),
@@ -565,10 +561,6 @@ class Collection(RoutablePageMixin, DALMEPage):
         qs = Source.objects.filter(pk=pk)
         if not qs.exists():
             raise Http404()
-
-        qs = qs.annotate(
-            no_folios=Count('pages', filter=Q(pages__source__isnull=False))
-        )
         source = qs.first()
         pages = source.source_pages.all().values(
             pageId=F('page__pk'),
