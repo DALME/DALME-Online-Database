@@ -151,13 +151,13 @@ class SetSerializer(serializers.ModelSerializer):
     owner_full_name = serializers.CharField(source='owner.profile.full_name', read_only=True, required=False)
     progress = serializers.ReadOnlyField(source='workset_progress', read_only=True, required=False)
     set_type_name = serializers.CharField(source='get_set_type_display', required=False)
-    set_permissions_name = serializers.CharField(source='get_set_permissions_display', required=False)
+    permissions_name = serializers.CharField(source='get_permissions_display', required=False)
     member_count = serializers.ReadOnlyField(source='get_member_count', read_only=True, required=False)
 
     class Meta:
         model = Set
-        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'set_permissions', 'set_permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count', 'is_public', 'has_landing', 'stat_title', 'stat_text')
-        extra_kwargs = {'set_type_label': {'required': False}, 'set_permissions_label': {'required': False}}
+        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'permissions', 'permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count', 'is_public', 'has_landing', 'stat_title', 'stat_text')
+        extra_kwargs = {'set_type_label': {'required': False}, 'permissions_label': {'required': False}}
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -184,9 +184,9 @@ class SetSerializer(serializers.ModelSerializer):
             'name': ret.pop('set_type_name'),
             'value': ret.pop('set_type')
         }
-        ret['set_permissions'] = {
-            'name': ret.pop('set_permissions_name'),
-            'value': ret.pop('set_permissions')
+        ret['permissions'] = {
+            'name': ret.pop('permissions_name'),
+            'value': ret.pop('permissions')
         }
         return ret
 

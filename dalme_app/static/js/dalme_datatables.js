@@ -486,7 +486,7 @@ function set_form(type, qset, endpoint, options=[]) {
             },
             {
               label: "Permissions:",
-              name:  "set_permissions",
+              name:  "permissions",
               type: "selectize",
               options: [
                 { label: "Private", value: "1" },

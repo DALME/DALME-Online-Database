@@ -9,7 +9,7 @@
     "is_public": {{ set.is_public|lower|safe }},
     "has_landing": {{ set.has_landing|lower|safe }},
     "owner": "{{ set.owner.id }}",
-    "set_permissions": "{{ set.set_permissions }}",
+    "permissions": "{{ set.permissions }}",
     "description": "{{ set.description }}",
     "stat_title": "{{ set.stat_title }}",
     "stat_text": "{{ set.stat_text }}"
@@ -97,7 +97,7 @@
                   </div>
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Permissions</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.get_set_permissions_display }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.get_permissions_display }}</span></div>
                   </div>
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Description</span></div>

@@ -1,0 +1,36 @@
+[
+  {
+    "action": ["list", "has_permission"],
+    "principal": ["*"],
+    "effect": "allow"
+  },
+  {
+    "action": ["retrieve"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "can_view"
+  },
+  {
+    "action": ["partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
+    "principal": ["group:Administrators"],
+    "effect": "allow"
+  },
+  {
+    "action": ["partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "is_owner"
+  },
+  {
+    "action": ["partial_update", "update", "add_members"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "can_add"
+  },
+  {
+    "action": ["destroy", "remove_members"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "can_delete"
+  }
+]

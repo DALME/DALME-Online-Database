@@ -566,7 +566,7 @@ class Set(dalmeUuid):
         (DATASET, 'Dataset'),
         (WORKSET, 'Workset')
     )
-    SET_PERMISSIONS = [
+    PERMISSIONS = [
         (PRIVATE, 'Private'),
         (VIEW, 'Others: view'),
         (ADD, 'Others: view|add'),
@@ -579,7 +579,7 @@ class Set(dalmeUuid):
     has_landing = models.BooleanField(default=False)
     endpoint = models.CharField(max_length=55)
     owner_local = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
-    set_permissions = models.IntegerField(choices=SET_PERMISSIONS, default=VIEW)
+    permissions = models.IntegerField(choices=PERMISSIONS, default=VIEW)
     description = models.TextField()
     comments = GenericRelation('Comment')
     stat_title = models.CharField(max_length=25, null=True, blank=True)
