@@ -18,7 +18,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
-from rest_framework.permissions import DjangoModelPermissions, IsAuthenticatedOrReadOnly
+# from rest_framework.permissions import DjangoModelPermissions, IsAuthenticatedOrReadOnly
 
 from dalme_app import functions
 from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, TaskSerializer,
@@ -32,13 +32,12 @@ from dalme_app.models import (Profile, Attribute_type, Content_class, Content_ty
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
                               wiki_user_groups, wp_users, wp_usermeta, Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy)
-from dalme_app.access_policies import SourceAccessPolicy
-from dalme_app.utils import IsOwnerOrReadOnly
+from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy
 
 
 class Datasets(viewsets.ViewSet):
     """ API endpoint for generating lists of options for DTE forms """
-    permission_classes = (DjangoModelPermissions,)
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Workflow.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -86,15 +85,15 @@ class Datasets(viewsets.ViewSet):
 
 class WorkflowManager(viewsets.ModelViewSet):
     """ API endpoint for managing the project's workflow """
-    permission_classes = (DjangoModelPermissions,)
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Workflow.objects.all()
     serializer_class = WorkflowSerializer
 
     @action(detail=True, methods=['patch'])
     def change_state(self, request, *args, **kwargs):
         result = {}
-        #object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        #self.check_object_permissions(request, object)
+        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+        # self.check_object_permissions(request, object)
         object = self.get_object()
         try:
             action = self.request.POST['action']
@@ -191,7 +190,7 @@ class DTViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(self.request, object)
         return Response(200)
 
-    @action(detail=False)
+    @action(detail=False, methods=['get'])
     def get_set(self, request, *args, **kwargs):
         data_dict = {}
         if request.GET.get('data') is not None:
@@ -360,30 +359,35 @@ class DTViewSet(viewsets.ModelViewSet):
 
 class AsynchronousTasks(DTViewSet):
     """ API endpoint for managing asynchronous tasks """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = TaskResult.objects.all()
     serializer_class = AsyncTaskSerializer
 
 
 class Countries(DTViewSet):
     """ API endpoint for managing countries """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = CountryReference.objects.all()
     serializer_class = CountrySerializer
 
 
 class Cities(DTViewSet):
     """ API endpoint for managing cities """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = CityReference.objects.all()
     serializer_class = CitySerializer
 
 
 class Rights(DTViewSet):
     """ API endpoint for managing rights policies """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = RightsPolicy.objects.all()
     serializer_class = RightsSerializer
 
 
 class AttributeTypes(DTViewSet):
     """ API endpoint for managing attribute types """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Attribute_type.objects.all()
     serializer_class = AttributeTypeSerializer
 
@@ -406,18 +410,21 @@ class AttributeTypes(DTViewSet):
 
 class Attributes(DTViewSet):
     """ API endpoint for managing attributes """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Attribute.objects.all().order_by('attribute_type')
     serializer_class = SimpleAttributeSerializer
 
 
 class ContentClasses(DTViewSet):
     """ API endpoint for managing content classes """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Content_class.objects.all()
     serializer_class = ContentClassSerializer
 
 
 class ContentTypes(DTViewSet):
     """ API endpoint for managing content types """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Content_type.objects.all()
     serializer_class = ContentTypeSerializer
 
@@ -491,12 +498,14 @@ class ContentTypes(DTViewSet):
 
 class DTFields(DTViewSet):
     """ API endpoint for managing DataTables list field attributes """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = DT_fields.objects.all()
     serializer_class = DTFieldsSerializer
 
 
 class DTLists(DTViewSet):
     """ API endpoint for managing DataTables lists """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = DT_list.objects.all()
     serializer_class = DTListsSerializer
 
@@ -600,6 +609,7 @@ class DTLists(DTViewSet):
 
 class Images(DTViewSet):
     """ API endpoint for managing DAM images """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = rs_resource.objects.filter(resource_type=1, archive=0, ref__gte=0)
     serializer_class = RSImageSerializer
     search_dict = {'collections': 'collections__name'}
@@ -726,12 +736,15 @@ class Images(DTViewSet):
 
 class Languages(DTViewSet):
     """ API endpoint for managing languages """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = LanguageReference.objects.all()
     serializer_class = LanguageSerializer
 
 
 class Options(viewsets.ViewSet):
     """ API endpoint for generating data for options in the UI """
+    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Set.objects.none()
 
     def list(self, request, *args, **kwargs):
@@ -808,7 +821,7 @@ class Options(viewsets.ViewSet):
 
     def available_sets(self, **kwargs):
         filters = Q(owner=str(self.request.user.id))
-        filters |= Q(set_permissions__in=[3, 4])
+        filters |= Q(permissions__in=[3, 4])
         sets = [{'label': '{} ({})'.format(i.name, i.get_set_type_display()), 'value': i.id} for i in Set.objects.filter(filters).distinct().order_by('name')]
         return sets
 
@@ -848,7 +861,7 @@ class Options(viewsets.ViewSet):
 
 class Pages(DTViewSet):
     """ API endpoint for managing pages """
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Page.objects.all()
     serializer_class = PageSerializer
 
@@ -869,7 +882,7 @@ class Pages(DTViewSet):
 
 class Sources(DTViewSet):
     """ API endpoint for managing sources """
-    permission_classes = (SourceAccessPolicy, IsOwnerOrReadOnly,)
+    permission_classes = (SourceAccessPolicy,)
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
     display_fields = ['name', 'type', 'parent']
@@ -1190,6 +1203,7 @@ class Sources(DTViewSet):
 
 class Tasks(DTViewSet):
     """ API endpoint for managing tasks """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
@@ -1217,7 +1231,7 @@ class Tasks(DTViewSet):
 
 class Comments(viewsets.ModelViewSet):
     """ API endpoint for managing comments """
-    permission_classes = (DjangoModelPermissions,)
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
@@ -1251,6 +1265,7 @@ class Comments(viewsets.ModelViewSet):
 
 class Tickets(DTViewSet):
     """ API endpoint for managing issue tickets """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
@@ -1307,13 +1322,14 @@ class Tickets(DTViewSet):
 
 class TaskLists(DTViewSet):
     """ API endpoint for managing tasks lists """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = TaskList.objects.all().annotate(task_count=Count('task'))
     serializer_class = TaskListSerializer
 
 
 class Attachments(viewsets.ModelViewSet):
     """ API endpoint for managing attachments """
-    permission_classes = (DjangoModelPermissions,)
+    permission_classes = (GeneralAccessPolicy,)
     parser_classes = (MultiPartParser, FormParser, FileUploadParser,)
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
@@ -1338,7 +1354,7 @@ class Attachments(viewsets.ModelViewSet):
 
 class Transcriptions(viewsets.ModelViewSet):
     """ API endpoint for managing transcriptions """
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Transcription.objects.all()
     serializer_class = TranscriptionSerializer
 
@@ -1386,6 +1402,7 @@ class Transcriptions(viewsets.ModelViewSet):
 
 class Users(DTViewSet):
     """ API endpoint for managing users """
+    permission_classes = (GeneralAccessPolicy,)
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
@@ -1511,6 +1528,7 @@ class Users(DTViewSet):
 
 class Sets(DTViewSet):
     """ API endpoint for managing sets """
+    permission_classes = (SetAccessPolicy,)
     queryset = Set.objects.all()
     serializer_class = SetSerializer
 
@@ -1518,14 +1536,12 @@ class Sets(DTViewSet):
     def add_members(self, request, *args, **kwargs):
         result = {}
         try:
-            data = request.data
-            members = json.loads(data['qset'])
-            set_id = data['data[0][set]']
-            object = self.queryset.get(pk=set_id)
+            members = json.loads(request.data['qset'])
+            object = self.get_object()
             new_members = []
             for i in members:
                 source_object = Source.objects.get(pk=i)
-                if not Set_x_content.objects.filter(set_id=set_id, object_id=source_object).exists():
+                if not Set_x_content.objects.filter(set_id=object.id, object_id=source_object.id).exists():
                     new_entry = Set_x_content()
                     new_entry.set_id = object
                     new_entry.content_object = source_object
@@ -1580,7 +1596,7 @@ class Sets(DTViewSet):
         set_para = {
             'name': data['data[0][name]'],
             'description': data['data[0][description]'],
-            'set_permissions': data['data[0][set_permissions]'],
+            'permissions': data['data[0][permissions]'],
             'set_type': data['data[0][set_type]'],
             'endpoint': data['endpoint']
         }
@@ -1607,12 +1623,21 @@ class Sets(DTViewSet):
         return Response(result, status)
 
     def get_queryset(self, *args, **kwargs):
+        search_q = Q()
         if self.request.GET.get('type') is not None:
-            type = int(self.request.GET['type'])
-            queryset = self.queryset.filter(set_type=type)
-        else:
-            queryset = self.queryset
+            type_q = Q(set_type=int(self.request.GET['type']))
+            search_q &= type_q
+        ownership_q = Q(owner=str(self.request.user.id)) | ~Q(permissions=1)
+        search_q &= ownership_q
+        queryset = self.queryset.filter(search_q)
         return queryset
+
+    def get_object(self, pk=None):
+        if pk is None:
+            object = self.queryset.get(pk=self.request.data['data[0][set]'])
+        else:
+            object = self.queryset.get(pk=pk)
+        return object
 
 
 """ GENERALIZED FUNCTIONS """

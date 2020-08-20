@@ -18,15 +18,29 @@ class BaseAccessPolicy(AccessPolicy):
         record = view.get_object()
         return request.user == record.owner
 
+    def can_view(self, request, view, action):
+        record = view.get_object()
+        return request.user == record.owner or record.permissions != 1
+
+    def can_add(self, request, view, action):
+        record = view.get_object()
+        return request.user == record.owner or record.permissions > 2
+
+    def can_delete(self, request, view, action):
+        record = view.get_object()
+        return request.user == record.owner or record.permissions == 4
+
+
+class GeneralAccessPolicy(BaseAccessPolicy):
+    ''' Manages general access policies for all endpoints '''
+    id = 'general-policy'
+
 
 class SourceAccessPolicy(BaseAccessPolicy):
     ''' Manages access policies for Sources endpoint '''
-
     id = 'sources-policy'
 
-    # @classmethod
-    # def scope_queryset(cls, request, queryset):
-    #     if request.user.groups.filter(name='Administrators').exists():
-    #         return queryset
-    #
-    #     return queryset.filter(status='published')
+
+class SetAccessPolicy(BaseAccessPolicy):
+    ''' Manages access policies for Sets endpoint '''
+    id = 'sets-policy'
