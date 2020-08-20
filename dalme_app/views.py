@@ -1167,7 +1167,7 @@ class SetList(DTListView):
     breadcrumb = [('Project', ''), ('Sets', '/sets')]
     list_name = 'sets'
     dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'set_type', 'is_public', 'has_landing', 'description', 'owner', 'set_permissions']
+    dte_field_list = ['name', 'set_type', 'is_public', 'has_landing', 'description', 'owner', 'permissions']
     dt_options = {
         'pageLength': 25,
         'paging': 'true',
