@@ -44,3 +44,8 @@ class SourceAccessPolicy(BaseAccessPolicy):
 class SetAccessPolicy(BaseAccessPolicy):
     ''' Manages access policies for Sets endpoint '''
     id = 'sets-policy'
+
+
+class WorkflowAccessPolicy(BaseAccessPolicy):
+    ''' Manages access policies for Sets endpoint '''
+    id = 'workflow-policy'
