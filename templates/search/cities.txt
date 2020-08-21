@@ -1,0 +1,3 @@
+{{ object.name }}
+{{ object.administrative_region }}
+{{ object.country.name }}

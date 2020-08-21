@@ -1,0 +1,9 @@
+{{ object.name }}
+{{ object.rights }}
+{{ object.rights_notice }}
+{{ object.licence }}
+{{ object.rights_holder }}
+{{ object.notice_display }}
+{% for comm in object.comments.all %}
+  {{ comm.body }}
+{% endfor %}

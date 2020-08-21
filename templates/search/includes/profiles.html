@@ -1,0 +1,5 @@
+{% load highlight %}
+<div class="search-result-entry">
+    <a class="search-result-link" href="{{ result.object.get_absolute_url }}">{{ result.object.full_name }}</a>
+    <div class="search-result-detail">User Profile | Username: {{ result.object.user.username }}</div>
+</div>

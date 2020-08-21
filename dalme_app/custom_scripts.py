@@ -166,11 +166,12 @@ def fix_workflow(request):
 
 
 def test_expression(request):
-    Authority = 128
-    Format = 129
-    for row in Attribute.objects.filter(attribute_type__in=[128, 129]).reverse():
-        if Attribute.objects.filter(object_id=row.object_id, attribute_type=row.attribute_type).count() > 1:
-            row.delete()
+    record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
+    att_dict = {}
+    for a in record.attributes.all():
+        att_dict[a.attribute_type.name] = a.value_STR
+    #return record.get_clean_transcription_blob()
+    return str(att_dict)
 
 
 def fix_users(records):

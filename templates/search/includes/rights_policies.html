@@ -1,0 +1,11 @@
+{% load highlight %}
+<div class="search-result-entry">
+    <a class="search-result-link" href="{{ result.object.get_absolute_url }}">{{ result.object.name }}</a>
+    <div class="search-result-detail">Content Rights Policy |
+      Status: {{ result.object.get_rights_status_display }}
+      {% if result.object.notice_display %}
+        | Must display notice
+      {% endif %}
+      </div>
+    <div class="search-result-text">Holder: {{ result.object.rights_holder }} Rights: {{ result.object.rights }}</div>
+</div>
