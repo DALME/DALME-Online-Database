@@ -17,7 +17,7 @@
           },
           {
             "text": "Documentation",
-            "link": "#",
+            "link": "https://kb.dalme.org",
             "iconClass": "fas fa-file-alt"
           },
           {
@@ -34,11 +34,6 @@
     "title": "Tools",
     "tooltip": "DALME tools",
     "children": [
-          {
-            "text": "Wiki",
-            "link": "https://wiki.dalme.org",
-            "iconClass": "fab fa-wikipedia-w"
-          },
           {
             "text": "DAM",
             "link": "https://dam.dalme.org",

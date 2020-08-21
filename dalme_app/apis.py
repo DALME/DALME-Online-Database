@@ -32,7 +32,7 @@ from dalme_app.models import (Profile, Attribute_type, Content_class, Content_ty
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
                               wiki_user_groups, wp_users, wp_usermeta, Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy)
-from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy
+from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy
 
 
 class Datasets(viewsets.ViewSet):
@@ -85,7 +85,7 @@ class Datasets(viewsets.ViewSet):
 
 class WorkflowManager(viewsets.ModelViewSet):
     """ API endpoint for managing the project's workflow """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (WorkflowAccessPolicy,)
     queryset = Workflow.objects.all()
     serializer_class = WorkflowSerializer
 
@@ -1074,18 +1074,18 @@ class Sources(DTViewSet):
             result['pages'] = pages
         return result
 
-    # def get_queryset(self, *args, **kwargs):
-    #     if self.request.GET.get('type') is not None:
-    #         type = self.request.GET['type']
-    #         queryset = self.queryset
-    #         q_obj = Q()
-    #         content_types = DT_list.objects.get(short_name=type).content_types.all()
-    #         for i in content_types:
-    #             q_obj |= Q(type=i.pk)
-    #         queryset = queryset.filter(q_obj)
-    #     else:
-    #         queryset = self.queryset
-    #     return queryset
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('type') is not None:
+            type = self.request.GET['type']
+            queryset = self.queryset
+            q_obj = Q()
+            content_types = DT_list.objects.get(short_name=type).content_types.all()
+            for i in content_types:
+                q_obj |= Q(type=i.pk)
+            queryset = queryset.filter(q_obj)
+        else:
+            queryset = self.queryset
+        return queryset
 
     def filter_on_search(self, *args, **kwargs):
         dt_data = kwargs['dt_data']
