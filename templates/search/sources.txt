@@ -5,7 +5,7 @@
   {{ att.value_STR }}
 {% endfor %}
 {% for page in object.source_pages.all %}
-  {{ page.transcription.text_blob }}
+  {{ page.transcription.transcription }}
 {% endfor %}
 {% for comm in object.comments.all %}
   {{ comm.body }}
