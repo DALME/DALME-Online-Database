@@ -18,6 +18,11 @@ class BaseAccessPolicy(AccessPolicy):
         record = view.get_object()
         return request.user == record.owner
 
+    def owns_wf_target(self, request, view, action):
+        wf = view.get_object()
+        target = wf.source
+        return request.user == target.owner
+
     def can_view(self, request, view, action):
         record = view.get_object()
         return request.user == record.owner or record.permissions != 1
