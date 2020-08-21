@@ -1074,18 +1074,18 @@ class Sources(DTViewSet):
             result['pages'] = pages
         return result
 
-    # def get_queryset(self, *args, **kwargs):
-    #     if self.request.GET.get('type') is not None:
-    #         type = self.request.GET['type']
-    #         queryset = self.queryset
-    #         q_obj = Q()
-    #         content_types = DT_list.objects.get(short_name=type).content_types.all()
-    #         for i in content_types:
-    #             q_obj |= Q(type=i.pk)
-    #         queryset = queryset.filter(q_obj)
-    #     else:
-    #         queryset = self.queryset
-    #     return queryset
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('type') is not None:
+            type = self.request.GET['type']
+            queryset = self.queryset
+            q_obj = Q()
+            content_types = DT_list.objects.get(short_name=type).content_types.all()
+            for i in content_types:
+                q_obj |= Q(type=i.pk)
+            queryset = queryset.filter(q_obj)
+        else:
+            queryset = self.queryset
+        return queryset
 
     def filter_on_search(self, *args, **kwargs):
         dt_data = kwargs['dt_data']
