@@ -1,6 +1,6 @@
 {% load highlight %}
 <div class="search-result-entry">
     <a class="search-result-link" href="{{ result.object.get_absolute_url }}">{{ result.object.name }}</a>
-    <div class="search-result-detail">{{ result.object.type }}: {{ result.object.short_name }}</div>
-    <div class="search-result-text">{% highlight result.object.transcriptions with query max_length 500 %}</div>
+    <div class="search-result-detail">{{ result.object.type }} | Short name: {{ result.object.short_name }}</div>
+    <div class="search-result-text">{% highlight result.object.get_data_blob with query max_length 500 %}</div>
 </div>

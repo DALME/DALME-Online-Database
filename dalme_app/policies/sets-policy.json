@@ -5,6 +5,11 @@
     "effect": "allow"
   },
   {
+    "action": ["create"],
+    "principal": ["group:Staff"],
+    "effect": "allow"
+  },
+  {
     "action": ["retrieve"],
     "principal": ["*"],
     "effect": "allow",

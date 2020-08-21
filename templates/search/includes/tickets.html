@@ -1,0 +1,6 @@
+{% load highlight %}
+<div class="search-result-entry">
+    <a class="search-result-link" href="{{ result.object.get_absolute_url }}">{{ result.object.subject }}</a>
+    <div class="search-result-detail">Issue Ticket | Status: {{ result.object.get_status_display }} | Opened by {{ result.object.creation_name }} on {{ result.object.creation_timestamp|date:"j-M-Y" }}</div>
+    <div class="search-result-text">{% highlight result.object.description with query max_length 500 %}</div>
+</div>

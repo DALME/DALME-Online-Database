@@ -261,6 +261,29 @@ class Source(index.Indexed, dalmeUuid):
         except Exception as e:
             return str(e)
 
+    def get_transcription_blob(self):
+        if self.source_pages.all().select_related('transcription').exists():
+            trs = self.source_pages.all().select_related('transcription')
+            text = ''
+            xml_parser = et.XMLParser(recover=True)
+            for tr in trs:
+                try:
+                    tr_tree = et.fromstring('<xml>' + tr.transcription.transcription + '</xml>', xml_parser)
+                    txt_tr = et.tostring(tr_tree, encoding='utf8', method='text').decode('utf-8')
+                    text = text + txt_tr
+                except:
+                    continue
+            return text
+
+    def get_attribute_blob(self):
+        att_blob = {}
+        for att in self.attributes.all():
+            att_blob[att.attribute_type.name] = att.value_STR
+        return str(att_blob)
+
+    def get_data_blob(self):
+        return str(self.get_attribute_blob()) + str(self.get_transcription_blob())
+
 
 @receiver(models.signals.post_save, sender=Source)
 def update_workflow(sender, instance, created, **kwargs):
@@ -376,6 +399,12 @@ class Transcription(dalmeUuid):
         if len(tr_tree) == 1 and tr_tree[0].tag in ['quote', 'gap', 'mute'] or len(tr_tree) == 0:
             self.count_ignore = True
         super(Transcription, self).save()
+
+    @property
+    def text_blob(self):
+        xml_parser = et.XMLParser(recover=True)
+        tr_tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
+        return et.tostring(tr_tree, encoding='utf8', method='text').decode('utf-8')
 
 
 @receiver(models.signals.post_save, sender=Transcription)

@@ -1,0 +1,3 @@
+{{ object.name }}
+{{ object.alpha_3_code }}
+{{ object.num_code }}
