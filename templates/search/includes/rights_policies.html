@@ -1,6 +1,6 @@
 {% load highlight %}
 <div class="search-result-entry">
-    <a class="search-result-link" href="{{ result.object.get_absolute_url }}">{{ result.object.name }}</a>
+    <a class="search-result-link" href="{{ result.object.get_url }}">{{ result.object.name }}</a>
     <div class="search-result-detail">Content Rights Policy |
       Status: {{ result.object.get_rights_status_display }}
       {% if result.object.notice_display %}

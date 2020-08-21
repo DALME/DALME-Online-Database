@@ -571,6 +571,9 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+    def get_absolute_url(self):
+        return reverse('user_detail', kwargs={'username': self.user.username})
+
     def get_dam_usergroup(self):
         dam_ug = rs_user.objects.get(ref=self.dam_user).usergroup
         return dam_ug
@@ -616,6 +619,9 @@ class Set(dalmeUuid):
 
     def __str__(self):
         return f'{self.name}({self.set_type})'
+
+    def get_absolute_url(self):
+        return reverse('set_detail', kwargs={'pk': self.id})
 
     @property
     def workset_progress(self):
@@ -882,7 +888,7 @@ class Task(dalmeIntid):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("/tasks/", kwargs={"task_id": self.id})
+        return reverse('task_detail', kwargs={'pk': self.pk})
 
     # Auto-set the Task creation / completed date
     def save(self, **kwargs):
@@ -936,6 +942,9 @@ class Ticket(dalmeIntid):
 
     def __str__(self):
         return str(self.id) + ' - ' + self.title + ' ('+self.get_status_display+')'
+
+    def get_absolute_url(self):
+        return reverse('ticket_detail', kwargs={'pk': self.pk})
 
     class Meta:
         ordering = ["status", "creation_timestamp"]
