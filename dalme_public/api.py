@@ -72,16 +72,10 @@ class PublicRecordSerializer(RecordSerializer):
             return resource.ref
         return None
 
-    @staticmethod
-    def get_transcription_count(instance):
-        # TODO: Need Gabe's update
-        return instance.source_pages.all().select_related('transcription').count()  # noqa
-
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data.update({
             'image_ref': self.get_image(instance),
-            'transcription_count':  self.get_transcription_count(instance),
         })
         return data
 

@@ -196,14 +196,16 @@ def test_expression2(request):
     #     s.modification_user = m_user
     #     s.save()
 
-    inv = Source.objects.get(id='7c7efca6-c324-452a-9a21-0e84f55a386f')
+    inv = Source.objects.get(id='7c8837ac-b1e2-42ad-86f5-1322982a1eb6')
     # if inv.source_pages.all().select_related('transcription').exists():
     #     result = 'cool'
     # else:
     #     result = 'fail'
     # return result
-    res = inv.source_pages.exclude(transcription__version__lt=1).count()
-    return res
+    #res = str(inv.pages.all().count()) + '/' + str(inv.source_pages.filter(transcription__count_ignore=False).count())
+    #tr_count = len([i.id for i in inv.source_pages.all() if i.count_tr() is False])
+    #res = str(inv.pages.all().count()) + '/' + str(tr_count)
+    return inv.pages.exclude(dam_id__isnull=True).count()
 
 # REMOVE DUPLICATES
 # def test_expression2(request):

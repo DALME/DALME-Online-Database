@@ -220,16 +220,9 @@ class Source(index.Indexed, dalmeUuid):
             return False
 
     @property
-    def no_folios(self):
-        if self.pages.all().exists():
-            return self.pages.all().count()
-        else:
-            return 0
-
-    @property
-    def no_transcriptions(self):
-        if self.source_pages.exclude(transcription__count_ignore=True).exists():
-            return self.source_pages.exclude(transcription__count_ignore=True).count()
+    def no_images(self):
+        if self.pages.exclude(dam_id__isnull=True).exists():
+            return self.pages.exclude(dam_id__isnull=True).count()
         else:
             return 0
 
@@ -239,6 +232,20 @@ class Source(index.Indexed, dalmeUuid):
             return True
         else:
             return False
+
+    @property
+    def no_transcriptions(self):
+        if self.source_pages.exclude(transcription__count_ignore=True).exists():
+            return self.source_pages.exclude(transcription__count_ignore=True).count()
+        else:
+            return 0
+
+    @property
+    def no_folios(self):
+        if self.pages.all().exists():
+            return self.pages.all().count()
+        else:
+            return 0
 
     @property
     def get_credit_line(self):

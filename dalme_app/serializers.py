@@ -437,13 +437,14 @@ class SourceSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True, required=False)
     inherited = AttributeSerializer(many=True, required=False)
     no_folios = serializers.IntegerField(required=False)
+    no_images = serializers.IntegerField(required=False)
     tags = TagSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
 
     class Meta:
         model = Source
         fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'has_inventory',
-                  'attributes', 'inherited', 'no_folios', 'tags', 'workflow')
+                  'attributes', 'inherited', 'no_folios', 'no_images', 'tags', 'workflow')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

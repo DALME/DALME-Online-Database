@@ -57,13 +57,14 @@ class RecordSerializer(serializers.ModelSerializer):
     parent = serializers.PrimaryKeyRelatedField(queryset=Source.objects.all(), allow_null=True)
     parent_name = serializers.StringRelatedField(source='parent', read_only=True, required=False)
     no_folios = serializers.IntegerField(required=False)
+    no_images = serializers.IntegerField(required=False)
     attributes = AttributeSerializer(many=True, required=False)
     inherited = AttributeSerializer(many=True, required=False)
     collections = CollectionMembershipSerializer(source='sets', many=True, required=False)
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'name', 'short_name', 'is_public', 'parent', 'parent_name', 'no_folios', 'no_transcriptions', 'collections',
+        fields = ('id', 'type', 'name', 'short_name', 'is_public', 'parent', 'parent_name', 'no_folios', 'no_images', 'no_transcriptions', 'collections',
                   'attributes', 'inherited', 'has_images', 'has_transcriptions', 'get_credit_line')
 
     def to_representation(self, instance):
