@@ -40,7 +40,7 @@ DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # Application definition
-ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443']
+ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io']
 CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     # 'django.contrib.humanize',
     # 'django.contrib.admindocs',
     'django.contrib.sites',
+    'django_hosts',
     'haystack',
     # 'treebeard',
     # 'sekizai',
@@ -96,6 +97,7 @@ if DEBUG and ENABLE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware',
     # 'corsheaders.middleware.CorsMiddleware',
     # 'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -113,10 +115,13 @@ MIDDLEWARE = [
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware'
 ]
 
-
+ROOT_HOSTCONF = 'dalme.devHosts'
 ROOT_URLCONF = 'dalme.devUrls'
+DEFAULT_HOST = 'public'
+# PARENT_HOST = 'dalme.org'
 
 TEMPLATES = [
     {
