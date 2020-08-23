@@ -11,11 +11,7 @@ from django.shortcuts import get_object_or_404
 class Records(viewsets.ModelViewSet):
     """ API endpoint for managing records for the web frontend """
     permission_classes = (DjangoModelPermissions,)
-    queryset = Source.objects.filter(
-        type=13, workflow__is_public=True
-    ).annotate(
-        no_folios=Count('pages', filter=Q(pages__source__isnull=False))
-    )
+    queryset = Source.objects.filter(type=13, workflow__is_public=True)
     serializer_class = RecordSerializer
 
 

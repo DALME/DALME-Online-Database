@@ -1015,7 +1015,7 @@ i.inactive {
 }
 .app.inventory-list .inventory-wide .icons span,
 .app.inventory-list .inventory-detail .icons span {
-  background: #008000;
+  background: #717171;
   border-radius: 0.3rem;
   color: #fff;
   float: right;
@@ -1023,10 +1023,15 @@ i.inactive {
   padding: 0.2rem;
   position: absolute;
   text-align: center;
-  transform: translate(20px, -7px);
+  transform: translate(10px, -7px);
   width: 1.4rem;
 }
-.app.inventory-list .inventory-wide .icons span.zero {
+.app.inventory-list .inventory-wide .icons span.yellow,
+.app.inventory-list .inventory-detail .icons span.yellow {
+  background: #ffa500;
+}
+.app.inventory-list .inventory-wide .icons span.red,
+.app.inventory-list .inventory-detail .icons span.red {
   background: #ffa500;
 }
 .app.inventory-list .inventory-wide .icons .second {
@@ -1122,6 +1127,7 @@ i.inactive {
 .app.inventory-list .inventory-detail .top .icons .first {
   margin-bottom: 0.5rem;
 }
+
 .app.inventory-list .inventory-detail .bottom {
   margin-top: auto;
   padding: 1rem;

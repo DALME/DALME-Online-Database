@@ -1,6 +1,7 @@
 from haystack import indexes
 from dalme_app.models import (Attribute_type, CityReference, CountryReference,
                               LanguageReference, Profile, RightsPolicy, Set, Source, Task, Ticket)
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Attribute_typeIndex(indexes.SearchIndex, indexes.Indexable):
@@ -74,10 +75,22 @@ class SetIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class SourceIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/sources.txt")
+    text = indexes.EdgeNgramField(document=True, use_template=True, template_name="search/sources.txt")
+    name = indexes.CharField(model_attr='name')
+    type = indexes.IntegerField()
+    is_public = indexes.BooleanField()
 
     def get_model(self):
         return Source
+
+    def prepare_type(self, obj):
+        return obj.type.id
+
+    def prepare_is_public(self, obj):
+        try:
+            return obj.workflow.is_public
+        except ObjectDoesNotExist:
+            return False
 
     def index_queryset(self, using=None):
         return self.get_model().objects.all()

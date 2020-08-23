@@ -35,7 +35,7 @@
         <li class="search">
           <input
             type="search"
-            placeholder="Search by name"
+            placeholder="Search"
             v-model="search"
             :value="search"
           >
@@ -139,8 +139,8 @@
               <span class="inventory-field record-type">${inventory.record_type}</span>
               <span class="inventory-field date">${inventory.date}</span>
               <span class="inventory-field icons">
-                <i v-if="inventory.has_images" class="fas fa-pen-nib"></i>
-                <i v-if="inventory.has_transcriptions" class="fas fa-camera"></i>
+                <i v-if="inventory.no_folios > 0" class="fas fa-file"></i>
+                <i v-if="inventory.has_transcriptions" class="fas fa-file-image"></i>
               </span>
             </div>
           </template>
@@ -163,15 +163,15 @@
             </div>
             <div class="u-flex icons">
               <div class="u-flex first">
-                <i v-if="inventory.has_images" class="fas fa-pen-nib pen"></i>
-                <span class="icon-count" :class="inventory.transcription_count === 0 ? 'zero' : ''">
-                  ${inventory.transcription_count}
+                <i class="fas fa-file"></i>
+                <span class="icon-count" :class="inventory.no_folios === 0 ? 'red' : ''">
+                  ${inventory.no_folios}
                 </span>
               </div>
               <div class="u-flex second">
-                <i v-if="inventory.has_transcriptions" class="fas fa-camera camera"></i>
-                <span class="icon-count" :class="inventory.no_folios === 0 ? 'zero' : ''">
-                  ${inventory.no_folios}
+                <i v-if="inventory.has_transcriptions" class="fas fa-file-alt"></i>
+                <span class="icon-count" :class="inventory.no_transcriptions === 0 ? 'red' : inventory.no_transcriptions === inventory.no_folios ? '' : 'yellow'">
+                  ${inventory.no_transcriptions}
                 </span>
               </div>
             </div>
@@ -192,15 +192,21 @@
                       <p>${inventory.name}</p>
                       <div class="u-flex icons">
                         <div class="u-flex first">
-                          <i v-if="inventory.has_images" class="fas fa-pen-nib pen"></i>
-                          <span class="icon-count" :class="inventory.transcription_count === 0 ? 'zero' : ''">
-                            ${inventory.transcription_count}
+                          <i v-if="inventory.has_transcriptions" class="fas fa-file"></i>
+                          <span class="icon-count" :class="inventory.no_folios === 0 ? 'red' : ''">
+                            ${inventory.no_folios}
                           </span>
                         </div>
-                        <div class="u-flex second">
-                          <i v-if="inventory.has_transcriptions" class="fas fa-camera camera"></i>
-                          <span class="icon-count" :class="inventory.no_folios === 0 ? 'zero' : ''">
-                            ${inventory.no_folios}
+                        <div class="u-flex first">
+                          <i v-if="inventory.has_images" class="fas fa-file-image"></i>
+                          <span class="icon-count" :class="inventory.no_images === 0 ? 'red' : inventory.no_images === inventory.no_folios ? '' : 'yellow'">
+                            ${inventory.no_images}
+                          </span>
+                        </div>
+                        <div class="u-flex">
+                          <i v-if="inventory.has_transcriptions" class="fas fa-file-alt"></i>
+                          <span class="icon-count" :class="inventory.no_transcriptions === 0 ? 'red' : inventory.no_transcriptions === inventory.no_folios ? '' : 'yellow'">
+                            ${inventory.no_transcriptions}
                           </span>
                         </div>
                       </div>
@@ -284,7 +290,7 @@
         count: null,
         totalPages: null,
         currentPage: null,
-        search: new URLSearchParams(window.location.search).get('name'),
+        search: new URLSearchParams(window.location.search).get('q'),
         showFilters: false,
         corpus: null,
         mode: 'compact',
@@ -303,7 +309,7 @@
       watch: {
         inventories: 'fetchThumbnails',
         search: debounce(function() {
-          this.filterData('name', this.search)
+          this.filterData('q', this.search)
         }, 250),
         date: debounce(function() {
           const [min, max] = this.date;
