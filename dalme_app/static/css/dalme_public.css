@@ -847,6 +847,9 @@ nav.collections-filter ul li {
   text-align: center;
   width: 100%;
 }
+nav.collections-filter ul li.searchbox {
+  margin-bottom: .4rem;
+}
 nav.collections-filter input {
   border: 0;
   border-bottom: 1px solid #ccc;
@@ -1730,8 +1733,12 @@ div.description[data-collapsed='true'] {
   }
 
   nav.collections-filter input {
-    margin-right: 1rem;
+    margin-right: 0;
+    padding-right: 0;
     width: 100%;
+    text-align: right;
+    font-size: 1.1rem;
+    line-height: 1.8;
   }
   nav.collections-filter ul li {
     text-align: right;
