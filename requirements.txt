@@ -8,6 +8,7 @@ django-celery-results==1.2.1
 django-cors-headers==3.4.0
 django-filter==2.3.0
 django-haystack==2.8.1
+django-hosts==4.0
 django-maintenance-mode==0.14.0
 django-storages==1.9.1
 djangorestframework==3.11.1
