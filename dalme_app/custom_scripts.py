@@ -22,6 +22,7 @@ from django.contrib import messages
 from django.template import defaultfilters
 from django.utils import timezone
 from django.forms.models import model_to_dict
+from haystack.query import SearchQuerySet
 
 
 def get_script_menu():
@@ -50,6 +51,11 @@ def get_script_menu():
             "name": "fix_workflow",
             "description": "Ensures that there is a workflow record for every source with a list.",
             "type": "danger"
+        },
+        {
+            "name": "test_search",
+            "description": "Tests search backend.",
+            "type": "info"
         },
         {
             "name": "test_expression",
@@ -90,6 +96,20 @@ def get_script_menu_item(name=None, description=None, type=None):
                    bg-{}-soft"><i class="fas {} text-{}"></i></div>'.format(name, type, icon_dict[type], type)
     currentItem += '<span class="font-weight-bold mr-1">{}: </span> {}</a>'.format(name, description)
     return currentItem
+
+
+def queryset_gen(search_qs):
+    for item in search_qs:
+        yield item.object  # This is the line that gets the model instance out of the Search object
+
+
+def test_search(request):
+    sqs = SearchQuerySet().filter(content='schiav')
+    qs = queryset_gen(sqs)
+    res = []
+    for e in qs:
+        res.append([e.name])
+    return res
 
 
 def add_attribute_types():
@@ -167,11 +187,12 @@ def fix_workflow(request):
 
 def test_expression(request):
     record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
-    att_dict = {}
-    for a in record.attributes.all():
-        att_dict[a.attribute_type.name] = a.value_STR
-    #return record.get_clean_transcription_blob()
-    return str(att_dict)
+    # att_dict = {}
+    # for a in record.attributes.all():
+    #     att_dict[a.attribute_type.name] = a.value_STR
+    # #return record.get_clean_transcription_blob()
+    # return str(att_dict)
+    return int(record.type.id)
 
 
 def fix_users(records):
@@ -185,8 +206,6 @@ def fix_users(records):
         s.save()
 
 def test_expression2(request):
-
-
     # records = Attribute_type.objects.all()
     # for s in records:
     #     c_user = User.objects.get(username=s.creation_username)
