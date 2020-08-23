@@ -25,17 +25,17 @@
               <i class="fas fa-caret-down corpus"></i>
             </div>
             {{ corpus.description|richtext }}
-            <h4>Collections</h4>
-            <ul class="collections">
+            <div class="collections-container">
+              <h4>Collections</h4>
               {% for collection in collections %}
-                <li class="u-flex">
-                  <a href="{% pageurl collection %}">{{ collection.title }}</a>
-                  <span class="count">
+                <a class="u-flex" href="{% pageurl collection %}">
+                  <div class="title">{{ collection.title }}</div>
+                  <div class="count">
                     {% collection_date_range collection %} | {{ collection.count }} Records
-                  </span>
-                </li>
+                  </div>
+                </a>
               {% endfor %}
-            </ul>
+            </div>
           </section>
         {% endfor %}
       </div>
