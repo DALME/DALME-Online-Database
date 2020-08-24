@@ -42,6 +42,10 @@ DEBUG = True
 # Application definition
 ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io']
 CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ALLOW_CREDENTIALS = True
+# SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
+# SESSION_COOKIE_NAME = 'session_id'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -98,12 +102,12 @@ if DEBUG and ENABLE_DJANGO_EXTENSIONS:
 
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
-    # 'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     # 'oauth2_provider.middleware.OAuth2TokenMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.security.SecurityMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -121,7 +125,7 @@ MIDDLEWARE = [
 ROOT_HOSTCONF = 'dalme.devHosts'
 ROOT_URLCONF = 'dalme.devUrls'
 DEFAULT_HOST = 'public'
-# PARENT_HOST = 'dalme.org'
+PARENT_HOST = '127.0.0.1.xip.io:8443'
 
 TEMPLATES = [
     {
@@ -166,7 +170,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # authentication settings
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
 # LOGIN_URL = '/accounts/login/dalme_wp/'
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = 'https://db.127.0.0.1.xip.io:8443/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 # LOGIN_REDIRECT_URL = 'https://db.dalme.org'

@@ -32,6 +32,8 @@ DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
 
 DEBUG = False
 ALLOWED_HOSTS = ['.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
+CORS_ORIGIN_WHITELIST = ['https://db.dalme.org', 'https://public.dalme.org', 'https://dalme.org', 'https://kb.dalme.org', 'https://dam.dalme.org']
+SESSION_COOKIE_DOMAIN = '.dalme.org'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -73,6 +75,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -127,7 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = 'https://db.dalme.org/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 

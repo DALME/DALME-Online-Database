@@ -1,5 +1,6 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
 {% load static %}
+{% load hosts %}
 
 {% block title %}{{ data.short_name }} &mdash; {{ block.super }}{% endblock %}
 
@@ -185,7 +186,7 @@
           node.innerHTML = `<div class="warning">${warning}</div>`;
         } else {
           window.folio = new Diva('diva_viewer', {
-            objectData: `/pages/${pageId}/manifest`,
+            objectData: `{% host_url 'page_list' host 'db' %}${pageId}/manifest`,
             enableAutoTitle: false,
             enableFullscreen: false,
             enableKeyScroll: false,
@@ -207,7 +208,7 @@
         const node = $('#folio-rights');
         node.empty();
         if (pageId) {
-          const endpoint = `/api/rights/?pk=${pageId}`;
+          const endpoint = `{% host_url 'api_endpoint:rights-list' host 'db' %}?pk=${pageId}`;
           $.get(endpoint, function(data) {
             if (data.data.length) {
               const [rights] = data.data;
@@ -236,7 +237,7 @@
           const warning = 'This folio has not been transcribed.'
           node.innerHTML = `<div class="warning">${warning}</div>`;
         } else {
-          const endpoint = `/api/transcriptions/${transcriptionId}?format=json`;
+          const endpoint = `{% host_url 'api_endpoint:transcriptions-list' host 'db' %}${transcriptionId}?format=json`;
           const tei = new CETEI();
           tei.addBehaviors(teiBehaviours);
           $.get(endpoint, function(data) {
