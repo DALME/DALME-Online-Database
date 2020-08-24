@@ -43,10 +43,10 @@ web_router.register(r'collections', web_apis.Collections, basename='collections'
 
 urlpatterns = [
     path('maintenance-mode/', include(maintenance_mode_urls)),
-    path('api/', include(router.urls)),
+    path('api/', include((router.urls, 'dalme_app'), namespace='api_endpoint')),
     path('web-api/', include(web_router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include(('django.contrib.auth.urls', 'dalme_app'), namespace='dalme_auth')),
     path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('django_admin/', admin.site.urls),
