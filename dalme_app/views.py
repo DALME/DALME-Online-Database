@@ -20,6 +20,7 @@ import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.contrib.auth.views import LoginView
 
 
 def SessionUpdate(request):
@@ -1499,3 +1500,15 @@ class TasksList(TemplateView):
              ]
         ]
         return context
+
+
+class DalmeLogin(LoginView):
+    """ Overwrites LoginView method to allow users to be redirected accross subdomains on login """
+
+    def get_redirect_url(self):
+        """Return the user-originating redirect URL"""
+        redirect_to = self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, '')
+        )
+        return redirect_to

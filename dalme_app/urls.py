@@ -46,6 +46,7 @@ urlpatterns = [
     path('api/', include((router.urls, 'dalme_app'), namespace='api_endpoint')),
     path('web-api/', include(web_router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('accounts/login/', views.DalmeLogin.as_view(), name='login'),
     path('accounts/', include(('django.contrib.auth.urls', 'dalme_app'), namespace='dalme_auth')),
     path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
