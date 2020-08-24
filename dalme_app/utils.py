@@ -123,8 +123,8 @@ class SAMLProcessor(BaseProcessor):
             attr_lst = user_attr.split('.')
             if len(attr_lst) > 1 and attr_lst[0] == 'profile':
                 results[out_attr] = getattr(user.profile, attr_lst[1])
-            # if user_attr == 'full_name':
-            #     results[out_attr] = user.profile.full_name
+            if user_attr == 'groups':
+                results[out_attr] = user.groups.values_list('name', flat=True)
             # elif user_attr == 'profile_image':
             #     results[out_attr] = user.profile.profile_image
             elif hasattr(user, user_attr):
