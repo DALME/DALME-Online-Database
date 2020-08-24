@@ -22,6 +22,5 @@ urlpatterns = [
     path('cms/logout/', auth_views.LogoutView.as_view(), name='wagtailadmin_logout'),
     path('cms/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
-    path('accounts/', include('django.contrib.auth.urls')),
     path('', include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
