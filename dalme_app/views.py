@@ -13,7 +13,7 @@ from django.views.generic.base import TemplateView
 from dalme_app import functions, custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
                               Source, Set, TaskList, Task, rs_resource, rs_collection_resource,
-                              rs_resource_data, rs_resource_type_field, rs_user, wiki_user_groups, LanguageReference,
+                              rs_resource_data, rs_resource_type_field, rs_user, LanguageReference,
                               Attribute_type, CountryReference, rs_collection, Ticket, Workflow, RightsPolicy)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
@@ -706,8 +706,7 @@ class UserList(DTListView):
     breadcrumb = [('Project', ''), ('Users', '/users')]
     dt_editor_options = {'idSrc': '"id"'}
     dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username',
-                      'password', 'is_staff', 'is_superuser', 'groups', 'dam_usergroup',
-                      'wiki_groups', 'wp_role']
+                      'password', 'is_staff', 'is_superuser', 'groups', 'dam_group']
 
     def get_dte_buttons(self, *args, **kwargs):
         dte_buttons = []
@@ -747,7 +746,7 @@ class UserDetail(DetailView):
             'Joined': functions.format_date(self.object.user.date_joined, 'timestamp-long'),
             'Last login': functions.format_date(self.object.user.last_login, 'timestamp-long'),
             'Groups': self.object.user.groups,
-            'WordPress role': self.object.get_wp_role_display()
+            'DAM group': self.object.get_dam_group_display()
         }
         context['user_data'] = user_data
         context['image_url'] = self.object.profile_image

@@ -188,21 +188,7 @@ DATABASES = {
         'USER': os.environ.get('DAM_USERNAME', ''),
         'PASSWORD': os.environ.get('DAM_PASSWORD', ''),
         'HOST': os.environ.get('DAM_HOSTNAME', ''),
-    },
-    'wiki': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('WIKI_DB_NAME', ''),
-        'USER': os.environ.get('WIKI_USERNAME', ''),
-        'PASSWORD': os.environ.get('WIKI_PASSWORD', ''),
-        'HOST': os.environ.get('WIKI_HOSTNAME', ''),
-    },
-    'wp': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('WP_DB_NAME', ''),
-        'USER': os.environ.get('WP_USERNAME', ''),
-        'PASSWORD': os.environ.get('WP_PASSWORD', ''),
-        'HOST': os.environ.get('WP_HOSTNAME', ''),
-    },
+    }
 }
 
 db_from_env = dj_database_url.config(conn_max_age=500)
