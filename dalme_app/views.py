@@ -743,7 +743,7 @@ class UserDetail(DetailView):
             'Active': functions.format_boolean(self.object.user.is_active),
             'Joined': functions.format_date(self.object.user.date_joined, 'timestamp-long'),
             'Last login': functions.format_date(self.object.user.last_login, 'timestamp-long'),
-            'Groups': self.object.user.groups
+            'Groups': ', '.join([i.name for i in self.object.user.groups.all()])
         }
         context['user_data'] = user_data
         context['image_url'] = self.object.profile_image

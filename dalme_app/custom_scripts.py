@@ -23,6 +23,8 @@ from django.template import defaultfilters
 from django.utils import timezone
 from django.forms.models import model_to_dict
 from haystack.query import SearchQuerySet
+from wagtail.users.models import UserProfile
+from django.conf import settings
 
 
 def get_script_menu():
@@ -186,13 +188,17 @@ def fix_workflow(request):
 
 
 def test_expression(request):
-    record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
+    # record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
     # att_dict = {}
     # for a in record.attributes.all():
     #     att_dict[a.attribute_type.name] = a.value_STR
     # #return record.get_clean_transcription_blob()
     # return str(att_dict)
-    return int(record.type.id)
+    #return Profile.objects.get(user=1).user.wagtail_userprofile.avatar
+    #avatar = UserProfile.objects.get(pk=profile.user.id).avatar
+    return Profile.objects.get(user=1).profile_image_2
+    #avatar = User.objects.get(id=1).wagtailusers.userprofile.avatar
+    #result = blah
 
 
 def fix_users(records):
