@@ -15,6 +15,11 @@
     "effect": "allow"
   },
   {
+    "action": ["partial_update", "update"],
+    "principal": ["group:General Editors"],
+    "effect": "allow"
+  },
+  {
     "action": ["partial_update", "update", "destroy"],
     "principal": ["*"],
     "effect": "allow",

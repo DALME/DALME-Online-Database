@@ -21,6 +21,11 @@
     "effect": "allow"
   },
   {
+    "action": ["partial_update", "update", "workset_state", "remove_members", "add_members"],
+    "principal": ["group:General Editors"],
+    "effect": "allow"
+  },
+  {
     "action": ["partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
     "principal": ["*"],
     "effect": "allow",
