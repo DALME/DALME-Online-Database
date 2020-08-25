@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
-                              DT_list, DT_fields, Page, Source, TaskList, Task, wiki_user_groups,
+                              DT_list, DT_fields, Page, Source, TaskList, Task,
                               rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
                               CountryReference, CityReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app import functions
-import base64
 import textwrap
 import datetime
 import json
@@ -481,20 +480,6 @@ class SourceSerializer(DynamicSerializer):
         return result
 
 
-class WikiGroupSerializer(serializers.ModelSerializer):
-    """Basic serializer for user group data from the wiki database"""
-
-    class Meta:
-        model = wiki_user_groups
-        fields = ('ug_group',)
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        for key, value in ret.items():
-            ret[key] = base64.b64decode(value)
-        return ret
-
-
 class GroupSerializer(serializers.ModelSerializer):
     """ Basic serializer for user group data """
     name = serializers.CharField(max_length=255, required=False)
@@ -520,33 +505,19 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     """ Serialises user profiles and combines user data """
     user = UserSerializer(required=True)
-    dam_usergroup = serializers.ChoiceField(choices=rs_user.DAM_USERGROUPS, source='get_dam_usergroup', required=False)
-    wiki_groups = serializers.SerializerMethodField(required=False)
-    wp_role_display = serializers.ChoiceField(choices=Profile.WP_ROLE, source='get_wp_role_display', required=False)
-    dam_usergroup_display = serializers.ChoiceField(choices=rs_user.DAM_USERGROUPS, source='get_dam_usergroup_display', required=False)
+    dam_group_display = serializers.ChoiceField(choices=Profile.DAM_GROUPS, source='get_dam_group_display', required=False)
 
     class Meta:
         model = Profile
-        fields = ('id', 'full_name', 'user_id', 'dam_usergroup', 'wiki_groups', 'wp_role',
-                  'user', 'wp_role_display', 'dam_usergroup_display', 'wiki_user', 'dam_user',
-                  'wp_user')
-
-    def get_wiki_groups(self, obj):
-        wg = wiki_user_groups.objects.filter(ug_user=obj.wiki_user)
-        serializer = WikiGroupSerializer(instance=wg, many=True)
-        return serializer.data
+        fields = ('id', 'full_name', 'user_id', 'dam_group', 'user', 'dam_group_display')
 
     def to_representation(self, instance):
         """ set display for choice fields """
         ret = super().to_representation(instance)
-        if 'wp_role' in ret:
-            if ret['wp_role'] != '':
-                wp_role_d = ret.pop('wp_role_display')
-                ret['wp_role'] = {'name': wp_role_d, 'value': ret['wp_role']}
-        if 'dam_usergroup' in ret:
-            if ret['dam_usergroup'] != '':
-                dam_group_d = ret.pop('dam_usergroup_display')
-                ret['dam_usergroup'] = {'name': dam_group_d, 'value': ret['dam_usergroup']}
+        if 'dam_group' in ret:
+            if ret['dam_group'] is not None:
+                dam_group_d = ret.pop('dam_group_display')
+                ret['dam_group'] = {'name': dam_group_d, 'value': ret['dam_group']}
         return ret
 
     def update(self, instance, validated_data):

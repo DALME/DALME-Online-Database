@@ -240,21 +240,7 @@ if 'RDS_DB_NAME' in os.environ:
             'USER': os.environ['DAM_USERNAME'],
             'PASSWORD': os.environ['DAM_PASSWORD'],
             'HOST': os.environ['DAM_HOSTNAME'],
-        },
-        'wiki': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['WIKI_DB_NAME'],
-            'USER': os.environ['WIKI_USERNAME'],
-            'PASSWORD': os.environ['WIKI_PASSWORD'],
-            'HOST': os.environ['WIKI_HOSTNAME'],
-        },
-        'wp': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['WP_DB_NAME'],
-            'USER': os.environ['WP_USERNAME'],
-            'PASSWORD': os.environ['WP_PASSWORD'],
-            'HOST': os.environ['WP_HOSTNAME'],
-        },
+        }
     }
 else:
     DATABASES = {
@@ -274,21 +260,7 @@ else:
             'USER': os.environ['DAM_USERNAME'],
             'PASSWORD': os.environ['DAM_PASSWORD'],
             'HOST': os.environ['DAM_HOSTNAME'],
-        },
-        'wiki': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['WIKI_DB_NAME'],
-            'USER': os.environ['WIKI_USERNAME'],
-            'PASSWORD': os.environ['WIKI_PASSWORD'],
-            'HOST': os.environ['WIKI_HOSTNAME'],
-        },
-        'wp': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['WP_DB_NAME'],
-            'USER': os.environ['WP_USERNAME'],
-            'PASSWORD': os.environ['WP_PASSWORD'],
-            'HOST': os.environ['WP_HOSTNAME'],
-        },
+        }
     }
 
 # Update database configuration with $DATABASE_URL.
