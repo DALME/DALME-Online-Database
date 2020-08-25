@@ -339,8 +339,8 @@ def format_boolean(value):
 
 def format_user(ref, type, output=None):
     if type == 'dam':
-        if Profile.objects.filter(dam_user=ref).exists():
-            user = Profile.objects.get(dam_user=ref)
+        if Profile.objects.filter(user__username=ref).exists():
+            user = Profile.objects.get(user__username=ref)
             if output == 'html':
                 f_user = '<a href="/users/{}">{}</a>'.format(user.user.username, user.full_name)
             else:
