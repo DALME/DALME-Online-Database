@@ -561,21 +561,29 @@ class Profile(models.Model):
     One-to-one extension of user model to accomodate additional user related
     data, including permissions of associated accounts on other platforms.
     """
-
-    WP_ROLE = (
-        ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber'),
-        ('a:1:{s:11:"contributor";b:1;}', 'Contributor'),
-        ('a:1:{s:6:"author";b:1;}', 'Author'),
-        ('a:1:{s:6:"editor";b:1;}', 'Editor'),
-        ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
+    DAM_GROUPS = (
+        ('dam_administrators', 'Administrators'),
+        ('dam_archivists', 'Archivists'),
+        ('dam_general_users', 'General Users'),
+        ('dam_restricted_user', 'Restricted User'),
+        ('dam_super_admin', 'Super Admin')
     )
+
+    # WP_ROLE = (
+    #     ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber'),
+    #     ('a:1:{s:11:"contributor";b:1;}', 'Contributor'),
+    #     ('a:1:{s:6:"author";b:1;}', 'Author'),
+    #     ('a:1:{s:6:"editor";b:1;}', 'Editor'),
+    #     ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
+    # )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
-    dam_user = models.IntegerField(null=True)
-    wiki_user = models.IntegerField(null=True)
-    wp_user = models.IntegerField(null=True)
-    wp_role = models.CharField(max_length=50, blank=True, choices=WP_ROLE, default='a:1:{s:10:"subscriber";b:1;}')
+    dam_group = models.CharField(max_length=50, blank=True, choices=DAM_GROUPS, default='dam_restricted_user')
+    # dam_user = models.IntegerField(null=True)
+    # wiki_user = models.IntegerField(null=True)
+    # wp_user = models.IntegerField(null=True)
+    # wp_role = models.CharField(max_length=50, blank=True, choices=WP_ROLE, default='a:1:{s:10:"subscriber";b:1;}')
     profile_image = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
@@ -584,13 +592,13 @@ class Profile(models.Model):
     def get_absolute_url(self):
         return reverse('user_detail', kwargs={'username': self.user.username})
 
-    def get_dam_usergroup(self):
-        dam_ug = rs_user.objects.get(ref=self.dam_user).usergroup
-        return dam_ug
+    # def get_dam_usergroup(self):
+    #     dam_ug = rs_user.objects.get(ref=self.dam_user).usergroup
+    #     return dam_ug
 
-    def get_dam_usergroup_display(self):
-        dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
-        return dam_ug
+    # def get_dam_usergroup_display(self):
+    #     dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
+    #     return dam_ug
 
 
 class Set(dalmeUuid):
@@ -1333,102 +1341,5 @@ class rs_resource_type_field(models.Model):
         managed = False
         db_table = 'resource_type_field'
         in_db = 'dam'
-# <-
-
-
-# -> MediaWiki
-class wiki_user(models.Model):
-    user_id = models.IntegerField(primary_key=True)
-    user_name = models.BinaryField(max_length=255, unique=True)
-    user_real_name = models.BinaryField(max_length=255)
-    user_password = models.BinaryField()
-    user_newpassword = models.BinaryField()
-    user_newpass_time = models.BinaryField(max_length=14, null=True)
-    user_email = models.BinaryField()
-    user_touched = models.BinaryField(max_length=14)
-    user_token = models.BinaryField(max_length=32)
-    user_email_authenticated = models.BinaryField(max_length=14, null=True)
-    user_email_token = models.BinaryField(max_length=32, null=True)
-    user_email_token_expires = models.BinaryField(max_length=14, null=True)
-    user_registration = models.BinaryField(max_length=14, null=True)
-    user_editcount = models.IntegerField(null=True)
-    user_password_expires = models.BinaryField(max_length=14, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'user'
-        in_db = 'wiki'
-
-
-class wiki_user_groups(models.Model):
-
-    WIKI_GROUPS = (
-        ('users', 'Users'),
-        ('administrator', 'Administrator'),
-        ('bureaucrat', 'Bureaucrat'),
-        ('sysop', 'Sysop')
-    )
-
-    ug_user = models.ForeignKey('wiki_user', to_field='user_id', db_index=True, on_delete=models.CASCADE, related_name='wiki_groups', db_column="ug_user")
-    ug_group = models.BinaryField(max_length=255, choices=WIKI_GROUPS)
-    ug_expiry = models.BinaryField(max_length=14, primary_key=True)
-
-    class Meta:
-        managed = False
-        db_table = 'user_groups'
-        in_db = 'wiki'
-
-
-class wiki_page(models.Model):
-    page_id = models.IntegerField(primary_key=True)
-    page_namespace = models.IntegerField()
-    page_title = models.BinaryField(max_length=255)
-    page_restrictions = models.BinaryField()
-    page_is_redirect = models.IntegerField(default='0')
-    page_is_new = models.IntegerField(default='0')
-    page_random = models.FloatField()
-    page_touched = models.BinaryField(max_length=14)
-    page_links_updated = models.BinaryField(max_length=14, null=True)
-    page_latest = models.IntegerField()
-    page_len = models.IntegerField()
-    page_content_model = models.BinaryField(max_length=32, null=True)
-    page_lang = models.BinaryField(max_length=35, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'page'
-        in_db = 'wiki'
-# <-
-
-
-# -> Wordpress
-class wp_users(models.Model):
-    ID = models.IntegerField(primary_key=True)
-    user_login = models.CharField(max_length=60, unique=True)
-    user_pass = models.CharField(max_length=255)
-    user_nicename = models.CharField(max_length=50)
-    user_email = models.CharField(max_length=100)
-    user_url = models.CharField(max_length=100)
-    user_registered = models.DateTimeField(default='0000-00-00 00:00:00')
-    user_activation_key = models.CharField(max_length=255)
-    user_status = models.IntegerField(default='0')
-    display_name = models.CharField(max_length=250)
-
-    class Meta:
-        managed = False
-        db_table = 'wp_users'
-        in_db = 'wp'
-
-
-class wp_usermeta(models.Model):
-    umeta_id = models.IntegerField(primary_key=True)
-    user_id = models.IntegerField(default='0')
-    meta_key = models.CharField(max_length=255, null=True)
-    meta_value = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'wp_usermeta'
-        in_db = 'wp'
 # <-
 # <-

@@ -1,4 +1,4 @@
-import uuid
+# import uuid
 import datetime
 import json
 import ast
@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from django_celery_results.models import TaskResult
-from passlib.apps import phpass_context
+# from passlib.apps import phpass_context
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -29,8 +29,8 @@ from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, Langua
                                    WorkflowSerializer, SetSerializer, RightsSerializer)
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, LanguageReference,
-                              TaskList, Task, rs_resource, rs_collection, rs_collection_resource, rs_user, wiki_user,
-                              wiki_user_groups, wp_users, wp_usermeta, Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
+                              TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
+                              Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy)
 from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy
 
@@ -1408,33 +1408,12 @@ class Users(DTViewSet):
 
     def create(self, request, *args, **kwargs):
         result = {}
-        display_fields = ['dam_usergroup', 'wp_role']
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
         if data_dict['user'].get('groups', None) is not None and type(data_dict['user']['groups']) is not list:
             data_dict['user']['groups'] = [data_dict['user']['groups']]
         serializer = self.get_serializer(data=data_dict)
         if serializer.is_valid():
-            # create wp user
-            result = create_wp_user(data_dict)
-            if result['status'] == 201:
-                data_dict['wp_user'] = result['id']
-            else:
-                return Response(result['error'], result['status'])
-            # create dam user
-            result = create_dam_user(data_dict)
-            if result['status'] == 201:
-                data_dict['dam_user'] = result['id']
-                data_dict.pop('dam_usergroup', None)
-            else:
-                return Response(result['error'], result['status'])
-            # create wiki user
-            result = create_wiki_user(data_dict)
-            if result['status'] == 201:
-                data_dict['wiki_user'] = result['id']
-                data_dict.pop('wiki_groups', None)
-            else:
-                return Response(result['error'], result['status'])
             if data_dict['user'].get('groups') is not None and data_dict['user'].get('groups') != 0:
                 groups = [i['id'] for i in data_dict['user']['groups']]
                 serializer = self.get_serializer(data=data_dict, context={'groups': groups})
@@ -1447,10 +1426,10 @@ class Users(DTViewSet):
                 result['data'] = serializer.data
                 status = 201
             else:
-                result['fieldErrors'] = get_error_array(serializer.errors, display_fields)
+                result['fieldErrors'] = get_error_array(serializer.errors)
                 status = 400
         else:
-            result['fieldErrors'] = get_error_array(serializer.errors, display_fields)
+            result['fieldErrors'] = get_error_array(serializer.errors)
             status = 400
         return Response(result, status)
 
@@ -1460,18 +1439,8 @@ class Users(DTViewSet):
         # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
         # self.check_object_permissions(request, object)
         object = self.get_object()
-        display_fields = ['dam_usergroup', 'wp_role']
         data_dict = get_dte_data(request)
         data_dict = data_dict[0][1]
-        dam_usergroup = data_dict.pop('dam_usergroup', None)
-        if data_dict.get('wiki_groups') is not None and data_dict.get('wiki_groups') != 0:
-            if type(data_dict['wiki_groups']) is list:
-                wiki_groups = [i['ug_group'] for i in data_dict.pop('wiki_groups', None)]
-            else:
-                wiki_groups = [data_dict.pop('wiki_groups')['ug_group']]
-        else:
-            wiki_groups = None
-        wp_role = data_dict['wp_role']
         groups = data_dict['user'].pop('groups', None)
         if groups is not None:
             if type(groups) is list:
@@ -1482,26 +1451,13 @@ class Users(DTViewSet):
         serializer = self.get_serializer(object, data=data_dict, partial=partial)
         if serializer.is_valid():
             serializer.save()
-            if dam_usergroup != '':
-                rs_user.objects.filter(ref=object.dam_user).update(usergroup=dam_usergroup)
-            if wp_role != '':
-                wp_usermeta.objects.filter(user_id=object.wp_user, meta_key='wp_capabilities').update(meta_value=wp_role)
-            if wiki_groups is not None:
-                wiki_user_groups.objects.filter(ug_user=object.wiki_user).delete()
-                usr = wiki_user.objects.get(user_id=object.wiki_user)
-                for i in wiki_groups:
-                    dict = {
-                        'ug_user': usr,
-                        'ug_group': bytes(i, encoding='ascii')
-                    }
-                    wiki_user_groups(**dict).save()
             object = Profile.objects.get(pk=object.id)
             serializer = self.get_serializer(object)
             result['data'] = serializer.data
             result['data_dict'] = data_dict
             status = 201
         else:
-            result['fieldErrors'] = get_error_array(serializer.errors, display_fields)
+            result['fieldErrors'] = get_error_array(serializer.errors)
             status = 400
         return Response(result, status)
 
@@ -1512,10 +1468,6 @@ class Users(DTViewSet):
         try:
             # django switch active to false
             User.objects.filter(id=object.user.pk).update(is_active=False)
-            # resourcespace switch "approved" to false
-            rs_user.objects.filter(ref=object.dam_user).update(approved=0)
-            # wordpress change role to: -no role for this site- in meta, wp_capabilities = a:0:{}
-            wp_usermeta.objects.filter(user_id=object.wp_user, meta_key='wp_capabilities').update(meta_value='a:0:{}')
             object = Profile.objects.get(pk=object.pk)
             serializer = ProfileSerializer(object)
             result['data'] = serializer.data
@@ -1812,90 +1764,3 @@ def get_error_array(errors, display_fields=[]):
                 field = k
             fieldErrors.append({'name': field, 'status': str(v[0])})
     return fieldErrors
-
-
-""" USER MANAGEMENT FUNCTIONS """
-
-
-def create_wp_user(data_dict):
-    result = {}
-    try:
-        wp_dict = {
-            'user_login': functions.get_unique_username(data_dict['user']['username'], 'wp'),
-            'user_pass': phpass_context.hash(data_dict['user']['password']),
-            'user_nicename': data_dict['user']['username'],
-            'user_email': data_dict['user']['email'],
-            'user_registered': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'display_name': data_dict['full_name']
-            }
-        wp_meta_list = [
-            ['nickname', data_dict['user']['username']],
-            ['first_name', data_dict['user']['first_name']],
-            ['last_name', data_dict['user']['last_name']],
-            ['wp_capabilities', data_dict['wp_role']]
-        ]
-        wp_user = wp_users(**wp_dict).save()
-        wp_user = wp_users.objects.get(user_login=wp_dict['user_login'])
-        for i in wp_meta_list:
-            dict = {
-                'user_id': wp_user.pk,
-                'meta_key': i[0],
-                'meta_value': i[1],
-                }
-            wp_usermeta(**dict).save()
-        result['status'] = 201
-        result['id'] = wp_user.pk
-    except Exception as e:
-        result['status'] = 400
-        result['error'] = 'Failed to create WordPress user. Error: '+str(e)
-    return result
-
-
-def create_dam_user(data_dict):
-    result = {}
-    try:
-        dam_dict = {
-            'username': functions.get_unique_username(data_dict['user']['username'], 'dam'),
-            'password': str(uuid.uuid4()),
-            'fullname': data_dict['full_name'],
-            'email': data_dict['user']['email'],
-            'usergroup': data_dict['dam_usergroup'],
-            'approved': 1,
-        }
-        dam_user = rs_user(**dam_dict).save()
-        dam_user = rs_user.objects.get(username=dam_dict['username'])
-        result['status'] = 201
-        result['id'] = dam_user.pk
-    except Exception as e:
-        result['status'] = 400
-        result['error'] = 'Failed to create DAM user. Error: '+str(e)
-    return result
-
-
-def create_wiki_user(data_dict):
-    result = {}
-    try:
-        wiki_dict = {
-            'user_name': bytes(functions.get_unique_username(data_dict['user']['username'], 'wiki'), encoding='ascii'),
-            'user_real_name': bytes(data_dict['full_name'], encoding='ascii'),
-            'user_password': bytes(str(uuid.uuid4().hex), encoding='ascii'),
-            'user_email': bytes(data_dict['user']['email'], encoding='ascii'),
-        }
-        wiki_user(**wiki_dict).save()
-        new_user = wiki_user.objects.get(user_name=wiki_dict.get('user_name'))
-        wiki_groups = data_dict.get('wiki_groups', None)
-        if type(wiki_groups) is not list:
-            wiki_groups = [wiki_groups]
-        if wiki_groups is not None:
-            for i in wiki_groups:
-                dict = {
-                    'ug_user': new_user,
-                    'ug_group': bytes(i['ug_group'], encoding='ascii')
-                }
-                wiki_user_groups(**dict).save()
-        result['status'] = 201
-        result['id'] = new_user.pk
-    except Exception as e:
-        result['status'] = 400
-        result['error'] = 'Failed to create Wiki user. Error: '+str(e)
-    return result
