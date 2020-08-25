@@ -19,10 +19,16 @@
         {% if forloop.counter0 == 0 %}
           <div class="carousel-item active">
             {% image slide height-400 %}
+            {% if slide.caption %}
+              <div class="caption-container"><div class="over-caption">{{ slide.caption }}</div></div>
+            {% endif %}
           </div>
         {% else %}
           <div class="carousel-item">
             {% image slide height-400 %}
+            {% if slide.caption %}
+              <div class="caption-container"><div class="over-caption">{{ slide.caption }}</div></div>
+            {% endif %}
           </div>
         {% endif %}
       {% endfor %}
