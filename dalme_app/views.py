@@ -1,6 +1,7 @@
 import json
 import mimetypes
 import urllib
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import render
@@ -9,9 +10,9 @@ from django.views import View
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 from dalme_app import functions, custom_scripts
-from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page,
-                              Source, Set, TaskList, Task, rs_resource, rs_collection_resource,
-                              rs_resource_data, Ticket, Workflow, RightsPolicy)
+from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page, Attribute_type,
+                              Source, Set, TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
+                              LanguageReference, CountryReference, rs_resource_data, Ticket, Workflow, RightsPolicy)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
