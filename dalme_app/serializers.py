@@ -505,20 +505,10 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     """ Serialises user profiles and combines user data """
     user = UserSerializer(required=True)
-    dam_group_display = serializers.ChoiceField(choices=Profile.DAM_GROUPS, source='get_dam_group_display', required=False)
 
     class Meta:
         model = Profile
-        fields = ('id', 'full_name', 'user_id', 'dam_group', 'user', 'dam_group_display')
-
-    def to_representation(self, instance):
-        """ set display for choice fields """
-        ret = super().to_representation(instance)
-        if 'dam_group' in ret:
-            if ret['dam_group'] is not None:
-                dam_group_d = ret.pop('dam_group_display')
-                ret['dam_group'] = {'name': dam_group_d, 'value': ret['dam_group']}
-        return ret
+        fields = ('id', 'full_name', 'user_id', 'user')
 
     def update(self, instance, validated_data):
         """ Update profile and user. Assumes there is a user for every profile """

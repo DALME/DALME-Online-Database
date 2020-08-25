@@ -54,18 +54,6 @@ class AsyncMiddleware(MiddlewareMixin):
         return response
 
 
-# OIDC Provider Settings
-# def oidc_userinfo(claims, user):
-#     # Populate claims dict.
-#     claims['name'] = '{0} {1}'.format(user.first_name, user.last_name)
-#     claims['given_name'] = user.first_name
-#     claims['family_name'] = user.last_name
-#     claims['email'] = user.email
-#     claims['address']['street_address'] = '...'
-#     claims['preferred_username'] = user.username
-#     return claims
-
-
 # BasePermission Override to implement per-ownership permission_classes
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """ Object-level permission to only allow owners of an object to edit it. """
