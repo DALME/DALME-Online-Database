@@ -560,17 +560,9 @@ class Profile(models.Model):
     One-to-one extension of user model to accomodate additional user related
     data, including permissions of associated accounts on other platforms.
     """
-    DAM_GROUPS = (
-        ('dam_administrators', 'Administrators'),
-        ('dam_archivists', 'Archivists'),
-        ('dam_general_users', 'General Users'),
-        ('dam_restricted_user', 'Restricted User'),
-        ('dam_super_admin', 'Super Admin')
-    )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
-    dam_group = models.CharField(max_length=50, blank=True, choices=DAM_GROUPS, default='dam_restricted_user')
     profile_image = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
