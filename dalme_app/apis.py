@@ -32,7 +32,7 @@ from dalme_app.models import (Profile, Attribute_type, Content_class, Content_ty
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
                               Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy)
-from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy
+from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy, ProfileAccessPolicy
 
 
 class Datasets(viewsets.ViewSet):
@@ -1402,7 +1402,7 @@ class Transcriptions(viewsets.ModelViewSet):
 
 class Users(DTViewSet):
     """ API endpoint for managing users """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (ProfileAccessPolicy,)
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 

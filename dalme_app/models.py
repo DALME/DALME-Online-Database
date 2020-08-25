@@ -19,7 +19,6 @@ from django.utils import timezone
 import calendar
 import mimetypes
 import uuid
-# from django.conf import settings
 from django.dispatch import receiver
 from collections import Counter
 from wagtail.search import index
@@ -569,21 +568,9 @@ class Profile(models.Model):
         ('dam_super_admin', 'Super Admin')
     )
 
-    # WP_ROLE = (
-    #     ('a:1:{s:10:"subscriber";b:1;}', 'Subscriber'),
-    #     ('a:1:{s:11:"contributor";b:1;}', 'Contributor'),
-    #     ('a:1:{s:6:"author";b:1;}', 'Author'),
-    #     ('a:1:{s:6:"editor";b:1;}', 'Editor'),
-    #     ('a:1:{s:13:"administrator";b:1;}', 'Administrator'),
-    # )
-
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
     dam_group = models.CharField(max_length=50, blank=True, choices=DAM_GROUPS, default='dam_restricted_user')
-    # dam_user = models.IntegerField(null=True)
-    # wiki_user = models.IntegerField(null=True)
-    # wp_user = models.IntegerField(null=True)
-    # wp_role = models.CharField(max_length=50, blank=True, choices=WP_ROLE, default='a:1:{s:10:"subscriber";b:1;}')
     profile_image = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
@@ -591,14 +578,6 @@ class Profile(models.Model):
 
     def get_absolute_url(self):
         return reverse('user_detail', kwargs={'username': self.user.username})
-
-    # def get_dam_usergroup(self):
-    #     dam_ug = rs_user.objects.get(ref=self.dam_user).usergroup
-    #     return dam_ug
-
-    # def get_dam_usergroup_display(self):
-    #     dam_ug = rs_user.objects.get(ref=self.dam_user).get_usergroup_display()
-    #     return dam_ug
 
 
 class Set(dalmeUuid):
