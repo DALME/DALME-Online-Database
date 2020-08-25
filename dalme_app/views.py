@@ -701,7 +701,7 @@ def SourceManifest(request, pk):
 class UserList(DTListView):
     """ Lists users and allows editing and creation of new records via the API """
     list_name = 'users'
-    breadcrumb = [('Project', ''), ('Users', '/users')]
+    breadcrumb = [('System', ''), ('Users', '/users')]
     dt_editor_options = {'idSrc': '"id"'}
     dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username',
                       'password', 'is_staff', 'is_superuser', 'groups']
@@ -725,7 +725,7 @@ class UserDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = [('Project', ''), ('Users', '/users')]
+        breadcrumb = [('System', ''), ('Users', '/users')]
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
