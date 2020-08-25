@@ -144,6 +144,9 @@ class Attribute(dalmeUuid):
                 self.value_STR = str(self.value_DATE_y)
         super().save(*args, **kwargs)
 
+    class Meta:
+        unique_together = ('object_id', 'attribute_type', 'value_STR')
+
 
 class Content_attributes(dalmeIntid):
     content_type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='attribute_type_list')
