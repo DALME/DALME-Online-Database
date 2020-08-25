@@ -699,6 +699,27 @@ nav.browse a {
   color: #aaa;
   margin: 0 0 0 auto;
 }
+.carousel-item .caption-container {
+  display: flex;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+.carousel-item .caption-container .over-caption {
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+  align-self: flex-end;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
+}
+
 body.essay .main-image {
   align-self: center;
 }
