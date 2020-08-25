@@ -16,7 +16,7 @@
             "divider": true
           },
           {
-            "text": "Documentation",
+            "text": "Knowledge Base",
             "link": "https://kb.dalme.org",
             "iconClass": "fas fa-file-alt"
           },
@@ -40,7 +40,12 @@
             "iconClass": "fas fa-image"
           },
           {
-            "text": "Website",
+            "text": "Knowledge Base",
+            "link": "https://kb.dalme.org",
+            "iconClass": "fas fa-file-alt"
+          },
+          {
+            "text": "Public Website",
             "link": "https://dalme.org",
             "iconClass": "fas fa-globe"
           }
