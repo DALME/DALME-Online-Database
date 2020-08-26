@@ -24,5 +24,11 @@
     "principal": ["*"],
     "effect": "allow",
     "condition": "is_owner"
+  },
+  {
+    "action": ["partial_update", "update", "destroy"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "in_dataset_usergroup"
   }
 ]

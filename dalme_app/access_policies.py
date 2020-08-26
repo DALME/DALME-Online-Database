@@ -18,10 +18,29 @@ class BaseAccessPolicy(AccessPolicy):
         record = view.get_object()
         return request.user == record.owner
 
-    def owns_wf_target(self, request, view, action):
-        wf = view.get_object()
-        target = wf.source
-        return request.user == target.owner
+
+class GeneralAccessPolicy(BaseAccessPolicy):
+    ''' Manages general access policies for all endpoints '''
+    id = 'general-policy'
+
+
+class SourceAccessPolicy(BaseAccessPolicy):
+    ''' Manages access policies for Sources endpoint '''
+    id = 'sources-policy'
+
+    def in_dataset_usergroup(self, request, view, action):
+        record = view.get_object()
+        if record.sets.filter(set_id__set_type=3).exists():
+            ds_ugs = [i.set_id.dataset_usergroup.name for i in record.sets.filter(set_id__set_type=3) if i.set_id.dataset_usergroup is not None]
+            usergroups = [i.name for i in request.user.groups.all()]
+            return len(list(set(ds_ugs) & set(usergroups))) > 0
+        else:
+            return False
+
+
+class SetAccessPolicy(BaseAccessPolicy):
+    ''' Manages access policies for Sets endpoint '''
+    id = 'sets-policy'
 
     def can_view(self, request, view, action):
         record = view.get_object()
@@ -36,24 +55,14 @@ class BaseAccessPolicy(AccessPolicy):
         return request.user == record.owner or record.permissions == 4
 
 
-class GeneralAccessPolicy(BaseAccessPolicy):
-    ''' Manages general access policies for all endpoints '''
-    id = 'general-policy'
-
-
-class SourceAccessPolicy(BaseAccessPolicy):
-    ''' Manages access policies for Sources endpoint '''
-    id = 'sources-policy'
-
-
-class SetAccessPolicy(BaseAccessPolicy):
-    ''' Manages access policies for Sets endpoint '''
-    id = 'sets-policy'
-
-
 class WorkflowAccessPolicy(BaseAccessPolicy):
     ''' Manages access policies for Sets endpoint '''
     id = 'workflow-policy'
+
+    def owns_wf_target(self, request, view, action):
+        wf = view.get_object()
+        target = wf.source
+        return request.user == target.owner
 
 
 class ProfileAccessPolicy(BaseAccessPolicy):
