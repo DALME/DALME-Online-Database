@@ -2,8 +2,9 @@ function set_detail() {
 }
 
 function edit_set(id) {
-      $.get("/api/options/?target=active_staff&format=json", function ( data ) {
+      $.get("/api/options/?target=active_staff,user_groups_1&format=json", function ( data ) {
           const staff = data.active_staff;
+          const usergroups = data.user_groups;
           editSetForm = new $.fn.dataTable.Editor( {
                 ajax: {
                   method: "PATCH",
@@ -33,20 +34,9 @@ function edit_set(id) {
                       ],
                     },
                     {
-                      label: "Public",
-                      name:  "is_public",
-                      type: "checkbox",
-                      options: [
-                        {label: "Set featured in the public-facing website.", value: true}
-                      ],
-                    },
-                    {
-                      label: "Landing",
-                      name:  "has_landing",
-                      type: "checkbox",
-                      options: [
-                        {label: "Set has a landing page on the public-facing website.", value: true}
-                      ],
+                      label: "Description:",
+                      name:  "description",
+                      type: "textarea"
                     },
                     {
                       label: "Owner",
@@ -67,9 +57,27 @@ function edit_set(id) {
                       ],
                     },
                     {
-                      label: "Description:",
-                      name:  "description",
-                      type: "textarea"
+                      label: "Public",
+                      name:  "is_public",
+                      type: "checkbox",
+                      options: [
+                        {label: "Set featured in the public-facing website.", value: true}
+                      ],
+                    },
+                    {
+                      label: "Landing",
+                      name:  "has_landing",
+                      type: "checkbox",
+                      options: [
+                        {label: "Set has a landing page on the public-facing website.", value: true}
+                      ],
+                    },
+                    {
+                      label: "DS User Group",
+                      name: "dataset_usergroup",
+                      type: "selectize",
+                      opts: {'placeholder': "Select user group"},
+                      options: usergroups
                     },
                     {
                       label: "Stat Title:",
@@ -82,6 +90,8 @@ function edit_set(id) {
                     }
                   ]
           });
+          editSetForm.hide(['is_public', 'has_landing', 'dataset_usergroup', 'stat_title', 'stat_text']);
+          editSetForm.field('set_type').input().on('change.dalme', change_on_set_type);
           editSetForm.on('submitSuccess', function(e, json, data, action) {
             toastr.success('The set was updated successfully.');
             location.reload();
@@ -98,6 +108,16 @@ function edit_set(id) {
           };
           editSetForm.open();
       }, 'json');
+}
+
+function change_on_set_type(callback='undefined') {
+  var stype = editSetForm.get('set_type');
+  editSetForm.hide(['is_public', 'has_landing', 'dataset_usergroup', 'stat_title', 'stat_text']);
+  if (stype == "2") {
+    editSetForm.show(['is_public', 'has_landing', 'stat_title', 'stat_text']);
+  } else if (stype == "3") {
+    editSetForm.show('dataset_usergroup');
+  }
 }
 
 function delete_set_members(table, id) {

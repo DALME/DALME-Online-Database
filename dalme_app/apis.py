@@ -6,7 +6,7 @@ import operator
 import os
 from functools import reduce
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db.models import Q, Count
 from django.db.models.expressions import RawSQL
 from django.shortcuts import get_object_or_404
@@ -31,7 +31,7 @@ from dalme_app.models import (Profile, Attribute_type, Content_class, Content_ty
                               DT_fields, Page, Source_pages, Source, Transcription, LanguageReference,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
                               Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
-                              Comment, Workflow, Set, Set_x_content, RightsPolicy)
+                              Comment, Workflow, Set, Set_x_content, RightsPolicy, GroupProperties)
 from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy, ProfileAccessPolicy
 
 
@@ -249,11 +249,6 @@ class DTViewSet(viewsets.ModelViewSet):
             except Exception as e:
                 data_dict['error'] = 'The following error occured while trying to serialize the data: ' + str(e)
         return Response(data_dict)
-
-    # def retrieve(self, request, pk=None):
-    #     object = get_object_or_404(self.queryset, pk=pk)
-    #     serializer = self.get_serializer(object)
-    #     return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         result = {}
@@ -825,9 +820,17 @@ class Options(viewsets.ViewSet):
         sets = [{'label': '{} ({})'.format(i.name, i.get_set_type_display()), 'value': i.id} for i in Set.objects.filter(filters).distinct().order_by('name')]
         return sets
 
-    def user_groups(self, **kwargs):
-        user_groups = [{'label': i.name, 'value': i.id} for i in self.request.user.groups.all().order_by('name')]
-        return user_groups
+    def user_groups(self, list_type=None, **kwargs):
+        # list types:
+        # 1 = list of dataset-type groups
+        user_groups = [i.name for i in self.request.user.groups.all()]
+        if list_type is not None and list_type == 1:
+            if 'Administrators' in user_groups:
+                return [{'label': i.name, 'value': i.id} for i in Group.objects.filter(properties__type=3).order_by('name')]
+            else:
+                return [{'label': i.name, 'value': i.id} for i in self.request.user.groups.filter(properties__type=3).order_by('name')]
+        else:
+            return [{'label': i.name, 'value': i.id} for i in self.request.user.groups.all().order_by('name')]
 
     def user_task_lists(self, **kwargs):
         groups = self.request.user.groups.all()
@@ -1543,35 +1546,34 @@ class Sets(DTViewSet):
         return Response(result, status)
 
     def create(self, request, format=None):
-        data = request.data
-        member_list = json.loads(data['qset'])
-        set_para = {
-            'name': data['data[0][name]'],
-            'description': data['data[0][description]'],
-            'permissions': data['data[0][permissions]'],
-            'set_type': data['data[0][set_type]'],
-            'endpoint': data['endpoint']
-        }
-        serializer = SetSerializer(data=set_para)
+        result = {}
+        data_dict = get_dte_data(request)
+        data_dict = data_dict[0][1]
+        if request.data.get('endpoint') is not None:
+            data_dict['endpoint'] = request.data.get('endpoint')
+        if request.data.get('qset') is not None:
+            member_list = json.loads(request.data['qset'])
+        else:
+            member_list = None
+        serializer = self.get_serializer(data=data_dict)
         if serializer.is_valid():
-            new_set = Set(**set_para)
-            new_set.save()
+            new_set = serializer.save()
             set_object = Set.objects.get(pk=new_set.id)
-            new_members = []
-            for i in member_list:
-                source_object = Source.objects.get(pk=i)
-                new_entry = Set_x_content()
-                new_entry.set_id = set_object
-                new_entry.content_object = source_object
-                new_members.append(new_entry)
-            Set_x_content.objects.bulk_create(new_members)
+            if member_list is not None:
+                new_members = []
+                for i in member_list:
+                    source_object = Source.objects.get(pk=i)
+                    new_entry = Set_x_content()
+                    new_entry.set_id = set_object
+                    new_entry.content_object = source_object
+                    new_members.append(new_entry)
+                Set_x_content.objects.bulk_create(new_members)
             serializer = SetSerializer(set_object)
             result = serializer.data
             status = 201
         else:
             result = get_error_array(serializer.errors)
             status = 400
-
         return Response(result, status)
 
     def get_queryset(self, *args, **kwargs):

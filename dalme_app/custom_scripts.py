@@ -78,6 +78,11 @@ def get_script_menu():
             "name": "add_attribute_types",
             "description": "Takes a dictionary representing a metadata schema and creates entries in the attribute types reference table.",
             "type": "warning"
+        },
+        {
+            "name": "migrate_datasets",
+            "description": "Migrates dataset attribute to sets.",
+            "type": "warning"
         }
     ]
     _output = ''
@@ -186,9 +191,43 @@ def fix_workflow(request):
             lst.append(i.id)
     return lst
 
+def migrate_datasets(request):
+    owner = User.objects.get(pk=5)
+    datasets = list(set([i.value_STR for i in Attribute.objects.filter(attribute_type=27)]))
+    result = 'Unique dataset names = ' + str(len(datasets)) + ' | '
+    new_sets = []
+    for ds in datasets:
+        new_set = Set(
+            set_type = 4,
+            endpoint = 'sources',
+            permissions = 4,
+            description = 'Auto-generated from dataset attribute.',
+            name = ds,
+            owner = owner
+        )
+        new_sets.append(new_set)
+    Set.objects.bulk_create(new_sets)
+    result = result + 'New sets created = ' + str(len(new_sets)) + ' | '
+    sources = Attribute.objects.filter(attribute_type=27)
+    result = result + 'Sources to add = ' + str(sources.count()) + ' | '
+    new_members = []
+    for s in sources:
+        source_object = Source.objects.get(pk=s.object_id)
+        set_object = Set.objects.get(name=s.value_STR)
+        if not Set_x_content.objects.filter(set_id=set_object.id, object_id=s.object_id).exists():
+            new_entry = Set_x_content(
+                set_id = set_object,
+                content_object = source_object
+            )
+            new_members.append(new_entry)
+    Set_x_content.objects.bulk_create(new_members)
+    result = result + 'New members created = ' + str(len(new_members)) + ' | '
+    sources.delete()
+    result = result + 'Attributes deleted.'
+    return result
 
 def test_expression(request):
-    # record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
+    record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
     # att_dict = {}
     # for a in record.attributes.all():
     #     att_dict[a.attribute_type.name] = a.value_STR
@@ -196,9 +235,10 @@ def test_expression(request):
     # return str(att_dict)
     #return Profile.objects.get(user=1).user.wagtail_userprofile.avatar
     #avatar = UserProfile.objects.get(pk=profile.user.id).avatar
-    return Profile.objects.get(user=1).profile_image_2
+    #return Profile.objects.get(user=1).profile_image_2
     #avatar = User.objects.get(id=1).wagtailusers.userprofile.avatar
     #result = blah
+    return [i.name for i in request.user.groups.all()]
 
 
 def fix_users(records):

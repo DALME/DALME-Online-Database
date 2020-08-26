@@ -441,7 +441,14 @@ function save_set(type) {
               toastr.error('There was an error communicating with the server: '+errorThrown);
           });
       } else {
-          set_form(type, data.data, url_params[2]);
+        $.ajax({
+            method: "GET",
+            url: "/api/options/?target=user_groups_1&format=json"
+        }).done(function(options_data, textStatus, jqXHR) {
+            set_form(type, data.data, url_params[2], options_data.user_groups);
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            toastr.error('There was an error communicating with the server: '+errorThrown);
+        });
       }
   }).fail(function(jqXHR, textStatus, errorThrown) {
         toastr.error('There was an error communicating with the server: '+errorThrown);
@@ -494,7 +501,30 @@ function set_form(type, qset, endpoint, options=[]) {
                 { label: "Others: view|add", value: "3" },
                 { label: "Others: view|add|delete", value: "4" },
               ],
-            }
+            },
+            {
+              label: "Public",
+              name:  "is_public",
+              type: "checkbox",
+              options: [
+                {label: "Set featured in the public-facing website.", value: true}
+              ],
+            },
+            {
+              label: "Landing",
+              name:  "has_landing",
+              type: "checkbox",
+              options: [
+                {label: "Set has a landing page on the public-facing website.", value: true}
+              ],
+            },
+            {
+              label: "DS User Group",
+              name: "dataset_usergroup",
+              type: "selectize",
+              opts: {'placeholder': "Select user group"},
+              options: options
+            },
         ];
         var title = 'Create New Set';
         var url = '/api/sets/';
@@ -508,12 +538,26 @@ function set_form(type, qset, endpoint, options=[]) {
           },
           fields: fields
     });
+    if (type != 'add') {
+      filterForm.hide(['is_public', 'has_landing', 'dataset_usergroup']);
+      filterForm.field('set_type').input().on('change.dalme', change_on_set_type);
+    };
     filterForm.on('submitSuccess', function(e, json, data, action) { toastr.success('The set was saved successfully.') });
     filterForm.buttons({
       text: "Save",
       className: "btn btn-primary",
       action: function () { this.submit(); }
     }).title(title).create({ focus: null });
+}
+
+function change_on_set_type(callback='undefined') {
+  var stype = filterForm.get('set_type');
+  filterForm.hide(['is_public', 'has_landing', 'dataset_usergroup']);
+  if (stype == "2") {
+    filterForm.show(['is_public', 'has_landing']);
+  } else if (stype == "3") {
+    filterForm.show('dataset_usergroup');
+  }
 }
 
 /*** utility functions for creating specific filter types ***/

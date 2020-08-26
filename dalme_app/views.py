@@ -1164,7 +1164,7 @@ class SetList(DTListView):
     breadcrumb = [('Project', ''), ('Sets', '/sets')]
     list_name = 'sets'
     dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'set_type', 'is_public', 'has_landing', 'description', 'owner', 'permissions']
+    dte_field_list = ['name', 'set_type', 'endpoint', 'is_public', 'has_landing', 'description', 'owner', 'permissions', 'dataset_usergroup']
     dt_options = {
         'pageLength': 25,
         'paging': 'true',
@@ -1186,6 +1186,8 @@ class SetList(DTListView):
 
     def get_dte_buttons(self, *args, **kwargs):
         dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_set'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Set'})
         if self.request.user.has_perm('dalme_app.change_set'):
             dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Set Information'})
         if self.request.user.has_perm('dalme_app.delete_set'):

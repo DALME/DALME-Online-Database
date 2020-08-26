@@ -12,7 +12,8 @@
     "permissions": "{{ set.permissions }}",
     "description": "{{ set.description }}",
     "stat_title": "{{ set.stat_title }}",
-    "stat_text": "{{ set.stat_text }}"
+    "stat_text": "{{ set.stat_text }}",
+    "dataset_usergroup": "{{ set.dataset_usergroup.id }}"
   }
 </script>
 {% endblock %}
@@ -63,6 +64,7 @@
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Type</span></div>
                       <div class="col-sm-9"><span class="attribute_list_value">{{ set.get_set_type_display }}</span></div>
                   </div>
+                  {% if set.set_type == 2 %}
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Public</span></div>
                       <div class="col-sm-9">
@@ -87,6 +89,7 @@
                         </span>
                       </div>
                   </div>
+                  {% endif %}
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Endpoint</span></div>
                       <div class="col-sm-9"><span class="attribute_list_value">{{ set.endpoint|title }}</span></div>
@@ -108,6 +111,12 @@
                         <div class="col-sm-3 text-right"><span class="attribute_list_label">Progress</span></div>
                         <div class="col-sm-9"><span class="attribute_list_value">{{ set.workset_progress }}%</span></div>
                     </div>
+                  {% endif %}
+                  {% if set.set_type == 3 and set.dataset_usergroup is not None %}
+                  <div class="form-row">
+                      <div class="col-sm-3 text-right"><span class="attribute_list_label">DS User Group</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.dataset_usergroup.name }}</span></div>
+                  </div>
                   {% endif %}
                   {% if set.stat_title is not None %}
                     <div class="form-row">
