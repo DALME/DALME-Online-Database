@@ -591,6 +591,7 @@ class SourceDetail(DetailView):
             'Name': self.object.name,
             'Short name': self.object.short_name,
             'List': functions.format_boolean(has_inv),
+            'Owner': functions.format_user(self.object.owner, 'user', 'html')
         }
         if self.object.parent:
             source_data['Parent'] = '<a href="{}">{}</a>'.format('/sources/'+str(self.object.parent.id), self.object.parent.name)
@@ -1164,7 +1165,7 @@ class SetList(DTListView):
     breadcrumb = [('Project', ''), ('Sets', '/sets')]
     list_name = 'sets'
     dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'set_type', 'is_public', 'has_landing', 'description', 'owner', 'permissions']
+    dte_field_list = ['name', 'set_type', 'endpoint', 'is_public', 'has_landing', 'description', 'owner', 'permissions', 'dataset_usergroup']
     dt_options = {
         'pageLength': 25,
         'paging': 'true',
@@ -1186,6 +1187,8 @@ class SetList(DTListView):
 
     def get_dte_buttons(self, *args, **kwargs):
         dte_buttons = []
+        if self.request.user.has_perm('dalme_app.add_set'):
+            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Set'})
         if self.request.user.has_perm('dalme_app.change_set'):
             dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Set Information'})
         if self.request.user.has_perm('dalme_app.delete_set'):

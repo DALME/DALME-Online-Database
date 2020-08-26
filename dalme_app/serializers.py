@@ -152,10 +152,13 @@ class SetSerializer(serializers.ModelSerializer):
     set_type_name = serializers.CharField(source='get_set_type_display', required=False)
     permissions_name = serializers.CharField(source='get_permissions_display', required=False)
     member_count = serializers.ReadOnlyField(source='get_member_count', read_only=True, required=False)
+    dataset_usergroup_name = serializers.CharField(source='dataset_usergroup.name', read_only=True, required=False)
 
     class Meta:
         model = Set
-        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'permissions', 'permissions_name', 'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count', 'is_public', 'has_landing', 'stat_title', 'stat_text')
+        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'permissions', 'permissions_name',
+                  'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count', 'is_public',
+                  'has_landing', 'stat_title', 'stat_text', 'dataset_usergroup', 'dataset_usergroup_name')
         extra_kwargs = {'set_type_label': {'required': False}, 'permissions_label': {'required': False}}
 
     def to_representation(self, instance):
@@ -174,6 +177,11 @@ class SetSerializer(serializers.ModelSerializer):
             progress_circle = '<div class="pie-wrapper"><span class="label">{}<span class="smaller">%</span></span><div class="pie" {}>'.format(round(progress), pie_style)
             progress_circle += '<div class="left-side half-circle" {}></div><div class="right-side half-circle" {}></div></div></div>'.format(left_style, right_style)
             ret['progress_circle'] = progress_circle
+        if ret['set_type'] == 3 and ret['dataset_usergroup']:
+            ret['dataset_usergroup'] = {
+                'id': ret.pop('dataset_usergroup'),
+                'name': ret.pop('dataset_usergroup_name'),
+            }
         ret['owner'] = {
             'id': ret.pop('owner'),
             'username': ret.pop('owner_username'),
@@ -439,11 +447,13 @@ class SourceSerializer(DynamicSerializer):
     no_images = serializers.IntegerField(required=False)
     tags = TagSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
+    owner_username = serializers.CharField(source='owner.username', read_only=True, required=False)
+    owner_full_name = serializers.CharField(source='owner.profile.full_name', read_only=True, required=False)
 
     class Meta:
         model = Source
         fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'has_inventory',
-                  'attributes', 'inherited', 'no_folios', 'no_images', 'tags', 'workflow')
+                  'attributes', 'inherited', 'no_folios', 'no_images', 'tags', 'workflow', 'owner_username', 'owner_full_name', 'owner')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -458,6 +468,11 @@ class SourceSerializer(DynamicSerializer):
             ret.pop('parent')
         type_name = ret.pop('type_name')
         ret['type'] = {'name': type_name, 'value': ret['type']}
+        ret['owner'] = {
+            'id': ret.pop('owner'),
+            'username': ret.pop('owner_username'),
+            'user': ret.pop('owner_full_name'),
+        }
         return ret
 
     def process_attributes(self, qset):

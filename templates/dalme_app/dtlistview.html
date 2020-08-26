@@ -1,13 +1,6 @@
 {% extends "base.html" %}
 {% load static i18n %}
 {% block extra_head %}
-{% if helpers %}
-  {% for helper in helpers %}
-    {% with 'dalme_helpers/'|add:helper|add:'.js' as helper_static %}
-      <script type="text/javascript" src="{% static helper_static %}"></script>
-    {% endwith %}
-  {% endfor %}
-{% endif %}
 <script type="text/javascript" src="{% static 'js/dalme_datatables.js' %}"></script>
 <script type="text/javascript">
   {% if action %}
@@ -163,6 +156,13 @@
     </div>
   </div>
 {% include 'forms/dte_inventories.html' %}
+{% if helpers %}
+  {% for helper in helpers %}
+    {% with 'dalme_helpers/'|add:helper|add:'.js' as helper_static %}
+      <script type="text/javascript" src="{% static helper_static %}"></script>
+    {% endwith %}
+  {% endfor %}
+{% endif %}
 {% endblock %}
 {% block extra_scripts %}
 {% endblock %}
