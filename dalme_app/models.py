@@ -583,10 +583,35 @@ class Profile(models.Model):
             return None
 
 
+class GroupProperties(models.Model):
+    """
+    One-to-one extension of group model to accomodate additional group related
+    data, including group types.
+    """
+    ADMIN = 1
+    DAM = 2
+    DATASET = 3
+    KNOWLEDGEBASE = 4
+    WEBSITE = 5
+    GROUP_TYPES = (
+        (ADMIN, 'Admin'),
+        (DAM, 'DAM'),
+        (DATASET, 'Dataset'),
+        (KNOWLEDGEBASE, 'Knowledge Base'),
+        (WEBSITE, 'Website')
+    )
+
+    group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name='properties')
+    type = models.IntegerField(choices=GROUP_TYPES)
+
+    def __str__(self):
+        return self.group.name
+
+
 class Set(dalmeUuid):
     CORPUS = 1  # a set representing a coherent body of materials defined by a project or sub-project
     COLLECTION = 2  # a generic set defined by a user for any purpose -- collections could potentially by qualified by other terms
-    DATASET = 3  # a set defined for analytical purposes
+    DATASET = 3  # a set corresponding to a project or sub-project and related to a team user group
     WORKSET = 4  # a set defined as part of a project's workflow for the purpose of systematically performing a well-defined task to its members
     PRIVATE = 1  # only owner can view set
     VIEW = 2  # others can view the set
