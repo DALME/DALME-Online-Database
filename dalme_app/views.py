@@ -591,6 +591,7 @@ class SourceDetail(DetailView):
             'Name': self.object.name,
             'Short name': self.object.short_name,
             'List': functions.format_boolean(has_inv),
+            'Owner': functions.format_user(self.object.owner, 'user', 'html')
         }
         if self.object.parent:
             source_data['Parent'] = '<a href="{}">{}</a>'.format('/sources/'+str(self.object.parent.id), self.object.parent.name)

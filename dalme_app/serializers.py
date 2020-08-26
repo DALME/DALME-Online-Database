@@ -447,11 +447,13 @@ class SourceSerializer(DynamicSerializer):
     no_images = serializers.IntegerField(required=False)
     tags = TagSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
+    owner_username = serializers.CharField(source='owner.username', read_only=True, required=False)
+    owner_full_name = serializers.CharField(source='owner.profile.full_name', read_only=True, required=False)
 
     class Meta:
         model = Source
         fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'has_inventory',
-                  'attributes', 'inherited', 'no_folios', 'no_images', 'tags', 'workflow')
+                  'attributes', 'inherited', 'no_folios', 'no_images', 'tags', 'workflow', 'owner_username', 'owner_full_name', 'owner')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -466,6 +468,11 @@ class SourceSerializer(DynamicSerializer):
             ret.pop('parent')
         type_name = ret.pop('type_name')
         ret['type'] = {'name': type_name, 'value': ret['type']}
+        ret['owner'] = {
+            'id': ret.pop('owner'),
+            'username': ret.pop('owner_username'),
+            'user': ret.pop('owner_full_name'),
+        }
         return ret
 
     def process_attributes(self, qset):

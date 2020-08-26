@@ -190,6 +190,21 @@ class DTViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(self.request, object)
         return Response(200)
 
+    @action(detail=True, methods=['patch'])
+    def change_owner(self, request, *args, **kwargs):
+        result = {}
+        object = self.get_object()
+        try:
+            new_owner = self.request.POST['new_owner']
+            object.owner = new_owner
+            object.save(update_fields=['owner', 'modification_user', 'modification_timestamp'])
+            result['message'] = 'Owner changed succesfully.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
     @action(detail=False, methods=['get'])
     def get_set(self, request, *args, **kwargs):
         data_dict = {}
