@@ -39,9 +39,6 @@ def rs_api_query(endpoint, user, key, **kwargs):
     return R
 
 
-# ->**************************************    DATA STORE   **************************************
-
-# ->Content and Attributes
 class Content_class(dalmeIntid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55, unique=True)
@@ -154,10 +151,8 @@ class Content_attributes(dalmeIntid):
     attribute_type = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='content_types')
     order = models.IntegerField(db_index=True, null=True)
     required = models.BooleanField(default=False)
-# <-
 
 
-# -> Source Management
 class Source(index.Indexed, dalmeUuid):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
@@ -294,6 +289,14 @@ class Source(index.Indexed, dalmeUuid):
 
     def get_data_blob(self):
         return str(self.get_attribute_blob()) + str(self.get_transcription_blob())
+
+
+@receiver(models.signals.post_save, sender=Source)
+def update_attribute_ownership(sender, instance, created, **kwargs):
+    if not created:
+        for a in instance.attributes.all():
+            a.owner = instance.owner
+            a.save(update_fields=['owner', 'modification_user', 'modification_timestamp'])
 
 
 @receiver(models.signals.post_save, sender=Source)
@@ -447,10 +450,8 @@ class Entity_phrase(dalmeUuid):
 
     def __str__(self):
         return self.phrase
-# <-
 
 
-# -> Entities and Relationships
 class Agent(dalmeUuid):
     PERSON = 1
     ORGANIZATION = 2
@@ -513,10 +514,8 @@ class Scope(dalmeUuid):
 
     type = models.IntegerField(choices=SCOPE_TYPES)
     range = models.TextField()  # a JSON object that contains the scope parameters, depending on its type
-# <-
 
 
-# -> Language Processing
 class Concept(dalmeUuid):
     getty_id = models.IntegerField(db_index=True)
     tags = GenericRelation('Tag')
@@ -553,10 +552,8 @@ class Wordform(dalmeUuid):
 
     def __str__(self):
         return self.normalized_form
-# <-
 
 
-# ->User Profiles and Sets
 class Profile(models.Model):
     """
     One-to-one extension of user model to accomodate additional user related
@@ -635,12 +632,12 @@ class Set(dalmeUuid):
     is_public = models.BooleanField(default=False)
     has_landing = models.BooleanField(default=False)
     endpoint = models.CharField(max_length=55)
-    owner_local = models.ForeignKey(User, on_delete=models.CASCADE, default=get_current_user)
     permissions = models.IntegerField(choices=PERMISSIONS, default=VIEW)
     description = models.TextField()
     comments = GenericRelation('Comment')
     stat_title = models.CharField(max_length=25, null=True, blank=True)
     stat_text = models.CharField(max_length=255, null=True, blank=True)
+    dataset_usergroup = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='dataset', limit_choices_to={'properties__type': 3}, null=True)
 
     def __str__(self):
         return f'{self.name}({self.set_type})'
@@ -696,12 +693,6 @@ class Set_x_content(dalmeBasic):
         ordering = ['set_id', 'id']
 
 
-# <-
-# <-
-
-# ->**************************************    REFERENCE DATASETS    **************************************
-
-
 class AttributeReference(dalmeUuid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
@@ -754,12 +745,8 @@ class LanguageReference(dalmeIntid):
 
     class Meta:
         ordering = ["name"]
-# <-
-
-# ->**************************************    APPLICATION MANAGEMENT    **************************************
 
 
-# -> Workflow
 class Workflow(models.Model):
     ASSESSING = 1
     PROCESSING = 2
@@ -833,10 +820,8 @@ class Work_log(models.Model):
     event = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
-# <-
 
 
-# ->Tasks and Tickets
 class Attachment(dalmeUuid):
     file = models.FileField(upload_to='attachments/%Y/%m/')
     type = models.CharField(max_length=255, null=True)
@@ -973,10 +958,8 @@ class Ticket(dalmeIntid):
 
     class Meta:
         ordering = ["status", "creation_timestamp"]
-# <-
 
 
-# ->Data annotation: Comments, Tags, Rights
 class Comment(dalmeIntid):
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
@@ -1048,10 +1031,8 @@ class Tag(dalmeUuid):
 
     def __str__(self):
         return self.tag
-# <
 
 
-# -> DataTables
 class DT_list(dalmeIntid):
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55, unique=True)
@@ -1127,13 +1108,8 @@ class DT_fields(dalmeIntid):
     class Meta:
         unique_together = ("list", "field")
         ordering = ['order']
-# <-
-# <-
-
-# ->**************************************    EXTERNAL UNMANAGED MODELS    **************************************
 
 
-# -> ResourceSpace
 class rs_resource(models.Model):
 
     ref = models.IntegerField(primary_key=True)
@@ -1348,5 +1324,3 @@ class rs_resource_type_field(models.Model):
         managed = False
         db_table = 'resource_type_field'
         in_db = 'dam'
-# <-
-# <-
