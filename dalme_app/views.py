@@ -9,16 +9,18 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
-from dalme_app import functions, custom_scripts
-from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page, Attribute_type,
-                              Source, Set, TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
-                              LanguageReference, CountryReference, rs_resource_data, Ticket, Workflow, RightsPolicy)
+from dalme_app.utils import DALMEMenus as dm
+from dalme_app import custom_scripts
+from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page, Attribute_type, Attribute, Tag,
+                              Source, Set, TaskList, Task, rs_resource, rs_collection, rs_collection_resource, CityReference,
+                              LanguageReference, CountryReference, rs_resource_data, Ticket, Workflow, RightsPolicy, get_dam_preview)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth.views import LoginView
+from django.utils import timezone
 
 
 def SessionUpdate(request):
@@ -77,10 +79,11 @@ class DefaultSearch(SearchView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = 'Search Results'
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         return context
 
 
@@ -118,13 +121,14 @@ class DTListView(TemplateView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         list_name = self.get_list_name()
         _list = self.get_list(list_name)
         fields_dict = self.get_fields_dict(_list)
         page_title = self.get_page_title(_list)
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         context['dt_options'] = self.get_dt_options(_list, fields_dict)
         context['dt_editor'] = self.get_dt_editor(_list, fields_dict)
         context['filters'] = self.get_filters(fields_dict)
@@ -286,20 +290,53 @@ class DTListView(TemplateView):
                 if d.get('filter_lookup') is not None:
                     filter['lookup'] = d['filter_lookup']
                 if filter['type'] in types_w_lookups:
-                    filter['lookups'] = functions.get_filter_lookups(filter['type'])
+                    filter['lookups'] = self.get_filter_lookups(filter['type'])
                 if filter['type'] == 'check' or filter['type'] == 'select':
                     if d.get('filter_mode') is not None:
                         f_mode = d['filter_mode']
                     else:
                         f_mode = 'complete'
                     if d.get('filter_options') is not None:
-                        # values = eval(dict['filter_options'])
                         values = d['filter_options']
-                        filter = functions.add_filter_options(values, filter, f_mode)
+                        filter['options'] = self.filter_options(values, f_mode)
                 filters.append(filter)
         if filters == []:
             filters = None
         return filters
+
+    def filter_options(self, values_exp, mode):
+        values_list = eval(values_exp)
+        if mode == 'strict':
+            op = []
+        elif mode == 'check':
+            op = [{'label': 'None', 'value': 'none'}]
+        else:
+            op = [{'label': 'Any', 'value': 'any'}, {'label': 'None', 'value': 'none'}, {'label': 'divider'}]
+        return op + values_list
+
+    def get_filter_lookups(self, type):
+        lookup_dict = [
+            {'label': 'is', 'value': 'exact', 'types': ['text', 'integer']},
+            {'label': 'contains', 'value': 'contains', 'types': ['text']},
+            {'label': 'starts with', 'value': 'startswith', 'types': ['text']},
+            {'label': 'ends with', 'value': 'endswith', 'types': ['text']},
+            {'label': 'year is', 'value': 'year', 'types': ['date', 'datetime']},
+            {'label': 'month is', 'value': 'month', 'types': ['date', 'datetime']},
+            {'label': 'day is', 'value': 'day', 'types': ['date', 'datetime']},
+            {'label': 'date is', 'value': 'date', 'types': ['date', 'datetime']},
+            {'label': 'hour is', 'value': 'hour', 'types': ['datetime']},
+            {'label': 'minutes are', 'value': 'minute', 'types': ['datetime']},
+            {'label': 'time is', 'value': 'time', 'types': ['datetime']},
+            {'label': 'is greater than', 'value': 'gt', 'types': ['integer']},
+            {'label': 'is greater than or equal to', 'value': 'gte', 'types': ['integer']},
+            {'label': 'is less than', 'value': 'lt', 'types': ['integer']},
+            {'label': 'is less than or equal to', 'value': 'lte', 'types': ['integer']},
+            {'label': 'is in range', 'value': 'range', 'types': ['date', 'datetime', 'integer']},
+            {'label': 'is in list', 'value': 'in', 'types': ['text', 'integer']},
+            {'label': 'is matched by regex', 'value': 'regex', 'types': ['text', 'integer', 'date', 'datetime']},
+            {'label': 'is empty', 'value': 'isnull', 'types': ['text', 'integer', 'date', 'datetime']},
+        ]
+        return [{'label': i['label'], 'value':i['value']} for i in lookup_dict if type in i['types']]
 
     def get_helpers(self, _list, *args, **kwargs):
         helpers = _list.helpers
@@ -359,10 +396,11 @@ class ModelLists(DTListView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = self.get_page_title('')
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         model = self.kwargs['model']
         context['model'] = model
         if model == 'content_types':
@@ -508,7 +546,7 @@ class SourceList(DTListView):
         if 'type' in self.request.GET:
             if self.request.GET['type'] == 'records':
                 module_list = ['filters']
-                if functions.check_group(self.request, ['Staff']):
+                if 'Staff' in [i.name for i in self.request.user.groups.all()]:
                     module_list.append('workflow')
         return module_list
 
@@ -561,10 +599,11 @@ class SourceDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = self.object.name
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         context['source_id'] = self.object.id
         context['comments_count'] = self.object.comments.count()
         has_inv = self.object.has_inventory
@@ -590,16 +629,16 @@ class SourceDetail(DetailView):
             'Type': self.object.type.name,
             'Name': self.object.name,
             'Short name': self.object.short_name,
-            'List': functions.format_boolean(has_inv),
-            'Owner': functions.format_user(self.object.owner, 'user', 'html')
+            'List': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if has_inv else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
+            'Owner': '<a href="/users/{}">{}</a>'.format(self.object.owner.username, self.object.owner.profile.full_name)
         }
         if self.object.parent:
             source_data['Parent'] = '<a href="{}">{}</a>'.format('/sources/'+str(self.object.parent.id), self.object.parent.name)
         context['source_data'] = source_data
         context['source_metadata'] = {
             'ID': str(self.object.id),
-            'Created': functions.format_rct(self.object.creation_user, self.object.creation_timestamp),
-            'Modified': functions.format_rct(self.object.modification_user, self.object.modification_timestamp),
+            'Created': timezone.localtime(self.object.creation_timestamp).strftime('%d-%b-%Y@%H:%M') + ' by ' + '<a href="/users/{}">{}</a>'.format(self.object.creation_user.username, self.object.creation_user.profile.full_name),
+            'Modified': timezone.localtime(self.object.modification_timestamp).strftime('%d-%b-%Y@%H:%M') + ' by ' + '<a href="/users/{}">{}</a>'.format(self.object.modification_user.username, self.object.modification_user.profile.full_name),
         }
         attribute_data = self.get_attributes()
         if attribute_data.get('description', None) is not None:
@@ -608,7 +647,7 @@ class SourceDetail(DetailView):
         tables = []
         if has_pages:
             title = 'Pages (' + str(len(self.object.pages.all())) + ')'
-            folios = functions.get_editor_folios(self.object)
+            folios = self.get_folios()
             context['folio_count'] = folios['folio_count']
             context['folio_menu'] = folios['folio_menu']
             context['folio_list'] = folios['folio_list']
@@ -651,7 +690,6 @@ class SourceDetail(DetailView):
         if self.object.attributes is not None:
             for a in self.object.attributes.all():
                 label = a.attribute_type.name
-                # value = functions.get_attribute_value(a)
                 value = str(a)
                 if label == 'Description':
                     result['description'] = value
@@ -660,7 +698,6 @@ class SourceDetail(DetailView):
         if self.object.inherited is not None:
             for a in self.object.inherited.all():
                 label = a.attribute_type.name
-                # value = functions.get_attribute_value(a)
                 value = str(a)
                 attributes.append({'label': label, 'value': value, 'icon': 'fa fa-dna fa-xs'})
         result['attributes'] = attributes
@@ -688,6 +725,47 @@ class SourceDetail(DetailView):
             return object
         except ObjectDoesNotExist:
             raise Http404
+
+    def get_folios(self):
+        folios = self.object.pages.all().order_by('order')
+        folio_count = len(folios)
+        folio_list = []
+        if folio_count == 1:
+            folio_menu = '<div class="single_folio">Folio {} (1/1)</div>'.format(folios[0].name)
+            folio_dict = {
+                'name': folios[0].name,
+                'id': str(folios[0].id),
+                'dam_id': str(folios[0].dam_id),
+                'order': str(folios[0].order)
+                }
+            transcription = self.object.source_pages.all().first().transcription
+            folio_dict['tr_id'] = str(transcription.id) if transcription is not None else "None"
+            folio_dict['tr_version'] = transcription.version if transcription.version is not None else 0
+            folio_list.append(folio_dict)
+        else:
+            folio_menu = '<button class="editor-btn button-border-left" id="btn_prevFolio" value="" onclick="changeEditorFolio(this.value)" disabled><i class="fa fa-caret-left fa-fw"></i></button>'
+            count = 0
+            for f in folios:
+                folio_dict = {
+                    'name': f.name,
+                    'id': str(f.id),
+                    'dam_id': str(f.dam_id),
+                    'order': str(f.order)
+                    }
+                transcription = self.object.source_pages.all()[count].transcription
+                folio_dict['tr_id'] = str(transcription.id) if transcription is not None else "None"
+                folio_dict['tr_version'] = transcription.version if transcription.version is not None else 0
+                if count == 0:
+                    folio_menu += '<button id="btn_selectFolio" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" \
+                                   aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name, folio_count)
+                    folio_menu += '<a class="dropdown-item current-folio" href="#" id="0" onclick="changeEditorFolio(this.id)">Folio {}</a>'.format(f.name)
+                else:
+                    folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="changeEditorFolio(this.id)">Folio {}</a>'.format(count, f.name)
+                count = count + 1
+                folio_list.append(folio_dict)
+            folio_menu += '</div><button class="editor-btn button-border-left" id="btn_nextFolio" value="1" onclick="changeEditorFolio(this.value)">\
+                            <i class="fa fa-caret-right fa-fw"></i></button>'
+        return {'folio_count': folio_count, 'folio_menu': folio_menu, 'folio_list': folio_list}
 
 
 def SourceManifest(request, pk):
@@ -730,20 +808,21 @@ class UserDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = self.object.full_name
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         user_data = {
             'First name': self.object.user.first_name,
             'Last name': self.object.user.last_name,
-            'User Id': self.object.user.id,
-            'Email': functions.format_email(self.object.user.email),
-            'Staff': functions.format_boolean(self.object.user.is_staff),
-            'Superuser': functions.format_boolean(self.object.user.is_superuser),
-            'Active': functions.format_boolean(self.object.user.is_active),
-            'Joined': functions.format_date(self.object.user.date_joined, 'timestamp-long'),
-            'Last login': functions.format_date(self.object.user.last_login, 'timestamp-long'),
+            'User ID': self.object.user.id,
+            # 'Email': '<a href="mailto:{}">{}</a>'.format(self.object.user.email),
+            # 'Staff': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.user.is_staff else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
+            # 'Superuser': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.user.is_superuser else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
+            # 'Active': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.user.is_active else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
+            # 'Joined': timezone.localtime(self.object.user.date_joined).strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " "),
+            # 'Last login': timezone.localtime(self.object.user.last_login.strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " "),
             'Groups': ', '.join([i.name for i in self.object.user.groups.all()])
         }
         context['user_data'] = user_data
@@ -904,10 +983,11 @@ class RightsDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = 'Policy: ' + self.object.name
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         context['object_class'] = 'Rights Policy'
         context['object_icon'] = 'fas fa-copyright'
         context['comments'] = 'RightsPolicy'
@@ -1026,18 +1106,19 @@ class ImageDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = 'DAM Image ' + str(self.object.ref)
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         image_data = {
             'DAM Id': self.object.ref,
-            'Created': functions.format_date(self.object.creation_date, 'timestamp'),
-            'Creator': functions.format_user(self.object.created_by, 'dam', 'html'),
-            'Record modified': functions.format_date(self.object.modified, 'timestamp'),
-            'File modified': functions.format_date(self.object.file_modified, 'timestamp'),
+            'Created': timezone.localtime(self.object.creation_date).strftime('%d-%b-%Y@%H:%M'),
+            'Creator': rs_user.objects.get(ref=self.object.created_by).fullname if rs_user.objects.filter(ref=self.object.created_by).exists() else self.object.created_by,
+            'Record modified': timezone.localtime(self.object.modified).strftime('%d-%b-%Y@%H:%M'),
+            'File modified': timezone.localtime(self.object.file_modified).strftime('%d-%b-%Y@%H:%M'),
             'Filesize': self.object.file_size,
-            'Image?': functions.format_boolean(self.object.has_image)
+            'Image?': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.has_image else '<i class="fa fa-times-circle dt_checkbox_false"></i>'
         }
         context['image_data'] = image_data
         tables = []
@@ -1069,7 +1150,7 @@ class ImageDetail(DetailView):
                 d = {
                     'id': col.collection.ref,
                     'name': col.collection.name,
-                    'creator': functions.format_user(col.collection.user, 'dam', 'html'),
+                    'creator': rs_user.objects.get(ref=col.collection.user).fullname if rs_user.objects.filter(ref=col.collection.user).exists() else col.collection.user,
                     'path': path
                 }
                 collections.append(d)
@@ -1090,7 +1171,7 @@ class ImageDetail(DetailView):
                     'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
                     },
                 }
-        context['image_url'] = functions.get_dam_preview(self.object.ref)
+        context['image_url'] = get_dam_preview(self.object.ref)
         return context
 
     def get_object(self):
@@ -1120,10 +1201,11 @@ class PageDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = self.object.name
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         # context['form'] = forms.page_main(instance=self.object)
         return context
 
@@ -1131,9 +1213,9 @@ class PageDetail(DetailView):
 @method_decorator(login_required, name='dispatch')
 class Index(TemplateView):
     template_name = 'dalme_app/index.html'
-    default_cards = ['cards/counter_articles.html',
-                     'cards/counter_assets.html',
-                     'cards/counter_inventories.html']
+    default_cards = ['/dalme_app/cards/counter_articles.html',
+                     'dalme_app/cards/counter_assets.html',
+                     'dalme_app/cards/counter_inventories.html']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1145,10 +1227,11 @@ class Index(TemplateView):
             self.request.session['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = 'Dashboard'
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         return context
 
 
@@ -1208,10 +1291,11 @@ class SetsDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = self.object.name
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         context['set'] = self.object
         context['comments_count'] = self.object.comments.count()
         members = self.object.members.all()
@@ -1268,11 +1352,12 @@ class Scripts(TemplateView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         context['scripts'] = custom_scripts.get_script_menu()
         page_title = 'Custom Scripts'
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         if self.request.GET.get('s') is not None:
             context['output'] = eval('custom_scripts.'+self.request.GET['s']+'(self.request)')
         return context
@@ -1289,10 +1374,11 @@ class TicketDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = 'Ticket #'+str(self.object.id)
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         context['ticket'] = self.object
         return context
 
@@ -1339,10 +1425,11 @@ class TasksDetail(DetailView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = 'Task #'+str(self.object.id)+' ('+self.object.task_list.name+')'
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         context['task'] = self.object
         return context
 
@@ -1364,10 +1451,11 @@ class TasksList(TemplateView):
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
-        context = functions.set_menus(self.request, context, state)
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
         page_title = 'Task Manager'
         context['page_title'] = page_title
-        context['page_chain'] = functions.get_page_chain(breadcrumb, page_title)
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         # Superusers see all lists
         if self.request.user.is_superuser:
             lists = TaskList.objects.all().order_by('group', 'name')
@@ -1511,3 +1599,27 @@ class DalmeLogin(LoginView):
             self.request.GET.get(self.redirect_field_name, '')
         )
         return redirect_to
+
+
+def get_page_chain(breadcrumb, current=None):
+    i_count = len(breadcrumb)
+    title = ''
+    if current and current != breadcrumb[i_count-1][0]:
+        if len(current) > 55:
+            current = current[:55] + ' <i class="fa fa-plus-circle fa-fw" data-toggle="tooltip" data-placement="bottom" title="{}"></i> '.format(current)
+        for i in breadcrumb:
+            if i[1] != '':
+                title += '<a href="{}" class="title_link">{}</a>'.format(i[1], i[0])
+            else:
+                title += i[0]
+            title += ' <i class="fa fa-caret-right fa-fw"></i> '
+        title += '<span class="title_current">{}</span>'.format(current)
+    else:
+        c = 0
+        while c <= i_count - 1:
+            if c == i_count - 1:
+                title += '<span class="title_current">{}</span>'.format(breadcrumb[c][0])
+            else:
+                title += breadcrumb[c][0] + ' <i class="fa fa-caret-right fa-fw"></i> '
+            c = c + 1
+    return title

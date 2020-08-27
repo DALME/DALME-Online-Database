@@ -1,6 +1,7 @@
 function set_form() {
   $(document).ready(function () {
     dt_editor.on('open.dalme', function(e, mode, action) { change_set_form(e, action) });
+    dt_editor.on('submitSuccess.dalme', function(e, json, data, action) { location.reload(); });
   });
 }
 

@@ -3,7 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
-from dalme_app.utils import get_current_user, get_current_username
+# from dalme_app.utils import get_current_user, get_current_username
 import os
 import json
 import requests
@@ -12,7 +12,7 @@ import textwrap
 import lxml.etree as et
 from urllib.parse import urlencode
 import datetime
-from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid
+from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid, get_current_user, get_current_username
 import django.db.models.options as options
 from django.utils.dateparse import parse_date
 from django.utils import timezone
@@ -37,6 +37,32 @@ def rs_api_query(endpoint, user, key, **kwargs):
     sign.update(paramstr.encode('utf-8'))
     R = requests.get(endpoint + paramstr + "&sign=" + sign.hexdigest())
     return R
+
+
+def get_dam_preview(resource):
+    """
+    Returns the url for an image from the ResourceSpace Digital Asset Management
+    system for the given resource.
+    """
+    endpoint = 'https://dam.dalme.org/api/?'
+    user = 'api_bot'
+    key = os.environ['DAM_API_KEY']
+    queryParams = {
+        "function": "search_get_previews",
+        "param1": '!list'+str(resource),
+        "param2": "",
+        "param3": "",
+        "param4": "0",
+        "param5": "1",
+        "param6": "asc",
+        "param7": "",
+        "param8": "scr",
+        "param9": "jpg",
+    }
+    response = rs_api_query(endpoint, user, key, **queryParams)
+    data = json.loads(response.text)
+    preview_url = data[0]['url_scr']
+    return preview_url
 
 
 class Content_class(dalmeIntid):

@@ -5,7 +5,7 @@ from dalme_app.models import (Profile, Content_class, Content_type, Content_attr
                               CountryReference, CityReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
-from dalme_app import functions
+from dalme_app.utils import round_timesince, DALMEDateRange
 import textwrap
 import datetime
 import json
@@ -285,11 +285,8 @@ class RSCollectionsSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        t1 = ret.pop('theme')
-        t2 = ret.pop('theme2')
-        t3 = ret.pop('theme3')
-        usr = ret.pop('user')
-        ret['name'] = functions.get_full_collection_string(t1, t2, t3, functions.format_user(usr, 'dam'), ret['name'])
+        t_fields = [ret.pop(i) for i in ['theme', 'theme2', 'theme3']]
+        ret['name'] = '≫'.join(t_fields)
         return ret
 
 
@@ -425,9 +422,9 @@ class WorkflowSerializer(serializers.ModelSerializer):
         tstamp = ret.pop('last_modified')
         ret['activity'] = {
             # version of code that needs Python 3.7 to work
-            # 'timestamp': functions.round_timesince(datetime.datetime.fromisoformat(ret.pop('last_modified'))),
+            # 'timestamp': round_timesince(datetime.datetime.fromisoformat(ret.pop('last_modified'))),
             # version for Python 3.6 (has to remove : from utcoffset because ISO standard is not properly implemented)
-            'timestamp': functions.round_timesince(datetime.datetime.strptime(tstamp[0:-3:]+tstamp[-2::], '%Y-%m-%dT%H:%M:%S.%f%z')),
+            'timestamp': round_timesince(datetime.datetime.strptime(tstamp[0:-3:]+tstamp[-2::], '%Y-%m-%dT%H:%M:%S.%f%z')),
             'user': ret.pop('last_full_name'),
             'username': ret.pop('last_username')
         }
@@ -487,7 +484,7 @@ class SourceSerializer(DynamicSerializer):
         if dates:
             if 'start_date' in dates:
                 if 'end_date' in dates:
-                    result['date'] = functions.get_date_range(dates['start_date'], dates['end_date'])
+                    result['date'] = DALMEDateRange(dates['start_date'], dates['end_date']).short
                 else:
                     result['date'] = dates['start_date']
             else:
@@ -593,7 +590,9 @@ class ContentTypeSerializer(serializers.ModelSerializer):
             name = ret.pop('cont_class')
             ret['content_class'] = {'name': name, 'value': ret['content_class']}
         if ret['parents'] is not None:
-            ret['parents'] = functions.get_ctype_parents(ret['parents'])
+            ctype_dict = {i.id: i.name for i in Content_type.objects.all()}
+            list_ids = ret['parents'].split(',') if ',' in ret['parents'] else [ret['parents']]
+            ret['parents'] = [{'id': int(i), 'name': ctype_dict[int(i)]} for i in list_ids]
         return ret
 
 

@@ -5,8 +5,19 @@ timestamps and unique IDs.
 """
 from django.db import models
 from django.contrib.auth.models import User
-from dalme_app.utils import get_current_user
+#from dalme_app.utils import get_current_user
 import uuid
+from threading import local
+
+_user = local()
+
+
+def get_current_username():
+    return _user.__getattribute__('username')
+
+
+def get_current_user():
+    return _user.__getattribute__('user')
 
 
 class dalmeBasic(models.Model):

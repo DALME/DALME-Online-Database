@@ -26,7 +26,7 @@
         </li>
       </ul>
       {% if workset %}
-        {% include "includes/workset_controller.html" with current=workset.current total=workset.total progress=workset.progress name=workset.name description=workset.description %}
+        {% include "dalme_app/includes/workset_controller.html" with current=workset.current total=workset.total progress=workset.progress name=workset.name description=workset.description %}
       {% endif %}
     </div>
     <!-- Tab panes -->
@@ -59,7 +59,7 @@
                       </div>
                     {% endfor %}
                     {% if comments %}
-                      {% include "includes/comments_box.html" with model=comments object=object_attributes.ID %}
+                      {% include "dalme_app/includes/comments_box.html" with model=comments object=object_attributes.ID %}
                     {% endif %}
           </div>
           <div class="col-md-4">

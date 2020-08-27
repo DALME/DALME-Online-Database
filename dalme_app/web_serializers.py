@@ -1,6 +1,6 @@
 from dalme_app.models import (Source, Attribute, Set, Set_x_content)
 from rest_framework import serializers
-from dalme_app import functions
+from dalme_app.utils import DALMEDateRange
 import json
 import random
 
@@ -91,7 +91,7 @@ class RecordSerializer(serializers.ModelSerializer):
         if dates:
             if 'start_date' in dates:
                 if 'end_date' in dates:
-                    result['date'] = functions.get_date_range(dates['start_date'], dates['end_date'])
+                    result['date'] = DALMEDateRange(dates['start_date'], dates['end_date']).long
                 else:
                     result['date'] = dates['start_date']
             else:

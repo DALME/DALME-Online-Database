@@ -248,6 +248,7 @@ function setEditorOptions(dict) {
 }
 
 function setEditorToolbar() {
+  let editor_options = $('#hidden-content').html();
   $('#editor-right-toolbar')
     .prepend('<button class="editor-btn button-border-left" id="btn_cancel" onclick="cancelEditor()"><i class="fa fa-times-circle fa-fw"></i> Cancel</button>')
     .prepend('<button class="editor-btn button-border-left" id="btn_save" onclick="saveButton()" disabled><i class="fa fa-save fa-fw"></i> Save</button>');
@@ -255,11 +256,10 @@ function setEditorToolbar() {
     .prepend('<button class="editor-btn button-border-right" id="btn_options" onclick="editorOptionsMenu()" title="Editor options" data-toggle="tooltip"><i class="fas fa-cog fa-fw" ></i></button>')
     .append('<button class="editor-btn button-border-right" id="btn_redo" onclick="redoEditor()" title="Redo" data-toggle="tooltip" disabled><i class="fa fa-redo-alt fa-fw"></i></button>')
     .append('<button class="editor-btn button-border-right" id="btn_undo" onclick="undoEditor()" title="Undo" data-toggle="tooltip" disabled><i class="fa fa-undo-alt fa-fw"></i></button>');
-  $('#xmleditor-options').load('/static/includes/xmleditor_options.html', function() {
-    $('#xmleditor-options-form').find('input').on('change.dalme', function (e) { setEditorOptions(e) });
-    $('#xmleditor-options-form').find('select').on('change.dalme', function (e) { setEditorOptions(e) });
-    $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-  });
+  $('#xmleditor-options').html(editor_options);
+  $('#xmleditor-options-form').find('input').on('change.dalme', function (e) { setEditorOptions(e) });
+  $('#xmleditor-options-form').find('select').on('change.dalme', function (e) { setEditorOptions(e) });
+  $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
 }
 
 function removeEditorToolbar() {

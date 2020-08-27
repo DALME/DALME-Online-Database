@@ -20,7 +20,6 @@ from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 # from rest_framework.permissions import DjangoModelPermissions, IsAuthenticatedOrReadOnly
 
-from dalme_app import functions
 from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, TaskSerializer,
                                    TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
@@ -31,7 +30,7 @@ from dalme_app.models import (Profile, Attribute_type, Content_class, Content_ty
                               DT_fields, Page, Source_pages, Source, Transcription, LanguageReference,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
                               Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
-                              Comment, Workflow, Set, Set_x_content, RightsPolicy, GroupProperties)
+                              Comment, Workflow, Set, Set_x_content, RightsPolicy, GroupProperties, Work_log, get_dam_preview)
 from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy, ProfileAccessPolicy
 
 
@@ -106,7 +105,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_user = request.user
                 object.last_modified = timezone.now()
                 object.save()
-                functions.update_log(object, stage_name + ': marked as done')
+                self.update_log(object, stage_name + ': marked as done')
                 next_stage = stage + 1
                 result['prev_stage_name'] = stage_name
                 result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
@@ -122,7 +121,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_user = request.user
                 object.last_modified = timezone.now()
                 object.save()
-                functions.update_log(object, stage_name + ': work commenced')
+                self.update_log(object, stage_name + ': work commenced')
                 result['stage_name'] = stage_name
                 result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
                 result['status_html'] = '<div class="wf-manager-status tag-wf-in_progress">' + stage_name + ' in progress</div>\
@@ -136,7 +135,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_user = request.user
                 object.last_modified = timezone.now()
                 object.save()
-                functions.update_log(object, 'help flag set to ' + str(object.help_flag))
+                self.update_log(object, 'help flag set to ' + str(object.help_flag))
             elif action == 'toggle_public':
                 if object.is_public:
                     object.is_public = False
@@ -145,7 +144,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_user = request.user
                 object.last_modified = timezone.now()
                 object.save()
-                functions.update_log(object, 'public flag set to ' + str(object.is_public))
+                self.update_log(object, 'public flag set to ' + str(object.is_public))
             elif action == 'change_status':
                 status = int(self.request.POST['code'])
                 prev_status = object.wf_status
@@ -153,7 +152,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_user = request.user
                 object.last_modified = timezone.now()
                 object.save()
-                functions.update_log(object, 'status changed from "' + status_dict[prev_status] + '" to "' + status_dict[status] + '"')
+                self.update_log(object, 'status changed from "' + status_dict[prev_status] + '" to "' + status_dict[status] + '"')
                 status_name = status_dict[status]
                 result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
                 if status != 2:
@@ -178,6 +177,9 @@ class WorkflowManager(viewsets.ModelViewSet):
             result['error'] = str(e)
             status = 400
         return Response(result, status)
+
+    def update_log(self, source, message):
+        Work_log.objects.create(source=source, event=message)
 
 
 class DTViewSet(viewsets.ModelViewSet):
@@ -628,7 +630,7 @@ class Images(DTViewSet):
     def get_preview_url(self, request, pk=None):
         result = {}
         try:
-            url = functions.get_dam_preview(pk)
+            url = get_dam_preview(pk)
             result['preview_url'] = url
             status = 201
         except Exception as e:
@@ -780,7 +782,7 @@ class Options(viewsets.ViewSet):
     def json_file(self, **kwargs):
         if self.request.GET.get('name') is not None:
             filename = self.request.GET['name']
-            file = os.path.join('templates', 'json', filename + '.json')
+            file = os.path.join('dalme_app', 'config', filename + '.json')
         with open(file, 'r') as fp:
             output = json.load(fp)
         return output

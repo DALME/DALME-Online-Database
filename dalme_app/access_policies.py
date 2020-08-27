@@ -10,7 +10,7 @@ class BaseAccessPolicy(AccessPolicy):
     id = 'base-policy'
 
     def get_policy_statements(self, request, view):
-        statements = os.path.join('dalme_app', 'policies', self.id + '.json')
+        statements = os.path.join('dalme_app', 'config', 'policies', self.id + '.json')
         with open(statements, 'r') as policy:
             return json.load(policy)
 
