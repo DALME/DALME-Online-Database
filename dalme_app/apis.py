@@ -7,10 +7,13 @@ import os
 from functools import reduce
 
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.forms import PasswordResetForm
 from django.db.models import Q, Count
 from django.db.models.expressions import RawSQL
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.http import HttpRequest
+from django.conf import settings
 
 from django_celery_results.models import TaskResult
 # from passlib.apps import phpass_context
@@ -1425,6 +1428,29 @@ class Users(DTViewSet):
     permission_classes = (ProfileAccessPolicy,)
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+
+    @action(detail=True, methods=['post'])
+    def reset_password(self, request, *args, **kwargs):
+        result = {}
+        object = self.get_object().user
+        try:
+            form = PasswordResetForm({'email': object.email})
+            assert form.is_valid()
+            request = HttpRequest()
+            request.META['SERVER_NAME'] = 'db.dalme.org'
+            request.META['SERVER_PORT'] = '443'
+            form.save(
+                request=request,
+                use_https=True,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                email_template_name='registration/password_reset_email_auto.html'
+            )
+            result['data'] = 'Email sent'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
 
     def create(self, request, *args, **kwargs):
         result = {}

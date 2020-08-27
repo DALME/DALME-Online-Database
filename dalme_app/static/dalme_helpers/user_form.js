@@ -1,6 +1,7 @@
 function user_form() {
   dt_editor.on('open.dalme', function( e, mode, action ) { change_form(e, action) });
   dt_editor.on('close.dalme', function( e ) { change_form(e) });
+  dt_editor.on('submitSuccess.dalme', function(e, json, data, action) { location.reload(); });
   password_state = 'divs';
 }
 
@@ -21,6 +22,23 @@ function change_form(e, action) {
   }
 }
 
+function reset_password() {
+  var conf = confirm("Are you sure you wish to reset this user's password?");
+  if (conf == true) {
+    var user_id = dt_editor.ids()[0];
+    dt_editor.close();
+    $.ajax({
+      method: "POST",
+      url: "/api/users/"+user_id+"/reset_password/",
+      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+    }).done(function(data, textStatus, jqXHR) {
+      toastr.success('An email with instructions was sent to the user.');
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      toastr.error('There was an error communicating with the server: '+errorThrown);
+    });
+  }
+}
+
 function toggle_password_button(e) {
   var container = $(dt_editor.field('user.password').node());
   var label = $(container).find('label');
@@ -30,8 +48,10 @@ function toggle_password_button(e) {
     $(divs).remove();
     $(label).after(button);
     password_state = 'button';
+    $('#reset_password').on('click.dalme', reset_password);
   } else if (e.type == 'close') {
     if ( password_state == 'button' ) {
+      $('#reset_password').off('click.dalme');
       $(container).find('button').remove();
       $(label).after(divs);
     }
