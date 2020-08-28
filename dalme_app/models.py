@@ -930,7 +930,7 @@ class Task(dalmeIntid):
     def save(self, **kwargs):
         # If Task is being marked complete, set the completed_date
         if self.completed:
-            self.completed_date = datetime.datetime.now()
+            self.completed_date = timezone.now()
         super(Task, self).save()
 
     class Meta:
