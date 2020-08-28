@@ -154,8 +154,8 @@
     "permissions": ["Administrators", "Developers"]
   },
   {
-    "text": "Cities",
-    "link": "/cities",
+    "text": "Locales",
+    "link": "/locales",
     "iconClass": "fa-city",
     "child": true,
     "permissions": ["Users", "Staff", "Administrators", "Developers"]

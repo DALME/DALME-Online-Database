@@ -51,8 +51,8 @@
                 {% if result.content_type == "dalme_app.attribute_type" %}
                 {% include "dalme_app/search/includes/attribute_types.html" %}
                 {% endif %}
-                {% if result.content_type == "dalme_app.cityreference" %}
-                {% include "dalme_app/search/includes/cities.html" %}
+                {% if result.content_type == "dalme_app.localereference" %}
+                {% include "dalme_app/search/includes/locales.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.countryreference" %}
                 {% include "dalme_app/search/includes/countries.html" %}

@@ -12,7 +12,7 @@ from django.views.generic.base import TemplateView
 from dalme_app.utils import DALMEMenus as dm
 from dalme_app import custom_scripts
 from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page, Attribute_type, Attribute, Tag,
-                              Source, Set, TaskList, Task, rs_resource, rs_collection, rs_collection_resource, CityReference,
+                              Source, Set, TaskList, Task, rs_resource, rs_collection, rs_collection_resource, LocaleReference,
                               LanguageReference, CountryReference, rs_resource_data, Ticket, Workflow, RightsPolicy, get_dam_preview)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
@@ -899,9 +899,9 @@ class CountryList(DTListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class CityList(DTListView):
-    breadcrumb = [('System', ''), ('Cities', '/cities')]
-    list_name = 'cities'
+class LocaleList(DTListView):
+    breadcrumb = [('System', ''), ('Locales', '/locales')]
+    list_name = 'locales'
     dt_editor_options = {'idSrc': '"id"'}
     dte_field_list = ['name', 'administrative_region', 'country']
     dt_options = {
@@ -925,11 +925,11 @@ class CityList(DTListView):
 
     def get_dte_buttons(self, *args, **kwargs):
         dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_cityreference'):
+        if self.request.user.has_perm('dalme_app.add_localereference'):
             dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New City'})
-        if self.request.user.has_perm('dalme_app.change_cityreference'):
+        if self.request.user.has_perm('dalme_app.change_localereference'):
             dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit City Information'})
-        if self.request.user.has_perm('dalme_app.delete_cityreference'):
+        if self.request.user.has_perm('dalme_app.delete_localereference'):
             dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete City',
                                 'formMessage': 'Are you sure you wish to remove this city from the database? This action cannot be undone.'})
         return dte_buttons

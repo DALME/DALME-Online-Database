@@ -27,12 +27,12 @@ from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, Langua
                                    TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
                                    SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
-                                   CountrySerializer, CitySerializer, AttachmentSerializer, TicketSerializer, CommentSerializer,
+                                   CountrySerializer, LocaleSerializer, AttachmentSerializer, TicketSerializer, CommentSerializer,
                                    WorkflowSerializer, SetSerializer, RightsSerializer)
 from dalme_app.models import (Profile, Attribute_type, Content_class, Content_type, Content_attributes, DT_list,
                               DT_fields, Page, Source_pages, Source, Transcription, LanguageReference,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
-                              Attribute, CountryReference, CityReference, Attachment, Ticket, Tag,
+                              Attribute, CountryReference, LocaleReference, Attachment, Ticket, Tag,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy, GroupProperties, Work_log, get_dam_preview)
 from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy, ProfileAccessPolicy
 
@@ -386,11 +386,11 @@ class Countries(DTViewSet):
     serializer_class = CountrySerializer
 
 
-class Cities(DTViewSet):
-    """ API endpoint for managing cities """
+class Locales(DTViewSet):
+    """ API endpoint for managing locales """
     permission_classes = (GeneralAccessPolicy,)
-    queryset = CityReference.objects.all()
-    serializer_class = CitySerializer
+    queryset = LocaleReference.objects.all()
+    serializer_class = LocaleSerializer
 
 
 class Rights(DTViewSet):

@@ -734,7 +734,7 @@ class AttributeReference(dalmeUuid):
     term_type = models.CharField(max_length=55, blank=True, default=None)
 
 
-class CityReference(dalmeIntid):
+class LocaleReference(dalmeIntid):
     name = models.CharField(max_length=255)
     administrative_region = models.CharField(max_length=255)
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)

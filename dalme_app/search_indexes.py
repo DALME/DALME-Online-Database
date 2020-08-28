@@ -1,5 +1,5 @@
 from haystack import indexes
-from dalme_app.models import (Attribute_type, CityReference, CountryReference,
+from dalme_app.models import (Attribute_type, LocaleReference, CountryReference,
                               LanguageReference, Profile, RightsPolicy, Set, Source, Task, Ticket)
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -14,11 +14,11 @@ class Attribute_typeIndex(indexes.SearchIndex, indexes.Indexable):
         return self.get_model().objects.all()
 
 
-class CityReferenceIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/cities.txt")
+class LocaleReferenceIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/locales.txt")
 
     def get_model(self):
-        return CityReference
+        return LocaleReference
 
     def index_queryset(self, using=None):
         return self.get_model().objects.all()

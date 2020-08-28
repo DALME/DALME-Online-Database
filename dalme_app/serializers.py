@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
                               DT_list, DT_fields, Page, Source, TaskList, Task,
                               rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
-                              CountryReference, CityReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
+                              CountryReference, LocaleReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app.utils import round_timesince, DALMEDateRange
@@ -90,11 +90,11 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'alpha_2_code', 'alpha_3_code', 'num_code')
 
 
-class CitySerializer(serializers.ModelSerializer):
+class LocaleSerializer(serializers.ModelSerializer):
     country_name = serializers.StringRelatedField(source='country')
 
     class Meta:
-        model = CityReference
+        model = LocaleReference
         fields = ('id', 'name', 'administrative_region', 'country', 'country_name')
 
     def to_representation(self, instance):
