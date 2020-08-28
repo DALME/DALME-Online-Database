@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
             name='Attachment',
             fields=[
                 ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('creation_username', models.CharField(blank=True, default=dalme_app.utils.get_current_username, max_length=255, null=True)),
+                ('creation_username', models.CharField(blank=True, default=dalme_app.model_templates.get_current_username, max_length=255, null=True)),
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
-                ('modification_username', models.CharField(blank=True, default=dalme_app.utils.get_current_username, max_length=255, null=True)),
+                ('modification_username', models.CharField(blank=True, default=dalme_app.model_templates.get_current_username, max_length=255, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('file', models.FileField(upload_to='attachments/%Y/%m/')),
                 ('object_id', models.UUIDField(db_index=True, null=True)),

@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
                 ('event', models.CharField(max_length=255)),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('user', models.CharField(default=dalme_app.utils.get_current_user, max_length=255)),
+                ('user', models.CharField(default=dalme_app.model_templates.get_current_user, max_length=255)),
                 ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.Workflow')),
             ],
         ),

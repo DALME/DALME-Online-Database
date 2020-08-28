@@ -3,7 +3,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
-# from dalme_app.utils import get_current_user, get_current_username
 import os
 import json
 import requests
@@ -190,6 +189,7 @@ class Source(index.Indexed, dalmeUuid):
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
     sets = GenericRelation('Set_x_content', related_query_name='source')
+    primary_dataset = models.ForeignKey('Set', db_index=True, on_delete=models.PROTECT, related_query_name='set_members', null=True)
 
     search_fields = [
         index.FilterField('name'),
@@ -197,6 +197,12 @@ class Source(index.Indexed, dalmeUuid):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.type == 13 and self.parent is not None:
+            if self.parent.primary_dataset is not None:
+                self.primary_dataset = self.parent.primary_dataset
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('source_detail', kwargs={'pk': self.pk})
