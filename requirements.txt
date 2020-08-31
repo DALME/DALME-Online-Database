@@ -11,7 +11,7 @@ django-compressor==2.4
 django-cors-headers==3.4.0
 django-dynamic-preferences==1.10.1
 django-filter==2.3.0
-django-haystack==3.0
+django-haystack==3.0b1
 django-hosts==4.0
 django-maintenance-mode==0.14.0
 django-storages==1.9.1
