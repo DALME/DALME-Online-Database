@@ -20,7 +20,7 @@ djangosaml2idp==0.7.2
 drf-access-policy==0.7.0
 elasticsearch>=2.0.0,<3.0.0
 kombu==4.6.11
-lxml==4.4.2
+lxml==4.5.2
 mysqlclient==2.0.1
 pandas==1.1.0
 passlib==1.7.2
