@@ -27,6 +27,6 @@ passlib==1.7.2
 requests==2.20.1
 requests-aws4auth==1.0
 urllib3==1.24.3
-wagtail==2.10
+wagtail==2.10.1
 wagtail-modelchooser==2.3.3
 whitenoise==5.2.0
