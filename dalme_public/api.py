@@ -125,7 +125,7 @@ class SourceList(ListAPIView):
                 qs = filtered
 
                 # Sorting by 'name' happens on the Order filter itself as we are
-                # dealing with a plan qs without annotations there.
+                # dealing with a plain qs without annotations there.
                 order_by = self.request.GET.get('order_by')
                 if order_by.endswith('date'):
                     maxdate = datetime.date(datetime.MAXYEAR, 1, 1)
