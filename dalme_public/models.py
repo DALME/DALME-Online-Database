@@ -3,7 +3,7 @@ import textwrap
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, F, Q
+from django.db.models import F
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template.response import TemplateResponse
