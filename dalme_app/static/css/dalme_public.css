@@ -497,11 +497,11 @@ main.essay > .content {
   margin: 0 0 0 1rem;
   width: 100%;
 }
-.featured-object-nav li {
+.featured-object-nav ul li {
   border-top: 1px dotted #636363;
   padding: 0.3rem 0;
 }
-.featured-object-nav li:last-child {
+.featured-object-nav ul li:last-of-type {
   border-bottom: 1px dotted #636363;
 }
 
