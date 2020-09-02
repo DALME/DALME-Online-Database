@@ -189,6 +189,8 @@ class DTViewSet(viewsets.ModelViewSet):
     """ Generic viewset for managing communication with DataTables.
     Should be subclassed for specific API endpoints. """
 
+    choice_keys = ['i[\'name\']', 'i[\'id\']']
+
     @action(detail=True, methods=['post'])
     def has_permission(self, request, pk=None):
         object = self.get_object()
@@ -255,7 +257,7 @@ class DTViewSet(viewsets.ModelViewSet):
             data_dict['recordsFiltered'] = rec_count
             # filter the queryset for the current page
             queryset = queryset[dt_data.get('start'):dt_data.get('start')+dt_data.get('length')]
-            serializer = self.get_serializer(queryset, many=True)
+            serializer = self.get_serializer(queryset, many=True, context={'choice_keys': self.choice_keys})
             data = serializer.data
             data_dict['data'] = data
             # except Exception as e:
@@ -263,7 +265,7 @@ class DTViewSet(viewsets.ModelViewSet):
         else:
             queryset = self.get_queryset()
             try:
-                serializer = self.get_serializer(queryset, many=True)
+                serializer = self.get_serializer(queryset, many=True, context={'choice_keys': self.choice_keys})
                 data = serializer.data
                 data_dict['data'] = data
             except Exception as e:
@@ -344,6 +346,15 @@ class DTViewSet(viewsets.ModelViewSet):
             queryset = self.queryset
         return queryset
 
+    def get_renderer_context(self):
+        return {
+            'view': self,
+            'args': getattr(self, 'args', ()),
+            'kwargs': getattr(self, 'kwargs', {}),
+            'request': getattr(self, 'request', None),
+            'choice_keys': self.choice_keys
+        }
+
     def filter_on_search(self, *args, **kwargs):
         return filter_on_search(*args, **kwargs)
 
@@ -384,6 +395,7 @@ class Countries(DTViewSet):
     permission_classes = (GeneralAccessPolicy,)
     queryset = CountryReference.objects.all()
     serializer_class = CountrySerializer
+    choice_keys = ['i[\'name\']', 'i[\'name\']']
 
 
 class Locales(DTViewSet):
@@ -391,6 +403,7 @@ class Locales(DTViewSet):
     permission_classes = (GeneralAccessPolicy,)
     queryset = LocaleReference.objects.all()
     serializer_class = LocaleSerializer
+    choice_keys = ['i[\'name\']', 'i[\'name\']']
 
 
 class Rights(DTViewSet):
@@ -398,6 +411,7 @@ class Rights(DTViewSet):
     permission_classes = (GeneralAccessPolicy,)
     queryset = RightsPolicy.objects.all()
     serializer_class = RightsSerializer
+    choice_keys = ['i[\'name\'][\'name\']', '\'{{"class": "RightsPolicy", "id": "{}"}}\'.format(i[\'id\'].replace(\'-\', \'\'))']
 
 
 class AttributeTypes(DTViewSet):
@@ -754,6 +768,7 @@ class Languages(DTViewSet):
     permission_classes = (GeneralAccessPolicy,)
     queryset = LanguageReference.objects.all()
     serializer_class = LanguageSerializer
+    choice_keys = ['i[\'name\']', 'i[\'iso6393\']']
 
 
 class Options(viewsets.ViewSet):
@@ -1428,6 +1443,7 @@ class Users(DTViewSet):
     permission_classes = (ProfileAccessPolicy,)
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    choice_keys = ['i[\'full_name\']', 'i[\'user_id\']']
 
     @action(detail=True, methods=['post'])
     def reset_password(self, request, *args, **kwargs):
@@ -1529,6 +1545,7 @@ class Sets(DTViewSet):
     permission_classes = (SetAccessPolicy,)
     queryset = Set.objects.all()
     serializer_class = SetSerializer
+    choice_keys = ['i[\'name\']', 'i[\'id\']', 'i[\'detail_string\']']
 
     @action(detail=False, methods=['post'])
     def add_members(self, request, *args, **kwargs):

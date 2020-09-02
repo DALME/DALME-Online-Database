@@ -3,6 +3,8 @@ import os
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib import messages
 from async_messages import get_messages
+from rest_framework import permissions, renderers
+from rest_framework.compat import INDENT_SEPARATORS, LONG_SEPARATORS, SHORT_SEPARATORS
 from djangosaml2idp.processors import BaseProcessor
 from typing import Dict
 from dalme_app.models import Task
@@ -10,9 +12,32 @@ from django.template import defaultfilters
 import re
 
 
+class DRFSelectRenderer(renderers.JSONRenderer):
+    """ Django Rest Framework renderer to return selectize ready value lists """
 
+    format = 'select'
 
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        if data is None:
+            return b''
 
+        renderer_context = renderer_context or {}
+        indent = self.get_indent(accepted_media_type, renderer_context)
+        if indent is None:
+            separators = SHORT_SEPARATORS if self.compact else LONG_SEPARATORS
+        else:
+            separators = INDENT_SEPARATORS
+        if len(renderer_context['choice_keys']) == 2:
+            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1])} for i in data['data']]
+        else:
+            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1]), 'detail': eval(renderer_context['choice_keys'][2])} for i in data['data']]
+        ret = json.dumps(
+            new_data, cls=self.encoder_class,
+            indent=indent, ensure_ascii=self.ensure_ascii,
+            allow_nan=not self.strict, separators=separators
+        )
+        ret = ret.replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+        return ret.encode()
 
 
 class AsyncMiddleware(MiddlewareMixin):
