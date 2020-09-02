@@ -83,7 +83,12 @@ def get_script_menu():
             "name": "migrate_datasets",
             "description": "Migrates dataset attribute to sets.",
             "type": "warning"
-        }
+        },
+        {
+            "name": "create_json_field_reps",
+            "description": "Takes a list of fields and creates individual json files.",
+            "type": "warning"
+        },
     ]
     _output = ''
     for item in script_register:
@@ -117,6 +122,15 @@ def test_search(request):
     for e in qs:
         res.append([e.name])
     return res
+
+
+def create_json_field_reps(request):
+    with open(os.path.join('dalme_app', 'config', 'datatables', 'field_defs', 'sources.json')) as f:
+        input = json.load(f)
+    for field in input:
+        with open(os.path.join('dalme_app', 'config', 'datatables', 'field_defs', 'sources', '_' + field['name'] + '.json'), 'w') as json_file:
+            json_file.write(json.dumps(field, indent=4))
+    return 'done'
 
 
 def add_attribute_types():
@@ -238,7 +252,7 @@ def test_expression(request):
     #return Profile.objects.get(user=1).profile_image_2
     #avatar = User.objects.get(id=1).wagtailusers.userprofile.avatar
     #result = blah
-    return [i.name for i in request.user.groups.all()]
+    return sorted(list(set(list(Attribute.objects.filter(attribute_type=28, value_STR__isnull=False).values_list('value_STR', flat=True)))))
 
 
 def fix_users(records):

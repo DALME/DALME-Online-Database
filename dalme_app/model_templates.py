@@ -5,11 +5,26 @@ timestamps and unique IDs.
 """
 from django.db import models
 from django.contrib.auth.models import User
-#from dalme_app.utils import get_current_user
 import uuid
 from threading import local
 
+# MIDDLEWARE
 _user = local()
+
+
+class CurrentUserMiddleware(object):
+    """
+    Enables setting user or usename as default values in models.py.
+    Used to automatically set creation and modification records.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        _user.__setattr__('username', request.user.username)
+        _user.__setattr__('user', request.user)
+        return self.get_response(request)
 
 
 def get_current_username():

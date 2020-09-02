@@ -1,33 +1,18 @@
 import json
 import os
-from threading import local
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib import messages
 from async_messages import get_messages
-from rest_framework import permissions
 from djangosaml2idp.processors import BaseProcessor
 from typing import Dict
 from dalme_app.models import Task
 from django.template import defaultfilters
 import re
 
-# MIDDLEWARE
-_user = local()
 
 
-class CurrentUserMiddleware(object):
-    """
-    Enables setting user or usename as default values in models.py.
-    Used to automatically set creation and modification records.
-    """
 
-    def __init__(self, get_response):
-        self.get_response = get_response
 
-    def __call__(self, request):
-        _user.__setattr__('username', request.user.username)
-        _user.__setattr__('user', request.user)
-        return self.get_response(request)
 
 
 class AsyncMiddleware(MiddlewareMixin):
