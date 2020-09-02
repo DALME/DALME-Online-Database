@@ -36,6 +36,8 @@ router.register(r'comments', apis.Comments, basename='comments')
 router.register(r'workflow', apis.WorkflowManager, basename='workflow')
 router.register(r'datasets', apis.Datasets, basename='datasets')
 router.register(r'rights', apis.Rights, basename='rights')
+router.register(r'configs', apis.Configs, basename='configs')
+router.register(r'choices', apis.Choices, basename='choices')
 
 web_router = routers.DefaultRouter()
 web_router.register(r'records', web_apis.Records, basename='records')

@@ -771,9 +771,60 @@ class Languages(DTViewSet):
     choice_keys = ['i[\'name\']', 'i[\'iso6393\']']
 
 
+class Configs(viewsets.ViewSet):
+    """ API endpoint for retrieving configuration files """
+    permission_classes = (GeneralAccessPolicy,)
+    queryset = Set.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        result = {}
+        if self.request.GET.get('file') is None or self.request.GET.get('path') is None:
+            result['error'] = 'Request has no file/path information.'
+            status = 400
+        else:
+            file = self.request.GET['file']
+            path = self.request.GET['path'].split(',')
+            try:
+                with open(os.path.join('dalme_app', 'config', *path, '_' + file + '.json'), 'r') as fp:
+                    result = json.load(fp)
+                status = 201
+            except Exception as e:
+                result['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+                status = 400
+        return Response(result, status)
+
+
+class Choices(viewsets.ViewSet):
+    """ API endpoint for generating value lists for choice fields in the UI """
+    permission_classes = (GeneralAccessPolicy,)
+    queryset = Set.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        result = {}
+        type = self.request.GET.get('type')
+        field = self.request.GET.get('field')
+        query = self.request.GET.get('q')
+        if type is None or field is None:
+            result['error'] = 'Request has no type/field information.'
+            status = 400
+        else:
+            try:
+                if type == 'list':
+                    with open(os.path.join('dalme_app', 'config', 'value_lists', '_' + field + '.json'), 'r') as fp:
+                        result = json.load(fp)
+                    status = 201
+                elif type == 'model':
+                    para = field.split('.')
+                    result = [{'label': label, 'value': value} for value, label in eval('{}._meta.get_field("{}").choices'.format(para[0], para[1]))]
+                    status = 201
+            except Exception as e:
+                result['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
+                status = 400
+        return Response(result, status)
+
+
 class Options(viewsets.ViewSet):
     """ API endpoint for generating data for options in the UI """
-    permission_classes = (GeneralAccessPolicy,)
     permission_classes = (GeneralAccessPolicy,)
     queryset = Set.objects.none()
 
