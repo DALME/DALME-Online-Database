@@ -197,6 +197,10 @@ class FeaturedPage(DALMEPage):
         abstract = True
 
     @property
+    def published_switch(self):
+        return self.go_live_at or self.first_published_at
+
+    @property
     def author(self):
         if self.alternate_author:
             return self.alternate_author
