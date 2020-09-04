@@ -1,7 +1,7 @@
 {% load dalme_public_tags wagtailroutablepage_tags %}
 
 {% get_source_details as source_data %}
-{% if source_data.source %}
+{% if source_data.pk and source_data.source %}
   <div class="record-detail u-flex">
     <h4 class="u-small-caps-heading">RECORD</h4>
     <ul>
