@@ -1,0 +1,36 @@
+{
+  "name": "attributes.record_type",
+  "label": "Record type",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select type",
+    "preload": true,
+    "optgroups": [
+      {
+        "value": "Inventory",
+        "label": "Inventory"
+      },
+      {
+        "value": "Guardianship",
+        "label": "Guardianship"
+      },
+      {
+        "value": "Seizure",
+        "label": "Seizure"
+      },
+      {
+        "value": "Testament",
+        "label": "Testament"
+      },
+      {
+        "value": "Other",
+        "label": "Other"
+      }
+    ],
+    "optgroupField": "group"
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/choices/?type=list&field=attributes.record_type&format=json&q="
+  }
+}

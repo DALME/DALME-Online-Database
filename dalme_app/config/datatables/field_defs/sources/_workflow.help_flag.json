@@ -1,0 +1,14 @@
+{
+  "name": "workflow.help_flag",
+  "label": "Help",
+  "type": "checkbox",
+  "options": {
+    "type": "list",
+    "list": [
+      {
+        "label": "Indicates whether help with this source has been requested.",
+        "value": "1"
+      }
+    ]
+  }
+}

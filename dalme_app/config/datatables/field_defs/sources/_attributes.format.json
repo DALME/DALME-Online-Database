@@ -1,0 +1,13 @@
+{
+  "name": "attributes.format",
+  "label": "Format",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select type",
+    "preload": true
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/choices/?type=list&field=attributes.format&format=json&q="
+  }
+}

@@ -1,0 +1,13 @@
+{
+    "name": "owner.id",
+    "label": "Owner",
+    "type": "selectize",
+    "opts": {
+        "placeholder": "Select owner",
+        "preload": true
+    },
+    "options": {
+        "type": "api_call",
+        "url": "/api/users?is_active=True&format=select&q="
+    }
+}

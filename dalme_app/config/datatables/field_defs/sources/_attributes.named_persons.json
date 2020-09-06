@@ -1,0 +1,6 @@
+{
+    "name": "attributes.named_persons",
+    "label": "Named persons",
+    "type": "text",
+    "fieldInfo": "A list of persons mentioned in a document"
+}

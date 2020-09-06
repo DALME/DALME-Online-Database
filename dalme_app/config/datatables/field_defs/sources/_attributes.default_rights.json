@@ -1,0 +1,13 @@
+{
+  "name": "attributes.default_rights.value",
+  "label": "Default rights",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select rights object",
+    "preload": true
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/rights/?format=select&q="
+  }
+}

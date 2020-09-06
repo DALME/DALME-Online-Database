@@ -1,0 +1,14 @@
+{
+  "name": "workflow.is_public",
+  "label": "Public",
+  "type": "checkbox",
+  "options": {
+    "type": "list",
+    "list": [
+      {
+        "label": "Indicates whether this source is included in the public website.",
+        "value": "1"
+      }
+    ]
+  }
+}

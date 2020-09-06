@@ -1,0 +1,13 @@
+{
+  "name": "attributes.country",
+  "label": "Country",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select country",
+    "preload": true
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/countries/?format=select&q="
+  }
+}

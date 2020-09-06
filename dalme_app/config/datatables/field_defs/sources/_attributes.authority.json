@@ -1,0 +1,13 @@
+{
+  "name": "attributes.authority",
+  "label": "Authority",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select type",
+    "preload": true
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/choices/?type=list&field=attributes.authority&format=json&q="
+  }
+}

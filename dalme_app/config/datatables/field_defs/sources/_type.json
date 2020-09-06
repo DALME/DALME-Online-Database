@@ -1,0 +1,13 @@
+{
+  "name": "type.id",
+  "label": "Type",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select type",
+    "preload": true
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/content_types/?format=select&q="
+  }
+}

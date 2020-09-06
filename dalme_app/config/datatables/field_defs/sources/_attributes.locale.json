@@ -1,0 +1,13 @@
+{
+  "name": "attributes.locale",
+  "label": "Locale",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select locale",
+    "preload": true
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/locales/?format=select&q="
+  }
+}
