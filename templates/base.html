@@ -60,7 +60,7 @@
               var _opened = $(".navbar-collapse").hasClass("show");
               if (_opened === true && !clickover.hasClass("navbar-toggler")) { $(".navbar-toggler").click(); }
           });
-          dalme_startup();
+          dalme_startup({% if helpers %}"{{ helpers | safe }}"{% endif %});
           {% if messages %}
               {% for message in messages %}
                 toastr.{{ message.tags }}('{{ message | safe }}');

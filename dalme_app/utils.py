@@ -2,6 +2,7 @@ import json
 import os
 import re
 from django.conf import settings
+from django.http import QueryDict
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib import messages
 from async_messages import get_messages
@@ -30,10 +31,11 @@ class DRFSelectRenderer(renderers.JSONRenderer):
             separators = SHORT_SEPARATORS if self.compact else LONG_SEPARATORS
         else:
             separators = INDENT_SEPARATORS
+
         if len(renderer_context['choice_keys']) == 2:
-            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1])} for i in data['data']]
+            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1])} for i in data]
         else:
-            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1]), 'detail': eval(renderer_context['choice_keys'][2])} for i in data['data']]
+            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1]), 'detail': eval(renderer_context['choice_keys'][2])} for i in data]
         ret = json.dumps(
             new_data, cls=self.encoder_class,
             indent=indent, ensure_ascii=self.ensure_ascii,
