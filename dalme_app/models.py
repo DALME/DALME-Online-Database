@@ -165,6 +165,10 @@ class Attribute(dalmeUuid):
                 self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
             elif self.value_DATE_y is not None:
                 self.value_STR = str(self.value_DATE_y)
+        if self.attribute_type.data_type == 'INT':
+            self.value_STR = str(self.value_INT)
+        if self.attribute_type.data_type == 'TXT':
+            self.value_STR = self.value_TXT[0:254] if len(self.value_TXT) > 255 else self.value_TXT
         super().save(*args, **kwargs)
 
     class Meta:
