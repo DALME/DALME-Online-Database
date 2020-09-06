@@ -26,6 +26,117 @@ class DynamicSerializer(serializers.ModelSerializer):
                     self.fields.pop(k)
 
 
+class GroupSerializer(serializers.ModelSerializer):
+    """ Basic serializer for user group data """
+    name = serializers.CharField(max_length=255, required=False)
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
+
+
+class UserSerializer(DynamicSerializer):
+    """ Serializer for user data """
+    groups = GroupSerializer(many=True, required=False)
+    last_login = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
+    date_joined = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
+    full_name = serializers.CharField(source='profile.full_name', read_only=True, required=False)
+
+    class Meta:
+        model = User
+        fields = ('id', 'last_login', 'is_superuser', 'username', 'first_name', 'last_name',
+                  'email', 'is_staff', 'is_active', 'date_joined', 'groups', 'full_name')
+        extra_kwargs = {'username': {'validators': []}}
+
+
+class ProfileSerializer(DynamicSerializer):
+    """ Serialises user profiles and combines user data """
+    user = UserSerializer(required=True)
+    user_id = serializers.IntegerField(source='user.id')
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'full_name', 'user', 'user_id')
+
+    def update(self, instance, validated_data):
+        """ Update profile and user. Assumes there is a user for every profile """
+        user_data = validated_data.pop('user')
+        groups = self.initial_data.pop('groups', None)
+        super().update(instance, validated_data)
+        user = instance.user
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+        if groups is not None:
+            user.groups.clear()
+            for g in groups:
+                grp = Group.objects.get(pk=g)
+                user.groups.add(grp)
+        return instance
+
+    def create(self, validated_data):
+        """ Create profile and user. Assumes there is a user for every profile """
+        user_data = validated_data.pop('user')
+        user_data.pop('groups')
+        user = User.objects.create_user(**user_data)
+        if self.context.get('groups') is not None:
+            groups = self.context['groups']
+            for g in groups:
+                grp = Group.objects.get(pk=g)
+                user.groups.add(grp)
+        profile = Profile.objects.create(user=user, **validated_data)
+        return profile
+
+
+class AsyncTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskResult
+        fields = '__all__'
+
+
+class AttachmentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Attachment
+        fields = '__all__'
+
+
+class AttributeSerializer(serializers.ModelSerializer):
+    """ DT serializer for attribute data """
+
+    class Meta:
+        model = Attribute
+        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DATE_d', 'value_DATE_m', 'value_DATE_y')
+
+    def to_representation(self, instance):
+        label = instance.attribute_type.short_name
+        if instance.attribute_type.data_type == 'UUID':
+            data = json.loads(instance.value_STR)
+            object = eval('{}.objects.get(pk="{}")'.format(data['class'], data['id']))
+            ret = {label: {
+                'name': object.name,
+                'url': object.get_url(),
+                'value': instance.value_STR
+            }}
+        elif instance.attribute_type.data_type == 'DATE':
+            ret = {label: {
+                'name': str(instance),
+                'value': {
+                    'd': instance.value_DATE_d,
+                    'm': instance.value_DATE_m,
+                    'y': instance.value_DATE_y
+                }}}
+        else:
+            ret = {label: str(instance)}
+        return ret
+
+
+class AttributeTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Attribute_type
+        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'options_list', 'same_as')
+
+
 class CommentSerializer(serializers.ModelSerializer):
     creation_timestamp = serializers.DateTimeField(format='%-d-%b-%Y@%H:%M')
 
@@ -35,7 +146,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        # user = Profile.objects.get(user__username=instance.creation_username)
         ret['user'] = '<a href="/users/{}">{}</a>'.format(instance.creation_user.username, instance.creation_user.profile.full_name)
         if instance.creation_user.profile.profile_image is not None:
             ret['avatar'] = '<img src="{}" class="img_avatar" alt="avatar">'.format(instance.creation_user.profile.profile_image)
@@ -44,19 +154,53 @@ class CommentSerializer(serializers.ModelSerializer):
         return ret
 
 
+class ContentClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content_class
+        fields = ('id', 'name', 'short_name', 'description')
+
+
+class ContentTypeSerializer(DynamicSerializer):
+    cont_class = serializers.StringRelatedField(source='content_class', required=False)
+    attribute_types = AttributeTypeSerializer(many=True, required=False)
 
     class Meta:
+        model = Content_type
+        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types', 'has_pages', 'parents', 'has_inventory', 'r1_inheritance', 'r2_inheritance')
+        extra_kwargs = {'name': {'validators': []}}
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['field'] and ret['field_label']:
-            name = ret.pop('field_label')
-            ret['field'] = {'name': name, 'value': ret['field']}
+        if ret.get('content_class') is not None and ret.get('cont_class') is not None:
+            name = ret.pop('cont_class')
+            ret['content_class'] = {'name': name, 'value': ret['content_class']}
+        if ret.get('parents') is not None:
+            ctype_dict = {i.id: i.name for i in Content_type.objects.all()}
+            list_ids = ret['parents'].split(',') if ',' in ret['parents'] else [ret['parents']]
+            ret['parents'] = [{'id': int(i), 'name': ctype_dict[int(i)]} for i in list_ids]
         return ret
 
 
+class ContentXAttributeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='attribute_type.id')
+    name = serializers.CharField(max_length=255, source='attribute_type.name')
+    short_name = serializers.CharField(max_length=55, source='attribute_type.short_name')
+    description = serializers.CharField(source='attribute_type.description')
+    data_type = serializers.CharField(max_length=15, source='attribute_type.data_type')
+    source = serializers.CharField(max_length=255, source='attribute_type.source')
+    same_as = serializers.PrimaryKeyRelatedField(source='attribute_type.same_as', read_only=True)
+    options_list = serializers.CharField(max_length=255, source='attribute_type.options_list')
+    required = serializers.BooleanField()
 
     class Meta:
+        model = Content_attributes
+        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as', 'options_list', 'required')
+
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CountryReference
+        fields = ('id', 'name', 'alpha_2_code', 'alpha_3_code', 'num_code')
 
 
 class LanguageSerializer(serializers.ModelSerializer):
@@ -74,12 +218,6 @@ class LanguageSerializer(serializers.ModelSerializer):
         return ret
 
 
-class CountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CountryReference
-        fields = ('id', 'name', 'alpha_2_code', 'alpha_3_code', 'num_code')
-
-
 class LocaleSerializer(serializers.ModelSerializer):
     country_name = serializers.StringRelatedField(source='country')
 
@@ -92,6 +230,12 @@ class LocaleSerializer(serializers.ModelSerializer):
         country_name = ret.pop('country_name')
         ret['country'] = {'name': country_name, 'value': ret['country']}
         return ret
+
+
+class PageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Page
+        fields = ('id', 'name', 'dam_id', 'order')
 
 
 class RightsSerializer(serializers.ModelSerializer):
@@ -129,33 +273,54 @@ class RightsSerializer(serializers.ModelSerializer):
         return ret
 
 
-class AsyncTaskSerializer(serializers.ModelSerializer):
+class RSCollectionsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TaskResult
-        fields = '__all__'
-
-
-class SetSerializer(serializers.ModelSerializer):
-    owner_username = serializers.CharField(source='owner.username', read_only=True, required=False)
-    owner_full_name = serializers.CharField(source='owner.profile.full_name', read_only=True, required=False)
-    progress = serializers.ReadOnlyField(source='workset_progress', read_only=True, required=False)
-    set_type_name = serializers.CharField(source='get_set_type_display', required=False)
-    permissions_name = serializers.CharField(source='get_permissions_display', required=False)
-    member_count = serializers.ReadOnlyField(source='get_member_count', read_only=True, required=False)
-    dataset_usergroup_name = serializers.CharField(source='dataset_usergroup.name', read_only=True, required=False)
-
-    class Meta:
-        model = Set
-        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'permissions', 'permissions_name',
-                  'owner_username', 'owner_full_name', 'progress', 'endpoint', 'creation_timestamp', 'member_count', 'is_public',
-                  'has_landing', 'stat_title', 'stat_text', 'dataset_usergroup', 'dataset_usergroup_name')
-        extra_kwargs = {'set_type_label': {'required': False}, 'permissions_label': {'required': False}}
+        model = rs_collection
+        fields = ('ref', 'name', 'user', 'theme', 'theme2', 'theme3')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['set_type'] == 4:
+        t_fields = [ret.pop(i) for i in ['theme', 'theme2', 'theme3']]
+        ret['name'] = '≫'.join(t_fields)
+        return ret
+
+
+class RSImageSerializer(serializers.ModelSerializer):
+    collections = RSCollectionsSerializer(many=True, required=False)
+
+    class Meta:
+        model = rs_resource
+        fields = ('ref', 'has_image', 'creation_date', 'created_by', 'field12', 'field8',
+                  'field3', 'field51', 'field79', 'collections')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        try:
+            ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
+        except rs_user.DoesNotExist:
+            ret['created_by'] = ret['created_by']
+        ret['id'] = ret['ref']
+        ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
+        return ret
+
+
+class SetSerializer(DynamicSerializer):
+    owner = UserSerializer(fields=['id', 'full_name', 'username'])
+    set_type_name = serializers.CharField(source='get_set_type_display', required=False)
+    permissions_name = serializers.CharField(source='get_permissions_display', required=False)
+    dataset_usergroup = GroupSerializer()
+
+    class Meta:
+        model = Set
+        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'permissions', 'permissions_name', 'workset_progress', 'member_count', 'endpoint', 'creation_timestamp', 'is_public',
+                  'has_landing', 'stat_title', 'stat_text', 'dataset_usergroup', 'detail_string')
+        # extra_kwargs = {'set_type_label': {'required': False}, 'permissions_label': {'required': False}}
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if ret.get('workset_progress') is not None and ret['set_type'] == 4:
             ret['workset'] = '<a class="workset-title" href="/sets/go/{}">{}</a><div class="workset-description">{}</div><div class="workset-endpoint">Endpoint: {}</div>'.format(ret['id'], ret['name'], ret['description'], ret['endpoint'])
-            progress = ret['progress']
+            progress = ret['workset_progress']
             angle = round((progress * 360 / 100))
             if angle <= 180:
                 right_style = 'style="display:none;"'
@@ -167,16 +332,6 @@ class SetSerializer(serializers.ModelSerializer):
             progress_circle = '<div class="pie-wrapper"><span class="label">{}<span class="smaller">%</span></span><div class="pie" {}>'.format(round(progress), pie_style)
             progress_circle += '<div class="left-side half-circle" {}></div><div class="right-side half-circle" {}></div></div></div>'.format(left_style, right_style)
             ret['progress_circle'] = progress_circle
-        if ret['set_type'] == 3 and ret['dataset_usergroup']:
-            ret['dataset_usergroup'] = {
-                'id': ret.pop('dataset_usergroup'),
-                'name': ret.pop('dataset_usergroup_name'),
-            }
-        ret['owner'] = {
-            'id': ret.pop('owner'),
-            'username': ret.pop('owner_username'),
-            'user': ret.pop('owner_full_name'),
-        }
         ret['set_type'] = {
             'name': ret.pop('set_type_name'),
             'value': ret.pop('set_type')
@@ -186,6 +341,41 @@ class SetSerializer(serializers.ModelSerializer):
             'value': ret.pop('permissions')
         }
         return ret
+
+
+class SimpleAttributeSerializer(serializers.ModelSerializer):
+    """ Basic serializer for attribute data """
+    attribute_name = serializers.StringRelatedField(source='attribute_type')
+    attribute_type = serializers.PrimaryKeyRelatedField(read_only=True)
+    data_type = serializers.CharField(max_length=15, source='attribute_type.data_type', read_only=True)
+    options_list = serializers.CharField(max_length=15, source='attribute_type.options_list', read_only=True)
+
+    class Meta:
+        model = Attribute
+        fields = ('id', 'attribute_type', 'value_STR', 'value_TXT', 'attribute_name',
+                  'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'data_type', 'options_list')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.attribute_type.data_type != 'DATE':
+            ret.pop('value_DATE_d')
+            ret.pop('value_DATE_m')
+            ret.pop('value_DATE_y')
+        if instance.attribute_type.data_type != 'TXT':
+            ret.pop('value_TXT')
+        if instance.attribute_type.data_type != 'STR' and instance.attribute_type.data_type != 'INT' and instance.attribute_type.data_type != 'UUID':
+            ret.pop('value_STR')
+        return ret
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """ Serializer for tag data """
+    tag_type_name = serializers.ChoiceField(choices=Tag.TAG_TYPES, source='get_tag_type_display', required=False)
+
+    class Meta:
+        model = Tag
+        fields = ('tag_type', 'tag', 'tag_group', 'tag_type_name')
+        extra_kwargs = {'tag_type': {'required': False}}
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -262,87 +452,6 @@ class TaskListSerializer(serializers.ModelSerializer):
         return ret
 
 
-class PageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Page
-        fields = ('id', 'name', 'dam_id', 'order')
-
-
-class RSCollectionsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = rs_collection
-        fields = ('ref', 'name', 'user', 'theme', 'theme2', 'theme3')
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        t_fields = [ret.pop(i) for i in ['theme', 'theme2', 'theme3']]
-        ret['name'] = '≫'.join(t_fields)
-        return ret
-
-
-class RSImageSerializer(serializers.ModelSerializer):
-    collections = RSCollectionsSerializer(many=True, required=False)
-
-    class Meta:
-        model = rs_resource
-        fields = ('ref', 'has_image', 'creation_date', 'created_by', 'field12', 'field8',
-                  'field3', 'field51', 'field79', 'collections')
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        try:
-            ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
-        except rs_user.DoesNotExist:
-            ret['created_by'] = ret['created_by']
-        ret['id'] = ret['ref']
-        ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
-        return ret
-
-
-class TranscriptionSerializer(serializers.ModelSerializer):
-    """ Basic serializer for transcriptions """
-    author = serializers.CharField(max_length=255, required=False)
-
-    class Meta:
-        model = Transcription
-        fields = ('id', 'transcription', 'author', 'version')
-
-
-class SimpleAttributeSerializer(serializers.ModelSerializer):
-    """ Basic serializer for attribute data """
-    attribute_name = serializers.StringRelatedField(source='attribute_type')
-    attribute_type = serializers.PrimaryKeyRelatedField(read_only=True)
-    data_type = serializers.CharField(max_length=15, source='attribute_type.data_type', read_only=True)
-    options_list = serializers.CharField(max_length=15, source='attribute_type.options_list', read_only=True)
-
-    class Meta:
-        model = Attribute
-        fields = ('id', 'attribute_type', 'value_STR', 'value_TXT', 'attribute_name',
-                  'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'data_type', 'options_list')
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        if instance.attribute_type.data_type != 'DATE':
-            ret.pop('value_DATE_d')
-            ret.pop('value_DATE_m')
-            ret.pop('value_DATE_y')
-        if instance.attribute_type.data_type != 'TXT':
-            ret.pop('value_TXT')
-        if instance.attribute_type.data_type != 'STR' and instance.attribute_type.data_type != 'INT' and instance.attribute_type.data_type != 'UUID':
-            ret.pop('value_STR')
-        return ret
-
-
-class TagSerializer(serializers.ModelSerializer):
-    """ Serializer for tag data """
-    tag_type_name = serializers.ChoiceField(choices=Tag.TAG_TYPES, source='get_tag_type_display', required=False)
-
-    class Meta:
-        model = Tag
-        fields = ('tag_type', 'tag', 'tag_group', 'tag_type_name')
-        extra_kwargs = {'tag_type': {'required': False}}
-
-
 class TicketSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, required=False)
     creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
@@ -375,50 +484,74 @@ class TicketSerializer(serializers.ModelSerializer):
         return ret
 
 
-class AttributeSerializer(serializers.ModelSerializer):
-    """ DT serializer for attribute data """
+class TranscriptionSerializer(serializers.ModelSerializer):
+    """ Basic serializer for transcriptions """
+    author = serializers.CharField(max_length=255, required=False)
 
     class Meta:
-        model = Attribute
-        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT')
-
-    def to_representation(self, instance):
-        label = instance.attribute_type.short_name
-        if instance.attribute_type.data_type == 'UUID':
-            data = json.loads(instance.value_STR)
-            object = eval('{}.objects.get(pk="{}")'.format(data['class'], data['id']))
-            value = {
-                'name': object.name,
-                'url': object.get_url(),
-                'value': instance.value_STR
-            }
-        else:
-            value = str(instance)
-        ret = {label: value}
-        return ret
+        model = Transcription
+        fields = ('id', 'transcription', 'author', 'version')
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
     """Basic serializer for workflow control"""
-    last_username = serializers.CharField(source='last_user.username', read_only=True, required=False)
-    last_full_name = serializers.CharField(source='last_user.profile.full_name', read_only=True, required=False)
+    last_user = UserSerializer(fields=['full_name', 'username'])
 
     class Meta:
         model = Workflow
-        fields = ('status', 'help_flag', 'is_public', 'last_modified', 'last_username', 'last_full_name')
+        fields = ('help_flag', 'is_public', 'last_modified', 'last_user', 'wf_status', 'stage', 'status')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         tstamp = ret.pop('last_modified')
+        last_user = ret.pop('last_user')
         ret['activity'] = {
             # version of code that needs Python 3.7 to work
             # 'timestamp': round_timesince(datetime.datetime.fromisoformat(ret.pop('last_modified'))),
             # version for Python 3.6 (has to remove : from utcoffset because ISO standard is not properly implemented)
             'timestamp': round_timesince(datetime.datetime.strptime(tstamp[0:-3:]+tstamp[-2::], '%Y-%m-%dT%H:%M:%S.%f%z')),
-            'user': ret.pop('last_full_name'),
-            'username': ret.pop('last_username')
+            'user': last_user['full_name'],
+            'username': last_user['username']
         }
         return ret
+
+
+def translate_workflow_status(data):
+    stage_by_no = dict(Workflow.PROCESSING_STAGES)
+    stage_by_name = {label: number for number, label in stage_by_no.items()}
+    if type(data) is str:
+        str_elements = data.split(' ')
+        if len(str_elements) == 1:
+            return {'wf_status': 1}
+        elif len(str_elements) == 2:
+            return {'wf_status': 3, 'stage': stage_by_name[str_elements[1]] + 1}
+        elif len(str_elements) == 3:
+            return {'wf_status': 2, 'stage': stage_by_name[str_elements[0]]}
+        else:
+            raise ValueError('Incorrect data supplied: invalid text string.')
+    elif type(data) is dict:
+        if data.get('wf_status') is not None and data.get('stage') is not None:
+            if data['wf_status'] == 1:
+                return 'assessing'
+            elif data['wf_status'] == 2:
+                return '{} in progress'.format(stage_by_no[data['stage']])
+            elif data['wf_status'] == 3:
+                return 'awaiting {}'.format(stage_by_no[data['stage'] + 1])
+            else:
+                raise ValueError('Incorrect data supplied: invalid wf_status value.')
+        else:
+            raise ValueError('Incorrect data supplied: dict must contain keys wf_status and stage.')
+    else:
+        raise ValueError('Incorrect data supplied: must be string or dict.')
+
+
+class SourceSetSerializer(serializers.ModelSerializer):
+    name = serializers.ReadOnlyField(source='set_id.name', read_only=True, required=False)
+    detail_string = serializers.ReadOnlyField(source='set_id.detail_string', read_only=True, required=False)
+
+    class Meta:
+        model = Set_x_content
+        fields = ('set_id', 'name', 'detail_string')
 
 
 class SourceSerializer(DynamicSerializer):
