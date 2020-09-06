@@ -1,0 +1,9 @@
+{
+  "extend": "create",
+  "text": "<i class=\"fa fa-plus fa-fw dt_menu_icon\"></i> Create New",
+  "formTitle": "Create New",
+  "formButtons": [
+                    { "text": "Create", "className": "btn-success", "action": "function () { this.submit(); }" },
+                    { "text": "Cancel", "className": "btn-primary", "action": "function () { this.close(); }" }
+                ]
+}
