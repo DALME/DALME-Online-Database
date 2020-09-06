@@ -1,0 +1,14 @@
+{
+  "name": "is_superuser",
+  "label": "Superuser",
+  "type": "checkbox",
+  "options": {
+    "type": "list",
+    "list": [
+      {
+        "label": "User has complete access to all parts of the system.",
+        "value": "1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "groups[].id",
+  "label": "Groups",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select groups",
+    "preload": true,
+    "maxItems": null
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/groups/?format=select&q="
+  }
+}

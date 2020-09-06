@@ -1,0 +1,5 @@
+{
+    "name": "full_name",
+    "label": "Full name",
+    "type": "text"
+}

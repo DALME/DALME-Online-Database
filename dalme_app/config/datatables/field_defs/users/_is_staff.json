@@ -1,0 +1,14 @@
+{
+  "name": "is_staff",
+  "label": "Staff",
+  "type": "checkbox",
+  "options": {
+    "type": "list",
+    "list": [
+      {
+        "label": "User has access to Admin Area.",
+        "value": "1"
+      }
+    ]
+  }
+}
