@@ -1,27 +1,17 @@
-# import uuid
-import datetime
 import json
-import ast
-import operator
 import os
-from functools import reduce
-
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import PasswordResetForm
 from django.db.models import Q, Count
-from django.db.models.expressions import RawSQL
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.http import HttpRequest
 from django.conf import settings
 
 from django_celery_results.models import TaskResult
-# from passlib.apps import phpass_context
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
-# from rest_framework.permissions import DjangoModelPermissions, IsAuthenticatedOrReadOnly
 
 from dalme_app.serializers import (DTFieldsSerializer, DTListsSerializer, LanguageSerializer, TaskSerializer,
                                    TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
@@ -212,138 +202,30 @@ class DTViewSet(viewsets.ModelViewSet):
             status = 400
         return Response(result, status)
 
-    @action(detail=False, methods=['get'])
-    def get_set(self, request, *args, **kwargs):
-        data_dict = {}
-        if request.GET.get('data') is not None:
-            dt_data = json.loads(request.GET['data'])
-            if hasattr(self, 'search_dict'):
-                search_dict = self.search_dict
-            else:
-                search_dict = {}
-            queryset = self.get_queryset()
-            try:
-                if dt_data['search']['value']:
-                    queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-                if request.GET.get('filters') is not None:
-                    queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
-                queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-                query_list = list(queryset.values_list('id', flat=True))
-                data_dict['data'] = query_list
-            except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the set: ' + str(e)
-        else:
-            data_dict['error'] = 'There was no data in the request.'
-        return Response(data_dict)
-
     def list(self, request, *args, **kwargs):
-        data_dict = {}
+        full_queryset = self.get_queryset()
+        queryset = self.filter_queryset(full_queryset)
+
         if request.GET.get('data') is not None:
-            dt_data = json.loads(request.GET['data'])
-            if hasattr(self, 'search_dict'):
-                search_dict = self.search_dict
-            else:
-                search_dict = {}
-            queryset = self.get_queryset()
-            # try:
-            data_dict['draw'] = int(dt_data.get('draw'))  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-            if dt_data['search']['value']:
-                queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-            if request.GET.get('filters') is not None:
-                queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
-            queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-            rec_count = queryset.count()
-            data_dict['recordsTotal'] = rec_count
-            data_dict['recordsFiltered'] = rec_count
-            # filter the queryset for the current page
-            queryset = queryset[dt_data.get('start'):dt_data.get('start')+dt_data.get('length')]
+            dt_request = json.loads(request.GET['data'])
+            page = self.paginate_queryset(queryset, dt_request.get('start'), dt_request.get('length'))
+            serializer = self.get_serializer(page, many=True, context={'choice_keys': self.choice_keys})
+            result = {
+                'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                'recordsTotal': full_queryset.count(),
+                'recordsFiltered': queryset.count(),
+                'data': serializer.data
+                }
+        else:
             serializer = self.get_serializer(queryset, many=True, context={'choice_keys': self.choice_keys})
-            data = serializer.data
-            data_dict['data'] = data
-            # except Exception as e:
-            #     data_dict['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
-        else:
-            queryset = self.get_queryset()
-            try:
-                serializer = self.get_serializer(queryset, many=True, context={'choice_keys': self.choice_keys})
-                data = serializer.data
-                data_dict['data'] = data
-            except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to serialize the data: ' + str(e)
-        return Response(data_dict)
+            result = serializer.data
+        return Response(result)
 
-    def create(self, request, *args, **kwargs):
-        result = {}
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        serializer = self.get_serializer(data=data_dict)
-        if serializer.is_valid():
-            try:
-                serializer.save()
-                result['data'] = serializer.data
-                status = 201
-            except Exception as e:
-                result['error'] = 'The following error occured while trying to save the data: ' + str(e)
-                status = 400
-        else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
-
-    def partial_update(self, request, *args, **kwargs):
-        kwargs['partial'] = True
-        return self.update(request, *args, **kwargs)
-
-    def update(self, request, *args, **kwargs):
-        result = {}
-        partial = kwargs.pop('partial', False)
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
-        object = self.get_object()
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        serializer = self.get_serializer(object, data=data_dict, partial=partial)
-        if serializer.is_valid():
-            serializer.save()
-            result['data'] = serializer.data
-            status = 201
-        else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
-
-    def destroy(self, request, *args, **kwargs):
-        result = {}
-        status = 0
-        # object = self.get_object()
-        if kwargs.get('pk') is not None:
-            if ',' in str(kwargs.get('pk')):
-                object_ids = kwargs.get('pk').split(',')
-            else:
-                object_ids = [kwargs.get('pk')]
-            for obj in object_ids:
-                object = get_object_or_404(self.queryset, pk=obj)
-                self.check_object_permissions(request, object)
-                try:
-                    object.delete()
-                    result['result'] = 'success'
-                    status = 201
-                except Exception as e:
-                    result['result'] = 'error'
-                    result['error'] = 'The following error occured while trying to delete the data: ' + str(e)
-                    status = 400
-        return Response(result, status)
-
-    def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('filter') is not None:
-            filter = self.request.GET['filter'].split(',')
-            filter_q = Q(**{filter[0]: filter[1]})
-            queryset = self.queryset.filter(filter_q).distinct()
-        elif self.request.GET.get('workset') is not None:
-            ws_id = self.request.GET['workset']
-            queryset = self.queryset.filter(sets__set_id=ws_id)
-        else:
-            queryset = self.queryset
+    def paginate_queryset(self, queryset, start, length):
+        if start is not None and length is not None:
+            page = queryset[start:start+length]
+            if page is not None:
+                queryset = page
         return queryset
 
     def get_renderer_context(self):
@@ -354,18 +236,6 @@ class DTViewSet(viewsets.ModelViewSet):
             'request': getattr(self, 'request', None),
             'choice_keys': self.choice_keys
         }
-
-    def filter_on_search(self, *args, **kwargs):
-        return filter_on_search(*args, **kwargs)
-
-    def filter_on_filters(self, *args, **kwargs):
-        return filter_on_filters(*args, **kwargs)
-
-    def filter_on_workflow(self, *args, **kwargs):
-        return filter_on_workflow(*args, **kwargs)
-
-    def get_ordered_queryset(self, *args, **kwargs):
-        return get_ordered_queryset(*args, **kwargs)
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
@@ -1705,175 +1575,3 @@ class Sets(DTViewSet):
         return object
 
 
-""" GENERALIZED FUNCTIONS """
-
-
-def get_dte_data(request):
-    dt_request = json.loads(request.data['data'])
-    dt_request.pop('action', None)
-    rows = dt_request['data']
-    data_list = []
-    for k, v in rows.items():
-        row_values = {}
-        for field, value in v.items():
-            if 'many-count' not in field:
-                if type(value) is list:
-                    if len(value) == 1:
-                        value = normalize_value(value[0])
-                    elif len(value) == 0:
-                        value = 0
-                    else:
-                        value = [normalize_value(i) for i in value]
-                elif type(value) is dict:
-                    # if len(value) == 1 and value.get('value') is not None:
-                    if len(value) == 1:
-                        # value = normalize_value(value['value'])
-                        value = normalize_value(list(value.values())[0])
-                    else:
-                        value = {key: normalize_value(val) for key, val in value.items() if 'many-count' not in key}
-                else:
-                    value = normalize_value(value)
-                row_values[field] = value
-        data_list.append([k, row_values])
-    return data_list
-
-
-def normalize_value(value):
-    if type(value) is list:
-        if len(value) == 1:
-            n_value = normalize_value(value[0])
-        elif len(value) == 0:
-            n_value = 0
-        else:
-            n_value = [normalize_value(i) for i in value]
-    elif type(value) is dict:
-        n_value = {key: normalize_value(val) for key, val in value.items() if 'many-count' not in key}
-    elif type(value) is str and value.isdigit():
-        n_value = int(value)
-    else:
-        if value != '' and value != 'none' and value != 'null' and value != 'Null':
-            n_value = value
-        else:
-            n_value = None
-    return n_value
-
-
-def filter_on_search(*args, **kwargs):
-    dt_data = kwargs['dt_data']
-    search_string = dt_data['search']['value']
-    queryset = kwargs['queryset']
-    fields = get_searchable_fields(**kwargs)
-    search_words = search_string.split()
-    search_q = Q()
-    for word in search_words:
-        for f in fields:
-            search_word = Q(**{'%s__icontains' % f: word})
-            search_q |= search_word
-    queryset = queryset.filter(search_q).distinct()
-    return queryset
-
-
-def filter_on_filters(*args, **kwargs):
-    queryset = kwargs['queryset']
-    filters = kwargs['filters']
-    if 'and_list' in filters:
-        queryset = queryset.filter(reduce(operator.and_, (Q(**q) for q in filters['and_list']))).distinct()
-    if 'or_list' in filters:
-        queryset = queryset.filter(reduce(operator.or_, (Q(**q) for q in filters['or_list']))).distinct()
-    return queryset
-
-
-def filter_on_workflow(*args, **kwargs):
-    queryset = kwargs['queryset']
-    wf_query = kwargs['wf_query']
-    query_list = wf_query.split('|')
-    if query_list[0] == 'special':
-        status_list = [1, 2, 3]
-        q_dict = {'workflow__wf_status__in': status_list}
-    elif query_list[0] == 'timedelta':
-        if query_list[1] != 'older':
-            timedelta_dict = {'days': int(query_list[1])}
-            cut_off = timezone.now().date() - datetime.timedelta(**timedelta_dict)
-            q_dict = {'workflow__last_modified__gte': cut_off}
-        else:
-            cut_off = timezone.now().date() - datetime.timedelta(days=365)
-            q_dict = {'workflow__last_modified__lte': cut_off}
-    elif query_list[0] == 'status':
-        stage_dict = dict(Workflow.PROCESSING_STAGES)
-        if query_list[1] == 'awaiting':
-            q_dict = {
-                'workflow__stage': int(query_list[2]) - 1,
-                'workflow__' + stage_dict[int(query_list[2]) - 1] + '_done': True,
-            }
-        elif query_list[1] == 'in_progress':
-            q_dict = {
-                'workflow__stage': int(query_list[2]),
-                'workflow__' + stage_dict[int(query_list[2])] + '_done': False,
-            }
-        elif query_list[1] == 'done':
-            q_dict = {
-                'workflow__' + stage_dict[int(query_list[2])] + '_done': True,
-            }
-        elif query_list[1] == 'not_done':
-            q_dict = {
-                'workflow__' + stage_dict[int(query_list[2])] + '_done': False,
-            }
-    else:
-        if query_list[1].isdigit():
-            value = int(query_list[1])
-        else:
-            value = query_list[1]
-        q_dict = {'workflow__' + query_list[0]: value}
-    return queryset.filter(Q(**q_dict))
-
-
-def get_searchable_fields(**kwargs):
-    dt_data = kwargs['dt_data']
-    fields = []
-    columns = dt_data['columns']
-    for c in columns:
-        if c['searchable'] is True:
-            fields.append(get_clean_field_name(c['data'], **kwargs))
-    return fields
-
-
-def get_ordered_queryset(*args, **kwargs):
-    queryset = kwargs['queryset']
-    dt_data = kwargs['dt_data']
-    order_column = dt_data['order'][0]['column']
-    order_column_name = get_clean_field_name(dt_data['columns'][order_column]['data'], **kwargs)
-    order_dir = dt_data['order'][0]['dir']
-    if order_dir == 'desc':
-        order = '-'+order_column_name
-    else:
-        order = order_column_name
-    queryset = queryset.order_by(order)
-    return queryset
-
-
-def get_clean_field_name(field, **kwargs):
-    if 'search_dict' in kwargs and field in kwargs['search_dict']:
-        field = kwargs['search_dict'][field]
-    elif '.' in field:
-        field_list = field.split('.')
-        field = '__'.join(field_list)
-    return field
-
-
-def get_error_array(errors, display_fields=[]):
-    fieldErrors = []
-    for k, v in errors.items():
-        if type(v) is dict:
-            for k2, v2 in v.items():
-                field = k+'.'+k2
-                try:
-                    fieldErrors.append({'name': field, 'status': str(v2[0])})
-                except KeyError:
-                    fieldErrors.append({'name': field, 'status': errors})
-        else:
-            if k in display_fields:
-                field = k+'.value'
-            else:
-                field = k
-            fieldErrors.append({'name': field, 'status': str(v[0])})
-    return fieldErrors

@@ -1,11 +1,10 @@
 from django.contrib.auth.models import User, Group
-from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes,
-                              DT_list, DT_fields, Page, Source, TaskList, Task,
+from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes, Set_x_content, Page, Source, TaskList, Task,
                               rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
                               CountryReference, LocaleReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
-from dalme_app.utils import round_timesince, DALMEDateRange
+from dalme_app.utils import round_timesince
 import textwrap
 import datetime
 import json
@@ -13,16 +12,18 @@ import json
 
 class DynamicSerializer(serializers.ModelSerializer):
     """ A serializer that takes an additional `fields` argument that
-    indicates which fields should be removed. """
+    indicates which fields should be included. """
 
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
-        rem_fields = kwargs.pop('fields', None)
+        fields = kwargs.pop('fields', None)
         # Instantiate the superclass normally
         super(DynamicSerializer, self).__init__(*args, **kwargs)
-        if rem_fields is not None:
-            for field_name in rem_fields:
-                self.fields.pop(field_name)
+        if fields is not None:
+            set_fields = dict(self.fields)
+            for k, v in set_fields.items():
+                if k not in fields:
+                    self.fields.pop(k)
 
 
 class CommentSerializer(serializers.ModelSerializer):
