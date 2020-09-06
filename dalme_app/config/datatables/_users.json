@@ -1,0 +1,96 @@
+{
+  "config": {
+    "helpers": [
+      "user_forms"
+    ],
+    "template_field_container": "#form-field-container",
+    "endpoint": "users",
+    "globals": {
+      "password_state": "divs",
+      "on_open_function": "change_form",
+      "on_close_function": "change_form",
+      "messages_list": {
+        "create_success": "The user was created succesfully.",
+        "edit_success": "The user was updated succesfully."
+      },
+      "attribute_concordance": {
+        "first_name": "first_name",
+        "last_name": "last_name",
+        "full_name": "full_name",
+        "email": "email",
+        "username": "username",
+        "password": "password",
+        "is_active": "is_active",
+        "is_staff": "is_staff",
+        "is_superuser": "is_superuser",
+        "groups.id": "groups"
+      }
+    }
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "first_name",
+      "last_name",
+      "full_name",
+      "email",
+      "username",
+      "last_login",
+      "is_active",
+      "is_staff",
+      "is_superuser",
+      "date_joined",
+      "groups"
+    ],
+    "options": {
+      "select": {
+        "style": "single"
+      },
+      "ajax": {
+        "url": "/api/users/?format=json"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "first_name",
+      "last_name",
+      "full_name",
+      "email",
+      "username",
+      "password",
+      "is_active",
+      "is_staff",
+      "is_superuser",
+      "groups"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/users/"
+        },
+        "edit": {
+          "url": "/api/users/_id_/"
+        },
+        "remove": {
+          "url": "/api/users/_id_/"
+        }
+      },
+      "template": "#generic-form-template"
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_user"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_user"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_user"
+      }
+    ]
+  }
+}
