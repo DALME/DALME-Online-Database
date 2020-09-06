@@ -1,0 +1,8 @@
+{
+    "title": "Last login",
+    "data": "last_login",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": false
+}

@@ -1,0 +1,8 @@
+{
+    "title": "Joined",
+    "data": "date_joined",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": false
+}

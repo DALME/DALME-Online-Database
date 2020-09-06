@@ -1,0 +1,8 @@
+{
+    "title": "Full name",
+    "data": "full_name",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true
+}

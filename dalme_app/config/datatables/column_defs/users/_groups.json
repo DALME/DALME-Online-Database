@@ -1,0 +1,10 @@
+{
+    "title": "Groups",
+    "data": "groups",
+    "editField": "groups[].id",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": false,
+    "searchable": true,
+    "render": "function ( data, type, row, meta ) { return data.map(a => a.name); }"
+}
