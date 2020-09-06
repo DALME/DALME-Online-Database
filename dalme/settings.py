@@ -223,6 +223,11 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
         'dalme_app.utils.DRFSelectRenderer',
         'dalme_app.utils.DRFDTEJSONRenderer'
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'dalme_app.utils.DRFDTEParser',
+    ],
 }
 
 LANGUAGES = [

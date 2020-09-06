@@ -1,15 +1,16 @@
 import json
 import os
+import re
+from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib import messages
 from async_messages import get_messages
-from rest_framework import permissions, renderers
+from rest_framework import permissions, renderers, parsers
 from rest_framework.compat import INDENT_SEPARATORS, LONG_SEPARATORS, SHORT_SEPARATORS
 from djangosaml2idp.processors import BaseProcessor
 from typing import Dict
 from dalme_app.models import Task
 from django.template import defaultfilters
-import re
 
 
 class DRFSelectRenderer(renderers.JSONRenderer):
@@ -68,6 +69,49 @@ class DRFDTEJSONRenderer(renderers.JSONRenderer):
 
         ret = ret.replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
         return ret.encode()
+
+
+class DRFDTEParser(parsers.BaseParser):
+    """ Django Rest Framework parser that translates Datatables Editor format """
+
+    media_type = 'application/json-dte'
+    renderer_class = DRFDTEJSONRenderer
+
+    def parse(self, stream, media_type=None, parser_context=None):
+        parser_context = parser_context or {}
+        encoding = parser_context.get('encoding', settings.DEFAULT_CHARSET)
+        parsed_data = QueryDict(stream.read(), encoding=encoding)
+        return self.convert_dte_data(parsed_data)
+
+    def convert_dte_data(self, parsed_data):
+        (id, dte_data), = json.loads(parsed_data['data'])['data'].items()
+        data = {}
+        for field, value in dte_data.items():
+            if self.clean_entry(value) is not None:
+                data[field] = self.clean_entry(value)
+        return data
+
+    def clean_entry(self, value):
+        if type(value) is list:
+            if len(value) == 0:
+                return 0
+            elif len(value) == 1 and value[0].isdigit():
+                return int(value[0])
+            else:
+                return [self.clean_entry(i) for i in value if self.clean_entry(i) is not None]
+        elif type(value) is dict:
+            if len(value) == 1 and value.get('value') is not None:
+                return self.clean_entry(value['value'])
+            else:
+                value_dict = {k: self.clean_entry(v) for k, v in value.items() if self.clean_entry(v) is not None}
+                return value_dict if len(value_dict) > 0 else None
+        elif type(value) is str:
+            if value.isdigit():
+                return int(value)
+            elif value in ['', 'none', 'null', 'Null']:
+                return None
+            else:
+                return value
 class AsyncMiddleware(MiddlewareMixin):
     """
     Fix for django-async-messages to work with newer Django versions.

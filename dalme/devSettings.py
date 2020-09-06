@@ -300,6 +300,10 @@ REST_FRAMEWORK = {
         'dalme_app.utils.DRFSelectRenderer',
         'dalme_app.utils.DRFDTEJSONRenderer'
     ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'dalme_app.utils.DRFDTEParser',
+    ],
 }
 
 # Internationalization
