@@ -1,0 +1,9 @@
+{
+    "title": "Country",
+    "data": "attributes.country",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap"
+}

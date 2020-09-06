@@ -1,0 +1,11 @@
+{
+    "title": "Help",
+    "data": "workflow.help_flag",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": false,
+    "searchable": false,
+    "render": "function ( data, type, row, meta ) {return (typeof data == \"undefined\") ? \"\" : data == true ? '<i class=\"fa fa-flag dt_checkbox_false\"></i>' : '';}",
+    "width": "19px",
+    "className": "td-center"
+}

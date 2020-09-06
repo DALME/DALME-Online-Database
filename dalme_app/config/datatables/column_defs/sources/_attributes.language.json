@@ -1,0 +1,9 @@
+{
+    "title": "Language",
+    "data": "attributes.language",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap"
+}

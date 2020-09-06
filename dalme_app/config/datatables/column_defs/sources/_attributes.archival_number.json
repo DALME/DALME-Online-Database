@@ -1,0 +1,8 @@
+{
+    "title": "Archival Number",
+    "data": "attributes.archival_number",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": true
+}

@@ -1,0 +1,9 @@
+{
+    "title": "Language (GC)",
+    "data": "attributes.language_gc",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap"
+}

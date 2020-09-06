@@ -1,0 +1,10 @@
+{
+    "title": "End date",
+    "data": "attributes.end_date.name",
+    "editField": "attributes.end_date.value",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": false,
+    "className": "nowrap"
+}

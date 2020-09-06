@@ -1,0 +1,9 @@
+{
+    "title": "Locale",
+    "data": "attributes.locale",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap"
+}

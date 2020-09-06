@@ -1,0 +1,9 @@
+{
+    "title": "Activity",
+    "data": "workflow.activity",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": false,
+    "searchable": false,
+    "render": "function ( data, type, row, meta ) {return (typeof data == \"undefined\") ? \"\" : '<a href=\"/users/'+data.username+'\">'+data.user+'</a>, '+data.timestamp;}"
+}

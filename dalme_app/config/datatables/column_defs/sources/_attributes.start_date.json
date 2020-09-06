@@ -1,0 +1,10 @@
+{
+    "title": "Start date",
+    "data": "attributes.start_date.name",
+    "editField": "attributes.start_date.value",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": false,
+    "className": "nowrap"
+}

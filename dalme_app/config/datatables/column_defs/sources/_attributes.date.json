@@ -1,0 +1,10 @@
+{
+    "title": "Date",
+    "data": "attributes.date.name",
+    "editField": "attributes.date.value",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": false,
+    "searchable": false,
+    "className": "nowrap"
+}
