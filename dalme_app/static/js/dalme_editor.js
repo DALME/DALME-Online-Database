@@ -130,7 +130,7 @@ function changeEditorMode() {
       xmleditor = ace.edit("editor");
       setEditorOptions();
       xmleditor.session.setValue(tr_text);
-      xmleditor.session.on("change", debounce(saveEditor, 1000));
+      xmleditor.session.on("change", _.debounce(saveEditor, 1000));
       xmleditor.session.on("change", updateEditorToolbar);
       setEditorToolbar();
       setTagMenu('on');
