@@ -959,36 +959,7 @@ table.dataTable tbody tr.selected a, table.dataTable tbody td.selected a {
 
 /* datatables Editor form classes */
 
-.modal-content {
-  border-radius: 8px;
-}
 
-.modal-header {
-  padding: 8px 16px;
-  border-bottom: 1px solid #a5a5a5;
-  background-color: #2f333c;
-  color: #ffffff;
-  background-image: linear-gradient(#11587c 10%, #2e4558);
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
-  font-weight: 600;
-}
-
-.modal-header .close {
-  font-size: 21px;
-  color: #fff;
-  padding: 0;
-  margin: 0;
-  line-height: .8;
-}
-
-.modal-footer {
-  border-top: 1px solid #a5a5a5;
-  border-bottom-right-radius: 8px;
-  border-bottom-left-radius: 8px;
-  background-color: #e8e9ec;
-  height: 41px;
-}
 
 h5.modal-title {
   font-size: 16px;
@@ -1002,7 +973,500 @@ h5.modal-title {
   color: #c5c6cd;
 }
 
+/*   *********** */
+
 .DTE {
+  font-size: 14px;
+  display: flex;
+  flex-direction: row;
+}
+
+.DTED .modal-dialog {
+  display: flex;
+  max-width: 95vw !important;
+}
+
+.DTED .modal-body {
+  max-height: 95vh;
+  overflow: scroll;
+  padding: 0;
+
+}
+
+.modal-content {
+  border-radius: 8px;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #505050;
+}
+
+.DTE_Header_Content .form_title_text {
+  transform: rotate(-90deg);
+  transform-origin: 0 100%;
+  white-space: nowrap;
+  position: absolute;
+  height: 65px;
+  left: 75px;
+  bottom: 20px;
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.modal-header {
+  padding: 0;
+  border: 0;
+  border-right: 1px solid #a5a5a5;
+  border-bottom: none;
+  background-color: #2f333c;
+  color: #ffffff;
+  background-image: linear-gradient(#11587c 10%, #2e4558);
+  border-top-left-radius: 7px;
+  border-bottom-left-radius: 7px;
+  border-top-right-radius: 0;
+  width: 45px;
+  flex: 0 0 auto;
+}
+
+.modal-header .close {
+  font-size: 21px;
+  color: #fff;
+  padding: 0;
+  line-height: .8;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7px;
+}
+
+.modal-header .btn {
+  width: 45px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-top: 29px;
+  border-right: none;
+  border-left: none;
+  border-top: 1px solid #a5a5a5;
+  border-bottom: 1px solid #a5a5a5;
+  border-radius: 0;
+  display: block;
+  background-color: white;
+}
+
+.modal-header .dropright .dropdown-toggle::after {
+  font-size: 15px;
+  margin: 0;
+}
+
+#form-field-container {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1rem;
+  padding-right: 1.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: .75rem;
+  max-width: 500px;
+}
+
+.selectize-control {
+    height: 33px;
+    width: 100%;
+}
+
+.DTE .selectize-input>input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.DTE_Field {
+  display: flex;
+  flex-direction: column;
+}
+
+.DTE_Field label {
+  display: flex;
+}
+
+.DTE .col-form-label {
+  height: 18px;
+  font-size: 11px;
+  padding: 0;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-left: 1px;
+  color: #3c6e94;
+  padding-right: .75rem;
+}
+
+.DTE_Field .col-lg-12 {
+  padding-left: 0;
+}
+
+.DTE_Field_InputControl > div {
+  display: flex;
+}
+
+.DTE_Field_InputControl label {
+  font-size: 13px;
+  color: #8b949b;
+  padding-bottom: 1px;
+}
+
+.DTE_Field_InputControl textarea {
+  min-height: 100px;
+}
+
+.DTE .form-control {
+  font-size: 14px;
+  height: auto;
+  padding: 5px 8px;
+  border: 1px solid #a5a5a5;
+}
+
+.DTE .form-group {
+  margin-bottom: 10px;
+  padding-left: 20px;
+}
+
+.DTE .form-text {
+  font-size: 13px;
+  margin-top: 0;
+  margin-left: 2px;
+  text-align: right;
+}
+
+.DTE .DTE_Label_Info {
+  margin-left: auto;
+  padding-left: 20px;
+  font-size: 12px;
+  color: #afafaf !important;
+  font-weight: 400;
+  text-transform: none;
+  text-align: right;
+  overflow: hidden;
+}
+
+.modal-footer {
+  flex-direction: column;
+  border-left: 1px solid #a5a5a5;
+  border-bottom-right-radius: 7px;
+  border-top-right-radius: 7px;
+  background-color: #e8e9ec;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 28px;
+}
+
+.DTE_Footer_Content {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100%;
+  margin-bottom: auto;
+  margin-top: 0;
+}
+
+.modal-pane-button {
+  border-top: 1px solid #a5a5a5;
+  border-bottom: 1px solid #a5a5a5;
+  border-radius: 0;
+  width: 100%;
+  background-color: white;
+  margin-top: -1px;
+  display: flex;
+  align-items: center;
+}
+
+.modal-pane-button:hover {
+  color: #fff;
+  background-color: #215986;
+}
+
+.modal-pane-button.active {
+  background-color: #11587c;
+  color: #b7b7b7;
+}
+
+.modal-pane-button.active .badge {
+  background-color: #7b7b7b;
+  color: #dcdcdc;
+}
+
+.modal-pane-button:hover .badge {
+  color: #000;
+  background-color: #fff;
+}
+
+.modal-pane-button .badge {
+  margin-left: 6px;
+}
+
+.modal-pane-button .icon {
+  margin-left: 6px;
+  font-size: 14px;
+}
+
+.modal-pane-button .fa-caret {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.modal-pane-button .icon-container {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+}
+
+.DTE_Form_Buttons {
+  align-self: flex-end;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.remove-action-buttons {
+  flex-direction: row;
+  padding-bottom: 1rem;
+}
+
+.remove-action-buttons .btn-danger {
+  margin-left: auto !important;
+  margin-right: 5px;
+}
+
+.remove-action-info {
+  padding: 2rem;
+  font-size: 16px;
+}
+
+.DTE_Form_Buttons .btn {
+  margin-left: 0;
+  margin-top: 5px;
+}
+
+.DTE .btn {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.DTE_Form_Error {
+  float: none !important;
+  padding: .5rem;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: center;
+  background-color: #fbd7d7;
+  border-top: 1px solid #e27d7d;
+}
+
+.sources-formset {
+  border-left: 1px solid #a5a5a5;
+  min-width: 270px;
+  background-color: #f2f8fd;
+}
+
+.sources-formset .add-record {
+  height: 42px;
+  border: 2px dotted #8cb7ca;
+  margin: 2px;
+  color: #adc9d4;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.sources-formset .add-record > div {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sources-formset .add-record:hover {
+  color: #90b2bf;
+  border-color: #8cb7ca;
+  border-style: solid;
+}
+
+.sources-formset label {
+  font-size: 13px;
+  text-align: right;
+  padding-left: 3px;
+  padding-right: 5px;
+  height: 32px;
+}
+
+.sources-formset .formset-header {
+  background-color: #e8e9ec;
+  color: inherit;
+  border-bottom: 1px solid #a5a5a5;
+}
+
+.sources-formset .formset-header .editor-btn:hover {
+  color: #fff;
+  background-color: #215986;
+}
+
+.DTE_Field_Type_checkbox {
+  margin-bottom: 6px !important;
+}
+
+.DTE_Field_Type_checkbox div[data-dte-e="input"] {
+  padding-left: 1px;
+}
+
+div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
+  line-height: 1.2;
+  margin-bottom: 0;
+  display: inline-block;
+  vertical-align: text-top;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-grow: 0;
+  flex-shrink: 1;
+}
+
+div.DTE_Field_Type_textarea textarea {
+    min-height: 120px;
+}
+
+.formset_flatentry {
+  border-top: 1px solid #a5a5a5;
+  display: flex;
+  background-color: #fff;
+}
+
+.formset_flatentry:first-child {
+  border-top: none;
+}
+
+.formset_flatentry:last-child {
+  border-bottom: 1px solid #a5a5a5;
+}
+
+.formset_flatentry .selectize-input {
+  border-radius: 0;
+  border: none;
+  min-height: 53px;
+  display: flex;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.formset_flatentry .DTE_Field_Type_selectize {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.formset_flatentry .selectize-control {
+  height: 53px;
+  width: 100%;
+}
+
+.formset_flatentry_title {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.formset_flatentry_detail {
+  font-size: 12px;
+  color: #969595;
+}
+
+.formset_flatentry_delete {
+  border-left: 1px solid #a5a5a5;
+  padding-left: 7px;
+  padding-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.formset_flatentry_delete:hover {
+  color: #fff;
+  background-color: #215986;
+}
+
+.sources-formset .formset-table {
+  display: table;
+  border-top: none;
+  width: 100%;
+  font-size: 13px;
+  background-color: #fff;
+}
+
+.sources-formset .formset-thead {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.sources-formset .formset-thead .formset-td {
+  height: 22px;
+  padding: 2px 10px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.sources-formset .pages-table-body {
+  display: contents;
+}
+
+.sources-formset .formset-td {
+  display: table-cell;
+  border-bottom: 1px solid #a5a5a5;
+  border-right: 1px solid #a5a5a5;
+}
+
+.sources-formset .formset-td:first-child {
+  width: 45px;
+}
+
+.sources-formset .formset-td:nth-child(3) {
+  width: 100px
+}
+
+.sources-formset .formset-td:last-child {
+  width: 32px;
+  border-right: none;
+  text-align: center;
+}
+
+.sources-formset .formset-td:last-child:hover {
+  color: #fff;
+  background-color: #215986;
+}
+
+.sources-formset .formset-table .form-group {
+  margin-bottom: 0;
+  padding-left: 0;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.sources-formset .formset-table .DTE_Field input {
+  border: none !important;
+  border-radius: 0;
+  padding-left: 10px;
+}
+
+.DTE .formset-date-container .selectize-control {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.DTE .formset-date-container input {
+  width: 50%;
+}
+/* ************ */
+
+.fa-caret {
+  margin-right: .6rem;
   font-size: 14px;
 }
 
@@ -1014,37 +1478,18 @@ h5.modal-title {
   margin-left: 0;
 }
 
-.DTE .form-group {
-  margin-bottom: 4px;
-}
-
-.DTE .form-control {
-  font-size: 14px;
-  height: auto;
-  padding: 5px 8px;
-  border: 1px solid #a5a5a5;
-}
 
 .DTE .form-control:focus {
   box-shadow: 0px 0px 1px 2px #0361aa inset !important;
 }
 
-.DTE .col-form-label {
-  height: 32px;
-  text-align: right;
-  font-size: 14px;
-  padding-right: 0;
-}
+
 
 .DTE .error {
   width: auto;
 }
 
-.DTE .form-text {
-  font-size: 13px;
-  margin-top: 3px;
-  margin-left: 5px;
-}
+
 
 .DTE .editor_upload button {
   margin-left: 0;
@@ -1060,45 +1505,13 @@ h5.modal-title {
   padding-top: 15px;
 }
 
-.DTE_Field_InputControl label {
-  font-size: 13px;
-  color: #8b949b;
-  padding-bottom: 1px;
-}
 
-.DTE_Field_InputControl textarea {
-  min-height: 100px;
-}
 
-.DTE_Field_Type_checkbox div[data-dte-e="input"] {
-  padding-top: 9px;
-}
 
-.DTE .btn {
-  font-size: 13px;
-  line-height: 1.2;
-  margin-left: 10px;
-}
-
-div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
-  line-height: 1;
-  margin-bottom: 0;
-}
-
-div.DTE_Field_Type_textarea textarea {
-    min-height: 120px;
-}
 
 /* special form classes  */
 
-.DTED .modal-dialog {
-  max-width: 700px !important;
-}
 
-.DTED .modal-body {
-  max-height: 85vh;
-  overflow: scroll;
-}
 
 .formset-none {
   border-top: 1px solid #a5a5a5;
@@ -1133,10 +1546,6 @@ div.DTE_Field_Type_textarea textarea {
   line-height: 1.5;
 }
 
-.selectize-input input:focus {
-  box-shadow: none !important;
-}
-
 .selectize-control.plugin-remove_button [data-value] .remove {
   padding: 5px 0 0 0;
 }
@@ -1156,17 +1565,7 @@ div.DTE_Field_Type_textarea textarea {
   padding: 4px 8px;
 }
 
-#page-formset, #attribute-formset {
-  margin-top: 15px;
-}
 
-#page-formset label {
-  font-size: 13px;
-  text-align: right;
-  padding-left: 3px;
-  padding-right: 5px;
-  height: 32px;
-}
 
 .remove_icon {
   align-self: flex-start;

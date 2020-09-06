@@ -1,5 +1,5 @@
 /* custom JavaScript functions used by dalme.app */
-function dalme_startup() {
+function dalme_startup(helpers) {
   $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
   toastr.options = {
       "closeButton": false,
@@ -17,6 +17,10 @@ function dalme_startup() {
       "hideEasing": "linear",
       "showMethod": "fadeIn",
       "hideMethod": "fadeOut"
+  };
+  if (typeof helpers != 'undefined' && helpers != 'None') {
+    helpers = JSON.parse(helpers.replace(/'/g, '"'));
+    for (let i = 0, len = helpers.length; i < len; ++i) { eval(helpers[i]+'_load()'); };
   };
 }
 
@@ -75,10 +79,6 @@ function get_cookie(name) {
         }
     }
     return cookieValue;
-}
-
-function fix_dt_search() {
-  $('.dataTables_filter label').contents().filter(function () { return this.nodeType == 3; }).remove();
 }
 
 function create_task_list() {
@@ -351,17 +351,22 @@ function full_screen_mode(action) {
 }
 
 function remove_param(key, sourceURL) {
+    if (!Array.isArray(key)) {
+      key = [key]
+    }
     var rtn = sourceURL.split("?")[0],
         param,
         params_arr = [],
         queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
     if (queryString !== "") {
         params_arr = queryString.split("&");
-        for (let i = params_arr.length - 1; i >= 0; i -= 1) {
-            param = params_arr[i].split("=")[0];
-            if (param === key) {
-                params_arr.splice(i, 1);
-            }
+        for (let i = 0, len = key.length; i < len; ++i) {
+          for (let j = params_arr.length - 1; j >= 0; j -= 1) {
+              param = params_arr[j].split("=")[0];
+              if (param === key[i]) {
+                  params_arr.splice(j, 1);
+              }
+          }
         }
         rtn = rtn + "?" + params_arr.join("&");
     }
