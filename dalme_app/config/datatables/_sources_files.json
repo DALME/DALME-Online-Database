@@ -1,0 +1,154 @@
+{
+  "config": {
+    "helpers": [
+      "source_forms"
+    ],
+    "template_field_container": "#form-field-container",
+    "endpoint": "sources",
+    "globals": {
+      "source_type": "files",
+      "on_open_function": "source_form_setup",
+      "on_close_function": "source_form_restore",
+      "messages_list": {
+        "create_success": "The source was created succesfully.",
+        "edit_success": "The source was updated succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "short_name": "short_name",
+        "parent": "parent.id",
+        "primary_dataset": "primary_dataset.value",
+        "owner": "owner.id",
+        "archival_series": "attributes.archival_series",
+        "archival_number": "attributes.archival_number",
+        "locale": "attributes.locale",
+        "start_date": "attributes.start_date.value",
+        "end_date": "attributes.end_date.value",
+        "authority": "attributes.authority",
+        "format": "attributes.format"
+      },
+      "required_list": [
+        "name",
+        "short_name",
+        "parent.id",
+        "primary_dataset.value"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "name",
+      "short_name",
+      "parent",
+      "primary_dataset",
+      "owner",
+      "no_records",
+      "attributes.locale",
+      "attributes.start_date",
+      "attributes.end_date",
+      "attributes.archival_series",
+      "attributes.archival_number",
+      "attributes.authority",
+      "attributes.format"
+    ],
+    "options": {
+      "pageLength": 25,
+      "paging": true,
+      "responsive": true,
+      "fixedHeader": true,
+      "dom": "<\"card-table-header\"B<\"btn-group ml-auto\"f>r><\"#filters-container.collapse\"><\"panel-container\"<\"panel-left\"t>><\"sub-card-footer\"ip>",
+      "serverSide": true,
+      "stateSave": true,
+      "select": {
+        "style": "single"
+      },
+      "deferRender": true,
+      "rowId": "id",
+      "processing": true,
+      "language": {
+        "searchPlaceholder": "Search",
+        "processing": "<div class=\"spinner-border ml-auto mr-auto\" role=\"status\"><span class=\"sr-only\">Loading...</span></div>"
+      },
+      "ajax": {
+        "url": "/api/sources/?format=json&type=12"
+      }
+    },
+    "buttons": [
+      {
+        "button": "colvis"
+      },
+      {
+        "button": "page_length"
+      }
+    ],
+    "overrides": {}
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "short_name",
+      "parent",
+      "primary_dataset",
+      "owner",
+      "attributes.archival_series",
+      "attributes.archival_number",
+      "attributes.locale",
+      "attributes.start_date",
+      "attributes.end_date",
+      "attributes.authority",
+      "attributes.format"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "type": "POST",
+          "url": "/api/sources/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        },
+        "edit": {
+          "type": "PATCH",
+          "url": "/api/sources/_id_/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        },
+        "remove": {
+          "type": "DELETE",
+          "url": "/api/sources/_id_/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        }
+      },
+      "idSrc": "id",
+      "template": "#source-form-template"
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_source"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_source"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_source"
+      }
+    ],
+    "overrides": {
+      "type.id": {
+        "type": "hidden",
+        "def": 12,
+        "opts": {},
+        "options": []
+      }
+    }
+  }
+}

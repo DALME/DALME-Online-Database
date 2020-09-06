@@ -1,0 +1,181 @@
+{
+  "config": {
+    "helpers": [
+      "source_forms",
+      "workflow_module"
+    ],
+    "template_field_container": "#form-field-container",
+    "endpoint": "sources",
+    "globals": {
+      "source_type": "records",
+      "on_open_function": "source_form_setup",
+      "on_close_function": "source_form_restore",
+      "messages_list": {
+        "create_success": "The source was created succesfully.",
+        "edit_success": "The source was updated succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "short_name": "short_name",
+        "parent": "parent.id",
+        "has_inventory": "has_inventory",
+        "city": "attributes.city",
+        "owner": "owner.id",
+        "record_type": "attributes.record_type",
+        "date": "attributes.date.value",
+        "start_date": "attributes.start_date.value",
+        "end_date": "attributes.end_date.value",
+        "language": "attributes.language",
+        "named_persons": "attributes.named_persons",
+        "description": "attributes.description",
+        "status": "workflow.status.text",
+        "help_flag": "workflow.help_flag",
+        "is_public": "workflow.is_public"
+      },
+      "required_list": [
+        "name",
+        "short_name",
+        "parent.id",
+        "has_inventory",
+        "attributes.record_type",
+        "attributes.language"
+      ],
+      "multi_attributes": [
+        "attributes.language",
+        "attributes.city"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "name",
+      "short_name",
+      "parent",
+      "has_inventory",
+      "no_folios",
+      "owner",
+      "attributes.city",
+      "attributes.record_type",
+      "attributes.start_date",
+      "attributes.end_date",
+      "attributes.date",
+      "attributes.language",
+      "attributes.named_persons",
+      "attributes.description",
+      "workflow.status",
+      "workflow.help_flag",
+      "workflow.activity",
+      "workflow.is_public"
+    ],
+    "options": {
+      "pageLength": 25,
+      "paging": true,
+      "responsive": true,
+      "fixedHeader": true,
+      "dom": "<\"card-table-header\"B<\"btn-group ml-auto\"f>r><\"#filters-container.collapse\"><\"panel-container\"<\"panel-left\"t>><\"sub-card-footer\"ip>",
+      "serverSide": true,
+      "stateSave": true,
+      "select": {
+        "style": "single"
+      },
+      "deferRender": true,
+      "rowId": "id",
+      "processing": true,
+      "language": {
+        "searchPlaceholder": "Search",
+        "processing": "<div class=\"spinner-border ml-auto mr-auto\" role=\"status\"><span class=\"sr-only\">Loading...</span></div>"
+      },
+      "ajax": {
+        "url": "/api/sources/?format=json&type=13"
+      }
+    },
+    "buttons": [
+      {
+        "button": "colvis"
+      },
+      {
+        "button": "page_length"
+      }
+    ],
+    "overrides": {}
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "short_name",
+      "parent",
+      "has_inventory",
+      "owner",
+      "attributes.city",
+      "attributes.record_type",
+      "attributes.date",
+      "attributes.start_date",
+      "attributes.end_date",
+      "attributes.language",
+      "attributes.named_persons",
+      "attributes.description",
+      "workflow.status",
+      "workflow.help_flag",
+      "workflow.is_public"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "type": "POST",
+          "url": "/api/sources/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        },
+        "edit": {
+          "type": "PATCH",
+          "url": "/api/sources/_id_/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        },
+        "remove": {
+          "type": "DELETE",
+          "url": "/api/sources/_id_/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        }
+      },
+      "idSrc": "id",
+      "template": "#source-form-template"
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_source"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_source"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_source"
+      },
+      {
+        "button": "create_set_from_sources",
+        "permissions": "dalme_app.create_set"
+      },
+      {
+        "button": "add_sources_to_set"
+      }
+    ],
+    "overrides": {
+      "type.id": {
+        "type": "hidden",
+        "def": 13,
+        "opts": {},
+        "options": []
+      }
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "config": {
+    "helpers": [
+      "source_forms"
+    ],
+    "template_field_container": "#form-field-container",
+    "endpoint": "sources",
+    "globals": {
+      "source_type": "bibliography",
+      "on_open_function": "source_form_setup",
+      "on_close_function": "source_form_restore",
+      "messages_list": {
+        "create_success": "The source was created succesfully.",
+        "edit_success": "The source was updated succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "short_name": "short_name",
+        "type": "type.id",
+        "parent": "parent.id",
+        "language": "attributes.language",
+        "url": "attributes.url"
+      },
+      "required_list": [
+        "name",
+        "short_name",
+        "type.id"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "name",
+      "short_name",
+      "type",
+      "parent",
+      "attributes.language",
+      "attributes.url"
+    ],
+    "options": {
+      "pageLength": 25,
+      "paging": true,
+      "responsive": true,
+      "fixedHeader": true,
+      "dom": "<\"card-table-header\"B<\"btn-group ml-auto\"f>r><\"#filters-container.collapse\"><\"panel-container\"<\"panel-left\"t>><\"sub-card-footer\"ip>",
+      "serverSide": true,
+      "stateSave": true,
+      "select": {
+        "style": "single"
+      },
+      "deferRender": true,
+      "rowId": "id",
+      "processing": true,
+      "language": {
+        "searchPlaceholder": "Search",
+        "processing": "<div class=\"spinner-border ml-auto mr-auto\" role=\"status\"><span class=\"sr-only\">Loading...</span></div>"
+      },
+      "ajax": {
+        "url": "/api/sources/?format=json&type=1,2,3,4,5,6,7,8,9,10,11"
+      }
+    },
+    "buttons": [
+      {
+        "button": "colvis"
+      },
+      {
+        "button": "page_length"
+      }
+    ],
+    "overrides": {}
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "short_name",
+      "parent",
+      "type",
+      "attributes.language",
+      "attributes.url"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "type": "POST",
+          "url": "/api/sources/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        },
+        "edit": {
+          "type": "PATCH",
+          "url": "/api/sources/_id_/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        },
+        "remove": {
+          "type": "DELETE",
+          "url": "/api/sources/_id_/",
+          "headers": {
+            "Content-Type": "application/json-dte",
+            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
+          }
+        }
+      },
+      "idSrc": "id",
+      "template": "#source-form-template"
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_source"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_source"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_source"
+      }
+    ],
+    "overrides": {
+      "type.id": {
+        "options": {
+          "type": "api_call",
+          "url": "/api/content_types/?format=select&context=bibliography&q="
+        }
+      },
+      "name": {
+        "type": "textarea"
+      }
+    }
+  }
+}
