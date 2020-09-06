@@ -304,6 +304,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
         'dalme_app.utils.DRFDTEParser',
     ],
+    'EXCEPTION_HANDLER': 'dalme_app.utils.DRFDTE_exception_handler',
 }
 
 # Internationalization

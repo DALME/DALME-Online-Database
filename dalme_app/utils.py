@@ -11,6 +11,8 @@ from djangosaml2idp.processors import BaseProcessor
 from typing import Dict
 from dalme_app.models import Task
 from django.template import defaultfilters
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
 
 class DRFSelectRenderer(renderers.JSONRenderer):
@@ -112,6 +114,33 @@ class DRFDTEParser(parsers.BaseParser):
                 return None
             else:
                 return value
+
+
+def DRFDTE_exception_handler(exc, context):
+    if not isinstance(exc, ValidationError):
+        return None
+    else:
+        result = {}
+        fieldErrors = []
+        errors = exc.detail
+        for k, v in errors.items():
+            if type(v) is dict:
+                for k2, v2 in v.items():
+                    field = k+'.'+k2
+                    try:
+                        fieldErrors.append({'name': field, 'status': str(v2[0])})
+                    except KeyError:
+                        fieldErrors.append({'name': field, 'status': errors})
+            else:
+                field = k
+                fieldErrors.append({'name': field, 'status': str(v[0])})
+
+        result['fieldErrors'] = fieldErrors
+        status = 400
+
+    return Response(result, status)
+
+
 class AsyncMiddleware(MiddlewareMixin):
     """
     Fix for django-async-messages to work with newer Django versions.
