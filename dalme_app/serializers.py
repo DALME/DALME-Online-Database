@@ -433,177 +433,228 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 
 class SourceSerializer(DynamicSerializer):
-    type_name = serializers.StringRelatedField(source='type', read_only=True, required=False)
-    type = serializers.PrimaryKeyRelatedField(queryset=Content_type.objects.all())
-    name = serializers.CharField(max_length=255)
-    short_name = serializers.CharField(max_length=55, required=True)
-    parent = serializers.PrimaryKeyRelatedField(queryset=Source.objects.all(), allow_null=True)
-    parent_name = serializers.StringRelatedField(source='parent', read_only=True, required=False)
     attributes = AttributeSerializer(many=True, required=False)
     inherited = AttributeSerializer(many=True, required=False)
-    no_folios = serializers.IntegerField(required=False)
-    no_images = serializers.IntegerField(required=False)
     tags = TagSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
-    owner_username = serializers.CharField(source='owner.username', read_only=True, required=False)
-    owner_full_name = serializers.CharField(source='owner.profile.full_name', read_only=True, required=False)
+    sets = SourceSetSerializer(many=True, required=False)
+    type = ContentTypeSerializer(fields=['id', 'name'])
+    pages = PageSerializer(many=True, required=False)
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'type_name', 'name', 'short_name', 'parent', 'parent_name', 'has_inventory',
-                  'attributes', 'inherited', 'no_folios', 'no_images', 'tags', 'workflow', 'owner_username', 'owner_full_name', 'owner')
+        fields = ('id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'primary_dataset', 'attributes', 'inherited',
+                  'no_folios', 'no_images', 'tags', 'workflow', 'owner', 'primary_dataset', 'sets', 'pages')
+        extra_kwargs = {
+                        'parent': {'required': False},
+                        'no_folios': {'required': False},
+                        'no_images': {'required': False},
+                        'primary_dataset': {'required': False}
+                        }
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['attributes'] = self.process_attributes(ret.pop('attributes'))
-        if ret['inherited'] is not None:
-            ret['inherited'] = self.process_attributes(ret.pop('inherited'))
-        ret['name'] = {'name': ret['name'], 'url': '/sources/'+ret['id'], 'value': ret['name']}
-        parent_name = ret.pop('parent_name', None)
-        if parent_name is not None:
-            ret['parent'] = {'name': parent_name, 'url': '/sources/'+str(ret['parent']), 'value': ret['parent']}
-        else:
-            ret.pop('parent')
-        type_name = ret.pop('type_name')
-        ret['type'] = {'name': type_name, 'value': ret['type']}
-        ret['owner'] = {
-            'id': ret.pop('owner'),
-            'username': ret.pop('owner_username'),
-            'user': ret.pop('owner_full_name'),
-        }
+        if ret.get('attributes') is not None:
+            ret['attributes'] = self.process_attributes(ret.pop('attributes'), instance)
+        if ret.get('inherited') is not None:
+            if ret['inherited'] is not None:
+                ret['inherited'] = self.process_attributes(ret.pop('inherited'))
+        if ret.get('parent') is not None:
+            if ret['parent']:
+                ret['parent'] = {'id': ret['parent'], 'name': instance.parent.name}
+        if ret.get('owner') is not None:
+            ret['owner'] = {
+                'id': instance.owner.id,
+                'username': instance.owner.username,
+                'full_name': instance.owner.profile.full_name
+            }
+        for k, v in dict(ret).items():
+            if v is None:
+                ret.pop(k)
         return ret
 
-    def process_attributes(self, qset):
-        result = {}
-        dates = {}
-        for i in qset:
-            (k, v), = i.items()
-            if k == 'start_date' or k == 'end_date':
-                dates[k] = v
+    def to_internal_value(self, data):
+        if 'attributes' in data:
+            multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(content_type=self.instance.type) if not i.unique]
+            deserialised = []
+            for key, value in data['attributes'].items():
+                att_type = Attribute_type.objects.get(short_name=key)
+                if key in multi_attributes and value == 0:
+                    continue
+                value_list = value if key in multi_attributes else [value]
+                for v in value_list:
+                    att = {'attribute_type': att_type.id}
+                    if att_type.data_type == 'INT':
+                        att['value_INT'] = int(v)
+                    elif att_type.data_type == 'TXT':
+                        att['value_TXT'] = v
+                    elif att_type.data_type == 'DATE':
+                        att['value_DATE_d'] = v['d']
+                        att['value_DATE_m'] = v['m']
+                        att['value_DATE_y'] = v['y']
+                    else:
+                        att['value_STR'] = v
+                    deserialised.append(att)
+            data['attributes'] = deserialised
+        if 'pages' in data:
+            if data['pages'].get('0') is not None:
+                data['pages'] = self.deserialise_numbered_dict(data['pages'])
             else:
-                result[k] = v
-        if dates:
-            if 'start_date' in dates:
-                if 'end_date' in dates:
-                    result['date'] = DALMEDateRange(dates['start_date'], dates['end_date']).short
-                else:
-                    result['date'] = dates['start_date']
+                data['pages'] = [data['pages']]
+        if 'sets' in data:
+            if data['sets'].get('0') is not None:
+                data['sets'] = self.deserialise_numbered_dict(data['sets'])
             else:
-                result['date'] = dates['end_date']
-        return result
-
-
-class GroupSerializer(serializers.ModelSerializer):
-    """ Basic serializer for user group data """
-    name = serializers.CharField(max_length=255, required=False)
-
-    class Meta:
-        model = Group
-        fields = ('id', 'name')
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """ Basic serializer for user data """
-    groups = GroupSerializer(many=True, required=False)
-    last_login = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
-    date_joined = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
-
-    class Meta:
-        model = User
-        fields = ('id', 'last_login', 'is_superuser', 'username', 'first_name', 'last_name',
-                  'email', 'is_staff', 'is_active', 'date_joined', 'groups')
-        extra_kwargs = {'username': {'validators': []}}
-
-
-class ProfileSerializer(serializers.ModelSerializer):
-    """ Serialises user profiles and combines user data """
-    user = UserSerializer(required=True)
-
-    class Meta:
-        model = Profile
-        fields = ('id', 'full_name', 'user_id', 'user')
-
-    def update(self, instance, validated_data):
-        """ Update profile and user. Assumes there is a user for every profile """
-        user_data = validated_data.pop('user')
-        groups = self.initial_data.pop('groups', None)
-        super().update(instance, validated_data)
-        user = instance.user
-        for attr, value in user_data.items():
-            setattr(user, attr, value)
-        user.save()
-        if groups is not None:
-            user.groups.clear()
-            for g in groups:
-                grp = Group.objects.get(pk=g)
-                user.groups.add(grp)
-        return instance
+                data['sets'] = [data['sets']]
+        if 'parent' in data:
+            data['parent'] = data['parent']['id']
+        if 'workflow' in data:
+            if data['workflow'].get('status') is not None:
+                text = data['workflow']['status']['text']
+                values = translate_workflow_status(text)
+                data['workflow']['wf_status'] = values['wf_status']
+                data['workflow']['stage'] = values['stage']
+        if 'owner' in data:
+            data['owner'] = data['owner']['id']
+        return super().to_internal_value(data)
 
     def create(self, validated_data):
-        """ Create profile and user. Assumes there is a user for every profile """
-        user_data = validated_data.pop('user')
-        user_data.pop('groups')
-        user = User.objects.create_user(**user_data)
-        if self.context.get('groups') is not None:
-            groups = self.context['groups']
-            for g in groups:
-                grp = Group.objects.get(pk=g)
-                user.groups.add(grp)
-        profile = Profile.objects.create(user=user, **validated_data)
-        return profile
+        if validated_data.get('attributes') is not None:
+            attributes_data = validated_data.pop('attributes')
+        if validated_data.get('workflow') is not None:
+            workflow_data = validated_data.pop('workflow')
+        if validated_data.get('pages') is not None:
+            pages_data = validated_data.pop('pages')
+        if validated_data.get('sets') is not None:
+            sets_list = [i['set_id'] for i in validated_data.pop('sets')]
 
+        source = Source.objects.create(**validated_data)
 
-class AttributeTypeSerializer(serializers.ModelSerializer):
+        if attributes_data:
+            for attribute in attributes_data:
+                source.attributes.create(**attribute)
 
-    class Meta:
-        model = Attribute_type
-        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'options_list', 'same_as')
+        if workflow_data:
+            workflow = source.workflow
+            if workflow_data.get('status') is not None:
+                status_data = translate_workflow_status(workflow_data['status'])
+                workflow.wf_status = status_data.get('wf_status', workflow.wf_status)
+                workflow.stage = status_data.get('stage', workflow.stage)
+            workflow.help_flag = workflow_data.get('help_flag', workflow.help_flag)
+            workflow.is_public = workflow_data.get('is_public', workflow.is_public)
+            workflow.save()
 
+        if pages_data:
+            for page in pages_data:
+                source.pages.create(**page)
 
-class ContentXAttributeSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='attribute_type.id')
-    name = serializers.CharField(max_length=255, source='attribute_type.name')
-    short_name = serializers.CharField(max_length=55, source='attribute_type.short_name')
-    description = serializers.CharField(source='attribute_type.description')
-    data_type = serializers.CharField(max_length=15, source='attribute_type.data_type')
-    source = serializers.CharField(max_length=255, source='attribute_type.source')
-    same_as = serializers.PrimaryKeyRelatedField(source='attribute_type.same_as', read_only=True)
-    options_list = serializers.CharField(max_length=255, source='attribute_type.options_list')
-    required = serializers.BooleanField()
+        if sets_list:
+            for _set in sets_list:
+                Set_x_content.objects.create(set_id=_set, content_object=source)
 
-    class Meta:
-        model = Content_attributes
-        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as', 'options_list', 'required')
+        return source
 
+    def update(self, instance, validated_data):
+        if validated_data.get('attributes') is not None:
+            attributes_data = validated_data.pop('attributes')
+            multi_attributes = [i.attribute_type for i in Content_attributes.objects.filter(content_type=instance.type) if not i.unique]
+            attributes = {}
+            for attribute in attributes_data:
+                if attribute['attribute_type'] in multi_attributes:
+                    if attributes.get(attribute['attribute_type']) is not None:
+                        attributes[attribute['attribute_type']].append(attribute)
+                    else:
+                        attributes[attribute['attribute_type']] = [attribute]
+                else:
+                    attributes[attribute['attribute_type']] = attribute
 
-class ContentTypeSerializer(serializers.ModelSerializer):
-    cont_class = serializers.StringRelatedField(source='content_class', required=False)
-    attribute_types = AttributeTypeSerializer(many=True, required=False)
+            current_attributes = instance.attributes.all()
+            control = []
 
-    class Meta:
-        model = Content_type
-        fields = ('id', 'name', 'short_name', 'content_class', 'cont_class', 'description', 'attribute_types', 'has_pages', 'parents', 'has_inventory', 'r1_inheritance', 'r2_inheritance')
-        extra_kwargs = {'name': {'validators': []}}
+            for att_type, attribute_dict in attributes.items():
+                if type(attribute_dict) is list:
+                    current_attributes.filter(attribute_type=att_type).delete()
+                    for att in attribute_dict:
+                        na = instance.attributes.create(**att)
+                        control.append(na.id)
+                else:
+                    if current_attributes.filter(**attribute_dict).exists():
+                        control.append(current_attributes.get(**attribute_dict).id)
+                    elif current_attributes.filter(attribute_type=att_type).count() > 0:
+                        attribute = current_attributes.get(attribute_type=att_type)
+                        attribute_dict.pop('attribute_type')
+                        for attr, value in attribute_dict.items():
+                            setattr(attribute, attr, value)
+                        attribute.save()
+                        control.append(attribute.id)
+                    else:
+                        na = instance.attributes.create(**attribute_dict)
+                        control.append(na.id)
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        if ret['content_class'] and ret['cont_class']:
-            name = ret.pop('cont_class')
-            ret['content_class'] = {'name': name, 'value': ret['content_class']}
-        if ret['parents'] is not None:
-            ctype_dict = {i.id: i.name for i in Content_type.objects.all()}
-            list_ids = ret['parents'].split(',') if ',' in ret['parents'] else [ret['parents']]
-            ret['parents'] = [{'id': int(i), 'name': ctype_dict[int(i)]} for i in list_ids]
-        return ret
+            for attribute in current_attributes:
+                if attribute.id not in control:
+                    attribute.delete()
 
+        if validated_data.get('workflow') is not None:
+            workflow_data = validated_data.pop('workflow')
+            workflow = instance.workflow
+            if workflow_data.get('status') is not None:
+                status_data = translate_workflow_status(workflow_data['status'])
+                workflow.wf_status = status_data.get('wf_status', workflow.wf_status)
+                workflow.stage = status_data.get('stage', workflow.stage)
+            workflow.help_flag = workflow_data.get('help_flag', workflow.help_flag)
+            workflow.is_public = workflow_data.get('is_public', workflow.is_public)
+            workflow.save()
 
-class ContentClassSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Content_class
-        fields = ('id', 'name', 'short_name', 'description')
+        if validated_data.get('pages') is not None:
+            pages_data = validated_data.pop('pages')
+            current_pages = instance.pages.all()
+            control = []
+            for page_dict in pages_data:
+                if current_pages.filter(**page_dict).exists():
+                    control.append(current_pages.get(**page_dict).id)
+                else:
+                    if page_dict.get('id') is not None:
+                        page = current_pages.get(pk=page_dict['id'])
+                        for attr, value in page_dict.items():
+                            setattr(page, attr, value)
+                        page.save()
+                        control.append(page.id)
+                    else:
+                        np = instance.pages.create(**page_dict)
+                        control.append(np.id)
+            for page in current_pages:
+                if page.id not in control:
+                    page.delete()
 
+        if validated_data.get('sets') is not None:
+            sets_list = [i['set_id'] for i in validated_data.pop('sets')]
+            current_sets_list = [i.set_id for i in instance.sets.all()]
+            for _set in sets_list:
+                if _set not in current_sets_list:
+                    Set_x_content.objects.create(set_id=_set, content_object=instance)
+            for _set in current_sets_list:
+                if _set not in sets_list:
+                    instance.sets.get(set_id=_set.id).delete()
 
-class AttachmentSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Attachment
-        fields = '__all__'
+        return super().update(instance, validated_data)
+
+    def deserialise_numbered_dict(self, data):
+        deserialised = []
+        for key, value in data.items():
+            deserialised.append(value)
+        return deserialised
+
+    def process_attributes(self, qset, instance):
+        result = {}
+        multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(content_type=instance.type) if not i.unique]
+        for i in qset:
+            (k, v), = i.items()
+            if k in multi_attributes:
+                if result.get(k) is not None:
+                    result[k].append(v)
+                else:
+                    result[k] = [v]
+            else:
+                result[k] = v
+        return result

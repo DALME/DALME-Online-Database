@@ -840,17 +840,53 @@ class Pages(DTViewSet):
 
 
 class Sources(DTViewSet):
-    """ API endpoint for managing sources """
     permission_classes = (SourceAccessPolicy,)
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
-    display_fields = ['name', 'type', 'parent']
+    filterset_fields = ['type', 'type__name', 'name', 'short_name', 'owner', 'primary_dataset', 'parent', 'has_inventory']
+    search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name', 'primary_dataset__name']
+    ordering_fields = ['type', 'name', 'short_name', 'owner', 'primary_dataset']
+    ordering = ['name']
+
+    # search prepends:
+    # '^' Starts-with search.
+    # '=' Exact matches.
+    # '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
+    # '$' Regex search.
+
+    # @action(detail=False, methods=['get'])
+    # def get_set(self, request, *args, **kwargs):
+    #     data_dict = {}
+    #     if request.GET.get('data') is not None:
+    #         dt_data = json.loads(request.GET['data'])
+    #         if hasattr(self, 'search_dict'):
+    #             search_dict = self.search_dict
+    #         else:
+    #             search_dict = {}
+    #         queryset = self.get_queryset()
+    #         try:
+    #             if dt_data['search']['value']:
+    #                 queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+    #             if request.GET.get('filters') is not None:
+    #                 queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
+    #             queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
+    #             query_list = list(queryset.values_list('id', flat=True))
+    #             data_dict['data'] = query_list
+    #         except Exception as e:
+    #             data_dict['error'] = 'The following error occured while trying to fetch the set: ' + str(e)
+    #     else:
+    #         data_dict['error'] = 'There was no data in the request.'
+    #     return Response(data_dict)
+
+    #     # @action(detail=True, methods=['post'])
+    #     # def add_identity_phrase(self, request, *args, **kwargs):
+    #     #     result = {}
+    #     #     object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
+    #     #     try:
 
     @action(detail=True, methods=['patch'])
     def change_description(self, request, *args, **kwargs):
         result = {}
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
         object = self.get_object()
         try:
             action = self.request.POST['action']
@@ -869,294 +905,10 @@ class Sources(DTViewSet):
             status = 400
         return Response(result, status)
 
-    # @action(detail=True, methods=['post'])
-    # def add_identity_phrase(self, request, *args, **kwargs):
-    #     result = {}
-    #     object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-    #     try:
-
-    def create(self, request, *args, **kwargs):
-        result = {}
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        validated_extra = self.validate_extra(data_dict.pop('attributes', None), data_dict.pop('pages', None))
-        serializer = self.get_serializer(data=data_dict)
-        if validated_extra['valid'] and serializer.is_valid():
-            attributes = validated_extra['attributes']
-            pages = validated_extra['pages']
-            new_obj = serializer.save()
-            object = Source.objects.get(pk=new_obj.id)
-            if attributes is not None:
-                create_attributes = []
-                for a in attributes:
-                    a_type = a.pop('attribute_type', None)
-                    if a_type is not None:
-                        a['attribute_type'] = Attribute_type.objects.get(pk=a_type)
-                        create_attributes.append(a)
-                if create_attributes:
-                    for new_att in create_attributes:
-                        object.attributes.create(**new_att)
-            if pages is not None:
-                create_pages = []
-                for page in pages:
-                    page.pop('id', None)
-                    create_pages.append(page)
-                if create_pages:
-                    for new_page in create_pages:
-                        object.pages.create(**new_page)
-            result['data'] = serializer.data
-            status = 201
-        else:
-            fieldErrors = []
-            if validated_extra.get('fieldErrors') is not None:
-                fieldErrors += validated_extra['fieldErrors']
-            if not serializer.is_valid():
-                fieldErrors += get_error_array(serializer.errors, self.display_fields)
-            result['fieldErrors'] = fieldErrors
-            status = 400
-        return Response(result, status)
-
-    def update(self, request, *args, **kwargs):
-        result = {}
-        partial = kwargs.pop('partial', False)
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
-        object = self.get_object()
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        validated_extra = self.validate_extra(data_dict.pop('attributes', None), data_dict.pop('pages', None))
-        serializer = self.get_serializer(object, data=data_dict, partial=partial)
-        if validated_extra['valid'] and serializer.is_valid():
-            attributes = validated_extra['attributes']
-            pages = validated_extra['pages']
-            if attributes is not None:
-                create_attributes = []
-                update_attributes = {}
-                for a in attributes:
-                    a_id = a.pop('id', None)
-                    a_type = a.pop('attribute_type', None)
-                    if a_type is not None:
-                        a['attribute_type'] = Attribute_type.objects.get(pk=a_type)
-                        if a_id is not None:
-                            update_attributes[a_id] = a
-                        else:
-                            create_attributes.append(a)
-                if update_attributes:
-                    old_attributes = object.attributes.all()
-                    for att in old_attributes:
-                        if str(att.id) in update_attributes:
-                            up_att = update_attributes.get(str(att.id))
-                            att_object = Attribute.objects.get(pk=att.id)
-                            for attr, val in up_att.items():
-                                setattr(att_object, attr, val)
-                            att_object.save()
-                        else:
-                            # id = att.id
-                            object.attributes.remove(att)
-                            # Attribute.objects.get(pk=id).delete()
-                if create_attributes:
-                    for new_att in create_attributes:
-                        if new_att.get('value_UUID', None) is not None:
-                            new_att['value_STR'] = new_att.pop('value_UUID')
-                        object.attributes.create(**new_att)
-            if pages is not None:
-                create_pages = []
-                update_pages = {}
-                for page in pages:
-                    p_id = page.pop('id', None)
-                    if p_id is not None:
-                        update_pages[p_id] = page
-                    else:
-                        create_pages.append(page)
-                if update_pages:
-                    old_pages = object.pages.all()
-                    for pp in old_pages:
-                        if str(pp.id) in update_pages:
-                            up_page = update_pages.get(str(pp.id))
-                            page_object = Page.objects.get(pk=pp.id)
-                            for attr, val in up_page.items():
-                                setattr(page_object, attr, val)
-                            page_object.save()
-                        else:
-                            # id = att.id
-                            object.pages.remove(pp)
-                            # Attribute.objects.get(pk=id).delete()
-                if create_pages:
-                    for new_page in create_pages:
-                        object.pages.create(**new_page)
-            serializer.save()
-            object = Source.objects.get(pk=object.id)
-            serializer = self.get_serializer(object)
-            result['data'] = serializer.data
-            status = 201
-        else:
-            fieldErrors = []
-            if validated_extra.get('fieldErrors') is not None:
-                fieldErrors += validated_extra['fieldErrors']
-            if not serializer.is_valid():
-                fieldErrors += get_error_array(serializer.errors, self.display_fields)
-            result['fieldErrors'] = fieldErrors
-            status = 400
-        return Response(result, status)
-
-    def validate_extra(self, attributes, pages):
-        result = {}
-        fieldErrors = []
-        if attributes is not None:
-            if 'attribute_type' in attributes:
-                test_attributes = {'1': attributes}
-                attributes = [attributes]
-            else:
-                test_attributes = attributes
-                attributes = list(attributes.values())
-            for key, value in test_attributes.items():
-                if value['attribute_type'] is None:
-                    fieldErrors.append({'name': 'attributes.'+str(key)+'.attribute_type', 'status': 'Attribute type must be selected.'})
-        if pages is not None:
-            if 'id' in pages:
-                test_pages = {'1': pages}
-                pages = [pages]
-            else:
-                test_pages = pages
-                pages = list(pages.values())
-            for key, value in test_pages.items():
-                if value['order'] is None:
-                    fieldErrors.append({'name': 'pages.'+str(key)+'.order', 'status': 'A value for order must be included.'})
-                if value['name'] is None:
-                    fieldErrors.append({'name': 'pages.'+str(key)+'.name', 'status': 'A name for the folio must be included.'})
-        if fieldErrors:
-            result['valid'] = False
-            result['fieldErrors'] = fieldErrors
-        else:
-            result['valid'] = True
-            result['attributes'] = attributes
-            result['pages'] = pages
-        return result
-
-    def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('type') is not None:
-            type = self.request.GET['type']
-            queryset = self.queryset
-            q_obj = Q()
-            content_types = DT_list.objects.get(short_name=type).content_types.all()
-            for i in content_types:
-                q_obj |= Q(type=i.pk)
-            queryset = queryset.filter(q_obj)
-        else:
-            queryset = self.queryset
-        return queryset
-
-    def filter_on_search(self, *args, **kwargs):
-        dt_data = kwargs['dt_data']
-        search_string = dt_data['search']['value']
-        queryset = kwargs['queryset']
-        search_words = search_string.split()
-        search_q = Q()
-        for word in search_words:
-            search_word = Q(name__icontains=word) | Q(type__name__icontains=word) | Q(parent__name__icontains=word) | Q(att_blob__icontains=word)
-            search_q &= search_word
-        queryset = queryset.annotate(att_blob=RawSQL('SELECT GROUP_CONCAT(dalme_app_attribute.value_STR SEPARATOR ",") FROM dalme_app_attribute JOIN dalme_app_source src2 ON dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id', [])).filter(search_q)
-        return queryset
-
-    def filter_on_filters(self, *args, **kwargs):
-        queryset = kwargs['queryset']
-        filters = kwargs['filters']
-        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'no_folios', 'tags', 'workflow']
-        annotate_dict = {}
-        if filters.get('and_list') is not None:
-            for filter in filters['and_list']:
-                annotate_dict = self.get_annotation(filter, local_fields, annotate_dict)
-        if filters.get('or_list') is not None:
-            for filter in filters['or_list']:
-                annotate_dict = self.get_annotation(filter, local_fields, annotate_dict)
-        queryset = queryset.annotate(**annotate_dict)
-        if filters.get('and_list') is not None:
-            for i, f in enumerate(filters['and_list']):
-                (key, val), = f.items()
-                if 'timedelta' in str(val):
-                    cut_off = timezone.now().date() - datetime.timedelta(**{'days': int(val.split('-')[1])})
-                    filters['and_list'][i][key] = cut_off
-            qf = reduce(operator.and_, (Q(**q) for q in filters['and_list']))
-        if filters.get('or_list') is not None:
-            qf |= reduce(operator.or_, (Q(**q) for q in filters['or_list']))
-        queryset = queryset.filter(qf).distinct()
-        return queryset
-
-    def get_annotation(self, filter, local_fields, annotate_dict):
-        (k, v), = filter.items()
-        if '__' in k:
-            field = k.split('__')[0]
-        else:
-            field = k
-        if field not in local_fields:
-            if Attribute_type.objects.filter(short_name=field).exists():
-                att_type_id = Attribute_type.objects.get(short_name=field).id
-                annotate_dict[field] = RawSQL('SELECT value_STR FROM dalme_app_attribute \
-                                               JOIN dalme_app_source src2 ON dalme_app_attribute.object_id = src2.id \
-                                               WHERE src2.id = dalme_app_source.id AND dalme_app_attribute.attribute_type = %s', [att_type_id])
-        return annotate_dict
-
-    def get_ordered_queryset(self, *args, **kwargs):
-        queryset = kwargs['queryset']
-        dt_data = kwargs['dt_data']
-        order_column = dt_data['order'][0]['column']
-        order_column_name_raw = dt_data['columns'][order_column]['data']
-        if '.' in order_column_name_raw:
-            field_list = order_column_name_raw.split('.')
-            if field_list[0] in ['type', 'parent', 'name']:
-                order_column_name = field_list[0]
-            elif field_list[0] == 'attributes':
-                order_column_name = field_list[1]
-        elif ',' in order_column_name_raw:
-            field_list = order_column_name_raw.split(',')
-            order_column_name = field_list[0]
-        else:
-            order_column_name = order_column_name_raw
-        order_dir = dt_data['order'][0]['dir']
-        local_fields = ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'no_folios']
-        if order_column_name not in local_fields:
-            att_type = Attribute_type.objects.get(short_name=order_column_name)
-            att_type_id = att_type.id
-            att_dt = att_type.data_type
-            if att_dt == 'DATE':
-                queryset = queryset.annotate(value_DATE_d=RawSQL('SELECT value_DATE_d FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
-                                                            dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
-                                                            dalme_app_attribute.attribute_type = %s', [att_type_id]))
-                queryset = queryset.annotate(value_DATE_m=RawSQL('SELECT value_DATE_m FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
-                                                            dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
-                                                            dalme_app_attribute.attribute_type = %s', [att_type_id]))
-                queryset = queryset.annotate(value_DATE_y=RawSQL('SELECT value_DATE_y FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
-                                                            dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
-                                                            dalme_app_attribute.attribute_type = %s', [att_type_id]))
-                if order_dir == 'desc':
-                    queryset = queryset.order_by('-value_DATE_y', '-value_DATE_m', '-value_DATE_d')
-                else:
-                    queryset = queryset.order_by('value_DATE_y', 'value_DATE_m', 'value_DATE_d')
-            else:
-                target_field = 'value_' + att_dt
-                queryset = queryset.annotate(ord_field=RawSQL('SELECT '+target_field+' FROM dalme_app_attribute JOIN dalme_app_source src2 ON \
-                                                            dalme_app_attribute.object_id = src2.id WHERE src2.id = dalme_app_source.id AND \
-                                                            dalme_app_attribute.attribute_type = %s', [att_type_id]))
-                if order_dir == 'desc':
-                    queryset = queryset.order_by('-ord_field')
-                else:
-                    queryset = queryset.order_by('ord_field')
-        else:
-            if order_dir == 'desc':
-                order = '-'+order_column_name
-            else:
-                order = order_column_name
-            queryset = queryset.order_by(order)
-        return queryset
-
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.serializer_class
-        if self.request.GET.get('type') is not None:
-            type = self.request.GET['type']
-        else:
-            type = ''
-        if type != 'records':
-            kwargs['fields'] = ['no_folios', 'workflow']
+        if self.request.GET.get('st') is not None:
+            kwargs['fields'] = ['id', 'name']
         return serializer_class(*args, **kwargs)
 
 
