@@ -40,6 +40,34 @@ class DRFSelectRenderer(renderers.JSONRenderer):
         return ret.encode()
 
 
+class DRFDTEJSONRenderer(renderers.JSONRenderer):
+    """ Django Rest Framework renderer that returns Datatables Editor format """
+
+    media_type = 'application/json-dte'
+    format = 'json-dte'
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        if data is None:
+            return b''
+
+        renderer_context = renderer_context or {}
+        indent = self.get_indent(accepted_media_type, renderer_context)
+
+        if indent is None:
+            separators = SHORT_SEPARATORS if self.compact else LONG_SEPARATORS
+        else:
+            separators = INDENT_SEPARATORS
+
+        data = {'data': data}
+
+        ret = json.dumps(
+            data, cls=self.encoder_class,
+            indent=indent, ensure_ascii=self.ensure_ascii,
+            allow_nan=not self.strict, separators=separators
+        )
+
+        ret = ret.replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+        return ret.encode()
 class AsyncMiddleware(MiddlewareMixin):
     """
     Fix for django-async-messages to work with newer Django versions.
