@@ -276,59 +276,16 @@ class ModelLists(DTListView):
 
 @method_decorator(login_required, name='dispatch')
 class SourceList(DTListView):
-    """ Lists sources """
-    dt_editor_options = {'idSrc': '"id"', 'template': '"#inventoryForm"'}
-    dte_field_list = ['name', 'short_name', 'type', 'parent', 'has_inventory']
 
-    def get_list_name(self, *args, **kwargs):
-        list_name = 'all'
-        if 'type' in self.request.GET:
-            list_name = self.request.GET['type']
-        return list_name
-
-    def get_breadcrumb(self, *args, **kwargs):
-        _type = self.get_list_name()
-        if _type == 'all':
-            breadcrumb = [('Sources', ''), ('All Sources', '/sources')]
-        else:
-            list_label = DT_list.objects.get(short_name=_type).name
-            breadcrumb = [('Sources', ''), (list_label, '/sources?type='+_type)]
-        return breadcrumb
-
-    def get_dt_ajax_str(self, _list, *args, **kwargs):
-        base_url = _list.api_url
-        _type = _list.short_name
-        if _type == 'sources':
-            dt_ajax_str = '"'+base_url+'?format=json"'
-        else:
-            dt_ajax_str = '"'+base_url+'?format=json&type='+_type+'"'
-        return dt_ajax_str
-
-    def get_dt_fields(self, _list, *args, **kwargs):
-        dt_fields = DT_fields.objects.filter(list=_list).values_list('field__short_name', flat=True)
-        return dt_fields
-
-    def get_modules(self, *args, **kwargs):
-        module_list = None
-        if 'type' in self.request.GET:
-            if self.request.GET['type'] == 'records':
-                module_list = ['filters']
-                if 'Staff' in [i.name for i in self.request.user.groups.all()]:
-                    module_list.append('workflow')
-        return module_list
-
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_source'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New Source', 'formTitle': 'Create New Source'})
-        if self.request.user.has_perm('dalme_app.change_source'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected Source', 'formTitle': 'Edit Source Information'})
-        if self.request.user.has_perm('dalme_app.delete_source'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected Source', 'formTitle': 'Delete Source',
-                                'formMessage': 'Are you sure you wish to remove this source from the database? This action cannot be undone.'})
-        dte_buttons.append({'action': 'save_set("create")', 'text': '<i class="fa fa-folder fa-fw dt_menu_icon"></i> Create New Set'})
-        dte_buttons.append({'action': 'save_set("add")', 'text': '<i class="fa fa-folder-plus fa-fw dt_menu_icon"></i> Add Sources to Set...'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        type = self.request.GET['type']
+        return {
+            'page_title': type.capitalize() if type != 'files' else 'Archival Files',
+            'dt_config': 'sources_' + type,
+            'breadcrumb': [('Sources', ''), (type.capitalize(), '/sources?type='+type)],
+            'helpers': ['source_forms', 'workflow_module'],
+            'template': 'source_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
@@ -401,6 +358,8 @@ class SourceDetail(DetailView):
         }
         if self.object.parent:
             source_data['Parent'] = '<a href="{}">{}</a>'.format('/sources/'+str(self.object.parent.id), self.object.parent.name)
+        if self.object.type.id == 12 and self.object.primary_dataset:
+            source_data['Primary Dataset'] = '<a href="{}">{}</a>'.format('/sets/'+str(self.object.primary_dataset.id), self.object.primary_dataset.name)
         context['source_data'] = source_data
         context['source_metadata'] = {
             'ID': str(self.object.id),
@@ -486,7 +445,6 @@ class SourceDetail(DetailView):
         return breadcrumb
 
     def get_object(self):
-        """ Raise a 404 instead of exception on things that aren't proper UUIDs """
         try:
             object = super().get_object()
             return object
@@ -546,27 +504,20 @@ def SourceManifest(request, pk):
 @method_decorator(login_required, name='dispatch')
 class UserList(DTListView):
     """ Lists users and allows editing and creation of new records via the API """
-    list_name = 'users'
-    breadcrumb = [('System', ''), ('Users', '/users')]
-    dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['first_name', 'last_name', 'full_name', 'email', 'username',
-                      'password', 'is_staff', 'is_superuser', 'groups']
 
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_user'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New User'})
-        if self.request.user.has_perm('dalme_app.change_user'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit User Information'})
-        if self.request.user.has_perm('dalme_app.delete_user'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete User',
-                                'formMessage': 'Are you sure you wish to remove this user from the database? This action cannot be undone.'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Users',
+            'dt_config': 'users',
+            'breadcrumb': [('System', ''), ('Users', '/users/')],
+            'helpers': ['user_forms'],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
 class UserDetail(DetailView):
-    model = Profile
+    model = User
     template_name = 'dalme_app/user_detail.html'
 
     def get_context_data(self, **kwargs):
@@ -577,29 +528,28 @@ class UserDetail(DetailView):
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
         context['sidebar'] = dm(self.request, state).sidebar
-        page_title = self.object.full_name
+        page_title = self.object.profile.full_name
         context['page_title'] = page_title
         context['page_chain'] = get_page_chain(breadcrumb, page_title)
         user_data = {
-            'First name': self.object.user.first_name,
-            'Last name': self.object.user.last_name,
-            'User ID': self.object.user.id,
-            # 'Email': '<a href="mailto:{}">{}</a>'.format(self.object.user.email),
-            # 'Staff': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.user.is_staff else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
-            # 'Superuser': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.user.is_superuser else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
-            # 'Active': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.user.is_active else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
-            # 'Joined': timezone.localtime(self.object.user.date_joined).strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " "),
-            # 'Last login': timezone.localtime(self.object.user.last_login.strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " "),
-            'Groups': ', '.join([i.name for i in self.object.user.groups.all()])
+            'First name': self.object.first_name,
+            'Last name': self.object.last_name,
+            'User ID': self.object.id,
+            'Email': '<a href="mailto:{}">{}</a>'.format(self.object.email, self.object.email),
+            'Staff': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.is_staff else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
+            'Superuser': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.is_superuser else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
+            'Active': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.is_active else '<i class="fa fa-times-circle dt_checkbox_false"></i>',
+            'Joined': timezone.localtime(self.object.date_joined).strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " "),
+            'Last login': timezone.localtime(self.object.last_login).strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " "),
+            'Groups': ', '.join([i.name for i in self.object.groups.all()])
         }
         context['user_data'] = user_data
-        context['image_url'] = self.object.profile_image
+        context['image_url'] = self.object.profile.profile_image
         return context
 
     def get_object(self):
-        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
         try:
-            object = Profile.objects.get(user__username=self.kwargs['username'])
+            object = User.objects.get(username=self.kwargs['username'])
             return object
         except ObjectDoesNotExist:
             raise Http404
@@ -607,136 +557,50 @@ class UserDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class AsyncTaskList(DTListView):
-    breadcrumb = [('System', ''), ('Asynchronous Tasks', '/async_tasks')]
-    list_name = 'async_tasks'
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            },
-        'order': '[[ 0, "desc" ]]'
-        }
+
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Asynchronous Tasks',
+            'dt_config': 'async_tasks',
+            'breadcrumb': [('System', ''), ('Asynchronous Tasks', '/async_tasks')],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
 class CountryList(DTListView):
-    breadcrumb = [('System', ''), ('Countries', '/countries')]
-    list_name = 'countries'
-    dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'alpha_3_code', 'alpha_2_code', 'num_code']
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            },
-        'order': '[[ 1, "asc" ]]'
-        }
 
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_country'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Country'})
-        if self.request.user.has_perm('dalme_app.change_country'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Country Information'})
-        if self.request.user.has_perm('dalme_app.delete_country'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Country',
-                                'formMessage': 'Are you sure you wish to remove this country from the database? This action cannot be undone.'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Countries',
+            'dt_config': 'countries',
+            'breadcrumb': [('System', ''), ('Countries', '/countries')],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
 class LocaleList(DTListView):
-    breadcrumb = [('System', ''), ('Locales', '/locales')]
-    list_name = 'locales'
-    dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'administrative_region', 'country']
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            },
-        'order': '[[ 1, "asc" ]]'
-        }
 
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_localereference'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New City'})
-        if self.request.user.has_perm('dalme_app.change_localereference'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit City Information'})
-        if self.request.user.has_perm('dalme_app.delete_localereference'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete City',
-                                'formMessage': 'Are you sure you wish to remove this city from the database? This action cannot be undone.'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Locales',
+            'dt_config': 'locales',
+            'breadcrumb': [('System', ''), ('Locales', '/locales')],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
 class RightsList(DTListView):
-    breadcrumb = [('Project', ''), ('Rights Policies', '/rights')]
-    list_name = 'rights'
-    dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'rights_holder', 'rights_status', 'rights', 'notice_display', 'rights_notice', 'licence', 'attachments']
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            },
-        'order': '[[ 1, "asc" ]]'
-        }
 
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_rightspolicy'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Policy'})
-        if self.request.user.has_perm('dalme_app.change_rightspolicy'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Policy Information'})
-        if self.request.user.has_perm('dalme_app.delete_rightspolicy'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Policy',
-                                'formMessage': 'Are you sure you wish to remove this policy from the database? This action cannot be undone.'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Rights Policies',
+            'dt_config': 'rights',
+            'breadcrumb': [('Project', ''), ('Rights Policies', '/rights')],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
@@ -777,7 +641,6 @@ class RightsDetail(DetailView):
         return context
 
     def get_object(self):
-        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
         try:
             object = RightsPolicy.objects.get(pk=self.kwargs['pk'])
             return object
@@ -787,79 +650,64 @@ class RightsDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class LanguageList(DTListView):
-    breadcrumb = [('System', ''), ('Languages', '/languages')]
-    list_name = 'languages'
-    dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'glottocode', 'iso6393', 'parent', 'type']
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            }
-        }
 
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_language'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Language'})
-        if self.request.user.has_perm('dalme_app.change_language'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Language Information'})
-        if self.request.user.has_perm('dalme_app.delete_language'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Language',
-                                'formMessage': 'Are you sure you wish to remove this language from the database? This action cannot be undone.'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Languages',
+            'dt_config': 'languages',
+            'breadcrumb': [('System', ''), ('Languages', '/languages')],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
 class ImageList(DTListView):
-    breadcrumb = [('DAM Images', '/images')]
-    list_name = 'images'
-    dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['field8', 'field79', 'field12', 'field3', 'collections']
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'multi'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            },
-        # 'order': '[[ 1, "asc" ]]'
-        }
-    module_list = ['filters', 'preview']
 
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.change_rs_resource'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Image Information'})
-            dte_buttons.append({'action': 'toggle_inline_edit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline', 'className': "inline-edit-toggle"})
-        if self.request.user.has_perm('dalme_app.delete_rs_resource'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Image',
-                                'formMessage': 'Are you sure you wish to remove this image from the DAM? This action cannot be undone.'})
-        if self.request.user.has_perm('dalme_app.add_source'):
-            dte_buttons.append({'extend': 'selectAll', 'text': '<i class="fa fa-check-double fa-fw dt_menu_icon"></i> Select All'})
-            dte_buttons.append({'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'})
-            dte_buttons.append({'extend': 'selected', 'action': 'create_source_from_selected()', 'text': '<i class="fa fa-plus-square fa-fw dt_menu_icon"></i> Create Source from Selection'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'DAM Images',
+            'dt_config': 'images',
+            'breadcrumb': [('DAM Images', '/images')],
+            'helpers': ['preview_module'],
+            'template': 'generic_form_template'
+            }
+    # breadcrumb = [('DAM Images', '/images')]
+    # list_name = 'images'
+    # dt_editor_options = {'idSrc': '"id"'}
+    # dte_field_list = ['field8', 'field79', 'field12', 'field3', 'collections']
+    # dt_options = {
+    #     'pageLength': 25,
+    #     'paging': 'true',
+    #     'responsive': 'true',
+    #     'fixedHeader': 'true',
+    #     'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
+    #     'serverSide': 'true',
+    #     'stateSave': 'true',
+    #     'select': {'style': 'multi'},
+    #     'deferRender': 'true',
+    #     'rowId': '"id"',
+    #     'processing': 'true',
+    #     'language': {
+    #         'searchPlaceholder': 'Search',
+    #         'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+    #         },
+    #     # 'order': '[[ 1, "asc" ]]'
+    #     }
+    # module_list = ['filters', 'preview']
+
+    # def get_dte_buttons(self, *args, **kwargs):
+    #     dte_buttons = []
+    #     if self.request.user.has_perm('dalme_app.change_rs_resource'):
+    #         dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Image Information'})
+    #         dte_buttons.append({'action': 'toggle_inline_edit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline', 'className': "inline-edit-toggle"})
+    #     if self.request.user.has_perm('dalme_app.delete_rs_resource'):
+    #         dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Image',
+    #                             'formMessage': 'Are you sure you wish to remove this image from the DAM? This action cannot be undone.'})
+    #     if self.request.user.has_perm('dalme_app.add_source'):
+    #         dte_buttons.append({'extend': 'selectAll', 'text': '<i class="fa fa-check-double fa-fw dt_menu_icon"></i> Select All'})
+    #         dte_buttons.append({'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'})
+    #         dte_buttons.append({'extend': 'selected', 'action': 'create_source_from_selected()', 'text': '<i class="fa fa-plus-square fa-fw dt_menu_icon"></i> Create Source from Selection'})
+    #     return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
@@ -942,39 +790,11 @@ class ImageDetail(DetailView):
         return context
 
     def get_object(self):
-        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
         try:
             object = super().get_object()
             return object
         except ObjectDoesNotExist:
             raise Http404
-
-
-@method_decorator(login_required, name='dispatch')
-class PageList(DTListView):
-    breadcrumb = [('Pages', '/pages')]
-    list_name = 'pages'
-    dt_field_list = ['name', 'dam_id', 'order']
-
-
-@method_decorator(login_required, name='dispatch')
-class PageDetail(DetailView):
-    model = Page
-    context_object_name = 'page'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        breadcrumb = ['Pages']
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
-        context['sidebar_toggle'] = sidebar_toggle
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = dm(self.request, state).dropdowns
-        context['sidebar'] = dm(self.request, state).sidebar
-        page_title = self.object.name
-        context['page_title'] = page_title
-        context['page_chain'] = get_page_chain(breadcrumb, page_title)
-        # context['form'] = forms.page_main(instance=self.object)
-        return context
 
 
 @method_decorator(login_required, name='dispatch')
@@ -1012,39 +832,14 @@ def PageManifest(request, pk):
 
 @method_decorator(login_required, name='dispatch')
 class SetList(DTListView):
-    breadcrumb = [('Project', ''), ('Sets', '/sets')]
-    list_name = 'sets'
-    dt_editor_options = {'idSrc': '"id"'}
-    dte_field_list = ['name', 'set_type', 'endpoint', 'is_public', 'has_landing', 'description', 'owner', 'permissions', 'dataset_usergroup']
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            },
-        'order': '[[ 1, "asc" ]]'
-        }
 
-    def get_dte_buttons(self, *args, **kwargs):
-        dte_buttons = []
-        if self.request.user.has_perm('dalme_app.add_set'):
-            dte_buttons.append({'extend': 'create', 'text': '<i class="fa fa-plus fa-fw dt_menu_icon"></i> Create New', 'formTitle': 'Create New Set'})
-        if self.request.user.has_perm('dalme_app.change_set'):
-            dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Set Information'})
-        if self.request.user.has_perm('dalme_app.delete_set'):
-            dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Set',
-                                'formMessage': 'Are you sure you wish to remove this set from the database? This action cannot be undone.'})
-        return dte_buttons
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Sets',
+            'dt_config': 'sets',
+            'breadcrumb': [('Project', ''), ('Sets', '/sets')],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
@@ -1088,7 +883,6 @@ class SetsDetail(DetailView):
         return context
 
     def get_object(self):
-        """ Raise a 404 instead of exception on things that aren't proper UUIDs"""
         try:
             object = Set.objects.get(pk=self.kwargs['pk'])
             return object
@@ -1159,26 +953,14 @@ class TicketDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class TicketList(DTListView):
-    breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
-    list_name = 'tickets'
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            },
-        'order': '[[ 0, "desc" ]]'
-        }
+
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': 'Issue Tickets',
+            'dt_config': 'tickets',
+            'breadcrumb': [('Project', ''), ('Issue Tickets', '/tickets')],
+            'template': 'generic_form_template'
+            }
 
 
 @method_decorator(login_required, name='dispatch')
