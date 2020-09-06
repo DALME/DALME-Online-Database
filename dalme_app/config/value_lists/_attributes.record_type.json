@@ -1,0 +1,187 @@
+[
+  {
+    "label": "Inventory-Comanda",
+    "value": "Inventory-Comanda",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Criminal Inquest",
+    "value": "Inventory-Criminal Inquest",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Division",
+    "value": "Inventory-Division",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Donation",
+    "value": "Inventory-Donation",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Dowry",
+    "value": "Inventory-Dowry",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Dowry Restitution",
+    "value": "Inventory-Dowry Restitution",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Ecclesiastical",
+    "value": "Inventory-Ecclesiastical",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Emancipation",
+    "value": "Inventory-Emancipation",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Generic",
+    "value": "Inventory-Generic",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Guardianship",
+    "value": "Inventory-Guardianship",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Insolvency",
+    "value": "Inventory-Insolvency",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Legacy",
+    "value": "Inventory-Legacy",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-List of objects",
+    "value": "Inventory-List of objects",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Postmortem",
+    "value": "Inventory-Postmortem",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Premortem",
+    "value": "Inventory-Premortem",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Quittance",
+    "value": "Inventory-Quittance",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Repudiation of inheritance",
+    "value": "Inventory-Repudiation of inheritance",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Restitution of pawned goods",
+    "value": "Inventory-Restitution of pawned goods",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Ship",
+    "value": "Inventory-Ship",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Taking up inheritance",
+    "value": "Inventory-Taking up inheritance",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Tax seizure",
+    "value": "Inventory-Tax seizure",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Undefended Goods",
+    "value": "Inventory-Undefended Goods",
+    "group": "Inventory"
+  },
+  {
+    "label": "Guardianship",
+    "value": "Guardianship",
+    "group": "Guardianship"
+  },
+  {
+    "label": "Liquidation of guardianship",
+    "value": "Liquidation of guardianship",
+    "group": "Guardianship"
+  },
+  {
+    "label": "Failed Seizure",
+    "value": "Failed Seizure",
+    "group": "Seizure"
+  },
+  {
+    "label": "Seizure",
+    "value": "Seizure",
+    "group": "Seizure"
+  },
+  {
+    "label": "Testament",
+    "value": "Testament",
+    "group": "Testament"
+  },
+  {
+    "label": "Testamentary execution",
+    "value": "Testamentary execution",
+    "group": "Testament"
+  },
+  {
+    "label": "Arrest",
+    "value": "Arrest",
+    "group": "Other"
+  },
+  {
+    "label": "Auction",
+    "value": "Auction",
+    "group": "Other"
+  },
+  {
+    "label": "Codicil",
+    "value": "Codicil",
+    "group": "Other"
+  },
+  {
+    "label": "Eviction",
+    "value": "Eviction",
+    "group": "Other"
+  },
+  {
+    "label": "Incarceration",
+    "value": "Incarceration",
+    "group": "Other"
+  },
+  {
+    "label": "Order to deliver goods",
+    "value": "Order to deliver goods",
+    "group": "Other"
+  },
+  {
+    "label": "Promise to pay debt",
+    "value": "Promise to pay debt",
+    "group": "Other"
+  },
+  {
+    "label": "Renvoi",
+    "value": "Renvoi",
+    "group": "Other"
+  },
+  {
+    "label": "unclear",
+    "value": "unclear",
+    "group": "Other"
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "label": "Ingestion in progress",
+    "value": "ingestion in progress",
+    "group": "Ingestion"
+  },
+  {
+    "label": "Awaiting transcription",
+    "value": "awaiting transcription",
+    "group": "Transcription"
+  },
+  {
+    "label": "Transcription in progress",
+    "value": "transcription in progress",
+    "group": "Transcription"
+  },
+  {
+    "label": "Awaiting Markup",
+    "value": "awaiting markup",
+    "group": "Markup"
+  },
+  {
+    "label": "Markup in progress",
+    "value": "markup in progress",
+    "group": "Markup"
+  },
+  {
+    "label": "Awaiting Review",
+    "value": "awaiting review",
+    "group": "Review"
+  },
+  {
+    "label": "Review in progress",
+    "value": "review in progress",
+    "group": "Review"
+  },
+  {
+    "label": "Awaiting Parsing",
+    "value": "awaiting parsing",
+    "group": "Parsing"
+  },
+  {
+    "label": "Parsing in progress",
+    "value": "parsing in progress",
+    "group": "Parsing"
+  },
+  {
+    "label": "Assessing",
+    "value": "assessing",
+    "group": "Other"
+  }
+]
