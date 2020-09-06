@@ -13,165 +13,18 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 
+from dalme_app.serializers import (LanguageSerializer, TaskSerializer, GroupSerializer,
                                    TaskListSerializer, PageSerializer, RSImageSerializer, TranscriptionSerializer,
-                                   SourceSerializer, ProfileSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
+                                   SourceSerializer, UserSerializer, AttributeTypeSerializer, ContentXAttributeSerializer,
                                    ContentTypeSerializer, ContentClassSerializer, AsyncTaskSerializer, SimpleAttributeSerializer,
                                    CountrySerializer, LocaleSerializer, AttachmentSerializer, TicketSerializer, CommentSerializer,
                                    WorkflowSerializer, SetSerializer, RightsSerializer)
 from dalme_app.models import (Attribute_type, Content_class, Content_type, Content_attributes,
                               Page, Source_pages, Source, Transcription, LanguageReference,
                               TaskList, Task, rs_resource, rs_collection, rs_collection_resource,
-                              Attribute, CountryReference, LocaleReference, Attachment, Ticket, Tag,
-                              Comment, Workflow, Set, Set_x_content, RightsPolicy, GroupProperties, Work_log, get_dam_preview)
-from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy, ProfileAccessPolicy
-
-
-class Datasets(viewsets.ViewSet):
-    """ API endpoint for generating lists of options for DTE forms """
-    permission_classes = (GeneralAccessPolicy,)
-    queryset = Workflow.objects.all()
-
-    def list(self, request, *args, **kwargs):
-        data_dict = {}
-        if self.request.GET.get('id') is not None:
-            try:
-                ds_id = self.request.GET['id']
-                if ds_id == '1':
-                    data_dict = {
-                        'chart': {'type': 'bar'},
-                        'title': {'text': 'Sources worked on per period and per processing stage'},
-                        'yAxis': {'min': 0, 'title': {'text': 'Number of sources'}},
-                        'legend': {'reversed': 'true'},
-                        'plotOptions': {'series': {'stacking': 'normal'}},
-                        'series': []
-                    }
-                    x_dict = {
-                        'Past week': 'timedelta|7',
-                        'Past month': 'timedelta|30',
-                        'Past three months': 'timedelta|90',
-                        'Past year': 'timedelta|365',
-                        'Earlier': 'timedelta|older'
-                    }
-                    y_dict = {
-                        1: 'ingestion',
-                        2: 'transcription',
-                        3: 'markup',
-                        4: 'review',
-                        5: 'parsing',
-                    }
-                    categories = [label for label, query in x_dict.items()]
-                    for stage, name in y_dict.items():
-                        queryset = Source.objects.filter(has_inventory=True, workflow__stage=stage)
-                        src_counts = []
-                        for label, query in x_dict.items():
-                            src_counts.append(filter_on_workflow(queryset=queryset, wf_query=query).count())
-                        data_dict['series'].append({'name': name, 'data': src_counts})
-                    data_dict['xAxis'] = {'categories': categories}
-            except Exception as e:
-                data_dict['error'] = 'The following error occured while trying to fetch the dataset: ' + str(e)
-        else:
-            data_dict['error'] = 'No dataset id was included in the request.'
-        return Response(data_dict)
-
-
-class WorkflowManager(viewsets.ModelViewSet):
-    """ API endpoint for managing the project's workflow """
-    permission_classes = (WorkflowAccessPolicy,)
-    queryset = Workflow.objects.all()
-    serializer_class = WorkflowSerializer
-
-    @action(detail=True, methods=['patch'])
-    def change_state(self, request, *args, **kwargs):
-        result = {}
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
-        object = self.get_object()
-        try:
-            action = self.request.POST['action']
-            stage_dict = dict(Workflow.PROCESSING_STAGES)
-            status_dict = dict(Workflow.WORKFLOW_STATUS)
-            if action == 'stage_done':
-                stage = int(self.request.POST['code'])
-                stage_name = stage_dict[stage]
-                setattr(object, stage_name + '_done', True)
-                object.last_user = request.user
-                object.last_modified = timezone.now()
-                object.save()
-                self.update_log(object, stage_name + ': marked as done')
-                next_stage = stage + 1
-                result['prev_stage_name'] = stage_name
-                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
-                if stage == 4:
-                    result['status_html'] = '<div class="wf-manager-status tag-wf-awaiting">awaiting parsing</div>'
-                else:
-                    result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\',' + str(next_stage) + ')">\
-                    begin ' + stage_dict[next_stage] + '</button>'
-            elif action == 'begin_stage':
-                stage = int(self.request.POST['code'])
-                stage_name = stage_dict[stage]
-                object.stage = stage
-                object.last_user = request.user
-                object.last_modified = timezone.now()
-                object.save()
-                self.update_log(object, stage_name + ': work commenced')
-                result['stage_name'] = stage_name
-                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
-                result['status_html'] = '<div class="wf-manager-status tag-wf-in_progress">' + stage_name + ' in progress</div>\
-                <button class="wf-manager-status_btn tag-wf-in_progress" role="button" onclick="update_workflow(\'stage_done\', ' + str(stage) + ')">\
-                <i class="far fa-check-square fa-fw"></i> DONE</button>'
-            elif action == 'toggle_help':
-                if object.help_flag:
-                    object.help_flag = False
-                else:
-                    object.help_flag = True
-                object.last_user = request.user
-                object.last_modified = timezone.now()
-                object.save()
-                self.update_log(object, 'help flag set to ' + str(object.help_flag))
-            elif action == 'toggle_public':
-                if object.is_public:
-                    object.is_public = False
-                else:
-                    object.is_public = True
-                object.last_user = request.user
-                object.last_modified = timezone.now()
-                object.save()
-                self.update_log(object, 'public flag set to ' + str(object.is_public))
-            elif action == 'change_status':
-                status = int(self.request.POST['code'])
-                prev_status = object.wf_status
-                object.wf_status = status
-                object.last_user = request.user
-                object.last_modified = timezone.now()
-                object.save()
-                self.update_log(object, 'status changed from "' + status_dict[prev_status] + '" to "' + status_dict[status] + '"')
-                status_name = status_dict[status]
-                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
-                if status != 2:
-                    result['status_html'] = '<div class="wf-manager-status tag-wf-' + status_name + '">' + status_name + '</div>'
-                else:
-                    stage = object.stage
-                    stage_name = stage_dict[stage]
-                    if getattr(object, stage_name + '_done'):
-                        if stage == 4:
-                            result['status_html'] = '<div class="wf-manager-status tag-wf-awaiting">awaiting parsing</div>'
-                        else:
-                            next_stage = stage + 1
-                            result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\', ' + str(next_stage) + ')">\
-                            begin ' + stage_dict[next_stage] + '</button>'
-                    else:
-                        result['status_html'] = '<div class="wf-manager-status tag-wf-in_progress">' + stage_name + ' in progress</div>\
-                        <button class="wf-manager-status_btn tag-wf-in_progress" role="button" onclick="update_workflow(\'stage_done\', ' + str(stage) + ')">\
-                        <i class="far fa-check-square fa-fw"></i> DONE</button>'
-            result['message'] = 'Update succesful.'
-            status = 201
-        except Exception as e:
-            result['error'] = str(e)
-            status = 400
-        return Response(result, status)
-
-    def update_log(self, source, message):
-        Work_log.objects.create(source=source, event=message)
+                              Attribute, CountryReference, LocaleReference, Attachment, Ticket,
+                              Comment, Workflow, Set, Set_x_content, RightsPolicy, Work_log, get_dam_preview)
+from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy, UserAccessPolicy
 
 
 class DTViewSet(viewsets.ModelViewSet):
@@ -259,28 +112,36 @@ class AsynchronousTasks(DTViewSet):
     serializer_class = AsyncTaskSerializer
 
 
-class Countries(DTViewSet):
-    """ API endpoint for managing countries """
+class Attachments(viewsets.ModelViewSet):
+    """ API endpoint for managing attachments """
     permission_classes = (GeneralAccessPolicy,)
-    queryset = CountryReference.objects.all()
-    serializer_class = CountrySerializer
-    choice_keys = ['i[\'name\']', 'i[\'name\']']
+    parser_classes = (MultiPartParser, FormParser, FileUploadParser,)
+    queryset = Attachment.objects.all()
+    serializer_class = AttachmentSerializer
+
+    def create(self, request, format=None):
+        result = {}
+        try:
+            new_obj = Attachment()
+            new_obj.file = request.data['upload']
+            new_obj.save()
+            result['upload'] = {'id': new_obj.id}
+            result['files'] = {'Attachment': {str(new_obj.id): {
+                'filename': str(new_obj.filename),
+                'web_path': str(new_obj.file)
+            }}}
+            status = 201
+        except Exception as e:
+            result['error'] = 'There was an error processing the file: '+str(e)
+            status = 400
+        return Response(result, status)
 
 
-class Locales(DTViewSet):
-    """ API endpoint for managing locales """
+class Attributes(DTViewSet):
+    """ API endpoint for managing attributes """
     permission_classes = (GeneralAccessPolicy,)
-    queryset = LocaleReference.objects.all()
-    serializer_class = LocaleSerializer
-    choice_keys = ['i[\'name\']', 'i[\'name\']']
-
-
-class Rights(DTViewSet):
-    """ API endpoint for managing rights policies """
-    permission_classes = (GeneralAccessPolicy,)
-    queryset = RightsPolicy.objects.all()
-    serializer_class = RightsSerializer
-    choice_keys = ['i[\'name\'][\'name\']', '\'{{"class": "RightsPolicy", "id": "{}"}}\'.format(i[\'id\'].replace(\'-\', \'\'))']
+    queryset = Attribute.objects.all().order_by('attribute_type')
+    serializer_class = SimpleAttributeSerializer
 
 
 class AttributeTypes(DTViewSet):
@@ -306,8 +167,6 @@ class AttributeTypes(DTViewSet):
         return serializer
 
 
-class Attributes(DTViewSet):
-    """ API endpoint for managing attributes """
 class Choices(viewsets.ViewSet):
     """ API endpoint for generating value lists for choice fields in the UI """
     permission_classes = (GeneralAccessPolicy,)
@@ -379,70 +238,37 @@ class ContentTypes(DTViewSet):
     queryset = Content_type.objects.all()
     serializer_class = ContentTypeSerializer
 
-    def create(self, request, format=None):
-        result = {}
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        attribute_types = data_dict.pop('attribute_types', None)
-        serializer = self.get_serializer(data=data_dict)
-        if serializer.is_valid():
-            new_obj = serializer.save()
-            object = Content_type.objects.get(pk=new_obj.id)
-            if attribute_types is not None:
-                if ',' in str(attribute_types):
-                    attribute_types = [int(i) for i in attribute_types.split(',')]
-                else:
-                    attribute_types = [attribute_types]
-                for a in attribute_types:
-                    atype = Attribute_type.objects.get(id=a)
-                    new_record = Content_attributes()
-                    new_record.content_type = object
-                    new_record.attribute_type = atype
-                    new_record.save()
-            serializer = self.get_serializer(object)
-            result['data'] = serializer.data
-            status = 201
-        else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
 
-    def update(self, request, *args, **kwargs):
-        result = {}
-        partial = kwargs.pop('partial', False)
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
-        object = self.get_object()
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        attribute_types = data_dict.pop('attribute_types', None)
-        serializer = self.get_serializer(object, data=data_dict, partial=partial)
-        if serializer.is_valid():
-            if attribute_types is not None:
-                if ',' in str(attribute_types):
-                    attribute_types = [int(i) for i in attribute_types.split(',')]
-                else:
-                    attribute_types = [attribute_types]
-                current_types = Content_attributes.objects.filter(content_type=object.id).values_list('attribute_type', flat=True)
-                add_types = list(set(attribute_types) - set(current_types))
-                remove_types = list(set(current_types) - set(attribute_types))
-                if add_types:
-                    for t in add_types:
-                        new_type = Content_attributes()
-                        new_type.content_type = object
-                        new_type.attribute_type = Attribute_type.objects.get(id=t)
-                        new_type.save()
-                if remove_types:
-                    q = Q(content_type=object.id)
-                    for t in remove_types:
-                        q &= Q(attribute_type=t)
-                        Content_attributes.objects.filter(q).delete()
-            serializer.save()
-            serializer = self.get_serializer(object)
-            result['data'] = serializer.data
-            status = 201
+class Comments(viewsets.ModelViewSet):
+    """ API endpoint for managing comments """
+    permission_classes = (GeneralAccessPolicy,)
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
+            model = self.request.GET['model']
+            object = self.request.GET['object']
+            if type(object) is not str:
+                object = str(object)
+            obj_instance = eval(model+'.objects.get(pk="'+object+'")')
+            queryset = obj_instance.comments.all()
         else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
+            queryset = self.queryset
+            # raise ValueError('A model and object must be provided to filter the comments dataset.')
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        result = {}
+        data = request.data
+        try:
+            content_object = eval(data['model']+'.objects.get(pk="'+data['object']+'")')
+            new_comment = content_object.comments.create(body=data['body'])
+            serializer = self.get_serializer(new_comment)
+            result = serializer.data
+            status = 201
+        except Exception as e:
+            result = str(e)
             status = 400
         return Response(result, status)
 
@@ -552,45 +378,43 @@ class Images(DTViewSet):
             status = 400
         return Response(result, status)
 
-    def update(self, request, *args, **kwargs):
-        result = {}
-        partial = kwargs.pop('partial', False)
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
-        object = self.get_object()
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        collections = data_dict.pop('collections', None)
-        serializer = self.get_serializer(object, data=data_dict, partial=partial)
-        if serializer.is_valid():
-            if collections is not None:
-                if ',' in str(collections):
-                    collections = [int(i) for i in collections.split(',')]
-                else:
-                    collections = [collections]
-                current_collections = rs_collection_resource.objects.filter(resource=object.ref).values_list('collection', flat=True)
-                add_collections = list(set(collections) - set(current_collections))
-                remove_collections = list(set(current_collections) - set(collections))
-                if add_collections:
-                    for c in add_collections:
-                        new_col = rs_collection_resource()
-                        new_col.resource = object
-                        new_col.collection = rs_collection.objects.get(pk=c)
-                        new_col.save()
-                if remove_collections:
-                    q = Q(list=object.ref)
-                    for c in remove_collections:
-                        q &= Q(collection=c)
-                        rs_collection_resource.objects.filter(q).delete()
-            serializer.save()
-            object = rs_resource.objects.get(pk=object.ref)
-            serializer = self.get_serializer(object)
-            result['data'] = serializer.data
-            status = 201
-        else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
+    # def update(self, request, *args, **kwargs):
+    #     result = {}
+    #     partial = kwargs.pop('partial', False)
+    #     object = self.get_object()
+    #     data_dict = get_dte_data(request)
+    #     data_dict = data_dict[0][1]
+    #     collections = data_dict.pop('collections', None)
+    #     serializer = self.get_serializer(object, data=data_dict, partial=partial)
+    #     if serializer.is_valid():
+    #         if collections is not None:
+    #             if ',' in str(collections):
+    #                 collections = [int(i) for i in collections.split(',')]
+    #             else:
+    #                 collections = [collections]
+    #             current_collections = rs_collection_resource.objects.filter(resource=object.ref).values_list('collection', flat=True)
+    #             add_collections = list(set(collections) - set(current_collections))
+    #             remove_collections = list(set(current_collections) - set(collections))
+    #             if add_collections:
+    #                 for c in add_collections:
+    #                     new_col = rs_collection_resource()
+    #                     new_col.resource = object
+    #                     new_col.collection = rs_collection.objects.get(pk=c)
+    #                     new_col.save()
+    #             if remove_collections:
+    #                 q = Q(list=object.ref)
+    #                 for c in remove_collections:
+    #                     q &= Q(collection=c)
+    #                     rs_collection_resource.objects.filter(q).delete()
+    #         serializer.save()
+    #         object = rs_resource.objects.get(pk=object.ref)
+    #         serializer = self.get_serializer(object)
+    #         result['data'] = serializer.data
+    #         status = 201
+    #     else:
+    #         result['fieldErrors'] = get_error_array(serializer.errors)
+    #         status = 400
+    #     return Response(result, status)
 
 
 class Languages(DTViewSet):
@@ -601,59 +425,12 @@ class Languages(DTViewSet):
     choice_keys = ['i[\'name\']', 'i[\'iso6393\']']
 
 
-class Configs(viewsets.ViewSet):
-    """ API endpoint for retrieving configuration files """
+class Locales(DTViewSet):
+    """ API endpoint for managing locales """
     permission_classes = (GeneralAccessPolicy,)
-    queryset = Set.objects.none()
-
-    def list(self, request, *args, **kwargs):
-        result = {}
-        if self.request.GET.get('file') is None or self.request.GET.get('path') is None:
-            result['error'] = 'Request has no file/path information.'
-            status = 400
-        else:
-            file = self.request.GET['file']
-            path = self.request.GET['path'].split(',')
-            try:
-                with open(os.path.join('dalme_app', 'config', *path, '_' + file + '.json'), 'r') as fp:
-                    result = json.load(fp)
-                status = 201
-            except Exception as e:
-                result['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
-                status = 400
-        return Response(result, status)
-
-
-    permission_classes = (GeneralAccessPolicy,)
-    queryset = Set.objects.none()
-
-    def list(self, request, *args, **kwargs):
-        result = {}
-        type = self.request.GET.get('type')
-        field = self.request.GET.get('field')
-        query = self.request.GET.get('q')
-        if type is None or field is None:
-            result['error'] = 'Request has no type/field information.'
-            status = 400
-        else:
-            try:
-                if type == 'list':
-                    with open(os.path.join('dalme_app', 'config', 'value_lists', '_' + field + '.json'), 'r') as fp:
-                        result = json.load(fp)
-                    status = 201
-                elif type == 'model':
-                    para = field.split('.')
-                    result = [{'label': label, 'value': value} for value, label in eval('{}._meta.get_field("{}").choices'.format(para[0], para[1]))]
-                    status = 201
-            except Exception as e:
-                result['error'] = 'The following error occured while trying to fetch the data: ' + str(e)
-                status = 400
-        return Response(result, status)
-
-
-    permission_classes = (GeneralAccessPolicy,)
-    queryset = Set.objects.none()
-
+    queryset = LocaleReference.objects.all()
+    serializer_class = LocaleSerializer
+    choice_keys = ['i[\'name\']', 'i[\'name\']']
 
 
 class Pages(DTViewSet):
@@ -665,8 +442,6 @@ class Pages(DTViewSet):
     @action(detail=True, methods=['post', 'get'])
     def get_rights(self, request, *args, **kwargs):
         result = {}
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
         object = self.get_object()
         try:
             result['rights'] = object.get_rights()
@@ -675,6 +450,128 @@ class Pages(DTViewSet):
             result['error'] = str(e)
             status = 400
         return Response(result, status)
+
+
+class Rights(DTViewSet):
+    """ API endpoint for managing rights policies """
+    permission_classes = (GeneralAccessPolicy,)
+    queryset = RightsPolicy.objects.all()
+    serializer_class = RightsSerializer
+    choice_keys = ['i[\'name\'][\'name\']', '\'{{"class": "RightsPolicy", "id": "{}"}}\'.format(i[\'id\'].replace(\'-\', \'\'))']
+
+
+class Sets(DTViewSet):
+    """ API endpoint for managing sets """
+    permission_classes = (SetAccessPolicy,)
+    queryset = Set.objects.all()
+    serializer_class = SetSerializer
+    choice_keys = ['i[\'name\']', 'i[\'id\']', 'i[\'detail_string\']']
+
+    @action(detail=False, methods=['post'])
+    def add_members(self, request, *args, **kwargs):
+        result = {}
+        try:
+            members = json.loads(request.data['qset'])
+            object = self.get_object()
+            new_members = []
+            for i in members:
+                source_object = Source.objects.get(pk=i)
+                if not Set_x_content.objects.filter(set_id=object.id, object_id=source_object.id).exists():
+                    new_entry = Set_x_content()
+                    new_entry.set_id = object
+                    new_entry.content_object = source_object
+                    new_members.append(new_entry)
+            Set_x_content.objects.bulk_create(new_members)
+            result['message'] = 'Action succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
+    @action(detail=True, methods=['patch'])
+    def remove_members(self, request, *args, **kwargs):
+        result = {}
+        try:
+            set_id = kwargs.get('pk')
+            members = json.loads(self.request.POST['members'])
+            member_objects = Set_x_content.objects.filter(set_id=set_id, object_id__in=members)
+            member_objects.delete()
+            result['message'] = 'Action succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
+    @action(detail=True, methods=['patch'])
+    def workset_state(self, request, *args, **kwargs):
+        result = {}
+        try:
+            action = self.request.POST['action']
+            target = self.request.POST['target']
+            set_id = kwargs.get('pk')
+            object = Set_x_content.objects.get(set_id=set_id, object_id=target)
+            if action == 'mark_done':
+                mark = True
+            elif action == 'mark_undone':
+                mark = False
+            object.workset_done = mark
+            object.save(update_fields=['workset_done', 'modification_user', 'modification_timestamp'])
+            result['message'] = 'Update succesful.'
+            status = 201
+        except Exception as e:
+            result['error'] = str(e)
+            status = 400
+        return Response(result, status)
+
+    # def create(self, request, format=None):
+    #     result = {}
+    #     data_dict = get_dte_data(request)
+    #     data_dict = data_dict[0][1]
+    #     if request.data.get('endpoint') is not None:
+    #         data_dict['endpoint'] = request.data.get('endpoint')
+    #     if request.data.get('qset') is not None:
+    #         member_list = json.loads(request.data['qset'])
+    #     else:
+    #         member_list = None
+    #     serializer = self.get_serializer(data=data_dict)
+    #     if serializer.is_valid():
+    #         new_set = serializer.save()
+    #         set_object = Set.objects.get(pk=new_set.id)
+    #         if member_list is not None:
+    #             new_members = []
+    #             for i in member_list:
+    #                 source_object = Source.objects.get(pk=i)
+    #                 new_entry = Set_x_content()
+    #                 new_entry.set_id = set_object
+    #                 new_entry.content_object = source_object
+    #                 new_members.append(new_entry)
+    #             Set_x_content.objects.bulk_create(new_members)
+    #         serializer = SetSerializer(set_object)
+    #         result = serializer.data
+    #         status = 201
+    #     else:
+    #         result = get_error_array(serializer.errors)
+    #         status = 400
+    #     return Response(result, status)
+
+    def get_queryset(self, *args, **kwargs):
+        search_q = Q()
+        if self.request.GET.get('type') is not None:
+            type_q = Q(set_type=int(self.request.GET['type']))
+            search_q &= type_q
+        ownership_q = Q(owner=str(self.request.user.id)) | ~Q(permissions=1)
+        search_q &= ownership_q
+        queryset = self.queryset.filter(search_q)
+        return queryset
+
+    def get_object(self):
+        if self.kwargs.get('pk') is not None:
+            object = self.queryset.get(pk=self.kwargs.get('pk'))
+        else:
+            object = self.queryset.get(pk=self.request.data['data[0][set]'])
+        return object
 
 
 class Sources(DTViewSet):
@@ -759,8 +656,6 @@ class Tasks(DTViewSet):
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
         result = {}
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
         object = self.get_object()
         try:
             action = self.request.POST['action']
@@ -778,38 +673,11 @@ class Tasks(DTViewSet):
         return Response(result, status)
 
 
-class Comments(viewsets.ModelViewSet):
-    """ API endpoint for managing comments """
+class TaskLists(DTViewSet):
+    """ API endpoint for managing tasks lists """
     permission_classes = (GeneralAccessPolicy,)
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-
-    def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
-            model = self.request.GET['model']
-            object = self.request.GET['object']
-            if type(object) is not str:
-                object = str(object)
-            obj_instance = eval(model+'.objects.get(pk="'+object+'")')
-            queryset = obj_instance.comments.all()
-        else:
-            queryset = self.queryset
-            # raise ValueError('A model and object must be provided to filter the comments dataset.')
-        return queryset
-
-    def create(self, request, *args, **kwargs):
-        result = {}
-        data = request.data
-        try:
-            content_object = eval(data['model']+'.objects.get(pk="'+data['object']+'")')
-            new_comment = content_object.comments.create(body=data['body'])
-            serializer = self.get_serializer(new_comment)
-            result = serializer.data
-            status = 201
-        except Exception as e:
-            result = str(e)
-            status = 400
-        return Response(result, status)
+    queryset = TaskList.objects.all().annotate(task_count=Count('task'))
+    serializer_class = TaskListSerializer
 
 
 class Tickets(DTViewSet):
@@ -821,8 +689,6 @@ class Tickets(DTViewSet):
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
         result = {}
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
         object = self.get_object()
         try:
             action = self.request.POST['action']
@@ -836,67 +702,6 @@ class Tickets(DTViewSet):
             status = 201
         except Exception as e:
             result['error'] = str(e)
-            status = 400
-        return Response(result, status)
-
-    def create(self, request, *args, **kwargs):
-        result = {}
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        tags = data_dict.pop('tags', None)
-        serializer = self.get_serializer(data=data_dict)
-        if serializer.is_valid():
-            new_obj = serializer.save()
-            if tags is not None:
-                if type(tags) is not list:
-                    tags = [tags]
-                for tag in tags:
-                    tag_dict = {
-                            'content_object': new_obj,
-                            'tag_type': 'T',
-                            'tag': tag
-                        }
-                    Tag.objects.create(**tag_dict)
-                    # new_tag = Tag(**tag_dict)
-                    # new_tag.save()
-            object = Ticket.objects.get(pk=new_obj.id)
-            serializer = self.get_serializer(object)
-            result['data'] = serializer.data
-            status = 201
-        else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
-
-
-class TaskLists(DTViewSet):
-    """ API endpoint for managing tasks lists """
-    permission_classes = (GeneralAccessPolicy,)
-    queryset = TaskList.objects.all().annotate(task_count=Count('task'))
-    serializer_class = TaskListSerializer
-
-
-class Attachments(viewsets.ModelViewSet):
-    """ API endpoint for managing attachments """
-    permission_classes = (GeneralAccessPolicy,)
-    parser_classes = (MultiPartParser, FormParser, FileUploadParser,)
-    queryset = Attachment.objects.all()
-    serializer_class = AttachmentSerializer
-
-    def create(self, request, format=None):
-        result = {}
-        try:
-            new_obj = Attachment()
-            new_obj.file = request.data['upload']
-            new_obj.save()
-            result['upload'] = {'id': new_obj.id}
-            result['files'] = {'Attachment': {str(new_obj.id): {
-                'filename': str(new_obj.filename),
-                'web_path': str(new_obj.file)
-            }}}
-            status = 201
-        except Exception as e:
-            result['error'] = 'There was an error processing the file: '+str(e)
             status = 400
         return Response(result, status)
 
@@ -951,10 +756,14 @@ class Transcriptions(viewsets.ModelViewSet):
 
 class Users(DTViewSet):
     """ API endpoint for managing users """
-    permission_classes = (ProfileAccessPolicy,)
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-    choice_keys = ['i[\'full_name\']', 'i[\'user_id\']']
+    permission_classes = (UserAccessPolicy,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filterset_fields = ['id', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'profile__full_name', 'groups']
+    search_fields = ['username', 'email', 'profile__full_name', 'first_name', 'last_name']
+    ordering_fields = ['id', 'username', 'email', 'profile__full_name', 'last_login', 'date_joined', 'is_staff', 'is_active', 'is_superuser']
+    ordering = ['first_name']
+    choice_keys = ['i[\'full_name\']', 'i[\'id\']']
 
     @action(detail=True, methods=['post'])
     def reset_password(self, request, *args, **kwargs):
@@ -979,136 +788,94 @@ class Users(DTViewSet):
             status = 400
         return Response(result, status)
 
-    def create(self, request, *args, **kwargs):
-        result = {}
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        if data_dict['user'].get('groups', None) is not None and type(data_dict['user']['groups']) is not list:
-            data_dict['user']['groups'] = [data_dict['user']['groups']]
-        serializer = self.get_serializer(data=data_dict)
-        if serializer.is_valid():
-            if data_dict['user'].get('groups') is not None and data_dict['user'].get('groups') != 0:
-                groups = [i['id'] for i in data_dict['user']['groups']]
-                serializer = self.get_serializer(data=data_dict, context={'groups': groups})
-            else:
-                serializer = self.get_serializer(data=data_dict)
-            if serializer.is_valid():
-                new_obj = serializer.save()
-                object = Profile.objects.get(pk=new_obj.id)
-                serializer = self.get_serializer(object)
-                result['data'] = serializer.data
-                status = 201
-            else:
-                result['fieldErrors'] = get_error_array(serializer.errors)
-                status = 400
-        else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
 
-    def update(self, request, *args, **kwargs):
+class WorkflowManager(viewsets.ModelViewSet):
+    """ API endpoint for managing the project's workflow """
+    permission_classes = (WorkflowAccessPolicy,)
+    queryset = Workflow.objects.all()
+    serializer_class = WorkflowSerializer
+
+    @action(detail=True, methods=['patch'])
+    def change_state(self, request, *args, **kwargs):
         result = {}
-        partial = kwargs.pop('partial', False)
-        # object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-        # self.check_object_permissions(request, object)
         object = self.get_object()
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        groups = data_dict['user'].pop('groups', None)
-        if groups is not None:
-            if type(groups) is list:
-                groups = [i['id'] for i in groups]
-            else:
-                groups = [groups['id']]
-        data_dict['groups'] = groups
-        serializer = self.get_serializer(object, data=data_dict, partial=partial)
-        if serializer.is_valid():
-            serializer.save()
-            object = Profile.objects.get(pk=object.id)
-            serializer = self.get_serializer(object)
-            result['data'] = serializer.data
-            result['data_dict'] = data_dict
-            status = 201
-        else:
-            result['fieldErrors'] = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
-
-    def destroy(self, request, pk=None, format=None):
-        result = {}
-        profile_id = self.kwargs.get('pk')
-        object = Profile.objects.get(pk=profile_id)
-        try:
-            # django switch active to false
-            User.objects.filter(id=object.user.pk).update(is_active=False)
-            object = Profile.objects.get(pk=object.pk)
-            serializer = ProfileSerializer(object)
-            result['data'] = serializer.data
-            status = 201
-        except Exception as e:
-            result['error'] = 'There was a problem deleting the user: ' + str(e)
-            status = 400
-        return Response(result, status)
-
-
-class Sets(DTViewSet):
-    """ API endpoint for managing sets """
-    permission_classes = (SetAccessPolicy,)
-    queryset = Set.objects.all()
-    serializer_class = SetSerializer
-    choice_keys = ['i[\'name\']', 'i[\'id\']', 'i[\'detail_string\']']
-
-    @action(detail=False, methods=['post'])
-    def add_members(self, request, *args, **kwargs):
-        result = {}
-        try:
-            members = json.loads(request.data['qset'])
-            object = self.get_object()
-            new_members = []
-            for i in members:
-                source_object = Source.objects.get(pk=i)
-                if not Set_x_content.objects.filter(set_id=object.id, object_id=source_object.id).exists():
-                    new_entry = Set_x_content()
-                    new_entry.set_id = object
-                    new_entry.content_object = source_object
-                    new_members.append(new_entry)
-            Set_x_content.objects.bulk_create(new_members)
-            result['message'] = 'Action succesful.'
-            status = 201
-        except Exception as e:
-            result['error'] = str(e)
-            status = 400
-        return Response(result, status)
-
-    @action(detail=True, methods=['patch'])
-    def remove_members(self, request, *args, **kwargs):
-        result = {}
-        try:
-            set_id = kwargs.get('pk')
-            members = json.loads(self.request.POST['members'])
-            member_objects = Set_x_content.objects.filter(set_id=set_id, object_id__in=members)
-            member_objects.delete()
-            result['message'] = 'Action succesful.'
-            status = 201
-        except Exception as e:
-            result['error'] = str(e)
-            status = 400
-        return Response(result, status)
-
-    @action(detail=True, methods=['patch'])
-    def workset_state(self, request, *args, **kwargs):
-        result = {}
         try:
             action = self.request.POST['action']
-            target = self.request.POST['target']
-            set_id = kwargs.get('pk')
-            object = Set_x_content.objects.get(set_id=set_id, object_id=target)
-            if action == 'mark_done':
-                mark = True
-            elif action == 'mark_undone':
-                mark = False
-            object.workset_done = mark
-            object.save(update_fields=['workset_done', 'modification_user', 'modification_timestamp'])
+            stage_dict = dict(Workflow.PROCESSING_STAGES)
+            status_dict = dict(Workflow.WORKFLOW_STATUS)
+            if action == 'stage_done':
+                stage = int(self.request.POST['code'])
+                stage_name = stage_dict[stage]
+                setattr(object, stage_name + '_done', True)
+                object.last_user = request.user
+                object.last_modified = timezone.now()
+                object.save()
+                self.update_log(object, stage_name + ': marked as done')
+                next_stage = stage + 1
+                result['prev_stage_name'] = stage_name
+                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
+                if stage == 4:
+                    result['status_html'] = '<div class="wf-manager-status tag-wf-awaiting">awaiting parsing</div>'
+                else:
+                    result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\',' + str(next_stage) + ')">\
+                    begin ' + stage_dict[next_stage] + '</button>'
+            elif action == 'begin_stage':
+                stage = int(self.request.POST['code'])
+                stage_name = stage_dict[stage]
+                object.stage = stage
+                object.last_user = request.user
+                object.last_modified = timezone.now()
+                object.save()
+                self.update_log(object, stage_name + ': work commenced')
+                result['stage_name'] = stage_name
+                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
+                result['status_html'] = '<div class="wf-manager-status tag-wf-in_progress">' + stage_name + ' in progress</div>\
+                <button class="wf-manager-status_btn tag-wf-in_progress" role="button" onclick="update_workflow(\'stage_done\', ' + str(stage) + ')">\
+                <i class="far fa-check-square fa-fw"></i> DONE</button>'
+            elif action == 'toggle_help':
+                if object.help_flag:
+                    object.help_flag = False
+                else:
+                    object.help_flag = True
+                object.last_user = request.user
+                object.last_modified = timezone.now()
+                object.save()
+                self.update_log(object, 'help flag set to ' + str(object.help_flag))
+            elif action == 'toggle_public':
+                if object.is_public:
+                    object.is_public = False
+                else:
+                    object.is_public = True
+                object.last_user = request.user
+                object.last_modified = timezone.now()
+                object.save()
+                self.update_log(object, 'public flag set to ' + str(object.is_public))
+            elif action == 'change_status':
+                status = int(self.request.POST['code'])
+                prev_status = object.wf_status
+                object.wf_status = status
+                object.last_user = request.user
+                object.last_modified = timezone.now()
+                object.save()
+                self.update_log(object, 'status changed from "' + status_dict[prev_status] + '" to "' + status_dict[status] + '"')
+                status_name = status_dict[status]
+                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
+                if status != 2:
+                    result['status_html'] = '<div class="wf-manager-status tag-wf-' + status_name + '">' + status_name + '</div>'
+                else:
+                    stage = object.stage
+                    stage_name = stage_dict[stage]
+                    if getattr(object, stage_name + '_done'):
+                        if stage == 4:
+                            result['status_html'] = '<div class="wf-manager-status tag-wf-awaiting">awaiting parsing</div>'
+                        else:
+                            next_stage = stage + 1
+                            result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\', ' + str(next_stage) + ')">\
+                            begin ' + stage_dict[next_stage] + '</button>'
+                    else:
+                        result['status_html'] = '<div class="wf-manager-status tag-wf-in_progress">' + stage_name + ' in progress</div>\
+                        <button class="wf-manager-status_btn tag-wf-in_progress" role="button" onclick="update_workflow(\'stage_done\', ' + str(stage) + ')">\
+                        <i class="far fa-check-square fa-fw"></i> DONE</button>'
             result['message'] = 'Update succesful.'
             status = 201
         except Exception as e:
@@ -1116,52 +883,5 @@ class Sets(DTViewSet):
             status = 400
         return Response(result, status)
 
-    def create(self, request, format=None):
-        result = {}
-        data_dict = get_dte_data(request)
-        data_dict = data_dict[0][1]
-        if request.data.get('endpoint') is not None:
-            data_dict['endpoint'] = request.data.get('endpoint')
-        if request.data.get('qset') is not None:
-            member_list = json.loads(request.data['qset'])
-        else:
-            member_list = None
-        serializer = self.get_serializer(data=data_dict)
-        if serializer.is_valid():
-            new_set = serializer.save()
-            set_object = Set.objects.get(pk=new_set.id)
-            if member_list is not None:
-                new_members = []
-                for i in member_list:
-                    source_object = Source.objects.get(pk=i)
-                    new_entry = Set_x_content()
-                    new_entry.set_id = set_object
-                    new_entry.content_object = source_object
-                    new_members.append(new_entry)
-                Set_x_content.objects.bulk_create(new_members)
-            serializer = SetSerializer(set_object)
-            result = serializer.data
-            status = 201
-        else:
-            result = get_error_array(serializer.errors)
-            status = 400
-        return Response(result, status)
-
-    def get_queryset(self, *args, **kwargs):
-        search_q = Q()
-        if self.request.GET.get('type') is not None:
-            type_q = Q(set_type=int(self.request.GET['type']))
-            search_q &= type_q
-        ownership_q = Q(owner=str(self.request.user.id)) | ~Q(permissions=1)
-        search_q &= ownership_q
-        queryset = self.queryset.filter(search_q)
-        return queryset
-
-    def get_object(self):
-        if self.kwargs.get('pk') is not None:
-            object = self.queryset.get(pk=self.kwargs.get('pk'))
-        else:
-            object = self.queryset.get(pk=self.request.data['data[0][set]'])
-        return object
-
-
+    def update_log(self, source, message):
+        Work_log.objects.create(source=source, event=message)

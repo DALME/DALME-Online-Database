@@ -65,6 +65,6 @@ class WorkflowAccessPolicy(BaseAccessPolicy):
         return request.user == target.owner
 
 
-class ProfileAccessPolicy(BaseAccessPolicy):
+class UserAccessPolicy(BaseAccessPolicy):
     ''' Manages access policies for users/profiles endpoint '''
-    id = 'profile-policy'
+    id = 'user-policy'
