@@ -176,6 +176,7 @@ class Content_attributes(dalmeIntid):
     attribute_type = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='content_types')
     order = models.IntegerField(db_index=True, null=True)
     required = models.BooleanField(default=False)
+    unique = models.BooleanField(default=True)
 
 
 class Source(index.Indexed, dalmeUuid):
