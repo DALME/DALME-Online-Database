@@ -38,6 +38,30 @@ def HealthCheck(request):
     return HttpResponse(status=200)
 
 
+def get_page_chain(breadcrumb, current=None):
+    i_count = len(breadcrumb)
+    title = ''
+    if current and current != breadcrumb[i_count-1][0]:
+        if len(current) > 55:
+            current = current[:55] + ' <i class="fa fa-plus-circle fa-fw" data-toggle="tooltip" data-placement="bottom" title="{}"></i> '.format(current)
+        for i in breadcrumb:
+            if i[1] != '':
+                title += '<a href="{}" class="title_link">{}</a>'.format(i[1], i[0])
+            else:
+                title += i[0]
+            title += ' <i class="fa fa-caret-right fa-fw"></i> '
+        title += '<span class="title_current">{}</span>'.format(current)
+    else:
+        c = 0
+        while c <= i_count - 1:
+            if c == i_count - 1:
+                title += '<span class="title_current">{}</span>'.format(breadcrumb[c][0])
+            else:
+                title += breadcrumb[c][0] + ' <i class="fa fa-caret-right fa-fw"></i> '
+            c = c + 1
+    return title
+
+
 def DownloadAttachment(request, path):
     path_tokens = path.split('/')
     original_filename = path_tokens.pop(-1)
@@ -89,281 +113,24 @@ class DefaultSearch(SearchView):
 
 @method_decorator(login_required, name='dispatch')
 class DTListView(TemplateView):
-    """ Generic list view that feeds Datatables """
     template_name = 'dalme_app/dtlistview.html'
     breadcrumb = []
-    dt_options = {
-        'pageLength': 25,
-        'paging': 'true',
-        'responsive': 'true',
-        'fixedHeader': 'true',
-        'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-        'serverSide': 'true',
-        'stateSave': 'true',
-        'select': {'style': 'single'},
-        'deferRender': 'true',
-        'rowId': '"id"',
-        'processing': 'true',
-        'language': {
-            'searchPlaceholder': 'Search',
-            'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-            }
-        }
-    dt_buttons = [
-        {'extend': 'colvis', 'text': '<i class="fa fa-columns fa-fw"></i>'},
-        {'extend': "pageLength"}
-    ]
-    dte_field_list = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = self.get_breadcrumb()
+        config = self.get_config()
+        breadcrumb = config['breadcrumb']
         sidebar_toggle = self.request.session.get('sidebar_toggle', '')
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
         context['sidebar'] = dm(self.request, state).sidebar
-        list_name = self.get_list_name()
-        _list = self.get_list(list_name)
-        fields_dict = self.get_fields_dict(_list)
-        page_title = self.get_page_title(_list)
-        context['page_title'] = page_title
-        context['page_chain'] = get_page_chain(breadcrumb, page_title)
-        context['dt_options'] = self.get_dt_options(_list, fields_dict)
-        context['dt_editor'] = self.get_dt_editor(_list, fields_dict)
-        context['filters'] = self.get_filters(fields_dict)
-        context['helpers'] = self.get_helpers(_list)
-        context['modules'] = self.get_modules()
+        context['page_title'] = config['page_title']
+        context['page_chain'] = get_page_chain(breadcrumb, context['page_title'])
+        context['config'] = config['dt_config']
+        context['helpers'] = config['helpers']
+        context['template'] = config['template']
         return context
-
-    def get_list_name(self, *args, **kwargs):
-        if hasattr(self, 'list_name'):
-            list_name = self.list_name
-        else:
-            list_name = None
-        return list_name
-
-    def get_list(self, list_name, *args, **kwargs):
-        _list = get_object_or_404(DT_list, short_name=list_name)
-        return _list
-
-    def get_fields_dict(self, _list, *args, **kwargs):
-        fields = ['field__short_name', 'field__name', 'orderable', 'visible', 'searchable', 'render_exp', 'dte_type', 'dte_options',
-                  'dte_message', 'dt_class_name', 'dt_width', 'dt_name', 'dte_name', 'dte_opts', 'is_filter', 'filter_options',
-                  'filter_type', 'filter_lookup', 'order']
-        qset = DT_fields.objects.filter(list=_list.id).order_by('order').values(*fields)
-        fields_dict = {}
-        for i in qset:
-            fields_dict[i['field__short_name']] = i
-        return fields_dict
-
-    def get_breadcrumb(self, *args, **kwargs):
-        if hasattr(self, 'breadcrumb'):
-            breadcrumb = self.breadcrumb
-        else:
-            breadcrumb = None
-        return breadcrumb
-
-    def get_page_title(self, _list, *args, **kwargs):
-        return _list.name
-
-    def get_dt_options(self, _list, fields_dict, *args, **kwargs):
-        dt_options = {}
-        options = self.dt_options
-        options['ajax'] = self.get_dt_ajax_str(_list)
-        dt_options['options'] = options
-        dt_options['buttons'] = self.dt_buttons
-        if options.get('select', {}).get('selector') is not None:
-            dt_options['columnDefs'] = self.get_dt_column_defs(_list, fields_dict, sel=True)
-        else:
-            dt_options['columnDefs'] = self.get_dt_column_defs(_list, fields_dict)
-        return dt_options
-
-    def get_dt_ajax_str(self, _list, *args, **kwargs):
-        if hasattr(_list, 'api_url'):
-            base_url = _list.api_url
-            dt_ajax_str = '"'+base_url+'?format=json"'
-        else:
-            dt_ajax_str = None
-        return dt_ajax_str
-
-    def get_dt_column_defs(self, _list, fields_dict, *args, **kwargs):
-        sel = kwargs.get('sel', False)
-        if sel:
-            column_defs = [{'orderable': 'false', 'className': '"select-checkbox"', 'targets':   0, 'defaultContent': '""'}]
-            col = 1
-        else:
-            column_defs = []
-            col = 0
-        for field, options in fields_dict.items():
-            c_dict = {}
-            if options.get('dt_name') is not None:
-                dt_name = options['dt_name']
-            else:
-                dt_name = options.get('field__short_name')
-            c_dict['title'] = '"'+options.get('field__name')+'"'
-            c_dict['targets'] = col
-            c_dict['data'] = '"'+dt_name+'"'
-            if options.get('dte_name') is not None:
-                c_dict['editField'] = '"'+options.get('dte_name')+'"'
-            c_dict['defaultContent'] = '""'
-            c_dict['visible'] = str(options.get('visible')).lower()
-            c_dict['orderable'] = str(options.get('orderable')).lower()
-            c_dict['searchable'] = str(options.get('searchable')).lower()
-            if options.get('render_exp') is not None:
-                c_dict['render'] = options.get('render_exp')
-            if options.get('dt_width') is not None:
-                c_dict['width'] = '"'+options.get('dt_width')+'"'
-            if options.get('dt_class_name') is not None:
-                c_dict['className'] = '"' + options.get('dt_class_name') + '"'
-            column_defs.append(c_dict)
-            col = col + 1
-        return column_defs
-
-    def get_dte_fields(self, _list, *args, **kwargs):
-        if hasattr(self, 'dte_field_list'):
-            dte_fields = self.dte_field_list
-        else:
-            dte_fields = None
-        return dte_fields
-
-    def get_dt_editor(self, _list, fields_dict, *args, **kwargs):
-        if self.get_dte_fields(_list) is not None:
-            dte_fields = self.get_dte_fields(_list)
-            dt_editor = {}
-            dt_editor['ajax_url'] = _list.api_url
-            fields = []
-            for f in dte_fields:
-                lf = fields_dict.get(f)
-                if lf is not None:
-                    f_dict = {}
-                    if lf.get('dte_name') is not None:
-                        f_dict['name'] = lf['dte_name']
-                    elif lf.get('dt_name') is not None:
-                        f_dict['name'] = lf['dt_name']
-                    else:
-                        f_dict['name'] = lf['field__short_name']
-                    f_dict['label'] = lf['field__name']
-                    if lf.get('dte_type') is not None:
-                        f_dict['type'] = lf['dte_type']
-                    else:
-                        f_dict['type'] = 'text'
-                    if lf.get('dte_opts') is not None:
-                        if f_dict['type'] == 'autoComplete':
-                            ac_opts = eval(lf['dte_opts'])
-                        else:
-                            f_dict['opts'] = eval(lf['dte_opts'])
-                            ac_opts = None
-                    if lf.get('dte_options') is not None:
-                        if f_dict['type'] == 'autoComplete':
-                            if type(ac_opts) is dict:
-                                ac_opts['source'] = eval(lf['dte_options'])
-                            else:
-                                ac_opts = {'source': eval(lf['dte_options'])}
-                            f_dict['opts'] = ac_opts
-                        else:
-                            f_dict['options'] = eval(lf['dte_options'])
-                    if lf.get('dte_message') is not None:
-                        f_dict['fieldInfo'] = lf['dte_message']
-                    fields.append(f_dict)
-            dt_editor['fields'] = fields
-            if self.get_dte_options() is not None:
-                dt_editor['options'] = self.get_dte_options()
-            if self.get_dte_buttons() is not None:
-                dt_editor['buttons'] = self.get_dte_buttons()
-        else:
-            dt_editor = None
-        return dt_editor
-
-    def get_filters(self, fields_dict, *args, **kwargs):
-        filters = []
-        types_w_lookups = ['text', 'date', 'datetime', 'integer']
-        for k, d in fields_dict.items():
-            if d['is_filter']:
-                filter = {}
-                filter['label'] = d['field__name']
-                filter['field'] = k
-                if d.get('filter_type') is not None:
-                    filter['type'] = d['filter_type']
-                else:
-                    filter['type'] = 'text'
-                if d.get('filter_lookup') is not None:
-                    filter['lookup'] = d['filter_lookup']
-                if filter['type'] in types_w_lookups:
-                    filter['lookups'] = self.get_filter_lookups(filter['type'])
-                if filter['type'] == 'check' or filter['type'] == 'select':
-                    if d.get('filter_mode') is not None:
-                        f_mode = d['filter_mode']
-                    else:
-                        f_mode = 'complete'
-                    if d.get('filter_options') is not None:
-                        values = d['filter_options']
-                        filter['options'] = self.filter_options(values, f_mode)
-                filters.append(filter)
-        if filters == []:
-            filters = None
-        return filters
-
-    def filter_options(self, values_exp, mode):
-        values_list = eval(values_exp)
-        if mode == 'strict':
-            op = []
-        elif mode == 'check':
-            op = [{'label': 'None', 'value': 'none'}]
-        else:
-            op = [{'label': 'Any', 'value': 'any'}, {'label': 'None', 'value': 'none'}, {'label': 'divider'}]
-        return op + values_list
-
-    def get_filter_lookups(self, type):
-        lookup_dict = [
-            {'label': 'is', 'value': 'exact', 'types': ['text', 'integer']},
-            {'label': 'contains', 'value': 'contains', 'types': ['text']},
-            {'label': 'starts with', 'value': 'startswith', 'types': ['text']},
-            {'label': 'ends with', 'value': 'endswith', 'types': ['text']},
-            {'label': 'year is', 'value': 'year', 'types': ['date', 'datetime']},
-            {'label': 'month is', 'value': 'month', 'types': ['date', 'datetime']},
-            {'label': 'day is', 'value': 'day', 'types': ['date', 'datetime']},
-            {'label': 'date is', 'value': 'date', 'types': ['date', 'datetime']},
-            {'label': 'hour is', 'value': 'hour', 'types': ['datetime']},
-            {'label': 'minutes are', 'value': 'minute', 'types': ['datetime']},
-            {'label': 'time is', 'value': 'time', 'types': ['datetime']},
-            {'label': 'is greater than', 'value': 'gt', 'types': ['integer']},
-            {'label': 'is greater than or equal to', 'value': 'gte', 'types': ['integer']},
-            {'label': 'is less than', 'value': 'lt', 'types': ['integer']},
-            {'label': 'is less than or equal to', 'value': 'lte', 'types': ['integer']},
-            {'label': 'is in range', 'value': 'range', 'types': ['date', 'datetime', 'integer']},
-            {'label': 'is in list', 'value': 'in', 'types': ['text', 'integer']},
-            {'label': 'is matched by regex', 'value': 'regex', 'types': ['text', 'integer', 'date', 'datetime']},
-            {'label': 'is empty', 'value': 'isnull', 'types': ['text', 'integer', 'date', 'datetime']},
-        ]
-        return [{'label': i['label'], 'value':i['value']} for i in lookup_dict if type in i['types']]
-
-    def get_helpers(self, _list, *args, **kwargs):
-        helpers = _list.helpers
-        if helpers is not None and helpers != '':
-            helpers = [i.strip() for i in helpers.split(',')]
-        return helpers
-
-    def get_dte_options(self, *args, **kwargs):
-        if hasattr(self, 'dt_editor_options'):
-            dte_options = self.dt_editor_options
-        else:
-            dte_options = None
-        return dte_options
-
-    def get_dte_buttons(self, *args, **kwargs):
-        if hasattr(self, 'dt_editor_buttons'):
-            dte_buttons = self.dt_editor_buttons
-        else:
-            dte_buttons = None
-        return dte_buttons
-
-    def get_modules(self, *args, **kwargs):
-        if hasattr(self, 'module_list'):
-            module_list = self.module_list
-        else:
-            module_list = None
-        return module_list
 
 
 @method_decorator(login_required, name='dispatch')
@@ -1599,27 +1366,3 @@ class DalmeLogin(LoginView):
             self.request.GET.get(self.redirect_field_name, '')
         )
         return redirect_to
-
-
-def get_page_chain(breadcrumb, current=None):
-    i_count = len(breadcrumb)
-    title = ''
-    if current and current != breadcrumb[i_count-1][0]:
-        if len(current) > 55:
-            current = current[:55] + ' <i class="fa fa-plus-circle fa-fw" data-toggle="tooltip" data-placement="bottom" title="{}"></i> '.format(current)
-        for i in breadcrumb:
-            if i[1] != '':
-                title += '<a href="{}" class="title_link">{}</a>'.format(i[1], i[0])
-            else:
-                title += i[0]
-            title += ' <i class="fa fa-caret-right fa-fw"></i> '
-        title += '<span class="title_current">{}</span>'.format(current)
-    else:
-        c = 0
-        while c <= i_count - 1:
-            if c == i_count - 1:
-                title += '<span class="title_current">{}</span>'.format(breadcrumb[c][0])
-            else:
-                title += breadcrumb[c][0] + ' <i class="fa fa-caret-right fa-fw"></i> '
-            c = c + 1
-    return title
