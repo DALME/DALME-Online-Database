@@ -44,14 +44,8 @@ class CommentSerializer(serializers.ModelSerializer):
         return ret
 
 
-class DTFieldsSerializer(serializers.ModelSerializer):
-    field_label = serializers.StringRelatedField(source='field')
 
     class Meta:
-        model = DT_fields
-        fields = ('id', 'list', 'field', 'render_exp', 'orderable', 'visible', 'searchable', 'dt_name', 'dte_name', 'dte_type',
-                  'dte_options', 'dte_opts', 'dte_message', 'is_filter', 'filter_type', 'filter_options',
-                  'filter_lookup', 'field_label', 'dt_class_name', 'dt_width', 'order')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -61,13 +55,8 @@ class DTFieldsSerializer(serializers.ModelSerializer):
         return ret
 
 
-class DTListsSerializer(serializers.ModelSerializer):
-    fields = DTFieldsSerializer(many=True, required=False)
 
     class Meta:
-        model = DT_list
-        fields = ('id', 'name', 'short_name', 'description', 'content_types', 'api_url', 'helpers', 'fields')
-        extra_kwargs = {'content_types': {'required': False}}
 
 
 class LanguageSerializer(serializers.ModelSerializer):

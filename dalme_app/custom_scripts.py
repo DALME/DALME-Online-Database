@@ -10,7 +10,7 @@ from datetime import date
 from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
 from django.contrib.auth.models import User
-from dalme_app.apis import normalize_value, filter_on_workflow
+# from dalme_app.apis import normalize_value, filter_on_workflow
 from django.db.models.expressions import RawSQL
 import operator
 from functools import reduce
@@ -241,7 +241,7 @@ def migrate_datasets(request):
     return result
 
 def test_expression(request):
-    record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
+    record = Attribute_type.objects.get(pk=15)
     # att_dict = {}
     # for a in record.attributes.all():
     #     att_dict[a.attribute_type.name] = a.value_STR
@@ -251,8 +251,8 @@ def test_expression(request):
     #avatar = UserProfile.objects.get(pk=profile.user.id).avatar
     #return Profile.objects.get(user=1).profile_image_2
     #avatar = User.objects.get(id=1).wagtailusers.userprofile.avatar
-    #result = blah
-    return sorted(list(set(list(Attribute.objects.filter(attribute_type=28, value_STR__isnull=False).values_list('value_STR', flat=True)))))
+    result = dict(Workflow.PROCESSING_STAGES)
+    return result is None
 
 
 def fix_users(records):

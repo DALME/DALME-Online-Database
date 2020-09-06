@@ -16,12 +16,6 @@
     "dropdown": true
   },
   {
-    "text": "All Sources",
-    "link": "/sources",
-    "iconClass": "fa-asterisk",
-    "child": true
-  },
-  {
     "text": "Archives",
     "link": "/sources?type=archives",
     "iconClass": "fa-landmark",
@@ -219,13 +213,6 @@
     "permissions": ["Developers"]
   },
   {
-    "text": "DataTables Fields",
-    "link": "/models/dt_fields",
-    "iconClass": "fa-cube",
-    "child": true,
-    "permissions": ["Developers"]
-  },
-  {
     "close_dropdown": true
   },
   {
@@ -233,13 +220,6 @@
     "link": "/scripts",
     "iconClass": "fa-code",
     "itemClass": "scripts",
-    "permissions": ["Developers"]
-  },
-  {
-    "text": "Pages",
-    "link": "/pages",
-    "iconClass": "fa-file",
-    "itemClass": "pages",
     "permissions": ["Developers"]
   }
 ]
