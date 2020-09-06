@@ -228,6 +228,11 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
         'dalme_app.utils.DRFDTEParser',
     ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter'
+    ],
     'EXCEPTION_HANDLER': 'dalme_app.utils.DRFDTE_exception_handler',
 }
 
