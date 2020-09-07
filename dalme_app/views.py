@@ -114,7 +114,11 @@ class DefaultSearch(SearchView):
 @method_decorator(login_required, name='dispatch')
 class DTListView(TemplateView):
     template_name = 'dalme_app/dtlistview.html'
+    page_title = None
+    dt_config = None
     breadcrumb = []
+    helpers = None
+    form_template = 'generic_form_template'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -129,8 +133,17 @@ class DTListView(TemplateView):
         context['page_chain'] = get_page_chain(breadcrumb, context['page_title'])
         context['config'] = config['dt_config']
         context['helpers'] = config['helpers']
-        context['template'] = config['template']
+        context['form_template'] = config['form_template']
         return context
+
+    def get_config(self, *args, **kwargs):
+        return {
+            'page_title': self.page_title,
+            'dt_config': self.dt_config,
+            'breadcrumb': self.breadcrumb,
+            'helpers': self.helpers,
+            'form_template': self.form_template
+            }
 
 
 @method_decorator(login_required, name='dispatch')
@@ -506,15 +519,10 @@ def SourceManifest(request, pk):
 @method_decorator(login_required, name='dispatch')
 class UserList(DTListView):
     """ Lists users and allows editing and creation of new records via the API """
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Users',
-            'dt_config': 'users',
-            'breadcrumb': [('System', ''), ('Users', '/users/')],
-            'helpers': ['user_forms'],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Users'
+    dt_config = 'users'
+    breadcrumb = [('System', ''), ('Users', '/users/')]
+    helpers = ['user_forms']
 
 
 @method_decorator(login_required, name='dispatch')
@@ -559,50 +567,30 @@ class UserDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class AsyncTaskList(DTListView):
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Asynchronous Tasks',
-            'dt_config': 'async_tasks',
-            'breadcrumb': [('System', ''), ('Asynchronous Tasks', '/async_tasks')],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Asynchronous Tasks'
+    dt_config = 'async_tasks'
+    breadcrumb = [('System', ''), ('Asynchronous Tasks', '/async_tasks')]
 
 
 @method_decorator(login_required, name='dispatch')
 class CountryList(DTListView):
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Countries',
-            'dt_config': 'countries',
-            'breadcrumb': [('System', ''), ('Countries', '/countries')],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Countries'
+    dt_config = 'countries'
+    breadcrumb = [('System', ''), ('Countries', '/countries')]
 
 
 @method_decorator(login_required, name='dispatch')
 class LocaleList(DTListView):
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Locales',
-            'dt_config': 'locales',
-            'breadcrumb': [('System', ''), ('Locales', '/locales')],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Locales'
+    dt_config = 'locales'
+    breadcrumb = [('System', ''), ('Locales', '/locales')]
 
 
 @method_decorator(login_required, name='dispatch')
 class RightsList(DTListView):
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Rights Policies',
-            'dt_config': 'rights',
-            'breadcrumb': [('Project', ''), ('Rights Policies', '/rights')],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Rights Policies'
+    dt_config = 'rights'
+    breadcrumb = [('Project', ''), ('Rights Policies', '/rights')]
 
 
 @method_decorator(login_required, name='dispatch')
@@ -652,27 +640,18 @@ class RightsDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class LanguageList(DTListView):
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Languages',
-            'dt_config': 'languages',
-            'breadcrumb': [('System', ''), ('Languages', '/languages')],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Languages'
+    dt_config = 'languages'
+    breadcrumb = [('System', ''), ('Languages', '/languages')]
 
 
 @method_decorator(login_required, name='dispatch')
 class ImageList(DTListView):
+    page_title = 'DAM Images'
+    dt_config = 'images'
+    breadcrumb = [('DAM Images', '/images')]
+    helpers = ['preview_module']
 
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'DAM Images',
-            'dt_config': 'images',
-            'breadcrumb': [('DAM Images', '/images')],
-            'helpers': ['preview_module'],
-            'template': 'generic_form_template'
-            }
     # breadcrumb = [('DAM Images', '/images')]
     # list_name = 'images'
     # dt_editor_options = {'idSrc': '"id"'}
@@ -834,14 +813,9 @@ def PageManifest(request, pk):
 
 @method_decorator(login_required, name='dispatch')
 class SetList(DTListView):
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Sets',
-            'dt_config': 'sets',
-            'breadcrumb': [('Project', ''), ('Sets', '/sets')],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Sets'
+    dt_config = 'sets'
+    breadcrumb = [('Project', ''), ('Sets', '/sets')]
 
 
 @method_decorator(login_required, name='dispatch')
@@ -955,14 +929,9 @@ class TicketDetail(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class TicketList(DTListView):
-
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': 'Issue Tickets',
-            'dt_config': 'tickets',
-            'breadcrumb': [('Project', ''), ('Issue Tickets', '/tickets')],
-            'template': 'generic_form_template'
-            }
+    page_title = 'Issue Tickets'
+    dt_config = 'tickets'
+    breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
 
 
 @method_decorator(login_required, name='dispatch')
