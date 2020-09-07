@@ -9,18 +9,13 @@
   },
   {
     "type": "item",
-    "text": "All",
-    "query": "clear"
-  },
-  {
-    "type": "item",
     "text": "Processed",
-    "query": "processed"
+    "query": "{'wf_status': 3}"
   },
   {
     "type": "item",
     "text": "Under Assessment",
-    "query": "assessing"
+    "query": "{'wf_status': 1}"
   },
   {
     "type": "divider"
@@ -28,12 +23,12 @@
   {
     "type": "item",
     "text": "Flagged for help",
-    "query": "help"
+    "query": "{'help_flag': 1}"
   },
   {
     "type": "item",
     "text": "Flagged for publication",
-    "query": "public"
+    "query": "{'is_public': 1}"
   },
   {
     "type": "divider"
@@ -49,27 +44,27 @@
   {
     "type": "item-select",
     "text": "Ingestion",
-    "query": "1"
+    "query": "{'stage': 1"
   },
   {
     "type": "item-select",
     "text": "Transcription",
-    "query": "2"
+    "query": "{'stage': 2"
   },
   {
     "type": "item-select",
     "text": "Markup",
-    "query": "3"
+    "query": "{'stage': 3"
   },
   {
     "type": "item-select",
     "text": "Review",
-    "query": "4"
+    "query": "{'stage': 4"
   },
   {
     "type": "item-select",
     "text": "Parsing",
-    "query": "5"
+    "query": "{'stage': 5"
   },
   {
     "type": "divider"
@@ -85,26 +80,26 @@
   {
     "type": "item",
     "text": "Past week",
-    "query": "timedelta-7"
+    "query": "{'last_modified_lt': 7}"
   },
   {
     "type": "item",
     "text": "Past month",
-    "query": "timedelta-30"
+    "query": "{'last_modified_lt': 7}"
   },
   {
     "type": "item",
     "text": "Past three months",
-    "query": "timedelta-90"
+    "query": "{'last_modified_lt': 7}"
   },
   {
     "type": "item",
     "text": "Past year",
-    "query": "timedelta-365"
+    "query": "{'last_modified_lt': 7}"
   },
   {
     "type": "item",
     "text": "Over a year ago",
-    "query": "timedelta-older"
+    "query": "{'last_modified_lt': 7}"
   }
 ]
