@@ -23,8 +23,8 @@
       </div>
     </div>
   </div>
-{% if template %}
-{% include 'dalme_app/includes/'|add:template|add:'.html' %}
+{% if form_template %}
+{% include 'dalme_app/includes/'|add:form_template|add:'.html' %}
 {% endif %}
 {% if helpers %}
   {% for helper in helpers %}
