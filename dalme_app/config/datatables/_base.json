@@ -1,11 +1,12 @@
 {
   "datatables": {
     "options": {
+      "colReorder": true,
       "pageLength": 25,
       "paging": true,
       "responsive": true,
       "fixedHeader": true,
-      "dom": "<\"card-table-header\"B<\"btn-group ml-auto\"f>r><\"#filters-container.collapse\"><\"panel-container\"<\"panel-left\"t>><\"sub-card-footer\"ip>",
+      "dom": "<\"card-table-header\"B<\"filter-button-container ml-auto\"f>r><\"#filters-container.collapse\"><\"panel-container\"<\"panel-left\"t>><\"sub-card-footer\"ip>",
       "serverSide": true,
       "stateSave": true,
       "select": {
