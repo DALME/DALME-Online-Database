@@ -195,6 +195,7 @@ class Source(index.Indexed, dalmeUuid):
     comments = GenericRelation('Comment')
     sets = GenericRelation('Set_x_content', related_query_name='source')
     primary_dataset = models.ForeignKey('Set', db_index=True, on_delete=models.PROTECT, related_query_name='set_members', null=True)
+    is_private = models.BooleanField(default=False, db_index=True)
 
     search_fields = [
         index.FilterField('name'),
@@ -637,6 +638,7 @@ class GroupProperties(models.Model):
 
     group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name='properties')
     type = models.IntegerField(choices=GROUP_TYPES)
+    description = models.CharField(max_length=255)
 
     def __str__(self):
         return self.group.name
