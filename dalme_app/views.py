@@ -276,15 +276,17 @@ class ModelLists(DTListView):
 
 @method_decorator(login_required, name='dispatch')
 class SourceList(DTListView):
+    helpers = ['source_forms', 'workflow_module', 'corpus_filter_module']
+    form_template = 'source_form_template'
 
     def get_config(self, *args, **kwargs):
-        type = self.request.GET['type']
+        _class = self.request.GET['class']
         return {
-            'page_title': type.capitalize() if type != 'files' else 'Archival Files',
-            'dt_config': 'sources_' + type,
-            'breadcrumb': [('Sources', ''), (type.capitalize(), '/sources?type='+type)],
-            'helpers': ['source_forms', 'workflow_module'],
-            'template': 'source_form_template'
+            'page_title': _class.capitalize().replace('_', ' '),
+            'dt_config': 'sources_' + _class,
+            'breadcrumb': [('Sources', ''), (_class.capitalize().replace('_', ' '), '/sources?class=' + _class)],
+            'helpers': self.helpers,
+            'form_template': self.form_template
             }
 
 

@@ -17,25 +17,25 @@
   },
   {
     "text": "Archives",
-    "link": "/sources?type=archives",
+    "link": "/sources?class=archives",
     "iconClass": "fa-landmark",
     "child": true
   },
   {
     "text": "Archival Files",
-    "link": "/sources?type=files",
+    "link": "/sources?class=archival_files",
     "iconClass": "fa-archive",
     "child": true
   },
   {
     "text": "Records",
-    "link": "/sources?type=records",
+    "link": "/sources?class=records",
     "iconClass": "fa-list-ol",
     "child": true
   },
   {
     "text": "Bibliography",
-    "link": "/sources?type=bibliography",
+    "link": "/sources?class=bibliography",
     "iconClass": "fa-book",
     "child": true
   },

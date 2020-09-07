@@ -25,7 +25,7 @@ from dalme_app.models import (Attribute_type, Content_class, Content_type, Conte
                               Attribute, CountryReference, LocaleReference, Attachment, Ticket,
                               Comment, Workflow, Set, Set_x_content, RightsPolicy, Work_log, get_dam_preview)
 from dalme_app.access_policies import GeneralAccessPolicy, SourceAccessPolicy, SetAccessPolicy, WorkflowAccessPolicy, UserAccessPolicy
-
+from dalme_app.filters import SourceFilter
 
 class DTViewSet(viewsets.ModelViewSet):
     """ Generic viewset for managing communication with DataTables.
@@ -581,7 +581,7 @@ class Sources(DTViewSet):
     permission_classes = (SourceAccessPolicy,)
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
-    filterset_fields = ['type', 'type__name', 'name', 'short_name', 'owner', 'primary_dataset', 'parent', 'has_inventory']
+    filterset_class = SourceFilter
     search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name', 'primary_dataset__name']
     ordering_fields = ['type', 'name', 'short_name', 'owner', 'primary_dataset']
     ordering = ['name']
@@ -648,6 +648,19 @@ class Sources(DTViewSet):
         if self.request.GET.get('st') is not None:
             kwargs['fields'] = ['id', 'name']
         return serializer_class(*args, **kwargs)
+
+    def get_queryset(self, *args, **kwargs):
+        if self.request.GET.get('class') is not None:
+            query = {
+                'archives': Q(type=19),
+                'archival_files': Q(type=12),
+                'records': Q(type=13),
+                'bibliography': Q(type__in=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+            }
+            queryset = Source.objects.filter(query[self.request.GET['class']])
+        else:
+            queryset = Source.objects.all()
+        return queryset
 
 
 class Tasks(DTViewSet):

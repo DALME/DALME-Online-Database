@@ -125,38 +125,6 @@ function general_form_restore(e) {
   }
 }
 
-function update_dt_url(data) {
-  data = JSON.parse(data['data'])
-  console.log(data);
-  var url = remove_param(['search', 'ordering'], dt_table.ajax.url())
-  console.log(url);
-  if (data['order'].length) {
-    var ordering = [];
-    for (let i = 0, len = data['order'].length; i < len; ++i) {
-      let column = data['order'][i]['dir'] == 'asc' ? '' : '-'
-      column = column + data['columns'][data['order'][i]['column']]['data']
-      ordering.push(column)
-    }
-    console.log(ordering);
-    url = url + '&ordering=' + ordering.join(',')
-  }
-  if (data['search']['value'] != '') {
-    url = url + '&search=' + data['search']['value']
-  }
-  console.log(url);
-  dt_table.ajax.url(url)
-}
-
-function set_globals(config) {
-  if (config.hasOwnProperty('globals')) {
-    for (const prop in config['globals']) {
-        if (config['globals'].hasOwnProperty(prop)) {
-          window[prop] = config['globals'][prop];
-        }
-    }
-  }
-}
-
 function add_fields_to_template(tag, fields) {
     for (let i = 0, len = fields.length; i < len; ++i) {
       $(tag).append('<div data-editor-template="' + fields[i] + '"></div>');
@@ -282,6 +250,52 @@ function retrieve_field_options(url) {
           toastr.error('There was an error communicating with the server: '+errorThrown);
       });
   });
+}
+
+function update_dt_url(data) {
+  data = JSON.parse(data['data'])
+  var url = remove_param(['search', 'ordering'], dt_table.ajax.url())
+  if (data['order'].length) {
+    var ordering = [];
+    for (let i = 0, len = data['order'].length; i < len; ++i) {
+      let column = data['order'][i]['dir'] == 'asc' ? '' : '-'
+      column = column + data['columns'][data['order'][i]['column']]['data']
+      ordering.push(column)
+    }
+    url = url + '&ordering=' + ordering.join(',')
+  }
+  if (data['search']['value'] != '') {
+    url = url + '&search=' + data['search']['value']
+  }
+  dt_table.ajax.url(url)
+}
+
+function filter_set(data, options=[]) {
+  var param_list = []
+  for (const prop in data) {
+    if (data.hasOwnProperty(prop)) {
+      param_list.push(prop)
+    }
+  }
+  var url = remove_param(param_list, dt_table.ajax.url())
+  if (!options.includes('clear')) {
+    for (let i = 0, len = param_list.length; i < len; ++i) {
+      if (data[param_list[i]] != 'clear') {
+        url = url + '&' + param_list[i] + '=' + data[param_list[i]]
+      }
+    }
+  }
+  dt_table.ajax.url(url).load();
+}
+
+function set_globals(config) {
+  if (config.hasOwnProperty('globals')) {
+    for (const prop in config['globals']) {
+        if (config['globals'].hasOwnProperty(prop)) {
+          window[prop] = config['globals'][prop];
+        }
+    }
+  }
 }
 
 function fix_dt_search() {
