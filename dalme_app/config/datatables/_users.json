@@ -43,9 +43,6 @@
       "groups"
     ],
     "options": {
-      "select": {
-        "style": "single"
-      },
       "ajax": {
         "url": "/api/users/?format=json"
       }

@@ -1,7 +1,8 @@
 {
   "config": {
     "helpers": [
-      "source_forms"
+      "source_forms",
+      "corpus_filter_module"
     ],
     "template_field_container": "#form-field-container",
     "endpoint": "sources",
@@ -52,36 +53,10 @@
       "attributes.format"
     ],
     "options": {
-      "pageLength": 25,
-      "paging": true,
-      "responsive": true,
-      "fixedHeader": true,
-      "dom": "<\"card-table-header\"B<\"btn-group ml-auto\"f>r><\"#filters-container.collapse\"><\"panel-container\"<\"panel-left\"t>><\"sub-card-footer\"ip>",
-      "serverSide": true,
-      "stateSave": true,
-      "select": {
-        "style": "single"
-      },
-      "deferRender": true,
-      "rowId": "id",
-      "processing": true,
-      "language": {
-        "searchPlaceholder": "Search",
-        "processing": "<div class=\"spinner-border ml-auto mr-auto\" role=\"status\"><span class=\"sr-only\">Loading...</span></div>"
-      },
       "ajax": {
-        "url": "/api/sources/?format=json&type=12"
+        "url": "/api/sources/?format=json&class=archival_files&mode=own"
       }
-    },
-    "buttons": [
-      {
-        "button": "colvis"
-      },
-      {
-        "button": "page_length"
-      }
-    ],
-    "overrides": {}
+    }
   },
   "editor": {
     "fields": [
@@ -101,31 +76,15 @@
     "options": {
       "ajax": {
         "create": {
-          "type": "POST",
-          "url": "/api/sources/",
-          "headers": {
-            "Content-Type": "application/json-dte",
-            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
-          }
+          "url": "/api/sources/"
         },
         "edit": {
-          "type": "PATCH",
-          "url": "/api/sources/_id_/",
-          "headers": {
-            "Content-Type": "application/json-dte",
-            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
-          }
+          "url": "/api/sources/_id_/"
         },
         "remove": {
-          "type": "DELETE",
-          "url": "/api/sources/_id_/",
-          "headers": {
-            "Content-Type": "application/json-dte",
-            "Accept": "application/json-dte, text/javascript, */*; q=0.01"
-          }
+          "url": "/api/sources/_id_/"
         }
       },
-      "idSrc": "id",
       "template": "#source-form-template"
     },
     "buttons": [
