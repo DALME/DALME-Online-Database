@@ -358,9 +358,9 @@ function setTagMenu(action) {
       if (typeof tag_menu_html == 'undefined') {
           $.ajax({
               method: "GET",
-              url: "/api/options/?target=json_file&name=editor_tei_tags&format=json",
+              url: "/api/configs/?target=editor_tei_tags"
           }).done(function(data, textStatus, jqXHR) {
-              tei_tags = data.json_file;
+              tei_tags = data[0];
               tag_menu_html = '';
               for (let i = 0, len = tei_tags.length; i < len; ++i) {
                   let item = tei_tags[i];

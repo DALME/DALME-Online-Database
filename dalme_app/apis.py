@@ -202,15 +202,18 @@ class Configs(viewsets.ViewSet):
 
     def list(self, request, *args, **kwargs):
         result = []
-        if self.request.GET.get('target') is None or self.request.GET.get('path') is None:
-            result = {'error': 'Request has no target/path information.'}
+        if self.request.GET.get('target') is None:
+            result = {'error': 'Request has no target information.'}
             status = 400
         else:
-            path = self.request.GET['path'].split(',')
+            path = self.request.GET['path'].split(',') if self.request.GET.get('path') is not None else ''
             if self.request.GET.get('base') is not None:
                 files = [self.request.GET['target'], 'base']
             else:
-                files = json.loads(self.request.GET['target'])
+                try:
+                    files = json.loads(self.request.GET['target'])
+                except ValueError:
+                    files = [self.request.GET['target']]
             if self.request.GET.get('buttons') is not None:
                 files = [i['button'] for i in files if request.user.has_perm(i.get('permissions', 'auth.view_user'))]
             try:
