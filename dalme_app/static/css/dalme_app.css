@@ -1820,12 +1820,44 @@ div.DTE_Field_Type_textarea textarea {
   padding: 0 !important;
 }
 
-.dt-buttons button.btn {
+.filter-button-container {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+
+.dt-buttons button.btn,
+.dt-extra-buttons button.btn {
   font-size: 13px !important;
   background-color: #fff;
   border-color: #a3b1bd;
   color: #787878;
   padding: 4px 8px;
+}
+
+.dt-buttons button.btn:hover,
+.dt-extra-buttons button.btn:hover,
+.dt-buttons button.active:hover,
+.dt-extra-buttons button.active:hover  {
+  background-color: #0361aa;
+  border-color: #0361aa;
+  color: #fff;
+}
+
+.dt-buttons button.disabled:hover,
+.dt-extra-buttons button.disabled:hover {
+  background-color: #fff;
+  border-color: #a3b1bd;
+  color: #787878;
+  cursor: default;
+}
+
+.dt-buttons button.active,
+.dt-extra-buttons button.active {
+  background-color: #86c2f1;
+  border-color: #6d8fad;
+  color: #004fa0;
 }
 
 .dt-btn-group {
@@ -1870,19 +1902,6 @@ div.DTE_Field_Type_textarea textarea {
   color: #3a3b45 !important;
   background-color: #e3e4e7 !important;
   border-color: #a5a5a5 !important;
-}
-
-.dt-buttons button.btn:hover {
-  background-color: #0361aa;
-  border-color: #0361aa;
-  color: #fff;
-}
-
-.dt-buttons button.disabled:hover {
-  background-color: #fff;
-  border-color: #a3b1bd;
-  color: #787878;
-  cursor: default;
 }
 
 .btn_single {
@@ -2667,6 +2686,10 @@ li.search-field input.default {
   color: #0361aa;
   text-decoration: none;
   border-color: #0361aa;
+}
+
+.dropdown-tag.active {
+  background-color: #e4e4e4;
 }
 
 .dropdown-item-select.active {
