@@ -10,7 +10,7 @@
       "attribute_concordance": {
         "name": "name",
         "administrative_region": "administrative_region",
-        "country.value": "country"
+        "country": "country.id"
       }
     }
   },

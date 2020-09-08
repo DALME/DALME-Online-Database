@@ -120,7 +120,6 @@ class AttributeSerializer(serializers.ModelSerializer):
 
 
 class AttributeTypeSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Attribute_type
         fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'options_list', 'same_as')
@@ -193,31 +192,32 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializer(serializers.ModelSerializer):
-    parent_name = serializers.StringRelatedField(source='parent')
-
     class Meta:
         model = LanguageReference
-        fields = ('id', 'glottocode', 'iso6393', 'name', 'type', 'parent', 'parent_name')
+        fields = ('id', 'glottocode', 'iso6393', 'name', 'type', 'parent')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['parent'] and ret['parent_name']:
-            name = ret.pop('parent_name')
-            ret['parent'] = {'name': name, 'value': ret['parent']}
+        if ret.get('parent') is not None:
+            ret['parent'] = {
+                'name': instance.parent.name,
+                'id': instance.parent.id
+                }
         return ret
 
 
 class LocaleSerializer(serializers.ModelSerializer):
-    country_name = serializers.StringRelatedField(source='country')
-
     class Meta:
         model = LocaleReference
-        fields = ('id', 'name', 'administrative_region', 'country', 'country_name')
+        fields = ('id', 'name', 'administrative_region', 'country')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        country_name = ret.pop('country_name')
-        ret['country'] = {'name': country_name, 'value': ret['country']}
+        if ret.get('country') is not None:
+            ret['country'] = {
+                'name': instance.country.name,
+                'id': instance.country.id
+                }
         return ret
 
 

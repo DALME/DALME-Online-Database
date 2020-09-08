@@ -1,5 +1,5 @@
 {
-    "name": "country.value",
+    "name": "country.id",
     "label": "Country",
     "type": "selectize",
     "opts": {

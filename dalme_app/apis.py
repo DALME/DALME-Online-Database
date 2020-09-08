@@ -281,7 +281,7 @@ class Countries(DTViewSet):
     permission_classes = (GeneralAccessPolicy,)
     queryset = CountryReference.objects.all()
     serializer_class = CountrySerializer
-    choice_keys = ['i[\'name\']', 'i[\'name\']']
+    #choice_keys = ['i[\'name\']', 'i[\'name\']']
 
 
 class Groups(DTViewSet):
@@ -426,7 +426,7 @@ class Languages(DTViewSet):
     permission_classes = (GeneralAccessPolicy,)
     queryset = LanguageReference.objects.all()
     serializer_class = LanguageSerializer
-    choice_keys = ['i[\'name\']', 'i[\'iso6393\']']
+    # choice_keys = ['i[\'name\']', 'i[\'iso6393\']']
 
 
 class Locales(DTViewSet):
