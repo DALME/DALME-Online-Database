@@ -23,12 +23,14 @@ AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 SAML_CERT = os.environ.get('SAML_CERT', '')
 SAML_KEY = os.environ.get('SAML_KEY', '')
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
+DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 
 DEBUG = False
 ALLOWED_HOSTS = ['.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
