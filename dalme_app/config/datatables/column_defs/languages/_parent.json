@@ -1,0 +1,9 @@
+{
+    "title": "Parent",
+    "data": "parent.name",
+    "editField": "parent.id",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true
+}

@@ -1,0 +1,13 @@
+{
+  "name": "parent.id",
+  "label": "Parent",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select parent",
+    "preload": true
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/languages/?format=select&type=language&q="
+  }
+}

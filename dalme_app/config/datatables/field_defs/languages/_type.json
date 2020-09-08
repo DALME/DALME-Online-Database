@@ -1,0 +1,21 @@
+{
+  "name": "type",
+  "label": "Type",
+  "type": "selectize",
+  "opts": {
+        "placeholder": "Select type"
+  },
+  "options": {
+    "type": "list",
+    "list": [
+      {
+          "label": "language",
+          "value": "language"
+      },
+      {
+          "label": "dialect",
+          "value": "dialect"
+      }
+    ]
+  }
+}

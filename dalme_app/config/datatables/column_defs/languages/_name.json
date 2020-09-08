@@ -1,0 +1,8 @@
+{
+    "title": "Name",
+    "data": "name",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true
+}
