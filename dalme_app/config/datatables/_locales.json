@@ -1,0 +1,65 @@
+{
+  "config": {
+    "template_field_container": "#form-field-container",
+    "endpoint": "locales",
+    "globals": {
+      "messages_list": {
+        "create_success": "The locale was created succesfully.",
+        "edit_success": "The locale was updated succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "administrative_region": "administrative_region",
+        "country.value": "country"
+      }
+    }
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "name",
+      "administrative_region",
+      "country"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/locales/?format=json"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "administrative_region",
+      "country"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/locales/"
+        },
+        "edit": {
+          "url": "/api/locales/_id_/"
+        },
+        "remove": {
+          "url": "/api/locales/_id_/"
+        }
+      },
+      "template": "#generic-form-template"
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_locale"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_locale"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_locale"
+      }
+    ]
+  }
+}

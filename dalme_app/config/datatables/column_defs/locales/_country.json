@@ -1,0 +1,10 @@
+{
+    "title": "Country",
+    "data": "country.name",
+    "editField": "country.value",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap"
+}
