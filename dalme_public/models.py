@@ -361,9 +361,9 @@ class Features(DALMEPage):
         context = super().get_context(request)
         filtered = FeaturedFilter(
             request.GET,
-            queryset=self.get_children().live().specific().order_by(
-                '-first_published_at'
-            )
+            queryset=self.get_children().live().specific().annotate(
+                published=Coalesce('go_live_at', 'first_published_at')
+            ).order_by('-published')
         )
         context['featured'] = filtered.qs
         return context

@@ -104,16 +104,16 @@ def get_flat_nav(context):
 
 @register.simple_tag
 def get_object_nav():
-    return reversed(FeaturedObject.objects.all().order_by(
-        '-first_published_at'
-    )[:3])
+    return FeaturedObject.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
 
 
 @register.simple_tag
 def get_inventory_nav():
-    return reversed(FeaturedInventory.objects.all().order_by(
-        '-first_published_at'
-    )[:3])
+    return FeaturedInventory.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
 
 
 @register.simple_tag(takes_context=True)
