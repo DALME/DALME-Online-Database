@@ -1,71 +1,94 @@
-function build_datatable(target, config) {
+function initialize_dt(config, editor, target) {
   $.ajax({
       method: "GET",
       url: "/api/configs/?path=datatables&target="+config+"&base=true"
   }).done(function(data, textStatus, jqXHR) {
-      var config_data = data[0]['config']
-      set_globals(config_data);
-      var table_options = set_ajax_paras(_.merge(data[1].datatables.options, data[0].datatables.options));
+      set_globals(data[0]['config']);
+      if (editor && data[0].hasOwnProperty('editor')) {
+        start_editor(data, target);
+      } else {
+        start_datatables(data, target, false);
+      }
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+      toastr.error('There was an error communicating with the server: ' + errorThrown);
+  });
+}
+
+function start_editor(data, target) {
+  var config_data = data[0]['config']
+  get_dt_elements({
+        type: 'field_defs',
+        el_list: data[0].editor.fields,
+        overrides: data[0].editor.overrides,
+        endpoint: config_data.endpoint
+  }).then(function(e_fields) {
       var editor_options = set_ajax_paras(_.merge(data[1].editor.options, data[0].editor.options));
       if (editor_options.hasOwnProperty('template')) {
           add_fields_to_template(config_data.template_field_container, Object.values(attribute_concordance));
       }
-      get_dt_elements({
-            type: 'field_defs',
-            el_list: data[0].editor.fields,
-            overrides: data[0].editor.overrides,
-            endpoint: config_data.endpoint
-      }).then(function(e_fields) {
-          editor_options['fields'] = e_fields;
-          editor_options['table'] = target;
-          dt_editor = new $.fn.dataTable.Editor(editor_options);
-          one_time_general_setup = false;
-          dt_editor.on('open.dalme', general_form_setup);
-          dt_editor.on('close.dalme', general_form_restore);
-          dt_editor.on('postSubmit.dalme', function(e, json, data, action, xhr) {
-              if (json != null && json.hasOwnProperty('fieldErrors')) {
-                for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
-                  if (json['fieldErrors'][i].hasOwnProperty('name')) {
-                      json['fieldErrors'][i]['name'] = attribute_concordance[json['fieldErrors'][i]['name']];
-                  }
-                }
+      editor_options['fields'] = e_fields;
+      if (typeof target != 'undefined') { editor_options['table'] = target }
+      dt_editor = new $.fn.dataTable.Editor(editor_options);
+      one_time_general_setup = false;
+      dt_editor.on('open.dalme', general_form_setup);
+      dt_editor.on('close.dalme', general_form_restore);
+      dt_editor.on('postSubmit.dalme', function(e, json, data, action, xhr) {
+          if (json != null && json.hasOwnProperty('fieldErrors')) {
+            for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
+              if (json['fieldErrors'][i].hasOwnProperty('name')) {
+                  json['fieldErrors'][i]['name'] = attribute_concordance[json['fieldErrors'][i]['name']];
               }
-          });
-          dt_editor.on('submitSuccess', function(e, json, data, action) { toastr.success(messages_list[action+'_success']) });
-          get_dt_buttons(_.merge(data[1].datatables.buttons, data[0].datatables.buttons), data[0].editor.buttons, dt_editor)
-          .then(function(buttons) {
-              table_options['buttons'] = buttons;
-              get_dt_elements({
-                type: 'column_defs',
-                el_list: data[0].datatables.columns,
-                overrides: data[0].datatables.overrides,
-                endpoint: config_data.endpoint
-              }).then(function(t_columns) {
-                  table_options['columnDefs'] = t_columns;
-                  dt_table = $(target).DataTable(table_options);
-                  dt_table.on('init', function() {
-                      fix_dt_search();
-                      dt_table.on('preXhr.dt', function (e, settings, data) { update_dt_url(data); });
-                      dt_table.on('draw.dalme', function() {
-                          dt_table.columns.adjust();
-                          dt_table.responsive.recalc();
-                          window.dispatchEvent(new Event('resize'));
-                      });
-                      dt_table.on('column-visibility.dalme', function() {
-                          dt_table.columns.adjust();
-                          dt_table.responsive.recalc();
-                          window.dispatchEvent(new Event('resize'));
-                      });
-                      if (Array.isArray(config_data.helpers) && config_data.helpers.length) {
-                        for (let i = 0, len = config_data.helpers.length; i < len; ++i) { eval(config_data.helpers[i]+'_init()'); };
-                      };
-                    });
-              });
-          });
-        });
-  }).fail(function(jqXHR, textStatus, errorThrown) {
-      toastr.error('There was an error communicating with the server: '+errorThrown);
+            }
+          }
+      });
+      dt_editor.on('submitSuccess', function(e, json, data, action) { toastr.success(messages_list[action+'_success']) });
+      if (typeof target != 'undefined') {
+        start_datatables(data, target, true);
+      } else {
+        load_helpers(config_data);
+      }
   });
+}
+
+function start_datatables(data, target, editor) {
+  var config_data = data[0]['config']
+  var table_options = set_ajax_paras(_.merge(data[1].datatables.options, data[0].datatables.options));
+  let editor_buttons = editor ? data[0].editor.buttons : []
+  let editor_instance = editor ? dt_editor : null
+  get_dt_buttons(_.merge(data[1].datatables.buttons, data[0].datatables.buttons), editor_buttons, editor_instance)
+  .then(function(buttons) {
+    table_options['buttons'] = buttons;
+    get_dt_elements({
+      type: 'column_defs',
+      el_list: data[0].datatables.columns,
+      overrides: data[0].datatables.overrides,
+      endpoint: config_data.endpoint
+    }).then(function(t_columns) {
+        table_options['columnDefs'] = t_columns;
+        dt_table = $(target).DataTable(table_options);
+        dt_table.on('init', function() {
+            fix_dt_search();
+            dt_table.on('preXhr.dt', function (e, settings, data) { update_dt_url(data); });
+            dt_table.on('draw.dalme', function() {
+                dt_table.columns.adjust();
+                dt_table.responsive.recalc();
+                window.dispatchEvent(new Event('resize'));
+            });
+            dt_table.on('column-visibility.dalme', function() {
+                dt_table.columns.adjust();
+                dt_table.responsive.recalc();
+                window.dispatchEvent(new Event('resize'));
+            });
+          });
+        load_helpers(config_data);
+      });
+  });
+}
+
+function load_helpers(config_data) {
+  if (Array.isArray(config_data.helpers) && config_data.helpers.length) {
+    for (let i = 0, len = config_data.helpers.length; i < len; ++i) { eval(config_data.helpers[i]+'_init()'); };
+  };
 }
 
 function set_ajax_paras(options) {
@@ -191,6 +214,12 @@ function process_dt_fields(type, fields, overrides) {
                   case 'api_call':
                       fields[i]['opts']['load'] = eval("(function(query, callback) {$.ajax({url: \"" + opt_object['url'] + "\"\+ encodeURIComponent(query),type: 'GET',error: function() {callback();},success: function(res) {callback(res);}});})")
                       delete fields[i]['options'];
+                      break;
+                  case 'api_call_x':
+                      fields[i]['opts']['load'] = eval("(function(query, callback) {$.ajax({url: \"" + opt_object['url'] + "\"\+ encodeURIComponent(query),type: 'GET',error: function() {callback();},success: function(res) {callback(res);}});})")
+                      fields[i]['opts']['render'] = eval("({option: function(item, escape) {return '<div class=\"pt-2 pb-2 pl-2 pr-2\"><div class=\"formset_flatentry_title\">' + escape(item.label) + '<\/div><div class=\"formset_flatentry_detail\">' + escape(item.detail) + '<\/div><\/div>';}})")
+                      delete fields[i]['options'];
+
                 }
               }
             }

@@ -5,7 +5,7 @@
 <script type="text/javascript" src="{% static 'dalme_helpers/datatable_utils.js' %}"></script>
 <script type="text/javascript">
   $(document).ready( function () {
-    build_datatable("#dataTables-list", "{{ config }}");
+    initialize_dt("{{ config }}", {{ editor|safe }}, "#dataTables-list");
   });
 </script>
 {% endblock %}

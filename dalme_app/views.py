@@ -119,6 +119,7 @@ class DTListView(TemplateView):
     breadcrumb = []
     helpers = None
     form_template = 'generic_form_template'
+    editor = 'true'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -134,6 +135,7 @@ class DTListView(TemplateView):
         context['config'] = config['dt_config']
         context['helpers'] = config['helpers']
         context['form_template'] = config['form_template']
+        context['editor'] = config['editor']
         return context
 
     def get_config(self, *args, **kwargs):
@@ -142,7 +144,8 @@ class DTListView(TemplateView):
             'dt_config': self.dt_config,
             'breadcrumb': self.breadcrumb,
             'helpers': self.helpers,
-            'form_template': self.form_template
+            'form_template': self.form_template,
+            'editor': self.editor
             }
 
 
@@ -291,6 +294,7 @@ class ModelLists(DTListView):
 class SourceList(DTListView):
     helpers = ['source_forms', 'workflow_module', 'corpus_filter_module']
     form_template = 'source_form_template'
+    editor = 'true'
 
     def get_config(self, *args, **kwargs):
         _class = self.request.GET['class']
@@ -299,7 +303,8 @@ class SourceList(DTListView):
             'dt_config': 'sources_' + _class,
             'breadcrumb': [('Sources', ''), (_class.capitalize().replace('_', ' '), '/sources?class=' + _class)],
             'helpers': self.helpers,
-            'form_template': self.form_template
+            'form_template': self.form_template,
+            'editor': self.editor
             }
 
 
@@ -570,6 +575,7 @@ class AsyncTaskList(DTListView):
     page_title = 'Asynchronous Tasks'
     dt_config = 'async_tasks'
     breadcrumb = [('System', ''), ('Asynchronous Tasks', '/async_tasks')]
+    editor = 'false'
 
 
 @method_decorator(login_required, name='dispatch')
