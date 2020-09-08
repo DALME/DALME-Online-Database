@@ -194,11 +194,9 @@ def get_features_nav_q(key):
 
 @register.simple_tag()
 def get_recent_objects():
-    objs = reversed(
-        FeaturedObject.objects.live().specific().annotate(
-            published=Coalesce('go_live_at', 'first_published_at')
-        ).order_by('-published')[:3]
-    )
+    objs = FeaturedObject.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
     return [
         {'url': obj.url, 'month': month_name[obj.published_switch.month]}
         for obj in objs
@@ -207,11 +205,9 @@ def get_recent_objects():
 
 @register.simple_tag()
 def get_recent_inventories():
-    objs = reversed(
-        FeaturedInventory.objects.live().specific().annotate(
-            published=Coalesce('go_live_at', 'first_published_at')
-        ).order_by('-published')[:3]
-    )
+    objs = FeaturedInventory.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
     return [
         {'url': obj.url, 'month': month_name[obj.published_switch.month]}
         for obj in objs
@@ -220,10 +216,9 @@ def get_recent_inventories():
 
 @register.simple_tag()
 def get_recent_essays():
-    objs = reversed(Essay.objects.live().annotate(
-            published=Coalesce('go_live_at', 'first_published_at')
-        ).order_by('-published')[:3]
-    )
+    objs = Essay.objects.live().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
     return [
         {'url': obj.url, 'month': month_name[obj.published_switch.month]}
         for obj in objs

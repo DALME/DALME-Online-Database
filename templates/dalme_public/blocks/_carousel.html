@@ -47,15 +47,17 @@
       </a>
     {% endif %}
 
-    <ol class="carousel-indicators">
-      {% for slide in slides %}
-        {% if forloop.counter0 == 0 %}
-          <li data-target="#carousel" data-slide-to="0" class="active"></li>
-        {% else %}
-          <li data-target="#carousel" data-slide-to="{{ forloop.counter0 }}"></li>
-        {% endif %}
-      {% endfor %}
-    </ol>
+    {% if slides|length > 1 %}
+      <ol class="carousel-indicators">
+        {% for slide in slides %}
+          {% if forloop.counter0 == 0 %}
+            <li data-target="#carousel" data-slide-to="0" class="active"></li>
+          {% else %}
+            <li data-target="#carousel" data-slide-to="{{ forloop.counter0 }}"></li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+    {% endif %}
 
   </div>
 {% endwith %}

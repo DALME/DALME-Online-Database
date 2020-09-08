@@ -914,6 +914,7 @@ i.inactive {
 }
 .app nav > ul {
   flex-direction: row-reverse;
+  margin-bottom: 0;
 }
 .app nav li {
   cursor: pointer;

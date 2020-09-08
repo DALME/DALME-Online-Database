@@ -3,6 +3,7 @@ import textwrap
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.functions import Coalesce
 from django.db.models import F
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -283,11 +284,15 @@ class Home(DALMEPage):
     def get_context(self, request):
         context = super().get_context(request)
 
-        objects = FeaturedObject.objects.live().order_by('-first_published_at')
-        inventories = FeaturedInventory.objects.live().order_by(
-            '-first_published_at'
-        )
-        essays = Essay.objects.live().order_by('-first_published_at')
+        objects = FeaturedObject.objects.live().specific().annotate(
+            published=Coalesce('go_live_at', 'first_published_at')
+        ).order_by('-published')
+        inventories = FeaturedInventory.objects.live().specific().annotate(
+            published=Coalesce('go_live_at', 'first_published_at')
+        ).order_by('-published')
+        essays = Essay.objects.live().specific().annotate(
+            published=Coalesce('go_live_at', 'first_published_at')
+        ).order_by('-published')
 
         context['featured_object'] = objects.last()
         context['featured_inventory'] = inventories.last()
