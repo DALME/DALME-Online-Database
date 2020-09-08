@@ -16,14 +16,14 @@
       "attribute_concordance": {
         "first_name": "first_name",
         "last_name": "last_name",
-        "full_name": "full_name",
+        "full_name": "profile.full_name",
         "email": "email",
         "username": "username",
         "password": "password",
+        "groups": "groups[].id",
         "is_active": "is_active",
         "is_staff": "is_staff",
-        "is_superuser": "is_superuser",
-        "groups.id": "groups"
+        "is_superuser": "is_superuser"
       }
     }
   },

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes, Set_x_content, Page, Source, TaskList, Task,
-                              rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type,
+                              rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type, GroupProperties,
                               CountryReference, LocaleReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
@@ -26,66 +26,55 @@ class DynamicSerializer(serializers.ModelSerializer):
                     self.fields.pop(k)
 
 
+class GroupPropertiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroupProperties
+        fields = ('type', 'description')
+
+
 class GroupSerializer(serializers.ModelSerializer):
     """ Basic serializer for user group data """
-    name = serializers.CharField(max_length=255, required=False)
+    properties = GroupPropertiesSerializer()
 
     class Meta:
         model = Group
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'properties')
+
+
+class ProfileSerializer(DynamicSerializer):
+    """ Serialises user profiles """
+    class Meta:
+        model = Profile
+        fields = ('full_name',)
 
 
 class UserSerializer(DynamicSerializer):
-    """ Serializer for user data """
+    """ Serializes user and profile data """
     groups = GroupSerializer(many=True, required=False)
     last_login = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
     date_joined = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
-    full_name = serializers.CharField(source='profile.full_name', read_only=True, required=False)
+    profile = ProfileSerializer()
 
     class Meta:
         model = User
         fields = ('id', 'last_login', 'is_superuser', 'username', 'first_name', 'last_name',
-                  'email', 'is_staff', 'is_active', 'date_joined', 'groups', 'full_name')
+                  'email', 'is_staff', 'is_active', 'date_joined', 'groups', 'profile')
         extra_kwargs = {'username': {'validators': []}}
 
-
-class ProfileSerializer(DynamicSerializer):
-    """ Serialises user profiles and combines user data """
-    user = UserSerializer(required=True)
-    user_id = serializers.IntegerField(source='user.id')
-
-    class Meta:
-        model = Profile
-        fields = ('id', 'full_name', 'user', 'user_id')
-
     def update(self, instance, validated_data):
-        """ Update profile and user. Assumes there is a user for every profile """
-        user_data = validated_data.pop('user')
-        groups = self.initial_data.pop('groups', None)
-        super().update(instance, validated_data)
-        user = instance.user
-        for attr, value in user_data.items():
-            setattr(user, attr, value)
-        user.save()
-        if groups is not None:
-            user.groups.clear()
-            for g in groups:
-                grp = Group.objects.get(pk=g)
-                user.groups.add(grp)
-        return instance
+        if validated_data.get('profile') is not None:
+            profile_data = validated_data.pop('profile')
+            profile = instance.profile
+            for attr, value in profile_data.items():
+                setattr(profile, attr, value)
+            profile.save()
+        return super().update(instance, validated_data)
 
     def create(self, validated_data):
-        """ Create profile and user. Assumes there is a user for every profile """
-        user_data = validated_data.pop('user')
-        user_data.pop('groups')
-        user = User.objects.create_user(**user_data)
-        if self.context.get('groups') is not None:
-            groups = self.context['groups']
-            for g in groups:
-                grp = Group.objects.get(pk=g)
-                user.groups.add(grp)
-        profile = Profile.objects.create(user=user, **validated_data)
-        return profile
+        profile_data = validated_data.pop('profile')
+        user = User.objects.create_user(**validated_data)
+        Profile.objects.create(user=user, **profile_data)
+        return user
 
 
 class AsyncTaskSerializer(serializers.ModelSerializer):
@@ -495,7 +484,7 @@ class TranscriptionSerializer(serializers.ModelSerializer):
 
 class WorkflowSerializer(serializers.ModelSerializer):
     """Basic serializer for workflow control"""
-    last_user = UserSerializer(fields=['full_name', 'username'])
+    last_user = UserSerializer(fields=['username', 'profile'])
 
     class Meta:
         model = Workflow
@@ -510,7 +499,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             # 'timestamp': round_timesince(datetime.datetime.fromisoformat(ret.pop('last_modified'))),
             # version for Python 3.6 (has to remove : from utcoffset because ISO standard is not properly implemented)
             'timestamp': round_timesince(datetime.datetime.strptime(tstamp[0:-3:]+tstamp[-2::], '%Y-%m-%dT%H:%M:%S.%f%z')),
-            'user': last_user['full_name'],
+            'user': last_user['profile']['full_name'],
             'username': last_user['username']
         }
         return ret

@@ -6,7 +6,7 @@ function user_forms_init() {
   dt_editor.on('submitSuccess.dalme', function(e, json, data, action) { location.reload(); });
 }
 
-function change_form(e, action) {
+function change_form(e, mode, action) {
   if (e.type == 'open') {
     if (action == 'edit') {
       toggle_password_button(e);
@@ -42,7 +42,7 @@ function reset_password() {
 function toggle_password_button(e) {
   var container = $(dt_editor.field('password').node());
   var label = $(container).find('label');
-  var button = '<div class="col-lg-8"><button class="btn btn-light ml-0" type="button" id="reset_password">Reset password</button></div>';
+  var button = '<div><button class="btn btn-light ml-0" type="button" id="reset_password">Reset password</button></div>';
   if (e.type == 'open' && typeof divs == 'undefined') { divs = $(container).children('div') };
   if (e.type == 'open') {
     $(divs).remove();
@@ -63,7 +63,7 @@ function suggest_fullname() {
   var last_name = $(dt_editor.field('last_name').node()).find('input').val();
   if (first_name != '' && last_name != '') {
     var suggestion = first_name+' '+last_name;
-    $(dt_editor.field('full_name').node()).find('input').val(suggestion);
+    $(dt_editor.field('profile.full_name').node()).find('input').val(suggestion);
   }
 }
 

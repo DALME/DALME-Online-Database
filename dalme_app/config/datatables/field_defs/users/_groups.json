@@ -8,7 +8,7 @@
     "maxItems": null
   },
   "options": {
-    "type": "api_call",
+    "type": "api_call_x",
     "url": "/api/groups/?format=select&q="
   }
 }

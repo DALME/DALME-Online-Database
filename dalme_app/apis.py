@@ -293,6 +293,7 @@ class Groups(DTViewSet):
     search_fields = ['name']
     ordering_fields = ['id', 'name']
     ordering = ['name']
+    choice_keys = ['i[\'name\']', 'i[\'id\']', 'i[\'properties\'][\'description\']']
 
 
 class Images(DTViewSet):
@@ -779,7 +780,7 @@ class Users(DTViewSet):
     search_fields = ['username', 'email', 'profile__full_name', 'first_name', 'last_name']
     ordering_fields = ['id', 'username', 'email', 'profile__full_name', 'last_login', 'date_joined', 'is_staff', 'is_active', 'is_superuser']
     ordering = ['first_name']
-    choice_keys = ['i[\'full_name\']', 'i[\'id\']']
+    choice_keys = ['i[\'profile\'][\'full_name\']', 'i[\'id\']']
 
     @action(detail=True, methods=['post'])
     def reset_password(self, request, *args, **kwargs):

@@ -1,5 +1,5 @@
 {
-    "name": "full_name",
+    "name": "profile.full_name",
     "label": "Full name",
     "type": "text"
 }
