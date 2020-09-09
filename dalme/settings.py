@@ -41,6 +41,8 @@ CSRF_COOKIE_DOMAIN = '.dalme.org'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'dynamic_preferences',
+    'dynamic_preferences.users.apps.UserPreferencesConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -113,6 +115,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'dalme_public.context_processors.year',
                 'dalme_public.context_processors.project',
+                'django.template.context_processors.request',
+                'dynamic_preferences.processors.global_preferences',
             ],
             'debug': DEBUG,
         },
@@ -236,6 +240,15 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter'
     ],
     'EXCEPTION_HANDLER': 'dalme_app.utils.DRFDTE_exception_handler',
+}
+
+DYNAMIC_PREFERENCES = {
+    'MANAGER_ATTRIBUTE': 'preferences',
+    'REGISTRY_MODULE': 'preferences',
+    'ADMIN_ENABLE_CHANGELIST_FORM': False,
+    'SECTION_KEY_SEPARATOR': '__',
+    'ENABLE_CACHE': True,
+    'VALIDATE_NAMES': True,
 }
 
 LANGUAGES = [
