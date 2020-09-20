@@ -18,3 +18,9 @@ def relative_url(value, field_name, urlencode=None):
 @register.filter
 def htimesince(d):
     return round_timesince(d)
+
+
+@register.simple_tag
+def dict_key_lookup(_dict, key):
+    # Try to fetch from the dict, and if it's not found return an empty string.
+    return _dict.get(key, '')
