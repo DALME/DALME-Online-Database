@@ -1,0 +1,15 @@
+<div id="form-template" class="d-flex">
+  <div id="form-field-container"></div>
+  {% if form_template %}
+    {% include 'dalme_app/includes/'|add:form_template|add:'.html' %}
+  {% endif %}
+</div>
+<div class="d-none">
+  <div class="btn-group dropright" id="header-button">
+    <button class="btn modal-pane-button dropdown-toggle d-none" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="add-attribute-button">
+      <i class="fas fa-plus fa-fw"></i>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="form-add-attribute-button" id="add-attribute-menu-container"></div>
+  </div>
+  <div class="DTE_Header_Content"></div>
+</div>
