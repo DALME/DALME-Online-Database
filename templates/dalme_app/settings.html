@@ -11,54 +11,13 @@
       <!-- tabs -->
       <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
         <li class="nav-item">
-          <a class="nav-link {% if not preferences %} active {% endif %}" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Settings</a>
         </li>
-        {% dict_key_lookup user_data "User ID" as user_id %}
-        {% if request.user.id == user_id %}
-        <li class="nav-item">
-          <a class="nav-link {% if preferences %} active {% endif %}" id="pref-tab" data-toggle="tab" href="#prefs" role="tab" aria-controls="prefs" aria-selected="false">Preferences</a>
-        </li>
-        {% endif %}
       </ul>
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="tab-pane card-body {% if not preferences %} active {% endif %}" id="info" role="tabpanel" aria-labelledby="info-tab">
-        <div class="row">
-          <div class="col-md-9">
-              <div class="card mb-3">
-                <div class="sub-card-header">
-                  <div class="card-header-title"><i class="fa fa-user-alt fa-fw"></i> Profile</div>
-                </div>
-                <div class="card-body attribute_list">
-                    {% for k,v in user_data.items %}
-                      <div class="form-row">
-                          <div class="col-sm-3 text-right">
-                            <span class="attribute_list_label">{{ k }}</span>
-                          </div>
-                          <div class="col-sm-9">
-                            <span class="attribute_list_value">{{ v | safe }}</span>
-                          </div>
-                      </div>
-                    {% endfor %}
-                </div>
-              </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card mb-3">
-              {% if image_url %}
-              <img src="{{ image_url | safe }}" class="card-img-top" alt="dam image">
-              {% else %}
-              <div class="img-placeholder d-flex justify-content-center align-items-center">
-                <i class="d-block fa fa-user-circle fa-4x mt-5 mb-5"></i>
-              </div>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-      {% if request.user.id == user_id %}
-      <div class="tab-pane card-body {% if preferences %} active {% endif %}" id="prefs" role="tabpanel" aria-labelledby="pref-tab">
+      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
         <form action="" enctype="multipart/form-data" method="post">
           {% csrf_token %}
           {% for hidden_field in form.hidden_fields %}
@@ -101,7 +60,6 @@
           <button type="submit" class="btn btn-primary">Save</button>
         </form>
       </div>
-      {% endif %}
       <div class="tab-footer">
         <div id="tab-footer-interface" class="clearfix">
           <small class="text-muted float-left tab-footer-text" id="transcriber"></small>

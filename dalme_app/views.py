@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import DetailView
+from django.views.generic.edit import FormMixin
 from django.views.generic.base import TemplateView
 from dalme_app.utils import DALMEMenus as dm
 from dalme_app import custom_scripts
@@ -21,6 +22,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth.views import LoginView
 from django.utils import timezone
+from dalme_app.forms import preference_form_builder
 
 
 def SessionUpdate(request):
@@ -531,14 +533,21 @@ class UserList(DTListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class UserDetail(DetailView):
+class UserDetail(FormMixin, DetailView):
     model = User
     template_name = 'dalme_app/user_detail.html'
+    form_class = UserPreferenceForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_form_class(self, *args, **kwargs):
+        form_class = preference_form_builder(self.form_class, instance=self.request.user)
+        return form_class
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(UserDetail, self).get_context_data(*args, **kwargs)
+        if self.request.GET.get('preferences') is not None:
+            context['preferences'] = True
         breadcrumb = [('System', ''), ('Users', '/users')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -560,7 +569,23 @@ class UserDetail(DetailView):
         }
         context['user_data'] = user_data
         context['image_url'] = self.object.profile.profile_image
+        context['form'] = self.get_form()
+        context['section_list'] = [i[0] for i in self.form_class.registry.section_objects.items()]
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return self.request.path
+
+    def form_valid(self, form):
+        form.update_preferences()
+        return super(UserDetail, self).form_valid(form)
 
     def get_object(self):
         try:
@@ -571,7 +596,46 @@ class UserDetail(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class AsyncTaskList(DTListView):
+class Settings(FormMixin, TemplateView):
+    template_name = 'dalme_app/settings.html'
+    form_class = GlobalPreferenceForm
+
+    def get_form_class(self, *args, **kwargs):
+        form_class = preference_form_builder(self.form_class)
+        return form_class
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = [('Tools', ''), ('Settings', '/settings')]
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['sidebar_toggle'] = sidebar_toggle
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
+        page_title = 'Settings'
+        context['page_title'] = page_title
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
+        context['form'] = self.get_form()
+        context['section_list'] = [i[0] for i in self.form_class.registry.section_objects.items()]
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return self.request.path
+
+    def form_valid(self, form):
+        form.update_preferences()
+        return super(Settings, self).form_valid(form)
+
+
+@method_decorator(login_required, name='dispatch')
+class AsyncTaskList(DALMEListView):
     page_title = 'Asynchronous Tasks'
     dt_config = 'async_tasks'
     breadcrumb = [('System', ''), ('Asynchronous Tasks', '/async_tasks')]

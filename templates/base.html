@@ -107,7 +107,7 @@
               <div class="dropdown-menu dropdown-menu-right animated--grow-in search-slider" aria-labelledby="searchDropdown">
                 <form class="form-inline navbar-search" role="form" method="get" id="search-form" enctype="multipart/form-data" action="/search">
                   {% csrf_token %}
-                  <input id="topbar_search" type="text" class="form-control border-0 small" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" name="q" value='{{ query|default:"" }}' required>
+                  <input id="topbar_search" type="text" class="form-control border-0 small" placeholder="Search" aria-label="Search" name="q" value='{{ query|default:"" }}' required>
                 </form>
               </div>
             </li>
@@ -122,14 +122,11 @@
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right animated--grow-in" aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="https://dalme.org/wp/wp-admin/profile.php">
+                <a class="dropdown-item" href="/users/{{ request.user.username }}/">
                   <i class="fas fa-user fa-fw mr-2 text-gray-400"></i> Profile
                 </a>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-cog fa-fw mr-2 text-gray-400"></i> Settings
-                </a>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-list fa-fw mr-2 text-gray-400"></i> Activity Log
+                <a class="dropdown-item" href="/users/{{ request.user.username }}/?preferences">
+                  <i class="fas fa-cog fa-fw mr-2 text-gray-400"></i> Preferences
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
