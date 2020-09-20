@@ -3,7 +3,6 @@
     "helpers": [
       "user_forms"
     ],
-    "template_field_container": "#form-field-container",
     "endpoint": "users",
     "globals": {
       "password_state": "divs",
@@ -11,7 +10,8 @@
       "on_close_function": "change_form",
       "messages_list": {
         "create_success": "The user was created succesfully.",
-        "edit_success": "The user was updated succesfully."
+        "edit_success": "The user was updated succesfully.",
+        "remove_success": "The user was deleted succesfully."
       },
       "attribute_concordance": {
         "first_name": "first_name",
@@ -24,7 +24,16 @@
         "is_active": "is_active",
         "is_staff": "is_staff",
         "is_superuser": "is_superuser"
-      }
+      },
+      "required_list": [
+        "first_name",
+        "last_name",
+        "profile.full_name",
+        "email",
+        "username",
+        "groups[].id",
+        "is_active"
+      ]
     }
   },
   "datatables": {
@@ -72,8 +81,7 @@
         "remove": {
           "url": "/api/users/_id_/"
         }
-      },
-      "template": "#generic-form-template"
+      }
     },
     "buttons": [
       {

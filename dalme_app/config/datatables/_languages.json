@@ -1,23 +1,28 @@
 {
   "config": {
-    "template_field_container": "#form-field-container",
+    "helpers": [
+      "language_forms"
+    ],
     "endpoint": "languages",
     "globals": {
+      "on_open_function": "change_form",
+      "on_close_function": "change_form",
       "messages_list": {
         "create_success": "The language was created succesfully.",
-        "edit_success": "The language was updated succesfully."
+        "edit_success": "The language was updated succesfully.",
+        "remove_success": "The language was deleted succesfully."
       },
       "attribute_concordance": {
         "name": "name",
-        "type": "type",
+        "type": "type.id",
         "parent": "parent.id",
         "iso6393": "iso6393",
         "glottocode": "glottocode"
       },
       "required_list": [
         "name",
-        "type",
-        "iso6393"
+        "type.id",
+        "glottocode"
       ]
     }
   },
@@ -55,8 +60,7 @@
         "remove": {
           "url": "/api/languages/_id_/"
         }
-      },
-      "template": "#generic-form-template"
+      }
     },
     "buttons": [
       {

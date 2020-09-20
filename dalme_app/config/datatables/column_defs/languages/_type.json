@@ -1,6 +1,8 @@
 {
     "title": "Type",
-    "data": "type",
+    "data": "type.name",
+    "name": "type",
+    "editField": "type.id",
     "defaultContent": "",
     "visible": true,
     "orderable": true,

@@ -10,7 +10,7 @@
       "serverSide": true,
       "stateSave": true,
       "select": {
-        "style": "single"
+        "style": true
       },
       "deferRender": true,
       "rowId": "id",
@@ -31,30 +31,47 @@
   },
   "editor": {
     "options": {
+      "formOptions": {
+        "main": {
+          "buttons": true,
+          "focus": null,
+          "message": true,
+          "onBackground": "none",
+          "onBlur": "none",
+          "onComplete": "close",
+          "onEsc": "none",
+          "onFieldError": "focus",
+          "onReturn": "none",
+          "submit": "all",
+          "drawType": false,
+          "scope": "row"
+        }
+      },
       "ajax": {
         "create": {
           "type": "POST",
           "headers": {
-            "Content-Type": "application/json-dte",
+            "Content-Type": "application/json-dte; charset=UTF-8",
             "Accept": "application/json-dte, text/javascript, */*; q=0.01"
           }
         },
         "edit": {
-          "type": "PATCH",
+          "type": "PUT",
           "headers": {
-            "Content-Type": "application/json-dte",
+            "Content-Type": "application/json-dte; charset=UTF-8",
             "Accept": "application/json-dte, text/javascript, */*; q=0.01"
           }
         },
         "remove": {
           "type": "DELETE",
           "headers": {
-            "Content-Type": "application/json-dte",
+            "Content-Type": "application/json-dte; charset=UTF-8",
             "Accept": "application/json-dte, text/javascript, */*; q=0.01"
           }
         }
       },
-      "idSrc": "id"
+      "idSrc": "id",
+      "template": "#form-template"
     }
   }
 }

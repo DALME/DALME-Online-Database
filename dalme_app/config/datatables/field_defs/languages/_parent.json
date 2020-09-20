@@ -4,10 +4,10 @@
   "type": "selectize",
   "opts": {
     "placeholder": "Select parent",
-    "preload": true
+    "preload": "focus"
   },
   "options": {
     "type": "api_call",
-    "url": "/api/languages/?format=select&type=language&q="
+    "url": "/api/languages/?format=select"
   }
 }

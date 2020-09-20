@@ -1,17 +1,21 @@
 {
   "config": {
-    "template_field_container": "#form-field-container",
     "endpoint": "locales",
     "globals": {
       "messages_list": {
         "create_success": "The locale was created succesfully.",
-        "edit_success": "The locale was updated succesfully."
+        "edit_success": "The locale was updated succesfully.",
+        "remove_success": "The locale was deleted succesfully."
       },
       "attribute_concordance": {
         "name": "name",
         "administrative_region": "administrative_region",
         "country": "country.id"
-      }
+      },
+      "required_list": [
+        "name",
+        "country.id"
+      ]
     }
   },
   "datatables": {
@@ -44,8 +48,7 @@
         "remove": {
           "url": "/api/locales/_id_/"
         }
-      },
-      "template": "#generic-form-template"
+      }
     },
     "buttons": [
       {

@@ -4,10 +4,10 @@
     "type": "selectize",
     "opts": {
         "placeholder": "Select country",
-        "preload": true
+        "preload": "focus"
     },
     "options": {
         "type": "api_call",
-        "url": "/api/countries/?format=select&q="
+        "url": "/api/countries/?format=select"
     }
 }

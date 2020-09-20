@@ -1,6 +1,6 @@
 {
     "title": "Date Completed",
-    "data": "data_done",
+    "data": "date_done",
     "defaultContent": "",
     "visible": true,
     "orderable": true,

@@ -9,6 +9,7 @@
   },
   "options": {
     "type": "api_call_x",
-    "url": "/api/groups/?format=select&q="
+    "url": "/api/groups/?format=select",
+    "render": "{option: function(item, escape) {return '<div class=\"pt-2 pb-2 pl-2 pr-2\"><div class=\"formset_flatentry_title\">' + escape(item.name) + '<\/div><div class=\"formset_flatentry_detail\">' + escape(item.description) + '<\/div><\/div>';}}"
   }
 }

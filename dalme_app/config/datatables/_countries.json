@@ -1,11 +1,11 @@
 {
   "config": {
-    "template_field_container": "#form-field-container",
     "endpoint": "countries",
     "globals": {
       "messages_list": {
         "create_success": "The country was created succesfully.",
-        "edit_success": "The country was updated succesfully."
+        "edit_success": "The country was updated succesfully.",
+        "remove_success": "The country was deleted succesfully."
       },
       "attribute_concordance": {
         "name": "name",
@@ -53,8 +53,7 @@
         "remove": {
           "url": "/api/countries/_id_/"
         }
-      },
-      "template": "#generic-form-template"
+      }
     },
     "buttons": [
       {
