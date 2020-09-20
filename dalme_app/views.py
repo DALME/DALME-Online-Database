@@ -424,7 +424,6 @@ class SourceDetail(DetailView):
                 'scrollX': '"100%"',
                 'scrollCollapse': 'true',
                 'deferRender': 'true',
-                'scroller': 'true',
                 'language': {
                     'searchPlaceholder': 'Search',
                     'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
@@ -967,6 +966,25 @@ class Scripts(TemplateView):
         context['page_chain'] = get_page_chain(breadcrumb, page_title)
         if self.request.GET.get('s') is not None:
             context['output'] = eval('custom_scripts.'+self.request.GET['s']+'(self.request)')
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class ConfigEditor(TemplateView):
+    template_name = 'dalme_app/config_editor.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        breadcrumb = [('Tools', ''), ('Config Editor', '/config-editor')]
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
+        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+        context['sidebar_toggle'] = sidebar_toggle
+        context['dropdowns'] = dm(self.request, state).dropdowns
+        context['sidebar'] = dm(self.request, state).sidebar
+        page_title = 'Config Editor'
+        context['page_title'] = page_title
+        context['page_chain'] = get_page_chain(breadcrumb, page_title)
+        context['helpers'] = ['config_editor']
         return context
 
 
