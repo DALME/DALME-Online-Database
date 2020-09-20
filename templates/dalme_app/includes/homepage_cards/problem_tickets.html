@@ -1,0 +1,100 @@
+<div class="card shadow mb-3 half-tile">
+  <div class="table-responsive dt-embed">
+    <table class="table responsive" id="dataTables-tickets" width="100%">
+    </table>
+  </div>
+</div>
+<script>
+  $('#dataTables-tickets').DataTable({
+  'ajax': {
+    'url': "/api/tickets/?format=json&filter=creation_user," + user['id'],
+    'data': function (data) { return { "data": JSON.stringify( data ) }; }
+  },
+  serverSide: true,
+  responsive: true,
+  dom: "<'sub-card-header pr-2 d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'iB>",
+  select: { style: 'single' },
+  scrollResize: true,
+  scrollY: "30vh",
+  scrollX: "100%",
+  deferRender: true,
+  scroller: true,
+  language: { searchPlaceholder: "Search" },
+  rowId: "id",
+  buttons: [
+      {
+        extend: 'collection',
+        dropup: true,
+        autoClose: true,
+        text: 'Sort',
+        className: 'footer-btn',
+        buttons: [
+          {
+                text: 'Subject',
+                className: 'footer-btn',
+                action: function () { table_tickets.order([4,'asc']).draw() }
+          },
+          {
+                text: 'Status',
+                className: 'footer-btn',
+                action: function () { table_tickets.order([5,'asc']).draw() }
+          }
+        ]
+      }
+  ],
+  columnDefs: [
+        {
+            title: "Id",
+            targets: 0,
+            data: "id",
+            visible: 1,
+            width: "20px"
+        },
+        {
+            title: "Ticket",
+            targets: 1,
+            data: "ticket",
+            visible: 1,
+            searchable: 0,
+            orderData: [ 5, 4 ],
+        },
+        {
+            title: "Tags",
+            targets: 2,
+            data: "tags",
+            visible: 1,
+            orderable: 0,
+            searchable: 0
+        },
+        {
+            title: "Attachments",
+            targets: 3,
+            data: "attachments",
+            visible: 1,
+            orderable: 0,
+            searchable: 0,
+        },
+        {
+            title: "Subject",
+            targets: 4,
+            data: "subject",
+            visible: 0
+        },
+        {
+            title: "Status",
+            targets: 5,
+            data: "status",
+            visible: 0,
+            searchable: 0
+        },
+        {
+            title: "Comments",
+            targets: 6,
+            data: "comment_count",
+            visible: 0,
+            searchable: 0
+        },
+  ]
+});
+$('#dataTables-tickets_wrapper').find('.card-header-title').html('<i class="fa fa-ticket-alt fa-fw"></i> My Issue Tickets');
+</script>
