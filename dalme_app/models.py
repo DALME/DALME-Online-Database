@@ -11,7 +11,7 @@ import textwrap
 import lxml.etree as et
 from urllib.parse import urlencode
 import datetime
-from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid, get_current_user, get_current_username
+from dalme_app.model_templates import dalmeBasic, dalmeUuid, dalmeIntid, dalmeUuidOwned, dalmeIntidOwned, get_current_user, get_current_username
 import django.db.models.options as options
 from django.utils.dateparse import parse_date
 from django.utils import timezone
@@ -183,7 +183,7 @@ class Content_attributes(dalmeIntid):
     unique = models.BooleanField(default=True)
 
 
-class Source(index.Indexed, dalmeUuid):
+class Source(index.Indexed, dalmeUuidOwned):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
@@ -329,12 +329,12 @@ class Source(index.Indexed, dalmeUuid):
         return str(self.get_attribute_blob()) + str(self.get_transcription_blob())
 
 
-@receiver(models.signals.post_save, sender=Source)
-def update_attribute_ownership(sender, instance, created, **kwargs):
-    if not created:
-        for a in instance.attributes.all():
-            a.owner = instance.owner
-            a.save(update_fields=['owner', 'modification_user', 'modification_timestamp'])
+# @receiver(models.signals.post_save, sender=Source)
+# def update_attribute_ownership(sender, instance, created, **kwargs):
+#     if not created:
+#         for a in instance.attributes.all():
+#             a.owner = instance.owner
+#             a.save(update_fields=['owner', 'modification_user', 'modification_timestamp'])
 
 
 @receiver(models.signals.post_save, sender=Source)
@@ -660,7 +660,7 @@ class GroupProperties(models.Model):
         return self.group.name
 
 
-class Set(dalmeUuid):
+class Set(dalmeUuidOwned):
     CORPUS = 1  # a set representing a coherent body of materials defined by a project or sub-project
     COLLECTION = 2  # a generic set defined by a user for any purpose -- collections could potentially by qualified by other terms
     DATASET = 3  # a set corresponding to a project or sub-project and related to a team user group

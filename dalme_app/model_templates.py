@@ -36,12 +36,11 @@ def get_current_user():
 
 
 class dalmeBasic(models.Model):
-    """ Model template with timestamps, but no pre-defined ID """
+    """ Model template with timestamps, but no pre-defined ID or Owner """
     creation_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_creation", null=True)
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_modification", null=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)
 
     def class_name(self):
         return self.__class__.__name__
@@ -62,7 +61,6 @@ class dalmeUuid(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_modification", null=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)
 
     def class_name(self):
         return self.__class__.__name__
@@ -83,7 +81,6 @@ class dalmeIntid(models.Model):
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_user = models.ForeignKey(User, on_delete=models.SET_NULL, default=get_current_user, related_name="%(app_label)s_%(class)s_modification", null=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)
 
     def class_name(self):
         return self.__class__.__name__
@@ -92,6 +89,22 @@ class dalmeIntid(models.Model):
         if self._state.adding is True:
             self.owner = get_current_user()
         super().save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
+
+
+class dalmeUuidOwned(dalmeUuid):
+    """ Same as dalmeUuid but with the addition of an owner field """
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)
+
+    class Meta:
+        abstract = True
+
+
+class dalmeIntidOwned(dalmeIntid):
+    """ Same as dalmeIntid but with the addition of an owner field """
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True)
 
     class Meta:
         abstract = True
