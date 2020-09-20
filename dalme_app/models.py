@@ -28,40 +28,30 @@ from django.core.exceptions import ObjectDoesNotExist
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 
-def rs_api_query(endpoint, user, key, **kwargs):
-    sign = hashlib.sha256(key.encode('utf-8'))
-    paramDict = kwargs
-    paramDict['user'] = user
-    paramstr = urlencode(paramDict)
-    sign.update(paramstr.encode('utf-8'))
-    R = requests.get(endpoint + paramstr + "&sign=" + sign.hexdigest())
-    return R
-
-
-def get_dam_preview(resource):
-    """
-    Returns the url for an image from the ResourceSpace Digital Asset Management
-    system for the given resource.
-    """
+def rs_api_query(**kwargs):
     endpoint = 'https://dam.dalme.org/api/?'
-    user = 'api_bot'
+    user = os.environ['DAM_API_USER']
     key = os.environ['DAM_API_KEY']
-    queryParams = {
-        "function": "search_get_previews",
-        "param1": '!list'+str(resource),
-        "param2": "",
-        "param3": "",
-        "param4": "0",
-        "param5": "1",
-        "param6": "asc",
-        "param7": "",
-        "param8": "scr",
-        "param9": "jpg",
+
+    query_params = {
+        'function': kwargs.get('function', 'search_get_previews'),
+        'param1': kwargs.get('param1', ''),  # search string in RS format
+        'param2': kwargs.get('param2', ''),  # string of resource type IDs "1,2". Empty = all types.
+        'param3': kwargs.get('param3', ''),  # string indicating results order. Valid options: relevance, popularity, rating, date, colour, country, title, file_path, resourceid, resouretype, titleandcountry, random, status. empty = relevance ordering.
+        'param4': kwargs.get('param4', 0),  # archive status of resources to return. 0=live assets
+        'param5': kwargs.get('param5', 20),  # maximum number of rows to return. Use "-1" to return all rows.
+        'param6': kwargs.get('param6', 'asc'),  # sort order, "asc"=ascending, "desc"=descending (default).
+        'param7': kwargs.get('param7', ''),  # if performing a 'recent' special search, limit the results to resources created in the last n number of days
+        'param8': kwargs.get('param8', 'thm, scr'),  # comma separated list of preview sizes e.g. "thm, scr"' will retrieve the thumbnail and screen sized previews, "" = don't return any preview URLs (default).
+        'param9': kwargs.get('param9', 'jpg'),  # Return preview files matching this file extension. e.g. "mp4", "jpg"
     }
-    response = rs_api_query(endpoint, user, key, **queryParams)
-    data = json.loads(response.text)
-    preview_url = data[0]['url_scr']
-    return preview_url
+
+    sign = hashlib.sha256(key.encode('utf-8'))
+    query_params['user'] = user
+    paramstr = urlencode(query_params)
+    sign.update(paramstr.encode('utf-8'))
+
+    return requests.get(endpoint + paramstr + "&sign=" + sign.hexdigest())
 
 
 class Content_class(dalmeIntid):
@@ -401,20 +391,13 @@ class Page(dalmeUuid):
                 "function": "get_resource_data",
                 "param1": self.dam_id
             }
-            page_meta = rs_api_query(
-                "https://dam.dalme.org/api/?",
-                os.environ['DAM_API_USER'],
-                os.environ['DAM_API_KEY'],
-                **api_params
-            )
+            page_meta = rs_api_query(**api_params)
             page_meta_obj = page_meta.json()
-            if type(page_meta_obj) == list:
+            if type(page_meta_obj) is list:
                 folio = page_meta_obj[0]['field79']
-            elif type(page_meta_obj) == dict:
+            elif type(page_meta_obj) is dict:
                 folio = page_meta_obj['field79']
-            canvas = requests.get(
-                "https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id, folio)
-            )
+            canvas = requests.get("https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id, folio))
             self.canvas = canvas.text
             return canvas.text
         else:
@@ -1219,6 +1202,16 @@ class rs_resource(models.Model):
         managed = False
         db_table = 'resource'
         in_db = 'dam'
+
+    def get_preview_url(self):
+        queryParams = {
+            'param1': '!list' + str(self.ref),
+            'param5': '1',
+            'param8': 'scr',
+        }
+        response = rs_api_query(**queryParams)
+        data = json.loads(response.text)
+        return data[0]['url_scr']
 
 
 class rs_resource_data(models.Model):
