@@ -12,9 +12,10 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.base import TemplateView
 from dalme_app.utils import DALMEMenus as dm
 from dalme_app import custom_scripts
-from dalme_app.models import (Profile, Content_class, Content_type, DT_list, DT_fields, Page, Attribute_type, Attribute, Tag,
+from dalme_app.forms import UserPreferenceForm, GlobalPreferenceForm
+from dalme_app.models import (Agent, Profile, Content_class, Content_type, DT_list, DT_fields, Page, Attribute_type, Attribute, Tag,
                               Source, Set, TaskList, Task, rs_resource, rs_collection, rs_collection_resource, LocaleReference,
-                              LanguageReference, CountryReference, rs_resource_data, Ticket, Workflow, RightsPolicy, get_dam_preview)
+                              LanguageReference, CountryReference, rs_resource_data, Ticket, Workflow, RightsPolicy, rs_user)
 from haystack.generic_views import SearchView
 import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
@@ -102,7 +103,7 @@ class DefaultSearch(SearchView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Search', ''), ('Search Results', '')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -114,20 +115,21 @@ class DefaultSearch(SearchView):
 
 
 @method_decorator(login_required, name='dispatch')
-class DTListView(TemplateView):
-    template_name = 'dalme_app/dtlistview.html'
+class DALMEListView(TemplateView):
+    template_name = 'dalme_app/list-views.html'
     page_title = None
     dt_config = None
     breadcrumb = []
     helpers = None
-    form_template = 'generic_form_template'
+    includes = None
     editor = 'true'
+    form_template = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         config = self.get_config()
         breadcrumb = config['breadcrumb']
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -136,6 +138,7 @@ class DTListView(TemplateView):
         context['page_chain'] = get_page_chain(breadcrumb, context['page_title'])
         context['config'] = config['dt_config']
         context['helpers'] = config['helpers']
+        context['includes'] = config['includes']
         context['form_template'] = config['form_template']
         context['editor'] = config['editor']
         return context
@@ -146,13 +149,21 @@ class DTListView(TemplateView):
             'dt_config': self.dt_config,
             'breadcrumb': self.breadcrumb,
             'helpers': self.helpers,
+            'includes': self.includes,
             'form_template': self.form_template,
             'editor': self.editor
             }
 
 
 @method_decorator(login_required, name='dispatch')
-class ModelLists(DTListView):
+class AgentList(DALMEListView):
+    page_title = 'Agents'
+    dt_config = 'agents'
+    breadcrumb = [('Entities', ''), ('Agents', '/agents')]
+
+
+@method_decorator(login_required, name='dispatch')
+class ModelLists(DALMEListView):
     template_name = 'dalme_app/models.html'
     dt_editor_options = {'idSrc': '"id"'}
     dt_options = {
@@ -178,7 +189,7 @@ class ModelLists(DTListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = self.get_breadcrumb()
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -188,14 +199,14 @@ class ModelLists(DTListView):
         context['page_chain'] = get_page_chain(breadcrumb, page_title)
         model = self.kwargs['model']
         context['model'] = model
-        if model == 'content_types':
+        if model == 'content-types':
             qs = Content_class.objects.all().order_by('name')
             parent_class_opt = {i.id: i.name for i in qs}
             context['parent_class'] = {
                 'name': 'content class',
                 'options': parent_class_opt
             }
-        elif model == 'attribute_types':
+        elif model == 'attribute-types':
             qs = Content_type.objects.all().order_by('name')
             parent_class_opt = {i.id: i.name for i in qs}
             context['parent_class'] = {
@@ -235,9 +246,9 @@ class ModelLists(DTListView):
 
     def get_page_title(self, _list, *args, **kwargs):
         model = self.kwargs['model']
-        if model == 'content_types':
+        if model == 'content-types':
             page_title = 'Content classes and types'
-        elif model == 'attribute_types':
+        elif model == 'attribute-types':
             page_title = 'Content types and attributes'
         elif model == 'dt_fields':
             page_title = 'DataTables lists and fields'
@@ -245,9 +256,9 @@ class ModelLists(DTListView):
 
     def get_dt_fields(self, _list, *args, **kwargs):
         model = self.kwargs['model']
-        if model == 'content_types':
+        if model == 'content-types':
             dt_field_list = ['id', 'name', 'short_name', 'content_class', 'description', 'attribute_types', 'has_pages', 'parents']
-        elif model == 'attribute_types':
+        elif model == 'attribute-types':
             dt_field_list = ['id', 'name', 'short_name', 'description', 'data_type', 'source', 'same_as',
                              'options_list', 'required']
         elif model == 'dt_fields':
@@ -259,9 +270,9 @@ class ModelLists(DTListView):
 
     def get_dte_fields(self, _list, *args, **kwargs):
         model = self.kwargs['model']
-        if model == 'content_types':
+        if model == 'content-types':
             dte_fields = ['name', 'short_name', 'content_class', 'description', 'attribute_types', 'parents', 'r1_inheritance', 'r2_inheritance', 'has_pages', 'has_inventory']
-        elif model == 'attribute_types':
+        elif model == 'attribute-types':
             dte_fields = ['name', 'short_name', 'description', 'data_type', 'source', 'same_as', 'options_list', 'required']
         elif model == 'dt_fields':
             dte_fields = ['dt_name', 'order', 'orderable', 'visible', 'searchable', 'render_exp', 'dt_class_name', 'dt_width',
@@ -293,21 +304,65 @@ class ModelLists(DTListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class SourceList(DTListView):
+class SourceList(DALMEListView):
     helpers = ['source_forms', 'workflow_module', 'corpus_filter_module']
-    form_template = 'source_form_template'
+    includes = ['dam_search_popup']
+    form_template = 'form_template_sources'
     editor = 'true'
 
     def get_config(self, *args, **kwargs):
         _class = self.request.GET['class']
         return {
-            'page_title': _class.capitalize().replace('_', ' '),
+            'page_title': _class.capitalize().replace('-', ' '),
             'dt_config': 'sources_' + _class,
-            'breadcrumb': [('Sources', ''), (_class.capitalize().replace('_', ' '), '/sources?class=' + _class)],
+            'breadcrumb': [('Sources', ''), (_class.capitalize().replace('-', ' '), '/sources?class=' + _class)],
             'helpers': self.helpers,
+            'includes': self.includes,
             'form_template': self.form_template,
             'editor': self.editor
             }
+
+
+# @method_decorator(login_required, name='dispatch')
+# class SourceDetail(DetailView):
+#     model = Source
+#     #template_name = 'dalme_app/source_detail.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         breadcrumb = self.get_breadcrumb()
+#         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
+#         context['sidebar_toggle'] = sidebar_toggle
+#         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
+#         context['dropdowns'] = dm(self.request, state).dropdowns
+#         context['sidebar'] = dm(self.request, state).sidebar
+#         page_title = self.object.name
+#         context['page_title'] = page_title
+#         context['page_chain'] = get_page_chain(breadcrumb, page_title)
+#         context['source_id'] = self.object.id
+#         return context
+#
+#     def get_object(self):
+#         try:
+#             object = super().get_object()
+#             return object
+#         except ObjectDoesNotExist:
+#             raise Http404
+#
+#     def get_breadcrumb(self, *args, **kwargs):
+#         try:
+#             parsed_ref = urlparse.urlparse(self.request.META.get('HTTP_REFERER', '/'))
+#             s_type = urlparse.parse_qs(parsed_ref.query)['type'][0]
+#         except:
+#             s_type = 'all'
+#         if s_type == 'all':
+#             breadcrumb = [('Sources', ''), ('All Sources', '/sources')]
+#         elif s_type == 'inventories':
+#             breadcrumb = [('Repository', ''), ('Inventories', '/sources?type=inventories')]
+#         else:
+#             list_label = DT_list.objects.get(short_name=s_type).name
+#             breadcrumb = [('Sources', ''), (list_label, '/sources?type='+s_type)]
+#         return breadcrumb
 
 
 @method_decorator(login_required, name='dispatch')
@@ -342,7 +397,7 @@ class SourceDetail(DetailView):
             }
             context['workset'] = para
         breadcrumb = self.get_breadcrumb()
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -355,8 +410,8 @@ class SourceDetail(DetailView):
         has_inv = self.object.has_inventory
         has_pages = self.object.pages.all().exists()
         has_children = self.object.source_set.all().exists()
-        has_agents = self.object.agents is not None and len(self.object.agents) > 0
-        has_places = self.object.places is not None and len(self.object.places) > 0
+        has_agents = self.object.agents() is not None and len(self.object.agents()) > 0
+        has_places = self.object.places() is not None and len(self.object.places()) > 0
         context['has_inv'] = has_inv
         context['has_pages'] = has_pages
         context['has_children'] = has_children
@@ -486,7 +541,7 @@ class SourceDetail(DetailView):
                 }
             transcription = self.object.source_pages.all().first().transcription
             folio_dict['tr_id'] = str(transcription.id) if transcription is not None else "None"
-            folio_dict['tr_version'] = transcription.version if transcription.version is not None else 0
+            folio_dict['tr_version'] = transcription.version if transcription is not None else 0
             folio_list.append(folio_dict)
         else:
             folio_menu = '<button class="editor-btn button-border-left" id="btn_prevFolio" value="" onclick="changeEditorFolio(this.value)" disabled><i class="fa fa-caret-left fa-fw"></i></button>'
@@ -500,7 +555,7 @@ class SourceDetail(DetailView):
                     }
                 transcription = self.object.source_pages.all()[count].transcription
                 folio_dict['tr_id'] = str(transcription.id) if transcription is not None else "None"
-                folio_dict['tr_version'] = transcription.version if transcription.version is not None else 0
+                folio_dict['tr_version'] = transcription.version if transcription is not None else 0
                 if count == 0:
                     folio_menu += '<button id="btn_selectFolio" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" \
                                    aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name, folio_count)
@@ -523,7 +578,7 @@ def SourceManifest(request, pk):
 
 
 @method_decorator(login_required, name='dispatch')
-class UserList(DTListView):
+class UserList(DALMEListView):
     """ Lists users and allows editing and creation of new records via the API """
     page_title = 'Users'
     dt_config = 'users'
@@ -642,21 +697,21 @@ class AsyncTaskList(DALMEListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class CountryList(DTListView):
+class CountryList(DALMEListView):
     page_title = 'Countries'
     dt_config = 'countries'
     breadcrumb = [('System', ''), ('Countries', '/countries')]
 
 
 @method_decorator(login_required, name='dispatch')
-class LocaleList(DTListView):
+class LocaleList(DALMEListView):
     page_title = 'Locales'
     dt_config = 'locales'
     breadcrumb = [('System', ''), ('Locales', '/locales')]
 
 
 @method_decorator(login_required, name='dispatch')
-class RightsList(DTListView):
+class RightsList(DALMEListView):
     page_title = 'Rights Policies'
     dt_config = 'rights'
     breadcrumb = [('Project', ''), ('Rights Policies', '/rights')]
@@ -670,7 +725,7 @@ class RightsDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Rights Policies', '/rights')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -708,56 +763,19 @@ class RightsDetail(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class LanguageList(DTListView):
+class LanguageList(DALMEListView):
     page_title = 'Languages'
     dt_config = 'languages'
     breadcrumb = [('System', ''), ('Languages', '/languages')]
+    helpers = ['language_forms']
 
 
 @method_decorator(login_required, name='dispatch')
-class ImageList(DTListView):
+class ImageList(DALMEListView):
     page_title = 'DAM Images'
     dt_config = 'images'
-    breadcrumb = [('DAM Images', '/images')]
+    breadcrumb = [('Sources', ''), ('DAM Images', '/images')]
     helpers = ['preview_module']
-
-    # breadcrumb = [('DAM Images', '/images')]
-    # list_name = 'images'
-    # dt_editor_options = {'idSrc': '"id"'}
-    # dte_field_list = ['field8', 'field79', 'field12', 'field3', 'collections']
-    # dt_options = {
-    #     'pageLength': 25,
-    #     'paging': 'true',
-    #     'responsive': 'true',
-    #     'fixedHeader': 'true',
-    #     'dom': '\'<"card-table-header"B<"btn-group ml-auto"f>r><"#filters-container.collapse.clearfix"><"panel-container"<"panel-left"t>><"sub-card-footer"ip>\'',
-    #     'serverSide': 'true',
-    #     'stateSave': 'true',
-    #     'select': {'style': 'multi'},
-    #     'deferRender': 'true',
-    #     'rowId': '"id"',
-    #     'processing': 'true',
-    #     'language': {
-    #         'searchPlaceholder': 'Search',
-    #         'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-    #         },
-    #     # 'order': '[[ 1, "asc" ]]'
-    #     }
-    # module_list = ['filters', 'preview']
-
-    # def get_dte_buttons(self, *args, **kwargs):
-    #     dte_buttons = []
-    #     if self.request.user.has_perm('dalme_app.change_rs_resource'):
-    #         dte_buttons.append({'extend': 'edit', 'text': '<i class="fa fa-pen fa-sm dt_menu_icon"></i> Edit Selected', 'formTitle': 'Edit Image Information'})
-    #         dte_buttons.append({'action': 'toggle_inline_edit()', 'text': '<i class="fa fa-edit fa-fw dt_menu_icon"></i> Edit Inline', 'className': "inline-edit-toggle"})
-    #     if self.request.user.has_perm('dalme_app.delete_rs_resource'):
-    #         dte_buttons.append({'extend': 'remove', 'text': '<i class="fa fa-times fa-fw dt_menu_icon"></i> Delete Selected', 'formTitle': 'Delete Image',
-    #                             'formMessage': 'Are you sure you wish to remove this image from the DAM? This action cannot be undone.'})
-    #     if self.request.user.has_perm('dalme_app.add_source'):
-    #         dte_buttons.append({'extend': 'selectAll', 'text': '<i class="fa fa-check-double fa-fw dt_menu_icon"></i> Select All'})
-    #         dte_buttons.append({'extend': 'selectNone', 'text': '<i class="fa fa-broom fa-fw dt_menu_icon"></i> Clear Selection'})
-    #         dte_buttons.append({'extend': 'selected', 'action': 'create_source_from_selected()', 'text': '<i class="fa fa-plus-square fa-fw dt_menu_icon"></i> Create Source from Selection'})
-    #     return dte_buttons
 
 
 @method_decorator(login_required, name='dispatch')
@@ -767,8 +785,8 @@ class ImageDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = [('DAM Images', '/images')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        breadcrumb = [('Sources', ''), ('DAM Images', '/images')]
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -836,7 +854,7 @@ class ImageDetail(DetailView):
                     'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
                     },
                 }
-        context['image_url'] = get_dam_preview(self.object.ref)
+        context['image_url'] = self.object.get_preview_url()
         return context
 
     def get_object(self):
@@ -850,18 +868,12 @@ class ImageDetail(DetailView):
 @method_decorator(login_required, name='dispatch')
 class Index(TemplateView):
     template_name = 'dalme_app/index.html'
-    default_cards = ['/dalme_app/cards/counter_articles.html',
-                     'dalme_app/cards/counter_assets.html',
-                     'dalme_app/cards/counter_inventories.html']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Dashboard', '')]
-        if self.request.session.get('sidebar_toggle') is not None:
-            sidebar_toggle = self.request.session.get('sidebar_toggle', '')
-        else:
-            sidebar_toggle = ''
-            self.request.session['sidebar_toggle'] = sidebar_toggle
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
+        self.request.session['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -869,6 +881,7 @@ class Index(TemplateView):
         page_title = 'Dashboard'
         context['page_title'] = page_title
         context['page_chain'] = get_page_chain(breadcrumb, page_title)
+        context['cards'] = eval(self.request.user.preferences['interface__homepage_cards'])
         return context
 
 
@@ -881,10 +894,22 @@ def PageManifest(request, pk):
 
 
 @method_decorator(login_required, name='dispatch')
-class SetList(DTListView):
-    page_title = 'Sets'
-    dt_config = 'sets'
-    breadcrumb = [('Project', ''), ('Sets', '/sets')]
+class SetList(DALMEListView):
+    helpers = None
+    editor = 'true'
+    includes = None
+
+    def get_config(self, *args, **kwargs):
+        type = self.request.GET['type']
+        return {
+            'page_title': type.capitalize(),
+            'dt_config': 'sets_' + type,
+            'breadcrumb': [('Sets', ''), (type.capitalize(), '/sets/?type=' + type)],
+            'helpers': self.helpers,
+            'includes': self.includes,
+            'form_template': self.form_template,
+            'editor': self.editor
+            }
 
 
 @method_decorator(login_required, name='dispatch')
@@ -895,7 +920,7 @@ class SetsDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Sets', '/sets')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -954,8 +979,8 @@ class Scripts(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumb = [('Scripts', '')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        breadcrumb = [('Tools', ''), ('Scripts', '/scripts')]
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -996,7 +1021,7 @@ class TicketDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -1016,7 +1041,7 @@ class TicketDetail(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class TicketList(DTListView):
+class TicketList(DALMEListView):
     page_title = 'Issue Tickets'
     dt_config = 'tickets'
     breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
@@ -1030,7 +1055,7 @@ class TasksDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Tasks', '/tasks')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['dropdowns'] = dm(self.request, state).dropdowns
@@ -1056,7 +1081,7 @@ class TasksList(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumb = [('Project', ''), ('Tasks', '/tasks')]
-        sidebar_toggle = self.request.session.get('sidebar_toggle', '')
+        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
         context['sidebar_toggle'] = sidebar_toggle
         context['dropdowns'] = dm(self.request, state).dropdowns
