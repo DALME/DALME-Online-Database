@@ -1,0 +1,5 @@
+{
+  "action": "toggle_inline_edit()",
+  "text": "<i class=\"fa fa-edit fa-fw dt_menu_icon\"><\/i> Edit Inline",
+  "className": "inline-edit-toggle"
+}

@@ -1,7 +1,7 @@
 {
   "extend": "edit",
   "text": "<i class=\"fa fa-pen fa-sm dt_menu_icon\"></i> Edit Selected",
-  "formTitle": "Edit Information",
+  "formTitle": "Edit",
   "formButtons": [
                     { "text": "Update", "className": "btn-success", "action": "function () { this.submit(); }" },
                     { "text": "Cancel", "className": "btn-primary", "action": "function () { this.close(); }" }

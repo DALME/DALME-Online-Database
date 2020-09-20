@@ -1,0 +1,4 @@
+{
+  "extend": "selectAll",
+  "text": "<i class=\"fa fa-check-double fa-fw dt_menu_icon\"><\/i> Select All"
+}
