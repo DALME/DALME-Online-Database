@@ -9,7 +9,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from dalme_app.models import Attribute, Source, rs_resource, get_dam_preview
+from dalme_app.models import Attribute, Source, rs_resource
 from dalme_app.web_serializers import RecordSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
@@ -83,7 +83,8 @@ class PublicRecordSerializer(RecordSerializer):
 class Thumbnail(View):
     def get_data(self):
         try:
-            thumbnail = get_dam_preview(self.request.GET['image_ref'])
+            # thumbnail = get_dam_preview(self.request.GET['image_ref'])
+            thumbnail = rs_resource.objects.get(ref=self.request.GET['image_ref']).get_preview_url()
         except KeyError:
             thumbnail = None
         return {'image_url': thumbnail}
