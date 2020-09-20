@@ -5,28 +5,29 @@
       "workflow_module",
       "corpus_filter_module"
     ],
-    "template_field_container": "#form-field-container",
     "endpoint": "sources",
     "globals": {
       "source_type": "records",
       "on_open_function": "source_form_setup",
       "on_close_function": "source_form_restore",
       "messages_list": {
-        "create_success": "The source was created succesfully.",
-        "edit_success": "The source was updated succesfully."
+        "create_success": "The record was created succesfully.",
+        "edit_success": "The record was updated succesfully.",
+        "remove_success": "The record was deleted succesfully."
       },
       "attribute_concordance": {
         "name": "name",
         "short_name": "short_name",
         "parent": "parent.id",
         "has_inventory": "has_inventory",
-        "city": "attributes.city",
+        "locale": "attributes.locale[].id",
         "owner": "owner.id",
+        "is_private": "is_private",
         "record_type": "attributes.record_type",
         "date": "attributes.date.value",
         "start_date": "attributes.start_date.value",
         "end_date": "attributes.end_date.value",
-        "language": "attributes.language",
+        "language": "attributes.language[].id",
         "named_persons": "attributes.named_persons",
         "description": "attributes.description",
         "status": "workflow.status.text",
@@ -36,14 +37,16 @@
       "required_list": [
         "name",
         "short_name",
+        "type.id",
         "parent.id",
         "has_inventory",
         "attributes.record_type",
-        "attributes.language"
+        "attributes.language[].id"
       ],
       "multi_attributes": [
-        "attributes.language",
-        "attributes.city"
+        "attributes.language[].id",
+        "attributes.locale[].id",
+        "sets[].id"
       ]
     }
   },
@@ -55,7 +58,8 @@
       "has_inventory",
       "no_folios",
       "owner",
-      "attributes.city",
+      "is_private",
+      "attributes.locale",
       "attributes.record_type",
       "attributes.start_date",
       "attributes.end_date",
@@ -72,16 +76,28 @@
       "ajax": {
         "url": "/api/sources/?format=json&class=records&mode=own"
       }
+    },
+    "overrides": {
+      "attributes.locale": {
+        "title": "Locale(s)",
+        "name": "attributes.locale",
+        "editField": "attributes.locale[].id",
+        "className": "",
+        "orderable": false,
+        "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.map(a => ' ' + a.name); }"
+      }
     }
   },
   "editor": {
     "fields": [
       "name",
       "short_name",
+      "type",
       "parent",
       "has_inventory",
       "owner",
-      "attributes.city",
+      "is_private",
+      "attributes.locale",
       "attributes.record_type",
       "attributes.date",
       "attributes.start_date",
@@ -91,7 +107,10 @@
       "attributes.description",
       "workflow.status",
       "workflow.help_flag",
-      "workflow.is_public"
+      "workflow.is_public",
+      "sets",
+      "pages",
+      "credits"
     ],
     "options": {
       "ajax": {
@@ -104,9 +123,7 @@
         "remove": {
           "url": "/api/sources/_id_/"
         }
-      },
-      "idSrc": "id",
-      "template": "#source-form-template"
+      }
     },
     "buttons": [
       {
@@ -135,6 +152,21 @@
         "def": 13,
         "opts": {},
         "options": []
+      },
+      "attributes.locale.id": {
+        "name": "attributes.locale[].id",
+        "label": "Locale(s)",
+        "opts": {
+          "placeholder": "Select locale(s)",
+          "preload": "focus",
+          "maxItems": null
+        }
+      },
+      "parent.id": {
+        "options": {
+            "type": "api_call",
+            "url": "/api/sources/?format=select&type=12&search="
+        }
       }
     }
   }

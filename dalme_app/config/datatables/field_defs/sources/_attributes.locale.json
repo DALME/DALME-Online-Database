@@ -1,13 +1,13 @@
 {
-  "name": "attributes.locale",
+  "name": "attributes.locale.id",
   "label": "Locale",
   "type": "selectize",
   "opts": {
     "placeholder": "Select locale",
-    "preload": true
+    "preload": "focus"
   },
   "options": {
     "type": "api_call",
-    "url": "/api/locales/?format=select&q="
+    "url": "/api/locales/?format=select&select_type=att&search="
   }
 }

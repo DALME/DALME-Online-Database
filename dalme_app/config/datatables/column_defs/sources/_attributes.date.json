@@ -1,6 +1,7 @@
 {
     "title": "Date",
     "data": "attributes.date.name",
+    "name": "date",
     "editField": "attributes.date.value",
     "defaultContent": "",
     "visible": true,

@@ -1,7 +1,8 @@
 {
     "title": "Default Rights",
     "data": "attributes.default_rights",
-    "editField": "attributes.default_rights.value",
+    "name": "default_rights",
+    "editField": "attributes.default_rights.id",
     "defaultContent": "",
     "visible": true,
     "orderable": false,

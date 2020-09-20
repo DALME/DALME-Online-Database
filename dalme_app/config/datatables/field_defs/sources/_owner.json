@@ -4,10 +4,13 @@
     "type": "selectize",
     "opts": {
         "placeholder": "Select owner",
-        "preload": true
+        "valueField": "id",
+        "labelField": "full_name",
+        "searchField": ["id", "full_name", "username"],
+        "preload": "focus"
     },
     "options": {
         "type": "api_call",
-        "url": "/api/users?is_active=True&format=select&q="
+        "url": "/api/users?is_active=True&ordering=first_name&format=select&search="
     }
 }

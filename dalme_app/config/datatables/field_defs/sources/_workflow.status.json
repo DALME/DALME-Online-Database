@@ -4,7 +4,10 @@
   "type": "selectize",
   "opts": {
     "placeholder": "Select status",
-    "preload": true,
+    "preload": "focus",
+    "valueField": "text",
+    "labelField": "title_text",
+    "searchField": ["text"],
     "optgroups": [
       {
         "value": "Ingestion",
@@ -35,6 +38,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/choices/?type=list&field=workflow.status&format=json&q="
+    "url": "/api/choices/?type=list&field=workflow.status&format=json&search="
   }
 }

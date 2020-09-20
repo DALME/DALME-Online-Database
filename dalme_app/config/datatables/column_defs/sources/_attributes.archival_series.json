@@ -1,6 +1,7 @@
 {
     "title": "Archival Series",
     "data": "attributes.archival_series",
+    "name": "archival_series",
     "defaultContent": "",
     "visible": false,
     "orderable": true,

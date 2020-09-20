@@ -4,7 +4,10 @@
   "type": "selectize",
   "opts": {
     "placeholder": "Select type",
-    "preload": true,
+    "valueField": "text",
+    "labelField": "text",
+    "searchField": ["text"],
+    "preload": "focus",
     "optgroups": [
       {
         "value": "Inventory",
@@ -31,6 +34,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/choices/?type=list&field=attributes.record_type&format=json&q="
+    "url": "/api/choices/?type=list&field=attributes.record_type&format=json&search="
   }
 }

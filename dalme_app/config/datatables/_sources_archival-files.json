@@ -4,25 +4,26 @@
       "source_forms",
       "corpus_filter_module"
     ],
-    "template_field_container": "#form-field-container",
     "endpoint": "sources",
     "globals": {
       "source_type": "files",
       "on_open_function": "source_form_setup",
       "on_close_function": "source_form_restore",
       "messages_list": {
-        "create_success": "The source was created succesfully.",
-        "edit_success": "The source was updated succesfully."
+        "create_success": "The file was created succesfully.",
+        "edit_success": "The file was updated succesfully.",
+        "remove_success": "The file was deleted succesfully."
       },
       "attribute_concordance": {
         "name": "name",
         "short_name": "short_name",
         "parent": "parent.id",
-        "primary_dataset": "primary_dataset.value",
+        "primary_dataset": "primary_dataset.id",
         "owner": "owner.id",
+        "is_private": "is_private",
         "archival_series": "attributes.archival_series",
         "archival_number": "attributes.archival_number",
-        "locale": "attributes.locale",
+        "locale": "attributes.locale[].id",
         "start_date": "attributes.start_date.value",
         "end_date": "attributes.end_date.value",
         "authority": "attributes.authority",
@@ -32,7 +33,14 @@
         "name",
         "short_name",
         "parent.id",
-        "primary_dataset.value"
+        "primary_dataset.id",
+        "attributes.archival_series",
+        "attributes.archival_number",
+        "attributes.authority",
+        "attributes.format"
+      ],
+      "multi_attributes": [
+        "attributes.locale[].id"
       ]
     }
   },
@@ -43,6 +51,7 @@
       "parent",
       "primary_dataset",
       "owner",
+      "is_private",
       "no_records",
       "attributes.locale",
       "attributes.start_date",
@@ -56,15 +65,26 @@
       "ajax": {
         "url": "/api/sources/?format=json&class=archival_files&mode=own"
       }
+    },
+    "overrides": {
+      "attributes.locale": {
+        "title": "Locale(s)",
+        "editField": "attributes.locale[].id",
+        "className": "",
+        "orderable": false,
+        "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.map(a => ' ' + a.name); }"
+      }
     }
   },
   "editor": {
     "fields": [
       "name",
       "short_name",
+      "type",
       "parent",
       "primary_dataset",
       "owner",
+      "is_private",
       "attributes.archival_series",
       "attributes.archival_number",
       "attributes.locale",
@@ -84,8 +104,7 @@
         "remove": {
           "url": "/api/sources/_id_/"
         }
-      },
-      "template": "#source-form-template"
+      }
     },
     "buttons": [
       {
@@ -107,6 +126,24 @@
         "def": 12,
         "opts": {},
         "options": []
+      },
+      "name": {
+        "type": "textarea"
+      },
+      "parent.id": {
+        "options": {
+            "type": "api_call",
+            "url": "/api/sources/?format=select&type=19&search="
+        }
+      },
+      "attributes.locale.id": {
+        "name": "attributes.locale[].id",
+        "label": "Locale(s)",
+        "opts": {
+          "placeholder": "Select locale(s)",
+          "preload": "focus",
+          "maxItems": null
+        }
       }
     }
   }

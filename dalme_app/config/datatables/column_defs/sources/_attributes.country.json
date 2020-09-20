@@ -1,6 +1,8 @@
 {
     "title": "Country",
-    "data": "attributes.country",
+    "data": "attributes.country.name",
+    "name": "country",
+    "editField": "attributes.country.id",
     "defaultContent": "",
     "visible": true,
     "orderable": true,

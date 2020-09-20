@@ -1,6 +1,7 @@
 {
     "title": "Description",
     "data": "attributes.description",
+    "name": "description",
     "defaultContent": "",
     "visible": false,
     "orderable": false,

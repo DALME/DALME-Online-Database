@@ -1,6 +1,7 @@
 {
     "title": "End date",
     "data": "attributes.end_date.name",
+    "name": "end_date",
     "editField": "attributes.end_date.value",
     "defaultContent": "",
     "visible": false,

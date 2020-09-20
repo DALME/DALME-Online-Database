@@ -1,6 +1,7 @@
 {
     "title": "Short name",
     "data": "short_name",
+    "name": "short_name",
     "defaultContent": "",
     "visible": false,
     "orderable": true,

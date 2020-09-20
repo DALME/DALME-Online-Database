@@ -4,11 +4,11 @@
     "type": "selectize",
     "opts": {
         "placeholder": "Select parent",
-        "preload": true
+        "preload": "focus"
     },
     "options": {
         "type": "api_call",
-        "url": "/api/sources/?st=parent&format=select&q="
+        "url": "/api/sources/?format=select&search="
     },
-    "fieldInfo": "Parent record, if applicable, <i>eg: a book for a book chapter, a register for an act, etc.</i>"
+    "fieldInfo": "Parent record, if applicable, <i>eg: a book for a book chapter, an archival unit for a record, etc.</i>"
 }

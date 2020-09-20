@@ -1,9 +1,10 @@
 {
     "title": "Primary Dataset",
     "data": "primary_dataset.name",
-    "editField": "primary_dataset.value",
+    "name": "primary_dataset",
+    "editField": "primary_dataset.id",
     "defaultContent": "",
-    "visible": false,
+    "visible": true,
     "orderable": true,
     "searchable": false
 }

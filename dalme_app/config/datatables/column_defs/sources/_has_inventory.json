@@ -1,6 +1,7 @@
 {
     "title": "List",
     "data": "has_inventory",
+    "name": "has_inventory",
     "defaultContent": "",
     "visible": true,
     "orderable": true,

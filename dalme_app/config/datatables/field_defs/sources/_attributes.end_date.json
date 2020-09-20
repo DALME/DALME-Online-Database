@@ -16,7 +16,7 @@
   ],
   "opts": {
     "placeholder": "month",
-    "preload": true
+    "preload": "focus"
   },
   "options": {
     "type": "list",

@@ -1,6 +1,7 @@
 {
     "title": "Named persons",
     "data": "attributes.named_persons",
+    "name": "named_persons",
     "defaultContent": "",
     "visible": false,
     "orderable": true,

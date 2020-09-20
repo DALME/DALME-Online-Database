@@ -1,9 +1,0 @@
-{
-    "title": "City",
-    "data": "attributes.city",
-    "defaultContent": "",
-    "visible": false,
-    "orderable": true,
-    "searchable": true,
-    "className": "nowrap"
-}

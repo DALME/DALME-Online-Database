@@ -3,7 +3,6 @@
     "helpers": [
       "source_forms"
     ],
-    "template_field_container": "#form-field-container",
     "endpoint": "sources",
     "globals": {
       "source_type": "bibliography",
@@ -11,20 +10,26 @@
       "on_close_function": "source_form_restore",
       "messages_list": {
         "create_success": "The source was created succesfully.",
-        "edit_success": "The source was updated succesfully."
+        "edit_success": "The source was updated succesfully.",
+        "remove_success": "The source was deleted succesfully."
       },
       "attribute_concordance": {
         "name": "name",
         "short_name": "short_name",
         "type": "type.id",
         "parent": "parent.id",
-        "language": "attributes.language",
+        "owner": "owner",
+        "is_private": "is_private",
+        "language": "attributes.language[].id",
         "url": "attributes.url"
       },
       "required_list": [
         "name",
         "short_name",
         "type.id"
+      ],
+      "multi_attributes": [
+        "attributes.language[].id"
       ]
     }
   },
@@ -34,6 +39,8 @@
       "short_name",
       "type",
       "parent",
+      "owner",
+      "is_private",
       "attributes.language",
       "attributes.url"
     ],
@@ -47,8 +54,10 @@
     "fields": [
       "name",
       "short_name",
-      "parent",
       "type",
+      "parent",
+      "owner",
+      "is_private",
       "attributes.language",
       "attributes.url"
     ],
@@ -63,8 +72,7 @@
         "remove": {
           "url": "/api/sources/_id_/"
         }
-      },
-      "template": "#source-form-template"
+      }
     },
     "buttons": [
       {
@@ -84,7 +92,7 @@
       "type.id": {
         "options": {
           "type": "api_call",
-          "url": "/api/content_types/?format=select&context=bibliography&q="
+          "url": "/api/content_types/?format=select&search="
         }
       },
       "name": {

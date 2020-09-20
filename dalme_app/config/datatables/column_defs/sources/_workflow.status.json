@@ -1,6 +1,7 @@
 {
     "title": "Status",
     "data": "workflow.status",
+    "name": "status",
     "editField": "workflow.status.text",
     "defaultContent": "",
     "visible": true,

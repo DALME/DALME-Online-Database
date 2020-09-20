@@ -1,6 +1,7 @@
 {
     "title": "Activity",
     "data": "workflow.activity",
+    "name": "activity",
     "defaultContent": "",
     "visible": true,
     "orderable": false,

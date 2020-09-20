@@ -1,6 +1,7 @@
 {
     "title": "Public",
     "data": "workflow.is_public",
+    "name": "is_public",
     "defaultContent": "",
     "visible": true,
     "orderable": false,

@@ -1,6 +1,7 @@
 {
     "title": "Start date",
     "data": "attributes.start_date.name",
+    "name": "start_date",
     "editField": "attributes.start_date.value",
     "defaultContent": "",
     "visible": false,

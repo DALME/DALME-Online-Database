@@ -1,6 +1,7 @@
 {
     "title": "Parent",
     "data": "parent",
+    "name": "parent",
     "editField": "parent.id",
     "defaultContent": "",
     "visible": false,

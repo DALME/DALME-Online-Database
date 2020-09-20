@@ -3,22 +3,22 @@
     "helpers": [
       "source_forms"
     ],
-    "template_field_container": "#form-field-container",
     "endpoint": "sources",
     "globals": {
       "source_type": "archives",
       "on_open_function": "source_form_setup",
       "on_close_function": "source_form_restore",
       "messages_list": {
-        "create_success": "The source was created succesfully.",
-        "edit_success": "The source was updated succesfully."
+        "create_success": "The archive was created succesfully.",
+        "edit_success": "The archive was updated succesfully.",
+        "remove_success": "The archive was deleted succesfully."
       },
       "attribute_concordance": {
         "name": "name",
         "short_name": "short_name",
-        "city": "attributes.city",
-        "country": "attributes.country",
-        "default_rights": "attributes.default_rights.value",
+        "locale": "attributes.locale.id",
+        "country": "attributes.country.id",
+        "default_rights": "attributes.default_rights.id",
         "url": "attributes.url",
         "street_address": "attributes.street_address",
         "email": "attributes.email"
@@ -26,8 +26,9 @@
       "required_list": [
         "name",
         "short_name",
-        "attributes.city",
-        "attributes.country"
+        "type.id",
+        "attributes.locale.id",
+        "attributes.country.id"
       ]
     }
   },
@@ -35,7 +36,8 @@
     "columns": [
       "name",
       "short_name",
-      "attributes.city",
+      "no_records",
+      "attributes.locale",
       "attributes.country",
       "attributes.default_rights",
       "attributes.url"
@@ -51,7 +53,7 @@
       "name",
       "short_name",
       "type",
-      "attributes.city",
+      "attributes.locale",
       "attributes.country",
       "attributes.default_rights",
       "attributes.url",
@@ -69,8 +71,7 @@
         "remove": {
           "url": "/api/sources/_id_/"
         }
-      },
-      "template": "#source-form-template"
+      }
     },
     "buttons": [
       {

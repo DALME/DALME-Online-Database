@@ -1,14 +1,14 @@
 {
-    "name": "primary_dataset.value",
+    "name": "primary_dataset.id",
     "label": "Primary Dataset",
     "type": "selectize",
     "opts": {
         "placeholder": "Select dataset",
-        "preload": true
+        "preload": "focus"
     },
     "options": {
         "type": "api_call",
-        "url": "/api/sets/?format=select&q=datasets,"
+        "url": "/api/sets/?format=select&set_type=3&search="
     },
     "fieldInfo": "Dataset used to assign permissions"
 }

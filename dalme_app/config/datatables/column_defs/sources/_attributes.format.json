@@ -1,8 +1,9 @@
 {
     "title": "Format",
     "data": "attributes.format",
+    "name": "format",
     "defaultContent": "",
-    "visible": false,
+    "visible": true,
     "orderable": true,
     "searchable": false
 }

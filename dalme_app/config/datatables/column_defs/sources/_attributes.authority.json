@@ -1,8 +1,9 @@
 {
     "title": "Authority",
     "data": "attributes.authority",
+    "name": "authority",
     "defaultContent": "",
-    "visible": false,
+    "visible": true,
     "orderable": true,
     "searchable": false
 }

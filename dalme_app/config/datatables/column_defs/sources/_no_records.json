@@ -1,6 +1,7 @@
 {
     "title": "No. Records",
     "data": "no_records",
+    "name": "no_records",
     "defaultContent": "",
     "visible": true,
     "orderable": true,
