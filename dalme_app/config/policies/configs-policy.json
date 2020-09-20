@@ -1,0 +1,12 @@
+[
+  {
+    "action": ["get"],
+    "principal": ["*"],
+    "effect": "allow"
+  },
+  {
+    "action": ["list", "update"],
+    "principal": ["group:Administrators"],
+    "effect": "allow"
+  }
+]
