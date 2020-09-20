@@ -32,12 +32,30 @@ class DRFSelectRenderer(renderers.JSONRenderer):
         else:
             separators = INDENT_SEPARATORS
 
-        if len(renderer_context['choice_keys']) == 2:
-            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1])} for i in data]
+        select_fields = ['name', 'id']
+
+        global_preferences = global_preferences_registry.manager()
+        if renderer_context.get('model') is not None:
+            if global_preferences['api_settings__model_select_fields'].get(renderer_context['model']) is not None:
+                select_fields = global_preferences['api_settings__model_select_fields'].get(renderer_context['model'])
+
+        select_list = []
+        if renderer_context.get('select_type') is not None:
+            if renderer_context['select_type'] == 'att':
+                for entry in data:
+                    select_list.append({
+                        select_fields[1]: '{{"class": "{}", "id": "{}"}}'.format(renderer_context['model'], entry[select_fields[1]]),
+                        select_fields[0]: entry[select_fields[0]]
+                    })
         else:
-            new_data = [{'label': eval(renderer_context['choice_keys'][0]), 'value': eval(renderer_context['choice_keys'][1]), 'detail': eval(renderer_context['choice_keys'][2])} for i in data]
+            for entry in data:
+                entry_dict = {}
+                for field in select_fields:
+                    entry_dict[field] = entry[field]
+                select_list.append(entry_dict)
+
         ret = json.dumps(
-            new_data, cls=self.encoder_class,
+            select_list, cls=self.encoder_class,
             indent=indent, ensure_ascii=self.ensure_ascii,
             allow_nan=not self.strict, separators=separators
         )
