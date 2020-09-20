@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from django import forms
 from django.conf import settings
 from django.http import QueryDict
 from django.utils.deprecation import MiddlewareMixin
@@ -14,6 +15,9 @@ from dalme_app.models import Task
 from django.template import defaultfilters
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from dynamic_preferences.types import BasePreferenceType
+from dynamic_preferences.serializers import BaseSerializer
+from dynamic_preferences.registries import global_preferences_registry
 
 
 class DRFSelectRenderer(renderers.JSONRenderer):
@@ -241,7 +245,36 @@ class ModelDatabaseRouter(object):
                 return False
 
 
-# djangosaml2idp processor
+class JSONPreferenceSerializer(BaseSerializer):
+    """ Serializer for JSONPreference type. Extends django-dynamic-preferences BaseSerializer. """
+
+    @classmethod
+    def to_db(cls, value, **kwargs):
+        try:
+            python_dict = eval(value)
+            return json.dumps(python_dict)
+        except ValueError:
+            raise cls.exception("JSON incorrectly formatted.")
+
+    @classmethod
+    def to_python(cls, value, **kwargs):
+        if not value:
+            return ''
+        try:
+            return json.loads(value)
+        except ValueError:
+            raise cls.exception("Failed to deserialise value.")
+
+
+class JSONPreference(BasePreferenceType):
+    """ Preference type to store JSON serialized data.
+    Extends django-dynamic-preferences BasePreferenceType. """
+
+    widget = forms.Textarea
+    field_class = forms.CharField
+    serializer = JSONPreferenceSerializer
+
+
 class SAMLProcessor(BaseProcessor):
     """ subclasses the default djangosaml2idp processor
     to allow for special fields to be included in response """
