@@ -307,18 +307,24 @@ class DALMEMenus():
         user_id = request.user.id
         _output = ''
         template = os.path.join('dalme_app', 'config', template + '.json')
+        breadcrumb = [i[0] for i in state['breadcrumb']]
         with open(template, 'r') as fp:
             menu = json.load(fp)
         for item in menu:
             if item.get('permissions') is None or self.check_group(request, item['permissions']):
-                _output += self.sidebar_menu(_output, state, **item) if constructor_type == 'sidebar' else self.dropdown_menu(_output, state, **item)
+                _output += self.sidebar_menu(breadcrumb, state['sidebar'], **item) if constructor_type == 'sidebar' else self.dropdown_menu(**item)
         if constructor_type == 'dropdown_item':
             _output = self.dropdown_tasks(_output, user_id)
         return [_output]
 
-    def sidebar_menu(self, wholeMenu, state, dropdown=None, text=None, iconClass=None, link=None, counter=None,
-                     section=None, child=None, divider=None, itemClass=None, close_dropdown=None, blank=None,
-                     permissions=None):
+    def sidebar_menu(self, breadcrumb, sidebar_state, dropdown=False, iconClass=None, text=None, section=False, divider=False,
+                     close_dropdown=False, child=False, link=None, itemClass=None, permissions=None):
+        if iconClass:
+            if ',' in iconClass:
+                icons = iconClass.split(',')
+                icon = '<span class="fa-stack-container"><i class="fas {} fa-stack-base"></i><i class="fas {} fa-stack-detail"></i></span>'.format(icons[0], icons[1])
+            else:
+                icon = '<i class="fas fa-fw {}"></i>'.format(iconClass)
         if section:
             currentItem = '<div class="sidebar-heading">{}</div><hr class="sidebar-divider">'.format(text)
         elif divider:
@@ -327,14 +333,14 @@ class DALMEMenus():
             currentItem = '</li>'
         elif dropdown:
             currentItem = '<li class="nav-item'
-            if text in state['breadcrumb']:
+            if text in breadcrumb:
                 currentItem += ' active'
             currentItem += '">'
             currentItem += '<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{}" aria-expanded="true" \
                             aria-controls="collapse{}">'.format(itemClass, itemClass)
-            currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
+            currentItem += icon
             currentItem += '<span>{}</span></a>'.format(text)
-            if text in state['breadcrumb'] and state['sidebar'] != 'toggled':
+            if text in breadcrumb and not sidebar_state:
                 currentItem += '<div id="collapse{}" class="collapse show" aria-labelledby="heading{}" \
                                 data-parent="#accordionSidebar">'.format(itemClass, itemClass)
             else:
@@ -343,27 +349,24 @@ class DALMEMenus():
             currentItem += '<div class="bg-white py-2 collapse-inner rounded">'
         elif child:
             currentItem = '<a class="collapse-item'
-            if text in state['breadcrumb']:
+            if text in breadcrumb:
                 currentItem += ' active'
             currentItem += '" href="{}"'.format(link)
-            if blank:
-                currentItem += ' target="_blank"'
-            currentItem += '><i class="fas fa-fw {}"></i> {}</a>'.format(iconClass, text)
+            currentItem += '>' + icon
+            currentItem += ' {}</a>'.format(text)
         else:
             currentItem = '<li class="nav-item'
             if text == 'Dashboard':
                 currentItem += ' dash-menu'
-            if text in state['breadcrumb']:
+            if text in breadcrumb:
                 currentItem += ' active'
             currentItem += '">'
             currentItem += '<a class="nav-link" href="{}">'.format(link)
-            currentItem += '<i class="fas fa-fw {}"></i>'.format(iconClass)
+            currentItem += icon
             currentItem += '<span>{}</span></a></li>'.format(text)
         return currentItem
 
-    def dropdown_menu(self, wholeMenu, state, topMenu=None, infoPanel=None, title=None, itemClass=None, iconClass=None,
-                      childrenIconClass=None, children=None, text=None, link=None, action=None, divider=None, section=None,
-                      counter=None, circleColour=None, moreText=None, moreLink=None, permissions=None, tooltip=None):
+    def dropdown_menu(self, link=None, itemClass=None, tooltip=None, iconClass=None, children=None, childrenIconClass=None):
         if link:
             currentItem = '<li class="nav-item dropdown no-arrow topbar-border-left">'
             currentItem += '<a class="nav-link dropdown-toggle" href="{}" id="{}button" role="button" data-toggle="tooltip" \
