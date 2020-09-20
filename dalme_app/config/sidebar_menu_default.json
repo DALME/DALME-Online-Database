@@ -23,7 +23,7 @@
   },
   {
     "text": "Archival Files",
-    "link": "/sources?class=archival_files",
+    "link": "/sources?class=archival-files",
     "iconClass": "fa-archive",
     "child": true
   },
@@ -40,13 +40,85 @@
     "child": true
   },
   {
-    "close_dropdown": true
+    "divider": true
   },
   {
     "text": "DAM Images",
     "link": "/images",
     "iconClass": "fa-images",
-    "itemClass": "images"
+    "child": true
+  },
+  {
+    "close_dropdown": true
+  },
+  {
+    "text": "Sets",
+    "link": "#",
+    "iconClass": "fa-clone",
+    "itemClass": "sets",
+    "dropdown": true
+  },
+  {
+    "text": "Corpora",
+    "link": "/sets/?type=corpora",
+    "iconClass": "fa-clone, fa-archive",
+    "child": true,
+    "permissions": ["Administrators", "Developers"]
+  },
+  {
+    "text": "Collections",
+    "link": "/sets/?type=collections",
+    "iconClass": "fa-clone, fa-globe",
+    "child": true,
+    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+  },
+  {
+    "text": "Datasets",
+    "link": "/sets/?type=datasets",
+    "iconClass": "fa-clone, fa-database",
+    "child": true,
+    "permissions": ["Administrators", "Developers"]
+  },
+  {
+    "text": "Worksets",
+    "link": "/sets/?type=worksets",
+    "iconClass": "fa-clone, fa-cog",
+    "child": true,
+    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+  },
+  {
+    "close_dropdown": true
+  },
+  {
+    "text": "Entities",
+    "link": "#",
+    "iconClass": "fa-atom",
+    "itemClass": "entities",
+    "dropdown": true
+  },
+  {
+    "text": "Agents",
+    "link": "/agents/",
+    "iconClass": "fa-hospital-user",
+    "child": true,
+    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+  },
+  {
+    "text": "Objects",
+    "link": "#",
+    "iconClass": "fa-mortar-pestle",
+    "child": true,
+    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+  },
+  {
+    "text": "Places",
+    "link": "#",
+    "iconClass": "fa-sign",
+    "child": true,
+    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+  },
+  {
+    "close_dropdown": true
   },
   {
     "text": "Lexicon",
@@ -116,13 +188,6 @@
     "permissions": ["Staff", "Administrators", "Developers"]
   },
   {
-    "text": "Sets",
-    "link": "/sets",
-    "iconClass": "fa-folder",
-    "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
-  },
-  {
     "text": "Tasks",
     "link": "/tasks",
     "iconClass": "fa-tasks",
@@ -142,7 +207,7 @@
   },
   {
     "text": "Asynchronous Tasks",
-    "link": "/async_tasks",
+    "link": "/async-tasks",
     "iconClass": "fa-tasks",
     "child": true,
     "permissions": ["Administrators", "Developers"]
@@ -176,8 +241,8 @@
     "permissions": ["Administrators", "Developers"]
   },
   {
-    "text": "Django Admin",
-    "link": "/django_admin",
+    "text": "Admin",
+    "link": "/admin",
     "iconClass": "fa-user-cog",
     "child": true,
     "permissions": ["Administrators", "Developers"]
@@ -200,14 +265,14 @@
   },
   {
     "text": "Content Types",
-    "link": "/models/content_types",
+    "link": "/models/content-types",
     "iconClass": "fa-cube",
     "child": true,
     "permissions": ["Developers"]
   },
   {
     "text": "Attribute Types",
-    "link": "/models/attribute_types",
+    "link": "/models/attribute-types",
     "iconClass": "fa-cube",
     "child": true,
     "permissions": ["Developers"]
@@ -216,10 +281,35 @@
     "close_dropdown": true
   },
   {
-    "text": "Scripts",
-    "link": "/scripts",
-    "iconClass": "fa-code",
-    "itemClass": "scripts",
+    "text": "Tools",
+    "link": "#",
+    "iconClass": "fa-toolbox",
+    "itemClass": "dev-tools",
+    "dropdown": true,
     "permissions": ["Developers"]
+  },
+  {
+    "text": "Config Editor",
+    "link": "/tools/config-editor",
+    "iconClass": "fa-laptop-code",
+    "child": true,
+    "permissions": ["Developers"]
+  },
+  {
+    "text": "Scripts",
+    "link": "/tools/scripts",
+    "iconClass": "fa-code",
+    "child": true,
+    "permissions": ["Developers"]
+  },
+  {
+    "text": "Settings",
+    "link": "/tools/settings",
+    "iconClass": "fa-clipboard-list",
+    "child": true,
+    "permissions": ["Developers"]
+  },
+  {
+    "close_dropdown": true
   }
 ]
