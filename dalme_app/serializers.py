@@ -1,13 +1,17 @@
 from django.contrib.auth.models import User, Group
-from dalme_app.models import (Profile, Content_class, Content_type, Content_attributes, Set_x_content, Page, Source, TaskList, Task,
+from dalme_app.models import (Agent, Profile, Content_class, Content_type, Content_attributes, Set_x_content, Page, Source, TaskList, Task,
                               rs_resource, LanguageReference, rs_collection, rs_user, Transcription, Attribute, Attribute_type, GroupProperties,
-                              CountryReference, LocaleReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy)
+                              CountryReference, LocaleReference, Tag, Attachment, Ticket, Comment, Workflow, Set, RightsPolicy, Source_pages,
+                              Source_credit)
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from dalme_app.utils import round_timesince
 import textwrap
 import datetime
 import json
+from rest_framework.fields import (  # NOQA # isort:skip
+    CreateOnlyDefault, CurrentUserDefault, SkipField, empty
+)
 
 
 class DynamicSerializer(serializers.ModelSerializer):
@@ -26,19 +30,21 @@ class DynamicSerializer(serializers.ModelSerializer):
                     self.fields.pop(k)
 
 
-class GroupPropertiesSerializer(serializers.ModelSerializer):
+class GroupPropertiesSerializer(DynamicSerializer):
     class Meta:
         model = GroupProperties
         fields = ('type', 'description')
 
 
-class GroupSerializer(serializers.ModelSerializer):
+class GroupSerializer(DynamicSerializer):
     """ Basic serializer for user group data """
-    properties = GroupPropertiesSerializer()
+    properties = GroupPropertiesSerializer(required=False)
+    description = serializers.CharField(max_length=255, source='properties.description', required=False)
 
     class Meta:
         model = Group
-        fields = ('id', 'name', 'properties')
+        fields = ('id', 'name', 'properties', 'description')
+        extra_kwargs = {'name': {'required': False}, }
 
 
 class ProfileSerializer(DynamicSerializer):
@@ -51,15 +57,22 @@ class ProfileSerializer(DynamicSerializer):
 class UserSerializer(DynamicSerializer):
     """ Serializes user and profile data """
     groups = GroupSerializer(many=True, required=False)
-    last_login = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
-    date_joined = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
     profile = ProfileSerializer()
+    full_name = serializers.CharField(max_length=255, source='profile.full_name', required=False)
 
     class Meta:
         model = User
-        fields = ('id', 'last_login', 'is_superuser', 'username', 'first_name', 'last_name',
-                  'email', 'is_staff', 'is_active', 'date_joined', 'groups', 'profile')
-        extra_kwargs = {'username': {'validators': []}}
+        fields = ('id', 'last_login', 'is_superuser', 'username', 'first_name', 'last_name', 'full_name',
+                  'email', 'is_staff', 'is_active', 'date_joined', 'groups', 'profile', 'password')
+        extra_kwargs = {
+            'username': {'validators': []},
+            'password': {'write_only': True}
+            }
+
+    def to_internal_value(self, data):
+        if data.get('groups') is not None:
+            self.context['groups'] = data.pop('groups')
+        return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
         if validated_data.get('profile') is not None:
@@ -68,12 +81,18 @@ class UserSerializer(DynamicSerializer):
             for attr, value in profile_data.items():
                 setattr(profile, attr, value)
             profile.save()
+        if self.context.get('groups') is not None:
+            group_data = [i['id'] for i in self.context['groups']]
+            instance.groups.set(group_data)
         return super().update(instance, validated_data)
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
         user = User.objects.create_user(**validated_data)
         Profile.objects.create(user=user, **profile_data)
+        if self.context.get('groups') is not None:
+            group_data = [i['id'] for i in self.context['groups']]
+            user.groups.set(group_data)
         return user
 
 
@@ -114,13 +133,13 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         label = instance.attribute_type.short_name
-        if instance.attribute_type.data_type == 'UUID':
+        if instance.attribute_type.data_type == 'FK-UUID' or instance.attribute_type.data_type == 'FK-INT':
             data = json.loads(instance.value_STR)
             object = eval('{}.objects.get(pk="{}")'.format(data['class'], data['id']))
             ret = {label: {
                 'name': object.name,
                 'url': object.get_url(),
-                'value': instance.value_STR
+                'id': instance.value_STR
             }}
         elif instance.attribute_type.data_type == 'DATE':
             ret = {label: {
@@ -219,6 +238,11 @@ class LanguageSerializer(serializers.ModelSerializer):
                 'name': instance.parent.name,
                 'id': instance.parent.id
                 }
+        if ret.get('type') is not None:
+            ret['type'] = {
+                'name': instance.get_type_display(),
+                'id': instance.type
+                }
         return ret
 
 
@@ -238,18 +262,21 @@ class LocaleSerializer(serializers.ModelSerializer):
 
 
 class PageSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(required=False)
+    order = serializers.IntegerField(required=False)
+    name = serializers.CharField(max_length=255, required=False)
+    dam_id = serializers.IntegerField(required=False)
+
     class Meta:
         model = Page
-        fields = ('id', 'name', 'dam_id', 'order')
+        fields = ('id', 'name', 'order', 'dam_id')
 
 
 class RightsSerializer(serializers.ModelSerializer):
-    rights_status_name = serializers.ChoiceField(choices=RightsPolicy.RIGHTS_STATUS, source='get_rights_status_display', required=False)
-    url = serializers.ReadOnlyField(source='get_url', read_only=True, required=False)
 
     class Meta:
         model = RightsPolicy
-        fields = ('id', 'name', 'url', 'rights_holder', 'rights_status', 'rights_status_name', 'rights', 'notice_display', 'rights_notice', 'licence', 'attachments')
+        fields = ('id', 'name', 'rights_holder', 'rights_status', 'rights', 'notice_display', 'rights_notice', 'licence', 'attachments')
         extra_kwargs = {
                         'rights_notice': {'required': False},
                         'licence': {'required': False},
@@ -267,12 +294,8 @@ class RightsSerializer(serializers.ModelSerializer):
                     'filename': instance.attachments.filename
                 }
             }
-        ret['name'] = {
-            'name': ret.pop('name'),
-            'url': ret.pop('url')
-        }
         ret['rights_status'] = {
-            'name': ret.pop('rights_status_name'),
+            'name': instance.get_rights_status_display,
             'value': ret.pop('rights_status')
         }
         return ret
@@ -291,22 +314,24 @@ class RSCollectionsSerializer(serializers.ModelSerializer):
 
 
 class RSImageSerializer(serializers.ModelSerializer):
-    collections = RSCollectionsSerializer(many=True, required=False)
+    # collections = RSCollectionsSerializer(many=True, required=False)
 
     class Meta:
         model = rs_resource
         fields = ('ref', 'has_image', 'creation_date', 'created_by', 'field12', 'field8',
-                  'field3', 'field51', 'field79', 'collections')
+                  'field3', 'field51', 'field79')
+        # fields = ('ref', 'has_image', 'creation_date', 'created_by', 'field12', 'field8',
+        #         'field3', 'field51', 'field79', 'collections')
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        try:
-            ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
-        except rs_user.DoesNotExist:
-            ret['created_by'] = ret['created_by']
-        ret['id'] = ret['ref']
-        ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
-        return ret
+    # def to_representation(self, instance):
+    #     ret = super().to_representation(instance)
+    #     try:
+    #         ret['created_by'] = rs_user.objects.get(ref=ret['created_by']).username
+    #     except rs_user.DoesNotExist:
+    #         ret['created_by'] = ret['created_by']
+    #     ret['id'] = ret['ref']
+    #     ret['ref'] = {'ref': ret['ref'], 'url': '/images/'+str(ret['ref'])}
+    #     return ret
 
 
 class SetSerializer(DynamicSerializer):
@@ -317,9 +342,8 @@ class SetSerializer(DynamicSerializer):
 
     class Meta:
         model = Set
-        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'permissions', 'permissions_name', 'workset_progress', 'member_count', 'endpoint', 'creation_timestamp', 'is_public',
-                  'has_landing', 'stat_title', 'stat_text', 'dataset_usergroup', 'detail_string')
-        # extra_kwargs = {'set_type_label': {'required': False}, 'permissions_label': {'required': False}}
+        fields = ('id', 'name', 'set_type', 'set_type_name', 'description', 'owner', 'permissions', 'permissions_name', 'workset_progress', 'member_count',
+                  'endpoint', 'creation_timestamp', 'is_public', 'has_landing', 'stat_title', 'stat_text', 'dataset_usergroup', 'detail_string')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -339,11 +363,11 @@ class SetSerializer(DynamicSerializer):
             ret['progress_circle'] = progress_circle
         ret['set_type'] = {
             'name': ret.pop('set_type_name'),
-            'value': ret.pop('set_type')
+            'id': ret.pop('set_type')
         }
         ret['permissions'] = {
             'name': ret.pop('permissions_name'),
-            'value': ret.pop('permissions')
+            'id': ret.pop('permissions')
         }
         return ret
 
@@ -500,11 +524,12 @@ class TranscriptionSerializer(serializers.ModelSerializer):
 
 class WorkflowSerializer(serializers.ModelSerializer):
     """Basic serializer for workflow control"""
-    last_user = UserSerializer(fields=['username', 'profile'])
+    last_user = UserSerializer(fields=['username', 'profile'], required=False)
 
     class Meta:
         model = Workflow
         fields = ('help_flag', 'is_public', 'last_modified', 'last_user', 'wf_status', 'stage', 'status')
+        extra_kwargs = {'last_user': {'required': False}, }
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -551,12 +576,15 @@ def translate_workflow_status(data):
 
 
 class SourceSetSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source='set_id.id', read_only=True)
     name = serializers.ReadOnlyField(source='set_id.name', read_only=True, required=False)
     detail_string = serializers.ReadOnlyField(source='set_id.detail_string', read_only=True, required=False)
 
     class Meta:
         model = Set_x_content
-        fields = ('set_id', 'name', 'detail_string')
+        fields = ('id', 'name', 'detail_string')
+
+
 class SourceCreditSerializer(DynamicSerializer):
     agent = serializers.ReadOnlyField(source='agent.standard_name', read_only=True, required=False)
     agent_id = serializers.ReadOnlyField(source='agent.id', read_only=True, required=False)
@@ -585,8 +613,8 @@ class SourceSerializer(DynamicSerializer):
     tags = TagSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
     sets = SourceSetSerializer(many=True, required=False)
-    type = ContentTypeSerializer(fields=['id', 'name'])
     pages = PageSerializer(many=True, required=False)
+    owner = UserSerializer(fields=['full_name', 'username', 'id'])
     credits = SourceCreditSerializer(many=True, required=False)
 
     class Meta:
@@ -610,11 +638,10 @@ class SourceSerializer(DynamicSerializer):
         if ret.get('parent') is not None:
             if ret['parent']:
                 ret['parent'] = {'id': ret['parent'], 'name': instance.parent.name}
-        if ret.get('owner') is not None:
-            ret['owner'] = {
-                'id': instance.owner.id,
-                'username': instance.owner.username,
-                'full_name': instance.owner.profile.full_name
+        if ret.get('type') is not None:
+            ret['type'] = {
+                'name': instance.type.name,
+                'id': ret['type']
             }
         for k, v in dict(ret).items():
             if v is None:
@@ -631,39 +658,31 @@ class SourceSerializer(DynamicSerializer):
                     continue
                 value_list = value if key in multi_attributes else [value]
                 for v in value_list:
-                    att = {'attribute_type': att_type.id}
-                    if att_type.data_type == 'INT':
-                        att['value_INT'] = int(v)
-                    elif att_type.data_type == 'TXT':
-                        att['value_TXT'] = v
-                    elif att_type.data_type == 'DATE':
-                        att['value_DATE_d'] = v['d']
-                        att['value_DATE_m'] = v['m']
-                        att['value_DATE_y'] = v['y']
-                    else:
-                        att['value_STR'] = v
-                    deserialised.append(att)
+                    if v is not None:
+                        att = {'attribute_type': att_type.id}
+                        add_att = True
+                        if att_type.data_type == 'INT':
+                            att['value_INT'] = int(v)
+                        elif att_type.data_type == 'TXT':
+                            att['value_TXT'] = v
+                        elif att_type.data_type == 'DATE':
+                            if v['d'] is None and v['m'] is None and v['y'] is None:
+                                add_att = False
+                            else:
+                                att['value_DATE_d'] = v['d']
+                                att['value_DATE_m'] = v['m']
+                                att['value_DATE_y'] = v['y']
+                        else:
+                            att['value_STR'] = v
+                        if add_att:
+                            deserialised.append(att)
             data['attributes'] = deserialised
-        if 'pages' in data:
-            if data['pages'].get('0') is not None:
-                data['pages'] = self.deserialise_numbered_dict(data['pages'])
-            else:
-                data['pages'] = [data['pages']]
-        if 'sets' in data:
-            if data['sets'].get('0') is not None:
-                data['sets'] = self.deserialise_numbered_dict(data['sets'])
-            else:
-                data['sets'] = [data['sets']]
-        if 'parent' in data:
-            data['parent'] = data['parent']['id']
         if 'workflow' in data:
             if data['workflow'].get('status') is not None:
                 text = data['workflow']['status']['text']
                 values = translate_workflow_status(text)
                 data['workflow']['wf_status'] = values['wf_status']
                 data['workflow']['stage'] = values['stage']
-        if 'owner' in data:
-            data['owner'] = data['owner']['id']
         return super().to_internal_value(data)
 
     def create(self, validated_data):
@@ -776,7 +795,7 @@ class SourceSerializer(DynamicSerializer):
                     page.delete()
 
         if validated_data.get('sets') is not None:
-            sets_list = [i['set_id'] for i in validated_data.pop('sets')]
+            sets_list = [i['id'] for i in validated_data.pop('sets')]
             current_sets_list = [i.set_id for i in instance.sets.all()]
             for _set in sets_list:
                 if _set not in current_sets_list:

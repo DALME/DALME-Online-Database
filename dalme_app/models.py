@@ -95,13 +95,13 @@ class Content_type(dalmeIntid):
 
 
 class Attribute_type(dalmeIntid):
-
     DATA_TYPES = (
         ('DATE', 'DATE (date)'),
         ('INT', 'INT (integer)'),
         ('STR', 'STR (string)'),
         ('TXT', 'TXT (text)'),
-        ('UUID', 'UUID (DALME record)')
+        ('FK-UUID', 'FK-UUID (DALME record)'),
+        ('FK-INT', 'FK-INT (DALME record)')
     )
 
     name = models.CharField(max_length=255)
@@ -131,14 +131,16 @@ class Attribute(dalmeUuid):
     value_DATE_y = models.IntegerField(blank=True, null=True)
     value_DATE = models.DateField(blank=True, null=True)
     value_INT = models.IntegerField(blank=True, null=True)
-    value_TXT = models.TextField(blank=True, default=None)
+    value_TXT = models.TextField(blank=True, default=None, null=True)
+
+    class Meta:
+        unique_together = ('object_id', 'attribute_type', 'value_STR')
 
     def __str__(self):
         if self.attribute_type.data_type == 'DATE':
             str_val = self.value_STR
-        elif self.attribute_type.data_type == 'UUID':
-            val_data = json.loads(self.value_STR)
-            object = eval('{}.objects.get(pk="{}")'.format(val_data['class'], val_data['id']))
+        elif self.attribute_type.data_type == 'FK-UUID' or self.attribute_type.data_type == 'FK-INT':
+            object = self.get_dalme_object()
             str_val = '<a href="{}">{}</a>'.format(object.get_url(), object.name)
         else:
             str_val = str(eval('self.value_' + self.attribute_type.data_type))
@@ -155,14 +157,18 @@ class Attribute(dalmeUuid):
                 self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
             elif self.value_DATE_y is not None:
                 self.value_STR = str(self.value_DATE_y)
-        if self.attribute_type.data_type == 'INT':
+        if self.attribute_type.data_type == 'INT' and self.value_INT is not None:
             self.value_STR = str(self.value_INT)
-        if self.attribute_type.data_type == 'TXT':
+        if self.attribute_type.data_type == 'TXT' and self.value_TXT is not None:
             self.value_STR = self.value_TXT[0:254] if len(self.value_TXT) > 255 else self.value_TXT
         super().save(*args, **kwargs)
 
-    class Meta:
-        unique_together = ('object_id', 'attribute_type', 'value_STR')
+    def get_dalme_object(self):
+        if self.attribute_type.data_type == 'FK-UUID' or self.attribute_type.data_type == 'FK-INT':
+            val_data = json.loads(self.value_STR)
+            obj_id = '"{}"'.format(val_data['id']) if self.attribute_type.data_type == 'FK-UUID' else val_data['id']
+            object = eval('{}.objects.get(pk={})'.format(val_data['class'], obj_id))
+            return object
 
 
 class Content_attributes(dalmeIntid):
@@ -221,19 +227,16 @@ class Source(index.Indexed, dalmeUuidOwned):
             else:
                 return r1_inherited
 
-    @property
     def agents(self):
         ep_list = [i.transcription.entity_phrases.filter(content_type=104) for i in self.source_pages.all().select_related('transcription') if i.transcription]
         if len(ep_list) > 0:
             return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
 
-    @property
     def places(self):
         ep_list = [i.transcription.entity_phrases.filter(content_type=115) for i in self.source_pages.all().select_related('transcription') if i.transcription]
         if len(ep_list) > 0:
             return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
 
-    @property
     def objects(self):
         ep_list = [i.transcription.entity_phrases.filter(content_type=118) for i in self.source_pages.all().select_related('transcription') if i.transcription]
         if len(ep_list) > 0:
@@ -252,6 +255,10 @@ class Source(index.Indexed, dalmeUuidOwned):
             return self.pages.exclude(dam_id__isnull=True).count()
         else:
             return 0
+
+    @property
+    def no_records(self):
+        return self.source_set.all().count()
 
     @property
     def has_transcriptions(self):
@@ -274,7 +281,6 @@ class Source(index.Indexed, dalmeUuidOwned):
         else:
             return 0
 
-    @property
     def get_credit_line(self):
         try:
             editor = self.owner.profile.full_name
@@ -358,6 +364,9 @@ class Page(dalmeUuid):
     canvas = models.TextField(null=True)
     tags = GenericRelation('Tag')
 
+    class Meta:
+        ordering = ['order']
+
     def __str__(self):
         return self.name
 
@@ -413,7 +422,7 @@ def update_folio(sender, instance, created, **kwargs):
 
 
 class Source_pages(dalmeIntid):
-    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE,  related_name='source_pages')
+    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='source_pages')
     page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
     transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='source_pages')
 
@@ -497,13 +506,14 @@ class Agent(dalmeUuid):
         (ORGANIZATION, 'Organization'),
     )
 
-    std_name = models.CharField(max_length=255)
+    standard_name = models.CharField(max_length=255)
     type = models.IntegerField(choices=AGENT_TYPES)
     attributes = GenericRelation('Attribute')
     instances = GenericRelation('Entity_phrase')
     relations = GenericRelation('Relationship', content_type_field='source_content_type', object_id_field='source_object_id')
     notes = models.TextField()
     tags = GenericRelation('Tag')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='agent', null=True)
 
 
 class Object(dalmeUuid):
@@ -747,12 +757,15 @@ class LocaleReference(dalmeIntid):
     administrative_region = models.CharField(max_length=255)
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
 
-    def __str__(self):
-        return f'{self.name}({self.country.name})'
-
     class Meta:
         ordering = ['country', 'name']
         unique_together = ('name', 'administrative_region')
+
+    def __str__(self):
+        return f'{self.name}({self.country.name})'
+
+    def get_url(self):
+        return '/locales/' + str(self.id)
 
 
 class CountryReference(dalmeIntid):
@@ -761,30 +774,44 @@ class CountryReference(dalmeIntid):
     alpha_2_code = models.CharField(max_length=2)
     num_code = models.IntegerField()
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ["name"]
 
+    def __str__(self):
+        return self.name
+
+    def get_url(self):
+        return '/countries/' + str(self.id)
+
 
 class LanguageReference(dalmeIntid):
-    LANGUAGE_TYPES = (
-        ('language', 'language'),
-        ('dialect', 'dialect')
+    # LANGUAGE_TYPES = (
+    #     ('language', 'language'),
+    #     ('dialect', 'dialect')
+    # )
+    LANGUAGE = 1
+    DIALECT = 2
+    LANG_TYPES = (
+        (LANGUAGE, 'Language'),
+        (DIALECT, 'Dialect'),
     )
 
     glottocode = models.CharField(max_length=25, unique=True)
     iso6393 = models.CharField(max_length=25, unique=True, blank=True, null=True, default=None)
     name = models.CharField(max_length=255)
-    type = models.CharField(max_length=15, choices=LANGUAGE_TYPES)
+    # lang_type = models.IntegerField(choices=LANG_TYPES)
+    type = models.IntegerField(choices=LANG_TYPES)
+    # type = models.CharField(max_length=15, choices=LANGUAGE_TYPES)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self):
         return self.name+' ('+self.glottocode+')'
 
-    class Meta:
-        ordering = ["name"]
+    def get_url(self):
+        return '/languages/' + str(self.id)
 
 
 class Workflow(models.Model):
@@ -843,7 +870,7 @@ class Workflow(models.Model):
             status_text = 'unknown'
             status_text_alt = ''
             css_class = 'tag-wf-unknown'
-        return {'text': status_text, 'css_class': css_class, 'text_alt': status_text_alt}
+        return {'text': status_text, 'css_class': css_class, 'text_alt': status_text_alt, 'title_text': status_text.capitalize()}
 
     @property
     def stage_done(self):
@@ -862,7 +889,7 @@ class Work_log(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
 
 
-class Attachment(dalmeUuid):
+class Attachment(dalmeUuidOwned):
     file = models.FileField(upload_to='attachments/%Y/%m/')
     type = models.CharField(max_length=255, null=True)
 
@@ -951,7 +978,7 @@ class Task(dalmeIntid):
         ordering = ["priority", "creation_timestamp"]
 
 
-class TaskList(dalmeIntid):
+class TaskList(dalmeIntidOwned):
     name = models.CharField(max_length=60)
     slug = models.SlugField(default="")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="task_list_group")
