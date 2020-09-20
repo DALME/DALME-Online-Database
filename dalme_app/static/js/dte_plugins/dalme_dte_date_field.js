@@ -28,7 +28,7 @@ _fieldTypes.dalmeDate = {
   _addOptions: function(conf, options) {
         var selectize = conf._selectize;
         selectize.clearOptions();
-        selectize.addOption( options );
+        selectize.addOption(options);
         selectize.refreshOptions(false);
     },
 
@@ -52,7 +52,7 @@ _fieldTypes.dalmeDate = {
           labelField: 'label',
           searchField: 'label',
           dropdownParent: 'body'
-        }, conf.opts ) );
+        }, conf.opts));
 
     conf._selectize = conf._input_month[0].selectize;
 
@@ -61,7 +61,6 @@ _fieldTypes.dalmeDate = {
     }
 
     this.on('preSubmit', function() { conf._selectize.close(); });
-
     return container[0];
   },
 

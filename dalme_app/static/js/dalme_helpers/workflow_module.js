@@ -4,8 +4,15 @@ function workflow_module_load() {
 
 function workflow_module_init() {
   $.ajax({
-      method: "GET",
-      url: "/api/configs/?target=workflow_menu"
+    method: "POST",
+    url: "/api/configs/get/",
+    headers: {
+      "Content-Type": "application/json",
+      'X-CSRFToken': get_cookie("csrftoken")
+    },
+    data: JSON.stringify({
+      'target': 'workflow_menu'
+    })
   }).done(function(data, textStatus, jqXHR) {
       workflow_filter_on = false;
       var wf_menu = data[0];
@@ -41,7 +48,8 @@ function workflow_module_init() {
       };
       $(container).append('<button class="btn buttons-collection dropdown-toggle" id="workflow_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-code-branch fa-sm"></i> Workflow</button>');
       $(container).append(dropdown);
-      $('.dt-buttons').append(container);
+      container.insertAfter($('.buttons-page-length').parent());
+      // $('.dt-buttons').append(container);
       $(container).on('click.dalme', 'a', function() {
           workflow_filter(this);
       });

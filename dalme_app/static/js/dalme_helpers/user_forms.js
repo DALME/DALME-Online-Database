@@ -12,13 +12,13 @@ function change_form(e, mode, action) {
       toggle_password_button(e);
     }
     if (action == 'create') {
-      $(dt_editor.field('last_name').node()).find('input').on('change.dalme', function() { suggest_fullname() });
-      $(dt_editor.field('email').node()).find('input').on('change.dalme', function() { suggest_username() });
+      dt_editor.field('last_name').input().on('change.dalme', suggest_fullname);
+      dt_editor.field('email').input().on('change.dalme', suggest_username);
     }
   } else if (e.type == 'close') {
         toggle_password_button(e);
-        $(dt_editor.field('last_name').node()).find('input').off('change.dalme');
-        $(dt_editor.field('email').node()).find('input').off('change.dalme');
+        dt_editor.field('last_name').input().off('change.dalme');
+        dt_editor.field('email').input().off('change.dalme');
   }
 }
 
@@ -59,18 +59,18 @@ function toggle_password_button(e) {
 }
 
 function suggest_fullname() {
-  var first_name = $(dt_editor.field('first_name').node()).find('input').val();
-  var last_name = $(dt_editor.field('last_name').node()).find('input').val();
+  var first_name = dt_editor.field('first_name').val()
+  var last_name = dt_editor.field('last_name').val()
   if (first_name != '' && last_name != '') {
     var suggestion = first_name+' '+last_name;
-    $(dt_editor.field('profile.full_name').node()).find('input').val(suggestion);
+    dt_editor.field('profile.full_name').val(suggestion)
   }
 }
 
 function suggest_username() {
-  var email = $(dt_editor.field('email').node()).find('input').val();
+  var email = dt_editor.field('email').val()
   if (email != '' && email.includes("@")) {
     var suggestion = email.split("@")[0];
-    $(dt_editor.field('username').node()).find('input').val(suggestion);
+    dt_editor.field('username').val(suggestion)
   }
 }
