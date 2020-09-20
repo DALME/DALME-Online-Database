@@ -1,52 +1,52 @@
 [
   {
-    "label": "Ingestion in progress",
-    "value": "ingestion in progress",
+    "title_text": "Ingestion in progress",
+    "text": "ingestion in progress",
     "group": "Ingestion"
   },
   {
-    "label": "Awaiting transcription",
-    "value": "awaiting transcription",
+    "title_text": "Awaiting transcription",
+    "text": "awaiting transcription",
     "group": "Transcription"
   },
   {
-    "label": "Transcription in progress",
-    "value": "transcription in progress",
+    "title_text": "Transcription in progress",
+    "text": "transcription in progress",
     "group": "Transcription"
   },
   {
-    "label": "Awaiting Markup",
-    "value": "awaiting markup",
+    "title_text": "Awaiting Markup",
+    "text": "awaiting markup",
     "group": "Markup"
   },
   {
-    "label": "Markup in progress",
-    "value": "markup in progress",
+    "title_text": "Markup in progress",
+    "text": "markup in progress",
     "group": "Markup"
   },
   {
-    "label": "Awaiting Review",
-    "value": "awaiting review",
+    "title_text": "Awaiting Review",
+    "text": "awaiting review",
     "group": "Review"
   },
   {
-    "label": "Review in progress",
-    "value": "review in progress",
+    "title_text": "Review in progress",
+    "text": "review in progress",
     "group": "Review"
   },
   {
-    "label": "Awaiting Parsing",
-    "value": "awaiting parsing",
+    "title_text": "Awaiting Parsing",
+    "text": "awaiting parsing",
     "group": "Parsing"
   },
   {
-    "label": "Parsing in progress",
-    "value": "parsing in progress",
+    "title_text": "Parsing in progress",
+    "text": "parsing in progress",
     "group": "Parsing"
   },
   {
-    "label": "Assessing",
-    "value": "assessing",
+    "title_text": "Assessing",
+    "text": "assessing",
     "group": "Other"
   }
 ]
