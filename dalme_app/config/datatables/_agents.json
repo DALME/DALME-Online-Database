@@ -1,0 +1,70 @@
+{
+  "config": {
+    "endpoint": "agents",
+    "globals": {
+      "messages_list": {
+        "create_success": "The agent was created succesfully.",
+        "edit_success": "The agent was updated succesfully.",
+        "remove_success": "The agent was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "standard_name": "standard_name",
+        "type": "type.id",
+        "notes": "notes",
+        "user": "user.id"
+      },
+      "required_list": [
+        "standard_name",
+        "type.id"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "standard_name",
+      "type",
+      "notes",
+      "user"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/agents/?format=json"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "standard_name",
+      "type",
+      "notes",
+      "user"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/agents/"
+        },
+        "edit": {
+          "url": "/api/agents/_id_/"
+        },
+        "remove": {
+          "url": "/api/agents/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_agent"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_agent"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_agent"
+      }
+    ]
+  }
+}

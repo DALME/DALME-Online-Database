@@ -77,6 +77,22 @@ class UserSerializer(DynamicSerializer):
         return user
 
 
+class AgentSerializer(DynamicSerializer):
+    user = UserSerializer(fields=['full_name', 'username', 'id'])
+
+    class Meta:
+        model = Agent
+        fields = ('id', 'type', 'standard_name', 'notes', 'user')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['type'] = {
+            'id': instance.type,
+            'name': instance.get_type_display()
+        }
+        return ret
+
+
 class AsyncTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskResult
@@ -541,6 +557,26 @@ class SourceSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Set_x_content
         fields = ('set_id', 'name', 'detail_string')
+class SourceCreditSerializer(DynamicSerializer):
+    agent = serializers.ReadOnlyField(source='agent.standard_name', read_only=True, required=False)
+    agent_id = serializers.ReadOnlyField(source='agent.id', read_only=True, required=False)
+    notes = serializers.ReadOnlyField(source='agent.notes', read_only=True, required=False)
+
+    class Meta:
+        model = Source_credit
+        fields = ('id', 'type', 'agent', 'agent_id', 'notes')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['type'] = {
+            'id': instance.type,
+            'name': instance.get_type_display()
+        }
+        ret['agent'] = {
+            'id': ret.pop('agent_id'),
+            'standard_name': ret['agent']
+        }
+        return ret
 
 
 class SourceSerializer(DynamicSerializer):
@@ -551,11 +587,12 @@ class SourceSerializer(DynamicSerializer):
     sets = SourceSetSerializer(many=True, required=False)
     type = ContentTypeSerializer(fields=['id', 'name'])
     pages = PageSerializer(many=True, required=False)
+    credits = SourceCreditSerializer(many=True, required=False)
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'primary_dataset', 'attributes', 'inherited',
-                  'no_folios', 'no_images', 'tags', 'workflow', 'owner', 'primary_dataset', 'sets', 'pages')
+        fields = ('id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'primary_dataset', 'attributes', 'inherited', 'credits',
+                  'no_folios', 'no_images', 'tags', 'workflow', 'owner', 'primary_dataset', 'sets', 'pages', 'no_records', 'is_private')
         extra_kwargs = {
                         'parent': {'required': False},
                         'no_folios': {'required': False},

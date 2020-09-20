@@ -469,6 +469,22 @@ def update_source_modification(sender, instance, created, **kwargs):
         source.save()
 
 
+class Source_credit(dalmeUuid):
+    EDITOR = 1
+    EDITOR_C = 2
+    CONTRIBUTOR = 3
+    CREDIT_TYPES = (
+        (EDITOR, 'Editor'),
+        (EDITOR_C, 'Editor - Corrections'),
+        (CONTRIBUTOR, 'Contributor'),
+    )
+
+    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='credits')
+    agent = models.ForeignKey('Agent', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='credits')
+    type = models.IntegerField(choices=CREDIT_TYPES)
+    note = models.CharField(max_length=255, blank=True, null=True)
+
+
 class Entity_phrase(dalmeUuid):
     AGENT = 1
     OBJECT = 2
