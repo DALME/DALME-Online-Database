@@ -1,11 +1,15 @@
 [
   {
-    "topMenu": true,
     "itemClass": "help",
     "iconClass": "fas fa-question-circle",
-    "title": "Help",
     "tooltip": "Get help",
     "children": [
+          {
+            "text": "Enable Tooltips",
+            "link": "#",
+            "action": "toggle_tooltips(this)",
+            "iconClass": "fas fa-comment-alt"
+          },
           {
             "text": "Report Issue",
             "link": "#",
@@ -28,10 +32,8 @@
     ]
   },
   {
-    "topMenu": true,
     "itemClass": "tools",
     "iconClass": "fas fa-tools",
-    "title": "Tools",
     "tooltip": "DALME tools",
     "children": [
           {
