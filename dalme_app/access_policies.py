@@ -19,9 +19,19 @@ class BaseAccessPolicy(AccessPolicy):
         return request.user == record.owner
 
 
+class ConfigsAccessPolicy(BaseAccessPolicy):
+    ''' Manages access policies for configs endpoint '''
+    id = 'configs-policy'
+
+
 class GeneralAccessPolicy(BaseAccessPolicy):
     ''' Manages general access policies for all endpoints '''
     id = 'general-policy'
+
+
+class ImageAccessPolicy(BaseAccessPolicy):
+    ''' Manages general access policies for Images endpoint'''
+    id = 'images-policy'
 
 
 class SourceAccessPolicy(BaseAccessPolicy):
