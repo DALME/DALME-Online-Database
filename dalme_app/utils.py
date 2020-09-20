@@ -108,25 +108,36 @@ class DRFDTEParser(parsers.BaseParser):
     def convert_dte_data(self, parsed_data):
         (id, dte_data), = json.loads(parsed_data['data'])['data'].items()
         data = {}
+        many_fields = [field[0:len(field)-11] for field, value in dte_data.items() if 'many-count' in field]
+        if many_fields:
+            [dte_data.pop(field + '-many-count') for field in many_fields]
         for field, value in dte_data.items():
-            if self.clean_entry(value) is not None:
-                data[field] = self.clean_entry(value)
+            data[field] = self.clean_entry(value, field in many_fields)
         return data
 
-    def clean_entry(self, value):
+    def clean_entry(self, value, is_many):
         if type(value) is list:
             if len(value) == 0:
                 return 0
-            elif len(value) == 1 and value[0].isdigit():
+            elif len(value) == 1 and not is_many and value[0].isdigit():
                 return int(value[0])
             else:
-                return [self.clean_entry(i) for i in value if self.clean_entry(i) is not None]
+                return [self.clean_entry(i, is_many) for i in value]
         elif type(value) is dict:
-            if len(value) == 1 and value.get('value') is not None:
-                return self.clean_entry(value['value'])
-            else:
-                value_dict = {k: self.clean_entry(v) for k, v in value.items() if self.clean_entry(v) is not None}
+            if len(value) > 1:
+                many_fields = [f[0:len(f)-11] for f, v in value.items() if 'many-count' in f]
+                if many_fields:
+                    [value.pop(f + '-many-count') for f in many_fields]
+                value_dict = {k: self.clean_entry(v, k in many_fields) for k, v in value.items()}
                 return value_dict if len(value_dict) > 0 else None
+            elif len(value) == 1:
+                (k, v), = value.items()
+                if k == 'value' or k == 'id' and not is_many:
+                    return self.clean_entry(value[k], False)
+                else:
+                    return {k: self.clean_entry(v, is_many)}
+            else:
+                return None
         elif type(value) is str:
             if value.isdigit():
                 return int(value)
@@ -134,6 +145,8 @@ class DRFDTEParser(parsers.BaseParser):
                 return None
             else:
                 return value
+        else:
+            return value
 
 
 def DRFDTE_exception_handler(exc, context):
