@@ -1,0 +1,13 @@
+{
+    "name": "set_type.id",
+    "label": "Type",
+    "type": "selectize",
+    "opts": {
+          "placeholder": "Select type",
+          "preload": true
+    },
+    "options": {
+      "type": "api_call",
+      "url": "/api/choices/?type=model&field=Set.set_type&format=json&search="
+    }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "is_public",
+  "label": "Public",
+  "type": "checkbox",
+  "options": {
+    "type": "list",
+    "list": [
+      {
+        "label": "The set will be featured in the public-facing website.",
+        "value": "1"
+      }
+    ]
+  }
+}

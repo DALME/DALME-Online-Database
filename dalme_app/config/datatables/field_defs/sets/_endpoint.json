@@ -1,0 +1,13 @@
+{
+  "name": "endpoint",
+  "label": "Endpoint",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select endpoint",
+    "preload": "focus"
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/choices/?type=list&field=attributes.record_type&format=json"
+  }
+}

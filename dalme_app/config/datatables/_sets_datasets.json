@@ -1,0 +1,93 @@
+{
+  "config": {
+    "endpoint": "sets",
+    "globals": {
+      "messages_list": {
+        "create_success": "The dataset was created succesfully.",
+        "edit_success": "The dataset was updated succesfully.",
+        "remove_success": "The dataset was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "description": "description",
+        "endpoint": "endpoint",
+        "owner": "owner.id",
+        "dataset_usergroup": "dataset_usergroup.id"
+      },
+      "required_list": [
+        "name",
+        "set_type.id",
+        "dataset_usergroup.id",
+        "description"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "name",
+      "set_type",
+      "description",
+      "endpoint",
+      "owner",
+      "dataset_usergroup"
+    ],
+    "options": {
+      "stateSave": false,
+      "ajax": {
+        "url": "/api/sets/?set_type=3&format=json"
+      }
+    },
+    "overrides": {
+      "dataset_usergroup": {
+        "visible": true
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "set_type",
+      "description",
+      "endpoint",
+      "owner",
+      "permissions",
+      "dataset_usergroup"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/sets/"
+        },
+        "edit": {
+          "url": "/api/sets/_id_/"
+        },
+        "remove": {
+          "url": "/api/sets/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_set"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_set"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_set"
+      }
+    ],
+    "overrides": {
+      "set_type.id": {
+        "type": "hidden",
+        "def": 3,
+        "opts": {},
+        "options": []
+      }
+    }
+  }
+}

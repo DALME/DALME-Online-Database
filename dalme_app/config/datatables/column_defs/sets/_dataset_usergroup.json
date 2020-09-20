@@ -1,0 +1,11 @@
+{
+    "title": "DS Group",
+    "data": "dataset_usergroup",
+    "name": "dataset_usergroup",
+    "editField": "dataset_usergroup.id",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": false,
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\" || data == null) ? \"\" :  data.name ;}"
+}

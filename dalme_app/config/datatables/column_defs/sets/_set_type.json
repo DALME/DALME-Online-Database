@@ -1,0 +1,11 @@
+{
+    "title": "Set type",
+    "data": "set_type",
+    "name": "set_type",
+    "editField": "set_type.id",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": false,
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\" || data == null) ? \"\" :  data.name ;}"
+}

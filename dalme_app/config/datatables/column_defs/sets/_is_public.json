@@ -1,0 +1,12 @@
+{
+    "title": "Public",
+    "data": "is_public",
+    "name": "is_public",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": false,
+    "render": "function ( data, type, row, meta ) {return data == true ? '<i class=\"fas fa-check-square\"></i>' : '<i class=\"far fa-square\"></i>';}",
+    "width": "19px",
+    "className": "td-center"
+}

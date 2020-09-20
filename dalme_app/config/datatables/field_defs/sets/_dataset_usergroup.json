@@ -1,0 +1,14 @@
+{
+    "name": "dataset_usergroup.id",
+    "label": "Dataset group",
+    "type": "selectize",
+    "opts": {
+        "placeholder": "Select dataset group",
+        "preload": "focus"
+    },
+    "options": {
+        "type": "api_call",
+        "url": "/api/groups/?format=select&type=3"
+    },
+    "fieldInfo": "User group to be linked with this set."
+}

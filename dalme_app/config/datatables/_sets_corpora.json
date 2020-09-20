@@ -1,0 +1,98 @@
+{
+  "config": {
+    "endpoint": "sets",
+    "globals": {
+      "messages_list": {
+        "create_success": "The corpus was created succesfully.",
+        "edit_success": "The corpus was updated succesfully.",
+        "remove_success": "The corpus was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "is_public": "is_public",
+        "has_landing": "has_landing",
+        "description": "description",
+        "endpoint": "endpoint",
+        "owner": "owner.id",
+        "permissions": "permissions.id"
+      },
+      "required_list": [
+        "name",
+        "set_type.id",
+        "permissions.id",
+        "description"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "name",
+      "set_type",
+      "is_public",
+      "has_landing",
+      "description",
+      "endpoint",
+      "owner",
+      "permissions"
+    ],
+    "options": {
+      "stateSave": false,
+      "ajax": {
+        "url": "/api/sets/?set_type=1&format=json"
+      }
+    },
+    "overrides": {
+      "description": {
+        "visible": true
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "set_type",
+      "is_public",
+      "has_landing",
+      "description",
+      "endpoint",
+      "owner",
+      "permissions"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/sets/"
+        },
+        "edit": {
+          "url": "/api/sets/_id_/"
+        },
+        "remove": {
+          "url": "/api/sets/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_set"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_set"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_set"
+      }
+    ],
+    "overrides": {
+      "set_type.id": {
+        "type": "hidden",
+        "def": 1,
+        "opts": {},
+        "options": []
+      }
+    }
+  }
+}

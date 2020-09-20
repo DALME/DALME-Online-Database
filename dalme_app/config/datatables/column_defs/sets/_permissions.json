@@ -1,0 +1,11 @@
+{
+    "title": "Permissions",
+    "data": "permissions",
+    "name": "permissions",
+    "editField": "permissions.id",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": false,
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\" || data == null) ? \"\" :  data.name ;}"
+}
