@@ -8,9 +8,9 @@
   {% endif %}
   {% if has_pages %}
     <link href="https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700,700i&amp;subset=latin-ext" rel="stylesheet">
-    <link href="{% static 'Diva-6.0.2/diva.css' %}" rel="stylesheet">
+    <link href="{% static 'js/Diva-6.0.2/diva.css' %}" rel="stylesheet">
     <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
-    <script type="text/javascript" src="{% static 'Diva-6.0.2/diva.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/Diva-6.0.2/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
     <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
@@ -66,7 +66,7 @@
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
+      <div class="tab-pane card-body transcription-editor active" id="info" role="tabpanel" aria-labelledby="info-tab">
         <div class="row">
           <div class="col-md-12">
             {% if has_inv %}
