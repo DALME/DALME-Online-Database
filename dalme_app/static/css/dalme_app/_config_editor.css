@@ -1,0 +1,55 @@
+/* BSTree View classes */
+
+.bstreeview {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    padding: 0;
+    overflow: scroll;
+    height: calc(100vh - 143px);
+    font-size: 13px;
+    border-bottom: 1px solid #a5a5a5;
+    border-right: 1px solid #a5a5a5;
+}
+
+.bstreeview .list-group {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.bstreeview .list-group-item {
+    border-radius: 0;
+    border-width: 1px 0 0 0;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    cursor: pointer;
+}
+
+.bstreeview .list-group-item:hover {
+  color: #fff;
+  background-color: #215986;
+}
+
+.bstreeview .list-group-item.active {
+  background-color: #11587c;
+  color: #b7b7b7;
+}
+
+.bstreeview > .list-group-item:first-child {
+    border-top-width: 0;
+}
+
+.bstreeview .state-icon {
+    margin-right: 8px;
+    width: 12px;
+    text-align: center;
+}
+.bstreeview .item-icon {
+    margin-right: 5px;
+}
