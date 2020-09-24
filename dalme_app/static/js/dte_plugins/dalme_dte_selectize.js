@@ -106,10 +106,14 @@ _fieldTypes.selectize = {
         }
 
         // Make sure the select list is closed when the form is submitted
-        this.on('preSubmit', function () {
+        this.on('preSubmit', function() {
             conf._selectize.close();
         });
 
+        conf._opt_loaded = false
+        this.on('load', function() {
+            conf._opt_loaded = true
+        });
         return container[0];
     },
 
@@ -119,33 +123,34 @@ _fieldTypes.selectize = {
 
     set: function (conf, val) {
         // THIS DOESN'T WORK IN STANDALONE MODE
-        if (!conf._selectize.hasOptions) {
-            let field_name = conf._selectize.$input["0"].id.substring('DTE_Field_'.length)
-            let cell_data = dt_table.cell(
-                dt_table.row(dt_editor.modifier()).index(),
-                dt_table.column(attribute_concordance_rev[field_name] + ':name')
-            ).data();
-            let prop_els = [conf._selectize.settings.labelField, conf._selectize.settings.valueField]
-            let options = []
-            if (Array.isArray(cell_data)) {
-              for (let i = 0, len = cell_data.length; i < len; ++i) {
-                let opt_obj = {}
-                opt_obj[prop_els[0]] = cell_data[i][prop_els[0]]
-                opt_obj[prop_els[1]] = cell_data[i][prop_els[1]]
-                options.push(opt_obj);
-              }
-            } else if (typeof cell_data === 'string') {
-                let opt_obj = {}
-                opt_obj[prop_els[0]] = cell_data
-                opt_obj[prop_els[1]] = cell_data
-                options.push(opt_obj);
-            } else if (typeof cell_data === 'object' && cell_data !== null) {
-                let opt_obj = {}
-                opt_obj[prop_els[0]] = cell_data[prop_els[0]]
-                opt_obj[prop_els[1]] = cell_data[prop_els[1]]
-                options.push(opt_obj);
+        //if (!conf._selectize.hasOptions || conf._selectize.options.length == 1) {
+        if (!conf._opt_loaded && val !== '' && conf.opts['preload'] != true) {
+          let field_name = conf._selectize.$input["0"].id.substring('DTE_Field_'.length)
+          let cell_data = dt_table.cell(
+              dt_table.row(dt_editor.modifier()).index(),
+              dt_table.column(attribute_concordance_rev[field_name] + ':name')
+          ).data();
+          let prop_els = [conf._selectize.settings.labelField, conf._selectize.settings.valueField]
+          let options = []
+          if (Array.isArray(cell_data)) {
+            for (let i = 0, len = cell_data.length; i < len; ++i) {
+              let opt_obj = {}
+              opt_obj[prop_els[0]] = cell_data[i][prop_els[0]]
+              opt_obj[prop_els[1]] = cell_data[i][prop_els[1]]
+              options.push(opt_obj);
             }
-            _fieldTypes.selectize._addOptions(conf, options);
+          } else if (typeof cell_data === 'string') {
+              let opt_obj = {}
+              opt_obj[prop_els[0]] = cell_data
+              opt_obj[prop_els[1]] = cell_data
+              options.push(opt_obj);
+          } else if (typeof cell_data === 'object' && cell_data !== null) {
+              let opt_obj = {}
+              opt_obj[prop_els[0]] = cell_data[prop_els[0]]
+              opt_obj[prop_els[1]] = cell_data[prop_els[1]]
+              options.push(opt_obj);
+          }
+          _fieldTypes.selectize._addOptions(conf, options);
         }
         return conf._selectize.setValue(val);
     },
