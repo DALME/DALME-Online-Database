@@ -2,7 +2,7 @@ from calendar import month_name
 
 from django import template
 
-from dalme_app.web_serializers import RecordSerializer
+from dalme_app.serializers import PublicSourceSerializer
 from dalme_public.models import (
     Collections,
     Essay,
@@ -140,7 +140,7 @@ def get_source_details(context):
     source_set = page.source_set
 
     if source:
-        data = RecordSerializer(source).data
+        data = PublicSourceSerializer(source).data
         name = data['name']
         short_name = data['short_name']
         date = data.get('date')

@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from dalme_app.models import Attribute, Source, rs_resource
-from dalme_app.web_serializers import RecordSerializer
+from dalme_app.serializers import PublicSourceSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
 from haystack.query import SearchQuerySet
@@ -63,7 +63,7 @@ class DALMEPagination(pagination.PageNumberPagination):
         })
 
 
-class PublicRecordSerializer(RecordSerializer):
+class PublicRecordSerializer(PublicSourceSerializer):
     @staticmethod
     def get_image(instance):
         page = instance.pages.exclude(dam_id__isnull=True).first()
@@ -96,7 +96,7 @@ class Thumbnail(View):
 class SourceList(ListAPIView):
     model = Source
     queryset = Source.objects.all()
-    serializer_class = PublicRecordSerializer
+    serializer_class = PublicSourceSerializer
     pagination_class = DALMEPagination
     filterset_class = SourceFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -145,7 +145,7 @@ class SourceList(ListAPIView):
 class SourceDetail(RetrieveAPIView):
     model = Source
     queryset = Source.objects.all()
-    serializer_class = RecordSerializer
+    serializer_class = PublicSourceSerializer
     lookup_url_kwarg = 'pk'
     permission_classes = (IsAuthenticatedOrReadOnly,)
 

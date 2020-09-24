@@ -33,7 +33,7 @@ from wagtailmodelchooser import register_model_chooser, Chooser
 from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
 from dalme_app.models import Set as DALMESet, Source
-from dalme_app.web_serializers import RecordSerializer
+from dalme_app.serializers import PublicSourceSerializer
 from dalme_public import forms
 from dalme_public.blocks import (
     CarouselBlock,
@@ -512,7 +512,7 @@ class Collections(RoutablePageMixin, DALMEPage):
             'title': source.name,
             'data': {
                 'folios': list(pages),
-                **RecordSerializer(source).data,
+                **PublicSourceSerializer(source).data,
             },
         })
         return TemplateResponse(
@@ -575,7 +575,7 @@ class Collection(RoutablePageMixin, DALMEPage):
             'title': source.name,
             'data': {
                 'folios': list(pages),
-                **RecordSerializer(source).data,
+                **PublicSourceSerializer(source).data,
             },
         })
         return TemplateResponse(
