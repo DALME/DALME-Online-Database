@@ -28,6 +28,7 @@
     "columns": [
       "id",
       "name",
+      "member_count",
       "set_type",
       "is_public",
       "has_landing",
@@ -40,11 +41,6 @@
       "stateSave": false,
       "ajax": {
         "url": "/api/sets/?set_type=1&format=json"
-      }
-    },
-    "overrides": {
-      "description": {
-        "visible": true
       }
     }
   },

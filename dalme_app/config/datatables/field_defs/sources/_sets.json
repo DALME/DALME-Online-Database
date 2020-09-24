@@ -7,6 +7,7 @@
     "valueField": "id",
     "labelField": "name",
     "searchField": ["id", "name", "detail_string"],
+    "plugins": ["remove_button"],
     "preload": true,
     "maxItems": null
   },

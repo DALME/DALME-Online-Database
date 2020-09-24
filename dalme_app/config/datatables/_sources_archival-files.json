@@ -67,7 +67,7 @@
       }
     },
     "overrides": {
-      "attributes.locale": {
+      "locale": {
         "title": "Locale(s)",
         "editField": "attributes.locale[].id",
         "className": "",
@@ -142,6 +142,7 @@
         "opts": {
           "placeholder": "Select locale(s)",
           "preload": "focus",
+          "plugins": ["remove_button"],
           "maxItems": null
         }
       }

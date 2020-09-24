@@ -4,7 +4,7 @@
     "name": "type",
     "editField": "type.id",
     "defaultContent": "",
-    "visible": true,
+    "visible": false,
     "orderable": true,
     "searchable": true,
     "className": "nowrap"

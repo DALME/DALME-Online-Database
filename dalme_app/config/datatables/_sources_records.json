@@ -3,7 +3,7 @@
     "helpers": [
       "source_forms",
       "workflow_module",
-      "corpus_filter_module"
+      "ownership_filter_module"
     ],
     "endpoint": "sources",
     "globals": {
@@ -20,14 +20,15 @@
         "short_name": "short_name",
         "parent": "parent.id",
         "has_inventory": "has_inventory",
-        "locale": "attributes.locale[].id",
+        "record_type": "attributes.record_type",
         "owner": "owner.id",
         "is_private": "is_private",
-        "record_type": "attributes.record_type",
         "date": "attributes.date.value",
         "start_date": "attributes.start_date.value",
         "end_date": "attributes.end_date.value",
         "language": "attributes.language[].id",
+        "locale": "attributes.locale[].id",
+        "support": "attributes.support",
         "named_persons": "attributes.named_persons",
         "description": "attributes.description",
         "status": "workflow.status.text",
@@ -41,7 +42,8 @@
         "parent.id",
         "has_inventory",
         "attributes.record_type",
-        "attributes.language[].id"
+        "attributes.language[].id",
+        "attributes.support"
       ],
       "multi_attributes": [
         "attributes.language[].id",
@@ -65,6 +67,7 @@
       "attributes.end_date",
       "attributes.date",
       "attributes.language",
+      "attributes.support",
       "attributes.named_persons",
       "attributes.description",
       "workflow.status",
@@ -80,7 +83,6 @@
     "overrides": {
       "attributes.locale": {
         "title": "Locale(s)",
-        "name": "attributes.locale",
         "editField": "attributes.locale[].id",
         "className": "",
         "orderable": false,
@@ -95,14 +97,15 @@
       "type",
       "parent",
       "has_inventory",
+      "attributes.record_type",
       "owner",
       "is_private",
-      "attributes.locale",
-      "attributes.record_type",
+      "attributes.support",
       "attributes.date",
       "attributes.start_date",
       "attributes.end_date",
       "attributes.language",
+      "attributes.locale",
       "attributes.named_persons",
       "attributes.description",
       "workflow.status",
@@ -159,7 +162,8 @@
         "opts": {
           "placeholder": "Select locale(s)",
           "preload": "focus",
-          "maxItems": null
+          "maxItems": null,
+          "plugins": ["remove_button"]
         }
       },
       "parent.id": {

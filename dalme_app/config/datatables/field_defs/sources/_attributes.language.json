@@ -5,7 +5,8 @@
   "opts": {
     "placeholder": "Select language(s)",
     "preload": "focus",
-    "maxItems": null
+    "maxItems": null,
+    "plugins": ["remove_button"]
   },
   "options": {
     "type": "api_call",

@@ -21,6 +21,7 @@
         "username": "username",
         "password": "password",
         "groups": "groups[].id",
+        "primary_group": "profile.primary_group.id",
         "is_active": "is_active",
         "is_staff": "is_staff",
         "is_superuser": "is_superuser"
@@ -32,6 +33,7 @@
         "email",
         "username",
         "groups[].id",
+        "profile.primary_group.id",
         "is_active"
       ]
     }
@@ -44,6 +46,7 @@
       "full_name",
       "email",
       "username",
+      "primary_group",
       "last_login",
       "is_active",
       "is_staff",
@@ -68,6 +71,7 @@
       "is_active",
       "is_staff",
       "is_superuser",
+      "primary_group",
       "groups"
     ],
     "options": {
@@ -76,6 +80,7 @@
           "url": "/api/users/"
         },
         "edit": {
+          "type": "PATCH",
           "url": "/api/users/_id_/"
         },
         "remove": {

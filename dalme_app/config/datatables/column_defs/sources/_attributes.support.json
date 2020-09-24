@@ -1,7 +1,7 @@
 {
-    "title": "Authority",
-    "data": "attributes.authority",
-    "name": "authority",
+    "title": "Support",
+    "data": "attributes.support",
+    "name": "support",
     "defaultContent": "",
     "visible": true,
     "orderable": true,

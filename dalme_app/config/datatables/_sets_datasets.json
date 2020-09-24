@@ -26,6 +26,7 @@
     "columns": [
       "id",
       "name",
+      "member_count",
       "set_type",
       "description",
       "endpoint",

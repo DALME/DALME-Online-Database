@@ -1,0 +1,10 @@
+{
+  "title": "Resource date",
+  "name": "field12",
+  "data": "field12",
+  "defaultContent": "",
+  "visible": false,
+  "orderable": true,
+  "searchable": false,
+  "render": "function(data) {return moment(data).format(\"DD-MMM-YYYY\");}"
+}

@@ -5,5 +5,5 @@
     "defaultContent": "",
     "visible": true,
     "orderable": true,
-    "searchable": false
+    "searchable": true
 }

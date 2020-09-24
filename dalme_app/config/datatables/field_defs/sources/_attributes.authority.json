@@ -3,7 +3,7 @@
   "label": "Authority",
   "type": "selectize",
   "opts": {
-    "placeholder": "Select type",
+    "placeholder": "Select authority",
     "preload": "focus"
   },
   "options": {

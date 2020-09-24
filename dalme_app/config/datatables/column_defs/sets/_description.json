@@ -3,7 +3,7 @@
     "data": "description",
     "name": "description",
     "defaultContent": "",
-    "visible": false,
+    "visible": true,
     "orderable": false,
     "searchable": true
 }

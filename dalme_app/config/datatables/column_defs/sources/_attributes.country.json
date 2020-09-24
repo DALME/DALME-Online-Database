@@ -1,11 +1,12 @@
 {
     "title": "Country",
-    "data": "attributes.country.name",
+    "data": "attributes.country",
     "name": "country",
     "editField": "attributes.country.id",
     "defaultContent": "",
     "visible": true,
     "orderable": true,
     "searchable": true,
-    "className": "nowrap"
+    "className": "nowrap",
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.name; }"
 }

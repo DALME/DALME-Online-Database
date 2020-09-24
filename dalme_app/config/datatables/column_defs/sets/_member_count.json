@@ -1,7 +1,7 @@
 {
     "title": "Members",
-    "data": "members",
-    "name": "members",
+    "data": "member_count",
+    "name": "member_count",
     "defaultContent": "",
     "visible": true,
     "orderable": true,

@@ -18,18 +18,15 @@
         "short_name": "short_name",
         "type": "type.id",
         "parent": "parent.id",
-        "owner": "owner",
+        "owner": "owner.id",
         "is_private": "is_private",
-        "language": "attributes.language[].id",
+        "language": "attributes.language.id",
         "url": "attributes.url"
       },
       "required_list": [
         "name",
         "short_name",
         "type.id"
-      ],
-      "multi_attributes": [
-        "attributes.language[].id"
       ]
     }
   },
@@ -47,6 +44,13 @@
     "options": {
       "ajax": {
         "url": "/api/sources/?format=json&class=bibliography"
+      }
+    },
+    "overrides": {
+      "attributes.language": {
+        "title": "Language",
+        "editField": "attributes.language.id",
+        "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.name; }"
       }
     }
   },
@@ -92,11 +96,24 @@
       "type.id": {
         "options": {
           "type": "api_call",
-          "url": "/api/content_types/?format=select&search="
+          "url": "/api/content-types/?format=select&search="
         }
       },
       "name": {
         "type": "textarea"
+      },
+      "attributes.language[].id": {
+        "name": "attributes.language.id",
+        "label": "Language",
+        "type": "selectize",
+        "opts": {
+          "placeholder": "Select language",
+          "preload": "focus"
+        },
+        "options": {
+          "type": "api_call",
+          "url": "/api/languages/?format=select&select_type=att&search="
+        }
       }
     }
   }

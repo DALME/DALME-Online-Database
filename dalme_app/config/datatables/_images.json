@@ -1,0 +1,86 @@
+{
+  "config": {
+    "endpoint": "images",
+    "globals": {
+      "messages_list": {
+        "create_success": "The image was saved succesfully.",
+        "edit_success": "The image was updated succesfully.",
+        "remove_success": "The image was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "ref": "ref.ref",
+        "field8": "field8",
+        "field79": "field79",
+        "has_image": "has_image",
+        "field3": "field3",
+        "field12": "field12",
+        "collections": "collections[].ref",
+        "creation_date": "creation_date",
+        "created_by": "created_by",
+        "field51": "field51",
+        "url_thm": "url_thm"
+      },
+      "required_list": [
+        "field8",
+        "field79",
+        "field12",
+        "field3",
+        "collections[].ref"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "url_thm",
+      "ref",
+      "field8",
+      "field79",
+      "has_image",
+      "field3",
+      "collections",
+      "field12",
+      "creation_date",
+      "created_by",
+      "field51"
+    ],
+    "options": {
+      "rowId": "ref",
+      "ajax": {
+        "url": "/api/images/?format=json"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "field8",
+      "field79",
+      "field12",
+      "field3",
+      "collections"
+    ],
+    "options": {
+      "idSrc": "ref",
+      "ajax": {
+        "create": {
+          "url": "/api/images/"
+        },
+        "edit": {
+          "url": "/api/images/_id_/"
+        },
+        "remove": {
+          "url": "/api/images/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_image"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_image"
+      }
+    ]
+  }
+}

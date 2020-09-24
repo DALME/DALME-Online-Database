@@ -3,7 +3,7 @@
   "label": "Format",
   "type": "selectize",
   "opts": {
-    "placeholder": "Select type",
+    "placeholder": "Select format",
     "preload": "focus"
   },
   "options": {

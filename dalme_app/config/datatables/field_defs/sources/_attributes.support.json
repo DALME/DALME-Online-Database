@@ -1,0 +1,15 @@
+{
+  "name": "attributes.support",
+  "label": "Support",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select support",
+    "valueField": "value",
+    "labelField": "label",
+    "preload": "focus"
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/choices/?type=list&field=attributes.support&format=json&search="
+  }
+}

@@ -4,10 +4,10 @@
   "type": "selectize",
   "opts": {
     "placeholder": "Select type",
-    "preload": "focus"
+    "preload": true
   },
   "options": {
     "type": "api_call",
-    "url": "/api/content_types/?format=select&search="
+    "url": "/api/content-types/?format=select&search="
   }
 }

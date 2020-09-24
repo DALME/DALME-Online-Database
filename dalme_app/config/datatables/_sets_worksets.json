@@ -1,5 +1,8 @@
 {
   "config": {
+    "helpers": [
+      "ownership_filter_module"
+    ],
     "endpoint": "sets",
     "globals": {
       "messages_list": {
@@ -26,6 +29,7 @@
     "columns": [
       "id",
       "name",
+      "member_count",
       "set_type",
       "description",
       "endpoint",
@@ -35,13 +39,10 @@
     "options": {
       "stateSave": false,
       "ajax": {
-        "url": "/api/sets/?set_type=4&format=json"
+        "url": "/api/sets/?set_type=4&mode=own&format=json"
       }
     },
     "overrides": {
-      "description": {
-        "visible": true
-      },
       "endpoint": {
         "visible": true
       }

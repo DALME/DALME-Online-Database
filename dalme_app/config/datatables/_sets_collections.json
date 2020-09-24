@@ -30,6 +30,7 @@
     "columns": [
       "id",
       "name",
+      "member_count",
       "set_type",
       "is_public",
       "has_landing",
@@ -49,9 +50,6 @@
         "visible": true
       },
       "has_landing": {
-        "visible": true
-      },
-      "description": {
         "visible": true
       }
     }

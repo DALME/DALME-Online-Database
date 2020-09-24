@@ -1,5 +1,5 @@
 {
-    "title": "Language",
+    "title": "Language(s)",
     "data": "attributes.language",
     "name": "language",
     "editField": "attributes.language[].id",

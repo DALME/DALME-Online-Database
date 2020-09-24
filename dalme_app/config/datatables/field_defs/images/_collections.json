@@ -1,0 +1,13 @@
+{
+  "name": "collections[].ref",
+  "label": "Collections",
+  "type": "selectize",
+  "opts": {
+    "maxItems": "null",
+    "plugins": [
+      "remove_button"
+    ],
+    "placeholder": "Select collections"
+  },
+  "options": {}
+}
