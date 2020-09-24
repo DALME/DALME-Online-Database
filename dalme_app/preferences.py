@@ -43,7 +43,7 @@ class HomepageCards(JSONPreference):
     """ Which cards should be included in the homepage? """
     section = interface
     name = 'homepage_cards'
-    default = ''
+    default = ['my_tasks', 'my_worksets', 'problem_tickets']
     verbose_name = "Homepage cards"
     help_text = "Which cards should be included in the home page?"
 
