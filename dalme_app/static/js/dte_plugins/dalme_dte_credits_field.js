@@ -37,7 +37,8 @@ _fieldTypes.dalmeCredits = {
       wrapper.append('<div class="dropleft"><i class="fas fa-sticky-note page-credit-note h-100" data-toggle="dropdown" id="' +
           inst_id + '_note_button" aria-haspopup="true" aria-expanded="false"></i>\
           <div class="dropdown-menu formset-dropdown" aria-labelledby=id="' + inst_id + '_note_button">\
-          <label class="col-form-label">NOTES</label><textarea id="' + inst_id + '_note" class="form-control page_credit_note">\
+          <button type="button" class="modal_close_button" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+          <label class="col-form-label">NOTES</label><textarea id="' + inst_id + '_note" class="form-control page_credit_note"></textarea>\
           </div></div>');
       wrapper.append('<i class="fas fa-times-circle entry-clear-button"></i>')
 
@@ -77,8 +78,6 @@ _fieldTypes.dalmeCredits = {
         content: '<a href="#" data-credit-id="' + inst_id + '" class="btn btn-sm btn-danger clear-credit mr-1">Remove</a><a href="#" class="btn btn-sm btn-primary">Cancel</a>',
       })
 
-      console.log(val.agent.id)
-      console.log(val.type.id)
       if (typeof val != 'undefined') {
         conf['_selectize_agent_' + inst_id].addOption({
           id: val.agent.id,
@@ -129,7 +128,6 @@ _fieldTypes.dalmeCredits = {
   },
 
   set: function(conf, val) {
-      console.log('called set - val = ' + val)
       conf._control = []
       conf._input.html('');
       for (let i = 0, len = val.length; i < len; ++i) { _fieldTypes.dalmeCredits._addCredit(conf, val[i]); }
@@ -141,7 +139,6 @@ _fieldTypes.dalmeCredits = {
   },
 
   addNew: function(conf) {
-    console.log('triggered addNew')
       _fieldTypes.dalmeCredits._addCredit(conf);
   },
 
