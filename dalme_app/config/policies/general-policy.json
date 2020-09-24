@@ -6,17 +6,12 @@
   },
   {
     "action": ["create"],
-    "principal": ["group:Staff"],
+    "principal": ["group:Editors"],
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "update", "destroy"],
+    "action": ["create", "partial_update", "update", "destroy"],
     "principal": ["group:Administrators"],
-    "effect": "allow"
-  },
-  {
-    "action": ["partial_update", "update"],
-    "principal": ["group:General Editors"],
     "effect": "allow"
   },
   {

@@ -6,7 +6,7 @@
   },
   {
     "action": ["create"],
-    "principal": ["group:Staff"],
+    "principal": ["group:Users"],
     "effect": "allow"
   },
   {
@@ -16,13 +16,8 @@
     "condition": "can_view"
   },
   {
-    "action": ["partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
+    "action": ["create", "partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
     "principal": ["group:Administrators"],
-    "effect": "allow"
-  },
-  {
-    "action": ["partial_update", "update", "workset_state", "remove_members", "add_members"],
-    "principal": ["group:General Editors"],
     "effect": "allow"
   },
   {
