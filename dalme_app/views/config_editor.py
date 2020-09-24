@@ -20,5 +20,4 @@ class ConfigEditor(TemplateView):
         page_title = 'Config Editor'
         context['page_title'] = page_title
         context['page_chain'] = get_page_chain(breadcrumb, page_title)
-        context['helpers'] = ['config_editor']
         return context

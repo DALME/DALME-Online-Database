@@ -8,15 +8,15 @@ from rest_framework import serializers
 from ._common import DynamicSerializer
 
 
-class ContentClassSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Content_class
-        fields = ('id', 'name', 'short_name', 'description')
-
-
 class AsyncTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskResult
+        fields = '__all__'
+
+
+class AttachmentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Attachment
         fields = '__all__'
 
 
@@ -26,10 +26,10 @@ class AttributeTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'options_list', 'same_as')
 
 
-class AttachmentSerializer(serializers.HyperlinkedModelSerializer):
+class ContentClassSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Attachment
-        fields = '__all__'
+        model = Content_class
+        fields = ('id', 'name', 'short_name', 'description')
 
 
 class ContentXAttributeSerializer(serializers.ModelSerializer):

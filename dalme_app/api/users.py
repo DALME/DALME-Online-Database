@@ -47,5 +47,4 @@ class Users(DALMEBaseViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial, fields=['id', 'is_superuser', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'groups', 'profile'])
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-
         return Response(serializer.data)
