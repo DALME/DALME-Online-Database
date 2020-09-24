@@ -21,11 +21,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='task',
             name='created_by',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='task_created_by', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='task_created_by', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='taskcomment',
             name='author',
-            field=models.ForeignKey(blank=True, default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(blank=True, default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
     ]

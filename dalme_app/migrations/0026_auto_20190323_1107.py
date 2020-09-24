@@ -16,9 +16,9 @@ class Migration(migrations.Migration):
             name='Comment',
             fields=[
                 ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('creation_username', models.CharField(blank=True, default=dalme_app.model_templates.get_current_username, max_length=255, null=True)),
+                ('creation_username', models.CharField(blank=True, default=dalme_app.models._templates.get_current_username, max_length=255, null=True)),
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
-                ('modification_username', models.CharField(blank=True, default=dalme_app.model_templates.get_current_username, max_length=255, null=True)),
+                ('modification_username', models.CharField(blank=True, default=dalme_app.models._templates.get_current_username, max_length=255, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('target', models.UUIDField(db_index=True)),
                 ('text', models.TextField()),
@@ -30,6 +30,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='transcription',
             name='author',
-            field=models.CharField(default=dalme_app.model_templates.get_current_username, max_length=255),
+            field=models.CharField(default=dalme_app.models._templates.get_current_username, max_length=255),
         ),
     ]

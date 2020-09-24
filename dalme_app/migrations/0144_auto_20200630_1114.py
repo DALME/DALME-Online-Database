@@ -17,12 +17,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='agent',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_agent_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_agent_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='agent',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_agent_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_agent_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='agent',
@@ -32,12 +32,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attachment',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attachment_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attachment_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attachment',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attachment_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attachment_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attachment',
@@ -47,12 +47,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attribute',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attribute',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attribute',
@@ -62,12 +62,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attribute_type',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_type_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_type_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attribute_type',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_type_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attribute_type_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attribute_type',
@@ -77,12 +77,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attributereference',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attributereference_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attributereference_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attributereference',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attributereference_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_attributereference_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='attributereference',
@@ -92,12 +92,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cityreference',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_cityreference_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_cityreference_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='cityreference',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_cityreference_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_cityreference_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='cityreference',
@@ -107,12 +107,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='comment',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_comment_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_comment_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='comment',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_comment_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_comment_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='comment',
@@ -122,12 +122,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='concept',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_concept_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_concept_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='concept',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_concept_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_concept_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='concept',
@@ -137,12 +137,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='content_attributes',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_attributes_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_attributes_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='content_attributes',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_attributes_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_attributes_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='content_attributes',
@@ -152,12 +152,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='content_class',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_class_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_class_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='content_class',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_class_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_class_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='content_class',
@@ -167,12 +167,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='content_type',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_type_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_type_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='content_type',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_type_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_content_type_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='content_type',
@@ -182,12 +182,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='countryreference',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_countryreference_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_countryreference_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='countryreference',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_countryreference_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_countryreference_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='countryreference',
@@ -197,12 +197,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dt_fields',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_fields_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_fields_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='dt_fields',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_fields_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_fields_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='dt_fields',
@@ -212,12 +212,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dt_list',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_list_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_list_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='dt_list',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_list_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_dt_list_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='dt_list',
@@ -227,12 +227,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='entity_phrase',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_entity_phrase_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_entity_phrase_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='entity_phrase',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_entity_phrase_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_entity_phrase_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='entity_phrase',
@@ -242,12 +242,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='headword',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_headword_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_headword_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='headword',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_headword_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_headword_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='headword',
@@ -257,12 +257,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='languagereference',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_languagereference_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_languagereference_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='languagereference',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_languagereference_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_languagereference_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='languagereference',
@@ -272,12 +272,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='object',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='object',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='object',
@@ -287,12 +287,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='object_attribute',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_attribute_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_attribute_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='object_attribute',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_attribute_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_object_attribute_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='object_attribute',
@@ -302,12 +302,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='page',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_page_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_page_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='page',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_page_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_page_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='page',
@@ -317,12 +317,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='place',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_place_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_place_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='place',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_place_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_place_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='place',
@@ -332,12 +332,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='relationship',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_relationship_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_relationship_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='relationship',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_relationship_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_relationship_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='relationship',
@@ -347,12 +347,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='rightspolicy',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_rightspolicy_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_rightspolicy_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='rightspolicy',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_rightspolicy_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_rightspolicy_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='rightspolicy',
@@ -362,12 +362,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='scope',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_scope_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_scope_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='scope',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_scope_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_scope_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='scope',
@@ -377,27 +377,27 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='set',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='set',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='set',
             name='owner_local',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='set_x_content',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_x_content_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_x_content_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='set_x_content',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_x_content_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_set_x_content_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='set_x_content',
@@ -407,12 +407,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='source',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='source',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='source',
@@ -422,12 +422,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='source_pages',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_pages_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_pages_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='source_pages',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_pages_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_source_pages_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='source_pages',
@@ -437,12 +437,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tag',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tag_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tag_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='tag',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tag_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tag_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='tag',
@@ -452,12 +452,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_task_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_task_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='task',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_task_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_task_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='task',
@@ -467,12 +467,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tasklist',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tasklist_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tasklist_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='tasklist',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tasklist_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_tasklist_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='tasklist',
@@ -482,12 +482,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ticket',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_ticket_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_ticket_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='ticket',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_ticket_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_ticket_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='ticket',
@@ -497,12 +497,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='token',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_token_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_token_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='token',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_token_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_token_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='token',
@@ -512,12 +512,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='transcription',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_transcription_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_transcription_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='transcription',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_transcription_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_transcription_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='transcription',
@@ -527,12 +527,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='wordform',
             name='creation_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_wordform_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_wordform_creation', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='wordform',
             name='modification_user',
-            field=models.ForeignKey(default=dalme_app.model_templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_wordform_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=dalme_app.models._templates.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='dalme_app_wordform_modification', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='wordform',

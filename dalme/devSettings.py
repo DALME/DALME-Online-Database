@@ -111,7 +111,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'dalme_app.model_templates.CurrentUserMiddleware',
+    'dalme_app.models._templates.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

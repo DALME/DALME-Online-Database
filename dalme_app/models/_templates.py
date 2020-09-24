@@ -33,6 +33,8 @@ def get_current_username():
 
 def get_current_user():
     return _user.__getattribute__('user')
+    #return User.objects.get(pk=1)
+    # return 1
 
 
 class dalmeBasic(models.Model):
