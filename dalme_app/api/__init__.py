@@ -1,15 +1,18 @@
-from .attachments import *
-from .attribute_types import *
-from .choices import *
-from .comments import *
-from .configs import *
-from .images import *
-from .other import *
-from .pages import *
-from .sets import *
-from .sources import *
-from .tasks import *
-from .tickets import *
-from .transcriptions import *
-from .users import *
-from .workflow_manager import *
+from .attachments import Attachments
+from .attribute_types import AttributeTypes
+from .choices import Choices
+from .comments import Comments
+from .configs import Configs
+from .images import Images
+
+from .other import (Agents, AsynchronousTasks, Attributes, ContentClasses, ContentTypes,
+                    Countries, Groups, Languages, Locales, Rights)
+
+from .pages import Pages
+from .sets import Sets
+from .sources import Sources
+from .tasks import Tasks, TaskLists
+from .tickets import Tickets
+from .transcriptions import Transcriptions
+from .users import Users
+from .workflow_manager import WorkflowManager
