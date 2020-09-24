@@ -83,7 +83,7 @@ function build_editor(data, target) {
                   resolve();
               }).fail(function(jqXHR, textStatus, errorThrown) {
                   dt_editor.on('preOpen.dalme', function(e, mode, action) { return false });
-                  toastr.error(jqXHR.responseJSON.detail);
+                  toastr.error('Permissions check failed.');
                   resolve();
               });
           });
@@ -259,16 +259,12 @@ function general_form_restore(e) {
 }
 
 function toggle_fields(target, action) {
-  console.log('target = ' + JSON.stringify(target))
   if (Array.isArray(target) && target.length) {
     let editor_fields = Object.values(attribute_concordance);
-    console.log('editor_fields = ' + JSON.stringify(editor_fields))
     let add_menu_list = [];
 
     for (let i = 0, len = editor_fields.length; i < len; ++i) {
-      console.log('looking at ' + editor_fields[i])
       if (target.includes(editor_fields[i])) {
-        console.log('included in target')
         toggle_fields(editor_fields[i], 'show')
 
         if (typeof multi_attributes !== 'undefined') {
@@ -278,37 +274,28 @@ function toggle_fields(target, action) {
         }
 
       } else {
-        console.log('not included in target')
         toggle_fields(editor_fields[i], 'hide')
         add_menu_list.push(editor_fields[i]);
       }
     }
-    console.log('compiled menu = ' + JSON.stringify(add_menu_list))
     if (add_menu_list.length) {
       let clean_menu_list = []
       add_menu_list.forEach((x) => { clean_menu_list.push(attribute_concordance_rev[x])});
       clean_menu_list.sort();
-      console.log('clean compiled menu = ' + JSON.stringify(clean_menu_list))
 
       $('#add-attribute-menu-container').html('');
 
       for (let i = 0, len = clean_menu_list.length; i < len; ++i) {
-          console.log('adding item to dropdown: ' + '<a class="dropdown-item" href="#" data-menu-field="'
-            + attribute_concordance[clean_menu_list[i]] + '">'
-            + clean_menu_list[i].replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>')
           $('#add-attribute-menu-container').append('<a class="dropdown-item" href="#" data-menu-field="'
             + attribute_concordance[clean_menu_list[i]] + '">'
             + clean_menu_list[i].replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>');
       }
-      console.log('making button visible')
-      console.log($('#add-attribute-button'))
       $('#add-attribute-button').removeClass('d-none');
       $('#add-attribute-menu-container').on('click.dalme', '.dropdown-item', function () {
         toggle_fields($(this).data('menu-field'), 'show');
       });
 
     } else {
-      console.log('menu list is empty')
       $('#add-attribute-button').addClass('d-none');
     }
 
@@ -412,17 +399,20 @@ function get_dt_elements({
 
 function process_dt_fields(type, fields, overrides) {
   return new Promise(function (resolve, reject) {
-      var key = type == "column_defs" ? 'name' : 'name';
+      var keys = ['name', 'data']
 
       for (let i = 0, len = fields.length; i < len; ++i) {
-          if (typeof overrides != "undefined" && overrides.hasOwnProperty(fields[i][key])) {
-              let ov = overrides[fields[i][key]];
-
-              for (const prop in ov) {
-                  if (ov.hasOwnProperty(prop)) {
-                    fields[i][prop] = ov[prop];
-                  }
+          if (typeof overrides != "undefined") {
+            for (let j = 0, len = keys.length; j < len; ++j) {
+              if (overrides.hasOwnProperty(fields[i][keys[j]])) {
+                let ov = overrides[fields[i][keys[j]]];
+                for (const prop in ov) {
+                    if (ov.hasOwnProperty(prop)) {
+                      fields[i][prop] = ov[prop];
+                    }
+                }
               }
+            }
           }
 
           if (type == "column_defs") {
@@ -459,6 +449,15 @@ function process_dt_fields(type, fields, overrides) {
                       delete fields[i]['options'];
                 }
               }
+            }
+
+            if (required_list.includes(fields[i]['name'])) {
+              if (fields[i].hasOwnProperty('attr')) {
+                  fields[i]['attr']['required'] = true
+              } else {
+                  fields[i]['attr'] = { required: true }
+              }
+
             }
           }
       };
