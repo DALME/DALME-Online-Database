@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
+    'compressor',
     'storages',
     'django_filters',
     'modelcluster',
@@ -265,9 +266,25 @@ DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
 AWS_DEFAULT_ACL = None
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+COMPRESS_OFFLINE = True
+COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
+COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
+COMPRESS_FILTERS = {
+    'css': ['compressor.filters.cssmin.rCSSMinFilter'],
+    'js': ['compressor.filters.jsmin.JSMinFilter']
+}
 
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'

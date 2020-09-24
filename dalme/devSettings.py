@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
+    'compressor',
     # 'oidc_provider',
     'storages',
     'django_filters',
@@ -367,6 +368,21 @@ STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
+COMPRESS_FILTERS = {
+    'css': ['compressor.filters.cssmin.rCSSMinFilter'],
+    'js': ['compressor.filters.jsmin.JSMinFilter']
+}
+COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
 
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
