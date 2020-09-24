@@ -33,7 +33,7 @@ from wagtailmodelchooser import register_model_chooser, Chooser
 from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
 from dalme_app.models import Set as DALMESet, Source
-from dalme_app.serializers import PublicSourceSerializer
+from dalme_public.serializers import PublicSourceSerializer
 from dalme_public import forms
 from dalme_public.blocks import (
     CarouselBlock,

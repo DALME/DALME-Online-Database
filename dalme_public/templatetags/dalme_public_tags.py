@@ -2,7 +2,7 @@ from calendar import month_name
 
 from django import template
 
-from dalme_app.serializers import PublicSourceSerializer
+from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.models import (
     Collections,
     Essay,

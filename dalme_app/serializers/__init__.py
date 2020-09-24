@@ -10,9 +10,6 @@ from .others import (AsyncTaskSerializer, AttachmentSerializer, AttributeTypeSer
                      ContentXAttributeSerializer, CountryReferenceSerializer, GroupPropertiesSerializer, GroupSerializer,
                      PageSerializer, ProfileSerializer, TagSerializer, TranscriptionSerializer)
 
-from .public import (PublicAttributeSerializer, PublicFilteredSetsSerializer,
-                     PublicCollectionMembershipSerializer, PublicSourceSerializer, PublicCollectionSerializer)
-
 from .rights_policies import RightsPolicySerializer
 from .sets import SetSerializer
 from .sources import SourceSetSerializer, SourceCreditSerializer, SourceSerializer
