@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% block extra_head %}
-<script type="text/javascript" src="{% static 'js/bstreeview.js' %}"></script>
+{% compress js %}
+  <script type="text/javascript" src="{% static 'js/bstreeview.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/dalme_app/config_editor.js' %}"></script>
+{% endcompress %}
 {% endblock %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}

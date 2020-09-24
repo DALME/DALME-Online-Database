@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% block extra_head %}
   {% if has_pages or has_children %}
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.2/css/scroller.bootstrap4.min.css"/>
@@ -12,11 +13,15 @@
     <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/Diva-6.0.2/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
-    <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
+    {% compress js %}
+      <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/dalme_app/dalme_editor.js' %}"></script>
+    {% endcompress %}
   {% endif %}
   {% if workset %}
-    <script type="text/javascript" src="{% static 'js/dalme_worksets.js' %}"></script>
+    {% compress js %}
+      <script type="text/javascript" src="{% static 'js/dalme_app/dalme_worksets.js' %}"></script>
+    {% endcompress %}
     <script type="text/javascript">
       var workset = {{ workset | safe }};
       $(document).ready(function() {

@@ -1,4 +1,5 @@
 {% load static i18n %}
+{% load compress %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -48,24 +49,45 @@
     <!-- other -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" integrity="sha256-R91pD48xW+oHbpJYGn5xR0Q7tMhH4xOrWn1QqMRINtA=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js" integrity="sha256-yNbKY1y6h2rbVcQtf0b8lq4a+xpktyFc3pSYoGAY1qQ=" crossorigin="anonymous"></script>
-    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
-    <script type="text/javascript" src="{% static 'js/dalme_app.js' %}"></script>
-    <link href="{% static 'css/dalme_app.css' %}" rel="stylesheet">
-    <script>
-      $(document).ready(function () {
-          $(document).click(function (event) {
-              var clickover = $(event.target);
-              var _opened = $(".navbar-collapse").hasClass("show");
-              if (_opened === true && !clickover.hasClass("navbar-toggler")) { $(".navbar-toggler").click(); }
-          });
-          dalme_startup({% if helpers %}"{{ helpers | safe }}"{% endif %});
-          {% if messages %}
-              {% for message in messages %}
-                toastr.{{ message.tags }}('{{ message | safe }}');
-              {% endfor %}
-          {% endif %}
-      });
-    </script>
+    <!-- DALME CSS START -->
+    {% compress css %}
+      <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_alerts.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_comments_module.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_config_editor.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_dt_rendering.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_dte_forms.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_general.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_homepage_cards.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_login.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_search_results.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_sidebar.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_source_editor.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_topbar.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_workflow_manager.css' %}" rel="stylesheet">
+      <link href="{% static 'css/dalme_app/_workset_controller.css' %}" rel="stylesheet">
+    {% endcompress %}
+    <!-- DALME CSS END -->
+    <!-- DALME JS START -->
+    {% compress js %}
+      <script type="text/javascript" src="{% static 'js/dalme_app/dalme_app.js' %}"></script>
+    {% endcompress %}
+      <script>
+        $(document).ready(function () {
+            $(document).click(function (event) {
+                var clickover = $(event.target);
+                var _opened = $(".navbar-collapse").hasClass("show");
+                if (_opened === true && !clickover.hasClass("navbar-toggler")) { $(".navbar-toggler").click(); }
+            });
+            dalme_startup({% if helpers %}"{{ helpers | safe }}"{% endif %});
+            {% if messages %}
+                {% for message in messages %}
+                  toastr.{{ message.tags }}('{{ message | safe }}');
+                {% endfor %}
+            {% endif %}
+        });
+      </script>
+    <!-- DALME JS END -->
     {% block extra_head %}{% endblock %}
     {% block extra_js %}{% endblock %}
 </head>
@@ -175,7 +197,9 @@
 {% if helpers %}
   {% for helper in helpers %}
     {% with 'js/dalme_helpers/'|add:helper|add:'.js' as helper_static %}
-      <script type="text/javascript" src="{% static helper_static %}"></script>
+      {% compress js %}
+        <script type="text/javascript" src="{% static helper_static %}"></script>
+      {% endcompress %}
     {% endwith %}
   {% endfor %}
 {% endif %}

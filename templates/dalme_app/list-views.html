@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
-<script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_selectize.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_credits_field.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_date_field.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_pages_field.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/dalme_helpers/dt_utilities.js' %}"></script>
+{% compress js %}
+  <script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_selectize.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_credits_field.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_date_field.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_pages_field.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/dalme_app/dt_utilities.js' %}"></script>
+{% endcompress %}
 <script type="text/javascript">
   $(document).ready( function () {
     initialize_dt("{{ config }}", {{ editor|safe }}, "#dataTables-list");
