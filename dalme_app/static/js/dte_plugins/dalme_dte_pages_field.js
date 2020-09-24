@@ -153,7 +153,7 @@ _fieldTypes.dalmePages = {
       if (query !== '') {
         $.ajax({
           method: "GET",
-          url: "/api/images/rs_api/?n=20&size=thm&q=" + query
+          url: "/api/images/?search=" + query
         }).done(function(data, textStatus, jqXHR) {
           $('#dam-search-results').removeClass('d-none');
           $('#dam-search-results').html('');
