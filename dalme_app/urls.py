@@ -7,7 +7,6 @@ from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
 from rest_framework import routers
 from dalme_app import api
-from dalme_app import api_web
 from maintenance_mode import urls as maintenance_mode_urls
 
 router = routers.DefaultRouter()
@@ -37,16 +36,11 @@ router.register(r'transcriptions', api.Transcriptions, basename='transcriptions'
 router.register(r'users', api.Users, basename='users')
 router.register(r'workflow', api.WorkflowManager, basename='workflow')
 
-web_router = routers.DefaultRouter()
-web_router.register(r'collections', api_web.Collections, basename='collections')
-web_router.register(r'records', api_web.Records, basename='records')
-
 urlpatterns = [
     path('maintenance-mode/', include(maintenance_mode_urls)),
     path('accounts/login/', views.DalmeLogin.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('api/', include((router.urls, 'dalme_app'), namespace='api_endpoint')),
-    path('api-web/', include(web_router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
