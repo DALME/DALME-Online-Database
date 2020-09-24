@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from dalme_app.models import Source
+from dalme_app.models import Source, Set
 
 
 class SourceFilter(filters.FilterSet):
@@ -20,9 +20,33 @@ class SourceFilter(filters.FilterSet):
         if self.request.GET.get('mode') is not None:
             mode = self.request.GET['mode']
             if mode == 'group':
-                return parent
+                dataset = Set.objects.get(dataset_usergroup=self.request.user.profile.primary_group)
+                return parent.filter(primary_dataset=dataset.id)
             elif mode == 'all':
                 return parent.filter(is_private=False)
+            else:
+                return parent.filter(owner=self.request.user)
+        else:
+            return parent
+
+
+class SetFilter(filters.FilterSet):
+
+    class Meta:
+        model = Set
+        fields = ['set_type', 'name', 'is_public', 'has_landing', 'endpoint',
+                  'permissions', 'description', 'dataset_usergroup', 'dataset_usergroup__name']
+
+    @property
+    def qs(self):
+        parent = super().qs
+        # change general qs based on superadmin status
+        if self.request.GET.get('mode') is not None:
+            mode = self.request.GET['mode']
+            if mode == 'group':
+                return parent
+            elif mode == 'all':
+                return parent.filter(set_type=4)
             else:
                 return parent.filter(owner=self.request.user)
         else:
