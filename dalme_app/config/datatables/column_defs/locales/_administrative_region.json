@@ -1,0 +1,8 @@
+{
+    "title": "Administrative Region",
+    "data": "administrative_region",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true
+}

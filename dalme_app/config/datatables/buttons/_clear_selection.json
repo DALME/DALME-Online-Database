@@ -1,0 +1,4 @@
+{
+  "extend": "selectNone",
+  "text": "<i class=\"fa fa-broom fa-fw dt_menu_icon\"><\/i> Clear Selection"
+}

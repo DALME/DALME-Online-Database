@@ -1,0 +1,54 @@
+/* search results page */
+
+.search-prepend {
+  font-size: 14px;
+  height: 31px;
+}
+
+.search-results-btn {
+  height: 31px;
+  font-size: 14px;
+  line-height: 0.5;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.search-results-input:focus {
+  box-shadow: 0px 0px 1px 2px #0361aa inset !important;
+}
+
+.search-results-checkbox {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.search-results-checkbox input {
+  margin-right: 5px;
+}
+
+.search-results-none {
+
+}
+
+.highlighted {
+  font-weight: 600;
+}
+
+
+.search-result-entry {
+  margin-bottom: 20px;
+}
+
+.search-result-link {
+  font-size: 19px;
+}
+
+.search-result-detail {
+  font-size: 14px;
+  color: #267e30;
+}
+
+.search-result-text {
+  font-size: 14px;
+  color: #686868;
+}

@@ -1,5 +1,5 @@
 from django import template
-from dalme_app import functions
+from dalme_app.utils import round_timesince
 
 register = template.Library()
 
@@ -17,4 +17,10 @@ def relative_url(value, field_name, urlencode=None):
 
 @register.filter
 def htimesince(d):
-    return functions.round_timesince(d)
+    return round_timesince(d)
+
+
+@register.simple_tag
+def dict_key_lookup(_dict, key):
+    # Try to fetch from the dict, and if it's not found return an empty string.
+    return _dict.get(key, '')

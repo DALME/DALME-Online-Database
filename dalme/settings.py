@@ -23,12 +23,14 @@ AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 SAML_CERT = os.environ.get('SAML_CERT', '')
 SAML_KEY = os.environ.get('SAML_KEY', '')
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
+DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 
 DEBUG = False
 ALLOWED_HOSTS = ['.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
@@ -39,6 +41,8 @@ CSRF_COOKIE_DOMAIN = '.dalme.org'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'dynamic_preferences',
+    'dynamic_preferences.users.apps.UserPreferencesConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
+    'compressor',
     'storages',
     'django_filters',
     'modelcluster',
@@ -83,7 +88,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'dalme_app.utils.CurrentUserMiddleware',
+    'dalme_app.models._templates.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -111,6 +116,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'dalme_public.context_processors.year',
                 'dalme_public.context_processors.project',
+                'django.template.context_processors.request',
+                'dynamic_preferences.processors.global_preferences',
             ],
             'debug': DEBUG,
         },
@@ -217,7 +224,32 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'dalme_app.utils.DRFSelectRenderer',
+        'dalme_app.utils.DRFDTEJSONRenderer'
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'dalme_app.utils.DRFDTEParser',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'dalme_app.utils.DalmeOrderingFilter'
+    ],
+    'EXCEPTION_HANDLER': 'dalme_app.utils.DRFDTE_exception_handler',
+}
+
+DYNAMIC_PREFERENCES = {
+    'MANAGER_ATTRIBUTE': 'preferences',
+    'REGISTRY_MODULE': 'preferences',
+    'ADMIN_ENABLE_CHANGELIST_FORM': False,
+    'SECTION_KEY_SEPARATOR': '__',
+    'ENABLE_CACHE': True,
+    'VALIDATE_NAMES': True,
 }
 
 LANGUAGES = [
@@ -234,9 +266,25 @@ DEFAULT_FILE_STORAGE = 'dalme.storage_backends.MediaStorage'
 AWS_DEFAULT_ACL = None
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+COMPRESS_OFFLINE = True
+COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
+COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
+COMPRESS_FILTERS = {
+    'css': ['compressor.filters.cssmin.rCSSMinFilter'],
+    'js': ['compressor.filters.jsmin.JSMinFilter']
+}
 
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'

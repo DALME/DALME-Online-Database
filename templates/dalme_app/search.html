@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% load template_helpers %}
+{% block extra_head %}
+{% compress css %}
+  <link href="{% static 'css/dalme_app/_search_results.css' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}
 {% block content %}
@@ -49,34 +55,34 @@
           <div class="card-body">
             {% for result in page_obj.object_list %}
                 {% if result.content_type == "dalme_app.attribute_type" %}
-                {% include "search/includes/attribute_types.html" %}
+                {% include "dalme_app/search/includes/attribute_types.html" %}
                 {% endif %}
-                {% if result.content_type == "dalme_app.cityreference" %}
-                {% include "search/includes/cities.html" %}
+                {% if result.content_type == "dalme_app.localereference" %}
+                {% include "dalme_app/search/includes/locales.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.countryreference" %}
-                {% include "search/includes/countries.html" %}
+                {% include "dalme_app/search/includes/countries.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.languagereference" %}
-                {% include "search/includes/languages.html" %}
+                {% include "dalme_app/search/includes/languages.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.profile" %}
-                {% include "search/includes/profiles.html" %}
+                {% include "dalme_app/search/includes/profiles.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.rightspolicy" %}
-                {% include "search/includes/rights_policies.html" %}
+                {% include "dalme_app/search/includes/rights_policies.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.set" %}
-                {% include "search/includes/sets.html" %}
+                {% include "dalme_app/search/includes/sets.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.source" %}
-                {% include "search/includes/sources.html" %}
+                {% include "dalme_app/search/includes/sources.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.task" %}
-                {% include "search/includes/tasks.html" %}
+                {% include "dalme_app/search/includes/tasks.html" %}
                 {% endif %}
                 {% if result.content_type == "dalme_app.ticket" %}
-                {% include "search/includes/tickets.html" %}
+                {% include "dalme_app/search/includes/tickets.html" %}
                 {% endif %}
             {% empty %}
                 <div class="search-results-none">No results found.</div>

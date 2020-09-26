@@ -1,0 +1,9 @@
+{
+    "title": "Username",
+    "data": "username",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "render": "function ( data, type, row, meta ) {return '<a href=\"/users/'+data+'\">'+data+'<\/a>';}"
+}

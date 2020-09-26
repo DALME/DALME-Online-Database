@@ -10,7 +10,6 @@ from datetime import date
 from dalme_app.tasks import update_rs_folio_field
 from async_messages import messages
 from django.contrib.auth.models import User
-from dalme_app.apis import normalize_value, filter_on_workflow
 from django.db.models.expressions import RawSQL
 import operator
 from functools import reduce
@@ -25,6 +24,7 @@ from django.forms.models import model_to_dict
 from haystack.query import SearchQuerySet
 from wagtail.users.models import UserProfile
 from django.conf import settings
+from django.db.models import OuterRef, Subquery
 
 
 def get_script_menu():
@@ -83,7 +83,12 @@ def get_script_menu():
             "name": "migrate_datasets",
             "description": "Migrates dataset attribute to sets.",
             "type": "warning"
-        }
+        },
+        {
+            "name": "create_json_field_reps",
+            "description": "Takes a list of fields and creates individual json files.",
+            "type": "warning"
+        },
     ]
     _output = ''
     for item in script_register:
@@ -99,7 +104,7 @@ def get_script_menu_item(name=None, description=None, type=None):
         'secondary': 'fa-scroll',
         'success': 'thumbs-up',
     }
-    currentItem = '<a class="script-item d-flex text-dark-gray" href="/scripts?s={}"><div class="script-icon \
+    currentItem = '<a class="script-item d-flex text-dark-gray" href="/tools/scripts?s={}"><div class="script-icon \
                    bg-{}-soft"><i class="fas {} text-{}"></i></div>'.format(name, type, icon_dict[type], type)
     currentItem += '<span class="font-weight-bold mr-1">{}: </span> {}</a>'.format(name, description)
     return currentItem
@@ -117,6 +122,15 @@ def test_search(request):
     for e in qs:
         res.append([e.name])
     return res
+
+
+def create_json_field_reps(request):
+    with open(os.path.join('dalme_app', 'config', 'datatables', 'field_defs', 'sources.json')) as f:
+        input = json.load(f)
+    for field in input:
+        with open(os.path.join('dalme_app', 'config', 'datatables', 'field_defs', 'sources', '_' + field['name'] + '.json'), 'w') as json_file:
+            json_file.write(json.dumps(field, indent=4))
+    return 'done'
 
 
 def add_attribute_types():
@@ -227,18 +241,17 @@ def migrate_datasets(request):
     return result
 
 def test_expression(request):
-    record = Source.objects.get(id='be296e02-8d6b-40e4-befe-a7616f3f5e01')
-    # att_dict = {}
-    # for a in record.attributes.all():
-    #     att_dict[a.attribute_type.name] = a.value_STR
-    # #return record.get_clean_transcription_blob()
-    # return str(att_dict)
-    #return Profile.objects.get(user=1).user.wagtail_userprofile.avatar
-    #avatar = UserProfile.objects.get(pk=profile.user.id).avatar
-    #return Profile.objects.get(user=1).profile_image_2
-    #avatar = User.objects.get(id=1).wagtailusers.userprofile.avatar
-    #result = blah
-    return [i.name for i in request.user.groups.all()]
+    test = {
+        'name': 'the_name',
+        'attributes': {
+            'att1': 'value1',
+            'att2': 'value2'
+        }
+    }
+    field = 'attributes.att2'
+    group, field = field.split('.') if '.' in field else (None, field)
+    return group
+    # return test.get(group, test).get(field)
 
 
 def fix_users(records):
@@ -251,26 +264,14 @@ def fix_users(records):
         s.modification_user = m_user
         s.save()
 
-def test_expression2(request):
-    # records = Attribute_type.objects.all()
-    # for s in records:
-    #     c_user = User.objects.get(username=s.creation_username)
-    #     m_user = User.objects.get(username=s.modification_username)
-    #     s.creation_user = c_user
-    #     s.owner = c_user
-    #     s.modification_user = m_user
-    #     s.save()
 
-    inv = Source.objects.get(id='7c8837ac-b1e2-42ad-86f5-1322982a1eb6')
-    # if inv.source_pages.all().select_related('transcription').exists():
-    #     result = 'cool'
-    # else:
-    #     result = 'fail'
-    # return result
-    #res = str(inv.pages.all().count()) + '/' + str(inv.source_pages.filter(transcription__count_ignore=False).count())
-    #tr_count = len([i.id for i in inv.source_pages.all() if i.count_tr() is False])
-    #res = str(inv.pages.all().count()) + '/' + str(tr_count)
-    return inv.pages.exclude(dam_id__isnull=True).count()
+def test_expression2(request):
+    p1, p2 = test_function()
+    return str(p1 + ' | ' + p2)
+
+
+def test_function():
+    return ('part1', 'part2')
 
 # REMOVE DUPLICATES
 # def test_expression2(request):

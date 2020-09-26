@@ -15,7 +15,7 @@ class ContactForm(forms.Form):
             'subject': self.cleaned_data['subject'],
             'message': self.cleaned_data['message'],
             'from_email': self.cleaned_data['email'],
-            'recipient_list': ['dalme@example.com'],
+            'recipient_list': ['projectdalme@gmail.com'],
             'fail_silently': False,
         }
 

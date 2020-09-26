@@ -1,0 +1,12 @@
+{
+    "title": "Locale",
+    "data": "attributes.locale",
+    "name": "locale",
+    "editField": "attributes.locale.id",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap",
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.name; }"
+}

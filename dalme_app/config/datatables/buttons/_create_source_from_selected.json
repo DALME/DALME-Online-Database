@@ -1,0 +1,5 @@
+{
+  "extend": "selected",
+  "action": "create_source_from_selected()",
+  "text": "<i class=\"fa fa-plus-square fa-fw dt_menu_icon\"><\/i> Create Source from Selection"
+}

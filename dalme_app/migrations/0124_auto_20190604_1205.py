@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
             name='Comment',
             fields=[
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
-                ('creation_username', models.CharField(blank=True, default=dalme_app.utils.get_current_username, max_length=255, null=True)),
+                ('creation_username', models.CharField(blank=True, default=dalme_app.models._templates.get_current_username, max_length=255, null=True)),
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
-                ('modification_username', models.CharField(blank=True, default=dalme_app.utils.get_current_username, max_length=255, null=True)),
+                ('modification_username', models.CharField(blank=True, default=dalme_app.models._templates.get_current_username, max_length=255, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('object_id', models.UUIDField(db_index=True, null=True)),
                 ('body', models.TextField(blank=True, default=None, null=True)),

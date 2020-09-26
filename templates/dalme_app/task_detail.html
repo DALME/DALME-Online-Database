@@ -3,7 +3,7 @@
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/luminous-lightbox/2.3.2/luminous-basic.min.css" integrity="sha256-tPW9wLkspLEhKo1rCAUlqiMvw30PPoyOatV5gL8a+/M=" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/luminous-lightbox/2.3.2/luminous.min.js" integrity="sha256-JtowJgZIxtr4WObMQMDqCojFv0TMRb438K2bLmjYS8Q=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="{% static 'dalme_helpers/task_detail.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dalme_helpers/task_detail.js' %}"></script>
 <script>
   var task = {
     "title": "{{ task.title }}",
@@ -61,7 +61,7 @@
                   {% endif %}
               </div>
             </div>
-            {% include "includes/comments_box.html" with model='Task' object=task.id %}
+            {% include "dalme_app/includes/comments_box.html" with model='Task' object=task.id %}
           </div>
           <div class="col-md-3">
             <div class="card mb-3">

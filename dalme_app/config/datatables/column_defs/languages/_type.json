@@ -1,0 +1,10 @@
+{
+    "title": "Type",
+    "data": "type.name",
+    "name": "type",
+    "editField": "type.id",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true
+}

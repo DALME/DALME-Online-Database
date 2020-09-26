@@ -1,0 +1,6 @@
+{
+    "name": "short_name",
+    "label": "Short name",
+    "type": "text",
+    "fieldInfo": "A short name for the source to use in lists, <i>eg: ADBR 3B 57 (Gassini)</i>"
+}

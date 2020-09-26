@@ -1,0 +1,14 @@
+{
+    "name": "parent.id",
+    "label": "Parent",
+    "type": "selectize",
+    "opts": {
+        "placeholder": "Select parent",
+        "preload": "focus"
+    },
+    "options": {
+        "type": "api_call",
+        "url": "/api/sources/?format=select&search="
+    },
+    "fieldInfo": "Parent record, if applicable, <i>eg: a book for a book chapter, an archival unit for a record, etc.</i>"
+}

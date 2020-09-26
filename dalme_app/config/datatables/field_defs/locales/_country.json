@@ -1,0 +1,13 @@
+{
+    "name": "country.id",
+    "label": "Country",
+    "type": "selectize",
+    "opts": {
+        "placeholder": "Select country",
+        "preload": "focus"
+    },
+    "options": {
+        "type": "api_call",
+        "url": "/api/countries/?format=select"
+    }
+}

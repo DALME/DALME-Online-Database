@@ -1,0 +1,11 @@
+{
+    "title": "Type",
+    "data": "type.name",
+    "name": "type",
+    "editField": "type.id",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap"
+}

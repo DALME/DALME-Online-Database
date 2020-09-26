@@ -1,0 +1,9 @@
+{
+    "title": "Support",
+    "data": "attributes.support",
+    "name": "support",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Country",
+  "name": "field3",
+  "data": "field3",
+  "defaultContent": "",
+  "visible": false,
+  "orderable": true,
+  "searchable": true
+}

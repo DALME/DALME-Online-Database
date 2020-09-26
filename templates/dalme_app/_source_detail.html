@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block extra_head %}
+<script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_date_field.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_sets_field.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_pages_field.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dalme_helpers/dt_utilities.js' %}"></script>
+<script type="text/javascript">
+  var source_id = "{{ source_id }}";
+</script>
+{% endblock %}
+{% block extra_dropdowns %}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card shadow mb-3">
+    <div class="card-header card-tabs-header">
+      <!-- tabs -->
+      <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false" {% if has_pages %} onclick="switch_tab('info-tab')" {% endif %}>Information</a>
+        </li>
+      </ul>
+    </div>
+    <!-- Tab panes -->
+    <div class="tab-content h-100">
+      <div class="tab-pane card-body transcription-editor active" id="info" role="tabpanel" aria-labelledby="info-tab" data-editor-id="bc50e462-adf9-4163-a3a3-7f3baed7fbb7">
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  $(document).ready(function() {
+    $.ajax({
+      method: "GET",
+      url: "/api/sources/" + source_id + "/",
+    }).done(function(source_data, textStatus, jqXHR) {
+      $.ajax({
+        method: "POST",
+        url: "/api/configs/get/",
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        },
+        data: JSON.stringify({
+          'target': 'sources_records',
+          'path': 'datatables',
+          'base': true
+        })
+      }).done(function(data, textStatus, jqXHR) {
+          if (data[0]['config'].hasOwnProperty('globals')) {
+            for (const prop in data[0]['config']['globals']) {
+                if (data[0]['config']['globals'].hasOwnProperty(prop)) {
+                  window[prop] = data[0]['config']['globals'][prop];
+                }
+            }
+          }
+          var config_data = data[0]['config']
+          attribute_concordance_rev = {}
+          for (key in attribute_concordance)
+            attribute_concordance_rev[attribute_concordance[key]] = key;
+          get_dt_elements({
+                type: 'field_defs',
+                el_list: data[0].editor.fields,
+                overrides: data[0].editor.overrides,
+                endpoint: config_data.endpoint
+          }).then(function(e_fields) {
+              var editor_options = _.merge(data[1].editor.options, data[0].editor.options);
+              for (const prop in editor_options['ajax']) {
+                  if (editor_options['ajax'].hasOwnProperty(prop) && ['create', 'edit', 'remove'].includes(prop)) {
+                      editor_options['ajax'][prop]['headers']['X-CSRFToken'] = (get_cookie("csrftoken"));
+                      editor_options['ajax'][prop]['data'] = (function (data) { return { "data": JSON.stringify(data) }; });
+                  }
+              };
+              let fields = Object.values(attribute_concordance)
+              for (let i = 0, len = fields.length; i < len; ++i) {
+                $('#info').append('<div class="d-flex flex-row-reverse" data-editor-field="' + fields[i] + '"></div>');
+              }
+              editor_options['fields'] = e_fields;
+              let field_list = $('#info').find('.flex-row-reverse')
+              for (let i = 0, len = field_list.length; i < len; ++i) {
+                $(field_list[i]).append(source_data[$(field_list[i]).data('editor-field')])
+              };
+              dt_editor = new $.fn.dataTable.Editor(editor_options);
+              $('[data-editor-field]').on('click', function (e) {
+                dt_editor.inline(this, {buttons: '_basic'});
+              });
+          });
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+          toastr.error('There was an error communicating with the server: ' + errorThrown);
+      });
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      toastr.error('There was an error communicating with the server: ' + errorThrown);
+    });
+  });
+</script>
+{% endblock %}

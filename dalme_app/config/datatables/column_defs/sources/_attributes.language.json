@@ -1,0 +1,11 @@
+{
+    "title": "Language(s)",
+    "data": "attributes.language",
+    "name": "language",
+    "editField": "attributes.language[].id",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": false,
+    "searchable": true,
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.map(a => ' ' + a.name); }"
+}

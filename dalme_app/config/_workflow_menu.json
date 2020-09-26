@@ -1,0 +1,105 @@
+[
+  {
+    "type": "title",
+    "text": "<i class=\"fas fa-poll-h fa-sm mr-1\"></i>Status"
+  },
+  {
+    "type": "message",
+    "text": "Show only sources with a specific status"
+  },
+  {
+    "type": "item",
+    "text": "Processed",
+    "query": "{'wf_status': 3}"
+  },
+  {
+    "type": "item",
+    "text": "Under Assessment",
+    "query": "{'wf_status': 1}"
+  },
+  {
+    "type": "divider"
+  },
+  {
+    "type": "item",
+    "text": "Flagged for help",
+    "query": "{'help_flag': 1}"
+  },
+  {
+    "type": "item",
+    "text": "Flagged for publication",
+    "query": "{'is_public': 1}"
+  },
+  {
+    "type": "divider"
+  },
+  {
+    "type": "title",
+    "text": "<i class=\"fas fa-sliders-h fa-sm mr-1\"></i>Processing Stage"
+  },
+  {
+    "type": "message",
+    "text": "Show only sources in a specific stage of processing (and/or state)"
+  },
+  {
+    "type": "item-select",
+    "text": "Ingestion",
+    "query": "{'stage': 1"
+  },
+  {
+    "type": "item-select",
+    "text": "Transcription",
+    "query": "{'stage': 2"
+  },
+  {
+    "type": "item-select",
+    "text": "Markup",
+    "query": "{'stage': 3"
+  },
+  {
+    "type": "item-select",
+    "text": "Review",
+    "query": "{'stage': 4"
+  },
+  {
+    "type": "item-select",
+    "text": "Parsing",
+    "query": "{'stage': 5"
+  },
+  {
+    "type": "divider"
+  },
+  {
+    "type": "title",
+    "text": "<i class=\"fas fa-history fa-sm mr-1\"></i>Activity"
+  },
+  {
+    "type": "message",
+    "text": "Show only sources with activity within a certain time period"
+  },
+  {
+    "type": "item",
+    "text": "Past week",
+    "query": "{'last_modified_lt': 7}"
+  },
+  {
+    "type": "item",
+    "text": "Past month",
+    "query": "{'last_modified_lt': 7}"
+  },
+  {
+    "type": "item",
+    "text": "Past three months",
+    "query": "{'last_modified_lt': 7}"
+  },
+  {
+    "type": "item",
+    "text": "Past year",
+    "query": "{'last_modified_lt': 7}"
+  },
+  {
+    "type": "item",
+    "text": "Over a year ago",
+    "query": "{'last_modified_lt': 7}"
+  }
+]

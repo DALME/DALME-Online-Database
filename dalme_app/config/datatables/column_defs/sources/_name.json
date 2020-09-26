@@ -1,0 +1,11 @@
+{
+    "title": "Name",
+    "data": "name",
+    "name": "name",
+    "editField": "name",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "render": "function (data, type, row, meta) {return (typeof data==\"undefined\") ? \"\" :  '<a href=\"/sources/'+row[\"id\"]+'\">'+data+'<\/a>';}"
+}

@@ -1,0 +1,120 @@
+{
+  "config": {
+    "helpers": [
+      "source_forms"
+    ],
+    "endpoint": "sources",
+    "globals": {
+      "source_type": "bibliography",
+      "on_open_function": "source_form_setup",
+      "on_close_function": "source_form_restore",
+      "messages_list": {
+        "create_success": "The source was created succesfully.",
+        "edit_success": "The source was updated succesfully.",
+        "remove_success": "The source was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "short_name": "short_name",
+        "type": "type.id",
+        "parent": "parent.id",
+        "owner": "owner.id",
+        "is_private": "is_private",
+        "language": "attributes.language.id",
+        "url": "attributes.url"
+      },
+      "required_list": [
+        "name",
+        "short_name",
+        "type.id"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "name",
+      "short_name",
+      "type",
+      "parent",
+      "owner",
+      "is_private",
+      "attributes.language",
+      "attributes.url"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/sources/?format=json&class=bibliography"
+      }
+    },
+    "overrides": {
+      "attributes.language": {
+        "title": "Language",
+        "editField": "attributes.language.id",
+        "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.name; }"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "short_name",
+      "type",
+      "parent",
+      "owner",
+      "is_private",
+      "attributes.language",
+      "attributes.url"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/sources/"
+        },
+        "edit": {
+          "url": "/api/sources/_id_/"
+        },
+        "remove": {
+          "url": "/api/sources/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_source"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_source"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_source"
+      }
+    ],
+    "overrides": {
+      "type.id": {
+        "options": {
+          "type": "api_call",
+          "url": "/api/content-types/?format=select&id__lt=11&search="
+        }
+      },
+      "name": {
+        "type": "textarea"
+      },
+      "attributes.language[].id": {
+        "name": "attributes.language.id",
+        "label": "Language",
+        "type": "selectize",
+        "opts": {
+          "placeholder": "Select language",
+          "preload": "focus"
+        },
+        "options": {
+          "type": "api_call",
+          "url": "/api/languages/?format=select&select_type=att&search="
+        }
+      }
+    }
+  }
+}

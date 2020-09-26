@@ -1,0 +1,4 @@
+{
+  "action": "function() { save_set(\"create\") }",
+  "text": "<i class=\"fa fa-folder fa-fw dt_menu_icon\"></i> Create New Set"
+}

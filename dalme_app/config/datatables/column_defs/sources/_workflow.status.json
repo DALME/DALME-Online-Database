@@ -1,0 +1,12 @@
+{
+    "title": "Status",
+    "data": "workflow.status",
+    "name": "status",
+    "editField": "workflow.status.text",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": false,
+    "searchable": false,
+    "render": "function ( data, type, row, meta ) {return (typeof data == \"undefined\") ? \"\" : '<div class=\"tag-wf '+data.css_class+'\">'+data.text+'</div>';}",
+    "className": "td-center"
+}

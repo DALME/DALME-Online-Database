@@ -1,0 +1,9 @@
+{
+    "title": "Joined",
+    "data": "date_joined",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": true,
+    "searchable": false,
+    "render": "function ( data ) {return moment(data).format(\"DD-MMM-YYYY@HH:mm\");}"
+}

@@ -1,11 +1,11 @@
 from haystack import indexes
-from dalme_app.models import (Attribute_type, CityReference, CountryReference,
+from dalme_app.models import (Attribute_type, LocaleReference, CountryReference,
                               LanguageReference, Profile, RightsPolicy, Set, Source, Task, Ticket)
 from django.core.exceptions import ObjectDoesNotExist
 
 
 class Attribute_typeIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/attribute_types.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/attribute_types.txt")
 
     def get_model(self):
         return Attribute_type
@@ -14,18 +14,18 @@ class Attribute_typeIndex(indexes.SearchIndex, indexes.Indexable):
         return self.get_model().objects.all()
 
 
-class CityReferenceIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/cities.txt")
+class LocaleReferenceIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/locales.txt")
 
     def get_model(self):
-        return CityReference
+        return LocaleReference
 
     def index_queryset(self, using=None):
         return self.get_model().objects.all()
 
 
 class CountryReferenceIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/countries.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/countries.txt")
 
     def get_model(self):
         return CountryReference
@@ -35,7 +35,7 @@ class CountryReferenceIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class LanguageReferenceIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/languages.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/languages.txt")
 
     def get_model(self):
         return LanguageReference
@@ -45,7 +45,7 @@ class LanguageReferenceIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class ProfileIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/profiles.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/profiles.txt")
 
     def get_model(self):
         return Profile
@@ -55,7 +55,7 @@ class ProfileIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class RightsPolicyIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/rights_policies.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/rights_policies.txt")
 
     def get_model(self):
         return RightsPolicy
@@ -65,7 +65,7 @@ class RightsPolicyIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class SetIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/sets.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/sets.txt")
 
     def get_model(self):
         return Set
@@ -75,7 +75,7 @@ class SetIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class SourceIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.EdgeNgramField(document=True, use_template=True, template_name="search/sources.txt")
+    text = indexes.EdgeNgramField(document=True, use_template=True, template_name="dalme_app/search/sources.txt")
     name = indexes.CharField(model_attr='name')
     type = indexes.IntegerField()
     is_public = indexes.BooleanField()
@@ -97,7 +97,7 @@ class SourceIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class TaskIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/tasks.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/tasks.txt")
 
     def get_model(self):
         return Task
@@ -107,7 +107,7 @@ class TaskIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class TicketIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True, template_name="search/tickets.txt")
+    text = indexes.CharField(document=True, use_template=True, template_name="dalme_app/search/tickets.txt")
 
     def get_model(self):
         return Ticket

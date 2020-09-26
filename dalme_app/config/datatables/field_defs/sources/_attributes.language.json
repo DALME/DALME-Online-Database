@@ -1,0 +1,16 @@
+{
+  "name": "attributes.language[].id",
+  "label": "Language(s)",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select language(s)",
+    "preload": "focus",
+    "maxItems": null,
+    "closeAfterSelect": true,
+    "plugins": ["remove_button"]
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/languages/?format=select&select_type=att&search="
+  }
+}

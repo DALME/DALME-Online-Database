@@ -1,0 +1,96 @@
+{
+  "config": {
+    "helpers": [
+      "ownership_filter_module"
+    ],
+    "endpoint": "sets",
+    "globals": {
+      "messages_list": {
+        "create_success": "The workset was created succesfully.",
+        "edit_success": "The workset was updated succesfully.",
+        "remove_success": "The workset was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "description": "description",
+        "endpoint": "endpoint",
+        "owner": "owner.id",
+        "permissions": "permissions.id"
+      },
+      "required_list": [
+        "name",
+        "set_type.id",
+        "endpoint",
+        "permissions.id"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "name",
+      "member_count",
+      "set_type",
+      "description",
+      "endpoint",
+      "owner",
+      "permissions"
+    ],
+    "options": {
+      "stateSave": false,
+      "ajax": {
+        "url": "/api/sets/?set_type=4&mode=own&format=json"
+      }
+    },
+    "overrides": {
+      "endpoint": {
+        "visible": true
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "set_type",
+      "description",
+      "endpoint",
+      "owner",
+      "permissions"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/sets/"
+        },
+        "edit": {
+          "url": "/api/sets/_id_/"
+        },
+        "remove": {
+          "url": "/api/sets/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_set"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_set"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_set"
+      }
+    ],
+    "overrides": {
+      "set_type.id": {
+        "type": "hidden",
+        "def": 4,
+        "opts": {},
+        "options": []
+      }
+    }
+  }
+}

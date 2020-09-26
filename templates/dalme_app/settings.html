@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% load template_helpers %}
+{% block extra_head %}
+{% endblock %}
+{% block extra_dropdowns %}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card shadow mb-3">
+    <div class="card-header card-tabs-header">
+      <!-- tabs -->
+      <ul class="nav nav-tabs card-header-tabs" id="sourceTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Settings</a>
+        </li>
+      </ul>
+    </div>
+    <!-- Tab panes -->
+    <div class="tab-content h-100">
+      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
+        <form action="" enctype="multipart/form-data" method="post">
+          {% csrf_token %}
+          {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field }}
+          {% endfor %}
+          {% for section in section_list %}
+              <div class="card mb-3">
+                <div class="sub-card-header">
+                  <div class="card-header-title"><i class="fa fa-user-alt fa-fw"></i> {{ section }}</div>
+                </div>
+                <div class="card-body attribute_list">
+                    {% for field in form.visible_fields %}
+                    {% if field.field.section == section %}
+                        {% if field.field.widget.input_type == 'checkbox' %}
+                          <div class="form-group row">
+                              <div class="col-sm-2">{{ field.label }}</div>
+                              <div class="col-sm-10">
+                                <div class="form-check">
+                                    {{ field }}
+                                    <label class="form-check-label" for="{{ field.id_for_label }}"><small class="form-text text-muted">{{ field.help_text }}</small></label>
+                                </div>
+                              </div>
+                          </div>
+                        {% else %}
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <div class="col-sm-10">
+                            {{ field }}
+                            {% if field.help_text %}
+                              <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+      <div class="tab-footer">
+        <div id="tab-footer-interface" class="clearfix">
+          <small class="text-muted float-left tab-footer-text" id="transcriber"></small>
+        </div>
+      </div>
+  </div>
+
+{% endblock %}
+{% block extra_scripts %}
+{% endblock %}

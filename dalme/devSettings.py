@@ -25,17 +25,14 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 
-SAML_CERT = os.environ.get('SAML_CERT', '')
-SAML_KEY = os.environ.get('SAML_KEY', '')
-
 # email setup
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'DALME Project <mail@dalme.org>'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
+# EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -51,6 +48,8 @@ CSRF_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'dynamic_preferences',
+    'dynamic_preferences.users.apps.UserPreferencesConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -72,6 +71,7 @@ INSTALLED_APPS = [
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
+    'compressor',
     # 'oidc_provider',
     'storages',
     'django_filters',
@@ -112,7 +112,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'dalme_app.utils.CurrentUserMiddleware',
+    'dalme_app.models._templates.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -142,6 +142,8 @@ TEMPLATES = [
                 # 'sekizai.context_processors.sekizai',
                 'dalme_public.context_processors.year',
                 'dalme_public.context_processors.project',
+                'django.template.context_processors.request',
+                'dynamic_preferences.processors.global_preferences',
             ],
             'debug': DEBUG,
         },
@@ -294,6 +296,49 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'dalme_app.utils.DRFSelectRenderer',
+        'dalme_app.utils.DRFDTEJSONRenderer'
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'dalme_app.utils.DRFDTEParser',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        #'rest_framework.filters.OrderingFilter'
+        'dalme_app.utils.DalmeOrderingFilter'
+    ],
+    'EXCEPTION_HANDLER': 'dalme_app.utils.DRFDTE_exception_handler',
+}
+
+
+DYNAMIC_PREFERENCES = {
+    # a python attribute that will be added to model instances with preferences
+    # override this if the default collide with one of your models attributes/fields
+    'MANAGER_ATTRIBUTE': 'preferences',
+
+    # The python module in which registered preferences will be searched within each app
+    'REGISTRY_MODULE': 'preferences',
+
+    # Allow quick editing of preferences directly in admin list view
+    # WARNING: enabling this feature can cause data corruption if multiple users
+    # use the same list view at the same time, see https://code.djangoproject.com/ticket/11313
+    'ADMIN_ENABLE_CHANGELIST_FORM': False,
+
+    # Customize how you can access preferences from managers. The default is to
+    # separate sections and keys with two underscores. This is probably not a settings you'll
+    # want to change, but it's here just in case
+    'SECTION_KEY_SEPARATOR': '__',
+
+    # Use this to disable caching of preference. This can be useful to debug things
+    'ENABLE_CACHE': False,
+
+    # Use this to disable checking preferences names. This can be useful to debug things
+    'VALIDATE_NAMES': True,
 }
 
 # Internationalization
@@ -324,6 +369,21 @@ STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
+COMPRESS_FILTERS = {
+    'css': ['compressor.filters.cssmin.rCSSMinFilter'],
+    'js': ['compressor.filters.jsmin.JSMinFilter']
+}
+COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
 
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'

@@ -1,23 +1,32 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% block extra_head %}
+  {% compress css %}
+    <link href="{% static 'css/dalme_app/_source_editor.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dalme_app/_workflow_manager.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dalme_app/_workset_controller.css' %}" rel="stylesheet">
+  {% endcompress %}
   {% if has_pages or has_children %}
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.0/css/scroller.bootstrap4.min.css"/>
-    <script type="text/javascript" src="https://cdn.datatables.net/scroller/2.0.0/js/dataTables.scroller.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.2/css/scroller.bootstrap4.min.css"/>
+  <script type="text/javascript" src="https://cdn.datatables.net/scroller/2.0.2/js/dataTables.scroller.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
   {% endif %}
   {% if has_pages %}
     <link href="https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700,700i&amp;subset=latin-ext" rel="stylesheet">
-    <link href="{% static 'css/diva.css' %}" rel="stylesheet">
+    <link href="{% static 'js/Diva-6.0.2/diva.css' %}" rel="stylesheet">
     <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
-    <script type="text/javascript" src="{% static 'js/diva.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/Diva-6.0.2/diva.js' %}"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.3/ace.js"></script>
-    <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/dalme_editor.js' %}"></script>
+    {% compress js %}
+      <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/dalme_app/dalme_editor.js' %}"></script>
+    {% endcompress %}
   {% endif %}
-  {% if workset %}
-    <script type="text/javascript" src="{% static 'js/dalme_worksets.js' %}"></script>
+  {% if workset and can_edit %}
+    {% compress js %}
+      <script type="text/javascript" src="{% static 'js/dalme_app/dalme_worksets.js' %}"></script>
+    {% endcompress %}
     <script type="text/javascript">
       var workset = {{ workset | safe }};
       $(document).ready(function() {
@@ -61,20 +70,20 @@
           </a>
         </li>
       </ul>
-      {% if workset %}
-        {% include "includes/workset_controller.html" with current=workset.current total=workset.total progress=workset.progress name=workset.name description=workset.description %}
+      {% if workset and can_edit %}
+        {% include "dalme_app/includes/workset_controller.html" with current=workset.current total=workset.total progress=workset.progress name=workset.name description=workset.description %}
       {% endif %}
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab">
-        <div class="row">
-          <div class="col-md-12">
-            {% if has_inv %}
-              {% include "includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
-            {% endif %}
+      <div class="tab-pane card-body transcription-editor active overflow-auto" id="info" role="tabpanel" aria-labelledby="info-tab">
+        {% if has_inv and can_edit %}
+          <div class="row">
+            <div class="col-md-12">
+                {% include "dalme_app/includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
+            </div>
           </div>
-        </div>
+        {% endif %}
         <div class="row">
           <div class="col-md-6">
             <div class="card mb-3">
@@ -143,9 +152,11 @@
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-align-left fa-fw"></i> Description</div>
-                <div id="descriptionEditorToolbar">
-                  <button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>
-                </div>
+                {% if can_edit %}
+                  <div id="descriptionEditorToolbar">
+                    <button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>
+                  </div>
+                {% endif %}
               </div>
               <div class="card-body">
                 {% if description %}
@@ -294,15 +305,17 @@
           <div class="splitter-horizontal ui-resizable-handle ui-resizable-s"></div>
         </div>
         <div class="panel-bottom">
-          <div id="editor-toolbar" class="dropdown d-flex">
+          <div id="editor-toolbar" class="dropdown d-flex {% if not can_edit %}border-bottom-0{% endif %}">
             <div id="editor-left-toolbar" class="align-self-start mr-auto btn-group">
               <!-- Dropdown - options -->
               <div class="dropdown-menu" id="xmleditor-options">
               </div>
             </div>
-            <div id="editor-right-toolbar" class="align-self-end btn-group">
-              <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
-            </div>
+              <div id="editor-right-toolbar" class="align-self-end btn-group">
+                {% if can_edit %}
+                <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
+                {% endif %}
+              </div>
           </div>
           <div class="d-flex flex-row">
             <div id="editor" class="d-flex justify-content-center w-100">
@@ -331,6 +344,11 @@
         <small class="text-muted tab-footer-text align-self-start" id="author"></small>
       </div>
     </div>
+  </div>
+  <div id="hidden-content" class="d-none">
+    {% if has_pages and can_edit %}
+      {% include "dalme_app/includes/xmleditor_options.html" %}
+    {% endif %}
   </div>
 {% endblock %}
 {% block extra_scripts %}

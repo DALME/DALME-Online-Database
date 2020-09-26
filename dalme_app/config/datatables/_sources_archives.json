@@ -1,0 +1,98 @@
+{
+  "config": {
+    "helpers": [
+      "source_forms"
+    ],
+    "endpoint": "sources",
+    "globals": {
+      "source_type": "archives",
+      "on_open_function": "source_form_setup",
+      "on_close_function": "source_form_restore",
+      "messages_list": {
+        "create_success": "The archive was created succesfully.",
+        "edit_success": "The archive was updated succesfully.",
+        "remove_success": "The archive was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "short_name": "short_name",
+        "locale": "attributes.locale.id",
+        "country": "attributes.country.id",
+        "default_rights": "attributes.default_rights.id",
+        "url": "attributes.url",
+        "street_address": "attributes.street_address",
+        "email": "attributes.email"
+      },
+      "required_list": [
+        "name",
+        "short_name",
+        "type.id",
+        "attributes.locale.id"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "name",
+      "short_name",
+      "no_records",
+      "attributes.locale",
+      "attributes.country",
+      "attributes.default_rights",
+      "attributes.url"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/sources/?format=json&class=archives"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "short_name",
+      "type",
+      "attributes.locale",
+      "attributes.country",
+      "attributes.default_rights",
+      "attributes.url",
+      "attributes.street_address",
+      "attributes.email"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/sources/"
+        },
+        "edit": {
+          "url": "/api/sources/_id_/"
+        },
+        "remove": {
+          "url": "/api/sources/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_source"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_source"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_source"
+      }
+    ],
+    "overrides": {
+      "type.id": {
+        "type": "hidden",
+        "def": 19,
+        "opts": {},
+        "options": []
+      }
+    }
+  }
+}

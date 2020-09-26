@@ -1,0 +1,80 @@
+{
+  "config": {
+    "helpers": [
+      "language_forms"
+    ],
+    "endpoint": "languages",
+    "globals": {
+      "on_open_function": "change_form",
+      "on_close_function": "change_form",
+      "messages_list": {
+        "create_success": "The language was created succesfully.",
+        "edit_success": "The language was updated succesfully.",
+        "remove_success": "The language was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "type": "type.id",
+        "parent": "parent.id",
+        "iso6393": "iso6393",
+        "glottocode": "glottocode"
+      },
+      "required_list": [
+        "name",
+        "type.id",
+        "glottocode"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "name",
+      "type",
+      "parent",
+      "iso6393",
+      "glottocode"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/languages/?format=json"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "type",
+      "parent",
+      "iso6393",
+      "glottocode"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/languages/"
+        },
+        "edit": {
+          "url": "/api/languages/_id_/"
+        },
+        "remove": {
+          "url": "/api/languages/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_language"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_language"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_language"
+      }
+    ]
+  }
+}

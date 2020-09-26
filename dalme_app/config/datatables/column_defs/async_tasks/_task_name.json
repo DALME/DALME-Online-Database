@@ -1,0 +1,8 @@
+{
+    "title": "Task name",
+    "data": "task_name",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true
+}

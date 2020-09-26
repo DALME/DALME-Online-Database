@@ -1,0 +1,20 @@
+{
+  "config": {
+    "endpoint": "async_tasks"
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "task_name",
+      "status",
+      "date_done",
+      "result",
+      "traceback"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/async-tasks/?format=json"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "is_private",
+  "label": "Private",
+  "type": "checkbox",
+  "options": {
+    "type": "list",
+    "list": [
+      {
+        "label": "Indicates whether access to this source should be restricted solely to its owner.",
+        "value": "1"
+      }
+    ]
+  }
+}

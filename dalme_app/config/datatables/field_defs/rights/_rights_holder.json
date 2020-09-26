@@ -1,0 +1,6 @@
+{
+    "name": "rights_holder",
+    "label": "Rights Holder",
+    "type": "textarea",
+    "fieldInfo": "Holder of the original rights"
+}

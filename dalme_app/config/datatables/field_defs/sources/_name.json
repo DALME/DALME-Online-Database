@@ -1,0 +1,6 @@
+{
+    "name": "name",
+    "label": "Name",
+    "type": "text",
+    "fieldInfo": "Name of the source, <i>eg: Inventory of Poncius Gassini (ADBR 3B 57)</i>"
+}

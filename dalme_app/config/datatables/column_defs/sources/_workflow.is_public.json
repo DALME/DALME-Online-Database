@@ -1,0 +1,12 @@
+{
+    "title": "Public",
+    "data": "workflow.is_public",
+    "name": "is_public",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": false,
+    "searchable": false,
+    "render": "function ( data, type, row, meta ) {return (typeof data == \"undefined\") ? \"\" : data == true ? '<i class=\"fa fa-atlas dt_checkbox_true\"></i>' : '';}",
+    "width": "19px",
+    "className": "td-center"
+}

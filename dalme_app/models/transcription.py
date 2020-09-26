@@ -1,0 +1,30 @@
+from django.db import models
+import lxml.etree as et
+from dalme_app.models._templates import dalmeUuid, get_current_username
+import django.db.models.options as options
+
+options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+
+
+class Transcription(dalmeUuid):
+    transcription = models.TextField(blank=True, default=None)
+    author = models.CharField(max_length=255, default=get_current_username)
+    version = models.IntegerField(null=True)
+    count_ignore = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.id)
+
+    def save(self, **kwargs):
+        # set count_ignore flag
+        xml_parser = et.XMLParser(recover=True)
+        tr_tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
+        if len(tr_tree) == 1 and tr_tree[0].tag in ['quote', 'gap', 'mute'] or len(tr_tree) == 0:
+            self.count_ignore = True
+        super(Transcription, self).save()
+
+    @property
+    def text_blob(self):
+        xml_parser = et.XMLParser(recover=True)
+        tr_tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
+        return et.tostring(tr_tree, encoding='utf8', method='text').decode('utf-8')

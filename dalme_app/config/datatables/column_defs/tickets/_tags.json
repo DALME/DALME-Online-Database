@@ -1,0 +1,9 @@
+{
+  "title": "Tags",
+  "data": "tags",
+  "name": "tags",
+  "defaultContent": "",
+  "visible": true,
+  "orderable": false,
+  "searchable": false
+}

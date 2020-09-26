@@ -1,0 +1,14 @@
+{
+  "name": "pages[]",
+  "label": "Folios",
+  "type": "dalmePages",
+  "multiEditable": false,
+  "opts": {
+    "placeholder": "Select DAM image",
+    "preload": "focus"
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/images/?format=select&search="
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extend": "remove",
+  "text": "<i class=\"fa fa-times fa-fw dt_menu_icon\"></i> Delete Selected",
+  "formTitle": "Delete",
+  "formMessage": "Are you sure you wish to proceed? This action cannot be undone.",
+  "formButtons": [
+                    { "text": "Delete", "className": "btn-danger", "action": "function () { this.submit(); }" },
+                    { "text": "Cancel", "className": "btn-primary", "action": "function () { this.close(); }" }
+                ]
+}

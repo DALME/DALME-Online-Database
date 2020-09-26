@@ -1,0 +1,10 @@
+{
+  "title": "Attachments",
+  "data": "attachments",
+  "name": "attachments",
+  "defaultContent": "",
+  "visible": true,
+  "orderable": false,
+  "searchable": false,
+  "className": "td-center"
+}

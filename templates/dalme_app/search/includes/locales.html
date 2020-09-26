@@ -1,0 +1,5 @@
+{% load highlight %}
+<div class="search-result-entry">
+    <a class="search-result-link" href="/locales">{{ result.object.name }}</a>
+    <div class="search-result-detail">Location | {{ result.object.administrative_region }}, {{ result.object.country.name }}</div>
+</div>

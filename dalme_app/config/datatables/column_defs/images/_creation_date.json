@@ -1,0 +1,10 @@
+{
+  "title": "Date created",
+  "name": "creation_date",
+  "data": "creation_date",
+  "defaultContent": "",
+  "visible": false,
+  "orderable": true,
+  "searchable": false,
+  "render": "function ( data ) {return moment(data).format(\"DD-MMM-YYYY@HH:mm\");}"
+}

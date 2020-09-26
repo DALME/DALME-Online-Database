@@ -21,9 +21,9 @@ class Migration(migrations.Migration):
             name='Ticket',
             fields=[
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
-                ('creation_username', models.CharField(blank=True, default=dalme_app.utils.get_current_username, max_length=255, null=True)),
+                ('creation_username', models.CharField(blank=True, default=dalme_app.models._templates.get_current_username, max_length=255, null=True)),
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
-                ('modification_username', models.CharField(blank=True, default=dalme_app.utils.get_current_username, max_length=255, null=True)),
+                ('modification_username', models.CharField(blank=True, default=dalme_app.models._templates.get_current_username, max_length=255, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('title', models.CharField(max_length=140)),
                 ('description', models.TextField(blank=True, null=True)),

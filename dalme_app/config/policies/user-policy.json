@@ -1,0 +1,12 @@
+[
+  {
+    "action": ["list", "retrieve", "has_permission"],
+    "principal": ["*"],
+    "effect": "allow"
+  },
+  {
+    "action": ["reset_password", "create", "partial_update", "update", "destroy"],
+    "principal": ["group:Administrators"],
+    "effect": "allow"
+  }
+]

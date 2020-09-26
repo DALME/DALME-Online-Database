@@ -1,4 +1,4 @@
-from rest_access_policy import AccessPolicy
+from rest_access_policy import AccessPolicy, AccessPolicyException
 import json
 import os
 
@@ -10,7 +10,7 @@ class BaseAccessPolicy(AccessPolicy):
     id = 'base-policy'
 
     def get_policy_statements(self, request, view):
-        statements = os.path.join('dalme_app', 'policies', self.id + '.json')
+        statements = os.path.join('dalme_app', 'config', 'policies', self.id + '.json')
         with open(statements, 'r') as policy:
             return json.load(policy)
 
@@ -19,9 +19,24 @@ class BaseAccessPolicy(AccessPolicy):
         return request.user == record.owner
 
 
+class ConfigsAccessPolicy(BaseAccessPolicy):
+    ''' Manages access policies for configs endpoint '''
+    id = 'configs-policy'
+
+
 class GeneralAccessPolicy(BaseAccessPolicy):
     ''' Manages general access policies for all endpoints '''
     id = 'general-policy'
+
+
+class ImageAccessPolicy(BaseAccessPolicy):
+    ''' Manages general access policies for Images endpoint'''
+    id = 'images-policy'
+
+
+class RightsAccessPolicy(BaseAccessPolicy):
+    ''' Manages general access policies for Rights endpoint'''
+    id = 'rights-policy'
 
 
 class SourceAccessPolicy(BaseAccessPolicy):
@@ -36,6 +51,19 @@ class SourceAccessPolicy(BaseAccessPolicy):
             return len(list(set(ds_ugs) & set(usergroups))) > 0
         else:
             return False
+
+    def _get_invoked_action(self, view) -> str:
+        if view.__class__.__name__ == 'SourceDetail':
+            return 'update'
+        else:
+            if hasattr(view, "action"):
+                if view.action == 'has_permission':
+                    return 'update'
+                else:
+                    return view.action
+            elif hasattr(view, "__class__"):
+                return view.__class__.__name__
+            raise AccessPolicyException("Could not determine action of request")
 
 
 class SetAccessPolicy(BaseAccessPolicy):
@@ -65,6 +93,6 @@ class WorkflowAccessPolicy(BaseAccessPolicy):
         return request.user == target.owner
 
 
-class ProfileAccessPolicy(BaseAccessPolicy):
+class UserAccessPolicy(BaseAccessPolicy):
     ''' Manages access policies for users/profiles endpoint '''
-    id = 'profile-policy'
+    id = 'user-policy'

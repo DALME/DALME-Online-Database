@@ -1,0 +1,9 @@
+{
+    "title": "Description",
+    "data": "description",
+    "name": "description",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": false,
+    "searchable": true
+}

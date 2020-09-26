@@ -1,0 +1,29 @@
+[
+  {
+    "action": ["list", "retrieve", "get_set", "has_permission"],
+    "principal": ["*"],
+    "effect": "allow"
+  },
+  {
+    "action": ["create"],
+    "principal": ["group:Users"],
+    "effect": "allow"
+  },
+  {
+    "action": ["create", "partial_update", "update", "destroy"],
+    "principal": ["group:Administrators"],
+    "effect": "allow"
+  },
+  {
+    "action": ["partial_update", "update", "destroy"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "is_owner"
+  },
+  {
+    "action": ["partial_update", "update", "destroy"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "in_dataset_usergroup"
+  }
+]

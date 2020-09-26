@@ -1,0 +1,11 @@
+{
+    "title": "No. folios",
+    "data": "no_folios",
+    "name": "no_folios",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": false,
+    "width": "19px",
+    "className": "td-center"
+}

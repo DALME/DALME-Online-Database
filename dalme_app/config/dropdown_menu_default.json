@@ -1,0 +1,56 @@
+[
+  {
+    "itemClass": "help",
+    "iconClass": "fas fa-question-circle",
+    "tooltip": "Get help",
+    "children": [
+          {
+            "text": "Enable Tooltips",
+            "link": "#",
+            "action": "toggle_tooltips(this)",
+            "iconClass": "fas fa-comment-alt"
+          },
+          {
+            "text": "Report Issue",
+            "link": "#",
+            "action": "create_ticket()",
+            "iconClass": "fas fa-bug"
+          },
+          {
+            "divider": true
+          },
+          {
+            "text": "Knowledge Base",
+            "link": "https://kb.dalme.org",
+            "iconClass": "fas fa-file-alt"
+          },
+          {
+            "text": "Search Help",
+            "link": "#",
+            "iconClass": "fas fa-search-location"
+          }
+    ]
+  },
+  {
+    "itemClass": "tools",
+    "iconClass": "fas fa-tools",
+    "tooltip": "DALME tools",
+    "children": [
+          {
+            "text": "DAM",
+            "link": "https://dam.dalme.org",
+            "iconClass": "fas fa-image"
+          },
+          {
+            "text": "Knowledge Base",
+            "link": "https://kb.dalme.org",
+            "iconClass": "fas fa-file-alt"
+          },
+          {
+            "text": "Public Website",
+            "link": "https://dalme.org",
+            "iconClass": "fas fa-globe"
+          }
+        ]
+    }
+]

@@ -1,0 +1,9 @@
+{
+  "title": "Created on",
+  "data": "creation_timestamp",
+  "name": "creation_timestamp",
+  "defaultContent": "",
+  "visible": true,
+  "orderable": false,
+  "searchable": false
+}

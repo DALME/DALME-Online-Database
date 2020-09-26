@@ -1,0 +1,43 @@
+{
+  "name": "workflow.status.text",
+  "label": "Status",
+  "type": "selectize",
+  "opts": {
+    "placeholder": "Select status",
+    "preload": "focus",
+    "valueField": "text",
+    "labelField": "title_text",
+    "searchField": ["text"],
+    "optgroups": [
+      {
+        "value": "Ingestion",
+        "label": "Ingestion"
+      },
+      {
+        "value": "Transcription",
+        "label": "Transcription"
+      },
+      {
+        "value": "Markup",
+        "label": "Markup"
+      },
+      {
+        "value": "Review",
+        "label": "Review"
+      },
+      {
+        "value": "Parsing",
+        "label": "Parsing"
+      },
+      {
+        "value": "Other",
+        "label": "Other"
+      }
+    ],
+    "optgroupField": "group"
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/choices/?type=list&field=workflow.status&format=json&search="
+  }
+}

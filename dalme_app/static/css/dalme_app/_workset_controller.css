@@ -1,0 +1,57 @@
+/* Workset controller */
+
+.workset-controller-container {
+  border: 1px solid #a5a5a5;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  background-color: #fff;
+}
+
+.btn-controller {
+  border: 0;
+  height: 24px;
+  background-color: transparent;
+  color: #5d656c;
+}
+
+.btn-controller:hover {
+  background-color: #e3f0f5;
+  color: #376783;
+}
+
+.btn-controller.disabled, .btn-controller.disabled:hover {
+  color: #a5a5a5;
+  background-color: transparent;
+  cursor: default;
+}
+
+.workset-controller-prev {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right: 1px solid #a5a5a5;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.workset-controller-next {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-left: 1px solid #a5a5a5;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.workset-controller-status {
+  display: inline-block;
+  padding-right: 15px;
+  padding-left: 15px;
+  padding-top: 3px;
+  padding-bottom: 1px;
+  background: linear-gradient(to right, #e3f0f5, #e3f0f5 49%, #ffffff 51%, #ffffff);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.workset-controller-menu {
+  border-left: 1px solid #a5a5a5;
+}
