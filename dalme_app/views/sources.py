@@ -117,7 +117,7 @@ class SourceDetail(DetailView):
         context['comments_count'] = self.object.comments.count()
         has_inv = self.object.has_inventory
         has_pages = self.object.pages.all().exists()
-        has_children = self.object.source_set.all().exists()
+        has_children = self.object.children.exists()
         has_agents = self.object.agents() is not None and len(self.object.agents()) > 0
         has_places = self.object.places() is not None and len(self.object.places()) > 0
         context['has_inv'] = has_inv

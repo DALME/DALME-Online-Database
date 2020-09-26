@@ -48,7 +48,7 @@ class SetsDetail(DetailView):
         context['set'] = self.object
         context['comments_count'] = self.object.comments.count()
         members = self.object.members.all()
-        context['members'] = members
+        context['members'] = members.all()
         tables = ['members', 'fa-plus-square', 'Set Members ({})'.format(members.count())]
         if tables != []:
             context['tables'] = tables
