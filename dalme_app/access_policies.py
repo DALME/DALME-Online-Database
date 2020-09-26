@@ -1,4 +1,4 @@
-from rest_access_policy import AccessPolicy
+from rest_access_policy import AccessPolicy, AccessPolicyException
 import json
 import os
 
@@ -51,6 +51,19 @@ class SourceAccessPolicy(BaseAccessPolicy):
             return len(list(set(ds_ugs) & set(usergroups))) > 0
         else:
             return False
+
+    def _get_invoked_action(self, view) -> str:
+        if view.__class__.__name__ == 'SourceDetail':
+            return 'update'
+        else:
+            if hasattr(view, "action"):
+                if view.action == 'has_permission':
+                    return 'update'
+                else:
+                    return view.action
+            elif hasattr(view, "__class__"):
+                return view.__class__.__name__
+            raise AccessPolicyException("Could not determine action of request")
 
 
 class SetAccessPolicy(BaseAccessPolicy):

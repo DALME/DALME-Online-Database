@@ -24,6 +24,7 @@ from django.forms.models import model_to_dict
 from haystack.query import SearchQuerySet
 from wagtail.users.models import UserProfile
 from django.conf import settings
+from django.db.models import OuterRef, Subquery
 
 
 def get_script_menu():
@@ -240,14 +241,17 @@ def migrate_datasets(request):
     return result
 
 def test_expression(request):
-    source = Source.objects.get(pk='bc3a2c32-639e-44d6-b5a2-1829b42ae0b5')
-    agent = Agent.objects.get(pk='f90d89a6-351d-48e0-a618-87907f12a15b')
-    new = Source_credit()
-    new.type = 1
-    new.source = source
-    new.agent = agent
-    new.save()
-    return source.source_credits
+    test = {
+        'name': 'the_name',
+        'attributes': {
+            'att1': 'value1',
+            'att2': 'value2'
+        }
+    }
+    field = 'attributes.att2'
+    group, field = field.split('.') if '.' in field else (None, field)
+    return group
+    # return test.get(group, test).get(field)
 
 
 def fix_users(records):

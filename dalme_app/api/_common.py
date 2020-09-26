@@ -9,8 +9,8 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def has_permission(self, request, pk=None):
-        object = self.get_object()
-        self.check_object_permissions(self.request, object)
+        pc = self.permission_classes[0]
+        pc().has_permission(request, self)
         return Response(200)
 
     @action(detail=True, methods=['patch'])
