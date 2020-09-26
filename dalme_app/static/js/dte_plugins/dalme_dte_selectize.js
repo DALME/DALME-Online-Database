@@ -123,7 +123,6 @@ _fieldTypes.selectize = {
 
     set: function (conf, val) {
         // THIS DOESN'T WORK IN STANDALONE MODE
-        //if (!conf._selectize.hasOptions || conf._selectize.options.length == 1) {
         if (!conf._opt_loaded && val !== '' && conf.opts['preload'] != true) {
           let field_name = conf._selectize.$input["0"].id.substring('DTE_Field_'.length)
           let cell_data = dt_table.cell(
