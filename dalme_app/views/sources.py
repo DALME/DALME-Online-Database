@@ -215,9 +215,8 @@ class SourceDetail(DetailView):
         return result
 
     def get_breadcrumb(self, *args, **kwargs):
-        parsed_ref = urlparse.urlparse(self.request.META.get('HTTP_REFERER', '/'))
-        s_class = urlparse.parse_qs(parsed_ref.query)['class'][0]
-        breadcrumb = [('Sources', ''), (s_class.capitalize().replace('-', ' '), '/sources?class=' + s_class)],
+        type = self.get_object().type
+        breadcrumb = [('Sources', ''), (type.name + 's', '/sources?class=' + type.short_name + 's')]
         return breadcrumb
 
     def get_object(self):
