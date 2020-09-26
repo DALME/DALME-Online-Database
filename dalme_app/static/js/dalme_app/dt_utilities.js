@@ -279,13 +279,6 @@ function toggle_fields(target, action) {
     for (let i = 0, len = editor_fields.length; i < len; ++i) {
       if (target.includes(editor_fields[i])) {
         toggle_fields(editor_fields[i], 'show')
-
-        if (typeof multi_attributes !== 'undefined') {
-          if (multi_attributes.includes(editor_fields[i])) {
-            add_menu_list.push(editor_fields[i]);
-          }
-        }
-
       } else {
         toggle_fields(editor_fields[i], 'hide')
         add_menu_list.push(editor_fields[i]);
@@ -349,16 +342,7 @@ function toggle_fields(target, action) {
         }
 
         if ($('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').length > 0) {
-
-          if (typeof multi_attributes !== 'undefined') {
-
-            if (!multi_attributes.includes(target)) {
-              $('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').remove()
-            }
-
-          } else {
-            $('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').remove()
-          }
+          $('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').remove()
 
           if ($('#add-attribute-menu-container').children().length < 1) {
             $('#add-attribute-button').addClass('d-none');
