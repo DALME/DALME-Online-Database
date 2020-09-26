@@ -8,25 +8,20 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attribute
-        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DATE_d', 'value_DATE_m', 'value_DATE_y')
+        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'value_JSON')
 
     def to_representation(self, instance):
         label = instance.attribute_type.short_name
-        if instance.attribute_type.data_type == 'FK-UUID' or instance.attribute_type.data_type == 'FK-INT':
-            data = json.loads(instance.value_STR)
-            object = eval('{}.objects.get(pk="{}")'.format(data['class'], data['id']))
-            ret = {label: {
-                'name': object.name,
-                'url': object.get_url(),
-                'id': instance.value_STR
-            }}
-            # serializer = eval(data['class'] + 'Serializer(object)')
-            # test = serializer.data
-            # ret = {
-            #         label: JSONRenderer().render(serializer.data)
-            #     }
+        if instance.attribute_type.data_type in ['FK-UUID', 'FK-INT']:
+            _id = '"{}"'.format(instance.value_JSON['id']) if instance.attribute_type.data_type == 'FK-UUID' else instance.value_JSON['id']
+            object = eval('{}.objects.get(pk={})'.format(instance.value_JSON['class'], _id))
+            return {label: {
+                    'name': object.name,
+                    'url': object.get_url(),
+                    'id': json.dumps(instance.value_JSON)
+                    }}
         elif instance.attribute_type.data_type == 'DATE':
-            ret = {label: {
+            return {label: {
                 'name': str(instance),
                 'value': {
                     'd': instance.value_DATE_d,
@@ -34,8 +29,7 @@ class AttributeSerializer(serializers.ModelSerializer):
                     'y': instance.value_DATE_y
                 }}}
         else:
-            ret = {label: str(instance)}
-        return ret
+            return {label: str(instance)}
 
 
 class SimpleAttributeSerializer(serializers.ModelSerializer):

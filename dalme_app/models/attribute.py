@@ -25,19 +25,21 @@ class Attribute(dalmeUuid):
     value_DATE = models.DateField(blank=True, null=True)
     value_INT = models.IntegerField(blank=True, null=True)
     value_TXT = models.TextField(blank=True, default=None, null=True)
+    value_JSON = models.JSONField(null=True)
 
     class Meta:
         unique_together = ('object_id', 'attribute_type', 'value_STR')
 
     def __str__(self):
-        if self.attribute_type.data_type == 'DATE':
-            str_val = self.value_STR
-        elif self.attribute_type.data_type == 'FK-UUID' or self.attribute_type.data_type == 'FK-INT':
-            object = self.get_dalme_object()
-            str_val = '<a href="{}">{}</a>'.format(object.get_url(), object.name)
-        else:
-            str_val = str(eval('self.value_' + self.attribute_type.data_type))
-        return str_val
+        return self.value_STR
+        # if self.attribute_type.data_type == 'DATE':
+        #     str_val = self.value_STR
+        # elif self.attribute_type.data_type == 'FK-UUID' or self.attribute_type.data_type == 'FK-INT':
+        #     object = self.get_dalme_object()
+        #     str_val = '<a href="{}">{}</a>'.format(object.get_url(), object.name)
+        # else:
+        #     str_val = str(eval('self.value_' + self.attribute_type.data_type))
+        # return str_val
 
     def save(self, *args, **kwargs):
         if self.attribute_type.data_type == 'DATE':
@@ -45,7 +47,7 @@ class Attribute(dalmeUuid):
                 date = str(self.value_DATE_y)+'-'+str(self.value_DATE_m)+'-'+str(self.value_DATE_d).zfill(2)
                 pDate = parse_date(date)
                 self.value_DATE = pDate
-                self.value_STR = self.value_DATE.strftime('%d-%b-%Y').lstrip("0").replace(" 0", " ")
+                self.value_STR = pDate.strftime('%d-%b-%Y').lstrip("0").replace(" 0", " ")
             elif self.value_DATE_m is not None and self.value_DATE_y is not None:
                 self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
             elif self.value_DATE_y is not None:
@@ -54,6 +56,9 @@ class Attribute(dalmeUuid):
             self.value_STR = str(self.value_INT)
         if self.attribute_type.data_type == 'TXT' and self.value_TXT is not None:
             self.value_STR = self.value_TXT[0:254] if len(self.value_TXT) > 255 else self.value_TXT
+        if self.attribute_type.data_type in ['FK-UUID', 'FK-INT'] and self.value_JSON is not None:
+            _id = '"{}"'.format(self.value_JSON['id']) if self.attribute_type.data_type == 'FK-UUID' else self.value_JSON['id']
+            self.value_STR = str(eval('{}.objects.get(pk={})'.format(self.value_JSON['class'], _id)))
         super().save(*args, **kwargs)
 
     def get_dalme_object(self):

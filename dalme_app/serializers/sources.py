@@ -112,17 +112,19 @@ class SourceSerializer(DynamicSerializer):
                             att['value_DATE_m'] = v['m']
                             att['value_DATE_y'] = v['y']
                     elif att_type.data_type == 'FK-INT' or att_type.data_type == 'FK-UUID':
-                        try:
-                            att['value_STR'] = v['id']
-                        except TypeError:
-                            att['value_STR'] = v
+                        if type(v) is dict and v.get('id') is not None:
+                            att['value_JSON'] = json.loads(v['id'])
+                        elif type(v) is str and v != '':
+                            att['value_JSON'] = json.loads(v)
+                        else:
+                            add_att = False
                     else:
                         att['value_STR'] = v
                     if add_att:
                         deserialised.append(att)
         data['attributes'] = deserialised
 
-        if data['workflow'].get('status') is not None:
+        if data.get('workflow') is not None and data['workflow'].get('status') is not None:
             if data['workflow']['status']['text'] is not None:
                 values = translate_workflow_status(data['workflow']['status']['text'])
                 data['workflow']['wf_status'] = values['wf_status']

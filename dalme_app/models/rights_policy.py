@@ -22,12 +22,15 @@ class RightsPolicy(dalmeUuid):
     name = models.CharField(max_length=100)
     rights_status = models.IntegerField(choices=RIGHTS_STATUS, default=5)
     rights = models.TextField(blank=True, default=None)
-    rights_notice = models.TextField(blank=True, default=None)
+    rights_notice = models.JSONField(null=True)
     licence = models.TextField(blank=True, null=True, default=None)
     rights_holder = models.CharField(max_length=255, null=True, default=None)
     notice_display = models.BooleanField(default=False)
     attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
     comments = GenericRelation('Comment')
+
+    def __str__(self):
+        return self.name
 
     def get_url(self):
         return '/rights/' + str(self.id)
