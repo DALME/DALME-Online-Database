@@ -448,6 +448,15 @@ function process_dt_fields(type, fields, overrides) {
               }
             }
 
+            if (fields[i]['type'] == "upload") {
+              fields[i]['ajax'] = {
+                method: 'POST',
+                url: '/api/attachments/',
+                headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+              };
+              fields[i]['display'] = eval("(function(file) { return file.filename })")
+            }
+
             if (required_list.includes(fields[i]['name'])) {
               if (fields[i].hasOwnProperty('attr')) {
                   fields[i]['attr']['required'] = true
