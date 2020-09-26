@@ -10,6 +10,7 @@ from dalme_app.models import (Agent, Attribute, Content_class, Content_type, Cou
 
 from dalme_app.access_policies import GeneralAccessPolicy, RightsAccessPolicy
 from ._common import DALMEBaseViewSet
+from dalme_app.filters import ContenTypeFilter
 
 
 class Agents(DALMEBaseViewSet):
@@ -53,6 +54,7 @@ class ContentTypes(DALMEBaseViewSet):
     permission_classes = (GeneralAccessPolicy,)
     queryset = Content_type.objects.all()
     serializer_class = ContentTypeSerializer
+    filterset_class = ContenTypeFilter
 
 
 class Countries(DALMEBaseViewSet):
@@ -95,7 +97,7 @@ class Locales(DALMEBaseViewSet):
     serializer_class = LocaleReferenceSerializer
     filterset_fields = ['id', 'name', 'administrative_region', 'country__name']
     search_fields = ['id', 'name', 'administrative_region', 'country__name']
-    ordering_fields = ['id', 'name', 'administrative_region', 'country__name']
+    ordering_fields = ['id', 'name', 'administrative_region', 'country']
     ordering = ['name']
 
 

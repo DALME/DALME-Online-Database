@@ -1,5 +1,13 @@
 from django_filters import rest_framework as filters
-from dalme_app.models import Source, Set
+from dalme_app.models import Source, Set, Content_type
+
+
+class ContenTypeFilter(filters.FilterSet):
+    id__lt = filters.NumberFilter(field_name='id', lookup_expr='lt')
+
+    class Meta:
+        model = Content_type
+        fields = ['id']
 
 
 class SourceFilter(filters.FilterSet):
