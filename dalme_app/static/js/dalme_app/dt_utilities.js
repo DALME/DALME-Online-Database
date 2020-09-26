@@ -83,7 +83,7 @@ function build_editor(data, target) {
                   resolve();
               }).fail(function(jqXHR, textStatus, errorThrown) {
                   dt_editor.on('preOpen.dalme', function(e, mode, action) { return false });
-                  toastr.error('Permissions check failed.');
+                  toastr.error('Permission denied.');
                   resolve();
               });
           });
@@ -94,25 +94,29 @@ function build_editor(data, target) {
       dt_editor.on('close.dalme', general_form_restore);
 
       dt_editor.on('postSubmit.dalme', function(e, json, data, action, xhr) {
-          if (json != null && json.hasOwnProperty('fieldErrors')) {
-            for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
-              if (json['fieldErrors'][i].hasOwnProperty('name')) {
-                  let name = json['fieldErrors'][i]['name'];
-                  if (name == 'non_field_errors') {
-                      json['error'] = json['fieldErrors'][i]['status'];
-                      delete json['fieldErrors'][i]
-                  } else {
-                      if (name.includes('.non_field_errors')) {
-                        name = name.replace('.non_field_errors', '');
+          if (json != null) {
+            if (json.hasOwnProperty('fieldErrors')) {
+                for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
+                  if (json['fieldErrors'][i].hasOwnProperty('name')) {
+                      let name = json['fieldErrors'][i]['name'];
+                      if (name == 'non_field_errors') {
+                          json['error'] = json['fieldErrors'][i]['status'];
+                          delete json['fieldErrors'][i]
+                      } else {
+                          if (name.includes('.non_field_errors')) {
+                            name = name.replace('.non_field_errors', '');
+                          }
+                          json['fieldErrors'][i]['name'] = attribute_concordance[name];
                       }
-                      json['fieldErrors'][i]['name'] = attribute_concordance[name];
                   }
+                  if (json['fieldErrors'][0] == null) {
+                    delete json['fieldErrors'];
+                  }
+                }
+              } else if (json.hasOwnProperty('data')) {
+                  toastr.error(json['data']['detail']);
+                  dt_editor.close()
               }
-              if (json['fieldErrors'][0] == null) {
-                delete json['fieldErrors'];
-              }
-            }
-
           }
       });
 
@@ -484,28 +488,28 @@ function get_dt_buttons(table_button_list, editor_button_list, editor) {
                 el_list: editor_button_list
 
               }).then(function(e_buttons) {
-                  for (let i = 0, len = e_buttons.length; i < len; ++i) {
-                    e_buttons[i]['editor'] = editor;
+                  if (e_buttons.length > 0) {
+                    for (let i = 0, len = e_buttons.length; i < len; ++i) {
+                      e_buttons[i]['editor'] = editor;
 
-                    if (e_buttons[i].hasOwnProperty('formButtons')) {
-                      for (let j = 0, len = e_buttons[i]['formButtons'].length; j < len; ++j) {
-                        for (const prop in e_buttons[i]['formButtons'][j]) {
-                            if (e_buttons[i]['formButtons'][j].hasOwnProperty(prop) && prop == 'action') {
-                                e_buttons[i]['formButtons'][j]['action'] = eval('(' + e_buttons[i]['formButtons'][j]['action'] + ')');
-                            }
-                        };
+                      if (e_buttons[i].hasOwnProperty('formButtons')) {
+                        for (let j = 0, len = e_buttons[i]['formButtons'].length; j < len; ++j) {
+                          for (const prop in e_buttons[i]['formButtons'][j]) {
+                              if (e_buttons[i]['formButtons'][j].hasOwnProperty(prop) && prop == 'action') {
+                                  e_buttons[i]['formButtons'][j]['action'] = eval('(' + e_buttons[i]['formButtons'][j]['action'] + ')');
+                              }
+                          };
+                        }
                       }
-                    }
-                  };
-
-                  let button_wrapper = {
-                      'extend': 'collection',
-                      'text': '<i class="fa fa-bars fa-fw"></i> Actions',
-                      'autoClose': 'true',
-                      'buttons': e_buttons
-                      };
-                  t_buttons.push(button_wrapper);
-
+                    };
+                    let button_wrapper = {
+                        'extend': 'collection',
+                        'text': '<i class="fa fa-bars fa-fw"></i> Actions',
+                        'autoClose': 'true',
+                        'buttons': e_buttons
+                        };
+                    t_buttons.push(button_wrapper);
+                  }
                   resolve(t_buttons);
               });
           } else {
