@@ -1,11 +1,12 @@
 {
     "title": "Start date",
-    "data": "attributes.start_date.name",
+    "data": "attributes.start_date",
     "name": "start_date",
     "editField": "attributes.start_date.value",
     "defaultContent": "",
     "visible": false,
     "orderable": true,
     "searchable": false,
-    "className": "nowrap"
+    "className": "nowrap",
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.name; }"
 }

@@ -8,7 +8,7 @@
     },
     "options": {
         "type": "api_call",
-        "url": "/api/groups/?format=select&type=3"
+        "url": "/api/groups/?properties__type=3&format=select&search="
     },
     "fieldInfo": "User group to be linked with this set."
 }

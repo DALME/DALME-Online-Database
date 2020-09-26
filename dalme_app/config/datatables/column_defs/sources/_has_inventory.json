@@ -3,7 +3,7 @@
     "data": "has_inventory",
     "name": "has_inventory",
     "defaultContent": "",
-    "visible": true,
+    "visible": false,
     "orderable": true,
     "searchable": false,
     "render": "function ( data, type, row, meta ) {return data == true ? '<i class=\"fa fa-check-circle dt_checkbox_true\"></i>' : '<i class=\"fa fa-times-circle dt_checkbox_false\"></i>';}",

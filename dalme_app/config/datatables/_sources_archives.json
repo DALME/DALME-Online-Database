@@ -27,8 +27,7 @@
         "name",
         "short_name",
         "type.id",
-        "attributes.locale.id",
-        "attributes.country.id"
+        "attributes.locale.id"
       ]
     }
   },

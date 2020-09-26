@@ -4,6 +4,6 @@
     "name": "description",
     "defaultContent": "",
     "visible": false,
-    "orderable": false,
+    "orderable": true,
     "searchable": true
 }

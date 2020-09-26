@@ -6,6 +6,7 @@
     "placeholder": "Select language(s)",
     "preload": "focus",
     "maxItems": null,
+    "closeAfterSelect": true,
     "plugins": ["remove_button"]
   },
   "options": {

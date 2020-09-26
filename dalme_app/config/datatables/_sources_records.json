@@ -28,7 +28,6 @@
         "end_date": "attributes.end_date.value",
         "language": "attributes.language[].id",
         "locale": "attributes.locale[].id",
-        "support": "attributes.support",
         "named_persons": "attributes.named_persons",
         "description": "attributes.description",
         "status": "workflow.status.text",
@@ -42,13 +41,7 @@
         "parent.id",
         "has_inventory",
         "attributes.record_type",
-        "attributes.language[].id",
-        "attributes.support"
-      ],
-      "multi_attributes": [
-        "attributes.language[].id",
-        "attributes.locale[].id",
-        "sets[].id"
+        "attributes.language[].id"
       ]
     }
   },
@@ -67,7 +60,6 @@
       "attributes.end_date",
       "attributes.date",
       "attributes.language",
-      "attributes.support",
       "attributes.named_persons",
       "attributes.description",
       "workflow.status",
@@ -100,7 +92,6 @@
       "attributes.record_type",
       "owner",
       "is_private",
-      "attributes.support",
       "attributes.date",
       "attributes.start_date",
       "attributes.end_date",
@@ -163,7 +154,8 @@
           "placeholder": "Select locale(s)",
           "preload": "focus",
           "maxItems": null,
-          "plugins": ["remove_button"]
+          "plugins": ["remove_button"],
+          "closeAfterSelect": true
         }
       },
       "parent.id": {

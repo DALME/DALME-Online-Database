@@ -4,6 +4,8 @@
   "type": "selectize",
   "opts": {
     "placeholder": "Select format",
+    "valueField": "value",
+    "labelField": "label",
     "preload": "focus"
   },
   "options": {

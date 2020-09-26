@@ -6,7 +6,8 @@
     "placeholder": "Select groups",
     "preload": true,
     "plugins": ["remove_button"],
-    "maxItems": null
+    "maxItems": null,
+    "closeAfterSelect": true
   },
   "options": {
     "type": "api_call_x",

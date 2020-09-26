@@ -1,11 +1,12 @@
 {
     "title": "Date",
-    "data": "attributes.date.name",
+    "data": "attributes.date",
     "name": "date",
     "editField": "attributes.date.value",
     "defaultContent": "",
     "visible": true,
-    "orderable": false,
+    "orderable": true,
     "searchable": false,
-    "className": "nowrap"
+    "className": "nowrap",
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.name; }"
 }

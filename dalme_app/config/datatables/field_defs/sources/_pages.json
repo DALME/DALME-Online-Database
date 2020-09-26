@@ -2,6 +2,7 @@
   "name": "pages[]",
   "label": "Folios",
   "type": "dalmePages",
+  "multiEditable": false,
   "opts": {
     "placeholder": "Select DAM image",
     "preload": "focus"

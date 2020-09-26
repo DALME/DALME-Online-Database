@@ -2,7 +2,7 @@
   "config": {
     "helpers": [
       "source_forms",
-      "corpus_filter_module"
+      "ownership_filter_module"
     ],
     "endpoint": "sources",
     "globals": {
@@ -27,20 +27,17 @@
         "start_date": "attributes.start_date.value",
         "end_date": "attributes.end_date.value",
         "authority": "attributes.authority",
-        "format": "attributes.format"
+        "format": "attributes.format",
+        "support": "attributes.support"
       },
       "required_list": [
         "name",
         "short_name",
         "parent.id",
         "primary_dataset.id",
-        "attributes.archival_series",
-        "attributes.archival_number",
         "attributes.authority",
-        "attributes.format"
-      ],
-      "multi_attributes": [
-        "attributes.locale[].id"
+        "attributes.format",
+        "attributes.support"
       ]
     }
   },
@@ -59,7 +56,8 @@
       "attributes.archival_series",
       "attributes.archival_number",
       "attributes.authority",
-      "attributes.format"
+      "attributes.format",
+      "attributes.support"
     ],
     "options": {
       "ajax": {
@@ -91,7 +89,8 @@
       "attributes.start_date",
       "attributes.end_date",
       "attributes.authority",
-      "attributes.format"
+      "attributes.format",
+      "attributes.support"
     ],
     "options": {
       "ajax": {
@@ -143,7 +142,8 @@
           "placeholder": "Select locale(s)",
           "preload": "focus",
           "plugins": ["remove_button"],
-          "maxItems": null
+          "maxItems": null,
+          "closeAfterSelect": true
         }
       }
     }

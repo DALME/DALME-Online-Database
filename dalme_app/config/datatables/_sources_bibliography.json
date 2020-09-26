@@ -96,7 +96,7 @@
       "type.id": {
         "options": {
           "type": "api_call",
-          "url": "/api/content-types/?format=select&search="
+          "url": "/api/content-types/?format=select&id__lt=11&search="
         }
       },
       "name": {
