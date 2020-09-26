@@ -1,0 +1,84 @@
+{
+  "config": {
+    "endpoint": "rights",
+    "globals": {
+      "messages_list": {
+        "create_success": "The rights policy was created succesfully.",
+        "edit_success": "The rights policy was updated succesfully.",
+        "remove_success": "The rights policy was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "name": "name",
+        "rights_status": "rights_status.id",
+        "rights": "rights",
+        "licence": "licence",
+        "rights_holder": "rights_holder",
+        "notice_display": "notice_display",
+        "attachments": "attachments.file",
+        "rights_notice": "rights_notice"
+      },
+      "required_list": [
+        "name",
+        "rights_holder",
+        "rights_status.id",
+        "rights"
+      ]
+    }
+  },
+  "datatables": {
+    "columns": [
+      "name",
+      "rights_holder",
+      "rights_status",
+      "rights",
+      "notice_display",
+      "rights_notice",
+      "licence",
+      "attachments"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/rights/?format=json"
+      }
+    }
+  },
+  "editor": {
+    "fields": [
+      "name",
+      "rights_holder",
+      "rights_status",
+      "rights",
+      "notice_display",
+      "rights_notice",
+      "licence",
+      "attachments"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/rights/"
+        },
+        "edit": {
+          "url": "/api/rights/_id_/"
+        },
+        "remove": {
+          "url": "/api/rights/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_rightspolicy"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_rightspolicy"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_rightspolicy"
+      }
+    ]
+  }
+}

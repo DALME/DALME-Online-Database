@@ -1,0 +1,14 @@
+{
+  "name": "notice_display",
+  "label": "Notice Display",
+  "type": "checkbox",
+  "options": {
+    "type": "list",
+    "list": [
+      {
+        "label": "Indicates whether a notice must be displayed in public facing pages.",
+        "value": "1"
+      }
+    ]
+  }
+}

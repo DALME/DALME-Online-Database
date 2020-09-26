@@ -1,0 +1,6 @@
+{
+    "name": "rights",
+    "label": "Rights",
+    "type": "textarea",
+    "fieldInfo": "Description of the rights granted to DALME"
+}
