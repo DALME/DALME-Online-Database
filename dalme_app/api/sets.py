@@ -1,5 +1,5 @@
 import json
-from django.db.models import Q
+from django.db.models import Q, Count
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.serializers import SetSerializer
@@ -17,7 +17,13 @@ class Sets(DALMEBaseViewSet):
     filterset_class = SetFilter
     # filterset_fields = ['id', 'name', 'set_type', 'is_public', 'has_landing', 'endpoint', 'permissions', 'dataset_usergroup', 'owner', 'owner__profile__full_name']
     search_fields = ['name', 'endpoint', 'dataset_usergroup__name', 'owner__profile__full_name', 'description']
-    ordering_fields = ['name', 'set_type', 'is_public', 'has_landing', 'endpoint', 'permissions', 'dataset_usergroup', 'owner', 'owner__first_name']
+    ordering_fields = ['name', 'set_type', 'is_public', 'has_landing', 'endpoint', 'permissions', 'dataset_usergroup', 'owner', 'owner__first_name', 'member_count']
+    ordering_aggregates = {
+        'member_count': {
+            'function': 'Count',
+            'expression': 'members'
+        }
+    }
     ordering = ['name']
 
     @action(detail=False, methods=['post'])
@@ -108,13 +114,10 @@ class Sets(DALMEBaseViewSet):
     #     return Response(result, status)
 
     def get_queryset(self, *args, **kwargs):
-        search_q = Q()
         if self.request.GET.get('type') is not None:
-            type_q = Q(set_type=int(self.request.GET['type']))
-            search_q &= type_q
-        ownership_q = Q(owner=str(self.request.user.id)) | ~Q(permissions=1)
-        search_q &= ownership_q
-        queryset = self.queryset.filter(search_q)
+            queryset = Set.objects.filter(set_type=int(self.request.GET['type']))
+        else:
+            queryset = Set.objects.all()
         return queryset
 
     def get_object(self):

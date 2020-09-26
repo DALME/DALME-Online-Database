@@ -14,7 +14,20 @@ class Sources(DALMEBaseViewSet):
     serializer_class = SourceSerializer
     filterset_class = SourceFilter
     search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name', 'primary_dataset__name']
-    ordering_fields = ['type', 'name', 'short_name', 'owner', 'primary_dataset']
+    ordering_fields = ['name', 'short_name', 'owner', 'primary_dataset', 'no_records', 'is_private', 'attributes.authority',
+                       'attributes.format', 'attributes.locale', 'attributes.country', 'attributes.default_rights',
+                       'attributes.archival_series', 'attributes.archival_number', 'attributes.date', 'attributes.start_date',
+                       'attributes.end_date', 'attributes.support', 'attributes.named_persons', 'attributes.description']
+    ordering_aggregates = {
+        'no_records': {
+            'function': 'Count',
+            'expression': 'children'
+        },
+        'no_folios': {
+            'function': 'Count',
+            'expression': 'pages'
+        }
+    }
     ordering = ['name']
 
     # search prepends:
