@@ -2,12 +2,13 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
 from dalme_app.models._templates import get_current_user
-from dalme_app.models import rs_resource, Workflow, Work_log, Page, Source, Transcription
+from dalme_app.models import rs_resource, Workflow, Work_log, Page, Set_x_content, Source, Transcription
+from django.contrib.contenttypes.models import ContentType
 
 
 @receiver(models.signals.post_save, sender=Page)
 def update_folio(sender, instance, created, **kwargs):
-    if created:
+    if created and instance.dam_id is not None:
         rs_image = rs_resource.objects.get(ref=instance.dam_id)
         rs_image.field79 = instance.name
         rs_image.save()
@@ -28,6 +29,14 @@ def update_workflow(sender, instance, created, **kwargs):
                 wf_object[0].last_modified = timezone.now()
                 wf_object[0].last_user = get_current_user()
                 wf_object[0].save()
+
+
+@receiver(models.signals.post_save, sender=Source)
+def update_dataset(sender, instance, created, **kwargs):
+    if instance.type == 13 and instance.primary_dataset is not None:
+        if not Set_x_content.objects.filter(set_id=instance.primary_dataset, object_id=instance.id).exists():
+            ct = ContentType.objects.get(pk=125)
+            Set_x_content.objects.create(set_id=instance.primary_dataset, object_id=instance.id, content_type=ct)
 
 
 @receiver(models.signals.pre_delete, sender=Source)
