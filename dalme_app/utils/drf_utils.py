@@ -174,8 +174,7 @@ def DRFDTE_exception_handler(exc, context):
             else:
                 field = k
                 fieldErrors.append({'name': field, 'status': str(v[0])})
-
-        result['fieldErrors'] = fieldErrors
+        result = {'fieldErrors': fieldErrors}
         status = 400
 
     return Response(result, status)

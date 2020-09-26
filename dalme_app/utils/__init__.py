@@ -6,3 +6,4 @@ from .drf_utils import DRFSelectRenderer, DRFDTEJSONRenderer, DRFDTEParser, IsOw
 from .dynamic_preferences import JSONPreferenceSerializer, JSONPreference
 from .menu_compiler import DALMEMenus
 from .offline_context_generator import offline_context_generator
+from .drf_ordering_backend import DalmeOrderingFilter
