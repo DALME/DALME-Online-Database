@@ -8,7 +8,7 @@ from dalme_app.serializers import (AgentSerializer, AsyncTaskSerializer, Content
 from dalme_app.models import (Agent, Attribute, Content_class, Content_type, CountryReference,
                               LanguageReference, LocaleReference, RightsPolicy)
 
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import GeneralAccessPolicy, RightsAccessPolicy
 from ._common import DALMEBaseViewSet
 
 
@@ -101,6 +101,6 @@ class Locales(DALMEBaseViewSet):
 
 class Rights(DALMEBaseViewSet):
     """ API endpoint for managing rights policies """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (RightsAccessPolicy,)
     queryset = RightsPolicy.objects.all()
     serializer_class = RightsPolicySerializer

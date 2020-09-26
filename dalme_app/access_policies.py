@@ -34,6 +34,11 @@ class ImageAccessPolicy(BaseAccessPolicy):
     id = 'images-policy'
 
 
+class RightsAccessPolicy(BaseAccessPolicy):
+    ''' Manages general access policies for Rights endpoint'''
+    id = 'rights-policy'
+
+
 class SourceAccessPolicy(BaseAccessPolicy):
     ''' Manages access policies for Sources endpoint '''
     id = 'sources-policy'
