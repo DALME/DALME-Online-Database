@@ -2,6 +2,9 @@
 {% load static i18n %}
 {% load compress %}
 {% block extra_head %}
+{% compress css %}
+  <link href="{% static 'css/dalme_app/_config_editor.css' %}" rel="stylesheet">
+{% endcompress %}
 {% compress js %}
   <script type="text/javascript" src="{% static 'js/bstreeview.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/dalme_app/config_editor.js' %}"></script>

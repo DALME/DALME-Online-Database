@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% block extra_head %}
+{% compress css %}
+  <link href="{% static 'css/dalme_app/_homepage_cards.css' %}" rel="stylesheet">
+{% endcompress %}
 <script>
   var user = { "id": "{{ user.id }}", "username": "{{ user.username }}" }
 </script>

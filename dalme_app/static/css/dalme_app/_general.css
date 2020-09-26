@@ -15,25 +15,6 @@ body {
   display: none;
 }
 
-
-
-.error {
-  color: #5a5c69;
-  font-size: 5rem;
-  position: relative;
-  line-height: 1;
-  width: 12.5rem;
-}
-
-.error_lead {
-  font-size: 1.5rem;
-  font-weight: 300;
-}
-
-.error_message {
-  font-size: 1.25rem;
-}
-
 .inline-badge {
   color: #fff;
   background-color: #376783;

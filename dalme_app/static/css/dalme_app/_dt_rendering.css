@@ -107,3 +107,13 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child, table.
   text-align: center;
   color: #d43f3a;
 }
+
+.dataTable tbody td:first-child,
+.dataTable thead th:first-child {
+  padding-left: 25px;
+}
+
+.dataTable tbody td:last-child,
+.dataTable thead th:last-child {
+  padding-right: 25px;
+}

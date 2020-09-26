@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% load template_helpers %}
+{% block extra_head %}
+{% compress css %}
+  <link href="{% static 'css/dalme_app/_search_results.css' %}" rel="stylesheet">
+{% endcompress %}
+{% endblock %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}
 {% block content %}

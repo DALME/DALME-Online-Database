@@ -1,5 +1,7 @@
+
+
 .DTE_Field [data-dte-e="msg-error"] {
-  margin-bottom: 5px;
+  margin-top: 5px !important;
 }
 
 .page_delete {
@@ -101,7 +103,7 @@
 
 .selectize-control {
     width: 100%;
-    margin-bottom: -5px;
+    display: flex;
 }
 
 .selectize-control.multi {
@@ -167,7 +169,6 @@
   font-size: 13px;
   margin-top: 0;
   margin-left: 2px;
-  text-align: right;
 }
 
 .DTE .DTE_Label_Info {
@@ -865,4 +866,41 @@ div.DTE_Field div.multi-restore {
 div.DTE_Field div.multi-restore:hover {
   background-color: #215986;
   color: #fff;
+}
+
+.editor-btn {
+  font-size: 13px;
+  border-color: #a5a5a5;
+  padding: 4px 8px;
+  line-height: 1.5;
+  border-radius: 0;
+  border: none;
+  background-color: transparent;
+  color: #3a3b45;
+}
+
+.editor-btn:hover {
+  background-color: #c4e1ef;
+  color: #0361aa;
+}
+
+.editor-btn:disabled {
+  color: #ababab;
+  cursor: default;
+}
+
+.editor-btn:disabled:hover {
+  color: #ababab;
+  cursor: default;
+  background-color: #fff;
+}
+
+.editor-btn:focus, .editor-btn:active {
+  background-color: #c4e1ef !important;
+  color: #024e88 !important;
+}
+
+.editor-btn.active {
+  background-color: #e3e4e7;
+  color: #3a3b45;
 }

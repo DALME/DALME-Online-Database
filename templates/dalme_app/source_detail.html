@@ -2,6 +2,11 @@
 {% load static i18n %}
 {% load compress %}
 {% block extra_head %}
+  {% compress css %}
+    <link href="{% static 'css/dalme_app/_source_editor.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dalme_app/_workflow_manager.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dalme_app/_workset_controller.css' %}" rel="stylesheet">
+  {% endcompress %}
   {% if has_pages or has_children %}
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.2/css/scroller.bootstrap4.min.css"/>
   <script type="text/javascript" src="https://cdn.datatables.net/scroller/2.0.2/js/dataTables.scroller.min.js"></script>
@@ -71,14 +76,14 @@
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="tab-pane card-body transcription-editor active" id="info" role="tabpanel" aria-labelledby="info-tab">
-        <div class="row">
-          <div class="col-md-12">
-            {% if has_inv %}
-              {% include "dalme_app/includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
-            {% endif %}
+      <div class="tab-pane card-body transcription-editor active overflow-auto" id="info" role="tabpanel" aria-labelledby="info-tab">
+        {% if has_inv %}
+          <div class="row">
+            <div class="col-md-12">
+                {% include "dalme_app/includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
+            </div>
           </div>
-        </div>
+        {% endif %}
         <div class="row">
           <div class="col-md-6">
             <div class="card mb-3">
