@@ -31,10 +31,6 @@ class CountryReference(dalmeIntid):
 
 
 class LanguageReference(dalmeIntid):
-    # LANGUAGE_TYPES = (
-    #     ('language', 'language'),
-    #     ('dialect', 'dialect')
-    # )
     LANGUAGE = 1
     DIALECT = 2
     LANG_TYPES = (
@@ -45,9 +41,7 @@ class LanguageReference(dalmeIntid):
     glottocode = models.CharField(max_length=25, unique=True)
     iso6393 = models.CharField(max_length=25, unique=True, blank=True, null=True, default=None)
     name = models.CharField(max_length=255)
-    # lang_type = models.IntegerField(choices=LANG_TYPES)
     type = models.IntegerField(choices=LANG_TYPES)
-    # type = models.CharField(max_length=15, choices=LANGUAGE_TYPES)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
 
     class Meta:
