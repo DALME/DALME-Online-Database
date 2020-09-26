@@ -3,7 +3,7 @@ Brotli==1.0.9
 celery==4.4.7
 chardet==3.0.4
 dj-database-url==0.5.0
-Django<3.0
+Django==3.1
 django-async-messages==0.3.1
 django-celery-beat==2.0.0
 django-celery-results==1.2.1
