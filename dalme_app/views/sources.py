@@ -5,10 +5,10 @@ from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from dalme_app.utils import DALMEMenus as dm
 from dalme_app.models import Set, Source, Workflow
-import urllib.parse as urlparse
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from ._common import DALMEListView, get_page_chain
+from dalme_app.access_policies import SourceAccessPolicy
 
 
 @method_decorator(login_required, name='dispatch')
@@ -79,6 +79,7 @@ class SourceDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['can_edit'] = SourceAccessPolicy().has_permission(self.request, self)
         if 'set' in self.request.GET:
             workset = Set.objects.get(pk=self.request.GET['set'])
             members = Source.objects.filter(sets__set_id=workset.id)

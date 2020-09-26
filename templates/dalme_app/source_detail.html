@@ -23,7 +23,7 @@
       <script type="text/javascript" src="{% static 'js/dalme_app/dalme_editor.js' %}"></script>
     {% endcompress %}
   {% endif %}
-  {% if workset %}
+  {% if workset and can_edit %}
     {% compress js %}
       <script type="text/javascript" src="{% static 'js/dalme_app/dalme_worksets.js' %}"></script>
     {% endcompress %}
@@ -70,14 +70,14 @@
           </a>
         </li>
       </ul>
-      {% if workset %}
+      {% if workset and can_edit %}
         {% include "dalme_app/includes/workset_controller.html" with current=workset.current total=workset.total progress=workset.progress name=workset.name description=workset.description %}
       {% endif %}
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
       <div class="tab-pane card-body transcription-editor active overflow-auto" id="info" role="tabpanel" aria-labelledby="info-tab">
-        {% if has_inv %}
+        {% if has_inv and can_edit %}
           <div class="row">
             <div class="col-md-12">
                 {% include "dalme_app/includes/workflow_manager.html" with workflow=workflow source_id=source_id %}
@@ -152,9 +152,11 @@
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-align-left fa-fw"></i> Description</div>
-                <div id="descriptionEditorToolbar">
-                  <button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>
-                </div>
+                {% if can_edit %}
+                  <div id="descriptionEditorToolbar">
+                    <button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>
+                  </div>
+                {% endif %}
               </div>
               <div class="card-body">
                 {% if description %}
@@ -303,15 +305,17 @@
           <div class="splitter-horizontal ui-resizable-handle ui-resizable-s"></div>
         </div>
         <div class="panel-bottom">
-          <div id="editor-toolbar" class="dropdown d-flex">
+          <div id="editor-toolbar" class="dropdown d-flex {% if not can_edit %}border-bottom-0{% endif %}">
             <div id="editor-left-toolbar" class="align-self-start mr-auto btn-group">
               <!-- Dropdown - options -->
               <div class="dropdown-menu" id="xmleditor-options">
               </div>
             </div>
-            <div id="editor-right-toolbar" class="align-self-end btn-group">
-              <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
-            </div>
+              <div id="editor-right-toolbar" class="align-self-end btn-group">
+                {% if can_edit %}
+                <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
+                {% endif %}
+              </div>
           </div>
           <div class="d-flex flex-row">
             <div id="editor" class="d-flex justify-content-center w-100">
@@ -342,7 +346,7 @@
     </div>
   </div>
   <div id="hidden-content" class="d-none">
-    {% if has_pages %}
+    {% if has_pages and can_edit %}
       {% include "dalme_app/includes/xmleditor_options.html" %}
     {% endif %}
   </div>
