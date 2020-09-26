@@ -238,7 +238,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter'
+        'dalme_app.utils.DalmeOrderingFilter'
     ],
     'EXCEPTION_HANDLER': 'dalme_app.utils.DRFDTE_exception_handler',
 }
