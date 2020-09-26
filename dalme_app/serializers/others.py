@@ -73,7 +73,7 @@ class GroupSerializer(DynamicSerializer):
 
 class ProfileSerializer(DynamicSerializer):
     """ Serialises user profiles """
-    primary_group = GroupSerializer(required=False, fields=['name', 'id', 'description'])
+    primary_group = GroupSerializer(fields=['name', 'id', 'description'], required=False)
 
     class Meta:
         model = Profile

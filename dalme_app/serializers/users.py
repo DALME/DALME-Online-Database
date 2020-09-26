@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from dalme_app.models import Agent, Profile
 from rest_framework import serializers
 from ._common import DynamicSerializer
@@ -29,12 +29,18 @@ class UserSerializer(DynamicSerializer):
                 }
         if data.get('groups') is not None:
             self.context['groups'] = data.pop('groups')
+
+        if data.get('profile') is not None:
+            self.context['profile'] = data.pop('profile')
+
         return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
-        if validated_data.get('profile') is not None:
-            profile_data = validated_data.pop('profile')
+        if self.context.get('profile') is not None:
+            profile_data = self.context.get('profile')
             profile = instance.profile
+            if profile_data.get('primary_group') is not None and type(profile_data.get('primary_group')) is int:
+                profile_data['primary_group'] = Group.objects.get(pk=profile_data['primary_group'])
             for attr, value in profile_data.items():
                 setattr(profile, attr, value)
             profile.save()
