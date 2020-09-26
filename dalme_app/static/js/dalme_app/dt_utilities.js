@@ -97,9 +97,22 @@ function build_editor(data, target) {
           if (json != null && json.hasOwnProperty('fieldErrors')) {
             for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
               if (json['fieldErrors'][i].hasOwnProperty('name')) {
-                  json['fieldErrors'][i]['name'] = attribute_concordance[json['fieldErrors'][i]['name']];
+                  let name = json['fieldErrors'][i]['name'];
+                  if (name == 'non_field_errors') {
+                      json['error'] = json['fieldErrors'][i]['status'];
+                      delete json['fieldErrors'][i]
+                  } else {
+                      if (name.includes('.non_field_errors')) {
+                        name = name.replace('.non_field_errors', '');
+                      }
+                      json['fieldErrors'][i]['name'] = attribute_concordance[name];
+                  }
+              }
+              if (json['fieldErrors'][0] == null) {
+                delete json['fieldErrors'];
               }
             }
+
           }
       });
 
