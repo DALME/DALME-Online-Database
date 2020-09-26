@@ -1,4 +1,11 @@
 
+.DTE_Action_Remove .DTE_Body {
+  min-height: auto !important;
+}
+
+.DTE_Action_Remove .DTE_Form_Error {
+  border-bottom: 1px solid #e27d7d;
+}
 
 .DTE_Field [data-dte-e="msg-error"] {
   margin-top: 5px !important;
@@ -108,7 +115,7 @@
 
 .selectize-control.multi {
     height: auto;
-    margin-bottom: -10px;
+    display: flex;
 }
 
 .DTE .selectize-input>input:focus {
