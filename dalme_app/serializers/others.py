@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group
 
 from dalme_app.models import (Attribute_type, Attachment, Content_attributes, Content_class, CountryReference,
-                              GroupProperties, Page, Profile, Tag, Transcription)
+                              GroupProperties, Profile, Tag, Transcription)
 
 from django_celery_results.models import TaskResult
 from rest_framework import serializers
@@ -69,17 +69,6 @@ class GroupSerializer(DynamicSerializer):
         model = Group
         fields = ('id', 'name', 'properties', 'description')
         extra_kwargs = {'name': {'required': False}, }
-
-
-class PageSerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField(required=False)
-    order = serializers.IntegerField(required=False)
-    name = serializers.CharField(max_length=255, required=False)
-    dam_id = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = Page
-        fields = ('id', 'name', 'order', 'dam_id')
 
 
 class ProfileSerializer(DynamicSerializer):
