@@ -7,7 +7,7 @@ from dalme_app.models._templates import dalmeBasic, dalmeUuidOwned
 import django.db.models.options as options
 import uuid
 from collections import Counter
-import dalme_app.models.reference as _reference
+from dalme_app.models.reference import LanguageReference
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -76,10 +76,10 @@ class Set(dalmeUuidOwned):
         return self.members.filter(source__workflow__is_public=True).count()
 
     def get_languages(self):
-        return [[_reference.LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15).values_list('source__attributes__value_STR', flat=True))]
+        return [[LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15).values_list('source__attributes__value_STR', flat=True))]
 
     def get_public_languages(self):
-        return [[_reference.LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15, source__workflow__is_public=True).values_list('source__attributes__value_STR', flat=True))]
+        return [[LanguageReference.objects.get(iso6393=i).name, i] for i in set(self.members.filter(source__attributes__attribute_type=15, source__workflow__is_public=True).values_list('source__attributes__value_STR', flat=True))]
 
     def get_time_coverage(self):
         years = self.members.filter(source__attributes__attribute_type=26).order_by('source__attributes__value_DATE_y').values_list('source__attributes__value_DATE_y', flat=True)

@@ -5,8 +5,8 @@ import json
 import requests
 from dalme_app.models._templates import dalmeUuid
 import django.db.models.options as options
-import dalme_app.models.rights_policy as _rights_policy
-import dalme_app.models.resourcespace as _resourcespace
+from dalme_app.models.rights_policy import RightsPolicy
+from dalme_app.models.resourcespace import rs_api_query
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -34,7 +34,7 @@ class Page(dalmeUuid):
             return None
 
         if exists:
-            rpo = _rights_policy.RightsPolicy.objects.get(
+            rpo = RightsPolicy.objects.get(
                 pk=json.loads(
                     source.parent.parent.attributes.get(attribute_type=144).value_STR
                 )['id'])
@@ -54,7 +54,7 @@ class Page(dalmeUuid):
                 "function": "get_resource_data",
                 "param1": self.dam_id
             }
-            page_meta = _resourcespace.rs_api_query(**api_params)
+            page_meta = rs_api_query(**api_params)
             page_meta_obj = page_meta.json()
             if type(page_meta_obj) is list:
                 folio = page_meta_obj[0]['field79']

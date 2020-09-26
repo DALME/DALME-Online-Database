@@ -5,7 +5,7 @@ import lxml.etree as et
 from dalme_app.models._templates import dalmeIntid, dalmeUuid, dalmeUuidOwned
 import django.db.models.options as options
 from wagtail.search import index
-import dalme_app.models.workflow as _workflow
+from dalme_app.models.workflow import Workflow
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -47,7 +47,7 @@ class Source(index.Indexed, dalmeUuidOwned):
     def is_public(self):
         try:
             return self.workflow.is_public
-        except _workflow.Workflow.DoesNotExist:
+        except Workflow.DoesNotExist:
             return False
 
     @property
