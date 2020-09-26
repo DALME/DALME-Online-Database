@@ -25,7 +25,16 @@ class RightsPolicySerializer(serializers.ModelSerializer):
                 }
             }
         ret['rights_status'] = {
-            'name': instance.get_rights_status_display,
-            'value': ret.pop('rights_status')
+            'name': instance.get_rights_status_display(),
+            'id': ret.pop('rights_status')
         }
         return ret
+
+    def to_internal_value(self, data):
+        if data.get('attachments') is not None:
+            if data['attachments'].get('file') is not None:
+                if type(data['attachments']['file']) is dict:
+                    data['attachments'] = data['attachments']['file']['file_id']
+                else:
+                    data['attachments'] = data['attachments']['file']
+        return super().to_internal_value(data)

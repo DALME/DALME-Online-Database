@@ -8,8 +8,9 @@ from .locale_references import LocaleReferenceSerializer
 
 from .others import (AsyncTaskSerializer, AttachmentSerializer, AttributeTypeSerializer, ContentClassSerializer,
                      ContentXAttributeSerializer, CountryReferenceSerializer, GroupPropertiesSerializer, GroupSerializer,
-                     PageSerializer, ProfileSerializer, TagSerializer, TranscriptionSerializer)
-
+                     ProfileSerializer, TagSerializer, TranscriptionSerializer)
+                     
+from .page import PageSerializer
 from .rights_policies import RightsPolicySerializer
 from .sets import SetSerializer
 from .sources import SourceSetSerializer, SourceCreditSerializer, SourceSerializer

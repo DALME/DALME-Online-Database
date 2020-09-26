@@ -1,11 +1,13 @@
+import json
 from django.contrib.auth.models import User
-from dalme_app.models import Agent, Attribute_type, Content_attributes, Set, Set_x_content, Source, Source_credit
+from dalme_app.models import Agent, Attribute_type, Content_attributes, Set, Set_x_content, Source, Source_credit, Workflow, Work_log
 from dalme_app.models._templates import get_current_user
 from rest_framework import serializers
 from ._common import DynamicSerializer, translate_workflow_status
 import dalme_app.serializers.users as _users
 import dalme_app.serializers.attributes as _attributes
 import dalme_app.serializers.others as _others
+import dalme_app.serializers.page as _page
 import dalme_app.serializers.workflow as _workflow
 import dalme_app.serializers.sets as _sets
 
@@ -48,7 +50,7 @@ class SourceSerializer(DynamicSerializer):
     tags = _others.TagSerializer(many=True, required=False)
     workflow = _workflow.WorkflowSerializer(required=False)
     sets = SourceSetSerializer(many=True, required=False)
-    pages = _others.PageSerializer(many=True, required=False)
+    pages = _page.PageSerializer(many=True, required=False)
     owner = _users.UserSerializer(fields=['full_name', 'username', 'id'])
     credits = SourceCreditSerializer(many=True, required=False)
     primary_dataset = _sets.SetSerializer(fields=['id', 'name', 'detail_string'], required=False)
@@ -132,32 +134,51 @@ class SourceSerializer(DynamicSerializer):
             else:
                 data['workflow'].pop('status')
 
-        credits = data.pop('credits')
-        if credits != 0:
-            self.context['credits'] = credits
+        for f in ['credits']:
+            if data.get(f) is not None:
+                f_value = data.pop(f)
+                if f_value != 0:
+                    self.context[f] = f_value
 
-        if data.get('sets') is not None and data.get('sets') == 0:
-            data.pop('sets')
-
-        if data.get('pages') is not None and data.get('pages') == 0:
-            data.pop('pages')
+        for f in ['sets', 'pages']:
+            if data.get(f) is not None and data.get(f) == 0:
+                data.pop(f)
 
         if data.get('owner') is None:
             data['owner'] = get_current_user().id
-
         return super().to_internal_value(data)
+
+    def run_validation(self, data):
+        if data.get('type') is not None:
+            required_dict = {
+                12: ['name', 'short_name', 'parent', 'primary_dataset', 'attributes.authority', 'attributes.format', 'attributes.support'],
+                13: ['name', 'short_name', 'parent', 'has_inventory', 'attributes.record_type', 'attributes.language'],
+                19: ['name', 'short_name', 'attributes.locale']
+            }
+            required = required_dict.get(data['type'], ['name', 'short_name'])
+            missing = {}
+            for field in required:
+                group, field = field.split('.') if '.' in field else (None, field)
+                if data.get(group, data).get(field) in [None, '', 0]:
+                    missing[field] = ['This field is required.']
+            if len(missing):
+                raise serializers.ValidationError(missing)
+            else:
+                validated_data = super().run_validation(data)
+        else:
+            raise serializers.ValidationError({'non_field_errors': ['Type information missing.']})
+
+        return validated_data
 
     def create(self, validated_data):
         attributes_data = validated_data.pop('attributes') if validated_data.get('attributes') is not None else False
         workflow_data = validated_data.pop('workflow') if validated_data.get('workflow') is not None else False
         pages_data = validated_data.pop('pages') if validated_data.get('pages') is not None else False
-        sets_list = [i['set_id'] for i in validated_data.pop('sets')] if validated_data.get('sets') is not None else False
+        sets_list = [i['set_id']['id'] for i in validated_data.pop('sets')] if validated_data.get('sets') is not None else False
         credits_data = self.context['credits'] if self.context.get('credits') is not None else False
 
         if validated_data.get('owner') is not None:
             validated_data['owner'] = User.objects.get(username=validated_data['owner']['username'])
-        # else:
-        #     validated_data['owner'] = get_current_user()
 
         source = Source.objects.create(**validated_data)
 
@@ -166,7 +187,11 @@ class SourceSerializer(DynamicSerializer):
                 source.attributes.create(**attribute)
 
         if workflow_data:
-            workflow = source.workflow
+            try:
+                workflow = source.workflow
+            except Workflow.DoesNotExist:
+                workflow = Workflow.objects.create(source=source, last_modified=source.modification_timestamp)
+                Work_log.objects.create(source=workflow, event='Source created', timestamp=workflow.last_modified)
             if workflow_data.get('status') is not None:
                 status_data = translate_workflow_status(workflow_data['status'])
                 workflow.wf_status = status_data.get('wf_status', workflow.wf_status)
@@ -181,7 +206,8 @@ class SourceSerializer(DynamicSerializer):
 
         if sets_list:
             for _set in sets_list:
-                Set_x_content.objects.create(set_id=_set, content_object=source)
+                set_obj = Set.objects.get(pk=_set)
+                Set_x_content.objects.create(set_id=set_obj, content_object=source)
 
         if credits_data:
             for credit in credits_data:
@@ -311,12 +337,13 @@ class SourceSerializer(DynamicSerializer):
         result = {}
         multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(content_type=instance.type) if not i.unique]
         for i in qset:
-            (k, v), = i.items()
-            if k in multi_attributes:
-                if result.get(k) is not None:
-                    result[k].append(v)
+            if i is not None:
+                (k, v), = i.items()
+                if k in multi_attributes:
+                    if result.get(k) is not None:
+                        result[k].append(v)
+                    else:
+                        result[k] = [v]
                 else:
-                    result[k] = [v]
-            else:
-                result[k] = v
+                    result[k] = v
         return result
