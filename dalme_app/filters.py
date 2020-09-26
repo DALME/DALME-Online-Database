@@ -15,10 +15,11 @@ class SourceFilter(filters.FilterSet):
     wf_stage = filters.NumberFilter(field_name='workflow__stage', lookup_expr='iexact')
     help_flag = filters.BooleanFilter(field_name='workflow__help_flag')
     is_public = filters.BooleanFilter(field_name='workflow__is_public')
+    type__in = filters.CharFilter(lookup_expr='in')
 
     class Meta:
         model = Source
-        fields = ['type', 'type__name', 'name', 'short_name', 'owner',
+        fields = ['type', 'type__name', 'type__in', 'name', 'short_name', 'owner',
                   'primary_dataset', 'parent', 'has_inventory', 'is_private']
 
     @property
