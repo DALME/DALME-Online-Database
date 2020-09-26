@@ -1,0 +1,23 @@
+{
+  "config": {
+    "endpoint": "tickets"
+  },
+  "datatables": {
+    "columns": [
+      "id",
+      "status",
+      "subject",
+      "description",
+      "tags",
+      "attachments",
+      "comment_count",
+      "creation_username",
+      "creation_timestamp"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/tickets/?format=json"
+      }
+    }
+  }
+}

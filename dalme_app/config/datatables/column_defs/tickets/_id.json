@@ -1,0 +1,9 @@
+{
+  "title": "Id",
+  "data": "id",
+  "name": "id",
+  "defaultContent": "",
+  "visible": true,
+  "orderable": true,
+  "searchable": false
+}

@@ -1,0 +1,12 @@
+{
+  "title": "Status",
+  "data": "status",
+  "name": "status",
+  "defaultContent": "",
+  "visible": true,
+  "orderable": true,
+  "searchable": true,
+  "render": "function (data) { return data == 1 ? '<div class=\"ticket-detail-closed-sm\"><i class=\"fa fa-exclamation-circle fa-fw\"></i> Closed</div>' : '<div class=\"ticket-detail-open-sm\"><i class=\"fa fa-exclamation-circle fa-fw\"></i> Open</div>';}",
+  "width": "29px",
+  "className": "td-center"
+}
