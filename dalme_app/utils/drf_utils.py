@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import QueryDict
 from rest_framework import permissions, renderers, parsers
 from rest_framework.compat import INDENT_SEPARATORS, LONG_SEPARATORS, SHORT_SEPARATORS
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.response import Response
 from dynamic_preferences.registries import global_preferences_registry
 
@@ -157,10 +157,9 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 
 def DRFDTE_exception_handler(exc, context):
-    if not isinstance(exc, ValidationError):
-        return None
-    else:
-        result = {}
+    if isinstance(exc, PermissionDenied):
+        return Response({'detail': 'Permission denied.'}, 400)
+    elif isinstance(exc, ValidationError):
         fieldErrors = []
         errors = exc.detail
         for k, v in errors.items():
@@ -174,7 +173,6 @@ def DRFDTE_exception_handler(exc, context):
             else:
                 field = k
                 fieldErrors.append({'name': field, 'status': str(v[0])})
-        result = {'fieldErrors': fieldErrors}
-        status = 400
-
-    return Response(result, status)
+        return Response({'fieldErrors': fieldErrors}, 400)
+    else:
+        return None
