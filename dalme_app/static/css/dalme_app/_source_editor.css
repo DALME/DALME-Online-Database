@@ -58,7 +58,7 @@
 .splitter-horizontal {
   flex: 0 0 auto;
   height: 15px !important;
-  background: url(./horizontalgrip.png) center 2px/30px 6px no-repeat #e8e9ec;
+  background: url(/static/images/horizontalgrip.png) center 2px/30px 6px no-repeat #e8e9ec;
   cursor: row-resize !important;
   border-top: 1px solid #a5a5a5;
   border-bottom: 1px solid #a5a5a5;
@@ -67,7 +67,7 @@
 .splitter-vertical {
   flex: 0 0 auto;
   width: 15px !important;
-  background: url(./verticalgrip.png) 2px center/6px 30px no-repeat #e8e9ec;
+  background: url(/static/images/verticalgrip.png) 2px center/6px 30px no-repeat #e8e9ec;
   cursor: col-resize !important;
   border-right: 1px solid #a5a5a5;
   border-left: 1px solid #a5a5a5;
