@@ -47,7 +47,7 @@ class Set(dalmeUuidOwned):
     dataset_usergroup = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='dataset', limit_choices_to={'properties__type': 3}, null=True)
 
     def __str__(self):
-        return f'{self.name}({self.set_type})'
+        return f'{self.name} ({self.set_type})'
 
     def get_absolute_url(self):
         return reverse('set_detail', kwargs={'pk': self.id})

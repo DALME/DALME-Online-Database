@@ -14,7 +14,7 @@ class Source(index.Indexed, dalmeUuidOwned):
     type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, related_name='children')
     has_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation('Attribute', related_query_name='sources')
     pages = models.ManyToManyField('Page', db_index=True, through='Source_pages')
@@ -35,7 +35,7 @@ class Source(index.Indexed, dalmeUuidOwned):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.type == 13 and self.parent is not None:
+        if self.type.id == 13 and self.parent is not None:
             if self.parent.primary_dataset is not None:
                 self.primary_dataset = self.parent.primary_dataset
         super().save(*args, **kwargs)
@@ -92,7 +92,7 @@ class Source(index.Indexed, dalmeUuidOwned):
 
     @property
     def no_records(self):
-        return self.source_set.all().count()
+        return self.children.count()
 
     @property
     def has_transcriptions(self):

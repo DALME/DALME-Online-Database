@@ -54,7 +54,7 @@ class LanguageReference(dalmeIntid):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name+' ('+self.glottocode+')'
+        return self.name
 
     def get_url(self):
         return '/languages/' + str(self.id)
@@ -70,7 +70,7 @@ class LocaleReference(dalmeIntid):
         unique_together = ('name', 'administrative_region')
 
     def __str__(self):
-        return f'{self.name}({self.country.name})'
+        return self.name
 
     def get_url(self):
         return '/locales/' + str(self.id)

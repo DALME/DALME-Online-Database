@@ -49,7 +49,7 @@ class Page(dalmeUuid):
         return reverse('page_detail', kwargs={'pk': self.pk})
 
     def get_canvas(self):
-        if not self.canvas:
+        if not self.canvas and self.dam_id is not None:
             api_params = {
                 "function": "get_resource_data",
                 "param1": self.dam_id
