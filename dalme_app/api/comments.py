@@ -2,13 +2,13 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from dalme_app.serializers import CommentSerializer
 from dalme_app.models import Comment
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import CommentAccessPolicy
 from dalme_app.models import *
 
 
 class Comments(viewsets.ModelViewSet):
     """ API endpoint for managing comments """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (CommentAccessPolicy,)
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 

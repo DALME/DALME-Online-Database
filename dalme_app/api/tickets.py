@@ -2,13 +2,13 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.serializers import TicketSerializer
 from dalme_app.models import Ticket
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import TicketAccessPolicy
 from ._common import DALMEBaseViewSet
 
 
 class Tickets(DALMEBaseViewSet):
     """ API endpoint for managing issue tickets """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (TicketAccessPolicy,)
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
@@ -16,7 +16,7 @@ class Tickets(DALMEBaseViewSet):
     def set_state(self, request, *args, **kwargs):
         object = self.get_object()
         try:
-            action = self.request.POST['action']
+            action = self.request.data['action']
             if action == 'Close':
                 object.status = 1
                 object.save(update_fields=['status', 'modification_user', 'modification_timestamp'])

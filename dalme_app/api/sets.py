@@ -52,7 +52,7 @@ class Sets(DALMEBaseViewSet):
     def remove_members(self, request, *args, **kwargs):
         try:
             set_id = kwargs.get('pk')
-            members = json.loads(self.request.POST['members'])
+            members = json.loads(self.request.data['members'])
             member_objects = Set_x_content.objects.filter(set_id=set_id, object_id__in=members)
             member_objects.delete()
             result = {'message': 'Action succesful.'}
@@ -65,8 +65,8 @@ class Sets(DALMEBaseViewSet):
     @action(detail=True, methods=['patch'])
     def workset_state(self, request, *args, **kwargs):
         try:
-            action = self.request.POST['action']
-            target = self.request.POST['target']
+            action = self.request.data['action']
+            target = self.request.data['target']
             set_id = kwargs.get('pk')
             object = Set_x_content.objects.get(set_id=set_id, object_id=target)
             if action == 'mark_done':

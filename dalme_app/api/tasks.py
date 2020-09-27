@@ -3,13 +3,13 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.serializers import TaskSerializer, TaskListSerializer
 from dalme_app.models import Task, TaskList
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import TaskAccessPolicy, TaskListAccessPolicy
 from ._common import DALMEBaseViewSet
 
 
 class Tasks(DALMEBaseViewSet):
     """ API endpoint for managing tasks """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (TaskAccessPolicy,)
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
@@ -17,7 +17,7 @@ class Tasks(DALMEBaseViewSet):
     def set_state(self, request, *args, **kwargs):
         object = self.get_object()
         try:
-            action = self.request.POST['action']
+            action = self.request.data['action']
             if action == 'mark_done':
                 object.completed = True
                 object.save(update_fields=['completed', 'modification_user', 'modification_timestamp'])
@@ -34,6 +34,6 @@ class Tasks(DALMEBaseViewSet):
 
 class TaskLists(DALMEBaseViewSet):
     """ API endpoint for managing tasks lists """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (TaskListAccessPolicy,)
     queryset = TaskList.objects.all().annotate(task_count=Count('task'))
     serializer_class = TaskListSerializer

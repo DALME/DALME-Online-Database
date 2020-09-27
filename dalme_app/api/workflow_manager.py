@@ -18,11 +18,11 @@ class WorkflowManager(viewsets.ModelViewSet):
         object = self.get_object()
         try:
             result = {}
-            action = self.request.POST['action']
+            action = self.request.data['action']
             stage_dict = dict(Workflow.PROCESSING_STAGES)
             status_dict = dict(Workflow.WORKFLOW_STATUS)
             if action == 'stage_done':
-                stage = int(self.request.POST['code'])
+                stage = int(self.request.data['code'])
                 stage_name = stage_dict[stage]
                 setattr(object, stage_name + '_done', True)
                 object.last_user = request.user
@@ -38,7 +38,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                     result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\',' + str(next_stage) + ')">\
                     begin ' + stage_dict[next_stage] + '</button>'
             elif action == 'begin_stage':
-                stage = int(self.request.POST['code'])
+                stage = int(self.request.data['code'])
                 stage_name = stage_dict[stage]
                 object.stage = stage
                 object.last_user = request.user
@@ -69,7 +69,7 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.save()
                 self.update_log(object, 'public flag set to ' + str(object.is_public))
             elif action == 'change_status':
-                status = int(self.request.POST['code'])
+                status = int(self.request.data['code'])
                 prev_status = object.wf_status
                 object.wf_status = status
                 object.last_user = request.user

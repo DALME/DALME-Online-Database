@@ -8,14 +8,14 @@ from dalme_app.serializers import (AgentSerializer, AsyncTaskSerializer, Content
 from dalme_app.models import (Agent, Attribute, Content_class, Content_type, CountryReference,
                               LanguageReference, LocaleReference, RightsPolicy)
 
-from dalme_app.access_policies import GeneralAccessPolicy, RightsAccessPolicy
+from dalme_app.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy
 from ._common import DALMEBaseViewSet
 from dalme_app.filters import ContenTypeFilter
 
 
 class Agents(DALMEBaseViewSet):
     """ API endpoint for managing agents """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (AgentAccessPolicy,)
     queryset = Agent.objects.all()
     serializer_class = AgentSerializer
     filterset_fields = ['id', 'type']

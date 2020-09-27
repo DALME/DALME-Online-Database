@@ -2,12 +2,12 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from dalme_app.serializers import TranscriptionSerializer
 from dalme_app.models import Source_pages, Transcription
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import TranscriptionAccessPolicy
 
 
 class Transcriptions(viewsets.ModelViewSet):
     """ API endpoint for managing transcriptions """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (TranscriptionAccessPolicy,)
     queryset = Transcription.objects.all()
     serializer_class = TranscriptionSerializer
 

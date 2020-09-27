@@ -1,0 +1,7 @@
+[
+  {
+    "action": ["list"],
+    "principal": ["*"],
+    "effect": "allow"
+  }
+]

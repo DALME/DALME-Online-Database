@@ -2,13 +2,13 @@ import json
 import os
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import ChoicesAccessPolicy
 from dalme_app.models import *
 
 
 class Choices(viewsets.ViewSet):
     """ API endpoint for generating value lists for choice fields in the UI """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (ChoicesAccessPolicy,)
 
     def list(self, request, *args, **kwargs):
         type = self.request.GET.get('type')
@@ -24,12 +24,6 @@ class Choices(viewsets.ViewSet):
                     status = 201
                 elif type == 'model':
                     para = field.split('.')
-                    # global_preferences = global_preferences_registry.manager()
-                    # if global_preferences['api_settings__model_select_fields'].get(para[0]) is not None:
-                    #     select_fields = global_preferences['api_settings__model_select_fields'].get(para[0])
-                    # else:
-                    #     # select_fields = ['id', 'name']
-                    #     select_fields = ['name', 'id']
                     result = [{'name': label, 'id': value} for value, label in eval('{}._meta.get_field("{}").choices'.format(para[0], para[1]))]
                     status = 201
             except Exception as e:

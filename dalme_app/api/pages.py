@@ -2,13 +2,13 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from dalme_app.serializers import PageSerializer
 from dalme_app.models import Page
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import PageAccessPolicy
 from ._common import DALMEBaseViewSet
 
 
 class Pages(DALMEBaseViewSet):
     """ API endpoint for managing pages """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (PageAccessPolicy,)
     queryset = Page.objects.all()
     serializer_class = PageSerializer
 

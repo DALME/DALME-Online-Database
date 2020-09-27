@@ -1,6 +1,8 @@
 from rest_access_policy import AccessPolicy, AccessPolicyException
 import json
 import os
+from django.views.generic import DetailView
+from dalme_app.models import Source
 
 
 class BaseAccessPolicy(AccessPolicy):
@@ -14,60 +16,106 @@ class BaseAccessPolicy(AccessPolicy):
         with open(statements, 'r') as policy:
             return json.load(policy)
 
+    @staticmethod
+    def get_view_object(view):
+        if type(view) is dict:
+            return view.get('object', {})
+        else:
+            if hasattr(view, "object"):
+                return view.object
+            elif hasattr(view, "get_object"):
+                return view.get_object()
+            else:
+                return {}
+
     def is_owner(self, request, view, action):
-        record = view.get_object()
-        return request.user == record.owner
+        record = self.get_view_object(view)
+        try:
+            return request.user == record.owner
+        except AttributeError:
+            return False
+
+    def is_creator(self, request, view, action):
+        record = self.get_view_object(view)
+        try:
+            return request.user == record.creation_user
+        except AttributeError:
+            return False
+
+
+class AgentAccessPolicy(BaseAccessPolicy):
+    id = 'agents-policy'
+
+
+class AttachmentAccessPolicy(BaseAccessPolicy):
+    id = 'attachments-policy'
+
+
+class ChoicesAccessPolicy(BaseAccessPolicy):
+    id = 'choices-policy'
+
+
+class CommentAccessPolicy(BaseAccessPolicy):
+    id = 'comments-policy'
 
 
 class ConfigsAccessPolicy(BaseAccessPolicy):
-    ''' Manages access policies for configs endpoint '''
     id = 'configs-policy'
 
 
 class GeneralAccessPolicy(BaseAccessPolicy):
-    ''' Manages general access policies for all endpoints '''
     id = 'general-policy'
 
 
 class ImageAccessPolicy(BaseAccessPolicy):
-    ''' Manages general access policies for Images endpoint'''
     id = 'images-policy'
 
 
+class PageAccessPolicy(BaseAccessPolicy):
+    id = 'pages-policy'
+
+    def can_edit_parent_source(self, request, view, action):
+        record = self.get_view_object(view)
+        try:
+            return SourceAccessPolicy().has_permission(
+                request,
+                {'object': record.sources.all()[0].source}
+            )
+        except:
+            return False
+
+
 class RightsAccessPolicy(BaseAccessPolicy):
-    ''' Manages general access policies for Rights endpoint'''
     id = 'rights-policy'
 
 
 class SourceAccessPolicy(BaseAccessPolicy):
-    ''' Manages access policies for Sources endpoint '''
     id = 'sources-policy'
 
     def in_dataset_usergroup(self, request, view, action):
-        record = view.get_object()
-        if record.sets.filter(set_id__set_type=3).exists():
+        record = self.get_view_object(view)
+        try:
             ds_ugs = [i.set_id.dataset_usergroup.name for i in record.sets.filter(set_id__set_type=3) if i.set_id.dataset_usergroup is not None]
             usergroups = [i.name for i in request.user.groups.all()]
             return len(list(set(ds_ugs) & set(usergroups))) > 0
-        else:
+        except:
             return False
 
     def _get_invoked_action(self, view) -> str:
-        if view.__class__.__name__ == 'SourceDetail':
-            return 'update'
-        else:
-            if hasattr(view, "action"):
-                if view.action == 'has_permission':
-                    return 'update'
-                else:
-                    return view.action
-            elif hasattr(view, "__class__"):
+        if hasattr(view, "action"):
+            if view.action == 'has_permission':
+                return 'update'
+            else:
+                return view.action
+        elif hasattr(view, "__class__"):
+            if view.__class__.__name__ in ['SourceDetail', 'dict']:
+                return 'update'
+            else:
                 return view.__class__.__name__
-            raise AccessPolicyException("Could not determine action of request")
+        raise AccessPolicyException("Could not determine action of request")
 
 
 class SetAccessPolicy(BaseAccessPolicy):
-    ''' Manages access policies for Sets endpoint '''
     id = 'sets-policy'
 
     def can_view(self, request, view, action):
@@ -83,8 +131,33 @@ class SetAccessPolicy(BaseAccessPolicy):
         return request.user == record.owner or record.permissions == 4
 
 
+class TaskAccessPolicy(BaseAccessPolicy):
+    id = 'tasks-policy'
+
+
+class TaskListAccessPolicy(BaseAccessPolicy):
+    id = 'task_lists-policy'
+
+
+class TranscriptionAccessPolicy(BaseAccessPolicy):
+    id = 'transcriptions-policy'
+
+    def can_edit_parent_source(self, request, view, action):
+        record = self.get_view_object(view)
+        try:
+            return SourceAccessPolicy().has_permission(
+                request,
+                {'object': record.source_pages.all()[0].source}
+            )
+        except:
+            return False
+
+
+class TicketAccessPolicy(BaseAccessPolicy):
+    id = 'tickets-policy'
+
+
 class WorkflowAccessPolicy(BaseAccessPolicy):
-    ''' Manages access policies for Sets endpoint '''
     id = 'workflow-policy'
 
     def owns_wf_target(self, request, view, action):
@@ -94,5 +167,4 @@ class WorkflowAccessPolicy(BaseAccessPolicy):
 
 
 class UserAccessPolicy(BaseAccessPolicy):
-    ''' Manages access policies for users/profiles endpoint '''
-    id = 'user-policy'
+    id = 'users-policy'

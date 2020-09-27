@@ -3,12 +3,12 @@ from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from dalme_app.serializers import AttachmentSerializer
 from dalme_app.models import Attachment
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_app.access_policies import AttachmentAccessPolicy
 
 
 class Attachments(viewsets.ModelViewSet):
     """ API endpoint for managing attachments """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (AttachmentAccessPolicy,)
     parser_classes = (MultiPartParser, FormParser, FileUploadParser,)
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer

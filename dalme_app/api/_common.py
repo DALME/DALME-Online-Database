@@ -13,19 +13,19 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
         pc().has_permission(request, self)
         return Response(200)
 
-    @action(detail=True, methods=['patch'])
-    def change_owner(self, request, *args, **kwargs):
-        object = self.get_object()
-        try:
-            new_owner = self.request.POST['new_owner']
-            object.owner = new_owner
-            object.save(update_fields=['owner', 'modification_user', 'modification_timestamp'])
-            result = {'message': 'Owner changed succesfully.'}
-            status = 201
-        except Exception as e:
-            result = {'error': str(e)}
-            status = 400
-        return Response(result, status)
+    # @action(detail=True, methods=['patch'])
+    # def change_owner(self, request, *args, **kwargs):
+    #     object = self.get_object()
+    #     try:
+    #         new_owner = self.request.POST['new_owner']
+    #         object.owner = new_owner
+    #         object.save(update_fields=['owner', 'modification_user', 'modification_timestamp'])
+    #         result = {'message': 'Owner changed succesfully.'}
+    #         status = 201
+    #     except Exception as e:
+    #         result = {'error': str(e)}
+    #         status = 400
+    #     return Response(result, status)
 
     def list(self, request, *args, **kwargs):
         full_queryset = self.get_queryset()
