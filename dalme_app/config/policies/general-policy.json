@@ -13,11 +13,5 @@
     "action": ["create", "partial_update", "update", "destroy"],
     "principal": ["group:Administrators"],
     "effect": "allow"
-  },
-  {
-    "action": ["partial_update", "update", "destroy"],
-    "principal": ["*"],
-    "effect": "allow",
-    "condition": "is_owner"
   }
 ]
