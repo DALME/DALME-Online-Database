@@ -3,12 +3,12 @@
     "short_name": "DALME",
     "icons": [
         {
-            "src": "/icons/android-chrome-192x192.png?v=alQLEaQ7mB",
+            "src": "/static/icons/android-chrome-192x192.png?v=alQLEaQ7mB",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/icons/android-chrome-256x256.png?v=alQLEaQ7mB",
+            "src": "/static/icons/android-chrome-256x256.png?v=alQLEaQ7mB",
             "sizes": "256x256",
             "type": "image/png"
         }
