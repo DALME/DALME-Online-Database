@@ -131,8 +131,11 @@ function delete_set_members(table, id) {
         $.ajax({
           method: "PATCH",
           url: "/api/sets/"+id+"/remove_members/",
-          headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-          data: { "members": JSON.stringify(sel_ids) }
+          headers: {
+            "Content-Type": "application/json",
+            'X-CSRFToken': get_cookie("csrftoken")
+          },
+          data: JSON.stringify({ members: sel_ids })
         }).done(function(data, textStatus, jqXHR) {
           table.rows( { selected: true } ).remove().draw();
           toastr.success('The set was updated successfully.')

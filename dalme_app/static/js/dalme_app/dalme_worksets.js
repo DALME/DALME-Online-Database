@@ -16,8 +16,11 @@ function ws_next() {
     $.ajax({
       method: "PATCH",
       url: "/api/sets/"+workset['workset_id']+"/workset_state/",
-      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-      data: { "action": "mark_done", "target": workset['current_id']}
+      headers: {
+        "Content-Type": "application/json",
+        'X-CSRFToken': get_cookie("csrftoken")
+      },
+      data: JSON.stringify({ "action": "mark_done", "target": workset['current_id']})
     }).done(function(data, textStatus, jqXHR) {
         let url = '/'+workset['endpoint']+'/'+workset['next_id']+'/?set='+workset['workset_id'];
         window.location.href = url;
@@ -42,8 +45,11 @@ function ws_mark(action) {
   $.ajax({
     method: "PATCH",
     url: "/api/sets/"+workset['workset_id']+"/workset_state/",
-    headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-    data: { "action": action, "target": workset['current_id']}
+    headers: {
+      "Content-Type": "application/json",
+      'X-CSRFToken': get_cookie("csrftoken")
+    },
+    data: JSON.stringify({ "action": action, "target": workset['current_id']})
   }).fail(function(jqXHR, textStatus, errorThrown) {
     if (errorThrown == "Forbidden") {
       toastr.error("You do not have the required permissions to change the state of this workset.");

@@ -297,8 +297,11 @@ function saveEditor() {
       $.ajax({
         method: "PUT",
         url: url,
-        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-        data: { 'version': ver, 'transcription': text, 'source': source },
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        },
+        data: JSON.stringify({ 'version': ver, 'transcription': text, 'source': source }),
       }).done(function(data, textStatus, jqXHR) {
           if (data['version'] > folio_array[folio]['tr_version']) { folio_array[folio]['tr_version'] = data['version'] };
       }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -317,7 +320,7 @@ function saveEditor() {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
         },
-        data: { 'version': ver, 'transcription': text, 'source': source, 'page': page },
+        data: JSON.stringify({ 'version': ver, 'transcription': text, 'source': source, 'page': page }),
       }).done(function(data, textStatus, jqXHR) {
           folio_array[folio]['tr_id'] = data['id'];
           folio_array[folio]['tr_version'] = data['version'];
@@ -599,7 +602,7 @@ function saveDescription() {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
         },
-        data: { "action": action, "description": description_text }
+        data: JSON.stringify({ "action": action, "description": description_text })
       }).done(function(data, textStatus, jqXHR) {
           toastr.success("The description was updated.");
       }).fail(function(jqXHR, textStatus, errorThrown) {

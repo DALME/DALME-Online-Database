@@ -91,8 +91,11 @@ function update_workflow(action, code=0) {
     $.ajax({
         method: "PATCH",
         url: "/api/workflow/"+source_id+"/change_state/",
-        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-        data: { "action": action, "code": code }
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        },
+        data: JSON.stringify({ "action": action, "code": code })
     }).done(function(data, textStatus, jqXHR) {
         if (action == 'toggle_help') {
             $('#wf-manager-help').toggleClass("wf-help_flag-on");
@@ -293,8 +296,11 @@ function task_set_state(task, state) {
     $.ajax({
       method: "PATCH",
       url: "/api/tasks/"+task+"/set_state/",
-      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-      data: { "action": action }
+      headers: {
+        "Content-Type": "application/json",
+        'X-CSRFToken': get_cookie("csrftoken")
+      },
+      data: JSON.stringify({ "action": action })
     }).done(function(data, textStatus, jqXHR) {
         if ( $('#task_'+task).length ) {
           switch (action) {
@@ -483,7 +489,7 @@ function create_comment(model, object) {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
         },
-        data: { 'model': model, 'object': object, 'body': body },
+        data: JSON.stringify({ 'model': model, 'object': object, 'body': body }),
   }).done(function(data, textStatus, jqXHR) {
         if (!$('#comments-container').length) {
           $('#comments').prepend('<div id="comments-container"></div>');
@@ -511,8 +517,11 @@ function ticket_set_state(id, action) {
   $.ajax({
     method: "PATCH",
     url: "/api/tickets/"+id+"/set_state/",
-    headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-    data: { "action": action }
+    headers: {
+      "Content-Type": "application/json",
+      'X-CSRFToken': get_cookie("csrftoken")
+    },
+    data: JSON.stringify({ "action": action })
   }).done(function(data, textStatus, jqXHR) {
         switch (action) {
           case 'Close':

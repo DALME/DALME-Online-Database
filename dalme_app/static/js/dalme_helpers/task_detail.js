@@ -126,8 +126,11 @@ function task_change_state(task, action) {
     $.ajax({
       method: "PATCH",
       url: "/api/tasks/"+task+"/set_state/",
-      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-      data: { "action": action }
+      headers: {
+        "Content-Type": "application/json",
+        'X-CSRFToken': get_cookie("csrftoken")
+      },
+      data: JSON.stringify({ "action": action })
     }).done(function(data, textStatus, jqXHR) {
           switch (action) {
             case 'mark_undone':
