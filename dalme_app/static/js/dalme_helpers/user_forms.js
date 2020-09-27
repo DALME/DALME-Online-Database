@@ -30,7 +30,10 @@ function reset_password() {
     $.ajax({
       method: "POST",
       url: "/api/users/"+user_id+"/reset_password/",
-      headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+      headers: {
+        "Content-Type": "application/json",
+        'X-CSRFToken': get_cookie("csrftoken")
+      },
     }).done(function(data, textStatus, jqXHR) {
       toastr.success('An email with instructions was sent to the user.');
     }).fail(function(jqXHR, textStatus, errorThrown) {

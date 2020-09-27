@@ -71,7 +71,10 @@ function edit_task(id) {
                       ajax: {
                         method: "POST",
                         url: "/api/attachments/",
-                        headers: { 'X-CSRFToken': get_cookie("csrftoken")},
+                        headers: {
+                          "Content-Type": "application/json",
+                          'X-CSRFToken': get_cookie("csrftoken")
+                        },
                       },
                       display: function (id) {
                         return editTaskForm.file('Attachment', id).filename;

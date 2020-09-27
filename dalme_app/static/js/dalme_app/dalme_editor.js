@@ -313,7 +313,10 @@ function saveEditor() {
       $.ajax({
         method: "POST",
         url: url,
-        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        },
         data: { 'version': ver, 'transcription': text, 'source': source, 'page': page },
       }).done(function(data, textStatus, jqXHR) {
           folio_array[folio]['tr_id'] = data['id'];
@@ -592,7 +595,10 @@ function saveDescription() {
       $.ajax({
         method: "PATCH",
         url: "/api/sources/"+source_id+"/change_description/",
-        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        },
         data: { "action": action, "description": description_text }
       }).done(function(data, textStatus, jqXHR) {
           toastr.success("The description was updated.");

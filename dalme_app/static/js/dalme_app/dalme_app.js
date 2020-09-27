@@ -151,7 +151,10 @@ function create_task_list() {
             ajax: {
               method: "POST",
               url: "/api/tasklists/",
-              headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+              headers: {
+                "Content-Type": "application/json",
+                'X-CSRFToken': get_cookie("csrftoken")
+              },
               data: function (data) { return { "data": JSON.stringify( data ) }; }
             },
             fields: [
@@ -193,7 +196,10 @@ function create_task() {
             ajax: {
               method: "POST",
               url: "/api/tasks/",
-              headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+              headers: {
+                "Content-Type": "application/json",
+                'X-CSRFToken': get_cookie("csrftoken")
+              },
               data: function (data) { return { "data": JSON.stringify( data ) }; }
             },
             fields: [
@@ -249,7 +255,10 @@ function create_task() {
                   ajax: {
                     method: "POST",
                     url: "/api/attachments/",
-                    headers: { 'X-CSRFToken': get_cookie("csrftoken")},
+                    headers: {
+                      "Content-Type": "application/json",
+                      'X-CSRFToken': get_cookie("csrftoken")
+                    },
                   },
                   display: function ( fileId ) {
                     return taskForm.file('Attachment', fileId ).filename;
@@ -310,7 +319,10 @@ function create_ticket() {
           ajax: {
             method: "POST",
             url: "/api/tickets/",
-            headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+            headers: {
+              "Content-Type": "application/json",
+              'X-CSRFToken': get_cookie("csrftoken")
+            },
             data: function (data) { return { "data": JSON.stringify( data ) };}
           },
           fields: [
@@ -350,7 +362,10 @@ function create_ticket() {
                 ajax: {
                   method: "POST",
                   url: "/api/attachments/",
-                  headers: { 'X-CSRFToken': get_cookie("csrftoken")},
+                  headers: {
+                    "Content-Type": "application/json",
+                    'X-CSRFToken': get_cookie("csrftoken")
+                  },
                 },
                 display: function ( fileId ) {
                   return ticketForm.file('Attachment', fileId ).filename;
@@ -464,7 +479,10 @@ function create_comment(model, object) {
   $.ajax({
         method: "POST",
         url: "/api/comments/",
-        headers: { 'X-CSRFToken': get_cookie("csrftoken") },
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        },
         data: { 'model': model, 'object': object, 'body': body },
   }).done(function(data, textStatus, jqXHR) {
         if (!$('#comments-container').length) {
