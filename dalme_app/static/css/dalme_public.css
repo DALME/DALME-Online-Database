@@ -1269,12 +1269,12 @@ i.inactive {
   border-top: 1px solid #6b6b6b;
 }
 .folios.vertical-split .resize-handle {
-  background: url(./verticalgrip.png) 3px center/7px 30px no-repeat #e8e9ec;
+  background: url(/static/images/verticalgrip.png) 3px center/7px 30px no-repeat #e8e9ec;
   cursor: col-resize;
   width: 1rem;
 }
 .folios.horizontal-split .resize-handle {
-  background: url(./horizontalgrip.png) center 3px/30px 7px no-repeat #e8e9ec;
+  background: url(/static/images/horizontalgrip.png) center 3px/30px 7px no-repeat #e8e9ec;
   cursor: row-resize;
   height: 1rem;
 }

@@ -2,13 +2,13 @@ from django.contrib.auth.models import User, Group
 from dalme_app.models import Agent, Profile
 from rest_framework import serializers
 from ._common import DynamicSerializer
-import dalme_app.serializers.others as _others
+from dalme_app.serializers.others import GroupSerializer, ProfileSerializer
 
 
 class UserSerializer(DynamicSerializer):
     """ Serializes user and profile data """
-    groups = _others.GroupSerializer(many=True, required=False)
-    profile = _others.ProfileSerializer()
+    groups = GroupSerializer(many=True, required=False)
+    profile = ProfileSerializer()
     full_name = serializers.CharField(max_length=255, source='profile.full_name', required=False)
 
     class Meta:

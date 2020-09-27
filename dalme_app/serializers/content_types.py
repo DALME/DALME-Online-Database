@@ -1,12 +1,12 @@
 from dalme_app.models import Content_type
 from rest_framework import serializers
 from ._common import DynamicSerializer
-import dalme_app.serializers.others as _others
+from dalme_app.serializers.others import AttributeTypeSerializer
 
 
 class ContentTypeSerializer(DynamicSerializer):
     cont_class = serializers.StringRelatedField(source='content_class', required=False)
-    attribute_types = _others.AttributeTypeSerializer(many=True, required=False)
+    attribute_types = AttributeTypeSerializer(many=True, required=False)
 
     class Meta:
         model = Content_type

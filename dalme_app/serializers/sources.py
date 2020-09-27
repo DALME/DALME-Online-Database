@@ -4,12 +4,12 @@ from dalme_app.models import Agent, Attribute_type, Content_attributes, Set, Set
 from dalme_app.models._templates import get_current_user
 from rest_framework import serializers
 from ._common import DynamicSerializer, translate_workflow_status
-import dalme_app.serializers.users as _users
-import dalme_app.serializers.attributes as _attributes
-import dalme_app.serializers.others as _others
-import dalme_app.serializers.page as _page
-import dalme_app.serializers.workflow as _workflow
-import dalme_app.serializers.sets as _sets
+from dalme_app.serializers.users import UserSerializer
+from dalme_app.serializers.attributes import AttributeSerializer
+from dalme_app.serializers.others import TagSerializer
+from dalme_app.serializers.page import PageSerializer
+from dalme_app.serializers.workflow import WorkflowSerializer
+from dalme_app.serializers.sets import SetSerializer
 
 
 class SourceSetSerializer(serializers.ModelSerializer):
@@ -45,15 +45,15 @@ class SourceCreditSerializer(DynamicSerializer):
 
 
 class SourceSerializer(DynamicSerializer):
-    attributes = _attributes.AttributeSerializer(many=True, required=False)
-    inherited = _attributes.AttributeSerializer(many=True, required=False)
-    tags = _others.TagSerializer(many=True, required=False)
-    workflow = _workflow.WorkflowSerializer(required=False)
+    attributes = AttributeSerializer(many=True, required=False)
+    inherited = AttributeSerializer(many=True, required=False)
+    tags = TagSerializer(many=True, required=False)
+    workflow = WorkflowSerializer(required=False)
     sets = SourceSetSerializer(many=True, required=False)
-    pages = _page.PageSerializer(many=True, required=False)
-    owner = _users.UserSerializer(fields=['full_name', 'username', 'id'])
+    pages = PageSerializer(many=True, required=False)
+    owner = UserSerializer(fields=['full_name', 'username', 'id'])
     credits = SourceCreditSerializer(many=True, required=False)
-    primary_dataset = _sets.SetSerializer(fields=['id', 'name', 'detail_string'], required=False)
+    primary_dataset = SetSerializer(fields=['id', 'name', 'detail_string'], required=False)
 
     class Meta:
         model = Source

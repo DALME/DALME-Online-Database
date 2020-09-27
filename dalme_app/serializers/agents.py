@@ -1,11 +1,11 @@
 
 from dalme_app.models import Agent
 from ._common import DynamicSerializer
-import dalme_app.serializers.users as _users
+from dalme_app.serializers.users import UserSerializer
 
 
 class AgentSerializer(DynamicSerializer):
-    user = _users.UserSerializer(fields=['full_name', 'username', 'id'])
+    user = UserSerializer(fields=['full_name', 'username', 'id'])
 
     class Meta:
         model = Agent

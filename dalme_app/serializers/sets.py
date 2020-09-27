@@ -2,16 +2,16 @@ from django.contrib.auth.models import Group
 from dalme_app.models import Set
 from rest_framework import serializers
 from ._common import DynamicSerializer
-import dalme_app.serializers.users as _users
-import dalme_app.serializers.others as _others
+from dalme_app.serializers.users import UserSerializer
+from dalme_app.serializers.others import GroupSerializer
 from dalme_app.models._templates import get_current_user
 
 
 class SetSerializer(DynamicSerializer):
-    owner = _users.UserSerializer(fields=['id', 'full_name', 'username'], required=False, read_only=True)
+    owner = UserSerializer(fields=['id', 'full_name', 'username'], required=False, read_only=True)
     set_type_name = serializers.CharField(source='get_set_type_display', required=False)
     permissions_name = serializers.CharField(source='get_permissions_display', required=False)
-    dataset_usergroup = _others.GroupSerializer(required=False, read_only=True)
+    dataset_usergroup = GroupSerializer(required=False, read_only=True)
 
     class Meta:
         model = Set
@@ -84,7 +84,3 @@ class SetSerializer(DynamicSerializer):
             return Set.objects.get(pk=data)
         else:
             return super().run_validation(data)
-
-    # def create(self, validated_data):
-    #     bob=uncle
-    #     return 's'

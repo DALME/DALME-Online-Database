@@ -1,10 +1,10 @@
 from dalme_app.models import Ticket
 from rest_framework import serializers
-import dalme_app.serializers.others as _others
+from dalme_app.serializers.others import TagSerializer
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    tags = _others.TagSerializer(many=True, required=False)
+    tags = TagSerializer(many=True, required=False)
     creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y@%H:%M', required=False)
 
     class Meta:

@@ -2,12 +2,12 @@ from dalme_app.models import Workflow
 from rest_framework import serializers
 from dalme_app.utils import round_timesince
 import datetime
-import dalme_app.serializers.users as _users
+from dalme_app.serializers.users import UserSerializer
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
     """Basic serializer for workflow control"""
-    last_user = _users.UserSerializer(fields=['username', 'profile'], required=False)
+    last_user = UserSerializer(fields=['username', 'profile'], required=False)
 
     class Meta:
         model = Workflow
