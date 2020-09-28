@@ -49,7 +49,6 @@ function workflow_module_init() {
       $(container).append('<button class="btn buttons-collection dropdown-toggle" id="workflow_button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-code-branch fa-sm"></i> Workflow</button>');
       $(container).append(dropdown);
       container.insertAfter($('.buttons-page-length').parent());
-      // $('.dt-buttons').append(container);
       $(container).on('click.dalme', 'a', function() {
           workflow_filter(this);
       });

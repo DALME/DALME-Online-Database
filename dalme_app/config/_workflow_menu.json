@@ -44,27 +44,27 @@
   {
     "type": "item-select",
     "text": "Ingestion",
-    "query": "{'stage': 1"
+    "query": "{'wf_stage': 1"
   },
   {
     "type": "item-select",
     "text": "Transcription",
-    "query": "{'stage': 2"
+    "query": "{'wf_stage': 2"
   },
   {
     "type": "item-select",
     "text": "Markup",
-    "query": "{'stage': 3"
+    "query": "{'wf_stage': 3"
   },
   {
     "type": "item-select",
     "text": "Review",
-    "query": "{'stage': 4"
+    "query": "{'wf_stage': 4"
   },
   {
     "type": "item-select",
     "text": "Parsing",
-    "query": "{'stage': 5"
+    "query": "{'wf_stage': 5"
   },
   {
     "type": "divider"
