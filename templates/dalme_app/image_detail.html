@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% block extra_head %}
+{% compress js %}
+<script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
+{% endcompress %}
 {% if workset %}
   <script type="text/javascript" src="{% static 'js/dalme_worksets.js' %}"></script>
   <script type="text/javascript">

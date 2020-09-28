@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% block extra_head %}
+{% compress js %}
+<script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/dalme_helpers/set_detail.js' %}"></script>
+{% endcompress %}
 <script>
   var set = {
     "name": "{{ set.name }}",

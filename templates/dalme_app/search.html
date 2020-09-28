@@ -3,6 +3,9 @@
 {% load compress %}
 {% load template_helpers %}
 {% block extra_head %}
+{% compress js %}
+<script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
+{% endcompress %}
 {% compress css %}
   <link href="{% static 'css/dalme_app/_search_results.css' %}" rel="stylesheet">
 {% endcompress %}

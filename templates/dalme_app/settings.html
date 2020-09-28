@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load compress %}
 {% load template_helpers %}
 {% block extra_head %}
+  {% compress js %}
+    <script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
+  {% endcompress %}
 {% endblock %}
 {% block extra_dropdowns %}{% endblock %}
 {% block content %}

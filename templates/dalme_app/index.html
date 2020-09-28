@@ -5,6 +5,9 @@
 {% compress css %}
   <link href="{% static 'css/dalme_app/_homepage_cards.css' %}" rel="stylesheet">
 {% endcompress %}
+{% compress js %}
+<script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
+{% endcompress %}
 <script>
   var user = { "id": "{{ user.id }}", "username": "{{ user.username }}" }
 </script>
