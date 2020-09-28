@@ -46,7 +46,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 
-DEBUG = True
+DEBUG = False
 COMPRESS_ENABLED = True
 
 CORS_ORIGIN_WHITELIST = ['https://db.dalme.org', 'https://public.dalme.org', 'https://dalme.org', 'https://kb.dalme.org', 'https://dam.dalme.org']
