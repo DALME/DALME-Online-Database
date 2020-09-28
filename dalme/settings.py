@@ -6,6 +6,20 @@ from django.contrib.messages import constants as messages
 import saml2
 from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
 from saml2.sigver import get_xmlsec_binary
+import requests
+
+
+def get_ec2_instance_ip():
+    """Try to obtain the IP address of the current EC2 instance in AWS"""
+    try:
+        ip = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
+    except requests.exceptions.ConnectionError:
+        return None
+    return ip
+
+
+AWS_LOCAL_IP = get_ec2_instance_ip()
+ALLOWED_HOSTS = [AWS_LOCAL_IP, '.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -32,8 +46,9 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 
-DEBUG = False
-ALLOWED_HOSTS = ['.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
+DEBUG = True
+COMPRESS_ENABLED = True
+
 CORS_ORIGIN_WHITELIST = ['https://db.dalme.org', 'https://public.dalme.org', 'https://dalme.org', 'https://kb.dalme.org', 'https://dam.dalme.org']
 SESSION_COOKIE_DOMAIN = '.dalme.org'
 CSRF_COOKIE_DOMAIN = '.dalme.org'
