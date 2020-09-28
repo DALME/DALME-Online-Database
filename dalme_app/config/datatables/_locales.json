@@ -14,7 +14,8 @@
       },
       "required_list": [
         "name",
-        "country.id"
+        "country.id",
+        "administrative_region"
       ]
     }
   },

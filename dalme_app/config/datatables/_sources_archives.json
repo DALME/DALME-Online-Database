@@ -17,7 +17,6 @@
         "name": "name",
         "short_name": "short_name",
         "locale": "attributes.locale.id",
-        "country": "attributes.country.id",
         "default_rights": "attributes.default_rights.id",
         "url": "attributes.url",
         "street_address": "attributes.street_address",
@@ -37,7 +36,6 @@
       "short_name",
       "no_records",
       "attributes.locale",
-      "attributes.country",
       "attributes.default_rights",
       "attributes.url"
     ],
@@ -53,7 +51,6 @@
       "short_name",
       "type",
       "attributes.locale",
-      "attributes.country",
       "attributes.default_rights",
       "attributes.url",
       "attributes.street_address",
