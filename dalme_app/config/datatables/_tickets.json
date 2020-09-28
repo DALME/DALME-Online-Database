@@ -1,6 +1,24 @@
 {
   "config": {
-    "endpoint": "tickets"
+    "endpoint": "tickets",
+    "globals": {
+      "messages_list": {
+        "create_success": "The ticket was created succesfully.",
+        "edit_success": "The ticket was updated succesfully.",
+        "remove_success": "The ticket was deleted succesfully."
+      },
+      "attribute_concordance": {
+        "subject": "subject",
+        "description": "description",
+        "tags": "tags[].tag",
+        "url": "url",
+        "attachments": "attachments.file"
+      },
+      "required_list": [
+        "subject",
+        "description"
+      ]
+    }
   },
   "datatables": {
     "columns": [
@@ -19,5 +37,41 @@
         "url": "/api/tickets/?format=json"
       }
     }
+  },
+  "editor": {
+    "fields": [
+      "subject",
+      "description",
+      "tags",
+      "url",
+      "attachments"
+    ],
+    "options": {
+      "ajax": {
+        "create": {
+          "url": "/api/tickets/"
+        },
+        "edit": {
+          "url": "/api/tickets/_id_/"
+        },
+        "remove": {
+          "url": "/api/tickets/_id_/"
+        }
+      }
+    },
+    "buttons": [
+      {
+        "button": "create",
+        "permissions": "dalme_app.add_ticket"
+      },
+      {
+        "button": "edit",
+        "permissions": "dalme_app.change_ticket"
+      },
+      {
+        "button": "remove",
+        "permissions": "dalme_app.delete_ticket"
+      }
+    ]
   }
 }
