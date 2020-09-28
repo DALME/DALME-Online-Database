@@ -77,10 +77,12 @@ _fieldTypes.dalmePages = {
 
       conf._input.sortable({
           dataIdAttr: "data-order",
+          sort: true,
           handle: '.page-grab-handle',
           ghostClass: "target-page-slot",
-      }).on('sort', function() {
-          _fieldTypes.dalmePages._syncSort(conf, this);
+          draggable: '.single-page-wrapper'
+      }).on('sortupdate', function() {
+          _fieldTypes.dalmePages._syncSort(conf);
       });
 
       $(document).on("click.dalme", ".popover .clear-page" , function() {

@@ -38,13 +38,13 @@ _fieldTypes.dalmeDate = {
     var container = $('<div/>')
         .attr($.extend({id: conf.id, class: 'formset-date-container'}, {}));
     conf._input_day = $('<input/>')
-        .attr($.extend({id: conf.id + '_day', type: 'number'}, conf.attr[0] || {}))
+        .attr($.extend({id: conf.id + '_day'}, conf.attr[0] || {}))
         .appendTo(container);
     conf._input_month = $('<select/>')
         .attr($.extend({id: conf.id + '_month'}, {}))
         .appendTo(container);
     conf._input_year = $('<input/>')
-        .attr($.extend({id: conf.id + '_year', type: 'number'}, conf.attr[1] || {}))
+        .attr($.extend({id: conf.id + '_year'}, conf.attr[1] || {}))
         .appendTo(container);
 
     conf._input_month.selectize($.extend({
