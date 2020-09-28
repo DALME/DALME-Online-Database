@@ -225,8 +225,11 @@ def get_recent_essays():
 
 @register.simple_tag()
 def collection_date_range(collection):
-    years = sorted(collection.source_set.get_time_coverage.keys())
-    return f'{years[0]} - {years[-1]}'
+    years = sorted(collection.source_set.get_public_time_coverage().keys())
+    try:
+        return f'{years[0]} - {years[-1]}' if len(years) > 1 else f'{years[0]}+'
+    except IndexError:
+        return 'Unknown'
 
 
 @register.simple_tag()
