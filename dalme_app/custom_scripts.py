@@ -25,6 +25,7 @@ from haystack.query import SearchQuerySet
 from wagtail.users.models import UserProfile
 from django.conf import settings
 from django.db.models import OuterRef, Subquery
+import requests
 
 
 def get_script_menu():
@@ -241,17 +242,11 @@ def migrate_datasets(request):
     return result
 
 def test_expression(request):
-    test = {
-        'name': 'the_name',
-        'attributes': {
-            'att1': 'value1',
-            'att2': 'value2'
-        }
-    }
-    field = 'attributes.att2'
-    group, field = field.split('.') if '.' in field else (None, field)
-    return group
-    # return test.get(group, test).get(field)
+    try:
+        ip = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
+    except requests.exceptions.ConnectionError:
+        return 'Error'
+    return ip
 
 
 def fix_users(records):
@@ -266,8 +261,7 @@ def fix_users(records):
 
 
 def test_expression2(request):
-    p1, p2 = test_function()
-    return str(p1 + ' | ' + p2)
+    return str(settings.ALLOWED_HOSTS)
 
 
 def test_function():
