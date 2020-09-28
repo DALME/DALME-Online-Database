@@ -363,8 +363,15 @@ function setTagMenu(action) {
   if (action == 'on') {
       if (typeof tag_menu_html == 'undefined') {
           $.ajax({
-              method: "GET",
-              url: "/api/configs/?target=editor_tei_tags"
+            method: "POST",
+            url: "/api/configs/get/",
+            headers: {
+              "Content-Type": "application/json",
+              'X-CSRFToken': get_cookie("csrftoken")
+            },
+            data: JSON.stringify({
+              'target': 'editor_tei_tags'
+            })
           }).done(function(data, textStatus, jqXHR) {
               tei_tags = data[0];
               tag_menu_html = '';
@@ -569,32 +576,39 @@ function getTitle(e, tag) {
 }
 
 function editDescription() {
-  initial_description_text = $('#descriptionEditor').text();
-  if (initial_description_text == 'No description.') {
-      $('#descriptionEditor').removeClass('empty-card-message');
+  if ($('#descriptionEditor').length) {
+    initial_description_text = $('#descriptionEditor').text();
+    $('#descriptionEditor').attr('contenteditable', true);
+  } else {
+    $('#description-container').html('<div id="descriptionEditor" contenteditable="true"></div>')
+    initial_description_text = '';
   }
-  $('#descriptionEditor').attr('contenteditable', true);
   $('#descriptionEditorToolbar').html('<button class="sub-card-button" role="button" onclick="saveDescription()">Save</button>\
   <button class="sub-card-button" role="button" onclick="cancelDescription()">Cancel</button>');
 }
 
 function cancelDescription() {
   if (confirm("Cancel the editing session? All your changes will be lost.")) {
-    $('#descriptionEditorToolbar').html('<button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>');
-    $('#descriptionEditor').text(initial_description_text);
-    $('#descriptionEditor').attr('contenteditable', false);
-    if (initial_description_text == 'No description.') {
-        $('#descriptionEditor').addClass('empty-card-message');
-    }
+    endDescriptionEditing(initial_description_text)
   }
+}
+
+function endDescriptionEditing(description_text) {
+  if (description_text == '') {
+      $('#description-container').html('<div class="placeholder d-flex justify-content-center align-items-center">\
+          <div class="d-block fa-stack mt-5 mb-5"><i class="d-block fas fa-align-left fa-stack-2x"></i><i class="d-block fas fa-slash fa-stack-2x"></i>\
+          </div></div>')
+  } else {
+    $('#descriptionEditor').text(description_text);
+    $('#descriptionEditor').attr('contenteditable', false);
+  }
+  $('#descriptionEditorToolbar').html('<button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>');
 }
 
 function saveDescription() {
   var description_text = $('#descriptionEditor').text();
   if (description_text !== initial_description_text) {
     if (confirm("Save changes and exit? This action cannot be undone.")) {
-      var action = 'update'
-      if (initial_description_text == 'No description.') { action = 'create' }
       $.ajax({
         method: "PATCH",
         url: "/api/sources/"+source_id+"/change_description/",
@@ -602,18 +616,18 @@ function saveDescription() {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
         },
-        data: JSON.stringify({ "action": action, "description": description_text })
+        data: JSON.stringify({ "description": description_text })
       }).done(function(data, textStatus, jqXHR) {
           toastr.success("The description was updated.");
+          endDescriptionEditing(description_text)
       }).fail(function(jqXHR, textStatus, errorThrown) {
         if (errorThrown == "Forbidden") {
           toastr.error("You do not have the required permissions to modify this description.");
         } else {
           toastr.error('There was an error saving the description to the server: '+errorThrown);
         }
+        endDescriptionEditing(initial_description_text)
       });
-      $('#descriptionEditorToolbar').html('<button class="sub-card-button" role="button" onclick="editDescription()">Edit</button>');
-      $('#descriptionEditor').attr('contenteditable', false);
     }
   }
 }

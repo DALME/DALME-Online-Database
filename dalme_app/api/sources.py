@@ -69,20 +69,23 @@ class Sources(DALMEBaseViewSet):
     @action(detail=True, methods=['patch'])
     def change_description(self, request, *args, **kwargs):
         object = self.get_object()
-        try:
-            action = self.request.POST['action']
-            desc_text = self.request.POST['description']
-            desc_att_obj = Attribute_type.objects.get(pk=79)
-            if action == 'update':
-                att_obj = Attribute.objects.filter(object_id=object.id, attribute_type=desc_att_obj)[0]
-                att_obj.value_TXT = desc_text
-                att_obj.save(update_fields=['value_TXT', 'modification_user', 'modification_timestamp'])
-            elif action == 'create':
-                object.attributes.create(attribute_type=desc_att_obj, value_TXT=desc_text)
-            result = {'message': 'Update succesful.'}
-            status = 201
-        except Exception as e:
-            result = {'error': str(e)}
+        if self.request.data.get('description') is not None:
+            try:
+                desc_text = self.request.data['description']
+                desc_att_obj = Attribute_type.objects.get(pk=79)
+                if Attribute.objects.filter(object_id=object.id, attribute_type=desc_att_obj).exists():
+                    att_obj = Attribute.objects.get(object_id=object.id, attribute_type=desc_att_obj)
+                    att_obj.value_TXT = desc_text
+                    att_obj.save(update_fields=['value_TXT', 'modification_user', 'modification_timestamp'])
+                else:
+                    object.attributes.create(attribute_type=desc_att_obj, value_TXT=desc_text)
+                result = {'description': att_obj.value_TXT}
+                status = 201
+            except Exception as e:
+                result = {'error': str(e)}
+                status = 400
+        else:
+            result = {'error': 'No description supplied.'}
             status = 400
         return Response(result, status)
 

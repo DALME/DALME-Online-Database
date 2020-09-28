@@ -1,0 +1,22 @@
+[
+ {
+   "label": "Bug",
+   "tag": "bug"
+ },
+ {
+   "label": "Feature",
+   "tag": "feature"
+ },
+ {
+   "label": "Documentation",
+   "tag": "documentation"
+ },
+ {
+   "label": "Question",
+   "tag": "question"
+ },
+ {
+   "label": "Content",
+   "tag": "content"
+ }
+]

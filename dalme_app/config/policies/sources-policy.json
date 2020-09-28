@@ -10,18 +10,18 @@
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy"],
+    "action": ["create", "change_description", "partial_update", "update", "destroy"],
     "principal": ["group:Administrators"],
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "update", "destroy"],
+    "action": ["partial_update", "change_description", "update", "destroy"],
     "principal": ["*"],
     "effect": "allow",
     "condition": "is_owner"
   },
   {
-    "action": ["partial_update", "update", "destroy"],
+    "action": ["partial_update", "change_description", "update"],
     "principal": ["*"],
     "effect": "allow",
     "condition": "in_dataset_usergroup"

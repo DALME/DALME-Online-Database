@@ -7,6 +7,9 @@
     <link href="{% static 'css/dalme_app/_workflow_manager.css' %}" rel="stylesheet">
     <link href="{% static 'css/dalme_app/_workset_controller.css' %}" rel="stylesheet">
   {% endcompress %}
+  {% compress js %}
+  <script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
+  {% endcompress %}
   {% if has_pages or has_children %}
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/2.0.2/css/scroller.bootstrap4.min.css"/>
   <script type="text/javascript" src="https://cdn.datatables.net/scroller/2.0.2/js/dataTables.scroller.min.js"></script>
@@ -158,7 +161,7 @@
                   </div>
                 {% endif %}
               </div>
-              <div class="card-body">
+              <div class="card-body" id="description-container">
                 {% if description %}
                   <div id="descriptionEditor">{{ description }}</div>
                 {% else %}

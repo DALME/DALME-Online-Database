@@ -164,10 +164,10 @@ class SourceDetail(DetailView):
             context['folio_menu'] = folios['folio_menu']
             context['folio_list'] = folios['folio_list']
             tables.append(['pages', 'fa-book-open', title])
-        # if has_children:
-        #     title = 'Children (' + str(len(self.object.children) + ')'
-        #     context['children'] = self.object.children.all().order_by('name')
-        #     tables.append(['children', 'fa-sitemap', title])
+        if has_children:
+            title = 'Children (' + str(len(self.object.children.all())) + ')'
+            context['children'] = self.object.children.all().order_by('name')
+            tables.append(['children', 'fa-sitemap', title])
         if has_agents:
             title = 'Agents (' + str(len(self.object.agents)) + ')'
             context['agents'] = self.object.agents
@@ -203,7 +203,7 @@ class SourceDetail(DetailView):
                 label = a.attribute_type.name
                 value = str(a)
                 if label == 'Description':
-                    result['description'] = value
+                    result['description'] = a.value_TXT
                 else:
                     attributes.append({'label': label, 'value': value})
         if self.object.inherited is not None:

@@ -1,0 +1,19 @@
+{
+  "label": "Tags",
+  "name": "tags[].tag",
+  "type": "selectize",
+  "opts": {
+    "maxItems": 10,
+    "labelField": "label",
+    "valueField": "tag",
+    "preload": true,
+    "plugins": [
+      "remove_button"
+    ],
+    "placeholder": "Tag ticket"
+  },
+  "options": {
+    "type": "api_call",
+    "url": "/api/choices/?type=list&field=ticket.tags&format=json&search="
+  }
+}
