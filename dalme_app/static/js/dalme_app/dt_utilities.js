@@ -60,10 +60,10 @@ function build_editor(data, target) {
 
       for (let i = 0, len = fields.length; i < len; ++i) {
         if (required_list.includes(fields[i])) {
-          $('#form-field-container').append('<div class="d-flex flex-row-reverse" data-editor-template="' + fields[i]
+          $('#form-field-container').append('<div class="flex-row-reverse" data-editor-template="' + fields[i]
               + '"></div>');
         } else {
-          $('#form-field-container').append('<div class="d-flex flex-row-reverse" data-editor-template="' + fields[i]
+          $('#form-field-container').append('<div class="flex-row-reverse" data-editor-template="' + fields[i]
               + '"><i class="fas fa-times-circle field_clear_button"></i></div>');}
       }
 

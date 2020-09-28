@@ -100,8 +100,10 @@
 #form-field-container {
   display: flex;
   flex-direction: column;
-  padding-left: 1rem;
-  padding-right: 1.5rem;
+  /* padding-left: 1rem; */
+  padding-left: 10px;
+  /* padding-right: 1.5rem; */
+  padding-right: 30px;
   padding-top: 1.5rem;
   padding-bottom: .75rem;
   max-width: 500px;
@@ -166,11 +168,18 @@
   line-height: 18px;
 }
 
-.DTE .form-group {
+/* .DTE .form-group {
   margin-bottom: 10px;
   padding-left: 20px;
   flex: 1 1 auto;
+} */
+
+.DTE .form-group {
+  margin-bottom: 10px;
+  margin-left: 17px;
+  flex: 1 1 auto;
 }
+
 
 .DTE .form-text {
   font-size: 13px;
@@ -452,7 +461,7 @@
   border-left: 1px solid #a5a5a5;
 }
 
-.field_clear_button {
+/* .field_clear_button {
   font-size: 16px;
   color: #e6e6e6;
   display: flex;
@@ -461,6 +470,14 @@
   cursor: pointer;
   padding-top: 6px;
   cursor: pointer;
+} */
+
+.field_clear_button {
+  font-size: 14px;
+  color: #e6e6e6;
+  cursor: pointer;
+  position: absolute;
+  margin-top: 2px;
 }
 
 .field_clear_button:hover {
@@ -648,6 +665,12 @@
 
 .DTE_Field_Type_checkbox div[data-dte-e="input"] {
   padding-left: 1px;
+  padding-top: 3px;
+}
+
+.DTE_Field_Type_checkbox input {
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .DTE_Field_Type_checkbox .DTE_Field_InputControl > div > div {
@@ -659,8 +682,8 @@ div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
   margin-bottom: 0;
   display: inline-block;
   overflow: hidden;
-  flex-grow: 0;
-  flex-shrink: 1;
+  margin-left: 10px;
+  width: 94%;
 }
 
 .formset_flatentry {
