@@ -28,6 +28,8 @@ class AttributeSerializer(serializers.ModelSerializer):
                     'm': instance.value_DATE_m,
                     'y': instance.value_DATE_y
                 }}}
+        elif instance.attribute_type.data_type == 'TXT':
+            return {label: instance.value_TXT}
         else:
             return {label: str(instance)}
 
