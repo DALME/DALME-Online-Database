@@ -33,8 +33,11 @@ class RightsPolicySerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         if data.get('attachments') is not None:
             if data['attachments'].get('file') is not None:
-                if type(data['attachments']['file']) is dict:
+                if type(data['attachments']['file']) is dict and data['attachments']['file'].get('file_id') is not None:
                     data['attachments'] = data['attachments']['file']['file_id']
                 else:
                     data['attachments'] = data['attachments']['file']
+            else:
+                data.pop('attachments')
+
         return super().to_internal_value(data)
