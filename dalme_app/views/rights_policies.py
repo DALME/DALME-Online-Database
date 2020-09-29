@@ -47,7 +47,7 @@ class RightsDetail(DetailView):
             'Rights Status': self.object.get_rights_status_display(),
             'Rights': self.object.rights,
             'Notice Display': notice_disp,
-            'Rights Notice': json.loads(self.object.rights_notice),
+            'Rights Notice': self.object.rights_notice,
             'Licence': self.object.licence,
             'Attachment': '<a href="/download/{}">{}</a></div></div>'.format(self.object.attachments.file, self.object.attachments.filename)
         }
