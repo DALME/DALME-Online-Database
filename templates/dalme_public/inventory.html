@@ -186,7 +186,7 @@
           node.innerHTML = `<div class="warning">${warning}</div>`;
         } else {
           window.folio = new Diva('diva_viewer', {
-            objectData: `{% host_url 'page_list' host 'db' %}${pageId}/manifest`,
+            objectData: `//db.dalme.org/pages/${pageId}/manifest`, //better still: {% host_url 'page_manifest' host 'db' pk='${pageId}' %}
             enableAutoTitle: false,
             enableFullscreen: false,
             enableKeyScroll: false,
