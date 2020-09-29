@@ -113,7 +113,7 @@ function build_editor(data, target) {
                     delete json['fieldErrors'];
                   }
                 }
-              } else if (json.hasOwnProperty('data')) {
+              } else if (json.hasOwnProperty('data') && json['data'].hasOwnProperty('detail')) {
                   toastr.error(json['data']['detail']);
                   dt_editor.close()
               }
@@ -542,24 +542,22 @@ function update_dt_url(data) {
   dt_table.ajax.url(url)
 }
 
-function filter_set(data, options=[]) {
-  var param_list = []
-
-  for (const prop in data) {
-    if (data.hasOwnProperty(prop)) {
-      param_list.push(prop)
+function filter_set(set, clear=[]) {
+  console.log('clear = ' + JSON.stringify(clear))
+  console.log('set = ' + JSON.stringify(set))
+  for (const prop in set) {
+    if (set.hasOwnProperty(prop)) {
+      clear.push(prop)
     }
   }
-
-  var url = remove_param(param_list, dt_table.ajax.url())
-
-  if (!options.includes('clear')) {
-    for (let i = 0, len = param_list.length; i < len; ++i) {
-      if (data[param_list[i]] != 'clear') {
-        url = url + '&' + param_list[i] + '=' + data[param_list[i]]
-      }
+  console.log('compiled clear = ' + JSON.stringify(clear))
+  var url = remove_param(clear, dt_table.ajax.url())
+  console.log('clean url = ' + url)
+  for (const prop in set) {
+    if (set.hasOwnProperty(prop)) {
+      url = url + '&' + prop + '=' + set[prop]
     }
   }
-
+  console.log('request url = ' + url)
   dt_table.ajax.url(url).load();
 }

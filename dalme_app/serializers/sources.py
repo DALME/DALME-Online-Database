@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from dalme_app.models import Agent, Attribute_type, Content_attributes, Set, Set_x_content, Source, Source_credit, Workflow, Work_log
 from dalme_app.models._templates import get_current_user
 from rest_framework import serializers
-from ._common import DynamicSerializer, translate_workflow_status
+from ._common import DynamicSerializer, translate_workflow_string
 from dalme_app.serializers.users import UserSerializer
 from dalme_app.serializers.attributes import AttributeSerializer
 from dalme_app.serializers.others import TagSerializer
@@ -128,9 +128,8 @@ class SourceSerializer(DynamicSerializer):
 
         if data.get('workflow') is not None and data['workflow'].get('status') is not None:
             if data['workflow']['status']['text'] is not None:
-                values = translate_workflow_status(data['workflow']['status']['text'])
-                data['workflow']['wf_status'] = values['wf_status']
-                data['workflow']['stage'] = values['stage']
+                for wf_k, wf_v in translate_workflow_string(data['workflow']['status']['text']).items():
+                    data['workflow'][wf_k] = wf_v
             else:
                 data['workflow'].pop('status')
 
@@ -193,9 +192,8 @@ class SourceSerializer(DynamicSerializer):
                 workflow = Workflow.objects.create(source=source, last_modified=source.modification_timestamp)
                 Work_log.objects.create(source=workflow, event='Source created', timestamp=workflow.last_modified)
             if workflow_data.get('status') is not None:
-                status_data = translate_workflow_status(workflow_data['status'])
-                workflow.wf_status = status_data.get('wf_status', workflow.wf_status)
-                workflow.stage = status_data.get('stage', workflow.stage)
+                for wf_k, wf_v in translate_workflow_string(workflow_data['status']).items():
+                    setattr(workflow, wf_k, wf_v)
             workflow.help_flag = workflow_data.get('help_flag', workflow.help_flag)
             workflow.is_public = workflow_data.get('is_public', workflow.is_public)
             workflow.save()
@@ -262,9 +260,8 @@ class SourceSerializer(DynamicSerializer):
             workflow_data = validated_data.pop('workflow')
             workflow = instance.workflow
             if workflow_data.get('status') is not None:
-                status_data = translate_workflow_status(workflow_data['status'])
-                workflow.wf_status = status_data.get('wf_status', workflow.wf_status)
-                workflow.stage = status_data.get('stage', workflow.stage)
+                for wf_k, wf_v in translate_workflow_string(workflow_data['status']).items():
+                    setattr(workflow, wf_k, wf_v)
             workflow.help_flag = workflow_data.get('help_flag', workflow.help_flag)
             workflow.is_public = workflow_data.get('is_public', workflow.is_public)
             workflow.save()

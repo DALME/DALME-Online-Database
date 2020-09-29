@@ -13,10 +13,7 @@ function ownership_filter_module_init() {
   container.insertBefore('#dataTables-list_filter');
   $(container).find('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
   $(container).on('click.dalme', 'button', function() {
-      if ($(this).hasClass('active')) {
-        filter_set({'mode': ''}, options=['clear']);
-        $(this).removeClass('active');
-      } else {
+      if (!$(this).hasClass('active')) {
         $(container).find('.active').removeClass('active');
         filter_set({'mode': $(this).data('of-mode')});
         $(this).addClass('active');

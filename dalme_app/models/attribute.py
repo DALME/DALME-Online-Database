@@ -32,14 +32,6 @@ class Attribute(dalmeUuid):
 
     def __str__(self):
         return self.value_STR
-        # if self.attribute_type.data_type == 'DATE':
-        #     str_val = self.value_STR
-        # elif self.attribute_type.data_type == 'FK-UUID' or self.attribute_type.data_type == 'FK-INT':
-        #     object = self.get_dalme_object()
-        #     str_val = '<a href="{}">{}</a>'.format(object.get_url(), object.name)
-        # else:
-        #     str_val = str(eval('self.value_' + self.attribute_type.data_type))
-        # return str_val
 
     def save(self, *args, **kwargs):
         if self.attribute_type.data_type == 'DATE':

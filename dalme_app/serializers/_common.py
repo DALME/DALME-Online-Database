@@ -18,30 +18,59 @@ class DynamicSerializer(serializers.ModelSerializer):
                     self.fields.pop(k)
 
 
-def translate_workflow_status(data):
+def translate_workflow_string(data):
     stage_by_no = dict(Workflow.PROCESSING_STAGES)
+    status_by_no = dict(Workflow.WORKFLOW_STATUS)
     stage_by_name = {label: number for number, label in stage_by_no.items()}
+    status_by_name = {label: number for number, label in status_by_no.items()}
+
     if type(data) is str:
-        str_elements = data.split(' ')
+        str_elements = data.strip().split(' ')
         if len(str_elements) == 1:
-            return {'wf_status': 1}
+            status = status_by_name[str_elements[0].strip().lower()]
+
+            if status == 1:
+                return {'wf_status': status}
+
+            elif status == 3:
+                return {
+                            'wf_status': status,
+                            'stage': 5,
+                            'ingestion_done': True,
+                            'transcription_done': True,
+                            'markup_done': True,
+                            'review_done': True,
+                            'parsing_done': True
+                       }
+
         elif len(str_elements) == 2:
-            return {'wf_status': 3, 'stage': stage_by_name[str_elements[1]] + 1}
+            stage_name = str_elements[1].strip().lower()
+            stage = stage_by_name[stage_name] - 1
+            value = {
+                        'wf_status': 2,
+                        'stage': stage
+                    }
+
+            for i in range(1, 6):
+                value[stage_by_no[i] + '_done'] = True if i <= stage else False
+
+            return value
+
         elif len(str_elements) == 3:
-            return {'wf_status': 2, 'stage': stage_by_name[str_elements[0]]}
+            stage_name = str_elements[0].strip().lower()
+            stage = stage_by_name[stage_name]
+            value = {
+                        'wf_status': 2,
+                        'stage': stage
+                    }
+
+            for i in range(1, 6):
+                value[stage_by_no[i] + '_done'] = True if i < stage else False
+
+            return value
+
         else:
             raise ValueError('Incorrect data supplied: invalid text string.')
-    elif type(data) is dict:
-        if data.get('wf_status') is not None and data.get('stage') is not None:
-            if data['wf_status'] == 1:
-                return 'assessing'
-            elif data['wf_status'] == 2:
-                return '{} in progress'.format(stage_by_no[data['stage']])
-            elif data['wf_status'] == 3:
-                return 'awaiting {}'.format(stage_by_no[data['stage'] + 1])
-            else:
-                raise ValueError('Incorrect data supplied: invalid wf_status value.')
-        else:
-            raise ValueError('Incorrect data supplied: dict must contain keys wf_status and stage.')
+
     else:
-        raise ValueError('Incorrect data supplied: must be string or dict.')
+        raise ValueError('Incorrect data supplied: must be a string.')
