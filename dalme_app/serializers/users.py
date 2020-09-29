@@ -38,7 +38,9 @@ class UserSerializer(DynamicSerializer):
     def update(self, instance, validated_data):
         if self.context.get('profile') is not None:
             profile_data = self.context.get('profile')
-            profile = instance.profile
+            profile = Profile.objects.get_or_create(user=instance)
+            if type(profile) is tuple:
+                profile = profile[0]
             if profile_data.get('primary_group') is not None and type(profile_data.get('primary_group')) is int:
                 profile_data['primary_group'] = Group.objects.get(pk=profile_data['primary_group'])
             for attr, value in profile_data.items():
