@@ -37,7 +37,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # Application definition
-ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io']
+ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io', 'public.127.0.0.1.xip.io:8443', 'public.127.0.0.1.xip.io']
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ALLOW_CREDENTIALS = True
 # SESSION_COOKIE_SAMESITE = None
