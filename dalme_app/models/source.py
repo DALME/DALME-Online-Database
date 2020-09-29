@@ -174,6 +174,9 @@ class Source_credit(dalmeUuid):
     type = models.IntegerField(choices=CREDIT_TYPES)
     note = models.CharField(max_length=255, blank=True, null=True)
 
+    class Meta:
+        unique_together = ('source', 'agent', 'type')
+
 
 class Source_pages(dalmeIntid):
     source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='source_pages')
