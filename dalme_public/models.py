@@ -52,6 +52,11 @@ from dalme_public.blocks import (
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 
+@hooks.register('construct_settings_menu')
+def hide_users_menu_item(request, menu_items):
+    menu_items[:] = [item for item in menu_items if item.name not in ['users', 'groups']]
+
+
 @hooks.register('before_serve_page')
 def redirects(page, request, serve_args, serve_kwargs):
     if page.is_root():
