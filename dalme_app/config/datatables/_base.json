@@ -10,7 +10,7 @@
       "serverSide": true,
       "stateSave": true,
       "select": {
-        "style": true
+        "style": "single"
       },
       "deferRender": true,
       "rowId": "id",
