@@ -52,7 +52,7 @@ class Sets(DALMEBaseViewSet):
     def remove_members(self, request, *args, **kwargs):
         try:
             set_id = kwargs.get('pk')
-            members = json.loads(self.request.data['members'])
+            members = self.request.data['members']
             member_objects = Set_x_content.objects.filter(set_id=set_id, object_id__in=members)
             member_objects.delete()
             result = {'message': 'Action succesful.'}
