@@ -1,4 +1,4 @@
-from dalme_app.models import *
+from dalme_app.models import * # NOQA
 from rest_framework import serializers
 import json
 
@@ -7,7 +7,7 @@ class AttributeSerializer(serializers.ModelSerializer):
     """ DT serializer for attribute data """
 
     class Meta:
-        model = Attribute
+        model = Attribute # NOQA
         fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'value_JSON')
 
     def to_representation(self, instance):
@@ -33,6 +33,47 @@ class AttributeSerializer(serializers.ModelSerializer):
         else:
             return {label: str(instance)}
 
+    def to_internal_value(self, data):
+        (key, value), = data.items()
+        _type = Attribute_type.objects.get(short_name=key) # NOQA
+
+        if _type.data_type == 'INT':
+            data = {
+                'attribute_type': _type.id,
+                'value_INT': int(value)
+            } if value is not None else None
+
+        elif _type.data_type == 'TXT':
+            data = {
+                'attribute_type': _type.id,
+                'value_TXT': value
+            } if value is not None else None
+
+        elif _type.data_type == 'DATE':
+            value_dict = {}
+            for item in ['d', 'm', 'y']:
+                if value['value'].get(item) is not None:
+                    value_dict['value_DATE_' + item] = value['value'][item]
+            if value_dict:
+                value_dict['attribute_type'] = _type.id
+                data = value_dict
+            else:
+                data = None
+
+        elif _type.data_type == 'FK-INT' or _type.data_type == 'FK-UUID':
+            data = {
+                'attribute_type': _type.id,
+                'value_JSON': json.loads(value['id'])
+            } if type(value) is dict and value.get('id') is not None else None
+
+        elif _type.data_type == 'STR':
+            data = {
+                'attribute_type': _type.id,
+                'value_STR': value
+            } if value is not None else None
+
+        return super().to_internal_value(data)
+
 
 class SimpleAttributeSerializer(serializers.ModelSerializer):
     """ Basic serializer for attribute data """
@@ -42,7 +83,7 @@ class SimpleAttributeSerializer(serializers.ModelSerializer):
     options_list = serializers.CharField(max_length=15, source='attribute_type.options_list', read_only=True)
 
     class Meta:
-        model = Attribute
+        model = Attribute # NOQA
         fields = ('id', 'attribute_type', 'value_STR', 'value_TXT', 'attribute_name',
                   'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'data_type', 'options_list')
 

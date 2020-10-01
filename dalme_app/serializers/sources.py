@@ -1,6 +1,5 @@
-import json
 from django.contrib.auth.models import User
-from dalme_app.models import Agent, Attribute_type, Content_attributes, Set, Set_x_content, Source, Source_credit, Workflow, Work_log
+from dalme_app.models import Agent, Content_attributes, Set, Set_x_content, Source, Source_credit, Workflow, Work_log
 from dalme_app.models._templates import get_current_user
 from rest_framework import serializers
 from ._common import DynamicSerializer, translate_workflow_string
@@ -10,6 +9,7 @@ from dalme_app.serializers.others import TagSerializer
 from dalme_app.serializers.page import PageSerializer
 from dalme_app.serializers.workflow import WorkflowSerializer
 from dalme_app.serializers.sets import SetSerializer
+from uuid import UUID
 
 
 class SourceSetSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class SourceSetSerializer(serializers.ModelSerializer):
 
 class SourceCreditSerializer(DynamicSerializer):
     agent = serializers.ReadOnlyField(source='agent.standard_name', required=False)
-    agent_id = serializers.ReadOnlyField(source='agent.id', required=False)
+    agent_id = serializers.UUIDField(source='agent.id', required=True)
     notes = serializers.ReadOnlyField(source='agent.notes', required=False)
 
     class Meta:
@@ -68,83 +68,62 @@ class SourceSerializer(DynamicSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
+
         if ret.get('attributes') is not None:
-            ret['attributes'] = self.process_attributes(ret.pop('attributes'), instance)
+            ret['attributes'] = self.process_attributes(instance.type, ret.pop('attributes'))
+
         if ret.get('inherited') is not None:
             if ret['inherited'] is not None:
                 ret['inherited'] = self.process_attributes(ret.pop('inherited'))
+
         if ret.get('parent') is not None:
-            if ret['parent']:
-                ret['parent'] = {'id': ret['parent'], 'name': instance.parent.name}
-        if ret.get('type') is not None:
-            ret['type'] = {
-                'name': instance.type.name,
-                'id': ret['type']
-            }
+            ret['parent'] = {'id': instance.parent.id, 'name': instance.parent.name}
+
+        ret['type'] = {
+            'name': instance.type.name,
+            'id': instance.type.id
+        }
+
         for k, v in dict(ret).items():
             if v is None:
                 ret.pop(k)
+
         return ret
 
     def to_internal_value(self, data):
-        try:
-            ct = self.instance.type
-        except AttributeError:
-            ct = data['type']
-        multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(content_type=ct) if not i.unique]
-        deserialised = []
-        for key, value in data['attributes'].items():
-            att_type = Attribute_type.objects.get(short_name=key)
-            if key in multi_attributes and value == 0:
-                continue
-            value_list = value if key in multi_attributes else [value]
-            for v in value_list:
-                if v is not None:
-                    att = {'attribute_type': att_type.id}
-                    add_att = True
-                    if att_type.data_type == 'INT':
-                        att['value_INT'] = int(v)
-                    elif att_type.data_type == 'TXT':
-                        att['value_TXT'] = v
-                    elif att_type.data_type == 'DATE':
-                        if v['d'] is None and v['m'] is None and v['y'] is None:
-                            add_att = False
-                        else:
-                            att['value_DATE_d'] = v['d']
-                            att['value_DATE_m'] = v['m']
-                            att['value_DATE_y'] = v['y']
-                    elif att_type.data_type == 'FK-INT' or att_type.data_type == 'FK-UUID':
-                        if type(v) is dict and v.get('id') is not None:
-                            att['value_JSON'] = json.loads(v['id'])
-                        elif type(v) is str and v != '':
-                            att['value_JSON'] = json.loads(v)
-                        else:
-                            add_att = False
-                    else:
-                        att['value_STR'] = v
-                    if add_att:
-                        deserialised.append(att)
-        data['attributes'] = deserialised
 
-        if data.get('workflow') is not None and data['workflow'].get('status') is not None:
+        for name in ['type', 'parent']:
+            if data.get(name) is not None:
+                data[name] = data[name]['id']
+
+        if data.get('attributes'):
+            _type = data.get('type', False) or self.instance.type
+            data['attributes'] = self.process_attributes(_type, data['attributes'])
+
+        if data.get('workflow', {}).get('status') is not None:
             if data['workflow']['status']['text'] is not None:
-                for wf_k, wf_v in translate_workflow_string(data['workflow']['status']['text']).items():
-                    data['workflow'][wf_k] = wf_v
+                for key, value in translate_workflow_string(data['workflow']['status']['text']).items():
+                    data['workflow'][key] = value
             else:
                 data['workflow'].pop('status')
 
-        for f in ['credits']:
-            if data.get(f) is not None:
-                f_value = data.pop(f)
-                if f_value != 0:
-                    self.context[f] = f_value
+        if data.get('credits') is not None:
+            if data.get('credits'):
+                credits_data = data.pop('credits')
+                data['credits'] = [{
+                    'agent_id': i['standard_name'],
+                    'type': i['type']
+                } for i in credits_data if i and i is not None]
+            else:
+                data.pop('credits')
 
-        for f in ['sets', 'pages']:
-            if data.get(f) is not None and data.get(f) == 0:
-                data.pop(f)
+        for name in ['sets', 'pages']:
+            if data.get(name) is not None and not data.get(name):
+                data.pop(name)
 
-        if data.get('owner') is None:
-            data['owner'] = get_current_user().id
+        data['owner'] = {'id': data.get('owner', {}).get('id', get_current_user().id)}
+        data['owner']['username'] = User.objects.get(pk=data['owner']['id']).username
+
         return super().to_internal_value(data)
 
     def run_validation(self, data):
@@ -154,7 +133,7 @@ class SourceSerializer(DynamicSerializer):
                 13: ['name', 'short_name', 'parent', 'has_inventory', 'attributes.record_type', 'attributes.language'],
                 19: ['name', 'short_name', 'attributes.locale']
             }
-            required = required_dict.get(data['type'], ['name', 'short_name'])
+            required = required_dict.get(data['type']['id'], ['name', 'short_name'])
             missing = {}
             for field in required:
                 group, field = field.split('.') if '.' in field else (None, field)
@@ -170,177 +149,173 @@ class SourceSerializer(DynamicSerializer):
         return validated_data
 
     def create(self, validated_data):
-        attributes_data = validated_data.pop('attributes') if validated_data.get('attributes') is not None else False
-        workflow_data = validated_data.pop('workflow') if validated_data.get('workflow') is not None else False
-        pages_data = validated_data.pop('pages') if validated_data.get('pages') is not None else False
-        sets_list = [i['set_id']['id'] for i in validated_data.pop('sets')] if validated_data.get('sets') is not None else False
-        credits_data = self.context['credits'] if self.context.get('credits') is not None else False
+        attributes = validated_data.pop('attributes', None)
+        workflow = validated_data.pop('workflow', None)
+        pages = validated_data.pop('pages', None)
+        sets = validated_data.pop('sets', None)
+        credits = validated_data.pop('credits', None)
 
         if validated_data.get('owner') is not None:
             validated_data['owner'] = User.objects.get(username=validated_data['owner']['username'])
 
         source = Source.objects.create(**validated_data)
 
-        if attributes_data:
-            for attribute in attributes_data:
-                source.attributes.create(**attribute)
-
-        if workflow_data:
-            try:
-                workflow = source.workflow
-            except Workflow.DoesNotExist:
-                workflow = Workflow.objects.create(source=source, last_modified=source.modification_timestamp)
-                Work_log.objects.create(source=workflow, event='Source created', timestamp=workflow.last_modified)
-            if workflow_data.get('status') is not None:
-                for wf_k, wf_v in translate_workflow_string(workflow_data['status']).items():
-                    setattr(workflow, wf_k, wf_v)
-            workflow.help_flag = workflow_data.get('help_flag', workflow.help_flag)
-            workflow.is_public = workflow_data.get('is_public', workflow.is_public)
-            workflow.save()
-
-        if pages_data:
-            for page in pages_data:
-                source.pages.create(**page)
-
-        if sets_list:
-            for _set in sets_list:
-                set_obj = Set.objects.get(pk=_set)
-                Set_x_content.objects.create(set_id=set_obj, content_object=source)
-
-        if credits_data:
-            for credit in credits_data:
-                credit.pop('id')
-                agent = Agent.objects.get(pk=credit.pop('standard_name'))
-                Source_credit.objects.create(source=source, agent=agent, **credit)
+        self.update_or_create_attributes(source, attributes)
+        self.update_or_create_workflow(source, workflow)
+        self.update_or_create_pages(source, pages)
+        self.update_or_create_sets(source, sets)
+        self.update_or_create_credits(source, credits)
 
         return source
 
     def update(self, instance, validated_data):
-        if validated_data.get('attributes') is not None:
-            attributes_data = validated_data.pop('attributes')
-            multi_attributes = [i.attribute_type for i in Content_attributes.objects.filter(content_type=instance.type) if not i.unique]
-            attributes = {}
-            for attribute in attributes_data:
-                if attribute['attribute_type'] in multi_attributes:
-                    if attributes.get(attribute['attribute_type']) is not None:
-                        attributes[attribute['attribute_type']].append(attribute)
-                    else:
-                        attributes[attribute['attribute_type']] = [attribute]
-                else:
-                    attributes[attribute['attribute_type']] = attribute
-
-            current_attributes = instance.attributes.all()
-            control = []
-
-            for att_type, attribute_dict in attributes.items():
-                if type(attribute_dict) is list:
-                    current_attributes.filter(attribute_type=att_type).delete()
-                    for att in attribute_dict:
-                        na = instance.attributes.create(**att)
-                        control.append(na.id)
-                else:
-                    if current_attributes.filter(**attribute_dict).exists():
-                        control.append(current_attributes.get(**attribute_dict).id)
-                    elif current_attributes.filter(attribute_type=att_type).count() > 0:
-                        attribute = current_attributes.get(attribute_type=att_type)
-                        attribute_dict.pop('attribute_type')
-                        for attr, value in attribute_dict.items():
-                            setattr(attribute, attr, value)
-                        attribute.save()
-                        control.append(attribute.id)
-                    else:
-                        na = instance.attributes.create(**attribute_dict)
-                        control.append(na.id)
-
-            for attribute in current_attributes:
-                if attribute.id not in control:
-                    attribute.delete()
-
-        if validated_data.get('workflow') is not None:
-            workflow_data = validated_data.pop('workflow')
-            workflow = instance.workflow
-            if workflow_data.get('status') is not None:
-                for wf_k, wf_v in translate_workflow_string(workflow_data['status']).items():
-                    setattr(workflow, wf_k, wf_v)
-            workflow.help_flag = workflow_data.get('help_flag', workflow.help_flag)
-            workflow.is_public = workflow_data.get('is_public', workflow.is_public)
-            workflow.save()
-
-        if validated_data.get('pages') is not None:
-            pages_data = validated_data.pop('pages')
-            current_pages = instance.pages.all()
-            control = []
-            for page_dict in pages_data:
-                if current_pages.filter(**page_dict).exists():
-                    control.append(current_pages.get(**page_dict).id)
-                else:
-                    if page_dict.get('id') is not None:
-                        page = current_pages.get(pk=page_dict['id'])
-                        for attr, value in page_dict.items():
-                            setattr(page, attr, value)
-                        page.save()
-                        control.append(page.id)
-                    else:
-                        np = instance.pages.create(**page_dict)
-                        control.append(np.id)
-            for page in current_pages:
-                if page.id not in control:
-                    page.delete()
-
-        if validated_data.get('sets') is not None:
-            sets = validated_data.pop('sets')
-            sets_list = [i['set_id']['id'] for i in sets]
-            current_sets_list = [i.set_id.id for i in instance.sets.all()]
-            for _set in sets_list:
-                if _set not in current_sets_list:
-                    set_object = Set.objects.get(pk=_set)
-                    Set_x_content.objects.create(set_id=set_object, content_object=instance)
-            for _set in current_sets_list:
-                if _set not in sets_list:
-                    instance.sets.get(set_id=_set.id).delete()
-
-        if self.context.get('credits') is not None:
-            credits = self.context['credits']
-            current_credits = [i.id for i in instance.credits.all()]
-            for credit in credits:
-                if credit.get('id') is not None:
-                    obj = Source_credit.objects.get(pk=credit.pop('id'))
-                    agent = Agent.objects.get(pk=credit.pop('standard_name'))
-                    obj.agent = agent
-                    obj.note = credit['note']
-                    obj.type = credit['type']
-                    obj.save()
-                    current_credits.remove(obj.id)
-                else:
-                    credit.pop('id')
-                    agent = Agent.objects.get(pk=credit.pop('standard_name'))
-                    Source_credit.objects.create(source=instance, agent=agent, **credit)
-            if current_credits:
-                for c in current_credits:
-                    Source_credit.objects.get(pk=c).delete()
+        self.update_or_create_attributes(instance, validated_data.pop('attributes', None))
+        self.update_or_create_workflow(instance, validated_data.pop('workflow', None))
+        self.update_or_create_pages(instance, validated_data.pop('pages', None))
+        self.update_or_create_sets(instance, validated_data.pop('sets', None))
+        self.update_or_create_credits(instance, validated_data.pop('credits', None))
 
         if validated_data.get('owner') is not None:
             validated_data['owner'] = User.objects.get(username=validated_data['owner']['username'])
 
         return super().update(instance, validated_data)
 
-    def deserialise_numbered_dict(self, data):
-        deserialised = []
-        for key, value in data.items():
-            deserialised.append(value)
-        return deserialised
-
-    def process_attributes(self, qset, instance):
-        result = {}
-        multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(content_type=instance.type) if not i.unique]
-        for i in qset:
-            if i is not None:
-                (k, v), = i.items()
-                if k in multi_attributes:
-                    if result.get(k) is not None:
-                        result[k].append(v)
+    def update_or_create_attributes(self, instance, validated_data):
+        if validated_data is not None:
+            if instance.attributes.all().exists():
+                current_attributes = instance.attributes.all()
+                current_attributes_dict = dict((i.id, i) for i in current_attributes)
+                active_types = list(set([i['attribute_type'] for i in validated_data]))
+                new_attributes = []
+                for i, attribute in enumerate(validated_data):
+                    if current_attributes.filter(**attribute).count() == 1:
+                        current_attributes_dict.pop(current_attributes.get(**attribute).id)
                     else:
-                        result[k] = [v]
-                else:
-                    result[k] = v
-        return result
+                        new_attributes.append(attribute)
+
+                if len(current_attributes_dict) > 0:
+                    for id, attribute in current_attributes_dict.items():
+                        if attribute.attribute_type in active_types:
+                            attribute.delete()
+            else:
+                new_attributes = validated_data
+
+            if new_attributes:
+                for attribute in new_attributes:
+                    instance.attributes.create(**attribute)
+
+    def update_or_create_credits(self, instance, validated_data):
+        if validated_data is not None:
+            if instance.credits.all().exists():
+                new_credits = []
+                current_credits = dict((i.id, i) for i in instance.credits.all())
+                for credit in validated_data:
+                    if 'id' in credit:
+                        current_credit = current_credits.pop(credit['id'])
+                        current_credit.agent = Agent.objects.get(pk=credit['agent']['id'])
+                        current_credit.type = credit.get('type')
+                        current_credit.note = credit.get('note')
+                        current_credit.save()
+                    else:
+                        new_credits.append(credit)
+                if len(current_credits) > 0:
+                    for credit in current_credits.values():
+                        credit.delete()
+            else:
+                new_credits = validated_data
+
+            if new_credits:
+                for credit in new_credits:
+                    agent = Agent.objects.get(pk=credit['agent']['id'])
+                    Source_credit.objects.create(
+                        source=instance,
+                        agent=agent,
+                        note=credit.get('note'),
+                        type=credit.get('type')
+                    )
+
+    def update_or_create_workflow(self, instance, validated_data):
+        if validated_data is not None:
+            try:
+                workflow = instance.workflow
+            except Workflow.DoesNotExist:
+                workflow = Workflow.objects.create(source=instance, last_modified=instance.modification_timestamp)
+                Work_log.objects.create(source=workflow, event='Source created', timestamp=workflow.last_modified)
+            for key, value in validated_data.items():
+                setattr(workflow, key, value)
+            workflow.save()
+
+    def update_or_create_pages(self, instance, validated_data):
+        if validated_data is not None:
+            if instance.pages.all().exists():
+                new_pages = []
+                current_pages = dict((i.id, i) for i in instance.pages.all())
+                for page in validated_data:
+                    if 'id' in page:
+                        current_page = current_pages.pop(UUID(page['id']))
+                        page.pop('id')
+                        for key, value in page.items():
+                            setattr(current_page, key, value)
+                        current_page.save()
+                    else:
+                        new_pages.append(page)
+                if len(current_pages) > 0:
+                    for page in current_pages.values():
+                        page.delete()
+            else:
+                new_pages = validated_data
+
+            if new_pages:
+                for page in new_pages:
+                    instance.pages.create(**page)
+
+    def update_or_create_sets(self, instance, validated_data):
+        if validated_data is not None:
+            sets = [i['set_id']['id'] for i in validated_data]
+            if instance.sets.all().exists():
+                current_sets = dict((i.id, i) for i in instance.sets.all())
+                new_sets = []
+                for set_id in sets:
+                    if set_id in current_sets:
+                        current_sets.pop(set_id)
+                    else:
+                        new_sets.append(set_id)
+
+                if len(current_sets) > 0:
+                    for set in current_sets.values():
+                        set.delete()
+            else:
+                new_sets = sets
+
+            if new_sets:
+                for set_id in new_sets:
+                    set = Set.objects.get(pk=set_id)
+                    Set_x_content.objects.create(set_id=set, content_object=instance)
+
+    def process_attributes(self, source_type, data):
+        multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(content_type=source_type) if not i.unique]
+
+        if type(data) is dict:
+            attributes = []
+            for key, value in data.items():
+                if key in multi_attributes and value == 0:
+                    continue
+                value_list = value if key in multi_attributes else [value]
+                for item in value_list:
+                    if item is not None:
+                        attributes.append({key: item})
+
+        else:
+            attributes = {}
+            for attribute in data:
+                if attribute is not None:
+                    (key, value), = attribute.items()
+                    if key in multi_attributes:
+                        if attributes.get(key) is not None:
+                            attributes[key].append(value)
+                        else:
+                            attributes[key] = [value]
+                    else:
+                        attributes[key] = value
+
+        return attributes

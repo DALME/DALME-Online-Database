@@ -145,7 +145,7 @@ class Source(index.Indexed, dalmeUuidOwned):
                     tr_tree = et.fromstring('<xml>' + tr.transcription.transcription + '</xml>', xml_parser)
                     txt_tr = et.tostring(tr_tree, encoding='utf8', method='text').decode('utf-8')
                     text = text + txt_tr
-                except:
+                except: # NOQA
                     continue
             return text
 

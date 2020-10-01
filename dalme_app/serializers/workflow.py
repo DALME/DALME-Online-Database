@@ -11,7 +11,8 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workflow
-        fields = ('help_flag', 'is_public', 'last_modified', 'last_user', 'wf_status', 'stage', 'status')
+        fields = ('help_flag', 'is_public', 'last_modified', 'last_user', 'wf_status', 'stage', 'status',
+                  'ingestion_done', 'transcription_done', 'markup_done', 'parsing_done', 'review_done')
         extra_kwargs = {'last_user': {'required': False}, }
 
     def to_representation(self, instance):

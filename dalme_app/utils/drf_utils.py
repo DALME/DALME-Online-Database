@@ -101,36 +101,24 @@ class DRFDTEParser(parsers.BaseParser):
     def convert_dte_data(self, parsed_data):
         (id, dte_data), = json.loads(parsed_data['data'])['data'].items()
         data = {}
-        many_fields = [field[0:len(field)-11] for field, value in dte_data.items() if 'many-count' in field]
-        if many_fields:
-            [dte_data.pop(field + '-many-count') for field in many_fields]
         for field, value in dte_data.items():
-            data[field] = self.clean_entry(value, field in many_fields)
+            if 'many-count' not in field:
+                if self.clean_entry(value) is not None:
+                    data[field] = self.clean_entry(value)
         return data
 
-    def clean_entry(self, value, is_many):
+    def clean_entry(self, value):
         if type(value) is list:
             if len(value) == 0:
-                return 0
-            elif len(value) == 1 and not is_many and value[0].isdigit():
-                return int(value[0])
-            else:
-                return [self.clean_entry(i, is_many) for i in value]
+                return False
+            if len(value) == 1 and value[0] in [1, '1']:
+                return True
+            elif len(value) > 0:
+                return [self.clean_entry(i) for i in value]
         elif type(value) is dict:
-            if len(value) > 1:
-                many_fields = [f[0:len(f)-11] for f, v in value.items() if 'many-count' in f]
-                if many_fields:
-                    [value.pop(f + '-many-count') for f in many_fields]
-                value_dict = {k: self.clean_entry(v, k in many_fields) for k, v in value.items()}
+            if len(value) > 0:
+                value_dict = {k: self.clean_entry(v) for k, v in value.items() if self.clean_entry(v) is not None and 'many-count' not in k}
                 return value_dict if len(value_dict) > 0 else None
-            elif len(value) == 1:
-                (k, v), = value.items()
-                if k == 'value' or k == 'id' and not is_many:
-                    return self.clean_entry(value[k], False)
-                else:
-                    return {k: self.clean_entry(v, is_many)}
-            else:
-                return None
         elif type(value) is str:
             if value.isdigit():
                 return int(value)
