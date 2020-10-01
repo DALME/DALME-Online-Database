@@ -95,18 +95,24 @@ function build_editor(data, target) {
 
       dt_editor.on('postSubmit.dalme', function(e, json, data, action, xhr) {
           if (json != null) {
+            let error_list = []
             if (json.hasOwnProperty('fieldErrors')) {
                 for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
                   if (json['fieldErrors'][i].hasOwnProperty('name')) {
                       let name = json['fieldErrors'][i]['name'];
                       if (name == 'non_field_errors') {
-                          json['error'] = json['fieldErrors'][i]['status'];
+                          error_list.push(`General error: ${json['fieldErrors'][i]['status']}`);
                           delete json['fieldErrors'][i]
                       } else {
                           if (name.includes('.non_field_errors')) {
                             name = name.replace('.non_field_errors', '');
                           }
-                          json['fieldErrors'][i]['name'] = attribute_concordance[name];
+                          if (attribute_concordance.hasOwnProperty(name)) {
+                            json['fieldErrors'][i]['name'] = attribute_concordance[name];
+                          } else {
+                            error_list.push(`${json['fieldErrors'][i]['name']} failed to validate with status ${json['fieldErrors'][i]['status']}`);
+                            delete json['fieldErrors'][i]
+                          }
                       }
                   }
                   if (json['fieldErrors'][0] == null) {
@@ -116,6 +122,16 @@ function build_editor(data, target) {
               } else if (json.hasOwnProperty('data') && json['data'].hasOwnProperty('detail')) {
                   toastr.error(json['data']['detail']);
                   dt_editor.close()
+              }
+              if (json.hasOwnProperty('error')) {
+                error_list.push(`General error: ${json['error']}`);
+              }
+              if (error_list.length) {
+                let error = $('<ul/>')
+                for (let i = 0, len = error_list.length; i < len; ++i) {
+                  error.append(`<li>${error_list[i]}</li>`)
+                }
+                json['error'] = error;
               }
           }
       });
