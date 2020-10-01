@@ -33,7 +33,7 @@ class SourceFilter(filters.FilterSet):
         # change general qs based on superadmin status
         if self.request.GET.get('mode') is not None:
             mode = self.request.GET['mode']
-            if mode == 'group':
+            if mode == 'team':
                 dataset = Set.objects.get(dataset_usergroup=self.request.user.profile.primary_group)
                 return parent.filter(primary_dataset=dataset.id)
             elif mode == 'all':
