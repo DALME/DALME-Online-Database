@@ -65,12 +65,12 @@ $ mysql -u root < path_to_db_dump.sql
 $ mysql -u root
 -- Where `$PASSWORD` == `password` found in the `db.cnf` file.
 mysql> CREATE USER 'dalme_app'@'localhost' IDENTIFIED BY '$PASSWORD';
-mysql> GRANT ALL PRIVILEGES ON ebdb.* TO 'dalme_app'@'localhost';
+mysql> GRANT ALL PRIVILEGES ON dalme_db.* TO 'dalme_app'@'localhost';
 mysql> FLUSH PRIVILEGES;
 -- While we are in the mysql shell let's set your `User` record (which should
 -- already be in the database dump) as a local superuser.
 -- First find the pk of your row and then update it.
-mysql> USE ebdb;
+mysql> USE dalme_db;
 mysql> SELECT username, id FROM auth_user;
 mysql> UPDATE auth_user SET is_superuser = 1 WHERE id = $YOUR_USER_PK;
 ```
