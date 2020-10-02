@@ -91,10 +91,12 @@ class SourceSerializer(DynamicSerializer):
         return ret
 
     def to_internal_value(self, data):
-
         for name in ['type', 'parent']:
             if data.get(name) is not None:
                 data[name] = data[name]['id']
+
+        if data.get('primary_dataset', {}).get('id') is not None:
+            data['primary_dataset']['name'] = Set.objects.get(pk=data['primary_dataset']['id']).name
 
         if data.get('attributes'):
             _type = data.get('type', False) or self.instance.type
@@ -143,6 +145,12 @@ class SourceSerializer(DynamicSerializer):
                 raise serializers.ValidationError(missing)
             else:
                 validated_data = super().run_validation(data)
+
+                if validated_data.get('primary_dataset') is not None:
+                    validated_data['primary_dataset'] = Set.objects.get(pk=validated_data['primary_dataset']['id'])
+
+                if validated_data.get('owner') is not None:
+                    validated_data['owner'] = User.objects.get(username=validated_data['owner']['username'])
         else:
             raise serializers.ValidationError({'non_field_errors': ['Type information missing.']})
 
@@ -154,9 +162,6 @@ class SourceSerializer(DynamicSerializer):
         pages = validated_data.pop('pages', None)
         sets = validated_data.pop('sets', None)
         credits = validated_data.pop('credits', None)
-
-        if validated_data.get('owner') is not None:
-            validated_data['owner'] = User.objects.get(username=validated_data['owner']['username'])
 
         source = Source.objects.create(**validated_data)
 
@@ -174,9 +179,6 @@ class SourceSerializer(DynamicSerializer):
         self.update_or_create_pages(instance, validated_data.pop('pages', None))
         self.update_or_create_sets(instance, validated_data.pop('sets', None))
         self.update_or_create_credits(instance, validated_data.pop('credits', None))
-
-        if validated_data.get('owner') is not None:
-            validated_data['owner'] = User.objects.get(username=validated_data['owner']['username'])
 
         return super().update(instance, validated_data)
 
