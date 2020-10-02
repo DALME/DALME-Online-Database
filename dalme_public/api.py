@@ -84,8 +84,10 @@ class Thumbnail(View):
     def get_data(self):
         try:
             # thumbnail = get_dam_preview(self.request.GET['image_ref'])
-            thumbnail = rs_resource.objects.get(ref=self.request.GET['image_ref']).get_preview_url()
-        except KeyError:
+            thumbnail = rs_resource.objects.get(
+                ref=self.request.GET['image_ref']
+            ).get_preview_url()
+        except (KeyError, ValueError):
             thumbnail = None
         return {'image_url': thumbnail}
 
