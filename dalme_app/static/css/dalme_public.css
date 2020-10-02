@@ -1533,7 +1533,7 @@ nav.secondary.features-filter ul {
 .block-inline_image {
   float: right;
   padding-left: 1.5rem;
-  width: 25%;
+  width: 30%;
 }
 
 .block-document,
@@ -2125,6 +2125,15 @@ div.description[data-collapsed='true'] {
   }
   footer .social > i {
     font-size: 1.5rem
+  }
+
+  .richtext-image.right {
+    float: right;
+    padding-left: 1rem;
+  }
+  .richtext-image.left {
+    float: left;
+    padding-right: 1rem;
   }
 }
 
