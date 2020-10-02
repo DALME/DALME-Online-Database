@@ -100,6 +100,7 @@ function build_editor(data, target) {
                 for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
                   if (json['fieldErrors'][i].hasOwnProperty('name')) {
                       let name = json['fieldErrors'][i]['name'];
+                      console.log('name = ' + name)
                       if (name == 'non_field_errors') {
                           error_list.push(`General error: ${json['fieldErrors'][i]['status']}`);
                           delete json['fieldErrors'][i]
@@ -127,12 +128,15 @@ function build_editor(data, target) {
                 error_list.push(`General error: ${json['error']}`);
               }
               if (error_list.length) {
-                let error = $('<ul/>')
+                console.log(JSON.stringify(error_list))
+                let error = '<ul>'
                 for (let i = 0, len = error_list.length; i < len; ++i) {
-                  error.append(`<li>${error_list[i]}</li>`)
+                  error += `<li>${error_list[i]}</li>`
                 }
+                error += '</ul>'
                 json['error'] = error;
               }
+            console.log(JSON.stringify(json))
           }
       });
 
