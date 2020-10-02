@@ -8,6 +8,7 @@
 {% endcompress %}
 <script>
   var set = {
+    "id": "{{ set.id }}",
     "name": "{{ set.name }}",
     "set_type": "{{ set.set_type }}",
     "is_public": {{ set.is_public|lower|safe }},
@@ -147,7 +148,7 @@
                     <tbody>
                       {% for row in members %}
                         <tr>
-                          <td>{{ row.content_object.id }}</td>
+                          <td>{{ row.object_id }}</td>
                           <td>{{ row.content_object.name }}</td>
                         </tr>
                       {% endfor %}
@@ -195,16 +196,28 @@
 {% if tables %}
 <script>
 $(document).ready(function() {
-    var table_members = $('#dataTables-members').DataTable({
-        {% if table_options %}
-          {% for key,value in table_options.items %}
-            {{ key | safe }}: {{ value | safe }},
-          {% endfor %}
-        {% endif %}
-    });
-    $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa {{ tables.1 }} fa-fw"></i> {{ tables.2 }}');
-    fix_dt_search();
-});
+    table_members = $('#dataTables-members').DataTable({
+        "responsive": true,
+        "dom": "<'sub-card-header d-flex'<'card-header-title'>Bfr><'card-body't>",
+        "stateSave": true,
+        "select": { "style": "multi" },
+        "scrollY": "calc(100vh - 600px)",
+        "deferRender": true,
+        "pageLength": {{ members.count }},
+        "rowId": "id",
+        "language": {
+            "searchPlaceholder": "Search",
+            "processing": '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+        },
+        "buttons": [{
+            text: '<i class="fa fa-trash-alt fa-fw"><i>',
+            action: function (e, dt, node, config) {delete_set_members(dt, set['id'])},
+            className: "align-self-end"
+          }]
+      });
+      $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa {{ tables.1 }} fa-fw"></i> {{ tables.2 }}');
+      fix_dt_search();
+  });
 </script>
 {% endif %}
 {% endblock %}

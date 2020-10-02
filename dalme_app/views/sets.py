@@ -48,25 +48,8 @@ class SetsDetail(DetailView):
         context['set'] = self.object
         context['comments_count'] = self.object.comments.count()
         members = self.object.members.all()
-        context['members'] = members.all()
-        tables = ['members', 'fa-plus-square', 'Set Members ({})'.format(members.count())]
-        if tables != []:
-            context['tables'] = tables
-            context['table_options'] = {
-                'responsive': 'true',
-                'dom': '''"<'sub-card-header d-flex'<'card-header-title'>Bfr><'card-body't>"''',
-                'stateSave': 'true',
-                'select': {'style': 'multi'},
-                'scrollY': '''"calc(100vh - 600px)"''',
-                'deferRender': 'true',
-                'scroller': 'true',
-                'rowId': '"id"',
-                'language': {
-                    'searchPlaceholder': 'Search',
-                    'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-                },
-                'buttons': "[{text: '<i class=\"fa fa-trash-alt fa-fw\"></i>', action: function (e, dt, node, config) {delete_set_members(dt, \"" + str(self.object.id) + "\")}, className: \"align-self-end\"}]"
-            }
+        context['members'] = members
+        context['tables'] = ['members', 'fa-plus-square', 'Set Members ({})'.format(members.count())]
         return context
 
     def get_object(self):
