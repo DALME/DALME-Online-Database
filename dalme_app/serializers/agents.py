@@ -1,4 +1,5 @@
 
+from django.contrib.auth.models import User
 from dalme_app.models import Agent
 from ._common import DynamicSerializer
 from dalme_app.serializers.users import UserSerializer
@@ -27,4 +28,15 @@ class AgentSerializer(DynamicSerializer):
         if data.get('type', {}).get('id') is not None:
             data['type'] = data['type']['id']
 
+        if data.get('user', {}).get('id') is not None:
+            data['user']['username'] = User.objects.get(pk=data['user']['id']).username
+
         return super().to_internal_value(data)
+
+    def run_validation(self, data):
+        validated_data = super().run_validation(data)
+
+        if validated_data.get('user') is not None:
+            validated_data['user'] = User.objects.get(username=validated_data['user']['username'])
+
+        return validated_data
