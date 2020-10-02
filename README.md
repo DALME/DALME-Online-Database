@@ -97,7 +97,7 @@ python manage.py runserver
 
 If you create a new terminal to do this, you'll need to make sure that you're in your environment with `source ~/virtualenvs/dalme/bin/activate`.
 
-9. Check out the site at `localhost:8000`.
+9. Check out the site at `localhost:8000` and `localhost:8000/cms`.
 
 10. You can monitor the log output if you feel like it. Open a separate terminal and call:
 ```
