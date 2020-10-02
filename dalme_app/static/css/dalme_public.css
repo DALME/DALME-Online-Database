@@ -929,6 +929,11 @@ i.inactive {
 .app nav li:not(:first-child) {
   border-right: 1px solid #6b6b6b;
 }
+.app nav li.pagination.next,
+.app nav li.pagination.current,
+.app nav li.pagination.previous {
+  align-items: center;
+}
 .app nav li.pagination.next {
   border-right: 0;
 }
