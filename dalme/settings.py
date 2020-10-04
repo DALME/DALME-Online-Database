@@ -49,7 +49,7 @@ DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 DEBUG = False
 COMPRESS_ENABLED = True
 
-CORS_ORIGIN_WHITELIST = ['https://db.dalme.org', 'https://public.dalme.org', 'https://dalme.org', 'https://kb.dalme.org', 'https://dam.dalme.org']
+CORS_ALLOWED_ORIGINS = ['https://db.dalme.org', 'https://public.dalme.org', 'https://dalme.org', 'https://kb.dalme.org', 'https://dam.dalme.org']
 SESSION_COOKIE_DOMAIN = '.dalme.org'
 CSRF_COOKIE_DOMAIN = '.dalme.org'
 
