@@ -13,19 +13,32 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
         pc().has_permission(request, self)
         return Response(200)
 
-    # @action(detail=True, methods=['patch'])
-    # def change_owner(self, request, *args, **kwargs):
-    #     object = self.get_object()
-    #     try:
-    #         new_owner = self.request.POST['new_owner']
-    #         object.owner = new_owner
-    #         object.save(update_fields=['owner', 'modification_user', 'modification_timestamp'])
-    #         result = {'message': 'Owner changed succesfully.'}
-    #         status = 201
-    #     except Exception as e:
-    #         result = {'error': str(e)}
-    #         status = 400
-    #     return Response(result, status)
+    @action(detail=False, methods=['delete'])
+    def bulk_remove(self, request, *args, **kwargs):
+        try:
+            for id in list(request.data.keys()):
+                self.kwargs['pk'] = id
+                instance = self.get_object()
+                instance.delete()
+            return Response(200)
+        except Exception as e:
+            return Response({'error': str(e)}, 400)
+
+    @action(detail=False, methods=['put', 'patch'])
+    def bulk_edit(self, request, *args, **kwargs):
+        partial = True if request.method == 'PATCH' else False
+        results = []
+        try:
+            for id, props in request.data.items():
+                self.kwargs['pk'] = id
+                instance = self.get_object()
+                serializer = self.get_serializer(instance, data=props, partial=partial)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                results.append(serializer.data)
+            return Response({'data': results}, 200)
+        except Exception as e:
+            return Response({'error': str(e)}, 400)
 
     def list(self, request, *args, **kwargs):
         full_queryset = self.get_queryset()
