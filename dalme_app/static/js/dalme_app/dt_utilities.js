@@ -42,9 +42,7 @@ function build_editor(data, target) {
   get_dt_elements({
         type: 'field_defs',
         el_list: data[0].editor.fields,
-        overrides: data[0].editor.overrides,
-        endpoint: config_data.endpoint
-
+        overrides: data[0].editor.overrides
   }).then(function(e_fields) {
       var editor_options = _.merge(data[1].editor.options, data[0].editor.options);
       one_time_general_setup = false;
@@ -74,15 +72,14 @@ function build_editor(data, target) {
 
       dt_editor.on('initEdit.dalme', function(e, node, data, items, type) {
           return new Promise(function (resolve, reject) {
-              let url_components = dt_editor.ajax()['edit']['url'].split('/')
               $.ajax({
                   method: "POST",
-                  url: "/api/" + url_components[2] + "/" + data.id + "/has_permission/",
+                  url: `/api/${endpoint}/${data.id}/has_permission/`,
                   headers: { 'X-CSRFToken': get_cookie("csrftoken") },
               }).done(function(response, textStatus, jqXHR) {
                   resolve();
               }).fail(function(jqXHR, textStatus, errorThrown) {
-                  dt_editor.on('preOpen.dalme', function(e, mode, action) { return false });
+                  dt_editor.one('preOpen.dalme', function(e, mode, action) { return false });
                   toastr.error('Permission denied.');
                   resolve();
               });
@@ -91,7 +88,16 @@ function build_editor(data, target) {
 
       dt_editor.on('open.dalme', general_form_setup);
 
-      dt_editor.on('close.dalme', general_form_restore);
+      dt_editor.on('preSubmit.dalme', function(e, data, action) {
+        let ajax_obj = dt_editor.ajax()
+        if (Object.keys(data.data).length == 1) {
+          let url = action == 'create' ? `/api/${endpoint}/` : `/api/${endpoint}/${Object.keys(data.data)[0]}/`
+          ajax_obj[action]['url'] = url
+        } else {
+          ajax_obj[action]['url'] = `/api/${endpoint}/bulk_${action}/`
+        }
+        dt_editor.ajax(ajax_obj)
+      });
 
       dt_editor.on('postSubmit.dalme', function(e, json, data, action, xhr) {
           if (json != null) {
@@ -100,7 +106,6 @@ function build_editor(data, target) {
                 for (let i = 0, len = json['fieldErrors'].length; i < len; ++i) {
                   if (json['fieldErrors'][i].hasOwnProperty('name')) {
                       let name = json['fieldErrors'][i]['name'];
-                      console.log('name = ' + name)
                       if (name == 'non_field_errors') {
                           error_list.push(`General error: ${json['fieldErrors'][i]['status']}`);
                           delete json['fieldErrors'][i]
@@ -128,7 +133,6 @@ function build_editor(data, target) {
                 error_list.push(`General error: ${json['error']}`);
               }
               if (error_list.length) {
-                console.log(JSON.stringify(error_list))
                 let error = '<ul>'
                 for (let i = 0, len = error_list.length; i < len; ++i) {
                   error += `<li>${error_list[i]}</li>`
@@ -136,11 +140,12 @@ function build_editor(data, target) {
                 error += '</ul>'
                 json['error'] = error;
               }
-            console.log(JSON.stringify(json))
           }
       });
 
       dt_editor.on('submitSuccess', function(e, json, data, action) { toastr.success(messages_list[action+'_success']) });
+
+      dt_editor.on('close.dalme', general_form_restore);
 
       if (typeof target != 'undefined') {
         build_datatables(data, target, true);
@@ -170,8 +175,7 @@ function build_datatables(data, target, editor) {
     get_dt_elements({
       type: 'column_defs',
       el_list: data[0].datatables.columns,
-      overrides: data[0].datatables.overrides,
-      endpoint: config_data.endpoint
+      overrides: data[0].datatables.overrides
 
     }).then(function(t_columns) {
         table_options['columnDefs'] = t_columns;
@@ -380,7 +384,6 @@ function get_dt_elements({
   type = 'field_defs',
   el_list,
   overrides,
-  endpoint,
   process=true
 }) {
   return new Promise(function (resolve, reject) {
@@ -563,21 +566,16 @@ function update_dt_url(data) {
 }
 
 function filter_set(set, clear=[]) {
-  console.log('clear = ' + JSON.stringify(clear))
-  console.log('set = ' + JSON.stringify(set))
   for (const prop in set) {
     if (set.hasOwnProperty(prop)) {
       clear.push(prop)
     }
   }
-  console.log('compiled clear = ' + JSON.stringify(clear))
   var url = remove_param(clear, dt_table.ajax.url())
-  console.log('clean url = ' + url)
   for (const prop in set) {
     if (set.hasOwnProperty(prop)) {
       url = url + '&' + prop + '=' + set[prop]
     }
   }
-  console.log('request url = ' + url)
   dt_table.ajax.url(url).load();
 }
