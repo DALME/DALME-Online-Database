@@ -1,20 +1,20 @@
-from .agents import AgentSerializer
-from .attributes import AttributeSerializer, SimpleAttributeSerializer
-from .comments import CommentSerializer
-from .content_types import ContentTypeSerializer
-from .images import RSCollectionsSerializer, RSImageSerializer
-from .language_references import LanguageReferenceSerializer
-from .locale_references import LocaleReferenceSerializer
+from .agents import AgentSerializer # noqa
+from .attributes import AttributeSerializer, SimpleAttributeSerializer # noqa
+from .comments import CommentSerializer # noqa
+from .content_types import ContentTypeSerializer # noqa
+from .images import RSCollectionsSerializer, RSImageSerializer # noqa
+from .language_references import LanguageReferenceSerializer # noqa
+from .locale_references import LocaleReferenceSerializer # noqa
 
-from .others import (AsyncTaskSerializer, AttachmentSerializer, AttributeTypeSerializer, ContentClassSerializer,
-                     ContentXAttributeSerializer, CountryReferenceSerializer, GroupPropertiesSerializer, GroupSerializer,
-                     ProfileSerializer, TagSerializer, TranscriptionSerializer)
-                     
-from .page import PageSerializer
-from .rights_policies import RightsPolicySerializer
-from .sets import SetSerializer
-from .sources import SourceSetSerializer, SourceCreditSerializer, SourceSerializer
-from .tasks import TaskSerializer, TaskListSerializer
-from .tickets import TicketSerializer
-from .users import UserSerializer
-from .workflow import WorkflowSerializer
+from .others import (AsyncTaskSerializer, AttachmentSerializer, AttributeTypeSerializer, ContentClassSerializer,  # noqa
+                     ContentXAttributeSerializer, CountryReferenceSerializer, GroupPropertiesSerializer, GroupSerializer,  # noqa
+                     ProfileSerializer, TagSerializer, TranscriptionSerializer) # noqa
+
+from .page import PageSerializer # noqa
+from .rights_policies import RightsPolicySerializer # noqa
+from .sets import SetSerializer # noqa
+from .sources import SourceSetSerializer, SourceCreditSerializer, SourceSerializer # noqa
+from .tasks import TaskSerializer, TaskListSerializer # noqa
+from .tickets import TicketSerializer # noqa
+from .users import UserSerializer # noqa
+from .workflow import WorkflowSerializer # noqa

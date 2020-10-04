@@ -57,7 +57,7 @@ class SourceSerializer(DynamicSerializer):
     class Meta:
         model = Source
         fields = ('id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'primary_dataset', 'attributes', 'inherited', 'credits',
-                  'no_folios', 'no_images', 'tags', 'workflow', 'owner', 'sets', 'pages', 'no_records', 'is_private')
+                  'no_folios', 'no_images', 'workflow', 'owner', 'sets', 'pages', 'no_records', 'is_private')
         extra_kwargs = {
                         'parent': {'required': False},
                         'no_folios': {'required': False},
@@ -132,6 +132,14 @@ class SourceSerializer(DynamicSerializer):
                 group, field = field.split('.') if '.' in field else (None, field)
                 if data.get(group, data).get(field) in [None, '', 0]:
                     missing[field] = ['This field is required.']
+
+            # special checks:
+            # a record's parent must have a primary_dataset
+            if data['type']['id'] == 13 and 'parent' not in missing:
+                parent = Source.objects.get(pk=data['parent']['id'])
+                if parent.primary_dataset is None:
+                    missing['parent'] = ['Parent must have a primary dataset assigned']
+
             if len(missing):
                 raise serializers.ValidationError(missing)
             else:

@@ -53,9 +53,9 @@ class Source(index.Indexed, dalmeUuidOwned):
     @property
     def inherited(self):
         inheritance = self.type.inheritance
-        if self.parent and inheritance.get('r1', None) is not None:
+        if self.parent and inheritance.get('r1') is not None:
             r1_inherited = self.parent.attributes.filter(attribute_type__in=inheritance['r1'])
-            if self.parent.parent and inheritance.get('r2', None) is not None:
+            if self.parent.parent and inheritance.get('r2') is not None:
                 r2_inherited = self.parent.inherited.filter(attribute_type__in=inheritance['r2'])
                 return r1_inherited | r2_inherited
             else:

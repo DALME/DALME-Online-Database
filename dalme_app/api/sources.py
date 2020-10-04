@@ -95,7 +95,7 @@ class Sources(DALMEBaseViewSet):
             'archives': ['id', 'type', 'name', 'short_name', 'is_private', 'no_records', 'attributes', 'sets'],
             'archival_files': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'primary_dataset', 'owner', 'no_records', 'attributes', 'sets'],
             'records': ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'pages', 'sets', 'is_private', 'owner', 'no_folios', 'workflow', 'attributes', 'credits'],
-            'bibliography': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'owner', 'attributes', 'sets']
+            'bibliography': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'owner', 'attributes', 'sets', 'no_records', 'primary_dataset']
         }
         if self.request.GET.get('class') is not None:
             kwargs['fields'] = fields[self.request.GET['class']]

@@ -20,7 +20,9 @@ class SourceFilter(filters.FilterSet):
     markup_done = filters.BooleanFilter(field_name='workflow__markup_done')
     review_done = filters.BooleanFilter(field_name='workflow__review_done')
     parsing_done = filters.BooleanFilter(field_name='workflow__parsing_done')
-    type__in = filters.CharFilter(lookup_expr='in')
+    type__in = filters.CharFilter(field_name='type', lookup_expr='in')
+    type__lt = filters.NumberFilter(field_name='type', lookup_expr='lt')
+    pd_null = filters.BooleanFilter(field_name='primary_dataset', lookup_expr='isnull')
 
     class Meta:
         model = Source
