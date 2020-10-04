@@ -18,9 +18,11 @@
         "short_name": "short_name",
         "type": "type.id",
         "parent": "parent.id",
+        "primary_dataset": "primary_dataset.id",
+        "default_rights": "attributes.default_rights.id",
         "owner": "owner.id",
         "is_private": "is_private",
-        "language": "attributes.language.id",
+        "language": "attributes.language[].id",
         "url": "attributes.url"
       },
       "required_list": [
@@ -36,23 +38,20 @@
       "short_name",
       "type",
       "parent",
+      "primary_dataset",
+      "attributes.default_rights",
       "owner",
       "is_private",
+      "no_records",
       "attributes.language",
       "attributes.url"
     ],
     "options": {
       "ajax": {
-        "url": "/api/sources/?format=json&class=bibliography"
+        "url": "/api/sources/?format=json&class=bibliography&mode=own"
       }
     },
-    "overrides": {
-      "attributes.language": {
-        "title": "Language",
-        "editField": "attributes.language.id",
-        "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.name; }"
-      }
-    }
+    "overrides": {}
   },
   "editor": {
     "fields": [
@@ -60,6 +59,8 @@
       "short_name",
       "type",
       "parent",
+      "primary_dataset",
+      "attributes.default_rights",
       "owner",
       "is_private",
       "attributes.language",
@@ -89,17 +90,10 @@
       "name": {
         "type": "textarea"
       },
-      "attributes.language[].id": {
-        "name": "attributes.language.id",
-        "label": "Language",
-        "type": "selectize",
-        "opts": {
-          "placeholder": "Select language",
-          "preload": "focus"
-        },
+      "parent.id": {
         "options": {
-          "type": "api_call",
-          "url": "/api/languages/?format=select&select_type=att&search="
+            "type": "api_call",
+            "url": "/api/sources/?format=select&type__lt=11&search="
         }
       }
     }

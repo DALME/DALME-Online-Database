@@ -4,7 +4,7 @@
     "type": "selectize",
     "opts": {
         "placeholder": "Select parent",
-        "preload": "focus"
+        "preload": false
     },
     "options": {
         "type": "api_call",
