@@ -31,7 +31,6 @@ _fieldTypes.dalmeCredits = {
       let inst_id = conf._control.length
 
       let wrapper = $('<div/>').attr($.extend({id: inst_id, class: 'single-credit-wrapper'}, {}));
-      wrapper.append('<div id="' + inst_id + '_id" class="d-none"></div>');
       let agent_select = $('<select/>').attr($.extend({id: inst_id + '_agent', class: 'form-control'}, {})).appendTo(wrapper);
       let type_select = $('<select/>').attr($.extend({id: inst_id + '_type', class: 'form-control'}, {})).appendTo(wrapper);
       wrapper.append('<div class="dropleft"><i class="fas fa-sticky-note page-credit-note h-100" data-toggle="dropdown" id="' +
@@ -80,8 +79,8 @@ _fieldTypes.dalmeCredits = {
 
       if (typeof val != 'undefined') {
         conf['_selectize_agent_' + inst_id].addOption({
-          id: val.agent.id,
-          standard_name: val.agent.standard_name
+          id: val.id,
+          standard_name: val.standard_name
         });
 
         conf['_selectize_type_' + inst_id].addOption({
@@ -89,8 +88,7 @@ _fieldTypes.dalmeCredits = {
           name: val.type.name
         });
 
-        conf._input.find('#' + inst_id + '_id').val(val.id);
-        conf['_selectize_agent_' + inst_id].setValue(val.agent.id)
+        conf['_selectize_agent_' + inst_id].setValue(val.id)
         conf['_selectize_type_' + inst_id].setValue(val.type.id)
         conf._input.find('#' + inst_id + '_note').val(val.note);
       }
@@ -118,8 +116,7 @@ _fieldTypes.dalmeCredits = {
       let value = []
       for (let i = 0, len = conf._control.length; i < len; ++i) {
         value.push({
-          id: conf._input.find('#' + conf._control[i] + '_id').val(),
-          standard_name: conf['_selectize_agent_' + conf._control[i]].getValue(),
+          id: conf['_selectize_agent_' + conf._control[i]].getValue(),
           type: conf['_selectize_type_' + conf._control[i]].getValue(),
           note: conf._input.find('#' + conf._control[i] + '_note').val()
         })

@@ -5,7 +5,6 @@ from rest_framework import serializers
 from ._common import DynamicSerializer, translate_workflow_string
 from dalme_app.serializers.users import UserSerializer
 from dalme_app.serializers.attributes import AttributeSerializer
-from dalme_app.serializers.others import TagSerializer
 from dalme_app.serializers.page import PageSerializer
 from dalme_app.serializers.workflow import WorkflowSerializer
 from dalme_app.serializers.sets import SetSerializer
@@ -23,13 +22,12 @@ class SourceSetSerializer(serializers.ModelSerializer):
 
 
 class SourceCreditSerializer(DynamicSerializer):
-    agent = serializers.ReadOnlyField(source='agent.standard_name', required=False)
-    agent_id = serializers.UUIDField(source='agent.id', required=True)
-    notes = serializers.ReadOnlyField(source='agent.notes', required=False)
+    standard_name = serializers.ReadOnlyField(source='agent.standard_name', required=False)
+    id = serializers.CharField(source='agent.id', required=True)
 
     class Meta:
         model = Source_credit
-        fields = ('id', 'type', 'agent', 'agent_id', 'notes')
+        fields = ('id', 'type', 'standard_name', 'note')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -37,17 +35,18 @@ class SourceCreditSerializer(DynamicSerializer):
             'id': instance.type,
             'name': instance.get_type_display()
         }
-        ret['agent'] = {
-            'id': ret.pop('agent_id'),
-            'standard_name': ret['agent']
-        }
         return ret
+
+    def to_internal_value(self, data):
+        if data.get('type') is not None and type(data.get('type')) is dict:
+            data['type'] = data['type']['id']
+            data.pop('standard_name')
+        return super().to_internal_value(data)
 
 
 class SourceSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True, required=False)
     inherited = AttributeSerializer(many=True, required=False)
-    tags = TagSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
     sets = SourceSetSerializer(many=True, required=False)
     pages = PageSerializer(many=True, required=False)
@@ -109,15 +108,8 @@ class SourceSerializer(DynamicSerializer):
             else:
                 data['workflow'].pop('status')
 
-        if data.get('credits') is not None:
-            if data.get('credits'):
-                credits_data = data.pop('credits')
-                data['credits'] = [{
-                    'agent_id': i['standard_name'],
-                    'type': i['type']
-                } for i in credits_data if i and i is not None]
-            else:
-                data.pop('credits')
+        if data.get('credits') is not None and not data.get('credits'):
+            data.pop('credits')
 
         for name in ['sets', 'pages']:
             if data.get(name) is not None and not data.get(name):
@@ -125,7 +117,6 @@ class SourceSerializer(DynamicSerializer):
 
         data['owner'] = {'id': data.get('owner', {}).get('id', get_current_user().id)}
         data['owner']['username'] = User.objects.get(pk=data['owner']['id']).username
-
         return super().to_internal_value(data)
 
     def run_validation(self, data):
@@ -209,19 +200,17 @@ class SourceSerializer(DynamicSerializer):
     def update_or_create_credits(self, instance, validated_data):
         if validated_data is not None:
             if instance.credits.all().exists():
+                current_credits = instance.credits.all()
+                current_credits_dict = dict((i.id, i) for i in current_credits)
                 new_credits = []
-                current_credits = dict((i.id, i) for i in instance.credits.all())
-                for credit in validated_data:
-                    if 'id' in credit:
-                        current_credit = current_credits.pop(credit['id'])
-                        current_credit.agent = Agent.objects.get(pk=credit['agent']['id'])
-                        current_credit.type = credit.get('type')
-                        current_credit.note = credit.get('note')
-                        current_credit.save()
+                for i, credit in enumerate(validated_data):
+                    if current_credits.filter(source=instance.id, agent=credit['agent']['id']).exists():
+                        current_credits_dict.pop(current_credits.get(source=instance.id, agent=credit['agent']['id']).id)
                     else:
                         new_credits.append(credit)
-                if len(current_credits) > 0:
-                    for credit in current_credits.values():
+
+                if len(current_credits_dict) > 0:
+                    for credit in current_credits_dict.values():
                         credit.delete()
             else:
                 new_credits = validated_data
