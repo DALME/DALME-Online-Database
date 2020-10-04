@@ -1,7 +1,7 @@
 {
   "config": {
-    "endpoint": "rights",
     "globals": {
+      "endpoint": "rights",
       "messages_list": {
         "create_success": "The rights policy was created succesfully.",
         "edit_success": "The rights policy was updated succesfully.",
@@ -53,19 +53,6 @@
       "licence",
       "attachments"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/rights/"
-        },
-        "edit": {
-          "url": "/api/rights/_id_/"
-        },
-        "remove": {
-          "url": "/api/rights/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

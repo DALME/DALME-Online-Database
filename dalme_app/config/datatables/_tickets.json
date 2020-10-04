@@ -1,7 +1,7 @@
 {
   "config": {
-    "endpoint": "tickets",
     "globals": {
+      "endpoint": "tickets",
       "messages_list": {
         "create_success": "The ticket was created succesfully.",
         "edit_success": "The ticket was updated succesfully.",
@@ -46,19 +46,6 @@
       "url",
       "attachments"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/tickets/"
-        },
-        "edit": {
-          "url": "/api/tickets/_id_/"
-        },
-        "remove": {
-          "url": "/api/tickets/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

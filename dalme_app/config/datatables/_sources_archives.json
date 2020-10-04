@@ -3,8 +3,8 @@
     "helpers": [
       "source_forms"
     ],
-    "endpoint": "sources",
     "globals": {
+      "endpoint": "sources",
       "source_type": "archives",
       "on_open_function": "source_form_setup",
       "on_close_function": "source_form_restore",
@@ -56,19 +56,6 @@
       "attributes.street_address",
       "attributes.email"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/sources/"
-        },
-        "edit": {
-          "url": "/api/sources/_id_/"
-        },
-        "remove": {
-          "url": "/api/sources/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

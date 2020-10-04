@@ -3,8 +3,8 @@
     "helpers": [
       "language_forms"
     ],
-    "endpoint": "languages",
     "globals": {
+      "endpoint": "languages",
       "on_open_function": "change_form",
       "on_close_function": "change_form",
       "messages_list": {
@@ -49,19 +49,6 @@
       "iso6393",
       "glottocode"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/languages/"
-        },
-        "edit": {
-          "url": "/api/languages/_id_/"
-        },
-        "remove": {
-          "url": "/api/languages/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

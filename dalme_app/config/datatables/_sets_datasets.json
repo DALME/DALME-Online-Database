@@ -1,7 +1,7 @@
 {
   "config": {
-    "endpoint": "sets",
     "globals": {
+      "endpoint": "sets",
       "messages_list": {
         "create_success": "The dataset was created succesfully.",
         "edit_success": "The dataset was updated succesfully.",
@@ -55,19 +55,6 @@
       "permissions",
       "dataset_usergroup"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/sets/"
-        },
-        "edit": {
-          "url": "/api/sets/_id_/"
-        },
-        "remove": {
-          "url": "/api/sets/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

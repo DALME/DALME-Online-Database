@@ -3,8 +3,8 @@
     "helpers": [
       "source_forms"
     ],
-    "endpoint": "sources",
     "globals": {
+      "endpoint": "sources",
       "source_type": "bibliography",
       "on_open_function": "source_form_setup",
       "on_close_function": "source_form_restore",
@@ -65,19 +65,6 @@
       "attributes.language",
       "attributes.url"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/sources/"
-        },
-        "edit": {
-          "url": "/api/sources/_id_/"
-        },
-        "remove": {
-          "url": "/api/sources/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

@@ -1,7 +1,7 @@
 {
   "config": {
-    "endpoint": "agents",
     "globals": {
+      "endpoint": "agents",
       "messages_list": {
         "create_success": "The agent was created succesfully.",
         "edit_success": "The agent was updated succesfully.",
@@ -39,19 +39,6 @@
       "notes",
       "user"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/agents/"
-        },
-        "edit": {
-          "url": "/api/agents/_id_/"
-        },
-        "remove": {
-          "url": "/api/agents/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

@@ -1,7 +1,7 @@
 {
   "config": {
-    "endpoint": "images",
     "globals": {
+      "endpoint": "images",
       "messages_list": {
         "create_success": "The image was saved succesfully.",
         "edit_success": "The image was updated succesfully.",
@@ -58,20 +58,6 @@
       "field3",
       "collections"
     ],
-    "options": {
-      "idSrc": "ref",
-      "ajax": {
-        "create": {
-          "url": "/api/images/"
-        },
-        "edit": {
-          "url": "/api/images/_id_/"
-        },
-        "remove": {
-          "url": "/api/images/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "edit",

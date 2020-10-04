@@ -7,5 +7,5 @@
     "visible": true,
     "orderable": true,
     "searchable": false,
-    "render": "function ( data, type, row, meta ) {return (typeof data == \"undefined\") ? \"\" : '<a href=\"'+data.url+'\">'+data.name+'</a>';}"
+    "render": "function ( data, type, row, meta ) {return (typeof data == \"undefined\" || data == null) ? \"\" : '<a href=\"'+data.url+'\">'+data.name+'</a>';}"
 }

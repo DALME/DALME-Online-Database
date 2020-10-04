@@ -10,7 +10,7 @@
       "serverSide": true,
       "stateSave": true,
       "select": {
-        "style": "single"
+        "style": true
       },
       "deferRender": true,
       "rowId": "id",
@@ -67,7 +67,8 @@
           "headers": {
             "Content-Type": "application/json-dte; charset=UTF-8",
             "Accept": "application/json-dte, text/javascript, */*; q=0.01"
-          }
+          },
+          "deleteBody": false
         }
       },
       "idSrc": "id",

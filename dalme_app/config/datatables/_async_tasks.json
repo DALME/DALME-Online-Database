@@ -1,6 +1,8 @@
 {
   "config": {
-    "endpoint": "async_tasks"
+    "globals": {
+      "endpoint": "async_tasks"
+    }
   },
   "datatables": {
     "columns": [

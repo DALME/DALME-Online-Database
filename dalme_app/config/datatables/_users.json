@@ -3,8 +3,8 @@
     "helpers": [
       "user_forms"
     ],
-    "endpoint": "users",
     "globals": {
+      "endpoint": "users",
       "password_state": "divs",
       "on_open_function": "change_form",
       "on_close_function": "change_form",
@@ -76,15 +76,8 @@
     ],
     "options": {
       "ajax": {
-        "create": {
-          "url": "/api/users/"
-        },
         "edit": {
-          "type": "PATCH",
-          "url": "/api/users/_id_/"
-        },
-        "remove": {
-          "url": "/api/users/_id_/"
+          "type": "PATCH"
         }
       }
     },

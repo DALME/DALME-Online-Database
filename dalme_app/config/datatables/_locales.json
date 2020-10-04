@@ -1,7 +1,7 @@
 {
   "config": {
-    "endpoint": "locales",
     "globals": {
+      "endpoint": "locales",
       "messages_list": {
         "create_success": "The locale was created succesfully.",
         "edit_success": "The locale was updated succesfully.",
@@ -38,19 +38,6 @@
       "administrative_region",
       "country"
     ],
-    "options": {
-      "ajax": {
-        "create": {
-          "url": "/api/locales/"
-        },
-        "edit": {
-          "url": "/api/locales/_id_/"
-        },
-        "remove": {
-          "url": "/api/locales/_id_/"
-        }
-      }
-    },
     "buttons": [
       {
         "button": "create",

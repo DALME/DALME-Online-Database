@@ -7,5 +7,5 @@
     "visible": true,
     "orderable": false,
     "searchable": true,
-    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : data.map(a => ' ' + a.name); }"
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\" || data == null) ? \"\" : data.map(a => ' ' + a.name); }"
 }
