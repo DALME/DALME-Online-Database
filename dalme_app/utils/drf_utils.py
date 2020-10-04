@@ -146,8 +146,8 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 def DRFDTE_exception_handler(exc, context):
     if isinstance(exc, PermissionDenied):
-        return Response({'detail': 'Permission denied.'}, 400)
-    elif isinstance(exc, ValidationError):
+        return Response({'detail': exc.detail}, 400)
+    if isinstance(exc, ValidationError):
         fieldErrors = []
         errors = exc.detail
         for k, v in errors.items():

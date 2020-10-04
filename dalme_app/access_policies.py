@@ -1,8 +1,6 @@
 from rest_access_policy import AccessPolicy, AccessPolicyException
 import json
 import os
-from django.views.generic import DetailView
-from dalme_app.models import Source
 
 
 class BaseAccessPolicy(AccessPolicy):
@@ -10,37 +8,64 @@ class BaseAccessPolicy(AccessPolicy):
     statements from external sources '''
 
     id = 'base-policy'
+    test_object = None
+
+    def _evaluate_statements(self, statements, request, view, action):
+        result = super()._evaluate_statements(statements, request, view, action)
+        if not result:
+            if self.test_object is not None and hasattr(self.test_object, 'name'):
+                self.message = 'You do not have permission to {} {}'.format(action.replace('bulk_', ''), self.test_object.name)
+        return result
 
     def get_policy_statements(self, request, view):
         statements = os.path.join('dalme_app', 'config', 'policies', self.id + '.json')
         with open(statements, 'r') as policy:
             return json.load(policy)
 
-    @staticmethod
-    def get_view_object(view):
+    def get_view_object(self, view):
         if type(view) is dict:
+            self.test_object = view.get('object')
             return view.get('object', {})
         else:
             if hasattr(view, "object"):
-                return view.object
+                obj = view.object
+                self.test_object = obj
+                return obj
             elif hasattr(view, "get_object"):
-                return view.get_object()
+                try:
+                    obj = view.get_object()
+                    self.test_object = obj
+                    return obj
+                except AssertionError:
+                    objects = []
+                    for id in list(view.request.data.keys()):
+                        view.kwargs['pk'] = id
+                        objects.append(view.get_object())
+                    return objects
             else:
                 return {}
 
     def is_owner(self, request, view, action):
-        record = self.get_view_object(view)
-        try:
-            return request.user == record.owner
-        except AttributeError:
-            return False
+        records = self.get_view_object(view) if type(self.get_view_object(view)) == 'list' else [self.get_view_object(view)]
+        for record in records:
+            try:
+                if request.user != record.owner:
+                    self.test_object = record
+                    return False
+            except AttributeError:
+                return False
+        return True
 
     def is_creator(self, request, view, action):
-        record = self.get_view_object(view)
-        try:
-            return request.user == record.creation_user
-        except AttributeError:
-            return False
+        records = self.get_view_object(view) if type(self.get_view_object(view)) == 'list' else [self.get_view_object(view)]
+        for record in records:
+            try:
+                if request.user != record.creation_user:
+                    self.test_object = record
+                    return False
+            except AttributeError:
+                return False
+        return True
 
 
 class AgentAccessPolicy(BaseAccessPolicy):
@@ -93,13 +118,16 @@ class SourceAccessPolicy(BaseAccessPolicy):
     id = 'sources-policy'
 
     def in_dataset_usergroup(self, request, view, action):
-        record = self.get_view_object(view)
-        try:
-            ds_ugs = [i.set_id.dataset_usergroup.name for i in record.sets.filter(set_id__set_type=3) if i.set_id.dataset_usergroup is not None]
-            usergroups = [i.name for i in request.user.groups.all()]
-            return len(list(set(ds_ugs) & set(usergroups))) > 0
-        except:
-            return False
+        records = self.get_view_object(view) if type(self.get_view_object(view)) == 'list' else [self.get_view_object(view)]
+        for record in records:
+            try:
+                ds_ugs = [i.set_id.dataset_usergroup.name for i in record.sets.filter(set_id__set_type=3) if i.set_id.dataset_usergroup is not None]
+                usergroups = [i.name for i in request.user.groups.all()]
+                if not len(list(set(ds_ugs) & set(usergroups))) > 0:
+                    return False
+            except:
+                return False
+        return True
 
     def _get_invoked_action(self, view) -> str:
         if hasattr(view, "action"):
