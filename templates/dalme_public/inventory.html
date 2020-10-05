@@ -86,7 +86,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
   {{ data|json_script:"source-data" }}
-
+  {% host_url 'dashboard' host 'db' as db_url %}
   <script>
     $(document).ready(function() {
 
@@ -186,7 +186,7 @@
           node.innerHTML = `<div class="warning">${warning}</div>`;
         } else {
           window.folio = new Diva('diva_viewer', {
-            objectData: `//db.dalme.org/pages/${pageId}/manifest`,
+            objectData:`{{db_url}}pages/${pageId}/manifest/`,
             enableAutoTitle: false,
             enableFullscreen: false,
             enableKeyScroll: false,
@@ -208,7 +208,7 @@
         const node = $('#folio-rights');
         node.empty();
         if (pageId) {
-          const endpoint = `{% host_url 'api_endpoint:rights-list' host 'db' %}?pk=${pageId}`;
+          const endpoint = `{{db_url}}api/pages/${pageId}/get_rights/`;
           $.get(endpoint, function(data) {
             if (data.data.length) {
               const [rights] = data.data;
