@@ -210,20 +210,9 @@
         if (pageId) {
           const endpoint = `{{db_url}}api/pages/${pageId}/get_rights/`;
           $.get(endpoint, function(data) {
-            if (data.data.length) {
-              const [rights] = data.data;
-              if (rights.notice_display) {
-                let notice = '';
-                Object.values(JSON.parse(rights.rights_notice))
-                  .map(value => notice += `<p>${value}</p>`);
-                node.html(`
-                  <h4 class="u-flex">
-                    &copy; ${rights.rights_status.name}
-                  </h4>
-                  <p>${rights.rights_holder}</p>
-                  <p>${rights.rights}</p>
-                  `.trim()
-                );
+            if (data.rights.hasOwnProperty('display_notice')) {
+              if (data.rights.display_notice) {
+                node.html(`<p>${data.rights.notice}</p>`)
               }
             }
           }, 'json');
