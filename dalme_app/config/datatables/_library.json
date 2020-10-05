@@ -1,0 +1,25 @@
+{
+  "config": {
+    "helpers": [
+      "zotero_rendering"
+    ],
+    "globals": {
+      "endpoint": "library"
+    }
+  },
+  "datatables": {
+    "columns": [
+      "key",
+      "itemType",
+      "title",
+      "creators",
+      "date",
+      "detail"
+    ],
+    "options": {
+      "ajax": {
+        "url": "/api/library/?format=json"
+      }
+    }
+  }
+}

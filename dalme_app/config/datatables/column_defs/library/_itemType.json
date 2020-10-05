@@ -1,0 +1,11 @@
+{
+    "title": "Type",
+    "data": "itemType",
+    "name": "itemType",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "render": "function (data, type, row, meta) { return zotero_type(data, type, row, meta) }",
+    "className": "nowrap"
+}

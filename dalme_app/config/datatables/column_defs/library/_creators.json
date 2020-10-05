@@ -1,0 +1,10 @@
+{
+    "title": "Author(s)",
+    "data": "creators",
+    "name": "creators",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "render": "function (data, type, row, meta) { return zotero_creators(data, type, row, meta) }"
+}
