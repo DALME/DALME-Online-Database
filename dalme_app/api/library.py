@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from dalme_app.access_policies import GeneralAccessPolicy
 from pyzotero import zotero
+from django.conf import settings
 
 
 class Library(viewsets.ViewSet):
@@ -10,7 +11,7 @@ class Library(viewsets.ViewSet):
     permission_classes = (GeneralAccessPolicy,)
 
     def list(self, request, *args, **kwargs):
-        queryset_generator = zotero.Zotero(2205678, 'group', 'AFJ2ZWKt6GiljKRCJc8VX3at')
+        queryset_generator = zotero.Zotero(settings.ZOTERO_LIBRARY_ID, 'group', settings.ZOTERO_API_KEY)
         record_total = queryset_generator.count_items(),
         if request.GET.get('data') is not None:
             dt_request = json.loads(request.GET['data'])
