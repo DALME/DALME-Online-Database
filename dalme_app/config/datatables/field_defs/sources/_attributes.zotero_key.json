@@ -1,0 +1,16 @@
+{
+    "name": "attributes.zotero_key",
+    "label": "Zotero Reference",
+    "type": "selectize",
+    "opts": {
+        "placeholder": "Select library entry",
+        "labelField": "title",
+        "valueField": "key",
+        "preload": "focus"
+    },
+    "options": {
+        "type": "api_call",
+        "url": "/api/library/?format=select&search="
+    },
+    "fieldInfo": "Reference in the DALME Zotero Library"
+}

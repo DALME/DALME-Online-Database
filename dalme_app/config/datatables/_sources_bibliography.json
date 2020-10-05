@@ -14,6 +14,7 @@
         "remove_success": "The source was deleted succesfully."
       },
       "attribute_concordance": {
+        "zotero_key": "attributes.zotero_key",
         "name": "name",
         "short_name": "short_name",
         "type": "type.id",
@@ -21,14 +22,16 @@
         "primary_dataset": "primary_dataset.id",
         "default_rights": "attributes.default_rights.id",
         "owner": "owner.id",
-        "is_private": "is_private",
-        "language": "attributes.language[].id",
-        "url": "attributes.url"
+        "is_private": "is_private"
       },
       "required_list": [
         "name",
         "short_name",
-        "type.id"
+        "type.id",
+        "parent.id",
+        "primary_dataset.id",
+        "attributes.default_rights.id",
+        "attributes.zotero_key"
       ]
     }
   },
@@ -40,11 +43,10 @@
       "parent",
       "primary_dataset",
       "attributes.default_rights",
+      "attributes.zotero_key",
       "owner",
       "is_private",
-      "no_records",
-      "attributes.language",
-      "attributes.url"
+      "no_records"
     ],
     "options": {
       "ajax": {
@@ -61,10 +63,9 @@
       "parent",
       "primary_dataset",
       "attributes.default_rights",
+      "attributes.zotero_key",
       "owner",
-      "is_private",
-      "attributes.language",
-      "attributes.url"
+      "is_private"
     ],
     "buttons": [
       {

@@ -34,7 +34,8 @@ class ModelSelectFields(JSONPreference):
         'Group': ['name', 'id', 'description'],
         'Set': ['name', 'id', 'detail_string'],
         'User': ['full_name', 'id'],
-        'Agent': ['standard_name', 'id']
+        'Agent': ['standard_name', 'id'],
+        'Library': ['title', 'key', 'shortTitle', 'itemType']
     }
 
 

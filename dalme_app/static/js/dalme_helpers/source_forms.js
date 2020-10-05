@@ -26,6 +26,12 @@ function source_form_setup(e, mode, action) {
       $('#form-side-container').removeClass('d-none');
     }
 
+    if (source_type == 'bibliography') {
+      let selectize = dt_editor.field('attributes.zotero_key').inst()
+      console.log(selectize)
+      selectize.on('change', populate_biblio_fields);
+    }
+
     if (action == 'create') {
       toggle_fields(required_list);
     } else if (action == 'edit') {
@@ -56,6 +62,25 @@ function source_form_restore(e) {
   if (source_type == 'records') {
     $('#form-side-container').addClass('d-none');
   }
+}
+
+function populate_biblio_fields() {
+  let selectize = dt_editor.field('attributes.zotero_key').inst()
+  let opt = selectize.options[selectize.getValue()]
+  let types = {
+    'book': 1,
+    'bookSection': 4,
+    'encyclopediaArticle': 9,
+    'journalArticle': 3,
+    'magazineArticle': 6,
+    'manuscript': 7,
+    'newspaperArticle': 6,
+    'thesis': 11,
+    'webpage': 2
+  }
+  dt_editor.field('name').set(opt.title)
+  dt_editor.field('short_name').set(opt.shortTitle)
+  dt_editor.field('type.id').set(types[opt.itemType])
 }
 
 // function init_dt_editor(para_data) {

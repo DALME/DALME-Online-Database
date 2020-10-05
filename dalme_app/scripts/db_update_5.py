@@ -40,6 +40,24 @@ def step_3():
 
 # delete all bibliographic sources
 def step_4():
-    sources = Source.objects.filter(type_lt=12)
+    sources = Source.objects.filter(type__lt=12)
     sources.delete()
     return 'Bibliographic sources deleted.'
+
+
+# create zotero attribute
+def step_5():
+    att_type = Attribute_type()
+    att_type.name = 'Zotero Key'
+    att_type.short_name = 'zotero_key'
+    att_type.description = 'Relates a source record to a unique key in the DALME Zotero Library'
+    att_type.data_type = 'STR'
+    att_type.source = 'DALME'
+    att_type.save()
+
+    for i in range(1, 11):
+        ct = Content_type.objects.get(pk=i)
+        Content_attributes.objects.create(content_type=ct, attribute_type=att_type)
+
+
+    return 'Zotero attribute created. Remember to update preferences!'
