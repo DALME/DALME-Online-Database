@@ -68,8 +68,9 @@ class PublicRecordSerializer(PublicSourceSerializer):
     def get_image(instance):
         page = instance.pages.exclude(dam_id__isnull=True).first()
         if page:
-            resource = rs_resource.objects.get(ref=page.dam_id)
-            return resource.ref
+            # resource = rs_resource.objects.get(ref=page.dam_id)
+            # return resource.ref
+            return page.dam_id
         return None
 
     def to_representation(self, instance):
