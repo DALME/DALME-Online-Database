@@ -35,13 +35,11 @@ class Page(dalmeUuid):
 
         if exists:
             rpo = RightsPolicy.objects.get(
-                pk=json.loads(
-                    source.parent.parent.attributes.get(attribute_type=144).value_STR
-                )['id'])
+                pk=source.parent.parent.attributes.get(attribute_type=144).value_JSON['id'])
             return {
                 'status': rpo.get_rights_status_display(),
                 'display_notice': rpo.notice_display,
-                'notice': json.loads(rpo.rights_notice)
+                'notice': rpo.rights_notice
             }
         return None
 
