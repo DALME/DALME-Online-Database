@@ -13,7 +13,7 @@ from dalme_app.models import Attribute, Source, rs_resource
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
-from haystack.query import SearchQuerySet
+from haystack.query import RelatedSearchQuerySet
 
 
 class DALMEPagination(pagination.PageNumberPagination):
@@ -84,8 +84,10 @@ class Thumbnail(View):
     def get_data(self):
         try:
             # thumbnail = get_dam_preview(self.request.GET['image_ref'])
-            thumbnail = rs_resource.objects.get(ref=self.request.GET['image_ref']).get_preview_url()
-        except KeyError:
+            thumbnail = rs_resource.objects.get(
+                ref=self.request.GET['image_ref']
+            ).get_preview_url()
+        except (KeyError, ValueError):
             thumbnail = None
         return {'image_url': thumbnail}
 
@@ -104,18 +106,30 @@ class SourceList(ListAPIView):
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('q'):
             q = self.request.GET.get('q')
-            qs = SearchQuerySet().filter(text=q, type=13, is_public=True).models(Source).order_by('name')
+            qs = RelatedSearchQuerySet().filter(
+                text=q, type=13, is_public=True
+            ).load_all()
+            qs = qs.load_all_queryset(
+                Source, Source.objects.all().prefetch_related(
+                    'attributes', 'attributes__attribute_type'
+                )
+            )
             qs = list(self.queryset_gen(qs))
         else:
             qs = super().get_queryset(*args, **kwargs).order_by('name')
             qs = qs.filter(type=13, workflow__is_public=True)
+            qs = qs.prefetch_related(
+                'attributes', 'attributes__attribute_type'
+            )
 
-            self.filterset = self.filterset_class(self.request.GET, queryset=qs)
+            self.filterset = self.filterset_class(
+                self.request.GET, queryset=qs
+            )
             qs = self.filterset.qs.distinct()
 
             if self.filterset.annotated:
-                # Currently necessary because of the inability to eliminate dupes
-                # when ordering across the Source - Attribute traversal.
+                # Currently necessary because of the inability to eliminate
+                # dupes when ordering across the Source - Attribute traversal.
                 seen = set()
                 filtered = []
                 for source in qs:
@@ -124,12 +138,14 @@ class SourceList(ListAPIView):
                         seen.add(source.pk)
                 qs = filtered
 
-                # Sorting by 'name' happens on the Order filter itself as we are
-                # dealing with a plan qs without annotations there.
+                # Sorting by 'name' happens on the Order filter itself as we
+                # are dealing with a plain qs without any annotations there.
                 order_by = self.request.GET.get('order_by')
                 if order_by.endswith('date'):
                     maxdate = datetime.date(datetime.MAXYEAR, 1, 1)
-                    qs = sorted(qs, key=lambda item: item.source_date or maxdate)
+                    qs = sorted(
+                        qs, key=lambda item: item.source_date or maxdate
+                    )
                 if order_by.endswith('source_type'):
                     qs = sorted(qs, key=lambda item: item.source_type or '')
                 if order_by.startswith('-'):

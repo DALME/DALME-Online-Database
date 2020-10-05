@@ -1,6 +1,8 @@
 from calendar import month_name
 
 from django import template
+from django.db.models.functions import Coalesce
+
 
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.models import (
@@ -102,22 +104,22 @@ def get_flat_nav(context):
 
 @register.simple_tag
 def get_object_nav():
-    return reversed(FeaturedObject.objects.all().order_by(
-        '-first_published_at'
-    )[:3])
+    return FeaturedObject.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
 
 
 @register.simple_tag
 def get_inventory_nav():
-    return reversed(FeaturedInventory.objects.all().order_by(
-        '-first_published_at'
-    )[:3])
+    return FeaturedInventory.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
 
 
 @register.simple_tag(takes_context=True)
 def get_header_image_styles(context, header_image):
     gradients = {
-        'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',
+        'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',  # noqa
         'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(58, 74, 60, 0.9) 100%',  # noqa
         'features': '125deg, rgba(99, 98, 58, 0.7) 0%, rgba(80, 41, 43, 0.9) 100%',  # noqa
         'collections': '125deg, rgba(95, 81, 111, 0.7) 0%, rgba(23, 62, 101, 0.9) 100%',  # noqa
@@ -192,33 +194,33 @@ def get_features_nav_q(key):
 
 @register.simple_tag()
 def get_recent_objects():
-    objs = reversed(
-        FeaturedObject.objects.live().order_by(
-            '-first_published_at'
-        )[:3]
-    )
+    objs = FeaturedObject.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
     return [
-        {'url': obj.url, 'month': month_name[obj.first_published_at.month]}
+        {'url': obj.url, 'month': month_name[obj.published_switch.month]}
         for obj in objs
     ]
 
 
 @register.simple_tag()
 def get_recent_inventories():
-    objs = reversed(
-        FeaturedInventory.objects.live().order_by('-first_published_at')[:3]
-    )
+    objs = FeaturedInventory.objects.live().specific().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
     return [
-        {'url': obj.url, 'month': month_name[obj.first_published_at.month]}
+        {'url': obj.url, 'month': month_name[obj.published_switch.month]}
         for obj in objs
     ]
 
 
 @register.simple_tag()
 def get_recent_essays():
-    objs = reversed(Essay.objects.live().order_by('-first_published_at')[:3])
+    objs = Essay.objects.live().annotate(
+        published=Coalesce('go_live_at', 'first_published_at')
+    ).order_by('published')[:3]
     return [
-        {'url': obj.url, 'month': month_name[obj.first_published_at.month]}
+        {'url': obj.url, 'month': month_name[obj.published_switch.month]}
         for obj in objs
     ]
 
