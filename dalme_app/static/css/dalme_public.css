@@ -12,6 +12,10 @@ a {
   color: #5e5e5e;
   text-decoration: none;
 }
+a:hover {
+  color: #5e5e5e;
+  text-decoration: none;
+}
 ul,
 li {
   list-style-type: none;
@@ -129,12 +133,12 @@ body {
 .content > * {
   width: 100%;
 }
-.content p a {
+.content .block-text>p>a {
   color: #084094;
   text-decoration: none;
   border-bottom: 1px dotted #084094;
 }
-.content p a:hover {
+.content .block-text>p>a:hover {
   color: #1152e6;
   border-bottom: 1px dotted #1152e6;
 }
@@ -275,7 +279,10 @@ nav.primary ul li a {
   border-bottom: 3px solid transparent;
   text-shadow: 0 0 12px rgba(0, 0, 0, 0.85);
 }
-
+nav.primary ul li a:hover {
+  color: #fff;
+  border-bottom: 3px solid rgba(49, 162, 249, 0.7);
+}
 a.active {
   border-bottom: 3px solid rgb(49, 162, 249) !important;
 }
@@ -390,6 +397,7 @@ aside.side-column a:visited {
 }
 aside.side-column a:hover {
   border-bottom: 2px solid rgba(49, 162, 249, 0.8);
+  text-decoration: none;
 }
 nav.features ul li a,
 nav.features ul li a:visited {
@@ -860,6 +868,7 @@ main.inventories > article {
 .corpora-container .collections-container a:hover {
   background-color: #e9f1fb;
   color: #354d87;
+  text-decoration: none;
 }
 .corpora-container .collections-container .count {
   margin-left: auto;
@@ -1008,6 +1017,7 @@ i.inactive {
 .app.inventory-list .grid-row-wrapper:hover > span.inventory-field,
 .app.inventory-list .inventory-wide:hover {
   background: #eef8fe;
+  text-decoration: none;
 }
 .app.inventory-list .inventory-field {
   border-top: 0;
