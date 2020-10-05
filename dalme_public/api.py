@@ -98,7 +98,7 @@ class Thumbnail(View):
 class SourceList(ListAPIView):
     model = Source
     queryset = Source.objects.all()
-    serializer_class = PublicSourceSerializer
+    serializer_class = PublicRecordSerializer
     pagination_class = DALMEPagination
     filterset_class = SourceFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -161,7 +161,7 @@ class SourceList(ListAPIView):
 class SourceDetail(RetrieveAPIView):
     model = Source
     queryset = Source.objects.all()
-    serializer_class = PublicSourceSerializer
+    serializer_class = PublicRecordSerializer
     lookup_url_kwarg = 'pk'
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
