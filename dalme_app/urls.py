@@ -35,6 +35,7 @@ router.register(r'tickets', api.Tickets, basename='tickets')
 router.register(r'transcriptions', api.Transcriptions, basename='transcriptions')
 router.register(r'users', api.Users, basename='users')
 router.register(r'workflow', api.WorkflowManager, basename='workflow')
+router.register(r'library', api.Library, basename='library')
 
 urlpatterns = [
     path('maintenance-mode/', include(maintenance_mode_urls)),
@@ -55,6 +56,7 @@ urlpatterns = [
     path('images/', views.ImageList.as_view(), name='image_list'),
     path('images/<slug:pk>/', views.ImageDetail.as_view(), name='image_detail'),
     path('languages/', views.LanguageList.as_view(), name='language_list'),
+    path('library/', views.LibraryList.as_view(), name='library_list'),
     path('locales/', views.LocaleList.as_view(), name='locale_list'),
     re_path(r'^pages/(?P<pk>[a-zA-Z0-9-]+)/manifest', views.PageManifest, name='page_manifest'),
     path('rights/', views.RightsList.as_view(), name='rights_list'),

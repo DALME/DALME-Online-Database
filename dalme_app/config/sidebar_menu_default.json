@@ -181,6 +181,13 @@
     "permissions": ["Users", "Staff", "Administrators", "Developers"]
   },
   {
+    "text": "Library",
+    "link": "/library",
+    "iconClass": "fa-book-reader",
+    "child": true,
+    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+  },
+  {
     "text": "Rights Policies",
     "link": "/rights",
     "iconClass": "fa-copyright",
