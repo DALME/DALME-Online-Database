@@ -19,7 +19,14 @@ def get_ec2_instance_ip():
 
 
 AWS_LOCAL_IP = get_ec2_instance_ip()
-ALLOWED_HOSTS = [AWS_LOCAL_IP, '.dalme.org', 'localhost', '127.0.0.1', '.us-east-1.elasticbeanstalk.com', '.compute-1.amazonaws.com']
+ALLOWED_HOSTS = [
+    AWS_LOCAL_IP,
+    '.dalme.org',
+    'localhost',
+    '127.0.0.1',
+    '.us-east-1.elasticbeanstalk.com',
+    '.compute-1.amazonaws.com'
+]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -52,19 +59,32 @@ DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 DEBUG = False
 COMPRESS_ENABLED = True
 
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://*.dalme.org'
     'https://db.dalme.org',
     'https://public.dalme.org',
-    'http://public.dalme.org',
     'https://dalme.org',
     'https://kb.dalme.org',
     'https://dam.dalme.org'
 ]
+CORS_ALLOW_CREDENTIALS = True
+
+ROOT_HOSTCONF = 'dalme.hosts'
+ROOT_URLCONF = 'dalme.urls'
+DEFAULT_HOST = 'public'
+PARENT_HOST = 'dalme.org'
+HOST_SCHEME = 'https://'
+
 SESSION_COOKIE_DOMAIN = '.dalme.org'
 CSRF_COOKIE_DOMAIN = '.dalme.org'
-CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = ['.dalme.org']
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -125,11 +145,6 @@ MIDDLEWARE = [
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware'
 ]
-
-ROOT_URLCONF = 'dalme.urls'
-ROOT_HOSTCONF = 'dalme.hosts'
-DEFAULT_HOST = 'public'
-PARENT_HOST = 'dalme.org'
 
 TEMPLATES = [
     {
@@ -317,11 +332,6 @@ COMPRESS_FILTERS = {
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
 WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
-
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CELERY_BROKER_URL = 'sqs://'
 CELERY_BROKER_TRANSPORT_OPTIONS = {
