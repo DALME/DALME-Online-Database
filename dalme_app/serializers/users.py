@@ -8,7 +8,7 @@ from dalme_app.serializers.others import GroupSerializer, ProfileSerializer
 class UserSerializer(DynamicSerializer):
     """ Serializes user and profile data """
     groups = GroupSerializer(many=True, required=False)
-    profile = ProfileSerializer()
+    profile = ProfileSerializer(required=False)
     full_name = serializers.CharField(max_length=255, source='profile.full_name', required=False)
 
     class Meta:
@@ -27,6 +27,7 @@ class UserSerializer(DynamicSerializer):
                 'id': user.id,
                 'username': user.username
                 }
+
         if data.get('groups') is not None:
             self.context['groups'] = data.pop('groups')
 
@@ -52,11 +53,18 @@ class UserSerializer(DynamicSerializer):
         return super().update(instance, validated_data)
 
     def create(self, validated_data):
-        profile_data = validated_data.pop('profile')
+        profile_data = self.context.get('profile')
+
         user = User.objects.create_user(**validated_data)
+
+        if profile_data.get('primary_group') is not None:
+            profile_data['primary_group'] = Group.objects.get(pk=profile_data['primary_group']['id'])
         Profile.objects.create(user=user, **profile_data)
+
         if self.context.get('groups') is not None:
             group_data = [i['id'] for i in self.context['groups']]
             user.groups.set(group_data)
+
         Agent.objects.create(standard_name=user.profile.full_name, type=1, user=user)
+
         return user
