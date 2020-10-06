@@ -1,3 +1,4 @@
+bibtexparser==1.2.0
 boto3==1.14.44
 Brotli==1.0.9
 celery==4.4.7
@@ -19,6 +20,7 @@ djangorestframework==3.11.1
 djangosaml2idp==0.7.2
 drf-access-policy==0.7.0
 elasticsearch>=2.0.0,<3.0.0
+feedparser==5.2.1
 kombu==4.6.11
 lxml==4.5.2
 mysqlclient==2.0.1
