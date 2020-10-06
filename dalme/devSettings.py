@@ -39,13 +39,56 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # Application definition
-ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'localhost', '127.0.0.1.xip.io', '127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io:8443', 'db.127.0.0.1.xip.io', 'public.127.0.0.1.xip.io:8443', 'public.127.0.0.1.xip.io']
-CORS_ORIGIN_ALLOW_ALL = True
+ALLOWED_HOSTS = [
+    '127.0.0.1:8000',
+    '127.0.0.1',
+    'localhost',
+    '127.0.0.1.xip.io',
+    '127.0.0.1.xip.io:8443',
+    'db.127.0.0.1.xip.io:8443',
+    'db.127.0.0.1.xip.io',
+    'public.127.0.0.1.xip.io:8443',
+    'public.127.0.0.1.xip.io'
+]
+CORS_ALLOW_ALL_ORIGINS = False
 # CORS_ALLOW_CREDENTIALS = True
 # SESSION_COOKIE_SAMESITE = None
 SESSION_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
 CSRF_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
 # SESSION_COOKIE_NAME = 'session_id'
+# CORS_PREFLIGHT_MAX_AGE = 2000
+# CSRF_TRUSTED_ORIGINS = ['.127.0.0.1.xip.io']
+# CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://*.127.0.0.1.xip.io:8443',
+    'https://*.127.0.0.1.xip.io',
+    'https://public.127.0.0.1.xip.io:8443',
+    'http://public.127.0.0.1.xip.io:8443',
+    'https://public.127.0.0.1.xip.io',
+    'http://public.127.0.0.1.xip.io'
+]
+
+# CORS_REPLACE_HTTPS_REFERER = True
+# CORS_ALLOWED_ORIGIN_REGEXES = [
+#     r'^https://.+\.127\.0\.0\.1\.xip\.io:8443$'
+# ]
+
+# CORS_ALLOW_CREDENTIALS = True
+# SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
+ROOT_HOSTCONF = 'dalme.devHosts'
+ROOT_URLCONF = 'dalme.devUrls'
+DEFAULT_HOST = 'public'
+PARENT_HOST = '127.0.0.1.xip.io:8443'
+HOST_SCHEME = 'https://'
+
+# HTTPS/SSL settings
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -95,6 +138,7 @@ INSTALLED_APPS = [
     'wagtail.core',
     'wagtailmodelchooser',
 
+    #'cors_headers.application.cors_headers_config',
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
 ]
@@ -104,15 +148,17 @@ if DEBUG and ENABLE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
+    #'dalme_app.test_middleware.DALMETestResponse',
     'django_hosts.middleware.HostsRequestMiddleware',
+    #'cors_headers.middleware.CorsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     # 'oauth2_provider.middleware.OAuth2TokenMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'dalme_app.models._templates.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -122,13 +168,8 @@ MIDDLEWARE = [
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    'django_hosts.middleware.HostsResponseMiddleware'
+    'django_hosts.middleware.HostsResponseMiddleware',
 ]
-
-ROOT_HOSTCONF = 'dalme.devHosts'
-ROOT_URLCONF = 'dalme.devUrls'
-DEFAULT_HOST = 'public'
-PARENT_HOST = '127.0.0.1.xip.io:8443'
 
 TEMPLATES = [
     {
@@ -390,13 +431,6 @@ COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
 WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
-
-# HTTPS/SSL settings
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # CELERY SETUP
 # CELERY_BROKER_URL = "sqs://%s:%s@" % (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
