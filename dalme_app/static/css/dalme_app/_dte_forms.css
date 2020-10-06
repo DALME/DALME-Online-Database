@@ -150,8 +150,12 @@
   padding-left: 0;
 }
 
+.DTE_Field_InputControl {
+  display: flex !important;
+}
+
 .DTE_Field_InputControl > div {
-  display: flex;
+  display: contents;
 }
 
 .DTE_Field_InputControl label {
@@ -328,6 +332,7 @@
 
 .formset-entry-container {
   flex-direction: column;
+  display: flex !important;
 }
 
 .DTE .DTE_Field_Type_dalmePages,
@@ -523,6 +528,7 @@
   color: #5483a5;
   margin-left: -10px;
   padding-right: 10px;
+  min-width: 70px;
 }
 
 .DTE .page_name {
@@ -807,7 +813,8 @@ div.DTE_Field_Type_checkbox div label, div.DTE_Field_Type_radio div label {
 }
 
 .DTE .formset-date-container input {
-  width: 50%;
+  width: 100%;
+  min-width: 50px;
 }
 
 #dam-search-dropdown {
