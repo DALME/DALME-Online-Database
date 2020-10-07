@@ -13,7 +13,7 @@ class Sources(DALMEBaseViewSet):
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
     filterset_class = SourceFilter
-    search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name', 'primary_dataset__name']
+    search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name', 'primary_dataset__name', 'attributes__value_STR']
     ordering_fields = ['name', 'short_name', 'owner', 'primary_dataset', 'no_records', 'is_private', 'attributes.authority',
                        'attributes.format', 'attributes.locale', 'attributes.country', 'attributes.default_rights',
                        'attributes.archival_series', 'attributes.archival_number', 'attributes.date', 'attributes.start_date',
