@@ -290,7 +290,7 @@
         count: null,
         totalPages: null,
         currentPage: null,
-        search: new URLSearchParams(window.location.search).get('q'),
+        search: new URLSearchParams(window.location.search).get('search'),
         showFilters: false,
         corpus: null,
         mode: 'compact',
@@ -309,7 +309,7 @@
       watch: {
         inventories: 'fetchThumbnails',
         search: debounce(function() {
-          this.filterData('q', this.search)
+          this.filterData('search', this.search)
         }, 250),
         date: debounce(function() {
           const [min, max] = this.date;

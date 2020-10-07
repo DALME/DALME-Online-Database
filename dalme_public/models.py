@@ -74,8 +74,8 @@ class SourceChooser(Chooser):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).order_by('name')
-        if request.GET.get('q'):
-            qs = qs.filter(name__icontains=request.GET['q'])
+        if request.GET.get('search'):
+            qs = qs.filter(name__icontains=request.GET['search'])
         return qs
 
 

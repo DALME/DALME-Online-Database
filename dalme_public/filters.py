@@ -127,7 +127,10 @@ class SourceFilter(django_filters.FilterSet):
         for definition in self.filters.values():
             definition.field.label_suffix = ''
 
-    name = django_filters.CharFilter(label='Name', lookup_expr='icontains')
+    name = django_filters.CharFilter(
+        label='Name',
+        lookup_expr='icontains'
+    )
     source_type = django_filters.MultipleChoiceFilter(
         label='Type',
         choices=source_type_choices,
@@ -148,7 +151,9 @@ class SourceFilter(django_filters.FilterSet):
         method='filter_collection'
     )
     has_image = django_filters.ChoiceFilter(
-        label='Has Image', method='filter_image', choices=BOOLEAN_CHOICES
+        label='Has Image',
+        method='filter_image',
+        choices=BOOLEAN_CHOICES
     )
     has_transcription = django_filters.ChoiceFilter(
         label='Has Transcription',
