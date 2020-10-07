@@ -253,6 +253,7 @@ class SourceSerializer(DynamicSerializer):
                     if 'id' in page:
                         current_page = current_pages.pop(UUID(page['id']))
                         page.pop('id')
+                        page['dam_id'] = page.get('dam_id')
                         for key, value in page.items():
                             setattr(current_page, key, value)
                         current_page.save()
