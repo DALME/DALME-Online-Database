@@ -40,16 +40,22 @@ class UserSerializer(DynamicSerializer):
         if self.context.get('profile') is not None:
             profile_data = self.context.get('profile')
             profile = Profile.objects.get_or_create(user=instance)
+
             if type(profile) is tuple:
                 profile = profile[0]
-            if profile_data.get('primary_group') is not None and type(profile_data.get('primary_group')) is int:
-                profile_data['primary_group'] = Group.objects.get(pk=profile_data['primary_group'])
+
+            if profile_data.get('primary_group') is not None:
+                profile_data['primary_group'] = Group.objects.get(pk=profile_data['primary_group']['id'])
+
             for attr, value in profile_data.items():
                 setattr(profile, attr, value)
+
             profile.save()
+
         if self.context.get('groups') is not None:
             group_data = [i['id'] for i in self.context['groups']]
             instance.groups.set(group_data)
+
         return super().update(instance, validated_data)
 
     def create(self, validated_data):
