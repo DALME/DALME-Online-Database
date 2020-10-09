@@ -1,105 +1,31 @@
-# DALME
+# [DALME Online Database](https://dalme.org)
 
-A work in progress port of the current FileMaker-based DALME database to the Python Django framework.
+[![License](https://img.shields.io/badge/License-BSD-green.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://www.python.org)
+[![Javascript](https://img.shields.io/badge/Language-Javascript-orange.svg)](http://www.ecma-international.org)
+[![Framework](https://img.shields.io/badge/Framework-Django-blue.svg)](https://www.djangoproject.com)
 
-## Setup for Development
+A digital environment designed to facilitate the extraction, analysis, and publication of material culture information from textual primary sources.
 
-### Software Required
+---
 
-The software required is listed below, along with commands for installation on OSX.
+![screenshot](https://dalme-app-media.s3.amazonaws.com/media/original_images/dalme_demo.gif)
 
-- Python 3
-  - `brew install python3`
-- Virtualenv
-  - `pip install virtualenv`
-- Postgres
-    - `brew install postgresql`
-- MySQL
-    - `brew install mysql`
+## Overview
 
-### Setup
+This application is the backbone of the [DALME project’s online environment](https://db.dalme.org), providing the tools to store, transcribe, and extract textual things, that is to say objects as described in textual sources, from household or estate inventories from a number of different cities and regions in Europe in a manner that makes it possible to draw legitimate comparisons between textual things on the one hand and museum objects or excavated artefacts on the other.
 
-1. Clone this repo and `cd` into the project.
-```
-git clone https://github.com/DALME/dalme.git
-````
+[DALME](https://dalme.org) is a research project directed by [Daniel Smail](https://scholar.harvard.edu/smail) and [Gabriel Pizzorno](https://scholar.harvard.edu/pizzorno), from the [Department of History](https://history.fas.harvard.edu) at [Harvard University](https://www.harvard.edu). The goal of the project is to increase our understanding of Europe’s material horizons during the later Middle Ages, an era when changing patterns of production and consumption altered the material world and transformed the relationship between people and things. We aim to accomplish this by developing a publicly accessible and fully searchable online database of material culture based on household inventories and other textual sources from the period.
 
-2. Set up a virtualenv for development. In this case, we're calling the environment "dalme" and placing it in a directory called `virtualenvs` in the home directory, but you can call it whatever you want and put it wherever you want.
-```
-virtualenv -p python3 ~/virtualenvs/dalme
-```
+## Requirements
 
-4. Activate the virtual environment.
-```
-source ~/virtualenvs/dalme/bin/activate
-```
+The core functionality of the DALME Online Database requires [Python](https://www.python.org), [Django](https://www.djangoproject.com), [Django REST Framework](https://www.django-rest-framework.org) (for the API), and [Wagtail](https://wagtail.io) (for the public website). [MySQL](https://www.mysql.com) is the current database backend, deployed through [RDS](https://aws.amazon.com/rds/), although [PostgreSQL](https://www.postgresql.org) is also supported. Full-text search capabilities are implemented using [Haystack](https://haystacksearch.org) and [Elasticsearch](https://aws.amazon.com/elasticsearch-service/). Periodic and background tasks are handled using [Celery](https://docs.celeryproject.org/en/stable/index.html) and [SQS](https://aws.amazon.com/sqs/). Bibliographic resources are kept in [Zotero](https://www.zotero.org) and managed via the [Zotero API](https://www.zotero.org/support/dev/web_api/v3/start). The app is deployed with [Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/), with [S3](https://aws.amazon.com/s3/) providing media storage.
 
-3. Install the dependencies.
-    - (in the directory for this repository) `pip install -r requirements.txt`
-    - Some installations may fail, try installing command line tools:
-        - `xcode-select --install`
-    - Also try installing `psycopg` and/or `mysqlclient` with the following pip commands:
-        - `env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip --no-cache install psycopg2`
-        - `env LDFLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib" pip --no-cache install mysqlclient`
-    - Alternatively, for compilers to find openssl you can set:
-        - `export LDFLAGS="-L/usr/local/opt/openssl/lib"`
-        - `export CPPFLAGS="-I/usr/local/opt/openssl/include"`
+## Documentation
 
-4. Get a copy of the `env` and `db.cnf` files from someone else in the project and place it in the root of the repository's directory.
+The project's documentation is available in our [Knowledge Base](https://kb.dalme.org).
+Instructions on how to set up a development environment to run the DALME Online Database can be found [here](getting_started.md).
 
-5. Prime your filesystem for logging.
-```
-sudo mkdir /var/log/django && \
-  sudo touch /var/log/django/dalme_app.log && \
-  sudo chown -R $(whoami) /var/log/django
-```
+## License
 
-6. Source the environment settings.
-```
-source ./env
-```
-
-7. Restore the db dump and create the application db user.
-```
-$ mysql -u root < path_to_db_dump.sql
-$ mysql -u root
--- Where `$PASSWORD` == `password` found in the `db.cnf` file.
-mysql> CREATE USER 'dalme_app'@'localhost' IDENTIFIED BY '$PASSWORD';
-mysql> GRANT ALL PRIVILEGES ON dalme_db.* TO 'dalme_app'@'localhost';
-mysql> FLUSH PRIVILEGES;
--- While we are in the mysql shell let's set your `User` record (which should
--- already be in the database dump) as a local superuser.
--- First find the pk of your row and then update it.
-mysql> USE dalme_db;
-mysql> SELECT username, id FROM auth_user;
-mysql> UPDATE auth_user SET is_superuser = 1 WHERE id = $YOUR_USER_PK;
-```
-
-Change your local password if you need to.
-```
-$ python manage.py changepassword $YOUR_USERNAME
-```
-
-If you don't already have a record in the database, create one.
-```
-python manage.py createsuperuser
-```
-
-8. Build the CMS tree.
-```
-python manage.py create_site
-```
-
-8. Test the local development setup.
-```
-python manage.py runserver
-```
-
-If you create a new terminal to do this, you'll need to make sure that you're in your environment with `source ~/virtualenvs/dalme/bin/activate`.
-
-9. Check out the site at `localhost:8000` and `localhost:8000/cms`.
-
-10. You can monitor the log output if you feel like it. Open a separate terminal and call:
-```
-$ tail -f /var/log/django/dalme_app.log
-```
+This software is licensed under a modified [BSD license](https://opensource.org/licenses/BSD-3-Clause). See the LICENSE file in the top distribution directory for the full license text.
