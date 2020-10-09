@@ -20,7 +20,7 @@ def rs_api_query(**kwargs):
         'param2': kwargs.get('param2', ''),  # string of resource type IDs "1,2". Empty = all types.
         'param3': kwargs.get('param3', ''),  # string indicating results order. Valid options: relevance, popularity, rating, date, colour, country, title, file_path, resourceid, resouretype, titleandcountry, random, status. empty = relevance ordering.
         'param4': kwargs.get('param4', 0),  # archive status of resources to return. 0=live assets
-        'param5': kwargs.get('param5', 20),  # maximum number of rows to return. Use "-1" to return all rows.
+        'param5': kwargs.get('param5', -1),  # maximum number of rows to return. Use "-1" to return all rows.
         'param6': kwargs.get('param6', 'asc'),  # sort order, "asc"=ascending, "desc"=descending (default).
         'param7': kwargs.get('param7', ''),  # if performing a 'recent' special search, limit the results to resources created in the last n number of days
         'param8': kwargs.get('param8', 'thm, scr'),  # comma separated list of preview sizes e.g. "thm, scr"' will retrieve the thumbnail and screen sized previews, "" = don't return any preview URLs (default).

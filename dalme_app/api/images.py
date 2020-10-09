@@ -6,6 +6,7 @@ from dalme_app.serializers import RSImageSerializer
 from dalme_app.models import rs_resource, rs_api_query, Source
 from dalme_app.access_policies import ImageAccessPolicy
 from ._common import DALMEBaseViewSet
+from json import JSONDecodeError
 
 
 class Images(DALMEBaseViewSet):
@@ -35,10 +36,14 @@ class Images(DALMEBaseViewSet):
                 if self.request.GET.get(k) is not None:
                     query_params[v] = self.request.GET.get(k)
 
-            row_cutoff = query_params.get('param5', '20')  # this is to deal with a bug in the RS API that returns 0s for records exceeding the row count requested
+            # row_cutoff = query_params.get('param5', '20')  # this is to deal with a bug/feature in the RS API that returns 0s for records exceeding the row count requested
             response = rs_api_query(**query_params)
-            result = json.loads(response.text)[:int(row_cutoff)]
-            status = 201
+            try:
+                result = json.loads(response.text) # [:int(row_cutoff)]
+                status = 201
+            except JSONDecodeError:
+                result = 'Your search did not return any results.'
+                status = 201
 
         except Exception as e:
             result = {'error': 'The following error occured while trying to fetch the data: ' + str(e)}
@@ -52,21 +57,25 @@ class Images(DALMEBaseViewSet):
             query_params['param1'] = request.GET['search']
         if request.GET.get('data') is not None:
             dt_request = json.loads(request.GET['data'])
-            query_params['param5'] = dt_request['length']
+            # query_params['param5'] = dt_request['length']
         try:
             response = rs_api_query(**query_params)
-            queryset = json.loads(response.text)
-            if request.GET.get('data') is not None:
-                page = queryset[dt_request.get('start'):dt_request.get('length')]
-                result = {
-                    'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-                    'recordsTotal': len(queryset),
-                    'recordsFiltered': len(queryset),
-                    'data': page
-                    }
-            else:
-                result = queryset[:20]
-            status = 200
+            try:
+                queryset = json.loads(response.text)
+                if request.GET.get('data') is not None:
+                    page = queryset[dt_request.get('start'):(dt_request.get('start') + dt_request.get('length'))]
+                    result = {
+                        'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                        'recordsTotal': len(queryset),
+                        'recordsFiltered': len(queryset),
+                        'data': page
+                        }
+                else:
+                    result = queryset[:25]
+                    status = 200
+            except JSONDecodeError:
+                result = 'Your search did not return any results.'
+                status = 201
         except Exception as e:
             result = {'error': 'The following error occured while trying to fetch the data: ' + str(e)}
             status = 400

@@ -157,21 +157,26 @@ _fieldTypes.dalmePages = {
           method: "GET",
           url: "/api/images/?search=" + query
         }).done(function(data, textStatus, jqXHR) {
-          $('#dam-search-results').removeClass('d-none');
-          $('#dam-search-results').html('');
-          for (let i = 0, len = data.length; i < len; ++i) {
-            let result = '<div class="media dam-search-result" id="' + data[i].ref + '">\
-              <img src="' + data[i].url_thm + '" class="mr-3">\
-              <div class="media-body">\
-                <h6 class="mt-0 mb-0">' + data[i].field8 + '</h6>\
-                <span class="mr-1"><strong><small>ID:</small></strong></span>' + data[i].ref + '<br/>\
-                <span class="mr-1"><strong><small>FOLIO:</small></strong></span>' + data[i].field79 + '<br/>\
-                <span class="mr-1"><strong><small>FILENAME:</small></strong></span>' + data[i].field51 + '<br/>\
-                <span class="mr-1"><strong><small>CREATED:</small></strong></span>' + data[i].creation_date + '<br/>\
-              </div>\
-            </div>'
-            $('#dam-search-results').append(result)
-          }
+          if (typeof data != 'string') {
+              $('#dam-search-results').removeClass('d-none');
+              $('#dam-search-results').html('');
+              for (let i = 0, len = data.length; i < len; ++i) {
+                let result = '<div class="media dam-search-result" id="' + data[i].ref + '">\
+                  <img src="' + data[i].url_thm + '" class="mr-3">\
+                  <div class="media-body">\
+                    <h6 class="mt-0 mb-0">' + data[i].field8 + '</h6>\
+                    <span class="mr-1"><strong><small>ID:</small></strong></span>' + data[i].ref + '<br/>\
+                    <span class="mr-1"><strong><small>FOLIO:</small></strong></span>' + data[i].field79 + '<br/>\
+                    <span class="mr-1"><strong><small>FILENAME:</small></strong></span>' + data[i].field51 + '<br/>\
+                    <span class="mr-1"><strong><small>CREATED:</small></strong></span>' + data[i].creation_date + '<br/>\
+                  </div>\
+                </div>'
+                $('#dam-search-results').append(result)
+              }
+            } else {
+              $('#dam-search-results').removeClass('d-none');
+              $('#dam-search-results').append('<div class="dam-search-message">' + data + '</div>')
+            }
         }).fail(function(jqXHR, textStatus, errorThrown) {
           $('#dam-search-results').removeClass('d-none');
           $('#dam-search-results').append('<div class="dam-search-error">There was an error communicating with the server: ' + errorThrown + '</div>')
