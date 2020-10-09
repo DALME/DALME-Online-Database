@@ -148,7 +148,7 @@
       "parent.id": {
         "options": {
             "type": "api_call",
-            "url": "/api/sources/?format=select&type_lt=13&search="
+            "url": "/api/sources/?format=select&type__lt=13&search="
         }
       }
     }

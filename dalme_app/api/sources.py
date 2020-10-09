@@ -97,8 +97,12 @@ class Sources(DALMEBaseViewSet):
             'records': ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'pages', 'sets', 'is_private', 'owner', 'no_folios', 'workflow', 'attributes', 'credits'],
             'bibliography': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'owner', 'attributes', 'sets', 'no_records', 'primary_dataset']
         }
-        if self.request.GET.get('class') is not None:
+
+        if self.request.GET.get('format') == 'select':
+            kwargs['fields'] = ['id', 'name']
+        elif self.request.GET.get('class') is not None:
             kwargs['fields'] = fields[self.request.GET['class']]
+
         return serializer_class(*args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):

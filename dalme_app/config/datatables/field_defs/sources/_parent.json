@@ -4,7 +4,8 @@
     "type": "selectize",
     "opts": {
         "placeholder": "Select parent",
-        "preload": false
+        "preload": "focus",
+        "loadThrottle": 900
     },
     "options": {
         "type": "api_call",
