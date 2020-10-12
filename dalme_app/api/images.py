@@ -70,6 +70,7 @@ class Images(DALMEBaseViewSet):
                         'recordsFiltered': len(queryset),
                         'data': page
                         }
+                    status = 200
                 else:
                     result = queryset[:25]
                     status = 200
