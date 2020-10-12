@@ -6,6 +6,7 @@
         "placeholder": "Select library entry",
         "labelField": "title",
         "valueField": "key",
+        "searchField": ["title"],
         "preload": "focus"
     },
     "options": {
