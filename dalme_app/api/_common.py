@@ -45,7 +45,10 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(full_queryset)
         if request.GET.get('data') is not None:
             dt_request = json.loads(request.GET['data'])
-            page = self.paginate_queryset(queryset, dt_request.get('start'), dt_request.get('length'))
+            if dt_request.get('length') != -1:
+                page = self.paginate_queryset(queryset, dt_request.get('start'), dt_request.get('length'))
+            else:
+                page = queryset
             serializer = self.get_serializer(page, many=True)
             result = {
                 'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
