@@ -28,7 +28,6 @@
         "name",
         "short_name",
         "type.id",
-        "parent.id",
         "primary_dataset.id",
         "attributes.default_rights.id",
         "attributes.zotero_key"
