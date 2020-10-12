@@ -1,7 +1,8 @@
 {
   "config": {
     "helpers": [
-      "source_forms"
+      "source_forms",
+      "ownership_filter_module"
     ],
     "globals": {
       "endpoint": "sources",
