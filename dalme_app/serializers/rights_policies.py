@@ -40,4 +40,8 @@ class RightsPolicySerializer(serializers.ModelSerializer):
             else:
                 data.pop('attachments')
 
+        if data.get('rights_status') is not None:
+            if data['rights_status'].get('id') is not None:
+                data['rights_status'] = data['rights_status']['id']
+
         return super().to_internal_value(data)
