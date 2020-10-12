@@ -39,7 +39,7 @@ class DRFSelectRenderer(renderers.JSONRenderer):
             for entry in data:
                 entry_dict = {}
                 for field in select_fields:
-                    entry_dict[field] = entry[field]
+                    entry_dict[field] = entry.get(field)
                 select_list.append(entry_dict)
 
         ret = json.dumps(
