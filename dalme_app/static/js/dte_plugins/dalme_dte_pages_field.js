@@ -175,6 +175,7 @@ _fieldTypes.dalmePages = {
               }
             } else {
               $('#dam-search-results').removeClass('d-none');
+              $('#dam-search-results').html('');
               $('#dam-search-results').append('<div class="dam-search-message">' + data + '</div>')
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
