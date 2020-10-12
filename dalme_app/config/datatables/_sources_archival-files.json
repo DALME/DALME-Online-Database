@@ -104,6 +104,14 @@
       {
         "button": "remove",
         "permissions": "dalme_app.delete_source"
+      },
+      {
+        "button": "select_all",
+        "permissions": "dalme_app.change_source"
+      },
+      {
+        "button": "clear_selection",
+        "permissions": "dalme_app.change_source"
       }
     ],
     "overrides": {

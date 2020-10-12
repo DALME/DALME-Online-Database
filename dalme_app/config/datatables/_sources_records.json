@@ -120,11 +120,12 @@
         "permissions": "dalme_app.delete_source"
       },
       {
-        "button": "create_set_from_sources",
-        "permissions": "dalme_app.create_set"
+        "button": "select_all",
+        "permissions": "dalme_app.change_source"
       },
       {
-        "button": "add_sources_to_set"
+        "button": "clear_selection",
+        "permissions": "dalme_app.change_source"
       }
     ],
     "overrides": {
