@@ -1,16 +1,17 @@
 <div class="at-a-glance">
   <ul>
-    <h3 class="u-small-caps-heading">AT A GLANCE</h3>
-
-    <li class="inventories">
+    <div class="sidebar-heading">
+      <h3 class="u-small-caps-heading">AT A GLANCE</h3>
+    </div>
+    <li class="inventories pb-1">
       <h5>Records</h5>
-      <p>{{ stats.inventories }}</p>
+      <span class="records">{{ stats.inventories }}</span>
     </li>
 
     {% if stats.languages %}
       <li class="languages u-flex">
         <h5>Languages</h5>
-        <ul>
+        <ul class="d-flex flex-column">
           {% for lang in stats.languages %}
             <li class="lang-lozenge">
               <span>{{ lang.0|title }}</span>

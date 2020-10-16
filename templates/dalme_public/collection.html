@@ -19,23 +19,6 @@
   <div class="content u-flex">
     <section>
       {% for block in page.body %}
-        {% if not page.main_image %}
-          {% if forloop.counter0 == 0 %}
-            <nav class="browse">
-              <div class="u-button">
-                <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse</a>
-              </div>
-            </nav>
-          {% endif %}
-        {% else %}
-          {% if forloop.counter0 == 1 %}
-            <nav class="browse">
-              <div class="u-button">
-                <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse</a>
-              </div>
-            </nav>
-          {% endif %}
-        {% endif %}
         <div class="block-{{ block.block_type }}">
           {% include_block block %}
         </div>
@@ -162,7 +145,7 @@
         }
       })
 
-      renderHistogram('#histogram', 150, 40, '#d6d5d5');
+      renderHistogram('#histogram', 150, 40, '#d0e7ff');
     });
   </script>
 {% endblock %}

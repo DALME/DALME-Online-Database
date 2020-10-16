@@ -1,16 +1,22 @@
 {% load wagtailroutablepage_tags %}
+{% load wagtailcore_tags static %}
 
 <nav class="secondary collections-filter">
   <ul class="u-flex">
-    <li class="searchbox">
-      <form method="get" action="{% routablepageurl page.specific 'unscoped_inventories' %}">
-        <input id="search" type="text" name="search" placeholder="Search">
-      </form>
-    </li>
     <li>
-      <a href="{% routablepageurl page.specific 'unscoped_inventories' %}">
-        Browse All
-      </a>
+      <a href="">Search</a>
+    </li>
+    {% if page.pk == 12 %}
+      <li>
+        <a href="{% routablepageurl page.specific 'unscoped_inventories' %}">Browse All</a>
+      </li>
+    {% else %}
+      <li>
+        <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse Collection</a>
+      </li>
+    {% endif %}
+    <li>
+      <a href="">Explore</a>
     </li>
   </ul>
 </nav>
