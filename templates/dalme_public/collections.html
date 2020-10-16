@@ -9,6 +9,9 @@
 
 {% block left_side_column %}
   {% include "dalme_public/includes/_collections_filter.html" %}
+  {% if page.citable %}
+    {% include "dalme_public/includes/_cite_menu.html" %}
+  {% endif %}
   {% include "dalme_public/includes/_features_nav.html" %}
 {% endblock %}
 

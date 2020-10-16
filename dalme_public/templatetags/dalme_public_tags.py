@@ -15,6 +15,7 @@ from dalme_public.models import (
     Home,
 )
 
+from datetime import date
 
 register = template.Library()
 
@@ -237,3 +238,48 @@ def collection_date_range(collection):
 @register.simple_tag()
 def get_snippet(obj, width):
     return obj.snippet(width)
+
+
+@register.simple_tag(takes_context=True)
+def get_citation(context):
+    accessed = date.today()
+    page = context['page']
+    page_class = page.get_verbose_name()
+    citation = {
+        'editor': [
+            {'family': 'Smail', 'given': 'Daniel Lord'},
+            {'family': 'Pizzorno', 'given': 'Gabriel H.'},
+            {'family': 'Morreale', 'given': 'Laura'}
+        ],
+        "accessed": {"date-parts": [[accessed.year, accessed.month, accessed.day]]},
+    }
+
+    if page_class == 'Collections':
+        citation.update({
+            'type': 'book',
+            'title': 'The Documentary Archaeology of Late Medieval Europe',
+            'URL': "https://dalme.org",
+            'issued': {'date-parts': [[accessed.year]]}
+        })
+    else:
+        citation.update({
+            'type': 'chapter',
+            'container-title': 'The Documentary Archaeology of Late Medieval Europe',
+            'title': page.title,
+            'URL': page.get_full_url(context['request'])
+        })
+        if page_class == 'Flat':
+            citation['issued'] = {'date-parts': [[accessed.year]]}
+        elif page_class == 'Collection':
+            citation['author'] = [{'literal': page.source_set.owner.profile.full_name}]
+            citation['issued'] = {'date-parts': [[accessed.year]]}
+        else:
+            author = page.alternate_author if page.alternate_author is not None else page.author
+            citation['author'] = [{'literal': author}]
+            citation['issued'] = {'date-parts': [[
+                    page.last_published_at.year,
+                    page.last_published_at.month,
+                    page.last_published_at.day
+                ]]}
+
+    return citation

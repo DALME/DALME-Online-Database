@@ -139,6 +139,10 @@ class DALMEPage(Page):
         blank=True,
         help_text='An optional short title that will be displayed in certain space constrained contexts.'  # noqa
     )
+    citable = models.BooleanField(
+        default=False,
+        help_text='Check this box to show the "Cite" menu for this page.'
+    )
 
     body = StreamField([
         ('main_image', MainImageBlock()),
@@ -155,6 +159,10 @@ class DALMEPage(Page):
         ('html', blocks.RawHTMLBlock()),
         ('subsection', SubsectionBlock()),
     ], null=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('citable'),
+    ]
 
     class Meta:
         abstract = True
