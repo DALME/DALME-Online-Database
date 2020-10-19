@@ -595,8 +595,9 @@ class Collection(RoutablePageMixin, DALMEPage):
         pages = source.source_pages.all().values(
             pageId=F('page__pk'),
             pageName=F('page__name'),
-            transcriptionId=F('transcription__pk')
-        )
+            transcriptionId=F('transcription__pk'),
+            pageOrder=F('page__order')
+        ).order_by('pageOrder')
 
         context = self.get_context(request)
         context.update({
