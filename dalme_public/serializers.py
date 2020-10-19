@@ -58,6 +58,9 @@ class PublicSourceSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
+        name_string = ret['name'].split('(')
+        ret['short_name'] = name_string[1][:-1]
+        ret['name'] = name_string[0]
         attributes = ret.pop('attributes')
         inherited = ret.pop('inherited')
         if attributes is not None:
