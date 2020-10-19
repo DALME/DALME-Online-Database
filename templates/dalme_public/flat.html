@@ -20,7 +20,11 @@
 {% endblock %}
 
 {% block left_side_column %}
-  {% include "dalme_public/includes/_flat_nav.html" %}
+  {% if page.get_parent.title == 'Collections' %}
+    {% include "dalme_public/includes/_collections_filter.html" %}
+  {% else %}
+    {% include "dalme_public/includes/_flat_nav.html" %}
+  {% endif %}
   {% if page.citable %}
     {% include "dalme_public/includes/_cite_menu.html" %}
   {% endif %}

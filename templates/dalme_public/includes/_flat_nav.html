@@ -5,7 +5,7 @@
   <ul class="u-flex">
     {% for tab in nav %}
       <li>
-        <a href="{% pageurl tab %}" {% if tab == page %}class="active"{% endif %}>
+        <a href="{% pageurl tab %}" {% if tab == page or tab == page.get_parent.specific %}class="active"{% endif %}>
           {{ tab.title_switch|title }}
         </a>
       </li>

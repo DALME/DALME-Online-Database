@@ -100,7 +100,11 @@ def get_breadcrumbs_nav(context):
 
 @register.simple_tag(takes_context=True)
 def get_flat_nav(context):
-    return [page.specific for page in context['page'].get_siblings().live()]
+    page = context['page']
+    if not page.show_in_menus:
+        return [p.specific for p in page.get_parent().get_siblings().live()]
+    else:
+        return [p.specific for p in page.get_siblings().live()]
 
 
 @register.simple_tag

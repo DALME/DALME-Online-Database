@@ -1,18 +1,27 @@
 {% load wagtailroutablepage_tags %}
-{% load wagtailcore_tags static %}
+{% load dalme_public_tags wagtailcore_tags static %}
 
 <nav class="secondary collections-filter">
   <ul class="u-flex">
+    {% if page|classname == 'Flat' %}
+    <li>
+      <a href="{% pageurl page.get_parent %}" class="active">Collections</a>
+    </li>
+    {% endif %}
     <li>
       <a href="">Search</a>
     </li>
-    {% if page.pk == 12 %}
+    {% if page|classname == 'Collection' %}
       <li>
-        <a href="{% routablepageurl page.specific 'unscoped_inventories' %}">Browse All</a>
+        <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse Collection</a>
+      </li>
+    {% elif page|classname == 'Flat' %}
+      <li>
+        <a href="{% routablepageurl page.get_parent.specific 'unscoped_inventories' %}">Browse All</a>
       </li>
     {% else %}
       <li>
-        <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse Collection</a>
+        <a href="{% routablepageurl page.specific 'unscoped_inventories' %}">Browse All</a>
       </li>
     {% endif %}
     <li>

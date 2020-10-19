@@ -323,8 +323,13 @@ class Flat(DALMEPage):
         help_text='Check this box to show a contact form on the page.'
     )
 
-    parent_page_types = ['dalme_public.Section', 'dalme_public.Collection']
-    subpage_types = []
+    parent_page_types = [
+        'dalme_public.Section',
+        'dalme_public.Collection',
+        'dalme_public.Flat',
+        'dalme_public.Collections'
+    ]
+    subpage_types = ['dalme_public.Flat']
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
@@ -496,7 +501,10 @@ class Corpus(Orderable, ClusterableModel):
 
 class Collections(RoutablePageMixin, DALMEPage):
     parent_page_types = ['dalme_public.Home']
-    subpage_types = ['dalme_public.Collection']
+    subpage_types = [
+        'dalme_public.Collection',
+        'dalme_public.Flat'
+    ]
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
