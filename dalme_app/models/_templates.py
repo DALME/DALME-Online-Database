@@ -65,11 +65,6 @@ class dalmeUuid(models.Model):
     def class_name(self):
         return self.__class__.__name__
 
-    def save(self, *args, **kwargs):
-        if self._state.adding is True:
-            self.owner = get_current_user()
-        super().save(*args, **kwargs)
-
     class Meta:
         abstract = True
 
@@ -84,11 +79,6 @@ class dalmeIntid(models.Model):
 
     def class_name(self):
         return self.__class__.__name__
-
-    def save(self, *args, **kwargs):
-        if self._state.adding is True:
-            self.owner = get_current_user()
-        super().save(*args, **kwargs)
 
     class Meta:
         abstract = True

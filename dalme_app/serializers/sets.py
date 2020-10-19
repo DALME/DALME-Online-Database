@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Group
 from dalme_app.models import Set
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from ._common import DynamicSerializer
 from dalme_app.serializers.users import UserSerializer
@@ -8,10 +9,10 @@ from dalme_app.models._templates import get_current_user
 
 
 class SetSerializer(DynamicSerializer):
-    owner = UserSerializer(fields=['id', 'full_name', 'username'], required=False, read_only=True)
+    owner = UserSerializer(fields=['id', 'full_name', 'username'], required=False)
     set_type_name = serializers.CharField(source='get_set_type_display', required=False)
     permissions_name = serializers.CharField(source='get_permissions_display', required=False)
-    dataset_usergroup = GroupSerializer(required=False, read_only=True)
+    dataset_usergroup = GroupSerializer(required=False)
 
     class Meta:
         model = Set
@@ -50,10 +51,17 @@ class SetSerializer(DynamicSerializer):
         return ret
 
     def to_internal_value(self, data):
-        if data.get('owner') is None:
-            data['owner'] = get_current_user().id
+        owner = get_current_user() if data.get('owner') is None else User.objects.get(pk=data['owner']['id'])
+        data['owner'] = {'id': owner.id, 'username': owner.username}
+
         if data.get('endpoint') is None:
             data['endpoint'] = 'sources'
+
+        id_fields = ['permissions', 'set_type', 'dataset_usergroup']
+        for field in id_fields:
+            if field in data:
+                data[field] = data[field]['id']
+
         return super().to_internal_value(data)
 
     def run_validation(self, data):
@@ -65,22 +73,33 @@ class SetSerializer(DynamicSerializer):
                     3: ['name', 'set_type', 'dataset_usergroup', 'description'],
                     4: ['name', 'set_type', 'endpoint', 'permissions']
                 }
+
                 missing = {}
-                for field in required[data['set_type']]:
+
+                for field in required[data['set_type']['id']]:
                     if data.get(field) in [None, '', 0]:
                         missing[field] = ['This field is required.']
+
                 if len(missing):
                     raise serializers.ValidationError(missing)
+
             _id = data['id'] if data.get('id') is not None else False
             _ds_usergroup = data.pop('dataset_usergroup') if data.get('dataset_usergroup') is not None else False
             data = {k: v for k, v in data.items() if v is not None}
             validated_data = super().run_validation(data)
             if _id:
                 validated_data['id'] = _id
+
             if _ds_usergroup:
-                validated_data['dataset_usergroup'] = Group.objects.get(pk=_ds_usergroup)
+                validated_data['dataset_usergroup'] = Group.objects.get(pk=_ds_usergroup['id'])
+
+            if validated_data.get('owner') is not None:
+                validated_data['owner'] = User.objects.get(username=validated_data['owner']['username'])
+
             return validated_data
+
         elif type(data) is str and data != '':
             return Set.objects.get(pk=data)
+
         else:
             return super().run_validation(data)

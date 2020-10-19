@@ -3,11 +3,13 @@
   "label": "Endpoint",
   "type": "selectize",
   "opts": {
+    "labelField": "label",
+    "valueField": "value",
     "placeholder": "Select endpoint",
     "preload": "focus"
   },
   "options": {
     "type": "api_call",
-    "url": "/api/choices/?type=list&field=attributes.record_type&format=json"
+    "url": "/api/choices/?type=list&field=set.endpoint&format=json"
   }
 }

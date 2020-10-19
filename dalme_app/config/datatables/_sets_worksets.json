@@ -20,6 +20,7 @@
       "required_list": [
         "name",
         "set_type.id",
+        "description",
         "endpoint",
         "permissions.id"
       ]
