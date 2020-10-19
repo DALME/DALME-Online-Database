@@ -13,20 +13,10 @@ class PublicAttributeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         label = instance.attribute_type.short_name
-        if label == 'language':
-            label = label + '_' + str(random.randint(0, 99))
-        if instance.attribute_type.data_type == 'UUID':
-            data = json.loads(instance.value_STR)
-            object = eval('{}.objects.get(pk="{}")'.format(data['class'], data['id']))
-            value = {
-                'name': object.name,
-                'url': object.get_url(),
-                'value': instance.value_STR
-            }
+        if instance.attribute_type.data_type == 'TXT':
+            return {label: instance.value_TXT}
         else:
-            value = str(instance)
-        ret = {label: value}
-        return ret
+            return {label: str(instance)}
 
 
 class PublicFilteredSetsSerializer(serializers.ListSerializer):
