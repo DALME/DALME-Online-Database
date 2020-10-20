@@ -40,6 +40,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEBUG = True
 # Application definition
 ALLOWED_HOSTS = [
+    '0.0.0.0',
     '127.0.0.1:8000',
     '127.0.0.1',
     'localhost',
@@ -82,7 +83,7 @@ PARENT_HOST = '127.0.0.1.xip.io:8443'
 HOST_SCHEME = 'https://'
 
 # HTTPS/SSL settings
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
