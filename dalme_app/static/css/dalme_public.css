@@ -1280,6 +1280,9 @@ i.inactive {
 .folios.vertical-split section.folio {
   width: 50%;
   max-width: 99.5%;
+
+  display: flex;
+  flex-direction: column;
 }
 .folios.horizontal-split section.folio {
   width: 100%;
@@ -1373,6 +1376,10 @@ section.transcription {
 .messages li.success {
   color: #fff;
   background: #5cb85c;
+}
+
+#diva_viewer {
+    flex-grow: 1;
 }
 
 form.contact-form {
@@ -1713,7 +1720,7 @@ nav.secondary.features-filter ul {
 
 /* TEI */
 section.transcription {
-  overflow-x: auto;
+  overflow: auto;
 }
 tei-text > tei-body {
   white-space: pre;
@@ -1748,6 +1755,7 @@ div.description[data-collapsed='true'] {
   main.collection.inventories,
   main.collections.inventories {
     padding-top: 1rem;
+    overflow: scroll;
   }
 
   .content {
