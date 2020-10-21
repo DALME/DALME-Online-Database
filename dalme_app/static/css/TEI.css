@@ -990,8 +990,10 @@ tei-langUsage {
 tei-language {
   /* Empty Rule Set */
 }
-tei-layout {
-  /* Empty Rule Set */
+tei-layout[columns] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 tei-layoutDesc {
   /* Empty Rule Set */
