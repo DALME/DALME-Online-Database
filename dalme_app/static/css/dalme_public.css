@@ -1715,6 +1715,9 @@ nav.secondary.features-filter ul {
 section.transcription {
   overflow-x: auto;
 }
+tei-mute {
+  display: none;
+}
 tei-text > tei-body {
   white-space: pre;
 }
