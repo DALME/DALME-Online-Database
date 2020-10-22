@@ -149,21 +149,6 @@ tei-abbr {
 
 }
 
-tei-w[type="elision"][join="right"]:after {
-  color: #757876;
-  content: "︙";
-}
-
-tei-w[type="elision"][join="left"]:before {
-  color: #757876;
-  content: "︙";
-}
-
-tei-w[type="elision"][lemma]:after {
-  color: #757876;
-  content: "["attr(lemma)"]︙";
-}
-
 tei-add:before {
   content: "»";
 }
