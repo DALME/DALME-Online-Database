@@ -287,3 +287,43 @@ def get_citation(context):
                 ]]}
 
     return citation
+
+
+@register.simple_tag
+def relative_url(value, field_name, urlencode=None):
+    url = '?{}={}'.format(field_name, value)
+    if urlencode:
+        querystring = urlencode.split('&')
+        filtered_querystring = filter(lambda p: p.split('=')[0] != field_name, querystring)
+        encoded_querystring = '&'.join(filtered_querystring)
+        url = '{}&{}'.format(url, encoded_querystring)
+    return url
+
+
+@register.simple_tag(takes_context=True)
+def pagination(context, adjacent_pages=2):
+    page_obj = context['page_obj']
+
+    startPage = max(page_obj.number - adjacent_pages, 1)
+    if startPage <= 3:
+        startPage = 1
+
+    endPage = page_obj.number + adjacent_pages + 1
+    if endPage >= page_obj.paginator.num_pages - 1:
+        endPage = page_obj.paginator.num_pages + 1
+
+    page_numbers = [n for n in range(startPage, endPage) if n > 0 and n <= page_obj.paginator.num_pages]
+
+    return {
+        'page_numbers': page_numbers,
+        'show_first': 1 not in page_numbers,
+        'show_last': page_obj.paginator.num_pages not in page_numbers,
+    }
+
+
+@register.filter
+def dd_record_name(name, part=''):
+    name_string = name.split('(')
+    if part == 'loc':
+        return name_string[1][:-1]
+    return name_string[0]

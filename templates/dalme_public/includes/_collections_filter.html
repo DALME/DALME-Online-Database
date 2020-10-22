@@ -9,7 +9,7 @@
     </li>
     {% endif %}
     <li>
-      <a href="">Search</a>
+      <a href="{% routablepageurl page.specific 'search' %}" {% if form %}class="active"{% endif %}>Search</a>
     </li>
     {% if page|classname == 'Collection' %}
       <li>
