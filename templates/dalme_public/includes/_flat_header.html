@@ -8,9 +8,7 @@
       {% if parent|classname == 'Collection' %}
         <a href="{% pageurl parent %}">{{ parent.title }}</a>
       {% else %}
-        {% with parent.get_parent as home %}
-          <a href="{% pageurl home %}">{{ home.title }}</a>
-        {% endwith %}
+          <a href="/">The Documentary Archaeology of Late Medieval Europe</a>
       {% endif %}
     {% endwith %}
   </h2>
