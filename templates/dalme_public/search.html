@@ -1,0 +1,71 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+{% load static %}
+{% load highlight %}
+
+{% block title %}Search &mdash; {{ block.super }}{% endblock %}
+
+{% block banner %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_collections_filter.html" %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    <form method="get" action="{% routablepageurl page.specific 'search' %}">
+      <div class="row">
+        <div class="col-md-12">
+          <label class="sr-only" for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
+          <div class="input-group mb-2 mr-sm-2 mt-3">
+            <div class="input-group-prepend">
+              <div class="input-group-text search-prepend">
+                  <i class="fas fa-search fa-fw"></i>
+              </div>
+            </div>
+            <input type="text" class="form-control form-control-sm search-results-input" id="{{ form.q.id_for_label }}" name="{{ form.q.html_name }}" value="{{ query }}">
+            <button type="submit" class="btn btn-primary search-results-btn">Search</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          {% if page_obj %}
+            <small>{{ page_obj.paginator.count }} matches(s) found.</small>
+          {% endif %}
+          <div class="mt-3">
+            {% for result in page_obj.object_list %}
+                <div class="search-result-entry">
+                    <a class="search-result-link" href="{% routablepageurl page.specific 'unscoped_inventory' result.object.id %}">{{ result.object.name|dd_record_name }}</a>
+                    <div class="search-result-detail">{{ result.object.name|dd_record_name:'loc' }}</div>
+                    <div class="search-result-text">{% highlight result.object.get_data_blob with query max_length 500 %}</div>
+                </div>
+              {% empty %}
+                <div class="search-results-none">No results found.</div>
+            {% endfor %}
+          </div>
+          {% if paginated %}
+            {% pagination as pagination %}
+            {% include "dalme_public/includes/_pagination.html" with pagination=pagination page_obj=page_obj %}
+          {% endif %}
+
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

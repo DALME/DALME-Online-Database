@@ -1280,6 +1280,9 @@ i.inactive {
 .folios.vertical-split section.folio {
   width: 50%;
   max-width: 99.5%;
+
+  display: flex;
+  flex-direction: column;
 }
 .folios.horizontal-split section.folio {
   width: 100%;
@@ -1373,6 +1376,10 @@ section.transcription {
 .messages li.success {
   color: #fff;
   background: #5cb85c;
+}
+
+#diva_viewer {
+    flex-grow: 1;
 }
 
 form.contact-form {
@@ -1713,7 +1720,10 @@ nav.secondary.features-filter ul {
 
 /* TEI */
 section.transcription {
-  overflow-x: auto;
+  overflow: auto;
+}
+tei-mute {
+  display: none;
 }
 tei-text > tei-body {
   white-space: pre;
@@ -1748,6 +1758,7 @@ div.description[data-collapsed='true'] {
   main.collection.inventories,
   main.collections.inventories {
     padding-top: 1rem;
+    overflow: scroll;
   }
 
   .content {
@@ -2240,4 +2251,89 @@ span.vs__selected {
 }
 div.vue-slider {
   padding: 1.5rem 0 0 0 !important;
+}
+
+/* pagination */
+
+.pager {
+  font-size: 13px;
+  align-self: flex-end;
+}
+
+.pagination {
+  margin: 2px 0;
+  white-space: nowrap;
+  justify-content: flex-end;
+}
+
+.page-link, .page-item.disabled .page-link {
+  padding: 6px 12px;
+  line-height: 1;
+  border-color: #a3b1bd;
+}
+
+.page-link:hover {
+  border-color: #a3b1bd;
+}
+
+/* search results */
+
+.search-prepend {
+  font-size: 14px;
+  height: 31px;
+}
+
+.search-results-btn {
+  height: 31px;
+  font-size: 14px;
+  line-height: 0.5;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.search-results-input:focus {
+  box-shadow: 0px 0px 1px 2px #0361aa inset !important;
+}
+
+.search-results-checkbox {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.search-results-checkbox input {
+  margin-right: 5px;
+}
+
+.search-results-none {
+
+}
+
+.highlighted {
+  font-weight: 600;
+  background-color: #ffffdd;
+}
+
+.search-result-entry {
+  margin-bottom: 20px;
+}
+
+.search-result-link {
+  color: #084094;
+  font-size: 19px;
+}
+
+.search-result-link:hover {
+  color: #084094;
+  font-size: 19px;
+  border-bottom: 1px dotted #084094;
+}
+
+.search-result-detail {
+  font-size: 14px;
+  color: #267e30;
+}
+
+.search-result-text {
+  font-size: 14px;
+  color: #686868;
 }
