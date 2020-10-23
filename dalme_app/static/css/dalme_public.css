@@ -1760,9 +1760,6 @@ div.description[data-collapsed='true'] {
     padding-top: 1rem;
     overflow: scroll;
   }
-  main.collections.inventories.horizontal-split {
-    overflow: unset;
-  }
 
   .content {
     padding: 0 1rem 4rem 1rem;
