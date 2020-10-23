@@ -502,22 +502,10 @@ class Corpus(Orderable, ClusterableModel):
         return self.title
 
 
-class Collections(RoutablePageMixin, DALMEPage):
-    parent_page_types = ['dalme_public.Home']
-    subpage_types = [
-        'dalme_public.Collection',
-        'dalme_public.Flat'
-    ]
+class SearchEnabled(RoutablePageMixin, DALMEPage):
 
-    content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
-        FieldPanel('short_title'),
-        StreamFieldPanel('body'),
-        MultiFieldPanel(
-            [InlinePanel('corpora', min_num=1, label='Corpus')],
-            heading='Corpora',
-        ),
-    ]
+    class Meta:
+        abstract = True
 
     @route(r'^search/$', name='search')
     def search(self, request):
@@ -547,29 +535,6 @@ class Collections(RoutablePageMixin, DALMEPage):
         return render(
             request, 'dalme_public/search.html', context
         )
-
-    def paginate_search(self, request, results):
-        results_per_page = getattr(settings, "HAYSTACK_SEARCH_RESULTS_PER_PAGE", 10)
-
-        try:
-            page_no = int(request.GET.get("page", 1))
-        except (TypeError, ValueError):
-            raise Http404("Not a valid number for page.")
-
-        if page_no < 1:
-            raise Http404("Pages should be 1 or greater.")
-
-        start_offset = (page_no - 1) * results_per_page
-        results[start_offset:start_offset + results_per_page]
-
-        paginator = Paginator(results, results_per_page)
-
-        try:
-            page = paginator.page(page_no)
-        except InvalidPage:
-            raise Http404("No such page!")
-
-        return (paginator, page)
 
     @route(r'^inventories/$', name='unscoped_inventories')
     def inventories(self, request):
@@ -604,6 +569,47 @@ class Collections(RoutablePageMixin, DALMEPage):
           request, 'dalme_public/inventory.html', context
         )
 
+    def paginate_search(self, request, results):
+        results_per_page = getattr(settings, "HAYSTACK_SEARCH_RESULTS_PER_PAGE", 10)
+
+        try:
+            page_no = int(request.GET.get("page", 1))
+        except (TypeError, ValueError):
+            raise Http404("Not a valid number for page.")
+
+        if page_no < 1:
+            raise Http404("Pages should be 1 or greater.")
+
+        start_offset = (page_no - 1) * results_per_page
+        results[start_offset:start_offset + results_per_page]
+
+        paginator = Paginator(results, results_per_page)
+
+        try:
+            page = paginator.page(page_no)
+        except InvalidPage:
+            raise Http404("No such page!")
+
+        return (paginator, page)
+
+
+class Collections(SearchEnabled):
+    parent_page_types = ['dalme_public.Home']
+    subpage_types = [
+        'dalme_public.Collection',
+        'dalme_public.Flat'
+    ]
+
+    content_panels = DALMEPage.content_panels + [
+        ImageChooserPanel('header_image'),
+        FieldPanel('short_title'),
+        StreamFieldPanel('body'),
+        MultiFieldPanel(
+            [InlinePanel('corpora', min_num=1, label='Corpus')],
+            heading='Corpora',
+        ),
+    ]
+
     def get_context(self, request):
         context = super().get_context(request)
         context['corpora'] = [
@@ -613,7 +619,7 @@ class Collections(RoutablePageMixin, DALMEPage):
         return context
 
 
-class Collection(RoutablePageMixin, DALMEPage):
+class Collection(SearchEnabled):
     set_type = DALMESet.COLLECTION
     source_set = models.ForeignKey(
         'dalme_app.Set',
