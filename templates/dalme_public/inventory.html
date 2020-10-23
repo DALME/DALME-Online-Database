@@ -259,8 +259,11 @@
       });
       window.eventBus.$on('flipView', data => {
         const node = $('.folios');
+        const main = node.parent().parent();
         if (node.hasClass('vertical-split')) {
           node.removeClass('vertical-split').addClass('horizontal-split');
+          main.toggleClass('vertical-split', false);
+          main.toggleClass('horizontal-split', true);
           node.find('.folio')
             .resizable('destroy')
             .resizableSafe({
@@ -275,6 +278,8 @@
             .css({ width: '' });
         } else {
           node.removeClass('horizontal-split').addClass('vertical-split');
+          main.toggleClass('horizontal-split', false);
+          main.toggleClass('vertical-split', true);
           node.find('.folio')
             .resizable('destroy')
             .resizableSafe({
