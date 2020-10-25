@@ -97,7 +97,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_hosts',
-    'haystack',
+    'django_elasticsearch_dsl',
     'django_celery_results',
     'django_celery_beat',
     'djangosaml2idp',
@@ -244,20 +244,18 @@ DATABASES = {
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
-HAYSTACK_CONNECTIONS = {
+ELASTICSEARCH_DSL = {
     'default': {
-        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': AWS_ES_ENDPOINT,
-        'INDEX_NAME': 'haystack',
-        'KWARGS': {
-            'port': 443,
-            'http_auth': awsauth,
-            'use_ssl': True,
-            'verify_certs': True,
-            'connection_class': elasticsearch.RequestsHttpConnection,
-        }
+        'host': AWS_ES_ENDPOINT,
+        'port': 443,
+        'http_auth': awsauth,
+        'use_ssl': True,
+        'verify_certs': True,
+        'connection_class': elasticsearch.RequestsHttpConnection,
     },
 }
+SEARCH_RESULTS_PER_PAGE = 10
+SEARCH_DEFAULT_INDEX = 'SourceDocument'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

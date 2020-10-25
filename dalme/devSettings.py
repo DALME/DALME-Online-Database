@@ -103,7 +103,8 @@ INSTALLED_APPS = [
     # 'django.contrib.admindocs',
     'django.contrib.sites',
     'django_hosts',
-    'haystack',
+    'django_elasticsearch_dsl',
+    #'haystack',
     # 'treebeard',
     # 'sekizai',
     'django_celery_results',
@@ -312,22 +313,37 @@ else:
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': AWS_ES_ENDPOINT,
-        'INDEX_NAME': 'haystack',
-        'KWARGS': {
-            'port': 443,
-            'http_auth': awsauth,
-            'use_ssl': True,
-            'verify_certs': True,
-            'connection_class': elasticsearch.RequestsHttpConnection,
-        }
-    },
-}
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         #'ENGINE': 'haystack.backends.elasticsearch5_backend.Elasticsearch5SearchEngine',
+#         'ENGINE': 'dalme_app.utils.elasticsearch_backend.CustomElasticSearchEngine',
+#         'URL': AWS_ES_ENDPOINT_5,
+#         'INDEX_NAME': 'haystack',
+#         'KWARGS': {
+#             'port': 443,
+#             'http_auth': awsauth,
+#             'use_ssl': True,
+#             'verify_certs': True,
+#             'connection_class': elasticsearch.RequestsHttpConnection,
+#         }
+#     },
+# }
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'host': AWS_ES_ENDPOINT,
+        'port': 443,
+        'http_auth': awsauth,
+        'use_ssl': True,
+        'verify_certs': True,
+        'connection_class': elasticsearch.RequestsHttpConnection,
+    },
+}
+SEARCH_RESULTS_PER_PAGE = 10
+SEARCH_DEFAULT_INDEX = 'SourceDocument'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -528,3 +544,111 @@ if "LOG_TO_STDOUT" in os.environ:
 
 if "HEROKU_APP_NAME" in os.environ:
     ALLOWED_HOSTS = ["*"]
+
+ELASTICSEARCH_INDEX_SETTINGS = {
+    'settings': {
+        'analysis': {
+            'analyzer': {
+                'ngram_analyzer': {
+                    'type': 'custom',
+                    'tokenizer': 'lowercase',
+                    'filter': ['haystack_ngram']
+                },
+                'edgengram_analyzer': {
+                    'type': 'custom',
+                    'tokenizer': 'lowercase',
+                    'filter': ['haystack_edgengram']
+                },
+                'suggest_analyzer': {
+                    'type': 'custom',
+                    'tokenizer': 'standard',
+                    'filter': [
+                        'standard',
+                        'lowercase',
+                        'asciifolding'
+                    ]
+                },
+            },
+            'tokenizer': {
+                'haystack_ngram_tokenizer': {
+                    'type': 'nGram',
+                    'min_gram': 3,
+                    'max_gram': 15,
+                },
+                'haystack_edgengram_tokenizer': {
+                    'type': 'edgeNGram',
+                    'min_gram': 2,
+                    'max_gram': 15,
+                    'side': 'front'
+                }
+            },
+            'filter': {
+                'haystack_ngram': {
+                    'type': 'nGram',
+                    'min_gram': 3,
+                    'max_gram': 15
+                },
+                'haystack_edgengram': {
+                    'type': 'edgeNGram',
+                    'min_gram': 2,
+                    'max_gram': 15
+                }
+            }
+        }
+    }
+}
+
+# ELASTICSEARCH_DSL_INDEX_SETTINGS = {
+#     'settings': {
+#         "analysis": {
+#             "analyzer": {
+#                 "custom_analyzer": {
+#                     "type": "custom",
+#                     "tokenizer": "standard",
+#                     "filter":  [ "lowercase", "asciifolding" ]
+#                 },
+#                 "str_index_analyzer" : {
+#                     "type": "custom",
+#                     "tokenizer" : "haystack_ngram_tokenizer",
+#                     "filter" : ["stopwords", "asciifolding", "lowercase", "snowball", "elision", "worddelimiter"]
+#                 },
+#                 "str_search_analyzer" : {
+#                     "type": "custom",
+#                     "tokenizer" : "standard",
+#                     "filter" : ["stopwords", "asciifolding", "lowercase", "snowball", "elision", "worddelimiter"]
+#                 },
+#                 "suggest_analyzer": {
+#                     "type":"custom",
+#                     "tokenizer":"standard",
+#                     "filter":[
+#                         "stopwords",
+#                         "standard",
+#                         "lowercase",
+#                         "asciifolding"
+#                     ]
+#                 },
+#             },
+#             "tokenizer": {
+#                 "haystack_ngram_tokenizer": {
+#                     "type": "nGram",
+#                     "min_gram": 2,
+#                     "max_gram": 20,
+#                 },
+#             },
+#             "filter": {
+#                 "elision": {
+#                     "type": "elision",
+#                     "articles": ["l", "m", "t", "qu", "n", "s", "j", "d"]
+#                 },
+#                 "stopwords": {
+#                     "type": "stop",
+#                     "stopwords": ["_french_", "_english_"],
+#                     "ignore_case": True
+#                 },
+#                 "worddelimiter": {
+#                     "type": "word_delimiter"
+#                 }
+#             }
+#         }
+#     }
+# }

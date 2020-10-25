@@ -22,7 +22,7 @@ def update_rs_folio_field(user_id):
 
 @shared_task
 def update_search_index():
-    call_command('update_index', '--remove')
+    call_command('search_index', '--rebuild')
 
 
 @shared_task

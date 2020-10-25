@@ -9,3 +9,4 @@ from .dynamic_preferences import JSONPreferenceSerializer, JSONPreference # NOQA
 from .menu_compiler import DALMEMenus # NOQA
 from .offline_context_generator import offline_context_generator # NOQA
 from .drf_ordering_backend import DalmeOrderingFilter # NOQA
+from .search import Search # NOQA
