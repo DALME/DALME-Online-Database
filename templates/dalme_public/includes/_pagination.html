@@ -2,13 +2,13 @@
 
 <div class="pager">
   <ul class="pagination">
-    {% if page_obj.has_previous %}
-      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url page_obj.previous_page_number 'page' request.GET.urlencode %}">Previous</a></li>
+    {% if paginator.has_previous %}
+      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url paginator.previous_page 'page' request.GET.urlencode %}">Previous</a></li>
     {% else %}
       <li class="paginate_button page-item previous disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
     {% endif %}
 
-    {% if pagination.show_first %}
+    {% if paginator.show_first %}
       <li class="paginate_button page-item">
         <a class="page-link" href="{% relative_url 1 'page' request.GET.urlencode %}">1</a>
       </li>
@@ -17,8 +17,8 @@
       </li>
     {% endif %}
 
-    {% for i in pagination.page_numbers %}
-      {% if page_obj.number == i %}
+    {% for i in paginator.page_numbers %}
+      {% if paginator.current_page == i %}
         <li class="paginate_button page-item active" aria-current="page">
           <a class="page-link" href="#">{{ i }}<span class="sr-only">(current)</span></a>
         </li>
@@ -29,17 +29,17 @@
       {% endif %}
     {% endfor %}
 
-    {% if pagination.show_last %}
+    {% if paginator.show_last %}
       <li class="paginate_button page-item disabled">
         <a class="page-link" href="">...</a>
       </li>
       <li class="paginate_button page-item">
-        <a class="page-link" href="{% relative_url page_obj.paginator.num_pages 'page' request.GET.urlencode %}">{{ page_obj.paginator.num_pages }}</a>
+        <a class="page-link" href="{% relative_url paginator.num_pages 'page' request.GET.urlencode %}">{{ paginator.num_pages }}</a>
       </li>
     {% endif %}
 
-    {% if page_obj.has_next %}
-      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url page_obj.next_page_number 'page' request.GET.urlencode %}">Next</a></li>
+    {% if paginator.has_next %}
+      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url paginator.next_page 'page' request.GET.urlencode %}">Next</a></li>
     {% else %}
       <li class="paginate_button page-item next disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>
     {% endif %}

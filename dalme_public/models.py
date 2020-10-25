@@ -48,9 +48,7 @@ from dalme_public.blocks import (
     SubsectionBlock,
 )
 
-from django.conf import settings
-from haystack.query import EmptySearchQuerySet, RelatedSearchQuerySet
-from django.core.paginator import InvalidPage, Paginator
+from dalme_app.documents import PublicSourceDocument
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -510,25 +508,30 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
     @route(r'^search/$', name='search')
     def search(self, request):
         context = self.get_context(request)
-        searchqueryset = RelatedSearchQuerySet().filter(type=13, is_public=True)
-        form = forms.SearchForm(load_all=True, searchqueryset=searchqueryset)
-        results = EmptySearchQuerySet()
+        searchindex = PublicSourceDocument()
+        form = forms.SearchForm()
+        paginator = {}
+        results = []
         query = ''
 
         if request.GET.get('q') is not None:
-            form = forms.SearchForm(request.GET, load_all=True, searchqueryset=searchqueryset)
+            form = forms.SearchForm(request.GET)
             if form.is_valid():
-                query = form.cleaned_data["q"]
-                results = form.search()
-
-        (paginator, results_page) = self.paginate_search(request, results)
-        paginated = paginator.num_pages > 1
+                query = form.cleaned_data['q']
+                (paginator, results) = form.search(
+                    searchindex=searchindex,
+                    page=request.GET.get('page', 1),
+                    highlight=('text', {
+                        'fragment_size': 100
+                        })
+                )
 
         context.update({
             'query': query,
             'form': form,
-            'page_obj': results_page,
-            'paginated': paginated,
+            'results': results,
+            'paginator': paginator,
+            'paginated': paginator.get('num_pages', 0) > 1,
             'suggestion': None,
         })
 
@@ -568,29 +571,6 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         return TemplateResponse(
           request, 'dalme_public/inventory.html', context
         )
-
-    def paginate_search(self, request, results):
-        results_per_page = getattr(settings, "HAYSTACK_SEARCH_RESULTS_PER_PAGE", 10)
-
-        try:
-            page_no = int(request.GET.get("page", 1))
-        except (TypeError, ValueError):
-            raise Http404("Not a valid number for page.")
-
-        if page_no < 1:
-            raise Http404("Pages should be 1 or greater.")
-
-        start_offset = (page_no - 1) * results_per_page
-        results[start_offset:start_offset + results_per_page]
-
-        paginator = Paginator(results, results_per_page)
-
-        try:
-            page = paginator.page(page_no)
-        except InvalidPage:
-            raise Http404("No such page!")
-
-        return (paginator, page)
 
 
 class Collections(SearchEnabled):

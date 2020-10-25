@@ -1,7 +1,6 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
 {% load dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 {% load static %}
-{% load highlight %}
 
 {% block title %}Search &mdash; {{ block.super }}{% endblock %}
 
@@ -45,25 +44,29 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          {% if page_obj %}
-            <small>{{ page_obj.paginator.count }} matches(s) found.</small>
+          {% if results %}
+            {% if paginated %}
+              <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
+            {% else %}
+              <small>{{ results | length }} results found.</small>
+            {% endif %}
+            <div class="mt-3">
+              {% for result in results %}
+                  <div class="search-result-entry">
+                      <a class="search-result-link" href="{% routablepageurl page.specific 'unscoped_inventory' result.meta.id %}">{{ result.name | dd_record_name }}</a>
+                      <div class="search-result-detail">{{ result.name | dd_record_name:'loc'}}</div>
+                      {% for fragment in result.meta.highlight.text %}
+                        <div class="search-result-text">{{ fragment | safe }}</div>
+                      {% endfor %}
+                  </div>
+              {% endfor %}
+            </div>
+            {% if paginated %}
+              {% include "dalme_public/includes/_pagination.html" with paginator=paginator %}
+            {% endif %}
+          {% else %}
+            <div class="search-results-none">No results found.</div>
           {% endif %}
-          <div class="mt-3">
-            {% for result in page_obj.object_list %}
-                <div class="search-result-entry">
-                    <a class="search-result-link" href="{% routablepageurl page.specific 'unscoped_inventory' result.object.id %}">{{ result.object.name|dd_record_name }}</a>
-                    <div class="search-result-detail">{{ result.object.name|dd_record_name:'loc' }}</div>
-                    <div class="search-result-text">{% highlight result.object.get_data_blob with query max_length 500 %}</div>
-                </div>
-              {% empty %}
-                <div class="search-results-none">No results found.</div>
-            {% endfor %}
-          </div>
-          {% if paginated %}
-            {% pagination as pagination %}
-            {% include "dalme_public/includes/_pagination.html" with pagination=pagination page_obj=page_obj %}
-          {% endif %}
-
         </div>
       </div>
     </form>

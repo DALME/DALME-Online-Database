@@ -2311,11 +2311,6 @@ div.vue-slider {
 
 }
 
-.highlighted {
-  font-weight: 600;
-  background-color: #ffffdd;
-}
-
 .search-result-entry {
   margin-bottom: 20px;
 }
@@ -2339,4 +2334,9 @@ div.vue-slider {
 .search-result-text {
   font-size: 14px;
   color: #686868;
+}
+
+.search-result-text em {
+  font-weight: 600;
+  background-color: #ffffdd;
 }
