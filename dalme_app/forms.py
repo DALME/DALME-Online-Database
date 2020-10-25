@@ -1,7 +1,26 @@
+from django import forms
 from dynamic_preferences.forms import PreferenceForm
 from dynamic_preferences.users.registries import user_preferences_registry
 from dynamic_preferences.registries import global_preferences_registry
 from collections import OrderedDict
+from dalme_app.utils import Search
+
+
+class SearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        label="Search",
+        widget=forms.TextInput(attrs={'type': 'search'}),
+    )
+
+    def search(self, **kwargs):
+        if not self.is_valid():
+            return None
+
+        if not self.cleaned_data.get("q"):
+            return None
+
+        return Search(self.cleaned_data["q"], **kwargs)
 
 
 class GlobalPreferenceForm(PreferenceForm):

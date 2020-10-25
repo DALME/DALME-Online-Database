@@ -24,3 +24,14 @@ def htimesince(d):
 def dict_key_lookup(_dict, key):
     # Try to fetch from the dict, and if it's not found return an empty string.
     return _dict.get(key, '')
+
+
+@register.filter
+def dd_record_name(name, part=''):
+    name_string = name.split('(')
+    if part == 'loc':
+        try:
+            return name_string[1][:-1]
+        except IndexError:
+            return 'Archival location not available'
+    return name_string[0]

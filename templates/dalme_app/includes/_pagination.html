@@ -1,0 +1,47 @@
+{% load dalme_public_tags %}
+
+<div class="pager">
+  <ul class="pagination">
+    {% if paginator.has_previous %}
+      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url paginator.previous_page 'page' request.GET.urlencode %}">Previous</a></li>
+    {% else %}
+      <li class="paginate_button page-item previous disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
+    {% endif %}
+
+    {% if paginator.show_first %}
+      <li class="paginate_button page-item">
+        <a class="page-link" href="{% relative_url 1 'page' request.GET.urlencode %}">1</a>
+      </li>
+      <li class="paginate_button page-item disabled">
+        <a class="page-link" href="">...</a>
+      </li>
+    {% endif %}
+
+    {% for i in paginator.page_numbers %}
+      {% if paginator.current_page == i %}
+        <li class="paginate_button page-item active" aria-current="page">
+          <a class="page-link" href="#">{{ i }}<span class="sr-only">(current)</span></a>
+        </li>
+      {% else %}
+        <li class="paginate_button page-item">
+          <a class="page-link" href="{% relative_url i 'page' request.GET.urlencode %}">{{ i }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    {% if paginator.show_last %}
+      <li class="paginate_button page-item disabled">
+        <a class="page-link" href="">...</a>
+      </li>
+      <li class="paginate_button page-item">
+        <a class="page-link" href="{% relative_url paginator.num_pages 'page' request.GET.urlencode %}">{{ paginator.num_pages }}</a>
+      </li>
+    {% endif %}
+
+    {% if paginator.has_next %}
+      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url paginator.next_page 'page' request.GET.urlencode %}">Next</a></li>
+    {% else %}
+      <li class="paginate_button page-item next disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>
+    {% endif %}
+  </ul>
+</div>

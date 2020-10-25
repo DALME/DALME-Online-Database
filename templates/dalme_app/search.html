@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static i18n %}
+{% load hosts %}
 {% load compress %}
 {% load template_helpers %}
 {% block extra_head %}
@@ -15,7 +16,6 @@
 {% block content %}
 <div class="container-fluid">
   <form method="get" action=".">
-    {% csrf_token %}
     <div class="row">
       <div class="col-md-12">
         <div class="card shadow mb-3">
@@ -30,18 +30,8 @@
               <div class="input-group-prepend">
                 <div class="input-group-text search-prepend">Search query:</div>
               </div>
-              <input type="text" class="form-control form-control-sm search-results-input" id="{{ form.q.id_for_label }}" name="{{ form.q.html_name }}" value="{{ form.q.value }}">
+              <input type="text" class="form-control form-control-sm search-results-input" id="{{ form.q.id_for_label }}" name="{{ form.q.html_name }}" value="{{ query }}">
               <button type="submit" class="btn btn-primary search-results-btn">Search</button>
-            </div>
-            <div class="d-flex">
-              <label class="col-form-label-sm mr-3 ml-2 text-nowrap">Search in:</label>
-              <div>
-              {% for choice in form.models %}
-                <div class="form-check form-check-inline search-results-checkbox">
-                  {{ choice.tag }} {{ choice.choice_label }}
-                </div>
-              {% endfor %}
-              </div>
             </div>
           </div>
         </div>
@@ -56,67 +46,30 @@
             </div>
           </div>
           <div class="card-body">
-            {% for result in page_obj.object_list %}
-                {% if result.content_type == "dalme_app.attribute_type" %}
-                {% include "dalme_app/search/includes/attribute_types.html" %}
+              {% if results %}
+                {% if paginated %}
+                  <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
+                {% else %}
+                  <small>{{ results | length }} results found.</small>
                 {% endif %}
-                {% if result.content_type == "dalme_app.localereference" %}
-                {% include "dalme_app/search/includes/locales.html" %}
+                <div class="mt-3">
+                  {% for result in results %}
+                      <div class="search-result-entry">
+                          <a class="search-result-link" href="/sources/{{ result.meta.id }}/">{{ result.name | dd_record_name }}</a>
+                          <div class="search-result-detail">{{ result.name | dd_record_name:'loc'}}</div>
+                          {% for fragment in result.meta.highlight.text %}
+                            <div class="search-result-text">{{ fragment | safe }}</div>
+                          {% endfor %}
+                      </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="search-results-none">No results found.</div>
                 {% endif %}
-                {% if result.content_type == "dalme_app.countryreference" %}
-                {% include "dalme_app/search/includes/countries.html" %}
-                {% endif %}
-                {% if result.content_type == "dalme_app.languagereference" %}
-                {% include "dalme_app/search/includes/languages.html" %}
-                {% endif %}
-                {% if result.content_type == "dalme_app.profile" %}
-                {% include "dalme_app/search/includes/profiles.html" %}
-                {% endif %}
-                {% if result.content_type == "dalme_app.rightspolicy" %}
-                {% include "dalme_app/search/includes/rights_policies.html" %}
-                {% endif %}
-                {% if result.content_type == "dalme_app.set" %}
-                {% include "dalme_app/search/includes/sets.html" %}
-                {% endif %}
-                {% if result.content_type == "dalme_app.source" %}
-                {% include "dalme_app/search/includes/sources.html" %}
-                {% endif %}
-                {% if result.content_type == "dalme_app.task" %}
-                {% include "dalme_app/search/includes/tasks.html" %}
-                {% endif %}
-                {% if result.content_type == "dalme_app.ticket" %}
-                {% include "dalme_app/search/includes/tickets.html" %}
-                {% endif %}
-            {% empty %}
-                <div class="search-results-none">No results found.</div>
-            {% endfor %}
+                </div>
             </div>
             <div class="sub-card-footer">
-              <div class="dataTables_info"></div>
-              {% if is_paginated %}
-              <div class="dataTables_paginate paging_simple_numbers" id="search_results_paginate">
-                <ul class="pagination">
-                  {% if page_obj.has_previous %}
-                    <li class="paginate_button page-item"><a class="page-link" href="{% relative_url page_obj.previous_page_number 'page' request.GET.urlencode %}">Previous</a></li>
-                  {% else %}
-                    <li class="paginate_button page-item previous disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
-                  {% endif %}
-                  {% for i in page_obj.paginator.page_range %}
-                    {% if page_obj.number == i %}
-                      <li class="paginate_button page-item active" aria-current="page">
-                        <a class="page-link" href="#">{{ i }}<span class="sr-only">(current)</span></a>
-                      </li>
-                    {% else %}
-                      <li class="paginate_button page-item"><a class="page-link" href="{% relative_url i 'page' request.GET.urlencode %}">{{ i }}</a></li>
-                    {% endif %}
-                  {% endfor %}
-                  {% if page_obj.has_next %}
-                    <li class="paginate_button page-item"><a class="page-link" href="{% relative_url page_obj.next_page_number 'page' request.GET.urlencode %}">Next</a></li>
-                  {% else %}
-                    <li class="paginate_button page-item next disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>
-                  {% endif %}
-                </ul>
-              </div>
+              {% if paginated %}
+                {% include "dalme_app/includes/_pagination.html" with paginator=paginator %}
               {% endif %}
             </div>
           </div>
