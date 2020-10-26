@@ -1,6 +1,5 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
-{% load dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
-{% load static %}
+{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}Search &mdash; {{ block.super }}{% endblock %}
 
@@ -29,46 +28,63 @@
   <div class="content">
     <form method="get" action="{% routablepageurl page.specific 'search' %}">
       <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-12">
           <label class="sr-only" for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
-          <div class="input-group mb-2 mr-sm-2 mt-3">
+          <div class="input-group mt-2">
             <div class="input-group-prepend">
               <div class="input-group-text search-prepend">
                   <i class="fas fa-search fa-fw"></i>
               </div>
             </div>
-            <input type="text" class="form-control form-control-sm search-results-input" id="{{ form.q.id_for_label }}" name="{{ form.q.html_name }}" value="{{ query }}">
-            <button type="submit" class="btn btn-primary search-results-btn">Search</button>
+            <input type="text" class="form-control form-control-lg search-results-input" id="{{ form.q.id_for_label }}" name="{{ form.q.html_name }}" value="{{ query }}" placeholder="Search">
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-12">
+          {% search_help %}
           {% if results %}
-            {% if paginated %}
-              <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
-            {% else %}
-              <small>{{ results | length }} results found.</small>
-            {% endif %}
-            <div class="mt-3">
+            <div class="ml-1 mr-1">
               {% for result in results %}
                   <div class="search-result-entry">
                       <a class="search-result-link" href="{% routablepageurl page.specific 'unscoped_inventory' result.meta.id %}">{{ result.name | dd_record_name }}</a>
                       <div class="search-result-detail">{{ result.name | dd_record_name:'loc'}}</div>
-                      {% for fragment in result.meta.highlight.text %}
-                        <div class="search-result-text">{{ fragment | safe }}</div>
-                      {% endfor %}
+                      <div class="search-text-container">
+                        <div class="search-show-more d-none">Show more</div>
+                        {% for fragment in result.meta.highlight.text %}
+                          <div class="search-result-text">{{ fragment|safe }}</div>
+                        {% endfor %}
+                      </div>
                   </div>
               {% endfor %}
             </div>
             {% if paginated %}
               {% include "dalme_public/includes/_pagination.html" with paginator=paginator %}
             {% endif %}
-          {% else %}
-            <div class="search-results-none">No results found.</div>
           {% endif %}
         </div>
       </div>
     </form>
   </div>
 {% endblock %}
+{% block js_foot %}
+  {{ block.super }}
+  <script>
+    $(document).ready(function() {
+      $('.search-text-container').each( function() {
+        if ($(this).prop('scrollHeight') > $(this).outerHeight()) {
+          $('.search-show-more').removeClass('d-none')
+        }
+      });
+      $('.search-show-more').on('click', function() {
+        if ($(this).text() == 'Show more') {
+          $(this).parent().css({"maxHeight":"1000px"});
+          $(this).text('Show less');
+        } else {
+          $(this).parent().css({"maxHeight":"84px"});
+          $(this).text('Show more');
+        }
+      })
+    })
+  </script>
+{% endblock%}
