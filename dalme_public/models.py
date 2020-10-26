@@ -125,6 +125,25 @@ class Footer(models.Model):
             raise ValidationError('The site can only have one footer.')
 
 
+@register_snippet
+class SearchHelpBlock(models.Model):
+    content = StreamField([
+            ('text', blocks.RichTextBlock()),
+            ('html', blocks.RawHTMLBlock()),
+        ], null=True)
+
+    panels = [
+        StreamFieldPanel('content'),
+    ]
+
+    def __str__(self):
+        return "Search Help"
+
+    def clean(self):
+        if self._meta.model.objects.exists():
+            raise ValidationError('The search page can only have one help block.')
+
+
 class DALMEPage(Page):
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
@@ -522,7 +541,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
                     searchindex=searchindex,
                     page=request.GET.get('page', 1),
                     highlight=('text', {
-                        'fragment_size': 100
+                        'fragment_size': 100,
                         })
                 )
 

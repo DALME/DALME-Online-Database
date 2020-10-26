@@ -13,6 +13,7 @@ from dalme_public.models import (
     Features,
     Footer,
     Home,
+    SearchHelpBlock
 )
 
 from datetime import date
@@ -309,3 +310,13 @@ def dd_record_name(name, part=''):
         except IndexError:
             return 'Archival location not available'
     return name_string[0]
+
+
+@register.inclusion_tag('dalme_public/includes/_search_help.html', takes_context=True)
+def search_help(context):
+    return {
+        'search_help': SearchHelpBlock.objects.first(),
+        'results': len(context['results']),
+        'paginated': context['paginated'],
+        'paginator': context['paginator'],
+    }
