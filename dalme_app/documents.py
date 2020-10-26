@@ -2,6 +2,7 @@ from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 from dalme_app.models import Source
 from django.core.exceptions import ObjectDoesNotExist
+import lxml.etree as et
 
 
 @registry.register_document
@@ -52,26 +53,21 @@ class SourceDocument(Document):
 
 @registry.register_document
 class PublicSourceDocument(Document):
+    # text = fields.TextField(
+    #     index_prefixes={
+    #       "min_chars": 2,
+    #       "max_chars": 10
+    #     }
+    # )
     text = fields.TextField()
     has_image = fields.BooleanField()
     has_transcription = fields.BooleanField()
     date = fields.DateField()
-    source_type = fields.TextField()
+    source_type = fields.KeywordField()
     set_membership = fields.TextField()
 
     class Index:
         name = 'public_sources'
-        mappings = {
-            "properties": {
-              "text": {
-                "type": "text",
-                "index_prefixes": {
-                  "min_chars": 2,
-                  "max_chars": 10
-                }
-              }
-            }
-        }
 
     class Django:
         model = Source
@@ -102,12 +98,14 @@ class PublicSourceDocument(Document):
 
     def prepare_text(self, instance):
         text = ''
+        xml_parser = et.XMLParser(recover=True)
         for attribute in instance.attributes.all():
-            text += '{}: {}'.format(attribute.attribute_type.name, str(attribute))
+            text += '{}: {}\n'.format(attribute.attribute_type.name, str(attribute))
 
         for page in instance.source_pages.all():
             try:
-                text += page.transcription.transcription
+                tree = et.fromstring('<xml>' + page.transcription.transcription + '</xml>', xml_parser)
+                text += et.tostring(tree, encoding='unicode', xml_declaration=False, method='text')
             except AttributeError:
                 pass
         return text
