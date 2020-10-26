@@ -13,7 +13,9 @@ from dalme_app.models import Attribute, Source, rs_resource
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
-from haystack.query import RelatedSearchQuerySet
+
+from dalme_app.documents import PublicSourceDocument
+from elasticsearch_dsl.query import MatchPhrasePrefix, Prefix
 
 
 class DALMEPagination(pagination.PageNumberPagination):
@@ -115,17 +117,13 @@ class SourceList(ListAPIView):
         return Response(serializer.data)
 
     def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('q'):
-            q = self.request.GET.get('q')
-            qs = RelatedSearchQuerySet().filter(
-                text=q, type=13, is_public=True
-            ).load_all()
-            qs = qs.load_all_queryset(
-                Source, Source.objects.all().prefetch_related(
-                    'attributes', 'attributes__attribute_type'
-                )
-            )
-            qs = list(self.queryset_gen(qs))
+        if self.request.GET.get('search'):
+            q = self.request.GET.get('search')
+            if len(q.strip().split(' ')) > 1:
+                query = MatchPhrasePrefix(text={'query': q})
+            else:
+                query = Prefix(text={'value': q})
+            qs = PublicSourceDocument.search().query(query).to_queryset().order_by('name')
         else:
             qs = super().get_queryset(*args, **kwargs).order_by('name')
             qs = qs.filter(type=13, workflow__is_public=True)
@@ -133,40 +131,36 @@ class SourceList(ListAPIView):
                 'attributes', 'attributes__attribute_type'
             )
 
-            self.filterset = self.filterset_class(
-                self.request.GET, queryset=qs
-            )
-            qs = self.filterset.qs.distinct()
+        self.filterset = self.filterset_class(
+            self.request.GET, queryset=qs
+        )
+        qs = self.filterset.qs.distinct()
 
-            if self.filterset.annotated:
-                # Currently necessary because of the inability to eliminate
-                # dupes when ordering across the Source - Attribute traversal.
-                seen = set()
-                filtered = []
-                for source in qs:
-                    if source.pk not in seen:
-                        filtered.append(source)
-                        seen.add(source.pk)
-                qs = filtered
+        if self.filterset.annotated:
+            # Currently necessary because of the inability to eliminate
+            # dupes when ordering across the Source - Attribute traversal.
+            seen = set()
+            filtered = []
+            for source in qs:
+                if source.pk not in seen:
+                    filtered.append(source)
+                    seen.add(source.pk)
+            qs = filtered
 
-                # Sorting by 'name' happens on the Order filter itself as we
-                # are dealing with a plain qs without any annotations there.
-                order_by = self.request.GET.get('order_by')
-                if order_by.endswith('date'):
-                    maxdate = datetime.date(datetime.MAXYEAR, 1, 1)
-                    qs = sorted(
-                        qs, key=lambda item: item.source_date or maxdate
-                    )
-                if order_by.endswith('source_type'):
-                    qs = sorted(qs, key=lambda item: item.source_type or '')
-                if order_by.startswith('-'):
-                    qs.reverse()
+            # Sorting by 'name' happens on the Order filter itself as we
+            # are dealing with a plain qs without any annotations there.
+            order_by = self.request.GET.get('order_by')
+            if order_by.endswith('date'):
+                maxdate = datetime.date(datetime.MAXYEAR, 1, 1)
+                qs = sorted(
+                    qs, key=lambda item: item.source_date or maxdate
+                )
+            if order_by.endswith('source_type'):
+                qs = sorted(qs, key=lambda item: item.source_type or '')
+            if order_by.startswith('-'):
+                qs.reverse()
 
         return qs
-
-    def queryset_gen(self, search_qs):
-        for item in search_qs:
-            yield item.object
 
 
 class SourceDetail(RetrieveAPIView):
