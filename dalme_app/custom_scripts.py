@@ -21,7 +21,6 @@ from django.contrib import messages
 from django.template import defaultfilters
 from django.utils import timezone
 from django.forms.models import model_to_dict
-from haystack.query import SearchQuerySet
 from wagtail.users.models import UserProfile
 from django.conf import settings
 from django.db.models import OuterRef, Subquery
