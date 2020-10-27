@@ -8,9 +8,14 @@ from django.core.management import call_command
 def update_rs_folio_field():
     pages = Page.objects.exclude(dam_id__isnull=True)
     for page in pages:
-        rs_image = rs_resource.objects.get(ref=page.dam_id)
-        rs_image.field79 = page.name
-        rs_image.save()
+        try:
+            dam_id = int(page.dam_id)
+        except ValueError:
+            continue
+        if rs_resource.objects.filter(ref=dam_id).exists():
+            rs_image = rs_resource.objects.get(ref=page.dam_id)
+            rs_image.field79 = page.name
+            rs_image.save()
 
 
 @shared_task

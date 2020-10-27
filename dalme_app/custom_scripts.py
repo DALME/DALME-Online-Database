@@ -152,12 +152,14 @@ def session_info(request, username):
 
 
 def update_folios_in_dam(request):
-    update_rs_folio_field.delay()
+    result = update_rs_folio_field.delay()
+    result.forget()
     return 'Process started...'
 
 
 def rebuild_search_index(request):
-    update_search_index().delay()
+    result = update_search_index.delay()
+    result.forget()
     return 'Process started...'
 
 
@@ -235,12 +237,21 @@ def migrate_datasets(request):
     result = result + 'Attributes deleted.'
     return result
 
+
 def test_expression(request):
-    try:
-        ip = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
-    except requests.exceptions.ConnectionError:
-        return 'Error'
-    return ip
+    pages = Page.objects.exclude(dam_id__isnull=True)
+    errors = []
+    for page in pages:
+        try:
+            dam_id = int(page.dam_id)
+        except ValueError:
+            errors.append(page.id)
+            continue
+        if rs_resource.objects.filter(ref=dam_id).exists():
+            rs_image = rs_resource.objects.get(ref=page.dam_id)
+            rs_image.field79 = page.name
+            rs_image.save()
+    return errors
 
 
 def fix_users(records):
