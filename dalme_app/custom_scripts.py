@@ -7,7 +7,7 @@ import json
 import pandas as pd
 from dalme_app.models import *
 from datetime import date
-from dalme_app.tasks import update_rs_folio_field
+from dalme_app.tasks import update_rs_folio_field, update_search_index
 from async_messages import messages
 from django.contrib.auth.models import User
 from django.db.models.expressions import RawSQL
@@ -40,6 +40,11 @@ def get_script_menu():
             "type": "warning"
         },
         {
+            "name": "rebuild_search_index",
+            "description": "Rebuilds the ElasticSearch indices.",
+            "type": "warning"
+        },
+        {
             "name": "import_languages",
             "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
             "type": "warning"
@@ -53,11 +58,6 @@ def get_script_menu():
             "name": "fix_workflow",
             "description": "Ensures that there is a workflow record for every source with a list.",
             "type": "danger"
-        },
-        {
-            "name": "test_search",
-            "description": "Tests search backend.",
-            "type": "info"
         },
         {
             "name": "test_expression",
@@ -115,15 +115,6 @@ def queryset_gen(search_qs):
         yield item.object  # This is the line that gets the model instance out of the Search object
 
 
-def test_search(request):
-    sqs = SearchQuerySet().filter(content='schiav')
-    qs = queryset_gen(sqs)
-    res = []
-    for e in qs:
-        res.append([e.name])
-    return res
-
-
 def create_json_field_reps(request):
     with open(os.path.join('dalme_app', 'config', 'datatables', 'field_defs', 'sources.json')) as f:
         input = json.load(f)
@@ -161,8 +152,12 @@ def session_info(request, username):
 
 
 def update_folios_in_dam(request):
-    user_id = request.user.id
-    update_rs_folio_field.delay(user_id)
+    update_rs_folio_field.delay()
+    return 'Process started...'
+
+
+def rebuild_search_index(request):
+    update_search_index().delay()
     return 'Process started...'
 
 
