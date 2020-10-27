@@ -116,24 +116,43 @@ class Source(index.Indexed, dalmeUuidOwned):
             return 0
 
     def get_credit_line(self):
-        try:
-            editor = self.owner.profile.full_name
-            contributors = [i.user.profile.full_name for i in self.workflow.work_log.all()]
-            tr_cr = [i.creation_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
-            contributors = contributors + tr_cr
-            tr_mod = [i.modification_user.profile.full_name for i in self.source_pages.all().select_related('transcription')]
-            contributors = list(set(contributors + tr_mod))
-            contributors = [i for i in contributors if i != editor]
-            if len(contributors) == 0:
-                credit_line = 'Edited by {}.'.format(editor)
-            elif len(contributors) == 1:
-                credit_line = 'Edited by {}, with contributions by {}.'.format(editor, contributors[0])
+        def get_people_string(_list):
+            if len(_list) > 1:
+                return '{}, and {}'.format(', '.join(_list[:-1]), _list[-1])
             else:
-                contributors_list = "{}, and {}".format(", ".join(contributors[:-1]),  contributors[-1])
-                credit_line = 'Edited by {}, with contributions by {}.'.format(editor, contributors_list)
+                return '{}'.format(_list[0])
+        try:
+            editors = [i.agent.standard_name for i in self.credits.all() if i.type == 1]
+            corrections = [i.agent.standard_name for i in self.credits.all() if i.type == 2]
+            contributors = [i.agent.standard_name for i in self.credits.all() if i.type == 3]
+
+            if not editors:
+                try:
+                    editors = [self.owner.agent.first().standard_name]
+                except: # NOQA
+                    editors = ['the DALME Team']
+
+            editors_string = get_people_string(editors)
+            corrections_string = get_people_string(corrections) if corrections else False
+            contributors_string = get_people_string(contributors) if contributors else False
+
+            credit_line = f'Edited by {editors_string}'
+
+            if corrections:
+                credit_line += f', with corrections by {corrections_string}'
+                if contributors:
+                    credit_line += f', and contributions by {contributors_string}.'
+                else:
+                    credit_line += '.'
+            elif contributors:
+                credit_line += f', with contributions by {contributors_string}.'
+            else:
+                credit_line += '.'
+
             return credit_line
-        except Exception as e:
-            return str(e)
+
+        except: # NOQA
+            return 'Edited by the DALME Team.'
 
     def get_transcription_blob(self):
         if self.source_pages.all().select_related('transcription').exists():
