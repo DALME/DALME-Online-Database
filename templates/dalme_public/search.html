@@ -58,7 +58,7 @@
             <div class="ml-1 mr-1">
               {% for result in results %}
                   <div class="search-result-entry">
-                      <a class="search-result-link" href="{% routablepageurl page.specific 'unscoped_inventory' result.meta.id %}">{{ result.name | dd_record_name }}</a>
+                      <a class="search-result-link" href="{% routablepageurl page.specific 'inventory' result.meta.id %}">{{ result.name | dd_record_name }}</a>
                       <div class="search-result-detail">{{ result.name | dd_record_name:'loc'}}</div>
                       <div class="search-text-container">
                         <div class="search-show-more d-none">Show more</div>

@@ -558,25 +558,38 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             request, 'dalme_public/search.html', context
         )
 
-    @route(r'^inventories/$', name='unscoped_inventories')
-    def inventories(self, request):
+    @route(r'^inventories/$', name='inventories')
+    def inventories(self, request, scoped=True):
         context = self.get_context(request)
         context.update({'inventories': True})
+
+        try:
+            context.update({'set_id': self.source_set.id})
+        except AttributeError:
+            pass
+
         return TemplateResponse(
           request, 'dalme_public/inventories.html', context
         )
 
-    @route(rf'^inventories/({UUID_RE})/$', name='unscoped_inventory')
-    def inventory(self, request, pk):
+    @route(rf'^inventories/({UUID_RE})/$', name='inventory')
+    def inventory(self, request, pk, scoped=True):
         qs = Source.objects.filter(pk=pk)
+
         if not qs.exists():
             raise Http404()
+
         source = qs.first()
+
+        if not source.workflow.is_public:
+            raise Http404()
+
         pages = source.source_pages.all().values(
             pageId=F('page__pk'),
             pageName=F('page__name'),
-            transcriptionId=F('transcription__pk')
-        )
+            transcriptionId=F('transcription__pk'),
+            pageOrder=F('page__order')
+        ).order_by('pageOrder')
 
         context = self.get_context(request)
         context.update({
@@ -587,6 +600,12 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
                 **PublicSourceSerializer(source).data,
             },
         })
+
+        try:
+            context.update({'set_id': self.source_set.id})
+        except AttributeError:
+            pass
+
         return TemplateResponse(
           request, 'dalme_public/inventory.html', context
         )
@@ -634,44 +653,6 @@ class Collection(SearchEnabled):
         ImageChooserPanel('header_image'),
         StreamFieldPanel('body'),
     ]
-
-    @route(r'^inventories/$', name='inventories')
-    def inventories(self, request):
-        context = self.get_context(request)
-        context.update({
-            'inventories': True,
-            'set_id': self.source_set.id,
-        })
-        return TemplateResponse(
-          request, 'dalme_public/inventories.html', context
-        )
-
-    @route(rf'^inventories/({UUID_RE})/$', name='inventory')
-    def inventory(self, request, pk):
-        qs = Source.objects.filter(pk=pk)
-        if not qs.exists():
-            raise Http404()
-        source = qs.first()
-        pages = source.source_pages.all().values(
-            pageId=F('page__pk'),
-            pageName=F('page__name'),
-            transcriptionId=F('transcription__pk'),
-            pageOrder=F('page__order')
-        ).order_by('pageOrder')
-
-        context = self.get_context(request)
-        context.update({
-            'inventory': True,
-            'set_id': self.source_set.id,
-            'title': source.name,
-            'data': {
-                'folios': list(pages),
-                **PublicSourceSerializer(source).data,
-            },
-        })
-        return TemplateResponse(
-          request, 'dalme_public/inventory.html', context
-        )
 
     @property
     def stats(self):

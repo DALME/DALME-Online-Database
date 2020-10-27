@@ -10,7 +10,7 @@
           <li>{{ source_data.name }}</li>
         </a>
       {% else %}
-        <a href="{% routablepageurl source_data.collections.specific 'unscoped_inventory' source_data.source.pk %}">
+        <a href="{% routablepageurl source_data.collections.specific 'inventory' source_data.source.pk %}">
           <li>{{ source_data.name }}</li>
         </a>
       {% endif %}
