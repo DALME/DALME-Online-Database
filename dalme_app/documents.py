@@ -97,7 +97,7 @@ class PublicSourceDocument(Document):
         return ','.join([str(set['set_id_id']) for set in instance.sets.all().values()])
 
     def prepare_text(self, instance):
-        text = ''
+        text = instance.name + '\n'
         xml_parser = et.XMLParser(recover=True)
         for attribute in instance.attributes.all():
             text += '{}: {}\n'.format(attribute.attribute_type.name, str(attribute))
