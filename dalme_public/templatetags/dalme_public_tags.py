@@ -315,6 +315,7 @@ def dd_record_name(name, part=''):
 @register.inclusion_tag('dalme_public/includes/_search_help.html', takes_context=True)
 def search_help(context):
     return {
+        'query': context['query'],
         'search_help': SearchHelpBlock.objects.first(),
         'results': len(context['results']),
         'paginated': context['paginated'],

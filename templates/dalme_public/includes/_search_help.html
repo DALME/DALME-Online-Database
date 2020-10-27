@@ -5,11 +5,15 @@
     <div id="search-help">
         <div class="search-help-header d-flex" data-toggle="collapse" data-target="#search-help-content" aria-expanded="{% if results %}false{% else %}true{% endif %}" aria-controls="search-help-content">
           <div class="mr-auto">
-          {% if results %}
-            {% if paginated %}
-              <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
+          {% if query %}
+            {% if results %}
+              {% if paginated %}
+                <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
+              {% else %}
+                <small>{{ results }} results found.</small>
+              {% endif %}
             {% else %}
-              <small>{{ results }} results found.</small>
+              <small>Your query returned no results.</small>
             {% endif %}
           {% else %}
             <small>Type a query to search.</small>
