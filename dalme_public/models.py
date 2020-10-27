@@ -536,7 +536,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         if request.GET.get('q') is not None:
             form = forms.SearchForm(request.GET)
             if form.is_valid():
-                query = form.cleaned_data['q']
+                query = form.cleaned_data['q'].lower().strip()
                 (paginator, results) = form.search(
                     searchindex=searchindex,
                     page=request.GET.get('page', 1),

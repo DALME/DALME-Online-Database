@@ -18,6 +18,8 @@ def Search(
     if not qstring or searchindex is None:
         return []
 
+    qstring = qstring.lower().strip()
+
     if type(searchindex) is str:
         searchindex = eval(f'{searchindex}()')
 
@@ -37,7 +39,7 @@ def Search(
 
 
 def build_query(qstring):
-    if len(qstring.strip().split(' ')) > 1:
+    if len(qstring.split(' ')) > 1:
         return MatchPhrasePrefix(
             text={'query': qstring},
         )

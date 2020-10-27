@@ -118,8 +118,8 @@ class SourceList(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('search'):
-            q = self.request.GET.get('search')
-            if len(q.strip().split(' ')) > 1:
+            q = self.request.GET.get('search').lower().strip()
+            if len(q.split(' ')) > 1:
                 query = MatchPhrasePrefix(text={'query': q})
             else:
                 query = Prefix(text={'value': q})
