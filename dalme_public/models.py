@@ -558,10 +558,10 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             request, 'dalme_public/search.html', context
         )
 
-    @route(r'^inventories/$', name='inventories')
-    def inventories(self, request, scoped=True):
+    @route(r'^records/$', name='records')
+    def records(self, request, scoped=True):
         context = self.get_context(request)
-        context.update({'inventories': True})
+        context.update({'records': True})
 
         try:
             context.update({'set_id': self.source_set.id})
@@ -569,11 +569,11 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             pass
 
         return TemplateResponse(
-          request, 'dalme_public/inventories.html', context
+          request, 'dalme_public/records.html', context
         )
 
-    @route(rf'^inventories/({UUID_RE})/$', name='inventory')
-    def inventory(self, request, pk, scoped=True):
+    @route(rf'^records/({UUID_RE})/$', name='record')
+    def record(self, request, pk, scoped=True):
         qs = Source.objects.filter(pk=pk)
 
         if not qs.exists():
@@ -593,7 +593,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
 
         context = self.get_context(request)
         context.update({
-            'inventory': True,
+            'record': True,
             'title': source.name,
             'data': {
                 'folios': list(pages),
@@ -607,7 +607,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             pass
 
         return TemplateResponse(
-          request, 'dalme_public/inventory.html', context
+          request, 'dalme_public/record.html', context
         )
 
 
@@ -657,7 +657,7 @@ class Collection(SearchEnabled):
     @property
     def stats(self):
         stats_dict = {
-            'inventories': self.source_set.get_public_member_count(),
+            'records': self.source_set.get_public_member_count(),
             'languages': self.source_set.get_public_languages(),
             'coverage': self.source_set.get_public_time_coverage(),
         }

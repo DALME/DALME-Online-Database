@@ -1,7 +1,7 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
 {% load static %}
 
-{% block title %}Inventories &mdash; {{ block.super }}{% endblock %}
+{% block title %}Records &mdash; {{ block.super }}{% endblock %}
 
 {% block styles %}
   {{ block.super }}
@@ -44,7 +44,7 @@
             spellcheck="false"
           >
         </li>
-        <div class="filter-panel" v-if="showFilters && inventories">
+        <div class="filter-panel" v-if="showFilters && records">
           <form method="get" class="filter-form u-flex">
 
             <label class="label">Corpus</label>
@@ -105,7 +105,7 @@
     <beat-loader v-if="spinner" :loading="spinner" color="#aaa"></beat-loader>
     <section v-else class="inventory-container" :class="mode">
       <template v-if="mode === 'compact'">
-        <p v-if="noResults">No inventories found.</p>
+        <p v-if="noResults">No records found.</p>
         <div v-else class="u-grid inventories">
           <div class="grid-row-wrapper compact u-contents">
             <span class="heading first">
@@ -133,49 +133,49 @@
             <span class="heading last"></span>
           </div>
 
-          <template v-for="(inventory, index) in inventories" :key="index">
+          <template v-for="(record, index) in records" :key="index">
             <div class="grid-row-wrapper compact u-contents">
               <span class="inventory-field name">
-                <a :href="inventoryUrl(inventory)">
-                  ${inventory.name}<span class="short-name"> ${inventory.short_name}</span>
+                <a :href="recordUrl(record)">
+                  ${record.name}<span class="short-name"> ${record.short_name}</span>
                 </a>
               </span>
-              <span class="inventory-field record-type">${inventory.record_type}</span>
-              <span class="inventory-field date">${inventory.date}</span>
+              <span class="inventory-field record-type">${record.record_type}</span>
+              <span class="inventory-field date">${record.date}</span>
               <span class="inventory-field icons">
-                <i v-if="inventory.no_folios > 0" class="fas fa-file"></i>
-                <i v-if="inventory.has_transcriptions" class="fas fa-file-image"></i>
+                <i v-if="record.no_folios > 0" class="fas fa-file"></i>
+                <i v-if="record.has_transcriptions" class="fas fa-file-image"></i>
               </span>
             </div>
           </template>
         </template>
 
         <template v-if="mode === 'wide'">
-          <div class="u-flex inventory-wide" v-for="(inventory, index) in inventories" :key="index">
+          <div class="u-flex inventory-wide" v-for="(record, index) in records" :key="index">
             <div class="u-flex inventory-details">
-              <a :href="inventoryUrl(inventory)">${inventory.name}</a>
+              <a :href="recordUrl(record)">${record.name}</a>
               <div>
-                ${componentInstance.truncate(inventory.description)}
+                ${componentInstance.truncate(record.description)}
                 <span class="u-ellipsis"> [...]</span>
               </div>
             </div>
             <div class="u-flex inventory-metadata">
-              <span class="short-name">${inventory.short_name}</span>
-              <span class="city">${inventory.city} | ${inventory.date}</span>
-              <span class="folios" v-if="inventory.no_folios > 1">${inventory.no_folios} Folios</span>
-              <span class="folios" v-else>${inventory.no_folios} Folio</span>
+              <span class="short-name">${record.short_name}</span>
+              <span class="city">${record.city} | ${record.date}</span>
+              <span class="folios" v-if="record.no_folios > 1">${record.no_folios} Folios</span>
+              <span class="folios" v-else>${record.no_folios} Folio</span>
             </div>
             <div class="u-flex icons">
               <div class="u-flex first">
                 <i class="fas fa-file"></i>
-                <span class="icon-count" :class="inventory.no_folios === 0 ? 'red' : ''">
-                  ${inventory.no_folios}
+                <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
+                  ${record.no_folios}
                 </span>
               </div>
               <div class="u-flex second">
-                <i v-if="inventory.has_transcriptions" class="fas fa-file-alt"></i>
-                <span class="icon-count" :class="inventory.no_transcriptions === 0 ? 'red' : inventory.no_transcriptions === inventory.no_folios ? '' : 'yellow'">
-                  ${inventory.no_transcriptions}
+                <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
+                <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
+                  ${record.no_transcriptions}
                 </span>
               </div>
             </div>
@@ -183,46 +183,46 @@
         </template>
 
         <template v-if="mode === 'detail'">
-          <template v-for="(partition, index) in partitionedInventories" :key="index">
+          <template v-for="(partition, index) in partitionedRecords" :key="index">
             <div class="grid-row-wrapper detail u-contents">
-              <template v-for="inventory in partition" :key="inventory.id">
+              <template v-for="record in partition" :key="record.id">
                 <a
                   class="inventory-detail u-flex"
-                  :href="inventoryUrl(inventory)"
-                  v-bind:style="inventoryDetailStyle(inventory)"
-                  v-on:mouseover="toggleHover(inventory.id)"
+                  :href="recordUrl(record)"
+                  v-bind:style="recordDetailStyle(record)"
+                  v-on:mouseover="toggleHover(record.id)"
                   v-on:mouseleave="toggleHover">
                     <div class="u-flex top">
-                      <p>${inventory.name}</p>
+                      <p>${record.name}</p>
                       <div class="u-flex icons">
                         <div class="u-flex first">
-                          <i v-if="inventory.has_transcriptions" class="fas fa-file"></i>
-                          <span class="icon-count" :class="inventory.no_folios === 0 ? 'red' : ''">
-                            ${inventory.no_folios}
+                          <i v-if="record.has_transcriptions" class="fas fa-file"></i>
+                          <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
+                            ${record.no_folios}
                           </span>
                         </div>
                         <div class="u-flex first">
-                          <i v-if="inventory.has_images" class="fas fa-file-image"></i>
-                          <span class="icon-count" :class="inventory.no_images === 0 ? 'red' : inventory.no_images === inventory.no_folios ? '' : 'yellow'">
-                            ${inventory.no_images}
+                          <i v-if="record.has_images" class="fas fa-file-image"></i>
+                          <span class="icon-count" :class="record.no_images === 0 ? 'red' : record.no_images === record.no_folios ? '' : 'yellow'">
+                            ${record.no_images}
                           </span>
                         </div>
                         <div class="u-flex">
-                          <i v-if="inventory.has_transcriptions" class="fas fa-file-alt"></i>
-                          <span class="icon-count" :class="inventory.no_transcriptions === 0 ? 'red' : inventory.no_transcriptions === inventory.no_folios ? '' : 'yellow'">
-                            ${inventory.no_transcriptions}
+                          <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
+                          <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
+                            ${record.no_transcriptions}
                           </span>
                         </div>
                       </div>
                     </div>
 
                     <div class="u-flex bottom">
-                      <span class="short-name">${inventory.short_name}</span>
-                      <span class="city">${inventory.city} | ${inventory.date}</span>
+                      <span class="short-name">${record.short_name}</span>
+                      <span class="city">${record.city} | ${record.date}</span>
                     </div>
 
-                    <div class="modal-description" v-if="inventoryDetailHover === inventory.id">
-                      ${componentInstance.truncate(inventory.description, 35)} [...]
+                    <div class="modal-description" v-if="recordDetailHover === record.id">
+                      ${componentInstance.truncate(record.description, 35)} [...]
                     </div>
                 </a>
               </template>
@@ -287,7 +287,7 @@
       },
       data: {
         fetching: false,
-        inventories: null,
+        records: null,
         thumbnails: {},
         next: null,
         previous: null,
@@ -307,11 +307,11 @@
         sourceTypeOrder: null,
         dateOrder: null,
         choices: {},
-        inventoryDetailHover: false,
+        recordDetailHover: false,
         windowWidth: window.innerWidth,
       },
       watch: {
-        inventories: 'fetchThumbnails',
+        records: 'fetchThumbnails',
         search: debounce(function() {
           this.filterData('search', this.search)
         }, 250),
@@ -356,10 +356,10 @@
           return '/api/public/thumbnails';
         },
         spinner() {
-          return (this.inventories === null) || this.fetching == true;
+          return (this.records === null) || this.fetching == true;
         },
         noResults() {
-          return Array.isArray(this.inventories) && !this.inventories.length;
+          return Array.isArray(this.records) && !this.records.length;
         },
         currentPageInfo() {
           return `Showing page ${this.currentPage} of ${this.totalPages}`;
@@ -370,28 +370,28 @@
         currentParams() {
           return new URLSearchParams(window.location.search);
         },
-        partitionedInventories() {
+        partitionedRecords() {
           const partition = 3;
-          return this.inventories
-            ? Array(Math.ceil(this.inventories.length / partition))
+          return this.records
+            ? Array(Math.ceil(this.records.length / partition))
                 .fill()
                 .map((_, index) => index * partition)
-                .map(begin => this.inventories.slice(begin, begin + partition))
+                .map(begin => this.records.slice(begin, begin + partition))
             : null;
         },
       },
       methods: {
-        inventoryDetailStyle(inventory) {
+        recordDetailStyle(record) {
           let blue = 'linear-gradient(to top, rgba(238,248,254,1) 0%, rgba(238,248,254,0) 100%)';
           let white = 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)';
           const thumbnail = Object.keys(this.thumbnails).length
-            ? this.thumbnails[inventory.id]
+            ? this.thumbnails[record.id]
             : null;
           if (thumbnail) {
             blue = `${blue}, url("${thumbnail}")`;
             white = `${white}, url("${thumbnail}")`;
           }
-          return this.inventoryDetailHover === inventory.id
+          return this.recordDetailHover === record.id
             ? { background: blue }
             : { background: white };
         },
@@ -402,7 +402,7 @@
           }
         },
         toggleHover(uid = false) {
-          this.inventoryDetailHover = uid;
+          this.recordDetailHover = uid;
         },
         truncate(str, max = 25) {
           const array = str.trim().split(' ');
@@ -492,7 +492,7 @@
           fetch(url || `${this.endpoint}/?${this.currentParams.toString()}`)
             .then(response => response.json())
             .then(data => {
-              this.inventories = data.results;
+              this.records = data.results;
               this.next = data.next;
               this.previous = data.previous;
               this.count = data.count;
@@ -502,14 +502,14 @@
             });
         },
         async fetchThumbnails() {
-          const inventories = this.inventories.filter(inventory =>
-            inventory.image_ref !== null && !(inventory.id in this.thumbnails)
+          const records = this.records.filter(record =>
+            record.image_ref !== null && !(record.id in this.thumbnails)
           );
-          await Promise.all(inventories.map(inventory => {
-            fetch(`${this.thumbnailEndpoint}/?image_ref=${inventory.image_ref}`)
+          await Promise.all(records.map(record => {
+            fetch(`${this.thumbnailEndpoint}/?image_ref=${record.image_ref}`)
               .then(response => response.json())
               .then(data => {
-                this.thumbnails[inventory.id] = data.image_url;
+                this.thumbnails[record.id] = data.image_url;
                 // Not ideal.
                 this.$forceUpdate();
               })
@@ -533,8 +533,8 @@
           this.fetchData(`${this.endpoint}/?${params}`);
           this.updateURL(params);
         },
-        inventoryUrl(inventory) {
-          return `${location.pathname}${inventory.id}`;
+        recordUrl(record) {
+          return `${location.pathname}${record.id}`;
         },
         toggleFilters() {
           this.showFilters = !this.showFilters;

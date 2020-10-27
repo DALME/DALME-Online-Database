@@ -13,15 +13,15 @@
     </li>
     {% if page|classname == 'Collection' %}
       <li>
-        <a href="{% pageurl page %}inventories/?collection={{ page.pk }}">Browse Collection</a>
+        <a href="{% pageurl page %}records/?collection={{ page.pk }}">Browse Collection</a>
       </li>
     {% elif page|classname == 'Flat' %}
       <li>
-        <a href="{% routablepageurl page.get_parent.specific 'inventories' %}">Browse All</a>
+        <a href="{% routablepageurl page.get_parent.specific 'records' %}">Browse All</a>
       </li>
     {% else %}
       <li>
-        <a href="{% routablepageurl page.specific 'inventories' %}">Browse All</a>
+        <a href="{% routablepageurl page.specific 'records' %}">Browse All</a>
       </li>
     {% endif %}
     <li>

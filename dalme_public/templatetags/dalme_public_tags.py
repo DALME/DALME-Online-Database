@@ -74,23 +74,23 @@ def get_breadcrumbs_nav(context):
 
     # We have to do some contortions here to make sure the RoutablePage
     # endpoints maintain the illusion of being actual Page objects.
-    inventories = context.get('inventories')
-    inventory = context.get('inventory')
-    if inventories or inventory:
+    records = context.get('records')
+    record = context.get('record')
+    if records or record:
         corpus = page.get_parent()
         breadcrumbs[-1].update({'active': False})
         breadcrumbs = [
             *breadcrumbs,
             {
-                'title': 'Inventories',
-                'url': f'{page.url}inventories/?corpus={corpus.pk}&collection={page.pk}',  # noqa
-                'active': True if inventories else False,
+                'title': 'Records',
+                'url': f'{page.url}records/?corpus={corpus.pk}&collection={page.pk}',  # noqa
+                'active': True if records else False,
             },
         ]
 
-    if inventory:
+    if record:
         title = context['data']['short_name']
-        url = page.url + f'inventories/{context["data"]["id"]}/'
+        url = page.url + f'records/{context["data"]["id"]}/'
         breadcrumbs = [
             *breadcrumbs,
             {'title': title, 'url': url, 'active': True},
@@ -158,7 +158,7 @@ def get_source_details(context):
     if source and source_set:
         stem = 'public/DALME/collections'
         collection = source_set.public_collections.first()
-        url = f'/{stem}/{collection.slug}/inventories/{source.pk}'
+        url = f'/{stem}/{collection.slug}/records/{source.pk}'
 
     return {
         'source': source,
