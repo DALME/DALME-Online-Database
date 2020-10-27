@@ -15,7 +15,7 @@ def update_rs_folio_field():
 
 @shared_task
 def update_search_index():
-    call_command('search_index', '--rebuild')
+    call_command('search_index', '--rebuild', '-f')
 
 
 @shared_task
