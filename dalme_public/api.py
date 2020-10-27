@@ -16,7 +16,7 @@ from dalme_public.models import Corpus, Collection
 
 from dalme_app.documents import PublicSourceDocument
 from elasticsearch_dsl.query import MatchPhrasePrefix, Prefix
-
+from dalme_public.filters import _map_source_types
 
 class DALMEPagination(pagination.PageNumberPagination):
     page_size = 24
@@ -185,12 +185,10 @@ class FilterChoices(View):
         ]
 
     def source_type_choices(self):
-        types = Attribute.objects.filter(
-            attribute_type__short_name='record_type'
-        ).values('value_STR').distinct()
+        types = _map_source_types()
         return sorted([
-            {'id': str(idx), 'label': attr['value_STR']}
-            for idx, attr in enumerate(types)
+            {'id': str(idx), 'label': value}
+            for idx, value in types.items()
         ], key=lambda choice: choice['label'])
 
     @property

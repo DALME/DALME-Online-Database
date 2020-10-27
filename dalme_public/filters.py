@@ -34,10 +34,12 @@ def _map_source_types():
     # sorting them for the frontend widget, that way we can reaccess them by
     # index later to get the right names back when a request with a query comes
     # in. See the `filter_type` method below.
+
     return {
         str(idx): attr['value_STR']
         for idx, attr in enumerate(Attribute.objects.filter(
-            attribute_type__short_name='record_type'
+            attribute_type__short_name='record_type',
+            object_id__in=Source.objects.filter(type=13, workflow__is_public=True).values('id')
         ).values('value_STR').distinct())
     }
 
