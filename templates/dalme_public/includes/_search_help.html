@@ -9,7 +9,7 @@
             {% if paginated %}
               <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
             {% else %}
-              <small>{{ results | length }} results found.</small>
+              <small>{{ results }} results found.</small>
             {% endif %}
           {% else %}
             <small>Type a query to search.</small>
