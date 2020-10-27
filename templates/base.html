@@ -121,7 +121,20 @@
               <div class="dropdown-menu dropdown-menu-right animated--grow-in search-slider" aria-labelledby="searchDropdown">
                 <form class="form-inline navbar-search" role="form" method="get" id="search-form" enctype="multipart/form-data" action="/search">
                   {% csrf_token %}
-                  <input id="topbar_search" type="text" class="form-control border-0 small" placeholder="Search" aria-label="Search" name="q" value='{{ query|default:"" }}' required>
+                  <input
+                    id="topbar_search"
+                    type="text"
+                    class="form-control border-0 small"
+                    placeholder="Search"
+                    aria-label="Search"
+                    name="q"
+                    value='{{ query|default:"" }}'
+                    required
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                  >
                 </form>
               </div>
             </li>

@@ -38,6 +38,10 @@
             placeholder="Search"
             v-model="search"
             :value="search"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
           >
         </li>
         <div class="filter-panel" v-if="showFilters && inventories">

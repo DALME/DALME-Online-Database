@@ -30,7 +30,17 @@
               <div class="input-group-prepend">
                 <div class="input-group-text search-prepend">Search query:</div>
               </div>
-              <input type="text" class="form-control form-control-sm search-results-input" id="{{ form.q.id_for_label }}" name="{{ form.q.html_name }}" value="{{ query }}">
+              <input
+                type="text"
+                class="form-control form-control-sm search-results-input"
+                id="{{ form.q.id_for_label }}"
+                name="{{ form.q.html_name }}"
+                value="{{ query }}"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+              >
               <button type="submit" class="btn btn-primary search-results-btn">Search</button>
             </div>
           </div>
