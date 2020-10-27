@@ -121,7 +121,7 @@ class Footer(models.Model):
         return "Site Footer"
 
     def clean(self):
-        if self._meta.model.objects.exists():
+        if self.id is None and self._meta.model.objects.exists():
             raise ValidationError('The site can only have one footer.')
 
 
@@ -140,7 +140,7 @@ class SearchHelpBlock(models.Model):
         return "Search Help"
 
     def clean(self):
-        if self._meta.model.objects.exists():
+        if self.id is None and self._meta.model.objects.exists():
             raise ValidationError('The search page can only have one help block.')
 
 
