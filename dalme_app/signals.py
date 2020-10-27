@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 
 @receiver(models.signals.post_save, sender=Page)
 def update_folio(sender, instance, created, **kwargs):
-    if created and instance.dam_id is not None:
+    if instance.dam_id is not None:
         rs_image = rs_resource.objects.get(ref=instance.dam_id)
         rs_image.field79 = instance.name
         rs_image.save()
