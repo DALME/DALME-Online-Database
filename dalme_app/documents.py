@@ -7,39 +7,24 @@ import lxml.etree as et
 
 @registry.register_document
 class SourceDocument(Document):
+    name = fields.TextField()
     text = fields.TextField()
-    type = fields.IntegerField()
+    has_image = fields.BooleanField()
+    has_transcription = fields.BooleanField()
+    date = fields.DateField()
+    source_type = fields.KeywordField()
+    set_membership = fields.TextField()
     is_public = fields.BooleanField()
+    type = fields.IntegerField()
 
     class Index:
         name = 'sources'
-        mappings = {
-            "properties": {
-              "text": {
-                "type": "text",
-                "index_prefixes": {
-                  "min_chars": 2,
-                  "max_chars": 10
-                }
-              }
-            }
-        }
 
     class Django:
         model = Source
-        fields = ['name']
 
-    def prepare_text(self, instance):
-        text = ''
-        for attribute in instance.attributes.all():
-            text += '{}: {}'.format(attribute.attribute_type.name, str(attribute))
-
-        for page in instance.source_pages.all():
-            try:
-                text += page.transcription.transcription
-            except AttributeError:
-                pass
-        return text
+    def prepare_name(self, instance):
+        return instance.name
 
     def prepare_type(self, instance):
         return instance.type.id
@@ -49,29 +34,6 @@ class SourceDocument(Document):
             return instance.workflow.is_public
         except ObjectDoesNotExist:
             return False
-
-
-@registry.register_document
-class PublicSourceDocument(Document):
-    # text = fields.TextField(
-    #     index_prefixes={
-    #       "min_chars": 2,
-    #       "max_chars": 10
-    #     }
-    # )
-    text = fields.TextField()
-    has_image = fields.BooleanField()
-    has_transcription = fields.BooleanField()
-    date = fields.DateField()
-    source_type = fields.KeywordField()
-    set_membership = fields.TextField()
-
-    class Index:
-        name = 'public_sources'
-
-    class Django:
-        model = Source
-        fields = ['name']
 
     def prepare_has_image(self, instance):
         return instance.has_images
@@ -109,6 +71,13 @@ class PublicSourceDocument(Document):
             except AttributeError:
                 pass
         return text
+
+
+@registry.register_document
+class PublicSourceDocument(SourceDocument):
+
+    class Index:
+        name = 'public_sources'
 
     def get_queryset(self):
         return Source.objects.filter(type=13, workflow__is_public=True)
