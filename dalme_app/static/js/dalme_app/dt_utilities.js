@@ -469,15 +469,15 @@ function process_dt_fields(type, fields, overrides) {
                       break;
 
                   case 'api_call':
-                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${opt_object['url']}\
-                      encodeURIComponent(query)",type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
+                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${opt_object['url']}" + encodeURIComponent(query),\
+                      type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
                       error: function() {callback();},success: function(res) {callback(res);}});})`)
                       delete fields[i]['options'];
                       break;
 
                   case 'api_call_x':
-                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${opt_object['url']}\
-                      encodeURIComponent(query)",type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
+                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${opt_object['url']}" + encodeURIComponent(query),\
+                      type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
                       error: function() {callback();},success: function(res) {callback(res);}});})`)
                       fields[i]['opts']['render'] = eval(`(${opt_object['render']})`)
                       delete fields[i]['options'];
