@@ -6,6 +6,7 @@ from dalme_app.utils import DALMEMenus as dm
 from ._common import get_page_chain
 from dalme_app.forms import preference_form_builder
 from dalme_app.forms import GlobalPreferenceForm
+from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
@@ -19,6 +20,7 @@ class Settings(FormMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = [('Tools', ''), ('Settings', '/settings')]
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}

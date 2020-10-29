@@ -10,6 +10,7 @@ from django.utils import timezone
 from ._common import DALMEListView, get_page_chain
 from dalme_app.forms import preference_form_builder
 from dalme_app.forms import UserPreferenceForm
+from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
@@ -33,6 +34,7 @@ class UserDetail(FormMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(UserDetail, self).get_context_data(*args, **kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         if self.request.GET.get('preferences') is not None:
             context['preferences'] = True
         breadcrumb = [('System', ''), ('Users', '/users')]

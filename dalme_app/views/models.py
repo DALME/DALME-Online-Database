@@ -3,6 +3,7 @@ from django.utils.decorators import method_decorator
 from dalme_app.utils import DALMEMenus as dm
 from dalme_app.models import Content_class, Content_type
 from ._common import DALMEListView, get_page_chain
+from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
@@ -31,6 +32,7 @@ class ModelLists(DALMEListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = self.get_breadcrumb()
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle

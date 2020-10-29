@@ -8,6 +8,7 @@ from dalme_app.models import RightsPolicy, Set, Source
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from ._common import DALMEListView, get_page_chain
+from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
@@ -36,6 +37,7 @@ class SetsDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = [('Project', ''), ('Sets', '/sets')]
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle

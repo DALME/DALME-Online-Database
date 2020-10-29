@@ -6,6 +6,7 @@ from dalme_app.utils import DALMEMenus as dm
 from dalme_app.models import Ticket
 from django.core.exceptions import ObjectDoesNotExist
 from ._common import DALMEListView, get_page_chain
+from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
@@ -15,6 +16,7 @@ class TicketDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = [('Project', ''), ('Issue Tickets', '/tickets')]
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle

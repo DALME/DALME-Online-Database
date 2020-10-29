@@ -6,6 +6,7 @@ from dalme_app.utils import DALMEMenus as dm
 from dalme_app.models import rs_resource, rs_collection_resource, rs_resource_data, rs_user
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from django.conf import settings
 from ._common import DALMEListView, get_page_chain
 
 
@@ -23,6 +24,7 @@ class ImageDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = [('Sources', ''), ('DAM Images', '/images')]
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle

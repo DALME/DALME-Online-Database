@@ -7,6 +7,7 @@ from dalme_app.utils import DALMEMenus as dm
 from dalme_app.models import TaskList, Task
 from django.core.exceptions import ObjectDoesNotExist
 from ._common import get_page_chain
+from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
@@ -16,6 +17,7 @@ class TasksDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = [('Project', ''), ('Tasks', '/tasks')]
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle
@@ -42,6 +44,7 @@ class TasksList(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = [('Project', ''), ('Tasks', '/tasks')]
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
@@ -67,7 +70,7 @@ class TasksList(TemplateView):
         context['task_count'] = task_count
         context['tables'] = [
             ['lists', 'fa-tasks', 'Lists', {
-                'ajax': '"/api/tasklists/?format=json"',
+                'ajax': '"{}/tasklists/?format=json"'.format(settings.API_ENDPOINT),
                 'serverSide': 'true',
                 'responsive': 'true',
                 'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>r><'card-body't><'sub-card-footer'i>"''',
@@ -96,7 +99,7 @@ class TasksList(TemplateView):
                 }
              ],
             ['tasks', 'fa-calendar-check', 'Tasks', {
-                'ajax': '"/api/tasks/?format=json"',
+                'ajax': '"{}/tasks/?format=json"'.format(settings.API_ENDPOINT),
                 'serverSide': 'true',
                 'responsive': 'true',
                 'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>"''',

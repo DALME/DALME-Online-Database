@@ -3,6 +3,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from dalme_app.utils import DALMEMenus as dm
 from ._common import get_page_chain
+from django.conf import settings
 from dalme_app.forms import SearchForm
 from dalme_app.documents import SourceDocument
 
@@ -15,6 +16,7 @@ class DefaultSearch(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['api_endpoint']: settings.API_ENDPOINT
         breadcrumb = [('Search', ''), ('Search', '')]
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         context['sidebar_toggle'] = sidebar_toggle

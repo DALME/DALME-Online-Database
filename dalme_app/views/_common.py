@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
+from django.conf import settings
 from dalme_app.utils import DALMEMenus as dm
 
 
@@ -18,19 +19,27 @@ class DALMEListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         config = self.get_config()
-        breadcrumb = config['breadcrumb']
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
-        context['sidebar_toggle'] = sidebar_toggle
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = dm(self.request, state).dropdowns
-        context['sidebar'] = dm(self.request, state).sidebar
-        context['page_title'] = config['page_title']
-        context['page_chain'] = get_page_chain(breadcrumb, context['page_title'])
-        context['config'] = config['dt_config']
-        context['helpers'] = config['helpers']
-        context['includes'] = config['includes']
-        context['form_template'] = config['form_template']
-        context['editor'] = config['editor']
+
+        state = {
+            'breadcrumb': config['breadcrumb'],
+            'sidebar': sidebar_toggle
+        }
+
+        context.update({
+            'api_endpoint': settings.API_ENDPOINT,
+            'sidebar_toggle': sidebar_toggle,
+            'dropdowns': dm(self.request, state).dropdowns,
+            'sidebar': dm(self.request, state).sidebar,
+            'page_title': config['page_title'],
+            'page_chain': get_page_chain(config['breadcrumb'], config['page_title']),
+            'config': config['dt_config'],
+            'helpers': config['helpers'],
+            'includes': config['includes'],
+            'form_template': config['form_template'],
+            'editor': config['editor'],
+        })
+
         return context
 
     def get_config(self, *args, **kwargs):
