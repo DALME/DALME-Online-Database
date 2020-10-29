@@ -116,12 +116,11 @@
       $('body').on('click', '#histogram', function() {
         const popup = $('body').find('#popup-histogram');
         if (!popup.length) {
-          const title = 'Records per year';
           const node = '<div id="popup-histogram" class="popup-histogram"></div>';
           $(window).width() >= 600
             ? $('#histogram').append(node)
             : $('#histogram').after(node);
-          renderHistogram('#popup-histogram', 400, 150, '#56c1fe', title, 20);
+          renderHistogram('#popup-histogram', 400, 150, '#56c1fe', '', 20);
         } else {
           popup.remove();
         }
