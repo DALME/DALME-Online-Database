@@ -44,9 +44,6 @@ AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
 ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
 
-SAML_CERT = os.environ.get('SAML_CERT', '')
-SAML_KEY = os.environ.get('SAML_KEY', '')
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
 EMAIL_USE_TLS = True
@@ -62,6 +59,7 @@ COMPRESS_ENABLED = True
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://*.dalme.org'
+    'https://data.dalme.org',
     'https://db.dalme.org',
     'https://public.dalme.org',
     'https://dalme.org',
@@ -75,16 +73,19 @@ ROOT_URLCONF = 'dalme.urls'
 DEFAULT_HOST = 'public'
 PARENT_HOST = 'dalme.org'
 HOST_SCHEME = 'https://'
+API_ENDPOINT = 'https://data.dalme.org'
 
 SESSION_COOKIE_DOMAIN = '.dalme.org'
+SESSION_COOKIE_SECURE = True
+
 CSRF_COOKIE_DOMAIN = '.dalme.org'
 CSRF_TRUSTED_ORIGINS = ['.dalme.org']
+CSRF_COOKIE_SECURE = True
 
 SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -123,6 +124,7 @@ INSTALLED_APPS = [
     'wagtail.admin',
     'wagtail.core',
     'wagtailmodelchooser',
+    'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
 ]

@@ -38,6 +38,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+API_ENDPOINT = 'https://data.127.0.0.1.xip.io:8443'
+
 # Application definition
 ALLOWED_HOSTS = [
     '127.0.0.1:8000',
@@ -48,48 +51,62 @@ ALLOWED_HOSTS = [
     'db.127.0.0.1.xip.io:8443',
     'db.127.0.0.1.xip.io',
     'public.127.0.0.1.xip.io:8443',
-    'public.127.0.0.1.xip.io'
+    'public.127.0.0.1.xip.io',
+    'data.127.0.0.1.xip.io:8443',
+    'data.127.0.0.1.xip.io'
 ]
-CORS_ALLOW_ALL_ORIGINS = False
-# CORS_ALLOW_CREDENTIALS = True
-# SESSION_COOKIE_SAMESITE = None
+
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
+
+SESSION_COOKIE_SECURE = True
+# SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
-CSRF_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
 # SESSION_COOKIE_NAME = 'session_id'
+# SESSION_COOKIE_HTTPONLY = False
+
+CSRF_COOKIE_SECURE = True
+# CSRF_USE_SESSIONS = True
+CSRF_TRUSTED_ORIGINS = [
+    '.127.0.0.1.xip.io',
+    '.127.0.0.1.xip.io:8443',
+    'data.127.0.0.1.xip.io',
+    'data.127.0.0.1.xip.io:8443',
+    'db.127.0.0.1.xip.io',
+    'db.127.0.0.1.xip.io:8443',
+    'public.127.0.0.1.xip.io',
+    'public.127.0.0.1.xip.io:8443',
+]
+CSRF_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
+# CSRF_COOKIE_SAMESITE = 'None'
+
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
 # CORS_PREFLIGHT_MAX_AGE = 2000
-# CSRF_TRUSTED_ORIGINS = ['.127.0.0.1.xip.io']
 # CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://*.127.0.0.1.xip.io:8443',
     'https://*.127.0.0.1.xip.io',
     'https://public.127.0.0.1.xip.io:8443',
-    'http://public.127.0.0.1.xip.io:8443',
-    'https://public.127.0.0.1.xip.io',
-    'http://public.127.0.0.1.xip.io'
+    'http://public.127.0.0.1.xip.io',
+    'https://data.127.0.0.1.xip.io:8443',
+    'http://data.127.0.0.1.xip.io',
+    'https://db.127.0.0.1.xip.io:8443',
+    'http://db.127.0.0.1.xip.io'
 ]
-
 # CORS_REPLACE_HTTPS_REFERER = True
 # CORS_ALLOWED_ORIGIN_REGEXES = [
 #     r'^https://.+\.127\.0\.0\.1\.xip\.io:8443$'
 # ]
-
 # CORS_ALLOW_CREDENTIALS = True
-# SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
 
 ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.devUrls'
 DEFAULT_HOST = 'public'
 PARENT_HOST = '127.0.0.1.xip.io:8443'
 HOST_SCHEME = 'https://'
-
-# HTTPS/SSL settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -141,6 +158,7 @@ INSTALLED_APPS = [
     'wagtailmodelchooser',
 
     #'cors_headers.application.cors_headers_config',
+    'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
 ]
@@ -545,111 +563,3 @@ if "LOG_TO_STDOUT" in os.environ:
 
 if "HEROKU_APP_NAME" in os.environ:
     ALLOWED_HOSTS = ["*"]
-
-ELASTICSEARCH_INDEX_SETTINGS = {
-    'settings': {
-        'analysis': {
-            'analyzer': {
-                'ngram_analyzer': {
-                    'type': 'custom',
-                    'tokenizer': 'lowercase',
-                    'filter': ['haystack_ngram']
-                },
-                'edgengram_analyzer': {
-                    'type': 'custom',
-                    'tokenizer': 'lowercase',
-                    'filter': ['haystack_edgengram']
-                },
-                'suggest_analyzer': {
-                    'type': 'custom',
-                    'tokenizer': 'standard',
-                    'filter': [
-                        'standard',
-                        'lowercase',
-                        'asciifolding'
-                    ]
-                },
-            },
-            'tokenizer': {
-                'haystack_ngram_tokenizer': {
-                    'type': 'nGram',
-                    'min_gram': 3,
-                    'max_gram': 15,
-                },
-                'haystack_edgengram_tokenizer': {
-                    'type': 'edgeNGram',
-                    'min_gram': 2,
-                    'max_gram': 15,
-                    'side': 'front'
-                }
-            },
-            'filter': {
-                'haystack_ngram': {
-                    'type': 'nGram',
-                    'min_gram': 3,
-                    'max_gram': 15
-                },
-                'haystack_edgengram': {
-                    'type': 'edgeNGram',
-                    'min_gram': 2,
-                    'max_gram': 15
-                }
-            }
-        }
-    }
-}
-
-# ELASTICSEARCH_DSL_INDEX_SETTINGS = {
-#     'settings': {
-#         "analysis": {
-#             "analyzer": {
-#                 "custom_analyzer": {
-#                     "type": "custom",
-#                     "tokenizer": "standard",
-#                     "filter":  [ "lowercase", "asciifolding" ]
-#                 },
-#                 "str_index_analyzer" : {
-#                     "type": "custom",
-#                     "tokenizer" : "haystack_ngram_tokenizer",
-#                     "filter" : ["stopwords", "asciifolding", "lowercase", "snowball", "elision", "worddelimiter"]
-#                 },
-#                 "str_search_analyzer" : {
-#                     "type": "custom",
-#                     "tokenizer" : "standard",
-#                     "filter" : ["stopwords", "asciifolding", "lowercase", "snowball", "elision", "worddelimiter"]
-#                 },
-#                 "suggest_analyzer": {
-#                     "type":"custom",
-#                     "tokenizer":"standard",
-#                     "filter":[
-#                         "stopwords",
-#                         "standard",
-#                         "lowercase",
-#                         "asciifolding"
-#                     ]
-#                 },
-#             },
-#             "tokenizer": {
-#                 "haystack_ngram_tokenizer": {
-#                     "type": "nGram",
-#                     "min_gram": 2,
-#                     "max_gram": 20,
-#                 },
-#             },
-#             "filter": {
-#                 "elision": {
-#                     "type": "elision",
-#                     "articles": ["l", "m", "t", "qu", "n", "s", "j", "d"]
-#                 },
-#                 "stopwords": {
-#                     "type": "stop",
-#                     "stopwords": ["_french_", "_english_"],
-#                     "ignore_case": True
-#                 },
-#                 "worddelimiter": {
-#                     "type": "word_delimiter"
-#                 }
-#             }
-#         }
-#     }
-# }
