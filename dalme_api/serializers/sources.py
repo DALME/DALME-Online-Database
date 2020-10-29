@@ -117,6 +117,7 @@ class SourceSerializer(DynamicSerializer):
 
         data['owner'] = {'id': data.get('owner', {}).get('id', get_current_user().id)}
         data['owner']['username'] = User.objects.get(pk=data['owner']['id']).username
+
         return super().to_internal_value(data)
 
     def run_validation(self, data):
@@ -273,7 +274,7 @@ class SourceSerializer(DynamicSerializer):
         if validated_data is not None:
             sets = [i['set_id']['id'] for i in validated_data]
             if instance.sets.all().exists():
-                current_sets = dict((i.id, i) for i in instance.sets.all())
+                current_sets = dict((i.set_id.id, i) for i in instance.sets.all())
                 new_sets = []
                 for set_id in sets:
                     if set_id in current_sets:
