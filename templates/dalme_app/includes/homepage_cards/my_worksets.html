@@ -7,7 +7,7 @@
 <script>
   $('#dataTables-worksets').DataTable({
   'ajax': {
-    'url': "/api/sets/?format=json&type=4&filter=owner," + user['id'],
+    'url': `${api_endpoint}/sets/?format=json&type=4&filter=owner,${user['id']}`,
     'data': function (data) { return { "data": JSON.stringify( data ) }; }
   },
   serverSide: true,

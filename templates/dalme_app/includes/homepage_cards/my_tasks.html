@@ -18,7 +18,7 @@
 <script>
   $('#dataTables-tasks').DataTable({
   'ajax': {
-    'url': "/api/tasks/?format=json&filter=assigned_to," + user['id'],
+    'url': `${api_endpoint}/tasks/?format=json&filter=assigned_to,${user['id']}`,
     'data': function (data) { return { "data": JSON.stringify( data ) }; }
   },
   serverSide: true,
@@ -38,14 +38,14 @@
                 text: 'Tasks assigned to me',
                 className: 'footer-btn',
                 action: function () {
-                  table_tasks.ajax.url("/api/tasks/?format=json&filter=assigned_to," + user['id']).draw();
+                  table_tasks.ajax.url(`${api_endpoint}/tasks/?format=json&filter=assigned_to,${user['id']}`).draw();
                 }
           },
           {
                 text: 'Tasks I created',
                 className: 'footer-btn',
                 action: function () {
-                  table_tasks.ajax.url("/api/tasks/?format=json&filter=created_by," + user['id']).draw();
+                  table_tasks.ajax.url(`${api_endpoint}/tasks/?format=json&filter=created_by,${user['id']}`).draw();
                 }
           },
         ],
@@ -138,7 +138,16 @@ function restore_detail_pane() {
 }
 
 function show_task_detail(id) {
-  $.get("/api/tasks/"+id+"/?format=json", function ( data ) {
+  $.ajax({
+    method: "GET",
+    url: `${api_endpoint}/tasks/"+id+"/?format=json`,
+    xhrFields: { withCredentials: true },
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      'X-CSRFToken': get_cookie("csrftoken")
+    }
+  }).done(function(data, textStatus, jqXHR) {
       var fields = ['title', 'description', 'dates_detail', 'attachments_detail'];
       $('#task_detail_container').html('');
       for (let i = 0; i < fields.length; i++) {
@@ -146,6 +155,6 @@ function show_task_detail(id) {
             '<div class="task-detail-'+fields[i]+'">'+data[fields[i]]+'</div>'
           );
       }
-  }, 'json');
+  });
 }
 </script>

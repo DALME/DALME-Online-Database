@@ -87,6 +87,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
   {{ data|json_script:"source-data" }}
   {% host_url 'dashboard' host 'db' as db_url %}
+  {% host_url 'api_endpoint' host 'data' as api_url %}
   <script>
     $(document).ready(function() {
 
@@ -208,7 +209,7 @@
         const node = $('#folio-rights');
         node.empty();
         if (pageId) {
-          const endpoint = `{{db_url}}api/pages/${pageId}/get_rights/`;
+          const endpoint = `{{api_url}}pages/${pageId}/get_rights/`;
           $.get(endpoint, function(data) {
             if (data.rights.hasOwnProperty('display_notice')) {
               if (data.rights.display_notice) {
@@ -226,7 +227,7 @@
           const warning = 'This folio has not been transcribed.'
           node.innerHTML = `<div class="warning">${warning}</div>`;
         } else {
-          const endpoint = `{% host_url 'api_endpoint:transcriptions-list' host 'db' %}${transcriptionId}?format=json`;
+          const endpoint = `{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${transcriptionId}?format=json`;
           const tei = new CETEI();
           tei.addBehaviors(teiBehaviours);
           $.get(endpoint, function(data) {

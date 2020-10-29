@@ -67,11 +67,11 @@
         $('#dataTables-lists_wrapper').find('.dt-btn-group').append('<button class="btn dt-btn" id="btn-addlist" type="button" onclick="create_task_list()"><i class="fa fa-plus fa-sm"></i> Create List</button>');
         table_lists.on('select', function ( e, dt, type, indexes ) {
           if (typeof dt != 'undefined') {
-            table_tasks.ajax.url("/api/tasks/?format=json&filter=task_list," + dt.id()).draw();
+            table_tasks.ajax.url(`${api_endpoint}/tasks/?format=json&filter=task_list,${dt.id()}`).draw();
           }
         });
         table_lists.on('deselect', function ( e, dt, type, indexes ) {
-          table_tasks.ajax.url("/api/tasks/?format=json").draw();
+          table_tasks.ajax.url(`${api_endpoint}/tasks/?format=json`).draw();
         });
     });
 </script>

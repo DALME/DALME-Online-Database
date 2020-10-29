@@ -7,7 +7,7 @@
 <script>
   $('#dataTables-tickets').DataTable({
   'ajax': {
-    'url': "/api/tickets/?format=json&filter=creation_user," + user['id'],
+    'url': `${api_endpoint}/tickets/?format=json&filter=creation_user,${user['id']}`,
     'data': function (data) { return { "data": JSON.stringify( data ) }; }
   },
   serverSide: true,
