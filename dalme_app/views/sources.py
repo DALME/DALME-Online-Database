@@ -22,11 +22,11 @@ class SourceList(DALMEListView):
 
     def get_breadcrumb(self):
         _class = self.request.GET['class']
-        return [('Sources', ''), (_class.capitalize().replace('-', ' '), '/sources?class=' + _class)]
+        return [('Sources', ''), (_class.capitalize().replace('-', ' '), f'/sources?class={_class}')]
 
     def get_dt_config(self):
         _class = self.request.GET['class']
-        return 'sources_' + _class
+        return f'sources_{_class}'
 
 
 @method_decorator(login_required, name='dispatch')

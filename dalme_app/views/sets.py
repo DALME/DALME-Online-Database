@@ -14,17 +14,17 @@ class SetList(DALMEListView):
     editor = 'true'
     includes = None
 
-    def get_config(self, *args, **kwargs):
+    def get_page_title(self):
         type = self.request.GET['type']
-        return {
-            'page_title': type.capitalize(),
-            'dt_config': 'sets_' + type,
-            'breadcrumb': [('Sets', ''), (type.capitalize(), '/sets/?type=' + type)],
-            'helpers': self.helpers,
-            'includes': self.includes,
-            'form_template': self.form_template,
-            'editor': self.editor
-            }
+        return type.capitalize()
+
+    def get_breadcrumb(self):
+        type = self.request.GET['type']
+        return [('Sets', ''), (type.capitalize(), f'/sets/?type={type}')]
+
+    def get_dt_config(self):
+        type = self.request.GET['type']
+        return f'sets_{type}'
 
 
 @method_decorator(login_required, name='dispatch')
