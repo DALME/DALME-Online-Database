@@ -55,8 +55,8 @@ def get_script_menu():
             "type": "danger"
         },
         {
-            "name": "fix_workflow",
-            "description": "Ensures that there is a workflow record for every source with a list.",
+            "name": "remove_11600",
+            "description": "Removes dam_id from pages for which the current value is 11600",
             "type": "danger"
         },
         {
@@ -191,16 +191,13 @@ def import_languages(request):
     return 'okay'
 
 
-def fix_workflow(request):
-    inventories = Source.objects.filter(has_inventory=True)
-    lst = []
-    lst.append(inventories.count())
-    for i in inventories:
-        try:
-            lst.append(i.workflow.wf_status)
-        except Workflow.DoesNotExist:
-            lst.append(i.id)
-    return lst
+def remove_11600(request):
+    pages = Page.objects.filter(dam_id=11600)
+    for page in pages:
+        page.dam_id = None
+        page.save()
+    return 'Done'
+
 
 def migrate_datasets(request):
     owner = User.objects.get(pk=5)
@@ -239,19 +236,8 @@ def migrate_datasets(request):
 
 
 def test_expression(request):
-    pages = Page.objects.exclude(dam_id__isnull=True)
-    errors = []
-    for page in pages:
-        try:
-            dam_id = int(page.dam_id)
-        except ValueError:
-            errors.append(page.id)
-            continue
-        if rs_resource.objects.filter(ref=dam_id).exists():
-            rs_image = rs_resource.objects.get(ref=page.dam_id)
-            rs_image.field79 = page.name
-            rs_image.save()
-    return errors
+    source = Source.objects.get(pk='be296e02-8d6b-40e4-befe-a7616f3f5e01')
+    return','.join([str(set['set_id_id']) for set in source.sets.all().values()])
 
 
 def fix_users(records):
@@ -266,7 +252,9 @@ def fix_users(records):
 
 
 def test_expression2(request):
-    return str(settings.ALLOWED_HOSTS)
+    source = Source.objects.all()[0]
+    page = source.pages.exclude(dam_id__isnull=True).first()
+    return page.dam_id
 
 
 def test_function():
