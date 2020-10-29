@@ -1,5 +1,0 @@
-{{ object.subject }}
-{{ object.description }}
-{% for comm in object.comments.all %}
-  {{ comm.body }}
-{% endfor %}

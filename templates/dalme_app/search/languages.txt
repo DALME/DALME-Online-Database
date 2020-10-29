@@ -1,4 +1,0 @@
-{{ object.name }}
-{{ object.get_type_display }}
-{{ object.glottocode }}
-{{ object.iso6393 }}

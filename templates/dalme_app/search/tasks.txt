@@ -1,7 +1,0 @@
-{{ object.title }}
-{{ object.task_list.name }}
-{{ object.description }}
-{{ object.workset.name }}
-{% for comm in object.comments.all %}
-  {{ comm.body }}
-{% endfor %}

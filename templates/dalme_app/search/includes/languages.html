@@ -1,9 +1,0 @@
-{% load highlight %}
-<div class="search-result-entry">
-    <a class="search-result-link" href="/languages">{{ result.object.name }}</a>
-    <div class="search-result-detail">{{ result.object.get_type_display }} | Codes: {{ result.object.glottocode }} | {{ result.object.iso6393 }}
-      {% if esult.object.parent %}
-        Parent: {{ result.object.parent.name }}
-      {% endif %}
-    </div>
-</div>

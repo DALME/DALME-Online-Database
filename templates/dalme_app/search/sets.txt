@@ -1,8 +1,0 @@
-{{ object.name }}
-{{ object.get_set_type_display }}
-{{ object.description }}
-{{ object.stat_title }}
-{{ object.stat_text }}
-{% for comm in object.comments.all %}
-  {{ comm.body }}
-{% endfor %}
