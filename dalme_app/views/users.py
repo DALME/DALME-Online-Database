@@ -3,14 +3,11 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormMixin
-from django.views.generic import DetailView
-from dalme_app.utils import DALMEMenus as dm
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from ._common import DALMEListView, get_page_chain
+from ._common import DALMEListView, DALMEDetailView
 from dalme_app.forms import preference_form_builder
 from dalme_app.forms import UserPreferenceForm
-from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
@@ -23,10 +20,11 @@ class UserList(DALMEListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class UserDetail(FormMixin, DetailView):
+class UserDetail(FormMixin, DALMEDetailView):
     model = User
     template_name = 'dalme_app/user_detail.html'
     form_class = UserPreferenceForm
+    breadcrumb = [('System', ''), ('Users', '/users')]
 
     def get_form_class(self, *args, **kwargs):
         form_class = preference_form_builder(self.form_class, instance=self.request.user)
@@ -34,18 +32,8 @@ class UserDetail(FormMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(UserDetail, self).get_context_data(*args, **kwargs)
-        context['api_endpoint']: settings.API_ENDPOINT
-        if self.request.GET.get('preferences') is not None:
-            context['preferences'] = True
-        breadcrumb = [('System', ''), ('Users', '/users')]
-        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
-        context['sidebar_toggle'] = sidebar_toggle
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = dm(self.request, state).dropdowns
-        context['sidebar'] = dm(self.request, state).sidebar
-        page_title = self.object.profile.full_name
-        context['page_title'] = page_title
-        context['page_chain'] = get_page_chain(breadcrumb, page_title)
+        preferences = True if self.request.GET.get('preferences') is not None else False
+
         user_data = {
             'First name': self.object.first_name,
             'Last name': self.object.last_name,
@@ -58,10 +46,15 @@ class UserDetail(FormMixin, DetailView):
             'Last login': timezone.localtime(self.object.last_login).strftime('%d %B, %Y @ %H:%M').lstrip("0").replace(" 0", " "),
             'Groups': ', '.join([i.name for i in self.object.groups.all()])
         }
-        context['user_data'] = user_data
-        context['image_url'] = self.object.profile.profile_image
-        context['form'] = self.get_form()
-        context['section_list'] = [i[0] for i in self.form_class.registry.section_objects.items()]
+
+        context.update({
+            'preferences': preferences,
+            'user_data': user_data,
+            'image_url': self.object.profile.profile_image,
+            'form': self.get_form(),
+            'section_list': [i[0] for i in self.form_class.registry.section_objects.items()]
+        })
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -77,6 +70,9 @@ class UserDetail(FormMixin, DetailView):
     def form_valid(self, form):
         form.update_preferences()
         return super(UserDetail, self).form_valid(form)
+
+    def get_page_title(self):
+        return self.object.profile.full_name
 
     def get_object(self):
         try:

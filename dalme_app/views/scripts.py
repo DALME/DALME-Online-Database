@@ -1,29 +1,19 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
-from dalme_app.utils import DALMEMenus as dm
-from ._common import get_page_chain
+from ._common import DALMEContextMixin
 from dalme_app import custom_scripts
-from django.conf import settings
 
 
 @method_decorator(login_required, name='dispatch')
-class Scripts(TemplateView):
+class Scripts(TemplateView, DALMEContextMixin):
     template_name = 'dalme_app/scripts.html'
+    breadcrumb = [('Tools', ''), ('Scripts', '/scripts')]
+    page_title = 'Custom Scripts'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['api_endpoint']: settings.API_ENDPOINT
-        breadcrumb = [('Tools', ''), ('Scripts', '/scripts')]
-        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['sidebar_toggle'] = sidebar_toggle
-        context['dropdowns'] = dm(self.request, state).dropdowns
-        context['sidebar'] = dm(self.request, state).sidebar
         context['scripts'] = custom_scripts.get_script_menu()
-        page_title = 'Custom Scripts'
-        context['page_title'] = page_title
-        context['page_chain'] = get_page_chain(breadcrumb, page_title)
         if self.request.GET.get('s') is not None:
             context['output'] = eval('custom_scripts.'+self.request.GET['s']+'(self.request)')
         return context

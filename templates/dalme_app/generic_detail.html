@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static i18n %}
+{% load static i18n template_helpers %}
 {% load compress %}
 {% block extra_head %}
 {% compress js %}
@@ -62,9 +62,13 @@
                           </div>
                       </div>
                     {% endfor %}
-                    {% if comments %}
-                      {% include "dalme_app/includes/comments_box.html" with model=comments object=object_attributes.ID %}
-                    {% endif %}
+                  </div>
+                </div>
+                {% if comments %}
+                  {% with object|get_class_name as model %}
+                    {% include "dalme_app/includes/comments_box.html" with model=model object=object_attributes.ID %}
+                  {% endwith %}
+                {% endif %}
           </div>
           <div class="col-md-4">
             <div class="card mb-3">
@@ -86,7 +90,7 @@
 {% if comments %}
   <script>
     $(document).ready(function() {
-      enable_comments("{{ comments }}", object_id);
+      enable_comments("{{ object|get_class_name }}", object_id);
     });
   </script>
 {% endif %}

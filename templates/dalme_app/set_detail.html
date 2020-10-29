@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static i18n %}
+{% load static i18n template_helpers %}
 {% load compress %}
 {% block extra_head %}
 {% compress js %}
@@ -8,17 +8,17 @@
 {% endcompress %}
 <script>
   var set = {
-    "id": "{{ set.id }}",
-    "name": "{{ set.name }}",
-    "set_type": "{{ set.set_type }}",
-    "is_public": {{ set.is_public|lower|safe }},
-    "has_landing": {{ set.has_landing|lower|safe }},
-    "owner": "{{ set.owner.id }}",
-    "permissions": "{{ set.permissions }}",
-    "description": "{{ set.description }}",
-    "stat_title": "{{ set.stat_title }}",
-    "stat_text": "{{ set.stat_text }}",
-    "dataset_usergroup": "{{ set.dataset_usergroup.id }}"
+    "id": "{{ object.id }}",
+    "name": "{{ object.name }}",
+    "set_type": "{{ object.set_type }}",
+    "is_public": {{ object.is_public|lower|safe }},
+    "has_landing": {{ object.has_landing|lower|safe }},
+    "owner": "{{ object.owner.id }}",
+    "permissions": "{{ object.permissions }}",
+    "description": "{{ object.description }}",
+    "stat_title": "{{ object.stat_title }}",
+    "stat_text": "{{ object.stat_text }}",
+    "dataset_usergroup": "{{ object.dataset_usergroup.id }}"
   }
 </script>
 {% endblock %}
@@ -33,48 +33,39 @@
         <li class="nav-item">
           <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Information</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" id="comments-tab" data-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="true" {% if has_pages %} onclick="switch_tab('comments-tab')" {% endif %}>Comments
-            {% if comments_count > 0 %}
-              <div id="comment_count" class="inline-badge">{{ comments_count }}</div>
-            {% else %}
-              <div id="comment_count"></div>
-            {% endif %}
-          </a>
-        </li>
       </ul>
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab" data-editor-id="{{ set.id }}">
+      <div class="tab-pane card-body active" id="info" role="tabpanel" aria-labelledby="info-tab" data-editor-id="{{ object.id }}">
         <div class="row">
-          <div class="col-md-8">
+          <div class="col-md-7">
               <div class="card mb-3">
                 <div class="sub-card-header">
-                  <div class="card-header-title"><i class="fas fa-folder fa-fw"></i> Set</div>
+                  <div class="card-header-title"><i class="fas fa-folder fa-fw"></i> Set ({{ object.get_set_type_display }})</div>
                   <!-- div id="descriptionEditorToolbar">
-                    <button class="sub-card-button" role="button" onclick="edit_set('{{ set.id }}')">Edit</button>
+                    <button class="sub-card-button" role="button" onclick="edit_set('{{ object.id }}')">Edit</button>
                   </div -->
                 </div>
                 <div class="card-body attribute_list">
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">ID</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.id }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ object.id }}</span></div>
                   </div>
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Name</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.name }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ object.name }}</span></div>
                   </div>
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Type</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.get_set_type_display }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ object.get_set_type_display }}</span></div>
                   </div>
-                  {% if set.set_type == 2 %}
+                  {% if object.set_type == 2 %}
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Public</span></div>
                       <div class="col-sm-9">
                         <span class="attribute_list_value">
-                          {% if set.is_public == 1 %}
+                          {% if object.is_public == 1 %}
                             <i class="fas fa-check-square"></i>
                           {% else %}
                             <i class="far fa-square"></i>
@@ -86,7 +77,7 @@
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Landing</span></div>
                       <div class="col-sm-9">
                         <span class="attribute_list_value">
-                          {% if set.has_landing == 1 %}
+                          {% if object.has_landing == 1 %}
                             <i class="fas fa-check-square"></i>
                           {% else %}
                             <i class="far fa-square"></i>
@@ -97,44 +88,54 @@
                   {% endif %}
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Endpoint</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.endpoint|title }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ object.endpoint|title }}</span></div>
                   </div>
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Owner</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value"><a href="/users/{{ set.owner.username }}">{{ set.owner.profile.full_name }} ({{ set.owner.username }})</a></span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value"><a href="/users/{{ object.owner.username }}">{{ object.owner.profile.full_name }} ({{ object.owner.username }})</a></span></div>
                   </div>
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Permissions</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.get_permissions_display }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ object.get_permissions_display }}</span></div>
                   </div>
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">Description</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.description }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ object.description }}</span></div>
                   </div>
-                  {% if set.set_type == 4 %}
+                  {% if object.set_type == 4 %}
                     <div class="form-row">
                         <div class="col-sm-3 text-right"><span class="attribute_list_label">Progress</span></div>
-                        <div class="col-sm-9"><span class="attribute_list_value">{{ set.workset_progress }}%</span></div>
+                        <div class="col-sm-9"><span class="attribute_list_value">{{ object.workset_progress }}%</span></div>
                     </div>
                   {% endif %}
-                  {% if set.set_type == 3 and set.dataset_usergroup is not None %}
+                  {% if object.set_type == 3 and object.dataset_usergroup is not None %}
                   <div class="form-row">
                       <div class="col-sm-3 text-right"><span class="attribute_list_label">DS User Group</span></div>
-                      <div class="col-sm-9"><span class="attribute_list_value">{{ set.dataset_usergroup.name }}</span></div>
+                      <div class="col-sm-9"><span class="attribute_list_value">{{ object.dataset_usergroup.name }}</span></div>
                   </div>
                   {% endif %}
-                  {% if set.stat_title is not None %}
+                  {% if object.stat_title is not None %}
                     <div class="form-row">
                         <div class="col-sm-3 text-right"><span class="attribute_list_label">Stat Title</span></div>
-                        <div class="col-sm-9"><span class="attribute_list_value">{{ set.stat_title }}</span></div>
+                        <div class="col-sm-9"><span class="attribute_list_value">{{ object.stat_title }}</span></div>
                     </div>
                     <div class="form-row">
                         <div class="col-sm-3 text-right"><span class="attribute_list_label">Stat Text</span></div>
-                        <div class="col-sm-9"><span class="attribute_list_value">{{ set.stat_text }}</span></div>
+                        <div class="col-sm-9"><span class="attribute_list_value">{{ object.stat_text }}</span></div>
                     </div>
                   {% endif %}
                 </div>
               </div>
+          </div>
+          <div class="col-md-5">
+            {% with object|get_class_name as model %}
+              {% include "dalme_app/includes/comments_box.html" with model=model object=object_attributes.ID %}
+            {% endwith %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            {% with object.members.all as members %}
               {% if members %}
               <div class="card mb-3">
                 <div class="table-responsive dt-embed">
@@ -157,25 +158,7 @@
                 </div>
             </div>
             {% endif %}
-          </div>
-          <div class="col-md-4">
-            <div class="card mb-3">
-              <div class="img-placeholder d-flex justify-content-center align-items-center">
-                <i class="d-block fas fa-folder fa-4x mt-5 mb-5"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane card-body transcription-editor pt-4" id="comments" role="tabpanel" aria-labelledby="comments-tab">
-        <div class="comment-box-container d-flex mb-3">
-          <div class="d-inline-block mr-3"><i class="fa fa-comment-medical img_avatar mt-1 fa-2x"></i></div>
-          <div class="comment-card comment-box d-inline-block">
-            <div class="comment-body p-2">
-              <textarea class="form-control form-control-sm comment-textarea" placeholder="Leave a comment..." id="new_comment_text"></textarea>
-              <div class="comment-tip">Click here for formatting options</div>
-            </div>
-            <button class="btn btn-primary ml-auto d-flex mr-2 mb-2" type="button" onclick="create_comment('Set', '{{ set.id }}')">Comment</button>
+          {% endwith %}
           </div>
         </div>
       </div>
@@ -190,34 +173,36 @@
 <script>
   $(document).ready(function() {
     $('#tag-menu').hide();
-    enable_comments("Set", "{{ set.id }}");
+    enable_comments("{{ object|get_class_name }}", "{{ object.id }}");
   });
 </script>
-{% if tables %}
-<script>
-$(document).ready(function() {
-    table_members = $('#dataTables-members').DataTable({
-        "responsive": true,
-        "dom": "<'sub-card-header d-flex'<'card-header-title'>Bfr><'card-body't>",
-        "stateSave": true,
-        "select": { "style": "multi" },
-        "scrollY": "calc(100vh - 600px)",
-        "deferRender": true,
-        "pageLength": {{ members.count }},
-        "rowId": "id",
-        "language": {
-            "searchPlaceholder": "Search",
-            "processing": '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-        },
-        "buttons": [{
-            text: '<i class="fa fa-trash-alt fa-fw"><i>',
-            action: function (e, dt, node, config) {delete_set_members(dt, set['id'])},
-            className: "align-self-end"
-          }]
-      });
-      $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa {{ tables.1 }} fa-fw"></i> {{ tables.2 }}');
-      fix_dt_search();
-  });
-</script>
-{% endif %}
+{% with object.members.all as members %}
+  {% if members %}
+  <script>
+  $(document).ready(function() {
+      table_members = $('#dataTables-members').DataTable({
+          "responsive": true,
+          "dom": "<'sub-card-header d-flex'<'card-header-title'>Bfr><'card-body't>",
+          "stateSave": true,
+          "select": { "style": "multi" },
+          "scrollY": "calc(100vh - 600px)",
+          "deferRender": true,
+          "pageLength": {{ members.count }},
+          "rowId": "id",
+          "language": {
+              "searchPlaceholder": "Search",
+              "processing": '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+          },
+          "buttons": [{
+              text: '<i class="fa fa-trash-alt fa-fw"><i>',
+              action: function (e, dt, node, config) {delete_set_members(dt, set['id'])},
+              className: "align-self-end"
+            }]
+        });
+        $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa fa-plus-square fa-fw"></i> Set Members ({{ members.count }})');
+        fix_dt_search();
+    });
+  </script>
+  {% endif %}
+{% endwith %}
 {% endblock %}

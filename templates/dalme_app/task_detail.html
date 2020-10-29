@@ -10,14 +10,14 @@
 {% endcompress %}
 <script>
   var task = {
-    "title": "{{ task.title }}",
-    "task_list": "{{ task.task_list.id }}",
-    "due_date": "{{ task.due_date|date:'Y-m-d' }}",
-    "assigned_to": "{{ task.assigned_to.id }}",
-    "description": "{{ task.description }}",
-    "workset": "{{ task.workset.id }}",
-    "url": "{{ task.url }}",
-    "file": "{{ task.file.id }}"
+    "title": "{{ object.title }}",
+    "task_list": "{{ object.task_list.id }}",
+    "due_date": "{{ object.due_date|date:'Y-m-d' }}",
+    "assigned_to": "{{ object.assigned_to.id }}",
+    "description": "{{ object.description }}",
+    "workset": "{{ object.workset.id }}",
+    "url": "{{ object.url }}",
+    "file": "{{ object.file.id }}"
   }
 </script>
 {% endblock %}
@@ -35,72 +35,72 @@
     </div>
     <!-- Tab panes -->
     <div class="tab-content h-100">
-      <div class="card-body active" id="info" role="tabpanel" aria-labelledby="info-tab" data-editor-id="{{ task.id }}">
+      <div class="card-body active" id="info" role="tabpanel" aria-labelledby="info-tab" data-editor-id="{{ object.id }}">
         <div class="row">
           <div class="col-md-9">
             <div class="card mb-3">
               <div class="card-body pb-3">
                   <div class="d-flex align-items-center">
-                    <div class="record-title">{{ task.title }}</div>
+                    <div class="record-title">{{ object.title }}</div>
                     {% if perms.dalme_app.can_delete_task %}
-                        <div class="dropdown-task-add ml-auto" onclick="delete_task({{ task.id }})"><i class="fa fa-trash fa-fw"></i></div>
+                        <div class="dropdown-task-add ml-auto" onclick="delete_task({{ object.id }})"><i class="fa fa-trash fa-fw"></i></div>
                     {% endif %}
                     {% if perms.dalme_app.can_change_task %}
-                        <div class="dropdown-task-add" onclick="edit_task({{ task.id }})"><i class="fa fa-pen fa-fw"></i></div>
+                        <div class="dropdown-task-add" onclick="edit_task({{ object.id }})"><i class="fa fa-pen fa-fw"></i></div>
                     {% endif %}
                   </div>
                   <div class="record-title-meta">
-                    <a href="/users/{{ task.created_by.username }}">{{ task.created_by.profile.full_name }}</a> created this task on {{ task.creation_timestamp|date:"j-M-Y" }}
-                    in <a href="/tasks/">{{ task.task_list.name }} ({{ task.task_list.group.name }})</a>
-                    {% if task.comments.count > 0 %}
-                      ・ {{ task.comments.count }} comment{{ task.comments.count|pluralize }}
+                    <a href="/users/{{ object.created_by.username }}">{{ object.created_by.profile.full_name }}</a> created this task on {{ object.creation_timestamp|date:"j-M-Y" }}
+                    in <a href="/tasks/">{{ object.task_list.name }} ({{ object.task_list.group.name }})</a>
+                    {% if object.comments.count > 0 %}
+                      ・ {{ object.comments.count }} comment{{ object.comments.count|pluralize }}
                     {% endif %}
                   </div>
-                  <div class="record-description">{{ task.description }}</div>
-                  {% if task.assigned_to %}
-                  <a class="basic-pill" href="/users/{{ task.assigned_to.username }}">Assigned to {{ task.assigned_to.profile.full_name }}</a>
+                  <div class="record-description">{{ object.description }}</div>
+                  {% if object.assigned_to %}
+                  <a class="basic-pill" href="/users/{{ object.assigned_to.username }}">Assigned to {{ object.assigned_to.profile.full_name }}</a>
                   {% endif %}
-                  {% if task.due_date %}
-                  <span class="basic-pill align-self-end task-{% if task.overdue %}over{% endif %}due">Due on {{ task.due_date }}</span>
+                  {% if object.due_date %}
+                  <span class="basic-pill align-self-end task-{% if object.overdue %}over{% endif %}due">Due on {{ object.due_date }}</span>
                   {% endif %}
               </div>
             </div>
-            {% include "dalme_app/includes/comments_box.html" with model='Task' object=task.id %}
+            {% include "dalme_app/includes/comments_box.html" with model='Task' object=object.id %}
           </div>
           <div class="col-md-3">
             <div class="card mb-3">
               <div class="card-body d-flex">
-                {% if task.completed %}
-                  <div class="task-detail-status">Completed: {{ task.completed_date }}</div>
-                  <div class="button-pointer d-inline-block ml-auto" id="task_{{ task.id }}" onclick="task_change_state({{ task.id }}, 'mark_undone')">
+                {% if object.completed %}
+                  <div class="task-detail-status">Completed: {{ object.completed_date }}</div>
+                  <div class="button-pointer d-inline-block ml-auto" id="task_{{ object.id }}" onclick="task_change_state({{ object.id }}, 'mark_undone')">
                     <i class="far fa-check-square fa-lg"></i>
                   </div>
                 {% else %}
                   <div class="task-detail-status">Not completed.</div>
-                  <div class="button-pointer d-inline-block ml-auto" id="task_{{ task.id }}" onclick="task_change_state({{ task.id }}, 'mark_done')">
+                  <div class="button-pointer d-inline-block ml-auto" id="task_{{ object.id }}" onclick="task_change_state({{ object.id }}, 'mark_done')">
                     <i class="far fa-square fa-lg"></i>
                   </div>
                 {% endif %}
               </div>
             </div>
-            {% if task.workset or task.url or task.file %}
+            {% if object.workset or object.url or object.file %}
             <div class="card mb-3">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-paperclip fa-fw"></i> Attachments</div>
               </div>
                 <div class="card-body p-2">
-                  {% if task.workset %}
+                  {% if object.workset %}
                       <div class="attachment-container-body">
                         <div class="attachment-container-header">
                             <div class="attachment-container-icon"><i class="fa fa-folder fa-fw"></i></div>
-                            <div class="attachment-container-label">Endpoint: {{ task.workset.endpoint }}</div>
+                            <div class="attachment-container-label">Endpoint: {{ object.workset.endpoint }}</div>
                         </div>
                         <div class="p-2">
-                            <a href="/sets/{{ task.workset.id }}" class="workset-title">{{ task.workset.name }}</a>
-                            {% widthratio task.workset.progress 100 360 as angle %}
+                            <a href="/sets/{{ object.workset.id }}" class="workset-title">{{ object.workset.name }}</a>
+                            {% widthratio object.workset.progress 100 360 as angle %}
                             {% if angle|add:"0" <= 180 %}
                               <div class="pie-wrapper">
-                                <span class="label">{{ task.workset.progress|floatformat:"0" }}<span class="smaller">%</span></span>
+                                <span class="label">{{ object.workset.progress|floatformat:"0" }}<span class="smaller">%</span></span>
                                 <div class="pie">
                                   <div class="left-side half-circle" style="transform:rotate({{ angle }}deg);"></div>
                                   <div class="right-side half-circle" style="display:none;"></div>
@@ -108,25 +108,25 @@
                               </div>
                             {% else %}
                               <div class="pie-wrapper">
-                                <span class="label">{{ task.workset.progress|floatformat:"0" }}<span class="smaller">%</span></span>
+                                <span class="label">{{ object.workset.progress|floatformat:"0" }}<span class="smaller">%</span></span>
                                 <div class="pie" style="clip:rect(auto, auto, auto, auto);">
                                   <div class="left-side half-circle" style="transform:rotate({{ angle }}deg);"></div>
                                   <div class="right-side half-circle" style="transform:rotate(180deg);"></div>
                                 </div>
                               </div>
                             {% endif %}
-                            <div class="workset-text">{{ task.workset.description }}</div>
+                            <div class="workset-text">{{ object.workset.description }}</div>
                         </div>
                       </div>
                   {% endif %}
-                  {% if task.url %}
-                        <a href="{{ task.url }}" class="pill-url d-flex align-items-center">
+                  {% if object.url %}
+                        <a href="{{ object.url }}" class="pill-url d-flex align-items-center">
                           <div class="pill-url-icon"><i class="fa fa-link fa-fw"></i></div>
-                          <div class="pill-url-label">{{ task.url }}</div>
+                          <div class="pill-url-label">{{ object.url }}</div>
                         </a>
                   {% endif %}
-                  {% if task.file %}
-                    {{ task.file.preview | safe }}
+                  {% if object.file %}
+                    {{ object.file.preview | safe }}
                   {% endif %}
               </div>
             </div>
@@ -140,10 +140,10 @@
 {% block extra_scripts %}
 <script>
   $(document).ready(function() {
-      enable_comments('Task', {{ task.id }});
+      enable_comments('Task', {{ object.id }});
   });
 </script>
-{% if task.file %}
+{% if object.file %}
 <script>
   $(document).ready(function() {
       new Luminous(document.querySelector('.attachment-file-image'), { sourceAttribute: "src" });

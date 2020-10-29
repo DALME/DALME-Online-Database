@@ -1,13 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView
-from dalme_app.utils import DALMEMenus as dm
 from dalme_app.models import rs_resource, rs_collection_resource, rs_resource_data, rs_user
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from django.conf import settings
-from ._common import DALMEListView, get_page_chain
+from ._common import DALMEListView, DALMEDetailView
 
 
 @method_decorator(login_required, name='dispatch')
@@ -18,22 +15,15 @@ class ImageList(DALMEListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ImageDetail(DetailView):
+class ImageDetail(DALMEDetailView):
     model = rs_resource
     template_name = 'dalme_app/image_detail.html'
+    breadcrumb = [('Sources', ''), ('DAM Images', '/images')]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['api_endpoint']: settings.API_ENDPOINT
-        breadcrumb = [('Sources', ''), ('DAM Images', '/images')]
-        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
-        context['sidebar_toggle'] = sidebar_toggle
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = dm(self.request, state).dropdowns
-        context['sidebar'] = dm(self.request, state).sidebar
-        page_title = 'DAM Image ' + str(self.object.ref)
-        context['page_title'] = page_title
-        context['page_chain'] = get_page_chain(breadcrumb, page_title)
+
+        tables = []
         image_data = {
             'DAM Id': self.object.ref,
             'Created': timezone.localtime(self.object.creation_date).strftime('%d-%b-%Y@%H:%M'),
@@ -43,8 +33,12 @@ class ImageDetail(DetailView):
             'Filesize': self.object.file_size,
             'Image?': '<i class="fa fa-check-circle dt_checkbox_true"></i>' if self.object.has_image else '<i class="fa fa-times-circle dt_checkbox_false"></i>'
         }
-        context['image_data'] = image_data
-        tables = []
+
+        context.update({
+            'image_data': image_data,
+            'image_url': self.object.get_preview_url(),
+        })
+
         if rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field').exists():
             attribute_data = []
             attributes = rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field')
@@ -59,6 +53,7 @@ class ImageDetail(DetailView):
                 }
                 attribute_data.append(d)
             context['attribute_data'] = attribute_data
+
         if rs_collection_resource.objects.filter(resource=self.object.ref).exists():
             collections = []
             col_list = rs_collection_resource.objects.filter(resource=self.object.ref)
@@ -79,23 +74,29 @@ class ImageDetail(DetailView):
                 collections.append(d)
             context['collections'] = collections
             tables.append(['collections', 'fa-th-large', 'Collections'])
+
         if tables != []:
-            context['tables'] = tables
-            context['table_options'] = {
-                'responsive': 'true',
-                'dom': '''"<'sub-card-header d-flex'<'card-header-title'>fr><'card-body't>"''',
-                'stateSave': 'true',
-                'select': {'style': 'single'},
-                'scrollY': 150,
-                'deferRender': 'true',
-                'scroller': 'true',
-                'language': {
-                    'searchPlaceholder': 'Search',
-                    'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
-                    },
-                }
-        context['image_url'] = self.object.get_preview_url()
+            context.update({
+                'tables': tables,
+                'table_options': {
+                    'responsive': 'true',
+                    'dom': '''"<'sub-card-header d-flex'<'card-header-title'>fr><'card-body't>"''',
+                    'stateSave': 'true',
+                    'select': {'style': 'single'},
+                    'scrollY': 150,
+                    'deferRender': 'true',
+                    'scroller': 'true',
+                    'language': {
+                        'searchPlaceholder': 'Search',
+                        'processing': '<div class="spinner-border ml-auto mr-auto" role="status"><span class="sr-only">Loading...</span></div>'
+                        },
+                    }
+            })
+
         return context
+
+    def get_page_title(self):
+        return 'DAM Image: {}'.format(str(self.object.ref))
 
     def get_object(self):
         try:

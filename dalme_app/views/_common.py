@@ -1,28 +1,21 @@
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, ContextMixin
+from django.views.generic import DetailView
 from django.conf import settings
 from dalme_app.utils import DALMEMenus as dm
 
 
-@method_decorator(login_required, name='dispatch')
-class DALMEListView(TemplateView):
-    template_name = 'dalme_app/list-views.html'
+class DALMEContextMixin(ContextMixin):
+    breadcrumb = None
     page_title = None
-    dt_config = None
-    breadcrumb = []
-    helpers = None
-    includes = None
-    editor = 'true'
-    form_template = None
+    comments = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        config = self.get_config()
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
-
+        page_title = self.get_page_title()
+        breadcrumb = self.get_breadcrumb()
         state = {
-            'breadcrumb': config['breadcrumb'],
+            'breadcrumb': breadcrumb,
             'sidebar': sidebar_toggle
         }
 
@@ -31,27 +24,52 @@ class DALMEListView(TemplateView):
             'sidebar_toggle': sidebar_toggle,
             'dropdowns': dm(self.request, state).dropdowns,
             'sidebar': dm(self.request, state).sidebar,
-            'page_title': config['page_title'],
-            'page_chain': get_page_chain(config['breadcrumb'], config['page_title']),
-            'config': config['dt_config'],
-            'helpers': config['helpers'],
-            'includes': config['includes'],
-            'form_template': config['form_template'],
-            'editor': config['editor'],
+            'page_title': page_title,
+            'page_chain': get_page_chain(breadcrumb, page_title),
+            'comments': self.comments
         })
 
         return context
 
-    def get_config(self, *args, **kwargs):
-        return {
-            'page_title': self.page_title,
-            'dt_config': self.dt_config,
-            'breadcrumb': self.breadcrumb,
+    def get_page_title(self):
+        return self.page_title
+
+    def get_breadcrumb(self):
+        return self.breadcrumb
+
+
+class DALMEDetailView(DetailView, DALMEContextMixin):
+    template_name = 'dalme_app/generic_detail.html'
+
+    def get_page_title(self):
+        return '{}: {}'.format(self.page_title, self.object.name) if self.page_title else self.object.name
+
+
+class DALMEListView(TemplateView, DALMEContextMixin):
+    template_name = 'dalme_app/list-views.html'
+    page_title = None
+    dt_config = None
+    breadcrumb = None
+    helpers = None
+    includes = None
+    editor = 'true'
+    form_template = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'config': self.get_dt_config(),
             'helpers': self.helpers,
             'includes': self.includes,
             'form_template': self.form_template,
-            'editor': self.editor
-            }
+            'editor': self.editor,
+        })
+
+        return context
+
+    def get_dt_config(self):
+        return self.dt_config
 
 
 def get_page_chain(breadcrumb, current=None):

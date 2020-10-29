@@ -2,13 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import DetailView
-from dalme_app.utils import DALMEMenus as dm
 from dalme_app.models import RightsPolicy, Set, Source
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
-from ._common import DALMEListView, get_page_chain
-from django.conf import settings
+from ._common import DALMEListView, DALMEDetailView
 
 
 @method_decorator(login_required, name='dispatch')
@@ -31,28 +28,11 @@ class SetList(DALMEListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class SetsDetail(DetailView):
+class SetsDetail(DALMEDetailView):
     model = RightsPolicy
     template_name = 'dalme_app/set_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['api_endpoint']: settings.API_ENDPOINT
-        breadcrumb = [('Project', ''), ('Sets', '/sets')]
-        sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
-        context['sidebar_toggle'] = sidebar_toggle
-        state = {'breadcrumb': breadcrumb, 'sidebar': sidebar_toggle}
-        context['dropdowns'] = dm(self.request, state).dropdowns
-        context['sidebar'] = dm(self.request, state).sidebar
-        page_title = self.object.name
-        context['page_title'] = page_title
-        context['page_chain'] = get_page_chain(breadcrumb, page_title)
-        context['set'] = self.object
-        context['comments_count'] = self.object.comments.count()
-        members = self.object.members.all()
-        context['members'] = members
-        context['tables'] = ['members', 'fa-plus-square', 'Set Members ({})'.format(members.count())]
-        return context
+    breadcrumb = [('Project', ''), ('Sets', '/sets')]
+    comments = True
 
     def get_object(self):
         try:
