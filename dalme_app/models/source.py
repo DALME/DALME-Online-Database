@@ -117,10 +117,13 @@ class Source(index.Indexed, dalmeUuidOwned):
 
     def get_credit_line(self):
         def get_people_string(_list):
-            if len(_list) > 1:
-                return '{}, and {}'.format(', '.join(_list[:-1]), _list[-1])
-            else:
+            if len(_list) == 1:
                 return '{}'.format(_list[0])
+            elif len(_list) == 2:
+                return '{} and {}'.format(_list[0], _list[1])
+            else:
+                return '{}, and {}'.format(', '.join(_list[:-1]), _list[-1])
+
         try:
             editors = [i.agent.standard_name for i in self.credits.all() if i.type == 1]
             corrections = [i.agent.standard_name for i in self.credits.all() if i.type == 2]
