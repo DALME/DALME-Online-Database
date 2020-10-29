@@ -61,14 +61,23 @@ function startEditor() {
           $('#author').html('No transcription available');
           tr_text = '';
       } else {
-          $.get("/api/transcriptions/"+folio_array[0].tr_id+"?format=json", function (data) {
-              tr_text = data.transcription;
-              tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
-                  $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
-              });
-              $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-              $('#author').html('Transcribed by '+data.author);
-          }, 'json');
+          $.ajax({
+            method: "GET",
+            url: `${api_endpoint}/transcriptions/${folio_array[0].tr_id}/?format=json`,
+            xhrFields: { withCredentials: true },
+            crossDomain: true,
+            headers: {
+              "Content-Type": "application/json",
+              'X-CSRFToken': get_cookie("csrftoken")
+            }
+          }).done(function(data, textStatus, jqXHR) {
+            tr_text = data.transcription;
+            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+                $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
+            });
+            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+            $('#author').html('Transcribed by '+data.author);
+          });
       };
       $('.panel-top').resizable({
           handles: {s: '.splitter-horizontal'},
@@ -186,30 +195,39 @@ function changeEditorFolio(target) {
         folio_idx = target;
         $(document.body).css('cursor', 'default');
     } else {
-        $.get("/api/transcriptions/"+folio_array[target].tr_id+"?format=json", function (data) {
-            tr_text = data.transcription;
-            if (editor_mode == 'render') {
-                tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
-                    $('#editor').html(text);
-                });
-                $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-            } else if (editor_mode == 'xml') {
-                saveEditor();
-                xmleditor.session.setValue(tr_text);
-                xmleditor.session.getUndoManager().reset();
-                updateEditorToolbar();
-            }
-            $('#author').html('Transcribed by '+data.author);
-            $('#btn_prevFolio').attr('value', prev);
-            $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
-            $('#folio-menu').find('.current-folio').removeClass('current-folio');
-            $('#folio-menu').find('#'+target).addClass('current-folio');
-            $('#btn_nextFolio').attr('value', next);
-            updateFolioButtons();
-            changeEditorImage(target);
-            folio_idx = target;
-            $(document.body).css('cursor', 'default');
-        });
+      $.ajax({
+        method: "GET",
+        url: `${api_endpoint}/transcriptions/${folio_array[target].tr_id}/?format=json`,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        }
+      }).done(function(data, textStatus, jqXHR) {
+        tr_text = data.transcription;
+        if (editor_mode == 'render') {
+            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+                $('#editor').html(text);
+            });
+            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+        } else if (editor_mode == 'xml') {
+            saveEditor();
+            xmleditor.session.setValue(tr_text);
+            xmleditor.session.getUndoManager().reset();
+            updateEditorToolbar();
+        }
+        $('#author').html('Transcribed by '+data.author);
+        $('#btn_prevFolio').attr('value', prev);
+        $('#btn_selectFolio').text("Folio "+folio_array[target].name+" ("+(target+1)+"/"+total+")");
+        $('#folio-menu').find('.current-folio').removeClass('current-folio');
+        $('#folio-menu').find('#'+target).addClass('current-folio');
+        $('#btn_nextFolio').attr('value', next);
+        updateFolioButtons();
+        changeEditorImage(target);
+        folio_idx = target;
+        $(document.body).css('cursor', 'default');
+      });
     }
   }
 }
@@ -293,10 +311,12 @@ function saveEditor() {
     var page = folio_array[folio].id
     var source = source_id;
     if (id != 'None') {
-      var url = "/api/transcriptions/"+id+"/";
+      var url = `${api_endpoint}/transcriptions/${id}/`;
       $.ajax({
         method: "PUT",
         url: url,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
         headers: {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
@@ -312,10 +332,12 @@ function saveEditor() {
         }
       });
     } else {
-      var url = "/api/transcriptions/";
+      var url = `${api_endpoint}/transcriptions/`;
       $.ajax({
         method: "POST",
         url: url,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
         headers: {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
@@ -364,7 +386,9 @@ function setTagMenu(action) {
       if (typeof tag_menu_html == 'undefined') {
           $.ajax({
             method: "POST",
-            url: "/api/configs/get/",
+            url: `${api_endpoint}/configs/get/`,
+            xhrFields: { withCredentials: true },
+            crossDomain: true,
             headers: {
               "Content-Type": "application/json",
               'X-CSRFToken': get_cookie("csrftoken")
@@ -611,7 +635,9 @@ function saveDescription() {
     if (confirm("Save changes and exit? This action cannot be undone.")) {
       $.ajax({
         method: "PATCH",
-        url: "/api/sources/"+source_id+"/change_description/",
+        url: `${api_endpoint}/sources/${source_id}/change_description/`,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
         headers: {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
@@ -636,7 +662,7 @@ function saveDescription() {
 //     namedEntityForm = new $.fn.dataTable.Editor( {
 //           ajax: {
 //             method: "POST",
-//             url: "/api/tasklists/",
+//             url: `${api_endpoint}/tasklists/`,
 //             headers: { 'X-CSRFToken': get_cookie("csrftoken") },
 //             data: function (data) { return { "data": JSON.stringify( data ) }; }
 //           },

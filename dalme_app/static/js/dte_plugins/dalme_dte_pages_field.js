@@ -155,7 +155,10 @@ _fieldTypes.dalmePages = {
       if (query !== '') {
         $.ajax({
           method: "GET",
-          url: "/api/images/?search=" + query
+          url: `${api_endpoint}/images/?search=${query}`,
+          xhrFields: { withCredentials: true },
+          crossDomain: true,
+          headers: { 'X-CSRFToken': get_cookie("csrftoken") },
         }).done(function(data, textStatus, jqXHR) {
           if (typeof data != 'string') {
               $('#dam-search-results').removeClass('d-none');

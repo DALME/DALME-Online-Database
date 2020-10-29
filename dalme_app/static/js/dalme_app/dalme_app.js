@@ -90,7 +90,9 @@ function toggle_tooltips(el) {
 function update_workflow(action, code=0) {
     $.ajax({
         method: "PATCH",
-        url: "/api/workflow/"+source_id+"/change_state/",
+        url: `${api_endpoint}/workflow/${source_id}/change_state/`,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
         headers: {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
@@ -148,143 +150,175 @@ function get_cookie(name) {
 }
 
 function create_task_list() {
-  $.get("/api/options/?target=user_groups&format=json", function ( data ) {
-      const groups = data.user_groups;
-      taskListForm = new $.fn.dataTable.Editor( {
-            ajax: {
-              method: "POST",
-              url: "/api/tasklists/",
-              headers: {
-                "Content-Type": "application/json",
-                'X-CSRFToken': get_cookie("csrftoken")
-              },
-              data: function (data) { return { "data": JSON.stringify( data ) }; }
+  $.ajax({
+    method: "GET",
+    url: `${api_endpoint}/options/?target=user_groups&format=json`,
+    xhrFields: { withCredentials: true },
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      'X-CSRFToken': get_cookie("csrftoken")
+    },
+  }).done(function(data, textStatus, jqXHR) {
+    const groups = data.user_groups;
+    taskListForm = new $.fn.dataTable.Editor( {
+          ajax: {
+            method: "POST",
+            url: `${api_endpoint}/tasklists/`,
+            xhrFields: { withCredentials: true },
+            crossDomain: true,
+            headers: {
+              "Content-Type": "application/json",
+              'X-CSRFToken': get_cookie("csrftoken")
             },
-            fields: [
-              {
-                label: "List name",
-                name: "name",
-                fieldInfo: "Name of the list to be created"
-              },
-              {
-                label: "Group",
-                name:  "group",
-                fieldInfo: "Group of users that will utilize the list",
-                type: "selectize",
-                opts: {'placeholder': "Select user group"},
-                options: groups
-              },
-            ]
-        });
-        taskListForm.on('submitSuccess', function(e, json, data, action) {
-          toastr.success('The task list was created successfully.');
-          if (typeof table_lists != 'undefined') {
-            table_lists.ajax.reload();
-          }
-        });
-        taskListForm.buttons({
-          text: "Create",
-          className: "btn btn-primary",
-          action: function () { this.submit(); }
-        }).title('Create New Task List').create();
-  }, 'json');
+            data: function (data) { return { "data": JSON.stringify( data ) }; }
+          },
+          fields: [
+            {
+              label: "List name",
+              name: "name",
+              fieldInfo: "Name of the list to be created"
+            },
+            {
+              label: "Group",
+              name:  "group",
+              fieldInfo: "Group of users that will utilize the list",
+              type: "selectize",
+              opts: {'placeholder': "Select user group"},
+              options: groups
+            },
+          ]
+      });
+
+      taskListForm.on('open.dalme', function(e, mode, action) {
+        editor_form_setup(e, mode, action, taskListForm)
+      });
+
+      taskListForm.on('close.dalme', function(e) {
+        editor_form_restore(e, taskListForm)
+      });
+
+      taskListForm.on('submitSuccess', function(e, json, data, action) {
+        toastr.success('The task list was created successfully.');
+        if (typeof table_lists != 'undefined') {
+          table_lists.ajax.reload();
+        }
+      });
+
+      taskListForm.buttons({
+        text: "Create",
+        className: "btn btn-primary",
+        action: function () { this.submit(); }
+      }).title('Create New Task List').create();
+  });
 }
 
 function create_task() {
-  $.get("/api/options/?target=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
-      const staff = data.active_staff;
-      const worksets = data.user_worksets;
-      const lists = data.user_task_lists;
-      taskForm = new $.fn.dataTable.Editor( {
-            ajax: {
-              method: "POST",
-              url: "/api/tasks/",
-              headers: {
-                "Content-Type": "application/json",
-                'X-CSRFToken': get_cookie("csrftoken")
-              },
-              data: function (data) { return { "data": JSON.stringify( data ) }; }
+  $.ajax({
+    method: "GET",
+    url: `${api_endpoint}/options/?target=active_staff,user_worksets,user_task_lists&format=json`,
+    xhrFields: { withCredentials: true },
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      'X-CSRFToken': get_cookie("csrftoken")
+    },
+  }).done(function(data, textStatus, jqXHR) {
+    const staff = data.active_staff;
+    const worksets = data.user_worksets;
+    const lists = data.user_task_lists;
+    taskForm = new $.fn.dataTable.Editor( {
+          ajax: {
+            method: "POST",
+            url: `${api_endpoint}/tasks/`,
+            xhrFields: { withCredentials: true },
+            crossDomain: true,
+            headers: {
+              "Content-Type": "application/json",
+              'X-CSRFToken': get_cookie("csrftoken")
             },
-            fields: [
-                {
-                  label: "Task",
-                  name:  "title"
-                },
-                {
-                  label: "Description",
-                  name:  "description",
-                  type: "textarea"
-                },
-                {
-                  label: "List",
-                  name:  "task_list",
-                  type: "selectize",
-                  opts: {'placeholder': "Select list"},
-                  fieldInfo: "Task list to which the task should be added",
-                  options: lists
-                },
-                {
-                  label: "Assigned to",
-                  name:  "assigned_to",
-                  type: "selectize",
-                  opts: {'placeholder': "Select user"},
-                  options: staff
-                },
-                {
-                  label: "Due date",
-                  name:  "due_date",
-                  type: "datetime",
-                  format: "YYYY-MM-DD"
-                },
-                {
-                  label: "Workset",
-                  name:  "workset",
-                  fieldInfo: "Workset to be used for the task, if applicable",
-                  type: "selectize",
-                  opts: {'placeholder': "Select workset"},
-                  options: worksets
-                },
-                {
-                  label: "URL",
-                  name:  "url",
-                  fieldInfo: "URL related to the task, if applicable",
-                  type: "text"
-                },
-                {
-                  label: "Attachment",
-                  name:  "file",
-                  fieldInfo: "A file to be attached to the task ",
-                  type: "upload",
-                  ajax: {
-                    method: "POST",
-                    url: "/api/attachments/",
-                    headers: {
-                      "Content-Type": "application/json",
-                      'X-CSRFToken': get_cookie("csrftoken")
-                    },
+            data: function (data) { return { "data": JSON.stringify( data ) }; }
+          },
+          fields: [
+              {
+                label: "Task",
+                name:  "title"
+              },
+              {
+                label: "Description",
+                name:  "description",
+                type: "textarea"
+              },
+              {
+                label: "List",
+                name:  "task_list",
+                type: "selectize",
+                opts: {'placeholder': "Select list"},
+                fieldInfo: "Task list to which the task should be added",
+                options: lists
+              },
+              {
+                label: "Assigned to",
+                name:  "assigned_to",
+                type: "selectize",
+                opts: {'placeholder': "Select user"},
+                options: staff
+              },
+              {
+                label: "Due date",
+                name:  "due_date",
+                type: "datetime",
+                format: "YYYY-MM-DD"
+              },
+              {
+                label: "Workset",
+                name:  "workset",
+                fieldInfo: "Workset to be used for the task, if applicable",
+                type: "selectize",
+                opts: {'placeholder': "Select workset"},
+                options: worksets
+              },
+              {
+                label: "URL",
+                name:  "url",
+                fieldInfo: "URL related to the task, if applicable",
+                type: "text"
+              },
+              {
+                label: "Attachment",
+                name:  "file",
+                fieldInfo: "A file to be attached to the task ",
+                type: "upload",
+                ajax: {
+                  method: "POST",
+                  url: `${api_endpoint}/attachments/`,
+                  headers: {
+                    "Content-Type": "application/json",
+                    'X-CSRFToken': get_cookie("csrftoken")
                   },
-                  display: function ( fileId ) {
-                    return taskForm.file('Attachment', fileId ).filename;
-                  },
-                  clearText: "Remove File",
-                  dragDrop: 'true',
-                  dragDropText: "Drag file here",
-                  uploadText: "Choose file..."
-                }
-            ]
-      });
-      taskForm.on('submitSuccess', function(e, json, data, action) {
-        toastr.success('The task was created successfully.');
-        if (typeof table_tasks != 'undefined') {
-          table_tasks.ajax.reload().draw();
-        }
-      });
-      taskForm.buttons({
-          text: "Create",
-          className: "btn btn-primary",
-          action: function () { this.submit(); }
-        }).title('Create New Task').create();
-  }, 'json');
+                },
+                display: function ( fileId ) {
+                  return taskForm.file('Attachment', fileId ).filename;
+                },
+                clearText: "Remove File",
+                dragDrop: 'true',
+                dragDropText: "Drag file here",
+                uploadText: "Choose file..."
+              }
+          ]
+    });
+    taskForm.on('submitSuccess', function(e, json, data, action) {
+      toastr.success('The task was created successfully.');
+      if (typeof table_tasks != 'undefined') {
+        table_tasks.ajax.reload().draw();
+      }
+    });
+    taskForm.buttons({
+        text: "Create",
+        className: "btn btn-primary",
+        action: function () { this.submit(); }
+      }).title('Create New Task').create();
+  });
 }
 
 function task_set_state(task, state) {
@@ -295,7 +329,9 @@ function task_set_state(task, state) {
     };
     $.ajax({
       method: "PATCH",
-      url: "/api/tasks/"+task+"/set_state/",
+      url: `${api_endpoint}/tasks/${task}/set_state/`,
+      xhrFields: { withCredentials: true },
+      crossDomain: true,
       headers: {
         "Content-Type": "application/json",
         'X-CSRFToken': get_cookie("csrftoken")
@@ -324,7 +360,9 @@ function create_ticket() {
     ticketForm = new $.fn.dataTable.Editor( {
           ajax: {
             method: "POST",
-            url: "/api/tickets/",
+            url: `${api_endpoint}/tickets/`,
+            xhrFields: { withCredentials: true },
+            crossDomain: true,
             headers: {
               "Content-Type": "application/json",
               'X-CSRFToken': get_cookie("csrftoken")
@@ -367,7 +405,7 @@ function create_ticket() {
                 type: "upload",
                 ajax: {
                   method: "POST",
-                  url: "/api/attachments/",
+                  url: `${api_endpoint}/attachments/`,
                   headers: {
                     "Content-Type": "application/json",
                     'X-CSRFToken': get_cookie("csrftoken")
@@ -399,6 +437,8 @@ function update_session(data) {
     $.ajax({
       type : "POST",
       url : "/su/",
+      xhrFields: { withCredentials: true },
+      crossDomain: true,
       headers : {'X-CSRFToken': get_cookie('csrftoken') },
       dataType : "json",
       data : data
@@ -466,25 +506,36 @@ function get_params(sourceURL) {
 }
 
 function enable_comments(model, object) {
-  $.get("/api/comments/?model="+model+"&object="+object+"&format=json", function ( data ) {
-        if (data.results.length > 0) {
-          $('#comments').prepend('<div id="comments-container"></div>');
-          for (let i = 0; i < data.results.length; i++) {
-              var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.results[i].avatar+'</div>';
-              comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
-              comment += '<b>'+data.results[i].user+'</b> commented on '+data.results[i].creation_timestamp+'</div>';
-              comment += '<div class="comment-body">'+data.results[i].body+'</div></div></div>';
-              $('#comments-container').append(comment);
-          }
-        };
-  }, 'json');
+  $.ajax({
+    method: "GET",
+    url: `${api_endpoint}/comments/?model=${model}&object=${object}&format=json`,
+    xhrFields: { withCredentials: true },
+    crossDomain: true,
+    headers: {
+      "Content-Type": "application/json",
+      'X-CSRFToken': get_cookie("csrftoken")
+    }
+  }).done(function(data, textStatus, jqXHR) {
+    if (data.results.length > 0) {
+      $('#comments').prepend('<div id="comments-container"></div>');
+      for (let i = 0; i < data.results.length; i++) {
+          var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.results[i].avatar+'</div>';
+          comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
+          comment += '<b>'+data.results[i].user+'</b> commented on '+data.results[i].creation_timestamp+'</div>';
+          comment += '<div class="comment-body">'+data.results[i].body+'</div></div></div>';
+          $('#comments-container').append(comment);
+      }
+    };
+  });
 }
 
 function create_comment(model, object) {
   var body = $('#new_comment_text').val();
   $.ajax({
         method: "POST",
-        url: "/api/comments/",
+        url: `${api_endpoint}/comments/`,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
         headers: {
           "Content-Type": "application/json",
           'X-CSRFToken': get_cookie("csrftoken")
@@ -516,7 +567,9 @@ function create_comment(model, object) {
 function ticket_set_state(id, action) {
   $.ajax({
     method: "PATCH",
-    url: "/api/tickets/"+id+"/set_state/",
+    url: `${api_endpoint}/tickets/${id}/set_state/`,
+    xhrFields: { withCredentials: true },
+    crossDomain: true,
     headers: {
       "Content-Type": "application/json",
       'X-CSRFToken': get_cookie("csrftoken")

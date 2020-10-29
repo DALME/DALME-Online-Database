@@ -2,14 +2,23 @@ function task_detail() {
 }
 
 function edit_task(id) {
-      $.get("/api/options/?target=active_staff,user_worksets,user_task_lists&format=json", function ( data ) {
+      $.ajax({
+        method: "GET",
+        url: `${api_endpoint}/options/?target=active_staff,user_worksets,user_task_lists&format=json`,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        }
+      }).done(function(data, textStatus, jqXHR) {
           const staff = data.active_staff;
           const worksets = data.user_worksets;
           const lists = data.user_task_lists;
           editTaskForm = new $.fn.dataTable.Editor( {
                 ajax: {
                   method: "PATCH",
-                  url: "/api/tasks/_id_/",
+                  url: `${api_endpoint}/tasks/_id_/`,
                   headers: { 'X-CSRFToken': get_cookie("csrftoken") },
                   data: function (data) { return { "data": JSON.stringify( data ) }; }
                 },
@@ -70,7 +79,7 @@ function edit_task(id) {
                       type: "upload",
                       ajax: {
                         method: "POST",
-                        url: "/api/attachments/",
+                        url: `${api_endpoint}/attachments/`,
                         headers: {
                           "Content-Type": "application/json",
                           'X-CSRFToken': get_cookie("csrftoken")
@@ -104,7 +113,7 @@ function edit_task(id) {
               }
           };
           editTaskForm.open();
-      }, 'json');
+      });
 }
 
 function delete_task(id) {
@@ -112,7 +121,9 @@ function delete_task(id) {
   if (conf == true) {
     $.ajax({
       method: "DELETE",
-      url: "/api/tasks/"+id,
+      url: `${api_endpoint}/tasks/${id}`,
+      xhrFields: { withCredentials: true },
+      crossDomain: true,
       headers: { 'X-CSRFToken': get_cookie("csrftoken") },
     }).done(function(data, textStatus, jqXHR) {
       window.location.href = "/tasks";
@@ -125,7 +136,9 @@ function delete_task(id) {
 function task_change_state(task, action) {
     $.ajax({
       method: "PATCH",
-      url: "/api/tasks/"+task+"/set_state/",
+      url: `${api_endpoint}/tasks/${task}/set_state/`,
+      xhrFields: { withCredentials: true },
+      crossDomain: true,
       headers: {
         "Content-Type": "application/json",
         'X-CSRFToken': get_cookie("csrftoken")

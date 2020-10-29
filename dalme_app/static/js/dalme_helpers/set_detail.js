@@ -2,13 +2,22 @@ function set_detail() {
 }
 
 function edit_set(id) {
-      $.get("/api/options/?target=active_staff,user_groups_1&format=json", function ( data ) {
+      $.ajax({
+        method: "GET",
+        url: `${api_endpoint}/options/?target=active_staff,user_groups_1&format=json`,
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': get_cookie("csrftoken")
+        }
+      }).done(function(data, textStatus, jqXHR) {
           const staff = data.active_staff;
           const usergroups = data.user_groups;
           editSetForm = new $.fn.dataTable.Editor( {
                 ajax: {
                   method: "PATCH",
-                  url: "/api/sets/_id_/",
+                  url: `${api_endpoint}/sets/_id_/`,
                   headers: { 'X-CSRFToken': get_cookie("csrftoken") },
                   data: function (data) { return { "data": JSON.stringify( data ) }; }
                 },
@@ -107,7 +116,7 @@ function edit_set(id) {
               }
           };
           editSetForm.open();
-      }, 'json');
+      });
 }
 
 function change_on_set_type(callback='undefined') {
@@ -130,7 +139,9 @@ function delete_set_members(table, id) {
         };
         $.ajax({
           method: "PATCH",
-          url: "/api/sets/"+id+"/remove_members/",
+          url: `${api_endpoint}/sets/${id}/remove_members/`,
+          xhrFields: { withCredentials: true },
+          crossDomain: true,
           headers: {
             "Content-Type": "application/json",
             'X-CSRFToken': get_cookie("csrftoken")

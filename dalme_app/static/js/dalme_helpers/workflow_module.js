@@ -5,7 +5,9 @@ function workflow_module_load() {
 function workflow_module_init() {
   $.ajax({
     method: "POST",
-    url: "/api/configs/get/",
+    url: `${api_endpoint}/configs/get/`,
+    xhrFields: { withCredentials: true },
+    crossDomain: true,
     headers: {
       "Content-Type": "application/json",
       'X-CSRFToken': get_cookie("csrftoken")

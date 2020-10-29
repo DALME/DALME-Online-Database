@@ -24,7 +24,10 @@ function update_class() {
       dt_table.ajax.url(table_url+url_prop+value).draw();
       $.ajax({
         method: "GET",
-        url: pc_url+value+"/?format=json"
+        url: pc_url+value+"/?format=json",
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
+        headers: { 'X-CSRFToken': get_cookie("csrftoken") }
       }).done(function(data, textStatus, jqXHR) {
         current_class = data;
         $('#parent_class_info').empty();

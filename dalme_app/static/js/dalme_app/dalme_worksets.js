@@ -15,14 +15,16 @@ function ws_next() {
   if (workset['next_id'] != 'none') {
     $.ajax({
       method: "PATCH",
-      url: "/api/sets/"+workset['workset_id']+"/workset_state/",
+      url: `${api_endpoint}/sets/${workset['workset_id']}/workset_state/`,
+      xhrFields: { withCredentials: true },
+      crossDomain: true,
       headers: {
         "Content-Type": "application/json",
         'X-CSRFToken': get_cookie("csrftoken")
       },
       data: JSON.stringify({ "action": "mark_done", "target": workset['current_id']})
     }).done(function(data, textStatus, jqXHR) {
-        let url = '/'+workset['endpoint']+'/'+workset['next_id']+'/?set='+workset['workset_id'];
+        let url = `${api_endpoint}/${workset['endpoint']}/${workset['next_id']}/?set=${workset['workset_id']}`
         window.location.href = url;
     }).fail(function(jqXHR, textStatus, errorThrown) {
       if (errorThrown == "Forbidden") {
@@ -36,7 +38,7 @@ function ws_next() {
 
 function ws_prev() {
   if (workset['prev_id'] != 'none') {
-      let url = '/'+workset['endpoint']+'/'+workset['prev_id']+'/?set='+workset['workset_id'];
+      let url = `${api_endpoint}/${workset['endpoint']}/${workset['prev_id']}/?set=${workset['workset_id']}`;
       window.location.href = url;
   }
 }
@@ -44,7 +46,9 @@ function ws_prev() {
 function ws_mark(action) {
   $.ajax({
     method: "PATCH",
-    url: "/api/sets/"+workset['workset_id']+"/workset_state/",
+    url: `${api_endpoint}/sets/${workset['workset_id']}/workset_state/`,
+    xhrFields: { withCredentials: true },
+    crossDomain: true,
     headers: {
       "Content-Type": "application/json",
       'X-CSRFToken': get_cookie("csrftoken")
@@ -60,6 +64,6 @@ function ws_mark(action) {
 }
 
 function ws_show_list() {
-  let url = '/'+workset['endpoint']+'/?set='+workset['workset_id'];
+  let url = `${api_endpoint}/${workset['endpoint']}/?set=${workset['workset_id']}`;
   window.location.href = url;
 }

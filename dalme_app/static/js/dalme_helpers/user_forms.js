@@ -29,7 +29,9 @@ function reset_password() {
     dt_editor.close();
     $.ajax({
       method: "POST",
-      url: "/api/users/"+user_id+"/reset_password/",
+      url: `${api_endpoint}/users/${user_id}/reset_password/`,
+      xhrFields: { withCredentials: true },
+      crossDomain: true,
       headers: {
         "Content-Type": "application/json",
         'X-CSRFToken': get_cookie("csrftoken")
