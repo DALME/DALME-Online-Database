@@ -66,6 +66,7 @@
     {% compress js %}
       <script type="text/javascript" src="{% static 'js/dalme_app/dalme_app.js' %}"></script>
     {% endcompress %}
+      <script>api_endpoint = "{{ api_endpoint }}";</script>
       <script>
         $(document).ready(function () {
             $(document).click(function (event) {
