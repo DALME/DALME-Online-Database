@@ -123,7 +123,7 @@ class SourceList(ListAPIView):
                 query = MatchPhrasePrefix(text={'query': q})
             else:
                 query = Prefix(text={'value': q})
-            qs = PublicSourceDocument.search().query(query).to_queryset().order_by('name')
+            qs = PublicSourceDocument.search().query(query)[:1000].to_queryset().order_by('name')
         else:
             qs = super().get_queryset(*args, **kwargs).order_by('name')
             qs = qs.filter(type=13, workflow__is_public=True)
