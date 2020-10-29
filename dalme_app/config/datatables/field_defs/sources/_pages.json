@@ -9,6 +9,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/images/?format=select&search="
+    "url": "images/?format=select&search="
   }
 }

@@ -50,7 +50,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/sources/?format=json&class=bibliography&mode=own"
+        "url": "sources/?format=json&class=bibliography&mode=own"
       }
     },
     "overrides": {}
@@ -93,7 +93,7 @@
       "type.id": {
         "options": {
           "type": "api_call",
-          "url": "/api/content-types/?format=select&id__lt=11&search="
+          "url": "content-types/?format=select&id__lt=11&search="
         }
       },
       "name": {
@@ -102,7 +102,7 @@
       "parent.id": {
         "options": {
             "type": "api_call",
-            "url": "/api/sources/?format=select&type__lt=11&search="
+            "url": "sources/?format=select&type__lt=11&search="
         }
       }
     }

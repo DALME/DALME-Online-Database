@@ -36,7 +36,7 @@
     "options": {
       "stateSave": false,
       "ajax": {
-        "url": "/api/sets/?set_type=3&format=json"
+        "url": "sets/?set_type=3&format=json"
       }
     },
     "overrides": {

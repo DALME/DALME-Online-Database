@@ -8,6 +8,6 @@
     },
     "options": {
         "type": "api_call",
-        "url": "/api/countries/?format=select"
+        "url": "countries/?format=select"
     }
 }

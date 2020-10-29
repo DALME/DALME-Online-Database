@@ -40,7 +40,7 @@
     "options": {
       "stateSave": false,
       "ajax": {
-        "url": "/api/sets/?set_type=4&mode=own&format=json"
+        "url": "sets/?set_type=4&mode=own&format=json"
       }
     },
     "overrides": {

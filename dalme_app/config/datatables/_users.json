@@ -56,7 +56,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/users/?format=json"
+        "url": "users/?format=json"
       }
     }
   },

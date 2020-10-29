@@ -46,7 +46,7 @@
     "options": {
       "rowId": "ref",
       "ajax": {
-        "url": "/api/images/?format=json"
+        "url": "images/?format=json"
       }
     }
   },

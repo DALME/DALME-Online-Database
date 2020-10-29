@@ -11,6 +11,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/languages/?format=select&select_type=att&search="
+    "url": "languages/?format=select&select_type=att&search="
   }
 }

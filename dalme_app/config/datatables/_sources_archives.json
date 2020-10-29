@@ -41,7 +41,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/sources/?format=json&class=archives"
+        "url": "sources/?format=json&class=archives"
       },
       "lengthMenu": [
           [ 10, 25, 50, -1 ],

@@ -31,7 +31,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/countries/?format=json"
+        "url": "countries/?format=json"
       }
     }
   },

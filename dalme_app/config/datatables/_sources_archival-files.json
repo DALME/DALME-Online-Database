@@ -61,7 +61,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/sources/?format=json&class=archival_files&mode=own"
+        "url": "sources/?format=json&class=archival_files&mode=own"
       }
     },
     "overrides": {
@@ -127,7 +127,7 @@
       "parent.id": {
         "options": {
             "type": "api_call",
-            "url": "/api/sources/?format=select&type=19&search="
+            "url": "sources/?format=select&type=19&search="
         }
       },
       "attributes.locale.id": {

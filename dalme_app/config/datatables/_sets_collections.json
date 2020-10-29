@@ -42,7 +42,7 @@
     "options": {
       "stateSave": false,
       "ajax": {
-        "url": "/api/sets/?set_type=2&format=json"
+        "url": "sets/?set_type=2&format=json"
       }
     },
     "overrides": {

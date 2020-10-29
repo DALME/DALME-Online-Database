@@ -8,6 +8,6 @@
     },
     "options": {
       "type": "api_call",
-      "url": "/api/choices/?type=model&field=Set.permissions&format=json&search="
+      "url": "choices/?type=model&field=Set.permissions&format=json&search="
     }
 }

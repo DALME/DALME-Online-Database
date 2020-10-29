@@ -28,7 +28,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/locales/?format=json"
+        "url": "locales/?format=json"
       }
     }
   },

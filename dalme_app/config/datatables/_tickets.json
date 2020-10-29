@@ -34,7 +34,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/tickets/?format=json"
+        "url": "tickets/?format=json"
       }
     }
   },

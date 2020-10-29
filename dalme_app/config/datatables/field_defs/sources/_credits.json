@@ -9,7 +9,7 @@
       "valueField": "id",
       "labelField": "standard_name",
       "searchField": ["standard_name", "notes"],
-      "url": "/api/agents/?format=select&search="
+      "url": "agents/?format=select&search="
     },
     "types": {
       "placeholder": "Select type",
@@ -17,7 +17,7 @@
       "valueField": "id",
       "labelField": "name",
       "searchField": ["name"],
-      "url": "/api/choices/?type=model&field=Source_credit.type&format=json&search="
+      "url": "choices/?type=model&field=Source_credit.type&format=json&search="
     }
   }
 }

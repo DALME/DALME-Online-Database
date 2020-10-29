@@ -14,6 +14,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/choices/?type=list&field=ticket.tags&format=json&search="
+    "url": "choices/?type=list&field=ticket.tags&format=json&search="
   }
 }

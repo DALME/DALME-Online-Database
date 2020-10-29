@@ -34,6 +34,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/choices/?type=list&field=attributes.record_type&format=json&search="
+    "url": "choices/?type=list&field=attributes.record_type&format=json&search="
   }
 }

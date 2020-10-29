@@ -28,7 +28,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/agents/?format=json"
+        "url": "agents/?format=json"
       }
     }
   },

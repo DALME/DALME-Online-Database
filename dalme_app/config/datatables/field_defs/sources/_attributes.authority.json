@@ -10,6 +10,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/choices/?type=list&field=attributes.authority&format=json&search="
+    "url": "choices/?type=list&field=attributes.authority&format=json&search="
   }
 }

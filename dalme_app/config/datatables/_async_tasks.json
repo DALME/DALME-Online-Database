@@ -15,7 +15,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/async-tasks/?format=json"
+        "url": "async-tasks/?format=json"
       }
     }
   }

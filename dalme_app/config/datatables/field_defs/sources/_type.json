@@ -8,6 +8,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/content-types/?format=select&search="
+    "url": "content-types/?format=select&search="
   }
 }

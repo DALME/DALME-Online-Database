@@ -38,7 +38,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/rights/?format=json"
+        "url": "rights/?format=json"
       }
     }
   },

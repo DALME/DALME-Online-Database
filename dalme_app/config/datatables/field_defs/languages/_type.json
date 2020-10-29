@@ -8,6 +8,6 @@
   },
   "options": {
     "type": "api_call",
-    "url": "/api/choices/?type=model&field=LanguageReference.type&format=json&q="
+    "url": "choices/?type=model&field=LanguageReference.type&format=json&q="
   }
 }

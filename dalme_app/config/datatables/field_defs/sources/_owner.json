@@ -11,6 +11,6 @@
     },
     "options": {
         "type": "api_call",
-        "url": "/api/users?is_active=True&ordering=first_name&format=select&search="
+        "url": "users?is_active=True&ordering=first_name&format=select&search="
     }
 }

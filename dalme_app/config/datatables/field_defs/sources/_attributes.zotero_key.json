@@ -11,7 +11,7 @@
     },
     "options": {
         "type": "api_call",
-        "url": "/api/library/?format=select&search="
+        "url": "library/?format=select&search="
     },
     "fieldInfo": "Reference in the DALME Zotero Library"
 }

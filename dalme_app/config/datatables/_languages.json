@@ -37,7 +37,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "/api/languages/?format=json"
+        "url": "languages/?format=json"
       }
     }
   },
