@@ -2,9 +2,9 @@ import json
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import RSImageSerializer
+from dalme_api.serializers import RSImageSerializer
 from dalme_app.models import rs_resource, rs_api_query, Source
-from dalme_app.access_policies import ImageAccessPolicy
+from dalme_api.access_policies import ImageAccessPolicy
 from ._common import DALMEBaseViewSet
 from json import JSONDecodeError
 

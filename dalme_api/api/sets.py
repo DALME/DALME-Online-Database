@@ -2,10 +2,10 @@ import json
 from django.db.models import Q, Count
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import SetSerializer
+from dalme_api.serializers import SetSerializer
 from dalme_app.models import Set, Set_x_content, Source
-from dalme_app.access_policies import SetAccessPolicy
-from dalme_app.filters import SetFilter
+from dalme_api.access_policies import SetAccessPolicy
+from dalme_api.filters import SetFilter
 from ._common import DALMEBaseViewSet
 
 

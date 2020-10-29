@@ -2,7 +2,7 @@ from dalme_app.models import Workflow
 from rest_framework import serializers
 from dalme_app.utils import round_timesince
 import datetime
-from dalme_app.serializers.users import UserSerializer
+from dalme_api.serializers.users import UserSerializer
 
 
 class WorkflowSerializer(serializers.ModelSerializer):

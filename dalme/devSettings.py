@@ -75,7 +75,8 @@ CORS_ALLOWED_ORIGINS = [
 
 # CORS_ALLOW_CREDENTIALS = True
 # SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
-ROOT_HOSTCONF = 'dalme.devHosts'
+
+ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.devUrls'
 DEFAULT_HOST = 'public'
 PARENT_HOST = '127.0.0.1.xip.io:8443'

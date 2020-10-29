@@ -4,8 +4,8 @@ from django.http import HttpRequest
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import UserSerializer
-from dalme_app.access_policies import UserAccessPolicy
+from dalme_api.serializers import UserSerializer
+from dalme_api.access_policies import UserAccessPolicy
 from ._common import DALMEBaseViewSet
 
 

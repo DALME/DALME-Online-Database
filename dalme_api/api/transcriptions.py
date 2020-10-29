@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dalme_app.serializers import TranscriptionSerializer
+from dalme_api.serializers import TranscriptionSerializer
 from dalme_app.models import Source_pages, Transcription
-from dalme_app.access_policies import TranscriptionAccessPolicy
+from dalme_api.access_policies import TranscriptionAccessPolicy
 
 
 class Transcriptions(viewsets.ModelViewSet):

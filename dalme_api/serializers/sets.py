@@ -3,8 +3,8 @@ from dalme_app.models import Set
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from ._common import DynamicSerializer
-from dalme_app.serializers.users import UserSerializer
-from dalme_app.serializers.others import GroupSerializer
+from dalme_api.serializers.users import UserSerializer
+from dalme_api.serializers.others import GroupSerializer
 from dalme_app.models._templates import get_current_user
 
 

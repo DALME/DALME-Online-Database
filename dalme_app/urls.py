@@ -5,44 +5,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponse
-from rest_framework import routers
-from dalme_app import api
 from maintenance_mode import urls as maintenance_mode_urls
-
-router = routers.DefaultRouter()
-router.register(r'agents', api.Agents, basename='agents')
-router.register(r'async-tasks', api.AsynchronousTasks, basename='async_tasks')
-router.register(r'attributes', api.Attributes, basename='attributes')
-router.register(r'attribute_types', api.AttributeTypes, basename='attribute_types')
-router.register(r'attachments', api.Attachments, basename='attachments')
-router.register(r'choices', api.Choices, basename='choices')
-router.register(r'comments', api.Comments, basename='comments')
-router.register(r'configs', api.Configs, basename='configs')
-router.register(r'content-classes', api.ContentClasses, basename='content_classes')
-router.register(r'content-types', api.ContentTypes, basename='content_types')
-router.register(r'countries', api.Countries, basename='countries')
-router.register(r'groups', api.Groups, basename='groups')
-router.register(r'images', api.Images, basename='images')
-router.register(r'languages', api.Languages, basename='languages')
-router.register(r'locales', api.Locales, basename='locales')
-router.register(r'pages', api.Pages, basename='pages')
-router.register(r'rights', api.Rights, basename='rights')
-router.register(r'sets', api.Sets, basename='sets')
-router.register(r'sources', api.Sources, basename='sources')
-router.register(r'tasks', api.Tasks, basename='tasks')
-router.register(r'tasklists', api.TaskLists, basename='tasklists')
-router.register(r'tickets', api.Tickets, basename='tickets')
-router.register(r'transcriptions', api.Transcriptions, basename='transcriptions')
-router.register(r'users', api.Users, basename='users')
-router.register(r'workflow', api.WorkflowManager, basename='workflow')
-router.register(r'library', api.Library, basename='library')
 
 urlpatterns = [
     path('maintenance-mode/', include(maintenance_mode_urls)),
     path('accounts/login/', views.DalmeLogin.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('api/', include((router.urls, 'dalme_app'), namespace='api_endpoint')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),

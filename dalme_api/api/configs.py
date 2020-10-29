@@ -3,7 +3,7 @@ import os
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.access_policies import ConfigsAccessPolicy
+from dalme_api.access_policies import ConfigsAccessPolicy
 
 
 class Configs(viewsets.ViewSet):

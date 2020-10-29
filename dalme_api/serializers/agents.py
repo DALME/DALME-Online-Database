@@ -2,7 +2,7 @@
 from django.contrib.auth.models import User
 from dalme_app.models import Agent
 from ._common import DynamicSerializer
-from dalme_app.serializers.users import UserSerializer
+from dalme_api.serializers.users import UserSerializer
 
 
 class AgentSerializer(DynamicSerializer):

@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import PageSerializer
+from dalme_api.serializers import PageSerializer
 from dalme_app.models import Page
-from dalme_app.access_policies import PageAccessPolicy
+from dalme_api.access_policies import PageAccessPolicy
 from ._common import DALMEBaseViewSet
 
 

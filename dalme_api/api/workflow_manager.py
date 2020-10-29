@@ -2,9 +2,9 @@ from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import WorkflowSerializer
+from dalme_api.serializers import WorkflowSerializer
 from dalme_app.models import Workflow, Work_log
-from dalme_app.access_policies import WorkflowAccessPolicy
+from dalme_api.access_policies import WorkflowAccessPolicy
 
 
 class WorkflowManager(viewsets.ModelViewSet):

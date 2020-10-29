@@ -2,7 +2,7 @@ import json
 import os
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dalme_app.access_policies import ChoicesAccessPolicy
+from dalme_api.access_policies import ChoicesAccessPolicy
 from dalme_app.models import *
 
 

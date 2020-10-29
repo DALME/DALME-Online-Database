@@ -1,7 +1,7 @@
 import json
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_api.access_policies import GeneralAccessPolicy
 from dalme_app.utils import zotero
 from django.conf import settings
 

@@ -1,7 +1,7 @@
 from django.db.models import Q
-from dalme_app.serializers import AttributeTypeSerializer, ContentXAttributeSerializer
+from dalme_api.serializers import AttributeTypeSerializer, ContentXAttributeSerializer
 from dalme_app.models import Attribute_type, Content_attributes
-from dalme_app.access_policies import GeneralAccessPolicy
+from dalme_api.access_policies import GeneralAccessPolicy
 from ._common import DALMEBaseViewSet
 
 

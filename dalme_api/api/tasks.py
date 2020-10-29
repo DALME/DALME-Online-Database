@@ -1,9 +1,9 @@
 from django.db.models import Count
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import TaskSerializer, TaskListSerializer
+from dalme_api.serializers import TaskSerializer, TaskListSerializer
 from dalme_app.models import Task, TaskList
-from dalme_app.access_policies import TaskAccessPolicy, TaskListAccessPolicy
+from dalme_api.access_policies import TaskAccessPolicy, TaskListAccessPolicy
 from ._common import DALMEBaseViewSet
 
 

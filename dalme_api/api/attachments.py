@@ -1,9 +1,9 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
-from dalme_app.serializers import AttachmentSerializer
+from dalme_api.serializers import AttachmentSerializer
 from dalme_app.models import Attachment
-from dalme_app.access_policies import AttachmentAccessPolicy
+from dalme_api.access_policies import AttachmentAccessPolicy
 
 
 class Attachments(viewsets.ModelViewSet):

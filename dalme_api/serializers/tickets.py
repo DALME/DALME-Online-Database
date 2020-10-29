@@ -1,6 +1,6 @@
 from dalme_app.models import Ticket
 from rest_framework import serializers
-from dalme_app.serializers.others import TagSerializer
+from dalme_api.serializers.others import TagSerializer
 
 
 class TicketSerializer(serializers.ModelSerializer):

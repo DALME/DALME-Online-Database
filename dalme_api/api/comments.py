@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dalme_app.serializers import CommentSerializer
+from dalme_api.serializers import CommentSerializer
 from dalme_app.models import Comment
-from dalme_app.access_policies import CommentAccessPolicy
+from dalme_api.access_policies import CommentAccessPolicy
 from dalme_app.models import *
 
 

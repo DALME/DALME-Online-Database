@@ -1,7 +1,7 @@
 from dalme_app.models import Content_type
 from rest_framework import serializers
 from ._common import DynamicSerializer
-from dalme_app.serializers.others import AttributeTypeSerializer
+from dalme_api.serializers.others import AttributeTypeSerializer
 
 
 class ContentTypeSerializer(DynamicSerializer):

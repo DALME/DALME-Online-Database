@@ -1,10 +1,10 @@
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import SourceSerializer
+from dalme_api.serializers import SourceSerializer
 from dalme_app.models import Attribute, Attribute_type, Source
-from dalme_app.access_policies import SourceAccessPolicy
-from dalme_app.filters import SourceFilter
+from dalme_api.access_policies import SourceAccessPolicy
+from dalme_api.filters import SourceFilter
 from ._common import DALMEBaseViewSet
 
 

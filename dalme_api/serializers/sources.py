@@ -3,11 +3,11 @@ from dalme_app.models import Agent, Content_attributes, Set, Set_x_content, Sour
 from dalme_app.models._templates import get_current_user
 from rest_framework import serializers
 from ._common import DynamicSerializer, translate_workflow_string
-from dalme_app.serializers.users import UserSerializer
-from dalme_app.serializers.attributes import AttributeSerializer
-from dalme_app.serializers.page import PageSerializer
-from dalme_app.serializers.workflow import WorkflowSerializer
-from dalme_app.serializers.sets import SetSerializer
+from dalme_api.serializers.users import UserSerializer
+from dalme_api.serializers.attributes import AttributeSerializer
+from dalme_api.serializers.page import PageSerializer
+from dalme_api.serializers.workflow import WorkflowSerializer
+from dalme_api.serializers.sets import SetSerializer
 from uuid import UUID
 
 

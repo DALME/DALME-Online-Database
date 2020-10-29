@@ -1,16 +1,16 @@
 from django.contrib.auth.models import Group
 from django_celery_results.models import TaskResult
 
-from dalme_app.serializers import (AgentSerializer, AsyncTaskSerializer, ContentClassSerializer, ContentTypeSerializer,
+from dalme_api.serializers import (AgentSerializer, AsyncTaskSerializer, ContentClassSerializer, ContentTypeSerializer,
                                    CountryReferenceSerializer, GroupSerializer, LanguageReferenceSerializer,
                                    LocaleReferenceSerializer, RightsPolicySerializer, SimpleAttributeSerializer)
 
 from dalme_app.models import (Agent, Attribute, Content_class, Content_type, CountryReference,
                               LanguageReference, LocaleReference, RightsPolicy)
 
-from dalme_app.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy
+from dalme_api.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy
 from ._common import DALMEBaseViewSet
-from dalme_app.filters import ContenTypeFilter
+from dalme_api.filters import ContenTypeFilter
 
 
 class Agents(DALMEBaseViewSet):

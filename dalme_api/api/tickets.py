@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_app.serializers import TicketSerializer
+from dalme_api.serializers import TicketSerializer
 from dalme_app.models import Ticket
-from dalme_app.access_policies import TicketAccessPolicy
+from dalme_api.access_policies import TicketAccessPolicy
 from ._common import DALMEBaseViewSet
 
 
