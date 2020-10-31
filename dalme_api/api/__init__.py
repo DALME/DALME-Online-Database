@@ -3,6 +3,7 @@ from .attribute_types import AttributeTypes # noqa
 from .choices import Choices # noqa
 from .comments import Comments # noqa
 from .configs import Configs # noqa
+from .datasets import Datasets # noqa
 from .images import Images # noqa
 
 from .other import (Agents, AsynchronousTasks, Attributes, ContentClasses, ContentTypes, # noqa

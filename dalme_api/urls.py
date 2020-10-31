@@ -16,9 +16,11 @@ router.register(r'configs', api.Configs, basename='configs')
 router.register(r'content-classes', api.ContentClasses, basename='content_classes')
 router.register(r'content-types', api.ContentTypes, basename='content_types')
 router.register(r'countries', api.Countries, basename='countries')
+router.register(r'datasets', api.Datasets, basename='datasets')
 router.register(r'groups', api.Groups, basename='groups')
 router.register(r'images', api.Images, basename='images')
 router.register(r'languages', api.Languages, basename='languages')
+router.register(r'library', api.Library, basename='library')
 router.register(r'locales', api.Locales, basename='locales')
 router.register(r'pages', api.Pages, basename='pages')
 router.register(r'rights', api.Rights, basename='rights')
@@ -30,9 +32,9 @@ router.register(r'tickets', api.Tickets, basename='tickets')
 router.register(r'transcriptions', api.Transcriptions, basename='transcriptions')
 router.register(r'users', api.Users, basename='users')
 router.register(r'workflow', api.WorkflowManager, basename='workflow')
-router.register(r'library', api.Library, basename='library')
+
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('', include((router.urls, 'dalme_app'), namespace='api_endpoint')),
+    path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
