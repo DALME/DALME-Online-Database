@@ -68,6 +68,10 @@ class BaseAccessPolicy(AccessPolicy):
         return True
 
 
+class PublicAccessPolicy(BaseAccessPolicy):
+    id = 'public-policy'
+
+
 class AgentAccessPolicy(BaseAccessPolicy):
     id = 'agents-policy'
 

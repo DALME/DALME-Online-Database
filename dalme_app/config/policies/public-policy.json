@@ -1,0 +1,7 @@
+[
+  {
+    "action": ["retrieve"],
+    "principal": ["*"],
+    "effect": "allow"
+  }
+]
