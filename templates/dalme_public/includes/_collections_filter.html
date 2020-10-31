@@ -3,29 +3,38 @@
 
 <nav class="secondary collections-filter">
   <ul class="u-flex">
-    {% if page|classname == 'Flat' %}
-    <li>
-      <a href="{% pageurl page.get_parent %}" class="active">Collections</a>
-    </li>
-    {% endif %}
-    <li>
-      <a href="{% routablepageurl page.specific 'search' %}" {% if form %}class="active"{% endif %}>Search</a>
-    </li>
-    {% if page|classname == 'Collection' %}
-      <li>
-        <a href="{% pageurl page %}records/?collection={{ page.pk }}">Browse Collection</a>
-      </li>
-    {% elif page|classname == 'Flat' %}
-      <li>
-        <a href="{% routablepageurl page.get_parent.specific 'records' %}">Browse All</a>
-      </li>
+    {% if page|classname != 'Collections' %}
+        <li>
+          <a href="{% pageurl page.get_parent %}">Collections</a>
+        </li>
+        <li>
+          <a href="{% routablepageurl page.get_parent.specific 'search' %}" {% if search %}class="active"{% endif %}>Search</a>
+        </li>
+            {% if page|classname == 'Collection' %}
+                <li>
+                  <a href="{% pageurl page %}records/?collection={{ page.pk }}">Browse Collection</a>
+                </li>
+            {% else %}
+                <li>
+                  <a href="{% routablepageurl page.get_parent.specific 'records' %}">Browse All</a>
+                </li>
+            {% endif %}
+          <li>
+            <a href="{% routablepageurl page.get_parent.specific 'explore' %}" {% if explore %}class="active"{% endif %}>Explore</a>
+          </li>
     {% else %}
-      <li>
-        <a href="{% routablepageurl page.specific 'records' %}">Browse All</a>
-      </li>
+        <li>
+          <a {% if not search and not explore %}href="" class="active"{% else %}href="{% pageurl page.specific %}"{% endif %}>Collections</a>
+        </li>
+        <li>
+          <a href="{% routablepageurl page.specific 'search' %}" {% if search %}class="active"{% endif %}>Search</a>
+        </li>
+        <li>
+          <a href="{% routablepageurl page.specific 'records' %}">Browse All</a>
+        </li>
+        <li>
+          <a href="{% routablepageurl page.specific 'explore' %}" {% if explore %}class="active"{% endif %}>Explore</a>
+        </li>
     {% endif %}
-    <li>
-      <a href="">Explore</a>
-    </li>
   </ul>
 </nav>

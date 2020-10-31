@@ -636,6 +636,15 @@ class Collections(SearchEnabled):
         ]
         return context
 
+    @route(r'^explore/$', name='explore')
+    def explore(self, request):
+        context = self.get_context(request)
+        context.update({'explore': True})
+
+        return TemplateResponse(
+          request, 'dalme_public/explore.html', context
+        )
+
 
 class Collection(SearchEnabled):
     set_type = DALMESet.COLLECTION

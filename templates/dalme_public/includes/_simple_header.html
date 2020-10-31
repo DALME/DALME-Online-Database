@@ -2,10 +2,14 @@
 
 {% include "dalme_public/includes/_breadcrumbs.html" %}
 <div class="title u-flex u-type-serif">
-  <h1>{{ page.title }}</h1>
-  <h2>
-    {% with page.get_parent as parent %}
-      <a href="{% pageurl parent %}">{{ parent.title }}</a>
-    {% endwith %}
-  </h2>
+  {% if search %}
+    <h1>Search</h1>
+    <h2>DALME Corpora and Collections</h2>
+  {% elif explore %}
+    <h1>Explore</h1>
+    <h2>DALME Corpora and Collections</h2>
+  {% else %}
+    <h1>{{ page.title }}</h1>
+    <h2>{{ page.get_parent.title }}</h2>
+  {% endif %}
 </div>

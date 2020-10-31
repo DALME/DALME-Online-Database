@@ -1,0 +1,64 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags hosts %}
+
+{% block title %}Explore &mdash; {{ block.super }}{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_collections_filter.html" %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  {% explore_map_text as map_text %}
+  <div class="content">
+    <h2>{{ map_text.title }}</h2>
+    {{ map_text.text_before }}
+    <div id="map_container" style="height:450px;" class="mt-2 mb-3"></div>
+    {{ map_text.text_after }}
+  </div>
+{% endblock %}
+{% block js_foot %}
+  {{ block.super }}
+  {% host_url 'api_endpoint' host 'data' as api_url %}
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <script>
+    $(document).ready(function() {
+      const endpoint = "{{ api_url }}/datasets/explore_map/?format=json";
+      $.get(endpoint, function(data) {
+          var map = L.map('map_container').setView([47.505, 15], 4);
+          var markers = [];
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                minZoom: 1,
+                maxZoom: 13,
+                attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+              }).addTo(map);
+
+          for (const prop in data) {
+              if (data.hasOwnProperty(prop)) {
+                let marker = L.circle([data[prop]['latitude'], data[prop]['longitude']], {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: data[prop]['count'] * 1000
+                });
+                marker.bindTooltip(`<b>Locale:</b> ${prop}, ${data[prop]['administrative_region']}<br/>\
+                <b>Records:</b> ${data[prop]['count']}<br/>`);
+                markers.push(marker);
+                marker.addTo(map);
+              }
+          }
+
+      }, 'json');
+    })
+  </script>
+{% endblock%}

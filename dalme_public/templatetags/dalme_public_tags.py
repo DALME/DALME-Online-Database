@@ -76,6 +76,9 @@ def get_breadcrumbs_nav(context):
     # endpoints maintain the illusion of being actual Page objects.
     records = context.get('records')
     record = context.get('record')
+    search = context.get('search')
+    explore = context.get('explore')
+
     if records or record:
         corpus = page.get_parent()
         breadcrumbs[-1].update({'active': False})
@@ -94,6 +97,22 @@ def get_breadcrumbs_nav(context):
         breadcrumbs = [
             *breadcrumbs,
             {'title': title, 'url': url, 'active': True},
+        ]
+
+    if search:
+        breadcrumbs[-1].update({'active': False})
+        url = f'{page.url}/search/'
+        breadcrumbs = [
+            *breadcrumbs,
+            {'title': 'Search', 'url': url, 'active': True},
+        ]
+
+    if explore:
+        breadcrumbs[-1].update({'active': False})
+        url = f'{page.url}/explore/'
+        breadcrumbs = [
+            *breadcrumbs,
+            {'title': 'Explore', 'url': url, 'active': True},
         ]
 
     return breadcrumbs
