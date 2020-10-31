@@ -2417,4 +2417,40 @@ div.vue-slider {
   color: #444;
   font-family: "Open Sans", sans-serif;
   font-size: 1rem;
+  line-height: 1.7;
+}
+
+#search-help-content .block-text ul {
+  margin-left: 1rem;
+  margin-right: 2rem;
+}
+
+#search-help-content .block-text li {
+  padding-left: 0.5rem;
+  list-style-type: disc;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+}
+
+#search-help-content .block-text b {
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    font-size: 87.5%;
+    color: #212529;
+    display: inline-block;
+    border-bottom: 1px solid grey;
+    background-color: white;
+}
+
+#search-help-content .block-text b::after {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  text-decoration: inherit;
+  content: "\f246";
+  margin-left: 5px;
+}
+
+#search-help-content .block-text i {
+  font-family: "PT Serif", serif;
 }
