@@ -384,20 +384,21 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
-        'dalme_app.utils.DRFSelectRenderer',
-        'dalme_app.utils.DRFDTEJSONRenderer'
+        'dalme_api.renderers.SelectRenderer',
+        'dalme_api.renderers.DTEJSONRenderer',
+        'dalme_api.renderers.DBRenderer'
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
-        'dalme_app.utils.DRFDTEParser',
+        'dalme_api.parsers.DTEParser',
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
-        #'rest_framework.filters.OrderingFilter'
-        'dalme_app.utils.DalmeOrderingFilter'
+        # 'rest_framework.filters.OrderingFilter'
+        'dalme_api.filter_backends.DalmeOrderingFilter'
     ],
-    'EXCEPTION_HANDLER': 'dalme_app.utils.DRFDTE_exception_handler',
+    'EXCEPTION_HANDLER': 'dalme_api.utils.DTE_exception_handler',
 }
 
 

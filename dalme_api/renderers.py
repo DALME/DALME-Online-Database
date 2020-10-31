@@ -4,7 +4,12 @@ from rest_framework.compat import INDENT_SEPARATORS, LONG_SEPARATORS, SHORT_SEPA
 from dynamic_preferences.registries import global_preferences_registry
 
 
-class DRFSelectRenderer(renderers.JSONRenderer):
+class DBRenderer(renderers.BaseRenderer):
+    media_type = 'application/json-dte'
+    format = 'db'
+
+
+class SelectRenderer(renderers.JSONRenderer):
     """ Django Rest Framework renderer to return selectize ready value lists """
 
     format = 'select'
@@ -51,7 +56,7 @@ class DRFSelectRenderer(renderers.JSONRenderer):
         return ret.encode()
 
 
-class DRFDTEJSONRenderer(renderers.JSONRenderer):
+class DTEJSONRenderer(renderers.JSONRenderer):
     """ Django Rest Framework renderer that returns Datatables Editor format """
 
     media_type = 'application/json-dte'

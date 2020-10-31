@@ -2,14 +2,14 @@ import json
 from django.conf import settings
 from django.http import QueryDict
 from rest_framework import parsers
-from dalme_app.utils.drf_renderers import DRFDTEJSONRenderer
+from dalme_api.renderers import DTEJSONRenderer
 
 
-class DRFDTEParser(parsers.BaseParser):
+class DTEParser(parsers.BaseParser):
     """ Django Rest Framework parser that translates Datatables Editor format """
 
     media_type = 'application/json-dte'
-    renderer_class = DRFDTEJSONRenderer
+    renderer_class = DTEJSONRenderer
 
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}

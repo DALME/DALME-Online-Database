@@ -17,7 +17,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return False
 
 
-def DRFDTE_exception_handler(exc, context):
+def DTE_exception_handler(exc, context):
     if isinstance(exc, PermissionDenied):
         return Response({'detail': exc.detail}, 400)
     if isinstance(exc, ValidationError):
