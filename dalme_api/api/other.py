@@ -97,7 +97,7 @@ class Locales(DALMEBaseViewSet):
     serializer_class = LocaleReferenceSerializer
     filterset_fields = ['id', 'name', 'administrative_region', 'country__name']
     search_fields = ['id', 'name', 'administrative_region', 'country__name']
-    ordering_fields = ['id', 'name', 'administrative_region', 'country']
+    ordering_fields = ['id', 'name', 'administrative_region', 'country', 'latitude', 'longitude']
     ordering = ['name']
 
 

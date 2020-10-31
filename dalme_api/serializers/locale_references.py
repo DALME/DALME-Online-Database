@@ -5,7 +5,7 @@ from rest_framework import serializers
 class LocaleReferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocaleReference
-        fields = ('id', 'name', 'administrative_region', 'country')
+        fields = ('id', 'name', 'administrative_region', 'country', 'latitude', 'longitude')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

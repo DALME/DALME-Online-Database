@@ -58,6 +58,8 @@ class LocaleReference(dalmeIntid):
     name = models.CharField(max_length=255)
     administrative_region = models.CharField(max_length=255)
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
 
     class Meta:
         ordering = ['country', 'name']
