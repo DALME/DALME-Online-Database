@@ -212,6 +212,17 @@ def migrate_datasets(request):
     return result
 
 
+def add_to_public_register(request):
+    public_sources = Source.objects.filter(workflow__is_public=True)
+    ct = ContentType.objects.get_for_model(public_sources.first())
+    for source in public_sources:
+        PublicRegister.objects.create(
+            object_id=source.id,
+            content_type=ct
+        )
+    return 'done'
+
+
 def geolocate_locales(request):
     locales = LocaleReference.objects.all()
     geolocator = AlgoliaPlaces(domain='places-dsn.algolia.net')
@@ -231,9 +242,17 @@ def geolocate_locales(request):
             errors[loc.name] = e
 
     return errors
+
+
 def test_expression(request):
-    source = Source.objects.get(pk='be296e02-8d6b-40e4-befe-a7616f3f5e01')
-    return','.join([str(set['set_id_id']) for set in source.sets.all().values()])
+    public_sources = Source.objects.filter(workflow__is_public=True)
+    ct = ContentType.objects.get_for_model(public_sources.first())
+    for source in public_sources:
+        PublicRegister.objects.create(
+            object_id=source.id,
+            content_type=ct
+        )
+    return 'done'
 
 
 def fix_users(records):
@@ -245,12 +264,6 @@ def fix_users(records):
         s.owner = c_user
         s.modification_user = m_user
         s.save()
-
-
-def test_expression2(request):
-    source = Source.objects.all()[0]
-    page = source.pages.exclude(dam_id__isnull=True).first()
-    return page.dam_id
 
 
 def test_function():
