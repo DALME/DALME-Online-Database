@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
 from dalme_app.models._templates import get_current_user
-from dalme_app.models import rs_resource, Workflow, Work_log, Page, Set_x_content, Source, Transcription
+from dalme_app.models import rs_resource, Workflow, Work_log, Page, PublicRegister, Set_x_content, Source, Transcription
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -34,9 +34,38 @@ def update_workflow(sender, instance, created, **kwargs):
 @receiver(models.signals.post_save, sender=Source)
 def update_dataset(sender, instance, created, **kwargs):
     if instance.type == 13 and instance.primary_dataset is not None:
-        if not Set_x_content.objects.filter(set_id=instance.primary_dataset, object_id=instance.id).exists():
-            ct = ContentType.objects.get(pk=125)
-            Set_x_content.objects.create(set_id=instance.primary_dataset, object_id=instance.id, content_type=ct)
+        Set_x_content.objects.get_or_create(
+            set_id=instance.primary_dataset,
+            object_id=instance.id,
+            content_type=ContentType.objects.get_for_model(instance)
+        )
+
+
+@receiver(models.signals.post_save, sender=Source)
+def create_public_record(sender, instance, created, **kwargs):
+    try:
+        public = instance.workflow.is_public
+    except Workflow.DoesNotExist:
+        public = False
+
+    if public:
+        PublicRegister.objects.get_or_create(
+            object_id=instance.id,
+            content_type=ContentType.objects.get_for_model(instance)
+        )
+
+
+@receiver(models.signals.post_save, sender=Source)
+def remove_public_record(sender, instance, created, **kwargs):
+    try:
+        public = instance.workflow.is_public
+    except Workflow.DoesNotExist:
+        public = False
+
+    if not public:
+        pr = PublicRegister.objects.filter(object_id=instance.id)
+        if pr.exists():
+            pr.first().delete()
 
 
 @receiver(models.signals.pre_delete, sender=Source)
@@ -48,6 +77,10 @@ def delete_source_dependencies(sender, instance, **kwargs):
                     if sp.transcription:
                         sp.transcription.delete()
             page.delete()
+
+    pr = PublicRegister.objects.filter(object_id=instance.id)
+    if pr.exists():
+        pr.first().delete()
 
 
 @receiver(models.signals.post_save, sender=Transcription)
