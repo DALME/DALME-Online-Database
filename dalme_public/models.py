@@ -144,6 +144,36 @@ class SearchHelpBlock(models.Model):
             raise ValidationError('The search page can only have one help block.')
 
 
+@register_snippet
+class ExploreMapText(models.Model):
+    title = models.CharField(max_length=255, blank=True, null=True)
+    text_before = StreamField([
+            ('text', blocks.RichTextBlock()),
+            ('heading', blocks.CharBlock()),
+            ('html', blocks.RawHTMLBlock()),
+        ], null=True)
+    text_after = StreamField([
+            ('inline_image', ImageChooserBlock()),
+            ('text', blocks.RichTextBlock()),
+            ('heading', blocks.CharBlock()),
+            ('html', blocks.RawHTMLBlock()),
+            ('embed', EmbedBlock(icon='media')),
+        ], null=True)
+
+    panels = [
+        FieldPanel('title'),
+        StreamFieldPanel('text_before'),
+        StreamFieldPanel('text_after'),
+    ]
+
+    def __str__(self):
+        return "Explore Map Text"
+
+    def clean(self):
+        if self.id is None and self._meta.model.objects.exists():
+            raise ValidationError('The Explore page can only have one set of text blocks.')
+
+
 class DALMEPage(Page):
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',

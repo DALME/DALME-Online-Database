@@ -8,6 +8,7 @@ from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.models import (
     Collections,
     Essay,
+    ExploreMapText,
     FeaturedObject,
     FeaturedInventory,
     Features,
@@ -340,3 +341,8 @@ def search_help(context):
         'paginated': context['paginated'],
         'paginator': context['paginator'],
     }
+
+
+@register.simple_tag
+def explore_map_text():
+    return ExploreMapText.objects.first()
