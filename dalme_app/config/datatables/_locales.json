@@ -10,12 +10,16 @@
       "attribute_concordance": {
         "name": "name",
         "administrative_region": "administrative_region",
-        "country": "country.id"
+        "country": "country.id",
+        "latitude": "latitude",
+        "longitude": "longitude"
       },
       "required_list": [
         "name",
         "country.id",
-        "administrative_region"
+        "administrative_region",
+        "latitude",
+        "longitude"
       ]
     }
   },
@@ -24,7 +28,9 @@
       "id",
       "name",
       "administrative_region",
-      "country"
+      "country",
+      "latitude",
+      "longitude"
     ],
     "options": {
       "ajax": {
@@ -36,7 +42,9 @@
     "fields": [
       "name",
       "administrative_region",
-      "country"
+      "country",
+      "latitude",
+      "longitude"
     ],
     "buttons": [
       {
