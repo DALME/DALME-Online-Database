@@ -49,6 +49,8 @@ from dalme_public.blocks import (
 )
 
 from dalme_app.documents import PublicSourceDocument
+from django.utils.html import format_html
+from django.templatetags.static import static
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -57,6 +59,11 @@ UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 @hooks.register('construct_settings_menu')
 def hide_users_menu_item(request, menu_items):
     menu_items[:] = [item for item in menu_items if item.name not in ['users', 'groups']]
+
+
+@hooks.register('insert_global_admin_css', order=0)
+def extra_admin_css():
+    return format_html('<link rel="stylesheet" href="{}">', static("css/dalme_public_admin.css"))
 
 
 @hooks.register('before_serve_page')

@@ -60,8 +60,8 @@ ordering: the current sort parameter
         {% page_table_header_label label=status_label sortable=sortable sort_field='live' parent_page_title=parent_page.title %}
     </th>
     {% if parent_page.get_admin_display_title == 'Features' %}
-    <th class="status projected_publication">
-        {% page_table_header_label label='Projected Publication' sortable=sortable sort_field='go_live_at' parent_page_title=parent_page.title %}
+    <th class="publication_date">
+        {% page_table_header_label label='Publication Date' sortable=sortable sort_field='go_live_at' parent_page_title=parent_page.title %}
     </th>
     {% endif %}
     <th></th>
