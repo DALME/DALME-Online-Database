@@ -220,33 +220,27 @@ def get_features_nav_q(key):
 
 @register.simple_tag()
 def get_recent_objects():
-    objs = FeaturedObject.objects.live().specific().annotate(
-        published=Coalesce('go_live_at', 'first_published_at')
-    ).order_by('published')[:3]
+    objs = FeaturedObject.objects.live().specific().order_by('go_live_at')[:3]
     return [
-        {'url': obj.url, 'month': month_name[obj.published_switch.month]}
+        {'url': obj.url, 'month': month_name[obj.go_live_at.month]}
         for obj in objs
     ]
 
 
 @register.simple_tag()
 def get_recent_inventories():
-    objs = FeaturedInventory.objects.live().specific().annotate(
-        published=Coalesce('go_live_at', 'first_published_at')
-    ).order_by('published')[:3]
+    objs = FeaturedInventory.objects.live().specific().order_by('go_live_at')[:3]
     return [
-        {'url': obj.url, 'month': month_name[obj.published_switch.month]}
+        {'url': obj.url, 'month': month_name[obj.go_live_at.month]}
         for obj in objs
     ]
 
 
 @register.simple_tag()
 def get_recent_essays():
-    objs = Essay.objects.live().annotate(
-        published=Coalesce('go_live_at', 'first_published_at')
-    ).order_by('published')[:3]
+    objs = Essay.objects.live().specific().order_by('go_live_at')[:3]
     return [
-        {'url': obj.url, 'month': month_name[obj.published_switch.month]}
+        {'url': obj.url, 'month': month_name[obj.go_live_at.month]}
         for obj in objs
     ]
 

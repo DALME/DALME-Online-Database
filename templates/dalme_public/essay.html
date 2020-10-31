@@ -17,7 +17,7 @@
 
 {% block main_column %}
   <div class="metadata u-flex">
-    <span>{{ page.published_switch.date }}</span>
+    <span>{{ page.go_live_at|date:"j F Y" }}</span>
     <span>by {{ page.author }}</span>
   </div>
 

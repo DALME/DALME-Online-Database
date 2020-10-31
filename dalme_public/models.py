@@ -263,10 +263,6 @@ class FeaturedPage(DALMEPage):
         abstract = True
 
     @property
-    def published_switch(self):
-        return self.go_live_at or self.first_published_at
-
-    @property
     def author(self):
         if self.alternate_author:
             return self.alternate_author
@@ -349,19 +345,14 @@ class Home(DALMEPage):
     def get_context(self, request):
         context = super().get_context(request)
 
-        objects = FeaturedObject.objects.live().specific().annotate(
-            published=Coalesce('go_live_at', 'first_published_at')
-        ).order_by('-published')
-        inventories = FeaturedInventory.objects.live().specific().annotate(
-            published=Coalesce('go_live_at', 'first_published_at')
-        ).order_by('-published')
-        essays = Essay.objects.live().specific().annotate(
-            published=Coalesce('go_live_at', 'first_published_at')
-        ).order_by('-published')
+        objects = FeaturedObject.objects.live().specific().order_by('go_live_at')
+        inventories = FeaturedInventory.objects.live().specific().order_by('go_live_at')
+        essays = Essay.objects.live().specific().order_by('go_live_at')
 
         context['featured_object'] = objects.last()
         context['featured_inventory'] = inventories.last()
         context['essay'] = essays.last()
+
         return context
 
 
@@ -589,6 +580,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             'paginator': paginator,
             'paginated': paginator.get('num_pages', 0) > 1,
             'suggestion': None,
+            'search': True,
         })
 
         return render(
