@@ -40,6 +40,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEBUG = True
 
 API_ENDPOINT = 'https://data.127.0.0.1.xip.io:8443'
+PURL_ENDPOINT = 'https://purl.127.0.0.1.xip.io:8443'
+DB_ENDPOINT = 'https://db.127.0.0.1.xip.io:8443'
 
 # Application definition
 ALLOWED_HOSTS = [

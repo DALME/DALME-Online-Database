@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from django.http import HttpResponseRedirect
 from dalme_app.models import PublicRegister
+from django.conf import settings
 
 
 class Endpoint(viewsets.GenericViewSet):
@@ -18,8 +19,8 @@ class Endpoint(viewsets.GenericViewSet):
         self.get_object()
 
         if format == 'db':
-            return HttpResponseRedirect(f'https://db.127.0.0.1.xip.io:8443/sources/{pk}/')
-        elif format == 'api':
-            return HttpResponseRedirect(f'https://data.127.0.0.1.xip.io:8443/sources/{pk}/?format=api')
+            return HttpResponseRedirect(f'{settings.DB_ENDPOINT}/sources/{pk}/')
+        elif format in ['api', 'json']:
+            return HttpResponseRedirect(f'{settings.API_ENDPOINT}/sources/{pk}/?format={format}')
         else:
-            return HttpResponseRedirect(f'https://public.127.0.0.1.xip.io:8443/collections/records/{pk}/')
+            return HttpResponseRedirect(f'{settings.HOST_SCHEME}{settings.PARENT_HOST}/collections/records/{pk}/')

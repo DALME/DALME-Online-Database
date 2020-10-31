@@ -75,6 +75,8 @@ DEFAULT_HOST = 'public'
 PARENT_HOST = 'dalme.org'
 HOST_SCHEME = 'https://'
 API_ENDPOINT = 'https://data.dalme.org'
+PURL_ENDPOINT = 'https://purl.dalme.org'
+DB_ENDPOINT = 'https://db.dalme.org'
 
 SESSION_COOKIE_DOMAIN = '.dalme.org'
 SESSION_COOKIE_SECURE = True
