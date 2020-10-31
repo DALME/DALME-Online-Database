@@ -22,6 +22,7 @@ djangosaml2idp==0.7.2
 drf-access-policy==0.7.0
 elasticsearch==7.9.1
 feedparser==5.2.1
+geopy==2.0.0
 kombu==4.6.11
 lxml==4.5.2
 mysqlclient==2.0.1
