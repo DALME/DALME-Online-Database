@@ -25,6 +25,8 @@ from wagtail.users.models import UserProfile
 from django.conf import settings
 from django.db.models import OuterRef, Subquery
 import requests
+from django.contrib.contenttypes.models import ContentType
+from geopy.geocoders import AlgoliaPlaces
 
 
 def get_script_menu():
@@ -37,22 +39,22 @@ def get_script_menu():
         {
             "name": "update_folios_in_dam",
             "description": "Updates the contents of the 'folio' field in the DAM to match the value in the corresponding DALME page.",
-            "type": "warning"
+            "type": "danger"
         },
         {
             "name": "rebuild_search_index",
             "description": "Rebuilds the ElasticSearch indices.",
-            "type": "warning"
-        },
-        {
-            "name": "import_languages",
-            "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
-            "type": "warning"
-        },
-        {
-            "name": "replace_in_transcription",
-            "description": "Search and replace in transcriptions.",
             "type": "danger"
+        },
+        {
+            "name": "add_to_public_register",
+            "description": "Add sources marked as public to Public Register (purl endpoint).",
+            "type": "danger"
+        },
+        {
+            "name": "geolocate_locales",
+            "description": "Add latitude and longitude to locales.",
+            "type": "warning"
         },
         {
             "name": "remove_11600",
@@ -63,32 +65,7 @@ def get_script_menu():
             "name": "test_expression",
             "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
             "type": "info"
-        },
-        {
-            "name": "test_expression2",
-            "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
-            "type": "info"
-        },
-        {
-            "name": "merge_attributes_csv",
-            "description": "Parses a .csv file containing attribute values and merges them into the database matching by attribute_id.",
-            "type": "danger"
-        },
-        {
-            "name": "add_attribute_types",
-            "description": "Takes a dictionary representing a metadata schema and creates entries in the attribute types reference table.",
-            "type": "warning"
-        },
-        {
-            "name": "migrate_datasets",
-            "description": "Migrates dataset attribute to sets.",
-            "type": "warning"
-        },
-        {
-            "name": "create_json_field_reps",
-            "description": "Takes a list of fields and creates individual json files.",
-            "type": "warning"
-        },
+        }
     ]
     _output = ''
     for item in script_register:
@@ -235,6 +212,25 @@ def migrate_datasets(request):
     return result
 
 
+def geolocate_locales(request):
+    locales = LocaleReference.objects.all()
+    geolocator = AlgoliaPlaces(domain='places-dsn.algolia.net')
+    errors = {}
+    for loc in locales:
+        try:
+            location = geolocator.geocode(f'{loc.name}, {loc.administrative_region}, {loc.country.name}')
+            loc.latitude = location.latitude
+            loc.longitude = location.longitude
+            loc.save()
+        except AttributeError:
+            location = geolocator.geocode(f'{loc.name}')
+            loc.latitude = location.latitude
+            loc.longitude = location.longitude
+            loc.save()
+        except Exception as e:
+            errors[loc.name] = e
+
+    return errors
 def test_expression(request):
     source = Source.objects.get(pk='be296e02-8d6b-40e4-befe-a7616f3f5e01')
     return','.join([str(set['set_id_id']) for set in source.sets.all().values()])
