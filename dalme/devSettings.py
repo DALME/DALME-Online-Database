@@ -53,7 +53,9 @@ ALLOWED_HOSTS = [
     'public.127.0.0.1.xip.io:8443',
     'public.127.0.0.1.xip.io',
     'data.127.0.0.1.xip.io:8443',
-    'data.127.0.0.1.xip.io'
+    'data.127.0.0.1.xip.io',
+    'purl.127.0.0.1.xip.io:8443',
+    'purl.127.0.0.1.xip.io'
 ]
 
 SECURE_SSL_REDIRECT = True
@@ -78,6 +80,8 @@ CSRF_TRUSTED_ORIGINS = [
     'db.127.0.0.1.xip.io:8443',
     'public.127.0.0.1.xip.io',
     'public.127.0.0.1.xip.io:8443',
+    'purl.127.0.0.1.xip.io:8443',
+    'purl.127.0.0.1.xip.io'
 ]
 CSRF_COOKIE_DOMAIN = '.127.0.0.1.xip.io'
 # CSRF_COOKIE_SAMESITE = 'None'
@@ -94,7 +98,9 @@ CORS_ALLOWED_ORIGINS = [
     'https://data.127.0.0.1.xip.io:8443',
     'http://data.127.0.0.1.xip.io',
     'https://db.127.0.0.1.xip.io:8443',
-    'http://db.127.0.0.1.xip.io'
+    'http://db.127.0.0.1.xip.io',
+    'https://purl.127.0.0.1.xip.io:8443',
+    'http://purl.127.0.0.1.xip.io'
 ]
 # CORS_REPLACE_HTTPS_REFERER = True
 # CORS_ALLOWED_ORIGIN_REGEXES = [
@@ -161,6 +167,7 @@ INSTALLED_APPS = [
     'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
+    'dalme_purl.application.DalmePURLConfig',
 ]
 
 ENABLE_DJANGO_EXTENSIONS = bool(int(os.environ.get("ENABLE_DJANGO_EXTENSIONS", "1")))

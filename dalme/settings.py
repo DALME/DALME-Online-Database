@@ -60,6 +60,7 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://*.dalme.org'
     'https://data.dalme.org',
+    'https://purl.dalme.org',
     'https://db.dalme.org',
     'https://public.dalme.org',
     'https://dalme.org',
@@ -127,6 +128,7 @@ INSTALLED_APPS = [
     'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
     'dalme_public.application.DalmePublicConfig',
+    'dalme_purl.application.DalmePURLConfig',
 ]
 
 MIDDLEWARE = [
