@@ -1,7 +1,6 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
-import json
 import requests
 from dalme_app.models._templates import dalmeUuid
 import django.db.models.options as options
@@ -37,6 +36,7 @@ class Page(dalmeUuid):
             rpo = RightsPolicy.objects.get(
                 pk=source.parent.parent.attributes.get(attribute_type=144).value_JSON['id'])
             return {
+                'show_image': rpo.public_display,
                 'status': rpo.get_rights_status_display(),
                 'display_notice': rpo.notice_display,
                 'notice': rpo.rights_notice

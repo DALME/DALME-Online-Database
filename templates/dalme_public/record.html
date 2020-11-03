@@ -203,19 +203,10 @@
         }
       };
 
-      const renderRights = (pageId, imageId) => {
+      const renderRights = (notice) => {
         const node = $('#folio-rights');
         node.empty();
-        if (pageId && imageId) {
-          const endpoint = `{{api_url}}/pages/${pageId}/get_rights/`;
-          $.get(endpoint, function(data) {
-            if (data.rights.hasOwnProperty('display_notice')) {
-              if (data.rights.display_notice) {
-                node.html(`<p>${data.rights.notice}</p>`)
-              }
-            }
-          }, 'json');
-        }
+        node.html(`<p>${notice}</p>`)
       };
 
       const renderTranscription = transcriptionId => {
@@ -242,16 +233,19 @@
       window.eventBus.$on('renderFolio', (data, everything = true) => {
         const endpoint = `{{api_url}}/pages/${data.pageId}/get_rights/`;
         $.get(endpoint, function(rdata) {
-          if (rdata.rights.hasOwnProperty('display_notice')) {
-            if (rdata.rights.display_notice) {
-              //CAN_DISPLAY???
+          console.log(rdata)
+          if (rdata.rights.hasOwnProperty('show_image')) {
+            if (rdata.rights.show_image) {
+              renderImage(data);
+              if (everything) {
+                if (data.imageId && rdata.rights.display_notice) {
+                  renderRights(rdata.rights.notice);
+                }
+                renderTranscription(data.transcriptionId);
+              }
             }
+          }
         }, 'json');
-        renderImage(data);
-        if (everything) {
-          renderRights(data.pageId, data.imageId);
-          renderTranscription(data.transcriptionId);
-        }
       });
       window.eventBus.$on('zoomIn', () => {
         if (window.folio) {

@@ -26,6 +26,7 @@ class RightsPolicy(dalmeUuid):
     licence = models.TextField(blank=True, null=True, default=None)
     rights_holder = models.CharField(max_length=255, null=True, default=None)
     notice_display = models.BooleanField(default=False)
+    public_display = models.BooleanField(default=True)
     attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
     comments = GenericRelation('Comment')
 
