@@ -302,11 +302,9 @@
         resizeHeight: $('.vertical-split').length ? false : true,
         resizeWidth: $('.vertical-split').length ? true : false,
         onDragEnd: function() {
-          if (data.imageId) {
-            Diva.Events.publish('PanelSizeDidChange');
-            window.folio.destroy();
-            renderImage(data);
-          }
+          Diva.Events.publish('PanelSizeDidChange');
+          window.folio.destroy();
+          renderImage(data);
         }
       });
 
