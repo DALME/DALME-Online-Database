@@ -2513,3 +2513,21 @@ div.vue-slider {
   background-color: #e9f1fb;
   color: #354d87;
 }
+
+/* viewer */
+
+.diva-no-image {
+  background-color: #2d2d2d;
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.diva-no-image::after {
+  content: "\f070";
+  font-family: "Font Awesome 5 Free";
+  font-size: 5rem;
+  font-weight: 900;
+  margin: auto;
+  color: #404040;
+}

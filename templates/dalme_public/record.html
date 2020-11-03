@@ -178,15 +178,14 @@
         }
       };
 
-      const renderImage = ({ pageId, zoomLevel }) => {
+      const renderImage = ({ pageId, zoomLevel, imageId }) => {
         const node = $('#diva_viewer');
         node.empty();
-        if (!pageId) {
-          const warning = 'No image available for this folio.';
-          node.innerHTML = `<div class="warning">${warning}</div>`;
+        if (!imageId) {
+          $('#diva_viewer').html('<div class="diva-no-image"></div>');
         } else {
           window.folio = new Diva('diva_viewer', {
-            objectData:`{{db_url}}pages/${pageId}/manifest/`,
+            objectData:`{{db_url}}/pages/${pageId}/manifest/`,
             enableAutoTitle: false,
             enableFullscreen: false,
             enableKeyScroll: false,
@@ -204,11 +203,11 @@
         }
       };
 
-      const renderRights = pageId => {
+      const renderRights = (pageId, imageId) => {
         const node = $('#folio-rights');
         node.empty();
-        if (pageId) {
-          const endpoint = `{{api_url}}pages/${pageId}/get_rights/`;
+        if (pageId && imageId) {
+          const endpoint = `{{api_url}}/pages/${pageId}/get_rights/`;
           $.get(endpoint, function(data) {
             if (data.rights.hasOwnProperty('display_notice')) {
               if (data.rights.display_notice) {
@@ -241,9 +240,16 @@
 
       window.eventBus = new Vue();
       window.eventBus.$on('renderFolio', (data, everything = true) => {
+        const endpoint = `{{api_url}}/pages/${data.pageId}/get_rights/`;
+        $.get(endpoint, function(rdata) {
+          if (rdata.rights.hasOwnProperty('display_notice')) {
+            if (rdata.rights.display_notice) {
+              //CAN_DISPLAY???
+            }
+        }, 'json');
         renderImage(data);
         if (everything) {
-          renderRights(data.pageId);
+          renderRights(data.pageId, data.imageId);
           renderTranscription(data.transcriptionId);
         }
       });
@@ -270,9 +276,9 @@
               handleSelector: '#resize-handle',
               resizeWidth: false,
               onDragEnd: function() {
-                Diva.Events.publish('PanelSizeDidChange');
-                window.folio.destroy();
-                renderImage(data);
+                  Diva.Events.publish('PanelSizeDidChange');
+                  window.folio.destroy();
+                  renderImage(data);
               },
             })
             .css({ width: '' });
@@ -286,9 +292,11 @@
               handleSelector: '#resize-handle',
               resizeHeight: false,
               onDragEnd: function() {
-                Diva.Events.publish('PanelSizeDidChange');
-                window.folio.destroy();
-                renderImage(data);
+                if (data.imageId) {
+                  Diva.Events.publish('PanelSizeDidChange');
+                  window.folio.destroy();
+                  renderImage(data);
+                }
               },
             })
             .css({ height: '' });
@@ -300,9 +308,11 @@
         resizeHeight: $('.vertical-split').length ? false : true,
         resizeWidth: $('.vertical-split').length ? true : false,
         onDragEnd: function() {
-          Diva.Events.publish('PanelSizeDidChange');
-          window.folio.destroy();
-          renderImage(data);
+          if (data.imageId) {
+            Diva.Events.publish('PanelSizeDidChange');
+            window.folio.destroy();
+            renderImage(data);
+          }
         }
       });
 
@@ -354,6 +364,9 @@
           folioCount() {
             return this.sourceData.no_folios;
           },
+          folioImageId() {
+            return this.sourceData.folios[this.folioIndex].pageImageId;
+          },
           folioId() {
             return this.hasFolios
               ? this.sourceData.folios[this.folioIndex].pageId
@@ -381,6 +394,7 @@
               pageId: this.folioId,
               transcriptionId: this.transcriptionId,
               zoomLevel: this.zoomLevel,
+              imageId: this.folioImageId
             };
           },
         },

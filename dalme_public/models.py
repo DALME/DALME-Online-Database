@@ -617,7 +617,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             pageId=F('page__pk'),
             pageName=F('page__name'),
             transcriptionId=F('transcription__pk'),
-            pageOrder=F('page__order')
+            pageOrder=F('page__order'),
+            pageImageId=F('page__dam_id'),
+            pageRights=F('page__get_rights')
         ).order_by('pageOrder')
 
         context = self.get_context(request)
