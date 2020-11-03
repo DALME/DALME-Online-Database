@@ -1,3 +1,5 @@
+*.cert
+*.key
 env
 devEnv
 venv

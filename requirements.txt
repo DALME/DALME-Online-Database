@@ -26,7 +26,7 @@ geopy==2.0.0
 kombu==4.6.11
 lxml==4.5.2
 mysqlclient==2.0.1
-pandas==1.1.0
+pandas==1.1.4
 passlib==1.7.3
 requests==2.24.0
 requests-aws4auth==1.0.1
