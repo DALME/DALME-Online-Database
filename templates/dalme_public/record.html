@@ -88,8 +88,12 @@
   {% host_url 'dashboard' host 'db' as db_url %}
   {% host_url 'api_endpoint' host 'data' as api_url %}
   <script>
+    const setHeaderHeight = () => {
+        const height = $('header.collections').height();
+        $('section#transcription').attr('style', `--header-height:${height}px;`);
+    }
     $(document).ready(function() {
-
+      setHeaderHeight();
       const splitter = $('div.folios');
       $(window).width() <= 600
         ? splitter.addClass('horizontal-split')
@@ -316,6 +320,7 @@
           .attr('data-collapsed', function(index, attr) {
             return attr === 'true' ? 'false' : 'true';
           });
+        setHeaderHeight();
       });
 
       const app = new Vue({
