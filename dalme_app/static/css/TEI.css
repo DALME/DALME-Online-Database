@@ -81,10 +81,6 @@ tei-gap[reason="context"]:before {
   content: "[" attr(extent) " of contextual information not transcribed]";
 }
 
-tei-pc[force="weak"] {
-  display: none;
-}
-
 tei-cb {
   display: inline-block;
   margin-top: 10px;
@@ -977,8 +973,12 @@ tei-language {
 }
 tei-layout[columns] {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+}
+tei-layout[columns] tei-ab {
+  position: relative;
+  padding-left: 2.5em;
+  border-left: 1px solid black;
+  min-height: 200px;
 }
 tei-layoutDesc {
   /* Empty Rule Set */

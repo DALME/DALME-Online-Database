@@ -1311,6 +1311,7 @@ section.transcription {
   background: #fff;
   flex: 1 1 auto;
   z-index: 1;
+  height: calc(100vh - (var(--header-height) + 150px));
 }
 .folios.vertical-split section.transcription {
   padding: 1rem 1rem 0 1rem;
@@ -1320,6 +1321,36 @@ section.transcription {
 }
 .transcription tei-TEI {
   margin: 0;
+}
+
+.closed .ab-content {
+    display: none;
+}
+.ab-column-toggler .label {
+    padding-right: 10px;
+}
+.ab-column-toggler .fa-caret-down {
+    display: inline;
+}
+.ab-column-toggler .fa-caret-left {
+    display: none;
+}
+.closed .ab-column-toggler .fa-caret-down {
+    display: none;
+}
+.closed .ab-column-toggler .fa-caret-left {
+    display: inline;
+}
+.ab-column-toggler {
+    cursor: pointer;
+    position: absolute;
+    left: -0.7em;
+    top: 1.1em;
+    transform: rotate(-90deg);
+    font-family: "Open Sans", sans-serif;
+}
+.ab-column-toggler .label {
+    padding-right: 10px;
 }
 
 .folio-rights {
