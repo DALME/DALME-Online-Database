@@ -51,6 +51,8 @@ from dalme_public.blocks import (
 from dalme_app.documents import PublicSourceDocument
 from django.utils.html import format_html
 from django.templatetags.static import static
+from django.forms import formset_factory
+from dalme_app.utils import Search
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -563,28 +565,36 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
     def search(self, request):
         context = self.get_context(request)
         searchindex = PublicSourceDocument()
-        form = forms.SearchForm()
+        formset = formset_factory(forms.SearchForm)
         paginator = {}
         results = []
-        query = ''
+        query = False
+        advanced = False
+        error = False
 
-        if request.GET.get('q') is not None:
-            form = forms.SearchForm(request.GET)
-            if form.is_valid():
-                query = form.cleaned_data['q'].lower().strip()
-                (paginator, results) = form.search(
+        if request.method == 'POST':
+            formset = formset(request.POST)
+            if formset.is_valid():
+                query = True
+                advanced = formset.cleaned_data[0]['field'] != ''
+                es_result = Search(
+                    data=formset.cleaned_data,
                     searchindex=searchindex,
-                    page=request.GET.get('page', 1),
-                    highlight=('text', {
-                        'fragment_size': 100,
-                        })
+                    page=request.POST.get('page', 1),
+                    highlight=True
                 )
+                if type(es_result) is tuple:
+                    (paginator, results) = es_result
+                else:
+                    error = es_result
 
         context.update({
             'query': query,
-            'form': form,
+            'advanced': advanced,
+            'form': formset,
             'results': results,
             'paginator': paginator,
+            'error': error,
             'paginated': paginator.get('num_pages', 0) > 1,
             'suggestion': None,
             'search': True,

@@ -2259,18 +2259,18 @@ div.vue-slider {
 
 /* search results */
 
-.search-prepend {
-  border-radius: 0;
-  background: none;
-  border-left: none;
+.search-icon {
   color: #6c757d;
+  position: absolute;
+  top: 20px;
+  left: 30px;
 }
 
 .search-results-input {
   border-radius: 0;
   border-left: none;
   border-right: none;
-  padding-left: 0;
+  padding-left: 45px;
 }
 
 .search-results-input:focus, .search-results-input:active {
@@ -2344,12 +2344,17 @@ div.vue-slider {
   margin-bottom: 2rem;
 }
 
-#search-help {
+.search-status {
   border-bottom: 1px solid #ced4da;
   border-radius: 0;
   color: #444;
   padding-right: 1rem;
   padding-left: 1rem;
+}
+
+.search-status.search-error {
+  color: #4e0f0f;
+  background: #f1b5b5;
 }
 
 .search-help-header {
@@ -2366,10 +2371,99 @@ div.vue-slider {
   color: #084094;
 }
 
+.search-help-header i[aria-expanded="true"] {
+  color: #0075ff;
+}
+
 #search-help-content {
   padding: 1rem;
   background-color: #f4f9fd;
   border-bottom: 1px dotted #9c9c9c;
+}
+
+#advanced-search {
+  background-color: #fbfbfb;
+  border-bottom: 1px solid #ced4da;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+#advanced-search .advanced-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  border-bottom: 1px dotted #9c9c9c;
+}
+
+#advanced-search .form-group {
+  margin-right: .5rem;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+#advanced-search .form-group:last-child {
+  margin-right: none;
+}
+
+#advanced-search .form-group:nth-child(3) {
+  flex-grow: 1;
+}
+
+#advanced-search .button {
+  border: 1px solid #ced4da;
+  border-radius: .2rem;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  line-height: 1.5;
+  background-color: #fff;
+  cursor: pointer;
+  color: #495057
+  ;
+  padding: 3px 3px;
+  align-self: center;
+  display: flex;
+}
+
+#advanced-search .button:hover {
+  background-color: #e9f1fb;
+  color: #354d87;
+}
+
+#advanced-search .button.disabled {
+  cursor: default;
+  border-color: #ced4da;
+  background-color: #fbfbfb;
+  color: #ced4da;
+  margin-right: 3px;
+}
+
+#advanced-search .button.remove {
+  margin-right: 3px;
+}
+
+#advanced-search .button i {
+  font-size: .7rem;
+  font-weight: 600;
+}
+
+#advanced-search .advanced-search-header {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+  color: #3a5d82;
+  border-bottom: 1px dotted #9c9c9c;
+}
+
+#advanced-search .advanced-search-footer {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  display: flex;
+}
+
+#advanced-search .advanced-search-footer button {
+  margin-left: auto;
 }
 
 #search-help-content .block-text {

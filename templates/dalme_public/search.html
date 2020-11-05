@@ -26,34 +26,115 @@
 
 {% block main_column %}
   <div class="content">
-    <form method="get" action="{% routablepageurl page.specific 'search' %}">
+    <form method="post" action="{% routablepageurl page.specific 'search' %}">
+      {% csrf_token %}
       <div class="row">
         <div class="col-lg-12">
-          <label class="sr-only" for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
-          <div class="input-group mt-2">
-            <div class="input-group-prepend">
-              <div class="input-group-text search-prepend">
-                  <i class="fas fa-search fa-fw"></i>
-              </div>
-            </div>
+          <div class="mt-2">
+            <i class="fas fa-search fa-fw search-icon"></i>
             <input
               type="text"
               class="form-control form-control-lg search-results-input"
-              id="{{ form.q.id_for_label }}"
-              name="{{ form.q.html_name }}"
-              value="{{ query }}"
+              id="{{ form.0.q.id_for_label }}"
+              name="{{ form.0.q.html_name }}"
+              value="{{ form.0.q.value|default_if_none:'' }}"
               placeholder="Search"
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
               spellcheck="false"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Query input"
             >
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-lg-12">
-          {% search_help %}
+          <div class="search-help-container">
+            <div class="search-status {% if error %}search-error{% endif %}">
+                <div class="search-help-header d-flex">
+                  <div class="mr-auto" data-toggle="tooltip" data-placement="left" title="Result information">
+                  {% if query %}
+                    {% if results %}
+                      {% if paginated %}
+                        <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
+                      {% else %}
+                        <small>{{ results|length }} result{{ results|length|pluralize }} found.</small>
+                      {% endif %}
+                    {% else %}
+                      {% if error %}
+                        <small>{{ error }}</small>
+                      {% else %}
+                        <small>Your query returned no results.</small>
+                      {% endif %}
+                    {% endif %}
+                  {% else %}
+                    <small>Type a query to search.</small>
+                  {% endif %}
+                  </div>
+                  <span data-toggle="tooltip" data-placement="left" title="Advanced search">
+                      <i id="advanced-toggle" class="fas fa-search-plus mr-2" data-toggle="collapse" data-target="#advanced-search" aria-expanded="{% if advanced %}true{% else %}false{% endif %}" aria-controls="advanced-search"></i>
+                  </span>
+                  <span data-toggle="tooltip" data-placement="top" title="Tooltips">
+                    <i id="help-toggle" class="fas fa-comment-medical mr-2"></i>
+                  </span>
+                  <span data-toggle="tooltip" data-placement="right" title="Help">
+                    <i id="example-toggle" class="fas fa-question-circle" data-toggle="collapse" data-target="#search-help-content" aria-expanded="{% if results %}false{% else %}true{% endif %}" aria-controls="search-help-content"></i>
+                  </span>
+                </div>
+            </div>
+            <div id="advanced-search" class="collapse {% if advanced %}show{% endif %}" aria-labelledby="advanced-toggle">
+              {{ form.management_form }}
+              <div class="advanced-search-header">Advanced Search</div>
+              <div id="advanced-search-sets">
+                <div class="advanced-search-row">
+                  <div class="form-group" data-toggle="tooltip" data-placement="bottom" title="Operator">{{ form.0.operator }}</div>
+                  <div class="form-group" data-toggle="tooltip" data-placement="bottom" title="Field name">{{ form.0.field }}</div>
+                  <div class="form-group" data-toggle="tooltip" data-placement="top" title="Query input">{{ form.0.field_value }}</div>
+                  <div class="form-group" data-toggle="tooltip" data-placement="bottom" title="Match type">{{ form.0.match_type }}</div>
+                  <div class="form-group" data-toggle="tooltip" data-placement="top" title="Wildcard">{{ form.0.wildcards }}</div>
+                  <div class="button disabled"><i class="fas fa-minus"></i></div>
+                  <div class="button add"><i class="fas fa-plus" data-toggle="tooltip" data-placement="right" title="Add/Remove"></i></div>
+                </div>
+                {% for set in form|slice:"1:" %}
+                  <div class="advanced-search-row">
+                    <div class="form-group">{{ set.operator }}</div>
+                    <div class="form-group">{{ set.field }}</div>
+                    <div class="form-group">{{ set.field_value }}</div>
+                    <div class="form-group">{{ set.match_type }}</div>
+                    <div class="form-group">{{ set.wildcards }}</div>
+                    <div class="button remove"><i class="fas fa-minus"></i></div>
+                    <div class="button add"><i class="fas fa-plus"></i></div>
+                  </div>
+                {% endfor %}
+              </div>
+              <div class="advanced-search-footer">
+                <button type="submit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="bottom" title="Submit search">Search</button>
+              </div>
+            </div>
+            </form>
+            <div class="d-none" id="form_template">
+                <div class="advanced-search-row">
+                  <div class="form-group">{{ form.empty_form.operator }}</div>
+                  <div class="form-group">{{ form.empty_form.field }}</div>
+                  <div class="form-group">{{ form.empty_form.field_value }}</div>
+                  <div class="form-group">{{ form.empty_form.match_type }}</div>
+                  <div class="form-group">{{ form.empty_form.wildcards }}</div>
+                  <div class="button remove"><i class="fas fa-minus"></i></div>
+                  <div class="button add"><i class="fas fa-plus"></i></div>
+                </div>
+            </div>
+            <div id="search-help-content" class="collapse {% if not results %}show{% endif %}" aria-labelledby="help-toggle">
+              {% search_help as search_help %}
+              {{ search_help.content }}
+            </div>
+         </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
           {% if results %}
             <div class="ml-1 mr-1">
               {% for result in results %}
@@ -75,7 +156,6 @@
           {% endif %}
         </div>
       </div>
-    </form>
   </div>
 {% endblock %}
 {% block js_foot %}
@@ -84,7 +164,7 @@
     $(document).ready(function() {
       $('.search-text-container').each( function() {
         if ($(this).prop('scrollHeight') > $(this).outerHeight()) {
-          $('.search-show-more').removeClass('d-none')
+          $(this).find('.search-show-more').removeClass('d-none')
         }
       });
       $('.search-show-more').on('click', function() {
@@ -95,7 +175,29 @@
           $(this).parent().css({"maxHeight":"84px"});
           $(this).text('Show more');
         }
+      });
+      $('[data-toggle="tooltip"]').tooltip({ trigger: 'manual'});
+      $('#help-toggle').on('click', function() {
+        $('[data-toggle="tooltip"]').tooltip('toggle')
+      });
+      $('#advanced-search').on('click', '.add', function(e) {
+        let formset_manager = $('#id_form-TOTAL_FORMS');
+        let idx = formset_manager.val();
+        $('#advanced-search-sets').append($('#form_template').html().replace(/__prefix__/g, idx));
+        formset_manager.val(parseInt(idx)+1);
+      });
+      $('#advanced-search').on('click', '.remove', function(e) {
+        let formset_manager = $('#id_form-TOTAL_FORMS');
+        let idx = formset_manager.val();
+        $(e.target).parents('.advanced-search-row').remove();
+        formset_manager.val(parseInt(idx)-1);
+      });
+      $('#advanced-search').on('hide.bs.collapse', function() {
+        let formset_manager = $('#id_form-TOTAL_FORMS');
+        $('#advanced-search-sets').html($('#form_template').html().replace(/__prefix__/g, 1));
+        formset_manager.val(1);
       })
+
     })
   </script>
 {% endblock%}

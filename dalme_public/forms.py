@@ -57,10 +57,76 @@ class SourceFilterForm(forms.Form):
 
 
 class SearchForm(forms.Form):
+
+    MATCH_TYPES = (
+        ('exact', 'Exact match'),
+        ('fuzzy', 'Fuzzy match'),
+        ('prefix', 'Prefix match')
+    )
+
+    OPERATORS = (
+        ('and', 'AND'),
+        ('or', 'OR'),
+    )
+
+    FIELDS = (
+        ('', 'Field'),
+        ('name', 'Name'),
+        ('text', 'Transcription'),
+        ('description', 'Description'),
+        ('source_type', 'Record Type'),
+        ('locations', 'Location'),
+    )
+
+    WILDCARDS = (
+        ('', 'Wildcard'),
+        ('*', '*'),
+        ('?', '?'),
+    )
+
     q = forms.CharField(
         required=False,
         label="Search",
         widget=forms.TextInput(attrs={'type': 'search'}),
+    )
+    match_type = forms.ChoiceField(
+        required=False,
+        label="Match",
+        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
+        choices=MATCH_TYPES
+    )
+    operator = forms.ChoiceField(
+        required=False,
+        label="Operator",
+        widget=forms.Select(attrs={'class': 'form-control form-control-sm form-operator'}),
+        choices=OPERATORS
+    )
+    wildcards = forms.ChoiceField(
+        required=False,
+        label="Wildcars",
+        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
+        choices=WILDCARDS
+    )
+    field = forms.ChoiceField(
+        required=False,
+        label="Field",
+        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
+        choices=FIELDS
+    )
+    field_value = forms.CharField(
+        required=False,
+        label="Query",
+        widget=forms.TextInput(
+            attrs={
+                'type': 'search',
+                'placeholder': 'Query',
+                'autocomplete': 'off',
+                'autocorrect': 'off',
+                'autocapitalize': 'off',
+                'spellcheck': 'false',
+                'class': 'form-control form-control-sm'
+            }
+        ),
     )
 
     def search(self, **kwargs):
@@ -70,4 +136,4 @@ class SearchForm(forms.Form):
         if not self.cleaned_data.get("q"):
             return None
 
-        return Search(self.cleaned_data["q"], **kwargs)
+        return Search(self.cleaned_data, **kwargs)

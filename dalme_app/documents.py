@@ -1,6 +1,6 @@
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
-from dalme_app.models import Source
+from dalme_app.models import Source, LocaleReference
 from django.core.exceptions import ObjectDoesNotExist
 import lxml.etree as et
 
@@ -10,12 +10,13 @@ class SourceDocument(Document):
     name = fields.TextField()
     text = fields.TextField()
     has_image = fields.BooleanField()
-    has_transcription = fields.BooleanField()
     date = fields.DateField()
     source_type = fields.KeywordField()
     set_membership = fields.TextField()
     is_public = fields.BooleanField()
     type = fields.IntegerField()
+    locations = fields.TextField()
+    description = fields.TextField()
 
     class Index:
         name = 'sources'
@@ -38,8 +39,19 @@ class SourceDocument(Document):
     def prepare_has_image(self, instance):
         return instance.has_images
 
-    def prepare_has_transcription(self, instance):
-        return instance.has_transcriptions
+    def prepare_locations(self, instance):
+        locales = instance.attributes.filter(attribute_type__short_name='locale')
+        keywords = []
+        if locales.exists():
+            for locale in locales:
+                loc_obj = LocaleReference.objects.get(pk=locale.value_JSON['id'])
+                keywords.extend([loc_obj.name, loc_obj.administrative_region, loc_obj.country.name])
+        return ' '.join(keywords)
+
+    def prepare_description(self, instance):
+        description = instance.attributes.filter(attribute_type__short_name='description')
+        if description.exists():
+            return description.first().value_TXT
 
     def prepare_date(self, instance):
         if instance.attributes.filter(attribute_type__short_name='start_date').exists():
