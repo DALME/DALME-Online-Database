@@ -29,11 +29,13 @@ ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
 ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
 # email setup
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
 # EMAIL_PORT = 587
 # EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 # EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
-# EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 
 # SECURITY WARNING: don't run with debug turned on in production!

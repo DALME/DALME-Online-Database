@@ -1369,13 +1369,20 @@ section.transcription {
   padding-top: 1rem;
 }
 
+.messages {
+  margin-bottom: 0;
+}
 .messages li {
-  padding: 1rem;
-  font-size: 1.2rem;
+  padding: .8rem 4rem;
+  font-size: 1rem;
 }
 .messages li.success {
-  color: #fff;
-  background: #5cb85c;
+  color: #254e0f;
+  background: #d1eac4;
+}
+.messages li.error {
+  color: #4e0f0f;
+  background: #f1b5b5;
 }
 
 #diva_viewer {

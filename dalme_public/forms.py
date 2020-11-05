@@ -1,6 +1,6 @@
 from datetime import datetime
 from django import forms
-from django.core import mail
+from django.core.mail import EmailMessage
 from dalme_app.utils import Search
 
 
@@ -10,17 +10,19 @@ class ContactForm(forms.Form):
     subject = forms.CharField(max_length=127, required=True)
     message = forms.CharField(widget=forms.Textarea, required=True)
 
-    def get_mail_kwargs(self):
-        return {
-            'subject': self.cleaned_data['subject'],
-            'message': self.cleaned_data['message'],
-            'from_email': self.cleaned_data['email'],
-            'recipient_list': ['projectdalme@gmail.com'],
-            'fail_silently': False,
-        }
-
     def save(self):
-        mail.send_mail(**self.get_mail_kwargs())
+        email = EmailMessage(
+            self.cleaned_data['subject'],
+            self.cleaned_data['message'],
+            f"{self.cleaned_data['name']} <{self.cleaned_data['email']}>",
+            ['projectdalme@gmail.com'],
+            reply_to=[self.cleaned_data['email']]
+        )
+        try:
+            email.send(fail_silently=False)
+            return True, ''
+        except Exception as e:
+            return False, e
 
 
 class SourceFilterForm(forms.Form):

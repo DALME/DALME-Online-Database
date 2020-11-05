@@ -389,17 +389,24 @@ class Flat(DALMEPage):
     def serve(self, request):
         if self.show_contact_form:
             form = forms.ContactForm(label_suffix='')
+
             if request.method == 'POST':
                 form = forms.ContactForm(request.POST, label_suffix='')
+
                 if form.is_valid():
-                    form.save()
-                    messages.success(
-                        request, 'Your message has been delivered.'
-                    )
+                    sent, error = form.save()
+                    if sent:
+                        messages.success(request, 'Your message has been delivered.')
+
+                    else:
+                        messages.error(request, f'There was a problem sending your message: {error}')
+
                     return HttpResponseRedirect(self.url)
+
             return render(
                 request, 'dalme_public/flat.html', {'page': self, 'form': form}
             )
+
         return super().serve(request)
 
 
