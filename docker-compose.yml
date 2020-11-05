@@ -8,10 +8,12 @@ services:
         MYSQL_ROOT_PASSWORD: root
         MYSQL_USER: dalme
         MYSQL_PASSWORD: dalme
-        MYSQL_DATABASE: dalme
+        MYSQL_DATABASE: dalme_db
     volumes:
         - ./.mysql:/docker-entrypoint-initdb.d
         - ./.mysql:/etc/mysql/conf.d
+    ports:
+      - 3306:3306
   web:
     image: dalme-web
     build:
@@ -20,12 +22,12 @@ services:
         - ./:/app
     entrypoint: /app/docker-entrypoint.sh
     ports:
-      - "8000:8000"
-      - "8443:8443"
+      - 8000:8000
+      - 8443:8443
     links:
       - db
     depends_on:
       - db
     env_file: .env
     environment:
-        DATABASE_URL: mysql://dalme:dalme@db:3306/dalme
+        DATABASE_URL: mysql://dalme:dalme@db:3306/dalme_db

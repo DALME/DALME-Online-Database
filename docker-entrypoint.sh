@@ -19,8 +19,8 @@ fi
 
 echo "DB is up..."
 
-echo "Running Migrations..."
-python manage.py migrate
+# echo "Running Migrations..."
+# python manage.py migrate
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
@@ -41,8 +41,8 @@ mod_wsgi-express start-server \
     --server-alias public.127.0.0.1.xip.io \
     --server-alias data.127.0.0.1.xip.io \
     --server-alias purl.127.0.0.1.xip.io \
-    --ssl-certificate-file dev-localhost.cert \
-    --ssl-certificate-key-file dev-localhost.key \
+    --ssl-certificate-file ssl-certs/dev-localhost.cert \
+    --ssl-certificate-key-file ssl-certs/dev-localhost.key \
     --reload-on-changes \
     --user whiskey \
     --group root
