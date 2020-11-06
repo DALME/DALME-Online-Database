@@ -44,6 +44,9 @@ AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
 ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
 
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY', '')
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY', '')
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
 EMAIL_USE_TLS = True
@@ -113,6 +116,7 @@ INSTALLED_APPS = [
     'modelcluster',
     'taggit',
     'maintenance_mode',
+    'captcha',
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.contrib.routable_page',

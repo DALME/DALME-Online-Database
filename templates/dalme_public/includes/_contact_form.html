@@ -5,29 +5,31 @@
   {{ form.source }}
 
   <div class="field sender u-flex">
-    <div class="name">
-      <h4 class="label">{{ form.name.label_tag }}</h4>
+    <div class="form-group name">
+      {{ form.name.label_tag }}
       {{ form.name.errors }}
       {{ form.name }}
     </div>
-    <div class="email">
-      <h4 class="label">{{ form.email.label_tag }}</h4>
+    <div class="form-group email">
+      {{ form.email.label_tag }}
       {{ form.email.errors }}
       {{ form.email }}
     </div>
   </div>
 
-  <div class="field subject">
-    <h4 class="label">{{ form.subject.label_tag }}</h4>
+  <div class="form-group field subject">
+    {{ form.subject.label_tag }}
     {{ form.subject.errors }}
     {{ form.subject }}
   </div>
 
-  <div class="field message">
-    <h4 class="label">{{ form.message.label_tag }}</h4>
+  <div class="form-group field message">
+    {{ form.message.label_tag }}
     {{ form.message.errors }}
     {{ form.message }}
   </div>
-
-  <button class="u-button" type="submit">Send</button>
+  <div class="captcha-container">
+    {{ form.captcha }}
+  <button class="btn btn-primary" type="submit">Send</button>
+  </div>
 </form>

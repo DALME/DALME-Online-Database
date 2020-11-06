@@ -25,6 +25,9 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY', '')
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY', '')
+
 ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
 ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
 # email setup
@@ -152,6 +155,7 @@ INSTALLED_APPS = [
     'modelcluster',
     'taggit',
     'maintenance_mode',
+    'captcha',
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.contrib.routable_page',

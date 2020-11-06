@@ -1,14 +1,40 @@
 from datetime import datetime
 from django import forms
 from django.core.mail import EmailMessage
+from captcha import fields, widgets
 from dalme_app.utils import Search
 
 
 class ContactForm(forms.Form):
-    name = forms.CharField(max_length=127, required=True, label='Your Name')
-    email = forms.EmailField(required=True, label='Your Email')
-    subject = forms.CharField(max_length=127, required=True)
-    message = forms.CharField(widget=forms.Textarea, required=True)
+    name = forms.CharField(
+        max_length=127,
+        required=True,
+        label='Your Name',
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    )
+    email = forms.EmailField(
+        required=True,
+        label='Your Email',
+        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+    )
+    subject = forms.CharField(
+        max_length=127,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    )
+    message = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={'class': 'form-control'}),
+    )
+    captcha = fields.ReCaptchaField(
+        public_key='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+        private_key='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
+        widget=widgets.ReCaptchaV2Checkbox(
+            # attrs={
+            #     'data-theme': 'dark',
+            #     'data-size': 'compact',
+            # }
+        ))
 
     def save(self):
         email = EmailMessage(
