@@ -24,11 +24,13 @@ drf-access-policy==0.7.0
 elasticsearch==7.9.1
 feedparser==5.2.1
 geopy==2.0.0
+gunicorn==20.0.4
 kombu==4.6.11
 lxml==4.5.2
 mysqlclient==2.0.1
 pandas==1.1.4
 passlib==1.7.3
+pycurl==7.43.0.5
 requests==2.24.0
 requests-aws4auth==1.0.1
 urllib3==1.25.10

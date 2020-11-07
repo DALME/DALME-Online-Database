@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  static:
+    image: static-dev
+    build:
+        context: '../..'
+        dockerfile: 'docker/dev/Dockerfile.static'
+    volumes:
+      - ../../www/static:/static
+    depends_on:
+      - web
+    network_mode: 'service:web' # network interface of web container simulates aws-vpc
+    env_file: dev.env
+  db:
+    image: mysql:8.0.19
+    restart: always
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_USER: dalme
+        MYSQL_PASSWORD: dalme
+        MYSQL_DATABASE: dalme_db
+    volumes:
+        - ../../.mysql:/docker-entrypoint-initdb.d
+        - ../../.mysql:/etc/mysql/conf.d
+    ports:
+      - "3306:3306"
+  web:
+    image: dalme-dev
+    build:
+        context: '../..'
+        dockerfile: 'docker/dev/Dockerfile.web'
+    volumes:
+      - ../../:/app
+    ports:
+      - "8443:8843" # forwards port to nginx container
+    links:
+      - db
+    depends_on:
+      - db
+    env_file: dev.env
+  celery:
+    command: celery -A dalme.celeryapp:app worker --beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler --loglevel=error --uid=1001
+    volumes:
+      - ../../:/app
+    env_file: dev.env
+    depends_on:
+      - web
+      - db
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    image: dalme-dev
+    network_mode: 'service:web'
+    restart: on-failure

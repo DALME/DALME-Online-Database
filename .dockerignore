@@ -1,0 +1,12 @@
+.elasticbeanstalk/*
+.ebextensions/*
+.git
+.gitignore
+.pyc
+.DS_Store
+.ebignore
+env
+docs
+db.cnf
+*.md
+pytest.ini

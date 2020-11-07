@@ -212,7 +212,7 @@
           $('#diva_viewer').html('<div class="diva-no-image"></div>');
         } else {
           window.folio = new Diva('diva_viewer', {
-            objectData:`{{db_url}}/pages/${pageId}/manifest/`,
+            objectData:`{{db_url}}pages/${pageId}/manifest/`,
             enableAutoTitle: false,
             enableFullscreen: false,
             enableKeyScroll: false,
@@ -260,7 +260,6 @@
       window.eventBus.$on('renderFolio', (data, everything = true) => {
         const endpoint = `{{api_url}}/pages/${data.pageId}/get_rights/`;
         $.get(endpoint, function(rdata) {
-          console.log(rdata)
           if (rdata.rights.hasOwnProperty('show_image')) {
             if (rdata.rights.show_image) {
               renderImage(data);

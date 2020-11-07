@@ -7,7 +7,7 @@ venv
 staticfiles
 media
 www
-.env
+*.env
 db.cnf
 db-test.cnf
 *.DS_Store

@@ -1,0 +1,5 @@
+FROM nginx:1.14
+
+COPY docker/dev/nginx.dev /etc/nginx/conf.d/default.conf
+COPY ssl-certs/dev-localhost.key /var/certs/dev-localhost.key
+COPY ssl-certs/dev-localhost.cert /var/certs/dev-localhost.cert
