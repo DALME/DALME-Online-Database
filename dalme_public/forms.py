@@ -27,14 +27,8 @@ class ContactForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control'}),
     )
     captcha = fields.ReCaptchaField(
-        public_key='6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
-        private_key='6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe',
-        widget=widgets.ReCaptchaV2Checkbox(
-            # attrs={
-            #     'data-theme': 'dark',
-            #     'data-size': 'compact',
-            # }
-        ))
+        widget=widgets.ReCaptchaV2Checkbox()
+    )
 
     def save(self):
         email = EmailMessage(
