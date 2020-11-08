@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from dalme_app.models._templates import get_current_user
+from django_currentuser.middleware import get_current_user
 import django.db.models.options as options
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)

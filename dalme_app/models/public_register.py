@@ -3,7 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 import django.db.models.options as options
-from dalme_app.models._templates import get_current_user
+from django_currentuser.middleware import get_current_user
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 

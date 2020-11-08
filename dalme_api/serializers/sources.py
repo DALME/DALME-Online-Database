@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from dalme_app.models import Agent, Content_attributes, Set, Set_x_content, Source, Source_credit, Workflow, Work_log
-from dalme_app.models._templates import get_current_user
+from django_currentuser.middleware import get_current_user
 from rest_framework import serializers
 from ._common import DynamicSerializer, translate_workflow_string
 from dalme_api.serializers.users import UserSerializer

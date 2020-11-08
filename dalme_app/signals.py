@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
-from dalme_app.models._templates import get_current_user
+from django_currentuser.middleware import get_current_user
 from dalme_app.models import rs_resource, Workflow, Work_log, Page, PublicRegister, Set_x_content, Source, Transcription
 from django.contrib.contenttypes.models import ContentType
 
