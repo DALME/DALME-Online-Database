@@ -47,6 +47,8 @@
               data-placement="top"
               title="Query input"
             >
+            <!-- Workaround for Safari (form cannot be submitted with enter if button is hidden) -->
+            <button type="submit" class="hidden-search-submit"></button>
           </div>
         </div>
       </div>

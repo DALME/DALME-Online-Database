@@ -2624,6 +2624,14 @@ div.vue-slider {
   color: #354d87;
 }
 
+.hidden-search-submit {
+  border: none;
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  right: 0;
+}
+
 /* viewer */
 
 .diva-no-image {
