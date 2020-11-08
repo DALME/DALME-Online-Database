@@ -198,10 +198,6 @@ class DALMEPage(Page):
         blank=True,
         help_text='An optional short title that will be displayed in certain space constrained contexts.'  # noqa
     )
-    citable = models.BooleanField(
-        default=False,
-        help_text='Check this box to show the "Cite" menu for this page.'
-    )
 
     body = StreamField([
         ('main_image', MainImageBlock()),
@@ -218,10 +214,6 @@ class DALMEPage(Page):
         ('html', blocks.RawHTMLBlock()),
         ('subsection', SubsectionBlock()),
     ], null=True)
-
-    content_panels = Page.content_panels + [
-        FieldPanel('citable'),
-    ]
 
     class Meta:
         abstract = True
@@ -259,6 +251,11 @@ class FeaturedPage(DALMEPage):
         null=True,
         blank=True,
         help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.'  # noqa
+    )
+
+    citable = models.BooleanField(
+        default=True,
+        help_text='Check this box to show the "Cite" menu for this page.'
     )
 
     class Meta:
@@ -373,6 +370,11 @@ class Flat(DALMEPage):
         help_text='Check this box to show a contact form on the page.'
     )
 
+    citable = models.BooleanField(
+        default=False,
+        help_text='Check this box to show the "Cite" menu for this page.'
+    )
+
     parent_page_types = [
         'dalme_public.Section',
         'dalme_public.Collection',
@@ -385,6 +387,7 @@ class Flat(DALMEPage):
         ImageChooserPanel('header_image'),
         FieldPanel('short_title'),
         FieldPanel('show_contact_form'),
+        FieldPanel('citable'),
         StreamFieldPanel('body'),
     ]
 
@@ -463,6 +466,7 @@ class FeaturedObject(FeaturedPage):
         ModelChooserPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
+        FieldPanel('citable'),
         StreamFieldPanel('body'),
     ]
 
@@ -495,6 +499,7 @@ class FeaturedInventory(FeaturedPage):
         ModelChooserPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
+        FieldPanel('citable'),
         StreamFieldPanel('body'),
     ]
 
@@ -529,6 +534,7 @@ class Essay(FeaturedPage):
         FieldPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
+        FieldPanel('citable'),
         StreamFieldPanel('body'),
     ]
 
@@ -659,6 +665,11 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
 
 
 class Collections(SearchEnabled):
+    citable = models.BooleanField(
+        default=True,
+        help_text='Check this box to show the "Cite" menu for this page.'
+    )
+
     parent_page_types = ['dalme_public.Home']
     subpage_types = [
         'dalme_public.Collection',
@@ -668,6 +679,7 @@ class Collections(SearchEnabled):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         FieldPanel('short_title'),
+        FieldPanel('citable'),
         StreamFieldPanel('body'),
         MultiFieldPanel(
             [InlinePanel('corpora', min_num=1, label='Corpus')],
@@ -700,6 +712,10 @@ class Collection(SearchEnabled):
         related_name='public_collections',
         on_delete=models.PROTECT
     )
+    citable = models.BooleanField(
+        default=True,
+        help_text='Check this box to show the "Cite" menu for this page.'
+    )
 
     parent_page_types = ['dalme_public.Collections']
     subpage_types = ['dalme_public.Flat']
@@ -707,6 +723,7 @@ class Collection(SearchEnabled):
     content_panels = DALMEPage.content_panels + [
         SetFieldPanel('source_set'),
         ImageChooserPanel('header_image'),
+        FieldPanel('citable'),
         StreamFieldPanel('body'),
     ]
 
