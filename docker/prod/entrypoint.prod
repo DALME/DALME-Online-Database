@@ -7,8 +7,8 @@ if [ -n "${WAIT_FOR_IT}" ]; then
 fi
 echo "DB is up..."
 
-# echo "running migrations"
-# python3 manage.py migrate
+echo "running migrations"
+python manage.py migrate
 
 echo "Starting $@"
 exec "$@"
