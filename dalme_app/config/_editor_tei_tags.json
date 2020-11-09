@@ -312,11 +312,28 @@
     ]
   },
   {
-    "name": "Column",
-    "type": "sc",
-    "help": "Mark the point at which a column of text begins.",
+    "name": "Layout > Columns",
+    "type": "w",
+    "help": "Wraps a section of text that is laid out as columns. The columns themselves must be tagged individually.",
     "link": "#Columns",
-    "tag_name": "cb",
+    "tag_name": "layout",
+    "attributes": [
+      {
+        "name": "columns",
+        "label": "Columns",
+        "message": "<b>Number of columns</b> in which the selected section is divided.",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "name": "Column",
+    "type": "w",
+    "help": "Wraps a column of text. Must be inside a <layout> tag.",
+    "link": "#Columns",
+    "tag_name": "ab",
+    "attribute_name": "type",
+    "attribute_value": "column",
     "attributes": [
       {
         "name": "n",
