@@ -208,9 +208,6 @@
       const renderImage = ({ pageId, zoomLevel, imageId }) => {
         const node = $('#diva_viewer');
         node.empty();
-        if (!imageId) {
-          $('#diva_viewer').html('<div class="diva-no-image"></div>');
-        } else {
           window.folio = new Diva('diva_viewer', {
             objectData:`{{db_url}}pages/${pageId}/manifest/`,
             enableAutoTitle: false,
@@ -227,7 +224,6 @@
             fixedPadding: 0,
             zoomLevel: zoomLevel,
           });
-        }
       };
 
       const renderRights = (notice) => {
@@ -257,20 +253,21 @@
       };
 
       window.eventBus = new Vue();
-      window.eventBus.$on('renderFolio', (data, everything = true) => {
+      window.eventBus.$on('renderFolio', (data) => {
         const endpoint = `{{api_url}}/pages/${data.pageId}/get_rights/`;
+        let image = false;
         $.get(endpoint, function(rdata) {
-          if (rdata.rights.hasOwnProperty('show_image')) {
-            if (rdata.rights.show_image) {
+          if (rdata.rights && rdata.rights.hasOwnProperty('show_image') && rdata.rights.show_image) {
+            if (data.imageId) {
+              image = true;
               renderImage(data);
-              if (everything) {
-                if (data.imageId && rdata.rights.display_notice) {
-                  renderRights(rdata.rights.notice);
-                }
-                renderTranscription(data.transcriptionId);
+              if (rdata.rights.display_notice) {
+                renderRights(rdata.rights.notice);
               }
             }
           }
+          if (!image) { $('#diva_viewer').html('<div class="diva-no-image"></div>'); }
+          renderTranscription(data.transcriptionId);
         }, 'json');
       });
       window.eventBus.$on('zoomIn', () => {
