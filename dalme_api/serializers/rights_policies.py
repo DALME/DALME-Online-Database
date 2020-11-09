@@ -6,7 +6,7 @@ class RightsPolicySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RightsPolicy
-        fields = ('id', 'name', 'rights_holder', 'rights_status', 'rights', 'notice_display', 'rights_notice', 'licence', 'attachments')
+        fields = ('id', 'name', 'rights_holder', 'rights_status', 'rights', 'public_display', 'notice_display', 'rights_notice', 'licence', 'attachments')
         extra_kwargs = {
                         'rights_notice': {'required': False},
                         'licence': {'required': False},

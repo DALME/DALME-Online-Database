@@ -14,6 +14,7 @@
         "licence": "licence",
         "rights_holder": "rights_holder",
         "notice_display": "notice_display",
+        "public_display": "public_display",
         "attachments": "attachments.file",
         "rights_notice": "rights_notice"
       },
@@ -21,7 +22,8 @@
         "name",
         "rights_holder",
         "rights_status.id",
-        "rights"
+        "rights",
+        "public_display"
       ]
     }
   },
@@ -31,6 +33,7 @@
       "rights_holder",
       "rights_status",
       "rights",
+      "public_display",
       "notice_display",
       "rights_notice",
       "licence",
@@ -48,6 +51,7 @@
       "rights_holder",
       "rights_status",
       "rights",
+      "public_display",
       "notice_display",
       "rights_notice",
       "licence",
