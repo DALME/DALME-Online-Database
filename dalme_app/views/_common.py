@@ -2,6 +2,8 @@ from django.views.generic.base import TemplateView, ContextMixin
 from django.views.generic import DetailView
 from django.conf import settings
 from dalme_app.utils import DALMEMenus as dm
+from dalme_app.forms import SearchForm
+from django.forms import formset_factory
 
 
 class DALMEContextMixin(ContextMixin):
@@ -26,7 +28,8 @@ class DALMEContextMixin(ContextMixin):
             'sidebar': dm(self.request, state).sidebar,
             'page_title': page_title,
             'page_chain': get_page_chain(breadcrumb, page_title),
-            'comments': self.comments
+            'comments': self.comments,
+            'form': formset_factory(SearchForm)
         })
 
         return context

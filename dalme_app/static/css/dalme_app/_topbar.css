@@ -116,14 +116,14 @@ li#searchIcon.show a {
   background-color: #3a3a3a;
 }
 
-.navbar-search {
+nav.topbar-dalme .navbar-search {
   width: 240px !important;
 }
 
-#topbar_search {
+nav.topbar-dalme .navbar-search input {
   border: none;
   background-color: #3a3a3a;
-  color: #b9b9b9 !important;
+  color: #b9b9b9;
   font-size: 13px;
   width: 100%;
   padding-top: 0;
@@ -132,11 +132,11 @@ li#searchIcon.show a {
   height: 32px;
 }
 
-#topbar_search:focus {
+nav.topbar-dalme .navbar-search input:focus {
   color: #fff !important;
   box-shadow: 0px 0px 1px 2px #0361aa inset !important;
 }
 
-#topbar_search::placeholder {
+nav.topbar-dalme .navbar-search input::placeholder {
   color: #777 !important;
 }

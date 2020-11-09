@@ -2517,6 +2517,14 @@ div.vue-slider {
   font-family: "PT Serif", serif;
 }
 
+.hidden-search-submit {
+  border: none;
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  right: 0;
+}
+
 /* documents/publications/lectures */
 
 .block-heading + .block-document {
@@ -2622,14 +2630,6 @@ div.vue-slider {
 .show-more:hover {
   background-color: #e9f1fb;
   color: #354d87;
-}
-
-.hidden-search-submit {
-  border: none;
-  width: 0px;
-  height: 0px;
-  position: absolute;
-  right: 0;
 }
 
 /* viewer */
