@@ -1,3 +1,5 @@
+import os
+import json
 from django.contrib.auth.models import User
 from dalme_app.models import Agent, Content_attributes, Set, Set_x_content, Source, Source_credit, Workflow, Work_log
 from django_currentuser.middleware import get_current_user
@@ -186,8 +188,8 @@ class SourceSerializer(DynamicSerializer):
         if validated_data is not None:
             if instance.attributes.all().exists():
                 current_attributes = instance.attributes.all()
-                current_attributes_dict = dict((i.id, i) for i in current_attributes)
-                active_types = list(set([i['attribute_type'] for i in validated_data]))
+                current_attributes_dict = dict((i.id, [i.attribute_type.short_name, i]) for i in current_attributes)
+                active_types = self.get_active_attributes(instance)
                 new_attributes = []
                 for i, attribute in enumerate(validated_data):
                     if current_attributes.filter(**attribute).count() == 1:
@@ -196,9 +198,9 @@ class SourceSerializer(DynamicSerializer):
                         new_attributes.append(attribute)
 
                 if len(current_attributes_dict) > 0:
-                    for id, attribute in current_attributes_dict.items():
-                        if attribute.attribute_type in active_types:
-                            attribute.delete()
+                    for id, lst in current_attributes_dict.items():
+                        if lst[0] in active_types:
+                            lst[1].delete()
             else:
                 new_attributes = validated_data
 
@@ -320,3 +322,18 @@ class SourceSerializer(DynamicSerializer):
                         attributes[key] = value
 
         return attributes
+
+    def get_active_attributes(self, instance):
+        if instance.type.id == 13:
+            source_type = 'records'
+        elif instance.type.id == 19:
+            source_type = 'archives'
+        elif instance.type.id == 12:
+            source_type = 'archival-files'
+        else:
+            source_type = 'bibliography'
+
+        with open(os.path.join('dalme_app', 'config', 'datatables', f'_sources_{source_type}.json'), 'r') as fp:
+            config_file = json.load(fp)
+
+        return [k for k, v in config_file['config']['globals']['attribute_concordance'].items()]
