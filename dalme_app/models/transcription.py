@@ -9,7 +9,7 @@ options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 class Transcription(dalmeUuid):
     transcription = models.TextField(blank=True, default=None)
     author = models.CharField(max_length=255, default=get_current_username)
-    version = models.IntegerField(null=True)
+    version = models.IntegerField(default=1)
     count_ignore = models.BooleanField(default=False)
 
     def __str__(self):
