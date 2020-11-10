@@ -25,6 +25,10 @@ function dalme_startup(helpers) {
       "hideMethod": "fadeOut"
   };
 
+  if ($('#user-preferences').length) {
+    user_prefs = JSON.parse($('#user-preferences').text());
+  }
+
   if (typeof helpers != 'undefined' && helpers != 'None') {
     helpers = JSON.parse(helpers.replace(/'/g, '"'));
     for (let i = 0, len = helpers.length; i < len; ++i) { eval(helpers[i]+'_load()'); };
@@ -441,7 +445,7 @@ function update_session(data) {
       crossDomain: true,
       headers : {'X-CSRFToken': get_cookie('csrftoken') },
       dataType : "json",
-      data : data
+      data : { "data": JSON.stringify(data) }
     });
 }
 

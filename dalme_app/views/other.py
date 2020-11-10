@@ -1,20 +1,18 @@
 import mimetypes
 import urllib
+import json
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse
 from django.conf import settings
 from dalme_app.models import Page
 
 
 def SessionUpdate(request):
-    if not request.is_ajax() or not request.method == 'POST':
-        return HttpResponseNotAllowed(['POST'])
-    if request.POST['var'] == 'sidebar_toggle':
-        if request.session['sidebar_toggle'] == '':
-            request.session['sidebar_toggle'] = 'toggled'
-        else:
-            request.session['sidebar_toggle'] = ''
-    return HttpResponse('ok')
+    if request.method == 'POST':
+        data = json.loads(request.POST['data'])
+        for key, value in data.items():
+            request.session[key] = value
+        return HttpResponse('ok')
 
 
 def HealthCheck(request):

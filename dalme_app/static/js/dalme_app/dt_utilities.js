@@ -165,7 +165,7 @@ function build_datatables(data, target, editor) {
   var table_options = _.merge(data[1].datatables.options, data[0].datatables.options);
   table_options['ajax']['headers']['X-CSRFToken'] = (get_cookie("csrftoken"));
   table_options['ajax']['data'] = (function (data) { return { "data": JSON.stringify(data) }; });
-  table_options['ajax']['url'] = `${api_endpoint}/${table_options['ajax']['url']}`
+  table_options['ajax']['url'] = `${api_endpoint}/${table_options['ajax']['url']}`;
 
   let editor_buttons = editor ? data[0].editor.buttons : []
   let editor_instance = editor ? dt_editor : null
@@ -556,7 +556,11 @@ function get_dt_buttons(table_button_list, editor_button_list, editor) {
 
 function update_dt_url(data) {
   data = JSON.parse(data['data'])
-  var url = remove_param(['search', 'ordering'], dt_table.ajax.url())
+  var url = remove_param(['search', 'ordering', 'mode'], dt_table.ajax.url())
+
+  if (typeof mode != 'undefined') {
+    url += `&mode=${mode}`;
+  }
 
   if (data['order'].length) {
     var ordering = [];
@@ -567,11 +571,13 @@ function update_dt_url(data) {
       ordering.push(column)
     }
 
-    url = url + '&ordering=' + ordering.join(',')
+    url += `&ordering=${ordering.join(',')}`
   }
 
   if (data['search']['value'] != '') {
-    url = url + '&search=' + data['search']['value']
+    url += `&search=${data['search']['value']}`
+  } else if ($('#dataTables-list_filter input').text() != '') {
+    url += `&search=${$('#dataTables-list_filter input').text()}`
   }
 
   dt_table.ajax.url(url)

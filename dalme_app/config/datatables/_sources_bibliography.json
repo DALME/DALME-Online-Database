@@ -50,7 +50,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "sources/?format=json&class=bibliography&mode=own"
+        "url": "sources/?format=json&class=bibliography"
       }
     },
     "overrides": {}

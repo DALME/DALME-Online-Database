@@ -61,7 +61,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "sources/?format=json&class=archival_files&mode=own"
+        "url": "sources/?format=json&class=archival_files"
       }
     },
     "overrides": {

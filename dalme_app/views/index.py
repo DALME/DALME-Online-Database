@@ -12,6 +12,5 @@ class Index(TemplateView, DALMEContextMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.request.session['sidebar_toggle'] = self.request.user.preferences['interface__sidebar_collapsed']
         context['cards'] = self.request.user.preferences['interface__homepage_cards']
         return context

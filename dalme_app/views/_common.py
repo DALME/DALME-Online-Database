@@ -29,7 +29,8 @@ class DALMEContextMixin(ContextMixin):
             'page_title': page_title,
             'page_chain': get_page_chain(breadcrumb, page_title),
             'comments': self.comments,
-            'form': formset_factory(SearchForm)
+            'form': formset_factory(SearchForm),
+            'preferences': self.get_preferences()
         })
 
         return context
@@ -39,6 +40,13 @@ class DALMEContextMixin(ContextMixin):
 
     def get_breadcrumb(self):
         return self.breadcrumb
+
+    def get_preferences(self):
+        return {
+            'sidebar_toggle': self.request.session.get('sidebar_toggle', self.request.user.preferences['interface__sidebar_collapsed']),
+            'remember_columns': self.request.session.get('remember_columns', self.request.user.preferences['interface__remember_column_visibility']),
+            'list_scope': self.request.session.get('list_scope', self.request.user.preferences['interface__records_list_scope'])
+        }
 
 
 class DALMEDetailView(DetailView, DALMEContextMixin):
