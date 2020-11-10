@@ -15,3 +15,8 @@ class LocaleReferenceSerializer(serializers.ModelSerializer):
                 'id': instance.country.id
                 }
         return ret
+
+    def to_internal_value(self, data):
+        if data.get('country') is not None and type(data.get('country')) is dict:
+            data['country'] = data['country']['id']
+        return super().to_internal_value(data)
