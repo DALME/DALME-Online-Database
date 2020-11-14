@@ -247,8 +247,9 @@ class SourceDetail(DALMEDetailView):
                 else:
                     folio_menu += f'<a class="dropdown-item" href="#" id="{i}" onclick="changeEditorFolio(this.id)">Folio {folio["pageName"]}</a>'
 
-        folio_menu += '</div><button class="editor-btn button-border-left" id="btn_nextFolio" value="1" \
-                      onclick="changeEditorFolio(this.value)"><i class="fa fa-caret-right fa-fw"></i></button>'
+        if folio_count != 1:
+            folio_menu += '</div><button class="editor-btn button-border-left" id="btn_nextFolio" value="1" \
+                          onclick="changeEditorFolio(this.value)"><i class="fa fa-caret-right fa-fw"></i></button>'
 
         return {'folio_count': folio_count, 'folio_menu': folio_menu, 'folio_list': folio_list}
 
