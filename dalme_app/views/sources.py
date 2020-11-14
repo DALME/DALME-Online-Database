@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
 from django.http import Http404
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -209,44 +210,46 @@ class SourceDetail(DALMEDetailView):
             raise Http404
 
     def get_folios(self):
-        folios = self.object.pages.all().order_by('order')
+        folios = self.object.source_pages.all().values(
+                pageId=F('page__pk'),
+                pageName=F('page__name'),
+                pageTranscriptionId=F('transcription__pk'),
+                pageTranscriptionVersion=F('transcription__version'),
+                pageOrder=F('page__order'),
+                pageDamId=F('page__dam_id')
+            ).order_by('pageOrder')
+
         folio_count = len(folios)
         folio_list = []
-        if folio_count == 1:
-            folio_menu = '<div class="single_folio">Folio {} (1/1)</div>'.format(folios[0].name)
+        folio_menu = '<button class="editor-btn button-border-left" id="btn_prevFolio" \
+                     value="" onclick="changeEditorFolio(this.value)" disabled><i class="fa \
+                     fa-caret-left fa-fw"></i></button>'
+
+        for i, folio in enumerate(folios):
             folio_dict = {
-                'name': folios[0].name,
-                'id': str(folios[0].id),
-                'dam_id': str(folios[0].dam_id),
-                'order': str(folios[0].order)
+                'name': folio['pageName'],
+                'id': str(folio['pageId']),
+                'dam_id': str(folio['pageDamId']),
+                'order': str(folio['pageOrder']),
+                'tr_id': str(folio['pageTranscriptionId']) or "None",
+                'tr_version': folio['pageTranscriptionVersion'] or 0
                 }
-            transcription = self.object.source_pages.all().first().transcription
-            folio_dict['tr_id'] = str(transcription.id) if transcription is not None else "None"
-            folio_dict['tr_version'] = transcription.version if transcription is not None else 0
             folio_list.append(folio_dict)
-        else:
-            folio_menu = '<button class="editor-btn button-border-left" id="btn_prevFolio" value="" onclick="changeEditorFolio(this.value)" disabled><i class="fa fa-caret-left fa-fw"></i></button>'
-            count = 0
-            for f in folios:
-                folio_dict = {
-                    'name': f.name,
-                    'id': str(f.id),
-                    'dam_id': str(f.dam_id),
-                    'order': str(f.order)
-                    }
-                transcription = self.object.source_pages.all()[count].transcription
-                folio_dict['tr_id'] = str(transcription.id) if transcription is not None else "None"
-                folio_dict['tr_version'] = transcription.version if transcription is not None else 0
-                if count == 0:
-                    folio_menu += '<button id="btn_selectFolio" class="editor-btn button-border-left" data-toggle="dropdown" aria-haspopup="true" \
-                                   aria-expanded="false">Folio {} (1/{})</button><div class="dropdown-menu" aria-labelledby="folios">'.format(f.name, folio_count)
-                    folio_menu += '<a class="dropdown-item current-folio" href="#" id="0" onclick="changeEditorFolio(this.id)">Folio {}</a>'.format(f.name)
+
+            if folio_count == 1:
+                folio_menu = f'<div class="single_folio">Folio {folio["pageName"]} (1/1)</div>'
+            else:
+                if i == 0:
+                    folio_menu += f'<button id="btn_selectFolio" class="editor-btn button-border-left" data-toggle="dropdown" \
+                                    aria-haspopup="true" aria-expanded="false">Folio {folio["pageName"]} (1/{folio_count})</button> \
+                                    <div class="dropdown-menu" aria-labelledby="folios"><a class="dropdown-item current-folio" \
+                                    href="#" id="0" onclick="changeEditorFolio(this.id)">Folio {folio["pageName"]}</a>'
                 else:
-                    folio_menu += '<a class="dropdown-item" href="#" id="{}" onclick="changeEditorFolio(this.id)">Folio {}</a>'.format(count, f.name)
-                count = count + 1
-                folio_list.append(folio_dict)
-            folio_menu += '</div><button class="editor-btn button-border-left" id="btn_nextFolio" value="1" onclick="changeEditorFolio(this.value)">\
-                            <i class="fa fa-caret-right fa-fw"></i></button>'
+                    folio_menu += f'<a class="dropdown-item" href="#" id="{i}" onclick="changeEditorFolio(this.id)">Folio {folio["pageName"]}</a>'
+
+        folio_menu += '</div><button class="editor-btn button-border-left" id="btn_nextFolio" value="1" \
+                      onclick="changeEditorFolio(this.value)"><i class="fa fa-caret-right fa-fw"></i></button>'
+
         return {'folio_count': folio_count, 'folio_menu': folio_menu, 'folio_list': folio_list}
 
 
