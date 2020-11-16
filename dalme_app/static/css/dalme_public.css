@@ -1311,7 +1311,7 @@ section.transcription {
   background: #fff;
   flex: 1 1 auto;
   z-index: 1;
-  height: calc(100vh - (var(--header-height) + 150px));
+  min-height: calc(100vh - (var(--header-height) + 150px));
 }
 .folios.vertical-split section.transcription {
   padding: 1rem 1rem 0 1rem;
