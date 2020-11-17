@@ -202,9 +202,12 @@ tei-note[type="marginal"] {
   border: 1px solid #cfd29a;
   background: #ffffdc;
   padding: 5px 10px;
+  margin: 10px auto;
   display: inline-block;
   font-size: 14px;
-  float: right;
+  width: 100%;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 tei-ref {
