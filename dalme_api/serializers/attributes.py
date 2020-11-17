@@ -1,6 +1,7 @@
 from dalme_app.models import * # NOQA
 from rest_framework import serializers
 import json
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -14,12 +15,16 @@ class AttributeSerializer(serializers.ModelSerializer):
         label = instance.attribute_type.short_name
         if instance.attribute_type.data_type in ['FK-UUID', 'FK-INT']:
             _id = '"{}"'.format(instance.value_JSON['id']) if instance.attribute_type.data_type == 'FK-UUID' else instance.value_JSON['id']
-            object = eval('{}.objects.get(pk={})'.format(instance.value_JSON['class'], _id))
-            return {label: {
-                    'name': object.name,
-                    'url': object.get_url(),
-                    'id': json.dumps(instance.value_JSON)
-                    }}
+            try:
+                object = eval('{}.objects.get(pk={})'.format(instance.value_JSON['class'], _id))
+                return {label: {
+                        'name': object.name,
+                        'url': object.get_url(),
+                        'id': json.dumps(instance.value_JSON)
+                        }}
+            except ObjectDoesNotExist:
+                instance.delete()
+
         elif instance.attribute_type.data_type == 'DATE':
             return {label: {
                 'name': str(instance),
