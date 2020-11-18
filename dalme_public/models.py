@@ -51,8 +51,7 @@ from dalme_public.blocks import (
 from dalme_app.documents import PublicSourceDocument
 from django.utils.html import format_html
 from django.templatetags.static import static
-from django.forms import formset_factory
-from dalme_app.utils import Search
+from dalme_app.utils import Search, formset_factory
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -578,15 +577,20 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         advanced = False
         error = False
 
+        if not request.method == 'POST' and 'public-search-post' in request.session:
+            request.POST = request.session['public-search-post']
+            request.method = 'POST'
+
         if request.method == 'POST':
             formset = formset(request.POST)
+            request.session['public-search-post'] = request.POST
             if formset.is_valid():
                 query = True
                 advanced = formset.cleaned_data[0]['field'] != ''
                 es_result = Search(
                     data=formset.cleaned_data,
                     searchindex=searchindex,
-                    page=request.POST.get('page', 1),
+                    page=request.POST.get('form-PAGE', 1),
                     highlight=True
                 )
                 if type(es_result) is tuple:
