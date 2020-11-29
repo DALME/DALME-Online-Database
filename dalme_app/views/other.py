@@ -10,9 +10,19 @@ from dalme_app.models import Page
 def SessionUpdate(request):
     if request.method == 'POST':
         data = json.loads(request.POST['data'])
+        result = []
         for key, value in data.items():
-            request.session[key] = value
-        return HttpResponse('ok')
+            if not value:
+                try:
+                    del request.session[key]
+                    result.append({'key': key, 'result': 'deleted'})
+                except KeyError:
+                    result.append({'key': key, 'result': 'skipped - does not exist'})
+            else:
+                request.session[key] = value
+                result.append({'key': key, 'result': f'new value: {value}'})
+
+        return HttpResponse(result)
 
 
 def HealthCheck(request):
