@@ -30,7 +30,7 @@ def htimesince(d):
 def dict_key_lookup(_dict, key):
     # Try to fetch from the dict, and if it's not found return an empty string.
     return _dict.get(key, '')
-    
+
 
 @register.filter
 def to_dict(target):
@@ -89,9 +89,13 @@ def get_highlights(meta, context):
         for doc in docs:
             for hit in meta.inner_hits[doc].hits:
                 if hit.meta:
-                    fields = hit.meta.highlight.to_dict().keys()
-                    for field in fields:
-                        for fragment in hit.meta.highlight[field]:
-                            highlights.append({'field': f'Folio {hit.folio}', 'fragment': fragment, 'link': hit.folio})
+                    try:
+                        fields = hit.meta.highlight.to_dict().keys()
+                        for field in fields:
+                            for fragment in hit.meta.highlight[field]:
+                                highlights.append({'field': f'Folio {hit.folio}', 'fragment': fragment, 'link': hit.folio})
+
+                    except AttributeError:
+                        pass
 
     return highlights

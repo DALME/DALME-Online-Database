@@ -394,9 +394,13 @@ def get_highlights(meta, context):
         for doc in docs:
             for hit in meta.inner_hits[doc].hits:
                 if hit.meta:
-                    fields = hit.meta.highlight.to_dict().keys()
-                    for field in fields:
-                        for fragment in hit.meta.highlight[field]:
-                            highlights.append({'field': f'Folio {hit.folio}', 'fragment': fragment, 'link': hit.folio})
+                    try:
+                        fields = hit.meta.highlight.to_dict().keys()
+                        for field in fields:
+                            for fragment in hit.meta.highlight[field]:
+                                highlights.append({'field': f'Folio {hit.folio}', 'fragment': fragment, 'link': hit.folio})
+
+                    except AttributeError:
+                        pass
 
     return highlights
