@@ -2,7 +2,7 @@ from calendar import month_name
 
 from django import template
 from django.db.models.functions import Coalesce
-
+from elasticsearch_dsl.utils import AttrDict
 
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.models import (
@@ -317,13 +317,20 @@ def relative_url(value, field_name, urlencode=None):
 
 @register.filter
 def dd_record_name(name, part=''):
-    name_string = name.split('(')
-    if part == 'loc':
-        try:
-            return name_string[1][:-1]
-        except IndexError:
-            return 'Archival location not available'
-    return name_string[0]
+    try:
+        name_string = name.split('(')
+        if part == 'loc':
+
+            try:
+                return name_string[1][:-1]
+
+            except IndexError:
+                return 'Archival location not available'
+
+        return name_string[0]
+
+    except AttributeError:
+        return name
 
 
 @register.simple_tag
@@ -334,3 +341,62 @@ def search_help():
 @register.simple_tag
 def explore_map_text():
     return ExploreMapText.objects.first()
+
+
+@register.filter
+def to_dict(target):
+    if type(target) is AttrDict:
+        return target.to_dict()
+    if type(target) is list and type(target[0]) is tuple:
+        return {i[0]: i[1] for i in target}
+
+
+@register.simple_tag
+def dict_key_lookup(_dict, key):
+    return _dict.get(key, '')
+
+
+@register.filter
+def in_list(value, list_string):
+    _list = []
+    conversions = {
+        'none': None,
+        'blank': '',
+        'empty': ' '
+    }
+
+    for item in list_string.split(','):
+        if item in conversions:
+            _list.append(conversions[item])
+        else:
+            _list.append(item)
+
+    return value in _list
+
+
+@register.filter
+def get_highlights(meta, context):
+    highlights = []
+    if 'highlight' in meta:
+        fields = list(meta.highlight.to_dict().keys())
+        for field in fields:
+            for fragment in meta.highlight[field]:
+                try:
+                    highlights.append({'field': context[field]['label'], 'fragment': fragment})
+
+                except KeyError:
+                    field_tokens = field.split('.')
+                    field_tokens.pop(-1)
+                    highlights.append({'field': context['.'.join(field_tokens)]['label'], 'fragment': fragment})
+
+    if 'inner_hits' in meta:
+        docs = list(meta.inner_hits.to_dict().keys())
+        for doc in docs:
+            for hit in meta.inner_hits[doc].hits:
+                if hit.meta:
+                    fields = hit.meta.highlight.to_dict().keys()
+                    for field in fields:
+                        for fragment in hit.meta.highlight[field]:
+                            highlights.append({'field': f'Folio {hit.folio}', 'fragment': fragment, 'link': hit.folio})
+
+    return highlights
