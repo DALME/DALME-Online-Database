@@ -66,4 +66,5 @@ def formset_factory(form, formset=PaginatedBaseFormSet, extra=1, can_order=False
         'validate_min': validate_min,
         'validate_max': validate_max,
     }
+
     return type(form.__name__ + 'FormSet', (formset,), attrs)
