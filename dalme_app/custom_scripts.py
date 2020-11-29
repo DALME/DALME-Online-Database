@@ -27,6 +27,8 @@ from django.db.models import OuterRef, Subquery
 import requests
 from django.contrib.contenttypes.models import ContentType
 from geopy.geocoders import AlgoliaPlaces
+import lxml.etree as et
+from django.core.management import call_command
 
 
 def get_script_menu():
@@ -135,8 +137,7 @@ def update_folios_in_dam(request):
 
 
 def rebuild_search_index(request):
-    result = update_search_index.delay()
-    result.forget()
+    call_command('search_index', '--rebuild', '-f')
     return 'Process started...'
 
 
@@ -245,14 +246,13 @@ def geolocate_locales(request):
 
 
 def test_expression(request):
-    public_sources = Source.objects.filter(workflow__is_public=True)
-    ct = ContentType.objects.get_for_model(public_sources.first())
-    for source in public_sources:
-        PublicRegister.objects.create(
-            object_id=source.id,
-            content_type=ct
-        )
-    return 'done'
+    attributes = Attribute.objects.filter(attribute_type__data_type__in=['FK-UUID', 'FK-INT'], value_JSON__isnull=False)
+    for attribute in attributes:
+        attribute.save()
+        # _id = '"{}"'.format(self.value_JSON['id']) if self.attribute_type.data_type == 'FK-UUID' else self.value_JSON['id']
+        # self.value_STR = str(eval('{}.objects.get(pk={})'.format(self.value_JSON['class'], _id)))
+    return attributes[1000].value_STR
+
 
 
 def fix_users(records):
