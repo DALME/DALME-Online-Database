@@ -48,13 +48,14 @@ from dalme_public.blocks import (
     SubsectionBlock,
 )
 
-from dalme_app.documents import PublicSourceDocument
 from django.utils.html import format_html
 from django.templatetags.static import static
-from dalme_app.utils import Search, formset_factory
+from dalme_app.utils import Search, formset_factory, SearchContext
+from dalme_app.forms import SearchForm
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+FOLIO_RE = '[0-9a-z]+'
 
 
 @hooks.register('construct_settings_menu')
@@ -569,46 +570,46 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
     @route(r'^search/$', name='search')
     def search(self, request):
         context = self.get_context(request)
-        searchindex = PublicSourceDocument()
-        formset = formset_factory(forms.SearchForm)
-        paginator = {}
-        results = []
-        query = False
-        advanced = False
-        error = False
+        search_context = SearchContext(public=True)
+        search_formset = formset_factory(SearchForm)
 
-        if not request.method == 'POST' and 'public-search-post' in request.session:
+        context.update({
+            'query': False,
+            'advanced': False,
+            'form': search_formset(form_kwargs={'fields': search_context.fields}),
+            'results': [],
+            'paginator': {},
+            'errors': False,
+            'paginated': False,
+            'suggestion': None,
+            'search': True,
+            'search_context': search_context.context
+        })
+
+        if not request.method == 'POST' and request.session.get('public-search-post', False):
             request.POST = request.session['public-search-post']
             request.method = 'POST'
 
         if request.method == 'POST':
-            formset = formset(request.POST)
+            formset = search_formset(request.POST, form_kwargs={'fields': search_context.fields})
             request.session['public-search-post'] = request.POST
             if formset.is_valid():
-                query = True
-                advanced = formset.cleaned_data[0]['field'] != ''
-                es_result = Search(
+                search_obj = Search(
                     data=formset.cleaned_data,
-                    searchindex=searchindex,
+                    public=True,
                     page=request.POST.get('form-PAGE', 1),
-                    highlight=True
+                    highlight=True,
+                    search_context=search_context.context
                 )
-                if type(es_result) is tuple:
-                    (paginator, results) = es_result
-                else:
-                    error = es_result
-
-        context.update({
-            'query': query,
-            'advanced': advanced,
-            'form': formset,
-            'results': results,
-            'paginator': paginator,
-            'error': error,
-            'paginated': paginator.get('num_pages', 0) > 1,
-            'suggestion': None,
-            'search': True,
-        })
+                context.update({
+                    'query': True,
+                    'advanced': formset.cleaned_data[0].get('field_value', '') != '',
+                    'form': formset,
+                    'results': search_obj.results,
+                    'paginator': search_obj.paginator,
+                    'errors': search_obj.errors,
+                    'paginated': search_obj.paginator.get('num_pages', 0) > 1
+                })
 
         return render(
             request, 'dalme_public/search.html', context

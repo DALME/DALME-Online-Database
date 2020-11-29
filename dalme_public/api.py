@@ -13,10 +13,9 @@ from dalme_app.models import Attribute, Source, rs_resource
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
-
-from dalme_app.documents import PublicSourceDocument
-from elasticsearch_dsl.query import MatchPhrasePrefix, Prefix
 from dalme_public.filters import _map_source_types
+from dalme_app.utils import Search, SearchContext
+
 
 class DALMEPagination(pagination.PageNumberPagination):
     page_size = 24
@@ -117,14 +116,20 @@ class SourceList(ListAPIView):
         return Response(serializer.data)
 
     def get_queryset(self, *args, **kwargs):
+        qs = []
         if self.request.GET.get('search'):
-            q = self.request.GET.get('search').lower().strip()
-            if len(q.split(' ')) > 1:
-                query = MatchPhrasePrefix(text={'query': q})
-            else:
-                query = Prefix(text={'value': q})
-            qs = PublicSourceDocument.search().query(query)[:1000].to_queryset().order_by('name')
-        else:
+            search_context = SearchContext(public=True)
+            search_obj = Search(
+                data=[{'query': self.request.GET.get('search').strip(), 'field_value': ''}],
+                public=True,
+                highlight=False,
+                search_context=search_context.context,
+                as_queryset=True,
+                sort='name'
+            )
+            qs = search_obj.results
+
+        if not qs:
             qs = super().get_queryset(*args, **kwargs).order_by('name')
             qs = qs.filter(type=13, workflow__is_public=True)
             qs = qs.prefetch_related(
