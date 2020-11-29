@@ -157,29 +157,6 @@ class Source(index.Indexed, dalmeUuidOwned):
         except: # NOQA
             return 'Edited by the DALME Team.'
 
-    def get_transcription_blob(self):
-        if self.source_pages.all().select_related('transcription').exists():
-            trs = self.source_pages.all().select_related('transcription')
-            text = ''
-            xml_parser = et.XMLParser(recover=True)
-            for tr in trs:
-                try:
-                    tr_tree = et.fromstring('<xml>' + tr.transcription.transcription + '</xml>', xml_parser)
-                    txt_tr = et.tostring(tr_tree, encoding='utf8', method='text').decode('utf-8')
-                    text = text + txt_tr
-                except: # NOQA
-                    continue
-            return text
-
-    def get_attribute_blob(self):
-        att_blob = {}
-        for att in self.attributes.all():
-            att_blob[att.attribute_type.name] = att.value_STR
-        return str(att_blob)
-
-    def get_data_blob(self):
-        return str(self.get_attribute_blob()) + str(self.get_transcription_blob())
-
 
 class Source_credit(dalmeUuid):
     EDITOR = 1
