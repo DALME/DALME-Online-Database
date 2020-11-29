@@ -137,22 +137,6 @@ function update_workflow(action, code=0) {
     });
 }
 
-function get_cookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 function create_task_list() {
   $.ajax({
     method: "GET",
@@ -437,18 +421,6 @@ function create_ticket() {
       }).title('Create New Issue Ticket').create();
 }
 
-function update_session(data) {
-    $.ajax({
-      type : "POST",
-      url : "/su/",
-      xhrFields: { withCredentials: true },
-      crossDomain: true,
-      headers : {'X-CSRFToken': get_cookie('csrftoken') },
-      dataType : "json",
-      data : { "data": JSON.stringify(data) }
-    });
-}
-
 function full_screen_mode(action) {
   if (action == 'on') {
     const elem = document.documentElement;
@@ -476,37 +448,6 @@ function full_screen_mode(action) {
     document.getElementById("fullScreenToggle").innerHTML = '<a class="nav-link" href="#" role="button" onclick="full_screen_mode(\'on\')"><i class="fas fa-expand fa-g"></i></a>';
     window.dispatchEvent(new Event('resize'));
   }
-}
-
-function remove_param(key, sourceURL) {
-    if (!Array.isArray(key)) {
-      key = [key]
-    }
-    var rtn = sourceURL.split("?")[0],
-        param,
-        params_arr = [],
-        queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
-    if (queryString !== "") {
-        params_arr = queryString.split("&");
-        for (let i = 0, len = key.length; i < len; ++i) {
-          for (let j = params_arr.length - 1; j >= 0; j -= 1) {
-              param = params_arr[j].split("=")[0];
-              if (param === key[i]) {
-                  params_arr.splice(j, 1);
-              }
-          }
-        }
-        rtn = rtn + "?" + params_arr.join("&");
-    }
-    return rtn;
-}
-
-function get_params(sourceURL) {
-    var params = {};
-    var parts = sourceURL.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        params[key] = value;
-    });
-    return params;
 }
 
 function enable_comments(model, object) {
