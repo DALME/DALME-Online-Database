@@ -6,4 +6,4 @@ from .dynamic_preferences import JSONPreferenceSerializer, JSONPreference # NOQA
 from .menu_compiler import DALMEMenus # NOQA
 from .offline_context_generator import offline_context_generator # NOQA
 from .paginated_formsets import formset_factory # NOQA
-from .search import Search # NOQA
+from .search import Search, SearchContext # NOQA

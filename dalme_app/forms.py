@@ -3,69 +3,91 @@ from dynamic_preferences.forms import PreferenceForm
 from dynamic_preferences.users.registries import user_preferences_registry
 from dynamic_preferences.registries import global_preferences_registry
 from collections import OrderedDict
-from dalme_app.utils import Search
 
 
 class SearchForm(forms.Form):
 
-    MATCH_TYPES = (
-        ('exact', 'Exact match'),
-        ('fuzzy', 'Fuzzy match'),
-        ('prefix', 'Prefix match')
-    )
-
-    OPERATORS = (
+    JOIN_TYPES = (
         ('and', 'AND'),
+        ('not', 'NOT'),
         ('or', 'OR'),
     )
 
-    FIELDS = (
-        ('', 'Field'),
-        ('name', 'Name'),
-        ('text', 'Transcription'),
-        ('description', 'Description'),
-        ('source_type', 'Record Type'),
-        ('locations', 'Location'),
+    QUERY_TYPES = (
+        ('match', 'matches'),
+        ('match_phrase', 'contains'),
+        ('prefix', 'begins with'),
+        ('term', 'is')
     )
 
-    WILDCARDS = (
-        ('', 'Wildcard'),
-        ('*', '*'),
-        ('?', '?'),
+    RANGE_TYPES = (
+        ('value', 'exactly'),
+        ('lt', 'before'),
+        ('gt', 'after'),
     )
 
-    q = forms.CharField(
+    join_type = forms.ChoiceField(
         required=False,
-        label="Search",
-        widget=forms.TextInput(attrs={'type': 'search'}),
-    )
-    match_type = forms.ChoiceField(
-        required=False,
-        label="Match",
-        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
-        choices=MATCH_TYPES
-    )
-    operator = forms.ChoiceField(
-        required=False,
-        label="Operator",
         widget=forms.Select(attrs={'class': 'form-control form-control-sm form-operator'}),
-        choices=OPERATORS
+        choices=JOIN_TYPES,
+        help_text='<p class=&quot;text-left p-1&quot;>\
+                    <b>AND:</b> both the current and previous clauses must match<br/> \
+                    <b>NOT:</b> the current clause must not match<br/> \
+                    <b>OR:</b> either the current or previous clauses must match<br/></p>'
     )
-    wildcards = forms.ChoiceField(
-        required=False,
-        label="Wildcars",
-        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
-        choices=WILDCARDS
-    )
+
     field = forms.ChoiceField(
         required=False,
-        label="Field",
         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
-        choices=FIELDS
+        choices=[],
+        help_text='Field to search'
     )
+
+    field_type = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        initial='text'
+    )
+
+    query_type = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
+        choices=QUERY_TYPES,
+        help_text='<p class=&quot;text-left p-1&quot;> \
+                    <b>Matches:</b> words must be present in field, but doesn\'t preserve their order<br/> \
+                    <b>Contains:</b> query must be present within field, preserves word order<br/> \
+                    <b>Begins with:</b> field must begin with word/phrase in query<br/> \
+                    <b>Is:</b> field must exactly match query<br/><p>'
+    )
+
+    range_type = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
+        choices=RANGE_TYPES,
+        help_text='<p class=&quot;text-left p-1&quot;> \
+                    <b>Exactly:</b> matches the date in the query<br/> \
+                    <b>Before:</b> matches any date before the date in the query<br/> \
+                    <b>After with:</b> matches any date after the date in the query<br/></p>'
+    )
+
     field_value = forms.CharField(
         required=False,
-        label="Query",
+        widget=forms.TextInput(
+            attrs={
+                'type': 'search',
+                'placeholder': 'Type a query to search in record names',
+                'autocomplete': 'off',
+                'autocorrect': 'off',
+                'autocapitalize': 'off',
+                'spellcheck': 'false',
+                'class': 'form-control form-control-sm'
+            }
+        ),
+        help_text='Value to search'
+    )
+
+    query = forms.CharField(
+        required=False,
         widget=forms.TextInput(
             attrs={
                 'type': 'search',
@@ -79,14 +101,10 @@ class SearchForm(forms.Form):
         ),
     )
 
-    def search(self, **kwargs):
-        if not self.is_valid():
-            return None
-
-        if not self.cleaned_data.get("q"):
-            return None
-
-        return Search(self.cleaned_data, **kwargs)
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', [])
+        super().__init__(*args, **kwargs)
+        self.fields['field'].choices = fields
 
 
 class GlobalPreferenceForm(PreferenceForm):
