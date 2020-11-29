@@ -3,6 +3,12 @@
 
 {% block title %}Search &mdash; {{ block.super }}{% endblock %}
 
+{% block styles %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/dalme_helpers/search_page.js' %}"></script>
+{% endblock %}
+
 {% block banner %}
   {% if messages %}
     <ul class="messages">
@@ -30,14 +36,22 @@
       {% csrf_token %}
       <div class="row">
         <div class="col-lg-12">
-          <div class="mt-2">
+          <div class="search-head-container d-flex">
+            <span data-toggle="tooltip" data-placement="left" title="Open advanced search" class="mr-1 ml-auto">
+                <div id="advanced-toggle" class="btn search-button" data-toggle="collapse" data-target="#advanced-search" aria-expanded="{% if advanced %}true{% else %}false{% endif %}" aria-controls="advanced-search">Advanced</div>
+            </span>
+            <span data-toggle="tooltip" data-placement="top" title="Show search tips and examples">
+              <div id="help-toggle" class="btn search-button {% if not results %}active{% endif %}" data-toggle="collapse" data-target="#search-help-content" aria-expanded="{% if results %}false{% else %}true{% endif %}" aria-controls="search-help-content">Help</div>
+            </span>
+          </div>
+          <div id="search_box" class="{% if advanced %}d-none{% endif %}">
             <i class="fas fa-search fa-fw search-icon"></i>
             <input
               type="text"
               class="form-control form-control-lg search-results-input"
-              id="{{ form.0.q.id_for_label }}"
-              name="{{ form.0.q.html_name }}"
-              value="{{ form.0.q.value|default_if_none:'' }}"
+              id="{{ form.0.query.id_for_label }}"
+              name="{{ form.0.query.html_name }}"
+              value="{{ form.0.query.value|default_if_none:'' }}"
               placeholder="Search"
               autocomplete="off"
               autocorrect="off"
@@ -45,113 +59,147 @@
               spellcheck="false"
               data-toggle="tooltip"
               data-placement="top"
-              title="Query input"
+              title="Type a query here to start a search"
             >
+            <div class="btn search-button clear-search clear-search-input" data-toggle="tooltip" data-placement="left" title="Clear search parameters">Clear</div>
             <!-- Workaround for Safari (form cannot be submitted with enter if button is hidden) -->
             <button type="submit" class="hidden-search-submit"></button>
+            {{ form.0.q.errors }}
+          </div>
+          <div id="advanced-search" class="collapse {% if advanced %}show{% endif %}" aria-labelledby="advanced-toggle">
+            {{ form.management_form }}
+            <div id="advanced-search-sets">
+              <div class="help-heading"><small>Use multiple statements to build a complex search query.</small></div>
+              {% for set in form %}
+                <div class="advanced-search-row">
+                  <div class="form-group query_field_type d-none">{{ set.field_type }}</div>
+                  <div class="form-group" data-toggle="tooltip" data-placement="left" data-html="true" title="{{ set.join_type.help_text|safe }}">{{ set.join_type }}</div>
+                  <div class="form-group query_field" data-toggle="tooltip" data-placement="top" title="{{ set.field.help_text|safe }}">{{ set.field }}</div>
+                  <div
+                    class="form-group query_type {% if set.field_type.value|in_list:'keyword,date' %}d-none{% endif %}"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-html="true"
+                    title="{{ set.query_type.help_text|safe }}"
+                  >{{ set.query_type }}</div>
+                  <div class="form-group query_is {% if not set.field_type.value|in_list:'keyword,date' %}d-none{% endif %}"> is </div>
+                  <div
+                    class="form-group range_type {% if set.field_type.value != 'date' %}d-none{% endif %}"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-html="true"
+                    title="{{ set.range_type.help_text|safe }}"
+                  >{{ set.range_type }}</div>
+                  {% if set.field_type.value in 'text,date' %}
+                    <div class="form-group query_input grow" data-toggle="tooltip" data-placement="top" title="{{ set.field_value.help_text|safe }}">{{ set.field_value }}</div>
+                  {% else %}
+                    <div class="form-group query_input" data-toggle="tooltip" data-placement="top" title="{{ set.field_value.help_text|safe }}">
+                      <select id="{{ set.field_value.id_for_label }}" name="{{ set.field_value.html_name }}" class="form-control form-control-sm">
+                        {% dict_key_lookup search_context.fields set.field.value as field_props %}
+                        {% for option in field_props.options %}
+                          <option value="{{ option.value }}" {% if set.field_value.value == option.value %}selected="selected"{% endif %}>{{ option.label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {{ form.0.field_value.errors }}
+                    <div class="button remove" data-toggle="tooltip" data-placement="top" title="Remove query clause"><i class="fas fa-minus"></i></div>
+                    <div class="button add" data-toggle="tooltip" data-placement="top" title="Add query clause"><i class="fas fa-plus"></i></div>
+                </div>
+              {% endfor %}
+            </div>
+            {{ form.non_field_errors }}
+            <div class="advanced-search-footer">
+              <div class="btn search-button ml-auto clear-search clear-search-button" data-toggle="tooltip" data-placement="left" title="Clear search">Clear</div>
+              <button id="search_submit" type="submit" class="btn search-button ml-1" data-toggle="tooltip" data-placement="top" title="Submit search">Search</button>
+            </div>
+          </div>
+          <div class="search-status d-flex {% if errors %}search-error{% endif %}">
+            <div data-toggle="tooltip" data-placement="top" title="Information about the result of your search is displayed here">
+            {% if query %}
+              {% if results %}
+                {% if paginated %}
+                  <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
+                {% else %}
+                  <small>{{ results|length }} result{{ results|length|pluralize }} found.</small>
+                {% endif %}
+              {% else %}
+                {% if errors %}
+                  {% for error in errors %}
+                  <ul>
+                    <li><small>{{ error }}</small></li>
+                  </ul>
+                  {% endfor %}
+                {% else %}
+                  <small>Your query returned no results.</small>
+                {% endif %}
+              {% endif %}
+            {% else %}
+              <small>Enter a query to search.</small>
+            {% endif %}
+            </div>
+          </div>
+          </form>
+          <div class="d-none" id="form_template">
+              <div class="advanced-search-row">
+                <div class="form-group query_field_type d-none">{{ form.empty_form.field_type }}</div>
+                <div class="form-group" data-toggle="tooltip" data-placement="left" data-html="true" title="{{ form.empty_form.join_type.help_text|safe }}">{{ form.empty_form.join_type }}</div>
+                <div class="form-group query_field" data-toggle="tooltip" data-placement="top" title="{{ form.empty_form.field.help_text|safe }}">{{ form.empty_form.field }}</div>
+                <div
+                  class="form-group query_type"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  title="{{ form.empty_form.query_type.help_text|safe }}"
+                >{{ form.empty_form.query_type }}</div>
+                <div class="form-group query_is d-none"> is </div>
+                <div
+                  class="form-group range_type"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  data-html="true"
+                  title="{{ form.empty_form.range_type.help_text|safe }}"
+                >{{ form.empty_form.range_type }}</div>
+                <div class="form-group query_input grow">{{ form.empty_form.field_value }}</div>
+                <div class="button remove" data-toggle="tooltip" data-placement="top" title="Remove query clause"><i class="fas fa-minus"></i></div>
+                <div class="button add" data-toggle="tooltip" data-placement="top" title="Add query clause"><i class="fas fa-plus"></i></div>
+              </div>
+          </div>
+          <div id="search-help-content" class="collapse {% if not results %}show{% endif %}" aria-labelledby="help-toggle">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="tooltip-toggle">
+              <label class="custom-control-label" for="tooltip-toggle"><small>Show/hide tooltips</small></label>
+            </div>
+            {% search_help as search_help %}
+            {{ search_help.content }}
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="search-help-container">
-            <div class="search-status {% if error %}search-error{% endif %}">
-                <div class="search-help-header d-flex">
-                  <div class="mr-auto" data-toggle="tooltip" data-placement="left" title="Result information">
-                  {% if query %}
-                    {% if results %}
-                      {% if paginated %}
-                        <small>Showing results {{ paginator.result_start }} to {{ paginator.result_end }} out of {{ paginator.total_count }} found.</small>
-                      {% else %}
-                        <small>{{ results|length }} result{{ results|length|pluralize }} found.</small>
-                      {% endif %}
-                    {% else %}
-                      {% if error %}
-                        <small>{{ error }}</small>
-                      {% else %}
-                        <small>Your query returned no results.</small>
-                      {% endif %}
-                    {% endif %}
-                  {% else %}
-                    <small>Type a query to search.</small>
-                  {% endif %}
-                  </div>
-                  <span data-toggle="tooltip" data-placement="left" title="Advanced search">
-                      <i id="advanced-toggle" class="fas fa-search-plus mr-2" data-toggle="collapse" data-target="#advanced-search" aria-expanded="{% if advanced %}true{% else %}false{% endif %}" aria-controls="advanced-search"></i>
-                  </span>
-                  <span data-toggle="tooltip" data-placement="top" title="Tooltips">
-                    <i id="help-toggle" class="fas fa-comment-medical mr-2"></i>
-                  </span>
-                  <span data-toggle="tooltip" data-placement="right" title="Help">
-                    <i id="example-toggle" class="fas fa-question-circle" data-toggle="collapse" data-target="#search-help-content" aria-expanded="{% if results %}false{% else %}true{% endif %}" aria-controls="search-help-content"></i>
-                  </span>
-                </div>
-            </div>
-            <div id="advanced-search" class="collapse {% if advanced %}show{% endif %}" aria-labelledby="advanced-toggle">
-              {{ form.management_form }}
-              <div class="advanced-search-header">Advanced Search</div>
-              <div id="advanced-search-sets">
-                <div class="advanced-search-row">
-                  <div class="form-group" data-toggle="tooltip" data-placement="bottom" title="Operator">{{ form.0.operator }}</div>
-                  <div class="form-group" data-toggle="tooltip" data-placement="bottom" title="Field name">{{ form.0.field }}</div>
-                  <div class="form-group" data-toggle="tooltip" data-placement="top" title="Query input">{{ form.0.field_value }}</div>
-                  <div class="form-group" data-toggle="tooltip" data-placement="bottom" title="Match type">{{ form.0.match_type }}</div>
-                  <div class="form-group" data-toggle="tooltip" data-placement="top" title="Wildcard">{{ form.0.wildcards }}</div>
-                  <div class="button disabled"><i class="fas fa-minus"></i></div>
-                  <div class="button add"><i class="fas fa-plus" data-toggle="tooltip" data-placement="right" title="Add/Remove"></i></div>
-                </div>
-                {% for set in form|slice:"1:" %}
-                  <div class="advanced-search-row">
-                    <div class="form-group">{{ set.operator }}</div>
-                    <div class="form-group">{{ set.field }}</div>
-                    <div class="form-group">{{ set.field_value }}</div>
-                    <div class="form-group">{{ set.match_type }}</div>
-                    <div class="form-group">{{ set.wildcards }}</div>
-                    <div class="button remove"><i class="fas fa-minus"></i></div>
-                    <div class="button add"><i class="fas fa-plus"></i></div>
-                  </div>
-                {% endfor %}
-              </div>
-              <div class="advanced-search-footer">
-                <button type="submit" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="bottom" title="Submit search">Search</button>
-              </div>
-            </div>
-            </form>
-            <div class="d-none" id="form_template">
-                <div class="advanced-search-row">
-                  <div class="form-group">{{ form.empty_form.operator }}</div>
-                  <div class="form-group">{{ form.empty_form.field }}</div>
-                  <div class="form-group">{{ form.empty_form.field_value }}</div>
-                  <div class="form-group">{{ form.empty_form.match_type }}</div>
-                  <div class="form-group">{{ form.empty_form.wildcards }}</div>
-                  <div class="button remove"><i class="fas fa-minus"></i></div>
-                  <div class="button add"><i class="fas fa-plus"></i></div>
-                </div>
-            </div>
-            <div id="search-help-content" class="collapse {% if not results %}show{% endif %}" aria-labelledby="help-toggle">
-              {% search_help as search_help %}
-              {{ search_help.content }}
-            </div>
-         </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12">
-          {% if results %}
-            <div class="ml-1 mr-1">
+      <div class="row search-results">
+        <div class="col-lg-12" id="results-container">
+            {% if results %}
+              <div class="ml-1 mr-1">
               {% for result in results %}
                   <div class="search-result-entry">
-                      <a class="search-result-link" href="{% routablepageurl page.specific 'record' result.meta.id %}">{{ result.name | dd_record_name }}</a>
-                      <div class="search-result-detail">{{ result.name | dd_record_name:'loc'}}</div>
+                      <a class="search-result-link" href="{% routablepageurl page.specific 'record' result.meta.id %}">{{ result.name|dd_record_name }}</a>
+                      <div class="search-result-detail">{{ result.name|dd_record_name:'loc'}}</div>
                       <div class="search-text-container">
-                        <div class="search-show-more d-none">Show more</div>
-                        {% for fragment in result.meta.highlight.text %}
-                          <div class="search-result-text">{{ fragment|safe }}</div>
-                        {% endfor %}
+                      {% with result.meta|get_highlights:search_context.fields as highlights %}
+                        {% if highlights %}
+                          <div class="show-more d-none">Show more</div>
+                          {% for highlight in highlights %}
+                            {% if highlight.link %}
+                              <div class="search-result-text"><b><a href="{% routablepageurl page.specific 'record_folio' result.meta.id highlight.link %}">{{ highlight.field }}:</a> </b>{{ highlight.fragment|safe }}</div>
+                            {% else %}
+                              <div class="search-result-text"><b>{{ highlight.field }}: </b>{{ highlight.fragment|safe }}</div>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      {% endwith %}
                       </div>
                   </div>
               {% endfor %}
-            </div>
+              </div>
             {% if paginated %}
               {% include "dalme_public/includes/_pagination_formset.html" with paginator=paginator %}
             {% endif %}
@@ -162,49 +210,8 @@
 {% endblock %}
 {% block js_foot %}
   {{ block.super }}
+  {{ search_context|json_script:"search_context" }}
   <script>
-    $(document).ready(function() {
-      $('.search-text-container').each( function() {
-        if ($(this).prop('scrollHeight') > $(this).outerHeight()) {
-          $(this).find('.search-show-more').removeClass('d-none')
-        }
-      });
-      $('.search-show-more').on('click', function() {
-        if ($(this).text() == 'Show more') {
-          $(this).parent().css({"maxHeight":"1000px"});
-          $(this).text('Show less');
-        } else {
-          $(this).parent().css({"maxHeight":"84px"});
-          $(this).text('Show more');
-        }
-      });
-      $('[data-toggle="tooltip"]').tooltip({ trigger: 'manual'});
-      $('#help-toggle').on('click', function() {
-        $('[data-toggle="tooltip"]').tooltip('toggle')
-      });
-      $('#advanced-search').on('click', '.add', function(e) {
-        let formset_manager = $('#id_form-TOTAL_FORMS');
-        let idx = formset_manager.val();
-        $('#advanced-search-sets').append($('#form_template').html().replace(/__prefix__/g, idx));
-        formset_manager.val(parseInt(idx)+1);
-      });
-      $('#advanced-search').on('click', '.remove', function(e) {
-        let formset_manager = $('#id_form-TOTAL_FORMS');
-        let idx = formset_manager.val();
-        $(e.target).parents('.advanced-search-row').remove();
-        formset_manager.val(parseInt(idx)-1);
-      });
-      $('#advanced-search').on('hide.bs.collapse', function() {
-        let formset_manager = $('#id_form-TOTAL_FORMS');
-        $('#advanced-search-sets').html($('#form_template').html().replace(/__prefix__/g, 1));
-        formset_manager.val(1);
-      })
-      $('.pagination').on('click', '.page-link', function(e) {
-        let page = $(e.target).data('page');
-        $('#id_form-PAGE').val(page);
-        $('#search-form').submit();
-      })
-
-    })
+    $(document).ready(function() { search_page_init(); })
   </script>
 {% endblock%}
