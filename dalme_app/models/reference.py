@@ -66,7 +66,7 @@ class LocaleReference(dalmeIntid):
         unique_together = ('name', 'administrative_region')
 
     def __str__(self):
-        return self.name
+        return f'{self.name}, {self.administrative_region}, {str(self.country)}'
 
     def get_url(self):
         return '/locales/' + str(self.id)
