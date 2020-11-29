@@ -262,10 +262,10 @@ ELASTICSEARCH_DSL = {
         'use_ssl': True,
         'verify_certs': True,
         'connection_class': elasticsearch.RequestsHttpConnection,
+        'timeout': 240,
     },
 }
 SEARCH_RESULTS_PER_PAGE = 10
-SEARCH_DEFAULT_INDEX = 'SourceDocument'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

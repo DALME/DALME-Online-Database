@@ -1,0 +1,27 @@
+[
+  {
+    "name": "name",
+    "label": "Name",
+    "type": "text"
+  },
+  {
+    "name": "text",
+    "label": "Transcription",
+    "type": "text"
+  },
+  {
+    "name": "description",
+    "label": "Description",
+    "type": "text"
+  },
+  {
+    "name": "source_type",
+    "label": "Record Type",
+    "type": "select"
+  },
+  {
+    "name": "locations",
+    "label": "Location",
+    "type": "text"
+  }
+]
