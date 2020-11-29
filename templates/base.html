@@ -64,6 +64,7 @@
     <!-- DALME CSS END -->
     <!-- DALME JS START -->
     {% compress js %}
+      <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
       <script type="text/javascript" src="{% static 'js/dalme_app/dalme_app.js' %}"></script>
     {% endcompress %}
       {{ preferences|json_script:"user-preferences" }}
@@ -127,9 +128,9 @@
                   <input
                     type="text"
                     class="topbar_search form-control border-0 small"
-                    id="{{ form.0.q.id_for_label }}"
-                    name="{{ form.0.q.html_name }}"
-                    value="{{ form.0.q.value|default_if_none:'' }}"
+                    id="{{ form.0.query.id_for_label }}"
+                    name="{{ form.0.query.html_name }}"
+                    value="{{ form.0.query.value|default_if_none:'' }}"
                     placeholder="Search"
                     autocomplete="off"
                     autocorrect="off"
