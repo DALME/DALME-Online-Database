@@ -47,7 +47,6 @@ class Search():
     @cached_property
     def get_results(self):
         query = self.build_query()
-        print(query)
         if not query:
             self.errors.append('No query could be built from the request.')
             return ({}, [])
