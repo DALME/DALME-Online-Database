@@ -629,9 +629,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         )
 
     @route(rf'^records/({UUID_RE})/$', name='record')
-    def record(self, request, pk, scoped=True):
+    @route(rf'^records/({UUID_RE})/({FOLIO_RE})/$', name='record_folio')
+    def record(self, request, pk, folio=None, scoped=True):
         qs = Source.objects.filter(pk=pk)
-
         if not qs.exists():
             raise Http404()
 
@@ -648,6 +648,8 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             pageImageId=F('page__dam_id')
         ).order_by('pageOrder')
 
+        initial_folio_index = next((i for i, item in enumerate(pages) if item["pageName"] == folio), 0) if folio else 0
+
         context = self.get_context(request)
         context.update({
             'record': True,
@@ -656,6 +658,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
                 'folios': list(pages),
                 **PublicSourceSerializer(source).data,
             },
+            'initial_folio_index': initial_folio_index
         })
 
         try:
