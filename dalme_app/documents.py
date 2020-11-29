@@ -2,7 +2,7 @@ from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 from elasticsearch_dsl import Join as dsl_Join
 from elasticsearch_dsl import Index, Mapping, normalizer
-from dalme_app.models import Source, Source_pages
+from dalme_app.models import Source, Source_pages, LocaleReference
 from django.core.exceptions import ObjectDoesNotExist
 import lxml.etree as et
 from datetime import date
@@ -88,6 +88,7 @@ class PublicSource(PublicSourceBase):
     attributes = fields.ObjectField()
     collections = fields.ObjectField()
     credits = fields.ObjectField()
+    geo_location = fields.GeoPointField()
 
     class Index:
         name = 'public_sources'
@@ -151,6 +152,13 @@ class PublicSource(PublicSourceBase):
                 'type': type
             })
         return credit_list
+
+    def prepare_geo_location(self, instance):
+        locales = instance.attributes.filter(attribute_type=36)
+        if locales.exists():
+            loc_id = locales[0].value_JSON['id']
+            locale = LocaleReference.objects.get(id=loc_id)
+            return f'{locale.latitude},{locale.longitude}'
 
 
 @registry.register_document
