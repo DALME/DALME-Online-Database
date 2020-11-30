@@ -17,7 +17,7 @@ function get_cookie(name) {
 function update_session(data) {
     $.ajax({
       type : "POST",
-      url : "https://db.127.0.0.1.xip.io:8443/su/",
+      url: `${db_endpoint}/su/`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers : {'X-CSRFToken': get_cookie('csrftoken') },

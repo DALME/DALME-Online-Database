@@ -68,7 +68,10 @@
       <script type="text/javascript" src="{% static 'js/dalme_app/dalme_app.js' %}"></script>
     {% endcompress %}
       {{ preferences|json_script:"user-preferences" }}
-      <script>api_endpoint = "{{ api_endpoint }}";</script>
+      <script>
+        api_endpoint = "{{ api_endpoint }}";
+        db_endpoint = "{{ db_endpoint }}";
+      </script>
       <script>
         $(document).ready(function () {
             $(document).click(function (event) {

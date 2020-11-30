@@ -8,6 +8,7 @@ from django.db.models import F
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template.response import TemplateResponse
+from django.conf import settings
 
 from bs4 import BeautifulSoup as BSoup
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
@@ -217,6 +218,14 @@ class DALMEPage(Page):
 
     class Meta:
         abstract = True
+
+    def get_context(self, request):
+        context = super().get_context(request)
+        context.update({
+            'api_endpoint': settings.API_ENDPOINT,
+            'db_endpoint': settings.DB_ENDPOINT
+        })
+        return context
 
     @property
     def main_image(self):

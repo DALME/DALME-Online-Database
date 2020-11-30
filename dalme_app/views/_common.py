@@ -23,6 +23,7 @@ class DALMEContextMixin(ContextMixin):
 
         context.update({
             'api_endpoint': settings.API_ENDPOINT,
+            'db_endpoint': settings.DB_ENDPOINT,
             'sidebar_toggle': sidebar_toggle,
             'dropdowns': dm(self.request, state).dropdowns,
             'sidebar': dm(self.request, state).sidebar,
