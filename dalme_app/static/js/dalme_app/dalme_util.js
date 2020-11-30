@@ -16,12 +16,14 @@ function get_cookie(name) {
 
 function update_session(data) {
     $.ajax({
-      type : "POST",
+      method : "POST",
       url: `${db_endpoint}/su/`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
-      headers : {'X-CSRFToken': get_cookie('csrftoken') },
-      dataType : "json",
+      headers : {
+        "Content-Type": "application/json",
+        'X-CSRFToken': get_cookie('csrftoken')
+      },
       data : { "data": JSON.stringify(data) }
     });
 }
