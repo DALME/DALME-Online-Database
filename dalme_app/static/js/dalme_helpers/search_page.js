@@ -82,11 +82,12 @@ function toggle_search_box() {
 
 function clear_search(sb=false) {
   let formset_manager = $('#id_form-TOTAL_FORMS');
-  $('#advanced-search-sets').html($('#form_template').html().replace(/__prefix__/g, 1));
+  $('#advanced-search-sets').html($('#form_template').html().replace(/__prefix__/g, formset_manager.val() - 1));
   formset_manager.val(1);
   $('#id_form-0-query').val('');
   $('#results-container').html('');
   $('.search-status div').html('<small>Enter a query to search.</small>');
+  $('.search-status').removeClass('search-error');
   let session_var = search_context['session_var']
   update_session({ session_var: false });
 }

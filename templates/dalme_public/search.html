@@ -90,7 +90,7 @@
                     data-html="true"
                     title="{{ set.range_type.help_text|safe }}"
                   >{{ set.range_type }}</div>
-                  {% if set.field_type.value in 'text,date' %}
+                  {% if set.field_type.value|in_list:'text,date,none,blank' %}
                     <div class="form-group query_input grow" data-toggle="tooltip" data-placement="top" title="{{ set.field_value.help_text|safe }}">{{ set.field_value }}</div>
                   {% else %}
                     <div class="form-group query_input" data-toggle="tooltip" data-placement="top" title="{{ set.field_value.help_text|safe }}">
@@ -154,7 +154,7 @@
                 >{{ form.empty_form.query_type }}</div>
                 <div class="form-group query_is d-none"> is </div>
                 <div
-                  class="form-group range_type"
+                  class="form-group range_type d-none"
                   data-toggle="tooltip"
                   data-placement="top"
                   data-html="true"

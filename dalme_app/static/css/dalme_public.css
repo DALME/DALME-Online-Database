@@ -2375,6 +2375,10 @@ div.vue-slider {
   background-color: #f1b5b5;
 }
 
+.search-status ul {
+  margin-bottom: 0;
+}
+
 .search-button {
   border: 1px solid #ced4da;
   font-size: 9px;
