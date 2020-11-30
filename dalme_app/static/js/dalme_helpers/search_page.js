@@ -88,8 +88,9 @@ function clear_search(sb=false) {
   $('#results-container').html('');
   $('.search-status div').html('<small>Enter a query to search.</small>');
   $('.search-status').removeClass('search-error');
-  let session_var = search_context['session_var']
-  update_session({ session_var: false });
+  let payload = {}
+  payload[search_context['session_var']] = false
+  update_session(payload);
 }
 
 function change_on_field(e) {

@@ -17,14 +17,14 @@ function get_cookie(name) {
 function update_session(data) {
     $.ajax({
       method : "POST",
-      url: `${db_endpoint}/su/`,
+      url: `${api_endpoint}/session/alter/`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
-      headers : {
+      headers: {
         "Content-Type": "application/json",
-        'X-CSRFToken': get_cookie('csrftoken')
+        'X-CSRFToken': get_cookie("csrftoken")
       },
-      data : { "data": JSON.stringify(data) }
+      data : JSON.stringify(data)
     });
 }
 

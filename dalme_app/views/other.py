@@ -1,28 +1,9 @@
 import mimetypes
 import urllib
-import json
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
 from dalme_app.models import Page
-
-
-def SessionUpdate(request):
-    if request.method == 'POST':
-        data = json.loads(request.POST['data'])
-        result = []
-        for key, value in data.items():
-            if not value:
-                try:
-                    del request.session[key]
-                    result.append({'key': key, 'result': 'deleted'})
-                except KeyError:
-                    result.append({'key': key, 'result': 'skipped - does not exist'})
-            else:
-                request.session[key] = value
-                result.append({'key': key, 'result': f'new value: {value}'})
-
-        return HttpResponse(result)
 
 
 def HealthCheck(request):

@@ -36,7 +36,6 @@ urlpatterns = [
     path('sources/', views.SourceList.as_view(), name='source_list'),
     path('sources/<slug:pk>/', views.SourceDetail.as_view(), name='source_detail'),
     re_path(r'^sources/(?P<pk>[a-zA-Z0-9-]+)/manifest', views.SourceManifest, name='source_manifest'),
-    path('su/', views.SessionUpdate, name='session_update'),
     path('tasks/', views.TasksList.as_view(), name='task_list'),
     path('tasks/<slug:pk>/', views.TasksDetail.as_view(), name='task_detail'),
     path('tickets/', views.TicketList.as_view(), name='ticket_list'),

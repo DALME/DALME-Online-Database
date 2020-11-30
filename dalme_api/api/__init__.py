@@ -10,6 +10,7 @@ from .other import (Agents, AsynchronousTasks, Attributes, ContentClasses, Conte
                     Countries, Groups, Languages, Locales, Rights) # noqa
 
 from .pages import Pages # noqa
+from .session import Session # noqa
 from .sets import Sets # noqa
 from .sources import Sources # noqa
 from .tasks import Tasks, TaskLists # noqa
