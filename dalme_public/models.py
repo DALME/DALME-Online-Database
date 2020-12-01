@@ -56,7 +56,7 @@ from dalme_app.forms import SearchForm
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-FOLIO_RE = '[0-9a-z]+'
+FOLIO_RE = '[0-9a-z:]+'
 
 
 @hooks.register('construct_settings_menu')

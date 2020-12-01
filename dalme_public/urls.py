@@ -1,12 +1,12 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from . import api
 from django.conf import settings
 from django.conf.urls.static import static
 from wagtail.admin import urls as wagtailadmin_urls
-from wagtail.core import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from django.contrib.auth import views as auth_views
 from django_hosts.resolvers import reverse
+from wagtail.core import views
 
 
 def to_dalme_login(request):
@@ -22,5 +22,5 @@ urlpatterns = [
     path('cms/logout/', auth_views.LogoutView.as_view(), name='wagtailadmin_logout'),
     path('cms/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
-    path('', include(wagtail_urls)),
+    re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
