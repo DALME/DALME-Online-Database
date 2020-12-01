@@ -119,13 +119,13 @@ class Search():
         if data is None:
             return False
 
-        bool_sets = {'and': [], 'or': [], 'not': []}
-        query_count = 0
-
+        bool_sets = {'must': [], 'should': [], 'must_not': []}
         for row in data:
-            method = getattr(self, row['field_type'], False)
+            join = row.get('join_type', False)
+            method = getattr(self, row.get('field_type'), False)
+
             if method:
-                join, query, highlight, error = method(row)
+                query, highlight, error = method(row)
                 if join and query:
                     bool_sets[join].append(query)
 
@@ -135,21 +135,19 @@ class Search():
                 if error:
                     self.errors.append(error)
 
-                query_count += 1
-
-        if bool_sets['and'] or bool_sets['or'] or bool_sets['not']:
+        if bool_sets['must'] or bool_sets['should'] or bool_sets['must_not']:
             query_object = {}
 
-            if bool_sets['and']:
-                query_object['must'] = bool_sets['and']
+            if bool_sets['must']:
+                query_object['must'] = bool_sets['must']
 
-            if bool_sets['or']:
-                query_object['should'] = bool_sets['or']
+            if bool_sets['should']:
+                query_object['should'] = bool_sets['should']
 
-            if bool_sets['not']:
-                query_object['must_not'] = bool_sets['not']
+            if bool_sets['must_not']:
+                query_object['must_not'] = bool_sets['must_not']
 
-                if not bool_sets['and']:
+                if not bool_sets['must']:
                     query_object['must'] = [Q('term', type=13)]  # prevents search from returning single folios as results
 
             return Q('bool', **query_object)
@@ -193,7 +191,7 @@ class Search():
                         'field': field,
                         'field_type': context[field]['type'],
                         'field_value': querystring,
-                        'query_type': 'match',
+                        'query_type': 'match_phrase',
                         'join_type': 'or',
                         'range_type': False,
                         'child_relationship': context[field].get('child_relationship', False),
@@ -225,14 +223,14 @@ class Search():
             query = Q(query, **{data['field']: query_object})
             highlight = {data['field']: data['highlight']} if data.get('highlight', False) else False
 
-            return data['join_type'], query, highlight, False
+            return query, highlight, False
 
         except ValueError:
             errors = [(
                 'Value "{}" could not be parsed into a date for field "{}". \
                 Try reformatting it, for example as "DD-MM-YYYY"'.format(data['field_value'], data['field'])
             )]
-            return False, False, False, errors
+            return False, False, errors
 
     @staticmethod
     def keyword(data):
@@ -240,34 +238,30 @@ class Search():
         query = Q('term', **{data['field']: query_object})
         highlight = {data['field']: data['highlight']} if data.get('highlight', False) else False
 
-        return data['join_type'], query, highlight, False
+        return query, highlight, False
 
     @staticmethod
     def text(data):
-        query = data['query_type']
-        join = data['join_type']
-        field = data['field']
         querystring = data['field_value'].strip()
-
-        if query in ['prefix', 'term']:
-            query_object = {'value': querystring}
-            field = f'{field}.keyword'
-        else:
-            query_object = {'query': querystring}
-
+        query = 'match_phrase_prefix' if data['query_type'] == 'prefix' and ' ' in querystring else data['query_type']
+        field = f'{data["field"]}.keyword' if query == 'term' else data['field']
+        keyname = 'value' if query in ['term', 'prefix'] else 'query'
+        query_object = {keyname: querystring}
         if query == 'match':
             query_object.update({
+                'query': querystring,
                 'lenient': True,
                 'operator': 'OR',
                 'fuzziness': 'AUTO',
-                'max_expansions': 50,
-                'prefix_length': 0,
+                'max_expansions': 10,
+                'prefix_length': 2,
             })
 
         query = Q({query: {field: query_object}})
         highlight = {field: data['highlight']} if data.get('highlight', False) else False
 
         if data.get('child_relationship', False):
+
             child_object = {
                 'type': data['child_relationship'],
                 'query': query,
@@ -288,7 +282,7 @@ class Search():
             query = Q({'has_child': child_object})
             highlight = False
 
-        return join, query, highlight, False
+        return query, highlight, False
 
 
 class SearchContext():

@@ -1,8 +1,8 @@
 {
   "name": {
-    "label": "Name",
+    "label": "Record name",
     "type": "text",
-    "placeholder": "Type a query to search in record names",
+    "placeholder": "Type one or more words",
     "highlight": {
       "number_of_fragments": 0
     }
@@ -17,7 +17,7 @@
   "credits.agent": {
     "label": "Credits",
     "type": "text",
-    "placeholder": "Type a name to search record credit lines",
+    "placeholder": "Type one or more names",
     "highlight": {
       "number_of_fragments": 0
     }
@@ -33,7 +33,7 @@
   "attributes.description": {
     "label": "Description",
     "type": "text",
-    "placeholder": "Type a query to search in record descriptions",
+    "placeholder": "Type one or more words",
     "highlight": {
       "number_of_fragments": 2,
       "type": "plain"
@@ -49,7 +49,7 @@
   "attributes.locale": {
     "label": "Location",
     "type": "text",
-    "placeholder": "Type a placename such as a town, region, or country",
+    "placeholder": "Type one or more placenames",
     "highlight": {
       "number_of_fragments": 0
     }
@@ -57,7 +57,7 @@
   "parent": {
     "label": "Parent",
     "type": "text",
-    "placeholder": "Type a query to search in record parent's names",
+    "placeholder": "Type one or more words",
     "highlight": {
       "number_of_fragments": 0
     }
@@ -72,7 +72,7 @@
   "transcription": {
     "label": "Transcription",
     "type": "text",
-    "placeholder": "Type a query to search in record transcriptions",
+    "placeholder": "Type one or more words",
     "child_relationship": "PublicFolio",
     "highlight": {
       "number_of_fragments": 10

@@ -8,16 +8,16 @@ from collections import OrderedDict
 class SearchForm(forms.Form):
 
     JOIN_TYPES = (
-        ('and', 'AND'),
-        ('not', 'NOT'),
-        ('or', 'OR'),
+        ('must', 'AND'),
+        ('must_not', 'NOT'),
+        ('should', 'OR'),
     )
 
     QUERY_TYPES = (
-        ('match', 'matches'),
-        ('match_phrase', 'contains'),
-        ('prefix', 'begins with'),
-        ('term', 'is')
+        ('match_phrase', 'the following word(s)'),
+        ('match', 'word(s) similar to'),
+        ('prefix', 'word(s) beginning with'),
+        ('term', 'exactly this expression')
     )
 
     RANGE_TYPES = (

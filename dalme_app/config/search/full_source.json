@@ -1,6 +1,6 @@
 {
   "name": {
-    "label": "Name",
+    "label": "Record name",
     "type": "text",
     "placeholder": "Type a query to search in record names",
     "highlight": {

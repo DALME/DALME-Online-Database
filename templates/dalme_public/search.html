@@ -38,7 +38,7 @@
         <div class="col-lg-12">
           <div class="search-head-container d-flex">
             <span data-toggle="tooltip" data-placement="left" title="Open advanced search" class="mr-1 ml-auto">
-                <div id="advanced-toggle" class="btn search-button" data-toggle="collapse" data-target="#advanced-search" aria-expanded="{% if advanced %}true{% else %}false{% endif %}" aria-controls="advanced-search">Advanced</div>
+                <div id="advanced-toggle" class="btn search-button {% if advanced %}active{% endif %}" data-toggle="collapse" data-target="#advanced-search" aria-expanded="{% if advanced %}true{% else %}false{% endif %}" aria-controls="advanced-search">Advanced</div>
             </span>
             <span data-toggle="tooltip" data-placement="top" title="Show search tips and examples">
               <div id="help-toggle" class="btn search-button {% if not results %}active{% endif %}" data-toggle="collapse" data-target="#search-help-content" aria-expanded="{% if results %}false{% else %}true{% endif %}" aria-controls="search-help-content">Help</div>
@@ -73,8 +73,10 @@
               {% for set in form %}
                 <div class="advanced-search-row">
                   <div class="form-group query_field_type d-none">{{ set.field_type }}</div>
-                  <div class="form-group" data-toggle="tooltip" data-placement="left" data-html="true" title="{{ set.join_type.help_text|safe }}">{{ set.join_type }}</div>
+                  <div class="form-group query_op {% if forloop.first %}d-none{% endif %}" data-toggle="tooltip" data-placement="left" data-html="true" title="{{ set.join_type.help_text|safe }}">{{ set.join_type }}</div>
+                  <div class="form-group query_op_first {% if not forloop.first %}d-none{% endif %}">Search:</div>
                   <div class="form-group query_field" data-toggle="tooltip" data-placement="top" title="{{ set.field.help_text|safe }}">{{ set.field }}</div>
+                  <div class="form-group query_is">{% if set.field_type.value|in_list:'keyword,date' %}is{% else %}contains{% endif %}</div>
                   <div
                     class="form-group query_type {% if set.field_type.value|in_list:'keyword,date' %}d-none{% endif %}"
                     data-toggle="tooltip"
@@ -82,7 +84,6 @@
                     data-html="true"
                     title="{{ set.query_type.help_text|safe }}"
                   >{{ set.query_type }}</div>
-                  <div class="form-group query_is {% if not set.field_type.value|in_list:'keyword,date' %}d-none{% endif %}"> is </div>
                   <div
                     class="form-group range_type {% if set.field_type.value != 'date' %}d-none{% endif %}"
                     data-toggle="tooltip"
@@ -143,8 +144,10 @@
           <div class="d-none" id="form_template">
               <div class="advanced-search-row">
                 <div class="form-group query_field_type d-none">{{ form.empty_form.field_type }}</div>
-                <div class="form-group" data-toggle="tooltip" data-placement="left" data-html="true" title="{{ form.empty_form.join_type.help_text|safe }}">{{ form.empty_form.join_type }}</div>
+                <div class="form-group query_op" data-toggle="tooltip" data-placement="left" data-html="true" title="{{ form.empty_form.join_type.help_text|safe }}">{{ form.empty_form.join_type }}</div>
+                <div class="form-group query_op_first d-none">Search:</div>
                 <div class="form-group query_field" data-toggle="tooltip" data-placement="top" title="{{ form.empty_form.field.help_text|safe }}">{{ form.empty_form.field }}</div>
+                <div class="form-group query_is">contains</div>
                 <div
                   class="form-group query_type"
                   data-toggle="tooltip"
@@ -152,7 +155,6 @@
                   data-html="true"
                   title="{{ form.empty_form.query_type.help_text|safe }}"
                 >{{ form.empty_form.query_type }}</div>
-                <div class="form-group query_is d-none"> is </div>
                 <div
                   class="form-group range_type d-none"
                   data-toggle="tooltip"

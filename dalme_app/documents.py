@@ -74,7 +74,8 @@ class PublicSource(PublicSourceBase):
         attr='name',
         fields={'keyword': fields.KeywordField(
             normalizer=basic_normalizer
-        )}
+        )},
+        index_prefixes={}
     )
     type = fields.IntegerField(attr='type.id')
     is_private = fields.BooleanField(attr='is_private')
@@ -83,7 +84,8 @@ class PublicSource(PublicSourceBase):
         attr='parent.name',
         fields={'keyword': fields.KeywordField(
             normalizer=basic_normalizer
-        )}
+        )},
+        index_prefixes={}
     )
     attributes = fields.ObjectField()
     collections = fields.ObjectField()
@@ -167,7 +169,8 @@ class PublicFolio(PublicSourceBase):
     transcription = fields.TextField(
         fields={'keyword': fields.KeywordField(
             normalizer=basic_normalizer
-        )}
+        )},
+        index_prefixes={}
     )
 
     class Index:

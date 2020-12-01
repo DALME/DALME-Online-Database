@@ -80,10 +80,12 @@ function toggle_search_box() {
     $('#id_form-0-query').val('');
 }
 
-function clear_search(sb=false) {
+function clear_search() {
   let formset_manager = $('#id_form-TOTAL_FORMS');
   $('#advanced-search-sets').html($('#form_template').html().replace(/__prefix__/g, formset_manager.val() - 1));
   formset_manager.val(1);
+  $('#advanced-search-sets .query_op').addClass('d-none');
+  $('#advanced-search-sets .query_op_first').removeClass('d-none');
   $('#id_form-0-query').val('');
   $('#results-container').html('');
   $('.search-status div').html('<small>Enter a query to search.</small>');
@@ -103,13 +105,13 @@ function change_on_field(e) {
 
   if (type == 'text') {
     row.find('.query_type').removeClass('d-none')
-    row.find('.query_is').addClass('d-none')
+    row.find('.query_is').html(' contains ')
     row.find('.range_type').addClass('d-none')
     row.find('.query_input').addClass('grow');
 
   } else {
     row.find('.query_type').addClass('d-none');
-    row.find('.query_is').removeClass('d-none');
+    row.find('.query_is').html(' is ');
     if (type == 'keyword') {
       row.find('.query_input').removeClass('grow');
       row.find('.range_type').addClass('d-none');

@@ -2459,8 +2459,18 @@ div.vue-slider {
 #advanced-search .query_is {
   font-size: .9rem;
   align-self: center;
-  margin-left: .25rem;
   margin-right: .5rem;
+}
+
+#advanced-search .query_op_first {
+  font-size: .9rem;
+  align-self: center;
+  width: 65px;
+  text-align: center;
+}
+
+#advanced-search .query_op {
+  width: 65px;
 }
 
 #advanced-search .button {
