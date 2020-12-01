@@ -1,10 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from dalme_api.access_policies import SessionAccessPolicy
 
 
 class Session(viewsets.ViewSet):
     """ API endpoint for managing user sessions """
+    permission_classes = (SessionAccessPolicy,)
 
     @action(detail=False, methods=['post'])
     def alter(self, request):

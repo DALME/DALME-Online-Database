@@ -1,0 +1,7 @@
+[
+  {
+    "action": "alter",
+    "principal": "*",
+    "effect": "allow"
+  }
+]

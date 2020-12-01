@@ -147,6 +147,10 @@ class SourceAccessPolicy(BaseAccessPolicy):
         raise AccessPolicyException("Could not determine action of request")
 
 
+class SessionAccessPolicy(BaseAccessPolicy):
+    id = 'session-policy'
+
+
 class SetAccessPolicy(BaseAccessPolicy):
     id = 'sets-policy'
 
