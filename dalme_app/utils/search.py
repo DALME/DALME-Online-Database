@@ -192,7 +192,7 @@ class Search():
                         'field_type': context[field]['type'],
                         'field_value': querystring,
                         'query_type': 'match_phrase',
-                        'join_type': 'or',
+                        'join_type': 'should',
                         'range_type': False,
                         'child_relationship': context[field].get('child_relationship', False),
                         'highlight': context[field].get('highlight', {})
