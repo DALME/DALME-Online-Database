@@ -120,9 +120,21 @@ class Search():
             return False
 
         bool_sets = {'must': [], 'should': [], 'must_not': []}
-        for row in data:
-            join = row.get('join_type', False)
+        child_rel = False
+        child_highlight = False
+
+        for i, row in enumerate(data):
+            join = row.get('join_type', False) if i > 0 else 'should'
             method = getattr(self, row.get('field_type'), False)
+
+            if row.get('child_relationship', False):
+                if child_rel and child_highlight:
+                    row['highlight'] = False
+
+                elif row.get('highlight', False):
+                    child_highlight = True
+
+                child_rel = True
 
             if method:
                 query, highlight, error = method(row)
@@ -264,8 +276,7 @@ class Search():
 
             child_object = {
                 'type': data['child_relationship'],
-                'query': query,
-                'inner_hits': {}
+                'query': query
             }
 
             if data.get('highlight', False):
