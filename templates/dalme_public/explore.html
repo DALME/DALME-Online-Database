@@ -6,6 +6,9 @@
 {% block styles %}
   {{ block.super }}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+  <link href="{% static 'js/leafletDraw/leaflet.draw.css' %}" rel="stylesheet">
+  <link href="{% static 'js/leafletFullscreen/Control.FullScreen.css' %}" rel="stylesheet">
+  <link href="{% static 'js/leafletBoxZoom/leaflet-control-boxzoom.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block header_extra %}
@@ -30,33 +33,126 @@
   {{ block.super }}
   {% host_url 'api_endpoint' host 'data' as api_url %}
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <script type="text/javascript" src="{% static 'js/leafletDraw/leaflet.draw.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/leafletFullscreen/Control.FullScreen.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/leafletBoxZoom/leaflet-control-boxzoom.js' %}"></script>
   <script>
     $(document).ready(function() {
       const endpoint = "{{ api_url }}/datasets/explore_map/?format=json";
       $.get(endpoint, function(data) {
-          var map = L.map('map_container').setView([47.505, 15], 4);
-          var markers = [];
 
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                minZoom: 1,
-                maxZoom: 13,
-                attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-              }).addTo(map);
+          var esri_natgeo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+          	attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
+          	maxZoom: 16
+          });
+
+          var esri_worldimagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          	 attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+             detectRetina: false,
+             opacity: 1.0,
+          });
+
+          var esri_worldphysical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+            	attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
+            	maxZoom: 7,
+              detectRetina: false,
+              opacity: 1.0,
+          });
+
+          var cartodb_voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            	subdomains: 'abcd',
+            	maxZoom: 19,
+              detectRetina: false,
+              opacity: 1.0,
+          });
+
+          var cartodb_labels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+          	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          	subdomains: 'abcd',
+          	maxZoom: 19,
+            zIndex: 200
+          });
+
+          var cartodb_labels_dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+          	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          	subdomains: 'abcd',
+          	maxZoom: 19
+          });
+
+          var map = L.map('map_container').setView([47.505, 15], 4);
+          var drawnItems = new L.featureGroup().addTo(map);
+          var record_markers = L.layerGroup();
 
           for (const prop in data) {
               if (data.hasOwnProperty(prop)) {
-                let marker = L.circle([data[prop]['latitude'], data[prop]['longitude']], {
+                let marker = L.circleMarker([data[prop]['latitude'], data[prop]['longitude']], {
                     color: 'red',
                     fillColor: '#f03',
-                    fillOpacity: 0.5,
-                    radius: data[prop]['count'] * 1000
+                    fillOpacity: 0.8,
+                    radius: data[prop]['count'],
+                    stroke: false
                 });
                 marker.bindTooltip(`<b>Locale:</b> ${prop}, ${data[prop]['administrative_region']}<br/>\
-                <b>Records:</b> ${data[prop]['count']}<br/>`);
-                markers.push(marker);
-                marker.addTo(map);
+                <b>Records:</b> ${data[prop]['records']}<br/>`);
+                record_markers.addLayer(marker);
               }
           }
+
+          L.control.fullscreen({
+                position: 'topleft', // change the position of the button can be topleft, topright, bottomright or bottomleft, defaut topleft
+                title: 'Show me the fullscreen !', // change the title of the button, default Full Screen
+                titleCancel: 'Exit fullscreen mode', // change the title of the button when fullscreen is on, default Exit Full Screen
+                content: null, // change the content of the button, can be HTML, default null
+                forceSeparateButton: true, // force seperate button to detach from zoom buttons, default false
+                forcePseudoFullscreen: true, // force use of pseudo full screen even if full screen API is available, default false
+                fullscreenElement: false // Dom element to render in full screen, false by default, fallback to map._container
+          }).addTo(map);
+
+          L.Control.boxzoom({
+            position: 'topleft', // Any of the usual position flags for a L.Control subclass: topright, topleft, and so on.
+            enableShiftDrag: false, // Enable the original functionality of Leaflet's shift-drag box zoom, in addition to the button. Defaults to false to disable Leaflet's shift-draw behavior, so the button must be used.
+            keepOn: false, // Boolean. Controls whether the zoombox button will remain active after zooming. Defaults to false (after zoom, turn off).
+            aspectRatio: null, // Number of fraction. Force the box to the given width-to-height aspect ratio. Easiest if you express it as a fraction e.g. aspectRatio: 8/7 Defaults to null so no aspect ratio will be enforced and any box may be drawn.
+            title: 'Click to zoom', // A tooltip when the user hovers their mouse over the control.
+            divClasses: '', // Add classes to the div that holds the Leaflet control.
+            iconClasses: '' // Any valid classes for an icon element. Used for easily adding a custom icon to the button.
+          }).addTo(map);
+
+          L.control.layers({
+                'National Geographic': esri_natgeo,
+                'Voyager': cartodb_voyager.addTo(map),
+                'Imagery': esri_worldimagery,
+                'Physical': esri_worldphysical.addTo(map),
+              },
+              {
+                'Labels': cartodb_labels.addTo(map),
+                'Selection': drawnItems,
+                'Records': record_markers.addTo(map),
+              },
+              {
+                position: 'topright',
+                collapsed: true
+              }
+          ).addTo(map);
+
+          map.addControl(new L.Control.Draw({
+              // edit: false,
+              edit: {
+                featureGroup: drawnItems,
+                edit: false,
+              },
+              draw: {
+                polyline: false,
+                marker: false,
+                circlemarker: false
+              }
+          }));
+
+          map.on(L.Draw.Event.CREATED, function (event) {
+              var layer = event.layer;
+              drawnItems.addLayer(layer);
+          });
 
       }, 'json');
     })
