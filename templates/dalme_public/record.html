@@ -79,7 +79,7 @@
   {{ block.super }}
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
-  <!-- <script type="text/javascript" src="{% static 'js/diva.js' %}"></script> -->
+  <!--script type="text/javascript" src="{% static 'js/diva_dev.js' %}"></script-->
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
@@ -205,29 +205,6 @@
         }
       };
 
-      const destoryFolio = () => {
-        // doing this instead of calling the destory() method because of known issue:
-        // https://github.com/DDMAL/diva.js/issues/498
-        // Useful event to access elements in diva before they get destroyed. Used by the highlight plugin.
-        const { settings } = window.folio;
-        console.log( settings);
-        // Cancel any pending request retrieving a manifest
-        if (settings.pendingManifestRequest && settings.pendingManifestRequest.abort)
-            settings.pendingManifestRequest.abort();
-
-        // Removes the hide-scrollbar class from the body
-        jQuery('body').removeClass('diva-hide-scrollbar');
-
-        // Empty the parent container and remove any diva-related data
-        jQuery(settings.parentObject).parent().empty().removeData('diva');
-
-        // Remove any additional styling on the parent element
-        jQuery(settings.parentObject).parent().removeAttr('style').removeAttr('class');
-
-        // Clear the Events cache
-        // diva.Events.unsubscribeAll(settings.ID);
-      }
-
       const renderImage = ({ pageId, zoomLevel, imageId }) => {
         const node = $('#diva_viewer');
         node.empty();
@@ -313,18 +290,11 @@
           main.toggleClass('vertical-split', false);
           main.toggleClass('horizontal-split', true);
           node.find('.folio')
-            .resizable('destroy')
             .resizableSafe({
               handleSelector: '#resize-handle',
               resizeWidth: false,
               onDragEnd: function() {
                   Diva.Events.publish('PanelSizeDidChange');
-                  destoryFolio();
-                  renderImage({
-                    pageId: window.folioPageId,
-                    zoomLevel: window.folio.settings.zoomLevel,
-                    imageId: null
-                  });
               },
             })
             .css({ width: '' });
@@ -333,19 +303,12 @@
           main.toggleClass('horizontal-split', false);
           main.toggleClass('vertical-split', true);
           node.find('.folio')
-            .resizable('destroy')
             .resizableSafe({
               handleSelector: '#resize-handle',
               resizeHeight: false,
               onDragEnd: function() {
                 if (data.imageId) {
                   Diva.Events.publish('PanelSizeDidChange');
-                  destoryFolio();
-                  renderImage({
-                    pageId: window.folioPageId,
-                    zoomLevel: window.folio.settings.zoomLevel,
-                    imageId: null
-                  });
                 }
               },
             })
@@ -359,12 +322,6 @@
         resizeWidth: $('.vertical-split').length ? true : false,
         onDragEnd: function() {
           Diva.Events.publish('PanelSizeDidChange');
-          destoryFolio();
-          renderImage({
-            pageId: window.folioPageId,
-            zoomLevel: window.folio.settings.zoomLevel,
-            imageId: null
-          });
         }
       });
 
