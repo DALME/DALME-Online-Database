@@ -8,7 +8,7 @@ from dalme_api.serializers import (AgentSerializer, AsyncTaskSerializer, Content
 from dalme_app.models import (Agent, Attribute, Content_class, Content_type, CountryReference,
                               LanguageReference, LocaleReference, RightsPolicy)
 
-from dalme_api.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy
+from dalme_api.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy, LocaleAccessPolicy
 from ._common import DALMEBaseViewSet
 from dalme_api.filters import ContenTypeFilter
 
@@ -92,7 +92,7 @@ class Languages(DALMEBaseViewSet):
 
 class Locales(DALMEBaseViewSet):
     """ API endpoint for managing locales """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (LocaleAccessPolicy,)
     queryset = LocaleReference.objects.all()
     serializer_class = LocaleReferenceSerializer
     filterset_fields = ['id', 'name', 'administrative_region', 'country__name']
