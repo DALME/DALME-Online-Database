@@ -332,6 +332,7 @@ header {
   background: linear-gradient(59deg, #11587c 54.62%, #1b1b1b);
   color: #fff;
   box-shadow: 0 5px 20px -4px rgba(0, 0, 0, 0.8);
+  background-position-y: center;
 }
 header a {
   color: #fff;
