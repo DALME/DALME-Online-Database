@@ -129,7 +129,7 @@ class SourceList(ListAPIView):
             )
             qs = search_obj.results
 
-        if not qs:
+        else:
             qs = super().get_queryset(*args, **kwargs).order_by('name')
             qs = qs.filter(type=13, workflow__is_public=True)
             qs = qs.prefetch_related(
