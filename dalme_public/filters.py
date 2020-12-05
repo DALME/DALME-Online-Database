@@ -84,10 +84,10 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
     @staticmethod
     def annotate_dates(qs):
         dates = Attribute.objects.filter(
-            Q(sources=OuterRef('pk'), attribute_type__short_name='start_date')
-            | Q(sources=OuterRef('pk'), attribute_type__short_name='end_date')
+            Q(sources=OuterRef('pk'), attribute_type__short_name='date')
+            | Q(sources=OuterRef('pk'), attribute_type__short_name='start_date')
         )
-        qs = qs.annotate(source_date=Subquery(dates.values('value_DATE')[:1]))
+        qs = qs.annotate(source_date=Subquery(dates.values('value_DATE_y')[:1]))
         return qs.distinct()
 
     @staticmethod
@@ -192,14 +192,14 @@ class SourceFilter(django_filters.FilterSet):
 
     def filter_date_range(self, queryset, name, value):
         queryset = queryset.filter(
-            attributes__attribute_type__short_name__endswith='_date'
+            attributes__attribute_type__id__in=[19, 26]
         ).distinct()
 
         after, before = value
         if after:
-            queryset = queryset.filter(attributes__value_DATE__gte=after)
+            queryset = queryset.filter(attributes__value_DATE_y__gte=after)
         if before:
-            queryset = queryset.filter(attributes__value_DATE__lte=before)
+            queryset = queryset.filter(attributes__value_DATE_y__lte=before)
 
         return queryset
 

@@ -9,7 +9,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from dalme_app.models import Attribute, Source, rs_resource
+from dalme_app.models import Source, rs_resource
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection

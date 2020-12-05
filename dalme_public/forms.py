@@ -54,20 +54,7 @@ class SourceFilterForm(forms.Form):
                 after, before = date_range.split(',')
             except ValueError:
                 self.add_error(
-                    'date_range', f'Incorrect date format, should be: %Y,%Y'
-                )
-            after = f'{after}-01-01'
-            before = f'{before}-12-31'
-
-            try:
-                after, before = [
-                    datetime.strptime(value, '%Y-%m-%d')
-                    for value in [after, before]
-                ]
-            except ValueError:
-                self.add_error(
-                    'date_range',
-                    f'Malformed date value for an element of: {date_range}'
+                    'date_range', 'Incorrect date format, should be: YYYY,YYYY'
                 )
 
             cleaned_data['date_range'] = [after, before]
