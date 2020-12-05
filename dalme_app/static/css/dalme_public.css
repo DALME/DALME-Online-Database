@@ -1707,8 +1707,14 @@ tei-text > tei-body {
 tei-quote {
   white-space: normal;
 }
-tei-hi[rend=indent1] {
+tei-hi[rend=indent] {
   padding-left: 1em;
+}
+tei-hi[rend=indent1] {
+  padding-left: 2em;
+}
+tei-hi[rend=indent2] {
+  padding-left: 3em;
 }
 tei-hi[rend=underline] {
   text-decoration: underline;
