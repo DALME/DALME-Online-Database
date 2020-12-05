@@ -43,6 +43,11 @@
             autocapitalize="off"
             spellcheck="false"
           >
+          <div
+            class="btn search-button clear-search clear-search-box"
+            :class="{ 'd-none' : search == null }"
+            @click="searchBoxClear"
+          >Clear</div>
         </li>
         <div class="filter-panel" v-if="showFilters && records">
           <form method="get" class="filter-form u-flex">
@@ -314,7 +319,7 @@
         records: 'fetchThumbnails',
         search: debounce(function() {
           this.filterData('search', this.search)
-        }, 250),
+        }, 300),
         date: debounce(function() {
           const [min, max] = this.date;
           if (min === this.dateMin && max === this.dateMax) {
@@ -528,7 +533,11 @@
           const url = params ? `${this.url}?${params}` : this.url;
           window.history.pushState(null, null, url);
         },
+        searchBoxClear() {
+          this.search = null
+        },
         filterData(key, value) {
+          console.log(value)
           const params = this.setParam(key, value).toString();
           this.fetchData(`${this.endpoint}/?${params}`);
           this.updateURL(params);

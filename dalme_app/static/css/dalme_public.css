@@ -1000,12 +1000,13 @@ i.inactive {
 .app nav li.search {
   border-right: 1px solid #6b6b6b;
   margin-right: auto;
+  padding-right: 70px;
 }
 .app nav li.search > input {
   border: 0;
   font-size: 1rem;
   outline: none;
-  width: 13rem;
+  width: 11rem;
 }
 .app .mode {
   display: list-item;
@@ -1953,7 +1954,7 @@ div.description[data-collapsed='true'] {
     padding: 0 2rem;
   }
   .app nav li.search > input {
-    width: 18rem;
+    width: 15rem;
   }
   .app section > div > span {
     padding: 0.75rem 2rem 0.75rem 0;
@@ -2293,6 +2294,12 @@ div.vue-slider {
   position: absolute;
   top: 42px;
   right: 26px;
+}
+
+.clear-search-box {
+  position: absolute;
+  top: 119px;
+  left: 282px;
 }
 
 .search-results-input {
