@@ -1720,8 +1720,9 @@ tei-hi[rend=underline] {
   text-decoration: underline;
 }
 tei-hi[rend=center] {
-  display: block;
+  display: inline-block;
   text-align: center;
+  width: 100%;
 }
 
 /* Data attributes */
