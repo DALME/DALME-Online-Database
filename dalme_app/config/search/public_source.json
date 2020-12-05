@@ -1,10 +1,11 @@
 {
-  "name": {
-    "label": "Record name",
+  "transcription": {
+    "label": "Transcription",
     "type": "text",
     "placeholder": "Type one or more words",
+    "child_relationship": "PublicFolio",
     "highlight": {
-      "number_of_fragments": 0
+      "number_of_fragments": 10
     }
   },
   "collections.name.keyword": {
@@ -62,20 +63,19 @@
       "number_of_fragments": 0
     }
   },
+  "name": {
+    "label": "Record name",
+    "type": "text",
+    "placeholder": "Type one or more words",
+    "highlight": {
+      "number_of_fragments": 0
+    }
+  },
   "attributes.record_type.keyword": {
     "label": "Record type",
     "type": "keyword",
     "highlight": {
       "number_of_fragments": 0
-    }
-  },
-  "transcription": {
-    "label": "Transcription",
-    "type": "text",
-    "placeholder": "Type one or more words",
-    "child_relationship": "PublicFolio",
-    "highlight": {
-      "number_of_fragments": 10
     }
   }
 }
