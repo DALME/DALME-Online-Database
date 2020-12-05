@@ -152,10 +152,17 @@ def get_header_image_styles(context, header_image):
         'about': '125deg, rgba(155, 149, 76, 0.7) 0%, rgba(63, 73, 54, 0.9) 100%',  # noqa
         'generic': '59deg, #11587c 54.62%, #1b1b1b',
     }
-    key = context['page'].slug
-    if key not in gradients.keys():
-        key = context['page'].get_parent().slug
-    value = gradients.get(key, gradients['generic'])
+    page = context['page']
+    value = False
+    count = 0
+
+    while not value and count < 4:
+        value = gradients.get(page.slug, False)
+        page = page.get_parent()
+
+    if not value:
+        value = gradients['generic']
+
     gradient = f'linear-gradient({value})'
     background_image = f'background-image: {gradient}, url({header_image.url})'
     return f'{background_image}; background-size: cover; width: 100%;'
