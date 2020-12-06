@@ -2831,3 +2831,98 @@ div.vue-slider {
     content: "";
     background: no-repeat 50%/50% 50%;
 }
+
+/* Leaflet map controls */
+
+.leaflet-zoom-box-control {
+    font-size: 18px;
+}
+.leaflet-zoom-box-crosshair {
+    cursor: crosshair !important;
+}
+.leaflet-zoom-box-icon {
+    background: transparent no-repeat center center;
+    background-image: url(/static/images/zoom-box-icon.svg);
+    background-size: 60%;
+}
+.leaflet-zoom-box-icon.active {
+    background-color: #f4f4f4;
+    /* border-bottom: 1px solid #ccc !important; */
+    border-bottom: none !important;
+}
+.leaflet-zoom-box-icon.leaflet-disabled{
+    color: #ccc;
+}
+
+.map-popup {
+  font-family: "Open Sans", sans-serif;
+}
+.map-pop-title {
+  font-family: "PT Serif", serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+.map-pop-subtitle {
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #5e6165;
+  border-bottom: 1px dotted #b9b9b9;
+  margin-bottom: 5px;
+  font-size: 10px;
+  padding-bottom: 5px;
+}
+.map-pop-detail {
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+.map-pop-key {
+  font-weight: 700;
+  color: #3a5d82;
+}
+.map-popup ul,
+.map-popup li {
+  list-style: disc;
+  list-style-position: inside;
+}
+.map-popup li {
+  margin-left: 10px;
+  color: #3a5d82;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+.leaflet-popup-wrapper a.map-pop-link {
+  margin-left: -5px;
+  color: #5e5e5e;
+}
+.leaflet-popup-wrapper a.map-pop-link:hover {
+  color: #354d87;
+  border-bottom: 1px dotted #354d87;
+}
+.leaflet-popup-wrapper .map-pop-button {
+  border: 1px solid #9c9c9c;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  color: #6d6d6d;
+  border-radius: 3px;
+  display: block;
+  text-align: center;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+.leaflet-popup-wrapper .map-pop-button:hover {
+  background-color: #e9f1fb;
+  color: #354d87 !important;
+  border-color: #354d87 !important;
+}
+.leaflet-popup-wrapper .leaflet-popup-content-wrapper {
+  border-radius: 5px;
+}
+
+#map_container {
+  background-color: #f1f8fb;
+}
+.loader {
+  color: #dee9fb;
+}

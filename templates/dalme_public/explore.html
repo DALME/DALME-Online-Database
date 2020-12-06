@@ -7,8 +7,7 @@
   {{ block.super }}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
   <link href="{% static 'js/leafletDraw/leaflet.draw.css' %}" rel="stylesheet">
-  <link href="{% static 'js/leafletFullscreen/Control.FullScreen.css' %}" rel="stylesheet">
-  <link href="{% static 'js/leafletBoxZoom/leaflet-control-boxzoom.css' %}" rel="stylesheet">
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
 {% endblock %}
 
 {% block header_extra %}
@@ -25,7 +24,9 @@
   <div class="content">
     <h2>{{ map_text.title }}</h2>
     {{ map_text.text_before }}
-    <div id="map_container" style="height:450px;" class="mt-2 mb-3"></div>
+    <div id="map_container" style="height:50vh;" class="mt-2 mb-3 d-flex">
+      <i class="fas fa-cog fa-spin fa-5x m-auto loader"></i>
+    </div>
     {{ map_text.text_after }}
   </div>
 {% endblock %}
@@ -33,101 +34,89 @@
   {{ block.super }}
   {% host_url 'api_endpoint' host 'data' as api_url %}
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
   <script type="text/javascript" src="{% static 'js/leafletDraw/leaflet.draw.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/leafletFullscreen/Control.FullScreen.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/leafletBoxZoom/leaflet-control-boxzoom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/leafletZoomBox/L.Control.ZoomBox.min.js' %}"></script>
   <script>
     $(document).ready(function() {
       const endpoint = "{{ api_url }}/datasets/explore_map/?format=json";
       $.get(endpoint, function(data) {
 
-          var esri_natgeo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-          	attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
-          	maxZoom: 16
+          map = L.map('map_container', {
+            fullscreenControl: true,
+            zoomSnap: 0.2,
+            zoomDelta: 1.0,
+            maxBounds: [[67.04012791618122, 78.25876635871595],[12.142718147196966, -55.86232739128406]],
+            minZoom: 3,
           });
+          map.fitBounds([[53.36972758064242, 17.77562407825832],[37.04731028371683, -4.754649359241663]])
 
-          var esri_worldimagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          	 attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-             detectRetina: false,
-             opacity: 1.0,
-          });
+          var cartodb_voyager_nl = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+              subdomains: 'abcd',
+              maxZoom: 19
+          }).addTo(map);
 
           var esri_worldphysical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
             	attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
             	maxZoom: 7,
               detectRetina: false,
               opacity: 1.0,
-          });
-
-          var cartodb_voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            	subdomains: 'abcd',
-            	maxZoom: 19,
-              detectRetina: false,
-              opacity: 1.0,
-          });
+          }).addTo(map);
 
           var cartodb_labels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
           	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
           	subdomains: 'abcd',
           	maxZoom: 19,
             zIndex: 200
-          });
+          }).addTo(map);
 
-          var cartodb_labels_dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-          	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          	subdomains: 'abcd',
-          	maxZoom: 19
-          });
-
-          var map = L.map('map_container').setView([47.505, 15], 4);
-          var drawnItems = new L.featureGroup().addTo(map);
           var record_markers = L.layerGroup();
+          for (let i = 0, len = data.length; i < len; ++i) {
+              let props = data[i];
+              let marker = L.circleMarker([props.latitude, props.longitude], {
+                  radius: props.count,
+                  stroke: true,
+                  color: '#611818',
+                  weight: 2,
+                  opacity: 0.8,
+                  fill: true,
+                  fillColor: '#840f0f',
+                  fillOpacity: 0.6,
+              });
 
-          for (const prop in data) {
-              if (data.hasOwnProperty(prop)) {
-                let marker = L.circleMarker([data[prop]['latitude'], data[prop]['longitude']], {
-                    color: 'red',
-                    fillColor: '#f03',
-                    fillOpacity: 0.8,
-                    radius: data[prop]['count'],
-                    stroke: false
-                });
-                marker.bindTooltip(`<b>Locale:</b> ${prop}, ${data[prop]['administrative_region']}<br/>\
-                <b>Records:</b> ${data[prop]['records']}<br/>`);
-                record_markers.addLayer(marker);
+              let pop_content = `<div class="map-popup"><div class="map-pop-title">${props.name}</div>
+                <div class="map-pop-subtitle">${props.administrative_region}, ${props.country}</div>
+                <div class="map-pop-detail"><span class="map-pop-key">Number of records: </span>${props.records}</div>
+                <div class="map-pop-detail"><span class="map-pop-key">Temporal coverage: </span>${props.coverage}</div>`;
+
+              if (props.collections.length > 0) {
+                pop_content += `<span class="map-pop-key">Collections:</span><br/><ul>`;
+                for (let j = 0, c_len = props.collections.length; j < c_len; ++j) {
+                  pop_content += `<li><a href="/collections/${props.collections[j].replace(/\s+/g, '-').toLowerCase()}/" class="map-pop-link">${props.collections[j]}</a></li>`
+                }
               }
+
+              pop_content += `</ul><a href="${props.target_url}" class="map-pop-button">Browse records</a></div>`;
+
+              marker.bindPopup(pop_content, {
+                className: 'leaflet-popup-wrapper',
+                maxWidth: 'auto'
+              });
+              record_markers.addLayer(marker);
           }
 
-          L.control.fullscreen({
-                position: 'topleft', // change the position of the button can be topleft, topright, bottomright or bottomleft, defaut topleft
-                title: 'Show me the fullscreen !', // change the title of the button, default Full Screen
-                titleCancel: 'Exit fullscreen mode', // change the title of the button when fullscreen is on, default Exit Full Screen
-                content: null, // change the content of the button, can be HTML, default null
-                forceSeparateButton: true, // force seperate button to detach from zoom buttons, default false
-                forcePseudoFullscreen: true, // force use of pseudo full screen even if full screen API is available, default false
-                fullscreenElement: false // Dom element to render in full screen, false by default, fallback to map._container
+          var zoom_box_control = L.control.zoomBox({
+              modal: false,
+              position: 'topleft',
+              title: 'Zoom to area',
+              addToZoomControl: true,
           }).addTo(map);
 
-          L.Control.boxzoom({
-            position: 'topleft', // Any of the usual position flags for a L.Control subclass: topright, topleft, and so on.
-            enableShiftDrag: false, // Enable the original functionality of Leaflet's shift-drag box zoom, in addition to the button. Defaults to false to disable Leaflet's shift-draw behavior, so the button must be used.
-            keepOn: false, // Boolean. Controls whether the zoombox button will remain active after zooming. Defaults to false (after zoom, turn off).
-            aspectRatio: null, // Number of fraction. Force the box to the given width-to-height aspect ratio. Easiest if you express it as a fraction e.g. aspectRatio: 8/7 Defaults to null so no aspect ratio will be enforced and any box may be drawn.
-            title: 'Click to zoom', // A tooltip when the user hovers their mouse over the control.
-            divClasses: '', // Add classes to the div that holds the Leaflet control.
-            iconClasses: '' // Any valid classes for an icon element. Used for easily adding a custom icon to the button.
-          }).addTo(map);
-
-          L.control.layers({
-                'National Geographic': esri_natgeo,
-                'Voyager': cartodb_voyager.addTo(map),
-                'Imagery': esri_worldimagery,
-                'Physical': esri_worldphysical.addTo(map),
+          var layers_control = L.control.layers({
               },
               {
-                'Labels': cartodb_labels.addTo(map),
-                'Selection': drawnItems,
+                'Labels': cartodb_labels,
                 'Records': record_markers.addTo(map),
               },
               {
@@ -135,24 +124,6 @@
                 collapsed: true
               }
           ).addTo(map);
-
-          map.addControl(new L.Control.Draw({
-              // edit: false,
-              edit: {
-                featureGroup: drawnItems,
-                edit: false,
-              },
-              draw: {
-                polyline: false,
-                marker: false,
-                circlemarker: false
-              }
-          }));
-
-          map.on(L.Draw.Event.CREATED, function (event) {
-              var layer = event.layer;
-              drawnItems.addLayer(layer);
-          });
 
       }, 'json');
     })
