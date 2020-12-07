@@ -1,0 +1,6 @@
+{
+    "name": "stat_title",
+    "label": "Public Stat Title",
+    "type": "text",
+    "fieldInfo": "Title of the text stat in the At-a-glance panel"
+}

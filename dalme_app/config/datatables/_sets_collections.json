@@ -14,7 +14,9 @@
         "description": "description",
         "endpoint": "endpoint",
         "owner": "owner.id",
-        "permissions": "permissions.id"
+        "permissions": "permissions.id",
+        "stat_title": "stat_title",
+        "stat_text": "stat_text"
       },
       "required_list": [
         "name",
@@ -63,7 +65,9 @@
       "description",
       "endpoint",
       "owner",
-      "permissions"
+      "permissions",
+      "stat_title",
+      "stat_text"
     ],
     "buttons": [
       {
