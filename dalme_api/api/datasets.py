@@ -24,12 +24,13 @@ class Datasets(viewsets.GenericViewSet):
         return Response(result, status)
 
     def explore_map(self):
-        sources = Source.objects.filter(type=13, workflow__is_public=True)
+        sources = Source.objects.filter(type=13, workflow__is_public=True).prefetch_related(
+            'attributes', 'attributes__attribute_type', 'sets', 'sets__set_id'
+        )
         place_data = {}
         for source in sources:
             source_date = list(source.attributes.filter(attribute_type__in=[19, 26]).values_list('value_DATE_y', flat=True))
-            sets = source.sets.filter(set_id__set_type=2)
-            source_collections = [c.set_id.name for c in sets] if sets.exists() else []
+            source_collections = [c.set_id.name for c in source.sets.filter(set_id__set_type=2)]
             locales = source.attributes.filter(attribute_type=36)
             if locales.exists():
                 for i in locales:

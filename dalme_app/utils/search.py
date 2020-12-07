@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 from elasticsearch_dsl.query import Q
 import elasticsearch.exceptions as es_exceptions
 from dalme_app.documents import PublicSource, FullSource
-from dalme_app.models import Attribute, LanguageReference, Set, Source
+from dalme_app.models import Attribute, LanguageReference, Set
 from dateutil.parser import parse
 
 
@@ -364,16 +364,17 @@ class SearchContext():
                 ]
 
     def record_type(self):
-        filter_options = {'type': 13}
+        filter_options = {
+            'attribute_type': 28,
+            'sources__type': 13,
+        }
 
         if self.public:
-            filter_options.update({'workflow__is_public': True})
+            filter_options.update({'sources__workflow__is_public': True})
 
         return [{'value': i, 'label': i}
-                for i in Attribute.objects.filter(
-                    attribute_type__short_name='record_type',
-                    object_id__in=Source.objects.filter(**filter_options).values('id')
-                ).order_by('value_STR')
+                for i in Attribute.objects.filter(**filter_options)
+                .order_by('value_STR')
                 .values_list('value_STR', flat=True)
                 .distinct()
                 ]
