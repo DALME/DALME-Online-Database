@@ -97,7 +97,7 @@
                 }
               }
 
-              pop_content += `</ul><a href="${props.target_url}" class="map-pop-button">Browse records</a></div>`;
+              pop_content += `</ul><a href="/collections/records/?locale=${props.locale_id}" class="map-pop-button">Browse records</a></div>`;
 
               marker.bindPopup(pop_content, {
                 className: 'leaflet-popup-wrapper',

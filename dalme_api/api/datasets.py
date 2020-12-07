@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from dalme_api.access_policies import PublicAccessPolicy
-from dalme_app.models import Attribute, LocaleReference, Source
+from dalme_app.models import LocaleReference, Source
 import numpy as np
 
 
@@ -42,6 +42,7 @@ class Datasets(viewsets.GenericViewSet):
                             place_data[place.name]['collections'] += source_collections
                         else:
                             place_data[place.name] = {
+                                'locale_id': place.id,
                                 'count': 1,
                                 'administrative_region': place.administrative_region,
                                 'country': place.country.name,
@@ -71,7 +72,6 @@ class Datasets(viewsets.GenericViewSet):
                 'records': data['count'],
                 'coverage': f'{min(dates)}–{max(dates)}' if len(dates) > 1 else dates[0],
                 'collections': collections,
-                'target_url': ''
             })
             data['count'] = (bin_index[values.index(data['count'])] * 2) + 1
             dataset.append(data)
