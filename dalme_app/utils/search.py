@@ -326,13 +326,17 @@ class SearchContext():
         if '.' in field:
             field_tokens = field.split('.')
             field = field_tokens[0] if field_tokens[0] != 'attributes' else field_tokens[1]
+
         method = getattr(self, field, 'Invalid field')
+
         return method()
 
     def collections(self):
         filter_options = {'set_type': 2}
+
         if self.public:
             filter_options.update({'is_public': True})
+
         return [{'value': i, 'label': i}
                 for i in Set.objects.filter(**filter_options)
                 .order_by('name')
@@ -340,25 +344,36 @@ class SearchContext():
                 ]
 
     def language(self):
-        filter_options = {'type': 13}
+        filter_options = {
+            'attribute_type': 15,
+            'sources__type': 13,
+        }
+
         if self.public:
-            filter_options.update({'workflow__is_public': True})
-        id_list = list(Attribute.objects.filter(
-                    attribute_type__short_name='language',
-                    object_id__in=Source.objects.filter(**filter_options).values('id')
-                ).values_list('value_JSON__id', flat=True).distinct())
+            filter_options.update({'sources__workflow__is_public': True})
+
+        languages = [
+            int(i) for i in Attribute.objects.filter(**filter_options)
+            .values_list('value_JSON__id', flat=True)
+            .distinct()
+        ]
+
         return [{'value': i.name, 'label': i.name}
-                for i in LanguageReference.objects.filter(id__in=id_list)
+                for i in LanguageReference.objects.filter(id__in=languages)
                 .order_by('name')
                 ]
 
     def record_type(self):
         filter_options = {'type': 13}
+
         if self.public:
             filter_options.update({'workflow__is_public': True})
+
         return [{'value': i, 'label': i}
                 for i in Attribute.objects.filter(
                     attribute_type__short_name='record_type',
                     object_id__in=Source.objects.filter(**filter_options).values('id')
-                ).order_by('value_STR').values_list('value_STR', flat=True).distinct()
+                ).order_by('value_STR')
+                .values_list('value_STR', flat=True)
+                .distinct()
                 ]
