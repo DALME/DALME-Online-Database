@@ -10,7 +10,7 @@
           <a href="{% pageurl featured_object %}">
             <div class="monthly source object u-flex">
               {% if featured_object.main_image %}
-                {% image featured_object.main_image fill-225x225-c100 %}
+                {% image featured_object.main_image fill-230x230-c50 %}
               {% endif %}
               <div class="u-flex">
                 <h3>{{ featured_object.title }}</h3>
@@ -25,7 +25,7 @@
           <a href="{% pageurl featured_inventory %}">
             <div class="monthly source u-flex">
               {% if featured_inventory.main_image %}
-                {% image featured_inventory.main_image fill-225x225-c100 %}
+                {% image featured_inventory.main_image fill-230x230-c50 %}
               {% endif %}
               <div class="u-flex">
                 <h3>{{ featured_inventory.title }}</h3>
@@ -41,14 +41,12 @@
     {% if essay %}
       <div class="monthly essay u-flex">
         {% if essay.main_image %}
-          {% image essay.main_image fill-400x250-c100 %}
+          {% image essay.main_image fill-311x200-c50 %}
         {% endif %}
-        <div class="u-flex">
+        <div class="u-flex essay-content">
           <h4>{{ essay.title }}</h4>
-          <p>{% get_snippet essay 300 %}</p>
-          <button class="u-button">
-            <a href="{% pageurl essay %}">READ MORE</a>
-          </button>
+          <p class="fading">{% get_snippet essay 300 %}</p>
+          <a class="u-button" href="{% pageurl essay %}">READ MORE</a>
         </div>
       </div>
     {% endif %}

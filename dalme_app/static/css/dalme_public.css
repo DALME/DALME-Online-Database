@@ -68,13 +68,31 @@ input[type=search]{
   box-shadow: 0 1px 12px rgba(0, 0, 0, 0.34);
 }
 
+a.u-lozenge:hover {
+  box-shadow: 0 3px 22px rgba(0, 0, 0, 0.64);
+}
+
 .u-button {
-  background: #02a1ff;
-  border-radius: 0.5rem;
-  border: 0;
-  cursor: pointer;
-  padding: 0.75rem 2rem;
+  border: 1px solid #9c9c9c;
+  font-size: 12px;
+  font-weight: 700 !important;
   text-transform: uppercase;
+  padding: 2px 5px;
+  color: #6d6d6d !important;
+  border-radius: 3px;
+  display: block;
+  text-align: center;
+  cursor: pointer;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: auto;
+  margin-bottom: 15px;
+}
+
+.u-button:hover {
+  background-color: #e9f1fb;
+  color: #354d87 !important;
+  border-color: #354d87 !important;
 }
 
 .sidebar-heading {
@@ -220,9 +238,9 @@ body.home main .main-column {
 }
 
 body.home section.featured {
-  align-items: center;
+  align-items: start;
   flex-direction: column;
-  margin: 0 1em;
+  margin: 0 auto;
 }
 body.home section.featured h4 {
   text-transform: none;
@@ -339,6 +357,10 @@ header a {
   text-decoration: none;
   text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.85);
 }
+header a:hover {
+  color: #fff;
+  text-decoration: none;
+}
 header hgroup {
   text-shadow: 0 0 12pt rgba(0, 0, 0, 0.6);
 }
@@ -389,7 +411,7 @@ header.home .title {
   display: none;
   padding: 4.8rem 0 0 0;
 }
-header.home > div > div {
+header.home > div > a {
   margin: 3rem 0 8rem 0;
 }
 
@@ -537,6 +559,7 @@ nav.browse a {
   box-shadow: 0 0 20px #7b7b7b;
   background: #000;
   flex-direction: column;
+  height: 230px;
 }
 .monthly > div {
   background: #fff;
@@ -591,10 +614,13 @@ nav.browse a {
 }
 .featured > div,
 .featured > div .monthly.object {
-  margin-bottom: 1rem;
+  margin-bottom: 15px;
 }
 .featured > div.monthly.essay {
   margin-bottom: 0;
+}
+.featured .essay-content {
+  height: 275px;
 }
 .metadata {
   color: #636363;
@@ -731,7 +757,7 @@ body footer {
 }
 nav.footer {
   display: none;
-  flex: 2 0 auto;
+  flex: 0 0 auto;
 }
 nav.footer ul {
   list-style-type: none;
@@ -745,18 +771,22 @@ nav.footer ul li:not(:last-child)::after {
   content: " \2022 ";
 }
 nav.footer ul li a {
-  color: #fff;
+  color: #ccc;
   text-decoration: none;
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   padding: 0 0.2rem;
+}
+nav.footer ul li a:hover {
+  color: #fff;
 }
 .copyright {
   font-size: 0.6rem;
   padding: 1rem;
   flex: 4 0 auto;
   text-align: center;
+  color: #ccc;
 }
 .social {
   display: none;
@@ -764,12 +794,16 @@ nav.footer ul li a {
   color: #ccc;
   text-align: center;
   flex: 1 0 0;
-  font-size: 1.2rem;
-  padding: 1rem 2rem;
+  font-size: 1.7rem;
+  padding: .75rem 2rem;
   white-space: nowrap;
 }
 .social > i:not(:first-child):not(:last-child) {
   margin: 0 0.3rem;
+}
+
+.social i:hover {
+  color: #fff;
 }
 
 /* Inventories */
@@ -1863,11 +1897,12 @@ div.description[data-collapsed='true'] {
 
   .monthly {
     flex-direction: row;
+    height: 230px;
   }
   .monthly.essay {
     background: #000;
     flex-direction: row;
-    height: 100%;
+    height: 475px;
     margin: 0;
   }
 
@@ -2081,17 +2116,22 @@ div.description[data-collapsed='true'] {
 
   body.home section.featured {
     flex-direction: row;
-    margin: 0 4em;
+    margin: 0 auto;
   }
   body.home section.featured > div:first-child {
-    width: calc(100% / 3 * 2);
+    /* width: calc(100% / 3 * 2); */
+    width: 622px;
   }
   body.home section.featured > div:last-child {
-    width: calc(100% / 3 * 1);
+    /* width: calc(100% / 3 * 1); */
+    width: 311px;
+    margin-left: 15px;
+    overflow: hidden;
   }
   .featured > div {
     margin-bottom: 0;
   }
+
   .statement {
     display: block;
   }
@@ -2113,10 +2153,7 @@ div.description[data-collapsed='true'] {
   .monthly.essay {
     background: #fff;
     flex-direction: column;
-    margin: 0 1rem;
-  }
-  .monthly.essay img {
-    padding: 1rem;
+    /* margin: 0 1rem; */
   }
 
   body.collection .collapsible {
@@ -2925,4 +2962,21 @@ div.vue-slider {
 }
 .loader {
   color: #dee9fb;
+}
+
+/* FADING TEXT BOX*/
+
+.fading {
+  position: relative;
+  overflow: hidden;
+}
+.fading:after {
+  content: "";
+  text-align: right;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 70%;
+  height: 1.2em;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
 }
