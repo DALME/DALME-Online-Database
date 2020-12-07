@@ -84,6 +84,13 @@
             >
             </vue-slider>
 
+            <label class="label">Locale</label>
+            <v-select
+              :options="choices.localeChoices"
+              @input="setLocale"
+              v-model="locale">
+            </v-select>
+
             <label class="label">Assets</label>
             <div class="asset u-flex">
               <input
@@ -306,6 +313,7 @@
         collection: null,
         sourceType: null,
         date: [1200, 1500],
+        locale: null,
         hasImage: null,
         hasTranscription: null,
         nameOrder: null,
@@ -348,7 +356,8 @@
             this.sourceType,
             this.date,
             this.hasImage,
-            this.hasTranscription
+            this.hasTranscription,
+            this.locale
           ].some(value => value);
         },
         endpoint() {
@@ -435,6 +444,10 @@
         setHasTranscription() {
           this.filterData('has_transcription', !this.hasTranscription);
         },
+        setLocale() {
+          const value = this.locale ? this.locale.id : null;
+          this.filterData('locale', value);
+        },
         toggleNameOrder() {
           this.sourceTypeOrder = null;
           this.dateOrder = null;
@@ -469,7 +482,7 @@
           let params = {};
           this.currentParams.forEach((value, key) => {
             const camelized = key.replace(/(_\w)/g, k => k[1].toUpperCase());
-            if (['collection', 'corpus', 'source_type'].includes(key)) {
+            if (['collection', 'corpus', 'source_type', 'locale'].includes(key)) {
               value = this.choices[`${camelized}Choices`]
                 .filter(item => {
                   return key === 'source_type'

@@ -5,7 +5,7 @@ from django.db.models import OuterRef, Q, Subquery
 
 import django_filters
 
-from dalme_app.models import Attribute, Source
+from dalme_app.models import Attribute, Source, LocaleReference
 from dalme_public import forms
 from dalme_public.models import (
     Collection,
@@ -61,6 +61,23 @@ def collection_choices():
 def source_type_choices():
     type_map = _map_source_types()
     return sorted(list(type_map.items()), key=lambda choice: choice[1])
+
+
+def locale_choices():
+    locales = [int(i) for i in Attribute.objects.filter(
+        attribute_type=36,
+        sources__type=13,
+        sources__workflow__is_public=True
+    ).values_list(
+        'value_JSON__id',
+        flat=True
+    ).distinct()]
+
+    return [
+        (i.id, i.name)
+        for i in LocaleReference.objects.filter(id__in=locales)
+        .order_by('name')
+    ]
 
 
 class SourceOrderingFilter(django_filters.OrderingFilter):
@@ -162,6 +179,11 @@ class SourceFilter(django_filters.FilterSet):
         method='filter_transcription',
         choices=BOOLEAN_CHOICES
     )
+    locale = django_filters.ChoiceFilter(
+        label='Locale',
+        choices=locale_choices,
+        method='filter_locale'
+    )
 
     order_by = SourceOrderingFilter()
 
@@ -176,6 +198,7 @@ class SourceFilter(django_filters.FilterSet):
             'collection',
             'has_transcription',
             'has_image',
+            'locale',
             'order_by',
         ]
 
@@ -229,6 +252,9 @@ class SourceFilter(django_filters.FilterSet):
     def filter_transcription(self, queryset, name, value):
         value = True if value == 'true' else False
         return queryset.exclude(source_pages__transcription__isnull=value)
+
+    def filter_locale(self, queryset, name, value):
+        return queryset.filter(attributes__attribute_type=36, attributes__value_JSON__id=str(value))
 
 
 class FeaturedFilter(django_filters.FilterSet):

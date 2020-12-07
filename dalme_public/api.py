@@ -13,7 +13,7 @@ from dalme_app.models import Source, rs_resource
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.filters import SourceFilter
 from dalme_public.models import Corpus, Collection
-from dalme_public.filters import _map_source_types
+from dalme_public.filters import _map_source_types, locale_choices
 from dalme_app.utils import Search, SearchContext
 
 
@@ -196,12 +196,17 @@ class FilterChoices(View):
             for idx, value in types.items()
         ], key=lambda choice: choice['label'])
 
+    def locale_choices_as_dict(self):
+        choices = locale_choices()
+        return [{'id': i[0], 'label': i[1]} for i in choices]
+
     @property
     def methods(self):
         return {
             'corpusChoices': self.corpus_choices,
             'collectionChoices': self.collection_choices,
             'sourceTypeChoices': self.source_type_choices,
+            'localeChoices': self.locale_choices_as_dict,
         }
 
     def get_data(self):
