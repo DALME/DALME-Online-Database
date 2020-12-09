@@ -1759,6 +1759,9 @@ tei-hi[rend=center] {
   text-align: center;
   width: 100%;
 }
+tei-w[type=elision]:empty {
+  margin-right: .25rem;
+}
 
 /* Data attributes */
 div.description[data-collapsed='true'] {
