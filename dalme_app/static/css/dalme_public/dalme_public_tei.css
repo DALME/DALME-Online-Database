@@ -1,0 +1,86 @@
+/* TEI Common */
+
+.transcription tei-TEI {
+  margin: 0;
+}
+.closed .ab-content {
+    display: none;
+}
+.ab-column-toggler .label {
+    padding-right: 10px;
+}
+.ab-column-toggler .fa-caret-down {
+    display: inline;
+}
+.ab-column-toggler .fa-caret-left {
+    display: none;
+}
+.closed .ab-column-toggler .fa-caret-down {
+    display: none;
+}
+.closed .ab-column-toggler .fa-caret-left {
+    display: inline;
+}
+.ab-column-toggler {
+    cursor: pointer;
+    position: absolute;
+    left: -0.7em;
+    top: 1.1em;
+    transform: rotate(-90deg);
+    font-family: "Open Sans", sans-serif;
+}
+.ab-column-toggler .label {
+    padding-right: 10px;
+}
+tei-mute {
+  display: none;
+}
+tei-quote {
+  white-space: normal;
+}
+tei-hi[rend=indent] {
+  padding-left: 1em;
+}
+tei-hi[rend=indent1] {
+  padding-left: 2em;
+}
+tei-hi[rend=indent2] {
+  padding-left: 3em;
+}
+tei-hi[rend=underline] {
+  text-decoration: underline;
+}
+tei-hi[rend=center] {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+}
+tei-w[type=elision]:empty {
+  margin-right: .25rem;
+}
+
+/* TEI Scholarly */
+section.transcription.scholarly {
+  overflow: auto;
+}
+section.transcription.scholarly tei-text > tei-body {
+  white-space: pre;
+}
+
+/* TEI Basic */
+section.transcription.basic {
+  overflow: scroll;
+}
+section.transcription.basic tei-text > tei-body {
+  white-space: pre-line;
+}
+section.transcription.basic tei-del,
+section.transcription.basic tei-pc {
+  display: none;
+}
+
+section.transcription.basic tei-hi[rend="superscript"],
+section.transcription.basic tei-hi[rend="subscript"] {
+  vertical-align: unset;
+  font-size: 100%;
+}
