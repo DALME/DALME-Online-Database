@@ -92,7 +92,7 @@
             </li>
             <div class="dropdown-divider"></div>
             <li>
-              <a class="dropdown-item" href="#" @click="toggleTextWrap">
+              <a class="dropdown-item" href="#" @click="toggleTextWrap" v-bind:class="{ disabled: renderMode == 'basic' }">
                 <i class="fa-fw" v-bind:class="{ 'far fa-square': !softWrap, 'fas fa-check-square': softWrap }"></i> Soft-wrap text
               </a>
             </li>
@@ -534,7 +534,9 @@
             this.softWrap = mode == 'basic' ? true : false;
           },
           toggleTextWrap() {
-            this.softWrap = this.softWrap ? false : true;
+            if (this.renderMode == 'scholarly') {
+              this.softWrap = this.softWrap ? false : true;
+            }
           }
         },
       });

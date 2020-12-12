@@ -2925,6 +2925,16 @@ section.transcription {
   color: #696969;
   margin-right: 2px;
 }
+.dropdown-item.disabled {
+  cursor: default;
+}
+.dropdown-item.disabled:hover {
+  color: #6c757d;
+  background-color: transparent;
+}
+.dropdown-item.disabled > i {
+  color: #9f9f9f;
+}
 .clear-select {
   position: absolute;
   right: 25px;
