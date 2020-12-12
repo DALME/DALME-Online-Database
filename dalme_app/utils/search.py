@@ -125,7 +125,7 @@ class Search():
 
         for i, row in enumerate(data):
             join = row.get('join_type', False)
-            if i == 0:
+            if i == 0 and len(data) > 1:
                 join = data[1].get('join_type', False)
                 if join and join == 'must_not':
                     join = 'must'
@@ -226,7 +226,6 @@ class Search():
                     'child_relationship': context[row['field']].get('child_relationship', False),
                     'highlight': context[row['field']].get('highlight', {})
                 })
-
         return clean_data if clean_data else None
 
     @staticmethod

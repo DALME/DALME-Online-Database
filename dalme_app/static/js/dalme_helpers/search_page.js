@@ -83,7 +83,8 @@ function toggle_search_box() {
 
 function clear_search() {
   let formset_manager = $('#id_form-TOTAL_FORMS');
-  $('#advanced-search-sets').html($('#form_template').html().replace(/__prefix__/g, formset_manager.val() - 1));
+  $('#advanced-search-sets').html('<div class="help-heading"><small>Use multiple statements to build a complex search query.</small></div>');
+  $('#advanced-search-sets').append($('#form_template').html().replace(/__prefix__/g, formset_manager.val() - 1));
   formset_manager.val(1);
   $('#advanced-search-sets .query_op').addClass('d-none');
   $('#advanced-search-sets .query_op_first').removeClass('d-none');
@@ -100,8 +101,8 @@ function change_on_field(e) {
   let field = $(e.target).val();
   let row = $(e.target).parent().parent();
   let type = search_context['fields'][field]['type'];
-  let id = row.find('.query_input input').attr('id');
-  let name = row.find('.query_input input').attr('name');
+  let id = row.find('.query_input').children().first().attr('id');
+  let name = row.find('.query_input').children().first().attr('name');
   let input = get_input(field, type, id, name);
 
   if (type == 'text') {
