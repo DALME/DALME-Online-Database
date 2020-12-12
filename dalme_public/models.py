@@ -66,7 +66,7 @@ def hide_users_menu_item(request, menu_items):
 
 @hooks.register('insert_global_admin_css', order=0)
 def extra_admin_css():
-    return format_html('<link rel="stylesheet" href="{}">', static("css/dalme_public_admin.css"))
+    return format_html('<link rel="stylesheet" href="{}">', static("css/dalme_public/dalme_public_admin.css"))
 
 
 @hooks.register('before_serve_page')
