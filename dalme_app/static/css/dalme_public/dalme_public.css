@@ -1002,6 +1002,7 @@ i.inactive {
   padding: .5rem 0;
   font-size: .9rem;
   text-transform: uppercase;
+  background-color: #fbfbfb;
 }
 .app.inventory-list .inventory-field {
   padding: 0.5rem 1rem 0 1rem;
