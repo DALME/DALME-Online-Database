@@ -56,7 +56,7 @@
                 <div
                   class="clear-select"
                   v-if="corpus !== ''"
-                  @click="clearSelect(event, 'corpus')">
+                  v-on:click.stop="clearSelect('corpus')">
                   <i class="fa fa-times"></i>
                 </div>
               </div>
@@ -70,7 +70,7 @@
                 <div
                   class="clear-select"
                   v-if="collection !== ''"
-                  @click="clearSelect(event, 'collection')">
+                  v-on:click.stop="clearSelect('collection')">
                   <i class="fa fa-times"></i>
                 </div>
               </div>
@@ -84,7 +84,7 @@
                 <div
                   class="clear-select"
                   v-if="sourceType !== ''"
-                  @click="clearSelect(event, 'sourceType')">
+                  v-on:click.stop="clearSelect('sourceType')">
                   <i class="fa fa-times"></i>
                 </div>
               </div>
@@ -98,7 +98,7 @@
                 <div
                   class="clear-select"
                   v-if="locale !== ''"
-                  @click="clearSelect(event, 'locale')">
+                  v-on:click.stop="clearSelect('locale')">
                   <i class="fa fa-times"></i>
                 </div>
               </div>
@@ -273,7 +273,7 @@
 
                       <div class="u-flex bottom">
                         <span class="short-name">${record.short_name}</span>
-                        <span class="city">${record.city} | ${record.date}</span>
+                        <span class="city">${record.date}</span>
                       </div>
 
                       <div class="modal-description" v-if="recordDetailHover === record.id">
@@ -586,10 +586,9 @@
         searchBoxClear() {
           this.search = null
         },
-        clearSelect(e, field) {
+        clearSelect(field) {
           this.filterData(field, '');
           this[field] = '';
-          e.stopPropagation();
         },
         filterData(key, value) {
           const params = this.setParam(key, value).toString();
