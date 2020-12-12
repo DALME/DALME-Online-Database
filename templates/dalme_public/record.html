@@ -15,21 +15,22 @@
 {% endblock %}
 
 {% block main_column %}
-  <div id="app" class="app inventory-toolbar">
+  <div id="app" class="h-100" v-on:click.once="toggleInfoPanel">
+  <div class="app inventory-toolbar">
     <nav>
       <ul class="u-flex">
-        <li
-          class="nav_button"
-          @click="toggleInfoPanel"
-          v-bind:class="{ active: showInfoPanel }">
-          <i class="fas fa-info-circle"></i>
-        </li>
-
         <li :id=`diva-${divaId}-zoom-out-button` class="zoom out nav_button" @click="handleZoomOut">
           <i class="fa fa-search-minus" aria-hidden="true"></i>
         </li>
         <li :id=`diva-${divaId}-zoom-in-button` class="zoom in nav_button" @click="handleZoomIn">
           <i class="fa fa-search-plus" aria-hidden="true"></i>
+        </li>
+
+        <li
+          class="nav_button mr-auto"
+          @click="toggleInfoPanel"
+          v-bind:class="{ active: showInfoPanel }">
+          <i class="fas fa-info-circle"></i>
         </li>
 
         <li class="border-0 text-start mr-auto">
@@ -79,26 +80,45 @@
             <i class="fa fa-bars"></i>
           </div>
           <ul class="dropdown-menu dropdown-menu-right p-0 pt-3 pb-3" aria-labelledby="viewer_menu">
-            <li><a class="dropdown-item" href="#" @click="handleFlipView"><i class="fas fa-grip-lines-vertical fa-fw"></i> Vertical Split</a></li>
-            <li><a class="dropdown-item" href="#" @click="handleFlipView"><i class="fas fa-grip-lines fa-fw"></i> Horizontal Split</a></li>
+            <li>
+              <a class="dropdown-item" href="#" @click="handleFlipView('vertical-split')">
+                <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'horizontal-split', 'fas fa-check-square': viewerMode == 'vertical-split' }"></i> Vertical Split
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" @click="handleFlipView('horizontal-split')">
+                <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'vertical-split', 'fas fa-check-square': viewerMode == 'horizontal-split' }"></i> Horizontal Split
+              </a>
+            </li>
             <div class="dropdown-divider"></div>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-check-square fa-fw"></i> Basic mode</a></li>
-            <li><a class="dropdown-item" href="#"><i class="far fa-square fa-fw"></i> Scholarly mode</a></li>
+            <li>
+              <a class="dropdown-item" href="#" @click="toggleTextWrap">
+                <i class="fa-fw" v-bind:class="{ 'far fa-square': !softWrap, 'fas fa-check-square': softWrap }"></i> Soft-wrap text
+              </a>
+            </li>
             <div class="dropdown-divider"></div>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-check-square fa-fw"></i> Original line endings</a></li>
-            <li><a class="dropdown-item" href="#"><i class="far fa-square fa-fw"></i> Wrap to window width</a></li>
+            <li>
+              <a class="dropdown-item" href="#" @click="changeRenderMode('basic')">
+                <i class="fa-fw" v-bind:class="{ 'far fa-square': renderMode == 'scholarly', 'fas fa-check-square': renderMode == 'basic' }"></i> Basic mode
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" @click="changeRenderMode('scholarly')">
+                <i class="fa-fw" v-bind:class="{ 'fas fa-check-square': renderMode == 'scholarly', 'far fa-square': renderMode == 'basic' }"></i> Scholarly mode
+              </a>
+            </li>
             <div class="dropdown-divider"></div>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-graduation-cap fa-fw"></i> Cite</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-share-square fa-fw"></i> Share</a></li>
+            <li>
+              <a class="dropdown-item" href="#"><i class="fas fa-graduation-cap fa-fw"></i> Cite...</a>
+            </li>
           </ul>
         </li>
-
       </ul>
     </nav>
   </div>
   <div class="folios u-flex viewer">
     <section class="folio">
-      <div class="record-info">
+      <div class="record-info" v-if="showInfoPanel">
         <div class="description">
           {% if data.description %}
             {{ data.description }}
@@ -107,14 +127,13 @@
           {% endif %}
         </div>
         <ul class="u-flex u-type-sans">
-          <li>{{ data.short_name }}</li>
-          <li>{{ data.date }}</li>
-          <li>{{ data.city }}</li>
+          <li><span>Archival location:</span> {{ data.short_name }}</li>
+          <li><span>Date(s):</span> {{ data.date }}</li>
           {% with data.folios|length as count %}
-            <li>{{ count }} Folio{% if count > 1 %}s{% endif %}</li>
+            <li><span>Extent:</span> {{ count }} Folio{% if count > 1 %}s{% endif %}</li>
           {% endwith %}
         </ul>
-        <div class="credit u-type-sans">
+        <div class="u-type-sans mt-2">
           {{ data.get_credit_line }}
         </div>
       </div>
@@ -122,8 +141,9 @@
       <div id="folio-rights" class="folio-rights u-flex"></div>
     </section>
     <div id="resize-handle" class="resize-handle"></div>
-    <section id="transcription" class="transcription"></section>
+    <section id="transcription" class="transcription" v-bind:class="[renderMode, { 'soft-wrap': softWrap }]"></section>
   </div>
+</div>
 {% endblock %}
 
 {% block js_foot %}
@@ -145,7 +165,6 @@
     $(document).ready(function() {
       setHeaderHeight();
       const splitter = $('div.folios');
-
       $(document).on('click', '.ab-column-toggler', (e) => {
           const parent = e.target.closest('tei-ab');
           parent.classList.toggle('closed');
@@ -258,7 +277,6 @@
       const renderImage = ({ pageId, zoomLevel, imageId }) => {
         const node = $('#diva_viewer');
         node.empty();
-        console.log('render image', pageId, zoomLevel, imageId);
         window.folio = new Diva('diva_viewer', {
           objectData:`{{db_url}}pages/${pageId}/manifest/`,
           enableAutoTitle: false,
@@ -404,6 +422,9 @@
           date: 0,
           divaId: 1,
           showInfoPanel: true,
+          renderMode: 'scholarly',
+          viewerMode: 'vertical-split',
+          softWrap: false
         },
         computed: {
           sourceData() {
@@ -499,24 +520,21 @@
               this.folioSelect = false;
             }
           },
-          handleFlipView() {
+          handleFlipView(split) {
             window.eventBus.$emit('flipView', this.eventData);
             // window.eventBus.$emit('renderFolio', this.eventData, false);
             this.incrementDivaId();
+            this.viewerMode = split;
           },
-          // toggleFolioSelect() {
-          //   if (this.hasMultipleFolios) {
-          //     this.folioSelect = !this.folioSelect;
-          //   }
-          // },
-          // hideFolioSelect(e) {
-          //   if (!e.target.closest('.folio-selector')) {
-          //     this.folioSelect = false;
-          //   }
-          // },
           toggleInfoPanel() {
             this.showInfoPanel = this.showInfoPanel ? false : true;
-            $('.record-info').toggleClass('d-none');
+          },
+          changeRenderMode(mode) {
+            this.renderMode = mode;
+            this.softWrap = mode == 'basic' ? true : false;
+          },
+          toggleTextWrap() {
+            this.softWrap = this.softWrap ? false : true;
           }
         },
       });
