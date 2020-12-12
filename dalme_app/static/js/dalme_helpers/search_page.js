@@ -3,6 +3,7 @@ function search_page_load() {
 
 function search_page_init() {
   search_context = JSON.parse($('#search_context').text());
+  $('#search-form').on('change', function() { $('#id_form-PAGE').val(1); });
   $('.search-text-container').each(init_show_more);
   $('.show-more').on('click', toggle_show_more);
 
