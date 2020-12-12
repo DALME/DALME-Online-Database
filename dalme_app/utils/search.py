@@ -124,7 +124,12 @@ class Search():
         child_highlight = False
 
         for i, row in enumerate(data):
-            join = row.get('join_type', False) if i > 0 else 'should'
+            join = row.get('join_type', False)
+            if i == 0:
+                join = data[1].get('join_type', False)
+                if join and join == 'must_not':
+                    join = 'must'
+
             method = getattr(self, row.get('field_type'), False)
 
             if row.get('child_relationship', False):
