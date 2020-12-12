@@ -18,7 +18,7 @@ class Search():
         self.errors = []
         self.results_per_page = getattr(settings, "SEARCH_RESULTS_PER_PAGE", 10)
         self.searchindex = PublicSource if public else FullSource
-        self.adjacent_pages = 2
+        self.adjacent_pages = 1
         self.highlight = highlight
         self.highlight_fields = {}
         self.sort = sort

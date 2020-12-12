@@ -29,7 +29,7 @@ function search_page_init() {
     $('[data-toggle="tooltip"]').tooltip('hide');
   });
 
-  $('.pagination').on('click', '.page-link', function(e) {
+  $('.pagination').on('click', 'button', function(e) {
     let page = $(e.target).data('page');
     $('#id_form-PAGE').val(page);
     $('#search-form').submit();

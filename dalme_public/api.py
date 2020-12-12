@@ -54,13 +54,29 @@ class DALMEPagination(pagination.PageNumberPagination):
         return list(self.page)
 
     def get_paginated_response(self, data):
+        page_size = self.page_size
+        current_page = self.page.number
+        total_count = self.page.paginator.count
+        num_pages = self.page.paginator.num_pages
+        adjacent_pages = 1
+        start_offset = (current_page - 1) * page_size
+        result_end = start_offset + page_size + 1
+        if result_end > total_count:
+            result_end = total_count
+        start_page = max(current_page - adjacent_pages, 1) if max(current_page - adjacent_pages, 1) >= 3 else 1
+        end_page = current_page + adjacent_pages if current_page + adjacent_pages <= num_pages else num_pages
+        page_numbers = [i for i in range(start_page, end_page + 1)]
+
         return Response({
             'results': data,
             'next': self.get_next_link(),
             'previous': self.get_previous_link(),
-            'count': self.page.paginator.count,
-            'totalPages': self.page.paginator.num_pages,
-            'currentPage': self.page.number,
+            'count': total_count,
+            'totalPages': num_pages,
+            'currentPage': current_page,
+            'page_numbers': page_numbers,
+            'page_start': start_offset + 1,
+            'page_end': result_end
         })
 
 
@@ -178,27 +194,30 @@ class SourceDetail(RetrieveAPIView):
 
 class FilterChoices(View):
     def corpus_choices(self):
-        return [
-            {'id': corpus.pk, 'label': corpus.title}
+        choices = [
+            {'value': corpus.pk, 'text': corpus.title}
             for corpus in Corpus.objects.all().order_by('title')
         ]
+        return [{'value': '', 'text': 'Filter by corpus', 'disabled': True}] + choices
 
     def collection_choices(self):
-        return [
-            {'id': collection.pk, 'label': collection.title}
+        choices = [
+            {'value': collection.pk, 'text': collection.title}
             for collection in Collection.objects.all().order_by('title')
         ]
+        return [{'value': '', 'text': 'Filter by collection', 'disabled': True}] + choices
 
     def source_type_choices(self):
         types = _map_source_types()
-        return sorted([
-            {'id': str(idx), 'label': value}
+        choices = sorted([
+            {'value': str(idx), 'text': value}
             for idx, value in types.items()
-        ], key=lambda choice: choice['label'])
+        ], key=lambda choice: choice['text'])
+        return [{'value': '', 'text': 'Filter by record type', 'disabled': True}] + choices
 
     def locale_choices_as_dict(self):
-        choices = locale_choices()
-        return [{'id': i[0], 'label': i[1]} for i in choices]
+        choices = [{'value': i[0], 'text': i[1]} for i in locale_choices()]
+        return [{'value': '', 'text': 'Filter by locale', 'disabled': True}] + choices
 
     @property
     def methods(self):

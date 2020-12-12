@@ -10,63 +10,113 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "dalme_public/includes/_collapsible_header.html" %}
+  {% include "dalme_public/includes/_breadcrumbs.html" %}
 {% endblock %}
 
 {% block main_column %}
-  <div id="app" class="app inventory-detail">
+  <div id="app" class="app inventory-toolbar">
     <nav>
       <ul class="u-flex">
-        <li class="hamburger" @click="handleFlipView">
-          <i class="fa fa-bars" aria-hidden="true"></i>
-        </li>
-
         <li
-          class="pagination next u-flex"
-          v-bind:class="{ inactive: !hasMultipleFolios }"
-          @click="handleFolioNext">
-            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+          class="nav_button"
+          @click="toggleInfoPanel"
+          v-bind:class="{ active: showInfoPanel }">
+          <i class="fas fa-info-circle"></i>
         </li>
 
-        <li
-          class="pagination current u-flex"
-          v-bind:class="{ inactive: !hasMultipleFolios }"
-          @click="toggleFolioSelect"
-          v-on-clickaway="hideFolioSelect">
-            <span>${folioInfo}</span>
-            <i v-if="hasMultipleFolios" class="fa fa-chevron-down" aria-hidden="true"></i>
+        <li :id=`diva-${divaId}-zoom-out-button` class="zoom out nav_button" @click="handleZoomOut">
+          <i class="fa fa-search-minus" aria-hidden="true"></i>
         </li>
-        <ul class="folio-selector u-flex" v-if="folioSelect">
-          <template v-for="(folio, index) in sourceData.folios">
-            <li v-if="index === folioIndex" :key="index" class="inactive">
-              Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})
-            </li>
-            <li v-else :key="index" @click="handleFolioSelect(index)">
-              Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})
-            </li>
-          </template>
-        </ul>
-
-        <li
-          class="pagination previous right u-flex"
-          v-bind:class="{ inactive: !hasMultipleFolios }"
-          @click="handleFolioPrevious">
-            <i class="fa fa-chevron-left" aria-hidden="true"></i>
-        </li>
-
-        <li :id=`diva-${divaId}-zoom-in-button` class="zoom in" @click="handleZoomIn">
+        <li :id=`diva-${divaId}-zoom-in-button` class="zoom in nav_button" @click="handleZoomIn">
           <i class="fa fa-search-plus" aria-hidden="true"></i>
         </li>
 
-        <li :id=`diva-${divaId}-zoom-out-button` class="zoom out" @click="handleZoomOut">
-          <i class="fa fa-search-minus" aria-hidden="true"></i>
+        <li class="border-0 text-start mr-auto">
+          <span>{{ title }}</span>
+        </li>
+
+        <li
+          class="pagination previous left u-flex nav_button"
+          v-bind:class="{ inactive: !hasMultipleFolios }"
+          @click="handleFolioPrevious">
+            <i class="fa fa-backward fa-sm mt-1" aria-hidden="true"></i>
+        </li>
+        <li class="dropdown p-0 nav_button">
+          <div
+            class="pagination current u-flex dropdown-button"
+            v-bind:class="{ inactive: !hasMultipleFolios }"
+            id="folio_menu"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false">
+              <span>${folioInfo}</span>
+              <i class="fa fa-caret-down fa-sm ml-2 mt-1" aria-hidden="true"></i>
+          </div>
+          <ul
+            class="dropdown-menu p-0 pt-3 pb-3"
+            v-if="hasMultipleFolios"
+            aria-labelledby="folio_menu">
+            <template v-for="(folio, index) in sourceData.folios">
+              <li v-if="index === folioIndex" :key="index" class="inactive">
+                <span class="dropdown-item">Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
+              </li>
+              <li v-else :key="index" @click="handleFolioSelect(index)">
+                <span class="dropdown-item">Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
+              </li>
+            </template>
+          </ul>
+        </li>
+        <li
+          class="pagination next u-flex nav_button"
+          v-bind:class="{ inactive: !hasMultipleFolios }"
+          @click="handleFolioNext">
+            <i class="fa fa-forward fa-sm mt-1" aria-hidden="true"></i>
+        </li>
+
+        <li class="dropdown p-0 nav_button">
+          <div class="hamburger dropdown-button" id="viewer_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-bars"></i>
+          </div>
+          <ul class="dropdown-menu dropdown-menu-right p-0 pt-3 pb-3" aria-labelledby="viewer_menu">
+            <li><a class="dropdown-item" href="#" @click="handleFlipView"><i class="fas fa-grip-lines-vertical fa-fw"></i> Vertical Split</a></li>
+            <li><a class="dropdown-item" href="#" @click="handleFlipView"><i class="fas fa-grip-lines fa-fw"></i> Horizontal Split</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-check-square fa-fw"></i> Basic mode</a></li>
+            <li><a class="dropdown-item" href="#"><i class="far fa-square fa-fw"></i> Scholarly mode</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-check-square fa-fw"></i> Original line endings</a></li>
+            <li><a class="dropdown-item" href="#"><i class="far fa-square fa-fw"></i> Wrap to window width</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-graduation-cap fa-fw"></i> Cite</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-share-square fa-fw"></i> Share</a></li>
+          </ul>
         </li>
 
       </ul>
     </nav>
   </div>
-  <div class="folios u-flex">
+  <div class="folios u-flex viewer">
     <section class="folio">
+      <div class="record-info">
+        <div class="description">
+          {% if data.description %}
+            {{ data.description }}
+          {% else %}
+            No description currently available.
+          {% endif %}
+        </div>
+        <ul class="u-flex u-type-sans">
+          <li>{{ data.short_name }}</li>
+          <li>{{ data.date }}</li>
+          <li>{{ data.city }}</li>
+          {% with data.folios|length as count %}
+            <li>{{ count }} Folio{% if count > 1 %}s{% endif %}</li>
+          {% endwith %}
+        </ul>
+        <div class="credit u-type-sans">
+          {{ data.get_credit_line }}
+        </div>
+      </div>
       <div id="diva_viewer"></div>
       <div id="folio-rights" class="folio-rights u-flex"></div>
     </section>
@@ -77,7 +127,6 @@
 
 {% block js_foot %}
   {{ block.super }}
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
   <!--script type="text/javascript" src="{% static 'js/diva_dev.js' %}"></script-->
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
@@ -353,6 +402,7 @@
           folioSelect: false,
           date: 0,
           divaId: 1,
+          showInfoPanel: true,
         },
         computed: {
           sourceData() {
@@ -450,19 +500,23 @@
           },
           handleFlipView() {
             window.eventBus.$emit('flipView', this.eventData);
-            window.eventBus.$emit('renderFolio', this.eventData, false);
+            // window.eventBus.$emit('renderFolio', this.eventData, false);
             this.incrementDivaId();
           },
-          toggleFolioSelect() {
-            if (this.hasMultipleFolios) {
-              this.folioSelect = !this.folioSelect;
-            }
-          },
-          hideFolioSelect(e) {
-            if (!e.target.closest('.folio-selector')) {
-              this.folioSelect = false;
-            }
-          },
+          // toggleFolioSelect() {
+          //   if (this.hasMultipleFolios) {
+          //     this.folioSelect = !this.folioSelect;
+          //   }
+          // },
+          // hideFolioSelect(e) {
+          //   if (!e.target.closest('.folio-selector')) {
+          //     this.folioSelect = false;
+          //   }
+          // },
+          toggleInfoPanel() {
+            this.showInfoPanel = this.showInfoPanel ? false : true;
+            $('.record-info').toggleClass('d-none');
+          }
         },
       });
 

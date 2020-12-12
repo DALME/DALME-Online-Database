@@ -5,8 +5,8 @@
 
 {% block styles %}
   {{ block.super }}
-  <link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css">
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
 {% endblock %}
 
 {% block header_extra %}
@@ -14,25 +14,15 @@
 {% endblock %}
 
 {% block main_column %}
-  <div id="app" class="app inventory-list">
+  <div id="app" class="app inventory-list inventory-toolbar">
     <nav>
       <ul class="u-flex">
-        <li class="filter" @click="toggleFilters" v-on-clickaway="hideFilters">
-          <span>Filter</span>
-          <i class="fa fa-sort" aria-hidden="true"></i>
+        <li>
+          <small>${statusInfo}</small>
         </li>
+        {% include "dalme_public/includes/_pagination.html" %}
 
-        <li v-if="showModes" id="compact" class="mode compact" @click="setMode">
-          <i class="fa fa-minus" aria-hidden="true"></i>
-        </li>
-        <li v-if="showModes" id="wide" class="mode wide" @click="setMode">
-          <i class="fa fa-bars" aria-hidden="true"></i>
-        </li>
-        <li v-if="showModes" id="detail" class="right mode detail" @click="setMode">
-          <i class="fa fa-th-large" aria-hidden="true"></i>
-        </li>
-
-        <li class="search">
+        <li class="search ml-auto">
           <input
             type="search"
             placeholder="Search"
@@ -49,68 +39,111 @@
             @click="searchBoxClear"
           >Clear</div>
         </li>
-        <div class="filter-panel" v-if="showFilters && records">
-          <form method="get" class="filter-form u-flex">
-
-            <label class="label">Corpus</label>
-            <v-select
-              :options="choices.corpusChoices"
-              @input="setCorpus"
-              v-model="corpus">
-            </v-select>
-
-            <label class="label">Collection</label>
-            <v-select
-              :options="choices.collectionChoices"
-              @input="setCollection"
-              v-model="collection">
-            </v-select>
-
-            <label class="label">Record Type</label>
-            <v-select
-              :options="choices.sourceTypeChoices"
-              @input="setSourceType"
-              v-model="sourceType">
-            </v-select>
-
-            <label class="label">Date</label>
-            <vue-slider
-              ref="slider"
-              v-model="date"
-              lazy="true"
-              stop-propagation="true"
-              :min="dateMin"
-              :max="dateMax"
-            >
-            </vue-slider>
-
-            <label class="label">Locale</label>
-            <v-select
-              :options="choices.localeChoices"
-              @input="setLocale"
-              v-model="locale">
-            </v-select>
-
-            <label class="label">Assets</label>
-            <div class="asset u-flex">
-              <input
-                type="checkbox"
+        <li class="dropdown p-0 nav_button">
+          <div class="filter dropdown-button" id="filter_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span>Filter</span>
+            <i class="fa fa-sort fa-sm" aria-hidden="true"></i>
+          </div>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="filter_menu">
+            <b-form method="get" class="filter-form u-flex">
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-2"
+                  :options="choices.corpusChoices"
+                  @change="setCorpus"
+                  v-model="corpus">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="corpus !== ''"
+                  @click="clearSelect(event, 'corpus')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-2"
+                  :options="choices.collectionChoices"
+                  @input="setCollection"
+                  v-model="collection">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="collection !== ''"
+                  @click="clearSelect(event, 'collection')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-2"
+                  :options="choices.sourceTypeChoices"
+                  @input="setSourceType"
+                  v-model="sourceType">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="sourceType !== ''"
+                  @click="clearSelect(event, 'sourceType')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="position-relative">
+                <b-form-select
+                  class="mb-3"
+                  :options="choices.localeChoices"
+                  @input="setLocale"
+                  v-model="locale">
+                </b-form-select>
+                <div
+                  class="clear-select"
+                  v-if="locale !== ''"
+                  @click="clearSelect(event, 'locale')">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="position-relative">
+                <label class="label">Filter by date</label>
+                <vue-slider
+                  ref="slider"
+                  v-model="date"
+                  tooltip="always"
+                  lazy="true"
+                  stop-propagation="true"
+                  :min="dateMin"
+                  :max="dateMax"
+                >
+                </vue-slider>
+              </div>
+              <div class="dropdown-divider mb-3"></div>
+              <b-form-checkbox
+                class="mb-2 ml-1"
                 id="imageCheckbox"
                 @input="setHasImage"
                 v-model="hasImage">
-              <label for="checkbox">Image</label>
-            </div>
-            <div class="asset u-flex">
-              <input
-                type="checkbox"
+                Show only records with images
+              </b-form-checkbox>
+              <b-form-checkbox
+                class="mb-2 ml-1"
                 id="transcriptionCheckbox"
                 @input="setHasTranscription"
                 v-model="hasTranscription">
-              <label for="checkbox">Transcription</label>
-            </div>
+                Show only records with transcriptions
+              </b-form-checkbox>
+            </b-form>
+          </div>
+        </li>
 
-          </form>
-        </div>
+        <li v-if="showModes" id="detail" class="mode detail nav_button" v-bind:class="{ active: mode == 'detail' }" @click="setMode">
+          <i class="fa fa-th-large" aria-hidden="true"></i>
+        </li>
+        <li v-if="showModes" id="wide" class="mode wide nav_button" v-bind:class="{ active: mode == 'wide' }" @click="setMode">
+          <i class="fa fa-th-list" aria-hidden="true"></i>
+        </li>
+        <li v-if="showModes" id="compact" class="mode compact nav_button" v-bind:class="{ active: mode == 'compact' }" @click="setMode">
+          <i class="fa fa-bars" aria-hidden="true"></i>
+        </li>
       </ul>
     </nav>
 
@@ -121,24 +154,24 @@
         <div v-else class="u-grid inventories">
           <div class="grid-row-wrapper compact u-contents">
             <span class="heading first">
-              <strong @click="toggleNameOrder" >Name</strong>
+              <strong @click="toggleNameOrder">Name</strong>
               <template v-if="nameOrder">
-                <i v-if="nameOrder.includes('-')" class="fa fa-chevron-down order-icon" aria-hidden="true"></i>
-                <i v-else class="fa fa-chevron-up order-icon" aria-hidden="true"></i>
+                <i v-if="nameOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
               </template>
             </span>
             <span class="heading">
               <strong @click="toggleSourceTypeOrder">Type</strong>
               <template v-if="sourceTypeOrder">
-                <i v-if="sourceTypeOrder.includes('-')" class="fa fa-chevron-down order-icon" aria-hidden="true"></i>
-                <i v-else class="fa fa-chevron-up order-icon" aria-hidden="true"></i>
+                <i v-if="sourceTypeOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
               </template>
             </span>
             <span class="heading">
               <strong @click="toggleDateOrder">Date</strong>
               <template v-if="dateOrder">
-                <i v-if="dateOrder.includes('-')" class="fa fa-chevron-down order-icon" aria-hidden="true"></i>
-                <i v-else class="fa fa-chevron-up order-icon" aria-hidden="true"></i>
+                <i v-if="dateOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
               </template>
             </span>
             <!-- Placeholder element to regulate the grid. -->
@@ -155,7 +188,7 @@
               <span class="inventory-field record-type">${record.record_type}</span>
               <span class="inventory-field date">${record.date}</span>
               <span class="inventory-field icons">
-                <i v-if="record.no_folios > 0" class="fas fa-file"></i>
+                <i v-if="record.no_folios > 0" class="fas fa-file ml-auto"></i>
                 <i v-if="record.has_transcriptions" class="fas fa-file-image"></i>
               </span>
             </div>
@@ -163,110 +196,101 @@
         </template>
 
         <template v-if="mode === 'wide'">
-          <div class="u-flex inventory-wide" v-for="(record, index) in records" :key="index">
-            <div class="u-flex inventory-details">
-              <a :href="recordUrl(record)">${record.name}</a>
-              <div>
-                ${componentInstance.truncate(record.description)}
-                <span class="u-ellipsis"> [...]</span>
-              </div>
-            </div>
-            <div class="u-flex inventory-metadata">
-              <span class="short-name">${record.short_name}</span>
-              <span class="city">${record.city} | ${record.date}</span>
-              <span class="folios" v-if="record.no_folios > 1">${record.no_folios} Folios</span>
-              <span class="folios" v-else>${record.no_folios} Folio</span>
-            </div>
-            <div class="u-flex icons">
-              <div class="u-flex first">
-                <i class="fas fa-file"></i>
-                <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
-                  ${record.no_folios}
-                </span>
-              </div>
-              <div class="u-flex second">
-                <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
-                <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
-                  ${record.no_transcriptions}
-                </span>
-              </div>
-            </div>
-          </div>
+          <template v-for="(record, index) in records" :key="index">
+              <a class="u-flex inventory-wide" :href="recordUrl(record)">
+                <div
+                  class="u-flex list-thumb"
+                  v-bind:style="recordThumbStyle(record)">
+                </div>
+                <div class="u-flex inventory-details">
+                  <div class="u-flex mb-1">
+                    <span class="name">${record.name}</span>
+                    <span class="short-name ml-auto">${record.short_name}</span>
+                  </div>
+                  <div class="u-flex">
+                    <div class="mr-auto">
+                      ${componentInstance.truncate(record.description)}
+                      <span class="u-ellipsis">...</span>
+                    </div>
+                    <div class="u-flex inventory-metadata flex-column">
+                      <span class="city">${record.date}</span>
+                      <span class="folios" v-if="record.no_folios > 1">${record.no_folios} Folios</span>
+                      <span class="folios" v-else>${record.no_folios} Folio</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="u-flex icons">
+                  <div class="u-flex first">
+                    <i class="fas fa-file"></i>
+                    <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
+                      ${record.no_folios}
+                    </span>
+                  </div>
+                  <div class="u-flex second">
+                    <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
+                    <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
+                      ${record.no_transcriptions}
+                    </span>
+                  </div>
+                </div>
+              </a>
+          </template>
         </template>
 
         <template v-if="mode === 'detail'">
           <template v-for="(partition, index) in partitionedRecords" :key="index">
             <div class="grid-row-wrapper detail u-contents">
               <template v-for="record in partition" :key="record.id">
-                <a
-                  class="inventory-detail u-flex"
-                  :href="recordUrl(record)"
-                  v-bind:style="recordDetailStyle(record)"
-                  v-on:mouseover="toggleHover(record.id)"
-                  v-on:mouseleave="toggleHover">
-                    <div class="u-flex top">
-                      <p>${record.name}</p>
-                      <div class="u-flex icons">
-                        <div class="u-flex first">
-                          <i v-if="record.has_transcriptions" class="fas fa-file"></i>
-                          <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
-                            ${record.no_folios}
-                          </span>
-                        </div>
-                        <div class="u-flex first">
-                          <i v-if="record.has_images" class="fas fa-file-image"></i>
-                          <span class="icon-count" :class="record.no_images === 0 ? 'red' : record.no_images === record.no_folios ? '' : 'yellow'">
-                            ${record.no_images}
-                          </span>
-                        </div>
-                        <div class="u-flex">
-                          <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
-                          <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
-                            ${record.no_transcriptions}
-                          </span>
+                <div
+                  class="detail-thumb"
+                  v-bind:style="recordThumbStyle(record)">
+                  <a
+                    class="inventory-detail u-flex"
+                    :href="recordUrl(record)">
+                      <div class="u-flex top">
+                        <p>${record.name}</p>
+                        <div class="u-flex icons">
+                          <div class="u-flex first">
+                            <i v-if="record.has_transcriptions" class="fas fa-file"></i>
+                            <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
+                              ${record.no_folios}
+                            </span>
+                          </div>
+                          <div class="u-flex first">
+                            <i v-if="record.has_images" class="fas fa-file-image"></i>
+                            <span class="icon-count" :class="record.no_images === 0 ? 'red' : record.no_images === record.no_folios ? '' : 'yellow'">
+                              ${record.no_images}
+                            </span>
+                          </div>
+                          <div class="u-flex">
+                            <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
+                            <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
+                              ${record.no_transcriptions}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div class="u-flex bottom">
-                      <span class="short-name">${record.short_name}</span>
-                      <span class="city">${record.city} | ${record.date}</span>
-                    </div>
+                      <div class="u-flex bottom">
+                        <span class="short-name">${record.short_name}</span>
+                        <span class="city">${record.city} | ${record.date}</span>
+                      </div>
 
-                    <div class="modal-description" v-if="recordDetailHover === record.id">
-                      ${componentInstance.truncate(record.description, 35)} [...]
-                    </div>
-                </a>
+                      <div class="modal-description" v-if="recordDetailHover === record.id">
+                        ${componentInstance.truncate(record.description, 35)} [...]
+                      </div>
+                  </a>
+                </div>
               </template>
             </div>
           </template>
         </template>
     </section>
-
-    <div v-if="!spinner" class="pagination u-flex">
-      <span class="step-links">
-        <template v-if="previous">
-          <i class="fas fa-angle-double-left step-first active" @click="handleFirstPage"></i>
-          <i class="fas fa-angle-left active" @click="handlePreviousPage"></i>
-        </template>
-        <template v-else>
-          <i class="fas fa-angle-double-left step-first inactive"></i>
-          <i class="fas fa-angle-left inactive"></i>
-        </template>
-
-        <span class="current">${currentPageInfo}</span>
-
-        <template v-if="next">
-          <i class="fas fa-angle-right active" @click="handleNextPage"></i>
-          <i class="fas fa-angle-double-right step-last active" @click="handleLastPage"></i>
-        </template>
-        <template v-else>
-          <i class="fas fa-angle-right inactive"></i>
-          <i class="fas fa-angle-double-right step-last inactive"></i>
-        </template>
-      </span>
+    <div v-if="!spinner" class="pager">
+      <ul class="pagination">
+        {% include "dalme_public/includes/_pagination.html" %}
+      </ul>
     </div>
-
 </div>
 
 {% endblock %}
@@ -274,13 +298,11 @@
 {% block js_foot %}
   {{ block.super }}
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-  <script src="https://unpkg.com/vue-select@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
   <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
   <script>
-    Vue.component('v-select', VueSelect.VueSelect);
     Vue.component('beat-loader', VueSpinner.BeatLoader);
     const app = new Vue({
       el: '#app',
@@ -294,9 +316,6 @@
       components: {
         'vue-slider': window['vue-slider-component'],
       },
-      directives: {
-        onClickaway: window.VueClickaway.directive,
-      },
       data: {
         fetching: false,
         records: null,
@@ -306,22 +325,28 @@
         count: null,
         totalPages: null,
         currentPage: null,
+        pageNumbers: [],
+        showFirst: false,
+        showLast: false,
+        pageStart: null,
+        pageEnd: null,
         search: new URLSearchParams(window.location.search).get('search'),
         showFilters: false,
-        corpus: null,
-        mode: 'detail',
-        collection: null,
-        sourceType: null,
+        corpus: '',
+        mode: 'wide',
+        collection: '',
+        sourceType: '',
         date: [1200, 1500],
-        locale: null,
+        locale: '',
         hasImage: null,
         hasTranscription: null,
-        nameOrder: null,
+        nameOrder: 'name',
         sourceTypeOrder: null,
         dateOrder: null,
         choices: {},
         recordDetailHover: false,
         windowWidth: window.innerWidth,
+        hasThumb: false
       },
       watch: {
         records: 'fetchThumbnails',
@@ -375,8 +400,14 @@
         noResults() {
           return Array.isArray(this.records) && !this.records.length;
         },
-        currentPageInfo() {
-          return `Showing page ${this.currentPage} of ${this.totalPages}`;
+        statusInfo() {
+          if (this.noResults) {
+            return 'No records found';
+          } else if (this.pageStart && this.pageEnd && this.count) {
+            return `Showing records ${this.pageStart} to ${this.pageEnd} of ${this.count}`;
+          } else {
+            return ''
+          }
         },
         url() {
           return location.protocol + '//' + location.host + location.pathname;
@@ -395,19 +426,20 @@
         },
       },
       methods: {
-        recordDetailStyle(record) {
-          let blue = 'linear-gradient(to top, rgba(238,248,254,1) 0%, rgba(238,248,254,0) 100%)';
-          let white = 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)';
+        recordThumbStyle(record) {
           const thumbnail = Object.keys(this.thumbnails).length
             ? this.thumbnails[record.id]
             : null;
           if (thumbnail) {
-            blue = `${blue}, url("${thumbnail}")`;
-            white = `${white}, url("${thumbnail}")`;
+            return {
+              'background-image': `url("${thumbnail}")`,
+              'background-size': 'cover',
+              'background-origin': 'content-box',
+              'background-clip': 'content-box',
+            };
+          } else {
+            return false;
           }
-          return this.recordDetailHover === record.id
-            ? { background: blue }
-            : { background: white };
         },
         onResize(e) {
           this.windowWidth = window.innerWidth;
@@ -427,15 +459,15 @@
           this.mode = e.currentTarget.id;
         },
         setCorpus() {
-          const value = this.corpus ? this.corpus.id : null;
+          const value = this.corpus ? this.corpus : '';
           this.filterData('corpus', value);
         },
         setCollection() {
-          const value = this.collection ? this.collection.id : null;
+          const value = this.collection ? this.collection : '';
           this.filterData('collection', value);
         },
         setSourceType() {
-          const value = this.sourceType ? this.sourceType.id : null;
+          const value = this.sourceType ? this.sourceType : '';
           this.filterData('source_type', value);
         },
         setHasImage() {
@@ -445,7 +477,7 @@
           this.filterData('has_transcription', !this.hasTranscription);
         },
         setLocale() {
-          const value = this.locale ? this.locale.id : null;
+          const value = this.locale ? this.locale : '';
           this.filterData('locale', value);
         },
         toggleNameOrder() {
@@ -516,6 +548,11 @@
               this.count = data.count;
               this.totalPages = data.totalPages;
               this.currentPage = data.currentPage;
+              this.pageNumbers = data.page_numbers;
+              this.pageStart = data.page_start,
+              this.pageEnd = data.page_end,
+              this.showFirst = !data.page_numbers.includes(1);
+              this.showLast = !data.page_numbers.includes(data.totalPages);
               this.fetching = false;
             });
         },
@@ -549,27 +586,18 @@
         searchBoxClear() {
           this.search = null
         },
+        clearSelect(e, field) {
+          this.filterData(field, '');
+          this[field] = '';
+          e.stopPropagation();
+        },
         filterData(key, value) {
-          console.log(value)
           const params = this.setParam(key, value).toString();
           this.fetchData(`${this.endpoint}/?${params}`);
           this.updateURL(params);
         },
         recordUrl(record) {
           return `${location.pathname}${record.id}`;
-        },
-        toggleFilters() {
-          this.showFilters = !this.showFilters;
-        },
-        hideFilters(e) {
-          if (!e.target.closest('.filter-panel')) {
-            this.showFilters = false;
-          }
-        },
-        handleFirstPage() {
-          const params = this.setParam('page', 1).toString();
-          this.fetchData(`${this.endpoint}/?${params}`);
-          this.updateURL(params);
         },
         handlePreviousPage() {
           if (this.previous) {
@@ -585,8 +613,8 @@
             this.updateURL(params);
           }
         },
-        handleLastPage() {
-          const params = this.setParam('page', this.totalPages).toString();
+        handlePage(page) {
+          const params = this.setParam('page', page).toString();
           this.fetchData(`${this.endpoint}/?${params}`);
           this.updateURL(params);
         },
