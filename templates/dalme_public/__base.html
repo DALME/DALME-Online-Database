@@ -139,7 +139,7 @@
           });
         </script>
       {% endblock %}
-      {% if page.citable %}
+      {% if page.citable and not records %}
           {% get_citation as citation %}
           {{ citation | json_script:"citation_data" }}
           <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw==" crossorigin="anonymous"></script>
@@ -168,9 +168,9 @@
 
                 $('#cite-popup').removeClass('d-none');
                 const citation_popup = $('#cite-popup').detach();
-                $('.cite-side-button').popover({
+                $('#cite-button').popover({
                     toggle: 'popover',
-                    placement: 'right',
+                    // placement: 'right',
                     html: true,
                     title: '',
                     content: citation_popup,
@@ -178,7 +178,7 @@
 
                 var clipboard_copy = new ClipboardJS('#cite_copy');
                 clipboard_copy.on('success', function(e) {
-                  $('.cite-side-button').popover('hide');
+                  $('#cite-button').popover('hide');
                   $('#cite-container').tooltip('show');
                   setTimeout(() => { $('#cite-container').tooltip('hide'); }, 800)
                 });
