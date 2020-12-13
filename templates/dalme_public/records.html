@@ -1,16 +1,32 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
-{% load static %}
+{% load dalme_public_tags static %}
 
 {% block title %}Records &mdash; {{ block.super }}{% endblock %}
 
 {% block styles %}
   {{ block.super }}
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css">
-  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+  <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css" />
+  <link type="text/plain" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
 {% endblock %}
 
 {% block header_extra %}
-  {% include "dalme_public/includes/_breadcrumbs.html" %}
+  <nav id="breadcrumb-app" class="breadcrumbs u-flex">
+    <ul>
+      <template v-for="(crumb, index) in breadcrumb">
+        <li v-if="index == 0" class="home">
+          <a :href="crumb.url">
+            <i class="fas fa-home"></i>
+          </a>
+        </li>
+        <li v-else-if="crumb.active" class="active">
+          ${crumb.title}
+        </li>
+        <li v-else>
+          <a :href="crumb.url"> ${crumb.title} </a>
+        </li>
+      </template>
+    </ul>
+  </nav>
 {% endblock %}
 
 {% block main_column %}
@@ -291,25 +307,44 @@
         {% include "dalme_public/includes/_pagination.html" %}
       </ul>
     </div>
+  </div>
 </div>
 
 {% endblock %}
 
 {% block js_foot %}
   {{ block.super }}
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
+  {% get_breadcrumbs_nav as breadcrumb %}
+  {{ breadcrumb | json_script:"breadcrumb_data" }}
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
   <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
   <script>
     Vue.component('beat-loader', VueSpinner.BeatLoader);
+    const breadcrumb_app = new Vue({
+      el: '#breadcrumb-app',
+      delimiters: ['${', '}'],
+      data: {
+        test: true,
+        breadcrumb: JSON.parse($('#breadcrumb_data').text()),
+      },
+      computed: {
+        crumbCount() {
+          return this.breadcrumb.length;
+        },
+      }
+    });
+
     const app = new Vue({
       el: '#app',
       delimiters: ['${', '}'],
       created() {
-        this.fetchData();
         this.fetchChoices();
+        if (!new URLSearchParams(window.location.search).keys().length) {
+          this.fetchData();
+        }
         window.componentInstance = this;
         window.addEventListener('resize', this.onResize);
       },
@@ -350,6 +385,7 @@
       },
       watch: {
         records: 'fetchThumbnails',
+        collection: 'updateCollection',
         search: debounce(function() {
           this.filterData('search', this.search)
         }, 300),
@@ -389,7 +425,7 @@
           return '/api/public/sources';
         },
         choicesEndpoint() {
-          return '/api/public/choices';
+          return '/api/public/choices/';
         },
         thumbnailEndpoint() {
           return '/api/public/thumbnails';
@@ -409,9 +445,6 @@
             return ''
           }
         },
-        url() {
-          return location.protocol + '//' + location.host + location.pathname;
-        },
         currentParams() {
           return new URLSearchParams(window.location.search);
         },
@@ -424,6 +457,12 @@
                 .map(begin => this.records.slice(begin, begin + partition))
             : null;
         },
+        collectionName() {
+          return this.choices.collectionChoices.find(x => x.value === this.collection).text || null;
+        },
+        collectionSlug() {
+          return this.collectionName.replace(/\s+/g, '-').toLowerCase() || null;
+        }
       },
       methods: {
         recordThumbStyle(record) {
@@ -512,17 +551,17 @@
         },
         destructureParams() {
           let params = {};
-          this.currentParams.forEach((value, key) => {
+          this.currentParams.forEach((val, key) => {
             const camelized = key.replace(/(_\w)/g, k => k[1].toUpperCase());
             if (['collection', 'corpus', 'source_type', 'locale'].includes(key)) {
-              value = this.choices[`${camelized}Choices`]
+              val = this.choices[`${camelized}Choices`]
                 .filter(item => {
                   return key === 'source_type'
-                    ? item.id == value
-                    : item.id === parseInt(value);
+                    ? item.value == val
+                    : item.value === parseInt(val);
                 });
             }
-            return params[camelized] = typeof value === 'object' ? value[0] : value;
+            return params[camelized] = typeof val === 'object' ? val[0]['value'] : val['value'];
           });
           return params;
         },
@@ -572,15 +611,19 @@
         },
         setParam(key, value) {
           let params = this.currentParams;
-          if (!value) {
+          if (!value || typeof value == 'undefined') {
             params.delete(key);
           } else {
             params.set(key, value);
           }
           return params;
         },
-        updateURL(params) {
-          const url = params ? `${this.url}?${params}` : this.url;
+        url(urlPath = location.pathname) {
+          return location.protocol + '//' + location.host + urlPath;
+        },
+        updateURL(params, urlPath = null) {
+          let base_url = urlPath ? this.url(urlPath) : this.url();
+          const url = params ? `${base_url}?${params}` : base_url;
           window.history.pushState(null, null, url);
         },
         searchBoxClear() {
@@ -591,9 +634,11 @@
           this[field] = '';
         },
         filterData(key, value) {
-          const params = this.setParam(key, value).toString();
-          this.fetchData(`${this.endpoint}/?${params}`);
-          this.updateURL(params);
+          if (typeof value !== 'undefined') {
+            const params = this.setParam(key, value).toString();
+            this.fetchData(`${this.endpoint}/?${params}`);
+            this.updateURL(params);
+          }
         },
         recordUrl(record) {
           return `${location.pathname}${record.id}`;
@@ -617,6 +662,25 @@
           this.fetchData(`${this.endpoint}/?${params}`);
           this.updateURL(params);
         },
+        updateCollection() {
+          console.log(this.collection)
+          console.log(this.collectionName)
+          console.log(this.collectionSlug)
+
+          let params = this.currentParams.toString();
+          let del = breadcrumb_app.crumbCount === 4 ? 1 : 0;
+          if (this.collection != '') {
+            this.updateURL(params, `/collections/${this.collectionSlug}/records/`);
+            breadcrumb_app.breadcrumb.splice(2, del, {
+              title: this.collectionName,
+              url: `/collections/${this.collectionSlug}/`,
+              active: false
+            });
+          } else {
+            this.updateURL(params, '/collections/records/');
+            breadcrumb_app.breadcrumb.splice(2, del);
+          }
+        }
       },
     });
   </script>
