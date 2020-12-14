@@ -338,7 +338,17 @@
           }
           if (!image) { $('#diva_viewer').html('<div class="diva-no-image"></div>'); }
           renderTranscription(data.transcriptionId);
-        }, 'json');
+        }, 'json').then(() => {
+            console.log('redner resize');
+            $('.folio').resizableSafe({
+                handleSelector: '#resize-handle',
+                resizeHeight: $('.vertical-split').length ? false : true,
+                resizeWidth: $('.vertical-split').length ? true : false,
+                onDragEnd: function() {
+                Diva.Events.publish('PanelSizeDidChange');
+                }
+            });
+        });
       });
       window.eventBus.$on('zoomIn', () => {
         if (window.folio) {
@@ -381,15 +391,6 @@
               },
             })
             .css({ height: '' });
-        }
-      });
-
-      $('.folio').resizableSafe({
-        handleSelector: '#resize-handle',
-        resizeHeight: $('.vertical-split').length ? false : true,
-        resizeWidth: $('.vertical-split').length ? true : false,
-        onDragEnd: function() {
-          Diva.Events.publish('PanelSizeDidChange');
         }
       });
 
