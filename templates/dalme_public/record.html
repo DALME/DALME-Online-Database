@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block main_column %}
-  <div id="app" class="h-100" v-on:click.once="toggleInfoPanel">
+  <div id="app" v-on:click.once="toggleInfoPanel">
   <div class="app inventory-toolbar">
     <nav>
       <ul class="u-flex">
@@ -289,6 +289,7 @@
           enableGridControls: false,
           enableImageTitles: false,
           enableToolbar: false,
+          enableAutoWidth: true,
           adaptivePadding: 0,
           fixedPadding: 0,
           zoomLevel: zoomLevel || 2,
@@ -322,6 +323,22 @@
         };
       };
 
+      const calcFolioHeight = () => {
+          const windowHeight = $(window).height();
+          const headerHeight = $('header').height();
+          const toolbarHeight = $('.inventory-toolbar').height();
+          const rightsHeight = $('.folio-rights').height();
+          const footerHeight = $('footer').height();
+
+          return windowHeight - (headerHeight + toolbarHeight + rightsHeight + footerHeight);
+      }
+
+      const resizeFolio = () => {
+        const ui = $('#diva_viewer');
+        ui.find('.diva-wrapper').width(ui.width()).height(calcFolioHeight());
+        window.dispatchEvent(new Event('resize'));
+      }
+
       window.eventBus = new Vue();
       window.eventBus.$on('renderFolio', (data) => {
         const endpoint = `{{api_url}}/pages/${data.pageId}/get_rights/`;
@@ -344,11 +361,12 @@
                 resizeHeight: $('.vertical-split').length ? false : true,
                 resizeWidth: $('.vertical-split').length ? true : false,
                 onDragEnd: function() {
-                    Diva.Events.publish('PanelSizeDidChange');
+                    resizeFolio();
                 }
             });
         });
       });
+
       window.eventBus.$on('zoomIn', () => {
         if (window.folio) {
           window.folio.zoomIn();
@@ -371,7 +389,7 @@
               handleSelector: '#resize-handle',
               resizeWidth: false,
               onDragEnd: function() {
-                  Diva.Events.publish('PanelSizeDidChange');
+                  resizeFolio();
               },
             })
             .css({ width: '' });
@@ -385,7 +403,7 @@
               resizeHeight: false,
               onDragEnd: function() {
                 if (data.imageId) {
-                  Diva.Events.publish('PanelSizeDidChange');
+                    resizeFolio();
                 }
               },
             })
