@@ -339,13 +339,12 @@
           if (!image) { $('#diva_viewer').html('<div class="diva-no-image"></div>'); }
           renderTranscription(data.transcriptionId);
         }, 'json').then(() => {
-            console.log('redner resize');
             $('.folio').resizableSafe({
                 handleSelector: '#resize-handle',
                 resizeHeight: $('.vertical-split').length ? false : true,
                 resizeWidth: $('.vertical-split').length ? true : false,
                 onDragEnd: function() {
-                Diva.Events.publish('PanelSizeDidChange');
+                    Diva.Events.publish('PanelSizeDidChange');
                 }
             });
         });
