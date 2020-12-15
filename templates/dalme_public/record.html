@@ -297,7 +297,7 @@
         window.folioPageId = pageId;
       };
 
-      Diva.Events.subscribe('ViewerDidLoad', () => resizeFolio());
+      Diva.Events.subscribe('ViewerDidLoad', () => resizeFolioAndRedraw());
 
       const renderRights = (notice) => {
         const node = $('#folio-rights');
@@ -340,7 +340,12 @@
       const resizeFolio = () => {
         const ui = $('#diva_viewer');
         ui.find('.diva-wrapper').width(ui.width()).height(calcFolioHeight());
-        window.dispatchEvent(new Event('resize'));
+      }
+      window.addEventListener('resize', resizeFolio);
+
+      const resizeFolioAndRedraw = () => {
+        resizeFolio();
+        window.dispatchEvent(new Event('resize'));  // simulate window resize to trigger canvas resize because Diva.Events.publish('PanelSizeDidChange'); doesn't seem to work
       }
 
       window.eventBus = new Vue();
@@ -365,7 +370,7 @@
                 resizeHeight: $('.vertical-split').length ? false : true,
                 resizeWidth: $('.vertical-split').length ? true : false,
                 onDragEnd: function() {
-                    resizeFolio();
+                    resizeFolioAndRedraw();
                 }
             });
         });
@@ -382,6 +387,7 @@
         }
       });
       window.eventBus.$on('flipView', data => {
+        resizeFolioAndRedraw();
         const node = $('.folios');
         const main = node.parent().parent();
         if (node.hasClass('vertical-split')) {
@@ -393,7 +399,7 @@
               handleSelector: '#resize-handle',
               resizeWidth: false,
               onDragEnd: function() {
-                  resizeFolio();
+                  resizeFolioAndRedraw();
               },
             })
             .css({ width: '' });
@@ -407,7 +413,7 @@
               resizeHeight: false,
               onDragEnd: function() {
                 if (data.imageId) {
-                    resizeFolio();
+                    resizeFolioAndRedraw();
                 }
               },
             })
