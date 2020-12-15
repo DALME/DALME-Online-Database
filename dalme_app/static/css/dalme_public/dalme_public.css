@@ -1266,9 +1266,6 @@ i.inactive {
   color: #4e0f0f;
   background: #f1b5b5;
 }
-#diva_viewer {
-    flex-grow: 1;
-}
 .diva-wrapper {
     height: 100%;
 }

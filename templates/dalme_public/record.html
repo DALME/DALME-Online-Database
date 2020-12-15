@@ -297,6 +297,8 @@
         window.folioPageId = pageId;
       };
 
+      Diva.Events.subscribe('ViewerDidLoad', () => resizeFolio());
+
       const renderRights = (notice) => {
         const node = $('#folio-rights');
         node.empty();
@@ -325,12 +327,14 @@
 
       const calcFolioHeight = () => {
           const windowHeight = $(window).height();
+          const transcriptionHeight = $('#transcription').height();
           const headerHeight = $('header').height();
           const toolbarHeight = $('.inventory-toolbar').height();
           const rightsHeight = $('.folio-rights').height();
           const footerHeight = $('footer').height();
 
-          return windowHeight - (headerHeight + toolbarHeight + rightsHeight + footerHeight);
+          const fullHeight = windowHeight - (headerHeight + toolbarHeight + rightsHeight + footerHeight);
+          return Math.max(fullHeight, (transcriptionHeight - rightsHeight));
       }
 
       const resizeFolio = () => {
