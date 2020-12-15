@@ -2818,7 +2818,7 @@ section.transcription {
   background-color: #fff;
   flex: 1 1 auto;
   z-index: 1;
-  min-height: calc(100vh - (var(--header-height) + 150px));
+  height: calc(100vh - (var(--header-height) + 88px));
 }
 .record-info {
   position: absolute;
