@@ -4,6 +4,7 @@ from elasticsearch_dsl import Join as dsl_Join
 from elasticsearch_dsl import Index, Mapping, normalizer
 from dalme_app.models import Source, Source_pages, LocaleReference
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 import lxml.etree as et
 from datetime import date
 
@@ -97,6 +98,12 @@ class PublicSource(PublicSourceBase):
 
     class Django:
         model = Source
+
+    def update(self, thing, refresh=None, action='index', parallel=False, **kwargs):
+        if isinstance(thing, models.Model) and not thing.workflow.is_public and action == "index":
+            action = "delete"
+            kwargs = {**kwargs, 'raise_on_error': False}
+        return super().update(thing, refresh, action, parallel, **kwargs)
 
     def get_queryset(self):
         return Source.objects.filter(type=13, workflow__is_public=True)

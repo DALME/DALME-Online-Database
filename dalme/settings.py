@@ -265,6 +265,9 @@ ELASTICSEARCH_DSL = {
         'timeout': 240,
     },
 }
+ELASTICSEARCH_DSL_AUTOSYNC = True
+ELASTICSEARCH_DSL_AUTO_REFRESH = True
+ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
 SEARCH_RESULTS_PER_PAGE = 10
 
 REST_FRAMEWORK = {

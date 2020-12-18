@@ -1,9 +1,10 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
-import lxml.etree as et
+from django.utils import timezone
 from dalme_app.models._templates import dalmeIntid, dalmeUuid, dalmeUuidOwned
 import django.db.models.options as options
+from django_currentuser.middleware import get_current_user
 from wagtail.search import index
 from dalme_app.models.workflow import Workflow
 
@@ -35,9 +36,15 @@ class Source(index.Indexed, dalmeUuidOwned):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.type.id == 13 and self.parent is not None:
-            if self.parent.primary_dataset is not None:
+        if self.type.id == 13:
+            if self.parent is not None and self.parent.primary_dataset is not None:
                 self.primary_dataset = self.parent.primary_dataset
+
+            Workflow.objects.update_or_create(source=self, defaults={
+                'last_modified': timezone.now(),
+                'last_user': get_current_user()
+            })
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
