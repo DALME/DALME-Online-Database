@@ -76,7 +76,7 @@ class DALMEPagination(pagination.PageNumberPagination):
             'currentPage': current_page,
             'page_numbers': page_numbers,
             'page_start': start_offset + 1,
-            'page_end': result_end
+            'page_end': result_end - 1
         })
 
 
