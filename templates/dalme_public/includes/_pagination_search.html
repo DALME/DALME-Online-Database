@@ -5,13 +5,13 @@
     {% if paginator.has_previous %}
       <li class="page-item">
         <button data-page="{{ paginator.previous_page }}">
-          <i class="fa fa-backward"></i>
+          <i class="fa fa-caret-left fa-lg"></i>
         </button>
       </li>
     {% else %}
       <li class="page-item previous disabled">
         <button tabindex="-1" aria-disabled="true">
-          <i class="fa fa-backward"></i>
+          <i class="fa-caret-left fa-lg"></i>
         </button>
       </li>
     {% endif %}
@@ -43,13 +43,13 @@
     {% if paginator.has_next %}
       <li class="page-item">
         <button data-page="{{ paginator.next_page }}">
-          <i class="fa fa-forward"></i>
+          <i class="fa fa-caret-right fa-lg"></i>
         </button>
       </li>
     {% else %}
       <li class="page-item next disabled">
         <button tabindex="-1" aria-disabled="true">
-          <i class="fa fa-forward"></i>
+          <i class="fa fa-caret-right fa-lg"></i>
         </button>
       </li>
     {% endif %}
