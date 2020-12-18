@@ -177,7 +177,7 @@
           });
         </script>
       {% endblock %}
-      {% if page.citable and not records %}
+      {% if page.citable and not records and not record %}
           {% get_citation as citation %}
           {{ citation | json_script:"citation_data" }}
           <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
