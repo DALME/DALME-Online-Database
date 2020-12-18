@@ -88,15 +88,15 @@ class rs_resource(models.Model):
         db_table = 'resource'
         in_db = 'dam'
 
-    def get_preview_url(self):
+    def get_image_url(self, size='scr'):
         queryParams = {
             'param1': '!list' + str(self.ref),
             'param5': '1',
-            'param8': 'scr',
+            'param8': size,
         }
         response = rs_api_query(**queryParams)
         data = json.loads(response.text)
-        return data[0]['url_scr']
+        return data[0][f'url_{size}']
 
 
 class rs_resource_data(models.Model):

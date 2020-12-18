@@ -369,6 +369,7 @@
         showFilters: false,
         corpus: '',
         mode: 'wide',
+        thumbSize: 'thm',
         collection: '',
         sourceType: '',
         date: [1200, 1500],
@@ -385,6 +386,7 @@
       },
       watch: {
         records: 'fetchThumbnails',
+        thumbSize: 'fetchThumbnails',
         collection: 'updateCollection',
         search: debounce(function() {
           this.filterData('search', this.search)
@@ -495,7 +497,13 @@
           return array.slice(0, max).join(' ');
         },
         setMode(e) {
-          this.mode = e.currentTarget.id;
+          let mode = e.currentTarget.id;
+          let target_size = mode == 'detail' ? 'scr' : 'thm';
+          this.mode = mode;
+          if (['detail', ''].includes(mode) && target_size != this.thumbSize) {
+            this.thumbSize = target_size;
+          }
+          this.$forceUpdate();
         },
         setCorpus() {
           const value = this.corpus ? this.corpus : '';
@@ -600,7 +608,7 @@
             record.image_ref !== null && !(record.id in this.thumbnails)
           );
           await Promise.all(records.map(record => {
-            fetch(`${this.thumbnailEndpoint}/?image_ref=${record.image_ref}`)
+            fetch(`${this.thumbnailEndpoint}/?image_ref=${record.image_ref}&size=${this.thumbSize}`)
               .then(response => response.json())
               .then(data => {
                 this.thumbnails[record.id] = data.image_url;
@@ -663,10 +671,6 @@
           this.updateURL(params);
         },
         updateCollection() {
-          console.log(this.collection)
-          console.log(this.collectionName)
-          console.log(this.collectionSlug)
-
           let params = this.currentParams.toString();
           let del = breadcrumb_app.crumbCount === 4 ? 1 : 0;
           if (this.collection != '') {

@@ -36,7 +36,7 @@ class ImageDetail(DALMEDetailView):
 
         context.update({
             'image_data': image_data,
-            'image_url': self.object.get_preview_url(),
+            'image_url': self.object.get_image_url('scr'),
         })
 
         if rs_resource_data.objects.filter(resource=self.object.ref).order_by('resource_type_field').exists():

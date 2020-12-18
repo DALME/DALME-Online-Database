@@ -103,7 +103,7 @@ class Thumbnail(View):
         try:
             thumbnail = rs_resource.objects.get(
                 ref=self.request.GET['image_ref']
-            ).get_preview_url()
+            ).get_image_url(self.request.GET['size'])
         except (KeyError, ValueError):
             thumbnail = None
         return {'image_url': thumbnail}
