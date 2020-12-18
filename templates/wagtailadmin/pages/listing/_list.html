@@ -70,14 +70,20 @@
                     {% endif %}
                     <td class="updated" valign="top">{% if page.latest_revision_created_at %}<div class="human-readable-date" title="{{ page.latest_revision_created_at|date:"d M Y H:i" }}">{% blocktrans with time_period=page.latest_revision_created_at|timesince %}{{ time_period }} ago{% endblocktrans %}</div>{% endif %}</td>
                     <td class="type" valign="top">{{ page.content_type.model_class.get_verbose_name }}</td>
-                    <td class="status" valign="top">
+                    <td class="status {% if parent_page.get_admin_display_title == 'Features' %} features {{ page.status_string }} {% endif %}" valign="top">
                         {% include "wagtailadmin/shared/page_status_tag.html" with page=page %}
                     </td>
                     {% if parent_page.get_admin_display_title == 'Features' %}
-                    {% now "Y-m-d" as today %}
-                    <td class="publication_date {% if todays_date < page.go_live_at|date:"Y-m-d" %}go_live_future{% else %}go_live_past{% endif %}" valign="top">
-                        {{ page.go_live_at|date:"j M Y H:i" }}
-                    </td>
+                      {% if 'live' in page.status_string %}
+                        <td class="publication_date p_date_live" valign="top">
+                        {{ page.last_published_at|date:"j M Y H:i" }}
+                      {% elif page.status_string == 'scheduled' %}
+                        <td class="publication_date p_date_scheduled" valign="top">
+                        {{ page.scheduled_publication|date:"j M Y H:i" }}
+                      {% else %}
+                        <td class="publication_date p_date_none" valign="top">
+                      {% endif %}
+                      </td>
                     {% endif %}
                     {% block page_navigation %}
                     {% endblock %}

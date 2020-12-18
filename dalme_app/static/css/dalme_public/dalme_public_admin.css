@@ -1,7 +1,45 @@
-.go_live_future {
-  color: red;
+.p_date_scheduled {
+  color: #ab803f;
+  font-weight: 700;
 }
-
-.go_live_past {
-  color: green;
+.p_date_live {
+  color: #528a52;
+  font-weight: 700;
+}
+td.status.features > .status-tag {
+  font-weight: 700;
+}
+td.status.features.scheduled > .status-tag {
+  border: 1px solid #ab803f;
+  color: #ab803f;
+  background-color: #f9ecd8;
+}
+td.status.features.live > .status-tag {
+  color: #528a52;
+  border: 1px solid #528a52;
+  background-color: #eaf3ea;
+}
+.listing td, .listing th {
+  padding: .5em .5rem;
+}
+table.listing tbody td.title {
+  display: flex;
+  position: relative;
+  padding: 0;
+  height: 40px;
+  align-items: center;
+}
+table.listing tbody td.title ul.actions {
+  position: absolute;
+  right: 0;
+  margin-top: 0;
+}
+table.listing tbody td {
+  vertical-align: middle;
+}
+input[type=checkbox]:before {
+  top: 5px;
+}
+.listing .children a:before {
+  font-size: 2rem;
 }

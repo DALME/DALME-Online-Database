@@ -276,6 +276,12 @@ class FeaturedPage(DALMEPage):
             return self.alternate_author
         return f'{self.owner.first_name} {self.owner.last_name}'
 
+    @property
+    def scheduled_publication(self):
+        revisions = self.revisions.filter(approved_go_live_at__isnull=False).order_by('-created_at')
+        if revisions.exists():
+            return revisions.first().approved_go_live_at  # .strftime('%d-%b-%Y@%H:%M')
+
     def snippet(self, width=200):
         try:
             text = next(
