@@ -783,6 +783,10 @@ nav.footer ul li a {
 nav.footer ul li a:hover {
   color: #fff;
 }
+.footer-button {
+  color: #5e5e5e;
+  display: inline;
+}
 .copyright {
   font-size: 0.6rem;
   padding: 1rem;

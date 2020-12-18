@@ -26,6 +26,7 @@
     </title>
     {% block styles %}
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+      <link type="text/plain" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
       <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public.css' %}" />
     {% endblock %}
   </head>
@@ -50,15 +51,19 @@
         {% block content %}{% endblock %}
       </main>
 
-      <footer class="u-flex">
+      <footer class="u-flex" id="footer-app">
         {% footer %}
+        {% include "dalme_public/includes/_share_popup.html" %}
       </footer>
 
       {% block js_foot %}
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
         <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw==" crossorigin="anonymous"></script>
         <script>
           $(document).ready(function() {
             api_endpoint = "{{ api_endpoint }}";
@@ -133,6 +138,39 @@
                   nextSubsection.length
                     ? subsection.nextUntil(nextSubsection).show()
                     : subsection.nextAll().show();
+                }
+              }
+            });
+
+            // share footer button
+            const share_app = new Vue({
+              el: '#footer-app',
+              delimiters: ['${', '}'],
+              created() {
+                const clipboard_copy = new ClipboardJS('#clip_copy');
+                this.format('html')
+              },
+              data: {
+                page_title: '{{ page.title }}',
+                page_url: '{{ page.url }}',
+                show_menu: false,
+                show_copied: false,
+                content: null
+              },
+              methods: {
+                showCopiedTooltip() {
+                  this.show_menu = false;
+                  this.show_copied = true;
+                  setTimeout(() => this.show_copied = false, 800)
+                },
+                format(type) {
+                  switch (type) {
+                    case 'html':
+                      this.content = `<a href=${this.page_url}>${this.page_title}</a>`
+                      break;
+                    default:
+                      return 'HEY!'
+                  }
                 }
               }
             });

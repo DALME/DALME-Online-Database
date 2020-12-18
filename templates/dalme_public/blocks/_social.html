@@ -1,3 +1,17 @@
-<a href="{{ value.url }}">
+{% if 'button' in value.css_class %}
+<div class="footer-button {{ value.css_class }}" @click="show_menu = !show_menu" id="share-button">
+  <i class="{{ value.fa_icon }}"></i>
+</div>
+<b-popover
+  variant="dark"
+  target="share-button"
+  placement="top"
+  :show.sync="show_copied"
+  triggers="manual">
+  Copied!
+</b-popover>
+{% else %}
+<a class="{{ value.css_class }}" href="{% if value.url %} {{ value.url }}  {% else %} # {% endif %}">
   <i class="{{ value.fa_icon }}"></i>
 </a>
+{% endif %}

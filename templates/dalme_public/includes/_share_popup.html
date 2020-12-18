@@ -1,0 +1,40 @@
+<b-popover
+  :show.sync="show_menu"
+  placement="top"
+  target="share-button"
+  v-cloak>
+  <div class="form-group">
+      <div class="form-control" v-html="content" id="share_content"></div>
+  </div>
+  <div class="form-button d-block">
+      <b-button
+        variant="secondary"
+        size="sm"
+        class="d-inline-block"
+        @click="format('html')">
+        HTML
+      </b-button>
+      <b-button
+        variant="secondary"
+        size="sm"
+        class="d-inline-block"
+        @click="format('link')">
+        Link
+      </b-button>
+      <b-button
+        variant="secondary"
+        size="sm"
+        class="d-inline-block"
+        @click="format('text')">
+        Text
+      </b-button>
+      <b-button
+        id="clip_copy"
+        variant="secondary"
+        size="sm"
+        class="d-inline-block"
+        :data-clipboard-text="content"
+        @click="showCopiedTooltip">
+        Copy to clipboard
+      </b-button>
+  </div>
