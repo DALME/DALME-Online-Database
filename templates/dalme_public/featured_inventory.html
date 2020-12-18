@@ -10,8 +10,10 @@
 {% block left_side_column %}
   {% include "dalme_public/includes/_features_back.html" %}
   {% if page.citable %}
-    {% include "dalme_public/includes/_cite_menu.html" %}
-    {% include "dalme_public/includes/_cite_popup.html" %}
+    <div id="cite-container" class="mt-5" v-cloak>
+      {% include "dalme_public/includes/_cite_menu.html" %}
+      {% include "dalme_public/includes/_cite_popup.html" %}
+    </div>
   {% endif %}
   {% include "dalme_public/includes/_record_detail.html" %}
   {% include "dalme_public/includes/_inventory_nav.html" %}
