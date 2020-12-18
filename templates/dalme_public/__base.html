@@ -180,48 +180,41 @@
       {% if page.citable and not records %}
           {% get_citation as citation %}
           {{ citation | json_script:"citation_data" }}
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw==" crossorigin="anonymous"></script>
           <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
           <script>
-              $(document).ready(function() {
-                const Cite = require('citation-js')
-                citation = new Cite($('#citation_data').text())
-                $('#citation').html(
-                  citation.format('bibliography', {
-                    format: 'html',
-                    template: 'apa',
-                    lang: 'en-US'
-                  })
-                );
-
-                $('.cite_format').on('click.dalme', function() {
-                  $('#citation').html(
-                    citation.format('bibliography', {
-                      format: 'html',
-                      template: $(this).data('format'),
-                      lang: 'en-US'
-                    })
-                  );
-                })
-
-                $('#cite-popup').removeClass('d-none');
-                const citation_popup = $('#cite-popup').detach();
-                $('#cite-button').popover({
-                    toggle: 'popover',
-                    // placement: 'right',
-                    html: true,
-                    title: '',
-                    content: citation_popup,
-                  })
-
-                var clipboard_copy = new ClipboardJS('#cite_copy');
-                clipboard_copy.on('success', function(e) {
-                  $('#cite-button').popover('hide');
-                  $('#cite-container').tooltip('show');
-                  setTimeout(() => { $('#cite-container').tooltip('hide'); }, 800)
-                });
-
-              });
+            const cite_app = new Vue({
+              el: '#cite-container',
+              delimiters: ['${', '}'],
+              created() {
+                const Cite = require('citation-js');
+                this.citation = new Cite($('#citation_data').text());
+                this.formatCitation('harvard1');
+              },
+              data: {
+                citation: null,
+                show_menu: false,
+                show_copied: false,
+                format: 'html',
+                template: 'apa',
+                lang: 'en-US',
+                formatted_citation: null
+              },
+              methods: {
+                formatCitation(template) {
+                  this.template = template;
+                  this.formatted_citation = this.citation.format('bibliography', {
+                      format: this.format,
+                      template: template,
+                      lang: this.lang
+                    });
+                },
+                showCopiedTooltip() {
+                  this.show_menu = false;
+                  this.show_copied = true;
+                  setTimeout(() => this.show_copied = false, 800)
+                }
+              }
+            });
           </script>
       {% endif %}
     </body>

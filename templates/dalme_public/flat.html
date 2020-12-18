@@ -26,8 +26,10 @@
     {% include "dalme_public/includes/_flat_nav.html" %}
   {% endif %}
   {% if page.citable %}
-    {% include "dalme_public/includes/_cite_menu.html" %}
-    {% include "dalme_public/includes/_cite_popup.html" %}
+    <div id="cite-container" class="mt-5" v-cloak>
+      {% include "dalme_public/includes/_cite_menu.html" %}
+      {% include "dalme_public/includes/_cite_popup.html" %}
+    </div>
   {% endif %}
   {% include "dalme_public/includes/_features_nav.html" %}
 {% endblock %}

@@ -1,29 +1,53 @@
-<div id="cite-popup" class="d-none">
+<b-popover
+  :show.sync="show_menu"
+  target="cite-button"
+  placement="right"
+  v-cloak>
   <div class="form-group">
-      <div class="form-control" id="citation"></div>
+      <div class="form-control" v-html="formatted_citation" id="citation"></div>
   </div>
   <div class="form-button d-block">
-      <div class="dropdown d-inline-block">
-        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="cite_format_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Change format
-        </button>
-        <div class="dropdown-menu" aria-labelledby="cite_format_menu">
-          <a class="dropdown-item cite_format" href="#" data-format="apa">APA</a>
-          <a class="dropdown-item cite_format" href="#" data-format="harvard1">Harvard</a>
-          <a class="dropdown-item cite_format" href="#" data-format="vancouver">Vancouver</a>
-        </div>
-      </div>
-      <button type="button" id="cite_copy" class="btn btn-secondary btn-sm d-inline-block" data-clipboard-target="#citation">Copy to clipboard</button>
-      <div class="dropdown d-inline-block">
-        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="cite_download" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Download
-        </button>
-        <div class="dropdown-menu" aria-labelledby="cite_download">
-          <a class="dropdown-item" href="#">BibTeX</a>
-          <a class="dropdown-item" href="#">Endnote</a>
-          <a class="dropdown-item" href="#">RIS</a>
-          <a class="dropdown-item" href="#">Zotero</a>
-        </div>
-      </div>
+      <b-dropdown
+        id="cite_format_menu"
+        class="d-inline-block"
+        size="sm"
+        variant="secondary"
+        text="Change format">
+        <b-dropdown-item
+          :class="{ active: template='apa'}"
+          @click="formatCitation('apa')">
+          APA
+        </b-dropdown-item>
+        <b-dropdown-item
+          :class="{ active: template='harvard1'}"
+          @click="formatCitation('harvard1')">
+          Harvard
+        </b-dropdown-item>
+        <b-dropdown-item
+          :class="{ active: template='vancouver'}"
+          @click="formatCitation('vancouver')">
+          Vancouver
+        </b-dropdown-item>
+      </b-dropdown>
+      <b-button
+        id="clip_copy"
+        variant="secondary"
+        size="sm"
+        class="d-inline-block"
+        data-clipboard-target="#citation"
+        @click="showCopiedTooltip">
+        Copy to clipboard
+      </b-button>
+      <b-dropdown
+        id="cite_download"
+        class="d-inline-block"
+        size="sm"
+        variant="secondary"
+        text="Download">
+        <b-dropdown-item>BibTeX</b-dropdown-item>
+        <b-dropdown-item>Endnote</b-dropdown-item>
+        <b-dropdown-item>RIS</b-dropdown-item>
+        <b-dropdown-item>Zotero</b-dropdown-item>
+      </b-dropdown>
   </div>
-</div>
+</b-popover>

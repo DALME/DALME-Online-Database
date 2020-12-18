@@ -1,11 +1,15 @@
-<div class="dropright mt-5" id="cite-container" data-toggle="tooltip" data-trigger="manual" data-placement="right" title="Copied!">
-  <button
-    id="cite-button"
-    class="cite-side-button dropdown-toggle"
-    type="button"
-    data-container="body"
-    data-toggle="popover"
-    data-placement="right">
-    Cite
-  </button>
-</div>
+<button
+  id="cite-button"
+  class="cite-side-button dropdown-toggle"
+  type="button"
+  @click="show_menu = !show_menu">
+  Cite
+</button>
+<b-popover
+  variant="dark"
+  target="cite-button"
+  placement="right"
+  :show.sync="show_copied"
+  triggers="manual">
+  Copied!
+</b-popover>
