@@ -38,7 +38,7 @@
         </li>
         {% include "dalme_public/includes/_pagination.html" %}
 
-        <li class="search ml-auto">
+        <li class="search ml-auto position-relative">
           <input
             type="search"
             placeholder="Search"
@@ -292,7 +292,7 @@
                         <span class="city">${record.date}</span>
                       </div>
 
-                      <div class="modal-description" v-if="recordDetailHover === record.id">
+                      <div class="modal-description d-none">
                         ${componentInstance.truncate(record.description, 35)} [...]
                       </div>
                   </a>
@@ -380,7 +380,6 @@
         sourceTypeOrder: null,
         dateOrder: null,
         choices: {},
-        recordDetailHover: false,
         windowWidth: window.innerWidth,
         hasThumb: false
       },
@@ -488,13 +487,14 @@
             this.mode = 'compact';
           }
         },
-        toggleHover(uid = false) {
-          this.recordDetailHover = uid;
-        },
         truncate(str, max = 25) {
-          const array = str.trim().split(' ');
-          const ellipsis = array.length > max ? ' [...]' : '';
-          return array.slice(0, max).join(' ');
+          if (typeof str != 'undefined') {
+            const array = str.trim().split(' ');
+            const ellipsis = array.length > max ? ' [...]' : '';
+            return array.slice(0, max).join(' ');
+          } else {
+            return 'N/A'
+          }
         },
         setMode(e) {
           let mode = e.currentTarget.id;
