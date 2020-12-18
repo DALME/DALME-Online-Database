@@ -345,18 +345,17 @@ nav.breadcrumbs ul li a {
   font-weight: 600;
   font-size: 0.9rem;
 }
-
 header {
   background: linear-gradient(59deg, #11587c 54.62%, #1b1b1b);
   color: #fff;
   /* box-shadow: 0 5px 20px -4px rgba(0, 0, 0, 0.8); */
   box-shadow: 0 0 20px #000000c2;
-  background-position-y: center;
+  background-position-y: top;
 }
 header a {
   color: #fff;
   text-decoration: none;
-  text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.85);
+  text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.85);
 }
 header a:hover {
   color: #fff;

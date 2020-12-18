@@ -185,6 +185,12 @@ class ExploreMapText(models.Model):
 
 
 class DALMEPage(Page):
+    HEADER_POSITION = (
+        ('top', 'Top'),
+        ('center', 'Center'),
+        ('bottom', 'Bottom'),
+    )
+
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
         null=True,
@@ -192,6 +198,12 @@ class DALMEPage(Page):
         on_delete=models.SET_NULL,
         related_name='+',
         help_text='The image that will display in the header.'
+    )
+    header_position = models.CharField(
+        max_length=6,
+        choices=HEADER_POSITION,
+        default='top',
+        help_text='Position of the header image within its container.'
     )
     short_title = models.CharField(
         max_length=63,
@@ -400,6 +412,7 @@ class Flat(DALMEPage):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         FieldPanel('short_title'),
         FieldPanel('show_contact_form'),
         FieldPanel('citable'),

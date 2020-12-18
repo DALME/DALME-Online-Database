@@ -143,7 +143,7 @@ def get_inventory_nav():
 
 
 @register.simple_tag(takes_context=True)
-def get_header_image_styles(context, header_image):
+def get_header_image_styles(context, header_image, header_position):
     gradients = {
         'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',  # noqa
         'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(58, 74, 60, 0.9) 100%',  # noqa
@@ -165,7 +165,7 @@ def get_header_image_styles(context, header_image):
 
     gradient = f'linear-gradient({value})'
     background_image = f'background-image: {gradient}, url({header_image.url})'
-    return f'{background_image}; background-size: cover; width: 100%;'
+    return f'{background_image}; background-size: cover; background-position-y: {header_position}; width: 100%;'
 
 
 @register.simple_tag(takes_context=True)
