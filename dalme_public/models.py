@@ -453,6 +453,7 @@ class Features(DALMEPage):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         FieldPanel('short_title'),
         StreamFieldPanel('body'),
     ]
@@ -491,6 +492,7 @@ class FeaturedObject(FeaturedPage):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         ModelChooserPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
@@ -524,6 +526,7 @@ class FeaturedInventory(FeaturedPage):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         ModelChooserPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
@@ -559,6 +562,7 @@ class Essay(FeaturedPage):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         FieldPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
@@ -714,6 +718,7 @@ class Collections(SearchEnabled):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         FieldPanel('short_title'),
         FieldPanel('citable'),
         StreamFieldPanel('body'),
@@ -759,6 +764,7 @@ class Collection(SearchEnabled):
     content_panels = DALMEPage.content_panels + [
         SetFieldPanel('source_set'),
         ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         FieldPanel('citable'),
         StreamFieldPanel('body'),
     ]
