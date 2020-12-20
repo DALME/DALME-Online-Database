@@ -2981,3 +2981,6 @@ section.transcription {
 .popover-body {
   color: #fff;
 }
+.subsection-container {
+  margin: 1rem 1rem 1.5rem .5rem;
+}

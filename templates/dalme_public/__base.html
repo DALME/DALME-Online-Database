@@ -82,11 +82,16 @@
             const subsections = $('.block-subsection');
             $.each(subsections, function(index, value) {
               const subsection = $(value);
+              const sub_container = $('<div/>').attr({class: 'subsection-container'});
               const nextSubsection = subsection.nextAll('.block-subsection:first');
+              if (nextSubsection.length) {
+                sub_container.append(subsection.nextUntil(nextSubsection).detach());
+              } else {
+                sub_container.append(subsection.nextAll().detach());
+              }
+              sub_container.insertAfter(subsection);
               if (subsection.find('i').hasClass('fa-caret-left')) {
-                nextSubsection.length
-                  ? subsection.nextUntil(nextSubsection).hide()
-                  : subsection.nextAll().hide();
+                sub_container.hide();
               }
             });
 
@@ -129,15 +134,10 @@
               // Subsections collapsing logic.
               if (icon.hasClass('subsection')) {
                 const subsection = $(icon).closest('.block-subsection');
-                const nextSubsection = subsection.nextAll('.block-subsection:first');
                 if (icon.hasClass('fa-caret-left')) {
-                  nextSubsection.length
-                    ? subsection.nextUntil(nextSubsection).hide()
-                    : subsection.nextAll().hide();
+                  subsection.next().hide();
                 } else {
-                  nextSubsection.length
-                    ? subsection.nextUntil(nextSubsection).show()
-                    : subsection.nextAll().show();
+                  subsection.next().show();
                 }
               }
             });
