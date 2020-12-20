@@ -5,6 +5,8 @@
     <div class="headshot">
       {% image value.photo fill-125x125-c100 %}
     </div>
+  {% else %}
+    <div class="headshot no-photo"></div>
   {% endif %}
   <div class="person">
     {% if value.url %}
