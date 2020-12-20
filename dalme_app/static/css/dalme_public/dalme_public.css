@@ -2006,7 +2006,8 @@ div.diva-outer {
   border: 0;
 }
 div.diva-wrapper {
-  min-height: 60vh;
+  /* min-height: 60vh; */
+  min-height: calc(100vh - (var(--header-height) + 96px));
 }
 input.vs__search {
   display: none;
@@ -2872,7 +2873,8 @@ section.transcription {
   background-color: #fff;
   flex: 1 1 auto;
   z-index: 1;
-  min-height: calc(100vh - (var(--header-height) + 150px));
+  height: calc(100vh - (var(--header-height) + 96px));
+  min-height: 100px;
 }
 .record-info {
   position: absolute;

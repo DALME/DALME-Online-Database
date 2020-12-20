@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
-{% load static hosts %}
+{% load dalme_public_tags static hosts %}
 
 {% block title %}{{ data.short_name }} &mdash; {{ block.super }}{% endblock %}
 
@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block main_column %}
-  <div id="app" class="h-100" v-on:click.once="toggleInfoPanel">
+  <div id="app" v-on:click.once="toggleInfoPanel">
   <div class="app inventory-toolbar">
     <nav>
       <ul class="u-flex">
@@ -108,9 +108,13 @@
               </a>
             </li>
             <div class="dropdown-divider"></div>
+
             <li>
-              <a class="dropdown-item" href="#"><i class="fas fa-graduation-cap fa-fw"></i> Cite...</a>
+              <a class="dropdown-item" href="#">
+                <i class="fas fa-graduation-cap fa-fw"></i> Cite...
+              </a>
             </li>
+
           </ul>
         </li>
       </ul>
@@ -154,12 +158,14 @@
   <!--script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script-->
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
+
   {{ data|json_script:"source-data" }}
   {% host_url 'dashboard' host 'db' as db_url %}
   {% host_url 'api_endpoint' host 'data' as api_url %}
+
   <script>
     const setHeaderHeight = () => {
-        const height = $('header.collections').height();
+        const height = $('header').height();
         $('section#transcription').attr('style', `--header-height:${height}px;`);
     }
     $(document).ready(function() {
@@ -289,12 +295,15 @@
           enableGridControls: false,
           enableImageTitles: false,
           enableToolbar: false,
+          enableAutoWidth: true,
           adaptivePadding: 0,
           fixedPadding: 0,
           zoomLevel: zoomLevel || 2,
         });
         window.folioPageId = pageId;
       };
+
+      Diva.Events.subscribe('ViewerDidLoad', () => resizeFolioAndRedraw());
 
       const renderRights = (notice) => {
         const node = $('#folio-rights');
@@ -309,7 +318,7 @@
           const warning = 'This folio has not been transcribed.'
           node.innerHTML = `<div class="warning">${warning}</div>`;
         } else {
-          const endpoint = `{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${transcriptionId}?format=json`;
+          const endpoint = `{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${transcriptionId}/?format=json`;
           const tei = new CETEI();
           tei.addBehaviors(teiBehaviours);
           $.get(endpoint, function(data) {
@@ -321,6 +330,30 @@
           }, 'json');
         };
       };
+
+      const calcFolioHeight = () => {
+        const windowHeight = $(window).height();
+        const transcriptionHeight = $('#transcription').height();
+        const headerHeight = $('header').height();
+        const toolbarHeight = $('.inventory-toolbar').height();
+        const rightsHeight = $('.folio-rights').height();
+        const footerHeight = $('footer').height();
+
+        const fullHeight = windowHeight - (headerHeight + toolbarHeight + rightsHeight + footerHeight);
+        return Math.max(fullHeight, (transcriptionHeight - rightsHeight));
+      }
+
+      const resizeFolio = () => {
+        const ui = $('#diva_viewer');
+        ui.find('.diva-wrapper').width(ui.width()).height(calcFolioHeight());
+      }
+      window.addEventListener('resize', resizeFolio);
+
+      const resizeFolioAndRedraw = () => {
+        console.log('resizeFolioAndRedraw')
+        resizeFolio();
+        window.dispatchEvent(new Event('resize'));  // simulate window resize to trigger canvas resize because Diva.Events.publish('PanelSizeDidChange'); doesn't seem to work
+      }
 
       window.eventBus = new Vue();
       window.eventBus.$on('renderFolio', (data) => {
@@ -338,19 +371,32 @@
           }
           if (!image) { $('#diva_viewer').html('<div class="diva-no-image"></div>'); }
           renderTranscription(data.transcriptionId);
-        }, 'json');
-      });
+        }, 'json').then(() => {
+             $('.folio').resizableSafe({
+                 handleSelector: '#resize-handle',
+                 resizeHeight: $('.vertical-split').length ? false : true,
+                 resizeWidth: $('.vertical-split').length ? true : false,
+                 onDragEnd: function() {
+                     resizeFolioAndRedraw();
+                 }
+             });
+         });
+       });
+
       window.eventBus.$on('zoomIn', () => {
         if (window.folio) {
           window.folio.zoomIn();
         }
       });
+
       window.eventBus.$on('zoomOut', () => {
         if (window.folio) {
           window.folio.zoomOut();
         }
       });
+
       window.eventBus.$on('flipView', data => {
+        resizeFolioAndRedraw();
         const node = $('.folios');
         const main = node.parent().parent();
         if (node.hasClass('vertical-split')) {
@@ -362,7 +408,7 @@
               handleSelector: '#resize-handle',
               resizeWidth: false,
               onDragEnd: function() {
-                  Diva.Events.publish('PanelSizeDidChange');
+                resizeFolioAndRedraw();
               },
             })
             .css({ width: '' });
@@ -376,20 +422,11 @@
               resizeHeight: false,
               onDragEnd: function() {
                 if (data.imageId) {
-                  Diva.Events.publish('PanelSizeDidChange');
+                  resizeFolioAndRedraw();
                 }
               },
             })
             .css({ height: '' });
-        }
-      });
-
-      $('.folio').resizableSafe({
-        handleSelector: '#resize-handle',
-        resizeHeight: $('.vertical-split').length ? false : true,
-        resizeWidth: $('.vertical-split').length ? true : false,
-        onDragEnd: function() {
-          Diva.Events.publish('PanelSizeDidChange');
         }
       });
 
@@ -424,7 +461,8 @@
           showInfoPanel: true,
           renderMode: 'scholarly',
           viewerMode: 'vertical-split',
-          softWrap: false
+          softWrap: false,
+          citeDialogue: false,
         },
         computed: {
           sourceData() {
@@ -481,6 +519,9 @@
           },
         },
         methods: {
+          showCite() {
+            this.citeDialogue = true;
+          },
           incrementDivaId() {
             this.divaId += 1;
           },
