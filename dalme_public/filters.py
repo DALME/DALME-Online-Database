@@ -275,11 +275,11 @@ class FeaturedFilter(django_filters.FilterSet):
         order = self.data.get('order_by', 'date')
         if order == 'date':
             grouped = []
-            qs = reversed(sorted(qs, key=lambda obj: obj.go_live_at))
+            qs = reversed(sorted(qs, key=lambda obj: obj.last_published_at))
             by_year = [
                 (key, list(values))
                 for key, values in itertools.groupby(
-                    qs, key=lambda obj: obj.go_live_at.year
+                    qs, key=lambda obj: obj.last_published_at.year
                 )
             ]
             for year, values in by_year:
@@ -287,7 +287,7 @@ class FeaturedFilter(django_filters.FilterSet):
                     (key, list(values))
                     for key, values in itertools.groupby(
                         values, key=lambda obj: calendar.month_name[
-                            obj.go_live_at.month
+                            obj.last_published_at.month
                         ]
                     )
                 ]
