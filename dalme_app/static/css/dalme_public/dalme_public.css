@@ -141,9 +141,6 @@ a.u-lozenge:hover {
 }
 
 /* Layout */
-html, body {
-  height: 100%;
-}
 html {
   font-size: 10pt;
 }
