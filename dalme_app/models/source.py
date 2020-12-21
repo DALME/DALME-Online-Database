@@ -165,7 +165,11 @@ class Source(index.Indexed, dalmeUuidOwned):
             else:
                 credit_line += '.'
 
-            return credit_line
+            return {
+                'credit_line': credit_line,
+                'authors': editors,
+                'contributors': corrections + contributors
+            }
 
         except: # NOQA
             return 'Edited by the DALME Team.'
