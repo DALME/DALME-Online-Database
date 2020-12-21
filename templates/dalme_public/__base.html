@@ -177,8 +177,9 @@
           });
         </script>
       {% endblock %}
-      {% if page.citable and not records and not record %}
-          {% get_citation as citation %}
+      {% if page.citable and not records %}
+          {% get_citation_data as citation %}
+          {{ citation.2 | safe }}
           {{ citation | json_script:"citation_data" }}
           <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
           <script>
@@ -187,31 +188,62 @@
               delimiters: ['${', '}'],
               created() {
                 const Cite = require('citation-js');
-                this.citation = new Cite($('#citation_data').text());
-                this.formatCitation('harvard1');
+                let _data = JSON.parse($('#citation_data').text());
+                let formats = _data[0];
+                let config = Cite.plugins.config.get('csl');
+                for (let i = 0, len = formats.length; i < len; ++i) {
+                  if (formats[i].file) {
+                    $.ajax({ method: "GET", url: `/static/citation_styles/${formats[i].file}`})
+                    .done(function(xml_data) {
+                      config.templates.add(formats[i].name, xml_data);
+                    })
+                  }
+                }
+                this.formats = formats;
+                this.citation = new Cite(_data[1]);
+                this.updateCitation('harvard1');
               },
               data: {
                 citation: null,
                 show_menu: false,
                 show_copied: false,
+                formats: null,
                 format: 'html',
-                template: 'apa',
+                template: 'harvard1',
                 lang: 'en-US',
-                formatted_citation: null
+                formatted_citation: null,
+                file_extensions: {
+                  bibtex: '.bib',
+                  ris: '.ris'
+                }
               },
               methods: {
-                formatCitation(template) {
-                  this.template = template;
-                  this.formatted_citation = this.citation.format('bibliography', {
-                      format: this.format,
+                formatCitation(template, format=this.format, output_format='bibliography') {
+                  return this.citation.format(output_format, {
+                      format: format,
                       template: template,
                       lang: this.lang
                     });
+                },
+                updateCitation(template) {
+                  this.formatted_citation = this.formatCitation(template);
+                  this.template = template;
                 },
                 showCopiedTooltip() {
                   this.show_menu = false;
                   this.show_copied = true;
                   setTimeout(() => this.show_copied = false, 800)
+                },
+                downloadCitation(format) {
+                  const blob = new Blob([this.formatCitation(this.template, 'text', format)], {
+                    encoding: 'UTF-8',
+                    type: 'text/plain;charset=UTF-8'
+                  })
+                  const link = document.createElement('a');
+                  link.href = URL.createObjectURL(blob)
+                  link.download = `citation${this.file_extensions[format]}`
+                  link.click()
+                  URL.revokeObjectURL(link.href)
                 }
               }
             });
