@@ -1,4 +1,7 @@
 from calendar import month_name
+import os
+import json
+import urllib
 
 from django import template
 from django.db.models.functions import Coalesce
@@ -267,10 +270,28 @@ def get_snippet(obj, width):
 
 
 @register.simple_tag(takes_context=True)
-def get_citation(context):
+def get_citation_data(context):
     accessed = date.today()
     page = context['page']
+    published = page.first_published_at
     page_class = page.get_verbose_name()
+    formats = None
+    record = context.get('record', False)
+
+    with open(os.path.join('dalme_app', 'config', '_citation_formats.json'), 'r') as fp:
+        formats = json.load(fp)
+
+    coins_list = [
+        ('url_ver', 'Z39.88-2004'),
+        ('ctx_ver', 'Z39.88-2004'),
+        ('rft_val_fmt', 'info:ofi/fmt:kev:mtx:book'),
+        ('rft.au', 'Daniel Lord Smail'),
+        ('rft.au', 'Gabriel H. Pizzorno'),
+        ('rft.au', 'Laura Morreale'),
+        ('rft.btitle', 'The Documentary Archaeology of Late Medieval Europe'),
+        ('rft.date', f'{published.year}/{published.month}/{published.day}'),
+        # ('rft.identifier', 'info:doi/10.1000/xyz123')
+    ]
     citation = {
         'editor': [
             {'family': 'Smail', 'given': 'Daniel Lord'},
@@ -280,35 +301,97 @@ def get_citation(context):
         "accessed": {"date-parts": [[accessed.year, accessed.month, accessed.day]]},
     }
 
-    if page_class == 'Collections':
+    if page_class == 'Collections' and not record:
+        coins_list += [
+            ('rft.genre', 'book'),
+            ('rft.identifier', 'https://dalme.org'),
+        ]
         citation.update({
             'type': 'book',
             'title': 'The Documentary Archaeology of Late Medieval Europe',
-            'URL': "https://dalme.org",
-            'issued': {'date-parts': [[accessed.year]]}
+            'URL': 'https://dalme.org',
+            'issued': {'date-parts': [[published.year]]}
         })
     else:
+        coins_list.append(('rft.genre', 'bookitem'))
         citation.update({
             'type': 'chapter',
             'container-title': 'The Documentary Archaeology of Late Medieval Europe',
-            'title': page.title,
-            'URL': page.get_full_url(context['request'])
         })
-        if page_class == 'Flat':
-            citation['issued'] = {'date-parts': [[accessed.year]]}
+
+        if record:
+            title = context['title']
+            purl = context['purl']
+            authors = context['data']['get_credit_line']['authors']
+            contributors = context['data']['get_credit_line']['contributors']
+
+            coins_list += [
+                ('rft.atitle', title),
+                ('rft.identifier', purl),
+            ]
+            for author in authors:
+                coins_list.append(('rft.au', author))
+
+            citation.update({
+                'author': [{'literal': i} for i in authors],
+                'title': title,
+                'URL': purl
+            })
+
+            if contributors:
+                citation['contributor'] = [{'literal': i} for i in contributors]
+                for contributor in contributors:
+                    coins_list.append(('rft.contributor', contributor))
+
+        elif page_class == 'Flat':
+            coins_list += [
+                ('rft.atitle', page.title),
+                ('rft.identifier', page.get_full_url(context['request'])),
+            ]
+
+            citation.update({
+                'issued': {'date-parts': [[published.year, published.month, published.day]]},
+                'title': page.title,
+                'URL': page.get_full_url(context['request'])
+            })
+
         elif page_class == 'Collection':
-            citation['author'] = [{'literal': page.source_set.owner.profile.full_name}]
-            citation['issued'] = {'date-parts': [[accessed.year]]}
+            coins_list += [
+                ('rft.atitle', page.title),
+                ('rft.identifier', page.get_full_url(context['request'])),
+                ('rft.au', page.source_set.owner.profile.full_name),
+            ]
+
+            citation.update({
+                'author': [{'literal': page.source_set.owner.profile.full_name}],
+                'issued': {'date-parts': [[published.year]]},
+                'title': page.title,
+                'URL': page.get_full_url(context['request'])
+            })
+
         else:
             author = page.alternate_author if page.alternate_author is not None else page.author
-            citation['author'] = [{'literal': author}]
-            citation['issued'] = {'date-parts': [[
-                    page.last_published_at.year,
-                    page.last_published_at.month,
-                    page.last_published_at.day
-                ]]}
+            coins_list += [
+                ('rft.atitle', page.title),
+                ('rft.identifier', page.get_full_url(context['request'])),
+                ('rft.au', author)
+            ]
 
-    return citation
+            citation.update({
+                'author': [{'literal': author}],
+                'issued': {'date-parts': [[
+                        published.year,
+                        published.month,
+                        published.day
+                    ]]},
+                'title': page.title,
+                'URL': page.get_full_url(context['request'])
+            })
+
+    coins_tokens = [f'{k}={urllib.parse.quote(v)}' for (k, v) in coins_list]
+    coins_span = f'<span class="Z3988" title="{"&".join(coins_tokens)}"></span>'
+
+    return [formats, citation, coins_span]
 
 
 @register.simple_tag
