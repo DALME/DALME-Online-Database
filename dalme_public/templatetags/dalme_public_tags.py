@@ -274,7 +274,7 @@ def get_citation_data(context):
     formats = None
     record = context.get('record', False)
 
-    with open(os.path.join('dalme_app', 'config', '_citation_formats.json'), 'r') as fp:
+    with open(os.path.join('dalme_app', 'config', '_citation_formats.json'), 'r', encoding='utf-8') as fp:
         formats = json.load(fp)
 
     coins_list = [
