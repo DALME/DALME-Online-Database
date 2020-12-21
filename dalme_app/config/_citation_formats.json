@@ -1,0 +1,47 @@
+[
+  {
+    "name": "apa",
+    "label": "American Psychological Association",
+    "file": null,
+    "divider": false
+  },
+  {
+    "name": "chicago_16",
+    "label": "Chicago (16th edition)",
+    "file": "chicago-author-date-16th-edition.csl",
+    "divider": false
+  },
+  {
+    "name": "harvard1",
+    "label": "Harvard",
+    "file": null,
+    "divider": false
+  },
+  {
+    "name": "turabian",
+    "label": "Turabian (9th edition)",
+    "file": "turabian-author-date.csl",
+    "divider": false
+  },
+  {
+    "divider": true
+  },
+  {
+    "name": "aja",
+    "label": "American Journal of Archaeology",
+    "file": "american-journal-of-archaeology.csl",
+    "divider": false
+  },
+  {
+    "name": "arch_med",
+    "label": "Archéologie médiévale",
+    "file": "archeologie-medievale.csl",
+    "divider": false
+  },
+  {
+    "name": "saa",
+    "label": "Society for American Archaeology",
+    "file": "society-for-american-archaeology.csl",
+    "divider": false
+  }
+]
