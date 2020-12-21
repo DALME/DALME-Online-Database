@@ -12,21 +12,15 @@
         size="sm"
         variant="secondary"
         text="Change format">
-        <b-dropdown-item
-          :class="{ active: template='apa'}"
-          @click="formatCitation('apa')">
-          APA
-        </b-dropdown-item>
-        <b-dropdown-item
-          :class="{ active: template='harvard1'}"
-          @click="formatCitation('harvard1')">
-          Harvard
-        </b-dropdown-item>
-        <b-dropdown-item
-          :class="{ active: template='vancouver'}"
-          @click="formatCitation('vancouver')">
-          Vancouver
-        </b-dropdown-item>
+        <template v-for="format in formats">
+          <b-dropdown-divider v-if="format.divider"></b-dropdown-divider>
+          <b-dropdown-item
+            v-else
+            v-bind:class="{ active: template == format.name }"
+            @click="updateCitation(format.name)">
+            ${format.label}
+          </b-dropdown-item>
+        </template>
       </b-dropdown>
       <b-button
         id="clip_copy"
@@ -42,10 +36,9 @@
         size="sm"
         variant="secondary"
         text="Download">
-        <b-dropdown-item>BibTeX</b-dropdown-item>
-        <b-dropdown-item>Endnote</b-dropdown-item>
-        <b-dropdown-item>RIS</b-dropdown-item>
-        <b-dropdown-item>Zotero</b-dropdown-item>
+        <b-dropdown-item @click="downloadCitation('bibtex')">BibTeX</b-dropdown-item>
+        <b-dropdown-item @click="downloadCitation('ris')">RIS/Endnote</b-dropdown-item>
+        <b-dropdown-item @click="downloadCitation('bibtex')">Zotero</b-dropdown-item>
       </b-dropdown>
   </div>
 </b-popover>
