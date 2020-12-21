@@ -686,6 +686,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         context = self.get_context(request)
         context.update({
             'record': True,
+            'purl': source.get_purl(),
             'title': source.name,
             'data': {
                 'folios': list(pages),
