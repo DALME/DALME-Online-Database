@@ -6,10 +6,9 @@
   <div class="form-group">
       <div class="form-control" v-html="formatted_citation" id="citation"></div>
   </div>
-  <div class="form-button d-block">
+  <div class="form-button d-flex">
       <b-dropdown
         id="cite_format_menu"
-        class="d-inline-block"
         size="sm"
         variant="secondary"
         text="Change format">
@@ -33,14 +32,13 @@
         id="clip_copy"
         variant="secondary"
         size="sm"
-        class="d-inline-block"
+        class="ml-auto mr-auto"
         data-clipboard-target="#citation"
         @click="showCopiedTooltip">
         Copy to clipboard
       </b-button>
       <b-dropdown
         id="cite_download"
-        class="d-inline-block"
         size="sm"
         variant="secondary"
         text="Download">
