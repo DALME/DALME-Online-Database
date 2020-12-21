@@ -122,6 +122,12 @@ class Source(index.Indexed, dalmeUuidOwned):
         else:
             return 0
 
+    def get_purl(self):
+        if self.workflow.is_public:
+            return f'https://purl.dalme.org/{self.id}/'
+        else:
+            return None
+
     def get_credit_line(self):
         def get_people_string(_list):
             if len(_list) == 1:
