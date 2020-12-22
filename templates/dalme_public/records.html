@@ -226,7 +226,6 @@
                   <div class="u-flex">
                     <div class="mr-auto">
                       ${componentInstance.truncate(record.description)}
-                      <span class="u-ellipsis">...</span>
                     </div>
                     <div class="u-flex inventory-metadata flex-column">
                       <span class="city">${record.date}</span>
@@ -237,13 +236,13 @@
                 </div>
                 <div class="u-flex icons">
                   <div class="u-flex first">
-                    <i class="fas fa-file"></i>
+                    <i class="fas fa-book-open"></i>
                     <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
                       ${record.no_folios}
                     </span>
                   </div>
                   <div class="u-flex second">
-                    <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
+                    <i class="fas fa-feather-alt fa-flip-horizontal"></i>
                     <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
                       ${record.no_transcriptions}
                     </span>
@@ -267,22 +266,32 @@
                         <p>${record.name}</p>
                         <div class="u-flex icons">
                           <div class="u-flex first">
-                            <i v-if="record.has_transcriptions" class="fas fa-file"></i>
+                            <i class="fas fa-book-open"></i>
                             <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
                               ${record.no_folios}
                             </span>
                           </div>
                           <div class="u-flex first">
-                            <i v-if="record.has_images" class="fas fa-file-image"></i>
+                            <i class="fas fa-images"></i>
                             <span class="icon-count" :class="record.no_images === 0 ? 'red' : record.no_images === record.no_folios ? '' : 'yellow'">
                               ${record.no_images}
                             </span>
                           </div>
-                          <div class="u-flex">
-                            <i v-if="record.has_transcriptions" class="fas fa-file-alt"></i>
+                          <div class="u-flex first">
+                            <i class="fas fa-feather-alt fa-flip-horizontal"></i>
                             <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
                               ${record.no_transcriptions}
                             </span>
+                          </div>
+                          <div class="u-flex">
+                            <i class="fas fa-info-circle" :id="record.id"></i>
+                            <b-popover
+                              :target="record.id"
+                              title="Description"
+                              triggers="hover focus"
+                              placement="left">
+                              ${componentInstance.truncate(record.description, 65)}
+                            </b-popover>
                           </div>
                         </div>
                       </div>
@@ -290,10 +299,6 @@
                       <div class="u-flex bottom">
                         <span class="short-name">${record.short_name}</span>
                         <span class="city">${record.date}</span>
-                      </div>
-
-                      <div class="modal-description d-none">
-                        ${componentInstance.truncate(record.description, 35)} [...]
                       </div>
                   </a>
                 </div>
@@ -490,8 +495,8 @@
         truncate(str, max = 25) {
           if (typeof str != 'undefined') {
             const array = str.trim().split(' ');
-            const ellipsis = array.length > max ? ' [...]' : '';
-            return array.slice(0, max).join(' ');
+            const ellipsis = array.length > max ? ' ...' : '';
+            return array.slice(0, max).join(' ') + ellipsis;
           } else {
             return 'N/A'
           }
