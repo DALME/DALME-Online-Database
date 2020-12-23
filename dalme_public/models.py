@@ -656,7 +656,10 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
     @route(r'^records/$', name='records')
     def records(self, request, scoped=True):
         context = self.get_context(request)
-        context.update({'records': True})
+        context.update({
+            'records': True,
+            'browse_mode': request.session.get('public-browse-mode', 'detail')
+        })
 
         try:
             context.update({'set_id': self.source_set.id})
