@@ -353,6 +353,9 @@
         if (!new URLSearchParams(window.location.search).keys().length) {
           this.fetchData();
         }
+        if (new URLSearchParams(window.location.search).get('order_by')) {
+          this.setInitialSortOrder(new URLSearchParams(window.location.search).get('order_by'));
+        }
         window.componentInstance = this;
         window.addEventListener('resize', this.onResize);
       },
@@ -693,6 +696,21 @@
           } else {
             this.updateURL(params, '/collections/records/');
             breadcrumb_app.breadcrumb.splice(2, del);
+          }
+        },
+        setInitialSortOrder(order) {
+          if (order.endsWith('name')) {
+            this.sourceTypeOrder = null;
+            this.dateOrder = null;
+            this.nameOrder = order;
+          } else if (order.endsWith('date')) {
+            this.sourceTypeOrder = null;
+            this.dateOrder = order;
+            this.nameOrder = null;
+          } else {
+            this.sourceTypeOrder = order;
+            this.dateOrder = null;
+            this.nameOrder = null;
           }
         }
       },
