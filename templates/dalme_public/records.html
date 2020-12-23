@@ -513,10 +513,10 @@
           update_session({ 'public-browse-mode': mode });
           let target_size = mode == 'detail' ? 'scr' : 'thm';
           this.mode = mode;
-          if (['detail', ''].includes(mode) && target_size != this.thumbSize) {
+          if (mode == 'detail' && target_size != this.thumbSize) {
             this.thumbSize = target_size;
           }
-          this.$forceUpdate();
+          // this.$forceUpdate();
         },
         setCorpus() {
           const value = this.corpus ? this.corpus : '';
@@ -618,7 +618,7 @@
         },
         async fetchThumbnails() {
           const records = this.records.filter(record =>
-            record.image_ref !== null && !(record.id in this.thumbnails)
+            record.image_ref !== null // && !(record.id in this.thumbnails)
           );
           await Promise.all(records.map(record => {
             fetch(`${this.thumbnailEndpoint}/?image_ref=${record.image_ref}&size=${this.thumbSize}`)
