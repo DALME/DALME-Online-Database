@@ -1,15 +1,16 @@
 <button
   id="cite-button"
-  class="cite-side-button dropdown-toggle"
+  class="cite-side-button"
   type="button"
-  @click="show_menu = !show_menu">
+  @click="showCitePanel = !showCitePanel">
   Cite
+  <i class="fa fa-caret-right fa-sm ml-2 mt-1" aria-hidden="true"></i>
 </button>
 <b-popover
   variant="dark"
   target="cite-button"
   placement="right"
-  :show.sync="show_copied"
+  :show="showCopied"
   triggers="manual">
   Copied!
 </b-popover>

@@ -177,15 +177,19 @@
           });
         </script>
       {% endblock %}
-      {% if page.citable and not records %}
+      {% if page.citable and not records and not record %}
           {% get_citation_data as citation %}
           {{ citation.2 | safe }}
           {{ citation | json_script:"citation_data" }}
+          <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
           <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
           <script>
             const cite_app = new Vue({
               el: '#cite-container',
               delimiters: ['${', '}'],
+              directives: {
+                onClickaway: window.VueClickaway.directive,
+              },
               created() {
                 const Cite = require('citation-js');
                 let _data = JSON.parse($('#citation_data').text());
@@ -205,8 +209,9 @@
               },
               data: {
                 citation: null,
-                show_menu: false,
-                show_copied: false,
+                showCitePanel: false,
+                showCopied: false,
+                popoverPlacement: 'right',
                 formats: null,
                 format: 'html',
                 template: 'harvard1',
@@ -230,9 +235,9 @@
                   this.template = template;
                 },
                 showCopiedTooltip() {
-                  this.show_menu = false;
-                  this.show_copied = true;
-                  setTimeout(() => this.show_copied = false, 800)
+                  this.showCitePanel = false;
+                  this.showCopied = true;
+                  setTimeout(() => this.showCopied = false, 800)
                 },
                 downloadCitation(format) {
                   const blob = new Blob([this.formatCitation(this.template, 'text', format)], {
@@ -244,7 +249,10 @@
                   link.download = `citation${this.file_extensions[format]}`
                   link.click()
                   URL.revokeObjectURL(link.href)
-                }
+                },
+                closeCitePanel() {
+                  this.showCitePanel = false;
+                },
               }
             });
           </script>

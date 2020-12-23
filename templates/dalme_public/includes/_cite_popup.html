@@ -1,18 +1,20 @@
 <b-popover
-  :show.sync="show_menu"
+  :show.sync="showCitePanel"
   target="cite-button"
-  placement="right"
+  :placement="popoverPlacement"
   custom-class="form-popover"
   v-cloak>
-  <div class="form-group">
-      <div class="form-control" v-html="formatted_citation" id="citation"></div>
+  <div v-on-clickaway="closeCitePanel">
+  <div class="mb-2">
+      <div class="form-control h-auto" v-html="formatted_citation" id="citation"></div>
   </div>
   <div class="form-button d-flex">
       <b-dropdown
         id="cite_format_menu"
         size="sm"
         variant="secondary"
-        text="Change format">
+        text="Change format"
+        class="flex-fill">
         <template v-for="format in formats">
           <b-dropdown-divider v-if="format.divider"></b-dropdown-divider>
           <b-dropdown-item
@@ -27,7 +29,7 @@
         id="clip_copy"
         variant="secondary"
         size="sm"
-        class="ml-auto mr-auto"
+        class="flex-fill ml-1 mr-1"
         data-clipboard-target="#citation"
         @click="showCopiedTooltip">
         Copy to clipboard
@@ -36,10 +38,12 @@
         id="cite_download"
         size="sm"
         variant="secondary"
-        text="Download">
+        text="Download"
+        class="flex-fill">
         <b-dropdown-item @click="downloadCitation('bibtex')">BibTeX</b-dropdown-item>
         <b-dropdown-item @click="downloadCitation('ris')">RIS/Endnote</b-dropdown-item>
         <b-dropdown-item @click="downloadCitation('bibtex')">Zotero</b-dropdown-item>
       </b-dropdown>
+  </div>
   </div>
 </b-popover>

@@ -37,7 +37,12 @@ input[type=search]{
    appearance: none;
 }
 .form-popover {
-  max-width: 336px;
+  max-width: 400px;
+  box-shadow: 0 0 20px -4px rgba(0, 0, 0, 0.4);
+}
+.form-popover .dropdown-toggle::after {
+  margin-left: .5em;
+  vertical-align: .1em;
 }
 /* Utilities */
 .u-flex {
@@ -958,7 +963,9 @@ i.inactive {
 .app nav li.search {
   cursor: text;
 }
-.app nav li:not(:last-child) {
+.app nav li:not(:last-child),
+.app nav #folio_menu,
+.app nav #cite-container {
   border-right: 1px solid #aaa;
 }
 .app nav li.zoom.out {
