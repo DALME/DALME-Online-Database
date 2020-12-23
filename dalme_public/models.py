@@ -1,4 +1,5 @@
 import textwrap
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -619,12 +620,17 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         })
 
         if not request.method == 'POST' and request.session.get('public-search-post', False):
-            request.POST = request.session['public-search-post']
-            request.method = 'POST'
+            default_ts = datetime.timestamp(datetime.now() - timedelta(seconds=86401))
+            stored_dt = datetime.fromtimestamp(request.session.get('public-search-ts', default_ts))
+            delta = datetime.now() - stored_dt
+            if delta.seconds < 86400:
+                request.POST = request.session['public-search-post']
+                request.method = 'POST'
 
         if request.method == 'POST':
             formset = search_formset(request.POST, form_kwargs={'fields': search_context.fields})
             request.session['public-search-post'] = request.POST
+            request.session['public-search-ts'] = datetime.timestamp(datetime.now())
             if formset.is_valid():
                 search_obj = Search(
                     data=formset.cleaned_data,
