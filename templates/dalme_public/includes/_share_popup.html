@@ -1,31 +1,31 @@
 <b-popover
-  :show.sync="show_menu"
+  :show="show_menu"
   placement="top"
   target="share-button"
   custom-class="form-popover"
   v-cloak>
   <div class="form-group">
-      <div class="form-control" v-html="content" id="share_content"></div>
+      <div class="form-control h-auto" v-html="content" id="share_content"></div>
   </div>
-  <div class="form-button d-block">
+  <div class="form-button d-flex">
       <b-button
         variant="secondary"
         size="sm"
-        class="d-inline-block"
+        class="flex-fill mr-1"
         @click="format('html')">
         HTML
       </b-button>
       <b-button
         variant="secondary"
         size="sm"
-        class="d-inline-block"
+        class="flex-fill mr-1"
         @click="format('link')">
         Link
       </b-button>
       <b-button
         variant="secondary"
         size="sm"
-        class="d-inline-block"
+        class="flex-fill mr-1"
         @click="format('text')">
         Text
       </b-button>
@@ -33,7 +33,7 @@
         id="clip_copy"
         variant="secondary"
         size="sm"
-        class="d-inline-block"
+        class="flex-fill"
         :data-clipboard-text="content"
         @click="showCopiedTooltip">
         Copy to clipboard

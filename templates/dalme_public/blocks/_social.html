@@ -6,8 +6,9 @@
   variant="dark"
   target="share-button"
   placement="top"
-  :show.sync="show_copied"
-  triggers="manual">
+  :show="show_copied"
+  triggers="manual"
+  v-cloak>
   Copied!
 </b-popover>
 {% else %}
