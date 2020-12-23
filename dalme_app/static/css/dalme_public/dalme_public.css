@@ -1275,22 +1275,26 @@ i.inactive {
   border-top: 3px solid #354d87;
 }
 .folio-rights {
-  flex-direction: column;
-  color: #b1afaf;
-  padding: 0 1rem;
-  text-align: center;
-}
-.folios .folio-rights h4 {
-  margin: 0.7rem 0 0.4rem 0;
+  color: #828282;
+  padding: .25rem;
+  background-color: rgb(62 62 62 / 7%);
+  backdrop-filter: blur(5px);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  max-height: 30px;
 }
 .folios .folio-rights p {
   font-size: 0.9rem;
-  margin: 0;
-  padding-right: 2rem;
+  margin: auto;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.folios .folio-rights p:last-child {
-  margin-bottom: 1rem;
-}
+
 .messages {
   margin-bottom: 0;
 }
@@ -2934,13 +2938,13 @@ section.transcription {
 .record-info {
   position: absolute;
   z-index: 2;
-  background-color: rgba(255, 255, 255, .8);
-  backdrop-filter: blur(5px);
+  background-color: rgb(109 109 109 / 18%);
+  backdrop-filter: blur(7px);
   border-bottom: 1px solid #6b6b6b87;
-  padding: 1rem 2rem;
+  padding: 2rem 2rem;
 }
 .record-info ul {
-  color: #6b6b6b;
+  color: #3a3a3a;
   flex-direction: column;
   margin: 1rem 0 0 0;
   padding: 0;
@@ -2949,12 +2953,19 @@ section.transcription {
   padding-bottom: 0.3rem;
 }
 .record-info ul li span {
+  color: #0e4386;
   font-weight: 600;
 }
 .record-info .description {
+  color: black;
   font-family: "PT Serif", serif;
   font-size: 16px;
 }
+.record-info .credits {
+  color: black;
+  font-weight: 600;
+}
+
 .list-thumb {
   height: 100%;
   width: 90px;
