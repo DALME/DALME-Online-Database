@@ -158,7 +158,7 @@
           <i class="fa fa-th-list" aria-hidden="true"></i>
         </li>
         <li v-if="showModes" id="compact" class="mode compact nav_button" v-bind:class="{ active: mode == 'compact' }" @click="setMode">
-          <i class="fa fa-bars" aria-hidden="true"></i>
+          <i class="fa fa-list fa-flip-horizontal" aria-hidden="true"></i>
         </li>
       </ul>
     </nav>
@@ -204,8 +204,14 @@
               <span class="inventory-field record-type">${record.record_type}</span>
               <span class="inventory-field date">${record.date}</span>
               <span class="inventory-field icons">
-                <i v-if="record.no_folios > 0" class="fas fa-file ml-auto"></i>
-                <i v-if="record.has_transcriptions" class="fas fa-file-image"></i>
+                <i
+                  class="fas fa-book-open fa-sm ml-auto"
+                  v-bind:class="{ active: record.no_folios > 0 }">
+                </i>
+                <i
+                  class="fas fa-sm fa-images"
+                  v-bind:class="{ active: record.has_transcriptions }">
+                </i>
               </span>
             </div>
           </template>
@@ -330,7 +336,6 @@
       el: '#breadcrumb-app',
       delimiters: ['${', '}'],
       data: {
-        test: true,
         breadcrumb: JSON.parse($('#breadcrumb_data').text()),
       },
       computed: {
@@ -384,7 +389,8 @@
         dateOrder: null,
         choices: {},
         windowWidth: window.innerWidth,
-        hasThumb: false
+        hasThumb: false,
+        session_data: null
       },
       watch: {
         records: 'fetchThumbnails',
@@ -501,6 +507,7 @@
         },
         setMode(e) {
           let mode = e.currentTarget.id;
+          update_session({ 'public-browse-mode': mode });
           let target_size = mode == 'detail' ? 'scr' : 'thm';
           this.mode = mode;
           if (['detail', ''].includes(mode) && target_size != this.thumbSize) {
