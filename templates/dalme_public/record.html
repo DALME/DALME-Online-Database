@@ -15,9 +15,10 @@
 {% endblock %}
 
 {% block main_column %}
-  <div id="app" v-on:click.once="toggleInfoPanel">
+  <div id="app">
+  <div v-if="showHelp" v-on-clickaway="toggleHelpTips"></div>
   <div class="app inventory-toolbar">
-    <nav>
+    <nav v-cloak>
       <ul class="u-flex">
         <li :id=`diva-${divaId}-zoom-out-button` class="zoom out nav_button" @click="handleZoomOut">
           <i class="fa fa-search-minus" aria-hidden="true"></i>
@@ -25,7 +26,6 @@
         <li :id=`diva-${divaId}-zoom-in-button` class="zoom in nav_button" @click="handleZoomIn">
           <i class="fa fa-search-plus" aria-hidden="true"></i>
         </li>
-
         <b-popover
           variant="dark"
           :target=`diva-${divaId}-zoom-out-button`
@@ -35,6 +35,7 @@
           Image zoom.
         </b-popover>
         <li
+          id="info_panel_button"
           class="nav_button mr-auto"
           @click="toggleInfoPanel"
           v-bind:class="{ active: showInfoPanel }">
@@ -59,31 +60,26 @@
           @click="handleFolioPrevious">
             <i class="fa fa-backward fa-sm mt-1" aria-hidden="true"></i>
         </li>
-        <li class="dropdown p-0 nav_button">
-          <div
-            class="pagination current u-flex dropdown-button"
-            v-bind:class="{ inactive: !hasMultipleFolios }"
-            id="folio_menu"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false">
+        <b-dropdown
+          id="folio_menu"
+          class="p-0"
+          right
+          no-caret
+          menu-class="dropdown-menu p-0 pt-3 pb-3"
+          toggle-class="nav_button">
+            <template #button-content>
               <span>${folioInfo}</span>
               <i class="fa fa-caret-down fa-sm ml-2 mt-1" aria-hidden="true"></i>
-          </div>
-          <ul
-            class="dropdown-menu p-0 pt-3 pb-3"
-            v-if="hasMultipleFolios"
-            aria-labelledby="folio_menu">
-            <template v-for="(folio, index) in sourceData.folios">
-              <li v-if="index === folioIndex" :key="index" class="inactive">
-                <span class="dropdown-item">Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
-              </li>
-              <li v-else :key="index" @click="handleFolioSelect(index)">
-                <span class="dropdown-item">Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
-              </li>
             </template>
-          </ul>
-        </li>
+            <template v-if="hasMultipleFolios" v-for="(folio, index) in sourceData.folios">
+              <b-dropdown-item v-if="index === folioIndex" :key="index" class="inactive dropdown-item">
+                <span>Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
+              </b-dropdown-item>
+              <b-dropdown-item v-else :key="index" @click="handleFolioSelect(index)" class="dropdown-item">
+                <span>Folio ${sourceData.folios[index].pageName} (${index + 1}/${folioCount})</span>
+              </b-dropdown-item>
+            </template>
+        </b-dropdown>
         <b-popover
           variant="dark"
           target="folio_menu"
@@ -98,48 +94,6 @@
           @click="handleFolioNext">
             <i class="fa fa-forward fa-sm mt-1" aria-hidden="true"></i>
         </li>
-
-        <li class="dropdown p-0 nav_button">
-          <div class="hamburger dropdown-button" id="viewer_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-bars"></i>
-          </div>
-          <ul class="dropdown-menu dropdown-menu-right p-0 pt-3 pb-3" aria-labelledby="viewer_menu">
-            <li>
-              <a class="dropdown-item" href="#" @click="handleFlipView('vertical-split')">
-                <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'horizontal-split', 'fas fa-check-square': viewerMode == 'vertical-split' }"></i> Vertical Split
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#" @click="handleFlipView('horizontal-split')">
-                <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'vertical-split', 'fas fa-check-square': viewerMode == 'horizontal-split' }"></i> Horizontal Split
-              </a>
-            </li>
-            <div class="dropdown-divider"></div>
-            <li>
-              <a class="dropdown-item" href="#" @click="toggleTextWrap" v-bind:class="{ disabled: renderMode == 'basic' }">
-                <i class="fa-fw" v-bind:class="{ 'far fa-square': !softWrap, 'fas fa-check-square': softWrap }"></i> Soft-wrap text
-              </a>
-            </li>
-            <div class="dropdown-divider"></div>
-            <li>
-              <a class="dropdown-item" href="#" @click="changeRenderMode('basic')">
-                <i class="fa-fw" v-bind:class="{ 'far fa-square': renderMode == 'scholarly', 'fas fa-check-square': renderMode == 'basic' }"></i> Basic mode
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#" @click="changeRenderMode('scholarly')">
-                <i class="fa-fw" v-bind:class="{ 'fas fa-check-square': renderMode == 'scholarly', 'far fa-square': renderMode == 'basic' }"></i> Scholarly mode
-              </a>
-            </li>
-            <div class="dropdown-divider"></div>
-
-            <li>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-graduation-cap fa-fw"></i> Cite...
-              </a>
-            </li>
-
-          </ul>
         <div id="cite-container">
           <li
             id="cite-button"
@@ -166,7 +120,31 @@
           </b-popover>
           {% include "dalme_public/includes/_cite_popup.html" %}
         </div>
+        <li
+          id="help_toggle"
+          class="nav_button"
+          v-bind:class="{ active: showHelp }"
+          @click="toggleHelpTips">
+          <i class="fas fa-question-circle"></i>
         </li>
+        <b-dropdown
+          id="viewer_menu"
+          ref="optionsDropdown"
+          class="p-0"
+          right
+          no-caret
+          menu-class="dropdown-menu p-0 pt-3 pb-3"
+          toggle-class="hamburger nav_button">
+          <template #button-content>
+            <i class="fa fa-bars"></i>
+          </template>
+          <b-dropdown-item
+            id="viewer_flip_menu"
+            class="dropdown-item"
+            href="#"
+            @click="handleFlipView('vertical-split')">
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'horizontal-split', 'fas fa-check-square': viewerMode == 'vertical-split' }"></i> Vertical Split
+          </b-dropdown-item>
           <b-popover
             boundary="window"
             variant="dark"
@@ -176,6 +154,13 @@
             triggers="manual">
             Change how the screen is split.
           </b-popover>
+          <b-dropdown-item class="dropdown-item" href="#" @click="handleFlipView('horizontal-split')">
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'vertical-split', 'fas fa-check-square': viewerMode == 'horizontal-split' }"></i> Horizontal Split
+          </b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item id="text_wrap_menu" class="dropdown-item" href="#" @click="toggleTextWrap" v-bind:class="{ disabled: renderMode == 'basic' }">
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': !softWrap, 'fas fa-check-square': softWrap }"></i> Soft-wrap text
+          </b-dropdown-item>
           <b-popover
             boundary="window"
             variant="dark"
@@ -185,6 +170,17 @@
             triggers="manual">
             Change how lines wider than the viewing area are treated.
           </b-popover>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item class="dropdown-item" href="#" @click="changeRenderMode('basic')">
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': renderMode == 'scholarly', 'fas fa-check-square': renderMode == 'basic' }"></i> Basic mode
+          </b-dropdown-item>
+          <b-dropdown-item
+            id="viewer_mode_menu"
+            class="dropdown-item"
+            href="#"
+            @click="changeRenderMode('scholarly')">
+            <i class="fa-fw" v-bind:class="{ 'fas fa-check-square': renderMode == 'scholarly', 'far fa-square': renderMode == 'basic' }"></i> Scholarly mode
+          </b-dropdown-item>
           <b-popover
             boundary="window"
             variant="dark"
@@ -211,7 +207,7 @@
   </div>
   <div class="folios u-flex viewer">
     <section class="folio">
-      <div class="record-info" v-if="showInfoPanel">
+      <div class="record-info" v-if="showInfoPanel" v-on-clickaway="toggleInfoPanel">
         <div class="description">
           {% if data.description %}
             {{ data.description }}
