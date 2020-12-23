@@ -337,6 +337,7 @@ nav.breadcrumbs ul li:not(:last-child)::after {
   font-size: 0.8rem;
   font-weight: 900;
   padding-left: 0.3rem;
+  margin-left: 0.5rem;
 }
 nav.breadcrumbs ul li.home {
   margin: 0;
@@ -1158,30 +1159,44 @@ i.inactive {
 .app.inventory-list .inventory-detail {
   flex-direction: column;
   height: 20rem;
-  background: linear-gradient(to top, rgb(255 255 255 / 95%) 0%, rgb(0 0 0 / 38%) 100%);
+  background: linear-gradient(to top, rgb(255 255 255 / 95%) 0%, rgb(0 0 0 / 48%) 100%);
 }
 .app.inventory-list .inventory-detail:hover {
-  background: linear-gradient(to top, rgb(197 208 222) 0%, rgb(140 176 220 / 16%) 100%);
+  background: linear-gradient(to bottom, rgb(197 208 222) 0%, rgb(140 176 220 / 16%) 100%);
 }
 .app.inventory-list .inventory-detail .top p {
   color: #fff;
-  font-weight: bold;
+  font-weight: 500;
   padding: 1rem;
   margin: 0;
-  text-shadow: 0px 0px 2pt rgba(0, 0, 0, 0.8);
+  text-shadow: 0px 0px 10pt rgba(0, 0, 0, 1);
   line-height: 1.5;
+  font-size: 18px;
+  font-family: "Lora", serif;
 }
 .app.inventory-list .inventory-detail:hover .top p {
   color: #2c4171;
-  text-shadow: 0 0 2pt white;
+  text-shadow: 0 0 15pt black;
+}
+.app.inventory-list .inventory-detail .bottom span {
+  color: #6b6b6b;
+  text-shadow: 0 0 15pt #00000045;
+}
+.app.inventory-list .inventory-detail:hover .bottom span {
+  color: #fff;
+  text-shadow: 0 0 5px #000000a3;
 }
 .app.inventory-list .inventory-detail .top .icons {
-  color: #d6d5d5;
+  color: #fff;
   font-size: 2rem;
   flex-direction: column;
   padding: 1rem 1.5rem;
-  text-shadow: 0 0 12pt rgba(0, 0, 0, 0.6);
+  text-shadow: 0 0 6pt rgba(0, 0, 0, 0.6);
   margin-left: auto;
+}
+.app.inventory-list .inventory-detail:hover .top .icons {
+  color: #2c4171;
+  text-shadow: 0 0 15pt #00000045;
 }
 .app.inventory-list .inventory-detail .top .icons .first {
   margin-bottom: 0.5rem;
@@ -1192,12 +1207,10 @@ i.inactive {
   padding: 1rem;
 }
 .app.inventory-list .inventory-detail .short-name {
-  color: #6b6b6b;
   font-weight: 700;
   margin-right: 1rem;
 }
 .app.inventory-list .inventory-detail .city {
-  color: #6b6b6b;
   margin-left: auto;
 }
 .app .inventory-field .short-name {
@@ -2859,6 +2872,37 @@ main.inventory article {
   background-color: #497bbb24;
   color: #354d87;
 }
+.inventory-toolbar button.nav_button {
+  color: #6b6b6b;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.75rem 1rem;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.inventory-toolbar button.nav_button:hover,
+.inventory-toolbar .btn-secondary:not(:disabled):not(.disabled).active,
+.inventory-toolbar .btn-secondary:not(:disabled):not(.disabled):active,
+.inventory-toolbar .show>.btn-secondary.dropdown-toggle {
+  background-color: #497bbb24;
+  color: #354d87;
+  border-color: #aaa;
+}
+.inventory-toolbar .dropdown-toggle-no-caret::after {
+  display: none !important;
+}
+.inventory-toolbar button.nav_button:focus {
+  box-shadow: none;
+}
+.inventory-toolbar li.nav_button:hover,
+.inventory-toolbar li.nav_button.active,
+.inventory-toolbar li.nav_button:active {
+  background-color: #497bbb24;
+  color: #354d87;
+}
 
 div.viewer {
   height: 100%;
@@ -3011,14 +3055,33 @@ section.transcription {
 [v-cloak] > * {
   display: none;
 }
-.b-popover-dark {
+.b-popover-dark.popover {
   background-color: #000;
+  border-color: #6b6b6b;
 }
 .b-popover-dark.bs-popover-right > .arrow::after {
   border-right-color: #000;
 }
+.b-popover-dark.bs-popover-right > .arrow::before {
+  border-right-color: #6b6b6b;
+}
+.b-popover-dark.bs-popover-left > .arrow::after {
+  border-left-color: #000;
+}
+.b-popover-dark.bs-popover-left > .arrow::before {
+  border-left-color: #6b6b6b;
+}
 .b-popover-dark.bs-popover-top > .arrow::after {
   border-top-color: #000;
+}
+.b-popover-dark.bs-popover-top > .arrow::before {
+  border-top-color: #6b6b6b;
+}
+.b-popover-dark.bs-popover-bottom > .arrow::after {
+  border-bottom-color: #000;
+}
+.b-popover-dark.bs-popover-bottom > .arrow::before {
+  border-bottom-color: #6b6b6b;
 }
 .b-popover-dark .popover-body {
   color: #fff;
@@ -3069,4 +3132,10 @@ section.transcription {
 }
 .popover-body .dropdown-menu li.active a {
   font-weight: 700;
+}
+.inventory-field.icons {
+  color: #d8d8d8;
+}
+.inventory-field.icons i.active {
+  color: #358738;
 }
