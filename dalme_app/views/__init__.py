@@ -1,5 +1,4 @@
 from .agents import AgentList # noqa
-from .async_tasks import AsyncTaskList # noqa
 from .config_editor import ConfigEditor # noqa
 from .country_references import CountryList # noqa
 from .images import ImageList, ImageDetail # noqa

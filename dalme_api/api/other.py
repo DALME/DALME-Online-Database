@@ -1,7 +1,6 @@
 from django.contrib.auth.models import Group
-from django_celery_results.models import TaskResult
 
-from dalme_api.serializers import (AgentSerializer, AsyncTaskSerializer, ContentClassSerializer, ContentTypeSerializer,
+from dalme_api.serializers import (AgentSerializer, ContentClassSerializer, ContentTypeSerializer,
                                    CountryReferenceSerializer, GroupSerializer, LanguageReferenceSerializer,
                                    LocaleReferenceSerializer, RightsPolicySerializer, SimpleAttributeSerializer)
 
@@ -22,17 +21,6 @@ class Agents(DALMEBaseViewSet):
     search_fields = ['id', 'standard_name', 'notes']
     ordering_fields = ['id', 'standard_name', 'type']
     ordering = ['type', 'standard_name']
-
-
-class AsynchronousTasks(DALMEBaseViewSet):
-    """ API endpoint for managing asynchronous tasks """
-    permission_classes = (GeneralAccessPolicy,)
-    queryset = TaskResult.objects.all()
-    serializer_class = AsyncTaskSerializer
-    filterset_fields = ['id', 'status', 'result']
-    search_fields = ['id', 'task_name', 'result', 'traceback']
-    ordering_fields = ['id', 'task_name', 'status', 'date_done', 'result', 'traceback']
-    ordering = ['id']
 
 
 class Attributes(DALMEBaseViewSet):

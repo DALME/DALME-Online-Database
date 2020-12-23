@@ -3,15 +3,8 @@ from django.contrib.auth.models import Group
 from dalme_app.models import (Attribute_type, Attachment, Content_attributes, Content_class, CountryReference,
                               GroupProperties, Profile, Tag, Transcription)
 
-from django_celery_results.models import TaskResult
 from rest_framework import serializers
 from ._common import DynamicSerializer
-
-
-class AsyncTaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TaskResult
-        fields = '__all__'
 
 
 class AttachmentSerializer(serializers.HyperlinkedModelSerializer):

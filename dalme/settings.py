@@ -39,7 +39,6 @@ AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 
 ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
 ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
@@ -105,8 +104,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_hosts',
     'django_elasticsearch_dsl',
-    'django_celery_results',
-    'django_celery_beat',
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
@@ -344,20 +341,20 @@ SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
 WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
 
-CELERY_BROKER_URL = 'sqs://'
-CELERY_BROKER_TRANSPORT_OPTIONS = {
-    'predefined_queues': {
-        'celery': {
-            'url': AWS_SQS_URL,
-            'access_key_id': AWS_ACCESS_KEY_ID,
-            'secret_access_key': AWS_SECRET_ACCESS_KEY,
-        }
+Q_CLUSTER = {
+    'name': 'dalme_q',
+    'workers': 2,
+    'recycle': 500,
+    'timeout': 60,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'bulk': 5,
+    'sqs': {
+        'aws_region': AWS_REGION,
+        'aws_access_key_id': AWS_ACCESS_KEY_ID,
+        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY
     }
 }
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'django-db'
 
 CACHES = {
     'default': {

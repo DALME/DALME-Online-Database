@@ -6,7 +6,7 @@ from .configs import Configs # noqa
 from .datasets import Datasets # noqa
 from .images import Images # noqa
 
-from .other import (Agents, AsynchronousTasks, Attributes, ContentClasses, ContentTypes, # noqa
+from .other import (Agents, Attributes, ContentClasses, ContentTypes, # noqa
                     Countries, Groups, Languages, Locales, Rights) # noqa
 
 from .pages import Pages # noqa

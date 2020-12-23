@@ -6,7 +6,7 @@ from .images import RSCollectionsSerializer, RSImageSerializer # noqa
 from .language_references import LanguageReferenceSerializer # noqa
 from .locale_references import LocaleReferenceSerializer # noqa
 
-from .others import (AsyncTaskSerializer, AttachmentSerializer, AttributeTypeSerializer, ContentClassSerializer,  # noqa
+from .others import (AttachmentSerializer, AttributeTypeSerializer, ContentClassSerializer,  # noqa
                      ContentXAttributeSerializer, CountryReferenceSerializer, GroupPropertiesSerializer, GroupSerializer,  # noqa
                      ProfileSerializer, TagSerializer, TranscriptionSerializer) # noqa
 

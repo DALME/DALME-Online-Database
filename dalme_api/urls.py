@@ -6,7 +6,6 @@ from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 router.register(r'agents', api.Agents, basename='agents')
-router.register(r'async-tasks', api.AsynchronousTasks, basename='async_tasks')
 router.register(r'attributes', api.Attributes, basename='attributes')
 router.register(r'attribute_types', api.AttributeTypes, basename='attribute_types')
 router.register(r'attachments', api.Attachments, basename='attachments')

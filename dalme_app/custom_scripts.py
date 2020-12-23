@@ -7,7 +7,6 @@ import json
 import pandas as pd
 from dalme_app.models import *
 from datetime import date
-from dalme_app.tasks import update_rs_folio_field, update_search_index
 from async_messages import messages
 from django.contrib.auth.models import User
 from django.db.models.expressions import RawSQL
@@ -131,8 +130,6 @@ def session_info(request, username):
 
 
 def update_folios_in_dam(request):
-    result = update_rs_folio_field.delay()
-    result.forget()
     return 'Process started...'
 
 

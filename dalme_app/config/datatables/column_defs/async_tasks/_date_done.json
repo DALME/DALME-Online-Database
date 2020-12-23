@@ -1,9 +1,0 @@
-{
-    "title": "Date Completed",
-    "data": "date_done",
-    "defaultContent": "",
-    "visible": true,
-    "orderable": true,
-    "searchable": false,
-    "render": "function ( data ) {return moment(data).format(\"DD-MMM-YYYY@HH:mm\");}"
-}

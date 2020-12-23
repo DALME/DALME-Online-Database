@@ -16,7 +16,6 @@ urlpatterns = [
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),
     path('admin/', admin.site.urls),
     path('agents/', views.AgentList.as_view(), name='agent_list'),
-    path('async-tasks/', views.AsyncTaskList.as_view(), name='async_task_list'),
     path('countries/', views.CountryList.as_view(), name='country_list'),
     path('download/<path:path>/', views.DownloadAttachment, name='download_attachment'),
     path('models/<model>/', views.ModelLists.as_view(), name='model_lists'),
