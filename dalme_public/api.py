@@ -172,9 +172,8 @@ class SourceList(ListAPIView):
             # are dealing with a plain qs without any annotations there.
             order_by = self.request.GET.get('order_by')
             if order_by.endswith('date'):
-                maxdate = datetime.date(datetime.MAXYEAR, 1, 1)
                 qs = sorted(
-                    qs, key=lambda item: item.source_date or maxdate
+                    qs, key=lambda item: item.source_date or 9999
                 )
             if order_by.endswith('source_type'):
                 qs = sorted(qs, key=lambda item: item.source_type or '')
