@@ -26,12 +26,28 @@
           <i class="fa fa-search-plus" aria-hidden="true"></i>
         </li>
 
+        <b-popover
+          variant="dark"
+          :target=`diva-${divaId}-zoom-out-button`
+          placement="bottomright"
+          :show="showHelp"
+          triggers="manual">
+          Image zoom.
+        </b-popover>
         <li
           class="nav_button mr-auto"
           @click="toggleInfoPanel"
           v-bind:class="{ active: showInfoPanel }">
           <i class="fas fa-info-circle"></i>
         </li>
+        <b-popover
+          variant="dark"
+          target="info_panel_button"
+          placement="top"
+          :show="showHelp"
+          triggers="manual">
+          Record information.
+        </b-popover>
 
         <li class="border-0 text-start mr-auto">
           <span>{{ title }}</span>
@@ -68,6 +84,14 @@
             </template>
           </ul>
         </li>
+        <b-popover
+          variant="dark"
+          target="folio_menu"
+          placement="topleft"
+          :show="showHelp"
+          triggers="manual">
+          Folio navigation.
+        </b-popover>
         <li
           class="pagination next u-flex nav_button"
           v-bind:class="{ inactive: !hasMultipleFolios }"
@@ -143,6 +167,45 @@
           {% include "dalme_public/includes/_cite_popup.html" %}
         </div>
         </li>
+          <b-popover
+            boundary="window"
+            variant="dark"
+            target="viewer_flip_menu"
+            placement="left"
+            :show="showHelp"
+            triggers="manual">
+            Change how the screen is split.
+          </b-popover>
+          <b-popover
+            boundary="window"
+            variant="dark"
+            target="text_wrap_menu"
+            placement="left"
+            :show="showHelp"
+            triggers="manual">
+            Change how lines wider than the viewing area are treated.
+          </b-popover>
+          <b-popover
+            boundary="window"
+            variant="dark"
+            target="viewer_mode_menu"
+            placement="rightbottom"
+            :show="showHelp"
+            triggers="manual">
+            <b>Basic Mode:</b></br>
+            Rendering emphasises readability. Lines are...</br>
+            <b>Scholarly Mode:</b></br>
+            Rendering emphasises accuracy. Editorial marks...</br>
+          </b-popover>
+        </b-dropdown>
+        <b-popover
+          variant="dark"
+          target="viewer_menu__BV_toggle_"
+          placement="top"
+          :show="showHelp"
+          triggers="manual">
+          Options.
+        </b-popover>
       </ul>
     </nav>
   </div>
@@ -171,6 +234,15 @@
       <div id="folio-rights" class="folio-rights u-flex"></div>
     </section>
     <div id="resize-handle" class="resize-handle"></div>
+    <b-popover
+      boundary="window"
+      variant="dark"
+      target="resize-handle"
+      :placement="handleHelpPlacement"
+      :show="showHelp"
+      triggers="manual">
+      Drag to resize viewer panels.
+    </b-popover>
     <section id="transcription" class="transcription" v-bind:class="[renderMode, { 'soft-wrap': softWrap }]"></section>
   </div>
 </div>
@@ -472,7 +544,7 @@
           });
         setHeaderHeight();
       });
-
+      // Vue.config.devtools = true
       const app = new Vue({
         el: '#app',
         delimiters: ['${', '}'],
@@ -500,7 +572,11 @@
           this.updateCitation('harvard1');
         },
         data: {
+          showHelp: false,
           showCitePanel: false,
+          showCopied: false,
+          popoverPlacement: 'bottom',
+          handleHelpPlacement: 'left',
           folioIndex: {{ initial_folio_index }},
           zoomLevel: 2,
           folioSelect: false,
@@ -619,6 +695,7 @@
             // window.eventBus.$emit('renderFolio', this.eventData, false);
             this.incrementDivaId();
             this.viewerMode = split;
+            this.handleHelpPlacement = split == 'vertical-split' ? 'right' : 'top';
           },
           toggleInfoPanel() {
             this.showInfoPanel = this.showInfoPanel ? false : true;
@@ -662,6 +739,14 @@
           closeCitePanel() {
             this.showCitePanel = false;
           },
+          toggleHelpTips() {
+            let state = this.showHelp ? false : true;
+            if(state) {
+              this.$refs.optionsDropdown.show();
+              setTimeout(() => this.showHelp = state, 80);
+            } else {
+              this.showHelp = state;
+            }
           }
         },
       });
