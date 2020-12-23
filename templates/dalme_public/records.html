@@ -5,8 +5,8 @@
 
 {% block styles %}
   {{ block.super }}
+  <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
   <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css" />
-  <link type="text/plain" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
 {% endblock %}
 
 {% block header_extra %}
@@ -321,8 +321,6 @@
   {{ block.super }}
   {% get_breadcrumbs_nav as breadcrumb %}
   {{ breadcrumb | json_script:"breadcrumb_data" }}
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-  <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
   <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
