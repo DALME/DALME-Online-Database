@@ -116,6 +116,32 @@
             </li>
 
           </ul>
+        <div id="cite-container">
+          <li
+            id="cite-button"
+            class="nav_button"
+            v-bind:class="{ active: showCitePanel }"
+            @click="showCitePanel = !showCitePanel">
+            <i class="fas fa-book"></i>
+          </li>
+          <b-popover
+            variant="dark"
+            target="cite-button"
+            placement="bottom"
+            :show="showCopied"
+            triggers="manual">
+            Copied!
+          </b-popover>
+          <b-popover
+            variant="dark"
+            target="cite-button"
+            placement="topleft"
+            :show="showHelp"
+            triggers="manual">
+            Citation panel.
+          </b-popover>
+          {% include "dalme_public/includes/_cite_popup.html" %}
+        </div>
         </li>
       </ul>
     </nav>
@@ -155,13 +181,17 @@
   <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
   <!--script type="text/javascript" src="{% static 'js/diva_dev.js' %}"></script-->
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
-  <!--script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script-->
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
 
   {{ data|json_script:"source-data" }}
   {% host_url 'dashboard' host 'db' as db_url %}
   {% host_url 'api_endpoint' host 'data' as api_url %}
+
+  {% get_citation_data as citation %}
+  {{ citation.2 | safe }}
+  {{ citation | json_script:"citation_data" }}
 
   <script>
     const setHeaderHeight = () => {
@@ -452,7 +482,25 @@
         mounted() {
           window.eventBus.$emit('renderFolio', this.eventData);
         },
+        created() {
+          const Cite = require('citation-js');
+          let _data = JSON.parse($('#citation_data').text());
+          let formats = _data[0];
+          let config = Cite.plugins.config.get('csl');
+          for (let i = 0, len = formats.length; i < len; ++i) {
+            if (formats[i].file) {
+              $.ajax({ method: "GET", url: `/static/citation_styles/${formats[i].file}`})
+              .done(function(xml_data) {
+                config.templates.add(formats[i].name, xml_data);
+              })
+            }
+          }
+          this.formats = formats;
+          this.citation = new Cite(_data[1]);
+          this.updateCitation('harvard1');
+        },
         data: {
+          showCitePanel: false,
           folioIndex: {{ initial_folio_index }},
           zoomLevel: 2,
           folioSelect: false,
@@ -462,7 +510,15 @@
           renderMode: 'scholarly',
           viewerMode: 'vertical-split',
           softWrap: false,
-          citeDialogue: false,
+          formats: null,
+          format: 'html',
+          template: 'harvard1',
+          lang: 'en-US',
+          formatted_citation: null,
+          file_extensions: {
+            bibtex: '.bib',
+            ris: '.ris'
+          }
         },
         computed: {
           sourceData() {
@@ -519,9 +575,6 @@
           },
         },
         methods: {
-          showCite() {
-            this.citeDialogue = true;
-          },
           incrementDivaId() {
             this.divaId += 1;
           },
@@ -578,6 +631,37 @@
             if (this.renderMode == 'scholarly') {
               this.softWrap = this.softWrap ? false : true;
             }
+          },
+          formatCitation(template, format=this.format, output_format='bibliography') {
+            return this.citation.format(output_format, {
+                format: format,
+                template: template,
+                lang: this.lang
+              });
+          },
+          updateCitation(template) {
+            this.formatted_citation = this.formatCitation(template);
+            this.template = template;
+          },
+          showCopiedTooltip() {
+            this.showCitePanel = false;
+            this.showCopied = true;
+            setTimeout(() => this.showCopied = false, 800);
+          },
+          downloadCitation(format) {
+            const blob = new Blob([this.formatCitation(this.template, 'text', format)], {
+              encoding: 'UTF-8',
+              type: 'text/plain;charset=UTF-8'
+            })
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob)
+            link.download = `citation${this.file_extensions[format]}`
+            link.click()
+            URL.revokeObjectURL(link.href)
+          },
+          closeCitePanel() {
+            this.showCitePanel = false;
+          },
           }
         },
       });
