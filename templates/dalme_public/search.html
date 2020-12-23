@@ -1,13 +1,7 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
-{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags compress %}
 
 {% block title %}Search &mdash; {{ block.super }}{% endblock %}
-
-{% block styles %}
-  {{ block.super }}
-  <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/dalme_helpers/search_page.js' %}"></script>
-{% endblock %}
 
 {% block banner %}
   {% if messages %}
@@ -212,6 +206,10 @@
 {% endblock %}
 {% block js_foot %}
   {{ block.super }}
+  {% compress js %}
+    <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_helpers/search_page.js' %}"></script>
+  {% endcompress %}
   {{ search_context|json_script:"search_context" }}
   <script>
     $(document).ready(function() { search_page_init(); })

@@ -1,11 +1,10 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
-{% load dalme_public_tags static %}
+{% load dalme_public_tags static compress %}
 
 {% block title %}Records &mdash; {{ block.super }}{% endblock %}
 
 {% block styles %}
   {{ block.super }}
-  <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
   <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/theme/default.css" />
 {% endblock %}
 
@@ -327,9 +326,12 @@
   {{ block.super }}
   {% get_breadcrumbs_nav as breadcrumb %}
   {{ breadcrumb | json_script:"breadcrumb_data" }}
+  {% compress js %}
+    <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
+  {% endcompress %}
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
-  <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
   <script>
     Vue.component('beat-loader', VueSpinner.BeatLoader);
     const breadcrumb_app = new Vue({

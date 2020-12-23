@@ -1,13 +1,15 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
-{% load dalme_public_tags static hosts %}
+{% load dalme_public_tags static hosts compress %}
 
 {% block title %}{{ data.short_name }} &mdash; {{ block.super }}{% endblock %}
 
 {% block styles %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'js/Diva-6.0.2/diva.css' %}">
-  <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public_tei.css' %}" />
+  {% compress css %}
+    <link rel="stylesheet" href="{% static 'js/Diva-6.0.2/diva.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/TEI.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public_tei.css' %}" />
+  {% endcompress %}
 {% endblock %}
 
 {% block header_extra %}
@@ -246,7 +248,9 @@
 
 {% block js_foot %}
   {{ block.super }}
-  <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+  {% compress js %}
+    <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+  {% endcompress %}
   <!--script type="text/javascript" src="{% static 'js/diva_dev.js' %}"></script-->
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
