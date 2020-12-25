@@ -2110,10 +2110,16 @@ ul.pagination li.page-item.disabled button {
   border-bottom-color: #aaa;
 }
 
-li.page-item button:hover,
-li.page-item.active button {
+li.page-item button:hover {
   background-color: #497bbb24;
   color: #354d87;
+}
+li.page-item.active button,
+li.page-item.active button:hover {
+  background-color: #497bbb24;
+  color: #354d87;
+  cursor: default;
+  border-bottom-color: #aaa;
 }
 
 ul.pagination li.page-item button:hover {
@@ -2140,14 +2146,14 @@ ul.pagination > li.page-item:last-child button {
 .search-icon {
   color: #6c757d;
   position: absolute;
-  top: 46px;
-  left: 26px;
+  top: 14px;
+  left: 12px;
 }
 
 .clear-search-input {
   position: absolute;
-  top: 42px;
-  right: 26px;
+  top: 10px;
+  right: 12px;
 }
 
 .clear-search-box {
@@ -2312,6 +2318,11 @@ ul.pagination > li.page-item:last-child button {
   border-bottom: 1px dotted #9c9c9c;
 }
 
+#advanced-search .advanced-search-row .custom-select,
+#advanced-search .advanced-search-row .form-control {
+  width: auto;
+}
+
 #advanced-search .form-group {
   margin-right: .5rem;
   margin-top: .5rem;
@@ -2335,7 +2346,7 @@ ul.pagination > li.page-item:last-child button {
 #advanced-search .query_op_first {
   font-size: .9rem;
   align-self: center;
-  width: 65px;
+  width: 57px;
   text-align: center;
 }
 

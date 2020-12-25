@@ -53,8 +53,8 @@ class SearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
         choices=QUERY_TYPES,
-        help_text='<p class=&quot;text-left p-1&quot;> \
-                    <b>Matches:</b> words must be present in field, but doesn\'t preserve their order<br/> \
+        help_text='<p class=&quot;text-left p-1&quot;>\
+                    <b>Matches:</b> words must be present in field, but does not preserve their order<br/> \
                     <b>Contains:</b> query must be present within field, preserves word order<br/> \
                     <b>Begins with:</b> field must begin with word/phrase in query<br/> \
                     <b>Is:</b> field must exactly match query<br/><p>'

@@ -178,7 +178,7 @@
           });
         </script>
       {% endblock %}
-      {% if page.citable and not records and not record %}
+      {% if page.citable and not records and not record and not search %}
           {% get_citation_data as citation %}
           {{ citation.2 | safe }}
           {{ citation | json_script:"citation_data" }}
@@ -193,7 +193,7 @@
               },
               created() {
                 const Cite = require('citation-js');
-                let _data = JSON.parse($('#citation_data').text());
+                let _data = JSON.parse($('#citation_data').detach().text());
                 let formats = _data[0];
                 let config = Cite.plugins.config.get('csl');
                 for (let i = 0, len = formats.length; i < len; ++i) {

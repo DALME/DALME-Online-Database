@@ -8,6 +8,7 @@ from elasticsearch_dsl.query import Q
 import elasticsearch.exceptions as es_exceptions
 from dalme_app.documents import PublicSource, FullSource
 from dalme_app.models import Attribute, LanguageReference, Set
+from dalme_app.forms import SearchForm
 from dateutil.parser import parse
 
 
@@ -321,9 +322,16 @@ class SearchContext():
 
         session_var = 'public-search-post' if self.public else 'search-post'
 
+        options = {
+            'join_types': [{'value': i[0], 'text': i[1]} for i in SearchForm.JOIN_TYPES],
+            'query_types': [{'value': i[0], 'text': i[1]} for i in SearchForm.QUERY_TYPES],
+            'range_types': [{'value': i[0], 'text': i[1]} for i in SearchForm.RANGE_TYPES]
+        }
+
         return {
             'session_var': session_var,
-            'fields': field_data
+            'fields': field_data,
+            'options': options
         }
 
     def get_options(self, field):
@@ -341,7 +349,7 @@ class SearchContext():
         if self.public:
             filter_options.update({'is_public': True})
 
-        return [{'value': i, 'label': i}
+        return [{'value': i, 'text': i}
                 for i in Set.objects.filter(**filter_options)
                 .order_by('name')
                 .values_list('name', flat=True)
@@ -362,7 +370,7 @@ class SearchContext():
             .distinct()
         ]
 
-        return [{'value': i.name, 'label': i.name}
+        return [{'value': i.name, 'text': i.name}
                 for i in LanguageReference.objects.filter(id__in=languages)
                 .order_by('name')
                 ]
@@ -376,7 +384,7 @@ class SearchContext():
         if self.public:
             filter_options.update({'sources__workflow__is_public': True})
 
-        return [{'value': i, 'label': i}
+        return [{'value': i, 'text': i}
                 for i in Attribute.objects.filter(**filter_options)
                 .order_by('value_STR')
                 .values_list('value_STR', flat=True)
