@@ -16,7 +16,6 @@ from django.db.models import Q, Count
 from collections import OrderedDict
 from django.core.mail import send_mail
 from django.http import HttpResponse
-from django.contrib import messages
 from django.template import defaultfilters
 from django.utils import timezone
 from django.forms.models import model_to_dict
@@ -27,7 +26,7 @@ import requests
 from django.contrib.contenttypes.models import ContentType
 from geopy.geocoders import AlgoliaPlaces
 import lxml.etree as et
-from django.core.management import call_command
+from django_q.tasks import async_task
 
 
 def get_script_menu():
@@ -65,6 +64,11 @@ def get_script_menu():
         {
             "name": "test_expression",
             "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
+            "type": "info"
+        },
+        {
+            "name": "test_django_q",
+            "description": "Tests the tasks backend.",
             "type": "info"
         }
     ]
@@ -129,13 +133,18 @@ def session_info(request, username):
     return output
 
 
+def test_django_q(request):
+    async_task('dalme_app.tasks.test_task', request.user.id, task_name='test_task', hook='dalme_app.utils.send_message')
+
+
 def update_folios_in_dam(request):
-    return 'Process started...'
+    async_task('dalme_app.tasks.update_rs_folio_field', request.user.id, task_name='update_folios_in_dam', hook='dalme_app.utils.send_message')
 
 
 def rebuild_search_index(request):
-    call_command('search_index', '--rebuild', '-f')
-    return 'Process started...'
+    async_task('dalme_app.tasks.update_search_index', request.user.id, task_name='rebuild_search_index', hook='dalme_app.utils.send_message')
+    # call_command('search_index', '--rebuild', '-f')
+    # return 'Process started...'
 
 
 def import_languages(request):
@@ -242,15 +251,18 @@ def geolocate_locales(request):
     return errors
 
 
+def test_task():
+    return Source.objects.filter(type=13).count()
+
+
 def test_expression(request):
-    attributes = Attribute.objects.filter(attribute_type__data_type__in=['FK-UUID', 'FK-INT'], value_JSON__isnull=False)
-    for attribute in attributes:
-        attribute.save()
-        # _id = '"{}"'.format(self.value_JSON['id']) if self.attribute_type.data_type == 'FK-UUID' else self.value_JSON['id']
-        # self.value_STR = str(eval('{}.objects.get(pk={})'.format(self.value_JSON['class'], _id)))
-    return attributes[1000].value_STR
-
-
+    # attributes = Attribute.objects.filter(attribute_type__data_type__in=['FK-UUID', 'FK-INT'], value_JSON__isnull=False)
+    # for attribute in attributes:
+    #     attribute.save()
+    #     # _id = '"{}"'.format(self.value_JSON['id']) if self.attribute_type.data_type == 'FK-UUID' else self.value_JSON['id']
+    #     # self.value_STR = str(eval('{}.objects.get(pk={})'.format(self.value_JSON['class'], _id)))
+    # return attributes[1000].value_STR
+    return 'ok'
 
 def fix_users(records):
     # records = Attribute.objects.all()
@@ -263,8 +275,6 @@ def fix_users(records):
         s.save()
 
 
-def test_function():
-    return ('part1', 'part2')
 
 # REMOVE DUPLICATES
 # def test_expression2(request):
