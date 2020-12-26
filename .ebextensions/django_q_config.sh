@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 commands:
   create_post_dir:
     command: "mkdir /opt/elasticbeanstalk/hooks/appdeploy/post"

@@ -60,7 +60,7 @@ COMPRESS_ENABLED = True
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    'https://*.dalme.org'
+    'https://*.dalme.org',
     'https://data.dalme.org',
     'https://purl.dalme.org',
     'https://db.dalme.org',
@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_hosts',
     'django_elasticsearch_dsl',
+    'django_q',
     'djangosaml2idp',
     'corsheaders',
     'rest_framework',
