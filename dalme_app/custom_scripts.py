@@ -250,11 +250,6 @@ def geolocate_locales(request):
 
     return errors
 
-
-def test_task():
-    return Source.objects.filter(type=13).count()
-
-
 def test_expression(request):
     # attributes = Attribute.objects.filter(attribute_type__data_type__in=['FK-UUID', 'FK-INT'], value_JSON__isnull=False)
     # for attribute in attributes:

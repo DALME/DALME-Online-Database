@@ -46,7 +46,7 @@ def wagtail_publish_pages():
     call_command('publish_scheduled_pages')
 
 
-def test_tasks(user_id):
+def test_task(user_id):
     return {
         'message': 'Test task completed.',
         'level': constants.INFO,
