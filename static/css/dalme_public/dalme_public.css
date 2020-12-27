@@ -1267,11 +1267,11 @@ i.inactive {
   max-height: fit-content;
 }
 .folios.vertical-split section.transcription {
-  padding: 1rem 1rem 0 1rem;
+  padding: 1.5rem;
   border-left: 3px solid #354d87;
 }
 .folios.horizontal-split section.transcription {
-  padding: 1rem 0;
+  padding: 1.5rem;
   border-top: 3px solid #354d87;
 }
 .folio-rights {

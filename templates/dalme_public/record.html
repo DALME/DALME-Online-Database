@@ -172,6 +172,18 @@
             triggers="manual">
             Change how lines wider than the viewing area are treated.
           </b-popover>
+          <b-dropdown-item id="newlines_menu" @click="showNewlines = !showNewlines" class="dropdown-item" href="#">
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': !showNewlines, 'fas fa-check-square': showNewlines }"></i> Newline symbols
+          </b-dropdown-item>
+          <b-popover
+            boundary="window"
+            variant="dark"
+            target="newlines_menu"
+            placement="left"
+            :show="showHelp"
+            triggers="manual">
+            Show or hide new line symbols.
+          </b-popover>
           <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item class="dropdown-item" href="#" @click="changeRenderMode('basic')">
             <i class="fa-fw" v-bind:class="{ 'far fa-square': renderMode == 'scholarly', 'fas fa-check-square': renderMode == 'basic' }"></i> Basic mode
@@ -241,7 +253,7 @@
       triggers="manual">
       Drag to resize viewer panels.
     </b-popover>
-    <section id="transcription" class="transcription" v-bind:class="[renderMode, { 'soft-wrap': softWrap }]"></section>
+    <section id="transcription" class="transcription" v-bind:class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]"></section>
   </div>
 </div>
 {% endblock %}
@@ -340,7 +352,7 @@
               content.setAttribute('n', colNum);
               content.innerHTML = e.innerHTML;
               const div = document.createElement('div');
-              div.innerHTML = `<span class="label">COL ${colNum}</span><i class="fa fa-caret-down"></i><i class="fa fa-caret-left"></i>`;
+              div.innerHTML = `<div><span class="label">C${colNum}</span><i class="fa fa-caret-down"></i><i class="fa fa-caret-right"></i></div>`;
               div.className = 'ab-column-toggler';
 
               e.innerHTML = '';
@@ -379,6 +391,13 @@
             e.setAttribute('title', getTitle(e, 'quote'));
             e.setAttribute('data-toggle', 'tooltip');
           }, //@resp
+          'hi': [
+            ["[rend=superscript]", function(e) {
+              if (e.innerText.length > 3) {
+                e.setAttribute('rend-basic', 1);
+              }
+            }],
+           ]
         }
       };
 
@@ -424,7 +443,8 @@
           const tei = new CETEI();
           tei.addBehaviors(teiBehaviours);
           $.get(endpoint, function(data) {
-            const tr_text = data.transcription;
+            let tr_text = data.transcription;
+            tr_text = tr_text.replace(/\n/g, '<lb/>');
             const tei_block = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>${tr_text}</body></text></TEI>`;
             tei.makeHTML5(tei_block, function(text) {
               node.addClass('justify-content-left').html(text);
@@ -586,6 +606,7 @@
           renderMode: 'scholarly',
           viewerMode: 'vertical-split',
           softWrap: false,
+          showNewlines: false,
           formats: null,
           format: 'html',
           template: 'harvard1',
@@ -703,6 +724,21 @@
           changeRenderMode(mode) {
             this.renderMode = mode;
             this.softWrap = mode == 'basic' ? true : false;
+            const columns = $('tei-ab[type=column]');
+            $('tei-ab[type=column]').each(function(index, el) {
+              let cbs = $(this).find('div.ab-content').children(':not(tei-lb)');
+              let hidden_cbs = $(this).find('div.ab-content').children(':not(tei-lb):hidden');
+              if (cbs.length == hidden_cbs.length) {
+                $(this).hide()
+              }
+            });
+            $('tei-layout[columns]').each(function(index, el) {
+              let columns = $(this).find('tei-ab[type=column]');
+              let hidden_columns = $(this).find('tei-ab[type=column]:hidden');
+              if (columns.length == hidden_columns.length) {
+                $(this).hide()
+              }
+            });
           },
           toggleTextWrap() {
             if (this.renderMode == 'scholarly') {

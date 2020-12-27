@@ -33,6 +33,7 @@ tei-unclear{
 }
 
 tei-del{
+  display: contents;
   text-decoration: line-through;
 }
 
@@ -67,7 +68,9 @@ tei-gap {
 }
 
 tei-gap:before {
-  content: "[…]"
+  content: "[…]";
+  top: 4px;
+  position: relative;
 }
 
 tei-gap[reason="context"] {
@@ -270,11 +273,7 @@ tei-choice tei-reg + tei-orig:after {
   content: ")";
 } */
 /* A */
-tei-ab {
-  display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
+
 tei-accMat {
   display: block;
 }
@@ -973,15 +972,6 @@ tei-langUsage {
 }
 tei-language {
   /* Empty Rule Set */
-}
-tei-layout[columns] {
-  display: flex;
-}
-tei-layout[columns] tei-ab {
-  position: relative;
-  padding-left: 2.5em;
-  border-left: 1px solid black;
-  min-height: 200px;
 }
 tei-layoutDesc {
   /* Empty Rule Set */
