@@ -33,7 +33,6 @@ tei-unclear{
 }
 
 tei-del{
-  display: contents;
   text-decoration: line-through;
 }
 

@@ -95,9 +95,8 @@ tei-w[type=elision]:empty {
 section.transcription.soft-wrap tei-text > tei-body {
   white-space: pre-line !important;
 }
-section.transcription.show-newlines tei-lb::after {
-  content: '\a';
-  white-space: pre;
+section.transcription.soft-wrap tei-lb::after {
+  white-space: pre-line;
 }
 section.transcription.show-newlines tei-lb::before {
   content: ' ';
@@ -108,7 +107,6 @@ section.transcription.show-newlines tei-lb::before {
   height: 23px;
   display: inline-block;
   background-size: contain;
-  white-space: pre;
 }
 section.transcription.show-newlines tei-hi[rend=center] + tei-lb::before,
 section.transcription.show-newlines tei-note + tei-lb::before,
@@ -129,7 +127,6 @@ section.transcription.show-newlines tei-hi[rend=center]::after {
   height: 23px;
   display: inline-block;
   background-size: contain;
-  white-space: pre;
 }
 
 /* TEI Scholarly */
