@@ -426,7 +426,18 @@
                 e.setAttribute('rend-basic', 1);
               }
             }],
-           ]
+          ],
+          'ref': [
+            ['[target]', function(e) {
+              let ref_id = e.getAttribute('target');
+              e.innerHTML = `<a href="#${ref_id}">${e.getAttribute('target')}</a>`;
+            }]
+          ],
+          'note': [
+            [':not([type=marginal])', function(e) {
+              e.setAttribute('name', e.getAttribute('target'));
+            }]
+          ],
         }
       };
 
