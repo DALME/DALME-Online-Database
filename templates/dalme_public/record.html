@@ -317,71 +317,60 @@
           }
         };
         if (extent) {
-          if (extent.unit.startsWith('word')) {
-            let content = '___ '.repeat(extent.quantity).trim();
+          const tag_name = e.tagName.slice(4,);
+          const reason = e.getAttribute('reason', false);
+          let content = '';
+          if (extent.unit.startsWith('word') || extent.unit.startsWith('char')) {
+            if (extent.unit.startsWith('word')) {
+              content = '___ '.repeat(extent.quantity).trim();
+            } else {
+              content = '. '.repeat(extent.quantity).trim();
+            }
             e.innerHTML = `[ ${content} ]`;
-          } else if (extent.unit.startsWith('line')) {
-            e.innerHTML = `[ Space: ${extent.quantity} ${extent.unit} ]`;
-          } else if (extent.unit.startsWith('char')) {
-            let content = '. '.repeat(extent.quantity).trim();
-            e.innerHTML = `[ ${content} ]`;
+            let title = `${extent.quantity} missing ${extent.unit}`;
+            if (reason) title += ` (${reason})`;
+            e.setAttribute('title', title);
+            e.setAttribute('data-toggle', 'tooltip');
+          } else if (extent.unit.startsWith('line') || extent.unit.startsWith('page')) {
+            if (reason) {
+              e.innerHTML = `${extent.quantity} ${extent.unit} (${reason})`;
+            } else {
+              let qual = tag_name == 'SPACE' ? ' blank ' : ' ';
+              e.innerHTML = `${extent.quantity}${qual}${extent.unit}`;
+            }
+            e.setAttribute('show', 'block');
           }
         }
         return e
       };
 
-      const getTitle = (e, tag) => {
-        let extent = null;
-        let reason = null;
-        let type = null;
-        let lemma = null;
-        let resp = null;
-        let title = null;
-        if (e.hasAttribute('unit') && e.hasAttribute('quantity')) {
-           quantity = e.getAttribute('quantity');
-          let unit = e.getAttribute('unit');
-          extent = 'extent ' + quantity + unit;
-        } else if (e.hasAttribute('extent')) {
-          extent = 'extent ' + e.getAttribute('extent');
-        };
-        if (e.hasAttribute('reason')) {
-          reason = e.getAttribute('reason')
-        };
-        if (e.hasAttribute('type')) {
-          type = e.getAttribute('type')
-        };
-        if (e.hasAttribute('lemma')) {
-          lemma = '' + e.getAttribute('lemma') + ''
-        };
-        if (e.hasAttribute('resp')) {
-          resp = ' by ' + e.getAttribute('resp')
-        };
-        if (tag == 'word' && type && lemma) {
-          title = type + ': ' + lemma;
+      const setTitle = (e) => {
+        const tag_name = e.tagName.slice(4,);
+        const reason = e.getAttribute('reason', false);
+        const type = e.getAttribute('type', false);
+        const lemma = e.getAttribute('lemma', false);
+        const resp = e.getAttribute('resp', false);
+        const title_strings = {
+          'ADD': 'addition',
+          'ABBR': `expanded ${e.getAttribute('type', 'abbreviation')}`,
+        }
+        if (reason) {
+          e.setAttribute('title', `${tag_name.toLowerCase()} (${reason})`);
+        } else if (type && lemma) {
+          e.setAttribute('title', `${type} (${lemma})`);
+        } else if (resp) {
+          e.setAttribute('title', `by ${resp}`);
+        } else if (tag_name in title_strings) {
+          e.setAttribute('title', title_strings[tag_name]);
         } else {
-          title = tag;
-          if (extent) {
-            title = title + ': ' + extent;
-            if (reason) {
-              title = title + ', ' + reason;
-            };
-          } else if (reason) {
-            title = title + ': ' + reason;
-          } else if (type) {
-            title = title + ': ' + type;
-          } else if (resp) {
-            title = title + resp;
-          }
-        };
-        return title;
+          e.setAttribute('title', `${tag_name.toLowerCase()}`);
+        }
+        e.setAttribute('data-toggle', 'tooltip');
       };
 
       const teiBehaviours = {
         'tei': {
           'ab': function(e) {
-              //if (e.parent.elementName !== 'tei-layout') {
-              //    return;
-              //}
               const colNum = e.getAttribute('n');
               const content = document.createElement('div');
               content.className = 'ab-content';
@@ -394,40 +383,14 @@
               e.appendChild(div);
               e.appendChild(content);
           },
-          'gap': function(e) {
-            e.setAttribute('title', getTitle(e, 'gap'));
-            e.setAttribute('data-toggle', 'tooltip');
-            e = setExtent(e);
-          }, //@reason, @unit, @quantity, @extent
-          'space': function(e) {
-            e.setAttribute('title', getTitle(e, 'space'));
-            e.setAttribute('data-toggle', 'tooltip');
-            e = setExtent(e);
-          }, //@unit, @quantity, @extent
-          'unclear': function(e) {
-            e.setAttribute('title', getTitle(e, 'unclear'));
-            e.setAttribute('data-toggle', 'tooltip');
-          }, //@reason
-          'supplied': function(e) {
-            e.setAttribute('title', getTitle(e, 'supplied'));
-            e.setAttribute('data-toggle', 'tooltip');
-          }, //@reason
-          'add': function(e) {
-            e.setAttribute('title', getTitle(e, 'addition'));
-            e.setAttribute('data-toggle', 'tooltip');
-          }, //@place
-          'abbr': function(e) {
-            e.setAttribute('title', getTitle(e, 'abbreviation'));
-            e.setAttribute('data-toggle', 'tooltip');
-          }, //@type
-          'w': function(e) {
-            e.setAttribute('title', getTitle(e, 'word'));
-            e.setAttribute('data-toggle', 'tooltip');
-          }, //@type, @lemma
-          'quote': function(e) {
-            e.setAttribute('title', getTitle(e, 'quote'));
-            e.setAttribute('data-toggle', 'tooltip');
-          }, //@resp
+          'gap': function(e) { e = setExtent(e); },
+          'space': function(e) { e = setExtent(e); },
+          'unclear': function(e) { e = setTitle(e); },
+          'supplied': function(e) { e = setTitle(e); },
+          'add': function(e) { e = setTitle(e); },
+          'abbr': function(e) { e = setTitle(e); },
+          'w': function(e) { e = setTitle(e); },
+          'quote': function(e) { e = setTitle(e); },
           'hi': [
             ["[rend=superscript]", function(e) {
               if (e.innerText.length > 3) {
@@ -603,6 +566,7 @@
           window.eventBus.$emit('renderFolio', this.eventData);
         },
         created() {
+          window.addEventListener("resize", this.windowResized);
           const Cite = require('citation-js');
           let _data = JSON.parse($('#citation_data').detach().text());
           let formats = _data[0];
@@ -822,11 +786,6 @@
                 });
               });
           },
-          setTranscription(text) {
-            this.loading = false;
-            this.renderedTranscription = text.outerHTML;
-            setTimeout(() => this.toggleTeiContainers(), 0);
-          },
           childrenAllHidden(container) {
             const all_children = $(container).children(':not(tei-lb)');
             const hidden_children = $(container).children(':not(tei-lb)').filter(function() {
@@ -834,6 +793,18 @@
             });
             let all_hidden = all_children.length === hidden_children.length ? true : false;
             return all_hidden
+          },
+          adjustTeiRendering() {
+            // leaders
+            let container_width = Math.round($('tei-text').innerWidth());
+            $('tei-metamark[function=leader]').each(function(index, el) {
+              let sum = 0;
+              const line_el = $.merge($(this).prevUntil('tei-lb'), $(this).nextUntil('tei-lb'));
+              line_el.each(function(i, elt) { sum += $(this).width(); });
+              let target_width = container_width - sum - 10;
+              target_width = target_width > 10 ? target_width : 10;
+              $(this).width(target_width);
+            })
           },
           toggleTeiContainers() {
             const containerList = [
@@ -852,6 +823,11 @@
                 }
               });
             }
+            $('[data-toggle="tooltip"]').tooltip();
+            this.adjustTeiRendering();
+          },
+          windowResized() {
+            setTimeout(() => this.adjustTeiRendering(), 0);
           }
         },
       });

@@ -28,8 +28,7 @@ tei-hi[rend="underscore"] {
 
 tei-unclear{
   color: #6d6d6d;
-  text-decoration: underline;
-  text-decoration-style: dotted;
+  border-bottom: 1px dashed #6d6d6d;
 }
 
 tei-del{
@@ -84,47 +83,42 @@ tei-metamark[rend="line"] {
   background-size: 50px 1px;
   border-bottom: 1px solid #aaa;
 }
-
-tei-metamark[rend="dashes"] {
-  background-size: 50px 1px;
-  background-image: radial-gradient(1px 1px at center, #aaa 10px, transparent 20px);
+tei-metamark[rend="dash"] {
+  background-size: 20px 1px;
+  background-image: radial-gradient(1px 1px at center,#aaa 5px,transparent 6px);
 }
-
-tei-metamark[rend="dots"] {
-  background-size: 8px 1px;
+tei-metamark[rend="dot"] {
+  background-size: 6px 1px;
   background-image: radial-gradient(1px 1px at center, #aaa 1px, transparent 2px);
 }
-
 tei-metamark[function="leader"] {
   height: 1px;
   display: inline-flex;
-  min-width: 40%;
   margin-left: 5px;
   margin-right: 5px;
 }
+tei-metamark[function="leader"]::before {
+  background-size: 50px 1px;
+  border-bottom: 1px solid #aaa;
+}
 
-tei-space[extent],
+tei-space,
 tei-gap {
-  color: #d4d4d4;
+  color: #ababab;
   font-weight: 700;
   font-size: 13px;
-  text-transform: uppercase;
   font-family: "Open Sans", sans-serif;
 }
-tei-gap {
-  position: relative;
-  top: 5px;
-}
-tei-space[extent] {
-  display: inline-block;
-  width: 100%;
+tei-space[show=block],
+tei-gap[show=block] {
+  font-weight: 400;
+  display: block;
   text-align: center;
   margin-top: 1rem;
   margin-bottom: 1rem;
-}
-tei-space[extent]:hover,
-tei-gap:hover {
-  color: #888888;
+  border-top: 1px dotted #d4d4d4;
+  border-bottom: 1px dotted #d4d4d4;
+  padding: .5rem;
 }
 tei-list {
   display: block;
@@ -150,43 +144,51 @@ tei-add:after {
 }
 
 tei-quote {
-  font-size: 14px;
+  font-size: 16px;
   font-style: italic;
-  font-weight: 600;
-  color: #757876;
-  background-color: #eee;
-  border: 1px dotted #ccc;
-  padding: 5px;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  display: inline-block;
+  font-weight: 400;
+  color: #6b6b6b;
+  border-top: 1px dotted #d4d4d4;
+  border-bottom: 1px dotted #d4d4d4;
+  padding: 1rem;
+  display: block;
   width: 100%;
+  font-family: 'Lora';
 }
-
+tei-quote:not(:first-child) {
+  margin-top: 1rem;
+}
+tei-quote:not(:last-child) {
+  margin-bottom: 1rem;
+}
 tei-quote:before {
-  content: open-quote;
+  content: "\f10d";
+  font-family: 'FontAwesome';
+  font-size: 11px;
+  margin-right: .4rem;
+  color: #bbbbbb;
 }
 tei-quote:after {
-  content: close-quote;
+  content: "\f10e";
+  font-family: 'FontAwesome';
+  font-size: 11px;
+  margin-left: .3rem;
+  color: #bbbbbb;
 }
-
 tei-quote[next]:after {
   content: "" !important;
 }
-
 tei-quote[prev]:before {
   content: "" !important;
 }
 
 tei-note:not([type]) {
-  background: #efefef;
+  border-top: 1px dotted #6b6b6b;
   padding: 5px 10px;
   display: inline-block;
   min-width: 100%;
   font-size: 14px;
-  margin-bottom: 2px;
 }
-
 tei-note:not([type]):before {
   content: attr(id)":";
   font-weight: 600;

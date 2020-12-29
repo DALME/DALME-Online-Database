@@ -2034,7 +2034,6 @@ div.diva-outer {
   border: 0;
 }
 div.diva-wrapper {
-  /* min-height: 60vh; */
   min-height: calc(100vh - (var(--header-height) + 96px));
 }
 input.vs__search {
@@ -2949,13 +2948,13 @@ section.transcription {
 .record-info {
   position: absolute;
   z-index: 2;
-  background-color: rgb(109 109 109 / 18%);
+  background-color: rgb(109 109 109 / 68%);
   backdrop-filter: blur(7px);
   border-bottom: 1px solid #6b6b6b87;
   padding: 2rem 2rem;
 }
 .record-info ul {
-  color: #3a3a3a;
+  color: white;
   flex-direction: column;
   margin: 1rem 0 0 0;
   padding: 0;
@@ -2964,16 +2963,16 @@ section.transcription {
   padding-bottom: 0.3rem;
 }
 .record-info ul li span {
-  color: #0e4386;
+  color: #8dbfff;
   font-weight: 600;
 }
 .record-info .description {
-  color: black;
+  color: white;
   font-family: "PT Serif", serif;
   font-size: 16px;
 }
 .record-info .credits {
-  color: black;
+  color: white;
   font-weight: 600;
 }
 
