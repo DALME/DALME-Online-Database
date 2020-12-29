@@ -148,7 +148,9 @@ section.transcription.basic tei-del,
 section.transcription.basic tei-pc {
   display: none;
 }
-
+section.transcription.basic tei-pc + tei-lb {
+  display: none;
+}
 section.transcription.basic tei-hi[rend-basic="1"],
 section.transcription.basic tei-hi[rend="subscript"] {
   vertical-align: unset;
