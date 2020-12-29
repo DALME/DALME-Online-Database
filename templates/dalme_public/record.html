@@ -294,6 +294,34 @@
         ? splitter.addClass('horizontal-split')
         : splitter.addClass('vertical-split')
 
+      const setExtent = (e) => {
+        let extent = {};
+        if (e.hasAttribute('unit') && e.hasAttribute('quantity')) {
+          if (parseInt(e.getAttribute('quantity')) != 'NaN') {
+            extent['quantity'] = parseInt(e.getAttribute('quantity'));
+            extent['unit'] = e.getAttribute('unit');
+          }
+        } else if (e.hasAttribute('extent')) {
+          e_tokens = e.getAttribute('extent').split(' ');
+          if (e_tokens.length == 2 && parseInt(e_tokens[0]) != 'NaN') {
+            extent['quantity'] = parseInt(e_tokens[0]);
+            extent['unit'] = e_tokens[1];
+          }
+        };
+        if (extent) {
+          if (extent.unit.startsWith('word')) {
+            let content = '___ '.repeat(extent.quantity).trim();
+            e.innerHTML = `[ ${content} ]`;
+          } else if (extent.unit.startsWith('line')) {
+            e.innerHTML = `[ Space: ${extent.quantity} ${extent.unit} ]`;
+          } else if (extent.unit.startsWith('char')) {
+            let content = '. '.repeat(extent.quantity).trim();
+            e.innerHTML = `[ ${content} ]`;
+          }
+        }
+        return e
+      };
+
       const getTitle = (e, tag) => {
         let extent = null;
         let reason = null;
@@ -354,7 +382,6 @@
               const div = document.createElement('div');
               div.innerHTML = `<div><span class="label">C${colNum}</span><i class="fa fa-caret-down"></i><i class="fa fa-caret-right"></i></div>`;
               div.className = 'ab-column-toggler';
-
               e.innerHTML = '';
               e.appendChild(div);
               e.appendChild(content);
@@ -362,10 +389,12 @@
           'gap': function(e) {
             e.setAttribute('title', getTitle(e, 'gap'));
             e.setAttribute('data-toggle', 'tooltip');
+            e = setExtent(e);
           }, //@reason, @unit, @quantity, @extent
           'space': function(e) {
             e.setAttribute('title', getTitle(e, 'space'));
             e.setAttribute('data-toggle', 'tooltip');
+            e = setExtent(e);
           }, //@unit, @quantity, @extent
           'unclear': function(e) {
             e.setAttribute('title', getTitle(e, 'unclear'));

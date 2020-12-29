@@ -59,30 +59,6 @@ tei-num[type="cardinal"]:before {
     content: attr(value);
 }
 
-tei-gap {
-  color: #757876;
-  font-weight: 600;
-  font-size: 80%;
-  vertical-align: middle;
-}
-
-tei-gap:before {
-  content: "[…]";
-  top: 4px;
-  position: relative;
-}
-
-tei-gap[reason="context"] {
-  color: #757876;
-  font-weight: 600;
-  font-size: 80%;
-  vertical-align: middle;
-}
-
-tei-gap[reason="context"]:before {
-  content: "[" attr(extent) " of contextual information not transcribed]";
-}
-
 tei-cb {
   display: inline-block;
   margin-top: 10px;
@@ -127,11 +103,29 @@ tei-metamark[function="leader"] {
   margin-right: 5px;
 }
 
-tei-space:before {
-  width: 30px;
-  border-bottom: 1px dotted #757876;
+tei-space[extent],
+tei-gap {
+  color: #d4d4d4;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-family: "Open Sans", sans-serif;
 }
-
+tei-gap {
+  position: relative;
+  top: 5px;
+}
+tei-space[extent] {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+tei-space[extent]:hover,
+tei-gap:hover {
+  color: #888888;
+}
 tei-list {
   display: block;
   margin-top: 1em;
