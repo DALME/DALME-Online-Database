@@ -1232,7 +1232,7 @@ i.inactive {
   display: none;
 }
 .folios {
-  margin: 0 1rem;
+  margin: 0;
   overflow: hidden;
 }
 
@@ -1872,7 +1872,7 @@ div.description[data-collapsed='true'] {
     padding-right: 2rem;
   }
   .folios {
-    margin: 0 2rem;
+    margin: 0;
   }
 
   .block-document .metadata > div {
@@ -1975,7 +1975,7 @@ div.description[data-collapsed='true'] {
     padding-left: 2rem;
   }
   .folios {
-    margin: 0 4rem;
+    margin: 0;
   }
 
   body footer {
@@ -3058,16 +3058,20 @@ section.transcription {
   color: #696969;
   margin-right: 2px;
 }
-.dropdown-item.disabled {
+
+.dropdown-item.disabled,
+.dropdown-item.disabled > a {
   cursor: default;
 }
-.dropdown-item.disabled:hover {
+.dropdown-item.disabled:hover,
+.dropdown-item.disabled:hover > a {
   color: #6c757d;
   background-color: transparent;
 }
-.dropdown-item.disabled > i {
+.dropdown-item.disabled > a > i {
   color: #9f9f9f;
 }
+
 .clear-select {
   position: absolute;
   right: 25px;
