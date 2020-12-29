@@ -16,6 +16,15 @@ def page_post_save(sender, instance, created, **kwargs):
 
 @receiver(models.signals.post_save, sender=Source)
 def source_post_save(sender, instance, created, **kwargs):
+    # create workflow record if this is a new source
+    if created and instance.type == 13:
+        wf = Workflow(
+         source=instance,
+         last_modified=timezone.now(),
+         last_user=get_current_user()
+        )
+        wf.save()
+
     if instance.type == 13:
         # update dataset
         if instance.primary_dataset is not None:

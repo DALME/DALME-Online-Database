@@ -100,7 +100,7 @@ class PublicSource(PublicSourceBase):
         model = Source
 
     def update(self, thing, refresh=None, action='index', parallel=False, **kwargs):
-        if isinstance(thing, models.Model) and not thing.workflow.is_public and action == "index":
+        if isinstance(thing, models.Model) and not thing.is_public and action == "index":
             action = "delete"
             kwargs = {**kwargs, 'raise_on_error': False}
         return super().update(thing, refresh, action, parallel, **kwargs)
@@ -109,10 +109,7 @@ class PublicSource(PublicSourceBase):
         return Source.objects.filter(type=13, workflow__is_public=True)
 
     def prepare_is_public(self, instance):
-        try:
-            return instance.workflow.is_public
-        except ObjectDoesNotExist:
-            return False
+        return instance.is_public
 
     def prepare_attributes(self, instance):
         attribute_list = []
