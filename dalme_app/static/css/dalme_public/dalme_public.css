@@ -1961,7 +1961,7 @@ div.diva-outer {
   border: 0;
 }
 div.diva-wrapper {
-  min-height: 60vh;
+  min-height: calc(100vh - (var(--header-height) + 96px));
 }
 input.vs__search {
   display: none;
@@ -2818,7 +2818,8 @@ section.transcription {
   background-color: #fff;
   flex: 1 1 auto;
   z-index: 1;
-  height: calc(100vh - (var(--header-height) + 88px));
+  min-height: 100px;
+  height: calc(100vh - (var(--header-height) + 96px));
 }
 .record-info {
   position: absolute;
