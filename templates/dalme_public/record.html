@@ -253,7 +253,14 @@
       triggers="manual">
       Drag to resize viewer panels.
     </b-popover>
-    <section id="transcription" class="transcription" v-bind:class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]"></section>
+    <section
+      id="transcription"
+      class="transcription"
+      v-bind:class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]">
+      <beat-loader v-show="loading" color="#aaa"></beat-loader>
+      <div class="warning" v-if="!transcriptionId">This folio has not been transcribed.</div>
+      <div v-html="renderedTranscription"></div>
+    </section>
   </div>
 </div>
 {% endblock %}
@@ -268,6 +275,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
 
   {{ data|json_script:"source-data" }}
   {% host_url 'dashboard' host 'db' as db_url %}
@@ -472,27 +480,6 @@
         node.html(`<p>${notice}</p>`)
       };
 
-      const renderTranscription = transcriptionId => {
-        const node = $('#transcription');
-        node.empty();
-        if (!transcriptionId) {
-          const warning = 'This folio has not been transcribed.'
-          node.innerHTML = `<div class="warning">${warning}</div>`;
-        } else {
-          const endpoint = `{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${transcriptionId}/?format=json`;
-          const tei = new CETEI();
-          tei.addBehaviors(teiBehaviours);
-          $.get(endpoint, function(data) {
-            let tr_text = data.transcription;
-            tr_text = tr_text.replace(/\n/g, '<lb/>');
-            const tei_block = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>${tr_text}</body></text></TEI>`;
-            tei.makeHTML5(tei_block, function(text) {
-              node.addClass('justify-content-left').html(text);
-            });
-          }, 'json');
-        };
-      };
-
       const calcFolioHeight = () => {
         const windowHeight = $(window).height();
         const transcriptionHeight = $('#transcription').height();
@@ -532,7 +519,6 @@
             }
           }
           if (!image) { $('#diva_viewer').html('<div class="diva-no-image"></div>'); }
-          renderTranscription(data.transcriptionId);
         }, 'json').then(() => {
              $('.folio').resizableSafe({
                  handleSelector: '#resize-handle',
@@ -604,7 +590,9 @@
           });
         setHeaderHeight();
       });
+
       // Vue.config.devtools = true
+      Vue.component('beat-loader', VueSpinner.BeatLoader);
       const app = new Vue({
         el: '#app',
         delimiters: ['${', '}'],
@@ -616,7 +604,7 @@
         },
         created() {
           const Cite = require('citation-js');
-          let _data = JSON.parse($('#citation_data').text());
+          let _data = JSON.parse($('#citation_data').detach().text());
           let formats = _data[0];
           let config = Cite.plugins.config.get('csl');
           for (let i = 0, len = formats.length; i < len; ++i) {
@@ -630,6 +618,9 @@
           this.formats = formats;
           this.citation = new Cite(_data[1]);
           this.updateCitation('harvard1');
+          this.tei = new CETEI();
+          this.tei.addBehaviors(teiBehaviours);
+          this.fetchTranscription();
         },
         data: {
           showHelp: false,
@@ -655,7 +646,13 @@
           file_extensions: {
             bibtex: '.bib',
             ris: '.ris'
-          }
+          },
+          loading: false,
+          renderedTranscription: null,
+          tei: null,
+        },
+        watch: {
+          folioIndex: "fetchTranscription"
         },
         computed: {
           sourceData() {
@@ -764,21 +761,7 @@
           changeRenderMode(mode) {
             this.renderMode = mode;
             this.softWrap = mode == 'basic' ? true : false;
-            const columns = $('tei-ab[type=column]');
-            $('tei-ab[type=column]').each(function(index, el) {
-              let cbs = $(this).find('div.ab-content').children(':not(tei-lb)');
-              let hidden_cbs = $(this).find('div.ab-content').children(':not(tei-lb):hidden');
-              if (cbs.length == hidden_cbs.length) {
-                $(this).hide()
-              }
-            });
-            $('tei-layout[columns]').each(function(index, el) {
-              let columns = $(this).find('tei-ab[type=column]');
-              let hidden_columns = $(this).find('tei-ab[type=column]:hidden');
-              if (columns.length == hidden_columns.length) {
-                $(this).hide()
-              }
-            });
+            setTimeout(() => this.toggleTeiContainers(), 0);
           },
           toggleTextWrap() {
             if (this.renderMode == 'scholarly') {
@@ -822,6 +805,52 @@
               setTimeout(() => this.showHelp = state, 80);
             } else {
               this.showHelp = state;
+            }
+          },
+          fetchTranscription() {
+            this.loading = true;
+            const that = this;
+            fetch(`{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${this.transcriptionId}/?format=json`)
+              .then(response => response.json())
+              .then(data => {
+                let tr_text = data.transcription.replace(/\n/g, '<lb/>');
+                const tei_block = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>${tr_text}</body></text></TEI>`;
+                that.tei.makeHTML5(tei_block, function (data) {
+                  that.loading = false;
+                  that.renderedTranscription = data.outerHTML;
+                  setTimeout(() => that.toggleTeiContainers(), 0);
+                });
+              });
+          },
+          setTranscription(text) {
+            this.loading = false;
+            this.renderedTranscription = text.outerHTML;
+            setTimeout(() => this.toggleTeiContainers(), 0);
+          },
+          childrenAllHidden(container) {
+            const all_children = $(container).children(':not(tei-lb)');
+            const hidden_children = $(container).children(':not(tei-lb)').filter(function() {
+              return $(this).css('display') == 'none';
+            });
+            let all_hidden = all_children.length === hidden_children.length ? true : false;
+            return all_hidden
+          },
+          toggleTeiContainers() {
+            const containerList = [
+              { selector: 'tei-ab[type=column] div.ab-content', parent: true },
+              { selector: 'tei-layout[columns]', parent: false },
+              { selector: 'tei-note:not([type=marginal])', parent: false }
+            ];
+            const that = this;
+            for (let i = 0, len = containerList.length; i < len; ++i) {
+              $(containerList[i].selector).each(function() {
+                let target = containerList[i].parent ? $(this).parent() : $(this);
+                if (that.childrenAllHidden(this)) {
+                  target.hide();
+                } else {
+                  target.show();
+                }
+              });
             }
           }
         },
