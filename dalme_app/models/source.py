@@ -40,11 +40,11 @@ class Source(index.Indexed, dalmeUuidOwned):
             if self.parent is not None and self.parent.primary_dataset is not None:
                 self.primary_dataset = self.parent.primary_dataset
 
-            if self.id is not None:
-                Workflow.objects.update_or_create(source=self, defaults={
-                    'last_modified': timezone.now(),
-                    'last_user': get_current_user()
-                })
+            # if self.id is not None:
+            #     Workflow.objects.update_or_create(source=self, defaults={
+            #         'last_modified': timezone.now(),
+            #         'last_user': get_current_user()
+            #     })
 
         super().save(*args, **kwargs)
 
