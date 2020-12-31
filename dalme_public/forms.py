@@ -1,4 +1,3 @@
-from datetime import datetime
 from django import forms
 from django.core.mail import EmailMessage
 from captcha import fields, widgets

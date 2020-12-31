@@ -103,6 +103,7 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
         dates = Attribute.objects.filter(
             Q(sources=OuterRef('pk'), attribute_type__short_name='date')
             | Q(sources=OuterRef('pk'), attribute_type__short_name='start_date')
+            | Q(sources=OuterRef('pk'), attribute_type__short_name='end_date')
         )
         qs = qs.annotate(source_date=Subquery(dates.values('value_DATE_y')[:1]))
         return qs.distinct()
@@ -215,7 +216,7 @@ class SourceFilter(django_filters.FilterSet):
 
     def filter_date_range(self, queryset, name, value):
         queryset = queryset.filter(
-            attributes__attribute_type__id__in=[19, 26]
+            attributes__attribute_type__id__in=[19, 25, 26]
         ).distinct()
 
         after, before = value
