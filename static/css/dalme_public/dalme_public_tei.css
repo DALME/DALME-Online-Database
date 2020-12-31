@@ -46,6 +46,7 @@
 .ab-column-toggler .label {
   font-size: 15px;
   font-weight: 600;
+  display: block;
 }
 
 tei-g {
@@ -53,9 +54,9 @@ tei-g {
   line-height: 1;
   margin: 0 5px;
 }
-
 span {
   display: inline-flex;
+  text-decoration: inherit;
 }
 tei-hi[rend*=indent] tei-lb + span,
 tei-hi[rend*=indent] tei-w[type=elision] + span {
@@ -88,6 +89,7 @@ tei-metamark[function="hr"] {
   background-size: 50px 1px;
   border-bottom: 1px solid #aaa;
   display: block;
+  margin: 1rem 0;
 }
 
 tei-ab {

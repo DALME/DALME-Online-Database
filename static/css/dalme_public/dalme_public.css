@@ -1279,13 +1279,14 @@ i.inactive {
   padding: .25rem;
   background-color: rgb(62 62 62 / 7%);
   backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   position: absolute;
   bottom: 0;
   right: 0;
   left: 0;
   max-height: 30px;
 }
-.folios .folio-rights p {
+.folios .folio-rights div {
   font-size: 0.9rem;
   margin: auto;
   font-family: "Open Sans", sans-serif;
@@ -2950,6 +2951,7 @@ section.transcription {
   z-index: 2;
   background-color: rgb(109 109 109 / 68%);
   backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
   border-bottom: 1px solid #6b6b6b87;
   padding: 2rem 2rem;
 }
