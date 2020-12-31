@@ -185,6 +185,18 @@
           <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
           <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
           <script>
+            const Cite = require('citation-js');
+            let _data = JSON.parse($('#citation_data').detach().text());
+            const formats = _data[0];
+            let config = Cite.plugins.config.get('csl');
+            for (let i = 0, len = formats.length; i < len; ++i) {
+              if (formats[i].file) {
+                $.ajax({ method: "GET", url: `/static/citation_styles/${formats[i].file}`})
+                .done(function(xml_data) {
+                  config.templates.add(formats[i].name, xml_data);
+                })
+              }
+            }
             const cite_app = new Vue({
               el: '#cite-container',
               delimiters: ['${', '}'],
@@ -192,18 +204,6 @@
                 onClickaway: window.VueClickaway.directive,
               },
               created() {
-                const Cite = require('citation-js');
-                let _data = JSON.parse($('#citation_data').detach().text());
-                let formats = _data[0];
-                let config = Cite.plugins.config.get('csl');
-                for (let i = 0, len = formats.length; i < len; ++i) {
-                  if (formats[i].file) {
-                    $.ajax({ method: "GET", url: `/static/citation_styles/${formats[i].file}`})
-                    .done(function(xml_data) {
-                      config.templates.add(formats[i].name, xml_data);
-                    })
-                  }
-                }
                 this.formats = formats;
                 this.citation = new Cite(_data[1]);
                 this.updateCitation('harvard1');
