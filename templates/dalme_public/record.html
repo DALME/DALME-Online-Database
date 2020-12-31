@@ -258,8 +258,8 @@
       class="transcription"
       v-bind:class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]">
       <beat-loader v-show="loading" color="#aaa"></beat-loader>
-      <div class="warning" v-if="!transcriptionId">This folio has not been transcribed.</div>
-      <div v-html="renderedTranscription"></div>
+      <div class="empty-folio-warning" v-if="!transcriptionId">This folio has not been transcribed.</div>
+      <div v-if="transcriptionId" v-html="renderedTranscription"></div>
     </section>
   </div>
 </div>
