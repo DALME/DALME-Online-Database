@@ -48,11 +48,6 @@
             autocapitalize="off"
             spellcheck="false"
           >
-          <div
-            class="btn search-button clear-search clear-search-box"
-            :class="{ 'd-none' : search == null }"
-            @click="searchBoxClear"
-          >Clear</div>
         </li>
         <li class="dropdown p-0 nav_button">
           <div class="filter dropdown-button" id="filter_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -647,10 +642,7 @@
         updateURL(params, urlPath = null) {
           let base_url = urlPath ? this.url(urlPath) : this.url();
           const url = params ? `${base_url}?${params}` : base_url;
-          window.history.pushState(null, null, url);
-        },
-        searchBoxClear() {
-          this.search = null
+          window.history.replaceState(null, null, url);
         },
         clearSelect(field) {
           this.filterData(field, '');
