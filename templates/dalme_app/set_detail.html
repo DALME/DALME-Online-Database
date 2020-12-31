@@ -199,7 +199,7 @@
               className: "align-self-end"
             }]
         });
-        $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa fa-plus-square fa-fw"></i> Set Members ({{ members.count }})');
+        $('#dataTables-members_wrapper').find('.card-header-title').html('<i class="fa fa-plus-square fa-fw"></i> Set Members ({{ members.count }}, {{ object.get_public_member_count|default_if_none:0 }} public)');
         fix_dt_search();
     });
   </script>
