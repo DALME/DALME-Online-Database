@@ -810,6 +810,8 @@ class Collection(SearchEnabled):
         return self.source_set.members.all()
 
     def clean(self):
+        if self.source_set:
+            self.slug = self.source_set.name.replace(' ', '-').lower()
         if self.alias_type is not None and self.set_type != self.alias_type:
             mismatch = f'{self.set_type} != {self.alias_type}'
             raise ValidationError(
