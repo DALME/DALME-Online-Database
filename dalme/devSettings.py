@@ -270,7 +270,7 @@ ELASTICSEARCH_DSL = {
         'use_ssl': True,
         'verify_certs': True,
         'connection_class': elasticsearch.RequestsHttpConnection,
-        'timeout': 240,  # Custom timeout
+        'timeout': 340,  # Custom timeout
     },
 }
 ELASTICSEARCH_DSL_AUTOSYNC = True
