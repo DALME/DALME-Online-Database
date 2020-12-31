@@ -626,7 +626,7 @@ nav.browse a {
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  font-family: "Azul", serif;
+  font-family: "Asul", serif;
   color: black;
   font-style: normal;
   font-weight: 500;
@@ -3163,4 +3163,16 @@ section.transcription {
 }
 .inventory-field.icons i.active {
   color: #358738;
+}
+
+.empty-folio-warning {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b6b6b;
+  border-top: 1px dotted #d4d4d4;
+  border-bottom: 1px dotted #d4d4d4;
+  padding: 1rem;
+  display: block;
+  width: 100%;
+  text-align: center;
 }
