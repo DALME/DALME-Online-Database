@@ -33,6 +33,6 @@ pycurl==7.43.0.5
 requests==2.24.0
 requests-aws4auth==1.0.1
 urllib3==1.25.10
-wagtail==2.11.3
+wagtail==2.10.2
 wagtail-modelchooser==2.3.3
 whitenoise==5.2.0
