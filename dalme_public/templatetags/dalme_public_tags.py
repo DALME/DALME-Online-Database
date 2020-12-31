@@ -4,7 +4,6 @@ import json
 import urllib
 
 from django import template
-# from django.db.models.functions import Coalesce
 from elasticsearch_dsl.utils import AttrDict
 
 from dalme_public.serializers import PublicSourceSerializer
@@ -84,7 +83,7 @@ def get_breadcrumbs_nav(context):
     explore = context.get('explore')
 
     if records or record:
-        collection = context['request'].GET.get('collection', False)
+        # collection = context['request'].GET.get('collection', False)
         breadcrumbs[-1].update({'active': False})
         breadcrumbs = [
             *breadcrumbs,
@@ -502,7 +501,9 @@ def js_trans(value, mode=None):
         return 'false'
     elif value is True:
         return 'true'
-    elif type(value) in [int, list]:
+    elif (type(value) in [int, list, dict]
+          or value.startswith('"') and value.endswith('"')
+          or value.startswith('\'') and value.endswith('\'')):
         return value
     else:
-        return f'"{value}"'
+        return value if value.startswith('"') and value.endswith('"') else f'"{value}"'

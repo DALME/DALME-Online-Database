@@ -114,7 +114,7 @@ class Thumbnail(View):
 
 class SourceList(ListAPIView):
     model = Source
-    queryset = Source.objects.all()
+    queryset = Source.objects.filter(type=13, workflow__is_public=True)
     serializer_class = PublicRecordSerializer
     pagination_class = DALMEPagination
     filterset_class = SourceFilter
@@ -147,7 +147,6 @@ class SourceList(ListAPIView):
 
         else:
             qs = super().get_queryset(*args, **kwargs).order_by('name')
-            qs = qs.filter(type=13, workflow__is_public=True)
             qs = qs.prefetch_related(
                 'attributes', 'attributes__attribute_type'
             )
