@@ -83,9 +83,10 @@ def redirects(page, request, serve_args, serve_kwargs):
 @register_model_chooser
 class SourceChooser(Chooser):
     model = Source
+    modal_template = 'dalme_public/includes/_source_chooser_modal.html'
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request).order_by('name')
+        qs = Source.objects.filter(type=13, workflow__is_public=True).order_by('name')
         if request.GET.get('search'):
             qs = qs.filter(name__icontains=request.GET['search'])
         return qs
