@@ -138,14 +138,10 @@ class PublicSource(PublicSourceBase):
             return dict(attribute_list)
 
     def prepare_collections(self, instance):
-        try:
-            if instance.sets.all().count() > 0:
-                cols = [('name', set.set_id.name) for set in instance.sets.all() if set.set_id.set_type == 2]
-                if cols:
-                    return dict(cols)
-                else:
-                    return [{'name': 'none'}]
-        except ObjectDoesNotExist:
+        cols = instance.sets.filter(set_id__set_type=2)
+        if cols.exists():
+            return [{'name': i.set_id.name} for i in cols]
+        else:
             return [{'name': 'none'}]
 
     def prepare_credits(self, instance):

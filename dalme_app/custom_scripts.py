@@ -251,13 +251,10 @@ def geolocate_locales(request):
     return errors
 
 def test_expression(request):
-    # attributes = Attribute.objects.filter(attribute_type__data_type__in=['FK-UUID', 'FK-INT'], value_JSON__isnull=False)
-    # for attribute in attributes:
-    #     attribute.save()
-    #     # _id = '"{}"'.format(self.value_JSON['id']) if self.attribute_type.data_type == 'FK-UUID' else self.value_JSON['id']
-    #     # self.value_STR = str(eval('{}.objects.get(pk={})'.format(self.value_JSON['class'], _id)))
-    # return attributes[1000].value_STR
-    return 'ok'
+    instance = Source.objects.get(id='82a803bc-31a9-4d2b-90aa-2901ba0d2fa0')
+    set_count = instance.sets.all().count()
+    cols = [{'name': set.set_id.name} for set in instance.sets.all() if set.set_id.set_type == 2]
+    return cols
 
 def fix_users(records):
     # records = Attribute.objects.all()
