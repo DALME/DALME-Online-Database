@@ -157,7 +157,6 @@ MIDDLEWARE = [
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
-    'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
 ]
@@ -270,7 +269,7 @@ ELASTICSEARCH_DSL = {
         'use_ssl': True,
         'verify_certs': True,
         'connection_class': elasticsearch.RequestsHttpConnection,
-        'timeout': 340,  # Custom timeout
+        'timeout': 360,  # Custom timeout
     },
 }
 ELASTICSEARCH_DSL_AUTOSYNC = True
