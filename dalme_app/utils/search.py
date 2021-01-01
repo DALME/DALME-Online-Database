@@ -88,7 +88,7 @@ class Search():
             paginator = {
                 'total_count': total_count,
                 'result_start': start_offset + 1,
-                'result_end': result_end - 1,
+                'result_end': result_end - 1 if result_end != total_count else result_end,
                 'num_pages': num_pages,
                 'current_page': self.page,
                 'previous_page': self.page - 1,

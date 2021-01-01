@@ -234,10 +234,10 @@ tei-lb:after {
 
 /* independent soft-wrap */
 section.transcription.soft-wrap tei-text > tei-body {
-  white-space: pre-line !important;
+  white-space: pre-wrap !important;
 }
 section.transcription.soft-wrap tei-lb::after {
-  white-space: pre-line;
+  white-space: pre-wrap;
 }
 section.transcription.show-newlines tei-lb::before {
   content: ' ';
@@ -283,7 +283,7 @@ section.transcription.basic {
   overflow: scroll;
 }
 section.transcription.basic tei-text > tei-body {
-  white-space: pre-line;
+  white-space: pre-wrap;
 }
 section.transcription.basic tei-del,
 section.transcription.basic tei-pc {

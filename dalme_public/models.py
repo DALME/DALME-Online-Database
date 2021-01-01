@@ -659,7 +659,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         context = self.get_context(request)
         context.update({
             'records': True,
-            'browse_mode': request.session.get('public-browse-mode', 'detail')
+            'browse_mode': request.session.get('public-browse-mode', 'wide')
         })
 
         try:

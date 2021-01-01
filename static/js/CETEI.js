@@ -781,7 +781,7 @@ var CETEI = function () {
             else {
                 // ORIGINAL: newElement.appendChild(node.cloneNode());
                 // ADDITION: wrapping text elements in <span> tag
-                if (node.textContent.trim()) {
+                if (node.cloneNode().textContent.trim()) {
                   let span = document.createElement("SPAN");
                   span.innerText = node.textContent;
                   newElement.appendChild(span);

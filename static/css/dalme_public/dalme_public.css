@@ -987,7 +987,6 @@ i.inactive {
 }
 .app nav li.search {
   border-left: 1px solid #aaa;
-  padding-right: 70px;
   margin-left: auto;
 }
 .app nav li.search > input {
@@ -1268,6 +1267,7 @@ i.inactive {
 }
 .folios.vertical-split section.transcription {
   padding: 1.5rem;
+  padding-right: 0;
   border-left: 3px solid #354d87;
 }
 .folios.horizontal-split section.transcription {
@@ -3177,4 +3177,43 @@ section.transcription {
   display: block;
   width: 100%;
   text-align: center;
+}
+
+parsererror {
+  white-space: normal;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  border: none !important;
+  border-bottom: 1px dotted #ef8c83 !important;
+  border-top: 1px dotted #ef8c83 !important;
+  background-color: transparent !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  font-family: "Open Sans", sans-serif;
+}
+
+parsererror h3 {
+  font-size: 16px !important;
+  color: #986561 !important;
+  margin-bottom: 0 !important;
+}
+
+parsererror div {
+  margin: .5rem .5rem;
+}
+
+#tei-container {
+  position: relative;
+}
+
+#notebar {
+  position: absolute;
+  width: 20px;
+  background-color: #6b6b6bad;
+  height: 100%;
+  right: 0;
+  top: 0;
 }

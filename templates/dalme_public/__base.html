@@ -183,12 +183,14 @@
           {{ citation.2 | safe }}
           {{ citation | json_script:"citation_data" }}
           <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.0-9"></script>
+          <!--script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script-->
+          <!--script src="https://cdn.jsdelivr.net/npm/citation-js@0.5.0-alpha.9/build/citation.min.js" integrity="sha256-8ylR6w3Vn9WiUCEGB2ScAUvOJbyBHALDDdw3xQwhbH8=" crossorigin="anonymous"></script-->
+          <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.js" integrity="sha256-Q1Pp1idp+sbT0HJtP+jE41gkFlby2mDGkdk1cifudTs=" crossorigin="anonymous"></script>
           <script>
             const Cite = require('citation-js');
             let _data = JSON.parse($('#citation_data').detach().text());
             const formats = _data[0];
-            let config = Cite.plugins.config.get('csl');
+            let config = Cite.plugins.config.get('@csl');
             for (let i = 0, len = formats.length; i < len; ++i) {
               if (formats[i].file) {
                 $.ajax({ method: "GET", url: `/static/citation_styles/${formats[i].file}`})
@@ -206,7 +208,7 @@
               created() {
                 this.formats = formats;
                 this.citation = new Cite(_data[1]);
-                this.updateCitation('harvard1');
+                this.updateCitation('harvard1', 'bibliography');
               },
               data: {
                 citation: null,
@@ -224,15 +226,15 @@
                 }
               },
               methods: {
-                formatCitation(template, format=this.format, output_format='bibliography') {
+                formatCitation(template, output_format, format=this.format, ) {
                   return this.citation.format(output_format, {
                       format: format,
                       template: template,
                       lang: this.lang
                     });
                 },
-                updateCitation(template) {
-                  this.formatted_citation = this.formatCitation(template);
+                updateCitation(template, output_format) {
+                  this.formatted_citation = this.formatCitation(template, output_format);
                   this.template = template;
                 },
                 showCopiedTooltip() {
@@ -241,7 +243,7 @@
                   setTimeout(() => this.showCopied = false, 800)
                 },
                 downloadCitation(format) {
-                  const blob = new Blob([this.formatCitation(this.template, 'text', format)], {
+                  const blob = new Blob([this.formatCitation(this.template, format, 'text')], {
                     encoding: 'UTF-8',
                     type: 'text/plain;charset=UTF-8'
                   })
@@ -253,7 +255,7 @@
                 },
                 closeCitePanel() {
                   this.showCitePanel = false;
-                },
+                }
               }
             });
           </script>
