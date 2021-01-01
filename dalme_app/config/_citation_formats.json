@@ -3,24 +3,28 @@
     "name": "apa",
     "label": "American Psychological Association",
     "file": null,
+    "output_format": "bibliography",
     "divider": false
   },
   {
     "name": "chicago_16",
     "label": "Chicago (16th edition)",
     "file": "chicago-author-date-16th-edition.csl",
+    "output_format": "bibliography",
     "divider": false
   },
   {
     "name": "harvard1",
     "label": "Harvard",
     "file": null,
+    "output_format": "bibliography",
     "divider": false
   },
   {
     "name": "turabian",
     "label": "Turabian (9th edition)",
     "file": "turabian-author-date.csl",
+    "output_format": "bibliography",
     "divider": false
   },
   {
@@ -30,18 +34,28 @@
     "name": "aja",
     "label": "American Journal of Archaeology",
     "file": "american-journal-of-archaeology.csl",
+    "output_format": "bibliography",
     "divider": false
   },
   {
     "name": "arch_med",
     "label": "Archéologie médiévale",
     "file": "archeologie-medievale.csl",
+    "output_format": "bibliography",
     "divider": false
   },
   {
     "name": "saa",
     "label": "Society for American Archaeology",
     "file": "society-for-american-archaeology.csl",
+    "output_format": "bibliography",
+    "divider": false
+  },
+  {
+    "name": "zm",
+    "label": "Zeitschrift für Medienwissenschaft",
+    "file": "zeitschrift-fur-medienwissenschaft.csl",
+    "output_format": "citation",
     "divider": false
   }
 ]

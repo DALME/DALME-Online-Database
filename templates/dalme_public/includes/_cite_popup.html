@@ -20,7 +20,7 @@
           <b-dropdown-item
             v-else
             v-bind:class="{ active: template == format.name }"
-            @click="updateCitation(format.name)">
+            @click="updateCitation(format.name, format.output_format)">
             ${format.label}
           </b-dropdown-item>
         </template>
