@@ -50,12 +50,5 @@
     "file": "society-for-american-archaeology.csl",
     "output_format": "bibliography",
     "divider": false
-  },
-  {
-    "name": "zm",
-    "label": "Zeitschrift für Medienwissenschaft",
-    "file": "zeitschrift-fur-medienwissenschaft.csl",
-    "output_format": "citation",
-    "divider": false
   }
 ]

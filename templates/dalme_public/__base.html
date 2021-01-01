@@ -199,6 +199,7 @@
                 })
               }
             }
+            const citation = new Cite(_data[1]);
             const cite_app = new Vue({
               el: '#cite-container',
               delimiters: ['${', '}'],
@@ -207,7 +208,7 @@
               },
               created() {
                 this.formats = formats;
-                this.citation = new Cite(_data[1]);
+                this.citation = citation;
                 this.updateCitation('harvard1', 'bibliography');
               },
               data: {
@@ -227,7 +228,7 @@
               },
               methods: {
                 formatCitation(template, output_format, format=this.format, ) {
-                  return this.citation.format(output_format, {
+                  return citation.format(output_format, {
                       format: format,
                       template: template,
                       lang: this.lang
