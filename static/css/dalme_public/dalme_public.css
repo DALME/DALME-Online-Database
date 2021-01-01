@@ -1284,10 +1284,13 @@ i.inactive {
 .folios.horizontal-split section.folio {
   width: 100%;
   max-height: fit-content;
+  position: relative;
+}
+.folios.horizontal-split section.folio .folio-rights {
+  bottom: -7px;
 }
 .folios.vertical-split section.transcription {
   padding: 1.5rem;
-  padding-right: 0;
   border-left: 3px solid #354d87;
 }
 .folios.horizontal-split section.transcription {

@@ -260,7 +260,6 @@
       <beat-loader v-show="loading" color="#aaa"></beat-loader>
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
       <div v-if="transcriptionId" v-html="renderedTranscription" id="tei-container"></div>
-      <div v-if="transcriptionId" id="notebar"></div>
     </section>
   </div>
 </div>
