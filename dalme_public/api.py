@@ -1,5 +1,3 @@
-import datetime
-
 from django.core.paginator import InvalidPage
 from django.http import JsonResponse
 from django.views import View
@@ -18,7 +16,7 @@ from dalme_app.utils import Search, SearchContext
 
 
 class DALMEPagination(pagination.PageNumberPagination):
-    page_size = 24
+    page_size = 25
 
     def get_next_link(self):
         if not self.page.has_next():
@@ -76,7 +74,7 @@ class DALMEPagination(pagination.PageNumberPagination):
             'currentPage': current_page,
             'page_numbers': page_numbers,
             'page_start': start_offset + 1,
-            'page_end': result_end - 1
+            'page_end': result_end - 1 if result_end != total_count else result_end,
         })
 
 
