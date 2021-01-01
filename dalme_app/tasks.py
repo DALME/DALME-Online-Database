@@ -35,11 +35,6 @@ def update_rs_folio_field(user_id):
 
 def update_search_index(user_id):
     call_command('search_index', '--rebuild', '-f')
-    return {
-        'message': 'Search indices are being updated,',
-        'level': constants.INFO,
-        'user_id': user_id
-    }
 
 
 def wagtail_publish_pages():
