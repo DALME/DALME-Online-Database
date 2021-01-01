@@ -258,8 +258,9 @@
       class="transcription"
       v-bind:class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]">
       <beat-loader v-show="loading" color="#aaa"></beat-loader>
-      <div class="empty-folio-warning" v-if="!transcriptionId">This folio has not been transcribed.</div>
-      <div v-if="transcriptionId" v-html="renderedTranscription"></div>
+      <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
+      <div v-if="transcriptionId" v-html="renderedTranscription" id="tei-container"></div>
+      <div v-if="transcriptionId" id="notebar"></div>
     </section>
   </div>
 </div>
@@ -331,7 +332,7 @@
           var title = '';
           if (unit.startsWith('word') || unit.startsWith('char')) {
             if (quantity) {
-              content = fillers[unit.slice(0,3)].repeat(quantity).trim();
+              content = fillers[unit.slice(0,4)].repeat(quantity).trim();
               title = `${quantity} missing ${unit}`;
               if (reason) title += ` (${reason})`;
             } else {
@@ -732,7 +733,7 @@
           handleFlipView(split) {
             window.eventBus.$emit('flipView', this.eventData);
             // window.eventBus.$emit('renderFolio', this.eventData, false);
-            this.incrementDivaId();
+            // this.incrementDivaId();
             this.viewerMode = split;
             this.handleHelpPlacement = split == 'vertical-split' ? 'right' : 'top';
           },
@@ -796,13 +797,18 @@
               fetch(`{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${this.transcriptionId}/?format=json`)
                 .then(response => response.json())
                 .then(data => {
-                  let tr_text = data.transcription.replace(/\n/g, '<lb/>');
-                  const tei_block = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>${tr_text}</body></text></TEI>`;
-                  that.tei.makeHTML5(tei_block, function (data) {
-                    that.loading = false;
-                    that.renderedTranscription = data.outerHTML;
-                    setTimeout(() => that.toggleTeiContainers(), 0);
-                  });
+                  if (data.transcription != '') {
+                    let tr_text = data.transcription.replace(/\n/g, '<lb/>');
+                    const tei_block = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>${tr_text}</body></text></TEI>`;
+                    that.tei.makeHTML5(tei_block, function (data) {
+                      that.loading = false;
+                      that.renderedTranscription = data.outerHTML;
+                      setTimeout(() => that.toggleTeiContainers(), 0);
+                    });
+                  } else {
+                    this.loading = false;
+                    that.renderedTranscription = null;
+                  }
               });
             }
           },
@@ -819,7 +825,26 @@
             let tei_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
             $('tei-metamark[function=leader]').each(function(index, el) {
               let sum = 0;
-              const line_el = $.merge($(this).prevUntil('tei-lb'), $(this).nextUntil('tei-lb'));
+              let prev_array = [];
+              let next_array = [];
+              let prevSibs = $(this).prevUntil('tei-lb');
+              let prevChild = $(this).prevUntil('*:has(tei-lb)');
+              let nextSibs = $(this).nextUntil('tei-lb');
+              let nextChild = $(this).nextUntil('*:has(tei-lb)');
+              if (prevChild.length < prevSibs.length) {
+                let prev_el = prevChild.length ? prevChild : this;
+                prev_array = $.merge(prevChild, $(prev_el).prev().children().nextUntil('tei-lb'));
+              } else {
+                prev_array = prevSibs;
+              }
+              if (nextChild.length < nextSibs.length) {
+                let next_el = nextChild.length ? nextChild : this;
+                next_array = $.merge(nextChild, $(next_el).next().children().nextUntil('tei-lb'));
+                console.log(next_array)
+              } else {
+                next_array = nextSibs;
+              }
+              const line_el = $.merge(prev_array, next_array)
               line_el.each(function(i, elt) { sum += $(this).width(); });
               let container_width = tei_width;
               if ($(this).parent().hasClass('ab-content')) {
