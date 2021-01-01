@@ -1,4 +1,4 @@
-{% load static dalme_public_tags wagtailimages_tags wagtailuserbar compress %}
+{% load static dalme_public_tags wagtailimages_tags wagtailuserbar wagtailcore_tags compress %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
   <head>
@@ -54,7 +54,6 @@
 
       <footer class="u-flex" id="footer-app">
         {% footer %}
-        {% include "dalme_public/includes/_share_popup.html" %}
       </footer>
 
       {% block js_foot %}
@@ -149,31 +148,11 @@
               delimiters: ['${', '}'],
               created() {
                 const clipboard_copy = new ClipboardJS('#clip_copy');
-                this.format('html')
               },
               data: {
                 page_title: '{{ page.title }}',
-                page_url: '{{ page.url }}',
-                show_menu: false,
-                show_copied: false,
-                content: null
+                page_url: '{{ request.build_absolute_uri }}',
               },
-              methods: {
-                showCopiedTooltip() {
-                  this.show_menu = false;
-                  this.show_copied = true;
-                  setTimeout(() => this.show_copied = false, 800)
-                },
-                format(type) {
-                  switch (type) {
-                    case 'html':
-                      this.content = `<a href=${this.page_url}>${this.page_title}</a>`
-                      break;
-                    default:
-                      return 'HEY!'
-                  }
-                }
-              }
             });
           });
         </script>
@@ -263,6 +242,5 @@
       {% endif %}
     </body>
   {% endwith %}
-
   {% wagtailuserbar 'bottom-right' %}
 </html>

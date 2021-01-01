@@ -1,16 +1,39 @@
 {% if 'button' in value.css_class %}
-<div class="footer-button {{ value.css_class }}" @click="show_menu = !show_menu" id="share-button">
-  <i class="{{ value.fa_icon }}"></i>
-</div>
-<b-popover
-  variant="dark"
-  target="share-button"
-  placement="top"
-  :show="show_copied"
-  triggers="manual"
-  v-cloak>
-  Copied!
-</b-popover>
+<b-dropdown
+  id="share-button"
+  ref="shareDropdown"
+  class="footer-button {{ value.css_class }}"
+  href="#"
+  right
+  no-caret
+  menu-class="dropdown-menu p-0 pt-3 pb-3"
+  toggle-class="social footer-button border-0"
+  toggle-tag="a">
+  <template #button-content>
+    <i class="share {{ value.fa_icon }}"></i>
+  </template>
+  <b-dropdown-item
+    class="dropdown-item"
+    href="mailto:?subject=subject&body=body"
+    target="_blank">
+    <i class="fa fa-envelope fa-fw"></i> Email
+  </b-dropdown-item>
+  <b-dropdown-item
+    id="clip_copy"
+    class="dropdown-item"
+    href="sms:1234567?body=hello world"
+    target="_blank">
+    <i class="fa fa-comment fa-fw"></i> Message
+  </b-dropdown-item>
+  <b-dropdown-divider></b-dropdown-divider>
+  <b-dropdown-item
+    id="clip_copy"
+    class="dropdown-item"
+    href="#"
+    :data-clipboard-text="page_url">
+    <i class="fa fa-link fa-fw"></i> Copy link
+  </b-dropdown-item>
+</b-dropdown>
 {% else %}
 <a class="{{ value.css_class }}" href="{% if value.url %} {{ value.url }}  {% else %} # {% endif %}">
   <i class="{{ value.fa_icon }}"></i>

@@ -824,10 +824,30 @@ nav.footer ul li a:hover {
 .social > i:not(:first-child):not(:last-child) {
   margin: 0 0.3rem;
 }
-
-.social i:hover {
-  color: #fff;
+.social i:hover,
+.social i:active {
+  color: #fff !important;
 }
+#share-button {
+  vertical-align: unset;
+  display: inline-flex;
+}
+#share-button i.share {
+  font-size: 1.7rem;
+  color: #5e5e5e;
+}
+#share-button a,
+#share-button a:active,
+#share-button a:focus {
+  padding: 0;
+  display: inline;
+  box-shadow: none;
+  background: none;
+}
+#share-button a:hover {
+  background: none;
+}
+
 
 /* Inventories */
 main.inventories > article {
