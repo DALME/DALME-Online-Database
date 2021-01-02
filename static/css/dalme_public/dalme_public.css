@@ -3240,3 +3240,8 @@ parsererror div {
   right: 0;
   top: 0;
 }
+
+#diva_viewer {
+  display: flex;
+  flex: 1 1 auto;
+}

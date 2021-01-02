@@ -22,15 +22,23 @@
   <div class="app inventory-toolbar">
     <nav v-cloak>
       <ul class="u-flex">
-        <li :id=`diva-${divaId}-zoom-out-button` class="zoom out nav_button" @click="handleZoomOut">
+        <li
+          id="diva-1-zoom-out-button"
+          class="zoom out nav_button"
+          :class="{ inactive: zoomLevel <= divaMinZoom }"
+          @click="handleZoomOut">
           <i class="fa fa-search-minus" aria-hidden="true"></i>
         </li>
-        <li :id=`diva-${divaId}-zoom-in-button` class="zoom in nav_button" @click="handleZoomIn">
+        <li
+          id="diva-1-zoom-in-button"
+          class="zoom in nav_button"
+          :class="{ inactive: zoomLevel >= divaMaxZoom }"
+          @click="handleZoomIn">
           <i class="fa fa-search-plus" aria-hidden="true"></i>
         </li>
         <b-popover
           variant="dark"
-          :target=`diva-${divaId}-zoom-out-button`
+          target="diva-1-zoom-out-button"
           placement="bottomright"
           :show="showHelp"
           triggers="manual">
@@ -240,8 +248,12 @@
           {{ data.get_credit_line.credit_line }}
         </div>
       </div>
-      <div id="diva_viewer"></div>
-      <div id="folio-rights" class="folio-rights u-flex"></div>
+      <div id="diva_viewer">
+        <div v-if="!hasImage" class="diva-no-image"></div>
+      </div>
+      <div id="folio-rights" class="folio-rights u-flex" v-if="rightsNotice">
+        <div>${rightsNotice}</div>
+      </div>
     </section>
     <div id="resize-handle" class="resize-handle"></div>
     <b-popover
@@ -293,14 +305,13 @@
     $(document).ready(function() {
       setHeaderHeight();
       const splitter = $('div.folios');
+
       $(document).on('click', '.ab-column-toggler', (e) => {
           const parent = e.target.closest('tei-ab');
           parent.classList.toggle('closed');
       });
 
-      $(window).width() <= 600
-        ? splitter.addClass('horizontal-split')
-        : splitter.addClass('vertical-split')
+      $(window).width() <= 600 ? splitter.addClass('horizontal-split') : splitter.addClass('vertical-split');
 
       const setExtent = (e) => {
         const tag_name = e.tagName.slice(4,);
@@ -429,149 +440,6 @@
         }
       };
 
-      const renderImage = ({ pageId, zoomLevel, imageId }) => {
-        const node = $('#diva_viewer');
-        node.empty();
-        window.folio = new Diva('diva_viewer', {
-          objectData:`{{db_url}}pages/${pageId}/manifest/`,
-          enableAutoTitle: false,
-          enableFullscreen: false,
-          enableKeyScroll: false,
-          blockMobileMove: false,
-          enableSpaceScroll: false,
-          enableGotoPage: false,
-          enableGridIcon: false,
-          enableGridControls: false,
-          enableImageTitles: false,
-          enableToolbar: false,
-          enableAutoWidth: true,
-          adaptivePadding: 0,
-          fixedPadding: 0,
-          zoomLevel: zoomLevel || 2,
-        });
-        window.folioPageId = pageId;
-      };
-
-      Diva.Events.subscribe('ViewerDidLoad', () => resizeFolioAndRedraw());
-
-      const renderRights = (notice) => {
-        const node = $('#folio-rights');
-        node.empty();
-        node.html(`<div>${notice}</div>`)
-      };
-
-      const calcFolioHeight = () => {
-        const windowHeight = $(window).height();
-        const transcriptionHeight = $('#transcription').height();
-        const headerHeight = $('header').height();
-        const toolbarHeight = $('.inventory-toolbar').height();
-        const rightsHeight = $('.folio-rights').height();
-        const footerHeight = $('footer').height();
-
-        const fullHeight = windowHeight - (headerHeight + toolbarHeight + rightsHeight + footerHeight);
-        return Math.max(fullHeight, (transcriptionHeight - rightsHeight));
-      }
-
-      const resizeFolio = () => {
-        const ui = $('#diva_viewer');
-        ui.find('.diva-wrapper').width(ui.width()).height(calcFolioHeight());
-      }
-      window.addEventListener('resize', resizeFolio);
-
-      const resizeFolioAndRedraw = () => {
-        console.log('resizeFolioAndRedraw')
-        resizeFolio();
-        window.dispatchEvent(new Event('resize'));  // simulate window resize to trigger canvas resize because Diva.Events.publish('PanelSizeDidChange'); doesn't seem to work
-      }
-
-      window.eventBus = new Vue();
-      window.eventBus.$on('renderFolio', (data) => {
-        const endpoint = `{{api_url}}/pages/${data.pageId}/get_rights/`;
-        let image = false;
-        $.get(endpoint, function(rdata) {
-          if (rdata.rights && rdata.rights.hasOwnProperty('show_image') && rdata.rights.show_image) {
-            if (data.imageId) {
-              image = true;
-              renderImage(data);
-              if (rdata.rights.display_notice) {
-                renderRights(rdata.rights.notice);
-              }
-            }
-          }
-          if (!image) { $('#diva_viewer').html('<div class="diva-no-image"></div>'); }
-        }, 'json').then(() => {
-             $('.folio').resizableSafe({
-                 handleSelector: '#resize-handle',
-                 resizeHeight: $('.vertical-split').length ? false : true,
-                 resizeWidth: $('.vertical-split').length ? true : false,
-                 onDragEnd: function() {
-                     resizeFolioAndRedraw();
-                 }
-             });
-         });
-       });
-
-      window.eventBus.$on('zoomIn', () => {
-        if (window.folio) {
-          window.folio.zoomIn();
-        }
-      });
-
-      window.eventBus.$on('zoomOut', () => {
-        if (window.folio) {
-          window.folio.zoomOut();
-        }
-      });
-
-      window.eventBus.$on('flipView', data => {
-        resizeFolioAndRedraw();
-        const node = $('.folios');
-        const main = node.parent().parent();
-        if (node.hasClass('vertical-split')) {
-          node.removeClass('vertical-split').addClass('horizontal-split');
-          main.toggleClass('vertical-split', false);
-          main.toggleClass('horizontal-split', true);
-          node.find('.folio')
-            .resizableSafe({
-              handleSelector: '#resize-handle',
-              resizeWidth: false,
-              onDragEnd: function() {
-                resizeFolioAndRedraw();
-              },
-            })
-            .css({ width: '' });
-        } else {
-          node.removeClass('horizontal-split').addClass('vertical-split');
-          main.toggleClass('horizontal-split', false);
-          main.toggleClass('vertical-split', true);
-          node.find('.folio')
-            .resizableSafe({
-              handleSelector: '#resize-handle',
-              resizeHeight: false,
-              onDragEnd: function() {
-                if (data.imageId) {
-                  resizeFolioAndRedraw();
-                }
-              },
-            })
-            .css({ height: '' });
-        }
-      });
-
-      $('body').on('click', '#collapsible-handle', function(e) {
-        const target = $(e.target).closest('div.title');
-        const icon = target.find('i');
-        icon.hasClass('fa-chevron-down')
-          ? icon.removeClass('fa-chevron-down').addClass('fa-chevron-left')
-          : icon.removeClass('fa-chevron-left').addClass('fa-chevron-down');
-        $('div.description')
-          .attr('data-collapsed', function(index, attr) {
-            return attr === 'true' ? 'false' : 'true';
-          });
-        setHeaderHeight();
-      });
-
-      // Vue.config.devtools = true
       Vue.component('beat-loader', VueSpinner.BeatLoader);
       const app = new Vue({
         el: '#app',
@@ -580,7 +448,10 @@
           onClickaway: window.VueClickaway.directive,
         },
         mounted() {
-          window.eventBus.$emit('renderFolio', this.eventData);
+          this.renderFolio();
+          this.fetchTranscription();
+          this.updateCitation('harvard1', 'bibliography');
+          this.updateURL();
         },
         created() {
           window.addEventListener("resize", this.windowResized);
@@ -602,11 +473,8 @@
             }
           }
           this.citation = new Cite(this.citationData[1]);
-          this.updateCitation('harvard1', 'bibliography');
           this.tei = new CETEI();
           this.tei.addBehaviors(teiBehaviours);
-          this.fetchTranscription();
-          this.updateURL();
         },
         data: {
           showHelp: false,
@@ -618,7 +486,6 @@
           zoomLevel: 2,
           folioSelect: false,
           date: 0,
-          divaId: 1,
           showInfoPanel: true,
           renderMode: 'scholarly',
           viewerMode: 'vertical-split',
@@ -636,9 +503,35 @@
           loading: false,
           renderedTranscription: null,
           tei: null,
+          api_endpoint: '{{ api_url }}',
+          db_endpoint: '{{ db_url }}',
+          hasImage: false,
+          rightsNotice: null,
+          divaMaxZoom: 4,
+          divaMinZoom: 0,
+          divaOptions: {
+            enableAutoTitle: false,
+            enableFullscreen: false,
+            enableKeyScroll: false,
+            blockMobileMove: false,
+            enableSpaceScroll: false,
+            enableGotoPage: false,
+            enableGridIcon: false,
+            enableGridControls: false,
+            enableImageTitles: false,
+            enableToolbar: false,
+            enableAutoWidth: true,
+            adaptivePadding: 0,
+            fixedPadding: 0,
+            zoomLevel: 2,
+            // fillParentHeight: true,
+            tileHeight: 250, // default = 256
+            tileWidth: 250 // default = 256
+          }
         },
         watch: {
-          folioIndex: "fetchTranscription"
+          folioIndex: "switchFolio",
+          zoomLevel: "zoomViewer"
         },
         computed: {
           citationData() {
@@ -691,115 +584,64 @@
           folioInfo() {
             return this.hasFolios ? this.currentFolio : 'No folios';
           },
-          eventData() {
-            return {
-              pageId: this.folioId,
-              transcriptionId: this.transcriptionId,
-              zoomLevel: this.zoomLevel,
-              imageId: this.folioImageId
-            };
-          },
         },
         methods: {
-          incrementDivaId() {
-            this.divaId += 1;
-          },
-          handleZoomIn() {
-            // Keep track of the zoom level so it persists between page loads,
-            // but there's no need to pass it to the viewer via the event.
-            if (this.zoomLevel > 0) {
-              this.zoomLevel = --this.zoomLevel;
-              window.eventBus.$emit('zoomIn');
-            }
-          },
-          handleZoomOut() {
-            if (this.zoomLevel < 4) {
-              this.zoomLevel = ++this.zoomLevel;
-              window.eventBus.$emit('zoomOut');
-            }
-          },
           handleFolioPrevious() {
-            if (this.hasPrevious) {
-              this.folioIndex = --this.folioIndex;
-              window.eventBus.$emit('renderFolio', this.eventData);
-              this.incrementDivaId();
-              this.updateURL();
-            }
+            if (this.hasPrevious) --this.folioIndex;
           },
           handleFolioNext() {
-            if (this.hasNext) {
-              this.folioIndex = ++this.folioIndex;
-              window.eventBus.$emit('renderFolio', this.eventData);
-              this.incrementDivaId();
-              this.updateURL();
-            }
+            if (this.hasNext) ++this.folioIndex;
           },
           handleFolioSelect(index) {
             if (this.folioIndex !== index) {
               this.folioIndex = index;
-              window.eventBus.$emit('renderFolio', this.eventData);
-              this.incrementDivaId();
               this.folioSelect = false;
-              this.updateURL();
             }
           },
-          handleFlipView(split) {
-            window.eventBus.$emit('flipView', this.eventData);
-            // window.eventBus.$emit('renderFolio', this.eventData, false);
-            // this.incrementDivaId();
-            this.viewerMode = split;
-            this.handleHelpPlacement = split == 'vertical-split' ? 'right' : 'top';
+          handleZoomIn() {
+            if (this.zoomLevel + 1 <= this.divaMaxZoom) ++this.zoomLevel;
           },
-          toggleInfoPanel() {
-            this.showInfoPanel = this.showInfoPanel ? false : true;
+          handleZoomOut() {
+            if (this.zoomLevel - 1 >= this.divaMinZoom) --this.zoomLevel;
           },
-          changeRenderMode(mode) {
-            this.renderMode = mode;
-            this.softWrap = mode == 'basic' ? true : false;
-            setTimeout(() => this.toggleTeiContainers(), 0);
+          zoomViewer() {
+            console.log(this.zoomLevel)
+            window.folio.setZoomLevel(this.zoomLevel);
           },
-          toggleTextWrap() {
-            if (this.renderMode == 'scholarly') {
-              this.softWrap = this.softWrap ? false : true;
-            }
+          switchFolio() {
+            this.fetchTranscription();
+            this.renderFolio();
+            this.updateURL();
           },
-          formatCitation(template, output_format, format=this.format) {
-            return this.citation.format(output_format, {
-                format: format,
-                template: template,
-                lang: this.lang
-              });
+          renderFolio() {
+            const that = this;
+            $.get(`${this.api_endpoint}/pages/${this.folioId}/get_rights/`, function(data) {
+              if (data.rights && data.rights.hasOwnProperty('show_image') && data.rights.show_image) {
+                if (that.folioImageId) {
+                  that.hasImage = true;
+                  that.renderImage();
+                  if (data.rights.display_notice) {
+                    that.rightsNotice = data.rights.notice;
+                  }
+                }
+              }
+            }, 'json').then(() => {
+                 $('.folio').resizableSafe({
+                     handleSelector: '#resize-handle',
+                     resizeHeight: $('.vertical-split').length ? false : true,
+                     resizeWidth: $('.vertical-split').length ? true : false,
+                     onDragEnd: function() { window.dispatchEvent(new Event('resize')); }
+                 });
+             });
           },
-          updateCitation(template, output_format) {
-            this.formatted_citation = this.formatCitation(template, output_format);
-            this.template = template;
-          },
-          showCopiedTooltip() {
-            this.showCitePanel = false;
-            this.showCopied = true;
-            setTimeout(() => this.showCopied = false, 800);
-          },
-          downloadCitation(format) {
-            const blob = new Blob([this.formatCitation(this.template, format, 'text')], {
-              encoding: 'UTF-8',
-              type: 'text/plain;charset=UTF-8'
-            })
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob)
-            link.download = `citation${this.file_extensions[format]}`
-            link.click()
-            URL.revokeObjectURL(link.href)
-          },
-          closeCitePanel() {
-            this.showCitePanel = false;
-          },
-          toggleHelpTips() {
-            let state = this.showHelp ? false : true;
-            if(state) {
-              this.$refs.optionsDropdown.show();
-              setTimeout(() => this.showHelp = state, 80);
+          renderImage() {
+            if (!window.folio) {
+              this.divaOptions['objectData'] = `${this.db_endpoint}/pages/${this.folioId}/manifest/`;
+              window.folio = new Diva('diva_viewer', this.divaOptions);
+              Diva.Events.subscribe('DocumentDidLoad',() => window.dispatchEvent(new Event('resize')));
             } else {
-              this.showHelp = state;
+              this.zoomLevel = 2;
+              window.folio.changeObject(`${this.db_endpoint}/pages/${this.folioId}/manifest/`);
             }
           },
           fetchTranscription() {
@@ -825,13 +667,53 @@
               });
             }
           },
-          childrenAllHidden(container) {
-            const all_children = $(container).children(':not(tei-lb)');
-            const hidden_children = $(container).children(':not(tei-lb)').filter(function() {
-              return $(this).css('display') == 'none';
-            });
-            let all_hidden = all_children.length === hidden_children.length ? true : false;
-            return all_hidden
+          handleFlipView(split) {
+            const node = $('.folios');
+            const main = node.parent().parent();
+            if (node.hasClass('vertical-split')) {
+              node.removeClass('vertical-split').addClass('horizontal-split');
+              main.toggleClass('vertical-split', false);
+              main.toggleClass('horizontal-split', true);
+              node.find('.folio').resizableSafe({
+                  handleSelector: '#resize-handle',
+                  resizeWidth: false,
+                  onDragEnd: function() { window.dispatchEvent(new Event('resize')); },
+                }).css({ width: '' });
+            } else {
+              node.removeClass('horizontal-split').addClass('vertical-split');
+              main.toggleClass('horizontal-split', false);
+              main.toggleClass('vertical-split', true);
+              node.find('.folio').resizableSafe({
+                  handleSelector: '#resize-handle',
+                  resizeHeight: false,
+                  onDragEnd: function() { window.dispatchEvent(new Event('resize')); },
+                }).css({ height: '' });
+            }
+            this.viewerMode = split;
+            this.handleHelpPlacement = split == 'vertical-split' ? 'right' : 'top';
+            window.dispatchEvent(new Event('resize'));
+          },
+          formatCitation(template, output_format, format=this.format) {
+            return this.citation.format(output_format, {
+                format: format,
+                template: template,
+                lang: this.lang
+              });
+          },
+          updateCitation(template, output_format) {
+            this.formatted_citation = this.formatCitation(template, output_format);
+            this.template = template;
+          },
+          downloadCitation(format) {
+            const blob = new Blob([this.formatCitation(this.template, format, 'text')], {
+              encoding: 'UTF-8',
+              type: 'text/plain;charset=UTF-8'
+            })
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob)
+            link.download = `citation${this.file_extensions[format]}`
+            link.click()
+            URL.revokeObjectURL(link.href)
           },
           adjustTeiRendering() {
             // leaders
@@ -868,6 +750,14 @@
             });
             $('[data-toggle="tooltip"]').tooltip();
           },
+          childrenAllHidden(container) {
+            const all_children = $(container).children(':not(tei-lb)');
+            const hidden_children = $(container).children(':not(tei-lb)').filter(function() {
+              return $(this).css('display') == 'none';
+            });
+            let all_hidden = all_children.length === hidden_children.length ? true : false;
+            return all_hidden
+          },
           toggleTeiContainers() {
             const containerList = [
               { selector: 'tei-ab[type=column] div.ab-content', parent: true },
@@ -887,8 +777,38 @@
             }
             this.adjustTeiRendering();
           },
+          changeRenderMode(mode) {
+            this.renderMode = mode;
+            this.softWrap = mode == 'basic' ? true : false;
+            setTimeout(() => this.toggleTeiContainers(), 0);
+          },
+          toggleTextWrap() {
+            if (this.renderMode == 'scholarly') {
+              this.softWrap = this.softWrap ? false : true;
+            }
+          },
+          toggleHelpTips() {
+            let state = this.showHelp ? false : true;
+            if(state) {
+              this.$refs.optionsDropdown.show();
+              setTimeout(() => this.showHelp = state, 80);
+            } else {
+              this.showHelp = state;
+            }
+          },
+          showCopiedTooltip() {
+            this.showCitePanel = false;
+            this.showCopied = true;
+            setTimeout(() => this.showCopied = false, 800);
+          },
           windowResized() {
             setTimeout(() => this.adjustTeiRendering(), 0);
+          },
+          closeCitePanel() {
+            this.showCitePanel = false;
+          },
+          toggleInfoPanel() {
+            this.showInfoPanel = this.showInfoPanel ? false : true;
           },
           updateURL() {
             let path_tokens = location.pathname.split('/').filter(Boolean);
@@ -900,7 +820,6 @@
           }
         },
       });
-
     });
   </script>
 {% endblock %}
