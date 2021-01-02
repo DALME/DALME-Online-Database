@@ -10,7 +10,6 @@
   </div>
   <div class="form-button d-flex">
       <b-dropdown
-        id="cite_format_menu"
         size="sm"
         variant="secondary"
         text="Change format"
@@ -32,17 +31,15 @@
         class="flex-fill ml-1 mr-1"
         data-clipboard-target="#citation"
         @click="showCopiedTooltip">
-        Copy to clipboard
+        Copy
       </b-button>
       <b-dropdown
-        id="cite_download"
         size="sm"
         variant="secondary"
         text="Download"
         class="flex-fill">
         <b-dropdown-item @click="downloadCitation('bibtex')">BibTeX</b-dropdown-item>
         <b-dropdown-item @click="downloadCitation('ris')">RIS/Endnote</b-dropdown-item>
-        <b-dropdown-item @click="downloadCitation('bibtex')">Zotero</b-dropdown-item>
       </b-dropdown>
   </div>
   </div>
