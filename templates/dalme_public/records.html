@@ -332,12 +332,10 @@
     const breadcrumb_app = new Vue({
       el: '#breadcrumb-app',
       delimiters: ['${', '}'],
+      data: {
+        breadcrumb: JSON.parse($('#breadcrumb_data').remove().text()),
+      },
       computed: {
-        breadcrumb() {
-          const node = document.getElementById('breadcrumb_data');
-          document.getElementsByTagName("BODY")[0].removeChild(node);
-          return JSON.parse(node.textContent);
-        },
         crumbCount() {
           return this.breadcrumb.length;
         },
@@ -352,9 +350,7 @@
         if (!new URLSearchParams(window.location.search).keys().length) {
           this.fetchData();
         }
-        if (new URLSearchParams(window.location.search).get('order_by')) {
-          this.setInitialSortOrder(new URLSearchParams(window.location.search).get('order_by'));
-        }
+        this.setInitialSortOrder(new URLSearchParams(window.location.search).get('order_by', null));
         window.componentInstance = this;
         window.addEventListener('resize', this.onResize);
       },
@@ -576,9 +572,7 @@
             if (['collection', 'corpus', 'source_type', 'locale'].includes(key)) {
               val = this.choices[`${camelized}Choices`]
                 .filter(item => {
-                  return key === 'source_type'
-                    ? item.value == val
-                    : item.value === parseInt(val);
+                  return key === 'source_type' ? item.value == val : item.value === parseInt(val);
                 });
             }
             return params[camelized] = typeof val === 'object' ? val[0]['value'] : val['value'];
@@ -613,6 +607,7 @@
               this.showFirst = !data.page_numbers.includes(1);
               this.showLast = !data.page_numbers.includes(data.totalPages);
               this.fetching = false;
+              // this.updateCollection();
             });
         },
         async fetchThumbnails() {
@@ -695,18 +690,20 @@
           }
         },
         setInitialSortOrder(order) {
-          if (order.endsWith('name')) {
-            this.sourceTypeOrder = null;
-            this.dateOrder = null;
-            this.nameOrder = order;
-          } else if (order.endsWith('date')) {
-            this.sourceTypeOrder = null;
-            this.dateOrder = order;
-            this.nameOrder = null;
-          } else {
-            this.sourceTypeOrder = order;
-            this.dateOrder = null;
-            this.nameOrder = null;
+          if (order) {
+            if (order.endsWith('name')) {
+              this.sourceTypeOrder = null;
+              this.dateOrder = null;
+              this.nameOrder = order;
+            } else if (order.endsWith('date')) {
+              this.sourceTypeOrder = null;
+              this.dateOrder = order;
+              this.nameOrder = null;
+            } else {
+              this.sourceTypeOrder = order;
+              this.dateOrder = null;
+              this.nameOrder = null;
+            }
           }
         }
       },

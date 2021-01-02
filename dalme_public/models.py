@@ -54,6 +54,7 @@ from django.utils.html import format_html
 from django.templatetags.static import static
 from dalme_app.utils import Search, formset_factory, SearchContext
 from dalme_app.forms import SearchForm
+from urllib import parse
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -779,6 +780,14 @@ class Collection(SearchEnabled):
         FieldPanel('citable'),
         StreamFieldPanel('body'),
     ]
+
+    def get_context(self, request):
+        context = super().get_context(request)
+        if request.META.get('HTTP_REFERER'):
+            params = dict(parse.parse_qsl(parse.urlsplit(request.META.get('HTTP_REFERER')).query))
+            if 'collection' in params:
+                context['collection'] = params['collection']
+        return context
 
     @property
     def stats(self):

@@ -83,13 +83,16 @@ def get_breadcrumbs_nav(context):
     explore = context.get('explore')
 
     if records or record:
-        # collection = context['request'].GET.get('collection', False)
+        collection = context.get('collection')
+        url = f'{page.url}records/'
+        if collection:
+            url += f'?collection={collection}'
         breadcrumbs[-1].update({'active': False})
         breadcrumbs = [
             *breadcrumbs,
             {
                 'title': 'Records',
-                'url': f'{page.url}records/?collection={page.id}',  # noqa
+                'url': url,
                 'active': True if records else False,
             },
         ]
