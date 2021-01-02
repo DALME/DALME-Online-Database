@@ -14,14 +14,14 @@
   </template>
   <b-dropdown-item
     class="dropdown-item"
-    href="mailto:?subject=subject&body=body"
+    :href="email"
     target="_blank">
     <i class="fa fa-envelope fa-fw"></i> Email
   </b-dropdown-item>
   <b-dropdown-item
     id="clip_copy"
     class="dropdown-item"
-    href="sms:1234567?body=hello world"
+    :href="sms"
     target="_blank">
     <i class="fa fa-comment fa-fw"></i> Message
   </b-dropdown-item>

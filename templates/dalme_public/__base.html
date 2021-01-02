@@ -153,9 +153,19 @@
                 const clipboard_copy = new ClipboardJS('#clip_copy');
               },
               data: {
-                page_title: '{{ page.title }}',
+                page_title: '{{ page.title|default_if_none:"Home" }}',
                 page_url: '{{ request.build_absolute_uri }}',
               },
+              computed: {
+                sms() {
+                  return `sms:?body=${this.page_url}`;
+                },
+                email() {
+                  let subject = `DALME - ${this.page_title}`;
+                  let body = `The Documentary Archaelogy of Late Medieval Europe - ${this.page_title}: ${this.page_url}`;
+                  return `mailto:?subject=${subject}&body=${body}`;
+                }
+              }
             });
           });
         </script>
