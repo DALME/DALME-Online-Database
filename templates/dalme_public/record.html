@@ -60,7 +60,7 @@
           class="pagination previous left u-flex nav_button"
           v-bind:class="{ inactive: !hasMultipleFolios }"
           @click="handleFolioPrevious">
-            <i class="fa fa-backward fa-sm mt-1" aria-hidden="true"></i>
+            <i class="fa fa-caret-left mt-1" aria-hidden="true"></i>
         </li>
         <b-dropdown
           id="folio_menu"
@@ -94,7 +94,7 @@
           class="pagination next u-flex nav_button"
           v-bind:class="{ inactive: !hasMultipleFolios }"
           @click="handleFolioNext">
-            <i class="fa fa-forward fa-sm mt-1" aria-hidden="true"></i>
+            <i class="fa fa-caret-right mt-1" aria-hidden="true"></i>
         </li>
         <div id="cite-container">
           <li
