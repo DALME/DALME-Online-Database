@@ -606,6 +606,7 @@
           this.tei = new CETEI();
           this.tei.addBehaviors(teiBehaviours);
           this.fetchTranscription();
+          this.updateURL();
         },
         data: {
           showHelp: false,
@@ -722,6 +723,7 @@
               this.folioIndex = --this.folioIndex;
               window.eventBus.$emit('renderFolio', this.eventData);
               this.incrementDivaId();
+              this.updateURL();
             }
           },
           handleFolioNext() {
@@ -729,6 +731,7 @@
               this.folioIndex = ++this.folioIndex;
               window.eventBus.$emit('renderFolio', this.eventData);
               this.incrementDivaId();
+              this.updateURL();
             }
           },
           handleFolioSelect(index) {
@@ -737,6 +740,7 @@
               window.eventBus.$emit('renderFolio', this.eventData);
               this.incrementDivaId();
               this.folioSelect = false;
+              this.updateURL();
             }
           },
           handleFlipView(split) {
@@ -885,6 +889,14 @@
           },
           windowResized() {
             setTimeout(() => this.adjustTeiRendering(), 0);
+          },
+          updateURL() {
+            let path_tokens = location.pathname.split('/').filter(Boolean);
+            if (!/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path_tokens[path_tokens.length - 1])) {
+              path_tokens.pop();
+            }
+            const url = `${location.protocol}//${location.host}/${path_tokens.join('/')}/${this.sourceData.folios[this.folioIndex].pageName}/`;
+            window.history.replaceState(null, null, url);
           }
         },
       });
