@@ -332,10 +332,12 @@
     const breadcrumb_app = new Vue({
       el: '#breadcrumb-app',
       delimiters: ['${', '}'],
-      data: {
-        breadcrumb: JSON.parse($('#breadcrumb_data').text()),
-      },
       computed: {
+        breadcrumb() {
+          const node = document.getElementById('breadcrumb_data');
+          document.getElementsByTagName("BODY")[0].removeChild(node);
+          return JSON.parse(node.textContent);
+        },
         crumbCount() {
           return this.breadcrumb.length;
         },

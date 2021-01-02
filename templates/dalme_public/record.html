@@ -585,8 +585,7 @@
         created() {
           window.addEventListener("resize", this.windowResized);
           const Cite = require('citation-js');
-          let _data = JSON.parse($('#citation_data').detach().text());
-          this.formats = _data[0];
+          this.formats = this.citationData[0];
           this.config = Cite.plugins.config.get('@csl');
           const that = this;
           for (let i = 0, len = this.formats.length; i < len; ++i) {
@@ -602,7 +601,7 @@
               xhttp.send();
             }
           }
-          this.citation = new Cite(_data[1]);
+          this.citation = new Cite(this.citationData[1]);
           this.updateCitation('harvard1', 'bibliography');
           this.tei = new CETEI();
           this.tei.addBehaviors(teiBehaviours);
@@ -641,8 +640,14 @@
           folioIndex: "fetchTranscription"
         },
         computed: {
+          citationData() {
+            const node = document.getElementById('citation_data');
+            document.getElementsByTagName("BODY")[0].removeChild(node);
+            return JSON.parse(node.textContent);
+          },
           sourceData() {
             const node = document.getElementById('source-data');
+            document.getElementsByTagName("BODY")[0].removeChild(node);
             return JSON.parse(node.textContent);
           },
           hasFolios() {
@@ -844,7 +849,6 @@
               if (nextChild.length < nextSibs.length) {
                 let next_el = nextChild.length ? nextChild : this;
                 next_array = $.merge(nextChild, $(next_el).next().children().nextUntil('tei-lb'));
-                console.log(next_array)
               } else {
                 next_array = nextSibs;
               }
