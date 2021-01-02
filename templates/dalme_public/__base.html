@@ -64,6 +64,9 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw==" crossorigin="anonymous"></script>
+
+        <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+
         <script>
           $(document).ready(function() {
             api_endpoint = "{{ api_endpoint }}";
@@ -162,23 +165,8 @@
           {{ citation.2 | safe }}
           {{ citation | json_script:"citation_data" }}
           <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
-          <!--script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script-->
-          <!--script src="https://cdn.jsdelivr.net/npm/citation-js@0.5.0-alpha.9/build/citation.min.js" integrity="sha256-8ylR6w3Vn9WiUCEGB2ScAUvOJbyBHALDDdw3xQwhbH8=" crossorigin="anonymous"></script-->
-          <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.js" integrity="sha256-Q1Pp1idp+sbT0HJtP+jE41gkFlby2mDGkdk1cifudTs=" crossorigin="anonymous"></script>
+          <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
           <script>
-            const Cite = require('citation-js');
-            let _data = JSON.parse($('#citation_data').detach().text());
-            const formats = _data[0];
-            let config = Cite.plugins.config.get('@csl');
-            for (let i = 0, len = formats.length; i < len; ++i) {
-              if (formats[i].file) {
-                $.ajax({ method: "GET", url: `/static/citation_styles/${formats[i].file}`})
-                .done(function(xml_data) {
-                  config.templates.add(formats[i].name, xml_data);
-                })
-              }
-            }
-            const citation = new Cite(_data[1]);
             const cite_app = new Vue({
               el: '#cite-container',
               delimiters: ['${', '}'],
@@ -186,16 +174,31 @@
                 onClickaway: window.VueClickaway.directive,
               },
               created() {
-                this.formats = formats;
-                this.citation = citation;
+                const Cite = require('citation-js');
+                let _data = JSON.parse($('#citation_data').detach().text());
+                this.formats = _data[0];
+                this.config = Cite.plugins.config.get('@csl');
+                const that = this;
+                for (let i = 0, len = this.formats.length; i < len; ++i) {
+                  if (this.formats[i].file) {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                      if (xhttp.readyState == 4 && xhttp.status == 200) {
+                        let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
+                        that.config.templates.add(that.formats[i].name, xml_data);
+                      }
+                    };
+                    xhttp.open("GET", `/static/citation_styles/${that.formats[i].file}`, true);
+                    xhttp.send();
+                  }
+                }
+                this.citation = new Cite(_data[1]);
                 this.updateCitation('harvard1', 'bibliography');
               },
               data: {
-                citation: null,
                 showCitePanel: false,
                 showCopied: false,
                 popoverPlacement: 'right',
-                formats: null,
                 format: 'html',
                 template: 'harvard1',
                 lang: 'en',
@@ -203,11 +206,11 @@
                 file_extensions: {
                   bibtex: '.bib',
                   ris: '.ris'
-                }
+                },
               },
               methods: {
                 formatCitation(template, output_format, format=this.format, ) {
-                  return citation.format(output_format, {
+                  return this.citation.format(output_format, {
                       format: format,
                       template: template,
                       lang: this.lang
@@ -235,7 +238,7 @@
                 },
                 closeCitePanel() {
                   this.showCitePanel = false;
-                }
+                },
               }
             });
           </script>

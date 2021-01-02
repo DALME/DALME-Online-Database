@@ -586,17 +586,22 @@
           window.addEventListener("resize", this.windowResized);
           const Cite = require('citation-js');
           let _data = JSON.parse($('#citation_data').detach().text());
-          let formats = _data[0];
-          let config = Cite.plugins.config.get('@csl');
-          for (let i = 0, len = formats.length; i < len; ++i) {
-            if (formats[i].file) {
-              $.ajax({ method: "GET", url: `/static/citation_styles/${formats[i].file}`})
-              .done(function(xml_data) {
-                config.templates.add(formats[i].name, xml_data);
-              })
+          this.formats = _data[0];
+          this.config = Cite.plugins.config.get('@csl');
+          const that = this;
+          for (let i = 0, len = this.formats.length; i < len; ++i) {
+            if (this.formats[i].file) {
+              var xhttp = new XMLHttpRequest();
+              xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                  let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
+                  that.config.templates.add(that.formats[i].name, xml_data);
+                }
+              };
+              xhttp.open("GET", `/static/citation_styles/${that.formats[i].file}`, true);
+              xhttp.send();
             }
           }
-          this.formats = formats;
           this.citation = new Cite(_data[1]);
           this.updateCitation('harvard1', 'bibliography');
           this.tei = new CETEI();
