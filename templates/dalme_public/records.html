@@ -323,8 +323,9 @@
   {{ breadcrumb | json_script:"breadcrumb_data" }}
   {% compress js %}
     <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script>
+    <!--script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script-->
   {% endcompress %}
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js" integrity="sha256-ur/YlHMU96MxHEsy3fHGszZHas7NzH4RQlD4tDVvFhw=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
   <script>
@@ -394,10 +395,10 @@
         records: 'fetchThumbnails',
         thumbSize: 'fetchThumbnails',
         collection: 'updateCollection',
-        search: debounce(function() {
+        search: _.debounce(function() {
           this.filterData('search', this.search)
         }, 300),
-        date: debounce(function() {
+        date: _.debounce(function() {
           const [min, max] = this.date;
           if (min === this.dateMin && max === this.dateMax) {
             const params = this.setParam('date_range', null).toString();
