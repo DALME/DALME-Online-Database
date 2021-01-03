@@ -1958,6 +1958,7 @@ tei-quote {
   width: 100%;
   font-family: 'Lora';
   white-space: normal;
+  text-align: center;
 }
 tei-quote:not(:first-child) {
   margin-top: 1rem;
