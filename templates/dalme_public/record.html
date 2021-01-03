@@ -442,6 +442,10 @@
           onClickaway: window.VueClickaway.directive,
         },
         mounted() {
+          this.windowHeight = $(window).height();
+          this.headerHeight = $('header').height();
+          this.divaHeight = $('.folio').height();
+          this.footerHeight = $('#footer-app').height();
           $('main.inventory').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
           this.renderFolio();
           this.fetchTranscription();
@@ -470,25 +474,21 @@
           this.citation = new Cite(this.citationData[1]);
           this.tei = new CETEI();
           this.tei.addBehaviors(teiBehaviours);
-          this.windowHeight = $(window).height();
-          this.headerHeight = $('header').height();
-          this.divaHeight = $('.folio').height();
-          this.footerHeight = $('#footer-app').height();
         },
         data: {
           showHelp: false,
           showCitePanel: false,
           showCopied: false,
           popoverPlacement: 'bottom',
-          handleHelpPlacement: 'left',
+          handleHelpPlacement: '{{ viewer_mode }}' == 'vertical-split' ? 'left' : 'bottom',
           folioIndex: {{ initial_folio_index }},
           zoomLevel: 2,
           folioSelect: false,
           date: 0,
           showInfoPanel: true,
-          renderMode: 'scholarly',
+          renderMode: '{{ render_mode }}',
           viewerMode: '{{ viewer_mode }}',
-          softWrap: false,
+          softWrap: '{{ render_mode }}' == 'basic' ? true : false,
           showNewlines: false,
           formats: null,
           format: 'html',
@@ -528,7 +528,9 @@
             tileWidth: 500 // default = 256
           },
           divaHeight: 100,
-          footerHeight: 54
+          footerHeight: 54,
+          windowHeight: null,
+          headerHeight: 93,
         },
         watch: {
           folioIndex: "switchFolio",
@@ -589,9 +591,9 @@
             if (this.viewerMode == 'vertical-split') {
               return Math.round(this.windowHeight - this.headerHeight - this.footerHeight - 42);
             } else {
-              return Math.round(this.windowHeight - this.headerHeight - this.divaHeight - this.footerHeight - 51);
+              return Math.round(this.windowHeight - this.headerHeight - this.divaHeight - this.footerHeight - 45);
             }
-          }
+          },
         },
         methods: {
           handleFolioPrevious() {
@@ -664,17 +666,17 @@
           },
           handleFlipView(split) {
             this.viewerMode = split;
-            update_session({ 'public-viewer-mode': split });
             this.setResizable();
             this.handleHelpPlacement = split == 'vertical-split' ? 'left' : 'bottom';
             this.adjustViewer();
+            update_session({ 'public-viewer-mode': split });
           },
           adjustViewer(divaHeight=false) {
             if (divaHeight) this.divaHeight = divaHeight;
             setTimeout(() => {
               window.dispatchEvent(new Event('resize'));
               this.divaLoading = false;
-            }, 400);
+            }, 600);
           },
           fetchTranscription() {
             if (this.transcriptionId) {
@@ -786,6 +788,7 @@
           },
           changeRenderMode(mode) {
             this.renderMode = mode;
+            update_session({ 'public-render-mode': mode });
             this.softWrap = mode == 'basic' ? true : false;
             setTimeout(() => this.toggleTeiContainers(), 0);
           },
@@ -810,6 +813,10 @@
           },
           windowResized() {
             this.windowHeight = $(window).height();
+            this.divaHeight = $('.folio').height();
+            this.headerHeight = $('header').height();
+            this.footerHeight = $('#footer-app').height();
+            $('main.inventory').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
             setTimeout(() => this.adjustTeiRendering(), 0);
           },
           closeCitePanel() {
