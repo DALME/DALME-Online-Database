@@ -7,7 +7,6 @@ def update_rs_folio_field(user_id):
     pages = Page.objects.exclude(dam_id__isnull=True)
     errors = []
     for page in pages:
-        print(page.id)
         try:
             dam_id = int(page.dam_id)
         except ValueError:
