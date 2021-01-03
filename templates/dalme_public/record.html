@@ -17,10 +17,10 @@
 {% endblock %}
 
 {% block main_column %}
-  <div id="app">
+  <div id="app" v-cloak>
   <div v-if="showHelp" v-on-clickaway="toggleHelpTips"></div>
   <div class="app inventory-toolbar">
-    <nav v-cloak>
+    <nav>
       <ul class="u-flex">
         <li
           id="diva-1-zoom-out-button"
@@ -227,7 +227,7 @@
       </ul>
     </nav>
   </div>
-  <div class="folios u-flex viewer">
+  <div class="folios u-flex viewer" :class="viewerMode">
     <section class="folio">
       <div class="record-info" v-if="showInfoPanel" v-on-clickaway="toggleInfoPanel">
         <div class="description">
@@ -268,7 +268,8 @@
     <section
       id="transcription"
       class="transcription"
-      v-bind:class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]">
+      :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]"
+      v-bind:style="{ height: transcriptionHeight + 'px' }">
       <beat-loader v-show="loading" color="#aaa"></beat-loader>
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
       <div v-if="transcriptionId" v-html="renderedTranscription" id="tei-container"></div>
@@ -298,20 +299,12 @@
   {{ citation | json_script:"citation_data" }}
 
   <script>
-    const setHeaderHeight = () => {
-        const height = $('header').height();
-        $('section#transcription').attr('style', `--header-height:${height}px;`);
-    }
     $(document).ready(function() {
-      setHeaderHeight();
-      const splitter = $('div.folios');
 
       $(document).on('click', '.ab-column-toggler', (e) => {
           const parent = e.target.closest('tei-ab');
           parent.classList.toggle('closed');
       });
-
-      $(window).width() <= 600 ? splitter.addClass('horizontal-split') : splitter.addClass('vertical-split');
 
       const setExtent = (e) => {
         const tag_name = e.tagName.slice(4,);
@@ -448,6 +441,9 @@
           onClickaway: window.VueClickaway.directive,
         },
         mounted() {
+          this.windowHeight = $(window).height();
+          this.headerHeight = $('header').height();
+          this.divaHeight = $('.folio').height();
           this.renderFolio();
           this.fetchTranscription();
           this.updateCitation('harvard1', 'bibliography');
@@ -488,7 +484,8 @@
           date: 0,
           showInfoPanel: true,
           renderMode: 'scholarly',
-          viewerMode: 'vertical-split',
+          // viewerMode: 'vertical-split',
+          viewerMode: 'horizontal-split',
           softWrap: false,
           showNewlines: false,
           formats: null,
@@ -527,7 +524,8 @@
             // fillParentHeight: true,
             tileHeight: 250, // default = 256
             tileWidth: 250 // default = 256
-          }
+          },
+          divaHeight: 100,
         },
         watch: {
           folioIndex: "switchFolio",
@@ -584,6 +582,20 @@
           folioInfo() {
             return this.hasFolios ? this.currentFolio : 'No folios';
           },
+          transcriptionHeight() {
+            if (this.viewerMode == 'vertical-split') {
+              return this.windowHeight - this.headerHeight - 96;
+            } else {
+              return this.windowHeight - this.headerHeight - this.divaHeight - 111;
+            }
+          },
+          maxDivaHeight() {
+            if (this.viewerMode == 'vertical-split') {
+              return this.windowHeight - this.headerHeight - 96;
+            } else {
+              return this.windowHeight - this.headerHeight - this.divaHeight - 111;
+            }
+          }
         },
         methods: {
           handleFolioPrevious() {
@@ -625,24 +637,43 @@
                   }
                 }
               }
-            }, 'json').then(() => {
-                 $('.folio').resizableSafe({
-                     handleSelector: '#resize-handle',
-                     resizeHeight: $('.vertical-split').length ? false : true,
-                     resizeWidth: $('.vertical-split').length ? true : false,
-                     onDragEnd: function() { window.dispatchEvent(new Event('resize')); }
-                 });
-             });
+            }, 'json').then(() => that.setResizable() );
           },
           renderImage() {
             if (!window.folio) {
               this.divaOptions['objectData'] = `${this.db_endpoint}/pages/${this.folioId}/manifest/`;
               window.folio = new Diva('diva_viewer', this.divaOptions);
-              Diva.Events.subscribe('DocumentDidLoad',() => window.dispatchEvent(new Event('resize')));
+              Diva.Events.subscribe('ViewerDidLoad', () => app.adjustViewer());
             } else {
               this.zoomLevel = 2;
               window.folio.changeObject(`${this.db_endpoint}/pages/${this.folioId}/manifest/`);
             }
+          },
+          setResizable() {
+            const node = $('.folio');
+            node.resizableSafe('destroy');
+            node.resizableSafe({
+                handleSelector: '#resize-handle',
+                resizeHeight: this.viewerMode == 'horizontal-split' ? true : false,
+                resizeWidth: this.viewerMode == 'vertical-split' ? true : false,
+                onDrag: function(e, el, newWidth, newHeight, opt) { app.adjustViewer(newHeight); },
+            });
+            let maxHeight = this.viewerMode == 'horizontal-split' ? `${this.windowHeight - this.headerHeight - 111}px` : 'unset';
+            node.css({
+              maxHeight: maxHeight,
+              height: '',
+              width: ''
+            });
+          },
+          handleFlipView(split) {
+            this.viewerMode = split;
+            this.setResizable();
+            this.handleHelpPlacement = split == 'vertical-split' ? 'right' : 'top';
+            setTimeout(() => this.adjustViewer(), 0);
+          },
+          adjustViewer(divaHeight=false) {
+            if (divaHeight) this.divaHeight = divaHeight;
+            window.dispatchEvent(new Event('resize'));
           },
           fetchTranscription() {
             if (this.transcriptionId) {
@@ -666,32 +697,6 @@
                   }
               });
             }
-          },
-          handleFlipView(split) {
-            const node = $('.folios');
-            const main = node.parent().parent();
-            if (node.hasClass('vertical-split')) {
-              node.removeClass('vertical-split').addClass('horizontal-split');
-              main.toggleClass('vertical-split', false);
-              main.toggleClass('horizontal-split', true);
-              node.find('.folio').resizableSafe({
-                  handleSelector: '#resize-handle',
-                  resizeWidth: false,
-                  onDragEnd: function() { window.dispatchEvent(new Event('resize')); },
-                }).css({ width: '' });
-            } else {
-              node.removeClass('horizontal-split').addClass('vertical-split');
-              main.toggleClass('horizontal-split', false);
-              main.toggleClass('vertical-split', true);
-              node.find('.folio').resizableSafe({
-                  handleSelector: '#resize-handle',
-                  resizeHeight: false,
-                  onDragEnd: function() { window.dispatchEvent(new Event('resize')); },
-                }).css({ height: '' });
-            }
-            this.viewerMode = split;
-            this.handleHelpPlacement = split == 'vertical-split' ? 'right' : 'top';
-            window.dispatchEvent(new Event('resize'));
           },
           formatCitation(template, output_format, format=this.format) {
             return this.citation.format(output_format, {
@@ -802,6 +807,7 @@
             setTimeout(() => this.showCopied = false, 800);
           },
           windowResized() {
+            this.windowHeight = $(window).height();
             setTimeout(() => this.adjustTeiRendering(), 0);
           },
           closeCitePanel() {
