@@ -978,7 +978,6 @@ i.inactive {
   padding: 0.75rem 1rem;
   align-items: center;
   white-space: nowrap;
-  overflow: hidden;
 }
 .app nav li .nav-record-title {
   overflow: auto;
