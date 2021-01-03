@@ -977,6 +977,12 @@ i.inactive {
 .app nav li {
   padding: 0.75rem 1rem;
   align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.app nav li .nav-record-title {
+  overflow: auto;
+  text-overflow: ellipsis;
 }
 .app nav li.inactive {
   cursor: default;
@@ -1255,16 +1261,23 @@ i.inactive {
   overflow: hidden;
 }
 .folio-rights {
-  color: #828282;
-  padding: .25rem;
-  background-color: rgb(62 62 62 / 7%);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  color: #4444446e;
+  padding: .25rem .75rem;
+  background-color: transparent;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
   position: absolute;
   bottom: 0;
   right: 0;
   left: 0;
   max-height: 30px;
+}
+.folio-rights:hover {
+  color: #fff;
+  background-color: rgb(62 62 62 / 39%);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  max-height: fit-content;
 }
 .folios .folio-rights div {
   font-size: 0.9rem;
@@ -1275,7 +1288,12 @@ i.inactive {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
+.folios .folio-rights:hover div {
+  white-space: normal;
+  overflow: auto;
+  text-overflow: ellipsis;
+  text-align: center;
+}
 .messages {
   margin-bottom: 0;
 }
@@ -2880,6 +2898,24 @@ div.viewer {
   flex: 1 1 auto;
   height: 100%;
 }
+#diva_viewer .v-spinner {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: #2d2d2d;
+  margin: 0;
+  flex-direction: row;
+  align-items: center;
+}
+#diva_viewer .v-spinner .v-beat:first-child {
+  margin-left: auto !important;
+}
+#diva_viewer .v-spinner .v-beat:last-child {
+  margin-right: auto !important;
+}
+
 #tei-container {
   position: relative;
   width: 100%;
@@ -2925,9 +2961,10 @@ main.inventory {
   width: 100%;
   position: relative;
   height: calc((100vh - 204px) / 2);
+  margin-bottom: -6px;
 }
 .folios.horizontal-split section.folio .folio-rights {
-  bottom: -7px;
+  bottom: -1px;
 }
 .folios.horizontal-split section.transcription {
   padding: 1.5rem;
@@ -2940,19 +2977,20 @@ main.inventory {
 }
 .folios .resize-handle {
   flex: 0 0 auto;
-  z-index: 2;
 }
 .folios.vertical-split .resize-handle {
   background: url(/static/images/solid_grip_v.svg) 0px center/15px 40px no-repeat;
   cursor: col-resize;
   width: 15px;
   margin-right: -8px;
+  z-index: 6;
 }
 .folios.horizontal-split .resize-handle {
   background: url(/static/images/solid_grip_h.svg) center 0px/40px 15px no-repeat;
   cursor: row-resize;
   height: 15px;
   margin-bottom: -8px;
+  z-index: 3;
 }
 div.diva-outer {
   background: none;
@@ -2980,7 +3018,7 @@ section.transcription {
 }
 .record-info {
   position: absolute;
-  z-index: 3;
+  z-index: 5;
   background-color: rgb(109 109 109 / 68%);
   backdrop-filter: blur(7px);
   -webkit-backdrop-filter: blur(7px);
@@ -3236,6 +3274,7 @@ parsererror h3 {
 parsererror div {
   margin: .5rem .5rem;
 }
+
 
 
 

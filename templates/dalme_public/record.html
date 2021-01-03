@@ -60,7 +60,7 @@
         </b-popover>
 
         <li class="border-0 text-start mr-auto">
-          <span>{{ title }}</span>
+          <div class="nav-record-title">{{ title }}</div>
         </li>
 
         <li
@@ -174,7 +174,7 @@
             boundary="window"
             variant="dark"
             target="text_wrap_menu"
-            placement="left"
+            placement="lefttop"
             :show="showHelp"
             triggers="manual">
             Change how lines wider than the viewing area are treated.
@@ -206,7 +206,7 @@
             boundary="window"
             variant="dark"
             target="viewer_mode_menu"
-            placement="rightbottom"
+            placement="right"
             :show="showHelp"
             triggers="manual">
             <b>Basic Mode:</b></br>
@@ -248,6 +248,7 @@
         </div>
       </div>
       <div id="diva_viewer">
+        <beat-loader v-show="divaLoading" color="#aaa"></beat-loader>
         <div v-if="!hasImage" class="diva-no-image"></div>
       </div>
       <div id="folio-rights" class="folio-rights u-flex" v-if="rightsNotice">
@@ -268,7 +269,7 @@
       id="transcription"
       class="transcription"
       :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]"
-      v-bind:style="{ height: transcriptionHeight + 'px' }">
+      :style="{ height: transcriptionHeight + 'px' }">
       <beat-loader v-show="loading" color="#aaa"></beat-loader>
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
       <div v-if="transcriptionId" v-html="renderedTranscription" id="tei-container"></div>
@@ -281,6 +282,7 @@
   {{ block.super }}
   {% compress js %}
     <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
   {% endcompress %}
   <!--script type="text/javascript" src="{% static 'js/diva_dev.js' %}"></script-->
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
@@ -440,9 +442,7 @@
           onClickaway: window.VueClickaway.directive,
         },
         mounted() {
-          this.windowHeight = $(window).height();
-          this.headerHeight = $('header').height();
-          this.divaHeight = $('.folio').height();
+          $('main.inventory').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
           this.renderFolio();
           this.fetchTranscription();
           this.updateCitation('harvard1', 'bibliography');
@@ -470,6 +470,10 @@
           this.citation = new Cite(this.citationData[1]);
           this.tei = new CETEI();
           this.tei.addBehaviors(teiBehaviours);
+          this.windowHeight = $(window).height();
+          this.headerHeight = $('header').height();
+          this.divaHeight = $('.folio').height();
+          this.footerHeight = $('#footer-app').height();
         },
         data: {
           showHelp: false,
@@ -483,8 +487,7 @@
           date: 0,
           showInfoPanel: true,
           renderMode: 'scholarly',
-          // viewerMode: 'vertical-split',
-          viewerMode: 'horizontal-split',
+          viewerMode: '{{ viewer_mode }}',
           softWrap: false,
           showNewlines: false,
           formats: null,
@@ -497,6 +500,7 @@
             ris: '.ris'
           },
           loading: false,
+          divaLoading: true,
           renderedTranscription: null,
           tei: null,
           api_endpoint: '{{ api_url }}',
@@ -520,11 +524,11 @@
             adaptivePadding: 0,
             fixedPadding: 0,
             zoomLevel: 2,
-            // fillParentHeight: true,
-            tileHeight: 250, // default = 256
-            tileWidth: 250 // default = 256
+            tileHeight: 500, // default = 256
+            tileWidth: 500 // default = 256
           },
           divaHeight: 100,
+          footerHeight: 54
         },
         watch: {
           folioIndex: "switchFolio",
@@ -583,16 +587,9 @@
           },
           transcriptionHeight() {
             if (this.viewerMode == 'vertical-split') {
-              return this.windowHeight - this.headerHeight - 96;
+              return Math.round(this.windowHeight - this.headerHeight - this.footerHeight - 42);
             } else {
-              return this.windowHeight - this.headerHeight - this.divaHeight - 111;
-            }
-          },
-          maxDivaHeight() {
-            if (this.viewerMode == 'vertical-split') {
-              return this.windowHeight - this.headerHeight - 96;
-            } else {
-              return this.windowHeight - this.headerHeight - this.divaHeight - 111;
+              return Math.round(this.windowHeight - this.headerHeight - this.divaHeight - this.footerHeight - 51);
             }
           }
         },
@@ -616,10 +613,10 @@
             if (this.zoomLevel - 1 >= this.divaMinZoom) --this.zoomLevel;
           },
           zoomViewer() {
-            console.log(this.zoomLevel)
             window.folio.setZoomLevel(this.zoomLevel);
           },
           switchFolio() {
+            this.divaLoading = true;
             this.fetchTranscription();
             this.renderFolio();
             this.updateURL();
@@ -657,7 +654,8 @@
                 resizeWidth: this.viewerMode == 'vertical-split' ? true : false,
                 onDrag: function(e, el, newWidth, newHeight, opt) { app.adjustViewer(newHeight); },
             });
-            let maxHeight = this.viewerMode == 'horizontal-split' ? `${this.windowHeight - this.headerHeight - 111}px` : 'unset';
+            let maxHeight = this.viewerMode == 'horizontal-split' ?
+              `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight - 51)}px` : 'unset';
             node.css({
               maxHeight: maxHeight,
               height: '',
@@ -666,13 +664,17 @@
           },
           handleFlipView(split) {
             this.viewerMode = split;
+            update_session({ 'public-viewer-mode': split });
             this.setResizable();
-            this.handleHelpPlacement = split == 'vertical-split' ? 'right' : 'top';
-            setTimeout(() => this.adjustViewer(), 0);
+            this.handleHelpPlacement = split == 'vertical-split' ? 'left' : 'bottom';
+            this.adjustViewer();
           },
           adjustViewer(divaHeight=false) {
             if (divaHeight) this.divaHeight = divaHeight;
-            window.dispatchEvent(new Event('resize'));
+            setTimeout(() => {
+              window.dispatchEvent(new Event('resize'));
+              this.divaLoading = false;
+            }, 400);
           },
           fetchTranscription() {
             if (this.transcriptionId) {
@@ -752,6 +754,7 @@
               target_width = target_width > 10 ? target_width : 10;
               $(this).width(target_width);
             });
+            $('section.transcription').scrollTop(0);
             $('[data-toggle="tooltip"]').tooltip();
           },
           childrenAllHidden(container) {
