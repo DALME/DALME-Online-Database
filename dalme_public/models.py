@@ -697,6 +697,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         context = self.get_context(request)
         context.update({
             'record': True,
+            'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
             'purl': source.get_purl(),
             'title': source.name,
             'data': {
