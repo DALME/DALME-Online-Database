@@ -966,7 +966,8 @@ i.inactive {
 .app .active {
   cursor: pointer!important;
 }
-.app .inactive {
+.app .inactive,
+.app .disabled {
   color: #aaa!important;
   cursor: default!important;
 }
@@ -983,7 +984,8 @@ i.inactive {
   overflow: auto;
   text-overflow: ellipsis;
 }
-.app nav li.inactive {
+.app nav li.inactive,
+.app nav li.disabled {
   cursor: default;
 }
 .app nav li.search {
@@ -1260,7 +1262,7 @@ i.inactive {
   overflow: hidden;
 }
 .folio-rights {
-  color: #4444446e;
+  color: #90909082;
   padding: .25rem .75rem;
   background-color: transparent;
   backdrop-filter: blur(1px);
@@ -2848,14 +2850,6 @@ main.inventory article {
   box-shadow: 0 0 20px -4px rgba(0, 0, 0, 0.4);
   padding: 1.5rem;
 }
-.inventory-toolbar li.nav_button {
-  cursor: pointer;
-}
-.inventory-toolbar li.nav_button:hover,
-.inventory-toolbar li.nav_button.active {
-  background-color: #497bbb24;
-  color: #354d87;
-}
 .inventory-toolbar button.nav_button {
   color: #6b6b6b;
   background-color: transparent;
@@ -2867,7 +2861,16 @@ main.inventory article {
   font-weight: 400;
   line-height: 1.5;
 }
-.inventory-toolbar button.nav_button:hover,
+.inventory-toolbar li.nav_button {
+  cursor: pointer;
+}
+.inventory-toolbar li.nav_button:not(:disabled):not(.disabled):not(.inactive):hover,
+.inventory-toolbar li.nav_button.active,
+.inventory-toolbar li.nav_button:active {
+  background-color: #497bbb24;
+  color: #354d87;
+}
+.inventory-toolbar button.nav_button:not(:disabled):not(.disabled):not(.inactive):hover,
 .inventory-toolbar .btn-secondary:not(:disabled):not(.disabled).active,
 .inventory-toolbar .btn-secondary:not(:disabled):not(.disabled):active,
 .inventory-toolbar .show>.btn-secondary.dropdown-toggle {
@@ -2875,17 +2878,11 @@ main.inventory article {
   color: #354d87;
   border-color: #aaa;
 }
-.inventory-toolbar .dropdown-toggle-no-caret::after {
-  display: none !important;
-}
 .inventory-toolbar button.nav_button:focus {
   box-shadow: none;
 }
-.inventory-toolbar li.nav_button:hover,
-.inventory-toolbar li.nav_button.active,
-.inventory-toolbar li.nav_button:active {
-  background-color: #497bbb24;
-  color: #354d87;
+.inventory-toolbar .dropdown-toggle-no-caret::after {
+  display: none !important;
 }
 
 /* VIEWER SIZING */

@@ -65,7 +65,7 @@
 
         <li
           class="pagination previous left u-flex nav_button"
-          v-bind:class="{ inactive: !hasMultipleFolios }"
+          v-bind:class="[{ disabled: !hasMultipleFolios }, { disabled: !hasPrevious }]"
           @click="handleFolioPrevious">
             <i class="fa fa-caret-left mt-1" aria-hidden="true"></i>
         </li>
@@ -74,11 +74,12 @@
           class="p-0"
           right
           no-caret
+          :disabled="!hasMultipleFolios"
           menu-class="dropdown-menu p-0 pt-3 pb-3"
           toggle-class="nav_button">
             <template #button-content>
               <span>${folioInfo}</span>
-              <i class="fa fa-caret-down fa-sm ml-2 mt-1" aria-hidden="true"></i>
+              <i class="fa fa-caret-down fa-sm ml-2 mt-1" v-if="hasMultipleFolios"></i>
             </template>
             <template v-if="hasMultipleFolios" v-for="(folio, index) in sourceData.folios">
               <b-dropdown-item v-if="index === folioIndex" :key="index" class="inactive dropdown-item">
@@ -99,7 +100,7 @@
         </b-popover>
         <li
           class="pagination next u-flex nav_button"
-          v-bind:class="{ inactive: !hasMultipleFolios }"
+          v-bind:class="[{ disabled: !hasMultipleFolios }, { disabled: !hasNext }]"
           @click="handleFolioNext">
             <i class="fa fa-caret-right mt-1" aria-hidden="true"></i>
         </li>
