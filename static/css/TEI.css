@@ -2006,15 +2006,44 @@ tei-note:not([type]):before {
 }
 
 tei-note[type="marginal"] {
-  border: 1px solid #cfd29a;
-  background: #ffffdc;
-  padding: 5px 10px;
-  margin: 10px auto;
-  display: block;
   font-size: 14px;
-  width: 100%;
-  white-space: normal;
-  line-height: 1.3;
+  float: right;
+  border-top: 1px dashed #aaa;
+  width: 50%;
+  text-align: end;
+  position: relative;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  right: -1.5rem;
+}
+tei-note[type="marginal"] > i {
+  border: 1px solid #aaa;
+  background-color: #ebebeb;
+  padding: .5rem;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+  position: absolute;
+  top: -15px;
+  right: 0;
+  border-right: none;
+}
+.tooltip.note-marginal {
+  font-family: "PT Serif";
+  font-size: 1rem;
+}
+.tooltip.note-marginal.show {
+  opacity: .95;
+}
+.tooltip.note-marginal .tooltip-inner {
+  max-width: 400px;
+  padding: .75rem .75rem;
+  color: #000;
+  text-align: left;
+  background-color: #ebebeb;
+  border: 1px solid #aaa;
+}
+.tooltip.note-marginal .arrow::before .bs-tooltip-left {
+  border-left-color: #aaa;
 }
 
 tei-ref a {

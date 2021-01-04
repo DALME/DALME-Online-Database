@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block header_extra %}
-  <nav id="breadcrumb-app" class="breadcrumbs u-flex">
+  <nav id="breadcrumb-app" class="breadcrumbs u-flex" v-cloak>
     <ul>
       <template v-for="(crumb, index) in breadcrumb">
         <li v-if="index == 0" class="home">

@@ -430,6 +430,17 @@
           'note': [
             [':not([type=marginal])', function(e) {
               e.setAttribute('name', e.getAttribute('target'));
+            }],
+            ['[type=marginal]', function(e) {
+              let content = document.createElement('i');
+              content.setAttribute('class', 'fas fa-sticky-note');
+              content.setAttribute('title', e.innerHTML);
+              content.setAttribute('data-toggle', 'tooltip');
+              content.setAttribute('data-placement', 'left');
+              content.setAttribute('data-html', 'true');
+              content.setAttribute('data-template', '<div class="tooltip note-marginal" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
+              e.innerHTML = '';
+              e.appendChild(content);
             }]
           ],
         }
@@ -669,6 +680,7 @@
             this.setResizable(true);
             this.handleHelpPlacement = split == 'vertical-split' ? 'left' : 'bottom';
             this.adjustViewer();
+            $('section.transcription').scrollTop(0);
             update_session({ 'public-viewer-mode': split });
           },
           adjustViewer(divaHeight=false) {
@@ -752,7 +764,6 @@
               target_width = target_width > 10 ? target_width : 10;
               $(this).width(target_width);
             });
-            $('section.transcription').scrollTop(0);
             $('[data-toggle="tooltip"]').tooltip();
           },
           childrenAllHidden(container) {

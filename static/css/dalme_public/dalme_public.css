@@ -989,7 +989,7 @@ i.inactive {
 }
 .app nav li.title {
   color: #516084;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   background-color: #b9d1e61a;
   display: flex;
@@ -2823,7 +2823,7 @@ main.inventory article {
 }
 .app.inventory-toolbar nav {
   color: #6b6b6b;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid #354d87;
   background: #ffffff3b;
 }
 .inventory-toolbar .dropdown li {
@@ -2927,6 +2927,7 @@ div.viewer {
 #tei-container {
   position: relative;
   width: 100%;
+  padding: 1.5rem;
 }
 main.inventory {
   flex: 0;
@@ -2941,7 +2942,6 @@ main.inventory {
 }
 .folios.vertical-split section.transcription {
   min-height: 100px;
-  padding: 1.5rem;
   border-left: 3px solid #354d87;
 }
 .folios.vertical-split .diva-viewer-canvas {
@@ -2975,7 +2975,6 @@ main.inventory {
   bottom: -1px;
 }
 .folios.horizontal-split section.transcription {
-  padding: 1.5rem;
   border-top: 3px solid #354d87;
   flex: 1 1 auto;
 }
@@ -3283,14 +3282,12 @@ parsererror div {
   margin: .5rem .5rem;
 }
 
-
-
-
-#notebar {
-  position: absolute;
-  width: 20px;
-  background-color: #6b6b6bad;
-  height: 100%;
-  right: 0;
-  top: 0;
+#margin_bar {
+  /* position: absolute; */
+  background-color: #efefef;
+  width: 30px;
+  /* right: 4rem;
+  z-index: 1; */
+  border-left: 1px solid #d6d6d6;
+  overflow: scroll;
 }
