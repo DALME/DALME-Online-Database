@@ -983,6 +983,18 @@ i.inactive {
 .app nav li .nav-record-title {
   overflow: auto;
   text-overflow: ellipsis;
+  line-height: 42px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.app nav li.title {
+  color: #516084;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #b9d1e61a;
+  display: flex;
+  flex-grow: 1;
+  padding: 0;
 }
 .app nav li.inactive,
 .app nav li.disabled {

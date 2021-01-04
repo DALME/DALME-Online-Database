@@ -45,7 +45,7 @@
         </b-popover>
         <li
           id="info_panel_button"
-          class="nav_button mr-auto"
+          class="nav_button"
           @click="toggleInfoPanel"
           v-bind:class="{ active: showInfoPanel }">
           <i class="fas fa-info-circle"></i>
@@ -59,8 +59,8 @@
           Record information.
         </b-popover>
 
-        <li class="border-0 text-start mr-auto overflow-hidden">
-          <div class="nav-record-title">{{ title }}</div>
+        <li class="border-0 title overflow-hidden">
+          <div class="nav-record-title">{{ data.name }}</div>
         </li>
 
         <li
