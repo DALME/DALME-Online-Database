@@ -1,7 +1,7 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
 {% load wagtailcore_tags static %}
 
-{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+{% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
 
 {% block header_extra %}
   {% include "dalme_public/includes/_simple_header.html" %}

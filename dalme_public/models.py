@@ -258,13 +258,21 @@ class DALMEPage(Page):
         except IndexError:
             return None
 
+    @staticmethod
+    def smart_truncate(content, length=25, suffix='...'):
+        # credit: https://stackoverflow.com/questions/250357/truncate-a-string-without-ending-in-the-middle-of-a-word
+        return content if len(content) <= length else ' '.join(content[:length+1].split(' ')[0:-1]).rstrip() + suffix
+
     @property
     def title_switch(self):
-        """Utility to reduce OR coalescing in templates.
+        """ Utility to reduce OR coalescing in templates.
         Prefer the short_title if a Page has one, if not fallback to title.
         """
         try:
-            return self.short_title or self.title
+            if self.short_title in ['Object', 'Essay', 'Inventory']:
+                return self.smart_truncate(self.title)
+            else:
+                return self.short_title or self.title
         except AttributeError:
             return self.title
 
@@ -695,15 +703,16 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         initial_folio_index = next((i for i, item in enumerate(pages) if item["pageName"] == folio), 0) if folio else 0
 
         context = self.get_context(request)
+        data = PublicSourceSerializer(source).data
         context.update({
             'record': True,
             'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
             'render_mode': request.session.get('public-render-mode', 'scholarly'),
             'purl': source.get_purl(),
-            'title': source.name,
+            'title': self.smart_truncate(data['name'], length=35),
             'data': {
                 'folios': list(pages),
-                **PublicSourceSerializer(source).data,
+                **data,
             },
             'initial_folio_index': initial_folio_index
         })

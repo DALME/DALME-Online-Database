@@ -1,7 +1,7 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
 {% load dalme_public_tags static hosts compress %}
 
-{% block title %}{{ data.short_name }} &mdash; {{ block.super }}{% endblock %}
+{% block title %}{{ block.super }} &ndash; {{ title }}{% endblock %}
 
 {% block styles %}
   {{ block.super }}

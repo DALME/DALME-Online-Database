@@ -1,7 +1,7 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
-{% block title %}{{ page.title_switch }} &mdash; {{ block.super }}{% endblock %}
+{% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
 
 {% block banner %}
   {% if messages %}
