@@ -428,19 +428,20 @@
             }]
           ],
           'note': [
-            [':not([type=marginal])', function(e) {
-              e.setAttribute('name', e.getAttribute('target'));
-            }],
-            ['[type=marginal]', function(e) {
+            ['[type=marginal], [type=brace]', function(e) {
               let content = document.createElement('i');
               content.setAttribute('class', 'fas fa-sticky-note');
               content.setAttribute('title', e.innerHTML);
               content.setAttribute('data-toggle', 'tooltip');
               content.setAttribute('data-placement', 'left');
+              content.setAttribute('data-fallbackPlacement', 'top');
               content.setAttribute('data-html', 'true');
               content.setAttribute('data-template', '<div class="tooltip note-marginal" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
               e.innerHTML = '';
               e.appendChild(content);
+            }],
+            [':not([type=marginal])', function(e) {
+              e.setAttribute('name', e.getAttribute('target'));
             }]
           ],
         }
@@ -763,6 +764,14 @@
               let target_width = container_width - sum - 15;
               target_width = target_width > 10 ? target_width : 10;
               $(this).width(target_width);
+            });
+            //braces
+            $('tei-seg[type=brace]').each(function(index, el) {
+              let target = $(this).attr('target');
+              if (target) {
+                if (target.startsWith('#')) target = target.substring(1);
+                $(this).append($(`tei-note#${target}`).remove());
+              }
             });
             $('[data-toggle="tooltip"]').tooltip();
           },
