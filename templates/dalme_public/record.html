@@ -524,8 +524,8 @@
             adaptivePadding: 0,
             fixedPadding: 0,
             zoomLevel: 2,
-            tileHeight: 500, // default = 256
-            tileWidth: 500 // default = 256
+            tileHeight: 1000, // default = 256
+            tileWidth: 1000 // default = 256
           },
           divaHeight: 100,
           footerHeight: 54,
@@ -625,29 +625,31 @@
           },
           renderFolio() {
             const that = this;
-            $.get(`${this.api_endpoint}/pages/${this.folioId}/get_rights/`, function(data) {
+            $.get(`${this.api_endpoint}/pages/${this.folioId}/get_rights/`, function (data) {
               if (data.rights && data.rights.hasOwnProperty('show_image') && data.rights.show_image) {
                 if (that.folioImageId) {
                   that.hasImage = true;
                   that.renderImage();
-                  if (data.rights.display_notice) {
-                    that.rightsNotice = data.rights.notice;
-                  }
+                  if (data.rights.display_notice) that.rightsNotice = data.rights.notice;
                 }
               }
-            }, 'json').then(() => that.setResizable() );
+            }, 'json').then(() => that.setResizable());
           },
           renderImage() {
             if (!window.folio) {
               this.divaOptions['objectData'] = `${this.db_endpoint}/pages/${this.folioId}/manifest/`;
               window.folio = new Diva('diva_viewer', this.divaOptions);
-              Diva.Events.subscribe('ViewerDidLoad', () => app.adjustViewer());
+              Diva.Events.subscribe('ViewerDidLoad', () => {
+                app.adjustViewer();
+                this.divaMaxZoom = window.folio.getMaxZoomLevel();
+                this.divaLoading = false;
+              });
             } else {
               this.zoomLevel = 2;
               window.folio.changeObject(`${this.db_endpoint}/pages/${this.folioId}/manifest/`);
             }
           },
-          setResizable() {
+          setResizable(flipView=false) {
             const node = $('.folio');
             node.resizableSafe('destroy');
             node.resizableSafe({
@@ -656,27 +658,21 @@
                 resizeWidth: this.viewerMode == 'vertical-split' ? true : false,
                 onDrag: function(e, el, newWidth, newHeight, opt) { app.adjustViewer(newHeight); },
             });
-            let maxHeight = this.viewerMode == 'horizontal-split' ?
-              `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight - 51)}px` : 'unset';
-            node.css({
-              maxHeight: maxHeight,
-              height: '',
-              width: ''
-            });
+            node.css({ maxHeight: this.viewerMode == 'horizontal-split' ?
+              `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight - 51)}px` :
+              'unset' });
+            if (flipView) node.css({ height: '', width: '' });
           },
           handleFlipView(split) {
             this.viewerMode = split;
-            this.setResizable();
+            this.setResizable(true);
             this.handleHelpPlacement = split == 'vertical-split' ? 'left' : 'bottom';
             this.adjustViewer();
             update_session({ 'public-viewer-mode': split });
           },
           adjustViewer(divaHeight=false) {
             if (divaHeight) this.divaHeight = divaHeight;
-            setTimeout(() => {
-              window.dispatchEvent(new Event('resize'));
-              this.divaLoading = false;
-            }, 600);
+            setTimeout(() => window.dispatchEvent(new Event('resize')), 600);
           },
           fetchTranscription() {
             if (this.transcriptionId) {
@@ -695,7 +691,7 @@
                       setTimeout(() => that.toggleTeiContainers(), 0);
                     });
                   } else {
-                    this.loading = false;
+                    that.loading = false;
                     that.renderedTranscription = null;
                   }
               });
@@ -725,7 +721,7 @@
           },
           adjustTeiRendering() {
             // leaders
-            let tei_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
+            let container_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
             $('tei-metamark[function=leader]').each(function(index, el) {
               let sum = 0;
               let prev_array = [];
@@ -747,8 +743,7 @@
                 next_array = nextSibs;
               }
               const line_el = $.merge(prev_array, next_array)
-              line_el.each(function(i, elt) { sum += $(this).width(); });
-              let container_width = tei_width;
+              line_el.each(function(i, elt) { sum += $(this).innerWidth(); });
               if ($(this).parent().hasClass('ab-content')) {
                 container_width = Math.round($(this).parent().innerWidth());
               }

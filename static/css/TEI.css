@@ -8,6 +8,11 @@ tei-TEI {
   color: #111;
 }
 
+tei-TEI > tei-text {
+  display: block;
+  line-height: 1.5;
+}
+
 tei-body {
   line-height: 1.8;
 }
@@ -1692,15 +1697,7 @@ tei-*/
   margin-top: 2em;
   margin-bottom: 2em;
 }
-tei-TEI > tei-text {
-  display: block;
-  /*
-tei-border-radius: 15px;
-tei-border: 1px solid black;
-tei-background:white;
-tei-*/
-  line-height: 1.5;
-}
+
 tei-textClass {
   display: none;
 }
@@ -2013,7 +2010,7 @@ tei-note[type="marginal"] {
   background: #ffffdc;
   padding: 5px 10px;
   margin: 10px auto;
-  display: inline-block;
+  display: block;
   font-size: 14px;
   width: 100%;
   white-space: normal;
