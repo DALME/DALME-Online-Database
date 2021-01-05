@@ -1856,7 +1856,7 @@ tei-zone {
   margin: 0;
 }
 .ab-content {
-  padding: 1rem;
+  padding: 1.5rem;
 }
 .closed .ab-content {
   display: none;
@@ -2030,19 +2030,15 @@ tei-note[type="brace"] {
   font-size: 12px;
   text-align: end;
   position: absolute;
-  top: calc(50% - 12px);
-  left: -23px;
-}
-tei-note[type="brace"] > i {
+  top: calc(50% - 10px);
+  left: -6px;
+  background-color: #fff;
   color: #a0a0a0;
   border: 1px solid #aaa;
-  background-color: #fff;
-  padding: .4rem;
-  border-bottom-left-radius: 5px;
-  border-top-left-radius: 5px;
   border-right: none;
+  border-left: none;
+  line-height: 17px;
 }
-
 tei-note[type="marginal"] {
   font-size: 14px;
   border-top: 1px dashed #aaa;
