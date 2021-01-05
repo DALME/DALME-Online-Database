@@ -17,7 +17,8 @@
         "message": "<b>Type</b> of note",
         "options": [
           "marginal",
-          "renvoi"
+          "renvoi",
+          "brace"
         ]
       },
       {

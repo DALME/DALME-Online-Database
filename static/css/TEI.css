@@ -1906,7 +1906,7 @@ tei-g {
   line-height: 1;
   margin: 0 5px;
 }
-span {
+tei-body span {
   display: inline-flex;
   text-decoration: inherit;
 }

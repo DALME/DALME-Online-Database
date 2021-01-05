@@ -15,6 +15,65 @@ function switch_tab(tab) {
 }
 
 function startEditor() {
+  const teiBehaviours = {
+    'tei': {
+      'ab': function(e) {
+          const colNum = e.getAttribute('n');
+          const content = document.createElement('div');
+          content.className = 'ab-content';
+          content.setAttribute('n', colNum);
+          content.innerHTML = e.innerHTML;
+          const div = document.createElement('div');
+          div.innerHTML = `<div><span class="label">C${colNum}</span><i class="fa fa-caret-down"></i><i class="fa fa-caret-right"></i></div>`;
+          div.className = 'ab-column-toggler';
+          e.innerHTML = '';
+          e.appendChild(div);
+          e.appendChild(content);
+      },
+      'gap': function(e) { e = setExtent(e); },
+      'space': function(e) { e = setExtent(e); },
+      'unclear': function(e) { e = setTitle(e); },
+      'supplied': function(e) { e = setTitle(e); },
+      'add': function(e) { e = setTitle(e); },
+      'abbr': function(e) { e = setTitle(e); },
+      'w': function(e) { e = setTitle(e); },
+      'quote': function(e) { e = setTitle(e); },
+      'g': function(e) {
+        let ref = e.getAttribute('ref', false);
+        if (ref) e.innerText = String.fromCharCode(parseInt(ref, 16));
+      },
+      'hi': [
+        ["[rend=superscript]", function(e) {
+          if (e.innerText.length > 3) {
+            e.setAttribute('rend-basic', 1);
+          }
+        }],
+      ],
+      'ref': [
+        ['[target]', function(e) {
+          let ref_id = e.getAttribute('target');
+          e.innerHTML = `<a href="#${ref_id}">${e.getAttribute('target')}</a>`;
+        }]
+      ],
+      'note': [
+        ['[type=marginal], [type=brace]', function(e) {
+          let content = document.createElement('i');
+          content.setAttribute('class', 'fas fa-sticky-note');
+          content.setAttribute('title', e.innerHTML);
+          content.setAttribute('data-toggle', 'tooltip');
+          content.setAttribute('data-placement', 'left');
+          content.setAttribute('data-fallbackPlacement', 'top');
+          content.setAttribute('data-html', 'true');
+          content.setAttribute('data-template', '<div class="tooltip note-marginal" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
+          e.innerHTML = '';
+          e.appendChild(content);
+        }],
+        [':not([type=marginal])', function(e) {
+          e.setAttribute('name', e.getAttribute('target'));
+        }]
+      ],
+    }
+  };
   if (typeof transcriber_state == 'undefined') {
       transcriber_state = 'on';
       footer_content = '...';
@@ -25,18 +84,7 @@ function startEditor() {
       folio_idx = 0;
       resetPanelMetrics();
       tei = new CETEI();
-      tei.addBehaviors({
-        'tei': {
-          'gap': function(e) { e.setAttribute("title", getTitle(e, 'gap')); e.setAttribute("data-toggle", "tooltip"); }, //@reason, @unit, @quantity, @extent
-          'space': function(e) { e.setAttribute("title", getTitle(e, 'space')); e.setAttribute("data-toggle", "tooltip"); }, //@unit, @quantity, @extent
-          'unclear': function(e) { e.setAttribute("title", getTitle(e, 'unclear')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
-          'supplied': function(e) { e.setAttribute("title", getTitle(e, 'supplied')); e.setAttribute("data-toggle", "tooltip"); }, //@reason
-          'add': function(e) { e.setAttribute("title", getTitle(e, 'addition')); e.setAttribute("data-toggle", "tooltip"); }, //@place
-          'abbr': function(e) { e.setAttribute("title", getTitle(e, 'abbreviation')); e.setAttribute("data-toggle", "tooltip"); }, //@type
-          'w': function(e) { e.setAttribute("title", getTitle(e, 'word')); e.setAttribute("data-toggle", "tooltip"); }, //@type, @lemma
-          'quote': function(e) { e.setAttribute("title", getTitle(e, 'quote')); e.setAttribute("data-toggle", "tooltip"); }, //@resp
-          }
-      });
+      tei.addBehaviors(teiBehaviours);
       if (folio_array[0].dam_id == 'None') {
           $('#diva_viewer').html('<div class="mt-auto mb-auto">There is no image associated with this folio/page.</div>');
       } else {
@@ -72,7 +120,8 @@ function startEditor() {
             }
           }).done(function(data, textStatus, jqXHR) {
             tr_text = data.transcription;
-            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+            let text_to_render = tr_text.replace(/\n/g, '<lb/>');
+            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
                 $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
             });
             $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
@@ -153,7 +202,8 @@ function changeEditorMode() {
       xmleditor.destroy();
       $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
       if (tr_text != '') {
-        tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+        let text_to_render = tr_text.replace(/\n/g, '<lb/>');
+        tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
             $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
         });
       } else {
@@ -207,7 +257,8 @@ function changeEditorFolio(target) {
       }).done(function(data, textStatus, jqXHR) {
         tr_text = data.transcription;
         if (editor_mode == 'render') {
-            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+tr_text+'</body></text></TEI>', function(text) {
+            let text_to_render = tr_text.replace(/\n/g, '<lb/>');
+            tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
                 $('#editor').html(text);
             });
             $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
@@ -548,7 +599,7 @@ function addTag(type, tag, att_array) {
         xmleditor.session.insert(xmleditor.getCursorPosition(), tag_output)
       };
       if (tag == 'seg') {
-        const note_output = `\n\n<note xml:id="${special_att['target']}">${special_att['text']}</note>`;
+        const note_output = `\n\n<note type="brace" xml:id="${special_att['target']}">${special_att['text']}</note>`;
         xmleditor.session.insert({row: xmleditor.session.getLength(), column: 0}, note_output)
       };
     }
@@ -570,33 +621,84 @@ function setKeybindings() {
   });
 }
 
-
-function getTitle(e, tag) {
-  if (e.hasAttribute("unit") && e.hasAttribute("quantity")) {
-    var extent = 'extent ' + e.getAttribute("quantity") + ' ' + e.getAttribute("unit");
-  } else if (e.hasAttribute("extent")) {
-    var extent = 'extent ' + e.getAttribute("extent");
-  };
-  if (e.hasAttribute("reason")) { var reason = e.getAttribute("reason") };
-  if (e.hasAttribute("type")) { var type = e.getAttribute("type") };
-  if (e.hasAttribute("lemma")) { var lemma = '"' + e.getAttribute("lemma") + '"' };
-  if (e.hasAttribute("resp")) { var resp = ' by ' + e.getAttribute("resp") };
-  if (tag == 'word' && type && lemma) {
-    var title = type + ': ' + lemma;
-  } else {
-    var title = tag;
-    if (extent) {
-      title = title + ': ' + extent;
-      if (reason) { title = title + ', ' + reason; };
-    } else if (reason) {
-      title = title + ': ' + reason;
-    } else if (type) {
-      title = title + ': ' + type;
-    } else if (resp) {
-      title = title + resp;
+function setExtent(e) {
+  const tag_name = e.tagName.slice(4,);
+  const reason = e.getAttribute('reason', false);
+  var quantity = parseInt(e.getAttribute('quantity', 'nope'));
+  var unit = e.getAttribute('unit', null);
+  var extent = e.getAttribute('extent', null);
+  const fillers = {
+    word: '___ ',
+    char: '* ',
+  }
+  if (extent && !quantity && !unit) {
+    let e_tokens = extent.split(' ');
+    if (e_tokens.length == 2) {
+      if (parseInt(e_tokens[0]) !== NaN) {
+        quantity = parseInt(e_tokens[0]);
+      } else if (e_tokens[0] == 'full') {
+        quantity = 1;
+      } else if (e_tokens[0].includes('-')) {
+        let range = e_tokens[0].split('-');
+        quantity = Math.max(range);
+      }
+      unit = e_tokens[1];
     }
-  };
-  return title
+  }
+  if (unit && extent) {
+    var content = '';
+    var title = '';
+    if (unit.startsWith('word') || unit.startsWith('char')) {
+      if (quantity) {
+        content = fillers[unit.slice(0,4)].repeat(quantity).trim();
+        title = `${quantity} missing ${unit}`;
+        if (reason) title += ` (${reason})`;
+      } else {
+        content = extent;
+        title = extent;
+      }
+      e.innerHTML = `[ ${content} ]`;
+      e.setAttribute('title', title);
+      e.setAttribute('data-toggle', 'tooltip');
+    } else if (unit.startsWith('line') || unit.startsWith('page')) {
+      if (quantity) {
+        let qual = tag_name == 'SPACE' ? ' blank ' : ' ';
+        content = reason ? `${quantity} ${unit} (${reason})` : `${quantity}${qual}${unit}`;
+      } else {
+        content = extent;
+      }
+      e.innerHTML = content;
+      e.setAttribute('show', 'block');
+    }
+  } else if (extent) {
+    e.innerHTML = `[ ${extent} ]`;
+  }
+  return e
+};
+
+function setTitle(e) {
+  const tag_name = e.tagName.slice(4,);
+  const reason = e.getAttribute('reason', false);
+  const type = e.getAttribute('type', false);
+  const lemma = e.getAttribute('lemma', false);
+  const resp = e.getAttribute('resp', false);
+  const title_strings = {
+    'ADD': 'addition',
+    'ABBR': `expanded ${e.getAttribute('type', 'abbreviation')}`,
+  }
+  if (reason) {
+    e.setAttribute('title', `${tag_name.toLowerCase()} (${reason})`);
+  } else if (type && lemma) {
+    e.setAttribute('title', `${type} (${lemma})`);
+  } else if (resp) {
+    e.setAttribute('title', `by ${resp}`);
+  } else if (tag_name in title_strings) {
+    e.setAttribute('title', title_strings[tag_name]);
+  } else {
+    e.setAttribute('title', `${tag_name.toLowerCase()}`);
+  }
+  e.setAttribute('data-toggle', 'tooltip');
+  return e
 }
 
 function editDescription() {
