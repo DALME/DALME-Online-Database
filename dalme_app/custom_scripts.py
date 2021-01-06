@@ -251,10 +251,11 @@ def geolocate_locales(request):
     return errors
 
 def test_expression(request):
-    instance = Source.objects.get(id='82a803bc-31a9-4d2b-90aa-2901ba0d2fa0')
-    set_count = instance.sets.all().count()
-    cols = [{'name': set.set_id.name} for set in instance.sets.all() if set.set_id.set_type == 2]
-    return cols
+    sources = Source.objects.filter(modification_user__isnull=True)
+    for source in sources:
+        source.modification_user = source.creation_user
+        source.save()
+    return sources.count()
 
 def fix_users(records):
     # records = Attribute.objects.all()
