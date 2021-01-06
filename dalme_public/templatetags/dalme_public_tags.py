@@ -102,7 +102,7 @@ def get_breadcrumbs_nav(context):
             breadcrumbs = [
                 *breadcrumbs,
                 {
-                    'title': 'Records',
+                    'title': 'Browse Records',
                     'url': url,
                     'active': True if records else False,
                 },
