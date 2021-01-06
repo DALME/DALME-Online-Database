@@ -795,7 +795,6 @@
             }
             // dynamic adjustments
             this.toggleTeiContainers();
-            this.adjustTeiRendering();
             // enable tooltips
             $('[data-toggle="tooltip"]').tooltip();
           },
@@ -824,8 +823,13 @@
               }
               const line_el = $.merge(prev_array, next_array)
               line_el.each(function(i, elt) { sum += $(this).innerWidth(); });
-              if ($(this).parent().hasClass('ab-content')) {
-                container_width = Math.round($(this).parent().innerWidth());
+              const container_column = $(this).parents('.ab-content');
+              if (container_column.length) {
+                let column_width = container_column.attr('width');
+                if (typeof column_width === typeof undefined || column_width === false) {
+                  container_column.attr('width', container_column.innerWidth());
+                }
+                container_width = container_column.attr('width');
               }
               let target_width = container_width - sum - 15;
               target_width = target_width > 10 ? target_width : 10;
@@ -857,15 +861,13 @@
                 }
               });
             }
+            this.adjustTeiRendering();
           },
           changeRenderMode(mode) {
             this.renderMode = mode;
             update_session({ 'public-render-mode': mode });
             this.softWrap = mode == 'basic' ? true : false;
-            setTimeout(() => {
-              this.toggleTeiContainers();
-              this.adjustTeiRendering();
-            }, 0);
+            setTimeout(() => this.toggleTeiContainers(), 0);
           },
           toggleTextWrap() {
             if (this.renderMode == 'scholarly') {
