@@ -704,8 +704,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
 
         context = self.get_context(request)
 
-        if request.META.get('HTTP_REFERER'):
-            from_search = True if 'search' in request.META.get('HTTP_REFERER') else False
+        from_search = False
+        if request.META.get('HTTP_REFERER') and 'search' in request.META.get('HTTP_REFERER'):
+            from_search = True
 
         data = PublicSourceSerializer(source).data
         context.update({
