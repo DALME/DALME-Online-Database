@@ -153,7 +153,7 @@
             class="dropdown-item"
             href="#"
             @click="handleFlipView('vertical-split')">
-            <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'horizontal-split', 'fas fa-check-square': viewerMode == 'vertical-split' }"></i> Vertical Split
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'horizontal-split', 'fas fa-check-square': viewerMode == 'vertical-split' }"></i> Vertical split
           </b-dropdown-item>
           <b-popover
             boundary="window"
@@ -165,11 +165,23 @@
             Change how the screen is split.
           </b-popover>
           <b-dropdown-item class="dropdown-item" href="#" @click="handleFlipView('horizontal-split')">
-            <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'vertical-split', 'fas fa-check-square': viewerMode == 'horizontal-split' }"></i> Horizontal Split
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': viewerMode == 'vertical-split', 'fas fa-check-square': viewerMode == 'horizontal-split' }"></i> Horizontal split
           </b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item id="notes_menu" class="dropdown-item" href="#" @click="showMarginalNotes = !showMarginalNotes" v-bind:class="{ disabled: !hasMarginalNotes }">
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': !showMarginalNotes, 'fas fa-check-square': showMarginalNotes }"></i> Marginal notes
+          </b-dropdown-item>
+          <b-popover
+            boundary="window"
+            variant="dark"
+            target="notes_menu"
+            placement="lefttop"
+            :show="showHelp"
+            triggers="manual">
+            Show or hide the marginal notes bar.
+          </b-popover>
           <b-dropdown-item id="text_wrap_menu" class="dropdown-item" href="#" @click="toggleTextWrap" v-bind:class="{ disabled: renderMode == 'basic' }">
-            <i class="fa-fw" v-bind:class="{ 'far fa-square': !softWrap, 'fas fa-check-square': softWrap }"></i> Soft-wrap text
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': !softWrap, 'fas fa-check-square': softWrap }"></i> Wrap long lines
           </b-dropdown-item>
           <b-popover
             boundary="window"
@@ -178,7 +190,7 @@
             placement="lefttop"
             :show="showHelp"
             triggers="manual">
-            Change how lines wider than the viewing area are treated.
+            Long lines are soft-wrapped.
           </b-popover>
           <b-dropdown-item id="newlines_menu" @click="showNewlines = !showNewlines" class="dropdown-item" href="#">
             <i class="fa-fw" v-bind:class="{ 'far fa-square': !showNewlines, 'fas fa-check-square': showNewlines }"></i> Newline symbols
@@ -250,9 +262,12 @@
       </div>
       <div id="diva_viewer">
         <beat-loader v-show="divaLoading" color="#aaa"></beat-loader>
-        <div v-if="!hasImage" class="diva-no-image"></div>
+        <div v-if="showImage && !folioImageId" class="diva-no-image"></div>
+        <div v-if="!showImage" class="diva-no-right">
+          <div>Copyright restrictions prevent us from displaying this image.</div>
+        </div>
       </div>
-      <div id="folio-rights" class="folio-rights u-flex" v-if="rightsNotice">
+      <div id="folio-rights" class="folio-rights u-flex" v-if="showImage && folioImageId && showNotice && rightsNotice">
         <div>${rightsNotice}</div>
       </div>
     </section>
@@ -266,10 +281,13 @@
       triggers="manual">
       Drag to resize viewer panels.
     </b-popover>
+    <div id="notebar" :style="{ height: transcriptionHeight + 'px' }" v-show="hasMarginalNotes && showMarginalNotes">
+      <div class="notes_container"></div>
+    </div>
     <section
       id="transcription"
       class="transcription"
-      :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }]"
+      :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }, { 'no-scroll-bar': hasMarginalNotes && showMarginalNotes}]"
       :style="{ height: transcriptionHeight + 'px' }">
       <beat-loader v-show="loading" color="#aaa"></beat-loader>
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
@@ -284,8 +302,8 @@
   {% compress js %}
     <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ResizeSensor.js' %}"></script>
   {% endcompress %}
-  <!--script type="text/javascript" src="{% static 'js/diva_dev.js' %}"></script-->
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
@@ -385,6 +403,7 @@
           e.setAttribute('title', `${tag_name.toLowerCase()}`);
         }
         e.setAttribute('data-toggle', 'tooltip');
+        return e
       };
 
       const teiBehaviours = {
@@ -429,18 +448,13 @@
           ],
           'note': [
             ['[type=marginal], [type=brace]', function(e) {
-              let content = document.createElement('i');
-              content.setAttribute('class', 'far fa-sticky-note');
-              content.setAttribute('title', e.innerHTML);
-              content.setAttribute('data-toggle', 'tooltip');
-              content.setAttribute('data-placement', 'left');
-              content.setAttribute('data-fallbackPlacement', 'top');
-              content.setAttribute('data-html', 'true');
-              content.setAttribute('data-template', '<div class="tooltip note-marginal" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
-              e.innerHTML = '';
-              e.appendChild(content);
+              e.setAttribute('title', e.innerHTML);
+              e.setAttribute('data-toggle', 'tooltip');
+              e.setAttribute('data-html', 'true');
+              e.setAttribute('data-template', '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
+              e.innerHTML = '<i class="fas fa-caret-left"></i><i class="fas fa-sticky-note"></i>';
             }],
-            [':not([type=marginal])', function(e) {
+            [':not([type])', function(e) {
               e.setAttribute('name', e.getAttribute('target'));
             }]
           ],
@@ -489,20 +503,11 @@
           this.tei.addBehaviors(teiBehaviours);
         },
         data: {
+          api_endpoint: '{{ api_url }}',
+          db_endpoint: '{{ db_url }}',
           showHelp: false,
-          showCitePanel: false,
-          showCopied: false,
-          popoverPlacement: 'bottom',
-          handleHelpPlacement: '{{ viewer_mode }}' == 'vertical-split' ? 'left' : 'bottom',
-          folioIndex: {{ initial_folio_index }},
-          zoomLevel: 2,
-          folioSelect: false,
-          date: 0,
           showInfoPanel: true,
-          renderMode: '{{ render_mode }}',
-          viewerMode: '{{ viewer_mode }}',
-          softWrap: '{{ render_mode }}' == 'basic' ? true : false,
-          showNewlines: false,
+          showCitePanel: false,
           formats: null,
           format: 'html',
           template: 'harvard1',
@@ -512,14 +517,26 @@
             bibtex: '.bib',
             ris: '.ris'
           },
+          showCopied: false,
+          popoverPlacement: 'bottom',
+          handleHelpPlacement: '{{ viewer_mode }}' == 'vertical-split' ? 'left' : 'bottom',
+          renderMode: '{{ render_mode }}',
+          viewerMode: '{{ viewer_mode }}',
+          softWrap: '{{ render_mode }}' == 'basic' ? true : false,
+          showNewlines: false,
+          folioSelect: false,
+          date: 0,
+          folioIndex: {{ initial_folio_index }},
           loading: false,
-          divaLoading: true,
           renderedTranscription: null,
           tei: null,
-          api_endpoint: '{{ api_url }}',
-          db_endpoint: '{{ db_url }}',
-          hasImage: false,
+          hasMarginalNotes: false,
+          showMarginalNotes: true,
+          showImage: false,
+          showNotice: false,
           rightsNotice: null,
+          divaLoading: true,
+          zoomLevel: 2,
           divaMaxZoom: 4,
           divaMinZoom: 0,
           divaOptions: {
@@ -632,6 +649,14 @@
           },
           switchFolio() {
             this.divaLoading = true;
+            this.loading = true;
+            $('[data-toggle="tooltip"]').tooltip('dispose');
+            if (this.hasMarginalNotes) {
+              this.hasMarginalNotes = false;
+              $('.notes_container').empty();
+              $('#transcription').off('scroll');
+              $('#notebar').off('scroll wheel');
+            }
             this.fetchTranscription();
             this.renderFolio();
             this.updateURL();
@@ -639,11 +664,14 @@
           renderFolio() {
             const that = this;
             $.get(`${this.api_endpoint}/pages/${this.folioId}/get_rights/`, function (data) {
-              if (data.rights && data.rights.hasOwnProperty('show_image') && data.rights.show_image) {
-                if (that.folioImageId) {
-                  that.hasImage = true;
+              if (data.rights) {
+                that.showImage = data.rights.hasOwnProperty('show_image') ? data.rights.show_image : false;
+                that.showNotice = data.rights.display_notice;
+                that.rightsNotice = data.rights.notice;
+                if (that.showImage && that.folioImageId) {
                   that.renderImage();
-                  if (data.rights.display_notice) that.rightsNotice = data.rights.notice;
+                } else {
+                  that.divaLoading = false;
                 }
               }
             }, 'json').then(() => that.setResizable());
@@ -690,8 +718,6 @@
           },
           fetchTranscription() {
             if (this.transcriptionId) {
-              $('[data-toggle="tooltip"]').tooltip('dispose');
-              this.loading = true;
               const that = this;
               fetch(`{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${this.transcriptionId}/?format=json`)
                 .then(response => response.json())
@@ -702,7 +728,7 @@
                     that.tei.makeHTML5(tei_block, function (data) {
                       that.loading = false;
                       that.renderedTranscription = data.outerHTML;
-                      setTimeout(() => that.toggleTeiContainers(), 0);
+                      setTimeout(() => that.setupTeiRendering(), 0);
                     });
                   } else {
                     that.loading = false;
@@ -733,8 +759,48 @@
             link.click()
             URL.revokeObjectURL(link.href)
           },
+          setupTeiRendering() {
+            //braces
+            const braces = $('tei-seg[type=brace]');
+            if (braces.length) {
+              braces.each(function(index, el) {
+                let target = $(this).attr('target');
+                if (target) {
+                  if (target.startsWith('#')) target = target.substring(1);
+                  $(this).append($(`tei-note#${target}`).remove());
+                }
+              });
+            }
+            // marginal notes
+            const marginal_notes = $('tei-note[type=marginal]');
+            if (marginal_notes.length) {
+              this.hasMarginalNotes = true;
+              $('tei-note[type=marginal]').each(function(index, el) {
+                let margin_top = Math.round($(this).position().top);
+                let note = $(this).remove();
+                $(note).css({ top: `${margin_top}px`});
+                $('.notes_container').append(note);
+              });
+              new ResizeSensor($('tei-text'), function(e) {
+                $('.notes_container').height(e.height);
+              });
+              $('#transcription').on('scroll', function (e) {
+                  $('#notebar').scrollTop($(this).scrollTop());
+              });
+              $('#notebar').on('scroll wheel', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return false;
+              });
+            }
+            // dynamic adjustments
+            this.toggleTeiContainers();
+            this.adjustTeiRendering();
+            // enable tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+          },
           adjustTeiRendering() {
-            // leaders
+            // adjust leaders
             let container_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
             $('tei-metamark[function=leader]').each(function(index, el) {
               let sum = 0;
@@ -765,15 +831,6 @@
               target_width = target_width > 10 ? target_width : 10;
               $(this).width(target_width);
             });
-            //braces
-            $('tei-seg[type=brace]').each(function(index, el) {
-              let target = $(this).attr('target');
-              if (target) {
-                if (target.startsWith('#')) target = target.substring(1);
-                $(this).append($(`tei-note#${target}`).remove());
-              }
-            });
-            $('[data-toggle="tooltip"]').tooltip();
           },
           childrenAllHidden(container) {
             const all_children = $(container).children(':not(tei-lb)');
@@ -787,7 +844,7 @@
             const containerList = [
               { selector: 'tei-ab[type=column] div.ab-content', parent: true },
               { selector: 'tei-layout[columns]', parent: false },
-              { selector: 'tei-note:not([type=marginal])', parent: false }
+              { selector: 'tei-note:not([type])', parent: false }
             ];
             const that = this;
             for (let i = 0, len = containerList.length; i < len; ++i) {
@@ -800,13 +857,15 @@
                 }
               });
             }
-            this.adjustTeiRendering();
           },
           changeRenderMode(mode) {
             this.renderMode = mode;
             update_session({ 'public-render-mode': mode });
             this.softWrap = mode == 'basic' ? true : false;
-            setTimeout(() => this.toggleTeiContainers(), 0);
+            setTimeout(() => {
+              this.toggleTeiContainers();
+              this.adjustTeiRendering();
+            }, 0);
           },
           toggleTextWrap() {
             if (this.renderMode == 'scholarly') {

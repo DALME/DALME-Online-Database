@@ -1910,11 +1910,15 @@ tei-body span {
   display: inline-flex;
   text-decoration: inherit;
 }
-tei-hi[rend*=indent] tei-lb + span,
-tei-hi[rend*=indent] tei-w[type=elision] + span {
-  padding: inherit;
+tei-hi[rend*=indent] tei-lb + span {
+    padding: inherit;
 }
-
+/* tei-hi[rend*=indent] tei-w[type=elision] + span {
+    padding: inherit;
+} */
+tei-w[type=elision] + span {
+  padding: 0;
+}
 tei-metamark[rend="line"] {
   background-size: 50px 1px;
   border-bottom: 1px solid #aaa;
@@ -2041,34 +2045,35 @@ tei-note[type="brace"] {
 }
 tei-note[type="marginal"] {
   font-size: 14px;
-  border-top: 1px dashed #aaa;
-  text-align: end;
   position: relative;
-  float: right;
-  width: 50%;
-  margin-top: .5rem;
-  margin-bottom: .5rem;
-  right: -1.5rem;
-}
-tei-note[type="marginal"] > i {
-  border: 1px solid #aaa;
-  background-color: #ebebeb;
-  padding: .5rem;
-  border-bottom-left-radius: 5px;
-  border-top-left-radius: 5px;
+  background-color: #ffffffd4;
+  border: 1px solid #d4d4d4;
   border-right: none;
-  position: absolute;
-  top: -15px;
-  right: 0;
+  margin-left: -1px;
+  color: #d4d4d4;
 }
-.tooltip.note-marginal {
+tei-note[type="marginal"]:hover {
+  color: #354d87;
+  border-color: #354d87;
+}
+tei-note[type="marginal"] > i:first-child {
+  position: absolute;
+  left: -17px;
+  top: 0;
+  font-size: 18px;
+}
+tei-note[type="marginal"] > i:not(first-child) {
+  width: 100%;
+  text-align: center;
+}
+.tooltip.note {
   font-family: "PT Serif";
   font-size: 1rem;
 }
-.tooltip.note-marginal.show {
+.tooltip.note.show {
   opacity: .95;
 }
-.tooltip.note-marginal .tooltip-inner {
+.tooltip.note .tooltip-inner {
   max-width: 400px;
   padding: .75rem .75rem;
   color: #000;
@@ -2076,8 +2081,17 @@ tei-note[type="marginal"] > i {
   background-color: #ebebeb;
   border: 1px solid #aaa;
 }
-.tooltip.note-marginal .arrow::before .bs-tooltip-left {
+.tooltip.note .arrow::before .bs-tooltip-left {
   border-left-color: #aaa;
+}
+.tooltip.note .arrow::before .bs-tooltip-right {
+  border-right-color: #aaa;
+}
+.tooltip.note .arrow::before .bs-tooltip-top {
+  border-top-color: #aaa;
+}
+.tooltip.note .arrow::before .bs-tooltip-bottom {
+  border-bottom-color: #aaa;
 }
 
 tei-ref a {

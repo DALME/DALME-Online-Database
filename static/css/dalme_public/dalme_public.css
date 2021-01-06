@@ -2946,6 +2946,9 @@ div.viewer {
   width: 100%;
   padding: 2rem;
 }
+section.transcription.no-scroll-bar #tei-container {
+  padding-right: 4rem;
+}
 main.inventory {
   flex: 0;
   height: calc(100vh - 147px);
@@ -3299,12 +3302,36 @@ parsererror div {
   margin: .5rem .5rem;
 }
 
-#margin_bar {
-  /* position: absolute; */
-  background-color: #efefef;
-  width: 30px;
-  /* right: 4rem;
-  z-index: 1; */
-  border-left: 1px solid #d6d6d6;
+#notebar {
+  position: absolute;
+  width: 36px;
+  right: 4rem;
+  display: block;
+  z-index: 2;
   overflow: scroll;
+}
+.notes_container {
+  position: relative;
+  display: block;
+  margin-left: 8px;
+  border-left: 1px dashed #8080802e;
+  background: linear-gradient(90deg, transparent, #ffffffd4);
+}
+.notes_container:hover {
+  background-color: #fbfbfb;
+  border-color: #d4d4d4;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.notes_container:hover tei-note {
+  color: #989898;
+  border-color: #989898;
+  background-color: #fbfbfb;
+}
+.no-scroll-bar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scroll-bar::-webkit-scrollbar {
+    display: none;
 }
