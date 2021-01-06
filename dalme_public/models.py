@@ -703,9 +703,14 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         initial_folio_index = next((i for i, item in enumerate(pages) if item["pageName"] == folio), 0) if folio else 0
 
         context = self.get_context(request)
+
+        if request.META.get('HTTP_REFERER'):
+            from_search = True if 'search' in request.META.get('HTTP_REFERER') else False
+
         data = PublicSourceSerializer(source).data
         context.update({
             'record': True,
+            'from_search': from_search,
             'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
             'render_mode': request.session.get('public-render-mode', 'scholarly'),
             'purl': source.get_purl(),

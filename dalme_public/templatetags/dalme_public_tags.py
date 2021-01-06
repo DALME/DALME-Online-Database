@@ -81,6 +81,7 @@ def get_breadcrumbs_nav(context):
     record = context.get('record')
     search = context.get('search')
     explore = context.get('explore')
+    from_search = context.get('from_search')
 
     if records or record:
         collection = context.get('collection')
@@ -88,14 +89,24 @@ def get_breadcrumbs_nav(context):
         if collection:
             url += f'?collection={collection}'
         breadcrumbs[-1].update({'active': False})
-        breadcrumbs = [
-            *breadcrumbs,
-            {
-                'title': 'Records',
-                'url': url,
-                'active': True if records else False,
-            },
-        ]
+        if record and from_search:
+            breadcrumbs = [
+                *breadcrumbs,
+                {
+                    'title': 'Search',
+                    'url': '/collections/search/',
+                    'active': False,
+                },
+            ]
+        else:
+            breadcrumbs = [
+                *breadcrumbs,
+                {
+                    'title': 'Records',
+                    'url': url,
+                    'active': True if records else False,
+                },
+            ]
 
     if record:
         title = context['data']['short_name']
