@@ -573,7 +573,7 @@ function addTag(type, tag, att_array) {
     };
     if (tag == 'note') {
       if (special_att['type'] == 'renvoi') {
-        const note_ref = `<ref target="#note_${special_att['target']}"/>`;
+        const note_ref = `<ref target="${special_att['target']}"/>`;
         const note_output = `\n\n<note xml:id="${special_att['target']}">${special_att['text']}</note>`;
         xmleditor.session.insert(xmleditor.getCursorPosition(), note_ref);
         xmleditor.session.insert({row: xmleditor.session.getLength(), column: 0}, note_output)
