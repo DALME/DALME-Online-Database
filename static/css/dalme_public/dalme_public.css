@@ -2560,19 +2560,36 @@ ul.pagination > li.page-item:last-child button {
 
 /* viewer */
 
-.diva-no-image {
+.diva-no-image,
+.diva-no-right {
   background-color: #2d2d2d;
   height: 100%;
   width: 100%;
   display: flex;
+  padding: 2rem;
+  flex-direction: column;
 }
-
+.diva-no-right > div {
+  color: #636363;
+  margin: 0 auto auto auto;
+  text-align: center;
+  min-width: 134px;
+  max-width: 270px;
+}
 .diva-no-image::after {
   content: "\f070";
   font-family: "Font Awesome 5 Free";
-  font-size: 10rem;
+  font-size: 6rem;
   font-weight: 900;
   margin: auto;
+  color: #404040;
+}
+.diva-no-right::before {
+  content: "\f1f9";
+  font-family: "Font Awesome 5 Free";
+  font-size: 6rem;
+  font-weight: 900;
+  margin: auto auto 0 auto;
   color: #404040;
 }
 
