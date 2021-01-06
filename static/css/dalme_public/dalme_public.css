@@ -3315,7 +3315,7 @@ parsererror div {
   display: block;
   margin-left: 8px;
   border-left: 1px dashed #8080802e;
-  background: linear-gradient(90deg, transparent, #ffffffd4);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), #ffffffc7);
 }
 .notes_container:hover {
   background-color: #fbfbfb;
