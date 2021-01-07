@@ -2043,6 +2043,20 @@ tei-note[type="brace"] {
   border-left: none;
   line-height: 17px;
 }
+#notebar {
+  position: absolute;
+  right: 4rem;
+  display: block;
+  z-index: 2;
+  overflow: scroll;
+  padding-left: 8px;
+}
+.notes_container {
+  position: relative;
+  display: block;
+  width: auto;
+  border-left: 1px dashed #bfbfbf41;
+}
 tei-note[type="marginal"] {
   font-size: 14px;
   position: relative;
@@ -2051,22 +2065,47 @@ tei-note[type="marginal"] {
   border-right: none;
   margin-left: -1px;
   color: #d4d4d4;
+  min-width: 28px;
+  display: flex;
+  flex-direction: row;
+  border-top-left-radius: .2rem;
+  border-bottom-left-radius: .2rem;
+
 }
-tei-note[type="marginal"]:hover {
-  color: #354d87;
-  border-color: #354d87;
-}
-tei-note[type="marginal"] > i:first-child {
-  position: absolute;
-  left: -17px;
-  top: 0;
+tei-note[type="marginal"] > div > i:first-child {
+  position: relative;
+  left: -7px;
+  top: 1px;
   font-size: 18px;
 }
-tei-note[type="marginal"] > i:not(first-child) {
-  width: 100%;
-  text-align: center;
+tei-note[type="marginal"] > div > i:not(first-child) {
+  margin-top: .3rem;
+  margin-bottom: .5rem;
 }
-.tooltip.note {
+.notes_container tei-note[type="marginal"] .note_content {
+  display: none;
+}
+.notes_container:hover tei-note[type="marginal"] {
+  color: #354d87;
+  border-color: #354d87;
+  background-color: #fbfbfb;
+}
+.notes_container:hover {
+  border-color: transparent;
+}
+tei-note[type="marginal"]:hover .note_content {
+  color: #6b6b6b;
+  display: block;
+  max-width: 200px;
+  line-height: 1.3;
+  padding: .5rem;
+  font-family: "PT Serif";
+  font-size: 1rem;
+  background-color: #fbfbfb5c;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+/* .tooltip.note {
   font-family: "PT Serif";
   font-size: 1rem;
 }
@@ -2092,7 +2131,7 @@ tei-note[type="marginal"] > i:not(first-child) {
 }
 .tooltip.note .arrow::before .bs-tooltip-bottom {
   border-bottom-color: #aaa;
-}
+} */
 
 tei-ref a {
   color: #888;

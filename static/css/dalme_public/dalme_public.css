@@ -3302,32 +3302,6 @@ parsererror div {
   margin: .5rem .5rem;
 }
 
-#notebar {
-  position: absolute;
-  width: 36px;
-  right: 4rem;
-  display: block;
-  z-index: 2;
-  overflow: scroll;
-}
-.notes_container {
-  position: relative;
-  display: block;
-  margin-left: 8px;
-  border-left: 1px dashed #8080802e;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0), #ffffffc7);
-}
-.notes_container:hover {
-  background-color: #fbfbfb;
-  border-color: #d4d4d4;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
-.notes_container:hover tei-note {
-  color: #989898;
-  border-color: #989898;
-  background-color: #fbfbfb;
-}
 .no-scroll-bar {
   -ms-overflow-style: none;
   scrollbar-width: none;
