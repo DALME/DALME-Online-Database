@@ -18,8 +18,9 @@ tei-body {
 }
 
 tei-hi[rend="superscript"] {
-  vertical-align: super;
   font-size: 90%;
+  position: relative;
+  top: -5px;
 }
 
 tei-hi[rend="subscript"] {

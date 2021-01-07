@@ -11,9 +11,9 @@
   <div class="form-button d-flex">
       <b-dropdown
         size="sm"
-        variant="secondary"
         text="Change format"
-        class="flex-fill">
+        class="flex-fill"
+        toggle-class="dalme-button">
         <template v-for="format in formats">
           <b-dropdown-divider v-if="format.divider"></b-dropdown-divider>
           <b-dropdown-item
@@ -26,18 +26,17 @@
       </b-dropdown>
       <b-button
         id="clip_copy"
-        variant="secondary"
         size="sm"
-        class="flex-fill ml-1 mr-1"
+        class="flex-fill dalme-button ml-1 mr-1"
         data-clipboard-target="#citation"
         @click="showCopiedTooltip">
         Copy
       </b-button>
       <b-dropdown
         size="sm"
-        variant="secondary"
         text="Download"
-        class="flex-fill">
+        class="flex-fill"
+        toggle-class="dalme-button">
         <b-dropdown-item @click="downloadCitation('bibtex')">BibTeX</b-dropdown-item>
         <b-dropdown-item @click="downloadCitation('ris')">RIS/Endnote</b-dropdown-item>
       </b-dropdown>
