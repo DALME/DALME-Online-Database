@@ -1911,7 +1911,8 @@ tei-body span {
   display: inline-flex;
   text-decoration: inherit;
 }
-tei-hi[rend*=indent] tei-lb + span {
+tei-hi[rend*=indent] tei-lb + span,
+tei-hi[rend*=indent] tei-lb + tei-w {
     padding: inherit;
 }
 /* tei-hi[rend*=indent] tei-w[type=elision] + span {
