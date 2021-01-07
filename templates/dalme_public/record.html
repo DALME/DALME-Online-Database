@@ -373,10 +373,6 @@
           template: 'harvard1',
           lang: 'en-US',
           formatted_citation: null,
-          file_extensions: {
-            bibtex: '.bib',
-            ris: '.ris'
-          },
           showCopied: false,
           popoverPlacement: 'bottom',
           handleHelpPlacement: '{{ viewer_mode }}' == 'vertical-split' ? 'left' : 'bottom',
@@ -391,6 +387,9 @@
           renderedTranscription: null,
           tei: null,
           hasMarginalNotes: false,
+          hasColumns: false,
+          hasLeaders: false,
+          hasBraces: false,
           showMarginalNotes: true,
           showImage: false,
           showNotice: false,
@@ -399,24 +398,6 @@
           zoomLevel: 2,
           divaMaxZoom: 4,
           divaMinZoom: 0,
-          divaOptions: {
-            enableAutoTitle: false,
-            enableFullscreen: false,
-            enableKeyScroll: false,
-            blockMobileMove: false,
-            enableSpaceScroll: false,
-            enableGotoPage: false,
-            enableGridIcon: false,
-            enableGridControls: false,
-            enableImageTitles: false,
-            enableToolbar: false,
-            enableAutoWidth: true,
-            adaptivePadding: 0,
-            fixedPadding: 0,
-            zoomLevel: 2,
-            tileHeight: 1000, // default = 256
-            tileWidth: 1000 // default = 256
-          },
           divaHeight: 100,
           footerHeight: 54,
           windowHeight: null,
@@ -510,13 +491,7 @@
           switchFolio() {
             this.divaLoading = true;
             this.loading = true;
-            $('[data-toggle="tooltip"]').tooltip('dispose');
-            if (this.hasMarginalNotes) {
-              this.hasMarginalNotes = false;
-              $('.notes_container').empty();
-              $('#transcription').off('scroll');
-              $('#notebar').off('scroll wheel');
-            }
+            this.resetTeiRendering();
             this.fetchTranscription();
             this.renderFolio();
             this.updateURL();
@@ -538,10 +513,27 @@
           },
           renderImage() {
             if (!window.folio) {
-              this.divaOptions['objectData'] = `${this.db_endpoint}/pages/${this.folioId}/manifest/`;
-              window.folio = new Diva('diva_viewer', this.divaOptions);
+              window.folio = new Diva('diva_viewer', {
+                objectData: `${this.db_endpoint}/pages/${this.folioId}/manifest/`,
+                enableAutoTitle: false,
+                enableFullscreen: false,
+                enableKeyScroll: false,
+                blockMobileMove: false,
+                enableSpaceScroll: false,
+                enableGotoPage: false,
+                enableGridIcon: false,
+                enableGridControls: false,
+                enableImageTitles: false,
+                enableToolbar: false,
+                enableAutoWidth: true,
+                adaptivePadding: 0,
+                fixedPadding: 0,
+                zoomLevel: 2,
+                tileHeight: 1000, // default = 256
+                tileWidth: 1000 // default = 256
+              });
               Diva.Events.subscribe('ViewerDidLoad', () => {
-                app.adjustViewer();
+                app.updateViewer();
                 this.divaMaxZoom = window.folio.getMaxZoomLevel();
                 this.divaLoading = false;
               });
@@ -557,7 +549,7 @@
                 handleSelector: '#resize-handle',
                 resizeHeight: this.viewerMode == 'horizontal-split' ? true : false,
                 resizeWidth: this.viewerMode == 'vertical-split' ? true : false,
-                onDrag: function(e, el, newWidth, newHeight, opt) { app.adjustViewer(newHeight); },
+                onDrag: function(e, el, newWidth, newHeight, opt) { app.updateViewer(newHeight); },
             });
             node.css({ maxHeight: this.viewerMode == 'horizontal-split' ?
               `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight - 51)}px` :
@@ -568,11 +560,11 @@
             this.viewerMode = split;
             this.setResizable(true);
             this.handleHelpPlacement = split == 'vertical-split' ? 'left' : 'bottom';
-            this.adjustViewer();
+            this.updateViewer();
             $('section.transcription').scrollTop(0);
             update_session({ 'public-viewer-mode': split });
           },
-          adjustViewer(divaHeight=false) {
+          updateViewer(divaHeight=false) {
             if (divaHeight) this.divaHeight = divaHeight;
             setTimeout(() => window.dispatchEvent(new Event('resize')), 600);
           },
@@ -615,51 +607,157 @@
             })
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob)
-            link.download = `citation${this.file_extensions[format]}`
+            link.download = format == 'bibtex' ? 'citation.bib' : 'citation.ris';
             link.click()
             URL.revokeObjectURL(link.href)
           },
           setupTeiRendering() {
-            //braces
-            const braces = $('tei-seg[type=brace]');
-            if (braces.length) {
-              braces.each(function(index, el) {
-                let target = $(this).attr('target');
-                if (target) {
-                  if (target.startsWith('#')) target = target.substring(1);
-                  $(this).append($(`tei-note#${target}`).remove());
-                }
-              });
+            if ($('tei-seg[type=brace]').length) {
+              this.hasBraces = true;
+              this.formatBraces();
             }
-            // marginal notes
-            const marginal_notes = $('tei-note[type=marginal]');
-            if (marginal_notes.length) {
+            if ($('tei-note[type=marginal]').length) {
               this.hasMarginalNotes = true;
-              $('tei-note[type=marginal]').each(function(index, el) {
-                let margin_top = Math.round($(this).position().top);
-                let note = $(this).remove();
-                $(note).css({ top: `${margin_top}px`});
-                $('.notes_container').append(note);
-              });
-              new ResizeSensor($('tei-text'), function(e) {
-                $('.notes_container').height(e.height);
-              });
-              $('#transcription').on('scroll', function (e) {
-                  $('#notebar').scrollTop($(this).scrollTop());
-              });
-              $('#notebar').on('scroll wheel', function(e) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  return false;
+              this.formatMarginalNotes();
+            }
+            if ($('tei-ab[type=column]').length) {
+              this.hasColumns = true;
+              this.formatColumns();
+            }
+            if ($('tei-metamark[function=leader]').length) {
+              this.hasLeaders = true;
+              this.formatLeaders();
+            }
+            $('[data-toggle="tooltip"]').tooltip();
+            setTimeout(() => {
+              new ResizeSensor($('tei-text'), function(e) { app.updateTeiRendering(e) });
+            }, 1000);
+          },
+          updateTeiRendering(e) {
+            if (this.hasLeaders) {
+              this.formatLeaders();
+            }
+            if (this.hasMarginalNotes) {
+              let prev_height = $('.notes_container').height();
+              $('.notes_container').height(e.height);
+              $('tei-note[type=marginal]').each(function() {
+                let new_top = (parseInt($(this).css('top'), 10) / prev_height) * e.height;
+                $(this).css({ top: `${Math.round(new_top)}px`});
               });
             }
-            // dynamic adjustments
-            this.toggleTeiContainers();
-            // enable tooltips
-            $('[data-toggle="tooltip"]').tooltip();
           },
-          adjustTeiRendering() {
-            // adjust leaders
+          resetTeiRendering() {
+            $('[data-toggle="tooltip"]').tooltip('dispose');
+            if (this.hasMarginalNotes) {
+              this.hasMarginalNotes = false;
+              $('.notes_container').empty();
+              $('#transcription').off('scroll');
+              $('#notebar').off('scroll wheel');
+            }
+            if (this.hasColumns) {
+              this.hasColumns = false;
+              $(document).off('click', '.ab-column-toggler')
+            }
+            this.hasBraces = false;
+            this.hasLeaders = false;
+          },
+          toggleTeiContainers() {
+            const containerList = [
+              { selector: 'tei-ab[type=column] div.ab-content', parent: true },
+              { selector: 'tei-layout[columns]', parent: false },
+              { selector: 'tei-note:not([type])', parent: false }
+            ];
+            const that = this;
+            for (let i = 0, len = containerList.length; i < len; ++i) {
+              $(containerList[i].selector).each(function() {
+                const target = containerList[i].parent ? $(this).parent() : $(this);
+                const all_children = $(this).children(':not(tei-lb)');
+                const hidden_children = $(this).children(':not(tei-lb)').filter(function() {
+                  return $(this).css('display') == 'none';
+                });
+                all_children.length === hidden_children.length ? target.hide() : target.show();
+              });
+            }
+          },
+          changeRenderMode(mode) {
+            this.renderMode = mode;
+            update_session({ 'public-render-mode': mode });
+            this.softWrap = mode == 'basic' ? true : false;
+            setTimeout(() => this.toggleTeiContainers(), 0);
+          },
+          toggleTextWrap() {
+            if (this.renderMode == 'scholarly') {
+              this.softWrap = this.softWrap ? false : true;
+            }
+          },
+          toggleHelpTips() {
+            let state = this.showHelp ? false : true;
+            if(state) {
+              this.$refs.optionsDropdown.show();
+              setTimeout(() => this.showHelp = state, 80);
+            } else {
+              this.showHelp = state;
+            }
+          },
+          showCopiedTooltip() {
+            this.showCitePanel = false;
+            this.showCopied = true;
+            setTimeout(() => this.showCopied = false, 800);
+          },
+          windowResized() {
+            this.windowHeight = $(window).height();
+            this.divaHeight = $('.folio').height();
+            this.headerHeight = $('header').height();
+            this.footerHeight = $('#footer-app').height();
+            $('main.inventory').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
+          },
+          closeCitePanel() {
+            this.showCitePanel = false;
+          },
+          toggleInfoPanel() {
+            this.showInfoPanel = this.showInfoPanel ? false : true;
+          },
+          updateURL() {
+            let path_tokens = location.pathname.split('/').filter(Boolean);
+            if (!/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path_tokens[path_tokens.length - 1])) {
+              path_tokens.pop();
+            }
+            const url = `${location.protocol}//${location.host}/${path_tokens.join('/')}/${this.sourceData.folios[this.folioIndex].pageName}/`;
+            window.history.replaceState(null, null, url);
+          },
+          formatBraces() {
+            $('tei-seg[type=brace]').each(function(index, el) {
+              let target = $(this).attr('target');
+              if (target) {
+                if (target.startsWith('#')) target = target.substring(1);
+                $(this).append($(`tei-note#${target}`).remove());
+              }
+            });
+          },
+          formatMarginalNotes() {
+            $('tei-note[type=marginal]').each(function(index, el) {
+              let margin_top = Math.round($(this).position().top);
+              let note = $(this).remove();
+              $(note).css({ top: `${margin_top}px`});
+              $('.notes_container').append(note);
+            });
+            $('.notes_container').height($('tei-text').height());
+            $('#transcription').on('scroll', function (e) {
+              $('#notebar').scrollTop($(this).scrollTop());
+            });
+            $('#notebar').on('scroll wheel', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              return false;
+            });
+          },
+          formatColumns() {
+            $(document).on('click', '.ab-column-toggler', (e) => {
+                const parent = e.target.closest('tei-ab');
+                parent.classList.toggle('closed');
+            });
+          },
+          formatLeaders() {
             let container_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
             $('tei-metamark[function=leader]').each(function(index, el) {
               let sum = 0;
@@ -695,82 +793,8 @@
               target_width = target_width > 10 ? target_width : 10;
               $(this).width(target_width);
             });
-          },
-          childrenAllHidden(container) {
-            const all_children = $(container).children(':not(tei-lb)');
-            const hidden_children = $(container).children(':not(tei-lb)').filter(function() {
-              return $(this).css('display') == 'none';
-            });
-            let all_hidden = all_children.length === hidden_children.length ? true : false;
-            return all_hidden
-          },
-          toggleTeiContainers() {
-            const containerList = [
-              { selector: 'tei-ab[type=column] div.ab-content', parent: true },
-              { selector: 'tei-layout[columns]', parent: false },
-              { selector: 'tei-note:not([type])', parent: false }
-            ];
-            const that = this;
-            for (let i = 0, len = containerList.length; i < len; ++i) {
-              $(containerList[i].selector).each(function() {
-                let target = containerList[i].parent ? $(this).parent() : $(this);
-                if (that.childrenAllHidden(this)) {
-                  target.hide();
-                } else {
-                  target.show();
-                }
-              });
-            }
-            this.adjustTeiRendering();
-          },
-          changeRenderMode(mode) {
-            this.renderMode = mode;
-            update_session({ 'public-render-mode': mode });
-            this.softWrap = mode == 'basic' ? true : false;
-            setTimeout(() => this.toggleTeiContainers(), 0);
-          },
-          toggleTextWrap() {
-            if (this.renderMode == 'scholarly') {
-              this.softWrap = this.softWrap ? false : true;
-            }
-          },
-          toggleHelpTips() {
-            let state = this.showHelp ? false : true;
-            if(state) {
-              this.$refs.optionsDropdown.show();
-              setTimeout(() => this.showHelp = state, 80);
-            } else {
-              this.showHelp = state;
-            }
-          },
-          showCopiedTooltip() {
-            this.showCitePanel = false;
-            this.showCopied = true;
-            setTimeout(() => this.showCopied = false, 800);
-          },
-          windowResized() {
-            this.windowHeight = $(window).height();
-            this.divaHeight = $('.folio').height();
-            this.headerHeight = $('header').height();
-            this.footerHeight = $('#footer-app').height();
-            $('main.inventory').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
-            setTimeout(() => this.adjustTeiRendering(), 0);
-          },
-          closeCitePanel() {
-            this.showCitePanel = false;
-          },
-          toggleInfoPanel() {
-            this.showInfoPanel = this.showInfoPanel ? false : true;
-          },
-          updateURL() {
-            let path_tokens = location.pathname.split('/').filter(Boolean);
-            if (!/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path_tokens[path_tokens.length - 1])) {
-              path_tokens.pop();
-            }
-            const url = `${location.protocol}//${location.host}/${path_tokens.join('/')}/${this.sourceData.folios[this.folioIndex].pageName}/`;
-            window.history.replaceState(null, null, url);
           }
-        },
+        }
       });
     });
   </script>
