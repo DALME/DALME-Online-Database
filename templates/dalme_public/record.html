@@ -281,9 +281,6 @@
       triggers="manual">
       Drag to resize viewer panels.
     </b-popover>
-    <div id="notebar" :style="{ height: transcriptionHeight + 'px' }" v-show="hasMarginalNotes && showMarginalNotes">
-      <div class="notes_container"></div>
-    </div>
     <section
       id="transcription"
       class="transcription"
@@ -293,6 +290,12 @@
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
       <div v-if="transcriptionId" v-html="renderedTranscription" id="tei-container"></div>
     </section>
+    <div
+      id="notebar"
+      :style= "[viewerMode == 'horizontal-split' ? { height: transcriptionHeight + 'px', top: divaHeight + headerHeight + 47 + 'px' } : { height: transcriptionHeight + 'px' }]"
+      v-show="hasMarginalNotes && showMarginalNotes">
+      <div class="notes_container"></div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -631,7 +634,8 @@
             $('[data-toggle="tooltip"]').tooltip();
             setTimeout(() => {
               new ResizeSensor($('tei-text'), function(e) { app.updateTeiRendering(e) });
-            }, 1000);
+              $('section.transcription').scrollTop(0);
+            }, 10);
           },
           updateTeiRendering(e) {
             if (this.hasLeaders) {
