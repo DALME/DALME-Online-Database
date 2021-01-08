@@ -198,7 +198,7 @@ main section {
 }
 main section p {
   font-size: 1.1rem;
-  margin: 1rem;
+  margin: 1rem 0;
 }
 main section h4 {
   color: #666;
@@ -256,7 +256,12 @@ body.home section.featured img {
 main.collections section p,
 main.collection section p {
   font-family: "PT Serif", serif;
-  margin: 1.5rem 1rem 1.5rem 1rem;
+}
+main.collections section h4,
+main.collection section h4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding-top: 1rem;
 }
 
 nav.primary {
@@ -757,7 +762,12 @@ nav.browse a {
 }
 .main-image .caption {
   color: #aaa;
-  margin: 1rem auto 0 auto;
+  margin: 3px 3px 0 auto;
+  font-family: "Open Sans", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: right;
+  max-width: 75%;
 }
 
 body.essay .main-image {
@@ -1511,7 +1521,7 @@ h4.featured-group-key {
 }
 
 .block-main_image {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .block-inline_image {
@@ -2471,7 +2481,7 @@ ul.pagination > li.page-item:last-child button {
   font-family: "Asul", serif;
   font-size: 1.4rem;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.4;
   color: #333;
   decoration: none;
 }
