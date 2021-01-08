@@ -1353,6 +1353,11 @@ form.contact-form textarea {
   padding: 0 0 0.5rem 0;
   margin-bottom: 0.5rem;
 }
+.record-detail h3 {
+  border-bottom: 1px solid #9c9c9c;
+  padding: 0 0 0.5rem 0;
+  margin-bottom: 0.5rem;
+}
 nav.secondary.features-filter ul {
   border-bottom: 1px dotted #9c9c9c;
   margin-bottom: 1rem;
@@ -1602,7 +1607,7 @@ h4.featured-group-key {
   margin-bottom: 1.5rem;
 }
 .block-carousel .carousel-inner {
-  background: #000;
+  background: #2d2d2d;
 }
 .block-carousel .carousel-inner {
   overflow: initial;
@@ -1618,10 +1623,9 @@ h4.featured-group-key {
   height: 500px;
 }
 .carousel-item .carousel-caption-container {
-  color: #fff;
-  background: #000;
+  background: #2d2d2d;
   padding: 0 2rem;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  /* text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; */
 }
 .carousel-item .carousel-caption {
   position: initial;
@@ -1631,6 +1635,8 @@ h4.featured-group-key {
   padding-top: 1rem;
   padding-bottom: 3rem;
   text-align: center;
+  font-size: 12px;
+  color: #737373;
 }
 
 /* Data attributes */

@@ -191,13 +191,12 @@ def get_source_details(context):
         name = data['name']
         short_name = data['short_name']
         date = data.get('date')
-        city = data.get('city')
+        locale = data.get('locale')
+        language = data.get('language')
 
-    url = None
-    if source and source_set:
-        stem = 'public/DALME/collections'
-        collection = source_set.public_collections.first()
-        url = f'/{stem}/{collection.slug}/records/{source.pk}'
+    collection_url = None
+    if source_set:
+        collection_url = f"/collections/{source_set.name.replace(' ', '-').lower()}/"
 
     return {
         'source': source,
@@ -205,9 +204,10 @@ def get_source_details(context):
         'name': name,
         'short_name': short_name,
         'date': date,
-        'city': city,
-        'url': url,
-        'collections': Collections.objects.first(),
+        'locale': locale,
+        'language': language,
+        'url': f'/collections/records/{source.pk}/',
+        'collection_url': collection_url
     }
 
 

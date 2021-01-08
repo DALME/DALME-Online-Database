@@ -1,25 +1,30 @@
 {% load dalme_public_tags wagtailroutablepage_tags %}
 
 {% get_source_details as source_data %}
-{% if source_data.pk and source_data.source %}
+{% if source_data.source %}
   <div class="record-detail u-flex">
-    <h4 class="u-small-caps-heading">RECORD</h4>
-    <ul>
-      {% if source_data.source_set %}
-        <a href="{{ source_data.url }}">
-          <li>{{ source_data.name }}</li>
+    <h3 class="u-small-caps-heading">RECORD</h3>
+    <div>
+      <a href="{{ source_data.url }}">
+        {{ source_data.name }}
+        {% if source_data.date %}
+          <span>| {{ source_data.date }}</span>
+        {% endif %}
+        {% if source_data.language %}
+          <span>| {{ source_data.language }}</span>
+        {% endif %}
+        {% if source_data.locale %}
+          <span>| {{ source_data.locale }}</span>
+        {% endif %}
+      </a>
+    </div>
+    {% if source_data.source_set %}
+    <h3 class="u-small-caps-heading mt-4">COLLECTION</h3>
+      <div>
+        <a href="{{ source_data.collection_url }}">
+          {{ source_data.source_set.name }}
         </a>
-      {% else %}
-        <a href="{% routablepageurl source_data.collections.specific 'record' source_data.source.pk %}">
-          <li>{{ source_data.name }}</li>
-        </a>
-      {% endif %}
-      {% if source_data.city %}
-        <li>{{ source_data.city }}</li>
-      {% endif %}
-      {% if source_data.date %}
-        <li>{{ source_data.date }}</li>
-      {% endif %}
-    </ul>
+      </div>
+    {% endif %}
   </div>
 {% endif %}
