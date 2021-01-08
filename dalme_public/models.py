@@ -316,7 +316,7 @@ class FeaturedPage(DALMEPage):
         return textwrap.shorten(
             BSoup(text.value.source, 'html.parser').get_text(),
             width=width,
-            placeholder=' [...]'
+            placeholder='...'
         )
 
     def resolve_source_url(self):

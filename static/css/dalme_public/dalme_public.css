@@ -587,7 +587,7 @@ nav.browse a {
   font-weight: 500;
   font-size: 1.4rem;
   margin-top: 1rem;
-  font-family: "Asul", serif;
+  font-family: "Lora", serif;
   font-style: italic;
 }
 .monthly h4 {
@@ -625,9 +625,9 @@ nav.browse a {
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  font-family: "Asul", serif;
+  font-family: "Lora", serif;
   color: black;
-  font-style: normal;
+  font-style: italic;
   font-weight: 500;
 }
 .featured > div,
@@ -2584,7 +2584,7 @@ ul.pagination > li.page-item:last-child button {
 /* RECAPTCHA */
 .captcha-container {
   display: flex;
-  border: 1px solid #aaa;
+  border: 1px dotted #9e9d9d;
   padding: .3rem;
   border-radius: .3rem;
   background-color: #f9f9f9;
@@ -3326,6 +3326,9 @@ parsererror div {
   box-shadow: none;
   border-radius: .3rem;
   text-transform: uppercase;
+}
+.dalme-button.large {
+  font-size: 14px;
 }
 .dalme-button:not(:disabled):not(.disabled):hover,
 .dalme-button:not(:disabled):not(.disabled).active,

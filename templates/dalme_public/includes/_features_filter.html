@@ -4,6 +4,14 @@
   <h3 class="u-small-caps-heading">FILTER</h3>
   <ul>
     <li>
+        {% get_features_filter_q 'kind' 'all' as params %}
+        <a
+          href="{% pageurl page %}{{ params }}"
+          {% if request.GET.kind is None %} class="active"{% endif %}>
+            All
+        </a>
+    </li>
+    <li>
         {% get_features_filter_q 'kind' 'essay' as params %}
         <a
           href="{% pageurl page %}{{ params }}"
@@ -27,30 +35,23 @@
             Objects
         </a>
     </li>
-    <li>
-        {% get_features_filter_q 'kind' 'all' as params %}
-        <a
-          href="{% pageurl page %}{{ params }}"
-          {% if request.GET.kind is None %} class="active"{% endif %}>
-            All
-        </a>
-    </li>
   </ul>
+  <h3 class="u-small-caps-heading mt-5">Sort</h3>
   <ul>
     <li>
         {% get_features_filter_q 'order_by' 'owner' as params %}
         <a
           href="{% pageurl page %}{{ params }}"
           {% if request.GET.order_by == 'owner' %} class="active"{% endif %}>
-            Author
+            by author
         </a>
     </li>
     <li>
         {% get_features_filter_q 'order_by' 'date' as params %}
         <a
           href="{% pageurl page %}{{ params }}"
-          {% if request.GET.order_by == 'date' %} class="active"{% endif %}>
-            Date
+          {% if request.GET.order_by == 'date' or not request.GET.order_by %} class="active"{% endif %}>
+            by date
         </a>
     </li>
   </ul>
