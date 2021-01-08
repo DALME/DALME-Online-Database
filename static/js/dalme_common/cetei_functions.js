@@ -106,7 +106,7 @@ const dalmeTeiBehaviours = {
       if (ref) e.innerText = String.fromCharCode(parseInt(ref, 16));
     },
     'hi': [
-      ["[rend=superscript]", function(e) {
+      ['[rend=superscript]', function(e) {
         if (e.innerText.length > 3) {
           e.setAttribute('rend-basic', 1);
         }
@@ -130,9 +130,9 @@ const dalmeTeiBehaviours = {
         e.setAttribute('data-template', '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
         e.innerHTML = '<i class="fas fa-sticky-note"></i>';
       }],
-      [':not([type])', function(e) {
-        e.setAttribute('name', e.getAttribute('target'));
-      }]
+      // [':not([type])', function(e) {
+      //   e.setAttribute('name', e.getAttribute('target'));
+      // }]
     ],
   }
 };

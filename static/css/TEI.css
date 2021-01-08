@@ -15,6 +15,9 @@ tei-TEI > tei-text {
 
 tei-body {
   line-height: 1.8;
+  /* display: block;
+  width: fit-content;
+  min-width: 100%; */
 }
 
 tei-hi[rend="superscript"] {
@@ -131,22 +134,22 @@ tei-list {
   margin-bottom: 1em;
   list-style-type: none;
 }
-
 tei-item > tei-list {
   margin-top: 0;
 }
-
 tei-abbr {
 
 }
-
-tei-add:before {
+tei-add {
+  font-style: italic;
+}
+/* tei-add:before {
   content: "»";
 }
 
 tei-add:after {
   content: "«";
-}
+} */
 /* tei-ref a:after {
     content: attr(href);
 } */
@@ -1653,7 +1656,12 @@ tei-subc {
   /* Empty Set Rule */
 }
 tei-subst {
-  /* Empty Set Rule */
+  display: inline-flex;
+  flex-direction: column-reverse;
+  line-height: 1;
+  position: relative;
+  top: 5px;
+  text-align: center;
 }
 tei-summary {
   /* Empty Set Rule */
@@ -1912,7 +1920,8 @@ tei-body span {
   text-decoration: inherit;
 }
 tei-hi[rend*=indent] tei-lb + span,
-tei-hi[rend*=indent] tei-lb + tei-w {
+tei-hi[rend*=indent] tei-lb + tei-w,
+tei-hi[rend*=indent] tei-lb + tei-hi[rend="underscore"] {
     padding: inherit;
 }
 /* tei-hi[rend*=indent] tei-w[type=elision] + span {
@@ -2144,6 +2153,7 @@ tei-ref a {
   position: relative;
   top: -5px;
   text-decoration: none !important;
+  display: inline-block;
 }
 
 tei-ref a:hover {

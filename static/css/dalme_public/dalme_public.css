@@ -256,7 +256,7 @@ body.home section.featured img {
 main.collections section p,
 main.collection section p {
   font-family: "PT Serif", serif;
-  margin: 1.5rem 1rem 2rem 1rem;
+  margin: 1.5rem 1rem 1.5rem 1rem;
 }
 
 nav.primary {
@@ -3334,4 +3334,13 @@ parsererror div {
   background-color: #e6ecf6;
   color: #354d87 !important;
   border-color: #354d87 !important;
+}
+.block-text ul {
+  margin: 1rem 1rem 2rem 3rem;
+}
+.block-text ul li {
+  list-style-type: disc;
+  list-style-position: outside;
+  font-size: 1.1rem;
+  line-height: 2;
 }
