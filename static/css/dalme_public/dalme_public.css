@@ -231,6 +231,7 @@ body.home main p {
   line-height: 1.5;
   color: #636363;
   overflow: auto;
+  margin: 1rem;
 }
 
 body.home main .main-column {
@@ -515,11 +516,15 @@ main.essay > .content {
   width: 100%;
   text-align: right;
 }
-.record-detail ul {
-  padding-top: 0.5rem;
+.record-detail a span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #989898;
 }
-.record-detail ul li {
-  padding-bottom: 0.5rem;
+aside.side-column .record-detail a:hover {
+  border-bottom: none;
+  text-decoration: none;
+  color: #084094;
 }
 
 .featured-object-nav {
@@ -730,7 +735,7 @@ nav.browse a {
   width: 30%;
   margin-bottom: 0.5rem;
 }
-.statement p {
+body.home main .statement p {
   margin: 0.5rem 0;
 }
 .register {
@@ -1517,12 +1522,33 @@ h4.featured-group-key {
   border-bottom: 1px dotted #9c9c9c;
   color: #636363;
   margin-bottom: 1.5rem;
-  padding: 0 0 2rem 0;
+  padding: .5rem 0 2rem 0;
   text-align: center;
+  font-family: "Lora", serif;
+  font-size: 18px;
+}
+.block-pullquote p:first-of-type:before {
+  content: "\f10d";
+  font-family: 'FontAwesome';
+  font-size: 11px;
+  margin-right: .5rem;
+  color: #bbbbbb;
+  position: relative;
+  top: 5px;
+}
+.block-pullquote p:last-of-type:after {
+  content: "\f10e";
+  font-family: 'FontAwesome';
+  font-size: 11px;
+  margin-left: .3rem;
+  color: #bbbbbb;
+  position: relative;
+  bottom: 5px;
 }
 .block-pullquote p {
   font-style: italic;
   margin: 0;
+  line-height: 1.7;
 }
 
 .block-main_image {
