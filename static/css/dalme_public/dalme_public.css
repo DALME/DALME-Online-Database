@@ -175,8 +175,8 @@ main {
   font-size: 1.1rem;
   padding: 1rem 0;
 }
-main.collection.inventories,
-main.collections.inventories {
+main.collection.browser,
+main.collections.browser {
   padding-top: 0;
 }
 
@@ -859,7 +859,7 @@ nav.footer ul li a:hover {
 
 
 /* Inventories */
-main.inventories > article {
+main.browser > article {
   border: 0;
 }
 
@@ -1652,11 +1652,11 @@ div.description[data-collapsed='true'] {
   main {
     padding: 3rem 0;
   }
-  main.collection.inventories,
-  main.collections.inventories {
+  main.collection.browser,
+  main.collections.browser {
     padding-top: 1rem;
   }
-  main.collections.inventories.horizontal-split {
+  main.collections.browser.horizontal-split {
     overflow: unset;
   }
 
@@ -2824,7 +2824,7 @@ ul.pagination > li.page-item:last-child button {
 }
 
 /* RECORD BROWSER AND VIEWER */
-main.inventories {
+main.browser {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   padding-right: 4rem;
@@ -2832,11 +2832,11 @@ main.inventories {
   margin: 0;
   width: 100%;
 }
-main.inventories article {
+main.browser article {
   box-shadow: 0 0 20px -4px rgba(0, 0, 0, 0.5);
   padding-bottom: 2rem;
 }
-main.inventory article {
+main.viewer article {
   padding-bottom: 0;
 }
 .app.inventory-toolbar {
@@ -2950,7 +2950,7 @@ div.viewer {
   width: 100%;
   padding: 2rem;
 }
-main.inventory {
+main.viewer {
   flex: 0;
   height: calc(100vh - 147px);
   overflow: hidden;

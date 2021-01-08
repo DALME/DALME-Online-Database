@@ -336,7 +336,7 @@
           this.headerHeight = $('header').height();
           this.divaHeight = $('.folio').height();
           this.footerHeight = $('#footer-app').height();
-          $('main.inventory').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
+          $('main.viewer').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
           this.renderFolio();
           this.fetchTranscription();
           this.updateCitation('harvard1', 'bibliography');
@@ -713,7 +713,7 @@
             this.divaHeight = $('.folio').height();
             this.headerHeight = $('header').height();
             this.footerHeight = $('#footer-app').height();
-            $('main.inventory').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
+            $('main.viewer').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
           },
           closeCitePanel() {
             this.showCitePanel = false;
