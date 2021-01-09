@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
-{% load wagtailcore_tags static compress %}
+{% load wagtailcore_tags static hosts compress %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
 
@@ -41,6 +41,7 @@
   {% endcompress %}
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
+  {% host_url 'api_endpoint' host 'data' as api_url %}
   <script>
     Vue.component('beat-loader', VueSpinner.BeatLoader);
     const bibliography_app = new Vue({
@@ -58,7 +59,7 @@
         config: null,
         citation: null,
         bibliography: null,
-        api_endpoint: 'https://data.127.0.0.1.xip.io:8443/',
+        api_endpoint: '{{ api_url }}',
         format: 'html',
         template: 'chicago',
         output_format: 'bibliography',
