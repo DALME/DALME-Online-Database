@@ -3400,3 +3400,14 @@ parsererror div {
 .eight-lines {
   -webkit-line-clamp: 8;
 }
+
+.bibliography-container {
+  font-family: "PT Serif", serif;
+  font-size: 1.3rem;
+}
+.csl-bib-body {
+  padding-top: 2rem;
+}
+.csl-entry:not(:last-child) {
+  margin-bottom: 1rem;
+}

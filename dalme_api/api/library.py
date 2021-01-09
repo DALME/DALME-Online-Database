@@ -17,32 +17,43 @@ class Library(viewsets.ViewSet):
             settings.ZOTERO_API_KEY
         )
 
-        record_total = queryset_generator.count_items(),
+        filter = request.GET.get('filter')
+        if filter and filter == 'editions':
+            if request.GET.get('data') is not None:
+                record_total = queryset_generator.count_items()
+                dt_request = json.loads(request.GET['data'])
+                page = self.paginate_queryset(
+                    queryset_generator,
+                    dt_request.get('start'),
+                    dt_request.get('length')
+                )
 
-        if request.GET.get('data') is not None:
-            dt_request = json.loads(request.GET['data'])
-            page = self.paginate_queryset(
-                queryset_generator,
-                dt_request.get('start'),
-                dt_request.get('length')
-            )
-            result = {
-                'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-                'recordsTotal': record_total,
-                'recordsFiltered': record_total,
-                'data': [i['data'] for i in page]
-                }
-        else:
-            if request.GET.get('search') is not None:
-                queryset = queryset_generator.collection_items_top(
-                    'A4QHN348',
-                    q=request.GET['search']
-                )
+                result = {
+                    'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                    'recordsTotal': record_total,
+                    'recordsFiltered': page.count_items(),
+                    'data': [i['data'] for i in page]
+                    }
             else:
-                queryset = queryset_generator.everything(
-                    queryset_generator.collection_items_top('A4QHN348')
-                )
-            result = [i['data'] for i in queryset]
+                if request.GET.get('search') is not None:
+                    queryset = queryset_generator.collection_items_top(
+                        'A4QHN348',
+                        q=request.GET['search']
+                    )
+                else:
+                    queryset = queryset_generator.everything(
+                        queryset_generator.collection_items_top('A4QHN348')
+                    )
+                result = [i['data'] for i in queryset]
+        else:
+            queryset_generator.add_parameters(
+                content='csljson',
+                limit=100
+            )
+            queryset = queryset_generator.everything(
+                queryset_generator.top()
+            )
+            result = queryset
 
         return Response(result)
 

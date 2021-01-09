@@ -400,7 +400,10 @@ class Home(DALMEPage):
 
 class Section(DALMEPage):
     parent_page_types = ['dalme_public.Home']
-    subpage_types = ['dalme_public.Flat']
+    subpage_types = [
+        'dalme_public.Flat',
+        'dalme_public.Bibliography'
+    ]
 
     content_panels = DALMEPage.content_panels + [
         FieldPanel('short_title'),
@@ -485,6 +488,18 @@ class Features(DALMEPage):
         )
         context['featured'] = filtered.qs
         return context
+
+
+class Bibliography(DALMEPage):
+    parent_page_types = ['dalme_public.Section']
+    subpage_types = ['dalme_public.Flat']
+
+    content_panels = DALMEPage.content_panels + [
+        ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
+        FieldPanel('short_title'),
+        StreamFieldPanel('body'),
+    ]
 
 
 class FeaturedObject(FeaturedPage):
