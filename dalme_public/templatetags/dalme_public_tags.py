@@ -144,16 +144,6 @@ def get_flat_nav(context):
         return [p.specific for p in page.get_siblings().live().filter(show_in_menus=True)]
 
 
-@register.simple_tag
-def get_object_nav():
-    return FeaturedObject.objects.live().specific().order_by('last_published_at')[:3]
-
-
-@register.simple_tag
-def get_inventory_nav():
-    return FeaturedInventory.objects.live().specific().order_by('last_published_at')[:3]
-
-
 @register.simple_tag(takes_context=True)
 def get_header_image_styles(context, header_image, header_position):
     gradients = {
@@ -185,30 +175,27 @@ def get_source_details(context):
     page = context['page']
     source = page.source
     source_set = page.source_set
+    result = {}
 
     if source:
         data = PublicSourceSerializer(source).data
-        name = data['name']
-        short_name = data['short_name']
-        date = data.get('date')
-        locale = data.get('locale')
-        language = data.get('language')
+        result.update({
+            'source': source,
+            'name': data['name'],
+            'short_name': data['short_name'],
+            'date': data.get('date'),
+            'locale': data.get('locale'),
+            'language': data.get('language'),
+            'url': f'/collections/records/{source.pk}/'
+        })
 
-    collection_url = None
     if source_set:
-        collection_url = f"/collections/{source_set.name.replace(' ', '-').lower()}/"
+        result.update({
+            'source_set': source_set,
+            'collection_url': f"/collections/{source_set.name.replace(' ', '-').lower()}/"
+        })
 
-    return {
-        'source': source,
-        'source_set': source_set,
-        'name': name,
-        'short_name': short_name,
-        'date': date,
-        'locale': locale,
-        'language': language,
-        'url': f'/collections/records/{source.pk}/',
-        'collection_url': collection_url
-    }
+    return result if result else None
 
 
 @register.simple_tag(takes_context=True)
@@ -237,31 +224,41 @@ def get_features_nav_q(key):
     }[key]
 
 
-@register.simple_tag()
-def get_recent_objects():
-    objs = FeaturedObject.objects.live().specific().order_by('last_published_at')[:3]
-    return [
-        {'url': obj.url, 'month': month_name[obj.last_published_at.month]}
-        for obj in objs
-    ]
+@register.simple_tag(takes_context=True)
+def get_recent_features(context):
+    feature_type = context.get('feature_type')
+    if feature_type == 'Essay':
+        title = 'Mini Essays'
+        objs = Essay.objects.live().specific().order_by('last_published_at')[:3]
+    elif feature_type == 'Inventory':
+        title = 'Inventories'
+        objs = FeaturedInventory.objects.live().specific().order_by('last_published_at')[:3]
+    elif feature_type == 'Object':
+        title = 'Objects'
+        objs = FeaturedObject.objects.live().specific().order_by('last_published_at')[:3]
+    else:
+        return None
 
-
-@register.simple_tag()
-def get_recent_inventories():
-    objs = FeaturedInventory.objects.live().specific().order_by('last_published_at')[:3]
-    return [
-        {'url': obj.url, 'month': month_name[obj.last_published_at.month]}
-        for obj in objs
-    ]
-
-
-@register.simple_tag()
-def get_recent_essays():
-    objs = Essay.objects.live().specific().order_by('last_published_at')[:3]
-    return [
-        {'url': obj.url, 'month': month_name[obj.last_published_at.month]}
-        for obj in objs
-    ]
+    results = {}
+    for obj in objs:
+        year = obj.last_published_at.strftime('%y')
+        if year not in results:
+            results[year] = [{
+                'url': obj.url,
+                'month': month_name[obj.last_published_at.month]
+            }]
+        else:
+            results[year].append({
+                'url': obj.url,
+                'month': month_name[obj.last_published_at.month]
+            })
+    if results:
+        return {
+            'title': title,
+            'features': results
+        }
+    else:
+        return None
 
 
 @register.simple_tag()

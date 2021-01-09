@@ -542,12 +542,12 @@ aside.side-column .record-detail a:hover {
   font-size: 1rem;
   margin-bottom: 0.2rem;
 }
-.featured-object-nav > div > div:not(:last-child) {
+.featured-object-nav > div > div > div:not(:last-child) {
   font-size: 1.3rem;
   margin-left: auto;
-  text-align: start;
+  text-align: center;
 }
-.featured-object-nav > div > div:not(:first-child) {
+.featured-object-nav > div > div > div:not(:first-child) {
   flex-direction: column;
   margin-left: auto;
 }
@@ -555,12 +555,12 @@ aside.side-column .record-detail a:hover {
   margin: 0 0 0 1rem;
   width: 100%;
 }
+.featured-object-nav > div > div:last-of-type ul {
+  border-bottom: 1px dotted #9c9c9c;
+}
 .featured-object-nav ul li {
   border-top: 1px dotted #636363;
   padding: 0.3rem 0;
-}
-.featured-object-nav ul li:last-of-type {
-  border-bottom: 1px dotted #9c9c9c;
 }
 
 nav.browse {

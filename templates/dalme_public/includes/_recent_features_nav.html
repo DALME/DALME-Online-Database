@@ -1,0 +1,26 @@
+{% load dalme_public_tags %}
+
+{% get_recent_features as recent_features %}
+{% if recent_features %}
+  <div class="featured-object-nav">
+    <h4 class="u-small-caps-heading">{{ recent_features.title }}</h4>
+    <div class="u-flex flex-column">
+      {% for year, obj in recent_features.features.items %}
+        <div class="d-flex">
+          <div class="u-small-caps-heading u-bottom-to-top year">{{ year }}</div>
+          <ul>
+            {% for data in obj %}
+              {% if page.url != data.url %}
+                <li>
+                  <a href="{{ data.url }}">{{ data.month }}</a>
+                </li>
+              {% else %}
+                <li>{{ data.month }}</li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}

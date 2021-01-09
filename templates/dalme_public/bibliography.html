@@ -1,0 +1,124 @@
+{% extends "dalme_public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags static compress %}
+
+{% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
+
+{% block banner %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block header_extra %}
+  {% include "dalme_public/includes/_flat_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "dalme_public/includes/_flat_nav.html" %}
+  {% include "dalme_public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    {{ page.body }}
+    <beat-loader v-if="spinner" :loading="spinner" color="#aaa"></beat-loader>
+    <div id="bibliography-app">
+      <template>
+        <p v-if="noResults">No records found.</p>
+        <div v-else class="u-grid inventories">
+          <div class="grid-row-wrapper compact u-contents">
+            <span class="heading first">
+              <strong @click="toggleNameOrder">Name</strong>
+              <template v-if="nameOrder">
+                <i v-if="nameOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <span class="heading">
+              <strong @click="toggleSourceTypeOrder">Type</strong>
+              <template v-if="sourceTypeOrder">
+                <i v-if="sourceTypeOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <span class="heading">
+              <strong @click="toggleDateOrder">Date</strong>
+              <template v-if="dateOrder">
+                <i v-if="dateOrder.includes('-')" class="fa fa-caret-down order-icon" aria-hidden="true"></i>
+                <i v-else class="fa fa-caret-up order-icon" aria-hidden="true"></i>
+              </template>
+            </span>
+            <!-- Placeholder element to regulate the grid. -->
+            <span class="heading last"></span>
+          </div>
+
+          <template v-for="(record, index) in records" :key="index">
+            <div class="grid-row-wrapper compact u-contents">
+              <span class="inventory-field name">
+                <a :href="recordUrl(record)">
+                  ${record.name}<span class="short-name"> ${record.short_name}</span>
+                </a>
+              </span>
+              <span class="inventory-field record-type">${record.record_type}</span>
+              <span class="inventory-field date">${record.date}</span>
+              <span class="inventory-field icons">
+                <i
+                  class="fas fa-book-open fa-sm ml-auto"
+                  v-bind:class="{ active: record.no_folios > 0 }">
+                </i>
+                <i
+                  class="fas fa-sm fa-images"
+                  v-bind:class="{ active: record.has_transcriptions }">
+                </i>
+              </span>
+            </div>
+          </template>
+        </template>
+      </div>
+  </div>
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  {% compress js %}
+    <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+  {% endcompress %}
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
+  <script>
+    Vue.component('beat-loader', VueSpinner.BeatLoader);
+    const bibliography_app = new Vue({
+      el: '#bibliography-app',
+      delimiters: ['${', '}'],
+      components: {
+        'vue-slider': window['vue-slider-component'],
+      },
+      data: {
+        fetching: false,
+        records: null,
+      },
+      computed: {
+        spinner() {
+          return (this.records === null) || this.fetching == true;
+        },
+      },
+      methods: {
+        fetchData(url = null) {
+          this.fetching = true;
+          fetch(url || `${this.endpoint}/?${this.currentParams.toString()}`)
+            // api.endpoint/library/?format=json
+            .then(response => response.json())
+            .then(data => {
+              this.records = data.results;
+              this.fetching = false;
+            });
+        },
+      }
+    });
+    </script>
+{% endblock%}

@@ -293,6 +293,11 @@ class FeaturedPage(DALMEPage):
     class Meta:
         abstract = True
 
+    def get_context(self, request):
+        context = super().get_context(request)
+        context['feature_type'] = self.short_title
+        return context
+
     @property
     def author(self):
         if self.alternate_author:
@@ -500,6 +505,7 @@ class FeaturedObject(FeaturedPage):
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
+    template = 'dalme_public/feature.html'
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
@@ -534,6 +540,7 @@ class FeaturedInventory(FeaturedPage):
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
+    template = 'dalme_public/feature.html'
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
@@ -570,6 +577,7 @@ class Essay(FeaturedPage):
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
+    template = 'dalme_public/feature.html'
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
