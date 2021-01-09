@@ -623,6 +623,9 @@
               this.hasMarginalNotes = true;
               this.formatMarginalNotes();
             }
+            if ($('tei-ref[target]').length) {
+              this.formatRenvois();
+            }
             if ($('tei-ab[type=column]').length) {
               this.hasColumns = true;
               this.formatColumns();
@@ -733,7 +736,7 @@
             $('tei-seg[type=brace]').each(function(index, el) {
               let target = $(this).attr('target');
               if (target) {
-                if (target.startsWith('#')) target = target.substring(1);
+                if (target.length > 1 && target.startsWith('#')) target = target.substring(1);
                 $(this).append($(`tei-note#${target}`).remove());
               }
             });
@@ -797,6 +800,21 @@
               target_width = target_width > 10 ? target_width : 10;
               $(this).width(target_width);
             });
+          },
+          formatRenvois() {
+            $('tei-ref[target]').each( function(index, el) {
+              let note_id = $(this).attr('target');
+              if (note_id.length > 1 && note_id.startsWith('#')) note_id = note_id.substring(1);
+              note = $(`tei-note[id='${note_id}']`)
+              if (note.length) {
+                $(this).attr({
+                  title: note.html(),
+                  'data-toggle': 'tooltip',
+                  'data-html': true,
+                  'data-template': '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
+                })
+              }
+            })
           }
         }
       });

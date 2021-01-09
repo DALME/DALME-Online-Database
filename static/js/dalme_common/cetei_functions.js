@@ -115,7 +115,16 @@ const dalmeTeiBehaviours = {
     'ref': [
       ['[target]', function(e) {
         let ref_id = e.getAttribute('target');
-        e.innerHTML = `<a href="#${ref_id}">${e.getAttribute('target')}</a>`;
+        if (ref_id.length > 1) {
+          if (ref_id.startsWith('#')) {
+            ref_id = ref_id.substring(1);
+          }
+          if (ref_id.startsWith('U-')) {
+            ref_id = String.fromCharCode(parseInt(ref_id.substring(2), 16));
+          }
+        }
+        e.innerText = ref_id;
+        // e.innerHTML = `<a href="#${ref_id}">${e.getAttribute('target')}</a>`;
       }]
     ],
     'note': [
@@ -130,9 +139,9 @@ const dalmeTeiBehaviours = {
         e.setAttribute('data-template', '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
         e.innerHTML = '<i class="fas fa-sticky-note"></i>';
       }],
-      // [':not([type])', function(e) {
-      //   e.setAttribute('name', e.getAttribute('target'));
-      // }]
+      [':not([type]), [type=renvoi]', function(e) {
+        e.setAttribute('class', 'd-none');
+      }]
     ],
   }
 };

@@ -2116,7 +2116,7 @@ tei-note[type="marginal"]:hover .note_content {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
-/* .tooltip.note {
+.tooltip.note {
   font-family: "PT Serif";
   font-size: 1rem;
 }
@@ -2142,10 +2142,9 @@ tei-note[type="marginal"]:hover .note_content {
 }
 .tooltip.note .arrow::before .bs-tooltip-bottom {
   border-bottom-color: #aaa;
-} */
+}
 
-tei-ref a {
-  color: #888;
+tei-ref {
   font-size: 20px;
   font-weight: 400;
   margin-left: 2px;
@@ -2154,10 +2153,6 @@ tei-ref a {
   top: -5px;
   text-decoration: none !important;
   display: inline-block;
-}
-
-tei-ref a:hover {
-  color: black;
 }
 
 tei-hi[rend=indent] {
