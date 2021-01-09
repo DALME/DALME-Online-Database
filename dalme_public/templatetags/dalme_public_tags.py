@@ -326,7 +326,7 @@ def get_citation_data(context):
         })
 
         if record:
-            title = context['title']
+            title = context['data']['name'].strip()
             purl = context['purl']
             authors = context['data']['get_credit_line']['authors']
             contributors = context['data']['get_credit_line']['contributors']

@@ -21,13 +21,6 @@
     "divider": false
   },
   {
-    "name": "turabian",
-    "label": "Turabian (9th edition)",
-    "file": "turabian-author-date.csl",
-    "output_format": "bibliography",
-    "divider": false
-  },
-  {
     "divider": true
   },
   {
