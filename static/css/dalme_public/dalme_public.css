@@ -590,7 +590,7 @@ nav.browse a {
 }
 .monthly h3,
 .monthly h4 {
-  margin: 0 1rem;
+  margin: 0 1.5rem;
 }
 .monthly h3 {
   color: #000;
@@ -612,7 +612,7 @@ nav.browse a {
 }
 .monthly p {
   font-size: 1rem;
-  margin-top: 0.4rem;
+  margin: 0.4rem 1.5rem 0 1.5rem !important;
 }
 .monthly img {
   align-self: center;
@@ -2836,7 +2836,7 @@ ul.pagination > li.page-item:last-child button {
 
 .fading {
   position: relative;
-  overflow: hidden;
+  overflow: hidden !important;
 }
 .fading:after {
   content: "";
@@ -2845,7 +2845,7 @@ ul.pagination > li.page-item:last-child button {
   bottom: 0;
   right: 0;
   width: 70%;
-  height: 1.2em;
+  height: 1.5em;
   background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
 }
 
@@ -3388,4 +3388,15 @@ parsererror div {
   list-style-position: outside;
   font-size: 1.1rem;
   line-height: 2;
+}
+
+.line-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+.seven-lines {
+  -webkit-line-clamp: 7;
+}
+.eight-lines {
+  -webkit-line-clamp: 8;
 }
