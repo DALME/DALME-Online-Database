@@ -1916,7 +1916,6 @@ tei-g {
   margin: 0 5px;
 }
 tei-body span {
-  display: inline-flex;
   text-decoration: inherit;
 }
 tei-hi[rend*=indent] tei-lb + span,
