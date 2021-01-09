@@ -192,13 +192,13 @@
             triggers="manual">
             Long lines are soft-wrapped.
           </b-popover>
-          <b-dropdown-item id="newlines_menu" @click="showNewlines = !showNewlines" class="dropdown-item" href="#">
-            <i class="fa-fw" v-bind:class="{ 'far fa-square': !showNewlines, 'fas fa-check-square': showNewlines }"></i> Newline symbols
+          <b-dropdown-item id="linebreak_menu" @click="showLinebreaks = !showLinebreaks" class="dropdown-item" href="#">
+            <i class="fa-fw" v-bind:class="{ 'far fa-square': !showLinebreaks, 'fas fa-check-square': showLinebreaks }"></i> Line-break symbols
           </b-dropdown-item>
           <b-popover
             boundary="window"
             variant="dark"
-            target="newlines_menu"
+            target="linebreak_menu"
             placement="left"
             :show="showHelp"
             triggers="manual">
@@ -284,7 +284,7 @@
     <section
       id="transcription"
       class="transcription"
-      :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showNewlines }, { 'no-scroll-bar': hasMarginalNotes && showMarginalNotes}]"
+      :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showLinebreaks }, { 'no-scroll-bar': hasMarginalNotes && showMarginalNotes}]"
       :style="{ height: transcriptionHeight + 'px' }">
       <beat-loader v-show="loading" color="#aaa"></beat-loader>
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
@@ -339,31 +339,19 @@
           $('main.viewer').css({ height: `${Math.round(this.windowHeight - this.headerHeight - this.footerHeight)}px`});
           this.renderFolio();
           this.fetchTranscription();
-          this.updateCitation('harvard1', 'bibliography');
           this.updateURL();
         },
         created() {
           window.addEventListener("resize", this.windowResized);
+          this.tei = new CETEI();
+          this.tei.addBehaviors(dalmeTeiBehaviours);
           const Cite = require('citation-js');
           this.formats = this.citationData[0];
           this.config = Cite.plugins.config.get('@csl');
-          const that = this;
-          for (let i = 0, len = this.formats.length; i < len; ++i) {
-            if (this.formats[i].file) {
-              var xhttp = new XMLHttpRequest();
-              xhttp.onreadystatechange = function() {
-                if (xhttp.readyState == 4 && xhttp.status == 200) {
-                  let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
-                  that.config.templates.add(that.formats[i].name, xml_data);
-                }
-              };
-              xhttp.open("GET", `/static/citation_styles/${that.formats[i].file}`, true);
-              xhttp.send();
-            }
-          }
-          this.citation = new Cite(this.citationData[1]);
-          this.tei = new CETEI();
-          this.tei.addBehaviors(dalmeTeiBehaviours);
+          this.loadTemplates().then( () => {
+            this.citation = new Cite(this.citationData[1]);
+            this.updateCitation('chicago_16', 'bibliography');
+          })
         },
         data: {
           api_endpoint: '{{ api_url }}',
@@ -373,7 +361,7 @@
           showCitePanel: false,
           formats: null,
           format: 'html',
-          template: 'harvard1',
+          template: 'chicago_16',
           lang: 'en-US',
           formatted_citation: null,
           showCopied: false,
@@ -382,7 +370,7 @@
           renderMode: '{{ render_mode }}',
           viewerMode: '{{ viewer_mode }}',
           softWrap: '{{ render_mode }}' == 'basic' ? true : false,
-          showNewlines: false,
+          showLinebreaks: false,
           folioSelect: false,
           date: 0,
           folioIndex: {{ initial_folio_index }},
@@ -591,6 +579,22 @@
                   }
               });
             }
+          },
+          async loadTemplates() {
+            const that = this;
+            await Promise.all(this.formats.map(format => {
+              if (format.file) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                  if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
+                    that.config.templates.add(format.name, xml_data);
+                  }
+                };
+                xhttp.open("GET", `/static/citation_styles/${format.file}`, true);
+                xhttp.send();
+              }
+            }));
           },
           formatCitation(template, output_format, format=this.format) {
             return this.citation.format(output_format, {

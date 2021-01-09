@@ -188,29 +188,17 @@
                 const Cite = require('citation-js');
                 this.formats = this.citationData[0];
                 this.config = Cite.plugins.config.get('@csl');
-                const that = this;
-                for (let i = 0, len = this.formats.length; i < len; ++i) {
-                  if (this.formats[i].file) {
-                    var xhttp = new XMLHttpRequest();
-                    xhttp.onreadystatechange = function() {
-                      if (xhttp.readyState == 4 && xhttp.status == 200) {
-                        let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
-                        that.config.templates.add(that.formats[i].name, xml_data);
-                      }
-                    };
-                    xhttp.open("GET", `/static/citation_styles/${that.formats[i].file}`, true);
-                    xhttp.send();
-                  }
-                }
-                this.citation = new Cite(this.citationData[1]);
-                this.updateCitation('harvard1', 'bibliography');
+                this.loadTemplates().then( () => {
+                  this.citation = new Cite(this.citationData[1]);
+                  this.updateCitation('chicago_16', 'bibliography');
+                })
               },
               data: {
                 showCitePanel: false,
                 showCopied: false,
                 popoverPlacement: 'right',
                 format: 'html',
-                template: 'harvard1',
+                template: 'chicago_16',
                 lang: 'en',
                 formatted_citation: null,
                 file_extensions: {
@@ -226,6 +214,22 @@
                 },
               },
               methods: {
+                async loadTemplates() {
+                  const that = this;
+                  await Promise.all(this.formats.map(format => {
+                    if (format.file) {
+                      var xhttp = new XMLHttpRequest();
+                      xhttp.onreadystatechange = function() {
+                        if (xhttp.readyState == 4 && xhttp.status == 200) {
+                          let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
+                          that.config.templates.add(format.name, xml_data);
+                        }
+                      };
+                      xhttp.open("GET", `/static/citation_styles/${format.file}`, true);
+                      xhttp.send();
+                    }
+                  }));
+                },
                 formatCitation(template, output_format, format=this.format, ) {
                   return this.citation.format(output_format, {
                       format: format,
