@@ -187,7 +187,7 @@
             boundary="window"
             variant="dark"
             target="text_wrap_menu"
-            placement="lefttop"
+            placement="left"
             :show="showHelp"
             triggers="manual">
             Long lines are soft-wrapped.
@@ -199,10 +199,10 @@
             boundary="window"
             variant="dark"
             target="linebreak_menu"
-            placement="left"
+            placement="leftbottom"
             :show="showHelp"
             triggers="manual">
-            Show or hide new line symbols.
+            Show or hide line breaks.
           </b-popover>
           <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item class="dropdown-item" href="#" @click="changeRenderMode('basic')">
@@ -219,13 +219,13 @@
             boundary="window"
             variant="dark"
             target="viewer_mode_menu"
-            placement="right"
+            placement="leftbottom"
             :show="showHelp"
             triggers="manual">
-            <b>Basic Mode:</b></br>
-            Rendering emphasises readability. Lines are...</br>
-            <b>Scholarly Mode:</b></br>
-            Rendering emphasises accuracy. Editorial marks...</br>
+            <b>Basic Mode:</b>
+            Emphasizes readability. Removes deleted text, marginal notes, and hard line breaks. Words tagged with superscript or subscript are rendered in the default font.</br>
+            <b>Scholarly Mode:</b>
+            Emphasizes technical scholarship. Layout and rendering approximates the original as closely as possible.
           </b-popover>
         </b-dropdown>
         <b-popover
@@ -350,7 +350,7 @@
           this.config = Cite.plugins.config.get('@csl');
           this.loadTemplates().then(() => {
             this.citation = new Cite(this.citationData[1]);
-            setTimeout(() => this.template = 'chicago_16', 0);
+            setTimeout(() => this.template = 'chicago_16', 100);
           })
         },
         data: {

@@ -54,10 +54,10 @@ class SearchForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
         choices=QUERY_TYPES,
         help_text='<p class=&quot;text-left p-1&quot;>\
-                    <b>Matches:</b> words must be present in field, but does not preserve their order<br/> \
-                    <b>Contains:</b> query must be present within field, preserves word order<br/> \
-                    <b>Begins with:</b> field must begin with word/phrase in query<br/> \
-                    <b>Is:</b> field must exactly match query<br/><p>'
+                    <b>the following word(s):</b> the query, as entered, must be present in the field.<br/>\
+                    <b>word(s) similar to:</b> ignores word order and also finds word(s) that vary by 1-2 letters from the query.<br/>\
+                    <b>word(s) beginning with:</b> matches words that begin with the characters in the query.<br/>\
+                    <b>exactly this expression:</b> the query must exactly match the contents of the field.<br/><p>'
     )
 
     range_type = forms.ChoiceField(
