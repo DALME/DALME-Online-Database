@@ -97,8 +97,20 @@
                 lang: this.lang
               });
               this.fetching = false;
+              setTimeout(() => this.addAnchors(), 0);
             });
         },
+        addAnchors() {
+          $('.csl-entry').each(function() {
+            let key = $(this).data('csl-entry-id').split('/');
+            $(this).prepend(`<a href="#${key['1']}"></a>`)
+          });
+          if (window.location.hash) {
+            $('html').animate({
+              scrollTop: $(`a[href='${window.location.hash}']`).offset().top
+            }, 800);
+          }
+        }
       }
     });
     </script>
