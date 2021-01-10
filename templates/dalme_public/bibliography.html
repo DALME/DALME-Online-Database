@@ -25,12 +25,8 @@
 {% endblock %}
 
 {% block main_column %}
-  <div class="content">
+  <div id="bibliography-app" class="content">
     {{ page.body }}
-    <div id="bibliography-app" v-cloak>
-      <beat-loader v-if="spinner" :loading="spinner" color="#aaa"></beat-loader>
-      <div class="bibliography-container" v-if="bibliography" v-html="bibliography"></div>
-    </div>
   </div>
 {% endblock %}
 
@@ -48,27 +44,25 @@
       el: '#bibliography-app',
       delimiters: ['${', '}'],
       created() {
-        const Cite = require('citation-js');
-        this.config = Cite.plugins.config.get('@csl');
+        this.cite = require('citation-js');
+        this.config = this.cite.plugins.config.get('@csl');
         this.loadTemplate();
-        this.citation = new Cite();
-        this.fetchData();
+        const that = this;
+        $('.bibliography-container').each(function() {
+          that.$set(that.collections, $(this).data('collection'), null)
+        });
+        this.fetchData().then(() => this.formatBibliography());
       },
       data: {
-        fetching: false,
+        loading: true,
         config: null,
-        citation: null,
-        bibliography: null,
         api_endpoint: '{{ api_url }}',
         format: 'html',
-        template: 'chicago',
+        template: 'dalme',
         output_format: 'bibliography',
         lang: 'en-US',
-      },
-      computed: {
-        spinner() {
-          return (this.entries === null) || this.fetching == true;
-        },
+        collections: {},
+        csldata: {}
       },
       methods: {
         loadTemplate() {
@@ -77,32 +71,45 @@
           xhttp.onreadystatechange = function() {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
               let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
-              that.config.templates.add('chicago', xml_data);
+              that.config.templates.add('dalme', xml_data);
             }
           };
-          xhttp.open("GET", '/static/citation_styles/chicago-author-date-16th-edition.csl', true);
+          xhttp.open("GET", '/static/citation_styles/dalme_bibliography.csl', true);
           xhttp.send();
         },
-        fetchData() {
-          this.fetching = true;
-          fetch(`${this.api_endpoint}/library/?format=json`)
-            .then(response => response.json())
-            .then(data => {
-              for (let i = 0, len = data.length; i < len; ++i) {
-                this.citation.add(data[i]);
-              }
-              this.bibliography = this.citation.format(this.output_format, {
-                format: this.format,
-                template: this.template,
-                lang: this.lang
-              });
-              this.fetching = false;
-              setTimeout(() => this.addAnchors(), 0);
-            });
+        async fetchData() {
+          const keys = Object.keys(this.collections);
+          await Promise.all(keys.map(this.createBibliography));
         },
-        addAnchors() {
+        createBibliography(key) {
+          const that = this;
+          return new Promise(async function (resolve, reject) {
+            await fetch(`${that.api_endpoint}/library/?collection=${key}&content=csljson&format=json`)
+              .then(response => response.json())
+              .then(data => {
+                let citation = new that.cite();
+                for (let i = 0, len = data.length; i < len; ++i) {
+                  citation.add(data[i]);
+                }
+                that.collections[key] = citation.format(that.output_format, {
+                  format: that.format,
+                  template: that.template,
+                  lang: that.lang
+                });
+                resolve()
+              });
+          });
+        },
+        formatBibliography() {
           $('.csl-entry').each(function() {
-            let key = $(this).data('csl-entry-id').split('/');
+            const key = $(this).data('csl-entry-id').split('/');
+            let last_node = $(this).contents().last()[0].textContent;
+            let url = last_node.match(/{([^}]+)}/);
+            if (url) {
+              last_node = last_node.replace(` ${url[0]}.`, '');
+              $(this).contents().last()[0].textContent = last_node;
+              $(this).html(`<a href="${url[1]}" target="_blank">${$(this).html()}</a>`)
+            }
             $(this).prepend(`<a href="#${key['1']}"></a>`)
           });
           if (window.location.hash) {

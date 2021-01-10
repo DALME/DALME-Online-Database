@@ -3405,12 +3405,20 @@ parsererror div {
   font-family: "PT Serif", serif;
   font-size: 1.3rem;
 }
-.csl-bib-body {
-  padding-top: 2rem;
+.bibliography-container .csl-bib-body {
+  padding-top: .5rem;
+  padding-right: 1.5rem;
 }
-.csl-entry {
+.bibliography-container .csl-entry {
   overflow-wrap: anywhere;
 }
-.csl-entry:not(:last-child) {
+.bibliography-container .csl-entry:not(:last-child) {
   margin-bottom: 1rem;
+}
+.bibliography-container .csl-entry a {
+  color: inherit;
+}
+.bibliography-container .csl-entry a:hover {
+  border-bottom: 1px dotted #354d87;
+  color: #354d87;
 }

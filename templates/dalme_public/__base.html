@@ -190,7 +190,7 @@
                 this.config = Cite.plugins.config.get('@csl');
                 this.loadTemplates().then(() => {
                   this.citation = new Cite(this.citationData[1]);
-                  setTimeout(() => this.template = 'chicago_16', 0);
+                  setTimeout(() => this.template = 'chicago_16', 100);
                 })
               },
               data: {
