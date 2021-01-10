@@ -18,7 +18,7 @@
     ],
     "options": {
       "ajax": {
-        "url": "library/?filter=editions&format=json"
+        "url": "library/?collection=A4QHN348&format=json"
       }
     }
   }

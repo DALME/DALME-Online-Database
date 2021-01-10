@@ -11,49 +11,52 @@ class Library(viewsets.ViewSet):
     permission_classes = (GeneralAccessPolicy,)
 
     def list(self, request, *args, **kwargs):
+        data = request.GET.get('data')
+        collection = request.GET.get('collection')
+        search = request.GET.get('search')
+        content = request.GET.get('content')
+        limit = request.GET.get('limit')
+
         queryset_generator = zotero.Zotero(
             settings.ZOTERO_LIBRARY_ID,
             'group',
             settings.ZOTERO_API_KEY
         )
 
-        filter = request.GET.get('filter')
-        if filter and filter == 'editions':
-            if request.GET.get('data') is not None:
-                record_total = queryset_generator.count_items()
-                dt_request = json.loads(request.GET['data'])
-                page = self.paginate_queryset(
-                    queryset_generator,
-                    dt_request.get('start'),
-                    dt_request.get('length')
-                )
+        if data:
+            record_total = queryset_generator.count_items()
+            dt_request = json.loads(data)
+            page = self.paginate_queryset(
+                queryset_generator,
+                dt_request.get('start'),
+                dt_request.get('length')
+            )
 
-                result = {
-                    'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-                    'recordsTotal': record_total,
-                    'recordsFiltered': page.count_items(),
-                    'data': [i['data'] for i in page]
-                    }
-            else:
-                if request.GET.get('search') is not None:
-                    queryset = queryset_generator.collection_items_top(
-                        'A4QHN348',
-                        q=request.GET['search']
-                    )
+            result = {
+                'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                'recordsTotal': record_total,
+                'recordsFiltered': page.count_items(),
+                'data': [i['data'] for i in page]
+                }
+        else:
+            if content:
+                queryset_generator.add_parameters(content=content)
+            if limit:
+                queryset_generator.add_parameters(limit=limit)
+            if search:
+                queryset_generator.add_parameters(q=search)
+
+            if collection:
+                if search:
+                    queryset = queryset_generator.collection_items_top(collection)
                 else:
                     queryset = queryset_generator.everything(
-                        queryset_generator.collection_items_top('A4QHN348')
+                        queryset_generator.collection_items_top(collection)
                     )
-                result = [i['data'] for i in queryset]
-        else:
-            queryset_generator.add_parameters(
-                content='csljson',
-                limit=100
-            )
-            queryset = queryset_generator.everything(
-                queryset_generator.top()
-            )
-            result = queryset
+            else:
+                queryset = queryset_generator.everything(queryset_generator.top())
+
+            result = queryset if content else [i['data'] for i in queryset]
 
         return Response(result)
 

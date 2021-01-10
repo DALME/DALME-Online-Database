@@ -11,7 +11,7 @@
     },
     "options": {
         "type": "api_call",
-        "url": "library/?filter=editions&format=select&search="
+        "url": "library/?collection=A4QHN348&format=select&search="
     },
     "fieldInfo": "Reference in the DALME Zotero Library"
 }
