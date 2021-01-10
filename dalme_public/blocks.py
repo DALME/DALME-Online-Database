@@ -3,6 +3,22 @@ from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
 
 
+class BibliographyBlock(blocks.StructBlock):
+    collection = blocks.ChoiceBlock(
+        choices=[
+            ('A4QHN348', 'Editions'),
+            ('BKW2PVCM', 'Glossaries and dictionaries'),
+            ('QM9AZNT3', 'Methodology'),
+            ('SLIT6LID', 'Studies'),
+            ('FRLVXUWL', 'Other resources')
+        ],
+    )
+
+    class Meta:
+        icon = 'list-ul'
+        template = 'dalme_public/blocks/_bibliography.html'
+
+
 class CarouselBlock(blocks.ListBlock):
     class Meta:
         icon = 'cogs'

@@ -39,6 +39,7 @@ from dalme_app.models import Set as DALMESet, Source
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public import forms
 from dalme_public.blocks import (
+    BibliographyBlock,
     CarouselBlock,
     DocumentBlock,
     ExternalResourceBlock,
@@ -223,6 +224,7 @@ class DALMEPage(Page):
         ('heading', blocks.CharBlock()),
         ('pullquote', blocks.RichTextBlock(icon='openquote')),
         ('page', blocks.PageChooserBlock()),
+        ('bibliography', BibliographyBlock()),
         ('document', DocumentBlock()),
         ('person', PersonBlock()),
         ('external_resource', ExternalResourceBlock()),
