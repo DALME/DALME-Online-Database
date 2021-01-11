@@ -3422,3 +3422,32 @@ parsererror div {
   border-bottom: 1px dotted #354d87;
   color: #354d87;
 }
+
+.banner-container {
+  padding: 1.5rem 4.5rem 3rem;
+  background-color: #ffffff99;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(15px);
+  font-family: "Open Sans", sans-serif;
+  color: #193a5d;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.8;
+  text-shadow: 0px 0px 3px rgb(255 255 255 / 47%);
+}
+.banner-container a {
+  color: inherit;
+  text-shadow: inherit;
+}
+.banner-container a:hover {
+  color: inherit;
+  text-shadow: 0px 0px 3px rgb(130 124 124 / 47%);
+}
+.banner-title {
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: .3rem;
+}
+.banner-info {
+
+}

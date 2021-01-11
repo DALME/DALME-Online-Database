@@ -39,6 +39,7 @@ from dalme_app.models import Set as DALMESet, Source
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public import forms
 from dalme_public.blocks import (
+    AnnouncementBannerBlock,
     BibliographyBlock,
     CarouselBlock,
     DocumentBlock,
@@ -372,6 +373,7 @@ class Home(DALMEPage):
         related_name='+',
     )
     sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
+    banners = StreamField([('banners', AnnouncementBannerBlock())], null=True)
 
     subpage_types = [
         'dalme_public.Section',
@@ -382,6 +384,7 @@ class Home(DALMEPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         PageChooserPanel('learn_more_page'),
+        StreamFieldPanel('banners'),
         StreamFieldPanel('body'),
         StreamFieldPanel('sponsors'),
     ]

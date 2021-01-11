@@ -10,6 +10,11 @@
       <a class="u-lozenge" href="{% pageurl page.learn_more_page %}">LEARN MORE</a>
     {% endif %}
   </div>
+  {% if page.banners %}
+    {% for banner in page.banners %}
+      {{ banner }}
+    {% endfor %}
+  {% endif %}
 {% endblock %}
 
 {% block main_column %}
