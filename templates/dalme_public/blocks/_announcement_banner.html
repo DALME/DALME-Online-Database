@@ -2,18 +2,20 @@
 {% now "Y-m-d" as today %}
 {% if value.start_date|date:"Y-m-d" < today and value.end_date|date:"Y-m-d" > today %}
 <div class="banner-container">
-  <div class="banner-title">
-    {% if value.url %}
-      <a href="{{ value.url }}" target="_blank">{{ value.title }}</a>
-    {% else %}
-      {{ value.title }}
-    {% endif %}
-  </div>
-  <div class="banner-info">
-    {{ value.info }}
-    {% if value.page %}
-      <a href="{% pageurl value.page %}"> Learn more...</a>
-    {% endif %}
+  <div class="banner-content">
+    <div class="banner-title">
+      {% if value.url %}
+        <a href="{{ value.url }}" target="_blank">{{ value.title }}</a>
+      {% else %}
+        {{ value.title }}
+      {% endif %}
+    </div>
+    <div class="banner-info">
+      {{ value.info }}
+      {% if value.page %}
+        <a href="{% pageurl value.page %}"> Learn more...</a>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endif %}

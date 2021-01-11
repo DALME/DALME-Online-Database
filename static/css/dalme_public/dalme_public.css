@@ -3424,7 +3424,8 @@ parsererror div {
 }
 
 .banner-container {
-  padding: 1.5rem 4.5rem 3rem;
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
   background-color: #ffffff99;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(15px);
@@ -3434,6 +3435,11 @@ parsererror div {
   font-weight: 600;
   line-height: 1.8;
   text-shadow: 0px 0px 3px rgb(255 255 255 / 47%);
+}
+.banner-content {
+  width: 948px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .banner-container a {
   color: inherit;
