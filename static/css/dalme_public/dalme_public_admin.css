@@ -43,3 +43,18 @@ input[type=checkbox]:before {
 .listing .children a:before {
   font-size: 2rem;
 }
+td.ord .handle {
+  margin-top: 0;
+}
+.human-readable-date {
+  white-space: nowrap;
+}
+.checkbox_input div.field-content input {
+  display: inline-block;
+}
+input[type=checkbox] {
+  height: 20px;
+}
+.object-layout table thead tr {
+  height: 40px;
+}
