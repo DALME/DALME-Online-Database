@@ -737,7 +737,7 @@ nav.browse a {
   padding: 3rem 3rem 2rem 4.5rem;
 }
 .statement .block-text p:first-of-type {
-  text-indent: 34px;
+  text-indent: 35px;
 }
 .statement .block-text p:first-of-type b:first-of-type {
   font-size: 110%;
@@ -2513,11 +2513,9 @@ ul.pagination > li.page-item:last-child button {
 
 .block-document {
   color: #5e5e5e;
-  border-top: 1px dotted #9c9c9c;
+  border-top: 1px solid #e0e0e0;
   padding-top: 1.5rem;
   margin-top: 1.5rem;
-  margin-right: .5rem;
-  margin-left: .5rem;
 }
 
 .block-document:last-of-type {
@@ -2538,15 +2536,20 @@ ul.pagination > li.page-item:last-child button {
 .block-document .metadata > div {
   flex-direction: row;
 }
-
+.block-document .doc-title {
+  display: flex;
+  align-items: center;
+}
 .block-document .doc-title h4,
 .block-document .doc-title a {
-  font-family: "Asul", serif;
-  font-size: 1.4rem;
+  font-family: "PT Serif", serif;
+  font-size: 1.3rem;
   font-weight: 500;
   line-height: 1.4;
   color: #333;
   decoration: none;
+  margin-bottom: 0;
+  display: inline;
 }
 
 .block-document .doc-title a:hover {
@@ -2581,10 +2584,11 @@ ul.pagination > li.page-item:last-child button {
   font-weight: 600;
   line-height: 2;
   white-space: nowrap;
+  padding-left: 1rem;
 }
 
 .abstract-text {
-  font-size: 15px;
+  font-size: 1.1rem;
   color: #686868;
   white-space: pre-line;
   font-family: "PT Serif", serif;
@@ -2592,7 +2596,7 @@ ul.pagination > li.page-item:last-child button {
 }
 
 .abstract-container {
-  max-height: 66px;
+  max-height: 25px;
   overflow-y: hidden;
   transition: max-height 0.8s ease-out;
   margin-top: .5rem;

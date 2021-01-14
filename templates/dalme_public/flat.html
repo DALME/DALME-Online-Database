@@ -45,7 +45,7 @@
 
 {% block js_foot %}
   {{ block.super }}
-  {% if page.specific.title == 'Publications' %}
+  {% if page.specific.title == 'Publications' or page.specific.title == 'Documentation' %}
     <script>
       $(document).ready(function() {
         $('.abstract-container').each( function() {
@@ -58,7 +58,7 @@
             $(this).parent().css({"maxHeight":"1000px"});
             $(this).text('Show less');
           } else {
-            $(this).parent().css({"maxHeight":"84px"});
+            $(this).parent().css({"maxHeight":"25px"});
             $(this).text('Show more');
           }
         });
