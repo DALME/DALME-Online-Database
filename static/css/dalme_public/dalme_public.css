@@ -257,11 +257,10 @@ body.home section.featured img {
 main.collections section p,
 main.collection section p {
   font-family: "PT Serif", serif;
+  padding: 0 .5rem;
 }
 main.collections section h4,
 main.collection section h4 {
-  margin-left: 1rem;
-  margin-right: 1rem;
   padding-top: 1rem;
 }
 
@@ -928,9 +927,8 @@ main.browser > article {
   font-family: "PT Serif", serif;
 }
 .corpora-container .collections-container {
-  margin-right: .5rem;
-  margin-left: .5rem;
   margin-bottom: 2rem;
+  padding: 0 1rem;
 }
 
 .corpora-container .collections-container a {
@@ -1417,7 +1415,7 @@ nav.secondary.features-filter ul {
   padding-bottom: 0.5rem;
 }
 h3.featured-group-key {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   color: #3a5d82;
   font-weight: 650;
   letter-spacing: 0.1rem;
@@ -1425,7 +1423,7 @@ h3.featured-group-key {
 h4.featured-group-key {
   color: #5e5e5e;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   margin-bottom: 1.5rem;
 }
 .features-back {
@@ -2516,6 +2514,8 @@ ul.pagination > li.page-item:last-child button {
   border-top: 1px solid #e0e0e0;
   padding-top: 1.5rem;
   margin-top: 1.5rem;
+  padding-left: .5rem;
+  padding-right: .5rem;
 }
 
 .block-document:last-of-type {
@@ -3329,7 +3329,8 @@ section.transcription {
 }
 
 .subsection-container {
-  margin: 1rem 1rem 1.5rem .5rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .popover-body .dropdown-menu {
@@ -3405,7 +3406,8 @@ parsererror div {
   text-transform: uppercase;
 }
 .dalme-button.large {
-  font-size: 14px;
+  font-size: 12px;
+  padding: .2rem .5rem;
 }
 .dalme-button:not(:disabled):not(.disabled):hover,
 .dalme-button:not(:disabled):not(.disabled).active,
@@ -3438,11 +3440,10 @@ parsererror div {
 
 .bibliography-container {
   font-family: "PT Serif", serif;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 .bibliography-container .csl-bib-body {
-  padding-top: .5rem;
-  padding-right: 1.5rem;
+  padding: .5rem .5rem 0 .5rem;
 }
 .bibliography-container .csl-entry {
   overflow-wrap: anywhere;
