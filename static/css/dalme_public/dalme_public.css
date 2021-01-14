@@ -230,7 +230,7 @@ main.home {
 body.home main p {
   line-height: 1.5;
   color: #636363;
-  overflow: auto;
+  overflow: hidden;
   margin: 1rem;
 }
 
@@ -695,7 +695,10 @@ nav.browse a {
 }
 
 .mission > div {
-  margin: 0rem 1.5rem 2rem 1.5rem;
+  /* width: 950px;
+  margin: 2rem 0 4rem 0;
+  padding: 0 1rem; */
+  margin-top: -42px;
 }
 .mission h2,
 .support h2 {
@@ -723,20 +726,50 @@ nav.browse a {
   flex-direction: column;
   height: 100%;
 }
+.statement a {
+  color: #354d87;
+}
+.statement a:hover {
+  border-bottom: 1px dotted #354d87;
+}
 .statement .block-text {
-  font-family: "Open Sans", sans-serif;
+  font-family: "PT Serif", serif;
+  padding: 3rem 3rem 2rem 4.5rem;
+}
+.statement .block-text p:first-of-type {
+  text-indent: 34px;
+}
+.statement .block-text p:first-of-type b:first-of-type {
+  font-size: 110%;
 }
 .statement .block-text .rich-text p {
   font-size: 1.2rem;
   overflow: initial;
 }
-.statement > img {
+.home-parchment {
+  background: url(/static/images/home_bg.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: right 0px top 0px;
+  width: 75%;
+}
+.home-parchment img {
+  width: 35px;
+  height: auto;
   float: left;
-  width: 30%;
-  margin-bottom: 0.5rem;
+  position: relative;
+  top: 39px;
+  left: 4.4rem;
+}
+.home-register {
+  background: url(/static/images/home_reg.jpg);
+  background-size: cover;
+  width: 25%;
 }
 body.home main .statement p {
-  margin: 0.5rem 0;
+  margin: 0 0 1rem 0;
+  line-height: 2;
+  color: #464646;
 }
 .register {
   display: none;
@@ -746,7 +779,7 @@ body.home main .statement p {
   width: 100%;
 }
 .register .a {
-  margin: 1em 0 0 6em;
+  margin: 1em .3em 0 6em;
   width: 150px;
   border: 10px solid rgb(91, 160, 241);
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
@@ -1719,17 +1752,9 @@ div.description[data-collapsed='true'] {
   header .description p {
     margin-right: 5rem;
   }
-
   .statement  {
     display: block;
   }
-  .statement > img {
-    height: 100%;
-    margin-right: 30px;
-    padding: .5rem 0 0 0;
-    width: 10rem;
-  }
-
   nav.primary {
     background-color: unset;
     background-image: unset;
@@ -1975,9 +2000,6 @@ div.description[data-collapsed='true'] {
   .register {
     display: block;
   }
-  .mission > div {
-    margin: 0rem 5rem 3.5rem 5rem;
-  }
   .support-logos {
     flex-direction: row;
     margin-bottom: 2rem;
@@ -2047,6 +2069,12 @@ div.description[data-collapsed='true'] {
 }
 
 @media only screen and (min-width: 1200px) {
+  .home-parchment {
+    width: 65%;
+  }
+  .home-register {
+    width: 35%;
+  }
   main {
     margin: 0 auto;
     width: 80rem;
@@ -3437,7 +3465,7 @@ parsererror div {
   text-shadow: 0px 0px 3px rgb(255 255 255 / 47%);
 }
 .banner-content {
-  width: 948px;
+  width: 950px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -3453,7 +3481,4 @@ parsererror div {
   font-weight: 800;
   font-size: 18px;
   margin-bottom: .3rem;
-}
-.banner-info {
-
 }
