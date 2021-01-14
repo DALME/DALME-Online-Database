@@ -148,10 +148,10 @@ def get_flat_nav(context):
 def get_header_image_styles(context, header_image, header_position):
     gradients = {
         'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',  # noqa
-        'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(58, 74, 60, 0.9) 100%',  # noqa
-        'features': '125deg, rgba(99, 98, 58, 0.7) 0%, rgba(80, 41, 43, 0.9) 100%',  # noqa
+        'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(63, 101, 68, 0.9) 100%',  # noqa
+        'features': '125deg, rgba(99, 98, 58, 0.7) 0%, rgba(138, 71, 71, 0.9) 100%',  # noqa
         'collections': '125deg, rgba(95, 81, 111, 0.7) 0%, rgba(23, 62, 101, 0.9) 100%',  # noqa
-        'about': '125deg, rgba(155, 149, 76, 0.7) 0%, rgba(63, 73, 54, 0.9) 100%',  # noqa
+        'about': '125deg, rgba(105, 102, 63, 0.6) 0%, rgba(146, 106, 16, 0.9) 100%',  # noqa
         'generic': '59deg, #11587c 54.62%, #1b1b1b',
     }
     page = context['page']

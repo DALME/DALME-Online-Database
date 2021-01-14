@@ -1392,7 +1392,7 @@ form.contact-form textarea {
   margin-bottom: 0.5rem;
 }
 .record-detail h3 {
-  border-bottom: 1px solid #9c9c9c;
+  border-bottom: 1px dotted #9c9c9c;
   padding: 0 0 0.5rem 0;
   margin-bottom: 0.5rem;
 }
@@ -1740,8 +1740,11 @@ div.description[data-collapsed='true'] {
     transform: translate(0, -4.25rem);
   }
 
-  header .title {
+  header:not(.home) .title {
+    background-color: #ffffff14;
+    backdrop-filter: blur(3px);
     padding: 2rem;
+    -webkit-backdrop-filter: blur(3px);
   }
   header .title h2 {
     display: block;
