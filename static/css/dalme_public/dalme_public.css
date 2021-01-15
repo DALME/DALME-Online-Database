@@ -2554,34 +2554,29 @@ ul.pagination > li.page-item:last-child button {
   decoration: none;
   margin-bottom: 0;
   display: inline;
+  border-bottom: 1px dotted transparent;
 }
-
 .block-document .doc-title a:hover {
   color: #084094;
   border-bottom: 1px dotted #084094;
 }
-
 .block-document .doc-title a.doc-icon {
   font-size: 12px;
   color: #999;
   margin-left: 5px;
 }
-
 .block-document .doc-title a.doc-icon:hover {
   color: #084094;
 }
-
 .block-document .doc-detail {
   align-items: baseline;
   display: flex;
 }
-
 .block-document .metadata span {
   font-weight: 400;
   font-size: 1.1rem;
   color: #6b6b6b;
 }
-
 .block-document .metadata .doc-date {
   margin-left: auto;
   font-size: 1rem;
@@ -3493,4 +3488,8 @@ parsererror div {
   font-weight: 800;
   font-size: 18px;
   margin-bottom: .3rem;
+}
+
+a.anchor {
+  white-space: pre;
 }
