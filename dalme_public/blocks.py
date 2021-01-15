@@ -87,6 +87,22 @@ class MainImageBlock(ImageChooserBlock):
         template = 'dalme_public/blocks/_main_image.html'
 
 
+class InlineImageBlock(blocks.StructBlock):
+    image = ImageChooserBlock()
+    caption = blocks.RichTextBlock(required=False)
+    alignment = blocks.ChoiceBlock(
+        choices=[
+            ('left', 'Left-aligned'),
+            ('right', 'Right-aligned')
+        ],
+    )
+    show_caption = blocks.BooleanBlock(required=False, default=True)
+
+    class Meta:
+        icon = 'image'
+        template = 'dalme_public/blocks/_inline_image.html'
+
+
 class PersonBlock(blocks.StructBlock):
     name = blocks.CharBlock()
     job = blocks.CharBlock()

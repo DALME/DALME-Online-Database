@@ -1,0 +1,8 @@
+{% load wagtailimages_tags %}
+
+<div class="inline-image u-flex {{ value.alignment }}">
+  {% image value.image max-350x350 %}
+  {% if value.show_caption and value.caption %}
+    <div class="caption">{{ value.caption }}</div>
+  {% endif %}
+</div>

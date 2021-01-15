@@ -46,6 +46,7 @@ from dalme_public.blocks import (
     ExternalResourceBlock,
     FooterPageChooserBlock,
     MainImageBlock,
+    InlineImageBlock,
     PersonBlock,
     SocialBlock,
     SponsorBlock,
@@ -192,7 +193,7 @@ class ExplorePage(models.Model):
         ], null=True)
 
     text_after = StreamField([
-            ('inline_image', ImageChooserBlock()),
+            ('inline_image', InlineImageBlock()),
             ('text', blocks.RichTextBlock()),
             ('heading', blocks.CharBlock()),
             ('html', blocks.RawHTMLBlock()),
@@ -317,7 +318,7 @@ class DALMEPage(Page):
     body = StreamField([
         ('main_image', MainImageBlock()),
         ('carousel', CarouselBlock(ImageChooserBlock())),
-        ('inline_image', ImageChooserBlock()),
+        ('inline_image', InlineImageBlock()),
         ('text', blocks.RichTextBlock()),
         ('heading', blocks.CharBlock()),
         ('pullquote', blocks.RichTextBlock(icon='openquote')),

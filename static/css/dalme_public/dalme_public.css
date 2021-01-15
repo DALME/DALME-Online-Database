@@ -1589,12 +1589,6 @@ h4.featured-group-key {
 .block-main_image {
   margin-bottom: 1rem;
 }
-
-.block-inline_image {
-  float: right;
-  padding-left: 1.5rem;
-  width: 30%;
-}
 .block-person {
   display: inline-block;
   padding-top: 1rem;
@@ -3489,7 +3483,36 @@ parsererror div {
   font-size: 18px;
   margin-bottom: .3rem;
 }
-
-a.anchor {
-  white-space: pre;
+.inline-image {
+  border: 1px solid #aaa;
+  padding: 3px;
+  background-color: #f8f9fa;
+  overflow: hidden;
+  flex-direction: column;
+  cursor: pointer;
+}
+.inline-image img {
+  max-width: 300px;
+  max-height: 300px;
+}
+.inline-image .caption {
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+  border: 0;
+  line-height: 1.4em;
+  padding: 6px 3px 3px 3px;
+  font-size: 12px;
+  color: #6b6b6b;
+}
+.inline-image .caption p {
+  margin: 0;
+  line-height: 1.5;
+}
+.inline-image.right {
+  float: right;
+  margin: 0.5em 0 1.3em 1.4em;
+}
+.inline-image.left {
+  float: left;
+  margin: 0.5em 1.4em 1.3em 0;
 }
