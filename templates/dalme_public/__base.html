@@ -114,7 +114,7 @@
               if (e.target.localName === 'div') {
                 icon = target.find('i');
               } else if (e.target.localName === 'h3') {
-                icon = target.next();
+                icon = target.parent().next();
               } else {
                 icon = target;
               }

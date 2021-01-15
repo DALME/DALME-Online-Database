@@ -1,4 +1,6 @@
 <div id="handle" class="u-subsection u-flex" data-collapsed="{{ value.collapsed|yesno:"true,false" }}">
-  <h3>{{ value.subsection }}</h3>
+  <a href="#{{ value.subsection|slugify }}" class="anchor">
+    <h3>{{ value.subsection }}</h3>
+  </a>
   <i class="fas {% if value.collapsed %}fa-caret-left{% else %}fa-caret-down{% endif %} subsection"></i>
 </div>

@@ -27,7 +27,9 @@
         {% for corpus, collections in corpora %}
           <section class="corpus">
             <div id="handle" class="u-subsection u-flex" data-collapsed="false">
-              <h3>{{ corpus.title }}</h3>
+              <a href="#{{ corpus.title|slugify }}" class="anchor">
+                <h3>{{ corpus.title }}</h3>
+              </a>
               <i class="fas fa-caret-down corpus"></i>
             </div>
             {{ corpus.description|richtext }}
