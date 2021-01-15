@@ -2,9 +2,11 @@
 
 <div class="u-flex">
   {% if value.photo %}
-    <div class="headshot">
+    <a href="#{{ value.name|slugify }}" class="anchor">
+      <div class="headshot">
       {% image value.photo fill-125x125-c100 %}
-    </div>
+      </div>
+    </a>
   {% else %}
     <div class="headshot no-photo"></div>
   {% endif %}

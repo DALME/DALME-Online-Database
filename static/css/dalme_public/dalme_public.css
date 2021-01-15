@@ -1632,7 +1632,7 @@ h4.featured-group-key {
 .block-person a:visited {
   color: #06305d;
 }
-.block-person a:hover {
+.block-person a:not(.anchor):hover {
   border-bottom: 1px dotted #06305d;
 }
 .block-person p {
