@@ -10,13 +10,13 @@ from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.models import (
     Collections,
     Essay,
-    ExploreMapText,
+    ExplorePage,
     FeaturedObject,
     FeaturedInventory,
     Features,
     Footer,
     Home,
-    SearchHelpBlock
+    SearchPage
 )
 
 from datetime import date
@@ -431,12 +431,12 @@ def dd_record_name(name, part=''):
 
 @register.simple_tag
 def search_help():
-    return SearchHelpBlock.objects.first()
+    return SearchPage.objects.first()
 
 
 @register.simple_tag
 def explore_map_text():
-    return ExploreMapText.objects.first()
+    return ExplorePage.objects.first()
 
 
 @register.filter

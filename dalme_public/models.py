@@ -62,6 +62,12 @@ from urllib import parse
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 FOLIO_RE = '[0-9a-z:]+'
 
+HEADER_POSITION = (
+    ('top', 'Top'),
+    ('center', 'Center'),
+    ('bottom', 'Bottom'),
+)
+
 
 @hooks.register('construct_settings_menu')
 def hide_users_menu_item(request, menu_items):
@@ -141,32 +147,50 @@ class Footer(models.Model):
 
 
 @register_snippet
-class SearchHelpBlock(models.Model):
-    content = StreamField([
+class SearchPage(models.Model):
+    help_content = StreamField([
             ('text', blocks.RichTextBlock()),
             ('html', blocks.RawHTMLBlock()),
         ], null=True)
 
+    header_image = models.ForeignKey(
+        'dalme_public.DALMEImage',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text='The image that will display in the header.'
+    )
+
+    header_position = models.CharField(
+        max_length=6,
+        choices=HEADER_POSITION,
+        default='top',
+        help_text='Position of the header image within its container.'
+    )
+
     panels = [
-        StreamFieldPanel('content'),
+        ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
+        StreamFieldPanel('help_content'),
     ]
 
     def __str__(self):
-        return "Search Help"
+        return "Search Page"
 
     def clean(self):
         if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('The search page can only have one help block.')
+            raise ValidationError('There can only be one search page.')
 
 
 @register_snippet
-class ExploreMapText(models.Model):
-    title = models.CharField(max_length=255, blank=True, null=True)
+class ExplorePage(models.Model):
     text_before = StreamField([
             ('text', blocks.RichTextBlock()),
             ('heading', blocks.CharBlock()),
             ('html', blocks.RawHTMLBlock()),
         ], null=True)
+
     text_after = StreamField([
             ('inline_image', ImageChooserBlock()),
             ('text', blocks.RichTextBlock()),
@@ -175,27 +199,100 @@ class ExploreMapText(models.Model):
             ('embed', EmbedBlock(icon='media')),
         ], null=True)
 
+    header_image = models.ForeignKey(
+        'dalme_public.DALMEImage',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text='The image that will display in the header.'
+    )
+
+    header_position = models.CharField(
+        max_length=6,
+        choices=HEADER_POSITION,
+        default='top',
+        help_text='Position of the header image within its container.'
+    )
+
     panels = [
-        FieldPanel('title'),
+        ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
         StreamFieldPanel('text_before'),
         StreamFieldPanel('text_after'),
     ]
 
     def __str__(self):
-        return "Explore Map Text"
+        return "Explore Page Content"
 
     def clean(self):
         if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('The Explore page can only have one set of text blocks.')
+            raise ValidationError('There can only be one Explore page.')
+
+
+@register_snippet
+class RecordBrowser(models.Model):
+    header_image = models.ForeignKey(
+        'dalme_public.DALMEImage',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text='The image that will display in the header.'
+    )
+
+    header_position = models.CharField(
+        max_length=6,
+        choices=HEADER_POSITION,
+        default='top',
+        help_text='Position of the header image within its container.'
+    )
+
+    panels = [
+        ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
+    ]
+
+    def __str__(self):
+        return "Record Browser"
+
+    def clean(self):
+        if self.id is None and self._meta.model.objects.exists():
+            raise ValidationError('There can only be one Record Browser page.')
+
+
+@register_snippet
+class RecordViewer(models.Model):
+    header_image = models.ForeignKey(
+        'dalme_public.DALMEImage',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        help_text='The image that will display in the header.'
+    )
+
+    header_position = models.CharField(
+        max_length=6,
+        choices=HEADER_POSITION,
+        default='top',
+        help_text='Position of the header image within its container.'
+    )
+
+    panels = [
+        ImageChooserPanel('header_image'),
+        FieldPanel('header_position'),
+    ]
+
+    def __str__(self):
+        return "Record Viewer"
+
+    def clean(self):
+        if self.id is None and self._meta.model.objects.exists():
+            raise ValidationError('There can only be one Record Viewer page.')
 
 
 class DALMEPage(Page):
-    HEADER_POSITION = (
-        ('top', 'Top'),
-        ('center', 'Center'),
-        ('bottom', 'Bottom'),
-    )
-
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
         null=True,
@@ -240,6 +337,8 @@ class DALMEPage(Page):
     def get_context(self, request):
         context = super().get_context(request)
         context.update({
+            'header_image': self.header_image,
+            'header_position': self.header_position,
             'api_endpoint': settings.API_ENDPOINT,
             'db_endpoint': settings.DB_ENDPOINT
         })
@@ -643,8 +742,11 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         context = self.get_context(request)
         search_context = SearchContext(public=True)
         search_formset = formset_factory(SearchForm)
+        search_snippet = SearchPage.objects.first()
 
         context.update({
+            'header_image': search_snippet.header_image,
+            'header_position': search_snippet.header_position,
             'query': False,
             'advanced': False,
             'form': search_formset(form_kwargs={'fields': search_context.fields}),
@@ -694,7 +796,11 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
     @route(r'^records/$', name='records')
     def records(self, request, scoped=True):
         context = self.get_context(request)
+        browser_snippet = RecordBrowser.objects.first()
+
         context.update({
+            'header_image': browser_snippet.header_image,
+            'header_position': browser_snippet.header_position,
             'records': True,
             'browse_mode': request.session.get('public-browse-mode', 'wide')
         })
@@ -731,6 +837,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         initial_folio_index = next((i for i, item in enumerate(pages) if item["pageName"] == folio), 0) if folio else 0
 
         context = self.get_context(request)
+        viewer_snippet = RecordViewer.objects.first()
 
         from_search = False
         if request.META.get('HTTP_REFERER') and 'search' in request.META.get('HTTP_REFERER'):
@@ -738,6 +845,8 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
 
         data = PublicSourceSerializer(source).data
         context.update({
+            'header_image': viewer_snippet.header_image,
+            'header_position': viewer_snippet.header_position,
             'record': True,
             'from_search': from_search,
             'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
@@ -796,7 +905,13 @@ class Collections(SearchEnabled):
     @route(r'^explore/$', name='explore')
     def explore(self, request):
         context = self.get_context(request)
-        context.update({'explore': True})
+        explorer_snippet = ExplorePage.objects.first()
+
+        context.update({
+            'header_image': explorer_snippet.header_image,
+            'header_position': explorer_snippet.header_position,
+            'explore': True
+        })
 
         return TemplateResponse(
           request, 'dalme_public/explore.html', context

@@ -36,12 +36,12 @@
   {% with page.get_verbose_name|lower as page_name %}
     <body id="body" class="{{ page_name }} u-flex u-type-sans">
       {% block banner %}{% endblock %}
-      {% image page.header_image original as header_image %}
       <header
         class="{{ page_name }}"
         role="banner"
         {% if header_image %}
-          {% get_header_image_styles header_image page.header_position as styles %}
+          {% image header_image original as header_background %}
+          {% get_header_image_styles header_background header_position as styles %}
           style="{{ styles }}"
         {% endif %}>
           {% include "dalme_public/includes/_nav.html" %}
