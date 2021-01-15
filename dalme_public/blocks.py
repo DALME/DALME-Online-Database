@@ -53,6 +53,7 @@ class DocumentBlock(blocks.StructBlock):
     version = blocks.FloatBlock(required=False)
     document = DocumentChooserBlock(required=False)
     url = blocks.URLBlock(required=False)
+    page = blocks.PageChooserBlock()
     date = blocks.DateBlock()
 
     class Meta:

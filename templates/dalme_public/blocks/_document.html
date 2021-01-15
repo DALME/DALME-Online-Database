@@ -1,7 +1,11 @@
+{% load wagtailcore_tags %}
+
 <div class="u-flex">
   <div class="metadata">
     <div class="doc-title">
-      {% if value.url %}
+      {% if value.page %}
+        <a href="{% pageurl value.page %}" target="_blank">{{ value.title }}</a>
+      {% elif value.url %}
         <a href="{{ value.url }}" target="_blank">{{ value.title }}</a>
       {% else %}
         <h4>{{ value.title }}</h4>

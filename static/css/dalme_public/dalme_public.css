@@ -392,6 +392,7 @@ header > div {
 header .title > h1 {
   font-size: 2rem;
   text-shadow: 0px 0px 12px rgba(0, 0, 0, 0.8);
+  text-align: center;
 }
 header .title > h2 {
   font-family: "PT Serif", serif;
@@ -1548,15 +1549,18 @@ h4.featured-group-key {
   font-family: "PT Serif", serif;
   font-size: 1.2rem;
 }
-
 .block-pullquote {
-  border-bottom: 1px dotted #9c9c9c;
   color: #636363;
-  margin-bottom: 1.5rem;
   padding: .5rem 0 2rem 0;
   text-align: center;
   font-family: "Lora", serif;
   font-size: 18px;
+  width: 96%;
+}
+.object .block-pullquote {
+  border-bottom: 1px dotted #9c9c9c;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 .block-pullquote p:first-of-type:before {
   content: "\f10d";
