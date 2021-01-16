@@ -3542,3 +3542,6 @@ parsererror div {
 .lightbox-caption p {
   margin: 0;
 }
+.highlight {
+  background-color: #fff4bf;
+}

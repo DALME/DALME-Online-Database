@@ -108,14 +108,16 @@
             if (url) {
               last_node = last_node.replace(` ${url[0]}.`, '');
               $(this).contents().last()[0].textContent = last_node;
-              $(this).html(`<a href="${url[1]}" target="_blank">${$(this).html()}</a>`)
+              $(this).html(`<a href="${url[1]}" target="_blank"><span>${$(this).html()}</a>`)
             }
-            $(this).prepend(`<a href="#${key['1']}"></a>`)
+            $(this).html(`<a href="#${key['1']}"></a><span>${$(this).html()}</span>`);
           });
           if (window.location.hash) {
+            const anchor = $(`a[href='${window.location.hash}']`)
             $('html').animate({
-              scrollTop: $(`a[href='${window.location.hash}']`).offset().top
+              scrollTop: anchor.offset().top
             }, 800);
+            anchor.next().addClass('highlight');
           }
         }
       }
