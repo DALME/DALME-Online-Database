@@ -45,6 +45,17 @@
 
 {% block js_foot %}
   {{ block.super }}
+  <script>
+    $(document).ready(function() {
+      if (window.location.hash) {
+        const anchor = $(`a[href='${window.location.hash}']`)
+        $('html').animate({
+          scrollTop: anchor.offset().top - 20
+        }, 800);
+        anchor.next().addClass('highlight');
+      }
+    });
+  </script>
   {% if page.specific.title == 'Publications' or page.specific.title == 'Documentation' %}
     <script>
       $(document).ready(function() {
@@ -53,6 +64,7 @@
             $(this).find('.show-more').removeClass('d-none')
           }
         });
+
         $('.show-more').on('click', function() {
           if ($(this).text() == 'Show more') {
             $(this).parent().css({"maxHeight":"1000px"});

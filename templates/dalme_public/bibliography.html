@@ -115,7 +115,7 @@
           if (window.location.hash) {
             const anchor = $(`a[href='${window.location.hash}']`)
             $('html').animate({
-              scrollTop: anchor.offset().top
+              scrollTop: anchor.offset().top - 20
             }, 800);
             anchor.next().addClass('highlight');
           }

@@ -21,7 +21,6 @@
 {% block main_column %}
   <div class="content">
     {{ page.body }}
-
     {% if corpora %}
       <div id="corpora" class="corpora-container u-flex">
         {% for corpus, collections in corpora %}
@@ -52,3 +51,20 @@
     {% endif %}
   </div>
 {% endblock %}
+{% block js_foot %}
+  {{ block.super }}
+  <script>
+    $(document).ready(function() {
+      if (window.location.hash) {
+        const anchor = $(`a[href='${window.location.hash}']`)
+        $('html').animate({
+          scrollTop: anchor.offset().top - 20
+        }, 800);
+        anchor.parent().addClass('highlight');
+        if (anchor.next().hasClass('fa-caret-left')) {
+          anchor.parent().click();
+        }
+      }
+    });
+  </script>
+{% endblock%}

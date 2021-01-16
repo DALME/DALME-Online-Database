@@ -148,6 +148,17 @@
       })
 
       renderHistogram('#histogram', 150, 40, '#d0e7ff');
+
+      if (window.location.hash) {
+        const anchor = $(`a[href='${window.location.hash}']`)
+        $('html').animate({
+          scrollTop: anchor.offset().top - 20
+        }, 800);
+        anchor.parent().addClass('highlight');
+        if (anchor.next().hasClass('fa-caret-left')) {
+          anchor.parent().click();
+        }
+      }
     });
   </script>
 {% endblock %}
