@@ -1,0 +1,23 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.6.7/jquery.timeago.min.js" integrity="sha512-RlGrSmkje9EE/FXpJKWf0fvOlg4UULy/blvNsviBX9LFwMj/uewXVoanRbxTIRDXy/0A3fBQppTmJ/qOboJzmA==" crossorigin="anonymous"></script>
+<script>
+  $(document).ready(function() {
+    fetch('https://api.github.com/repos/DALME/DALME-Online-Database/commits')
+      .then(response => response.json())
+      .then(commits => {
+        const last_activity = $.timeago(commits[0].commit.author.date);
+        const activity_url = commits[0].html_url;
+        fetch('https://api.github.com/repos/DALME/DALME-Online-Database/releases/latest')
+        .then(response => response.json())
+        .then(releases => {
+          const container = $('<div class="badge-container"></div>');
+          const badge = $('<div class="github-badge"></div>');
+          badge.append('<a target="_blank" href="https://github.com/DALME/DALME-Online-Database"><img src="/static/images/github_logo.png"></a>');
+          badge.append(`<a target="_blank" href="${releases.html_url}">Release ${releases.tag_name} (${$.timeago(releases.published_at)})</a>`);
+          badge.append(`<a target="_blank" href="${activity_url}">Updated ${last_activity}</a>`);
+          container.append(badge);
+          container.append('<div class="dataverse-badge"><a target="_blank" href="https://dataverse.harvard.edu/dataverse/dalme"><img src="/static/images/dataverse_logo.png"></a></div>');
+          $('.block-text').prepend(container);
+        });
+      });
+  });
+</script>

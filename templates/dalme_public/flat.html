@@ -45,6 +45,9 @@
 
 {% block js_foot %}
   {{ block.super }}
+  {% if page.title == 'Open Access' %}
+    {% include "dalme_public/includes/_repo_badges.html" %}
+  {% endif %}
   <script>
     $(document).ready(function() {
       if (window.location.hash) {
