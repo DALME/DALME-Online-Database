@@ -3510,9 +3510,27 @@ parsererror div {
 }
 .inline-image.right {
   float: right;
-  margin: 0.5em 0 1.3em 1.4em;
+  margin: 0.5rem 0 .5rem 1.4rem;
 }
 .inline-image.left {
   float: left;
-  margin: 0.5em 1.4em 1.3em 0;
+  margin: .5rem 1.4rem .5rem 0;
+}
+
+
+.lightbox-image {
+  width: 100%;
+}
+.modal-footer {
+  background-color: #f8f9fa;
+  justify-content: center;
+}
+.modal-footer > * {
+  margin: 0;
+}
+.lightbox-caption {
+  color: #6b6b6b;
+}
+.lightbox-caption p {
+  margin: 0;
 }

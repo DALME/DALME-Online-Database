@@ -57,6 +57,19 @@
         {% footer %}
       </footer>
 
+      <!-- LIGHTBOX MODAL -->
+      <div class="modal fade" id="lightbox" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <img src="" class="lightbox-image">
+            </div>
+            <div class="modal-footer">
+              <div class="lightbox-caption"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       {% block js_foot %}
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
         <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
@@ -144,6 +157,12 @@
                   subsection.next().show();
                 }
               }
+            });
+
+            $('body').on('click', '.inline-image', function(e) {
+              $('.lightbox-image').attr('src', $(this).find('img').attr('src'));
+              $('.lightbox-caption').html($(this).find('.caption').html());
+              $('#lightbox').modal('show');
             });
 
             // share footer button
