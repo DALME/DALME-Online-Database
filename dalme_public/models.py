@@ -42,6 +42,7 @@ from dalme_public.blocks import (
     AnnouncementBannerBlock,
     BibliographyBlock,
     CarouselBlock,
+    ChartEmbedBlock,
     DocumentBlock,
     ExternalResourceBlock,
     FooterPageChooserBlock,
@@ -318,6 +319,7 @@ class DALMEPage(Page):
     body = StreamField([
         ('main_image', MainImageBlock()),
         ('carousel', CarouselBlock(ImageChooserBlock())),
+        ('chart_embed', ChartEmbedBlock()),
         ('inline_image', InlineImageBlock()),
         ('text', blocks.RichTextBlock()),
         ('heading', blocks.CharBlock()),

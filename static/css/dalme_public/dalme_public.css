@@ -3508,15 +3508,23 @@ parsererror div {
   margin: 0;
   line-height: 1.5;
 }
-.inline-image.right {
+.inline-image.right,
+.chart-embed.right {
   float: right;
   margin: 0.5rem 0 .5rem 1.4rem;
 }
-.inline-image.left {
+.inline-image.left,
+.chart-embed.left {
   float: left;
   margin: .5rem 1.4rem .5rem 0;
 }
-
+.chart-embed {
+  border: 1px solid #aaa;
+  padding: 1rem;
+}
+.chart-embed.full iframe {
+  margin: .5rem auto;
+}
 
 .lightbox-image {
   width: 100%;

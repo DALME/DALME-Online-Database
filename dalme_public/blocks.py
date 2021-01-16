@@ -38,6 +38,21 @@ class CarouselBlock(blocks.ListBlock):
         template = 'dalme_public/blocks/_carousel.html'
 
 
+class ChartEmbedBlock(blocks.StructBlock):
+    html = blocks.RawHTMLBlock()
+    alignment = blocks.ChoiceBlock(
+        choices=[
+            ('left', 'Left-aligned'),
+            ('right', 'Right-aligned'),
+            ('full', 'Full-width')
+        ],
+    )
+
+    class Meta:
+        icon = 'image'
+        template = 'dalme_public/blocks/_chart_embed.html'
+
+
 class DocumentBlock(blocks.StructBlock):
     type = blocks.ChoiceBlock(
         choices=[
