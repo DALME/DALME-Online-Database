@@ -1420,12 +1420,14 @@ h3.featured-group-key {
   color: #3a5d82;
   font-weight: 650;
   letter-spacing: 0.1rem;
+  padding-left: .1rem;
 }
 h4.featured-group-key {
   color: #5e5e5e;
   font-weight: 700;
   font-size: 1.1rem;
   margin-bottom: 1.5rem;
+  padding-left: .1rem;
 }
 .features-back {
   display: none;
