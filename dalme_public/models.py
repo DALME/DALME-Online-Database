@@ -444,12 +444,7 @@ class FeaturedPage(DALMEPage):
                     f'{model}: {title} is already scheduled for publication at: {self.go_live_at}'  # noqa
                 )
 
-        if self.source_set and not self.source:
-            raise ValidationError(
-                'You must specify a source in order to also specify a source set.'  # noqa
-            )
-
-        if self.source_set:
+        if self.source_set and self.source:
             try:
                 # TODO: There must be a better way to determine Set membership
                 # than this but the (bi-directional) generic relations make it
