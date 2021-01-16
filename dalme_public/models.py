@@ -407,7 +407,7 @@ class FeaturedPage(DALMEPage):
     def author(self):
         if self.alternate_author:
             return self.alternate_author
-        return f'{self.owner.first_name} {self.owner.last_name}'
+        return self.owner.profile.full_name
 
     @property
     def scheduled_publication(self):

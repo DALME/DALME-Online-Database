@@ -20,9 +20,9 @@
 {% endblock %}
 
 {% block main_column %}
-  <div class="metadata u-flex">
+  <div class="feature metadata u-flex">
     <span>{{ page.go_live_at|date:"j F Y" }}</span>
-    <span>by {{ page.author }}</span>
+    <span>by <a href="/about/people/#{{ page.author|slugify }}">{{ page.author }}</a></span>
   </div>
 
   <div class="content">

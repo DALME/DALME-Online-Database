@@ -3545,3 +3545,14 @@ parsererror div {
 .highlight {
   background-color: #fff4bf;
 }
+.feature.metadata {
+  color: #636363;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.feature.metadata a {
+  color: #084094;
+}
+.feature.metadata a:hover {
+  border-bottom: 1px dotted #084094;
+}
