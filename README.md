@@ -9,7 +9,7 @@ A digital environment designed to facilitate the extraction, analysis, and publi
 
 ---
 
-![screenshot](https://dalme-app-media.s3.amazonaws.com/media/original_images/dalme_demo.gif)
+![screenshot](https://dalme-app-media.s3.amazonaws.com/media/original_images/dalme_parsing_3.gif)
 
 ## Overview
 
