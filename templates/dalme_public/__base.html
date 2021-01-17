@@ -39,9 +39,14 @@
       <header
         class="{{ page_name }}"
         role="banner"
-        {% if header_image %}
-          {% image header_image original as header_background %}
-          {% get_header_image_styles header_background header_position as styles %}
+        {% if header_image or page.header_image %}
+          {% if header_image %}
+            {% image header_image original as header_background %}
+            {% get_header_image_styles header_background header_position as styles %}
+          {% else %}
+            {% image page.header_image original as header_background %}
+            {% get_header_image_styles header_background page.header_position as styles %}
+          {% endif %}
           style="{{ styles }}"
         {% endif %}>
           {% include "dalme_public/includes/_nav.html" %}
