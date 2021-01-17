@@ -1601,12 +1601,15 @@ h4.featured-group-key {
 }
 .block-person .headshot {
   margin-right: 1.5rem;
-  width: auto;
+  width: 84px;
 }
 .block-person .headshot.no-photo {
-  background-color: #c5c5c5;
-  width: 125px;
+  background-color: #efefef;
+  width: 84px;
+  height: 84px;
   display: flex;
+  flex: 0 0 auto;
+  border: 1px solid #dcdcdc;
 }
 .block-person .headshot.no-photo:after {
   content: "\f007";
@@ -1614,13 +1617,14 @@ h4.featured-group-key {
   font-size: 4rem;
   font-weight: 800;
   margin: auto;
-  color: #9a9a9a;
+  color: #e6e6e6;
 }
 .block-person .person {
   width: 100%;
 }
 .block-person img {
   margin: 0;
+  border: 1px solid #000;
 }
 .block-person h4 {
   font-family: "Lora", serif;
@@ -1628,7 +1632,8 @@ h4.featured-group-key {
   font-size: 1.4rem;
   font-weight: 400;
   color: #06305d;
-  margin-bottom: .25rem;
+  margin-bottom: .3rem;
+  line-height: 1.4rem;
 }
 .block-person a,
 .block-person a:visited {
@@ -1642,6 +1647,9 @@ h4.featured-group-key {
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
+}
+.people .block-text p {
+  line-height: 1.6;
 }
 
 .block-iframe {
