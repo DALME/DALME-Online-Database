@@ -3492,6 +3492,7 @@ parsererror div {
   overflow: hidden;
   flex-direction: column;
   cursor: pointer;
+  max-width: 308px;
 }
 .inline-image img {
   max-width: 300px;
