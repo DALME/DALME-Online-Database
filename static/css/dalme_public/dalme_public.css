@@ -314,7 +314,7 @@ nav.primary ul li a:hover {
   color: #fff;
   border-bottom: 3px solid rgba(49, 162, 249, 0.7);
 }
-a.active {
+nav.primary a.active {
   border-bottom: 3px solid rgb(49, 162, 249) !important;
 }
 
@@ -479,7 +479,6 @@ nav.secondary ul li {
   flex: 1;
   font-size: 1.1rem;
   text-decoration: none;
-  line-height: 1.8;
   margin-bottom: 0.5rem;
 }
 nav.secondary ul li a.active {
@@ -2605,6 +2604,16 @@ ul.pagination > li.page-item:last-child button {
   margin-top: .5rem;
 }
 
+.collection-description {
+  max-height: 126px;
+  overflow-y: hidden;
+  transition: max-height 0.8s ease-out;
+  margin-top: 1.5rem;
+}
+.collection-description p {
+  margin-top: 0;
+}
+
 .show-more {
   margin-top: 2px;
   border-radius: 3px;
@@ -2618,6 +2627,8 @@ ul.pagination > li.page-item:last-child button {
   color: #cbcbcb;
   margin-left: 1rem;
   margin-bottom: 1rem;
+  width: 74px;
+  text-align: center;
 }
 
 .show-more:hover {
@@ -3122,9 +3133,7 @@ section.transcription {
   flex-direction: column;
   margin: 1rem 0 0 0;
   padding: 0;
-}
-.record-info ul li {
-  padding-bottom: 0.3rem;
+  font-size: 12px;
 }
 .record-info ul li span {
   color: #8dbfff;
@@ -3134,12 +3143,23 @@ section.transcription {
   color: white;
   font-family: "PT Serif", serif;
   font-size: 16px;
+  overflow: scroll;
+  max-height: calc(100vh - 500px);
 }
 .record-info .credits {
   color: white;
   font-weight: 600;
+  font-size: 1rem;
 }
-
+.record-info hr {
+  border-top: 1px solid #969696;
+}
+.record-info a {
+  color: #fff;
+}
+.record-info a:hover {
+  border-bottom: 1px dotted #fff;
+}
 .list-thumb {
   height: 100%;
   width: 90px;
@@ -3504,7 +3524,6 @@ parsererror div {
 }
 .inline-image img {
   max-width: 300px;
-  max-height: 300px;
 }
 .inline-image .caption {
   text-align: center;

@@ -31,7 +31,10 @@
               </a>
               <i class="fas fa-caret-down corpus"></i>
             </div>
-            {{ corpus.description|richtext }}
+            <div class="collection-description">
+              <div class="show-more d-none">Show more</div>
+              {{ corpus.description|richtext }}
+            </div>
             <div class="collections-container">
               <h4>Collections</h4>
               {% for collection in collections %}
@@ -55,6 +58,22 @@
   {{ block.super }}
   <script>
     $(document).ready(function() {
+      $('.collection-description').each( function() {
+        if ($(this).prop('scrollHeight') > $(this).outerHeight()) {
+          $(this).find('.show-more').removeClass('d-none')
+        }
+      });
+
+      $('.show-more').on('click', function() {
+        if ($(this).text() == 'Show more') {
+          $(this).parent().css({"maxHeight":"1000px"});
+          $(this).text('Show less');
+        } else {
+          $(this).parent().css({"maxHeight":"126px"});
+          $(this).text('Show more');
+        }
+      });
+
       if (window.location.hash) {
         const anchor = $(`a[href='${window.location.hash}']`)
         $('html').animate({
