@@ -433,7 +433,7 @@ header.home > div > a {
 aside.side-column {
   flex-direction: column;
   text-align: center;
-  padding: 0 1rem;
+  padding: .5rem 1rem;
   margin-bottom: 2rem;
 }
 aside.side-column a,
@@ -1802,7 +1802,7 @@ div.description[data-collapsed='true'] {
   aside.side-column {
     text-align: right;
     width: 20rem;
-    padding: 0 2rem;
+    padding: .5rem 2rem;
   }
   aside.side-column > *:last-child:not(:first-child) {
     margin-top: 5rem;
@@ -2604,13 +2604,17 @@ ul.pagination > li.page-item:last-child button {
   margin-top: .5rem;
 }
 
-.collection-description {
+.collection-description,
+main.features .block-text {
   max-height: 126px;
   overflow-y: hidden;
   transition: max-height 0.8s ease-out;
+}
+.collection-description {
   margin-top: 1.5rem;
 }
-.collection-description p {
+.collection-description p,
+main.features .block-text p {
   margin-top: 0;
 }
 

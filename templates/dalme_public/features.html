@@ -66,13 +66,33 @@
     };
     $(document).ready(function() {
       setContentWidth();
+
       $(window).resize(function() {
         if(this.resizeTO) clearTimeout(this.resizeTO);
         this.resizeTO = setTimeout(function() {
           $(this).trigger('windowResize');
         }, 500);
       });
+
       $(window).on('windowResize', function() { setContentWidth(); });
+
+      $('.block-text').prepend('<div class="show-more d-none">Show more</div>')
+
+      $('.block-text').each( function() {
+        if ($(this).prop('scrollHeight') > $(this).outerHeight()) {
+          $(this).find('.show-more').removeClass('d-none')
+        }
+      });
+
+      $('.show-more').on('click', function() {
+        if ($(this).text() == 'Show more') {
+          $(this).parent().css({"maxHeight":"1000px"});
+          $(this).text('Show less');
+        } else {
+          $(this).parent().css({"maxHeight":"126px"});
+          $(this).text('Show more');
+        }
+      });
     });
   </script>
 {% endblock %}
