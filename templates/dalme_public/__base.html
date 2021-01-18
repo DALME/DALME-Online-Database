@@ -185,7 +185,7 @@
               },
               computed: {
                 sms() {
-                  return `sms:?body=${this.page_url}`;
+                  return `sms://&body=${this.page_url}`;
                 },
                 email() {
                   let subject = `DALME - ${this.page_title}`;
