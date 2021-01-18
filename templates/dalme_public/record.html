@@ -242,23 +242,7 @@
   <div class="folios u-flex viewer" :class="viewerMode">
     <section class="folio">
       <div class="record-info" v-if="showInfoPanel" v-on-clickaway="toggleInfoPanel">
-        <div class="description">
-          {% if data.description %}
-            {{ data.description }}
-          {% else %}
-            No description currently available.
-          {% endif %}
-        </div>
-        <ul class="u-flex u-type-sans">
-          <li><span>Archival location:</span> {{ data.short_name }}</li>
-          <li><span>Date(s):</span> {{ data.date }}</li>
-          {% with data.folios|length as count %}
-            <li><span>Extent:</span> {{ count }} Folio{% if count > 1 %}s{% endif %}</li>
-          {% endwith %}
-        </ul>
-        <div class="u-type-sans mt-2 credits">
-          {{ data.get_credit_line.credit_line }}
-        </div>
+        {% include "dalme_public/includes/_record_info_panel.html" %}
       </div>
       <div id="diva_viewer">
         <beat-loader v-show="divaLoading" color="#aaa"></beat-loader>

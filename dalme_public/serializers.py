@@ -63,6 +63,7 @@ class PublicSourceSerializer(serializers.ModelSerializer):
         except IndexError:
             ret['short_name'] = 'N/A'
         ret['name'] = name_string[0]
+        ret['archival_location'], ret['format_info'], ret['parent_type'] = self.get_archival_info(instance)
         attributes = ret.pop('attributes')
         inherited = ret.pop('inherited')
         if attributes is not None:
@@ -85,13 +86,49 @@ class PublicSourceSerializer(serializers.ModelSerializer):
         if dates:
             if 'start_date' in dates and 'end_date' in dates:
                 result['date'] = FormatDalmeDate([dates['start_date'], dates['end_date']]).format('short', 'month_year')
+                result['full_date'] = FormatDalmeDate([dates['start_date'], dates['end_date']]).format('long', 'full')
             elif 'date' in dates:
                 result['date'] = FormatDalmeDate(dates['date']).format('short', 'month_year')
+                result['full_date'] = FormatDalmeDate(dates['date']).format('long', 'full')
             else:
                 result['date'] = FormatDalmeDate(list(dates.values())[0]).format('short', 'month_year')
+                result['full_date'] = FormatDalmeDate(list(dates.values())[0]).format('long', 'full')
         else:
             result['date'] = '—'
+            result['full_date'] = 'N/A'
         return result
+
+    def get_archival_info(self, instance):
+        _parent = instance.parent
+        loc = _parent.name
+
+        if _parent.parent:  # register
+            try:
+                format_values = {
+                    i['attribute_type__short_name']: i['value_STR'].lower()
+                    for i in _parent.attributes.filter(attribute_type__short_name__in=['support', 'format']).values('attribute_type__short_name', 'value_STR')
+                    }
+                format = format_values.get('support')
+                if format_values.get('format'):
+                    if format:
+                        format += f', {format_values["format"]}'
+                    else:
+                        format = format_values.get('format')
+            except: # noqa
+                format = None
+            archive_name = _parent.parent.name
+            archive_url = _parent.parent.attributes.filter(attribute_type__short_name='url')
+            archive_url = archive_url.first().value_STR if archive_url.exists() else None
+            marks = loc.replace(archive_name, '').strip() if archive_name in loc else None
+            marks = marks[1:] if marks and marks.startswith(',') else marks
+            if archive_name and archive_url and marks:
+                return (f'<a href="{archive_url}" target="_blank">{archive_name}</a>, {marks}', format, 'register')
+            else:
+                return (loc, format, 'register')
+        else:  # edition
+            zotero_key = _parent.attributes.filter(attribute_type__short_name='zotero_key')
+            zotero_key = zotero_key.first().value_STR if zotero_key.exists() else None
+            return (f'<a href="/project/bibliography/#{zotero_key}">{loc}</a>', None, 'edition') if zotero_key else (loc, None, 'edition')
 
 
 class PublicCollectionSerializer(serializers.ModelSerializer):

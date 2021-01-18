@@ -1,0 +1,31 @@
+<div class="description">
+  {% if data.description %}
+    {{ data.description }}
+  {% else %}
+    No description currently available.
+  {% endif %}
+</div>
+<hr/>
+<ul class="u-flex u-type-sans">
+  <li><span>Record type:</span> {{ data.record_type }}</li>
+  <li><span>Date:</span> {{ data.full_date }}</li>
+  {% if data.locale %}
+  <li><span>Locale:</span> {{ data.locale }}</li>
+  {% endif %}
+  {% if data.language %}
+  <li><span>Language(s):</span> {{ data.language }}</li>
+  {% endif %}
+  {% if data.named_persons %}
+  <li><span>Named person(s):</span> {{ data.named_persons }}</li>
+  {% endif %}
+  {% if data.archival_location %}
+  <li><span>{% if data.parent_type == 'register' %}Archival location:{% else %}Edition:{% endif %}</span> {{ data.archival_location|safe }}</li>
+  {% endif %}
+  {% with data.folios|length as count %}
+    <li><span>Extent:</span> {{ count }} Folio{% if count > 1 %}s{% endif %}{% if data.format_info %} ({{ data.format_info }}){% endif %}</li>
+  {% endwith %}
+</ul>
+<hr/>
+<div class="u-type-sans mt-2 credits">
+  {{ data.get_credit_line.credit_line }}
+</div>
