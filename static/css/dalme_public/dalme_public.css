@@ -2619,6 +2619,7 @@ main.features .block-text p {
 }
 
 .show-more {
+  font-family: "Open Sans", sans-serif;
   margin-top: 2px;
   border-radius: 3px;
   cursor: pointer;
