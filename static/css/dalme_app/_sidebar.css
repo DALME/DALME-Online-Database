@@ -126,3 +126,19 @@
   font-size: 8px;
   color: white;
 }
+
+.dash-menu {
+  margin-top: 10px;
+  border-top: 1px solid rgb(77, 87, 106);
+  background-color: rgb(26, 46, 61);
+}
+.search-menu {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgb(77, 87, 106);
+  background-color: rgb(26, 46, 61);
+}
+
+.dash-menu:hover,
+.search-menu.active {
+  background-color: rgba(50, 88, 117, 0.51)
+}

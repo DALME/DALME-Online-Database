@@ -2,13 +2,14 @@ from django.utils.functional import cached_property
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.forms.formsets import ManagementForm
-from django.forms import IntegerField, HiddenInput, BaseFormSet
+from django.forms import IntegerField, CharField, HiddenInput, BaseFormSet
 
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
 INITIAL_FORM_COUNT = 'INITIAL_FORMS'
 MIN_NUM_FORM_COUNT = 'MIN_NUM_FORMS'
 MAX_NUM_FORM_COUNT = 'MAX_NUM_FORMS'
 PAGE_NUM = 'PAGE'
+SAVE_NAME = 'SAVE'
 DEFAULT_MIN_NUM = 0
 DEFAULT_MAX_NUM = 1000
 
@@ -16,6 +17,7 @@ DEFAULT_MAX_NUM = 1000
 class PaginatedManagementForm(ManagementForm):
     def __init__(self, *args, **kwargs):
         self.base_fields[PAGE_NUM] = IntegerField(required=False, widget=HiddenInput)
+        self.base_fields[SAVE_NAME] = CharField(required=False, widget=HiddenInput)
         super().__init__(*args, **kwargs)
 
 
@@ -35,7 +37,8 @@ class PaginatedBaseFormSet(BaseFormSet):
                 INITIAL_FORM_COUNT: self.initial_form_count(),
                 MIN_NUM_FORM_COUNT: self.min_num,
                 MAX_NUM_FORM_COUNT: self.max_num,
-                PAGE_NUM: 1
+                PAGE_NUM: 1,
+                SAVE_NAME: None,
             })
         return form
 

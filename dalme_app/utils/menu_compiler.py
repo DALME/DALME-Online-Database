@@ -63,9 +63,9 @@ class DALMEMenus():
             currentItem += '>' + icon
             currentItem += ' {}</a>'.format(text)
         else:
-            currentItem = '<li class="nav-item'
-            if text == 'Dashboard':
-                currentItem += ' dash-menu'
+            currentItem = '<li class="nav-item '
+            if itemClass:
+                currentItem += itemClass
             if text in breadcrumb:
                 currentItem += ' active'
             currentItem += '">'

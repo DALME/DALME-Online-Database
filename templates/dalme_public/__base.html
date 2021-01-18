@@ -55,7 +55,7 @@
 
       <main
         id="main"
-        class="{{ page_name }} {{ page.title|slugify }}{% if records or record %} browser{% endif %}{% if record %} viewer{% endif %}" 
+        class="{{ page_name }} {{ page.title|slugify }}{% if records or record %} browser{% endif %}{% if record %} viewer{% endif %}"
         role="main">
         {% block content %}{% endblock %}
       </main>
@@ -85,9 +85,9 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw==" crossorigin="anonymous"></script>
-
-        <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
-
+        {% compress js %}
+          <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+        {% endcompress %}
         <script>
           $(document).ready(function() {
             api_endpoint = "{{ api_endpoint }}";

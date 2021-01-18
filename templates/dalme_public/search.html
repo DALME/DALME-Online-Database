@@ -67,20 +67,20 @@
           v-b-tooltip.hover.top="{title: 'Type a query here to start a search', disabled: true }">
         </b-form-input>
         <div class="search-input-buttons">
-          <div
-            class="btn search-button ml-auto clear-search"
-            v-if="searchQuery"
-            @click="clearSearch"
-            v-b-tooltip.hover.left="{title: 'Clear search', disabled: true }">
-            Clear
-          </div>
           <button
-            class="btn search-button ml-1"
+            class="btn search-button"
             v-if="searchQuery"
             @click="performSearch"
             v-b-tooltip.hover.top="{title: 'Submit search', disabled: true }">
             Search
           </button>
+          <div
+            class="btn search-button clear-search"
+            v-if="searchQuery"
+            @click="clearSearch"
+            v-b-tooltip.hover.left="{title: 'Clear search', disabled: true }">
+            X
+          </div>
         </div>
       </div>
       <div id="advanced-search" v-if="advancedMode">
@@ -176,18 +176,18 @@
           </template>
         </div>
         <div class="advanced-search-footer">
-          <div
-            class="btn search-button clear-search ml-auto mr-1"
-            @click="clearSearch"
-            v-b-tooltip.hover.left="{title: 'Clear search', disabled: true }">
-            Clear
-          </div>
           <button
-            class="btn search-button"
+            class="btn search-button ml-auto mr-1"
             @click="performSearch"
             v-b-tooltip.hover.top="{title: 'Submit search', disabled: true }">
             Search
           </button>
+          <div
+            class="btn search-button clear-search"
+            @click="clearSearch"
+            v-b-tooltip.hover.left="{title: 'Clear search', disabled: true }">
+            X
+          </div>
         </div>
       </div>
       <div

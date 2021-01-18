@@ -15,6 +15,7 @@ from .reference import AttributeReference, CountryReference, LanguageReference, 
 from .relationship import Relationship # NOQA
 from .resourcespace import rs_api_query, rs_resource, rs_resource_data, rs_collection, rs_collection_resource, rs_user, rs_resource_type_field # NOQA
 from .rights_policy import RightsPolicy # NOQA
+from .saved_search import SavedSearch # NOQA
 from .scope import Scope # NOQA
 from .set import Set, Set_x_content # NOQA
 from .source import Source, Source_credit, Source_pages # NOQA

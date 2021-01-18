@@ -99,3 +99,21 @@ def get_highlights(meta, context):
                         pass
 
     return highlights
+
+
+@register.filter
+def js_trans(value, mode=None):
+    if mode == 'bool':
+        return 'true' if value else 'false'
+    elif value is None:
+        return 'null'
+    elif value is False:
+        return 'false'
+    elif value is True:
+        return 'true'
+    elif (type(value) in [int, list, dict]
+          or value.startswith('"') and value.endswith('"')
+          or value.startswith('\'') and value.endswith('\'')):
+        return value
+    else:
+        return value if value.startswith('"') and value.endswith('"') else f'"{value}"'

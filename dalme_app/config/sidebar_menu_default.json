@@ -2,8 +2,14 @@
   "text": "Dashboard",
   "link": "/",
   "iconClass": "fa-tachometer-alt",
-  "itemClass": "dash"
+  "itemClass": "dash-menu"
   },
+  {
+    "text": "Search",
+    "link": "/search/",
+    "iconClass": "fa-search",
+    "itemClass": "search-menu"
+    },
   {
     "text": "Content",
     "section": true
