@@ -38,12 +38,10 @@ ALLOWED_HOSTS = [
     '127.0.0.1:8000',
     '127.0.0.1',
     'localhost',
-    '127.0.0.1.xip.io',
-    '127.0.0.1.xip.io:8443',
+    '.127.0.0.1.xip.io',
+    '.127.0.0.1.xip.io:8443',
     'db.127.0.0.1.xip.io:8443',
     'db.127.0.0.1.xip.io',
-    'public.127.0.0.1.xip.io:8443',
-    'public.127.0.0.1.xip.io',
     'data.127.0.0.1.xip.io:8443',
     'data.127.0.0.1.xip.io',
     'purl.127.0.0.1.xip.io:8443',
@@ -144,6 +142,7 @@ if DEBUG and ENABLE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
+    'dalme_app.utils.SubdomainRedirectMiddleware',
     'django_hosts.middleware.HostsRequestMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',

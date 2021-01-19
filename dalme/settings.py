@@ -135,6 +135,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'dalme_app.utils.SubdomainRedirectMiddleware',
     'django_hosts.middleware.HostsRequestMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
