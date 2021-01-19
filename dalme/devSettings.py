@@ -66,8 +66,8 @@ CSRF_TRUSTED_ORIGINS = [
     'data.127.0.0.1.xip.io:8443',
     'db.127.0.0.1.xip.io',
     'db.127.0.0.1.xip.io:8443',
-    'public.127.0.0.1.xip.io',
-    'public.127.0.0.1.xip.io:8443',
+    '127.0.0.1.xip.io',
+    '127.0.0.1.xip.io:8443',
     'purl.127.0.0.1.xip.io:8443',
     'purl.127.0.0.1.xip.io'
 ]
@@ -78,8 +78,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'https://*.127.0.0.1.xip.io:8443',
     'https://*.127.0.0.1.xip.io',
-    'https://public.127.0.0.1.xip.io:8443',
-    'http://public.127.0.0.1.xip.io',
+    'https://127.0.0.1.xip.io:8443',
+    'http://127.0.0.1.xip.io',
     'https://data.127.0.0.1.xip.io:8443',
     'http://data.127.0.0.1.xip.io',
     'https://db.127.0.0.1.xip.io:8443',

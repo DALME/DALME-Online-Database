@@ -61,11 +61,10 @@ COMPRESS_ENABLED = True
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://*.dalme.org',
+    'https://dalme.org',
     'https://data.dalme.org',
     'https://purl.dalme.org',
     'https://db.dalme.org',
-    'https://public.dalme.org',
-    'https://dalme.org',
     'https://kb.dalme.org',
     'https://dam.dalme.org'
 ]
