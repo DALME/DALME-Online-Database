@@ -3135,6 +3135,7 @@ section.transcription {
   -webkit-backdrop-filter: blur(7px);
   border-bottom: 1px solid #6b6b6b87;
   padding: 2rem 2rem;
+  width: 100%;
 }
 .record-info ul {
   color: white;
