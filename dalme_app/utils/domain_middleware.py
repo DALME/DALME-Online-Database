@@ -7,7 +7,6 @@ class SubdomainRedirectMiddleware:
 
     def __call__(self, request):
         host = request.get_host()
-        print('I am in!')
         if host in ['www.dalme.org', 'public.dalme.org']:
             return HttpResponsePermanentRedirect("https://dalme.org" + request.path)
         elif host in ['www.127.0.0.1.xip.io:8443', 'public.127.0.0.1.xip.io:8443']:
