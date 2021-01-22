@@ -42,8 +42,12 @@ class Attribute(dalmeUuid):
                 self.value_STR = pDate.strftime('%d-%b-%Y').lstrip("0").replace(" 0", " ")
             elif self.value_DATE_m is not None and self.value_DATE_y is not None:
                 self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
+            elif self.value_DATE_d is not None and self.value_DATE_m is not None:
+                self.value_STR = str(self.value_DATE_d)+'-'+str(calendar.month_abbr[self.value_DATE_m])
             elif self.value_DATE_y is not None:
                 self.value_STR = str(self.value_DATE_y)
+            else:
+                self.value_STR = 'Unknown'
         if self.attribute_type.data_type == 'INT' and self.value_INT is not None:
             self.value_STR = str(self.value_INT)
         if self.attribute_type.data_type == 'TXT' and self.value_TXT is not None:
