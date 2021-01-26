@@ -2032,9 +2032,15 @@ div.description[data-collapsed='true'] {
   .monthly.essay {
     background: #fff;
     flex-direction: column;
+    height: 475px;
     /* margin: 0 1rem; */
   }
-
+  .monthly img {
+    width: auto;
+  }
+  .featured .essay-content {
+    height: 275px;
+  }
   body.collection .collapsible {
     padding: 1rem 4rem;
   }

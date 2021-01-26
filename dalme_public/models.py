@@ -1,4 +1,5 @@
 import textwrap
+import json
 from datetime import datetime, timedelta
 
 from django.contrib import messages
@@ -35,7 +36,7 @@ from wagtail.snippets.models import register_snippet
 from wagtailmodelchooser import register_model_chooser, Chooser
 from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
-from dalme_app.models import Set as DALMESet, Source
+from dalme_app.models import Set as DALMESet, Source, SavedSearch
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public import forms
 from dalme_public.blocks import (
@@ -736,7 +737,8 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         abstract = True
 
     @route(r'^search/$', name='search')
-    def search(self, request):
+    @route(rf'^search/({UUID_RE})/$', name='saved_search')
+    def search(self, request, pk=None):
         context = self.get_context(request)
         search_context = SearchContext(public=True)
         search_formset = formset_factory(SearchForm)
@@ -756,6 +758,15 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             'search': True,
             'search_context': search_context.context
         })
+
+        if pk:
+            saved_search = SavedSearch.objects.filter(id=pk)
+            if saved_search.exists():
+                saved_search = json.loads(saved_search.first().search)
+                saved_search.pop('csrfmiddlewaretoken')
+                saved_search['form-SAVE'] = ''
+                request.POST = saved_search
+                request.method = 'POST'
 
         if not request.method == 'POST' and request.session.get('public-search-post', False):
             default_ts = datetime.timestamp(datetime.now() - timedelta(seconds=86401))

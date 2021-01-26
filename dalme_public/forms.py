@@ -1,6 +1,7 @@
 from django import forms
 from django.core.mail import EmailMessage
 from captcha import fields, widgets
+from dalme_app.models import SavedSearch
 
 
 class ContactForm(forms.Form):
@@ -59,3 +60,10 @@ class SourceFilterForm(forms.Form):
             cleaned_data['date_range'] = [after, before]
 
         return cleaned_data
+
+
+class SavedSearchLinkChooserForm(forms.Form):
+    search_list = [(i.id, i.name) for i in SavedSearch.objects.all()]
+
+    id = forms.ChoiceField(required=True, choices=search_list, label='Saved search')
+    link_text = forms.CharField(required=False)

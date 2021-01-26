@@ -1,0 +1,16 @@
+{% load i18n l10n wagtailadmin_tags %}
+{% include "wagtailadmin/shared/header.html" with title="Choose a Saved Search" icon="search" %}
+
+<div class="nice-padding">
+    {% include 'wagtailadmin/chooser/_link_types.html' with current='saved_search' %}
+
+    <form action="{% url 'wagtailadmin_choose_page_saved_search' %}{% querystring %}" method="post" novalidate>
+        {% csrf_token %}
+        <ul class="fields">
+            {% for field in form %}
+                {% include "wagtailadmin/shared/field_as_li.html" %}
+            {% endfor %}
+            <li><input type="submit" value="Insert link" class="button" /></li>
+        </ul>
+    </form>
+</div>
