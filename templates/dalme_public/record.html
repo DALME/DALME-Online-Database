@@ -60,7 +60,7 @@
         </b-popover>
 
         <li class="border-0 title overflow-hidden">
-          <div class="nav-record-title">{{ data.name }}</div>
+          <div class="nav-record-title" v-show="showModes">{{ data.name }}</div>
         </li>
 
         <li
@@ -134,7 +134,8 @@
           id="help_toggle"
           class="nav_button"
           v-bind:class="{ active: showHelp }"
-          @click="toggleHelpTips">
+          @click="toggleHelpTips"
+          v-show="showModes">
           <i class="fas fa-question-circle"></i>
         </li>
         <b-dropdown
@@ -379,12 +380,16 @@
           footerHeight: 54,
           windowHeight: null,
           headerHeight: 93,
+          windowWidth: window.innerWidth,
         },
         watch: {
           folioIndex: "switchFolio",
           zoomLevel: "zoomViewer"
         },
         computed: {
+          showModes() {
+            return this.windowWidth >= 600;
+          },
           citationData() {
             const node = document.getElementById('citation_data');
             document.getElementsByTagName("BODY")[0].removeChild(node);
@@ -698,6 +703,7 @@
             setTimeout(() => this.showCopied = false, 800);
           },
           windowResized() {
+            this.windowWidth = window.innerWidth;
             this.windowHeight = $(window).height();
             this.divaHeight = $('.folio').height();
             this.headerHeight = $('header').height();
