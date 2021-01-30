@@ -42,8 +42,8 @@ _set_current_user(ghp)
 
 def run_commands():
     # define general variables
-    target_set = Set.objects.get(pk='bad41158-9f01-4ac2-8bc6-8d71e096dbd9') # noqa DEVELOP
-    # target_set = Set.objects.get(pk='1c8a6c02-886a-4863-9b22-6c610a44d120') # noqa PRODUCTION
+    # target_set = Set.objects.get(pk='bad41158-9f01-4ac2-8bc6-8d71e096dbd9') # noqa DEVELOP
+    target_set = Set.objects.get(pk='1c8a6c02-886a-4863-9b22-6c610a44d120') # noqa PRODUCTION
 
     # delete old Lucca records
     print(delete_old_records())

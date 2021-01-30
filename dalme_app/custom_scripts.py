@@ -27,6 +27,7 @@ from django.contrib.contenttypes.models import ContentType
 from geopy.geocoders import AlgoliaPlaces
 import lxml.etree as et
 from django_q.tasks import async_task
+from django.core.management import call_command
 
 
 def get_script_menu():
@@ -142,9 +143,9 @@ def update_folios_in_dam(request):
 
 
 def rebuild_search_index(request):
-    async_task('dalme_app.tasks.update_search_index', request.user.id, task_name='rebuild_search_index', hook='dalme_app.utils.send_message')
-    # call_command('search_index', '--rebuild', '-f')
-    # return 'Process started...'
+    # async_task('dalme_app.tasks.update_search_index', request.user.id, task_name='rebuild_search_index', hook='dalme_app.utils.send_message')
+    call_command('search_index', '--rebuild', '-f')
+    return 'Process started...'
 
 
 def import_languages(request):
