@@ -11,6 +11,7 @@ from .others import (AttachmentSerializer, AttributeTypeSerializer, ContentClass
                      ProfileSerializer, TagSerializer, TranscriptionSerializer) # noqa
 
 from .page import PageSerializer # noqa
+from .places import PlaceSerializer # noqa
 from .rights_policies import RightsPolicySerializer # noqa
 from .sets import SetSerializer # noqa
 from .sources import SourceSetSerializer, SourceCreditSerializer, SourceSerializer # noqa

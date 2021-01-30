@@ -2,12 +2,12 @@ from django.contrib.auth.models import Group
 
 from dalme_api.serializers import (AgentSerializer, ContentClassSerializer, ContentTypeSerializer,
                                    CountryReferenceSerializer, GroupSerializer, LanguageReferenceSerializer,
-                                   LocaleReferenceSerializer, RightsPolicySerializer, SimpleAttributeSerializer)
+                                   LocaleReferenceSerializer, PlaceSerializer, RightsPolicySerializer, SimpleAttributeSerializer)
 
 from dalme_app.models import (Agent, Attribute, Content_class, Content_type, CountryReference,
-                              LanguageReference, LocaleReference, RightsPolicy)
+                              LanguageReference, LocaleReference, Place, RightsPolicy)
 
-from dalme_api.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy, LocaleAccessPolicy
+from dalme_api.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy, LocaleAccessPolicy, PlaceAccessPolicy
 from ._common import DALMEBaseViewSet
 from dalme_api.filters import ContenTypeFilter
 
@@ -87,6 +87,17 @@ class Locales(DALMEBaseViewSet):
     search_fields = ['id', 'name', 'administrative_region', 'country__name']
     ordering_fields = ['id', 'name', 'administrative_region', 'country', 'latitude', 'longitude']
     ordering = ['name']
+
+
+class Places(DALMEBaseViewSet):
+    """ API endpoint for managing places """
+    permission_classes = (PlaceAccessPolicy,)
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer
+    filterset_fields = ['id']
+    search_fields = ['id', 'standard_name', 'notes', 'locale__name', 'locale__country__name']
+    ordering_fields = ['id', 'standard_name', 'locale__name']
+    ordering = ['locale__name', 'standard_name']
 
 
 class Rights(DALMEBaseViewSet):
