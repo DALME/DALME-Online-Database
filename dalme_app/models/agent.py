@@ -20,6 +20,6 @@ class Agent(dalmeUuid):
     attributes = GenericRelation('Attribute')
     instances = GenericRelation('Entity_phrase')
     relations = GenericRelation('Relationship', content_type_field='source_content_type', object_id_field='source_object_id')
-    notes = models.TextField()
+    notes = models.TextField(blank=True)
     tags = GenericRelation('Tag')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='agent', null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='agent', null=True)

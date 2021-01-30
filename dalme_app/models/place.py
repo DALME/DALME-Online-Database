@@ -7,8 +7,10 @@ options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
 
 class Place(dalmeUuid):
-    std_name = models.CharField(max_length=255)
-    type = models.IntegerField(db_index=True)
+    standard_name = models.CharField(max_length=255)
+    type = models.IntegerField(db_index=True, null=True)
     attributes = GenericRelation('Attribute')
     instances = GenericRelation('Entity_phrase')
+    locale = models.ForeignKey('LocaleReference', on_delete=models.SET_NULL, null=True)
+    notes = models.TextField(blank=True)
     tags = GenericRelation('Tag')
