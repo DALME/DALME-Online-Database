@@ -4,8 +4,8 @@
     fetch('https://api.github.com/repos/DALME/DALME-Online-Database/commits')
       .then(response => response.json())
       .then(commits => {
-        const last_activity = $.timeago(commits[0].commit.author.date);
-        const activity_url = commits[0].html_url;
+        const last_activity = $.timeago(commits.commit.author.date);
+        const activity_url = commits.html_url;
         fetch('https://api.github.com/repos/DALME/DALME-Online-Database/releases/latest')
         .then(response => response.json())
         .then(releases => {
