@@ -72,7 +72,7 @@ class Source(index.Indexed, dalmeUuidOwned):
     def agents(self):
         ep_list = [i.transcription.entity_phrases.filter(content_type=104) for i in self.source_pages.all().select_related('transcription') if i.transcription]
         if len(ep_list) > 0:
-            return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+            return [i for i in ep_list[0].union(*ep_list[1:])]
 
     def places(self):
         ep_list = [i.transcription.entity_phrases.filter(content_type=115) for i in self.source_pages.all().select_related('transcription') if i.transcription]
@@ -82,7 +82,7 @@ class Source(index.Indexed, dalmeUuidOwned):
     def objects(self):
         ep_list = [i.transcription.entity_phrases.filter(content_type=118) for i in self.source_pages.all().select_related('transcription') if i.transcription]
         if len(ep_list) > 0:
-            return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+            return [i for i in ep_list[0].union(*ep_list[1:])]
 
     @property
     def has_images(self):
