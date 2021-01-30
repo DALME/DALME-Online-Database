@@ -80,19 +80,27 @@ function setTitle(e) {
 
 const dalmeTeiBehaviours = {
   'tei': {
-    'ab': function(e) {
-        const colNum = e.getAttribute('n');
-        const content = document.createElement('div');
-        content.className = 'ab-content';
-        content.setAttribute('n', colNum);
-        content.innerHTML = e.innerHTML;
-        const div = document.createElement('div');
-        div.innerHTML = `<div><span class="label">C${colNum}</span><i class="fa fa-caret-down"></i><i class="fa fa-caret-right"></i></div>`;
-        div.className = 'ab-column-toggler';
-        e.innerHTML = '';
-        e.appendChild(div);
-        e.appendChild(content);
-    },
+    'ab': [
+      ['[type=column]', function(e) {
+         const colNum = e.getAttribute('n');
+         const content = document.createElement('div');
+         content.className = 'ab-content';
+         content.setAttribute('n', colNum);
+         content.innerHTML = e.innerHTML;
+         const div = document.createElement('div');
+         div.innerHTML = `<div><span class="label">C${colNum}</span><i class="fa fa-caret-down"></i><i class="fa fa-caret-right"></i></div>`;
+         div.className = 'ab-column-toggler';
+         e.innerHTML = '';
+         e.appendChild(div);
+         e.appendChild(content);
+     }],
+     // ['[type=context]', function(e) {
+     //   if (e.getAttribute('key')) {
+     //     const content = document.createElement('a');
+     //     content.setAttribute('href', `/`);
+     //   }
+     // }]
+    ],
     'gap': function(e) { e = setExtent(e); },
     'space': function(e) { e = setExtent(e); },
     'unclear': function(e) { e = setTitle(e); },
