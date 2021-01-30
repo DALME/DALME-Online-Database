@@ -118,7 +118,7 @@
   },
   {
     "text": "Places",
-    "link": "#",
+    "link": "/places/",
     "iconClass": "fa-sign",
     "child": true,
     "permissions": ["Users", "Staff", "Administrators", "Developers"]

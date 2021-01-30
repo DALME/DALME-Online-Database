@@ -8,6 +8,7 @@ from .library import LibraryList # noqa
 from .locale_references import LocaleList # noqa
 from .login import DalmeLogin # noqa
 from .other import HealthCheck, DownloadAttachment, PageManifest # noqa
+from .places import PlaceList # noqa
 from .models import ModelLists # noqa
 from .rights_policies import RightsList, RightsDetail # noqa
 from .scripts import Scripts # noqa
