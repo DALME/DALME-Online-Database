@@ -610,12 +610,13 @@ class FeaturedObject(FeaturedPage):
     source = models.ForeignKey(
         'dalme_app.Source',
         related_name='featured_objects',
-        on_delete=models.PROTECT
+        on_delete=models.SET_NULL,
+        null=True,
     )
     source_set = models.ForeignKey(
         'dalme_app.Set',
         related_name='featured_objects',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text='Optional, select a particular public set for the source associated with this object. The source must be a member of the set chosen or the page will not validate.'  # noqa
@@ -645,12 +646,13 @@ class FeaturedInventory(FeaturedPage):
     source = models.ForeignKey(
         'dalme_app.Source',
         related_name='featured_inventories',
-        on_delete=models.PROTECT
+        on_delete=models.SET_NULL,
+        null=True,
     )
     source_set = models.ForeignKey(
         'dalme_app.Set',
         related_name='featured_inventories',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.'  # noqa
@@ -682,12 +684,12 @@ class Essay(FeaturedPage):
         related_name='essays',
         null=True,
         blank=True,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
     )
     source_set = models.ForeignKey(
         'dalme_app.Set',
         related_name='essays',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text='Optional, select a particular public set for the source associated with this essay. The source must be a member of the set chosen or the page will not validate.'  # noqa
