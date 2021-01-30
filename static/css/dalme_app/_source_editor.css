@@ -1,13 +1,3 @@
-#descriptionEditor {
-  min-height: 200px;
-  overflow: scroll;
-}
-
-#descriptionEditorToolbar {
-  align-items: center;
-  display: flex;
-}
-
 .transcription-editor {
   display: flex;
   flex-direction: column;

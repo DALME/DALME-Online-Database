@@ -140,6 +140,7 @@ function changeEditorMode() {
       setTagMenu('off');
       tr_text = xmleditor.getValue();
       xmleditor.off("change");
+      xmleditor.renderer.freeze();
       xmleditor.destroy();
       $('#btn_edit').html('<i class="fa fa-edit fa-fw"></i> Edit');
       if (tr_text != '') {

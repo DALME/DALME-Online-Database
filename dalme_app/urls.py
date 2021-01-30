@@ -26,6 +26,7 @@ urlpatterns = [
     path('library/', views.LibraryList.as_view(), name='library_list'),
     path('locales/', views.LocaleList.as_view(), name='locale_list'),
     re_path(r'^pages/(?P<pk>[a-zA-Z0-9-]+)/manifest', views.PageManifest, name='page_manifest'),
+    path('places/', views.PlaceList.as_view(), name='place_list'),
     path('rights/', views.RightsList.as_view(), name='rights_list'),
     path('rights/<slug:pk>/', views.RightsDetail.as_view(), name='rights_detail'),
     path('search/', views.DefaultSearch.as_view(), name='search'),

@@ -78,7 +78,7 @@ class Sources(DALMEBaseViewSet):
                     att_obj.value_TXT = desc_text
                     att_obj.save(update_fields=['value_TXT', 'modification_user', 'modification_timestamp'])
                 else:
-                    object.attributes.create(attribute_type=desc_att_obj, value_TXT=desc_text)
+                    att_obj = object.attributes.create(attribute_type=desc_att_obj, value_TXT=desc_text)
                 result = {'description': att_obj.value_TXT}
                 status = 201
             except Exception as e:

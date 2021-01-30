@@ -2,6 +2,9 @@
 {% load static i18n %}
 {% load compress %}
 {% block extra_head %}
+{% compress css %}
+  <link href="{% static 'css/TEI.css' %}" rel="stylesheet">
+{% endcompress %}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 {% compress js %}
   <script type="text/javascript" src="{% static 'js/dte_plugins/dalme_dte_selectize.js' %}"></script>

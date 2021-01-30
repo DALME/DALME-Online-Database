@@ -7,7 +7,7 @@ from .datasets import Datasets # noqa
 from .images import Images # noqa
 
 from .other import (Agents, Attributes, ContentClasses, ContentTypes, # noqa
-                    Countries, Groups, Languages, Locales, Rights) # noqa
+                    Countries, Groups, Languages, Locales, Places, Rights) # noqa
 
 from .pages import Pages # noqa
 from .session import Session # noqa

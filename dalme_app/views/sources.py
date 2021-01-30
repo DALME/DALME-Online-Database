@@ -113,19 +113,38 @@ class SourceDetail(DALMEDetailView):
             })
 
         if self.object.agents() is not None and len(self.object.agents()) > 0:
-            title = 'Agents ({})'.format(str(len(self.object.agents)))
+            title = 'Agents ({})'.format(str(len(self.object.agents())))
             tables.append(['agents', 'fa-user-friends', title])
+            agents = []
+            for agent in self.object.agents():
+                lp = agent.attributes.filter(attribute_type=150)
+                agents.append({
+                    'name': agent.content_object.standard_name,
+                    'type': agent.content_object.get_type_display(),
+                    'legal_persona': lp.first().value_STR if lp.exists() else 'Unknown'
+                })
+
             context.update({
                 'has_agents': True,
-                'agents': self.object.agents
+                'agents': agents
             })
 
         if self.object.places() is not None and len(self.object.places()) > 0:
-            title = 'Places ({})'.format(str(len(self.object.places)))
+            title = 'Places ({})'.format(str(len(self.object.places())))
             tables.append(['places', 'fa-map-marker-alt', title])
+            places = []
+            for place in self.object.places():
+                locale = f'{place.locale.name}, {place.locale.administrative_region}'
+                if place.locale.latitude and place.locale.longitude:
+                    locale += f' ({place.locale.latitude}, {place.locale.longitude})'
+                places.append({
+                    'name': place.standard_name,
+                    'locale': locale,
+                })
+
             context.update({
                 'has_places': True,
-                'places': self.object.places
+                'places': places
             })
 
         if tables != []:
@@ -136,10 +155,10 @@ class SourceDetail(DALMEDetailView):
                     'dom': '''"<'sub-card-header d-flex'<'card-header-title'>fr><'card-body't>"''',
                     'stateSave': 'true',
                     'select': {'style': 'single'},
-                    'scrollResize': 'true',
-                    'scrollY': '"30vh"',
-                    'scrollX': '"100%"',
-                    'scrollCollapse': 'true',
+                    # 'scrollResize': 'true',
+                    # 'scrollY': '"30vh"',
+                    # 'scrollX': '"100%"',
+                    # 'scrollCollapse': 'true',
                     'deferRender': 'true',
                     'language': {
                         'searchPlaceholder': 'Search',

@@ -88,9 +88,8 @@
             </div>
           </div>
         {% endif %}
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card mb-3">
+        <div class="detail-container">
+            <div class="card">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-bookmark fa-fw"></i> Source</div>
               </div>
@@ -107,7 +106,7 @@
                   {% endfor %}
               </div>
             </div>
-            <div class="card mb-3">
+            <div class="card">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-list-alt fa-fw"></i> Attributes</div>
               </div>
@@ -133,7 +132,7 @@
                 {% endif %}
               </div>
             </div>
-            <div class="card mb-3">
+            <div class="card">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-info-circle fa-fw"></i> Metadata</div>
               </div>
@@ -150,10 +149,8 @@
                   {% endfor %}
               </div>
             </div>
-          </div>
-          <div class="col-md-6">
             {% if source_data.Type == 'Record' %}
-            <div class="card mb-3">
+            <div class="card">
               <div class="sub-card-header">
                 <div class="card-header-title"><i class="fa fa-align-left fa-fw"></i> Description</div>
                 {% if can_edit %}
@@ -177,7 +174,7 @@
             </div>
             {% endif %}
             {% if has_children %}
-                <div class="card mb-3 pb-3">
+                <div class="card pb-2 card-detail-list">
                     <div class="table-responsive dt-embed">
                       <table class="table c_stripe responsive" id="dataTables-children" width="100%">
                         <thead>
@@ -209,7 +206,7 @@
                 </div>
             {% endif %}
             {% if has_pages %}
-                <div class="card mb-3 pb-3 card-detail-list">
+                <div class="card pb-2 card-detail-list">
                     <div class="table-responsive dt-embed">
                       <table class="table c_stripe responsive" id="dataTables-pages" width="100%">
                         <thead>
@@ -245,20 +242,22 @@
                 </div>
             {% endif %}
             {% if has_agents %}
-                <div class="card mb-3 pb-3 card-detail-list">
+                <div class="card pb-2 card-detail-list">
                     <div class="table-responsive dt-embed">
                       <table class="table c_stripe responsive" id="dataTables-agents" width="100%">
                         <thead>
                           <tr>
                             <th>Standard Name</th>
                             <th>Type</th>
+                            <th>Legal Persona</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for row in agents %}
                             <tr>
-                              <td>{{ row.std_name }}</td>
-                              <td>{{ row.get_type_display }}</td>
+                              <td>{{ row.name|safe }}</td>
+                              <td>{{ row.type }}</td>
+                              <td>{{ row.legal_persona }}</td>
                             </tr>
                           {% endfor %}
                         </tbody>
@@ -267,20 +266,20 @@
                 </div>
             {% endif %}
             {% if has_places %}
-                <div class="card mb-3 pb-3 card-detail-list">
+                <div class="card pb-2 card-detail-list">
                     <div class="table-responsive dt-embed">
                       <table class="table c_stripe responsive" id="dataTables-places" width="100%">
                         <thead>
                           <tr>
-                            <th>Standard Name</th>
-                            <th>Type</th>
+                            <th>Placename</th>
+                            <th>Locale</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for row in places %}
                             <tr>
-                              <td>{{ row.std_name }}</td>
-                              <td>{{ row.get_type_display }}</td>
+                              <td>{{ row.name }}</td>
+                              <td>{{ row.locale }}</td>
                             </tr>
                           {% endfor %}
                         </tbody>
@@ -289,7 +288,6 @@
                 </div>
             {% endif %}
           </div>
-        </div>
       </div>
       {% if has_pages %}
       <div class="tab-pane card-body p-0 clearfix transcription-editor" id="tr_editor" role="tabpanel" aria-labelledby="editor-tab">

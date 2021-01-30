@@ -25,7 +25,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.us-east-1.elasticbeanstalk.com',
-    '.compute-1.amazonaws.com'
+    '.compute-1.amazonaws.com',
+    '.us-east-1.elb.amazonaws.com'
 ]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -135,6 +136,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'dalme_app.utils.SubdomainRedirectMiddleware',
     'django_hosts.middleware.HostsRequestMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',

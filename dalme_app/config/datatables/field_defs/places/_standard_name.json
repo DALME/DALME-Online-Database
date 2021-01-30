@@ -1,0 +1,6 @@
+{
+    "name": "standard_name",
+    "label": "Standard name",
+    "type": "text",
+    "fieldInfo": "Standardised or normalised form of the name of this place."
+}

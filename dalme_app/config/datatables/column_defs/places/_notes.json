@@ -1,0 +1,9 @@
+{
+    "title": "Notes",
+    "data": "notes",
+    "name": "notes",
+    "defaultContent": "",
+    "visible": false,
+    "orderable": false,
+    "searchable": true
+}

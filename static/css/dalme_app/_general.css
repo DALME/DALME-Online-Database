@@ -59,10 +59,6 @@ body {
   height: calc(100vh - 373px);
 }
 
-.card-detail-list {
-  max-height: 200px;
-}
-
 .empty-card-message {
   padding: 1em;
   text-align: center;
@@ -2500,4 +2496,40 @@ button.bg-danger:focus {
 
 .progress {
   background-color: #e0e2e9 !important;
+}
+
+.detail-container {
+    margin-left: 0;
+    margin-right: 0;
+    /* flex-flow: row wrap;
+    gap: 14px; */
+    column-count: 2;
+    column-gap: 14px;
+    column-fill: balance;
+}
+.detail-container .card {
+  /* flex-basis: calc((100% - 14px) / 2); */
+  margin-bottom: 1rem;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.detail-container .dt-embed {
+    height: 100%
+}
+
+.card-detail-list .card-body {
+  max-height: 500px;
+  overflow: scroll;
+}
+
+#descriptionEditor {
+  min-height: 50px;
+  overflow: scroll;
+}
+
+#descriptionEditorToolbar {
+  align-items: center;
+  display: flex;
 }

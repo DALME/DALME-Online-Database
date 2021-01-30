@@ -1,4 +1,5 @@
 import textwrap
+import json
 from datetime import datetime, timedelta
 
 from django.contrib import messages
@@ -35,7 +36,7 @@ from wagtail.snippets.models import register_snippet
 from wagtailmodelchooser import register_model_chooser, Chooser
 from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
-from dalme_app.models import Set as DALMESet, Source
+from dalme_app.models import Set as DALMESet, Source, SavedSearch
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public import forms
 from dalme_public.blocks import (
@@ -609,12 +610,13 @@ class FeaturedObject(FeaturedPage):
     source = models.ForeignKey(
         'dalme_app.Source',
         related_name='featured_objects',
-        on_delete=models.PROTECT
+        on_delete=models.SET_NULL,
+        null=True,
     )
     source_set = models.ForeignKey(
         'dalme_app.Set',
         related_name='featured_objects',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text='Optional, select a particular public set for the source associated with this object. The source must be a member of the set chosen or the page will not validate.'  # noqa
@@ -644,12 +646,13 @@ class FeaturedInventory(FeaturedPage):
     source = models.ForeignKey(
         'dalme_app.Source',
         related_name='featured_inventories',
-        on_delete=models.PROTECT
+        on_delete=models.SET_NULL,
+        null=True,
     )
     source_set = models.ForeignKey(
         'dalme_app.Set',
         related_name='featured_inventories',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.'  # noqa
@@ -681,12 +684,12 @@ class Essay(FeaturedPage):
         related_name='essays',
         null=True,
         blank=True,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
     )
     source_set = models.ForeignKey(
         'dalme_app.Set',
         related_name='essays',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         help_text='Optional, select a particular public set for the source associated with this essay. The source must be a member of the set chosen or the page will not validate.'  # noqa
@@ -736,7 +739,8 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         abstract = True
 
     @route(r'^search/$', name='search')
-    def search(self, request):
+    @route(rf'^search/({UUID_RE})/$', name='saved_search')
+    def search(self, request, pk=None):
         context = self.get_context(request)
         search_context = SearchContext(public=True)
         search_formset = formset_factory(SearchForm)
@@ -756,6 +760,15 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             'search': True,
             'search_context': search_context.context
         })
+
+        if pk:
+            saved_search = SavedSearch.objects.filter(id=pk)
+            if saved_search.exists():
+                saved_search = json.loads(saved_search.first().search)
+                saved_search.pop('csrfmiddlewaretoken')
+                saved_search['form-SAVE'] = ''
+                request.POST = saved_search
+                request.method = 'POST'
 
         if not request.method == 'POST' and request.session.get('public-search-post', False):
             default_ts = datetime.timestamp(datetime.now() - timedelta(seconds=86401))

@@ -226,7 +226,7 @@
             </div>
             <div
               class="search-status d-flex"
-              :class="[{ 'search-error': formErrors }, { 'search-success': 'formSuccess' } ]"
+              :class="[{ 'search-error': formErrors }, { 'search-success': formSuccess } ]"
               v-b-tooltip.hover.bottom="{title: 'Information about the result of your search is displayed here', disabled: true }">
               <ul v-if="formErrors">
                 <li v-for="error in formErrors">
@@ -357,14 +357,14 @@
         hasResults: {{ results|js_trans:'bool'|safe }},
         resultCount: {{ results|length|js_trans|safe }},
         formErrors: {% if not errors %}null{% else %}[{% for error in errors %} '{{ error }}' {% endfor %}]{% endif %},
-        formSuccess: '{% if not success %}null{% else %}{{ success }}{% endif %}',
+        formSuccess: {{ success|js_trans|safe }},
         advancedMode: {{ advanced|js_trans|safe }},
         showHelp: false,
         showTooltips: false,
         searchContext: null,
         searchQuery: {{ form.0.query.value|js_trans|safe }},
         clauses: clauses,
-        page: {{ form.management_form.PAGE.value }},
+        page: {{ form.management_form.PAGE.value|default_if_none:1 }},
         saveName: null,
         isPaginated: {{ paginated|js_trans|safe }},
         paginator: {
