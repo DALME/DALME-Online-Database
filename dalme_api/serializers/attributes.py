@@ -2,6 +2,7 @@ from dalme_app.models import * # NOQA
 from rest_framework import serializers
 import json
 from django.core.exceptions import ObjectDoesNotExist
+from decimal import Decimal
 
 
 class AttributeSerializer(serializers.ModelSerializer):
@@ -9,7 +10,7 @@ class AttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attribute # NOQA
-        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_INT', 'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'value_JSON')
+        fields = ('attribute_type', 'value_STR', 'value_TXT', 'value_DEC', 'value_INT', 'value_DATE_d', 'value_DATE_m', 'value_DATE_y', 'value_JSON')
 
     def to_representation(self, instance):
         label = instance.attribute_type.short_name
@@ -46,6 +47,12 @@ class AttributeSerializer(serializers.ModelSerializer):
             data = {
                 'attribute_type': _type.id,
                 'value_INT': int(value)
+            } if value is not None else None
+
+        elif _type.data_type == 'DEC':
+            data = {
+                'attribute_type': _type.id,
+                'value_DEC': Decimal(value)
             } if value is not None else None
 
         elif _type.data_type == 'TXT':

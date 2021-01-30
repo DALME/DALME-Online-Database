@@ -7,8 +7,8 @@ import django.db.models.options as options
 from django.utils.dateparse import parse_date
 import calendar
 # model imports for eval()
-from dalme_app.models.reference import CountryReference, LanguageReference, LocaleReference
-from dalme_app.models.rights_policy import RightsPolicy
+from dalme_app.models.reference import CountryReference, LanguageReference, LocaleReference # noqa
+from dalme_app.models.rights_policy import RightsPolicy # noqa
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -24,6 +24,7 @@ class Attribute(dalmeUuid):
     value_DATE_y = models.IntegerField(blank=True, null=True)
     value_DATE = models.DateField(blank=True, null=True)
     value_INT = models.IntegerField(blank=True, null=True)
+    value_DEC = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     value_TXT = models.TextField(blank=True, default=None, null=True)
     value_JSON = models.JSONField(null=True)
 
@@ -36,10 +37,13 @@ class Attribute(dalmeUuid):
     def save(self, *args, **kwargs):
         if self.attribute_type.data_type == 'DATE':
             if self.value_DATE_d is not None and self.value_DATE_m is not None and self.value_DATE_y is not None:
-                date = str(self.value_DATE_y)+'-'+str(self.value_DATE_m)+'-'+str(self.value_DATE_d).zfill(2)
+                date = f'{str(self.value_DATE_y)}-{str(self.value_DATE_m)}-{str(self.value_DATE_d).zfill(2)}'
                 pDate = parse_date(date)
-                self.value_DATE = pDate
-                self.value_STR = pDate.strftime('%d-%b-%Y').lstrip("0").replace(" 0", " ")
+                if pDate:
+                    self.value_DATE = pDate
+                    self.value_STR = pDate.strftime('%d-%b-%Y').lstrip("0").replace(" 0", " ")
+                else:
+                    self.value_STR = 'Unknown'
             elif self.value_DATE_m is not None and self.value_DATE_y is not None:
                 self.value_STR = str(calendar.month_abbr[self.value_DATE_m])+'-'+str(self.value_DATE_y)
             elif self.value_DATE_d is not None and self.value_DATE_m is not None:
@@ -48,8 +52,11 @@ class Attribute(dalmeUuid):
                 self.value_STR = str(self.value_DATE_y)
             else:
                 self.value_STR = 'Unknown'
-        if self.attribute_type.data_type == 'INT' and self.value_INT is not None:
-            self.value_STR = str(self.value_INT)
+        if self.attribute_type.data_type in ['INT', 'DEC']:
+            if self.value_INT is not None:
+                self.value_STR = str(self.value_INT)
+            elif self.value_DEC is not None:
+                self.value_STR = str(self.value_DEC)
         if self.attribute_type.data_type == 'TXT' and self.value_TXT is not None:
             self.value_STR = self.value_TXT[0:254] if len(self.value_TXT) > 255 else self.value_TXT
         if self.attribute_type.data_type in ['FK-UUID', 'FK-INT'] and self.value_JSON is not None:
@@ -68,6 +75,7 @@ class Attribute(dalmeUuid):
 class Attribute_type(dalmeIntid):
     DATA_TYPES = (
         ('DATE', 'DATE (date)'),
+        ('DEC', 'DEC (decimal)'),
         ('INT', 'INT (integer)'),
         ('STR', 'STR (string)'),
         ('TXT', 'TXT (text)'),
