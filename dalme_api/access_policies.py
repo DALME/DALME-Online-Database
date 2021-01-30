@@ -114,8 +114,12 @@ class PageAccessPolicy(BaseAccessPolicy):
                 request,
                 {'object': record.sources.all()[0].source}
             )
-        except:
+        except: # noqa
             return False
+
+
+class PlaceAccessPolicy(BaseAccessPolicy):
+    id = 'places-policy'
 
 
 class RightsAccessPolicy(BaseAccessPolicy):
@@ -133,7 +137,7 @@ class SourceAccessPolicy(BaseAccessPolicy):
                 usergroups = [i.name for i in request.user.groups.all()]
                 if not len(list(set(ds_ugs) & set(usergroups))) > 0:
                     return False
-            except:
+            except: # noqa
                 return False
         return True
 
@@ -189,7 +193,7 @@ class TranscriptionAccessPolicy(BaseAccessPolicy):
                 request,
                 {'object': record.source_pages.all()[0].source}
             )
-        except:
+        except: # noqa
             return False
 
 
