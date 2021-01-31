@@ -1023,7 +1023,7 @@ i.inactive {
 .app nav > ul {
   flex-direction: row;
   margin-bottom: 0;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 .app nav li {
   padding: 0.75rem 1rem;
