@@ -18,9 +18,12 @@ class Transcription(dalmeUuid):
     def save(self, **kwargs):
         # set count_ignore flag
         xml_parser = et.XMLParser(recover=True)
-        tr_tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
-        if len(tr_tree) == 1 and tr_tree[0].tag in ['quote', 'gap', 'mute'] or len(tr_tree) == 0:
-            self.count_ignore = True
+        tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
+        tags = len(tree)
+
+        if tags == 1 and tree[0].tag in ['quote', 'gap', 'mute'] or tags == 0:
+            self.count_ignore = len(' '.join(t for t in tree.xpath('text()'))) == 0
+
         super(Transcription, self).save()
 
     @property

@@ -3664,3 +3664,9 @@ parsererror div {
   background-color: #497bbb24;
   color: #354d87;
 }
+a.anchor {
+  cursor: default;
+}
+a.anchor:hover {
+  border: none !important;
+}
