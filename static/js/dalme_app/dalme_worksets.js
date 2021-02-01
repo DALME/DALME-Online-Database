@@ -24,7 +24,7 @@ function ws_next() {
       },
       data: JSON.stringify({ "action": "mark_done", "target": workset['current_id']})
     }).done(function(data, textStatus, jqXHR) {
-        let url = `${api_endpoint}/${workset['endpoint']}/${workset['next_id']}/?set=${workset['workset_id']}`
+        let url = `${db_endpoint}/${workset['endpoint']}/${workset['next_id']}/?set=${workset['workset_id']}`
         window.location.href = url;
     }).fail(function(jqXHR, textStatus, errorThrown) {
       if (errorThrown == "Forbidden") {
@@ -38,7 +38,7 @@ function ws_next() {
 
 function ws_prev() {
   if (workset['prev_id'] != 'none') {
-      let url = `${api_endpoint}/${workset['endpoint']}/${workset['prev_id']}/?set=${workset['workset_id']}`;
+      let url = `${db_endpoint}/${workset['endpoint']}/${workset['prev_id']}/?set=${workset['workset_id']}`;
       window.location.href = url;
   }
 }
@@ -64,6 +64,6 @@ function ws_mark(action) {
 }
 
 function ws_show_list() {
-  let url = `${api_endpoint}/${workset['endpoint']}/?set=${workset['workset_id']}`;
+  let url = `${db_endpoint}/${workset['endpoint']}/?set=${workset['workset_id']}`;
   window.location.href = url;
 }
