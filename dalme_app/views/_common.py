@@ -31,7 +31,20 @@ class DALMEContextMixin(ContextMixin):
             'page_chain': get_page_chain(breadcrumb, page_title),
             'comments': self.comments,
             'form': formset_factory(SearchForm),
-            'preferences': self.get_preferences()
+            'preferences': self.get_preferences(),
+            'page_context': {
+                'breadcrumb': self.get_breadcrumb(),
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'full_name': user.profile.full_name,
+                    'avatar': user.profile.profile_image,
+                    'groups': [g.name for g in user.groups.all()]
+                },
+                'preferences': self.get_preferences(),
+                'main_menu': main_menu,
+                'secondary_menu': secondary_menu
+            }
         })
 
         return context
