@@ -31,7 +31,7 @@ class Users(DALMEBaseViewSet):
             request.META['SERVER_PORT'] = '443'
             form.save(
                 request=request,
-                use_https=True,
+                use_https=settings.USE_HTTPS,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 email_template_name='registration/password_reset_email.html'
             )

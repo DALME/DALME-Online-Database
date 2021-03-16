@@ -1,0 +1,80 @@
+services:
+  dalme.web:
+    image: "web:${TAG:-dev}"
+    container_name: dalme.web
+    build:
+      context: ./
+      dockerfile: "./config/${TAG:-dev}/Dockerfile.web"
+    env_file:
+      - "./config/${TAG:-dev}/env.web.dev"
+    volumes:
+      - ./dalme_api:/opt/app/dalme_api
+      - ./dalme_app:/opt/app/dalme_app
+      - ./dalme_public:/opt/app/dalme_public
+      - ./templates:/opt/app/templates
+    depends_on:
+      - dalme.db
+    networks:
+      - app-network
+    ports:
+      - "8443"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  dalme.ui:
+    image: "ui:${TAG:-dev}"
+    container_name: dalme.ui
+    build:
+      context: ./
+      dockerfile: "./config/${TAG:-dev}/Dockerfile.ui"
+    env_file:
+      - "./config/${TAG:-dev}/env.ui.dev"
+    volumes:
+      - ./dalme_ui/src:/opt/ui/src
+    networks:
+      - app-network
+    ports:
+      - "3000"
+
+  dalme.db:
+    image: mysql:8.0.19
+    container_name: dalme.db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: dalme
+      MYSQL_PASSWORD: dalme
+      MYSQL_DATABASE: dalme_db
+      MYSQL_HOST: db
+    volumes:
+      - "./config/${TAG:-dev}/my.cnf:/etc/mysql/conf.d/my.cnf:ro"
+      - ./sql:/docker-entrypoint-initdb.d
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+    ports:
+      - "3306"
+
+  dalme.proxy:
+    image: nginx:mainline
+    container_name: dalme.proxy
+    env_file:
+      - "./config/${TAG:-dev}/env.web.dev"
+    volumes:
+      - "./config/${TAG:-dev}/nginx:/etc/nginx/conf.d"
+      - ./ssl-certs:/var/certs
+      - assets:/static
+    networks:
+      - app-network
+    depends_on:
+      - dalme.web
+    ports:
+      - "8000:443"
+
+volumes:
+  assets:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge

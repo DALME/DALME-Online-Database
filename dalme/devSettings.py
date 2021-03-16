@@ -1,5 +1,4 @@
 import os
-import dj_database_url
 import elasticsearch
 from requests_aws4auth import AWS4Auth
 from django.contrib.messages import constants as messages
@@ -9,6 +8,7 @@ from saml2.sigver import get_xmlsec_binary
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DOCKER_ROOT = "/app"
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
@@ -30,6 +30,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEBUG = True
 
+HOST_SCHEME = 'https://'
+PARENT_HOST = '127.0.0.1.xip.io:8000'
+DEFAULT_HOST = 'public'
 API_ENDPOINT = 'https://data.127.0.0.1.sslip.io:8443'
 PURL_ENDPOINT = 'https://purl.127.0.0.1.sslip.io:8443'
 DB_ENDPOINT = 'https://db.127.0.0.1.sslip.io:8443'
@@ -48,11 +51,11 @@ ALLOWED_HOSTS = [
     'purl.127.0.0.1.sslip.io'
 ]
 
+USE_HTTPS = True
+USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
 SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
-
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
 
@@ -85,12 +88,15 @@ CORS_ALLOWED_ORIGINS = [
     'https://purl.127.0.0.1.sslip.io:8443',
     'http://purl.127.0.0.1.sslip.io'
 ]
+CORS_EXPOSE_HEADERS = [
+    'Content-Type',
+    'X-CSRFToken',
+    # TODO: Is this right/necessary?
+    'Access-Control-Allow-Origin: *'
+]
 
 ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.devUrls'
-DEFAULT_HOST = 'public'
-PARENT_HOST = '127.0.0.1.sslip.io:8443'
-HOST_SCHEME = 'https://'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -142,10 +148,10 @@ if DEBUG and ENABLE_DJANGO_EXTENSIONS:
     INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
-    'dalme_app.utils.SubdomainRedirectMiddleware',
-    'django_hosts.middleware.HostsRequestMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'dalme_app.utils.SubdomainRedirectMiddleware',
+    'django_hosts.middleware.HostsRequestMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -167,6 +173,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.csrf',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -225,12 +232,12 @@ SAML_IDP_CONFIG = {
     },
 
     # Signing
-    'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
-    'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
+    'key_file': f'{DOCKER_ROOT}/ssl-certs/dev-localhost.key',
+    'cert_file': f'{DOCKER_ROOT}/ssl-certs/dev-localhost.cert',
     # Encryption
     'encryption_keypairs': [{
-        'key_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.pem',
-        'cert_file': PROJECT_ROOT + '/ssl-certs/dam.dalme.org.cert',
+        'key_file': f'{DOCKER_ROOT}/ssl-certs/dev-localhost.key',
+        'cert_file': f'{DOCKER_ROOT}/ssl-certs/dev-localhost.cert',
     }],
     'valid_for': 365 * 24,
 }
@@ -240,8 +247,13 @@ DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'HOST': os.environ['MYSQL_HOST'],
+        'NAME': os.environ['MYSQL_DATABASE'],
+        'USER': os.environ['MYSQL_USER'],
+        'PASSWORD': os.environ['MYSQL_PASSWORD'],
+        'PORT': os.environ['MYSQL_PORT'],
+        'CONN_MAX_AGE': 500,
         'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, 'db.cnf'),
             'sql_mode': 'traditional',
         },
         'TEST': {
@@ -256,9 +268,6 @@ DATABASES = {
         'HOST': os.environ['DAM_HOSTNAME'],
     }
 }
-
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
 
 ELASTICSEARCH_DSL = {
     'default': {
@@ -338,9 +347,9 @@ STATICFILES_FINDERS = (
     'compressor.finders.CompressorFinder',
 )
 
+COMPRESS_ENABLED = False
+COMPRESS_OFFLINE = False
 COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
 COMPRESS_FILTERS = {
     'css': ['compressor.filters.cssmin.rCSSMinFilter'],
     'js': ['compressor.filters.jsmin.JSMinFilter']

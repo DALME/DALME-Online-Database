@@ -5,7 +5,7 @@
 <div class="login-card-body">
   <form id="login-form" method="post">
     {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next }}"/>
+    <input type="hidden" name="next" value="{{ next }}" />
     {{ form.non_field_errors }}
       <div class="mb-3">
         <input name="{{ form.username.name }}" type="text" id="{{ form.username.id_for_label }}" class="login-form-control" placeholder="Username"

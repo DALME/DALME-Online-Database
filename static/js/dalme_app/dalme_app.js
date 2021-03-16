@@ -671,7 +671,7 @@ function enable_comments(model, object) {
       'X-CSRFToken': get_cookie("csrftoken")
     }
   }).done(function(data, textStatus, jqXHR) {
-    if (data.results.length > 0) {
+    if (data.results && data.results.length > 0) {
       $('#comments').prepend('<div id="comments-container"></div>');
       for (let i = 0; i < data.results.length; i++) {
           var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+get_user_avatar(data.results[i].creation_user.avatar)+'</div>';

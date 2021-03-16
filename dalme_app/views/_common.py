@@ -1,8 +1,12 @@
+import os
+import json
+
 from django.views.generic.base import TemplateView, ContextMixin
 from django.views.generic import DetailView
 from django.conf import settings
 from dalme_app.utils import DALMEMenus as dm
 from dalme_app.forms import SearchForm
+from dalme_app.models.auth_extended import Profile
 from django.forms import formset_factory
 
 
@@ -20,6 +24,16 @@ class DALMEContextMixin(ContextMixin):
             'breadcrumb': breadcrumb,
             'sidebar': sidebar_toggle
         }
+        user = self.request.user
+        main_menu, secondary_menu = self.get_menus()
+
+        # TODO: Find a better way to do this.
+        try:
+            full_name = user.profile.full_name
+            avatar = user.profile.profile_image
+        except Profile.DoesNotExist:
+            full_name = "Dev User"
+            avatar = None
 
         context.update({
             'api_endpoint': settings.API_ENDPOINT,
@@ -32,6 +46,19 @@ class DALMEContextMixin(ContextMixin):
             'comments': self.comments,
             'form': formset_factory(SearchForm),
             'preferences': self.get_preferences(),
+            'page_context': {
+                'breadcrumb': self.get_breadcrumb(),
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'full_name': full_name,
+                    'avatar': avatar,
+                    'groups': [g.name for g in user.groups.all()]
+                },
+                'preferences': self.get_preferences(),
+                'main_menu': main_menu,
+                'secondary_menu': secondary_menu
+            }
         })
 
         return context

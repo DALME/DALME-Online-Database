@@ -8,10 +8,10 @@ staticfiles
 media
 www
 *.env
-db.cnf
-db-test.cnf
+env.*
 *.DS_Store
 data
+sql/
 *.sql
 
 # Elastic Beanstalk Files
@@ -30,4 +30,5 @@ TODO*
 dalme/media
 
 .ebignore
-config/dev/env*
+
+node_modules/

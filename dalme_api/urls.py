@@ -3,6 +3,7 @@ from rest_framework import routers
 from dalme_api import api
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 router = routers.DefaultRouter()
 router.register(r'agents', api.Agents, basename='agents')

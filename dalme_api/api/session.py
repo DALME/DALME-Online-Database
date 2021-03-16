@@ -8,6 +8,14 @@ class Session(viewsets.ViewSet):
     """ API endpoint for managing user sessions """
     permission_classes = (SessionAccessPolicy,)
 
+    def retrieve(self, request, pk=None):
+        from dalme_api.serializers.users import UserSerializer
+        if request.user.is_authenticated:
+            # TODO: Fix profile and add full_name here...
+            owner = UserSerializer(request.user, fields=['username', 'id'])
+            return Response(owner.data, 200)
+        return Response({'error': 'Not authenticated.'}, 403)
+
     @action(detail=False, methods=['post'])
     def alter(self, request):
 
