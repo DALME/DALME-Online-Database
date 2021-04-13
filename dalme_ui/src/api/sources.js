@@ -6,7 +6,9 @@ const sources = {
     const request = new Request(url);
 
     const response = await fetchApi(request);
-    return response;
+    const data = await response.json();
+
+    return { success: response.ok, data };
   },
 };
 

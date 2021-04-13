@@ -15,7 +15,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["vue"],
+  plugins: ["vue", "unused-imports"],
   rules: {
     indent: ["error", 2],
     "linebreak-style": ["error", "unix"],
@@ -23,5 +23,16 @@ module.exports = {
     semi: ["error", "always"],
     "prettier/prettier": ["error"],
     "vue/no-multiple-template-root": "off",
+    "no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        vars: "all",
+        varsIgnorePattern: "^_",
+        args: "after-used",
+        argsIgnorePattern: "^_",
+      },
+    ],
   },
 };

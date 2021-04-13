@@ -14,7 +14,8 @@
 
 <script>
 import { onBeforeMount, onMounted, ref } from "vue";
-import { API, dbUrl } from "../api";
+import { API } from "../api";
+import { sessionSchema, sourcesSchema } from "../schemas";
 
 export default {
   setup() {
@@ -24,17 +25,17 @@ export default {
     const logout = API.auth.logout;
 
     onBeforeMount(async () => {
-      const response = await API.auth.session();
-      response.ok
-        ? (user.value = await response.json())
-        : (window.location.href = dbUrl);
+      const { success, data } = await API.auth.session();
+      if (success) {
+        sessionSchema.validate(data).then((value) => (user.value = value));
+      }
     });
 
     onMounted(async () => {
-      const response = await API.sources.archives();
-      response.ok
-        ? (sources.value = await response.json())
-        : console.error(response.json());
+      const { success, data } = await API.sources.archives();
+      if (success) {
+        sourcesSchema.validate(data).then((value) => (sources.value = value));
+      }
       loading.value = false;
     });
 

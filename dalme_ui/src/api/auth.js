@@ -6,11 +6,9 @@ const auth = {
     const request = new Request(url, { method: "POST", headers: headers });
 
     const response = await fetchApi(request);
+
     if (response.redirected) {
       window.location.href = response.url;
-    } else {
-      const data = await response.json();
-      throw data;
     }
   },
 
@@ -19,7 +17,9 @@ const auth = {
     const request = new Request(url);
 
     const response = await fetchApi(request);
-    return response;
+    const data = await response.json();
+
+    return { success: response.ok, data };
   },
 };
 
