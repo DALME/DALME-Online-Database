@@ -135,7 +135,12 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@types/lodash@^4.14.165":
+"@popperjs/core@^2.4.4":
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.9.2.tgz#adea7b6953cbb34651766b0548468e743c6a2353"
+  integrity sha512-VZMYa7+fXHdwIq1TDhSXoVmSPEGM/aa+6Aiq3nVVJ9bXr24zScr+NlKFKC3iPljA7ho/GAZr+d2jOf5GIRC30Q==
+
+"@types/lodash@^4.14.161", "@types/lodash@^4.14.165":
   version "4.14.168"
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.168.tgz"
   integrity sha512-oVfRvqHV/V6D1yifJbVRU3TMp8OT6o6BG+U9MkwuJ3U8/CsDHvalRpsxBqivn71ztOFZBTfJMvETbqHiaNSj7Q==
@@ -296,6 +301,11 @@ astral-regex@^2.0.0:
   resolved "https://registry.npmjs.org/astral-regex/-/astral-regex-2.0.0.tgz"
   integrity sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==
 
+async-validator@^3.4.0:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/async-validator/-/async-validator-3.5.1.tgz#cd62b9688b2465f48420e27adb47760ab1b5559f"
+  integrity sha512-DDmKA7sdSAJtTVeNZHrnr2yojfFaoeW8MfQN8CeuXg8DDQHTqKk9Fdv38dSvnesHoO8MUwMI2HphOeSyIF+wmQ==
+
 babel-eslint@^10.1.0:
   version "10.1.0"
   resolved "https://registry.npmjs.org/babel-eslint/-/babel-eslint-10.1.0.tgz"
@@ -421,6 +431,11 @@ csstype@^2.6.8:
   resolved "https://registry.npmjs.org/csstype/-/csstype-2.6.16.tgz"
   integrity sha512-61FBWoDHp/gRtsoDkq/B1nWrCUG/ok1E3tUrcNbZjsE9Cxd9yzUirjS3+nAATB8U4cTtaQmAHbNndoFz5L6C9Q==
 
+dayjs@1.x:
+  version "1.10.4"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.4.tgz#8e544a9b8683f61783f570980a8a80eaf54ab1e2"
+  integrity sha512-RI/Hh4kqRc1UKLOAf/T5zdMMX5DQIlDxwUe3wSyMMnEbGunnpENCdbUgM+dW7kXidZqCttBrmw7BhN4TMddkCw==
+
 debug@^4.0.1, debug@^4.1.0, debug@^4.1.1:
   version "4.3.1"
   resolved "https://registry.npmjs.org/debug/-/debug-4.3.1.tgz"
@@ -439,6 +454,20 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+element-plus@^1.0.2-beta.40:
+  version "1.0.2-beta.40"
+  resolved "https://registry.yarnpkg.com/element-plus/-/element-plus-1.0.2-beta.40.tgz#30fc9b161496ae587fab86235c80b728ea43d909"
+  integrity sha512-8S7JbBpJLUa3ggexuKuKeyrTo451gMDHa/BKJVFiHSyexcHPgnHQwHf2nIoZvY1w6FzmZPdBdZ3NoDLXu51SIw==
+  dependencies:
+    "@popperjs/core" "^2.4.4"
+    "@types/lodash" "^4.14.161"
+    async-validator "^3.4.0"
+    dayjs "1.x"
+    lodash "^4.17.20"
+    mitt "^2.1.0"
+    normalize-wheel "^1.0.1"
+    resize-observer-polyfill "^1.5.1"
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -1003,6 +1032,11 @@ minimist@^1.2.0:
   resolved "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
+mitt@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/mitt/-/mitt-2.1.0.tgz#f740577c23176c6205b121b2973514eade1b2230"
+  integrity sha512-ILj2TpLiysu2wkBbWjAmww7TkZb65aiQO+DkVdUTBpBXq+MHYiETENkKFMtsJZX1Lf4pe4QOrTSjIfUwN5lRdg==
+
 ms@2.1.2:
   version "2.1.2"
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
@@ -1022,6 +1056,11 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
+
+normalize-wheel@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/normalize-wheel/-/normalize-wheel-1.0.1.tgz#aec886affdb045070d856447df62ecf86146ec45"
+  integrity sha1-rsiGr/2wRQcNhWRH32Ls+GFG7EU=
 
 once@^1.3.0:
   version "1.4.0"
@@ -1176,6 +1215,11 @@ require-from-string@^2.0.2:
   version "2.0.2"
   resolved "https://registry.npmjs.org/require-from-string/-/require-from-string-2.0.2.tgz"
   integrity sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==
+
+resize-observer-polyfill@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
+  integrity sha512-LwZrotdHOo12nQuZlHEmtuXdqGoOD0OhaxopaNFxWzInpEgaLWoVuAMbTzixuosCx2nEG58ngzW3vxdWoxIgdg==
 
 resolve-from@^4.0.0:
   version "4.0.0"
