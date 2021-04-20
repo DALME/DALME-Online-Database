@@ -11,6 +11,8 @@
     "element-plus": "^1.0.2-beta.40",
     "js-cookie": "^2.2.1",
     "vue": "^3.0.5",
+    "vue-router": "4",
+    "vue3-mq": "^2.3.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {
