@@ -1,5 +1,5 @@
-import auth from "./auth";
-import sources from "./sources";
+import auth from "@/api/auth";
+import sources from "@/api/sources";
 
 const API = {
   auth,

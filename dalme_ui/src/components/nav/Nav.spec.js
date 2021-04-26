@@ -1,11 +1,27 @@
 /* global describe, expect, it  */
+import ElementPlus from "element-plus";
 import { mount } from "@vue/test-utils";
-import { Nav } from "@/components/Nav.vue";
+import VueMq from "vue3-mq";
+
+import { Nav } from "@/components";
+import router from "@/router";
 
 describe("Nav.vue", () => {
-  it("should render the correct routes in the menu.", () => {
-    const wrapper = mount(Nav);
+  it("should render the correct routes in the menu.", async () => {
+    router.push("/");
+    await router.isReady();
 
+    const wrapper = mount(Nav, {
+      global: {
+        plugins: [
+          router,
+          ElementPlus,
+          [VueMq, { breakpoints: { sm: 600, md: 960, lg: 1280 } }],
+        ],
+      },
+    });
+
+    expect(wrapper.vm.$route).toBeInstanceOf(Object);
     expect(wrapper.html()).toBe("<div></div>");
   });
 });

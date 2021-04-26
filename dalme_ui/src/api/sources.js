@@ -1,4 +1,4 @@
-import { apiUrl, fetchApi } from "./config";
+import { apiUrl, fetchApi } from "@/api/config";
 
 const sources = {
   async archives() {
