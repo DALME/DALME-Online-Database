@@ -1,4 +1,4 @@
-import { apiUrl, dbUrl, fetchApi, headers } from "@/api/config";
+import { apiUrl, dbUrl, fetchApi, headers } from "./config";
 
 const auth = {
   async logout() {

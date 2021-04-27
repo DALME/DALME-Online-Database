@@ -2,21 +2,31 @@
   <el-container class="container">
     <Nav />
     <el-main>
-      <router-view />
+      <SuspenseWithError>
+        <template #default>
+          <router-view />
+        </template>
+        <template #fallback>
+          <Spinner />
+        </template>
+        <template #error>
+          <strong>Failed to load</strong>
+        </template>
+      </SuspenseWithError>
     </el-main>
   </el-container>
 </template>
 
 <script>
 import { Nav } from "@/components";
+import { Spinner, SuspenseWithError } from "@/components/utils";
 
 export default {
   name: "App",
   components: {
     Nav,
-  },
-  setup() {
-    return {};
+    Spinner,
+    SuspenseWithError,
   },
 };
 </script>
@@ -37,13 +47,11 @@ body {
 a {
   text-decoration: none;
 }
-section.container {
-  flex-direction: column;
-  height: 100%;
-}
-@media screen and (min-width: 600px) {
-  section.container {
-    flex-direction: row;
-  }
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
 }
 </style>

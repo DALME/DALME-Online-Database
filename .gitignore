@@ -32,3 +32,4 @@ dalme/media
 .ebignore
 
 node_modules/
+yarn-error.log

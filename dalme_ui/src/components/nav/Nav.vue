@@ -21,6 +21,9 @@
           <el-menu-item :index="route.path" :route="route">
             {{ route.name }}
           </el-menu-item>
+          <el-menu-item class="logout">
+            <button @click="logout">Logout</button>
+          </el-menu-item>
         </template>
       </el-menu>
     </el-drawer>
@@ -36,6 +39,9 @@
           <el-menu-item :index="route.path" :route="route">
             {{ route.name }}
           </el-menu-item>
+          <el-menu-item class="logout">
+            <button @click="logout">Logout</button>
+          </el-menu-item>
         </template>
       </el-menu>
     </el-aside>
@@ -44,15 +50,17 @@
 
 <script>
 import { computed, inject, ref } from "vue";
+import { API } from "@/api";
 
 export default {
   name: "Nav",
   setup() {
+    const $mq = inject("mq");
     const direction = "ltr";
     const drawer = ref(false);
-    const $mq = inject("mq");
+    const logout = API.auth.logout;
     const menuWidth = computed(() => ($mq.value === "lg" ? "18rem" : "12rem"));
-    return { direction, drawer, menuWidth };
+    return { direction, drawer, logout, menuWidth };
   },
 };
 </script>

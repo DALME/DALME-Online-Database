@@ -3,8 +3,8 @@ import ElementPlus from "element-plus";
 import { mount } from "@vue/test-utils";
 import VueMq from "vue3-mq";
 
-import { Nav } from "@/components";
 import router from "@/router";
+import { Nav } from "./Nav.vue";
 
 describe("Nav.vue", () => {
   it("should render the correct routes in the menu.", async () => {
