@@ -3,7 +3,7 @@
     <el-container class="header u-flip-orientation">
       <h4 class="subheading">My Issue Tickets</h4>
       <el-input
-        v-model="filter"
+        v-model="q"
         placeholder="Filter issues"
         prefix-icon="el-icon-search"
         clearable
@@ -54,22 +54,22 @@ export default {
   name: "Tickets",
   async setup() {
     const $mq = inject("mq");
+    const q = ref("");
     const count = ref(null);
     const next = ref(null);
     const previous = ref(null);
     const tickets = ref([]);
-    const filter = ref("");
     const cardStyle = computed(() =>
       $mq.value === "sm" ? "{ padding: '0px', margin: '0 2.5%' }" : "{}",
     );
     const paginationStyle = computed(() => ($mq.value === "sm" ? true : false));
     const reducer = (ticket) =>
-      ticket.subject.toLowerCase().includes(filter.value.toLowerCase());
+      ticket.subject.toLowerCase().includes(q.value.toLowerCase());
     const filteredTickets = computed(() => {
-      return useFilter(tickets.value, reducer);
+      return useFilter(reducer, tickets.value);
     });
     const ticketCount = computed(() =>
-      filter.value ? filteredTickets.value.length : count.value,
+      q.value ? filteredTickets.value.length : count.value,
     );
     const countInfo = computed(() =>
       ticketCount.value === 1
@@ -92,9 +92,9 @@ export default {
       cardStyle,
       count,
       countInfo,
-      filter,
       filteredTickets,
       paginationStyle,
+      q,
       tickets,
       ticketCount,
     };

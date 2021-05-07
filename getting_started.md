@@ -55,7 +55,7 @@ $ docker-compose run dalme.web bash
 ```
 
 Login to the DALME editing environment at
-`https://db.127.0.0.1.xip.io:8000/`.  You will probably have to bypass an SSL
+`https://db.127.0.0.1.sslip.io:8000/`.  You will probably have to bypass an SSL
 insecure certificate warning and then you are likely see further
 `net::ERR_CERT_AUTHORITY_INVALID` errors due to failing API calls in dev tools
 console. If this is the case, open up one of the failing URLs in a new tab and
@@ -64,11 +64,11 @@ should then succeed.
 
 The main entrypoint URLs are found below.
 ```
-https://127.0.0.1.xip.io:8000/       # Public site.
-https://127.0.0.1.xip.io:8000/cms/   # Wagtail CMS.
-https://data.127.0.0.1.xip.io:8000/  # DALME API.
-https://db.127.0.0.1.xip.io:8000/    # DALME editing-environment.
-https://127.0.0.1.xip.io:8000/ui/    # New Vue editing-environment (dev).
+https://127.0.0.1.sslip.io:8000/       # Public site.
+https://127.0.0.1.sslip.io:8000/cms/   # Wagtail CMS.
+https://data.127.0.0.1.sslip.io:8000/  # DALME API.
+https://db.127.0.0.1.sslip.io:8000/    # DALME editing-environment.
+https://127.0.0.1.sslip.io:8000/ui/    # New Vue editing-environment (dev).
 ```
-Using the [`xip.io`](http://xip.io/) DNS resolution is necessary for
+Using the [`sslip.io`](http://sslip.io/) DNS resolution is necessary for
 CSRF/cookie signing across local subdomains.

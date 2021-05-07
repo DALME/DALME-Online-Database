@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     hmr: {
       protocol: "wss",
-      host: "127.0.0.1.xip.io",
+      host: "127.0.0.1.sslip.io",
       path: "hmr",
       port: "8000",
     },

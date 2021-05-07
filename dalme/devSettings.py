@@ -31,25 +31,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEBUG = True
 
 HOST_SCHEME = 'https://'
-PARENT_HOST = '127.0.0.1.xip.io:8000'
+PARENT_HOST = '127.0.0.1.sslip.io:8000'
 DEFAULT_HOST = 'public'
+
 API_ENDPOINT = 'https://data.127.0.0.1.sslip.io:8443'
 PURL_ENDPOINT = 'https://purl.127.0.0.1.sslip.io:8443'
 DB_ENDPOINT = 'https://db.127.0.0.1.sslip.io:8443'
 
-ALLOWED_HOSTS = [
-    '127.0.0.1:8000',
-    '127.0.0.1',
-    'localhost',
-    '.127.0.0.1.sslip.io',
-    '.127.0.0.1.sslip.io:8443',
-    'db.127.0.0.1.sslip.io:8443',
-    'db.127.0.0.1.sslip.io',
-    'data.127.0.0.1.sslip.io:8443',
-    'data.127.0.0.1.sslip.io',
-    'purl.127.0.0.1.sslip.io:8443',
-    'purl.127.0.0.1.sslip.io'
-]
+ALLOWED_HOSTS = ['.127.0.0.1.sslip.io']
 
 USE_HTTPS = True
 USE_X_FORWARDED_HOST = True
@@ -60,33 +49,27 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
 
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = [
-    '.127.0.0.1.sslip.io',
-    '.127.0.0.1.sslip.io:8443',
-    'data.127.0.0.1.sslip.io',
-    'data.127.0.0.1.sslip.io:8443',
-    'db.127.0.0.1.sslip.io',
-    'db.127.0.0.1.sslip.io:8443',
-    '127.0.0.1.sslip.io',
-    '127.0.0.1.sslip.io:8443',
-    'purl.127.0.0.1.sslip.io:8443',
-    'purl.127.0.0.1.sslip.io'
-]
+SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
+SESSION_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
+CSRF_TRUSTED_ORIGINS = ['.127.0.0.1.sslip.io:8000']
+
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = False
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    'https://*.127.0.0.1.sslip.io:8443',
-    'https://*.127.0.0.1.sslip.io',
-    'https://127.0.0.1.sslip.io:8443',
-    'http://127.0.0.1.sslip.io',
-    'https://data.127.0.0.1.sslip.io:8443',
-    'http://data.127.0.0.1.sslip.io',
-    'https://db.127.0.0.1.sslip.io:8443',
-    'http://db.127.0.0.1.sslip.io',
-    'https://purl.127.0.0.1.sslip.io:8443',
-    'http://purl.127.0.0.1.sslip.io'
+    'https://127.0.0.1.sslip.io',
+    'https://db.127.0.0.1.sslip.io',
+    'https://data.127.0.0.1.sslip.io',
+    'https://purl.127.0.0.1.sslip.io',
+    'https://127.0.0.1.sslip.io:8000',
+    'https://db.127.0.0.1.sslip.io:8000',
+    'https://data.127.0.0.1.sslip.io:8000',
+    'https://purl.127.0.0.1.sslip.io:8000',
 ]
 CORS_EXPOSE_HEADERS = [
     'Content-Type',
@@ -202,26 +185,26 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
-LOGIN_URL = 'https://db.127.0.0.1.sslip.io:8443/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'https://dalme.org'
+LOGIN_URL = 'https://db.127.0.0.1.sslip.io:8000/accounts/login/'
+LOGIN_REDIRECT_URL = '/ui/'
+LOGOUT_REDIRECT_URL = 'https://127.0.0.1.sslip.io:8000/'
 
 SAML_IDP_CONFIG = {
     'debug': DEBUG,
     'xmlsec_binary': get_xmlsec_binary(['/opt/local/bin', '/usr/bin/xmlsec1']),
-    'entityid': 'https://127.0.0.1.sslip.io:8443/idp/metadata',
+    'entityid': 'https://127.0.0.1.sslip.io:8000/idp/metadata',
     'description': 'DALME SAML Identity Provider Setup',
     'service': {
         'idp': {
             'name': 'DALME SAML Identity Provider',
             'endpoints': {
                 'single_sign_on_service': [
-                    ('https://127.0.0.1.sslip.io:8443/idp/sso/post/', saml2.BINDING_HTTP_POST),
-                    ('https://127.0.0.1.sslip.io:8443/idp/sso/redirect/', saml2.BINDING_HTTP_REDIRECT),
+                    ('https://127.0.0.1.sslip.io:8000/idp/sso/post/', saml2.BINDING_HTTP_POST),
+                    ('https://127.0.0.1.sslip.io:8000/idp/sso/redirect/', saml2.BINDING_HTTP_REDIRECT),
                 ],
                 "single_logout_service": [
-                    ("https://127.0.0.1.sslip.io:8443/idp/slo/post/", saml2.BINDING_HTTP_POST),
-                    ("https://127.0.0.1.sslip.io:8443/idp/slo/redirect/", saml2.BINDING_HTTP_REDIRECT)
+                    ("https://127.0.0.1.sslip.io:8000/idp/slo/post/", saml2.BINDING_HTTP_POST),
+                    ("https://127.0.0.1.sslip.io:8000/idp/slo/redirect/", saml2.BINDING_HTTP_REDIRECT)
                 ],
             },
             'name_id_format': [NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED],
