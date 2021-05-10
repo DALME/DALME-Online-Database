@@ -5,7 +5,7 @@
     </el-menu>
   </mq-layout>
 
-  <mq-layout mq="sm" class="menu-mobile">
+  <mq-layout mq="sm">
     <el-drawer
       v-model="drawer"
       :direction="direction"
@@ -13,7 +13,7 @@
       :with-header="false"
       :size="'50%'"
     >
-      <el-menu router :default-active="$route.path">
+      <el-menu router class="mobile" :default-active="$route.path">
         <router-link exact to="/">
           <h1>DALME</h1>
         </router-link>
@@ -34,7 +34,7 @@
       <router-link exact to="/">
         <h1>DALME</h1>
       </router-link>
-      <el-menu router :default-active="$route.path">
+      <el-menu router class="desktop" :default-active="$route.path">
         <template v-for="(route, idx) in $router.options.routes" :key="idx">
           <el-menu-item :index="route.path" :route="route">
             {{ route.name }}
@@ -50,16 +50,17 @@
 
 <script>
 import { computed, inject, ref } from "vue";
-import { API } from "@/api";
+import { useStore } from "vuex";
 
 export default {
   name: "Nav",
   setup() {
+    const store = useStore();
     const $mq = inject("mq");
     const direction = "ltr";
     const drawer = ref(false);
-    const logout = API.auth.logout;
     const menuWidth = computed(() => ($mq.value === "lg" ? "18rem" : "12rem"));
+    const logout = () => store.dispatch("logout");
     return { direction, drawer, logout, menuWidth };
   },
 };
@@ -69,18 +70,41 @@ export default {
 a {
   text-decoration: none;
 }
-.el-aside {
-  width: 20rem;
-}
-.el-menu {
-  border-right: 0;
-}
 h1 {
   color: #000;
   font-size: 27px;
   margin: 0;
   padding: 1rem 1rem 1rem 1.15rem;
   text-align: left;
+}
+ul {
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+}
+ul li {
+  width: 100%;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+ul li i {
+  vertical-align: text-bottom;
+  text-align: left;
+}
+.el-aside {
+  height: 100%;
+  width: 20rem;
+}
+.el-menu {
+  border-right: 0;
+}
+.el-menu.desktop {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.logout {
+  margin-top: auto;
 }
 .nav {
   border-right: solid 1px #e6e6e6;
@@ -100,19 +124,5 @@ h1 {
   border-color: #fff;
   font-size: 21px;
   margin-left: auto;
-}
-ul {
-  align-items: flex-start;
-  text-align: left;
-  width: 100%;
-}
-ul li {
-  width: 100%;
-  font-size: 16px;
-  text-transform: capitalize;
-}
-ul li i {
-  vertical-align: text-bottom;
-  text-align: left;
 }
 </style>

@@ -1,4 +1,6 @@
+import { isEmpty } from "ramda";
+
 const useFilter = (reducer, data) =>
-  data && data.length ? data.filter((item) => reducer(item)) : data;
+  isEmpty(data) ? data : data.filter((item) => reducer(item));
 
 export default useFilter;

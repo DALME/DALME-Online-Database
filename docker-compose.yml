@@ -54,6 +54,8 @@ services:
       - app-network
     ports:
       - "3306"
+    cap_add:
+      - SYS_NICE
 
   dalme.proxy:
     image: nginx:mainline

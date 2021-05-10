@@ -31,10 +31,13 @@
       <el-table-column prop="tag" label="Tag" sortable> </el-table-column>
     </el-table>
     <el-container class="pagination">
-      <h5 class="subheading">{{ countInfo }}</h5>
+      <h5 class="subheading">
+        {{ ticketCount }}{{ ticketCount === 1 ? " issue" : " issues" }}
+      </h5>
       <el-pagination
-        :total="ticketCount"
+        :current-page="pageNumber"
         :small="paginationStyle"
+        :total="ticketCount"
         layout="prev, pager, next"
         hide-on-single-page
       >
@@ -44,7 +47,8 @@
 </template>
 
 <script>
-import { computed, inject, ref } from "vue";
+import { computed, inject, reactive, toRefs } from "vue";
+import { useStore } from "vuex";
 
 import { API } from "@/api";
 import { ticketListSchema } from "@/schemas";
@@ -53,49 +57,44 @@ import { useFilter } from "@/use";
 export default {
   name: "Tickets",
   async setup() {
+    const store = useStore();
     const $mq = inject("mq");
-    const q = ref("");
-    const count = ref(null);
-    const next = ref(null);
-    const previous = ref(null);
-    const tickets = ref([]);
-    const cardStyle = computed(() =>
-      $mq.value === "sm" ? "{ padding: '0px', margin: '0 2.5%' }" : "{}",
-    );
-    const paginationStyle = computed(() => ($mq.value === "sm" ? true : false));
-    const reducer = (ticket) =>
-      ticket.subject.toLowerCase().includes(q.value.toLowerCase());
-    const filteredTickets = computed(() => {
-      return useFilter(reducer, tickets.value);
+    const state = reactive({
+      count: 0,
+      next: null,
+      pageNumber: 1,
+      previous: null,
+      q: "",
+      tickets: [],
     });
-    const ticketCount = computed(() =>
-      q.value ? filteredTickets.value.length : count.value,
-    );
-    const countInfo = computed(() =>
-      ticketCount.value === 1
-        ? `${ticketCount.value} issue`
-        : `${ticketCount.value} issues`,
-    );
+    const stateAsRefs = toRefs(state);
 
-    // TODO: const { _, _ } = await API.auth.session();
-    const userId = 84;
+    const userId = store.getters.userId;
     const { success, data } = await API.tickets.userTickets(userId);
     if (success)
       ticketListSchema.validate(data, { stripUnknown: true }).then((value) => {
-        count.value = value.count;
-        next.value = value.next;
-        previous.value = value.previous;
-        tickets.value = value.results;
+        stateAsRefs.count.value = value.count;
+        stateAsRefs.next.value = value.next;
+        stateAsRefs.previous.value = value.previous;
+        stateAsRefs.tickets.value = value.results;
       });
 
+    const reducer = (ticket) =>
+      ticket.subject.toLowerCase().includes(stateAsRefs.q.value.toLowerCase());
+    const filteredTickets = computed(() => {
+      return useFilter(reducer, stateAsRefs.tickets.value);
+    });
+    const ticketCount = computed(() => filteredTickets.value.length);
+
+    const cardRules = "{ padding: '0px', margin: '0 2.5%' }";
+    const cardStyle = computed(() => ($mq.value === "sm" ? cardRules : "{}"));
+    const paginationStyle = computed(() => ($mq.value === "sm" ? true : false));
+
     return {
+      ...stateAsRefs,
       cardStyle,
-      count,
-      countInfo,
       filteredTickets,
       paginationStyle,
-      q,
-      tickets,
       ticketCount,
     };
   },
