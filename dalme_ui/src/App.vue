@@ -1,5 +1,5 @@
 <template>
-  <el-container class="container">
+  <el-container class="app-container">
     <Nav />
     <el-main>
       <SuspenseWithError>
@@ -54,7 +54,14 @@ h4,
 h5 {
   margin: 0;
 }
-.container {
+
+.app-container {
+  flex-direction: column;
   height: 100%;
+}
+@media screen and (min-width: 600px) {
+  .app-container {
+    flex-direction: row;
+  }
 }
 </style>

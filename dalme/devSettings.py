@@ -74,8 +74,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_EXPOSE_HEADERS = [
     'Content-Type',
     'X-CSRFToken',
-    # TODO: Is this right/necessary?
-    'Access-Control-Allow-Origin: *'
+    'Access-Control-Allow-Origin: https://db.127.0.0.1.sslip.io'
 ]
 
 ROOT_HOSTCONF = 'dalme.hosts'
