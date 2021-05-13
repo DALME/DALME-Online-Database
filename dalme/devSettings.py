@@ -74,11 +74,12 @@ CORS_ALLOWED_ORIGINS = [
 CORS_EXPOSE_HEADERS = [
     'Content-Type',
     'X-CSRFToken',
-    'Access-Control-Allow-Origin: https://db.127.0.0.1.sslip.io'
+    'Access-Control-Allow-Origin: https://db.127.0.0.1.sslip.io:8000',
 ]
 
 ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.devUrls'
+LOGOUT_REDIRECT_URL = 'https://127.0.0.1.sslip.io:8000/'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -184,9 +185,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
-LOGIN_URL = 'https://db.127.0.0.1.sslip.io:8000/accounts/login/'
-LOGIN_REDIRECT_URL = '/ui/'
-LOGOUT_REDIRECT_URL = 'https://127.0.0.1.sslip.io:8000/'
 
 SAML_IDP_CONFIG = {
     'debug': DEBUG,

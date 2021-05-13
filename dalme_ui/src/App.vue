@@ -1,19 +1,19 @@
 <template>
   <el-container class="app-container">
-    <Nav />
-    <el-main>
-      <SuspenseWithError>
-        <template #default>
+    <SuspenseWithError>
+      <template #default>
+        <Nav />
+        <el-main>
           <router-view />
-        </template>
-        <template #fallback>
-          <Spinner />
-        </template>
-        <template #error>
-          <strong>Failed to load</strong>
-        </template>
-      </SuspenseWithError>
-    </el-main>
+        </el-main>
+      </template>
+      <template #fallback>
+        <Spinner />
+      </template>
+      <template #error>
+        <h1>Failed to load</h1>
+      </template>
+    </SuspenseWithError>
   </el-container>
 </template>
 

@@ -1,5 +1,3 @@
-import os
-
 from django.contrib.auth.views import LoginView
 
 
@@ -21,9 +19,3 @@ class DalmeLogin(LoginView):
         self.request.session['sidebar_toggle'] = self.request.user.preferences['interface__sidebar_collapsed']
         self.request.session['remember_columns'] = self.request.user.preferences['interface__remember_column_visibility']
         self.request.session['list_scope'] = self.request.user.preferences['interface__records_list_scope']
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if bool(os.getenv('UI_DEV')):
-            context.update({'next': '/ui/'})
-        return context

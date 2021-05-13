@@ -67,8 +67,7 @@ The main entrypoint URLs are found below.
 https://127.0.0.1.sslip.io:8000/       # Public site.
 https://127.0.0.1.sslip.io:8000/cms/   # Wagtail CMS.
 https://data.127.0.0.1.sslip.io:8000/  # DALME API.
-https://db.127.0.0.1.sslip.io:8000/    # DALME editing-environment.
-https://127.0.0.1.sslip.io:8000/ui/    # New Vue editing-environment (dev).
+https://127.0.0.1.sslip.io:8000/ui     # Vue editing-environment.
 ```
 Using the [`sslip.io`](http://sslip.io/) DNS resolution is necessary for
 CSRF/cookie signing across local subdomains.

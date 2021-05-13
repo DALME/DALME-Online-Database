@@ -23,6 +23,9 @@ const store = createStore({
     },
   },
   actions: {
+    login({ commit }, data) {
+      commit("addUser", data);
+    },
     async logout({ commit }) {
       commit("deleteUser");
       await API.auth.logout();

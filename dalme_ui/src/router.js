@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 
 import { API } from "@/api";
-import { dbUrl } from "@/api/config";
+import { loginUrl } from "@/api/config";
 import store from "@/store";
 
 const history = createWebHistory("/ui/");
@@ -11,6 +11,11 @@ const routes = [
     path: "/",
     name: "dashboard",
     component: () => import("@/views/Dashboard"),
+  },
+  {
+    path: "/search",
+    name: "search",
+    component: () => import("@/views/Search"),
   },
 ];
 
@@ -23,7 +28,7 @@ router.beforeEach(async (to, from, next) => {
     next();
   } else {
     store.commit("deleteUser");
-    window.location.href = dbUrl;
+    window.location.href = `${loginUrl}?next=${to.href}`;
   }
 });
 

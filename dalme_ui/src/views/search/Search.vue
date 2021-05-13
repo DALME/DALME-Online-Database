@@ -1,7 +1,7 @@
 <template>
   <SuspenseWithError>
     <template #default>
-      <Tickets />
+      <h1>Stubbed</h1>
     </template>
     <template #fallback>
       <Spinner />
@@ -13,18 +13,13 @@
 </template>
 
 <script>
-import { Tickets } from "@/components";
 import { Spinner, SuspenseWithError } from "@/components/utils";
 
 export default {
-  name: "Dashboard",
+  name: "Search",
   components: {
     Spinner,
     SuspenseWithError,
-    Tickets,
-  },
-  async setup() {
-    return {};
   },
 };
 </script>

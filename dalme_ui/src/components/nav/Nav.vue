@@ -21,10 +21,10 @@
           <el-menu-item :index="route.path" :route="route">
             {{ route.name }}
           </el-menu-item>
-          <el-menu-item class="logout">
-            <button @click="logout">Logout</button>
-          </el-menu-item>
         </template>
+        <el-menu-item class="logout">
+          <button @click="logout">Logout</button>
+        </el-menu-item>
       </el-menu>
     </el-drawer>
   </mq-layout>
@@ -39,10 +39,10 @@
           <el-menu-item :index="route.path" :route="route">
             {{ route.name }}
           </el-menu-item>
-          <el-menu-item class="logout">
-            <button @click="logout">Logout</button>
-          </el-menu-item>
         </template>
+        <el-menu-item class="logout">
+          <button @click="logout">Logout</button>
+        </el-menu-item>
       </el-menu>
     </el-aside>
   </mq-layout>
@@ -60,8 +60,15 @@ export default {
     const direction = "ltr";
     const drawer = ref(false);
     const menuWidth = computed(() => ($mq.value === "lg" ? "18rem" : "12rem"));
-    const logout = () => store.dispatch("logout");
-    return { direction, drawer, logout, menuWidth };
+    return { direction, drawer, menuWidth, store };
+  },
+  methods: {
+    logout() {
+      this.$message({ message: "Logging out", type: "success" });
+      setTimeout(() => {
+        this.store.dispatch("logout");
+      }, 500);
+    },
   },
 };
 </script>
@@ -97,11 +104,17 @@ ul li i {
 }
 .el-menu {
   border-right: 0;
-}
-.el-menu.desktop {
   display: flex;
   flex-direction: column;
+}
+.el-menu.desktop {
+  height: 93%;
+}
+.el-menu.mobile {
   height: 100%;
+}
+.el-menu.desktop {
+  height: 93%;
 }
 .logout {
   margin-top: auto;

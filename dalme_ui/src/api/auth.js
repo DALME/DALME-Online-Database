@@ -1,6 +1,27 @@
-import { apiUrl, dbUrl, fetchApi, headers } from "./config";
+import {
+  apiUrl,
+  dbUrl,
+  loginUrl,
+  modalLoginUrl,
+  fetchApi,
+  headers,
+} from "./config";
 
 const auth = {
+  async login(form) {
+    const url = modalLoginUrl;
+    const request = new Request(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(form),
+    });
+
+    const response = await fetchApi(request);
+    const data = await response.json();
+
+    return { success: response.ok, data };
+  },
+
   async logout() {
     const url = `${dbUrl}/logout/`;
     const request = new Request(url, { method: "POST", headers: headers });
@@ -8,7 +29,7 @@ const auth = {
     const response = await fetchApi(request);
 
     if (response.redirected) {
-      window.location.href = response.url;
+      window.location.href = `${loginUrl}?next=/ui/`;
     }
   },
 
