@@ -1,4 +1,7 @@
 <template>
+  <Modal :show="showModal" :reauthenticate="reauthenticate">
+    <Login />
+  </Modal>
   <el-container class="app-container">
     <SuspenseWithError>
       <template #default>
@@ -11,22 +14,32 @@
         <Spinner />
       </template>
       <template #error>
-        <h1>Failed to load</h1>
+        <h1 class="error">Failed to load</h1>
       </template>
     </SuspenseWithError>
   </el-container>
 </template>
 
 <script>
-import { Nav } from "@/components";
+import { ref } from "vue";
+import { Login, Modal, Nav } from "@/components";
 import { Spinner, SuspenseWithError } from "@/components/utils";
+import { provideAPI } from "@/use";
 
 export default {
   name: "App",
   components: {
+    Login,
+    Modal,
     Nav,
     Spinner,
     SuspenseWithError,
+  },
+  setup() {
+    const showModal = ref(false);
+    const reauthenticate = (value) => (showModal.value = value);
+    provideAPI(reauthenticate);
+    return { reauthenticate, showModal };
   },
 };
 </script>
@@ -54,7 +67,6 @@ h4,
 h5 {
   margin: 0;
 }
-
 .app-container {
   flex-direction: column;
   height: 100%;
@@ -63,5 +75,9 @@ h5 {
   .app-container {
     flex-direction: row;
   }
+}
+.error {
+  margin-top: 1rem;
+  width: 100%;
 }
 </style>

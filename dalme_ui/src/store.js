@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 
-import { API } from "@/api";
+import { API as useAPI, loginUrl, requests } from "@/api";
 
 const store = createStore({
   state: {
@@ -28,7 +28,11 @@ const store = createStore({
     },
     async logout({ commit }) {
       commit("deleteUser");
-      await API.auth.logout();
+      const { fetchAPI, redirected } = useAPI();
+      await fetchAPI(requests.auth.logout());
+      if (redirected) {
+        window.location.href = `${loginUrl}?next=/ui/`;
+      }
     },
   },
 });

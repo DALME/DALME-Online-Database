@@ -1,6 +1,6 @@
 <template>
   <el-card class="login">
-    <h2>DALME</h2>
+    <h2 class="logo">DALME</h2>
     <el-form ref="formRef" :model="form" :rules="rules" class="login-form">
       <el-form-item prop="username">
         <el-input v-model="form.username" placeholder="Username"> </el-input>
@@ -19,30 +19,38 @@
           type="primary"
           native-type="button"
           block
-          :disabled="disabled"
+          :disabled="disabled || submitting"
           @click="onSubmit()"
         >
           Login
         </el-button>
       </el-form-item>
       <a class="forgot-password" href="/accounts/password_reset/">
-        Forgot password ?
+        Forgotten password ?
       </a>
     </el-form>
   </el-card>
 </template>
 
 <script>
+import { ElMessage } from "element-plus";
 import { any, isEmpty, values } from "ramda";
 import { computed, reactive, ref, unref } from "vue";
-import { API } from "@/api";
+import { useStore } from "vuex";
+
+import { requests } from "@/api";
 import { sessionSchema } from "@/schemas";
+import { useAPI } from "@/use";
 
 export default {
   name: "Login",
   setup() {
+    const store = useStore();
+    const { data, fetchAPI, status } = useAPI();
+
     const formRef = ref({});
     const form = reactive({ username: "", password: "" });
+    const submitting = ref(false);
     const disabled = computed(() => any(isEmpty)(values(form)));
     const rules = {
       username: [
@@ -61,39 +69,33 @@ export default {
       ],
     };
 
+    const onSubmit = async () => {
+      submitting.value = true;
+      const form = unref(formRef);
+      await form.validate(async (valid) => {
+        if (valid) {
+          await fetchAPI(requests.auth.login(form.model));
+          status.value === 200
+            ? await sessionSchema.validate(data.value).then((value) => {
+                ElMessage.success("Login successful");
+                store.dispatch("login", value);
+              })
+            : ElMessage.error("Login failed");
+        } else {
+          ElMessage.error("Login failed");
+        }
+      });
+      submitting.value = false;
+      form.resetFields();
+    };
+
     return {
       disabled,
       form,
       formRef,
+      onSubmit,
       rules,
     };
-  },
-  methods: {
-    async onSubmit() {
-      const form = unref(this.formRef);
-      await form.validate(async (valid) => {
-        if (valid) {
-          const { success, data } = await API.auth.login(this.form);
-          success
-            ? await sessionSchema
-                .validate(data)
-                .then((value) => this.login(value))
-            : this.failure(data.error);
-        } else {
-          this.failure();
-        }
-      });
-    },
-    login(data) {
-      this.success();
-      this.$store.dispatch("login", data);
-    },
-    success() {
-      this.$message({ message: "Login successful", type: "success" });
-    },
-    failure(message = "Login failed") {
-      this.$message({ message, type: "error" });
-    },
   },
 };
 </script>
@@ -104,9 +106,17 @@ export default {
   flex: 1;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  width: 17rem;
+}
+@media screen and (min-width: 600px) {
+  .login {
+    width: 20rem;
+  }
 }
 .login-button {
   width: 100%;
+}
+.logo {
+  margin-bottom: 1rem;
 }
 </style>

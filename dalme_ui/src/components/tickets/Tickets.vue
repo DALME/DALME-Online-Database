@@ -13,8 +13,8 @@
     <el-table
       v-if="tickets"
       :data="pagedTickets"
-      :default-sort="{ prop: 'id', order: 'ascending' }"
-      :empty-text="'No issues'"
+      :default-sort="sort"
+      :empty-text="empty"
       style="width: 100%"
     >
       <el-table-column prop="id" label="ID" sortable width="auto">
@@ -45,6 +45,9 @@
       >
       </el-pagination>
     </el-container>
+    <el-button native-type="button" @click="testModal()">
+      Test Login Modal
+    </el-button>
   </el-card>
 </template>
 
@@ -52,9 +55,9 @@
 import { computed, inject, reactive, toRefs } from "vue";
 import { useStore } from "vuex";
 
-import { API } from "@/api";
+import { modalLoginUrl, requests } from "@/api";
 import { ticketListSchema } from "@/schemas";
-import { useFilter, usePagination } from "@/use";
+import { useAPI, useFilter, usePagination } from "@/use";
 
 export default {
   name: "Tickets",
@@ -69,16 +72,17 @@ export default {
       tickets: [],
     });
 
+    const { success, data, fetchAPI } = useAPI();
     const userId = store.getters.userId;
-    const { success, data } = await API.tickets.userTickets(userId);
+    await fetchAPI(requests.tickets.userTickets(userId));
     if (success)
       await ticketListSchema
-        .validate(data, { stripUnknown: true })
-        .then((value) => {
-          state.count = value.count;
-          state.next = value.next;
-          state.previous = value.previous;
-          state.tickets = value.results;
+        .validate(data.value, { stripUnknown: true })
+        .then(({ count, next, previous, results }) => {
+          state.count = count;
+          state.next = next;
+          state.previous = previous;
+          state.tickets = results;
         });
 
     const reducer = (ticket) =>
@@ -86,21 +90,30 @@ export default {
     const filteredTickets = computed(() => {
       return useFilter(reducer, state.tickets);
     });
-    const ticketCount = computed(() => filteredTickets.value.length);
-
     const pagedTickets = computed(() =>
       usePagination(state.pageNumber, state.pageSize, filteredTickets),
     );
+    const ticketCount = computed(() => filteredTickets.value.length);
 
+    const empty = "No issues";
+    const sort = { prop: "id", order: "ascending" };
     const cardRules = "{ padding: '0px', margin: '0 2.5%' }";
     const cardStyle = computed(() => ($mq.value === "sm" ? cardRules : "{}"));
     const paginationStyle = computed(() => ($mq.value === "sm" ? true : false));
 
+    const testModal = async () => {
+      const request = new Request(modalLoginUrl);
+      await fetchAPI(request);
+    };
+
     return {
       ...toRefs(state),
       cardStyle,
+      empty,
       pagedTickets,
       paginationStyle,
+      sort,
+      testModal,
       ticketCount,
     };
   },

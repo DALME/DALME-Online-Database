@@ -10,6 +10,7 @@
     "test": "yarn jest src"
   },
   "dependencies": {
+    "@vueuse/core": "^4.11.0",
     "element-plus": "^1.0.2-beta.40",
     "epic-spinners": "^1.1.0",
     "js-cookie": "^2.2.1",

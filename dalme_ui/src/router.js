@@ -1,7 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router";
 
-import { API } from "@/api";
-import { loginUrl } from "@/api/config";
+import { API as useAPI, loginUrl, requests } from "@/api";
 import store from "@/store";
 
 const history = createWebHistory("/ui/");
@@ -22,9 +21,10 @@ const routes = [
 const router = createRouter({ history, routes });
 
 router.beforeEach(async (to, from, next) => {
-  const { success, data } = await API.auth.session();
-  if (success) {
-    store.commit("addUser", data);
+  const { data, fetchAPI, success } = useAPI();
+  await fetchAPI(requests.auth.session());
+  if (success.value) {
+    store.commit("addUser", data.value);
     next();
   } else {
     store.commit("deleteUser");

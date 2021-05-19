@@ -36,6 +36,7 @@ router.register(r'workflow', api.WorkflowManager, basename='workflow')
 
 
 urlpatterns = [
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
+    path('auth/', api.Auth.as_view(), name='refresh_auth'),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
