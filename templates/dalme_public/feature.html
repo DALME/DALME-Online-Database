@@ -21,7 +21,11 @@
 
 {% block main_column %}
   <div class="feature metadata u-flex">
-    <span>{{ page.go_live_at|date:"j F Y" }}</span>
+    {% if page.go_live_at %}
+      <span>{{ page.go_live_at|date:"j F Y" }}</span>
+    {% else %}
+      <span>{% now "j F Y" %}</span>
+    {% endif %}
     <span>by <a href="/about/people/#{{ page.author|slugify }}">{{ page.author }}</a></span>
   </div>
 

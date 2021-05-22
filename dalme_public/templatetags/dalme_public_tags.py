@@ -279,7 +279,7 @@ def get_snippet(obj, width):
 def get_citation_data(context):
     accessed = date.today()
     page = context['page']
-    published = page.first_published_at
+    published = page.first_published_at or date.today()
     page_class = page.get_verbose_name()
     formats = None
     record = context.get('record', False)
