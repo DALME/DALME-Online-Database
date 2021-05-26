@@ -33,3 +33,4 @@ dalme/media
 
 node_modules/
 yarn-error.log
+store-flag.d.ts
