@@ -12,6 +12,9 @@ class Auth(APIView):
 
     @staticmethod
     def create_session(request, user):
+        """Adapted from the Django login method.
+        https://github.com/django/django/blob/7cca22964c09e8dafc313a400c428242404d527a/django/contrib/auth/__init__.py#L90
+        """
         request.session.clear()
         request.session.cycle_key()
         request.session[auth.SESSION_KEY] = user._meta.pk.value_to_string(user)
