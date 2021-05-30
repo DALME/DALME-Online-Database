@@ -8,7 +8,7 @@ RUN chown -R node:node . && chmod -R 755 .
 USER node
 
 RUN yarn install --silent
-RUN yarn cache clean --force
+# RUN yarn cache clean --force  # Add for prod.
 
 CMD ["yarn", "dev"]
 STOPSIGNAL SIGINT

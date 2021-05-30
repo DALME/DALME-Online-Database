@@ -67,7 +67,7 @@ module.exports = configure(function (ctx) {
 
       // https://v2.quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-      chainWebpack (chain) {
+      chainWebpack(chain) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js', 'vue' ] }]);
         chain.resolve.alias.set('@', path.resolve(__dirname, './src'));
@@ -76,41 +76,45 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
+      host: '0.0.0.0',
       https: false,
       port: 3000,
-      open: true // opens browser window automatically
+      open: false,
+      client: {
+        port: 8000,
+      },
     },
 
-    // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
-    framework: {
-      config: {},
+  // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
+  framework: {
+    config: {},
 
-      // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
+    // iconSet: 'material-icons', // Quasar icon set
+    // lang: 'en-US', // Quasar language pack
 
-      // For special cases outside of where the auto-import stategy can have an impact
-      // (like functional components as one of the examples),
-      // you can manually specify Quasar components/directives to be available everywhere:
-      //
-      // components: [],
-      // directives: [],
+    // For special cases outside of where the auto-import stategy can have an impact
+    // (like functional components as one of the examples),
+    // you can manually specify Quasar components/directives to be available everywhere:
+    //
+    // components: [],
+    // directives: [],
 
-      // Quasar plugins
-      plugins: []
-    },
+    // Quasar plugins
+    plugins: []
+  },
 
-    // animations: 'all', // --- includes all animations
-    // https://v2.quasar.dev/options/animations
-    animations: [],
+  // animations: 'all', // --- includes all animations
+  // https://v2.quasar.dev/options/animations
+  animations: [],
 
-    // https://v2.quasar.dev/quasar-cli/developing-ssr/configuring-ssr
-    ssr: {
-      pwa: false,
+  // https://v2.quasar.dev/quasar-cli/developing-ssr/configuring-ssr
+  ssr: {
+    pwa: false,
 
-      // manualStoreHydration: true,
-      // manualPostHydrationTrigger: true,
+    // manualStoreHydration: true,
+    // manualPostHydrationTrigger: true,
 
-      prodPort: 3000, // The default port that the production server should use
+    prodPort: 3000, // The default port that the production server should use
                       // (gets superseded if process.env.PORT is specified at runtime)
 
       maxAge: 1000 * 60 * 60 * 24 * 30,
