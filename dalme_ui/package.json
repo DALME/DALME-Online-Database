@@ -14,16 +14,26 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "@vueuse/core": "^4.11.2",
     "core-js": "^3.6.5",
-    "quasar": "^2.0.0-beta.1"
+    "js-cookie": "^2.2.1",
+    "quasar": "^2.0.0-beta.1",
+    "ramda": "^0.27.1",
+    "string": "^3.3.3",
+    "yup": "^0.32.9"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
     "@quasar/app": "^3.0.0-beta.1",
+    "@vue/test-utils": "^1.2.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-unused-imports": "^1.1.1",
     "eslint-plugin-vue": "^7.0.0",
-    "eslint-webpack-plugin": "^2.4.0"
+    "eslint-webpack-plugin": "^2.4.0",
+    "jest": "^27.0.4",
+    "prettier": "^2.3.0"
   },
   "browserslist": [
     "last 10 Chrome versions",
