@@ -1,6 +1,6 @@
 [
   {
-    "text": "Inventory-Comanda",
+    "label": "Inventory-Comanda",
     "group": "Inventory"
   },
   {
@@ -8,15 +8,19 @@
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Division",
+    "label": "Inventory-Custody",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Donation",
+    "label": "Inventory-Division",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Dowry",
+    "label": "Inventory-Donation",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Dowry",
     "group": "Inventory"
   },
   {
@@ -24,27 +28,27 @@
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Ecclesiastical",
+    "label": "Inventory-Ecclesiastical",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Emancipation",
+    "label": "Inventory-Emancipation",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Generic",
+    "label": "Inventory-Generic",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Guardianship",
+    "label": "Inventory-Guardianship",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Insolvency",
+    "label": "Inventory-Insolvency",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Legacy",
+    "label": "Inventory-Legacy",
     "group": "Inventory"
   },
   {
@@ -52,15 +56,19 @@
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Postmortem",
+    "label": "Inventory-Postmortem",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Premortem",
+    "label": "Inventory-Premortem",
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Quittance",
+    "label": "Inventory-Probate",
+    "group": "Inventory"
+  },
+  {
+    "label": "Inventory-Quittance",
     "group": "Inventory"
   },
   {
@@ -72,7 +80,7 @@
     "group": "Inventory"
   },
   {
-    "text": "Inventory-Ship",
+    "label": "Inventory-Ship",
     "group": "Inventory"
   },
   {
@@ -88,7 +96,7 @@
     "group": "Inventory"
   },
   {
-    "text": "Guardianship",
+    "label": "Guardianship",
     "group": "Guardianship"
   },
   {
@@ -100,11 +108,15 @@
     "group": "Seizure"
   },
   {
-    "text": "Seizure",
+    "label": "Seizure",
     "group": "Seizure"
   },
   {
-    "text": "Testament",
+    "label": "Seizure-Debt",
+    "group": "Seizure"
+  },
+  {
+    "label": "Testament",
     "group": "Testament"
   },
   {
@@ -112,23 +124,75 @@
     "group": "Testament"
   },
   {
-    "text": "Arrest",
+    "label": "Sale-Auction",
+    "group": "Sales"
+  },
+  {
+    "label": "Sale-Notarial",
+    "group": "Sales"
+  },
+  {
+    "label": "Sale-Account",
+    "group": "Sales"
+  },
+  {
+    "label": "Estimate-Dowry",
+    "group": "Estimates"
+  },
+  {
+    "label": "Estimate-Testament",
+    "group": "Estimates"
+  },
+  {
+    "label": "Estimate-Insolvency",
+    "group": "Estimates"
+  },
+  {
+    "label": "Estimate-Pledge",
+    "group": "Estimates"
+  },
+  {
+    "label": "Estimate-Investment",
+    "group": "Estimates"
+  },
+  {
+    "label": "Estimate-Theft",
+    "group": "Estimates"
+  },
+  {
+    "label": "Tariffs-Price Caps",
+    "group": "Tariffs"
+  },
+  {
+    "label": "Tariffs-Lists",
+    "group": "Tariffs"
+  },
+  {
+    "label": "Tariffs-Customs Registers",
+    "group": "Tariffs"
+  },
+  {
+    "label": "Arrest",
     "group": "Other"
   },
   {
-    "text": "Auction",
+    "label": "Auction",
     "group": "Other"
   },
   {
-    "text": "Codicil",
+    "label": "Codicil",
     "group": "Other"
   },
   {
-    "text": "Eviction",
+    "label": "Eviction",
     "group": "Other"
   },
   {
-    "text": "Incarceration",
+    "label": "Incarceration",
+    "group": "Other"
+  },
+  {
+    "label": "Object List-Fictional",
     "group": "Other"
   },
   {
@@ -140,11 +204,11 @@
     "group": "Other"
   },
   {
-    "text": "Renvoi",
+    "label": "Renvoi",
     "group": "Other"
   },
   {
-    "text": "unclear",
+    "label": "unclear",
     "group": "Other"
   }
 ]

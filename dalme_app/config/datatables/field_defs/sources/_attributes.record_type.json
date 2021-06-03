@@ -4,9 +4,9 @@
   "type": "selectize",
   "opts": {
     "placeholder": "Select type",
-    "valueField": "text",
-    "labelField": "text",
-    "searchField": ["text"],
+    "valueField": "label",
+    "labelField": "label",
+    "searchField": ["label"],
     "preload": "focus",
     "optgroups": [
       {
@@ -24,6 +24,18 @@
       {
         "value": "Testament",
         "label": "Testament"
+      },
+      {
+        "value": "Sales",
+        "label": "Sales"
+      },
+      {
+        "value": "Estimates",
+        "label": "Estimates"
+      },
+      {
+        "value": "Tariffs",
+        "label": "Tariffs"
       },
       {
         "value": "Other",
