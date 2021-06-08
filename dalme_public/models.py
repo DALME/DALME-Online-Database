@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models.functions import Coalesce
 from django.db.models import F
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.conf import settings
 
@@ -24,7 +24,7 @@ from wagtail.admin.edit_handlers import (
     StreamFieldPanel,
 )
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
-from wagtail.core import blocks, hooks
+from wagtail.core import blocks
 
 from wagtail.core.models import Orderable, Page
 from wagtail.core.fields import RichTextField, StreamField
@@ -55,8 +55,6 @@ from dalme_public.blocks import (
     SubsectionBlock,
 )
 
-from django.utils.html import format_html
-from django.templatetags.static import static
 from dalme_app.utils import Search, formset_factory, SearchContext
 from dalme_app.forms import SearchForm
 from urllib import parse
@@ -70,26 +68,6 @@ HEADER_POSITION = (
     ('center', 'Center'),
     ('bottom', 'Bottom'),
 )
-
-
-@hooks.register('construct_settings_menu')
-def hide_users_menu_item(request, menu_items):
-    menu_items[:] = [item for item in menu_items if item.name not in ['users', 'groups']]
-
-
-@hooks.register('insert_global_admin_css', order=0)
-def extra_admin_css():
-    return format_html('<link rel="stylesheet" href="{}">', static("css/dalme_public/dalme_public_admin.css"))
-
-
-@hooks.register('before_serve_page')
-def redirects(page, request, serve_args, serve_kwargs):
-    if page.is_root():
-        home = page.get_children().live().first()
-        return redirect(home.url, permanent=False)
-    if page._meta.label == 'dalme_public.Section':
-        url = page.get_children().live().first().url
-        return redirect(url, permanent=False)
 
 
 @register_model_chooser
