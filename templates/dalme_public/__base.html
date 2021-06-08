@@ -27,6 +27,7 @@
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
       <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-vue.min.css' %}" />
       <script async defer data-domain="dalme.org" src="https://plausible.io/js/plausible.js"></script>
+      <script type="text/javascript" src="https://unpkg.com/autolinker@3.14.3/dist/Autolinker.min.js"></script>
       {% compress css %}
       <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public.css' %}" />
       {% endcompress %}
@@ -93,6 +94,7 @@
             api_endpoint = "{{ api_endpoint }}";
             db_endpoint = "{{ db_endpoint }}";
 
+            // Hamburger menu
             $('body').on('click', '#hamburger', function(e) {
               const menu = $(e.target).closest('nav').find('ul');
               if (menu.css('display') === 'none') {
@@ -101,6 +103,38 @@
                 menu.css({ display: 'none' })
               }
             });
+
+            // Format footnotes
+            const autolinker = new Autolinker({
+              newWindow: true,
+              truncate: 0
+            });
+            const fn_sources = $('[data-footnote]');
+            const footnotes = $('<ol>');
+            $.each(fn_sources, function(index, value) {
+              const fn_source = $(value);
+              const number = index + 1;
+              const content = fn_source.attr('data-footnote');
+              const id = fn_source.attr('data-note_id');
+
+              const callout = $('<sup>', { id: `fn_${number}` });
+              $('<a>', { href: `#${id}`, class: 'footnote_callout' }).text(number).appendTo(callout);
+
+              const footnote = $('<li>', { id: id });
+              const fn_text = $('<p>').html(autolinker.link(content));
+              $('<a>', {
+                href: `#fn_${number}`,
+                class: 'footnote_back_link',
+                title: `Jump back to footnote ${number} in the text.`
+              }).text('↩︎').appendTo(fn_text);
+              footnote.append(fn_text);
+              footnotes.append(footnote);
+              fn_source.replaceWith(callout);
+            });
+            const footnote_section = $('<div>', { class: 'footnote_list' });
+            footnote_section.append('<hr>');
+            footnote_section.append(footnotes);
+            $('.content').append(footnote_section);
 
             // Subsections initialize.
             const subsections = $('.block-subsection');

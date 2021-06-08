@@ -1,5 +1,5 @@
 from wagtail.core.rich_text import LinkHandler
-from wagtail.admin.rich_text.converters.html_to_contentstate import LinkElementHandler
+from wagtail.admin.rich_text.converters.html_to_contentstate import LinkElementHandler, InlineEntityElementHandler
 from django.utils.html import escape
 from dalme_app.models import SavedSearch
 from draftjs_exporter.dom import DOM
@@ -53,3 +53,27 @@ def link_entity_search(props):
         link_props['href'] = props.get('url')
 
     return DOM.create_element('a', link_props, props['children'])
+
+
+class FootnoteElementHandler(InlineEntityElementHandler):
+    """ Database HTML to Draft.js ContentState: Converts the span tag into
+    a FOOTNOTE entity, with the right data. """
+
+    mutability = 'IMMUTABLE'
+
+    def get_attribute_data(self, attrs):
+        # Take values from the HTML data attributes.
+        return {
+            'note_id': attrs['data-note_id'],
+            'text': attrs['data-footnote'],
+        }
+
+
+def footnote_decorator(props):
+    """ Draft.js ContentState to database HTML: Converts the FOOTNOTE
+    entities into a span tag. """
+
+    return DOM.create_element('span', {
+        'data-note_id': props['note_id'],
+        'data-footnote': props['text'],
+    }, props['children'])

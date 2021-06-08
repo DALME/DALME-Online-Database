@@ -1,0 +1,13 @@
+{% load i18n l10n wagtailadmin_tags %}
+{% include "wagtailadmin/shared/header.html" with title=title icon="list-ol" %}
+
+<div class="nice-padding">
+    <form action="{% url 'wagtailadmin_enter_footnote' %}" method="post" novalidate>
+        {% csrf_token %}
+        <ul class="fields">
+            {{ form.note_id }}
+            {% include "wagtailadmin/shared/field_as_li.html" with field=form.text %}
+            <li><input type="submit" value="Save" class="button" /></li>
+        </ul>
+    </form>
+</div>

@@ -7,7 +7,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 from django.contrib.auth import views as auth_views
 from django_hosts.resolvers import reverse
 from wagtail.core import views
-from dalme_public.views import saved_search, reroute_chooser
+from dalme_public.views import enter_footnote, saved_search, reroute_chooser
 
 
 def to_dalme_login(request):
@@ -24,6 +24,7 @@ urlpatterns = [
     path('cms/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('choose-saved-search/', saved_search, name='wagtailadmin_choose_page_saved_search'),
+    path('enter-footnote/', enter_footnote, name='wagtailadmin_enter_footnote'),
     path('choose-reroute/', reroute_chooser, name='wagtailadmin_chooser_page_reroute'),
     path('choose-reroute/<int:parent_page_id>/', reroute_chooser, name='wagtailadmin_chooser_page_reroute_child'),
     re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve')
