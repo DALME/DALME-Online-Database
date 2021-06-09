@@ -3722,3 +3722,7 @@ a.anchor:hover {
   text-decoration: none;
   border-bottom: none;
 }
+.footnote_list blockquote {
+  margin: 1rem 1rem 1rem 1rem;
+  font-family: "PT Serif", serif;
+}
