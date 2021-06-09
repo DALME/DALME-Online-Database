@@ -6,8 +6,50 @@
         {% csrf_token %}
         <ul class="fields">
             {{ form.note_id }}
-            {% include "wagtailadmin/shared/field_as_li.html" with field=form.text %}
+            <li class="required">
+              <div class="field char_field textarea" data-contentpath="text">
+                {{ form.text.label_tag }}
+                <div class="field-content">
+                  <div class="input bs-markdown-container">
+                    <textarea name="footnote-text" cols="40" rows="10" required="" id="id_footnote-text">{{ form.text.value }}</textarea>
+                  </div>
+                </div>
+                {% if show_help_text|default_if_none:True and form.text.help_text %}
+                    <p class="help">{{ form.text.help_text }}</p>
+                {% endif %}
+
+                {% if form.text|has_unrendered_errors %}
+                    <p class="error-message">
+                        {% for error in form.text.errors %}
+                            <span>{{ error|escape }}</span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+              </div>
+            </li>
             <li><input type="submit" value="Save" class="button" /></li>
         </ul>
     </form>
 </div>
+<script>
+  $('#id_footnote-text').markdown({
+    autofocus: true,
+    savable: false,
+    hideable: false,
+    resize: 'none',
+    fullscreen: { enable: false },
+    hiddenButtons: ['cmdImage', 'cmdHeading'],
+    iconlibrary: 'fa-5',
+    parser: window.snarkdown,
+    onPreview: function(e) {
+      const previewButton = e.$editor.find('button[data-handler="bootstrap-markdown-cmdPreview"]');
+      e.hideButtons(['cmdBold', 'cmdItalic', 'cmdUrl', 'cmdList', 'cmdListO', 'cmdCode', 'cmdQuote']);
+      $(previewButton).html('<span class="fas fa-pencil-alt"></span> Edit');
+    },
+    onPreviewEnd: function(e) {
+      const previewButton = e.$editor.find('button[data-handler="bootstrap-markdown-cmdPreview"]');
+      e.showButtons(['cmdBold', 'cmdItalic', 'cmdUrl', 'cmdList', 'cmdListO', 'cmdCode', 'cmdQuote']);
+      $(previewButton).html('<span class="fas fa-search"></span> Preview');
+    }
+  })
+</script>

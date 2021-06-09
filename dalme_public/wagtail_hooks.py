@@ -15,7 +15,14 @@ def hide_users_menu_item(request, menu_items):
 
 @hooks.register('insert_global_admin_css', order=0)
 def extra_admin_css():
-    return format_html('<link rel="stylesheet" href="{}">', static("css/dalme_public/dalme_public_admin.css"))
+    return format_html('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" /> \
+    <link rel="stylesheet" href="{}">', static("css/dalme_public/dalme_public_admin.css"))
+
+
+@hooks.register('insert_global_admin_js')
+def global_admin_js():
+    return format_html('<script src="https://cdn.jsdelivr.net/npm/snarkdown@2.0.0/dist/snarkdown.umd.js" integrity="sha256-QqCCWG2y306e9DZ9VbcdrkacMAz1nubFmYCkac3I3AM=" crossorigin="anonymous"></script> \
+        <script src="{}"></script>', static("js/bootstrap-markdown.js"))
 
 
 @hooks.register('before_serve_page')
