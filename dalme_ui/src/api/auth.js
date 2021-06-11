@@ -9,12 +9,10 @@ const auth = {
       body: JSON.stringify({ username, password }),
     });
   },
-
   logout() {
     const url = `${dbUrl}/logout/`;
     return new Request(url, { method: "POST", headers: headers });
   },
-
   session() {
     const url = `${apiUrl}/session/retrieve/`;
     return new Request(url);

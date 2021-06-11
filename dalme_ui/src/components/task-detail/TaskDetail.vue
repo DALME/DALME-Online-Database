@@ -1,0 +1,111 @@
+<template>
+  <div class="q-ma-md full-width full-height">
+    <q-card class="q-ma-md">
+      <q-item :class="colour">
+        <q-item-section avatar>
+          <q-avatar icon="assignment"> </q-avatar>
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label class="text-h5">
+            {{ task.title }}
+            <span>#{{ objId }}</span>
+          </q-item-label>
+          <q-item-label caption>{{ subheading }}</q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <q-separator />
+
+      <q-card-section>
+        <p class="text-body1">{{ task.description }}</p>
+      </q-card-section>
+
+      <q-separator />
+
+      <q-card-actions v-if="isAdmin">
+        <q-btn @click="onAction" flat>{{ action }}</q-btn>
+      </q-card-actions>
+    </q-card>
+
+    <Comments />
+  </div>
+</template>
+
+<script>
+import { defineComponent, inject, provide, ref } from "vue";
+import { useStore } from "vuex";
+
+import { requests } from "@/api";
+import { Comments } from "@/components";
+import notifier from "@/notifier";
+import { taskSchema } from "@/schemas";
+import { useAPI } from "@/use";
+
+export default defineComponent({
+  name: "TaskDetail",
+  components: {
+    Comments,
+  },
+  async setup() {
+    const $store = useStore();
+    const { success, data, fetchAPI } = useAPI();
+    const {
+      success: actionSuccess,
+      fetchAPI: actionFetchAPI,
+      status: actionStatus,
+    } = useAPI();
+
+    let subheading = "";
+    const model = "Task";
+    const action = ref("");
+    const colour = ref("");
+    const task = ref(null);
+    const attachment = ref(null);
+    const objId = inject("objId");
+    const isAdmin = $store.getters["auth/isAdmin"];
+
+    provide("attachment", attachment);
+    provide("model", model);
+
+    const onAction = async () => {
+      const action = task.value.completed ? "markUndone" : "markDone";
+      await actionFetchAPI(requests.tasks.setTaskState(objId, action));
+      if (actionSuccess.value && actionStatus.value === 201) {
+        await fetchTask();
+        notifier.tasks.taskStatusUpdated();
+      } else {
+        notifier.tasks.taskStatusUpdatedError();
+      }
+    };
+
+    const fetchTask = async () => {
+      await fetchAPI(requests.tasks.getTask(objId));
+      if (success.value)
+        await taskSchema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            subheading =
+              `${value.owner} created this task` +
+              ` at ${value.creationTimestamp} in ${value.assignedTo}`;
+            action.value = value.completed ? "reopen task" : "complete task";
+            colour.value = value.completed
+              ? "bg-green-5 text-grey-1"
+              : "bg-red-12 text-grey-1";
+            task.value = value;
+          });
+    };
+    await fetchTask();
+
+    return {
+      action,
+      colour,
+      isAdmin,
+      onAction,
+      subheading,
+      task,
+      objId,
+    };
+  },
+});
+</script>

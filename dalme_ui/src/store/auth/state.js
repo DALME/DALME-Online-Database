@@ -1,3 +1,3 @@
 export default () => ({
-  user: { id: null, username: null },
+  user: { id: null, username: null, isAdmin: null },
 });

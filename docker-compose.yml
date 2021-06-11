@@ -39,6 +39,7 @@ services:
 
   dalme.db:
     image: mysql:8.0.19
+    platform: linux/x86_64
     container_name: dalme.db
     environment:
       MYSQL_ROOT_PASSWORD: root

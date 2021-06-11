@@ -1,12 +1,12 @@
 from django.contrib.auth.models import Group
-from dalme_app.models import Task, TaskList
+from dalme_app.models import Profile, Task, TaskList
 from rest_framework import serializers
 import textwrap
 
 
 class TaskSerializer(serializers.ModelSerializer):
     creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y', required=False)
-    completed_date = serializers.DateField(format='%d-%b-%Y', required=False, allow_null=True)
+    completed_date = serializers.DateTimeField(format='%d-%b-%Y', required=False, allow_null=True)
     due_date = serializers.DateField(format='%d-%b-%Y', required=False, allow_null=True)
 
     class Meta:
@@ -56,6 +56,13 @@ class TaskSerializer(serializers.ModelSerializer):
             ret['assigned_to'] = instance.task_list.group.name
         else:
             ret['assigned_to'] = instance.assigned_to.profile.full_name
+
+        # TODO: No need for handling if we fix profile create via createsuperuser.
+        try:
+            ret['owner'] = instance.creation_user.profile.full_name
+        except Profile.RelatedObjectDoesNotExist:
+            ret['owner'] = instance.creation_user.username
+
         return ret
 
 
@@ -68,9 +75,18 @@ class TaskListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['group'] = Group.objects.get(pk=ret['group']).name
+
+        group = Group.objects.get(pk=ret['group'])
+        task_list_groups = group.task_list_group.all()
+        for task_list_group in task_list_groups:
+            tasks = task_list_group.task_set.all()
+            task_ids = [task.pk for task in tasks]
+            if task_list_group.name == ret['name']:
+                ret['task_index'] = task_ids
+
+        ret['group'] = group.name
         if 'task_count' in ret:
-            task_count = ret.pop('task_count')
+            task_count = ret['task_count']
         else:
             task_count = 0
         ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div>\

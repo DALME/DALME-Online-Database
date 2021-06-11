@@ -13,7 +13,13 @@ class Session(viewsets.ViewSet):
         if request.user.is_authenticated:
             # TODO: Fix profile and add full_name here...
             owner = UserSerializer(request.user, fields=['username', 'id'])
-            return Response(owner.data, 200)
+            is_admin = any(
+                group.name == "Administrators"
+                for group in request.user.groups.all()
+            )
+            data = owner.data
+            data["is_admin"] = is_admin
+            return Response(data, 200)
         return Response({'error': 'Not authenticated.'}, 403)
 
     @action(detail=False, methods=['post'])

@@ -28,20 +28,25 @@
           label="Logout"
           size="sm"
           @click="logout"
-        />
+          :loading="submitting"
+        >
+          <template v-slot:loading>
+            <q-spinner-facebook />
+          </template>
+        </q-btn>
       </q-item>
     </q-list>
   </q-drawer>
 </template>
 
 <script>
-import { head } from "ramda";
+import { filter as rFilter, head } from "ramda";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
 import { NavLink } from "@/components";
-import notifications from "@/notifications";
+import notifier from "@/notifier";
 
 export default defineComponent({
   name: "Nav",
@@ -53,11 +58,16 @@ export default defineComponent({
     const $store = useStore();
 
     const navOpen = ref(false);
+    const submitting = ref(false);
     const toggleNav = () => (navOpen.value = !navOpen.value);
-    const routes = head($router.options.routes).children;
+    const routes = rFilter(
+      (route) => route.nav,
+      head($router.options.routes).children,
+    );
 
     const logout = () => {
-      notifications.auth.logout();
+      submitting.value = true;
+      notifier.auth.logout();
       setTimeout(() => {
         $store.dispatch("auth/logout");
       }, 300);
@@ -67,6 +77,7 @@ export default defineComponent({
       logout,
       navOpen,
       routes,
+      submitting,
       toggleNav,
     };
   },

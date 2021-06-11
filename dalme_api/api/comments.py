@@ -1,3 +1,6 @@
+from django.apps import apps
+from django.core.exceptions import ValidationError
+
 from rest_framework import viewsets
 from rest_framework.response import Response
 from dalme_api.serializers import CommentSerializer
@@ -14,22 +17,24 @@ class Comments(viewsets.ModelViewSet):
 
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
-            model = self.request.GET['model']
-            object = self.request.GET['object']
-            if type(object) is not str:
-                object = str(object)
-            obj_instance = eval(model+'.objects.get(pk="'+object+'")')
-            queryset = obj_instance.comments.all()
-        else:
-            queryset = self.queryset
-        return queryset
+            model = apps.get_model(app_label='dalme_app', model_name=self.request.GET['model'])
+            obj_pk = self.request.GET['object']
+            if isinstance(obj_pk, str):
+                obj_pk = int(obj_pk)
+            instance = model.objects.get(pk=obj_pk)
+            return instance.comments.all()
+        return self.queryset
 
     def create(self, request, *args, **kwargs):
         result = {}
         data = request.data
         try:
-            content_object = eval(data['model']+'.objects.get(pk="'+str(data['object'])+'")')
-            new_comment = content_object.comments.create(body=data['body'])
+            model = apps.get_model(app_label='dalme_app', model_name=data['model'])
+            content_object = model.objects.get(pk=int(data['object']))
+            body = data['body']
+            if not body:
+                raise ValidationError("Comment body can't be empty")
+            new_comment = content_object.comments.create(body=body)
             serializer = self.get_serializer(new_comment)
             result = serializer.data
             status = 201

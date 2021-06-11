@@ -1,16 +1,19 @@
 import { apiUrl } from "./config";
 
-const sources = {
+const tickets = {
+  allTickets() {
+    const url = `${apiUrl}/tickets`;
+    return new Request(url);
+  },
+  getTicket(objId) {
+    const url = `${apiUrl}/tickets/${objId}`;
+    return new Request(url);
+  },
   userTickets(userId) {
-    const params = JSON.stringify({
-      draw: 1,
-      order: [{ column: 0, dir: "asc" }],
-      start: 0,
-    });
-    const query = `&filter=creation_user,${userId}&data=${params}`;
-    const url = `${apiUrl}/tickets/?format=json${query}`;
+    const query = `filter=creation_user=${userId}`;
+    const url = `${apiUrl}/tickets/?${query}`;
     return new Request(url);
   },
 };
 
-export default sources;
+export default tickets;

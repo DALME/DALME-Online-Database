@@ -1,11 +1,15 @@
 <template>
-  <slot v-if="error" name="error">Something went wrong...</slot>
+  <slot v-if="error" name="error">
+    <div class="q-ma-md full-width full-height">
+      <q-card class="flex flex-center q-ma-md">Something went wrong...</q-card>
+    </div>
+  </slot>
   <Suspense v-else>
     <template #default>
       <slot name="default"></slot>
     </template>
     <template #fallback>
-      <Spinner />
+      <Spinner class="flex flex-center" />
     </template>
   </Suspense>
 </template>

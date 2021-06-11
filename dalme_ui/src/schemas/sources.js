@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 // TODO: This needs filling out somewhat, currently simplified.
-const sourcesSchema = yup.array().of(
+export const sourcesSchema = yup.array().of(
   yup.object().shape({
     id: yup.string().uuid().required(),
     name: yup.string().required(),
@@ -16,5 +16,3 @@ const sourcesSchema = yup.array().of(
     }),
   }),
 );
-
-export { sourcesSchema };

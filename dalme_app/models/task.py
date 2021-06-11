@@ -16,7 +16,7 @@ class Task(dalmeIntid):
     task_list = models.ForeignKey('TaskList', on_delete=models.CASCADE)
     due_date = models.DateField(blank=True, null=True)
     completed = models.BooleanField(default=False)
-    completed_date = models.DateField(blank=True, null=True)
+    completed_date = models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name="task_created_by", default=get_current_user)
     assigned_to = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name="task_assigned_to")
     description = models.TextField(blank=True, null=True)

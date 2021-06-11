@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center"
+    class="fullscreen bg-blue text-white text-center q-ma-md flex flex-center"
   >
     <div>
       <div style="font-size: 30vh">404</div>
@@ -21,9 +21,13 @@
 </template>
 
 <script>
+import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Error404",
+  setup() {
+    useMeta({ title: "404" });
+  },
 });
 </script>

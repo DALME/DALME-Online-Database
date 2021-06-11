@@ -13,19 +13,20 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.10.7",
     "@vueuse/core": "^4.11.2",
     "core-js": "^3.6.5",
     "js-cookie": "^2.2.1",
-    "quasar": "^2.0.0-beta.1",
+    "moment": "^2.29.1",
+    "quasar": "^2.0.0-rc.2",
     "ramda": "^0.27.1",
     "string": "^3.3.3",
+    "vuex": "^4.0.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
-    "@quasar/app": "^3.0.0-beta.1",
-    "@vue/test-utils": "^1.2.0",
+    "@quasar/app": "^3.0.0-rc.2",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.4.0",

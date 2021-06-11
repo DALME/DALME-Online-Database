@@ -24,7 +24,7 @@ export default defineComponent({
     const showLoginModal = ref(false);
     const reauthenticate = (value) => (showLoginModal.value = value);
     provideAPI(reauthenticate);
-    return { reauthenticate, showLoginModal };
+    return { showLoginModal };
   },
 });
 </script>

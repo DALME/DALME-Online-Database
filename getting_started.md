@@ -58,7 +58,9 @@ Login to the DALME editing environment at
 `https://db.127.0.0.1.sslip.io:8000/`.  You will probably have to bypass an SSL
 insecure certificate warning and then you are likely see further
 `net::ERR_CERT_AUTHORITY_INVALID` errors due to failing API calls in dev tools
-console. If this is the case, open up one of the failing URLs in a new tab and
+console. If this is the case, open up one of the failing URLs in a new tab
+(for example, [this
+one](https://data.127.0.0.1.sslip.io:8000/session/retrieve/) and
 again bypass the SSL certificate warning. Remote calls to the API subdomain
 should then succeed.
 

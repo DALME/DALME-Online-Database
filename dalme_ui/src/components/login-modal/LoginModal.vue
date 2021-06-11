@@ -5,7 +5,7 @@
     transition-show="scale"
     transition-hide="scale"
   >
-    <div class="auth-modal q-pa-md">
+    <div class="auth-modal q-pa-md q-ma-md">
       <img class="dalme-logo" src="~assets/dalme_logo.svg" />
       <q-form @submit="onSubmit" class="q-gutter-md">
         <q-input
@@ -58,7 +58,7 @@ import { computed, defineComponent, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
-import notifications from "@/notifications";
+import notifier from "@/notifier";
 import { sessionSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -92,7 +92,7 @@ export default defineComponent({
 
     const validateSession = async () => {
       await sessionSchema.validate(data.value).then((value) => {
-        notifications.auth.reauthenticated();
+        notifier.auth.reauthenticated();
         $store.dispatch("auth/login", value);
       });
     };
@@ -111,9 +111,7 @@ export default defineComponent({
             password: password.value,
           }),
         );
-        status.value === 200
-          ? validateSession()
-          : notifications.auth.authFailed();
+        status.value === 200 ? validateSession() : notifier.auth.authFailed();
         submitting.value = false;
         reset();
       }, 500);

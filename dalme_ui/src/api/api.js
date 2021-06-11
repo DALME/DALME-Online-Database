@@ -12,7 +12,7 @@ const API = (reauthenticate = null) => {
   const redirected = ref(null);
   const error = ref(false);
 
-  const fetchAPI = async (request) => {
+  const fetchAPI = (request) => {
     loading.value = true;
     error.value = undefined;
 
@@ -25,6 +25,7 @@ const API = (reauthenticate = null) => {
         apiError.value = response.error || false;
         if (!isNil(reauthenticate)) {
           if (response.status === 200) reauthenticate(false);
+          if (response.status === 201) reauthenticate(false);
           if (response.status === 403) reauthenticate(true);
         }
       })

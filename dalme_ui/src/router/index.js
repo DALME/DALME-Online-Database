@@ -6,6 +6,7 @@ import {
 } from "vue-router";
 
 import { API as useAPI, loginUrl, requests } from "@/api";
+import { sessionSchema } from "@/schemas";
 import store from "@/store";
 
 import routes from "./routes";
@@ -24,12 +25,13 @@ const router = createRouter({
   scrollBehavior: () => ({ left: 0, top: 0 }),
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to) => {
   const { data, fetchAPI, success } = useAPI();
   await fetchAPI(requests.auth.session());
   if (success.value) {
-    store.dispatch("auth/login", data.value);
-    next();
+    await sessionSchema.validate(data.value).then((value) => {
+      store.dispatch("auth/login", value);
+    });
   } else {
     await store.dispatch("auth/logout");
     window.location.href = `${loginUrl}?next=${to.href}`;
