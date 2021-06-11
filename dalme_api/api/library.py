@@ -39,22 +39,26 @@ class Library(viewsets.ViewSet):
                 'data': [i['data'] for i in page]
                 }
         else:
-            if content:
-                queryset_generator.add_parameters(content=content)
+            paras = {}
             if limit:
-                queryset_generator.add_parameters(limit=limit)
+                paras['limit'] = int(limit)
+            if content:
+                paras['content'] = content
             if search:
-                queryset_generator.add_parameters(q=search)
+                paras['q'] = search
 
             if collection:
                 if search:
-                    queryset = queryset_generator.collection_items_top(collection)
+                    queryset = queryset_generator.collection_items_top(collection, **paras)
                 else:
                     queryset = queryset_generator.everything(
-                        queryset_generator.collection_items_top(collection)
+                        queryset_generator.collection_items_top(collection, **paras)
                     )
             else:
-                queryset = queryset_generator.everything(queryset_generator.top())
+                if not limit:
+                    queryset = queryset_generator.everything(queryset_generator.top(**paras))
+                else:
+                    queryset = queryset_generator.top(**paras)
 
             result = queryset if content else [i['data'] for i in queryset]
 
