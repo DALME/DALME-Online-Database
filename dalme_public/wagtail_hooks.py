@@ -1,4 +1,6 @@
-from dalme_public.handlers import SavedSearchLinkHandler, link_entity_search, SavedSearchElementHandler, footnote_decorator, FootnoteElementHandler
+from dalme_public.handlers import (link_entity_decorator, SavedSearchLinkHandler, SavedSearchElementHandler,
+                                   footnote_decorator, FootnoteElementHandler,
+                                   BibliographyElementHandler, BibliographyLinkHandler)
 from django.utils.html import format_html
 from django.urls import reverse
 from wagtail.admin.rich_text.converters.html_to_contentstate import PageLinkElementHandler, ExternalLinkElementHandler
@@ -16,13 +18,16 @@ def hide_users_menu_item(request, menu_items):
 @hooks.register('insert_global_admin_css', order=0)
 def extra_admin_css():
     return format_html('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" /> \
-    <link rel="stylesheet" href="{}">', static("css/dalme_public/dalme_public_admin.css"))
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" integrity="sha256-ibvTNlNAB4VMqE5uFlnBME6hlparj5sEr1ovZ3B/bNA=" crossorigin="anonymous" /> \
+        <link rel="stylesheet" href="{}">', static("css/dalme_public/dalme_public_admin.css"))
 
 
 @hooks.register('insert_global_admin_js')
 def global_admin_js():
     return format_html('<script src="https://cdn.jsdelivr.net/npm/snarkdown@2.0.0/dist/snarkdown.umd.js" integrity="sha256-QqCCWG2y306e9DZ9VbcdrkacMAz1nubFmYCkac3I3AM=" crossorigin="anonymous"></script> \
-        <script src="{}"></script>', static("js/bootstrap-markdown.js"))
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script> \
+        <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script> \
+        <script src="{}"></script><script src="{}"></script>', static("js/bootstrap-markdown.js"), static("js/dalme_app/dalme_util.js"))
 
 
 @hooks.register('before_serve_page')
@@ -42,11 +47,13 @@ def editor_js():
         <script>
             window.chooserUrls['pageChooser'] = '{}';
             window.chooserUrls['savedSearchChooser'] = '{}';
+            window.chooserUrls['bibliographyChooser'] = '{}';
             window.chooserUrls['footnoteEntry'] = '{}';
         </script>
         """,
         reverse('wagtailadmin_chooser_page_reroute'),
         reverse('wagtailadmin_choose_page_saved_search'),
+        reverse('wagtailadmin_choose_bibliography'),
         reverse('wagtailadmin_enter_footnote')
     ) + """
         <script>
@@ -66,25 +73,42 @@ def editor_js():
                     modal.respond('pageChosen', jsonData['result']);
                     modal.close();
                 };
+                PAGE_CHOOSER_MODAL_ONLOAD_HANDLERS['biblio_entry'] = function(modal, jsonData) {
+                    $('p.link-types a', modal.body).on('click', function() {
+                        modal.loadUrl(this.href);
+                        return false;
+                    });
+
+                    $('form', modal.body).on('submit', function() {
+                        modal.postForm(this.action, $(this).serialize());
+                        return false;
+                    });
+                };
+                PAGE_CHOOSER_MODAL_ONLOAD_HANDLERS['biblio_chosen'] = function(modal, jsonData) {
+                    modal.respond('pageChosen', jsonData['result']);
+                    modal.close();
+                };
             });
         </script>
         """
 
 
 @hooks.register('register_rich_text_features')
-def register_saved_search(features):
+def register_add_ons(features):
     del features.converter_rules_by_converter['contentstate']['link']
     features.register_converter_rule('contentstate', 'link', {
         'from_database_format': {
             'a[href]': ExternalLinkElementHandler('LINK'),
             'a[linktype="page"]': PageLinkElementHandler('LINK'),
             'a[linktype="saved_search"]': SavedSearchElementHandler('LINK'),
+            'a[linktype="biblio_entry"]': BibliographyElementHandler('LINK'),
         },
         'to_database_format': {
-            'entity_decorators': {'LINK': link_entity_search}
+            'entity_decorators': {'LINK': link_entity_decorator}
         }
     })
     features.register_link_type(SavedSearchLinkHandler)
+    features.register_link_type(BibliographyLinkHandler)
 
 
 @hooks.register('register_rich_text_features')

@@ -63,8 +63,17 @@ class SourceFilterForm(forms.Form):
 
 
 class SavedSearchLinkChooserForm(forms.Form):
-    search_list = [(i.id, i.name) for i in SavedSearch.objects.all()]
-    id = forms.ChoiceField(required=True, choices=search_list, label='Saved search')
+    id = forms.ChoiceField(required=True, choices=[], label='Saved search')
+    link_text = forms.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        search_list = [(i.id, i.name) for i in SavedSearch.objects.all()]
+        super().__init__(*args, **kwargs)
+        self.fields['id'].choices = search_list
+
+
+class BibliographyLinkChooserForm(forms.Form):
+    id = forms.CharField(required=True, label='Entry')
     link_text = forms.CharField(required=False)
 
 
