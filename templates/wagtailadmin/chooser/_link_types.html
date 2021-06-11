@@ -1,5 +1,5 @@
 {% load i18n wagtailadmin_tags %}
-{% if allow_external_link or allow_email_link or allow_phone_link or allow_anchor_link or current == 'external' or current == 'email' or current == 'phone' or current == 'anchor' or current == 'saved_search'%}
+{% if allow_external_link or allow_email_link or allow_phone_link or allow_anchor_link or current == 'external' or current == 'email' or current == 'phone' or current == 'anchor' or current == 'saved_search' or current == 'biblio_entry'%}
     <p class="link-types">
         {% if current == 'internal' %}
             <b>{% trans "Internal link" %}</b>
@@ -36,9 +36,15 @@
         {% endif %}
 
         {% if current == 'saved_search' %}
-            | <b>Saved Search Link</b>
+            | <b>Saved Search</b>
         {% else %}
-            | <a href="{% url 'wagtailadmin_choose_page_saved_search' %}{% querystring p=None parent_page_id=parent_page_id %}">Saved Search Link</a>
+            | <a href="{% url 'wagtailadmin_choose_page_saved_search' %}{% querystring p=None parent_page_id=parent_page_id %}">Saved Search</a>
+        {% endif %}
+
+        {% if current == 'biblio_entry' %}
+            | <b>Bibliographic Entry</b>
+        {% else %}
+            | <a href="{% url 'wagtailadmin_choose_bibliography' %}{% querystring p=None parent_page_id=parent_page_id %}">Bibliographic Entry</a>
         {% endif %}
     </p>
 {% endif %}

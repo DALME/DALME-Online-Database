@@ -268,3 +268,28 @@ input[type=checkbox] {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+/* bibliography chooser */
+
+.bibliography-chooser-select .selectize-input,
+.bibliography-chooser-select .selectize-input input {
+  line-height: 30px;
+  font-size: 1.1em;
+  font-weight: 300;
+}
+.bibliography-chooser-select .selectize-input {
+  border-radius: 6px;
+  padding: 8px 8px 8px 18px;
+}
+.bibliography-chooser-select .selectize-control.single .selectize-input,
+.bibliography-chooser-select .selectize-dropdown.single {
+  border-color: #e6e6e6;
+}
+.bibliography-chooser-select .selectize-dropdown-content {
+  padding: 1rem;
+  font-size: .8rem;
+  font-weight: 500;
+  line-height: 18px;
+}
+.bibliography-chooser-select .csl-bib-body {
+  margin-bottom: .5rem;
+}

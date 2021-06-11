@@ -3,6 +3,9 @@ from wagtail.admin.rich_text.converters.html_to_contentstate import LinkElementH
 from django.utils.html import escape
 from dalme_app.models import SavedSearch
 from draftjs_exporter.dom import DOM
+import re
+
+UUIDv4 = r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$'
 
 
 class SavedSearchLinkHandler(LinkHandler):
@@ -42,13 +45,37 @@ class SavedSearchElementHandler(LinkElementHandler):
         }
 
 
-def link_entity_search(props):
+class BibliographyLinkHandler(LinkHandler):
+    identifier = 'biblio_entry'
+
+    @classmethod
+    def expand_db_attributes(cls, attrs):
+        return '<a href="https://dalme.org/project/bibliography/#' + attrs['id'] + '">'
+
+
+class BibliographyElementHandler(LinkElementHandler):
+    def get_attribute_data(self, attrs):
+        return {
+            'id': attrs['id'],
+            'url': f'https://dalme.org/project/bibliography/#{attrs["id"]}/',
+            'parentId': None,
+        }
+
+
+def link_entity_decorator(props):
     id_ = props.get('id')
     link_props = {}
 
     if id_ is not None:
-        link_props['linktype'] = 'page' if type(id_) is int else 'saved_search'
+        if re.fullmatch(UUIDv4, id_):
+            link_props['linktype'] = 'saved_search'
+        elif type(id_) is int:
+            link_props['linktype'] = 'page'
+        else:
+            link_props['linktype'] = 'biblio_entry'
+
         link_props['id'] = id_
+
     else:
         link_props['href'] = props.get('url')
 
@@ -56,9 +83,6 @@ def link_entity_search(props):
 
 
 class FootnoteElementHandler(InlineEntityElementHandler):
-    """ Database HTML to Draft.js ContentState: Converts the span tag into
-    a FOOTNOTE entity, with the right data. """
-
     mutability = 'IMMUTABLE'
 
     def get_attribute_data(self, attrs):
@@ -70,9 +94,6 @@ class FootnoteElementHandler(InlineEntityElementHandler):
 
 
 def footnote_decorator(props):
-    """ Draft.js ContentState to database HTML: Converts the FOOTNOTE
-    entities into a span tag. """
-
     return DOM.create_element('span', {
         'data-note_id': props['note_id'],
         'data-footnote': props['text'],

@@ -1,0 +1,70 @@
+{% load i18n l10n wagtailadmin_tags hosts %}
+{% include "wagtailadmin/shared/header.html" with title="Choose an Entry" icon="openquote" %}
+{% host_url 'api_endpoint' host 'data' as api_url %}
+
+<div class="nice-padding">
+    {% include 'wagtailadmin/chooser/_link_types.html' with current='biblio_entry' %}
+    <form action="{% url 'wagtailadmin_choose_bibliography' %}{% querystring %}" method="post" novalidate>
+      {% csrf_token %}
+      <ul class="fields">
+          <li class="required">
+            <div class="field choice_field select" data-contentpath="id">
+              <label for="id_bibliography-chooser-id">Entry:</label>
+              <div class="field-content">
+                <div class="input bibliography-chooser-select">
+                  <select name="bibliography-chooser-id" id="id_bibliography-chooser-id" required=""></select>
+                </div>
+              </div>
+            </div>
+          </li>
+          {% include "wagtailadmin/shared/field_as_li.html" with field=form.link_text %}
+          <li><input type="submit" value="Insert link" class="button" /></li>
+      </ul>
+    </form>
+</div>
+<script>
+if (typeof(cite) == 'undefined') {
+  cite = require('citation-js');
+};
+
+$("#id_bibliography-chooser-id").selectize({
+  valueField: 'value',
+  labelField: 'label',
+  searchField: ['label', 'html'],
+  options: [],
+  create: false,
+  loadThrottle: 500,
+  preload: true,
+  closeAfterSelect: true,
+  placeholder: 'Type to search bibliography...',
+  render: {
+    option: function (item, escape) {
+      console.log(item);
+      return item.html
+    },
+  },
+  load: function (query, callback) {
+    let url = '{{ api_url }}/library/?';
+    if (query.length) url = url + `search=${query}&`;
+    url = url + 'limit=10&content=csljson&format=json';
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        var new_options = []
+        for (let i = 0, len = data.length; i < len; ++i) {
+          let entry = data[i];
+          let citation = new cite(entry);
+          let formatted = citation.format('bibliography', { format: 'html', template: 'apa', lang: 'en-US' });
+          let short = citation.format('citation', { format: 'text', template: 'apa', lang: 'en-US' });
+          new_options.push({
+            value: entry.id.split('/')[1],
+            label: short,
+            html: formatted
+          })
+        }
+        console.log(new_options);
+        callback(new_options);
+      });
+  },
+})
+</script>
