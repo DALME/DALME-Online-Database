@@ -27,7 +27,7 @@ def global_admin_js():
     return format_html('<script src="https://cdn.jsdelivr.net/npm/snarkdown@2.0.0/dist/snarkdown.umd.js" integrity="sha256-QqCCWG2y306e9DZ9VbcdrkacMAz1nubFmYCkac3I3AM=" crossorigin="anonymous"></script> \
         <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script> \
         <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script> \
-        <script src="{}"></script><script src="{}"></script>', static("js/bootstrap-markdown.js"), static("js/dalme_app/dalme_util.js"))
+        <script src="{}"></script><script src="{}"></script><script src="{}"></script>', static("js/bootstrap-markdown.js"), static("js/dalme_app/dalme_util.js"), static("js/wagtail_admin_addons.js"))
 
 
 @hooks.register('before_serve_page')

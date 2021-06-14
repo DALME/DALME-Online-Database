@@ -4,7 +4,6 @@ from wagtail.admin.views import chooser
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 import urllib
-from wagtail.admin.forms.search import SearchForm
 
 
 def saved_search(request):
@@ -19,7 +18,7 @@ def saved_search(request):
         if form.is_valid():
             result = {
                 'id': form.cleaned_data['id'],
-                'parentId': None,
+                'parentId': 'saved_search',
                 'url': '/collections/search/' + form.cleaned_data['id'] + '/',
                 'title': form.cleaned_data['link_text'].strip() or form.cleaned_data['id'],
                 'prefer_this_title_as_link_text': ('link_text' in form.changed_data),
@@ -44,8 +43,8 @@ def saved_search(request):
 
 def biblio_entry(request):
     initial_data = {
-        'link_text': request.GET.get('link_text', ''),
         'id': request.GET.get('id', ''),
+        'link_text': request.GET.get('link_text', ''),
     }
 
     if request.method == 'POST':
@@ -54,7 +53,7 @@ def biblio_entry(request):
         if form.is_valid():
             result = {
                 'id': form.cleaned_data['id'],
-                'parentId': None,
+                'parentId': 'biblio_entry',
                 'url': 'https://dalme.org/project/bibliography/#' + form.cleaned_data['id'] + '/',
                 'title': form.cleaned_data['link_text'].strip() or form.cleaned_data['id'],
                 'prefer_this_title_as_link_text': ('link_text' in form.changed_data),
@@ -71,20 +70,24 @@ def biblio_entry(request):
         'wagtailadmin/chooser/bibliographic_link.html',
         None,
         chooser.shared_context(request, {
-            'form': form,
-            'search_form': SearchForm()
+            'form': form
         }),
         json_data={'step': 'biblio_entry'}
     )
 
 
-def reroute_chooser(request, parent_page_id=None):
+def reroute_chooser(request, route=None):
     params = urllib.parse.urlencode(request.GET)
 
-    if parent_page_id:
-        rev = reverse('wagtailadmin_choose_page_child', args=[parent_page_id])
+    if route:
+        if str(route).isdigit():
+            rev = reverse('wagtailadmin_choose_page_child', args=[route])
+        elif route == 'saved_search':
+            rev = reverse('wagtailadmin_choose_page_saved_search')
+        elif route == 'biblio_entry':
+            rev = reverse('wagtailadmin_choose_bibliography')
     else:
-        rev = reverse('wagtailadmin_choose_page_saved_search')
+        rev = reverse('wagtailadmin_choose_page')
 
     if params:
         rev = f'{rev}?{params}'

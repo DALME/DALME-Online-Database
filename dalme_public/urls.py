@@ -27,6 +27,6 @@ urlpatterns = [
     path('choose-bibliography/', biblio_entry, name='wagtailadmin_choose_bibliography'),
     path('enter-footnote/', enter_footnote, name='wagtailadmin_enter_footnote'),
     path('choose-reroute/', reroute_chooser, name='wagtailadmin_chooser_page_reroute'),
-    path('choose-reroute/<int:parent_page_id>/', reroute_chooser, name='wagtailadmin_chooser_page_reroute_child'),
+    path('choose-reroute/<slug:route>/', reroute_chooser, name='wagtailadmin_chooser_page_reroute_child'),
     re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

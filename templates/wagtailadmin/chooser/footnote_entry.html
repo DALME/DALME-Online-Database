@@ -1,5 +1,6 @@
-{% load i18n l10n wagtailadmin_tags %}
+{% load i18n l10n wagtailadmin_tags hosts %}
 {% include "wagtailadmin/shared/header.html" with title=title icon="list-ol" %}
+{% host_url 'api_endpoint' host 'data' as api_url %}
 
 <div class="nice-padding">
     <form action="{% url 'wagtailadmin_enter_footnote' %}" method="post" novalidate>
@@ -30,8 +31,25 @@
             <li><input type="submit" value="Save" class="button" /></li>
         </ul>
     </form>
+    <div class="biblio-modal">
+      <div class="biblio-modal-box">
+        <div>
+          <label for="biblio-modal-id">Entry:</label>
+          <div class="field-content">
+            <select name="biblio-modal-id" id="biblio-modal-id"></select>
+          </div>
+        </div>
+        <div class="biblio-modal-button-container">
+          <button class="biblio-modal-insert">Insert</button>
+          <button class="biblio-modal-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
 </div>
+
 <script>
+  window.dalmeAPIurl = "{{ api_url }}";
+
   $('#id_footnote-text').markdown({
     autofocus: true,
     savable: false,
@@ -43,13 +61,61 @@
     parser: window.snarkdown,
     onPreview: function(e) {
       const previewButton = e.$editor.find('button[data-handler="bootstrap-markdown-cmdPreview"]');
-      e.hideButtons(['cmdBold', 'cmdItalic', 'cmdUrl', 'cmdList', 'cmdListO', 'cmdCode', 'cmdQuote']);
+      e.hideButtons(['cmdBold', 'cmdBiblio', 'cmdItalic', 'cmdUrl', 'cmdList', 'cmdListO', 'cmdCode', 'cmdQuote']);
       $(previewButton).html('<span class="fas fa-pencil-alt"></span> Edit');
     },
     onPreviewEnd: function(e) {
       const previewButton = e.$editor.find('button[data-handler="bootstrap-markdown-cmdPreview"]');
-      e.showButtons(['cmdBold', 'cmdItalic', 'cmdUrl', 'cmdList', 'cmdListO', 'cmdCode', 'cmdQuote']);
+      e.showButtons(['cmdBold', 'cmdBiblio', 'cmdItalic', 'cmdUrl', 'cmdList', 'cmdListO', 'cmdCode', 'cmdQuote']);
       $(previewButton).html('<span class="fas fa-search"></span> Preview');
     }
-  })
+  });
+
+  if (typeof(window.cite) == 'undefined') {
+    window.cite = require('citation-js');
+  };
+
+  $("#biblio-modal-id").selectize({
+    valueField: 'value',
+    labelField: 'label',
+    searchField: ['label', 'html'],
+    options: [],
+    create: false,
+    loadThrottle: 500,
+    preload: true,
+    closeAfterSelect: true,
+    placeholder: 'Type to search bibliography...',
+    render: {
+      option: function (item, escape) {
+        return item.html
+      },
+    },
+    load: function (query, callback) {
+      let url = '{{ api_url }}/library/?';
+      if (query.length) url = url + `search=${query}&`;
+      url = url + 'limit=10&content=csljson&format=json';
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          var new_options = []
+          for (let i = 0, len = data.length; i < len; ++i) {
+            let entry = data[i];
+            let citation = new window.cite(entry);
+            let formatted = citation.format('bibliography', { format: 'html', template: 'apa', lang: 'en-US' });
+            let short = citation.format('citation', { format: 'text', template: 'apa', lang: 'en-US' });
+            new_options.push({
+              value: entry.id.split('/')[1],
+              label: short,
+              html: formatted
+            })
+          }
+          callback(new_options);
+        });
+    },
+  });
+
+  $('.biblio-modal-cancel').on('click', function(e) {
+    $('.biblio-modal').hide();
+  });
+
 </script>

@@ -5,7 +5,7 @@ from dalme_app.models import SavedSearch
 from draftjs_exporter.dom import DOM
 import re
 
-UUIDv4 = r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$'
+UUIDv4 = r'^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}$'
 
 
 class SavedSearchLinkHandler(LinkHandler):
@@ -24,7 +24,7 @@ class SavedSearchLinkHandler(LinkHandler):
     def expand_db_attributes(cls, attrs):
         search = cls.get_instance(attrs)
         href = f'/collections/search/{search.id}/'
-        return '<a href="%s">' % escape(href)
+        return f'<a href="{escape(href)}">'
 
 
 class SavedSearchElementHandler(LinkElementHandler):
@@ -32,16 +32,17 @@ class SavedSearchElementHandler(LinkElementHandler):
         try:
             saved_search = SavedSearch.objects.get(id=attrs['id'])
         except SavedSearch.DoesNotExist:
+            _id = int(attrs['id'])
             return {
-                'id': int(attrs['id']),
-                'url': None,
-                'parentId': None
+                'id': _id,
+                'url': f'/collections/search/{_id}/',
+                'parentId': 'saved_search'
             }
 
         return {
             'id': str(saved_search.id),
             'url': f'/collections/search/{str(saved_search.id)}/',
-            'parentId': None,
+            'parentId': 'saved_search',
         }
 
 
@@ -58,7 +59,7 @@ class BibliographyElementHandler(LinkElementHandler):
         return {
             'id': attrs['id'],
             'url': f'https://dalme.org/project/bibliography/#{attrs["id"]}/',
-            'parentId': None,
+            'parentId': 'biblio_entry',
         }
 
 
@@ -66,11 +67,11 @@ def link_entity_decorator(props):
     id_ = props.get('id')
     link_props = {}
 
-    if id_ is not None:
-        if re.fullmatch(UUIDv4, id_):
-            link_props['linktype'] = 'saved_search'
-        elif type(id_) is int:
+    if id_ is not None and id_ != '':
+        if str(id_).isdigit():
             link_props['linktype'] = 'page'
+        elif re.fullmatch(UUIDv4, id_):
+            link_props['linktype'] = 'saved_search'
         else:
             link_props['linktype'] = 'biblio_entry'
 

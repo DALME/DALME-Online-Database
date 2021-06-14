@@ -1194,6 +1194,48 @@
             }
           }
         }, {
+          name: 'cmdBiblio',
+          title: 'Bibliography Reference',
+          hotkey: 'Ctrl+C',
+          icon: {
+            glyph: 'glyphicon glyphicon-book',
+            fa: 'fa fa-book',
+            'fa-3': 'icon-book',
+            'fa-5': 'fas fa-book',
+            octicons: 'octicon octicon-book'
+          },
+          callback: function(e) {
+            const top = parseInt($('.modal-content').css('margin-top')) + 155;
+            const left = parseInt($('.modal-dialog').css('margin-left')) + parseInt($('[for="id_footnote-text"]').css('width')) + 50 + 10 + 90 + 15 + 200 - 250;
+            console.log($('.modal-dialog').css('margin-left'))
+            console.log($('[for="id_footnote-text"]').css('width'))
+            console.log(`top: ${top}, left: ${left}`)
+            var chunk, cursor, selected = e.getSelection(),
+              content = e.getContent(),
+              link;
+
+            if (selected.length === 0) {
+              chunk = e.__localize('enter reference description here');
+            } else {
+              chunk = selected.text;
+            }
+            $('.biblio-modal-box').css({
+              'margin-top': `${top}px`,
+              'margin-left': `${left}px`
+            });
+            $('.biblio-modal').show();
+            $('.biblio-modal-insert').on('click', function() {
+              link = $('#biblio-modal-id').val();
+              if (link !== null && link !== '') {
+                var formattedLink = `https://dalme.org/project/bibliography/#${link}`;
+                e.replaceSelection('[' + chunk + '](' + formattedLink + ')');
+                cursor = selected.start + 1;
+                e.setSelection(cursor, cursor + chunk.length);
+              }
+              $('.biblio-modal').hide();
+            });
+          }
+        }, {
           name: 'cmdImage',
           title: 'Image',
           hotkey: 'Ctrl+G',

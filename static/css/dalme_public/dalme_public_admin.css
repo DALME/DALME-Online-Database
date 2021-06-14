@@ -270,26 +270,87 @@ input[type=checkbox] {
 }
 /* bibliography chooser */
 
-.bibliography-chooser-select .selectize-input,
-.bibliography-chooser-select .selectize-input input {
+.bibliography-chooser .selectize-input,
+.bibliography-chooser .selectize-input input,
+.biblio-modal-box .selectize-input,
+.biblio-modal-box .selectize-input input {
   line-height: 30px;
   font-size: 1.1em;
   font-weight: 300;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  background-color: #fafafa;
 }
-.bibliography-chooser-select .selectize-input {
+.bibliography-chooser .selectize-input,
+.biblio-modal-box .selectize-input {
   border-radius: 6px;
   padding: 8px 8px 8px 18px;
 }
-.bibliography-chooser-select .selectize-control.single .selectize-input,
-.bibliography-chooser-select .selectize-dropdown.single {
+.bibliography-chooser .selectize-control.single .selectize-input,
+.bibliography-chooser .selectize-dropdown.single,
+.biblio-modal-box .selectize-control.single .selectize-input,
+.biblio-modal-box .selectize-dropdown.single {
   border-color: #e6e6e6;
 }
-.bibliography-chooser-select .selectize-dropdown-content {
+.bibliography-chooser .selectize-dropdown-content,
+.biblio-modal-box .selectize-dropdown-content {
   padding: 1rem;
   font-size: .8rem;
   font-weight: 500;
   line-height: 18px;
 }
-.bibliography-chooser-select .csl-bib-body {
+.bibliography-chooser .csl-bib-body,
+.biblio-modal-box .csl-bib-body {
   margin-bottom: .5rem;
+}
+
+/* Footnote editor biblio modal */
+
+.biblio-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+.biblio-modal-box {
+  background-color: #fefefe;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+}
+.biblio-modal-button-container {
+  align-self: flex-end;
+  margin-top: 10px;
+}
+.biblio-modal-button-container button {
+  font-size: .95em;
+  height: 3em;
+  border-radius: 3px;
+  font-family: Open Sans,Arial,sans-serif;
+  width: auto;
+  font-weight: 400;
+  vertical-align: middle;
+  display: inline-block;
+  background-color: rgb(0, 125, 126);
+  border: 1px solid rgb(0, 125, 126);
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  -webkit-font-smoothing: auto;
+}
+.biblio-modal-button-container button:hover {
+  background-color: rgb(0, 103, 106);
+  color: #fff;
+  border-color: transparent;
 }
