@@ -135,6 +135,7 @@ export default defineComponent({
     const visibleColumns = ref(null);
     const rows = ref([]);
     const filter = ref("");
+
     const noData = "No tickets found.";
     const title = props.embedded ? "My Issue Tickets" : "Issue Tickets";
     const rowsPerPage = props.embedded ? 5 : 20;

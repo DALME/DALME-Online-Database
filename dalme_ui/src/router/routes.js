@@ -11,6 +11,40 @@ const routes = [
         nav: true,
       },
       {
+        component: () => import("pages/source-root/SourceRoot.vue"),
+        name: "Sources",
+        path: "sources",
+        props: { icon: "bookmark" },
+        nav: true,
+        redirect: "/sources/records",
+        children: [
+          {
+            component: () => import("pages/source-list/SourceList.vue"),
+            name: "Archives",
+            path: "archives",
+            nav: true,
+          },
+          {
+            component: () => import("pages/source-list/SourceList.vue"),
+            name: "Archival Files",
+            path: "archival-files",
+            nav: true,
+          },
+          {
+            component: () => import("pages/source-list/SourceList.vue"),
+            name: "Records",
+            path: "records",
+            nav: true,
+          },
+          {
+            component: () => import("pages/source-list/SourceList.vue"),
+            name: "Bibliographies",
+            path: "bibilographies",
+            nav: true,
+          },
+        ],
+      },
+      {
         component: () => import("pages/task-list/TaskList.vue"),
         name: "Tasks",
         path: "tasks",
@@ -26,7 +60,7 @@ const routes = [
       },
       {
         component: () => import("pages/ticket-list/TicketList.vue"),
-        name: "Issue Tickets",
+        name: "Tickets",
         path: "tickets",
         props: { icon: "subject" },
         nav: true,
