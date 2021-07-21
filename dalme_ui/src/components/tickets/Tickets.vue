@@ -41,7 +41,7 @@
               :color="props.value ? 'green' : 'red'"
               text-color="white"
               :icon="props.value ? 'check_circle_outline' : 'error'"
-              size="sm"
+              size="xs"
             />
           </q-td>
         </template>
@@ -49,7 +49,7 @@
         <template v-slot:body-cell-subject="props">
           <q-td :props="props">
             <router-link
-              class="text-subtitle1"
+              class="text-subtitle2"
               :to="{ name: 'Ticket', params: { objId: props.row.id } }"
             >
               {{ props.value }}

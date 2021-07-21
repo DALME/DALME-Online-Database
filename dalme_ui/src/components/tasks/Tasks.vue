@@ -61,7 +61,7 @@
               :color="props.value ? 'green' : 'red'"
               text-color="white"
               :icon="props.value ? 'check_circle_outline' : 'error'"
-              size="sm"
+              size="xs"
             />
           </q-td>
         </template>
@@ -129,6 +129,7 @@ export default defineComponent({
           assignedTo: "Assigned to",
           attachments: "Attachments",
           completed: "Status",
+          owner: "Owner",
         }[key],
         name: key,
         sortable: true,
@@ -218,11 +219,13 @@ export default defineComponent({
         .then((value) => {
           if (!isEmpty(value)) {
             columns.value = getColumns(keys(head(value)));
+            const excluded = props.embedded
+              ? ["owner", "description", "createdBy"]
+              : ["description", "createdBy"];
             visibleColumns.value = map(
               (column) => column.field,
               rFilter(
-                (column) =>
-                  !["createdBy", "description"].includes(column.field),
+                (column) => !excluded.includes(column.field),
                 columns.value,
               ),
             );

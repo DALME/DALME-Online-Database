@@ -6,11 +6,11 @@
 import { useMeta } from "quasar";
 import { defineComponent, provide } from "vue";
 
-// import { SourceDetail } from "@/components";
+// import { LocaleDetail } from "@/components";
 // import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
-  name: "Source",
+  name: "Locale",
   props: {
     objId: {
       type: String,
@@ -19,10 +19,10 @@ export default defineComponent({
   },
   components: {
     // SuspenseWithError,
-    // SourceDetail,
+    // LocaleDetail,
   },
   setup(props) {
-    useMeta({ title: `Source ${props.objId}` });
+    useMeta({ title: `Locale #${props.objId}` });
     provide("objId", props.objId);
   },
 });

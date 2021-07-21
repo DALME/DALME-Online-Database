@@ -6,11 +6,11 @@
 import { useMeta } from "quasar";
 import { defineComponent, provide } from "vue";
 
-// import { SourceDetail } from "@/components";
+// import { RightsDetail } from "@/components";
 // import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
-  name: "Source",
+  name: "Rights",
   props: {
     objId: {
       type: String,
@@ -19,10 +19,11 @@ export default defineComponent({
   },
   components: {
     // SuspenseWithError,
-    // SourceDetail,
+    // RightsDetail,
   },
   setup(props) {
-    useMeta({ title: `Source ${props.objId}` });
+    // TODO: We want to use the name here...
+    useMeta({ title: `Rights ${props.objId}` });
     provide("objId", props.objId);
   },
 });

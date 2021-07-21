@@ -4,7 +4,7 @@ const archives = {
   noRecords: "No. Records",
   locale: "Locale",
   defaultRights: "Default Rights",
-  url: "Web Address",
+  archiveUrl: "Web Address",
 };
 
 const archivalFiles = {
@@ -36,7 +36,7 @@ const records = {
   isPublic: "Public",
 };
 
-const bibliographies = {
+const bibliography = {
   id: "ID",
   name: "Name",
   primaryDataset: "Primary Dataset",
@@ -52,6 +52,6 @@ export const columnsByKind = (kind) => {
     archives,
     archivalFiles,
     records,
-    bibliographies,
+    bibliography,
   }[kind];
 };

@@ -2,14 +2,23 @@ import { last } from "ramda";
 import * as yup from "yup";
 
 const defaultRightsSchema = yup.object().shape({
-  id: yup.string().required(),
   name: yup.string().required(),
   url: yup.string().required(),
+  id: yup
+    .object()
+    .shape({ objId: yup.string().uuid().required() })
+    .transformKeys((value) => (value === "id" ? "objId" : value))
+    .required(),
 });
 
 const localeSchema = yup.object().shape({
   name: yup.string().required(),
   url: yup.string().required(),
+  id: yup
+    .object()
+    .shape({ objId: yup.number().required() })
+    .transformKeys((value) => (value === "id" ? "objId" : value))
+    .required(),
 });
 
 const ownerSchema = yup
@@ -21,25 +30,31 @@ const ownerSchema = yup
   })
   .camelCase();
 
-export const archiveSourceSchema = yup.object().shape({
-  id: yup.string().uuid().required(),
-  name: yup.string().required(),
-  attributes: yup
-    .object()
-    .shape({
-      url: yup
-        .string()
-        .url()
-        .nullable()
-        .transform((value) =>
-          value.includes(" ") ? `http://${last(value.split(" "))}` : value,
-        ),
-      locale: localeSchema.default(null).nullable(),
-      defaultRights: defaultRightsSchema.default(null).nullable(),
-    })
-    .required()
-    .camelCase(),
-});
+export const archiveSourceSchema = yup
+  .object()
+  .shape({
+    id: yup.string().uuid().required(),
+    name: yup.string().required(),
+    noRecords: yup.number().required(),
+    attributes: yup
+      .object()
+      .shape({
+        archiveUrl: yup
+          .string()
+          .url()
+          .default(null)
+          .nullable()
+          .transform((value) =>
+            value.includes(" ") ? `http://${last(value.split(" "))}` : value,
+          ),
+        locale: localeSchema.default(null).nullable(),
+        defaultRights: defaultRightsSchema.default(null).nullable(),
+      })
+      .transformKeys((value) => (value === "url" ? "archiveUrl" : value))
+      .required()
+      .camelCase(),
+  })
+  .camelCase();
 
 export const archivalFileSourceSchema = yup
   .object()
@@ -49,10 +64,11 @@ export const archivalFileSourceSchema = yup
     primaryDataset: yup
       .object()
       .shape({
-        id: yup.string().uuid().required(),
         name: yup.string().required(),
         detailString: yup.string().required(),
+        objId: yup.string().uuid().required(),
       })
+      .transformKeys((value) => (value === "id" ? "objId" : value))
       .required()
       .camelCase(),
     owner: ownerSchema.required(),
@@ -61,7 +77,7 @@ export const archivalFileSourceSchema = yup
     attributes: yup
       .object()
       .shape({
-        locale: localeSchema.nullable(),
+        locale: localeSchema.default(null).nullable(),
         authority: yup.string().nullable(),
         format: yup.string().nullable(),
         support: yup.string().required(),
@@ -95,7 +111,7 @@ export const recordSourceSchema = yup
     attributes: yup
       .object()
       .shape({
-        locale: localeSchema.nullable(),
+        locale: yup.array().of(localeSchema.default(null).nullable()),
         recordType: yup.string().required(),
         date: yup
           .object()
@@ -120,6 +136,11 @@ export const recordSourceSchema = yup
               .shape({
                 name: yup.string().required(),
                 url: yup.string().required(),
+                id: yup
+                  .object()
+                  .shape({ objId: yup.number().required() })
+                  .transformKeys((value) => (value === "id" ? "objId" : value))
+                  .required(),
               })
               .required(),
           )
@@ -146,7 +167,7 @@ export const bibliographySourceSchema = yup
       .object()
       .shape({
         defaultRights: defaultRightsSchema.required(),
-        zoteroKey: yup.string().required(),
+        zoteroKey: yup.string().nullable(),
       })
       .camelCase(),
   })
@@ -157,7 +178,7 @@ export const sourceListSchema = (kind) => {
     archives: archiveSourceSchema,
     archivalFiles: archivalFileSourceSchema,
     records: recordSourceSchema,
-    bibliographies: bibliographySourceSchema,
+    bibliography: bibliographySourceSchema,
   };
   return yup.object().shape({
     recordsTotal: yup.number().required(),
