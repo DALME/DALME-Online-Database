@@ -1,8 +1,13 @@
 import { apiUrl } from "./config";
 
+const endpoint = `${apiUrl}/sources`;
+
 const sources = {
+  getSource(objId) {
+    const url = `${endpoint}/${objId}`;
+    return new Request(url);
+  },
   getSources(kind) {
-    const endpoint = `${apiUrl}/sources/`;
     const data = JSON.stringify({
       draw: 1,
       start: 0,
@@ -11,8 +16,8 @@ const sources = {
       order: [{ column: 0, dir: "asc" }],
     });
     const url = kind
-      ? `${endpoint}?class=${kind}&data=${data}`
-      : `${endpoint}?data=${data}`;
+      ? `${endpoint}/?class=${kind}&data=${data}`
+      : `${endpoint}/?data=${data}`;
     return new Request(url);
   },
 };

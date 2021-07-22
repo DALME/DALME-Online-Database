@@ -20,7 +20,10 @@ class Comments(viewsets.ModelViewSet):
             model = apps.get_model(app_label='dalme_app', model_name=self.request.GET['model'])
             obj_pk = self.request.GET['object']
             if isinstance(obj_pk, str):
-                obj_pk = int(obj_pk)
+                try:
+                    obj_pk = int(obj_pk)
+                except ValueError:
+                    pass
             instance = model.objects.get(pk=obj_pk)
             return instance.comments.all()
         return self.queryset
@@ -30,7 +33,11 @@ class Comments(viewsets.ModelViewSet):
         data = request.data
         try:
             model = apps.get_model(app_label='dalme_app', model_name=data['model'])
-            content_object = model.objects.get(pk=int(data['object']))
+            try:
+                obj_pk = int(data['object'])
+            except ValueError:
+                obj_pk = data['object']
+            content_object = model.objects.get(pk=obj_pk)
             body = data['body']
             if not body:
                 raise ValidationError("Comment body can't be empty")

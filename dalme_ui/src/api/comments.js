@@ -1,8 +1,10 @@
 import { apiUrl, headers } from "./config";
 
+const endpoint = `${apiUrl}/comments`;
+
 const comments = {
   addComment(data) {
-    const url = `${apiUrl}/comments/`;
+    const url = `${endpoint}/`;
     return new Request(url, {
       method: "POST",
       headers: headers,
@@ -10,7 +12,7 @@ const comments = {
     });
   },
   getComments(model, objId) {
-    const url = `${apiUrl}/comments/?model=${model}&object=${objId}`;
+    const url = `${endpoint}/?model=${model}&object=${objId}`;
     return new Request(url);
   },
 };

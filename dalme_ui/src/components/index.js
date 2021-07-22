@@ -7,6 +7,7 @@ export { default as LoginModal } from "./login-modal";
 export { default as NavLink } from "./nav-link";
 export { default as Nav } from "./nav";
 export { default as Sources } from "./sources";
+export { default as SourceDetail } from "./source-detail";
 export { default as TaskLists } from "./task-lists";
 export { default as Tasks } from "./tasks";
 export { default as TaskDetail } from "./task-detail";

@@ -1,17 +1,18 @@
 import { apiUrl } from "./config";
 
+const endpoint = `${apiUrl}/tickets`;
+
 const tickets = {
   allTickets() {
-    const url = `${apiUrl}/tickets`;
-    return new Request(url);
+    return new Request(endpoint);
   },
   getTicket(objId) {
-    const url = `${apiUrl}/tickets/${objId}`;
+    const url = `${endpoint}/${objId}`;
     return new Request(url);
   },
   userTickets(userId) {
     const query = `filter=creation_user=${userId}`;
-    const url = `${apiUrl}/tickets/?${query}`;
+    const url = `${endpoint}/?${query}`;
     return new Request(url);
   },
 };

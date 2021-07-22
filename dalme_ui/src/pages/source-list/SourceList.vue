@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { defineComponent, provide } from "vue";
+import { defineComponent } from "vue";
 
 import { Sources } from "@/components";
 import { SuspenseWithError } from "@/components/utils";
@@ -19,9 +19,6 @@ export default defineComponent({
   components: {
     SuspenseWithError,
     Sources,
-  },
-  setup(props) {
-    provide("kind", props.kind);
   },
 });
 </script>

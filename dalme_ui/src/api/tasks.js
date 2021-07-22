@@ -2,17 +2,18 @@ import S from "string";
 
 import { apiUrl, headers } from "./config";
 
+const endpoint = `${apiUrl}/tasks`;
+
 const tasks = {
   allTasks() {
-    const url = `${apiUrl}/tasks`;
-    return new Request(url);
+    return new Request(endpoint);
   },
   getTask(objId) {
-    const url = `${apiUrl}/tasks/${objId}`;
+    const url = `${endpoint}/${objId}`;
     return new Request(url);
   },
   setTaskState(objId, action) {
-    const url = `${apiUrl}/tasks/${objId}/set_state/`;
+    const url = `${endpoint}/${objId}/set_state/`;
     return new Request(url, {
       method: "PATCH",
       headers: headers,
@@ -25,7 +26,7 @@ const tasks = {
   },
   userTasks(userId) {
     const query = `filter=assigned_to=${userId}`;
-    const url = `${apiUrl}/tasks/?${query}`;
+    const url = `${endpoint}/?${query}`;
     return new Request(url);
   },
 };

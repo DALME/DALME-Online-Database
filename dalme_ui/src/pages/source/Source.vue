@@ -1,13 +1,19 @@
 <template>
-  <q-page> </q-page>
+  <q-page>
+    <SuspenseWithError>
+      <template #default>
+        <SourceDetail />
+      </template>
+    </SuspenseWithError>
+  </q-page>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent, provide } from "vue";
 
-// import { SourceDetail } from "@/components";
-// import { SuspenseWithError } from "@/components/utils";
+import { SourceDetail } from "@/components";
+import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "Source",
@@ -18,8 +24,8 @@ export default defineComponent({
     },
   },
   components: {
-    // SuspenseWithError,
-    // SourceDetail,
+    SuspenseWithError,
+    SourceDetail,
   },
   setup(props) {
     useMeta({ title: `Source ${props.objId}` });

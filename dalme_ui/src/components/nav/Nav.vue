@@ -16,11 +16,27 @@
   <q-drawer v-model="navOpen" show-if-above bordered class="bg-grey-1">
     <q-list>
       <q-item-label header class="text-grey-8"> DALME </q-item-label>
-      <NavLink
-        v-for="(route, idx) in routes"
-        :key="idx"
-        v-bind="{ name: route.name, icon: route.props.icon }"
-      />
+      <template v-for="(route, idx) in routes" :key="idx">
+        <NavLink
+          v-if="!route.children"
+          v-bind="{ name: route.name, icon: route.props.icon }"
+        />
+        <q-expansion-item
+          v-else
+          expand-separator
+          :icon="route.props.icon"
+          :label="route.name"
+          :content-inset-level="0.333"
+          dense
+        >
+          <NavLink
+            v-for="(child, idx) in route.children"
+            v-bind="{ name: child.name, icon: child.props.icon }"
+            style="font-size: 0.8rem"
+            :key="idx"
+          />
+        </q-expansion-item>
+      </template>
       <q-item class="logout">
         <q-btn
           color="primary"

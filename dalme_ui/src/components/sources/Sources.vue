@@ -1,7 +1,9 @@
 <template>
   <div class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
+      <Spinner v-if="loading" />
       <q-table
+        v-else
         :title="title"
         :rows="rows"
         :columns="columns"
@@ -222,10 +224,11 @@
 import { isEmpty, keys, map, filter as rFilter } from "ramda";
 import { useMeta } from "quasar";
 import S from "string";
-import { defineComponent, ref } from "vue";
-import { useRouter } from "vue-router";
+import { defineComponent, onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
+import { Spinner } from "@/components/utils";
 import { sourceListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -233,28 +236,28 @@ import { columnsByKind } from "./columns";
 
 export default defineComponent({
   name: "Sources",
+  components: {
+    Spinner,
+  },
   async setup() {
-    const $router = useRouter();
-
-    // TODO: Let's try a ref + inject on SourceRoot to do this.
-    const routeName = $router.currentRoute.value.name;
-    const kind = S(routeName).toLowerCase().camelize().s;
-    const kindAPI = S(routeName).underscore().s;
-    const title = S(routeName).humanize().titleCase().s;
-
-    useMeta({ title });
-    const { success, data, fetchAPI } = useAPI();
+    const $route = useRoute();
+    const { loading, success, data, fetchAPI } = useAPI();
 
     const columns = ref([]);
     const visibleColumns = ref([]);
     const rows = ref([]);
     const filter = ref("");
+    const kind = ref("");
+    const kindAPI = ref("");
+    const title = ref("");
+
+    useMeta(() => ({ title: title.value }));
 
     const noData = "No sources found.";
     const pagination = { rowsPerPage: 20 };
 
     const getColumns = (keys) => {
-      const columnMap = columnsByKind(kind);
+      const columnMap = columnsByKind(kind.value);
       const toColumn = (key) => ({
         align: "left",
         field: key,
@@ -265,24 +268,40 @@ export default defineComponent({
       return map(toColumn, keys);
     };
 
-    const request = requests.sources.getSources(kindAPI);
-    await fetchAPI(request);
-    if (success.value)
-      await sourceListSchema(kind)
-        .validate(data.value, { stripUnknown: true })
-        .then((value) => {
-          if (!isEmpty(value)) {
-            columns.value = getColumns(keys(columnsByKind(kind)));
-            visibleColumns.value = map(
-              (column) => column.field,
-              rFilter(
-                (column) => !["id"].includes(column.field),
-                columns.value,
-              ),
-            );
-          }
-          rows.value = value.data;
-        });
+    const fetchData = async () => {
+      const request = requests.sources.getSources(kindAPI.value);
+      const schema = sourceListSchema(kind.value);
+      await fetchAPI(request);
+      if (success.value)
+        await schema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            if (!isEmpty(value)) {
+              columns.value = getColumns(keys(columnsByKind(kind.value)));
+              visibleColumns.value = map(
+                (column) => column.field,
+                rFilter(
+                  (column) => !["id"].includes(column.field),
+                  columns.value,
+                ),
+              );
+            }
+            rows.value = value.data;
+          });
+    };
+
+    watch(
+      () => $route.name,
+      async (to) => {
+        kindAPI.value = S(to).underscore().s;
+        title.value = S(to).humanize().titleCase().s;
+        kind.value = S(to).toLowerCase().camelize().s;
+        fetchData();
+      },
+      { immediate: true },
+    );
+
+    onMounted(async () => await fetchData());
 
     const renderDate = (attributes) => {
       if (attributes.startDate && attributes.endDate) {
@@ -300,6 +319,7 @@ export default defineComponent({
       columns,
       filter,
       getLocaleData,
+      loading,
       noData,
       pagination,
       renderDate,
