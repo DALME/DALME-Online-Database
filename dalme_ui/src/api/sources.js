@@ -7,13 +7,15 @@ const sources = {
     const url = `${endpoint}/${objId}`;
     return new Request(url);
   },
-  getSources(kind) {
+  getSources(kind, start = 0, length = 25, order = { column: 0, dir: "asc" }) {
+    // TODO: Move order to constant somewhere.
+    // const serverSideSchema = yup.object.shape({});
     const data = JSON.stringify({
       draw: 1,
-      start: 0,
-      length: 25,
       orderable: true,
-      order: [{ column: 0, dir: "asc" }],
+      order,
+      start,
+      length,
     });
     const url = kind
       ? `${endpoint}/?class=${kind}&data=${data}`

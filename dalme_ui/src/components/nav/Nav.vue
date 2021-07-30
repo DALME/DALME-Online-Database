@@ -26,13 +26,11 @@
           expand-separator
           :icon="route.props.icon"
           :label="route.name"
-          :content-inset-level="0.333"
-          dense
         >
           <NavLink
             v-for="(child, idx) in route.children"
             v-bind="{ name: child.name, icon: child.props.icon }"
-            style="font-size: 0.8rem"
+            class="bg-grey-3"
             :key="idx"
           />
         </q-expansion-item>

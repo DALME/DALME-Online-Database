@@ -53,7 +53,7 @@ export default defineComponent({
 
     const onSubmit = async () => {
       submitting.value = true;
-      const payload = { model, body: body.value, object: objId };
+      const payload = { model, body: body.value, object: objId.value };
       await commentPayloadSchema.validate(payload);
       setTimeout(async () => {
         const request = requests.comments.addComment(payload);

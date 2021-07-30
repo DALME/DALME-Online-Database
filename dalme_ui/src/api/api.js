@@ -12,7 +12,7 @@ const API = (reauthenticate = null) => {
   const redirected = ref(null);
   const error = ref(false);
 
-  const fetchAPI = (request) => {
+  const fetchAPI = (request, delegateLoading = false) => {
     loading.value = true;
     error.value = undefined;
 
@@ -33,7 +33,11 @@ const API = (reauthenticate = null) => {
         error.value = e;
         // TODO: Show internal error.
       })
-      .finally(() => (loading.value = false));
+      .finally(() => {
+        if (!delegateLoading) {
+          loading.value = false;
+        }
+      });
   };
 
   return {

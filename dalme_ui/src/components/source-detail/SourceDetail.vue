@@ -1,170 +1,420 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="bookmark" />
-          </q-avatar>
-        </q-item-section>
+  <Spinner v-if="loading" />
+  <div class="full-width full-height">
+    <q-splitter :horizontal="$q.screen.lt.sm" v-model="splitterModel">
+      <template v-slot:before>
+        <q-tabs v-model="tab" class="text-blue" :vertical="$q.screen.gt.sm">
+          <q-tab name="data" icon="info" label="Data" />
+          <q-tab v-if="hasPages" name="editor" icon="preview" label="Editor" />
+        </q-tabs>
+      </template>
 
-        <q-item-section>
-          <q-item-label>Source</q-item-label>
-        </q-item-section>
-      </q-item>
+      <template v-slot:after>
+        <q-tab-panels
+          v-model="tab"
+          animated
+          swipeable
+          transition-prev="jump-up"
+          transition-next="jump-up"
+        >
+          <q-tab-panel name="data">
+            <q-card class="q-ma-md">
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar>
+                    <q-icon name="bookmark" />
+                  </q-avatar>
+                </q-item-section>
 
-      <q-separator />
+                <q-item-section>
+                  <q-item-label class="text-weight-medium">Source</q-item-label>
+                </q-item-section>
+              </q-item>
 
-      <q-card-section> </q-card-section>
-    </q-card>
+              <q-separator />
 
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="assignment" />
-          </q-avatar>
-        </q-item-section>
+              <q-card-section>
+                <div class="row q-my-xs">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Type
+                  </div>
+                  <div class="col-8">{{ source.type.name }}</div>
+                </div>
 
-        <q-item-section>
-          <q-item-label>Attributes</q-item-label>
-        </q-item-section>
-      </q-item>
+                <div class="row q-my-xs">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Name
+                  </div>
+                  <div class="col-8">{{ source.name }}</div>
+                </div>
 
-      <q-separator />
+                <div class="row q-my-xs">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Short name
+                  </div>
+                  <div class="col-8">{{ source.shortName }}</div>
+                </div>
 
-      <q-card-section> </q-card-section>
-    </q-card>
+                <div class="row q-my-xs">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    List
+                  </div>
+                  <div class="col-8">
+                    <q-icon :name="source.hasInventory ? 'done' : 'close'" />
+                  </div>
+                </div>
 
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="info" />
-          </q-avatar>
-        </q-item-section>
+                <div class="row q-my-xs">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Owner
+                  </div>
+                  <div class="col-8">
+                    <router-link
+                      :to="{
+                        name: 'User',
+                        params: { username: source.owner.username },
+                      }"
+                    >
+                      {{ source.owner.fullName }}
+                    </router-link>
+                  </div>
+                </div>
 
-        <q-item-section>
-          <q-item-label>Metadata</q-item-label>
-        </q-item-section>
-      </q-item>
+                <div class="row q-my-xs" v-if="source.parent">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Parent
+                  </div>
+                  <div class="col-8">
+                    <router-link
+                      :to="{
+                        name: 'Source',
+                        params: { objId: source.parent.objId },
+                      }"
+                    >
+                      {{ source.parent.name }}
+                    </router-link>
+                  </div>
+                </div>
 
-      <q-separator />
+                <div class="row q-my-xs" v-if="source.primaryDataset">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Primary Dataset
+                  </div>
+                  <div class="col-8">
+                    <router-link
+                      :to="{
+                        name: 'Set',
+                        params: { objId: source.primaryDataset.objId },
+                      }"
+                    >
+                      {{ source.primaryDataset.name }}
+                    </router-link>
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
 
-      <q-card-section> </q-card-section>
-    </q-card>
+            <q-card class="q-ma-md">
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar>
+                    <q-icon name="assignment" />
+                  </q-avatar>
+                </q-item-section>
 
-    <!-- Don't show if not source.description -->
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="subject" />
-          </q-avatar>
-        </q-item-section>
+                <q-item-section>
+                  <q-item-label class="text-weight-medium">
+                    Attributes
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
 
-        <q-item-section>
-          <q-item-label>Description</q-item-label>
-        </q-item-section>
-      </q-item>
+              <q-separator />
 
-      <q-separator />
+              <q-card-section v-if="!hasAttributes">
+                <div class="q-my-xs text-center">
+                  <p>No attributes assigned.</p>
+                </div>
+              </q-card-section>
+              <q-card-section v-else>
+                <template v-for="(attribute, idx) in attributes" :key="idx">
+                  <template v-if="!isNil(attribute.value)">
+                    <div class="row q-my-xs">
+                      <div class="col-2 text-weight-medium text-right q-mr-lg">
+                        {{ getAttributeLabel(attribute.key) }}
+                      </div>
+                      <div v-if="attribute.key === 'url'">
+                        <a :href="attribute.value" target="_blank">
+                          {{ attribute.value }}
+                        </a>
+                      </div>
+                      <div
+                        v-else-if="Array.isArray(attribute.value)"
+                        class="col-8"
+                      >
+                        {{ attribute.value[0].name }}
+                      </div>
+                      <div v-else-if="isObj(attribute.value)" class="col-8">
+                        {{ attribute.value.name }}
+                      </div>
+                      <div v-else class="col-8">
+                        {{ attribute.value }}
+                      </div>
+                    </div>
+                  </template>
+                </template>
+              </q-card-section>
+            </q-card>
 
-      <q-card-section> </q-card-section>
-    </q-card>
+            <q-card class="q-ma-md">
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar>
+                    <q-icon name="info" />
+                  </q-avatar>
+                </q-item-section>
 
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="menu_book" />
-          </q-avatar>
-        </q-item-section>
+                <q-item-section>
+                  <q-item-label class="text-weight-medium">
+                    Metadata
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
 
-        <q-item-section>
-          <q-item-label>Pages</q-item-label>
-        </q-item-section>
-      </q-item>
+              <q-separator />
 
-      <q-separator />
+              <q-card-section>
+                <div class="row q-my-xs">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    ID
+                  </div>
+                  <div class="col-8">{{ source.id }}</div>
+                </div>
 
-      <q-card-section> </q-card-section>
-    </q-card>
+                <div class="row q-my-xs">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Created
+                  </div>
+                  <div class="col-8">
+                    <span>{{ source.created.timestamp }} by </span>
+                    <router-link
+                      :to="{
+                        name: 'User',
+                        params: { username: source.created.username },
+                      }"
+                    >
+                      {{ source.created.user }}
+                    </router-link>
+                  </div>
+                </div>
 
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="people" />
-          </q-avatar>
-        </q-item-section>
+                <div class="row q-my-xs" v-if="source.workflow">
+                  <div class="col-2 text-weight-medium text-right q-mr-lg">
+                    Modified
+                  </div>
+                  <div class="col-8">
+                    <span>{{ source.modified.timestamp }} by </span>
+                    <router-link
+                      :to="{
+                        name: 'User',
+                        params: { username: source.modified.username },
+                      }"
+                    >
+                      {{ source.modified.user }}
+                    </router-link>
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
 
-        <q-item-section>
-          <q-item-label>Agents</q-item-label>
-        </q-item-section>
-      </q-item>
+            <q-card class="q-ma-md">
+              <q-item>
+                <q-item-section avatar>
+                  <q-avatar>
+                    <q-icon name="subject" />
+                  </q-avatar>
+                </q-item-section>
 
-      <q-separator />
+                <q-item-section>
+                  <q-item-label class="text-weight-medium">
+                    Description
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
 
-      <q-card-section> </q-card-section>
-    </q-card>
+              <q-separator />
 
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="share" style="transform: rotate(90deg)" />
-          </q-avatar>
-        </q-item-section>
+              <q-card-section v-if="!hasDescription">
+                <div class="q-my-xs text-center text-body1">
+                  <p>No description assigned.</p>
+                </div>
+              </q-card-section>
+              <q-card-section v-else>
+                <div class="q-my-xs text-left text-body1">
+                  {{ source.attributes.description }}
+                </div>
+              </q-card-section>
+            </q-card>
 
-        <q-item-section>
-          <q-item-label>Children</q-item-label>
-        </q-item-section>
-      </q-item>
+            <q-card v-if="hasChildren" class="q-ma-md">
+              <SourceChildren :children="source.children" />
+            </q-card>
 
-      <q-separator />
+            <q-card v-if="hasPages" class="q-ma-md">
+              <SourcePages :pages="source.pages" />
+            </q-card>
 
-      <q-card-section> </q-card-section>
-    </q-card>
+            <q-card v-if="hasAgents" class="q-ma-md">
+              <SourceAgents :agents="source.agents" />
+            </q-card>
 
-    <Comments />
+            <q-card v-if="hasPlaces" class="q-ma-md">
+              <SourcePlaces :agents="source.places" />
+            </q-card>
+
+            <Comments />
+          </q-tab-panel>
+        </q-tab-panels>
+      </template>
+    </q-splitter>
   </div>
 </template>
 
 <script>
-import { defineComponent, inject, provide, ref } from "vue";
+import { useMeta } from "quasar";
+import { filter as rFilter, isEmpty, isNil, map } from "ramda";
+import { computed, defineComponent, provide, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
 import { Comments } from "@/components";
+import { Spinner } from "@/components/utils";
 import { sourceDetailSchema } from "@/schemas";
 import { useAPI } from "@/use";
+
+import SourceAgents from "./SourceAgents.vue";
+import SourceChildren from "./SourceChildren.vue";
+import SourcePages from "./SourcePages.vue";
+import SourcePlaces from "./SourcePlaces.vue";
+
+const getAttributeLabel = (attribute) => {
+  return {
+    url: "Web Address",
+    mk1Identifier: "Mk.I ID",
+    mk2Identifier: "Mk.II ID",
+    altIdentifier: "Alt ID",
+    archivalSeries: "Archival Series",
+    archivalNumber: "Archival Number",
+    recordType: "Record Type",
+    language: "Language",
+    recordTypePhrase: "Record Type Phrase",
+    namedPersons: "Named Persons",
+    decscription: "Description",
+    debtPhrase: "Debt Phrase",
+    debtAmount: "Debt Amount",
+    debtUnit: "Debt Unit",
+    debtSource: "Debt Source",
+    date: "Date",
+    startDate: "Start Date",
+    endDate: "End Date",
+    locale: "Locale",
+    defaultRights: "Default Rights",
+    authority: "Authority",
+    format: "Format",
+    support: "Support",
+    zoteroKey: "Zotero Key",
+  }[attribute];
+};
+
+const isObj = (obj) => {
+  const type = typeof obj;
+  return type === "function" || (type === "object" && !!obj);
+};
+
+const notNully = (value) => !isNil(value) && !isEmpty(value);
 
 export default defineComponent({
   name: "SourceDetail",
   components: {
     Comments,
+    SourceAgents,
+    SourceChildren,
+    SourcePages,
+    SourcePlaces,
+    Spinner,
   },
   async setup() {
-    const { success, data, fetchAPI } = useAPI();
-    // const {
-    //   success: childrenSuccess,
-    //   fetchAPI: childrenFetchAPI,
-    //   status: childrenStatus,
-    // } = useAPI();
+    const $route = useRoute();
+    const { loading, success, data, fetchAPI } = useAPI();
 
-    const source = ref(null);
-    const objId = inject("objId");
+    const source = ref({});
+    const objId = ref($route.params.objId);
+    const splitterModel = ref(10);
+    const tab = ref("data");
+
+    // TODO: Transducer.
+    const attributes = computed(() =>
+      rFilter(
+        (attribute) => !["description"].includes(attribute.key),
+        map(
+          (key) => ({ key, value: source.value.attributes[key] }),
+          Object.keys(source.value.attributes).reverse(),
+        ),
+      ),
+    );
+    const hasAttributes = computed(() => !isNil(source.value.attributes));
+    const hasDescription = computed(
+      () => !isNil(source.value.attributes.description),
+    );
+    const hasAgents = computed(() => notNully(source.value.agents));
+    const hasChildren = computed(() => notNully(source.value.children));
+    const hasPages = computed(() => notNully(source.value.pages));
+    const hasPlaces = computed(() => notNully(source.value.places));
+
     provide("model", "Source");
+    provide("objId", objId);
 
-    await fetchAPI(requests.sources.getSource(objId));
-    if (success.value)
-      await sourceDetailSchema
-        .validate(data.value, { stripUnknown: true })
-        .then((value) => {
-          source.value = value;
-        });
+    useMeta(() => ({
+      title: source.value ? source.value.name : `Source ${objId.value}`,
+    }));
 
-    return { source };
+    const fetchData = async () => {
+      await fetchAPI(requests.sources.getSource(objId.value), true);
+      if (success.value)
+        await sourceDetailSchema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            source.value = value;
+          })
+          .finally(() => (loading.value = false));
+    };
+
+    watch(
+      () => $route.params.objId,
+      async (to) => {
+        objId.value = to;
+        await fetchData();
+      },
+    );
+
+    await fetchData();
+
+    return {
+      attributes,
+      getAttributeLabel,
+      hasAgents,
+      hasAttributes,
+      hasChildren,
+      hasDescription,
+      hasPages,
+      hasPlaces,
+      isObj,
+      isNil,
+      loading,
+      source,
+      splitterModel,
+      tab,
+    };
   },
 });
 </script>

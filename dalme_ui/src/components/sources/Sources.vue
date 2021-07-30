@@ -1,9 +1,7 @@
 <template>
   <div class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
-      <Spinner v-if="loading" />
       <q-table
-        v-else
         :title="title"
         :rows="rows"
         :columns="columns"
@@ -224,11 +222,10 @@
 import { isEmpty, keys, map, filter as rFilter } from "ramda";
 import { useMeta } from "quasar";
 import S from "string";
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
-import { Spinner } from "@/components/utils";
 import { sourceListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -236,12 +233,9 @@ import { columnsByKind } from "./columns";
 
 export default defineComponent({
   name: "Sources",
-  components: {
-    Spinner,
-  },
   async setup() {
     const $route = useRoute();
-    const { loading, success, data, fetchAPI } = useAPI();
+    const { success, data, fetchAPI } = useAPI();
 
     const columns = ref([]);
     const visibleColumns = ref([]);
@@ -268,6 +262,18 @@ export default defineComponent({
       return map(toColumn, keys);
     };
 
+    const renderDate = (attributes) => {
+      if (attributes.startDate && attributes.endDate) {
+        return `${attributes.startDate.name}<br>${attributes.endDate.name}`;
+      }
+      if (attributes.startDate) {
+        return attributes.startDate.name;
+      }
+      return attributes.date.name;
+    };
+
+    const getLocaleData = (data) => (Array.isArray(data) ? data[0] : data);
+
     const fetchData = async () => {
       const request = requests.sources.getSources(kindAPI.value);
       const schema = sourceListSchema(kind.value);
@@ -293,33 +299,28 @@ export default defineComponent({
     watch(
       () => $route.name,
       async (to) => {
-        kindAPI.value = S(to).underscore().s;
-        title.value = S(to).humanize().titleCase().s;
-        kind.value = S(to).toLowerCase().camelize().s;
-        fetchData();
+        const reload = [
+          "Archives",
+          "Archival Files",
+          "Records",
+          "Bibliography",
+        ];
+        if (reload.includes(to)) {
+          kindAPI.value = S(to).underscore().s;
+          title.value = S(to).humanize().titleCase().s;
+          kind.value = S(to).toLowerCase().camelize().s;
+          await fetchData();
+        }
       },
       { immediate: true },
     );
 
-    onMounted(async () => await fetchData());
-
-    const renderDate = (attributes) => {
-      if (attributes.startDate && attributes.endDate) {
-        return `${attributes.startDate.name}<br>${attributes.endDate.name}`;
-      }
-      if (attributes.startDate) {
-        return attributes.startDate.name;
-      }
-      return attributes.date.name;
-    };
-
-    const getLocaleData = (data) => (Array.isArray(data) ? data[0] : data);
+    await fetchData();
 
     return {
       columns,
       filter,
       getLocaleData,
-      loading,
       noData,
       pagination,
       renderDate,

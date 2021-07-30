@@ -1,16 +1,31 @@
 import os
 import json
+from uuid import UUID
+
 from django.contrib.auth.models import User
-from dalme_app.models import Agent, Content_attributes, Set, Set_x_content, Source, Source_credit, Workflow, Work_log
+from django.db.models import F
+from django.utils import timezone
+
 from django_currentuser.middleware import get_current_user
 from rest_framework import serializers
-from ._common import DynamicSerializer, translate_workflow_string
+
 from dalme_api.serializers.users import UserSerializer
 from dalme_api.serializers.attributes import AttributeSerializer
 from dalme_api.serializers.page import PageSerializer
 from dalme_api.serializers.workflow import WorkflowSerializer
 from dalme_api.serializers.sets import SetSerializer
-from uuid import UUID
+from dalme_app.models import (
+    Agent,
+    Content_attributes,
+    Set,
+    Set_x_content,
+    Source,
+    Source_credit,
+    Workflow,
+    Work_log,
+)
+
+from ._common import DynamicSerializer, translate_workflow_string
 
 
 class SourceSetSerializer(serializers.ModelSerializer):
@@ -80,16 +95,67 @@ class SourceSerializer(DynamicSerializer):
         if ret.get('parent') is not None:
             ret['parent'] = {'id': instance.parent.id, 'name': instance.parent.name}
 
+        if instance.agents():
+            agents = []
+            for agent in instance.agents():
+                lp = agent.attributes.filter(attribute_type=150)
+                agents.append({
+                    'id': agent.id,
+                    'name': agent.content_object.standard_name,
+                    'type': agent.content_object.get_type_display(),
+                    'legal_persona': lp.first().value_STR if lp.exists() else 'Unknown'
+                })
+            ret['agents'] = agents
+
+        if instance.children.exists():
+            children = []
+            for child in instance.children.all():
+                children.append({
+                    'id': child.id,
+                    'name': child.name,
+                    'short_name': child.short_name,
+                    'type': child.type.name,
+                    'has_inventory': child.has_inventory,
+                })
+            ret['children'] = children
+
+        if instance.pages.exists():
+            ret['pages'] = self.get_folios(instance)
+
+        if instance.places():
+            places = []
+            for place in instance.places():
+                locale = f'{place.locale.name}, {place.locale.administrative_region}'
+                if place.locale.latitude and place.locale.longitude:
+                    locale += f' ({place.locale.latitude}, {place.locale.longitude})'
+                places.append({
+                    'id': place.id,
+                    'placename': place.standard_name,
+                    'locale': locale
+                })
+            ret['places'] = places
+
+        ret['created'] =  {
+            'timestamp': timezone.localtime(
+                instance.creation_timestamp
+            ).strftime('%d-%b-%Y@%H:%M'),
+            'username': instance.creation_user.username,
+            'user': instance.creation_user.profile.full_name,
+        }
+        ret['modified'] = {
+            'timestamp': timezone.localtime(
+                instance.modification_timestamp
+            ).strftime('%d-%b-%Y@%H:%M'),
+            'username': instance.modification_user.username,
+            'user': instance.modification_user.profile.full_name,
+        }
+
         ret['type'] = {
             'name': instance.type.name,
             'id': instance.type.id
         }
 
-        for k, v in dict(ret).items():
-            if v is None:
-                ret.pop(k)
-
-        return ret
+        return {key: value for key, value in ret.items() if value is not None}
 
     def to_internal_value(self, data):
         for name in ['type', 'parent']:
@@ -337,3 +403,27 @@ class SourceSerializer(DynamicSerializer):
             config_file = json.load(fp)
 
         return [k for k, v in config_file['config']['globals']['attribute_concordance'].items()]
+
+    @staticmethod
+    def get_folios(instance):
+        folio_list = []
+        folios = instance.source_pages.all().values(
+            sp_id=F('page__pk'),
+            sp_name=F('page__name'),
+            sp_transcription_id=F('transcription__pk'),
+            sp_transcription_version=F('transcription__version'),
+            sp_order=F('page__order'),
+            sp_dam_id=F('page__dam_id')
+        ).order_by('sp_order')
+
+        for folio in folios:
+            folio_list.append({
+                'id': folio['sp_id'],
+                'name': folio['sp_name'],
+                'dam_id': folio['sp_dam_id'],
+                'order': folio['sp_order'],
+                'has_image': folio['sp_transcription_id'] is not None,
+                'has_transcription': folio['sp_transcription_version'] is not None,
+            })
+
+        return folio_list

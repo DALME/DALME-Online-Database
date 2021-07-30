@@ -20,7 +20,16 @@
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>{{ comment.creationUser.fullName }}</q-item-label>
+            <q-item-label>
+              <router-link
+                :to="{
+                  name: 'User',
+                  params: { username: comment.creationUser.username },
+                }"
+              >
+                {{ comment.creationUser.fullName }}
+              </router-link>
+            </q-item-label>
             <q-item-label caption>
               Commented on {{ comment.creationTimestamp }}
             </q-item-label>
@@ -65,7 +74,7 @@ export default defineComponent({
     };
 
     const fetchComments = async () => {
-      await fetchAPI(requests.comments.getComments(model, objId));
+      await fetchAPI(requests.comments.getComments(model, objId.value));
       if (success.value)
         await commentsSchema
           .validate(data.value, { stripUnknown: true })

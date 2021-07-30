@@ -2,23 +2,27 @@
   <q-page>
     <SuspenseWithError>
       <template #default>
-        <SourceDetail />
+        <Sets />
       </template>
     </SuspenseWithError>
   </q-page>
 </template>
 
 <script>
+import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { SourceDetail } from "@/components";
+import { Sets } from "@/components";
 import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
-  name: "Source",
+  name: "TicketList",
   components: {
     SuspenseWithError,
-    SourceDetail,
+    Sets,
+  },
+  setup() {
+    useMeta({ title: "Sets" });
   },
 });
 </script>

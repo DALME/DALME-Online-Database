@@ -1,6 +1,8 @@
 <template>
   <div class="q-pa-lg">
-    <q-spinner color="primary" size="3em" :thickness="6" />
+    <q-inner-loading showing>
+      <q-spinner color="primary" size="3em" :thickness="6" />
+    </q-inner-loading>
   </div>
 </template>
 

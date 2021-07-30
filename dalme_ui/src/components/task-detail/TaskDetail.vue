@@ -33,7 +33,8 @@
 </template>
 
 <script>
-import { defineComponent, inject, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
+import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
@@ -48,6 +49,7 @@ export default defineComponent({
     Comments,
   },
   async setup() {
+    const $route = useRoute();
     const $store = useStore();
     const { success, data, fetchAPI } = useAPI();
     const {
@@ -56,21 +58,23 @@ export default defineComponent({
       status: actionStatus,
     } = useAPI();
 
-    let subheading = "";
-    const model = "Task";
     const action = ref("");
     const colour = ref("");
     const task = ref(null);
     const attachment = ref(null);
-    const objId = inject("objId");
+    const objId = ref($route.params.objId);
     const isAdmin = $store.getters["auth/isAdmin"];
+
+    let subheading = "";
+    const model = "Task";
 
     provide("attachment", attachment);
     provide("model", model);
+    provide("objId", objId);
 
     const onAction = async () => {
       const action = task.value.completed ? "markUndone" : "markDone";
-      await actionFetchAPI(requests.tasks.setTaskState(objId, action));
+      await actionFetchAPI(requests.tasks.setTaskState(objId.value, action));
       if (actionSuccess.value && actionStatus.value === 201) {
         await fetchTask();
         notifier.tasks.taskStatusUpdated();
@@ -80,7 +84,7 @@ export default defineComponent({
     };
 
     const fetchTask = async () => {
-      await fetchAPI(requests.tasks.getTask(objId));
+      await fetchAPI(requests.tasks.getTask(objId.value));
       if (success.value)
         await taskSchema
           .validate(data.value, { stripUnknown: true })

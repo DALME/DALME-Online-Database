@@ -33,9 +33,9 @@ const ownerSchema = yup
 const primaryDatasetSchema = yup
   .object()
   .shape({
+    objId: yup.string().uuid().required(),
     name: yup.string().required(),
     detailString: yup.string().required(),
-    objId: yup.string().uuid().required(),
   })
   .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
@@ -56,12 +56,12 @@ const workflowSchema = yup
     helpFlag: yup.boolean().required(),
     isPublic: yup.boolean().required(),
     wfStatus: yup.number().required(),
-    stage: yup.number().nullable(),
+    stage: yup.number().default(null).nullable(),
     ingestionDone: yup.boolean().required(),
     transcriptionDone: yup.boolean().required(),
     markupDone: yup.boolean().required(),
     reviewDone: yup.boolean().required(),
-    parsingDone: yup.boolean().nullable(),
+    parsingDone: yup.boolean().default(null).nullable(),
     activity: yup.object().shape({
       timestamp: yup.string().required(),
       user: yup.string().required(),
@@ -96,13 +96,50 @@ const setSchema = yup
   .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
-const pageSchema = yup
+const agentSchema = yup
   .object()
   .shape({
     objId: yup.string().uuid().required(),
     name: yup.string().required(),
-    order: yup.number().required(),
+    type: yup.string().required(),
+    legalPersona: yup.string().default(null).nullable(),
+  })
+  .transformKeys((value) => (value === "id" ? "objId" : value))
+  .camelCase();
+
+const childSchema = yup
+  .object()
+  .shape({
+    objId: yup.string().uuid().required(),
+    name: yup.string().required(),
+    shortName: yup.string().required(),
+    type: yup.string().required(),
+    hasInventory: yup.boolean().required(),
+  })
+  .transformKeys((value) => (value === "id" ? "objId" : value))
+  .camelCase();
+
+const objectSchema = yup.object().shape({});
+
+const pageSchema = yup
+  .object()
+  .shape({
+    objId: yup.string().uuid().required(),
     damId: yup.number().required(),
+    name: yup.string().required(),
+    order: yup.number().required(),
+    hasImage: yup.boolean().nullable(),
+    hasTranscription: yup.boolean().required(),
+  })
+  .transformKeys((value) => (value === "id" ? "objId" : value))
+  .camelCase();
+
+const placeSchema = yup
+  .object()
+  .shape({
+    objId: yup.string().uuid().required(),
+    placename: yup.string().required(),
+    locale: yup.string().required(),
   })
   .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
@@ -146,8 +183,8 @@ export const archivalFileSourceSchema = yup
       .object()
       .shape({
         locale: localeSchema.default(null).nullable(),
-        authority: yup.string().nullable(),
-        format: yup.string().nullable(),
+        authority: yup.string().default(null).nullable(),
+        format: yup.string().default(null).nullable(),
         support: yup.string().required(),
       })
       .required(),
@@ -219,7 +256,7 @@ export const bibliographySourceSchema = yup
       .object()
       .shape({
         defaultRights: defaultRightsSchema.required(),
-        zoteroKey: yup.string().nullable(),
+        zoteroKey: yup.string().default(null).nullable(),
       })
       .camelCase(),
   })
@@ -229,18 +266,23 @@ export const sourceDetailSchema = yup
   .object()
   .shape({
     id: yup.string().uuid().required(),
-    type: yup.object().shape({
-      name: yup.string().required(),
-      id: yup.number().required(),
-    }),
+    type: yup
+      .object()
+      .shape({
+        objId: yup.number().required(),
+        name: yup.string().required(),
+      })
+      .transformKeys((value) => (value === "id" ? "objId" : value))
+      .required(),
     name: yup.string().required(),
     shortName: yup.string().required(),
     parent: yup
       .object()
       .shape({
-        id: yup.string().uuid().required(),
+        objId: yup.string().uuid().required(),
         name: yup.string().required(),
       })
+      .transformKeys((value) => (value === "id" ? "objId" : value))
       .default(null)
       .nullable(),
     hasInventory: yup.boolean().required(),
@@ -249,22 +291,57 @@ export const sourceDetailSchema = yup
     noRecords: yup.number().required(),
     isPrivate: yup.boolean().required(),
     owner: ownerSchema.required(),
-    credits: yup.array().of(creditSchema).default(null).nullable(),
-    sets: yup.array().of(setSchema).default(null).nullable(),
-    pages: yup.array().of(pageSchema).default(null).nullable(),
     primaryDataset: primaryDatasetSchema.default(null).nullable(),
     workflow: workflowSchema.default(null).nullable(),
+    created: yup
+      .object()
+      .shape({
+        timestamp: yup.string().required(),
+        user: yup.string().required(),
+        username: yup.string().required(),
+      })
+      .required(),
+    modified: yup
+      .object()
+      .shape({
+        timestamp: yup.string().required(),
+        user: yup.string().required(),
+        username: yup.string().required(),
+      })
+      .default(null)
+      .nullable(),
+    credits: yup.array().of(creditSchema).default(null).nullable(),
+    sets: yup.array().of(setSchema).default(null).nullable(),
+    children: yup.array().of(childSchema).default(null).nullable(),
+    pages: yup.array().of(pageSchema).default(null).nullable(),
+    places: yup.array().of(placeSchema).default(null).nullable(),
+    agents: yup.array().of(agentSchema).default(null).nullable(),
+    objects: yup.array().of(objectSchema).default(null).nullable(),
     attributes: yup
       .object()
       .shape({
-        mk1Identifier: yup.number().nullable(),
-        mk2Identifier: yup.string().nullable(),
-        altIdentifier: yup.string().nullable(),
+        url: yup
+          .string()
+          .url()
+          .default(null)
+          .nullable()
+          .transform((value) =>
+            value.includes(" ") ? `http://${last(value.split(" "))}` : value,
+          ),
+        mk1Identifier: yup.number().default(null).nullable(),
+        mk2Identifier: yup.string().default(null).nullable(),
+        altIdentifier: yup.string().default(null).nullable(),
+        archivalSeries: yup.string().default(null).nullable(),
+        archivalNumber: yup.number().default(null).nullable(),
         locale: localeSchema.default(null).nullable(),
         recordType: yup.string().default(null).nullable(), // TODO: Really?
-        recordTypePhrase: yup.string().nullable(),
-        namedPersons: yup.string().nullable(),
-        description: yup.string().nullable(),
+        recordTypePhrase: yup.string().default(null).nullable(),
+        namedPersons: yup.string().default(null).nullable(),
+        description: yup.string().default(null).nullable(),
+        debtPhrase: yup.string().default(null).nullable(),
+        debtAmount: yup.string().default(null).nullable(),
+        debtUnit: yup.string().default(null).nullable(),
+        debtSource: yup.string().default(null).nullable(),
         date: yup
           .object()
           .shape({ name: yup.string().required() })
@@ -298,8 +375,14 @@ export const sourceDetailSchema = yup
           )
           .default(null)
           .nullable(),
+        defaultRights: defaultRightsSchema.default(null).nullable(),
+        authority: yup.string().default(null).nullable(),
+        format: yup.string().default(null).nullable(),
+        support: yup.string().default(null).nullable(),
+        zoteroKey: yup.string().default(null).nullable(),
       })
-      .required()
+      .default(null)
+      .nullable()
       .camelCase(),
   })
   .camelCase();
