@@ -23,7 +23,7 @@ export default defineComponent({
 
     const noData = "No sets found.";
     const title = "Sets";
-    const rowsPerPage = 20;
+    const rowsPerPage = 25;
     const pagination = { rowsPerPage };
 
     return {

@@ -8,6 +8,7 @@
     :pagination="pagination"
     :rows-per-page-options="[0]"
     row-key="id"
+    class="sticky-header"
   >
     <template v-slot:top>
       <q-item-section avatar>

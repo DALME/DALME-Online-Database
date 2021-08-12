@@ -10,23 +10,23 @@ export const taskSchema = yup
     description: yup.string().required(),
     createdBy: yup.number().required(),
     creationTimestamp: yup.string().required(),
-    assignedTo: yup.string().nullable(),
+    assignedTo: yup.string().default(null).nullable(),
     owner: yup.string(),
     attachments: yup
       .mixed()
-      .nullable()
       .transform((value) => {
         if (value) {
           const node = document.createElement("html");
           node.innerHTML = value;
           const link = head(node.getElementsByTagName("a"));
-          return {
-            url: link.getAttribute("href"),
-            kind: link.innerText,
-          };
+          const url = link.getAttribute("href");
+          const kind = link.innerText;
+          return { url, kind };
         }
         return value;
-      }),
+      })
+      .default(null)
+      .nullable(),
   })
   .camelCase();
 
@@ -40,14 +40,14 @@ export const taskListsSchema = yup.array().of(
       group: yup.string().required(),
       name: yup
         .string()
-        .required()
         .transform((value) => {
           const node = document.createElement("html");
           node.innerHTML = value;
           return head(node.getElementsByClassName("mr-auto")).innerText;
-        }),
+        })
+        .required(),
       taskCount: yup.number().required(),
-      taskIndex: yup.array().of(yup.number()),
+      taskIndex: yup.array().of(yup.number().required()).required(),
     })
     .camelCase(),
 );

@@ -1,1 +1,1 @@
-export { default } from "./Set.vue";
+export { default } from "./SetRoot.vue";

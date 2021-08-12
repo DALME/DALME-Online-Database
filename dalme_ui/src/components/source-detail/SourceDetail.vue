@@ -3,7 +3,7 @@
   <div class="full-width full-height">
     <q-splitter :horizontal="$q.screen.lt.sm" v-model="splitterModel">
       <template v-slot:before>
-        <q-tabs v-model="tab" class="text-blue" :vertical="$q.screen.gt.sm">
+        <q-tabs v-model="tab" class="text-blue" :vertical="$q.screen.gt.xs">
           <q-tab name="data" icon="info" label="Data" />
           <q-tab v-if="hasPages" name="editor" icon="preview" label="Editor" />
         </q-tabs>
@@ -269,7 +269,7 @@
             </q-card>
 
             <q-card v-if="hasPlaces" class="q-ma-md">
-              <SourcePlaces :agents="source.places" />
+              <SourcePlaces :places="source.places" />
             </q-card>
 
             <Comments />

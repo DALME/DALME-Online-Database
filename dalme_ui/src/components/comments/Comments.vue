@@ -70,10 +70,10 @@ export default defineComponent({
     const objId = inject("objId");
 
     const handleCommented = async () => {
-      await fetchComments();
+      await fetchData();
     };
 
-    const fetchComments = async () => {
+    const fetchData = async () => {
       await fetchAPI(requests.comments.getComments(model, objId.value));
       if (success.value)
         await commentsSchema
@@ -83,7 +83,7 @@ export default defineComponent({
           });
     };
 
-    await fetchComments();
+    await fetchData();
 
     return { comments, handleCommented };
   },

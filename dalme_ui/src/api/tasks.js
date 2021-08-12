@@ -5,7 +5,7 @@ import { apiUrl, headers } from "./config";
 const endpoint = `${apiUrl}/tasks`;
 
 const tasks = {
-  allTasks() {
+  getTasks() {
     return new Request(endpoint);
   },
   getTask(objId) {

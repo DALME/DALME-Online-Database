@@ -8,6 +8,7 @@
     :pagination="pagination"
     :rows-per-page-options="[0]"
     row-key="id"
+    class="sticky-header"
   >
     <template v-slot:top>
       <q-item-section avatar>
@@ -30,6 +31,12 @@
           <q-icon name="search" />
         </template>
       </q-input>
+    </template>
+
+    <template v-slot:body-cell-name="props">
+      <q-td :props="props">
+        <span v-html="props.value"></span>
+      </q-td>
     </template>
   </q-table>
 </template>
@@ -56,7 +63,7 @@ export default defineComponent({
 
     const getColumns = (keys) => {
       const columnMap = {
-        standardName: "Standard Name",
+        name: "Standard Name",
         type: "Type",
         legalPersona: "Legal Persona",
       };

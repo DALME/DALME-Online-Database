@@ -1,0 +1,63 @@
+import moment from "moment";
+import * as yup from "yup";
+
+const groupSchema = yup.object().shape({
+  id: yup.number().required(),
+  name: yup.string().required(),
+  description: yup.string().required(),
+});
+
+export const userSchema = yup
+  .object()
+  .shape({
+    id: yup.number().required(),
+    firstName: yup.string().required(),
+    lastName: yup.string().required(),
+    email: yup.string().email().required(),
+    isStaff: yup.boolean().required(),
+    isSuperuser: yup.boolean().required(),
+    isActive: yup.boolean().required(),
+    dateJoined: yup
+      .string()
+      .required()
+      .transform((value) =>
+        moment(new Date(value)).format("DD-MMM-YYYY HH:mm"),
+      ),
+    lastLogin: yup
+      .string()
+      .required()
+      .transform((value) =>
+        moment(new Date(value)).format("DD-MMM-YYYY HH:mm"),
+      ),
+    groups: yup.array().of(groupSchema).default(null).nullable(),
+    profile: yup
+      .object()
+      .shape({
+        fullName: yup.string().required(),
+      })
+      .required()
+      .camelCase(),
+    avatar: yup.string().default(null).nullable(),
+  })
+  .camelCase();
+
+export const userListSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      id: yup.number().required(),
+      username: yup.string().required(),
+      // TODO: Should be required but I don't have a profile.
+      fullName: yup.string().nullable(),
+      email: yup.string().required(),
+      lastLogin: yup
+        .string()
+        .required()
+        .transform((value) =>
+          moment(new Date(value)).format("DD-MMM-YYYY HH:mm"),
+        ),
+      isActive: yup.boolean().required(),
+      isStaff: yup.boolean().required(),
+    })
+    .camelCase(),
+);

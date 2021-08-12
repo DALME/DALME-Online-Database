@@ -19,3 +19,22 @@ pre {
   letter-spacing: 0.05rem;
   text-transform: uppercase;
 }
+
+.sticky-header {
+  max-height: 800px;
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    background-color: #fff;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+  &.q-table--loading thead tr:last-child th {
+    top: 400px;
+  }
+}

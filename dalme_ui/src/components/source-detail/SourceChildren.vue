@@ -8,6 +8,7 @@
     :pagination="pagination"
     :rows-per-page-options="[0]"
     row-key="id"
+    class="sticky-header"
   >
     <template v-slot:top>
       <q-item-section avatar>
@@ -106,14 +107,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-.q-table__top {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
-.q-table__bottom--nodata {
-  border: 0;
-}
-</style>

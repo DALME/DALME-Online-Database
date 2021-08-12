@@ -31,7 +31,9 @@
 </template>
 
 <script>
-import { defineComponent, ref, inject, provide } from "vue";
+import { useMeta } from "quasar";
+import { defineComponent, ref, provide } from "vue";
+import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
 import { Attachments, Comments } from "@/components";
@@ -45,6 +47,7 @@ export default defineComponent({
     Comments,
   },
   async setup() {
+    const $route = useRoute();
     const { success, data, fetchAPI } = useAPI();
 
     let subheading = "";
@@ -52,25 +55,32 @@ export default defineComponent({
     const attachment = ref("");
     const colour = ref("");
     const ticket = ref(null);
-    const objId = inject("objId");
+    const objId = ref($route.params.objId);
 
     provide("attachment", attachment);
     provide("model", model);
+    provide("objId", objId);
 
-    await fetchAPI(requests.tickets.getTicket(objId));
-    if (success.value);
-    await ticketDetailSchema
-      .validate(data.value, { stripUnknown: true })
-      .then((value) => {
-        subheading =
-          `${value.creationUser.fullName} opened this issue` +
-          ` on ${value.creationTimestamp}`;
-        colour.value = value.status
-          ? "bg-green-5 text-grey-1"
-          : "bg-red-12 text-grey-1";
-        ticket.value = value;
-        attachment.value = value.file;
-      });
+    useMeta({ title: `Ticket #${objId.value}` });
+
+    const fetchData = async () => {
+      await fetchAPI(requests.tickets.getTicket(objId));
+      if (success.value);
+      await ticketDetailSchema
+        .validate(data.value, { stripUnknown: true })
+        .then((value) => {
+          subheading =
+            `${value.creationUser.fullName} opened this issue` +
+            ` on ${value.creationTimestamp}`;
+          colour.value = value.status
+            ? "bg-green-5 text-grey-1"
+            : "bg-red-12 text-grey-1";
+          ticket.value = value;
+          attachment.value = value.file;
+        });
+    };
+
+    await fetchData();
 
     return { colour, subheading, ticket, objId };
   },

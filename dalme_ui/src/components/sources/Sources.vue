@@ -248,7 +248,7 @@ export default defineComponent({
     useMeta(() => ({ title: title.value }));
 
     const noData = "No sources found.";
-    const pagination = { rowsPerPage: 20 };
+    const pagination = { rowsPerPage: 25 };
 
     const getColumns = (keys) => {
       const columnMap = columnsByKind(kind.value);

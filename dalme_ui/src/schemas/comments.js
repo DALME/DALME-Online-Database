@@ -18,7 +18,7 @@ export const commentSchema = yup
       .shape({
         id: yup.number().required(),
         username: yup.string().required(),
-        // TODO: Needs required but I don't have profile...
+        // TODO: Should be required but I don't have a profile.
         fullName: yup.string().nullable(),
         avatar: yup.string().url().nullable(),
       })
@@ -26,6 +26,7 @@ export const commentSchema = yup
       .camelCase(),
     creationTimestamp: yup
       .string()
+      .required()
       .transform((value) =>
         moment(new Date(value)).format("DD-MMM-YYYY HH:mm"),
       ),

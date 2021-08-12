@@ -3,7 +3,7 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/tickets`;
 
 const tickets = {
-  allTickets() {
+  getTickets() {
     return new Request(endpoint);
   },
   getTicket(objId) {

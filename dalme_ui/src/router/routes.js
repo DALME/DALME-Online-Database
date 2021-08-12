@@ -53,6 +53,51 @@ const routes = [
       },
 
       {
+        // Sets
+        component: () => import("pages/set-root/SetRoot.vue"),
+        name: "Sets",
+        path: "sets",
+        props: { icon: "collections" },
+        nav: true,
+        redirect: "/sets/datasets",
+        children: [
+          {
+            component: () => import("pages/set-list/SetList.vue"),
+            name: "Datasets",
+            path: "datasets",
+            props: { icon: "snippet_folder" },
+            nav: true,
+          },
+        ],
+      },
+
+      {
+        // Entities
+        component: () => import("pages/entity-root/EntityRoot.vue"),
+        name: "Entities",
+        path: "entities",
+        props: { icon: "api" },
+        nav: true,
+        redirect: "/entities/agents",
+        children: [
+          {
+            component: () => import("pages/agent-list/AgentList.vue"),
+            name: "Agents",
+            path: "agents",
+            props: { icon: "recent_actors" },
+            nav: true,
+          },
+          {
+            component: () => import("pages/place-list/PlaceList.vue"),
+            name: "Places",
+            path: "places",
+            props: { icon: "place" },
+            nav: true,
+          },
+        ],
+      },
+
+      {
         // Project
         component: () => import("pages/project-root/ProjectRoot.vue"),
         name: "Project",
@@ -75,6 +120,13 @@ const routes = [
             props: { icon: "subject" },
             nav: true,
           },
+          {
+            component: () => import("pages/rights-list/RightsList.vue"),
+            name: "Rights Policies",
+            path: "rights",
+            props: { icon: "copyright" },
+            nav: true,
+          },
         ],
       },
 
@@ -88,6 +140,34 @@ const routes = [
         redirect: "/system/admin",
         children: [
           {
+            component: () => import("pages/locale-list/LocaleList.vue"),
+            name: "Locales",
+            path: "locales",
+            props: { icon: "location_city" },
+            nav: true,
+          },
+          {
+            component: () => import("pages/country-list/CountryList.vue"),
+            name: "Countries",
+            path: "countries",
+            props: { icon: "flag" },
+            nav: true,
+          },
+          {
+            component: () => import("pages/language-list/LanguageList.vue"),
+            name: "Languages",
+            path: "languages",
+            props: { icon: "translate" },
+            nav: true,
+          },
+          {
+            component: () => import("pages/user-list/UserList.vue"),
+            name: "Users",
+            path: "users",
+            props: { icon: "groups" },
+            nav: true,
+          },
+          {
             component: {},
             name: "Admin",
             path: "admin",
@@ -100,27 +180,8 @@ const routes = [
         ],
       },
 
-      {
-        // Sets
-        component: () => import("pages/set-root/SetRoot.vue"),
-        name: "Sets",
-        path: "sets",
-        props: { icon: "collections" },
-        nav: true,
-        redirect: "/sets/datasets",
-        children: [
-          {
-            component: () => import("pages/set-list/SetList.vue"),
-            name: "Datasets",
-            path: "datasets",
-            props: { icon: "snippet_folder" },
-            nav: true,
-          },
-        ],
-      },
-
       /* Detail Views */
-      // TODO: Scope paths by section?
+      // TODO: Should be able to scope these to children...
       {
         component: () => import("pages/language/Language.vue"),
         name: "Language",

@@ -1,29 +1,24 @@
 <template>
-  <q-page> </q-page>
+  <q-page>
+    <SuspenseWithError>
+      <template #default>
+        <UserDetail />
+      </template>
+    </SuspenseWithError>
+  </q-page>
 </template>
 
 <script>
-import { useMeta } from "quasar";
-import { defineComponent, provide } from "vue";
+import { defineComponent } from "vue";
 
-// import { UserDetail } from "@/components";
-// import { SuspenseWithError } from "@/components/utils";
+import { UserDetail } from "@/components";
+import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "User",
-  props: {
-    username: {
-      type: String,
-      required: true,
-    },
-  },
   components: {
-    // SuspenseWithError,
-    // UserDetail,
-  },
-  setup(props) {
-    useMeta({ title: `User: ${props.username}` });
-    provide("objId", props.username);
+    SuspenseWithError,
+    UserDetail,
   },
 });
 </script>

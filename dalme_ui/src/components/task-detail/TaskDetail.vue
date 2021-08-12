@@ -76,14 +76,14 @@ export default defineComponent({
       const action = task.value.completed ? "markUndone" : "markDone";
       await actionFetchAPI(requests.tasks.setTaskState(objId.value, action));
       if (actionSuccess.value && actionStatus.value === 201) {
-        await fetchTask();
+        await fetchData();
         notifier.tasks.taskStatusUpdated();
       } else {
         notifier.tasks.taskStatusUpdatedError();
       }
     };
 
-    const fetchTask = async () => {
+    const fetchData = async () => {
       await fetchAPI(requests.tasks.getTask(objId.value));
       if (success.value)
         await taskSchema
@@ -99,7 +99,8 @@ export default defineComponent({
             task.value = value;
           });
     };
-    await fetchTask();
+
+    await fetchData();
 
     return {
       action,

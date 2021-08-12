@@ -81,7 +81,7 @@
               round
               icon="comment"
               class="q-ml-md"
-              size="md"
+              size="sm"
               v-if="props.value"
             >
               <q-badge color="red" transparent floating rounded>
@@ -138,7 +138,7 @@ export default defineComponent({
 
     const noData = "No tickets found.";
     const title = props.embedded ? "My Issue Tickets" : "Issue Tickets";
-    const rowsPerPage = props.embedded ? 5 : 20;
+    const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
 
     const getColumns = (keys) => {
@@ -200,20 +200,24 @@ export default defineComponent({
       return Promise.all(map(resolveAttachment, tickets));
     };
 
-    const request = props.embedded
-      ? requests.tickets.userTickets($store.getters["auth/userId"])
-      : requests.tickets.allTickets();
-    await fetchAPI(request);
-    if (success.value)
-      await ticketListSchema
-        .validate(data.value, { stripUnknown: true })
-        .then(async (value) => {
-          if (!isEmpty(value.results)) {
-            columns.value = getColumns(keys(head(value.results)));
-            visibleColumns.value = filterVisibleColumns(columns.value);
-          }
-          rows.value = await resolveAttachments(value.results);
-        });
+    const fetchData = async () => {
+      const request = props.embedded
+        ? requests.tickets.userTickets($store.getters["auth/userId"])
+        : requests.tickets.getTickets();
+      await fetchAPI(request);
+      if (success.value)
+        await ticketListSchema
+          .validate(data.value, { stripUnknown: true })
+          .then(async (value) => {
+            if (!isEmpty(value.results)) {
+              columns.value = getColumns(keys(head(value.results)));
+              visibleColumns.value = filterVisibleColumns(columns.value);
+            }
+            rows.value = await resolveAttachments(value.results);
+          });
+    };
+
+    await fetchData();
 
     return {
       columns,

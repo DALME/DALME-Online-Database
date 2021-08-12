@@ -39,19 +39,7 @@
         </template>
 
         <template v-slot:body-cell-attachments="props">
-          <q-td :props="props">
-            <q-btn
-              push
-              @click="openURL(props.value.url)"
-              :label="props.value.kind"
-              target="_blank"
-              color="white"
-              size="sm"
-              text-color="primary"
-              v-if="props.value"
-            >
-            </q-btn>
-          </q-td>
+          <q-td :props="props"> </q-td>
         </template>
 
         <template v-slot:body-cell-completed="props">
@@ -115,7 +103,7 @@ export default defineComponent({
 
     const noData = "No tasks found.";
     const title = props.embedded ? "My Tasks" : "Tasks";
-    const rowsPerPage = props.embedded ? 5 : 20;
+    const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
 
     const getColumns = (keys) => {
@@ -209,35 +197,39 @@ export default defineComponent({
       },
     );
 
-    const request = props.embedded
-      ? requests.tasks.userTasks($store.getters["auth/userId"])
-      : requests.tasks.allTasks();
-    await fetchAPI(request);
-    if (success.value)
-      await taskListSchema
-        .validate(data.value, { stripUnknown: true })
-        .then((value) => {
-          if (!isEmpty(value)) {
-            columns.value = getColumns(keys(head(value)));
-            const excluded = props.embedded
-              ? ["owner", "description", "createdBy"]
-              : ["description", "createdBy"];
-            visibleColumns.value = map(
-              (column) => column.field,
-              rFilter(
-                (column) => !excluded.includes(column.field),
-                columns.value,
-              ),
-            );
-          }
-          rows.value = value;
-          const query = $router.currentRoute.value.query;
-          taskLists !== undefined &&
-          !isEmpty(taskLists.value) &&
-          !isEmpty(query)
-            ? filterTasks(query, taskLists.value)
-            : (filteredRows.value = value);
-        });
+    const fetchData = async () => {
+      const request = props.embedded
+        ? requests.tasks.userTasks($store.getters["auth/userId"])
+        : requests.tasks.getTasks();
+      await fetchAPI(request);
+      if (success.value)
+        await taskListSchema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            if (!isEmpty(value)) {
+              columns.value = getColumns(keys(head(value)));
+              const excluded = props.embedded
+                ? ["owner", "description", "createdBy"]
+                : ["description", "createdBy"];
+              visibleColumns.value = map(
+                (column) => column.field,
+                rFilter(
+                  (column) => !excluded.includes(column.field),
+                  columns.value,
+                ),
+              );
+            }
+            rows.value = value;
+            const query = $router.currentRoute.value.query;
+            taskLists !== undefined &&
+            !isEmpty(taskLists.value) &&
+            !isEmpty(query)
+              ? filterTasks(query, taskLists.value)
+              : (filteredRows.value = value);
+          });
+    };
+
+    await fetchData();
 
     return {
       columns,
