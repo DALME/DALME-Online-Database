@@ -3,6 +3,7 @@ export * from "./auth";
 export * from "./comments";
 export * from "./places";
 export * from "./rights";
+export * from "./sets";
 export * from "./sources";
 export * from "./tasks";
 export * from "./tickets";

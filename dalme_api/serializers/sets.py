@@ -1,11 +1,13 @@
-from django.contrib.auth.models import Group
-from dalme_app.models import Set
-from django.contrib.auth.models import User
-from rest_framework import serializers
-from ._common import DynamicSerializer
-from dalme_api.serializers.users import UserSerializer
-from dalme_api.serializers.others import GroupSerializer
+from django.contrib.auth.models import Group, User
+
 from django_currentuser.middleware import get_current_user
+from rest_framework import serializers
+
+from dalme_api.serializers.others import GroupSerializer
+from dalme_api.serializers.users import UserSerializer
+from dalme_app.models import Set, Source
+
+from ._common import DynamicSerializer
 
 
 class SetSerializer(DynamicSerializer):
@@ -48,6 +50,14 @@ class SetSerializer(DynamicSerializer):
                 'name': ret.pop('permissions_name'),
                 'id': ret.pop('permissions')
             }
+
+        from dalme_api.serializers.sources import SimpleSourceSerializer  # noqa
+        ret['members'] = [
+            SimpleSourceSerializer(member.content_object).data
+            for member in instance.members.all()
+        ]
+        ret['publicMemberCount'] = instance.get_public_member_count()
+
         return ret
 
     def to_internal_value(self, data):

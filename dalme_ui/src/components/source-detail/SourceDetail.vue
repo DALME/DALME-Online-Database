@@ -1,6 +1,6 @@
 <template>
   <Spinner v-if="loading" />
-  <div class="full-width full-height">
+  <div v-else class="full-width full-height">
     <q-splitter :horizontal="$q.screen.lt.sm" v-model="splitterModel">
       <template v-slot:before>
         <q-tabs v-model="tab" class="text-blue" :vertical="$q.screen.gt.xs">
@@ -383,9 +383,7 @@ export default defineComponent({
       if (success.value)
         await sourceDetailSchema
           .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            source.value = value;
-          })
+          .then((value) => (source.value = value))
           .finally(() => (loading.value = false));
     };
 

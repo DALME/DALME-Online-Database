@@ -47,11 +47,11 @@ const bibliography = {
   noRecords: "No. Records",
 };
 
-export const columnsByKind = (kind) => {
+export const columnsByType = (sourceType) => {
   return {
     archives,
     archivalFiles,
     records,
     bibliography,
-  }[kind];
+  }[sourceType];
 };

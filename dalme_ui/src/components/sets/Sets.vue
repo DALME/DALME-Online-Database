@@ -1,34 +1,174 @@
 <template>
-  <div class="q-ma-md full-width full-height">
+  <Spinner v-if="loading" />
+  <div v-else class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
-      <q-table> </q-table>
+      <q-table
+        :title="title"
+        :rows="rows"
+        :columns="columns"
+        :visible-columns="visibleColumns"
+        :no-data-label="noData"
+        :filter="filter"
+        :pagination="pagination"
+        :title-class="{ 'text-h6': true }"
+        row-key="id"
+      >
+        <template v-slot:top-right>
+          <q-input
+            borderless
+            dense
+            debounce="300"
+            v-model="filter"
+            placeholder="Search"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+
+        <template v-slot:body-cell-name="props">
+          <q-td :props="props">
+            <router-link
+              class="text-subtitle2"
+              :to="{ name: 'Set', params: { objId: props.row.id } }"
+            >
+              {{ props.value }}
+            </router-link>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-owner="props">
+          <q-td :props="props">
+            <router-link
+              :to="{
+                name: 'User',
+                params: { username: props.value.username },
+              }"
+            >
+              {{ props.value.fullName }}
+            </router-link>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-hasLanding="props">
+          <q-td :props="props">
+            <q-icon :name="props.value ? 'done' : 'close'" />
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-endpoint="props">
+          <q-td :props="props">
+            <q-badge outline color="primary" label="Outline">
+              {{ props.value }}
+            </q-badge>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-permissions="props">
+          <q-td :props="props">
+            {{ props.value.name }}
+          </q-td>
+        </template>
+      </q-table>
     </q-card>
   </div>
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { isEmpty, keys, map, filter as rFilter } from "ramda";
+import { useMeta } from "quasar";
+import S from "string";
+import { defineComponent, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
-// import { useAPI } from "@/use";
+import { requests } from "@/api";
+import { Spinner } from "@/components/utils";
+import { setListSchema } from "@/schemas";
+import { useAPI } from "@/use";
+
+import { columnsByType } from "./columns";
 
 export default defineComponent({
   name: "Sets",
+  components: {
+    Spinner,
+  },
   async setup() {
-    // const { success, data, fetchAPI } = useAPI();
+    const $route = useRoute();
+    const { loading, success, data, fetchAPI } = useAPI();
 
     const columns = ref([]);
-    const visibleColumns = ref(null);
+    const visibleColumns = ref([]);
     const rows = ref([]);
     const filter = ref("");
+    const setType = ref("");
+    const setTypeAPI = ref("");
+    const title = ref("");
+
+    useMeta(() => ({ title: title.value }));
 
     const noData = "No sets found.";
-    const title = "Sets";
-    const rowsPerPage = 25;
-    const pagination = { rowsPerPage };
+    const pagination = { rowsPerPage: 25 };
+    const setMap = { corpora: 1, collections: 2, datasets: 3, worksets: 4 };
+
+    const getColumns = () => {
+      const columnMap = columnsByType(setType.value);
+      const toColumn = (key) => ({
+        align: "left",
+        field: key,
+        label: columnMap[key],
+        name: key,
+        sortable: true,
+      });
+      return map(toColumn, keys(columnMap));
+    };
+
+    const fetchData = async () => {
+      const setTypeConstant = setMap[setTypeAPI.value];
+      const request = requests.sets.getSets(setTypeConstant);
+      const schema = setListSchema(setType.value);
+      await fetchAPI(request, true);
+      if (success.value)
+        await schema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            if (!isEmpty(value)) {
+              columns.value = getColumns();
+              visibleColumns.value = map(
+                (column) => column.field,
+                rFilter(
+                  (column) => !["id"].includes(column.field),
+                  columns.value,
+                ),
+              );
+            }
+            rows.value = value;
+          })
+          .finally(() => (loading.value = false));
+    };
+
+    watch(
+      () => $route.name,
+      async (to) => {
+        const reload = ["Corpora", "Collections", "Datasets", "Worksets"];
+        if (reload.includes(to)) {
+          loading.value = true;
+          setTypeAPI.value = S(to).underscore().s;
+          setType.value = S(to).toLowerCase().camelize().s;
+          title.value = S(to).humanize().titleCase().s;
+          await fetchData();
+        }
+      },
+      { immediate: true },
+    );
+
+    await fetchData();
 
     return {
       columns,
       filter,
+      loading,
       noData,
       pagination,
       rows,

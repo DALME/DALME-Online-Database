@@ -3,6 +3,7 @@ import attachments from "./attachments";
 import auth from "./auth";
 import comments from "./comments";
 import places from "./places";
+import sets from "./sets";
 import sources from "./sources";
 import rights from "./rights";
 import tasks from "./tasks";
@@ -16,6 +17,7 @@ const requests = {
   comments,
   places,
   rights,
+  sets,
   sources,
   tasks,
   tickets,

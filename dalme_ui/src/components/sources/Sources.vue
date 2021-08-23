@@ -1,5 +1,6 @@
 <template>
-  <div class="q-ma-md full-width full-height">
+  <Spinner v-if="loading" />
+  <div v-else class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
       <q-table
         :title="title"
@@ -226,23 +227,27 @@ import { defineComponent, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
+import { Spinner } from "@/components/utils";
 import { sourceListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
-import { columnsByKind } from "./columns";
+import { columnsByType } from "./columns";
 
 export default defineComponent({
   name: "Sources",
+  components: {
+    Spinner,
+  },
   async setup() {
     const $route = useRoute();
-    const { success, data, fetchAPI } = useAPI();
+    const { loading, success, data, fetchAPI } = useAPI();
 
     const columns = ref([]);
     const visibleColumns = ref([]);
     const rows = ref([]);
     const filter = ref("");
-    const kind = ref("");
-    const kindAPI = ref("");
+    const sourceType = ref("");
+    const sourceTypeAPI = ref("");
     const title = ref("");
 
     useMeta(() => ({ title: title.value }));
@@ -250,8 +255,8 @@ export default defineComponent({
     const noData = "No sources found.";
     const pagination = { rowsPerPage: 25 };
 
-    const getColumns = (keys) => {
-      const columnMap = columnsByKind(kind.value);
+    const getColumns = () => {
+      const columnMap = columnsByType(sourceType.value);
       const toColumn = (key) => ({
         align: "left",
         field: key,
@@ -259,7 +264,7 @@ export default defineComponent({
         name: key,
         sortable: true,
       });
-      return map(toColumn, keys);
+      return map(toColumn, keys(columnMap));
     };
 
     const renderDate = (attributes) => {
@@ -275,15 +280,15 @@ export default defineComponent({
     const getLocaleData = (data) => (Array.isArray(data) ? data[0] : data);
 
     const fetchData = async () => {
-      const request = requests.sources.getSources(kindAPI.value);
-      const schema = sourceListSchema(kind.value);
-      await fetchAPI(request);
+      const request = requests.sources.getSources(sourceTypeAPI.value);
+      const schema = sourceListSchema(sourceType.value);
+      await fetchAPI(request, true);
       if (success.value)
         await schema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             if (!isEmpty(value)) {
-              columns.value = getColumns(keys(columnsByKind(kind.value)));
+              columns.value = getColumns();
               visibleColumns.value = map(
                 (column) => column.field,
                 rFilter(
@@ -293,7 +298,8 @@ export default defineComponent({
               );
             }
             rows.value = value.data;
-          });
+          })
+          .finally(() => (loading.value = false));
     };
 
     watch(
@@ -306,9 +312,10 @@ export default defineComponent({
           "Bibliography",
         ];
         if (reload.includes(to)) {
-          kindAPI.value = S(to).underscore().s;
+          loading.value = true;
+          sourceTypeAPI.value = S(to).underscore().s;
+          sourceType.value = S(to).toLowerCase().camelize().s;
           title.value = S(to).humanize().titleCase().s;
-          kind.value = S(to).toLowerCase().camelize().s;
           await fetchData();
         }
       },
@@ -321,6 +328,7 @@ export default defineComponent({
       columns,
       filter,
       getLocaleData,
+      loading,
       noData,
       pagination,
       renderDate,

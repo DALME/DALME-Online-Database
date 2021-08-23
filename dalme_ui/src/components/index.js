@@ -10,6 +10,7 @@ export { default as Nav } from "./nav";
 export { default as Places } from "./places";
 export { default as Rights } from "./rights";
 export { default as Sets } from "./sets";
+export { default as SetDetail } from "./set-detail";
 export { default as Sources } from "./sources";
 export { default as SourceDetail } from "./source-detail";
 export { default as TaskLists } from "./task-lists";

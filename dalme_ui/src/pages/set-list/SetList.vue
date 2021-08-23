@@ -9,20 +9,16 @@
 </template>
 
 <script>
-import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
 import { Sets } from "@/components";
 import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
-  name: "TicketList",
+  name: "SetList",
   components: {
     SuspenseWithError,
     Sets,
-  },
-  setup() {
-    useMeta({ title: "Sets" });
   },
 });
 </script>

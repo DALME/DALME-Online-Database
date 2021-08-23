@@ -1,4 +1,5 @@
 import { apiUrl } from "./config";
+import { defaultOrder } from "./constants";
 
 const endpoint = `${apiUrl}/sources`;
 
@@ -7,9 +8,7 @@ const sources = {
     const url = `${endpoint}/${objId}`;
     return new Request(url);
   },
-  getSources(kind, start = 0, length = 25, order = { column: 0, dir: "asc" }) {
-    // TODO: Move order to constant somewhere.
-    // const serverSideSchema = yup.object.shape({});
+  getSources(sourceType, start = 0, length = 25, order = defaultOrder) {
     const data = JSON.stringify({
       draw: 1,
       orderable: true,
@@ -17,8 +16,8 @@ const sources = {
       start,
       length,
     });
-    const url = kind
-      ? `${endpoint}/?class=${kind}&data=${data}`
+    const url = sourceType
+      ? `${endpoint}/?class=${sourceType}&data=${data}`
       : `${endpoint}/?data=${data}`;
     return new Request(url);
   },

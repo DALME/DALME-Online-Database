@@ -28,6 +28,12 @@ from dalme_app.models import (
 from ._common import DynamicSerializer, translate_workflow_string
 
 
+class SimpleSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Source
+        fields = ('id', 'name')
+
+
 class SourceSetSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(source='set_id.id', required=True)
     name = serializers.ReadOnlyField(source='set_id.name', required=False)

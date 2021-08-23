@@ -1,6 +1,8 @@
 import { last } from "ramda";
 import * as yup from "yup";
 
+import { ownerSchema } from "./common";
+
 const defaultRightsSchema = yup.object().shape({
   name: yup.string().required(),
   url: yup.string().required(),
@@ -20,15 +22,6 @@ const localeSchema = yup.object().shape({
     .transformKeys((value) => (value === "id" ? "objId" : value))
     .required(),
 });
-
-const ownerSchema = yup
-  .object()
-  .shape({
-    id: yup.number().required(),
-    username: yup.string().required(),
-    fullName: yup.string().required(),
-  })
-  .camelCase();
 
 const primaryDatasetSchema = yup
   .object()
@@ -387,7 +380,7 @@ export const sourceDetailSchema = yup
   })
   .camelCase();
 
-export const sourceListSchema = (kind) => {
+export const sourceListSchema = (sourceType) => {
   const sourceMap = {
     archives: archiveSourceSchema,
     archivalFiles: archivalFileSourceSchema,
@@ -397,6 +390,6 @@ export const sourceListSchema = (kind) => {
   return yup.object().shape({
     recordsTotal: yup.number().required(),
     recordsFiltered: yup.number().required(),
-    data: yup.array().of(sourceMap[kind]),
+    data: yup.array().of(sourceMap[sourceType]),
   });
 };

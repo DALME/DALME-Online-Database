@@ -79,7 +79,7 @@ module.exports = configure(function (ctx) {
       port: 3000,
       open: false,
       client: {
-        port: 8000,
+        webSocketURL: "ws://0.0.0.0:8000/ws",
       },
     },
 
