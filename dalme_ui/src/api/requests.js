@@ -2,6 +2,9 @@ import agents from "./agents";
 import attachments from "./attachments";
 import auth from "./auth";
 import comments from "./comments";
+import countries from "./countries";
+import languages from "./languages";
+import locales from "./locales";
 import places from "./places";
 import sets from "./sets";
 import sources from "./sources";
@@ -15,6 +18,9 @@ const requests = {
   attachments,
   auth,
   comments,
+  countries,
+  languages,
+  locales,
   places,
   rights,
   sets,

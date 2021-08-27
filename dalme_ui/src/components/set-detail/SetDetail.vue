@@ -43,7 +43,9 @@
               <div class="col-2 text-weight-medium text-right q-mr-lg">
                 Public
               </div>
-              <q-icon :name="set.isPublic ? 'done' : 'close'" size="xs" />
+              <div class="col-8">
+                <q-icon :name="set.isPublic ? 'done' : 'close'" size="xs" />
+              </div>
             </div>
 
             <div class="row q-my-xs" v-if="!isNil(set.hasLanding)">
