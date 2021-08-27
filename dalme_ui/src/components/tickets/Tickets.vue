@@ -127,9 +127,9 @@ export default defineComponent({
       default: false,
     },
   },
-  async setup(props) {
+  async setup(props, context) {
     const $store = useStore();
-    const { success, data, fetchAPI } = useAPI();
+    const { success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const visibleColumns = ref(null);

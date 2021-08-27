@@ -72,8 +72,8 @@ import { useAPI } from "@/use";
 
 export default defineComponent({
   name: "Users",
-  async setup() {
-    const { success, data, fetchAPI } = useAPI();
+  async setup(_, context) {
+    const { success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const rows = ref([]);

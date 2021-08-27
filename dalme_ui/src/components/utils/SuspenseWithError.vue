@@ -9,7 +9,9 @@
       <slot name="default"></slot>
     </template>
     <template #fallback>
-      <Spinner class="flex flex-center" />
+      <div class="flex flex-center q-pa-lg">
+        <q-spinner color="primary" size="3em" :thickness="6" />
+      </div>
     </template>
   </Suspense>
 </template>
@@ -17,14 +19,10 @@
 <script>
 import { defineComponent, ref, onErrorCaptured } from "vue";
 
-import { Spinner } from "@/components/utils";
 import logger from "@/logger";
 
 export default defineComponent({
   name: "SuspenseWithError",
-  components: {
-    Spinner,
-  },
   setup() {
     const error = ref(null);
 

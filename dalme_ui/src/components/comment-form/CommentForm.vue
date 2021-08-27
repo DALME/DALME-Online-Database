@@ -39,8 +39,8 @@ import { useAPI } from "@/use";
 export default defineComponent({
   name: "CommentForm",
   emits: ["onSubmitComment"],
-  setup(_, { emit }) {
-    const { data, fetchAPI, status } = useAPI();
+  setup(_, context) {
+    const { data, fetchAPI, status } = useAPI(context);
 
     const body = ref("");
     const commentForm = ref("");
@@ -64,7 +64,7 @@ export default defineComponent({
               body.value = "";
               commentForm.value.resetValidation();
               notifier.comments.commentAdded();
-              emit("onSubmitComment");
+              context.emit("onSubmitComment");
             })
           : notifier.comments.commentFailed();
         /* eslint-enable */

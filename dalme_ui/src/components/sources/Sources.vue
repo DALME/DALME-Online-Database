@@ -238,9 +238,9 @@ export default defineComponent({
   components: {
     Spinner,
   },
-  async setup() {
+  async setup(_, context) {
     const $route = useRoute();
-    const { loading, success, data, fetchAPI } = useAPI();
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const visibleColumns = ref([]);
@@ -282,7 +282,7 @@ export default defineComponent({
     const fetchData = async () => {
       const request = requests.sources.getSources(sourceTypeAPI.value);
       const schema = sourceListSchema(sourceType.value);
-      await fetchAPI(request, true);
+      await fetchAPI(request);
       if (success.value)
         await schema
           .validate(data.value, { stripUnknown: true })
@@ -298,8 +298,8 @@ export default defineComponent({
               );
             }
             rows.value = value.data;
-          })
-          .finally(() => (loading.value = false));
+            loading.value = false;
+          });
     };
 
     watch(

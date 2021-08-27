@@ -46,9 +46,9 @@ export default defineComponent({
     Attachments,
     Comments,
   },
-  async setup() {
+  async setup(_, context) {
     const $route = useRoute();
-    const { success, data, fetchAPI } = useAPI();
+    const { success, data, fetchAPI } = useAPI(context);
 
     let subheading = "";
     const model = "Ticket";

@@ -45,14 +45,17 @@
     <q-card-section>
       <CommentForm @on-submit-comment="handleCommented" />
     </q-card-section>
+
+    <Spinner :showing="loading" />
   </q-card>
 </template>
 
 <script>
-import { defineComponent, inject, ref } from "vue";
+import { defineComponent, inject, onMounted, ref } from "vue";
 
 import { requests } from "@/api";
 import { CommentForm } from "@/components";
+import { Spinner } from "@/components/utils";
 import { commentsSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -60,9 +63,10 @@ export default defineComponent({
   name: "Comments",
   components: {
     CommentForm,
+    Spinner,
   },
-  async setup() {
-    const { success, data, fetchAPI } = useAPI();
+  setup(_, context) {
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const comments = ref([]);
 
@@ -80,12 +84,13 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             comments.value = value.results;
+            loading.value = false;
           });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
-    return { comments, handleCommented };
+    return { comments, handleCommented, loading };
   },
 });
 </script>

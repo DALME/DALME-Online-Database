@@ -31,9 +31,9 @@ export default defineComponent({
     TaskLists,
     Tasks,
   },
-  setup() {
+  setup(_, context) {
     useMeta({ title: "Tasks" });
-    const { success, data, fetchAPI } = useAPI();
+    const { success, data, fetchAPI } = useAPI(context);
 
     const taskLists = ref([]);
 

@@ -1,1 +1,1 @@
-export { provideAPI, useAPI } from "./api";
+export { useAPI } from "./api";

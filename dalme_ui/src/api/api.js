@@ -1,10 +1,9 @@
-import { isNil } from "ramda";
 import { ref } from "vue";
 
 import { fetcher } from "./config";
 
-const API = (reauthenticate = null) => {
-  const loading = ref(true);
+const API = (context = null) => {
+  const loading = ref(false);
   const success = ref(null);
   const status = ref(null);
   const data = ref(null);
@@ -12,7 +11,7 @@ const API = (reauthenticate = null) => {
   const redirected = ref(null);
   const error = ref(false);
 
-  const fetchAPI = (request, delegateLoading = false) => {
+  const fetchAPI = (request) => {
     loading.value = true;
     error.value = undefined;
 
@@ -23,20 +22,15 @@ const API = (reauthenticate = null) => {
         status.value = response.status;
         redirected.value = response.redirected || false;
         apiError.value = response.error || false;
-        if (!isNil(reauthenticate)) {
-          if (response.status === 200) reauthenticate(false);
-          if (response.status === 201) reauthenticate(false);
-          if (response.status === 403) reauthenticate(true);
+        if (context) {
+          const errors = new Set([403]);
+          const reauthenticate = errors.has(status.value);
+          context.emit("reauthenticate", reauthenticate);
         }
       })
       .catch((e) => {
         error.value = e;
         // TODO: Show internal error.
-      })
-      .finally(() => {
-        if (!delegateLoading) {
-          loading.value = false;
-        }
       });
   };
 

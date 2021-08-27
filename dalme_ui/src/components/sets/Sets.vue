@@ -1,6 +1,5 @@
 <template>
-  <Spinner v-if="loading" />
-  <div v-else class="q-ma-md full-width full-height">
+  <div class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
       <q-table
         :title="title"
@@ -83,7 +82,6 @@ import { defineComponent, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
-import { Spinner } from "@/components/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -91,12 +89,9 @@ import { columnsByType } from "./columns";
 
 export default defineComponent({
   name: "Sets",
-  components: {
-    Spinner,
-  },
-  async setup() {
+  async setup(_, context) {
     const $route = useRoute();
-    const { loading, success, data, fetchAPI } = useAPI();
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const visibleColumns = ref([]);
@@ -128,7 +123,7 @@ export default defineComponent({
       const setTypeConstant = setMap[setTypeAPI.value];
       const request = requests.sets.getSets(setTypeConstant);
       const schema = setListSchema(setType.value);
-      await fetchAPI(request, true);
+      await fetchAPI(request);
       if (success.value)
         await schema
           .validate(data.value, { stripUnknown: true })
@@ -144,8 +139,8 @@ export default defineComponent({
               );
             }
             rows.value = value;
-          })
-          .finally(() => (loading.value = false));
+            loading.value = false;
+          });
     };
 
     watch(
@@ -168,7 +163,6 @@ export default defineComponent({
     return {
       columns,
       filter,
-      loading,
       noData,
       pagination,
       rows,

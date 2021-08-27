@@ -48,8 +48,8 @@ import { placeListSchema } from "@/schemas";
 
 export default defineComponent({
   name: "Places",
-  async setup() {
-    const { success, data, fetchAPI } = useAPI();
+  async setup(_, context) {
+    const { success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const visibleColumns = ref([]);

@@ -48,15 +48,15 @@ export default defineComponent({
   components: {
     Comments,
   },
-  async setup() {
+  async setup(_, context) {
     const $route = useRoute();
     const $store = useStore();
-    const { success, data, fetchAPI } = useAPI();
+    const { success, data, fetchAPI } = useAPI(context);
     const {
       success: actionSuccess,
       fetchAPI: actionFetchAPI,
       status: actionStatus,
-    } = useAPI();
+    } = useAPI(context);
 
     const action = ref("");
     const colour = ref("");

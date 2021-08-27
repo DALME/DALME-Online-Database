@@ -343,9 +343,9 @@ export default defineComponent({
     SourcePlaces,
     Spinner,
   },
-  async setup() {
+  async setup(_, context) {
     const $route = useRoute();
-    const { loading, success, data, fetchAPI } = useAPI();
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const source = ref({});
     const objId = ref($route.params.objId);
@@ -383,8 +383,10 @@ export default defineComponent({
       if (success.value)
         await sourceDetailSchema
           .validate(data.value, { stripUnknown: true })
-          .then((value) => (source.value = value))
-          .finally(() => (loading.value = false));
+          .then((value) => {
+            source.value = value;
+            loading.value = false;
+          });
     };
 
     watch(

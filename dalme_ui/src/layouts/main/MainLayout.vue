@@ -1,5 +1,5 @@
 <template>
-  <LoginModal :show="showLoginModal" />
+  <LoginModal @reauthenticate="onReauthenticate" :show="showLoginModal" />
   <q-layout view="lHh Lpr lFf">
     <Nav />
     <q-page-container>
@@ -12,7 +12,6 @@
 import { defineComponent, ref } from "vue";
 
 import { LoginModal, Nav } from "@/components";
-import { provideAPI } from "@/use";
 
 export default defineComponent({
   name: "MainLayout",
@@ -22,9 +21,8 @@ export default defineComponent({
   },
   setup() {
     const showLoginModal = ref(false);
-    const reauthenticate = (value) => (showLoginModal.value = value);
-    provideAPI(reauthenticate);
-    return { showLoginModal };
+    const onReauthenticate = (value) => (showLoginModal.value = value);
+    return { onReauthenticate, showLoginModal };
   },
 });
 </script>

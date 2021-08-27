@@ -70,9 +70,9 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  setup(props, context) {
     const $store = useStore();
-    const { data, fetchAPI, status } = useAPI();
+    const { data, fetchAPI, status } = useAPI(context);
 
     const showModal = ref(false);
     const username = ref("");

@@ -31,9 +31,9 @@ const getAttributeLabel = (attribute) => {
 
 export default defineComponent({
   name: "UserDetail",
-  async setup() {
+  async setup(_, context) {
     const $route = useRoute();
-    const { success, data, fetchAPI } = useAPI();
+    const { success, data, fetchAPI } = useAPI(context);
 
     const user = ref(null);
     const username = $route.params.username;
