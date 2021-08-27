@@ -142,6 +142,13 @@ const routes = [
             nav: true,
           },
           {
+            component: () => import("pages/library-list/LibraryList.vue"),
+            name: "Library",
+            path: "library",
+            props: { icon: "menu_book" },
+            nav: true,
+          },
+          {
             component: () => import("pages/rights-list/RightsList.vue"),
             name: "Rights Policies",
             path: "rights",

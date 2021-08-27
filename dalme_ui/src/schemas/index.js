@@ -3,6 +3,7 @@ export * from "./auth";
 export * from "./comments";
 export * from "./countries";
 export * from "./languages";
+export * from "./library";
 export * from "./locales";
 export * from "./places";
 export * from "./rights";

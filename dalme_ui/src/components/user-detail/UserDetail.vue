@@ -44,7 +44,9 @@
                 <div class="col-3 text-weight-medium text-right q-mr-lg">
                   Staff
                 </div>
-                <div class="col-6">{{ user.isStaff }}</div>
+                <div class="col-6">
+                  <q-icon :name="user.isStaff ? 'done' : 'close'" size="xs" />
+                </div>
               </div>
 
               <div class="row q-my-xs">

@@ -4,6 +4,7 @@ import auth from "./auth";
 import comments from "./comments";
 import countries from "./countries";
 import languages from "./languages";
+import library from "./library";
 import locales from "./locales";
 import places from "./places";
 import sets from "./sets";
@@ -20,6 +21,7 @@ const requests = {
   comments,
   countries,
   languages,
+  library,
   locales,
   places,
   rights,

@@ -5,6 +5,7 @@ export { default as CommentForm } from "./comment-form";
 export { default as Comments } from "./comments";
 export { default as Countries } from "./countries";
 export { default as Languages } from "./languages";
+export { default as Library } from "./library";
 export { default as Locales } from "./locales";
 export { default as LoginModal } from "./login-modal";
 // NOTE: Don't move NavLink below Nav or it will fail!
