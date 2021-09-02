@@ -536,34 +536,55 @@ aside.side-column .record-detail a:hover {
   padding: 0;
   text-align: right;
 }
+.featured-object-nav a:hover {
+  border-bottom: none !important;
+  text-decoration: none !important;
+  color: #084094 !important;
+}
 .featured-object-nav .year {
   color: #d8d7d8;
   letter-spacing: 7px;
   padding: 0;
+  justify-content: center;
+  display: flex;
 }
 .featured-object-nav h4 {
   font-size: 1rem;
-  margin-bottom: 0.2rem;
-}
-.featured-object-nav > div > div > div:not(:last-child) {
-  font-size: 1.3rem;
-  margin-left: auto;
-  text-align: center;
-}
-.featured-object-nav > div > div > div:not(:first-child) {
-  flex-direction: column;
-  margin-left: auto;
-}
-.featured-object-nav ul {
-  margin: 0 0 0 1rem;
-  width: 100%;
-}
-.featured-object-nav > div > div:last-of-type ul {
+  margin-bottom: 0.5rem;
   border-bottom: 1px dotted #9c9c9c;
 }
-.featured-object-nav ul li {
-  border-top: 1px dotted #636363;
-  padding: 0.3rem 0;
+.featured-object-nav > div > div {
+  overflow: hidden;
+}
+.feature-year-container {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap-reverse;
+  width: 135px;
+  margin-left: auto;
+  margin-right: -1px;
+  margin-top: -1px;
+  align-items: end;
+  justify-content: flex-end;
+}
+.feature-month-container {
+  width: 45px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 1px dotted #9c9c9c;
+  font-size: 12px;
+  color: #bdbdbd;
+}
+.feature-month-container.current {
+  color: #084094;
+}
+.featured-object-nav hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px dotted #9c9c9c;
+  margin: 0;
 }
 
 nav.browse {
