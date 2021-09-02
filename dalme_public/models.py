@@ -92,7 +92,6 @@ class SetFieldPanel(FieldPanel):
 
 class DALMEImage(AbstractImage):
     caption = models.CharField(max_length=255, null=True, blank=True)
-
     admin_form_fields = Image.admin_form_fields + ('caption',)
 
 
@@ -374,6 +373,14 @@ class FeaturedPage(DALMEPage):
         help_text='Check this box to show the "Cite" menu for this page.'
     )
 
+    front_page_image = models.ForeignKey(
+        'dalme_public.DALMEImage',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text='The image that will display on the front page.'
+    )
+
     class Meta:
         abstract = True
 
@@ -393,6 +400,10 @@ class FeaturedPage(DALMEPage):
         revisions = self.revisions.filter(approved_go_live_at__isnull=False).order_by('-created_at')
         if revisions.exists():
             return revisions.first().approved_go_live_at  # .strftime('%d-%b-%Y@%H:%M')
+
+    @property
+    def front_image(self):
+        return self.front_page_image or self.main_image
 
     def snippet(self, width=200):
         try:
@@ -607,6 +618,7 @@ class FeaturedObject(FeaturedPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         FieldPanel('header_position'),
+        ImageChooserPanel('front_page_image'),
         ModelChooserPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
@@ -643,6 +655,7 @@ class FeaturedInventory(FeaturedPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         FieldPanel('header_position'),
+        ImageChooserPanel('front_page_image'),
         ModelChooserPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
@@ -680,6 +693,7 @@ class Essay(FeaturedPage):
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
         FieldPanel('header_position'),
+        ImageChooserPanel('front_page_image'),
         FieldPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
