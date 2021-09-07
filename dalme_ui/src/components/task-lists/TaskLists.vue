@@ -52,7 +52,7 @@ import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "TaskLists",
-  async setup() {
+  setup() {
     const $router = useRouter();
 
     const title = "Task Lists";

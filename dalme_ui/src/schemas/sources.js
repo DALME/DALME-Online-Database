@@ -238,10 +238,13 @@ export const bibliographySourceSchema = yup
   .shape({
     id: yup.string().uuid().required(),
     name: yup.string().required(),
-    primaryDataset: yup.object().shape({
-      id: yup.string().uuid().required(),
-      name: yup.string().required(),
-    }),
+    primaryDataset: yup
+      .object()
+      .shape({
+        objId: yup.string().uuid().required(),
+        name: yup.string().required(),
+      })
+      .transformKeys((value) => (value === "id" ? "objId" : value)),
     owner: ownerSchema.required(),
     isPrivate: yup.boolean().required(),
     noRecords: yup.number().required(),

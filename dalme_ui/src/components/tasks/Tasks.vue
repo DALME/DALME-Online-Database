@@ -10,6 +10,7 @@
         :filter="filter"
         :pagination="pagination"
         :title-class="{ 'text-h6': true }"
+        :loading="loading"
         row-key="title"
       >
         <template v-slot:top-right>
@@ -73,7 +74,7 @@ import {
   reverse,
   values,
 } from "ramda";
-import { defineComponent, inject, ref, watch } from "vue";
+import { defineComponent, inject, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
@@ -89,17 +90,17 @@ export default defineComponent({
       default: false,
     },
   },
-  async setup(props, context) {
+  setup(props, context) {
     const $router = useRouter();
     const $store = useStore();
-    const { success, data, fetchAPI } = useAPI(context);
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const visibleColumns = ref([]);
     const rows = ref([]);
     const filteredRows = ref([]);
     const filter = ref("");
-    const taskLists = inject("taskLists");
+    const taskLists = props.embedded ? ref([]) : inject("taskLists");
 
     const noData = "No tasks found.";
     const title = props.embedded ? "My Tasks" : "Tasks";
@@ -125,6 +126,7 @@ export default defineComponent({
       return reverse(map(toColumn, keys));
     };
 
+    // TODO: Move to local useTaskFilter hook -> taskFilter
     const filterTasks = (query, taskLists) => {
       let filter = query.filter.split(",");
 
@@ -226,14 +228,16 @@ export default defineComponent({
             !isEmpty(query)
               ? filterTasks(query, taskLists.value)
               : (filteredRows.value = value);
+            loading.value = false;
           });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
     return {
       columns,
       filter,
+      loading,
       noData,
       openURL,
       pagination,

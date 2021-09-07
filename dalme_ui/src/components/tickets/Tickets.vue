@@ -10,6 +10,7 @@
         :filter="filter"
         :pagination="pagination"
         :title-class="{ 'text-h6': true }"
+        :loading="loading"
         row-key="id"
       >
         <template v-slot:top-right>
@@ -112,7 +113,7 @@ import {
   keys,
   reverse,
 } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
@@ -127,9 +128,9 @@ export default defineComponent({
       default: false,
     },
   },
-  async setup(props, context) {
+  setup(props, context) {
     const $store = useStore();
-    const { success, data, fetchAPI } = useAPI(context);
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const visibleColumns = ref(null);
@@ -214,10 +215,11 @@ export default defineComponent({
               visibleColumns.value = filterVisibleColumns(columns.value);
             }
             rows.value = await resolveAttachments(value.results);
+            loading.value = false;
           });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
     return {
       columns,
@@ -228,6 +230,7 @@ export default defineComponent({
       rows,
       title,
       visibleColumns,
+      loading,
     };
   },
 });

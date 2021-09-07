@@ -112,8 +112,21 @@
               <div class="col-2 text-weight-medium text-right q-mr-lg">
                 Progress
               </div>
-              <!-- TODO: progress bar -->
-              <div class="col-8">{{ set.worksetProgress }}%</div>
+              <div class="col-8">
+                <q-linear-progress
+                  size="20px"
+                  :value="set.worksetProgress"
+                  color="teal"
+                >
+                  <div class="absolute-full flex flex-center">
+                    <q-badge
+                      color="white"
+                      text-color="teal"
+                      :label="`${set.worksetProgress * 100}%`"
+                    />
+                  </div>
+                </q-linear-progress>
+              </div>
             </div>
           </template>
         </q-card-section>
@@ -122,7 +135,7 @@
       <q-card class="q-ma-md">
         <SetMembers
           v-if="!loading && hasMembers"
-          :members="set.members"
+          :objId="set.id"
           :memberCount="set.memberCount"
           :publicMemberCount="set.publicMemberCount"
         />

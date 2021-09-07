@@ -75,14 +75,20 @@ const worksetSchema = yup
   })
   .camelCase();
 
-export const setMemberSchema = yup
-  .object()
-  .shape({
-    objId: yup.string().uuid().required(),
-    name: yup.string().required(),
-  })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
-  .camelCase();
+export const setMembersSchema = yup.object().shape({
+  count: yup.number().required(),
+  data: yup.array().of(
+    yup
+      .object()
+      .shape({
+        objId: yup.string().uuid().required(),
+        name: yup.string().required(),
+        isPublic: yup.boolean().required(),
+      })
+      .transformKeys((value) => (value === "id" ? "objId" : value))
+      .camelCase(),
+  ),
+});
 
 export const setDetailSchema = yup
   .object()
@@ -101,7 +107,6 @@ export const setDetailSchema = yup
     statText: yup.string().default(null).nullable(),
     memberCount: yup.number().required(),
     publicMemberCount: yup.number().required(),
-    members: yup.array().of(setMemberSchema),
   })
   .camelCase();
 

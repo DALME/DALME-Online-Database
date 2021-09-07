@@ -12,6 +12,7 @@ class DALMELimitOffsetPagination(LimitOffsetPagination):
             data, queryset, instance = data_object
         except ValueError:
             data, queryset, instance = data_object, None, None
+
         response_obj = [
             ('count', self.count),
             ('next', self.get_next_link()),

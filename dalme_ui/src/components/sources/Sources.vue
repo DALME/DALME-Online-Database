@@ -1,6 +1,5 @@
 <template>
-  <Spinner v-if="loading" />
-  <div v-else class="q-ma-md full-width full-height">
+  <div class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
       <q-table
         :title="title"
@@ -11,6 +10,7 @@
         :filter="filter"
         :pagination="pagination"
         :title-class="{ 'text-h6': true }"
+        :loading="loading"
         row-key="id"
       >
         <template v-slot:top-right>
@@ -175,19 +175,13 @@
 
         <template v-slot:body-cell-isPrivate="props">
           <q-td :props="props">
-            <q-icon v-if="props.row.isPrivate" name="vpn_lock" size="xs" />
-            <q-icon v-else name="public" size="xs" />
+            <q-icon :name="props.row.isPrivate ? 'done' : 'close'" />
           </q-td>
         </template>
 
         <template v-slot:body-cell-isPublic="props">
           <q-td :props="props">
-            <q-icon
-              v-if="props.row.workflow.isPublic"
-              name="public"
-              size="xs"
-            />
-            <q-icon v-else name="vpn_lock" size="xs" />
+            <q-icon :name="props.row.isPublic ? 'done' : 'close'" />
           </q-td>
         </template>
 
@@ -215,6 +209,7 @@
           </q-td>
         </template>
       </q-table>
+      <OpaqueSpinner :showing="loading" />
     </q-card>
   </div>
 </template>
@@ -223,11 +218,11 @@
 import { isEmpty, keys, map, filter as rFilter } from "ramda";
 import { useMeta } from "quasar";
 import S from "string";
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
-import { Spinner } from "@/components/utils";
+import { OpaqueSpinner } from "@/components/utils";
 import { sourceListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -236,9 +231,9 @@ import { columnsByType } from "./columns";
 export default defineComponent({
   name: "Sources",
   components: {
-    Spinner,
+    OpaqueSpinner,
   },
-  async setup(_, context) {
+  setup(_, context) {
     const $route = useRoute();
     const { loading, success, data, fetchAPI } = useAPI(context);
 
@@ -288,6 +283,7 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             if (!isEmpty(value)) {
+              // TODO: Convert this to the simple approach and move it to the top.
               columns.value = getColumns();
               visibleColumns.value = map(
                 (column) => column.field,
@@ -315,14 +311,20 @@ export default defineComponent({
           loading.value = true;
           sourceTypeAPI.value = S(to).underscore().s;
           sourceType.value = S(to).toLowerCase().camelize().s;
-          title.value = S(to).humanize().titleCase().s;
+          const setTitle = () => (title.value = S(to).humanize().titleCase().s);
+          let updateTitle = true;
+          if (!title.value) {
+            setTitle();
+            updateTitle = false;
+          }
           await fetchData();
+          if (updateTitle) setTitle();
         }
       },
       { immediate: true },
     );
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
     return {
       columns,

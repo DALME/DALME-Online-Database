@@ -1,12 +1,13 @@
 <template>
   <q-table
-    :rows="rows"
     :columns="columns"
-    :no-data-label="noData"
     :filter="filter"
-    :pagination="pagination"
-    :rows-per-page-options="[0]"
+    :loading="loading"
+    :no-data-label="noData"
+    :rows="rows"
+    @request="onRequest"
     row-key="id"
+    v-model:pagination="pagination"
     class="sticky-header"
   >
     <template v-slot:top>
@@ -44,18 +45,33 @@
         </router-link>
       </q-td>
     </template>
+
+    <template v-slot:body-cell-isPublic="props">
+      <q-td :props="props">
+        <div class="col-8">
+          <q-icon :name="props.value ? 'done' : 'close'" />
+        </div>
+      </q-td>
+    </template>
   </q-table>
+
+  <Spinner :showing="loading" />
 </template>
 
 <script>
-import { map } from "ramda";
+import { keys, map } from "ramda";
 import { defineComponent, ref } from "vue";
+
+import { requests } from "@/api";
+import { Spinner } from "@/components/utils";
+import { setMembersSchema } from "@/schemas";
+import { useAPI, usePagination } from "@/use";
 
 export default defineComponent({
   name: "SetMembers",
   props: {
-    members: {
-      type: Array,
+    objId: {
+      type: String,
       required: true,
     },
     memberCount: {
@@ -67,17 +83,23 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  components: {
+    Spinner,
+  },
+  setup(props, context) {
+    const { loading, success, data, fetchAPI } = useAPI(context);
+
     const columns = ref([]);
-    const filter = ref("");
+    const rows = ref([]);
+    const fieldMap = ref(null);
 
     const noData = "No members found.";
-    const pagination = { rowsPerPage: 0 }; // All rows.
 
     const getColumns = () => {
       const columnMap = {
         objId: "ID",
         name: "Name",
+        isPublic: "Public",
       };
       const toColumn = (key) => ({
         align: "left",
@@ -86,16 +108,37 @@ export default defineComponent({
         name: key,
         sortable: true,
       });
-      return map(toColumn, ["objId", "name"]);
+      return map(toColumn, ["objId", "name", "isPublic"]);
     };
     columns.value = getColumns();
+
+    const fetchData = async (q) => {
+      rows.value = [];
+      const request = requests.sets.getSetMembers(props.objId, q);
+      await fetchAPI(request);
+      if (success.value)
+        await setMembersSchema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            fieldMap.value = data.value.data.length
+              ? keys(data.value.data[0])
+              : null;
+            pagination.value.rowsNumber = value.count;
+            rows.value.splice(0, rows.value.length, ...value.data);
+            loading.value = false;
+          });
+    };
+
+    const { filter, pagination, onRequest } = usePagination(fetchData);
 
     return {
       columns,
       filter,
+      loading,
+      onRequest,
       noData,
       pagination,
-      rows: props.members,
+      rows,
     };
   },
 });

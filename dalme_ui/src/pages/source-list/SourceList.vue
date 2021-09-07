@@ -1,10 +1,6 @@
 <template>
   <q-page>
-    <SuspenseWithError>
-      <template #default>
-        <Sources />
-      </template>
-    </SuspenseWithError>
+    <Sources />
   </q-page>
 </template>
 
@@ -12,12 +8,10 @@
 import { defineComponent } from "vue";
 
 import { Sources } from "@/components";
-import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "SourceList",
   components: {
-    SuspenseWithError,
     Sources,
   },
 });

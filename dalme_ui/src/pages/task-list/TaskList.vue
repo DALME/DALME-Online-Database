@@ -1,15 +1,7 @@
 <template>
   <q-page>
-    <SuspenseWithError>
-      <template #default>
-        <TaskLists />
-      </template>
-    </SuspenseWithError>
-    <SuspenseWithError>
-      <template #default>
-        <Tasks />
-      </template>
-    </SuspenseWithError>
+    <TaskLists />
+    <Tasks />
   </q-page>
 </template>
 
@@ -20,14 +12,12 @@ import { defineComponent, provide, ref } from "vue";
 
 import { requests } from "@/api";
 import { TaskLists, Tasks } from "@/components";
-import { SuspenseWithError } from "@/components/utils";
 import { taskListsSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
 export default defineComponent({
   name: "TaskList",
   components: {
-    SuspenseWithError,
     TaskLists,
     Tasks,
   },

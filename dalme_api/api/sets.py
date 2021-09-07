@@ -1,11 +1,16 @@
 import json
+
 from django.db.models import Q, Count
-from rest_framework.response import Response
+
 from rest_framework.decorators import action
-from dalme_api.serializers import SetSerializer
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+
+from dalme_api.access_policies import SetAccessPolicy, SourceAccessPolicy
+from dalme_api.filters import SetFilter, SourceFilter
 from dalme_app.models import Set, Set_x_content, Source
-from dalme_api.access_policies import SetAccessPolicy
-from dalme_api.filters import SetFilter
+from dalme_api.serializers import SetSerializer
+
 from ._common import DALMEBaseViewSet
 
 
@@ -25,6 +30,32 @@ class Sets(DALMEBaseViewSet):
         }
     }
     ordering = ['name']
+
+    @action(detail=True, methods=['get'])
+    def members(self, request, *args, **kwargs):
+        from dalme_api.serializers.sources import SimpleSourceSerializer  # noqa
+
+        self.filterset_class = SourceFilter
+        self.search_fields = ["id", "name"]
+        self.ordering_fields = [*self.search_fields, "is_public"]
+
+        obj = self.get_object()
+
+        qs = Source.objects.filter(pk__in=[
+            x.content_object.pk
+            for x in obj.members.all().prefetch_related('content_object')
+        ])
+
+        qs = self.filter_queryset(qs)
+
+        data = self.request.GET.get('data', {})
+        if data:
+            data = json.loads(data)
+        page = self.paginate_queryset(qs, data.get('start'), data.get('length'))
+        serializer = SimpleSourceSerializer(page, many=True)
+
+        payload = {'count': qs.count(), 'data': serializer.data}
+        return Response(payload)
 
     @action(detail=False, methods=['post'])
     def add_members(self, request, *args, **kwargs):
@@ -115,14 +146,10 @@ class Sets(DALMEBaseViewSet):
 
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('type') is not None:
-            queryset = Set.objects.filter(set_type=int(self.request.GET['type']))
-        else:
-            queryset = Set.objects.all()
-        return queryset
+            return Set.objects.filter(set_type=int(self.request.GET['type']))
+        return Set.objects.all()
 
     def get_object(self):
         if self.kwargs.get('pk') is not None:
-            object = self.queryset.get(pk=self.kwargs.get('pk'))
-        else:
-            object = self.queryset.get(pk=self.request.data['data[0][set]'])
-        return object
+            return self.queryset.get(pk=self.kwargs.get('pk'))
+        return self.queryset.get(pk=self.request.data['data[0][set]'])

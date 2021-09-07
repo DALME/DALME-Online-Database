@@ -10,7 +10,7 @@
     "effect": "allow"
   },
   {
-    "action": ["retrieve"],
+    "action": ["retrieve", "members"],
     "principal": ["*"],
     "effect": "allow",
     "condition": "can_view"

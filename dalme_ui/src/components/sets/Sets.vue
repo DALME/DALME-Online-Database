@@ -10,6 +10,7 @@
         :filter="filter"
         :pagination="pagination"
         :title-class="{ 'text-h6': true }"
+        :loading="loading"
         row-key="id"
       >
         <template v-slot:top-right>
@@ -70,6 +71,7 @@
           </q-td>
         </template>
       </q-table>
+      <OpaqueSpinner :showing="loading" />
     </q-card>
   </div>
 </template>
@@ -78,10 +80,11 @@
 import { isEmpty, keys, map, filter as rFilter } from "ramda";
 import { useMeta } from "quasar";
 import S from "string";
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
+import { OpaqueSpinner } from "@/components/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -89,7 +92,10 @@ import { columnsByType } from "./columns";
 
 export default defineComponent({
   name: "Sets",
-  async setup(_, context) {
+  components: {
+    OpaqueSpinner,
+  },
+  setup(_, context) {
     const $route = useRoute();
     const { loading, success, data, fetchAPI } = useAPI(context);
 
@@ -151,18 +157,25 @@ export default defineComponent({
           loading.value = true;
           setTypeAPI.value = S(to).underscore().s;
           setType.value = S(to).toLowerCase().camelize().s;
-          title.value = S(to).humanize().titleCase().s;
+          const setTitle = () => (title.value = S(to).humanize().titleCase().s);
+          let updateTitle = true;
+          if (!title.value) {
+            setTitle();
+            updateTitle = false;
+          }
           await fetchData();
+          if (updateTitle) setTitle();
         }
       },
       { immediate: true },
     );
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
     return {
       columns,
       filter,
+      loading,
       noData,
       pagination,
       rows,

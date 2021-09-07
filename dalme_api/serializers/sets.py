@@ -40,23 +40,22 @@ class SetSerializer(DynamicSerializer):
             progress_circle = '<div class="pie-wrapper"><span class="label">{}<span class="smaller">%</span></span><div class="pie" {}>'.format(round(progress), pie_style)
             progress_circle += '<div class="left-side half-circle" {}></div><div class="right-side half-circle" {}></div></div></div>'.format(left_style, right_style)
             ret['progress_circle'] = progress_circle
+
+            ret['workset_progress'] = round(progress) / 100
+
         if ret.get('set_type') is not None:
             ret['set_type'] = {
                 'name': ret.pop('set_type_name'),
                 'id': ret.pop('set_type')
             }
+
         if ret.get('permissions') is not None:
             ret['permissions'] = {
                 'name': ret.pop('permissions_name'),
                 'id': ret.pop('permissions')
             }
 
-        from dalme_api.serializers.sources import SimpleSourceSerializer  # noqa
-        ret['members'] = [
-            SimpleSourceSerializer(member.content_object).data
-            for member in instance.members.all()
-        ]
-        ret['publicMemberCount'] = instance.get_public_member_count()
+        ret['public_member_count'] = instance.get_public_member_count()
 
         return ret
 
