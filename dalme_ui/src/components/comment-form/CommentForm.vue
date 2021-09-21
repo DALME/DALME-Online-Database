@@ -32,15 +32,15 @@ import { isEmpty } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 
 import { requests } from "@/api";
-import notifier from "@/notifier";
 import { commentPayloadSchema, commentSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useNotifier } from "@/use";
 
 export default defineComponent({
   name: "CommentForm",
   emits: ["onSubmitComment"],
   setup(_, context) {
     const { data, fetchAPI, status } = useAPI(context);
+    const $notifier = useNotifier();
 
     const body = ref("");
     const commentForm = ref("");
@@ -63,10 +63,10 @@ export default defineComponent({
           ? commentSchema.validate(data.value).then(() => {
               body.value = "";
               commentForm.value.resetValidation();
-              notifier.comments.commentAdded();
+              $notifier.comments.commentAdded();
               context.emit("onSubmitComment");
             })
-          : notifier.comments.commentFailed();
+          : $notifier.comments.commentFailed();
         /* eslint-enable */
       }, 250);
       submitting.value = false;

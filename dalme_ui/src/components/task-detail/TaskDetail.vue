@@ -39,9 +39,8 @@ import { useStore } from "vuex";
 
 import { requests } from "@/api";
 import { Comments } from "@/components";
-import notifier from "@/notifier";
 import { taskSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useNotifier } from "@/use";
 
 export default defineComponent({
   name: "TaskDetail",
@@ -57,6 +56,7 @@ export default defineComponent({
       fetchAPI: actionFetchAPI,
       status: actionStatus,
     } = useAPI(context);
+    const $notifier = useNotifier();
 
     const action = ref("");
     const colour = ref("");
@@ -77,9 +77,9 @@ export default defineComponent({
       await actionFetchAPI(requests.tasks.setTaskState(objId.value, action));
       if (actionSuccess.value && actionStatus.value === 201) {
         await fetchData();
-        notifier.tasks.taskStatusUpdated();
+        $notifier.tasks.taskStatusUpdated();
       } else {
-        notifier.tasks.taskStatusUpdatedError();
+        $notifier.tasks.taskStatusUpdatedError();
       }
     };
 

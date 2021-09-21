@@ -60,7 +60,7 @@ import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
 import { NavLink } from "@/components";
-import notifier from "@/notifier";
+import { useNotifier } from "@/use";
 
 export default defineComponent({
   name: "Nav",
@@ -70,6 +70,7 @@ export default defineComponent({
   setup() {
     const $router = useRouter();
     const $store = useStore();
+    const $notifier = useNotifier();
 
     const navOpen = ref(false);
     const submitting = ref(false);
@@ -81,7 +82,7 @@ export default defineComponent({
 
     const logout = () => {
       submitting.value = true;
-      notifier.auth.logout();
+      $notifier.auth.logout();
       setTimeout(() => {
         $store.dispatch("auth/logout");
       }, 300);

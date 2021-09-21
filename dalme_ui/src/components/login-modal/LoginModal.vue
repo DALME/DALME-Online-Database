@@ -58,9 +58,8 @@ import { computed, defineComponent, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
-import notifier from "@/notifier";
 import { sessionSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useNotifier } from "@/use";
 
 export default defineComponent({
   name: "LoginModal",
@@ -72,6 +71,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const $store = useStore();
+    const $notifier = useNotifier();
     const { data, fetchAPI, status } = useAPI(context);
 
     const showModal = ref(false);
@@ -92,7 +92,7 @@ export default defineComponent({
 
     const validateSession = async () => {
       await sessionSchema.validate(data.value).then((value) => {
-        notifier.auth.reauthenticated();
+        $notifier.auth.reauthenticated();
         $store.dispatch("auth/login", value);
       });
     };
@@ -111,7 +111,7 @@ export default defineComponent({
             password: password.value,
           }),
         );
-        status.value === 200 ? validateSession() : notifier.auth.authFailed();
+        status.value === 200 ? validateSession() : $notifier.auth.authFailed();
         submitting.value = false;
         reset();
       }, 500);
