@@ -67,6 +67,12 @@ import { Spinner } from "@/components/utils";
 import { setMembersSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 
+const columnMap = {
+  objId: "ID",
+  name: "Name",
+  isPublic: "Public",
+};
+
 export default defineComponent({
   name: "SetMembers",
   props: {
@@ -96,11 +102,6 @@ export default defineComponent({
     const noData = "No members found.";
 
     const getColumns = () => {
-      const columnMap = {
-        objId: "ID",
-        name: "Name",
-        isPublic: "Public",
-      };
       const toColumn = (key) => ({
         align: "left",
         field: key,
@@ -108,9 +109,8 @@ export default defineComponent({
         name: key,
         sortable: true,
       });
-      return map(toColumn, ["objId", "name", "isPublic"]);
+      return map(toColumn, keys(columnMap));
     };
-    columns.value = getColumns();
 
     const fetchData = async (q) => {
       rows.value = [];
@@ -120,6 +120,7 @@ export default defineComponent({
         await setMembersSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
+            columns.value = getColumns();
             fieldMap.value = data.value.data.length
               ? keys(data.value.data[0])
               : null;

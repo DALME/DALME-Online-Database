@@ -65,13 +65,11 @@ import {
   filter as rFilter,
   flatten,
   has,
-  head,
   isEmpty,
   map,
   mapObjIndexed,
   partition,
   keys,
-  reverse,
   values,
 } from "ramda";
 import { defineComponent, inject, onMounted, ref, watch } from "vue";
@@ -81,6 +79,16 @@ import { useStore } from "vuex";
 import { requests } from "@/api";
 import { taskListSchema } from "@/schemas";
 import { useAPI } from "@/use";
+
+const columnMap = {
+  id: "ID",
+  title: "Task",
+  creationTimestamp: "Dates",
+  assignedTo: "Assigned to",
+  attachments: "Attachments",
+  completed: "Status",
+  owner: "Owner",
+};
 
 export default defineComponent({
   name: "Tasks",
@@ -107,23 +115,15 @@ export default defineComponent({
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
 
-    const getColumns = (keys) => {
+    const getColumns = () => {
       const toColumn = (key) => ({
         align: "left",
         field: key,
-        label: {
-          id: "ID",
-          title: "Task",
-          creationTimestamp: "Dates",
-          assignedTo: "Assigned to",
-          attachments: "Attachments",
-          completed: "Status",
-          owner: "Owner",
-        }[key],
+        label: columnMap[key],
         name: key,
         sortable: true,
       });
-      return reverse(map(toColumn, keys));
+      return map(toColumn, keys(columnMap));
     };
 
     // TODO: Move to local useTaskFilter hook -> taskFilter
@@ -209,7 +209,7 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             if (!isEmpty(value)) {
-              columns.value = getColumns(keys(head(value)));
+              columns.value = getColumns();
               const excluded = props.embedded
                 ? ["owner", "description", "createdBy"]
                 : ["description", "createdBy"];

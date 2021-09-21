@@ -5,7 +5,6 @@
         :title="title"
         :rows="rows"
         :columns="columns"
-        :visible-columns="visibleColumns"
         :no-data-label="noData"
         :filter="filter"
         :pagination="pagination"
@@ -41,12 +40,18 @@
 </template>
 
 <script>
-import { filter as rFilter, head, isEmpty, map, keys, reverse } from "ramda";
+import { map, keys } from "ramda";
 import { defineComponent, ref } from "vue";
 
 import { requests } from "@/api";
 import { agentListSchema } from "@/schemas";
 import { useAPI } from "@/use";
+
+const columnMap = {
+  standardName: "Standard Name",
+  type: "Type",
+  user: "User",
+};
 
 export default defineComponent({
   name: "Agents",
@@ -54,7 +59,6 @@ export default defineComponent({
     const { success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
-    const visibleColumns = ref([]);
     const rows = ref([]);
     const filter = ref("");
 
@@ -63,19 +67,15 @@ export default defineComponent({
     const rowsPerPage = 25;
     const pagination = { rowsPerPage };
 
-    const getColumns = (keys) => {
+    const getColumns = () => {
       const toColumn = (key) => ({
         align: "left",
         field: key,
-        label: {
-          standardName: "Standard Name",
-          type: "Type",
-          user: "User",
-        }[key],
+        label: columnMap[key],
         name: key,
         sortable: true,
       });
-      return reverse(map(toColumn, keys));
+      return map(toColumn, keys(columnMap));
     };
 
     const fetchData = async () => {
@@ -84,17 +84,8 @@ export default defineComponent({
       if (success.value)
         await agentListSchema
           .validate(data.value.data, { stripUnknown: true })
-          .then(async (value) => {
-            if (!isEmpty(value)) {
-              columns.value = getColumns(keys(head(value)));
-            }
-            visibleColumns.value = map(
-              (column) => column.field,
-              rFilter(
-                (column) => !["id"].includes(column.field),
-                columns.value,
-              ),
-            );
+          .then((value) => {
+            columns.value = getColumns();
             rows.value = value;
           });
     };
@@ -108,7 +99,6 @@ export default defineComponent({
       pagination,
       rows,
       title,
-      visibleColumns,
     };
   },
 });

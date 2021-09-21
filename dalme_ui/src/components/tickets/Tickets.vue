@@ -104,21 +104,25 @@
 
 <script>
 import { openURL } from "quasar";
-import {
-  filter as rFilter,
-  head,
-  isEmpty,
-  isNil,
-  map,
-  keys,
-  reverse,
-} from "ramda";
+import { filter as rFilter, isNil, map, keys } from "ramda";
 import { defineComponent, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
 import { attachmentSchema, ticketListSchema } from "@/schemas";
 import { useAPI } from "@/use";
+
+const columnMap = {
+  id: "ID",
+  status: "Status",
+  file: "Attachments",
+  tags: "Tags",
+  subject: "Ticket",
+  commentCount: "Comments",
+  creationUser: "Created by",
+  creationTimestamp: "Created on",
+  closingDate: "Closed on",
+};
 
 export default defineComponent({
   name: "Tickets",
@@ -142,25 +146,15 @@ export default defineComponent({
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
 
-    const getColumns = (keys) => {
+    const getColumns = () => {
       const toColumn = (key) => ({
         align: "left",
         field: key,
-        label: {
-          id: "ID",
-          status: "Status",
-          file: "Attachments",
-          tags: "Tags",
-          subject: "Ticket",
-          commentCount: "Comments",
-          creationUser: "Created by",
-          creationTimestamp: "Created on",
-          closingDate: "Closed on",
-        }[key],
+        label: columnMap[key],
         name: key,
         sortable: true,
       });
-      return reverse(map(toColumn, keys));
+      return map(toColumn, keys(columnMap));
     };
 
     const filterVisibleColumns = (columns) => {
@@ -210,10 +204,8 @@ export default defineComponent({
         await ticketListSchema
           .validate(data.value, { stripUnknown: true })
           .then(async (value) => {
-            if (!isEmpty(value.results)) {
-              columns.value = getColumns(keys(head(value.results)));
-              visibleColumns.value = filterVisibleColumns(columns.value);
-            }
+            columns.value = getColumns();
+            visibleColumns.value = filterVisibleColumns(columns.value);
             rows.value = await resolveAttachments(value.results);
             loading.value = false;
           });

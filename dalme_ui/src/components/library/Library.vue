@@ -89,7 +89,7 @@ export default defineComponent({
       if (success.value)
         await libraryListSchema
           .validate(data.value, { stripUnknown: true })
-          .then(async (value) => {
+          .then((value) => {
             columns.value = getColumns();
             rows.value = value;
           });

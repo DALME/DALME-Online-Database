@@ -331,6 +331,7 @@ const isObj = (obj) => {
   return type === "function" || (type === "object" && !!obj);
 };
 
+// TODO: Invert to isNully and negate at call sites.
 const notNully = (value) => !isNil(value) && !isEmpty(value);
 
 export default defineComponent({

@@ -82,7 +82,7 @@ export default defineComponent({
       if (success.value)
         await localeListSchema
           .validate(data.value, { stripUnknown: true })
-          .then(async (value) => {
+          .then((value) => {
             columns.value = getColumns();
             rows.value = value;
           });

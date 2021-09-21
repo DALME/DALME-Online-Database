@@ -1,5 +1,4 @@
 const archives = {
-  id: "ID",
   name: "Name",
   noRecords: "No. Records",
   locale: "Locale",
@@ -8,7 +7,6 @@ const archives = {
 };
 
 const archivalFiles = {
-  id: "ID",
   name: "Name",
   primaryDataset: "Primary Dataset",
   owner: "Owner",
@@ -21,7 +19,6 @@ const archivalFiles = {
 };
 
 const records = {
-  id: "ID",
   name: "Name",
   noFolios: "No. Folios",
   owner: "Owner",
@@ -37,7 +34,6 @@ const records = {
 };
 
 const bibliography = {
-  id: "ID",
   name: "Name",
   primaryDataset: "Primary Dataset",
   defaultRights: "Default Rights",

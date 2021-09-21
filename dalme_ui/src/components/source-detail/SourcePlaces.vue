@@ -2,7 +2,6 @@
   <q-table
     :rows="rows"
     :columns="columns"
-    :visible-columns="visibleColumns"
     :no-data-label="noData"
     :filter="filter"
     :pagination="pagination"
@@ -36,8 +35,13 @@
 </template>
 
 <script>
-import { filter as rFilter, keys, map } from "ramda";
+import { keys, map } from "ramda";
 import { defineComponent, ref } from "vue";
+
+const columnMap = {
+  placename: "Placename",
+  locale: "Locale",
+};
 
 export default defineComponent({
   name: "SourcePlaces",
@@ -49,17 +53,12 @@ export default defineComponent({
   },
   setup(props) {
     const columns = ref([]);
-    const visibleColumns = ref([]);
     const filter = ref("");
 
     const noData = "No places found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
 
-    const getColumns = (keys) => {
-      const columnMap = {
-        placename: "Placename",
-        locale: "Locale",
-      };
+    const getColumns = () => {
       const toColumn = (key) => ({
         align: "left",
         field: key,
@@ -67,17 +66,12 @@ export default defineComponent({
         name: key,
         sortable: true,
       });
-      return map(toColumn, keys);
+      return map(toColumn, keys(columnMap));
     };
-    columns.value = getColumns(keys(props.places[0]));
-    visibleColumns.value = map(
-      (column) => column.field,
-      rFilter((column) => !["objId"].includes(column.field), columns.value),
-    );
+    columns.value = getColumns();
 
     return {
       columns,
-      visibleColumns,
       filter,
       noData,
       pagination,

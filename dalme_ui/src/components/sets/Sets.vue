@@ -5,7 +5,6 @@
         :title="title"
         :rows="rows"
         :columns="columns"
-        :visible-columns="visibleColumns"
         :no-data-label="noData"
         :filter="filter"
         :pagination="pagination"
@@ -77,7 +76,7 @@
 </template>
 
 <script>
-import { isEmpty, keys, map, filter as rFilter } from "ramda";
+import { keys, map } from "ramda";
 import { useMeta } from "quasar";
 import S from "string";
 import { defineComponent, onMounted, ref, watch } from "vue";
@@ -100,7 +99,6 @@ export default defineComponent({
     const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
-    const visibleColumns = ref([]);
     const rows = ref([]);
     const filter = ref("");
     const setType = ref("");
@@ -134,16 +132,7 @@ export default defineComponent({
         await schema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            if (!isEmpty(value)) {
-              columns.value = getColumns();
-              visibleColumns.value = map(
-                (column) => column.field,
-                rFilter(
-                  (column) => !["id"].includes(column.field),
-                  columns.value,
-                ),
-              );
-            }
+            columns.value = getColumns();
             rows.value = value;
             loading.value = false;
           });
@@ -180,7 +169,6 @@ export default defineComponent({
       pagination,
       rows,
       title,
-      visibleColumns,
     };
   },
 });

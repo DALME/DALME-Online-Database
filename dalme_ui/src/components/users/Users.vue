@@ -63,12 +63,22 @@
 </template>
 
 <script>
-import { head, isEmpty, map, keys, reverse } from "ramda";
+import { map, keys } from "ramda";
 import { defineComponent, ref } from "vue";
 
 import { requests } from "@/api";
 import { userListSchema } from "@/schemas";
 import { useAPI } from "@/use";
+
+const columnMap = {
+  id: "ID",
+  fullName: "Full Name",
+  email: "Email",
+  username: "Username",
+  lastLogin: "Last Login",
+  isActive: "Active",
+  isStaff: "Staff",
+};
 
 export default defineComponent({
   name: "Users",
@@ -84,23 +94,15 @@ export default defineComponent({
     const rowsPerPage = 25;
     const pagination = { rowsPerPage };
 
-    const getColumns = (keys) => {
+    const getColumns = () => {
       const toColumn = (key) => ({
         align: "left",
         field: key,
-        label: {
-          id: "ID",
-          fullName: "Full Name",
-          email: "Email",
-          username: "Username",
-          lastLogin: "Last Login",
-          isActive: "Active",
-          isStaff: "Staff",
-        }[key],
+        label: columnMap[key],
         name: key,
         sortable: true,
       });
-      return reverse(map(toColumn, keys));
+      return map(toColumn, keys(columnMap));
     };
 
     const fetchData = async () => {
@@ -109,10 +111,8 @@ export default defineComponent({
       if (success.value)
         await userListSchema
           .validate(data.value, { stripUnknown: true })
-          .then(async (value) => {
-            if (!isEmpty(value)) {
-              columns.value = getColumns(keys(head(value)));
-            }
+          .then((value) => {
+            columns.value = getColumns();
             rows.value = value;
           });
     };

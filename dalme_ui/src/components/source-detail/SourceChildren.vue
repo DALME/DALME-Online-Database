@@ -2,7 +2,6 @@
   <q-table
     :rows="rows"
     :columns="columns"
-    :visible-columns="visibleColumns"
     :no-data-label="noData"
     :filter="filter"
     :pagination="pagination"
@@ -55,8 +54,15 @@
 </template>
 
 <script>
-import { filter as rFilter, keys, map } from "ramda";
+import { keys, map } from "ramda";
 import { defineComponent, ref } from "vue";
+
+const columnMap = {
+  name: "Name",
+  shortName: "Short Name",
+  type: "Type",
+  hasInventory: "Inventory",
+};
 
 export default defineComponent({
   name: "SourceChildren",
@@ -68,19 +74,12 @@ export default defineComponent({
   },
   setup(props) {
     const columns = ref([]);
-    const visibleColumns = ref([]);
     const filter = ref("");
 
     const noData = "No children found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
 
-    const getColumns = (keys) => {
-      const columnMap = {
-        name: "Name",
-        shortName: "Short Name",
-        type: "Type",
-        hasInventory: "Inventory",
-      };
+    const getColumns = () => {
       const toColumn = (key) => ({
         align: "left",
         field: key,
@@ -88,17 +87,12 @@ export default defineComponent({
         name: key,
         sortable: true,
       });
-      return map(toColumn, keys);
+      return map(toColumn, keys(columnMap));
     };
-    columns.value = getColumns(keys(props.children[0]));
-    visibleColumns.value = map(
-      (column) => column.field,
-      rFilter((column) => !["objId"].includes(column.field), columns.value),
-    );
+    columns.value = getColumns();
 
     return {
       columns,
-      visibleColumns,
       filter,
       noData,
       pagination,

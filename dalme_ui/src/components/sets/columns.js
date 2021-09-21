@@ -1,6 +1,4 @@
 const collections = {
-  id: "ID",
-  name: "Name",
   memberCount: "Members",
   description: "Description",
   isPublic: "Public",
@@ -10,7 +8,6 @@ const collections = {
 };
 
 const corpora = {
-  id: "ID",
   name: "Name",
   memberCount: "Members",
   description: "Description",
@@ -19,7 +16,6 @@ const corpora = {
 };
 
 const datasets = {
-  id: "ID",
   name: "Name",
   memberCount: "Members",
   description: "Description",
@@ -28,7 +24,6 @@ const datasets = {
 };
 
 const worksets = {
-  id: "ID",
   name: "Name",
   memberCount: "Members",
   description: "Description",
