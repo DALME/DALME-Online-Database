@@ -6,8 +6,8 @@
     :no-data-label="noData"
     :rows="rows"
     @request="onRequest"
-    row-key="id"
     v-model:pagination="pagination"
+    row-key="id"
     class="sticky-header"
   >
     <template v-slot:top>

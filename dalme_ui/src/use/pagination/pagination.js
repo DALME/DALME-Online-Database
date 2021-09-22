@@ -42,13 +42,24 @@ export const usePagination = (fetchData) => {
     pagination.value = event.pagination;
   };
 
+  const fetchDataPaginated = async () => fetchData(query.value);
+
+  const resetPagination = () => (pagination.value = defaultPagination);
+
   watch(
     () => pagination.value,
     async () => {
-      await fetchData(query.value);
+      await fetchDataPaginated();
     },
     { immediate: true },
   );
 
-  return { filter, pagination, query, onRequest };
+  return {
+    fetchDataPaginated,
+    filter,
+    pagination,
+    onRequest,
+    query,
+    resetPagination,
+  };
 };

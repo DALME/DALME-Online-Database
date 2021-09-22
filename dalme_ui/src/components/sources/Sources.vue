@@ -7,9 +7,10 @@
         :columns="columns"
         :no-data-label="noData"
         :filter="filter"
-        :pagination="pagination"
         :title-class="{ 'text-h6': true }"
         :loading="loading"
+        @request="onRequest"
+        v-model:pagination="pagination"
         row-key="id"
       >
         <template v-slot:top-right>
@@ -222,7 +223,7 @@ import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
 import { sourceListSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, usePagination } from "@/use";
 
 import { columnsByType } from "./columns";
 
@@ -237,7 +238,6 @@ export default defineComponent({
 
     const columns = ref([]);
     const rows = ref([]);
-    const filter = ref("");
     const sourceType = ref("");
     const sourceTypeAPI = ref("");
     const title = ref("");
@@ -245,7 +245,6 @@ export default defineComponent({
     useMeta(() => ({ title: title.value }));
 
     const noData = "No sources found.";
-    const pagination = { rowsPerPage: 25 };
 
     const getColumns = () => {
       const columnMap = columnsByType(sourceType.value);
@@ -280,9 +279,19 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             columns.value = getColumns();
-            rows.value = value.data;
+            pagination.value.rowsNumber = value.count;
+            rows.value.splice(0, rows.value.length, ...value.data);
+            loading.value = false;
           });
     };
+
+    const {
+      fetchDataPaginated,
+      filter,
+      pagination,
+      onRequest,
+      resetPagination,
+    } = usePagination(fetchData);
 
     onBeforeRouteLeave(() => {
       if (loading.value) return false;
@@ -307,9 +316,9 @@ export default defineComponent({
             setTitle();
             updateTitle = false;
           }
-          await fetchData();
+          resetPagination();
+          await fetchDataPaginated();
           if (updateTitle) setTitle();
-          loading.value = false;
         };
         if (reload.includes(to)) {
           await reloadPage();
@@ -324,6 +333,7 @@ export default defineComponent({
       getLocaleData,
       loading,
       noData,
+      onRequest,
       pagination,
       renderDate,
       rows,
