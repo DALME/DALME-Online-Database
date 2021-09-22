@@ -25,7 +25,7 @@
       </q-card-section>
     </q-card>
 
-    <Attachments />
+    <Attachments v-if="attachment" />
     <Comments />
   </div>
 </template>
@@ -64,7 +64,7 @@ export default defineComponent({
     useMeta({ title: `Ticket #${objId.value}` });
 
     const fetchData = async () => {
-      await fetchAPI(requests.tickets.getTicket(objId));
+      await fetchAPI(requests.tickets.getTicket(objId.value));
       if (success.value);
       await ticketDetailSchema
         .validate(data.value, { stripUnknown: true })
@@ -82,7 +82,7 @@ export default defineComponent({
 
     await fetchData();
 
-    return { colour, subheading, ticket, objId };
+    return { attachment, colour, subheading, ticket, objId };
   },
 });
 </script>

@@ -27,6 +27,10 @@ const routes = [
             path: "archives",
             props: { icon: "villa" },
             nav: true,
+            meta: {
+              sourceType: "archives",
+              sourceTypeAPI: "archives",
+            },
           },
           {
             component: () => import("pages/source-list/SourceList.vue"),
@@ -34,6 +38,10 @@ const routes = [
             path: "archival-files",
             props: { icon: "inventory" },
             nav: true,
+            meta: {
+              sourceType: "archivalFiles",
+              sourceTypeAPI: "archival_files",
+            },
           },
           {
             component: () => import("pages/source-list/SourceList.vue"),
@@ -41,6 +49,10 @@ const routes = [
             path: "records",
             props: { icon: "format_list_numbered" },
             nav: true,
+            meta: {
+              sourceType: "records",
+              sourceTypeAPI: "records",
+            },
           },
           {
             component: () => import("pages/source-list/SourceList.vue"),
@@ -48,6 +60,10 @@ const routes = [
             path: "bibilography",
             props: { icon: "library_books" },
             nav: true,
+            meta: {
+              sourceType: "bibliography",
+              sourceTypeAPI: "bibliography",
+            },
           },
         ],
       },
@@ -67,6 +83,10 @@ const routes = [
             path: "corpora",
             props: { icon: "collections" },
             nav: true,
+            meta: {
+              setType: "corpora",
+              setTypeAPI: "corpora",
+            },
           },
           {
             component: () => import("pages/set-list/SetList.vue"),
@@ -74,6 +94,10 @@ const routes = [
             path: "collections",
             props: { icon: "collections" },
             nav: true,
+            meta: {
+              setType: "collections",
+              setTypeAPI: "collections",
+            },
           },
           {
             component: () => import("pages/set-list/SetList.vue"),
@@ -81,6 +105,10 @@ const routes = [
             path: "datasets",
             props: { icon: "collections" },
             nav: true,
+            meta: {
+              setType: "datasets",
+              setTypeAPI: "datasets",
+            },
           },
           {
             component: () => import("pages/set-list/SetList.vue"),
@@ -88,6 +116,10 @@ const routes = [
             path: "worksets",
             props: { icon: "collections" },
             nav: true,
+            meta: {
+              setType: "worksets",
+              setTypeAPI: "worksets",
+            },
           },
         ],
       },

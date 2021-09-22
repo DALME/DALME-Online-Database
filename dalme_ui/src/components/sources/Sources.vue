@@ -216,9 +216,8 @@
 <script>
 import { keys, map } from "ramda";
 import { useMeta } from "quasar";
-import S from "string";
-import { defineComponent, onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { defineComponent, ref, watch } from "vue";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
@@ -282,9 +281,12 @@ export default defineComponent({
           .then((value) => {
             columns.value = getColumns();
             rows.value = value.data;
-            loading.value = false;
           });
     };
+
+    onBeforeRouteLeave(() => {
+      if (loading.value) return false;
+    });
 
     watch(
       () => $route.name,
@@ -295,11 +297,11 @@ export default defineComponent({
           "Records",
           "Bibliography",
         ];
-        if (reload.includes(to)) {
+        const reloadPage = async () => {
           loading.value = true;
-          sourceTypeAPI.value = S(to).underscore().s;
-          sourceType.value = S(to).toLowerCase().camelize().s;
-          const setTitle = () => (title.value = S(to).humanize().titleCase().s);
+          sourceTypeAPI.value = $route.meta.sourceTypeAPI;
+          sourceType.value = $route.meta.sourceType;
+          const setTitle = () => (title.value = to);
           let updateTitle = true;
           if (!title.value) {
             setTitle();
@@ -307,12 +309,14 @@ export default defineComponent({
           }
           await fetchData();
           if (updateTitle) setTitle();
+          loading.value = false;
+        };
+        if (reload.includes(to)) {
+          await reloadPage();
         }
       },
       { immediate: true },
     );
-
-    onMounted(async () => await fetchData());
 
     return {
       columns,

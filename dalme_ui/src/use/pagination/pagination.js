@@ -1,15 +1,17 @@
 import { computed, ref, unref, watch } from "vue";
 
 export const usePagination = (fetchData) => {
-  const filter = ref("");
-
-  const pagination = ref({
+  const defaultPagination = {
     descending: false,
     page: 1,
     rowsNumber: null,
     rowsPerPage: 10,
     sortBy: null,
-  });
+  };
+
+  const filter = ref("");
+
+  const pagination = ref(defaultPagination);
 
   const query = computed(() => {
     const pageData = unref(pagination);
@@ -48,5 +50,5 @@ export const usePagination = (fetchData) => {
     { immediate: true },
   );
 
-  return { filter, pagination, onRequest };
+  return { filter, pagination, query, onRequest };
 };

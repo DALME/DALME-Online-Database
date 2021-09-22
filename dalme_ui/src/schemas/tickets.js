@@ -14,15 +14,16 @@ export const ticketDetailSchema = yup
     id: yup.number().required(),
     status: yup.boolean().required(),
     subject: yup.string().required(),
-    description: yup.string().nullable(),
+    description: yup.string().default(null).nullable(),
     tags: yup
       .string()
       .transform((_, originalValue) =>
         head(originalValue).tag !== "0" ? head(originalValue).tag.trim() : "",
       ),
-    file: attachmentSchema,
+    file: attachmentSchema.default(null).nullable(),
     commentCount: yup
       .number()
+      .default(null)
       .nullable()
       .transform((value) => (value === 0 ? null : value)),
     creationUser: yup
@@ -31,7 +32,7 @@ export const ticketDetailSchema = yup
         id: yup.number().required(),
         username: yup.string().required(),
         fullName: yup.string().required(),
-        avatar: yup.string().url().nullable(),
+        avatar: yup.string().url().default(null).nullable(),
       })
       .camelCase(),
     creationTimestamp: yup
@@ -49,15 +50,16 @@ export const ticketSchema = yup
     id: yup.number().required(),
     status: yup.boolean().required(),
     subject: yup.string().required(),
-    description: yup.string().nullable(),
+    description: yup.string().default(null).nullable(),
     tags: yup
       .string()
       .transform((_, originalValue) =>
         head(originalValue).tag !== "0" ? head(originalValue).tag.trim() : "",
       ),
-    file: yup.string().nullable(),
+    file: yup.string().default(null).nullable(),
     commentCount: yup
       .number()
+      .default(null)
       .nullable()
       .transform((value) => (value === 0 ? null : value)),
     creationUser: yup
@@ -66,7 +68,7 @@ export const ticketSchema = yup
         id: yup.number().required(),
         username: yup.string().required(),
         fullName: yup.string().required(),
-        avatar: yup.string().url().nullable(),
+        avatar: yup.string().url().default(null).nullable(),
       })
       .camelCase(),
     creationTimestamp: yup
@@ -80,7 +82,7 @@ export const ticketSchema = yup
 
 export const ticketListSchema = yup.object().shape({
   count: yup.number().required(),
-  next: yup.string().nullable(),
-  previous: yup.string().nullable(),
+  next: yup.string().default(null).nullable(),
+  previous: yup.string().default(null).nullable(),
   results: yup.array().of(ticketSchema),
 });

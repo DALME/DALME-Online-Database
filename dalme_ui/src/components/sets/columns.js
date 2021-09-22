@@ -1,4 +1,5 @@
 const collections = {
+  name: "Name",
   memberCount: "Members",
   description: "Description",
   isPublic: "Public",

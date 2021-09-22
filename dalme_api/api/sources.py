@@ -116,4 +116,4 @@ class Sources(DALMEBaseViewSet):
             queryset = Source.objects.filter(query[self.request.GET['class']])
         else:
             queryset = Source.objects.all()
-        return queryset
+        return queryset.prefetch_related('children', 'attributes', 'sets', 'type')
