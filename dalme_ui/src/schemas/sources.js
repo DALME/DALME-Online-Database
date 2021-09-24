@@ -118,7 +118,7 @@ const pageSchema = yup
   .object()
   .shape({
     objId: yup.string().uuid().required(),
-    damId: yup.number().required(),
+    damId: yup.number().default(null).nullable(), // TODO: Unsure if null ok.
     name: yup.string().required(),
     order: yup.number().required(),
     hasImage: yup.boolean().nullable(),

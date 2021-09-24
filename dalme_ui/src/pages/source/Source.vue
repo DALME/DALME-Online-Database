@@ -1,24 +1,64 @@
 <template>
   <q-page>
-    <SuspenseWithError>
-      <template #default>
-        <SourceDetail />
-      </template>
-    </SuspenseWithError>
+    <div class="full-width full-height">
+      <q-splitter :horizontal="$q.screen.lt.sm" v-model="splitterModel">
+        <template v-slot:before>
+          <q-tabs v-model="tab" class="text-blue" :vertical="$q.screen.gt.xs">
+            <q-tab name="data" icon="info" label="Data" />
+            <q-tab
+              v-if="hasPages"
+              name="editor"
+              icon="preview"
+              label="Editor"
+            />
+          </q-tabs>
+        </template>
+
+        <template v-slot:after>
+          <q-tab-panels
+            v-model="tab"
+            animated
+            swipeable
+            transition-prev="jump-up"
+            transition-next="jump-up"
+          >
+            <q-tab-panel name="data" v-if="!loading">
+              <SourceDetail />
+            </q-tab-panel>
+          </q-tab-panels>
+
+          <Comments />
+        </template>
+      </q-splitter>
+    </div>
   </q-page>
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, provide, ref } from "vue";
+import { useRoute } from "vue-router";
 
-import { SourceDetail } from "@/components";
-import { SuspenseWithError } from "@/components/utils";
+import { Comments, SourceDetail } from "@/components";
 
 export default defineComponent({
   name: "Source",
   components: {
-    SuspenseWithError,
+    Comments,
     SourceDetail,
+  },
+  setup() {
+    const $route = useRoute();
+
+    const objId = ref($route.params.objId);
+    const hasPages = ref(null);
+    const tab = ref("data");
+    const splitterModel = ref(10);
+
+    provide("model", "Source");
+    provide("objId", objId);
+    provide("hasPages", hasPages);
+
+    return { hasPages, splitterModel, tab };
   },
 });
 </script>

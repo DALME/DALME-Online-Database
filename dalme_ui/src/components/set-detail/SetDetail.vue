@@ -134,7 +134,7 @@
       />
     </q-card>
 
-    <Spinner :showing="loading" />
+    <OpaqueSpinner :showing="loading" />
   </q-tab-panel>
 </template>
 
@@ -144,7 +144,7 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, inject, onMounted, ref } from "vue";
 
 import { requests } from "@/api";
-import { Spinner } from "@/components/utils";
+import { OpaqueSpinner } from "@/components/utils";
 import { setDetailSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -154,7 +154,7 @@ export default defineComponent({
   name: "SetDetail",
   components: {
     SetMembers,
-    Spinner,
+    OpaqueSpinner,
   },
   setup(_, context) {
     const { loading, success, data, fetchAPI } = useAPI(context);
@@ -163,7 +163,9 @@ export default defineComponent({
     const hasMembers = computed(
       () => set.value.memberCount !== undefined && set.value.memberCount > 0,
     );
-    const isWorkset = computed(() => set.value.setType === "Workset");
+    const isWorkset = computed(
+      () => set.value.setType && set.value.setType.name === "Workset",
+    );
 
     const objId = inject("objId");
 
