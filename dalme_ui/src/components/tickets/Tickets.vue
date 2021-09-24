@@ -115,9 +115,9 @@ import { useAPI } from "@/use";
 const columnMap = {
   id: "ID",
   status: "Status",
+  subject: "Ticket",
   file: "Attachments",
   tags: "Tags",
-  subject: "Ticket",
   commentCount: "Comments",
   creationUser: "Created by",
   creationTimestamp: "Created on",

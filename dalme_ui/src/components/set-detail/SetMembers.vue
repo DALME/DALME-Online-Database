@@ -60,7 +60,7 @@
 
 <script>
 import { keys, map } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, inject, ref } from "vue";
 
 import { requests } from "@/api";
 import { Spinner } from "@/components/utils";
@@ -76,10 +76,6 @@ const columnMap = {
 export default defineComponent({
   name: "SetMembers",
   props: {
-    objId: {
-      type: String,
-      required: true,
-    },
     memberCount: {
       type: Number,
       required: true,
@@ -101,6 +97,8 @@ export default defineComponent({
 
     const noData = "No members found.";
 
+    const objId = inject("objId");
+
     const getColumns = () => {
       const toColumn = (key) => ({
         align: "left",
@@ -114,7 +112,7 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       rows.value = [];
-      const request = requests.sets.getSetMembers(props.objId, query);
+      const request = requests.sets.getSetMembers(objId.value, query);
       await fetchAPI(request);
       if (success.value)
         await setMembersSchema

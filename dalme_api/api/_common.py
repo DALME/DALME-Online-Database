@@ -51,7 +51,7 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
                 page = queryset
             serializer = self.get_serializer(page, many=True)
             result = {
-                'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                'draw': int(dt_request.get('draw', 1)),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
                 'recordsTotal': full_queryset.count(),
                 'recordsFiltered': queryset.count(),
                 'data': serializer.data

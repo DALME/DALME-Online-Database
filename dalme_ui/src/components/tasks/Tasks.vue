@@ -82,12 +82,12 @@ import { useAPI } from "@/use";
 
 const columnMap = {
   id: "ID",
+  completed: "Status",
   title: "Task",
-  creationTimestamp: "Dates",
   assignedTo: "Assigned to",
   attachments: "Attachments",
-  completed: "Status",
   owner: "Owner",
+  creationTimestamp: "Dates",
 };
 
 export default defineComponent({

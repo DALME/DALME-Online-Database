@@ -25,7 +25,8 @@ const tasks = {
     return new Request(url);
   },
   userTasks(userId) {
-    const query = `filter=assigned_to=${userId}`;
+    // TODO: This does nothing right now, add new endpoint.
+    const query = `stubbed=${userId}`;
     const url = `${endpoint}/?${query}`;
     return new Request(url);
   },

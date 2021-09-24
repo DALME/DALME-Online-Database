@@ -11,7 +11,8 @@ const tickets = {
     return new Request(url);
   },
   userTickets(userId) {
-    const query = `filter=creation_user=${userId}`;
+    // TODO: This does nothing right now, add new endpoint.
+    const query = `stubbed=${userId}`;
     const url = `${endpoint}/?${query}`;
     return new Request(url);
   },

@@ -1,18 +1,31 @@
 <template>
   <q-page>
-    <SetDetail />
+    <div class="full-width full-height">
+      <SetDetail />
+      <Comments />
+    </div>
   </q-page>
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, provide, ref } from "vue";
+import { useRoute } from "vue-router";
 
-import { SetDetail } from "@/components";
+import { Comments, SetDetail } from "@/components";
 
 export default defineComponent({
   name: "Set",
   components: {
+    Comments,
     SetDetail,
+  },
+  setup() {
+    const $route = useRoute();
+
+    const objId = ref($route.params.objId);
+
+    provide("model", "Set");
+    provide("objId", objId);
   },
 });
 </script>

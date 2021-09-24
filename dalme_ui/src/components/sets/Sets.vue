@@ -128,11 +128,11 @@ export default defineComponent({
       await fetchAPI(request);
       if (success.value)
         await schema
-          .validate(data.value, { stripUnknown: true })
+          .validate(data.value.data, { stripUnknown: true })
           .then((value) => {
             columns.value = getColumns();
             pagination.value.rowsNumber = value.count;
-            rows.value.splice(0, rows.value.length, ...value.data);
+            rows.value.splice(0, rows.value.length, ...value);
             loading.value = false;
           });
     };
