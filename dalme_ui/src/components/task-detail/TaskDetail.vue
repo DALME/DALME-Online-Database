@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { defineComponent, provide, ref } from "vue";
+import { defineComponent, provide, readonly, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
@@ -70,7 +70,7 @@ export default defineComponent({
 
     provide("attachment", attachment);
     provide("model", model);
-    provide("objId", objId);
+    provide("objId", readonly(objId));
 
     const onAction = async () => {
       const action = task.value.completed ? "markUndone" : "markDone";

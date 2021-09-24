@@ -112,9 +112,9 @@ export default defineComponent({
       return map(toColumn, keys(columnMap));
     };
 
-    const fetchData = async (q) => {
+    const fetchData = async (query) => {
       rows.value = [];
-      const request = requests.sets.getSetMembers(props.objId, q);
+      const request = requests.sets.getSetMembers(props.objId, query);
       await fetchAPI(request);
       if (success.value)
         await setMembersSchema

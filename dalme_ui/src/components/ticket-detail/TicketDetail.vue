@@ -32,7 +32,7 @@
 
 <script>
 import { useMeta } from "quasar";
-import { defineComponent, ref, provide } from "vue";
+import { defineComponent, readonly, ref, provide } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
@@ -59,7 +59,7 @@ export default defineComponent({
 
     provide("attachment", attachment);
     provide("model", model);
-    provide("objId", objId);
+    provide("objId", readonly(objId));
 
     useMeta({ title: `Ticket #${objId.value}` });
 

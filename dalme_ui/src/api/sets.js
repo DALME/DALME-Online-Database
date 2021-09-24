@@ -7,8 +7,8 @@ const sets = {
     const url = `${endpoint}/${objId}`;
     return new Request(url);
   },
-  getSets(setType) {
-    const url = `${endpoint}/?set_type=${setType}`;
+  getSets(setType, query) {
+    const url = `${endpoint}/?set_type=${setType}&${query}`;
     return new Request(url);
   },
   getSetMembers(objId, query) {

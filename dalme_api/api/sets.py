@@ -36,8 +36,8 @@ class Sets(DALMEBaseViewSet):
         from dalme_api.serializers.sources import SimpleSourceSerializer  # noqa
 
         self.filterset_class = SourceFilter
-        self.search_fields = ["id", "name"]
-        self.ordering_fields = [*self.search_fields, "is_public"]
+        self.search_fields = ['id', 'name']
+        self.ordering_fields = [*self.search_fields]
 
         obj = self.get_object()
 
@@ -92,7 +92,6 @@ class Sets(DALMEBaseViewSet):
             result = {'error': str(e)}
             status = 400
         return Response(result, status)
-
     @action(detail=True, methods=['patch'])
     def workset_state(self, request, *args, **kwargs):
         try:
@@ -111,7 +110,6 @@ class Sets(DALMEBaseViewSet):
         except Exception as e:
             result = {'error': str(e)}
             status = 400
-        return Response(result, status)
 
     # def create(self, request, format=None):
     #     result = {}

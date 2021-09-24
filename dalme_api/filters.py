@@ -1,9 +1,10 @@
-from django_filters import rest_framework as filters
-from dalme_app.models import Source, Set, Content_type, Ticket
 from django.contrib.auth.models import User
+from django_filters import rest_framework as filters
+
+from dalme_app.models import Source, Set, Content_type, Ticket
 
 
-class ContenTypeFilter(filters.FilterSet):
+class ContentTypeFilter(filters.FilterSet):
     id__lt = filters.NumberFilter(field_name='id', lookup_expr='lt')
 
     class Meta:

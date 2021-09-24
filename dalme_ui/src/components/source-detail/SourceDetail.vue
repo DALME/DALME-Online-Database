@@ -283,7 +283,7 @@
 <script>
 import { useMeta } from "quasar";
 import { filter as rFilter, isEmpty, isNil, map } from "ramda";
-import { computed, defineComponent, provide, ref, watch } from "vue";
+import { computed, defineComponent, provide, readonly, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
@@ -373,7 +373,7 @@ export default defineComponent({
     const hasPlaces = computed(() => notNully(source.value.places));
 
     provide("model", "Source");
-    provide("objId", objId);
+    provide("objId", readonly(objId));
 
     useMeta(() => ({
       title: source.value ? source.value.name : `Source ${objId.value}`,

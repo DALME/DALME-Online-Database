@@ -35,11 +35,7 @@ class SimpleSourceSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        try:
-            is_public = instance.workflow.is_public
-        except Workflow.DoesNotExist:
-            is_public = False
-        ret.update({'is_public': is_public})
+        ret.update({'is_public': instance.is_public})
         return ret
 
 

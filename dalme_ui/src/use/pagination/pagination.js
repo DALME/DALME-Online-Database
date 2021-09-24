@@ -1,4 +1,11 @@
+import S from "string";
 import { computed, ref, unref, watch } from "vue";
+
+const transformField = (field) => {
+  const transformMap = { objId: "id" };
+  const value = transformMap[field] || field;
+  return S(value).underscore().s;
+};
 
 export const usePagination = (fetchData) => {
   const defaultPagination = {
@@ -18,10 +25,8 @@ export const usePagination = (fetchData) => {
     const params = new URLSearchParams();
 
     if (pageData.sortBy) {
-      params.append(
-        "ordering",
-        `${pageData.descending ? "-" : ""}${pageData.sortBy}`,
-      );
+      const ordering = transformField(pageData.sortBy);
+      params.append("ordering", `${pageData.descending ? "-" : ""}${ordering}`);
     }
     if (filter.value) {
       params.append("search", filter.value);
@@ -42,6 +47,8 @@ export const usePagination = (fetchData) => {
     pagination.value = event.pagination;
   };
 
+  // Provide a callback to the component in case it's necessary to call the
+  // pagination-aware fetchData function from a watcher or something similar.
   const fetchDataPaginated = async () => fetchData(query.value);
 
   const resetPagination = () => (pagination.value = defaultPagination);
@@ -57,8 +64,8 @@ export const usePagination = (fetchData) => {
   return {
     fetchDataPaginated,
     filter,
-    pagination,
     onRequest,
+    pagination,
     query,
     resetPagination,
   };

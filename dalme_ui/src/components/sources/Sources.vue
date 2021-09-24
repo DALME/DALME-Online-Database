@@ -215,8 +215,8 @@
 </template>
 
 <script>
-import { keys, map } from "ramda";
 import { useMeta } from "quasar";
+import { keys, map } from "ramda";
 import { defineComponent, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 
@@ -245,7 +245,6 @@ export default defineComponent({
     useMeta(() => ({ title: title.value }));
 
     const noData = "No sources found.";
-
     const getColumns = () => {
       const columnMap = columnsByType(sourceType.value);
       const toColumn = (key) => ({
@@ -270,8 +269,8 @@ export default defineComponent({
 
     const getLocaleData = (data) => (Array.isArray(data) ? data[0] : data);
 
-    const fetchData = async () => {
-      const request = requests.sources.getSources(sourceTypeAPI.value);
+    const fetchData = async (query) => {
+      const request = requests.sources.getSources(sourceTypeAPI.value, query);
       const schema = sourceListSchema(sourceType.value);
       await fetchAPI(request);
       if (success.value)
