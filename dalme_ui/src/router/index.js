@@ -17,7 +17,7 @@ const createHistory = process.env.SERVER
     ? createWebHistory  // prettier-ignore
     : createWebHashHistory; // prettier-ignore
 
-const router = createRouter({
+export const router = createRouter({
   routes,
   history: createHistory(
     process.env.MODE === "ssr" ? void 0 : process.env.VUE_ROUTER_BASE,

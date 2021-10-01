@@ -334,7 +334,7 @@ export default defineComponent({
     }));
 
     const fetchData = async () => {
-      await fetchAPI(requests.sources.getSource(objId.value), true);
+      await fetchAPI(requests.sources.getSource(objId.value));
       if (success.value)
         await sourceDetailSchema
           .validate(data.value, { stripUnknown: true })

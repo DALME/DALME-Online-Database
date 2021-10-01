@@ -17,20 +17,17 @@ const API = (context = null) => {
 
     return fetcher(request)
       .then(async (response) => {
-        data.value = await response.json();
         success.value = response.ok;
         status.value = response.status;
         redirected.value = response.redirected || false;
         apiError.value = response.error || false;
+        data.value = await response.json();
         if (context) {
-          const errors = new Set([403]);
-          const reauthenticate = errors.has(status.value);
-          context.emit("reauthenticate", reauthenticate);
+          context.emit("reauthenticate", status.value === 403);
         }
       })
       .catch((e) => {
         error.value = e;
-        // TODO: Show internal error.
       });
   };
 

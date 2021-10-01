@@ -22,5 +22,6 @@ export { default as Tasks } from "./tasks";
 export { default as TaskDetail } from "./task-detail";
 export { default as Tickets } from "./tickets";
 export { default as TicketDetail } from "./ticket-detail";
+export { default as Transport } from "./transport";
 export { default as Users } from "./users";
 export { default as UserDetail } from "./user-detail";

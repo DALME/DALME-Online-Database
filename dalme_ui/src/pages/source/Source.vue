@@ -22,7 +22,7 @@
             transition-prev="jump-up"
             transition-next="jump-up"
           >
-            <q-tab-panel name="data" v-if="!loading">
+            <q-tab-panel name="data">
               <SourceDetail />
             </q-tab-panel>
           </q-tab-panels>
