@@ -1,11 +1,13 @@
 export { default as Agents } from "./agents";
-// NOTE: Don't move CommentForm below Comment or it will fail!
 export { default as Attachments } from "./attachments";
+// NOTE: Don't move CommentForm below Comment or it will fail!
 export { default as CommentForm } from "./comment-form";
 export { default as Comments } from "./comments";
 export { default as Countries } from "./countries";
 export { default as Languages } from "./languages";
 export { default as Library } from "./library";
+// NOTE: Don't move TransportSubmit below Locales or it will fail!
+export { default as TransportSubmit } from "./transport-submit";
 export { default as Locales } from "./locales";
 export { default as LoginModal } from "./login-modal";
 // NOTE: Don't move NavLink below Nav or it will fail!

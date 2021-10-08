@@ -34,7 +34,6 @@ router.register(r'transcriptions', api.Transcriptions, basename='transcriptions'
 router.register(r'users', api.Users, basename='users')
 router.register(r'workflow', api.WorkflowManager, basename='workflow')
 
-
 urlpatterns = [
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
     path('auth/', api.Auth.as_view(), name='refresh_auth'),

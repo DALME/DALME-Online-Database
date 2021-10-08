@@ -92,6 +92,7 @@ class Sets(DALMEBaseViewSet):
             result = {'error': str(e)}
             status = 400
         return Response(result, status)
+
     @action(detail=True, methods=['patch'])
     def workset_state(self, request, *args, **kwargs):
         try:

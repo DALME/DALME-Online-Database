@@ -2,7 +2,7 @@
   <LoginModal @reauthenticate="onReauthenticate" :show="showLoginModal" />
   <q-layout view="lHh Lpr lFf">
     <Nav />
-    <Transport v-if="tracked" />
+    <Transport v-if="showTransport" />
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import { defineComponent, provide, ref } from "vue";
+import { computed, defineComponent, provide, ref } from "vue";
+import { useManualRefHistory } from "@vueuse/core";
 
 import { LoginModal, Nav, Transport } from "@/components";
 import { provideTransport } from "@/use";
@@ -27,12 +28,18 @@ export default defineComponent({
     const showLoginModal = ref(false);
     const onReauthenticate = (value) => (showLoginModal.value = value);
 
-    // CRUD history tracker reactivity.
-    const tracked = ref(null);
-    provide("tracked", tracked);
-    provideTransport(tracked);
+    // CRUD history transport reactivity.
+    const tracked = ref({ objId: null, field: null, new: null, old: null });
+    const transport = useManualRefHistory(tracked, {
+      clone: true,
+    });
+    provide("transport", transport);
+    provideTransport(transport, tracked);
+    const showTransport = computed(() =>
+      transport.canUndo.value ? true : false,
+    );
 
-    return { onReauthenticate, showLoginModal, tracked };
+    return { onReauthenticate, showLoginModal, showTransport, transport };
   },
 });
 </script>

@@ -243,18 +243,6 @@ const routes = [
       /* Detail Views */
       // TODO: Should be able to scope these to children...
       {
-        component: () => import("pages/language/Language.vue"),
-        name: "Language",
-        path: "languages/:objId",
-        nav: false,
-      },
-      {
-        component: () => import("pages/locale/Locale.vue"),
-        name: "Locale",
-        path: "locales/:objId",
-        nav: false,
-      },
-      {
         component: () => import("pages/rights/Rights.vue"),
         name: "Rights",
         path: "rights/:objId",
