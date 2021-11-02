@@ -8,6 +8,7 @@ export { default as Languages } from "./languages";
 export { default as Library } from "./library";
 // NOTE: Don't move TransportSubmit below Locales or it will fail!
 export { default as TransportSubmit } from "./transport-submit";
+export { default as Table } from "./table";
 export { default as Locales } from "./locales";
 export { default as LoginModal } from "./login-modal";
 // NOTE: Don't move NavLink below Nav or it will fail!

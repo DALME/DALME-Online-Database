@@ -16,9 +16,9 @@ export const usePagination = (fetchData) => {
     sortBy: null,
   };
 
-  const filter = ref("");
-
   const pagination = ref(defaultPagination);
+
+  const filter = ref("");
 
   const query = computed(() => {
     const pageData = unref(pagination);
@@ -55,8 +55,10 @@ export const usePagination = (fetchData) => {
 
   watch(
     () => pagination.value,
-    async () => {
-      await fetchDataPaginated();
+    async (_, prev) => {
+      if (prev) {
+        await fetchDataPaginated();
+      }
     },
     { immediate: true },
   );

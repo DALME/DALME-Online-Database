@@ -175,10 +175,10 @@ export const archivalFileSourceSchema = yup
     attributes: yup
       .object()
       .shape({
-        locale: localeSchema.default(null).nullable(),
+        locale: yup.array().of(localeSchema).default(null).nullable(),
         authority: yup.string().default(null).nullable(),
         format: yup.string().default(null).nullable(),
-        support: yup.string().required(),
+        support: yup.string().default(null).nullable(),
       })
       .required(),
   })

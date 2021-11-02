@@ -97,17 +97,7 @@
 
         <template v-slot:body-cell-locale="props">
           <q-td :props="props">
-            <router-link
-              v-if="props.row.attributes.locale"
-              :to="{
-                name: 'Locale',
-                params: {
-                  objId: getLocaleData(props.row.attributes.locale).id.objId,
-                },
-              }"
-            >
-              {{ getLocaleData(props.row.attributes.locale).name }}
-            </router-link>
+            {{ getLocale(props.row.attributes.locale) }}
           </q-td>
         </template>
 
@@ -125,15 +115,7 @@
 
         <template v-slot:body-cell-language="props">
           <q-td :props="props">
-            <router-link
-              v-if="props.row.attributes.language[0]"
-              :to="{
-                name: 'Language',
-                params: { objId: props.row.attributes.language[0].id.objId },
-              }"
-            >
-              {{ props.row.attributes.language[0].name }}
-            </router-link>
+            {{ props.row.attributes.language[0].name }}
           </q-td>
         </template>
 
@@ -267,7 +249,9 @@ export default defineComponent({
       return attributes.date.name;
     };
 
-    const getLocaleData = (data) => (Array.isArray(data) ? data[0] : data);
+    const getLocale = (data) => {
+      return !data ? "" : Array.isArray(data) ? data[0].name : data.name;
+    };
 
     const fetchData = async (query) => {
       const request = requests.sources.getSources(sourceTypeAPI.value, query);
@@ -278,7 +262,7 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             columns.value = getColumns();
-            pagination.value.rowsNumber = value.count;
+            pagination.value.rowsNumber = value.recordsTotal;
             rows.value.splice(0, rows.value.length, ...value.data);
             loading.value = false;
           });
@@ -329,7 +313,7 @@ export default defineComponent({
     return {
       columns,
       filter,
-      getLocaleData,
+      getLocale,
       loading,
       noData,
       onRequest,

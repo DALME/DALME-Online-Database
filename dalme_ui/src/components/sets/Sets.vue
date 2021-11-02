@@ -131,7 +131,7 @@ export default defineComponent({
           .validate(data.value.data, { stripUnknown: true })
           .then((value) => {
             columns.value = getColumns();
-            pagination.value.rowsNumber = value.count;
+            pagination.value.rowsNumber = data.value.recordsTotal;
             rows.value.splice(0, rows.value.length, ...value);
             loading.value = false;
           });
