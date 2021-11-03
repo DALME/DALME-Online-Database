@@ -24,14 +24,13 @@ import { computed, defineComponent, inject, ref } from "vue";
 export default defineComponent({
   name: "TransportSubmit",
   setup(_, context) {
+    const enableSave = inject("enableSave");
     const submitted = ref(false);
     const position = ref([30, 30]);
     const dragging = ref(false);
     const disabled = computed(
       () => (submitted.value || dragging.value) && !enableSave.value,
     );
-
-    const enableSave = inject("enableSave");
 
     const submitTransport = () => {
       submitted.value = true;

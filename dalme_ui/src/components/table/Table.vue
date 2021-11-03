@@ -35,17 +35,19 @@
               'text-red-6': isDirty && cellIsDirty(props.row.id, column.field),
             }"
           >
-            {{ props.row[column.field] }}
+            <template v-if="isObj(props.row[column.field])">
+              {{ props.row[column.field].name }}
+            </template>
+            <template v-else>
+              {{ props.row[column.field] }}
+            </template>
 
             <template v-if="editable.includes(column.field)">
               <q-popup-edit
                 v-model="props.row[column.field]"
                 v-slot="scope"
                 :validate="validation[schemaTypes[column.field]]"
-                @before-show="
-                  editError = false;
-                  editErrorMessage = '';
-                "
+                @before-show="clearError"
                 @save="
                   (value, prev) =>
                     onDiff(props.row.id, column.field, value, prev)
@@ -149,11 +151,20 @@ export default defineComponent({
     // Can only open one popup at a time so we can share these.
     const editError = ref(false);
     const editErrorMessage = ref("");
+    const clearError = () => {
+      editError.value = false;
+      editErrorMessage.value = "";
+    };
 
     const schemaTypes = mapObjIndexed(
       (val) => val.type,
       props.schema.innerType.fields,
     );
+
+    const isObj = (obj) => {
+      const type = typeof obj;
+      return type === "function" || (type === "object" && !!obj);
+    };
 
     const isNumber = (val) => !isNaN(parseFloat(val)) && isFinite(val);
     const validation = {
@@ -163,8 +174,7 @@ export default defineComponent({
           editErrorMessage.value = "Input must be a number.";
           return false;
         }
-        editError.value = false;
-        editErrorMessage.value = "";
+        clearError();
         return true;
       },
       string: (val) => {
@@ -173,8 +183,7 @@ export default defineComponent({
           editErrorMessage.value = "Enter a value.";
           return false;
         }
-        editError.value = false;
-        editErrorMessage.value = "";
+        clearError();
         return true;
       },
     };
@@ -206,11 +215,13 @@ export default defineComponent({
 
     return {
       cellIsDirty,
+      clearError,
       editError,
       editErrorMessage,
       filter,
       handleSubmitTransport,
       isDirty,
+      isObj,
       onDiff,
       pagination,
       rows,
