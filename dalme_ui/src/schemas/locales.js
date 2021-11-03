@@ -10,10 +10,9 @@ export const localeListSchema = yup.array().of(
       country: yup
         .object()
         .shape({
-          objId: yup.number().required(),
+          id: yup.number().required(),
           name: yup.string().required(),
         })
-        .transformKeys((value) => (value === "id" ? "objId" : value))
         .required(),
       latitude: yup.number().required(),
       longitude: yup.number().required(),

@@ -16,15 +16,15 @@ const TransportSymbol = Symbol();
 export const provideTransport = (transport, tracked) => {
   const dirty = computed(() => {
     return transport.history.value.map((entry) => ({
-      objId: entry.snapshot.objId,
+      id: entry.snapshot.id,
       field: entry.snapshot.field,
     }));
   });
   const isDirty = computed(() => dirty.value.length > 1);
-  const cellIsDirty = (objId, field) => includes({ objId, field }, dirty.value);
+  const cellIsDirty = (id, field) => includes({ id, field }, dirty.value);
 
-  const onDiff = (objId, field, val, prev) => {
-    tracked.value = { objId, field, new: val, old: prev };
+  const onDiff = (id, field, val, prev) => {
+    tracked.value = { id, field, new: val, old: prev };
     transport.commit();
   };
 
@@ -32,7 +32,7 @@ export const provideTransport = (transport, tracked) => {
     const snapshots = transport.history.value
       .map((diff) => diff.snapshot)
       .slice(0, -1);
-    const byId = groupBy(prop("objId"))(snapshots);
+    const byId = groupBy(prop("id"))(snapshots);
     const byField = map((diffs) => groupBy(prop("field"))(diffs), byId);
     const values = map(
       (diffs) => map((history) => head(history).new, diffs),
@@ -57,7 +57,7 @@ export const provideTransport = (transport, tracked) => {
         // But setup fk choices on country if having time.
         const value = undone ? diff.old : diff.new;
         const lens = lensProp(diff.field);
-        const rowIndex = findIndex(propEq("id", diff.objId))(rows.value);
+        const rowIndex = findIndex(propEq("id", diff.id))(rows.value);
         const updated = set(lens, value, rows.value[rowIndex]);
         rows.value.splice(rowIndex, 1, updated);
       },

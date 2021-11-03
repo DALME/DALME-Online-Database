@@ -31,7 +31,7 @@
           <q-td class="task" :props="props">
             <router-link
               class="text-subtitle1"
-              :to="{ name: 'Task', params: { objId: props.row.id } }"
+              :to="{ name: 'Task', params: { id: props.row.id } }"
             >
               {{ props.value }}
             </router-link>

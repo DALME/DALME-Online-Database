@@ -3,16 +3,16 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/sets`;
 
 const sets = {
-  getSet(objId) {
-    const url = `${endpoint}/${objId}`;
+  getSet(id) {
+    const url = `${endpoint}/${id}`;
     return new Request(url);
   },
   getSets(setType, query) {
     const url = `${endpoint}/?set_type=${setType}&${query}`;
     return new Request(url);
   },
-  getSetMembers(objId, query) {
-    const url = `${endpoint}/${objId}/members/?${query}`;
+  getSetMembers(id, query) {
+    const url = `${endpoint}/${id}/members/?${query}`;
     return new Request(url);
   },
 };

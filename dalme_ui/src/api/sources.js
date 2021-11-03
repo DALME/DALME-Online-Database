@@ -3,8 +3,8 @@ import { apiUrl } from "./config";
 const endpoint = `${apiUrl}/sources`;
 
 const sources = {
-  getSource(objId) {
-    const url = `${endpoint}/${objId}`;
+  getSource(id) {
+    const url = `${endpoint}/${id}`;
     return new Request(url);
   },
   getSources(sourceType, query) {

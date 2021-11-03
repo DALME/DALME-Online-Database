@@ -9,7 +9,7 @@
         <q-item-section>
           <q-item-label class="text-h5">
             {{ task.title }}
-            <span>#{{ objId }}</span>
+            <span>#{{ id }}</span>
           </q-item-label>
           <q-item-label caption>{{ subheading }}</q-item-label>
         </q-item-section>
@@ -62,7 +62,7 @@ export default defineComponent({
     const colour = ref("");
     const task = ref(null);
     const attachment = ref(null);
-    const objId = ref($route.params.objId);
+    const id = ref($route.params.id);
     const isAdmin = $store.getters["auth/isAdmin"];
 
     let subheading = "";
@@ -70,11 +70,11 @@ export default defineComponent({
 
     provide("attachment", attachment);
     provide("model", model);
-    provide("objId", readonly(objId));
+    provide("id", readonly(id));
 
     const onAction = async () => {
       const action = task.value.completed ? "markUndone" : "markDone";
-      await actionFetchAPI(requests.tasks.setTaskState(objId.value, action));
+      await actionFetchAPI(requests.tasks.setTaskState(id.value, action));
       if (actionSuccess.value && actionStatus.value === 201) {
         await fetchData();
         $notifier.tasks.taskStatusUpdated();
@@ -84,7 +84,7 @@ export default defineComponent({
     };
 
     const fetchData = async () => {
-      await fetchAPI(requests.tasks.getTask(objId.value));
+      await fetchAPI(requests.tasks.getTask(id.value));
       if (success.value)
         await taskSchema
           .validate(data.value, { stripUnknown: true })
@@ -109,7 +109,7 @@ export default defineComponent({
       onAction,
       subheading,
       task,
-      objId,
+      id,
     };
   },
 });

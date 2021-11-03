@@ -11,8 +11,8 @@ const comments = {
       body: JSON.stringify(data),
     });
   },
-  getComments(model, objId) {
-    const url = `${endpoint}/?model=${model}&object=${objId}`;
+  getComments(model, id) {
+    const url = `${endpoint}/?model=${model}&object=${id}`;
     return new Request(url);
   },
 };

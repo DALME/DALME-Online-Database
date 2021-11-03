@@ -6,41 +6,28 @@ import { ownerSchema } from "./common";
 const defaultRightsSchema = yup.object().shape({
   name: yup.string().required(),
   url: yup.string().required(),
-  id: yup
-    .object()
-    .shape({ objId: yup.string().uuid().required() })
-    .transformKeys((value) => (value === "id" ? "objId" : value))
-    .required(),
+  id: yup.object().shape({ id: yup.string().uuid().required() }).required(),
 });
 
 const localeSchema = yup.object().shape({
   name: yup.string().required(),
   url: yup.string().required(),
-  id: yup
-    .object()
-    .shape({ objId: yup.number().required() })
-    .transformKeys((value) => (value === "id" ? "objId" : value))
-    .required(),
+  id: yup.object().shape({ id: yup.number().required() }).required(),
 });
 
 const primaryDatasetSchema = yup
   .object()
   .shape({
-    objId: yup.string().uuid().required(),
+    id: yup.string().uuid().required(),
     name: yup.string().required(),
     detailString: yup.string().required(),
   })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
 const languageSchema = yup.object().shape({
   name: yup.string().required(),
   url: yup.string().required(),
-  id: yup
-    .object()
-    .shape({ objId: yup.number().required() })
-    .transformKeys((value) => (value === "id" ? "objId" : value))
-    .required(),
+  id: yup.object().shape({ id: yup.number().required() }).required(),
 });
 
 const workflowSchema = yup
@@ -67,49 +54,44 @@ const workflowSchema = yup
 const creditSchema = yup
   .object()
   .shape({
-    objId: yup.string().uuid().required(),
+    id: yup.string().uuid().required(),
     type: yup
       .object()
-      .shape({ objId: yup.number().required(), name: yup.string().required() })
-      .transformKeys((value) => (value === "id" ? "objId" : value))
+      .shape({ id: yup.number().required(), name: yup.string().required() })
       .required(),
     standardName: yup.string().required(),
     note: yup.string().default(null).nullable(),
   })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
 const setSchema = yup
   .object()
   .shape({
-    objId: yup.string().uuid().required(),
+    id: yup.string().uuid().required(),
     name: yup.string().required(),
     detailString: yup.string().required(),
   })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
 const agentSchema = yup
   .object()
   .shape({
-    objId: yup.string().uuid().required(),
+    id: yup.string().uuid().required(),
     name: yup.string().required(),
     type: yup.string().required(),
     legalPersona: yup.string().default(null).nullable(),
   })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
 const childSchema = yup
   .object()
   .shape({
-    objId: yup.string().uuid().required(),
+    id: yup.string().uuid().required(),
     name: yup.string().required(),
     shortName: yup.string().required(),
     type: yup.string().required(),
     hasInventory: yup.boolean().required(),
   })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
 const objectSchema = yup.object().shape({});
@@ -117,24 +99,22 @@ const objectSchema = yup.object().shape({});
 const pageSchema = yup
   .object()
   .shape({
-    objId: yup.string().uuid().required(),
+    id: yup.string().uuid().required(),
     damId: yup.number().default(null).nullable(), // TODO: Unsure if null ok.
     name: yup.string().required(),
     order: yup.number().required(),
     hasImage: yup.boolean().nullable(),
     hasTranscription: yup.boolean().required(),
   })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
 const placeSchema = yup
   .object()
   .shape({
-    objId: yup.string().uuid().required(),
+    id: yup.string().uuid().required(),
     placename: yup.string().required(),
     locale: yup.string().required(),
   })
-  .transformKeys((value) => (value === "id" ? "objId" : value))
   .camelCase();
 
 export const archiveSourceSchema = yup
@@ -157,7 +137,6 @@ export const archiveSourceSchema = yup
         locale: localeSchema.default(null).nullable(),
         defaultRights: defaultRightsSchema.default(null).nullable(),
       })
-      .transformKeys((value) => (value === "url" ? "archiveUrl" : value))
       .required()
       .camelCase(),
   })
@@ -238,13 +217,10 @@ export const bibliographySourceSchema = yup
   .shape({
     id: yup.string().uuid().required(),
     name: yup.string().required(),
-    primaryDataset: yup
-      .object()
-      .shape({
-        objId: yup.string().uuid().required(),
-        name: yup.string().required(),
-      })
-      .transformKeys((value) => (value === "id" ? "objId" : value)),
+    primaryDataset: yup.object().shape({
+      id: yup.string().uuid().required(),
+      name: yup.string().required(),
+    }),
     owner: ownerSchema.required(),
     isPrivate: yup.boolean().required(),
     noRecords: yup.number().required(),
@@ -265,20 +241,18 @@ export const sourceDetailSchema = yup
     type: yup
       .object()
       .shape({
-        objId: yup.number().required(),
+        id: yup.number().required(),
         name: yup.string().required(),
       })
-      .transformKeys((value) => (value === "id" ? "objId" : value))
       .required(),
     name: yup.string().required(),
     shortName: yup.string().required(),
     parent: yup
       .object()
       .shape({
-        objId: yup.string().uuid().required(),
+        id: yup.string().uuid().required(),
         name: yup.string().required(),
       })
-      .transformKeys((value) => (value === "id" ? "objId" : value))
       .default(null)
       .nullable(),
     hasInventory: yup.boolean().required(),
@@ -363,8 +337,7 @@ export const sourceDetailSchema = yup
                 url: yup.string().required(),
                 id: yup
                   .object()
-                  .shape({ objId: yup.number().required() })
-                  .transformKeys((value) => (value === "id" ? "objId" : value))
+                  .shape({ id: yup.number().required() })
                   .required(),
               })
               .required(),

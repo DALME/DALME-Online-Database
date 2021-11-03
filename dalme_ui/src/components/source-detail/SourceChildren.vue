@@ -37,7 +37,7 @@
         <router-link
           :to="{
             name: 'Source',
-            params: { objId: props.row.objId },
+            params: { id: props.row.id },
           }"
         >
           {{ props.value }}

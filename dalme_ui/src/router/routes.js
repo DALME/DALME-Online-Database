@@ -245,32 +245,32 @@ const routes = [
       {
         component: () => import("pages/rights/Rights.vue"),
         name: "Rights",
-        path: "rights/:objId",
+        path: "rights/:id",
         props: true,
         nav: false,
       },
       {
         component: () => import("pages/set/Set.vue"),
         name: "Set",
-        path: "sets/:objId",
+        path: "sets/:id",
         nav: false,
       },
       {
         component: () => import("pages/source/Source.vue"),
         name: "Source",
-        path: "sources/:objId",
+        path: "sources/:id",
         nav: false,
       },
       {
         component: () => import("pages/task/Task.vue"),
         name: "Task",
-        path: "tasks/:objId",
+        path: "tasks/:id",
         nav: false,
       },
       {
         component: () => import("pages/ticket/Ticket.vue"),
         name: "Ticket",
-        path: "tickets/:objId",
+        path: "tickets/:id",
         nav: false,
       },
       {

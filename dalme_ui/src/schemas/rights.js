@@ -12,17 +12,16 @@ export const rightsListSchema = yup.array().of(
       rightsStatus: yup
         .object()
         .shape({
-          objId: yup.number().required(),
+          id: yup.number().required(),
           name: yup.string().required(),
         })
-        .transformKeys((value) => (value === "id" ? "objId" : value))
         .required(),
       publicDisplay: yup.boolean().required(),
       noticeDisplay: yup.boolean().required(),
       attachments: yup
         .object()
         .shape({
-          objId: yup.string().uuid().required(),
+          id: yup.string().uuid().required(),
           kind: yup.string().required(),
           url: yup.string().required(),
         })
@@ -34,10 +33,10 @@ export const rightsListSchema = yup.array().of(
             const kind = link.innerText;
             const href = link.getAttribute("href");
             const [, , , year, month] = href.split("/");
-            const objId = value.file.file_id;
+            const id = value.file.file_id;
             const filename = value.file.filename;
             const url = `/download/attachments/${year}/${month}/${filename}`;
-            return { objId, kind, url };
+            return { id, kind, url };
           }
           return value;
         })

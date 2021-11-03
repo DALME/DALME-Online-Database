@@ -31,7 +31,7 @@
           <q-td :props="props">
             <router-link
               class="text-subtitle2"
-              :to="{ name: 'Source', params: { objId: props.row.id } }"
+              :to="{ name: 'Source', params: { id: props.row.id } }"
             >
               {{ props.value }}
             </router-link>
@@ -40,9 +40,7 @@
 
         <template v-slot:body-cell-primaryDataset="props">
           <q-td :props="props">
-            <router-link
-              :to="{ name: 'Set', params: { objId: props.value.objId } }"
-            >
+            <router-link :to="{ name: 'Set', params: { id: props.value.id } }">
               {{ props.value.name }}
             </router-link>
           </q-td>
@@ -61,7 +59,7 @@
               :to="{
                 name: 'Rights',
                 params: {
-                  objId: props.row.attributes.defaultRights.id.objId,
+                  id: props.row.attributes.defaultRights.id.id,
                 },
               }"
             >

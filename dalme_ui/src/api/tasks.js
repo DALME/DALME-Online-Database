@@ -8,12 +8,12 @@ const tasks = {
   getTasks() {
     return new Request(endpoint);
   },
-  getTask(objId) {
-    const url = `${endpoint}/${objId}`;
+  getTask(id) {
+    const url = `${endpoint}/${id}`;
     return new Request(url);
   },
-  setTaskState(objId, action) {
-    const url = `${endpoint}/${objId}/set_state/`;
+  setTaskState(id, action) {
+    const url = `${endpoint}/${id}/set_state/`;
     return new Request(url, {
       method: "PATCH",
       headers: headers,

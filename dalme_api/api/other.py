@@ -122,7 +122,7 @@ class Locales(DALMEBaseViewSet):
             obj = self.queryset.filter(pk=pk)
             obj_data = request.data[pk]
 
-            # TODO: Temporary until sorting out objId
+            # TODO: Temporary until sorting out id/objId POST/PUT via frontend.
             from stringcase import snakecase
 
             # Update fields.
@@ -139,7 +139,7 @@ class Locales(DALMEBaseViewSet):
             }
             for fk_field, value in related.items():
                 RelatedModel = LocaleReference._meta.get_field(fk_field).rel.to
-                instance = RelatedModel.objects.get(pk=value.obj_id)  # TODO: Temp until objId situation resolved.
+                instance = RelatedModel.objects.get(pk=value.id)
                 obj.update(fk_field=instance)
 
         return Response(

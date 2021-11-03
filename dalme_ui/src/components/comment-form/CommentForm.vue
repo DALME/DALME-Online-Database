@@ -49,11 +49,11 @@ export default defineComponent({
     const label = "Leave a comment...";
 
     const model = inject("model");
-    const objId = inject("objId");
+    const id = inject("id");
 
     const onSubmit = async () => {
       submitting.value = true;
-      const payload = { model, body: body.value, object: objId.value };
+      const payload = { model, body: body.value, object: id.value };
       await commentPayloadSchema.validate(payload);
       setTimeout(async () => {
         const request = requests.comments.addComment(payload);

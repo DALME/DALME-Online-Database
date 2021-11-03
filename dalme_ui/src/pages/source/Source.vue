@@ -49,13 +49,13 @@ export default defineComponent({
   setup() {
     const $route = useRoute();
 
-    const objId = ref($route.params.objId);
+    const id = ref($route.params.id);
     const hasPages = ref(null);
     const tab = ref("data");
     const splitterModel = ref(10);
 
     provide("model", "Source");
-    provide("objId", objId);
+    provide("id", id);
     provide("hasPages", hasPages);
 
     return { hasPages, splitterModel, tab };

@@ -38,7 +38,7 @@
         <router-link
           :to="{
             name: 'Source',
-            params: { objId: props.row.objId },
+            params: { id: props.row.id },
           }"
         >
           {{ props.value }}
@@ -68,7 +68,7 @@ import { setMembersSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 
 const columnMap = {
-  objId: "ID",
+  id: "ID",
   name: "Name",
   isPublic: "Public",
 };
@@ -97,7 +97,7 @@ export default defineComponent({
 
     const noData = "No members found.";
 
-    const objId = inject("objId");
+    const id = inject("id");
 
     const getColumns = () => {
       const toColumn = (key) => ({
@@ -112,7 +112,7 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       rows.value = [];
-      const request = requests.sets.getSetMembers(objId.value, query);
+      const request = requests.sets.getSetMembers(id.value, query);
       await fetchAPI(request);
       if (success.value)
         await setMembersSchema

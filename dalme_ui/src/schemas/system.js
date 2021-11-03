@@ -50,19 +50,13 @@ export const languagesSchema = yup
     name: yup.string().required(),
     glottocode: yup.string().required(),
     iso6393: yup.string().default(null).nullable(),
-    type: yup
-      .object()
-      .shape({
-        objId: yup.number().required(),
-        name: yup.string().required(),
-      })
-      .transformKeys((value) => (value === "id" ? "objId" : value)),
-    parent: yup
-      .object()
-      .shape({
-        objId: yup.number().required(),
-        name: yup.string().required(),
-      })
-      .transformKeys((value) => (value === "id" ? "objId" : value)),
+    type: yup.object().shape({
+      id: yup.number().required(),
+      name: yup.string().required(),
+    }),
+    parent: yup.object().shape({
+      id: yup.number().required(),
+      name: yup.string().required(),
+    }),
   })
   .camelCase();

@@ -71,14 +71,14 @@ export default defineComponent({
     const comments = ref([]);
 
     const model = inject("model");
-    const objId = inject("objId");
+    const id = inject("id");
 
     const handleCommented = async () => {
       await fetchData();
     };
 
     const fetchData = async () => {
-      await fetchAPI(requests.comments.getComments(model, objId.value));
+      await fetchAPI(requests.comments.getComments(model, id.value));
       if (success.value)
         await commentsSchema
           .validate(data.value, { stripUnknown: true })

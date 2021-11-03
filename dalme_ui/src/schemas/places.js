@@ -10,12 +10,11 @@ export const placeListSchema = yup.array().of(
       locale: yup
         .object()
         .shape({
-          objId: yup.number().required(),
+          id: yup.number().required(),
           name: yup.string().required(),
           administrativeRegion: yup.string().required(),
           country: yup.string().required(),
         })
-        .transformKeys((value) => (value === "id" ? "objId" : value))
         .default(null)
         .nullable()
         .camelCase(),

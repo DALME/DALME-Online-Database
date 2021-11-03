@@ -1,11 +1,7 @@
 import S from "string";
 import { computed, ref, unref, watch } from "vue";
 
-const transformField = (field) => {
-  const transformMap = { objId: "id" };
-  const value = transformMap[field] || field;
-  return S(value).underscore().s;
-};
+const transformField = (field) => S(field).underscore().s;
 
 export const usePagination = (fetchData) => {
   const defaultPagination = {

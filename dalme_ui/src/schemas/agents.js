@@ -9,10 +9,9 @@ export const agentListSchema = yup.array().of(
       type: yup
         .object()
         .shape({
-          objId: yup.number().required(),
+          id: yup.number().required(),
           name: yup.string().required(),
         })
-        .transformKeys((value) => (value === "id" ? "objId" : value))
         .required(),
       user: yup.string().default(null).nullable(),
     })

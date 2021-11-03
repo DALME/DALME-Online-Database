@@ -60,7 +60,7 @@
             <router-link
               :to="{
                 name: 'Source',
-                params: { objId: source.parent.objId },
+                params: { id: source.parent.id },
               }"
             >
               {{ source.parent.name }}
@@ -76,7 +76,7 @@
             <router-link
               :to="{
                 name: 'Set',
-                params: { objId: source.primaryDataset.objId },
+                params: { id: source.primaryDataset.id },
               }"
             >
               {{ source.primaryDataset.name }}
@@ -302,7 +302,7 @@ export default defineComponent({
 
     const source = ref({});
 
-    const objId = inject("objId");
+    const id = inject("id");
 
     // TODO: Transducer.
     const attributes = computed(() =>
@@ -330,11 +330,11 @@ export default defineComponent({
     provide("model", "Source");
 
     useMeta(() => ({
-      title: source.value ? source.value.name : `Source ${objId.value}`,
+      title: source.value ? source.value.name : `Source ${id.value}`,
     }));
 
     const fetchData = async () => {
-      await fetchAPI(requests.sources.getSource(objId.value));
+      await fetchAPI(requests.sources.getSource(id.value));
       if (success.value)
         await sourceDetailSchema
           .validate(data.value, { stripUnknown: true })
@@ -345,9 +345,9 @@ export default defineComponent({
     };
 
     watch(
-      () => $route.params.objId,
+      () => $route.params.id,
       async (to) => {
-        objId.value = to;
+        id.value = to;
         await fetchData();
       },
       { immediate: true },

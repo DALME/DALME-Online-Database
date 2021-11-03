@@ -30,7 +30,7 @@
             <router-link
               :to="{
                 name: 'Rights',
-                params: { objId: props.row.id },
+                params: { id: props.row.id },
               }"
             >
               {{ props.value }}

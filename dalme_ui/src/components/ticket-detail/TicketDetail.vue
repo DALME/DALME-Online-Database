@@ -9,7 +9,7 @@
         <q-item-section>
           <q-item-label class="text-h5">
             {{ ticket.subject }}
-            <span>#{{ objId }}</span>
+            <span>#{{ id }}</span>
           </q-item-label>
           <q-item-label caption>{{ subheading }}</q-item-label>
         </q-item-section>
@@ -55,16 +55,16 @@ export default defineComponent({
     const attachment = ref("");
     const colour = ref("");
     const ticket = ref(null);
-    const objId = ref($route.params.objId);
+    const id = ref($route.params.id);
 
     provide("attachment", attachment);
     provide("model", model);
-    provide("objId", readonly(objId));
+    provide("id", readonly(id));
 
-    useMeta({ title: `Ticket #${objId.value}` });
+    useMeta({ title: `Ticket #${id.value}` });
 
     const fetchData = async () => {
-      await fetchAPI(requests.tickets.getTicket(objId.value));
+      await fetchAPI(requests.tickets.getTicket(id.value));
       if (success.value);
       await ticketDetailSchema
         .validate(data.value, { stripUnknown: true })
@@ -82,7 +82,7 @@ export default defineComponent({
 
     await fetchData();
 
-    return { attachment, colour, subheading, ticket, objId };
+    return { attachment, colour, subheading, ticket, id };
   },
 });
 </script>

@@ -22,10 +22,10 @@ export default defineComponent({
   setup() {
     const $route = useRoute();
 
-    const objId = ref($route.params.objId);
+    const id = ref($route.params.id);
 
     provide("model", "Set");
-    provide("objId", objId);
+    provide("id", id);
   },
 });
 </script>

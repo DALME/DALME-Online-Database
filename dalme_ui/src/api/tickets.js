@@ -6,8 +6,8 @@ const tickets = {
   getTickets() {
     return new Request(endpoint);
   },
-  getTicket(objId) {
-    const url = `${endpoint}/${objId}`;
+  getTicket(id) {
+    const url = `${endpoint}/${id}`;
     return new Request(url);
   },
   userTickets(userId) {

@@ -167,14 +167,14 @@ export default defineComponent({
       () => set.value.setType && set.value.setType.name === "Workset",
     );
 
-    const objId = inject("objId");
+    const id = inject("id");
 
     useMeta(() => ({
-      title: set.value ? set.value.name : `Set ${objId.value}`,
+      title: set.value ? set.value.name : `Set ${id.value}`,
     }));
 
     const fetchData = async () => {
-      await fetchAPI(requests.sets.getSet(objId.value));
+      await fetchAPI(requests.sets.getSet(id.value));
       if (success.value)
         await setDetailSchema
           .validate(data.value, { stripUnknown: true })

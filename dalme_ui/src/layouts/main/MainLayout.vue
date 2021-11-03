@@ -29,7 +29,7 @@ export default defineComponent({
     const onReauthenticate = (value) => (showLoginModal.value = value);
 
     // CRUD history transport reactivity.
-    const tracked = ref({ objId: null, field: null, new: null, old: null });
+    const tracked = ref({ id: null, field: null, new: null, old: null });
     const transport = useManualRefHistory(tracked, {
       clone: true,
     });
