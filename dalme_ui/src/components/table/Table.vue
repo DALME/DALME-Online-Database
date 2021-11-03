@@ -41,6 +41,11 @@
               <q-popup-edit
                 v-model="props.row[column.field]"
                 v-slot="scope"
+                :validate="validation[schemaTypes[column.field]]"
+                @before-show="
+                  editError = false;
+                  editErrorMessage = '';
+                "
                 @save="
                   (value, prev) =>
                     onDiff(props.row.id, column.field, value, prev)
@@ -48,11 +53,19 @@
                 buttons
               >
                 <q-input
+                  :type="
+                    schemaTypes[column.field] === 'string'
+                      ? 'text'
+                      : schemaTypes[column.field]
+                  "
+                  :error="editError"
+                  :error-message="editErrorMessage"
+                  :step="/\D/.test(props.row[column.field]) ? '0.01' : '1'"
+                  v-model="scope.value"
+                  @keyup.enter="scope.set"
                   dense
                   counter
                   autofocus
-                  v-model="scope.value"
-                  @keyup.enter="scope.set"
                 />
               </q-popup-edit>
             </template>
@@ -66,6 +79,7 @@
 </template>
 
 <script>
+import { mapObjIndexed } from "ramda";
 import { defineComponent, inject, provide, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
@@ -132,6 +146,39 @@ export default defineComponent({
     const saving = ref(false);
     const rows = inject("rows");
 
+    // Can only open one popup at a time so we can share these.
+    const editError = ref(false);
+    const editErrorMessage = ref("");
+
+    const schemaTypes = mapObjIndexed(
+      (val) => val.type,
+      props.schema.innerType.fields,
+    );
+
+    const isNumber = (val) => !isNaN(parseFloat(val)) && isFinite(val);
+    const validation = {
+      number: (val) => {
+        if (!isNumber(val)) {
+          editError.value = true;
+          editErrorMessage.value = "Input must be a number.";
+          return false;
+        }
+        editError.value = false;
+        editErrorMessage.value = "";
+        return true;
+      },
+      string: (val) => {
+        if (val.length === 0) {
+          editError.value = true;
+          editErrorMessage.value = "Enter a value.";
+          return false;
+        }
+        editError.value = false;
+        editErrorMessage.value = "";
+        return true;
+      },
+    };
+
     const rowsPerPage = 25;
     const pagination = { rowsPerPage };
 
@@ -158,14 +205,18 @@ export default defineComponent({
     onBeforeRouteLeave(() => resetTransport());
 
     return {
-      isDirty,
       cellIsDirty,
-      handleSubmitTransport,
-      onDiff,
+      editError,
+      editErrorMessage,
       filter,
+      handleSubmitTransport,
+      isDirty,
+      onDiff,
       pagination,
       rows,
       saving,
+      schemaTypes,
+      validation,
     };
   },
 });
