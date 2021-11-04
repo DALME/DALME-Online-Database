@@ -9,13 +9,13 @@ import {
   propEq,
   set,
 } from "ramda";
-import { computed, inject, provide, watch } from "vue";
+import { computed, inject, provide, ref, watch } from "vue";
 
 const TransportSymbol = Symbol();
 
 export const provideTransport = (transport, tracked) => {
   const dirty = computed(() => {
-    return transport.history.value.map((entry) => ({
+    return transport.history.value.slice(0, -1).map((entry) => ({
       id: entry.snapshot.id,
       field: entry.snapshot.field,
     }));
@@ -43,6 +43,7 @@ export const provideTransport = (transport, tracked) => {
 
   const resetTransport = () => {
     transport.clear();
+    tracked.value = ref({ id: null, field: null, new: null, old: null });
   };
 
   const transportWatcher = (rows) => {

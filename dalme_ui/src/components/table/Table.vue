@@ -33,6 +33,7 @@
             :props="props"
             v-bind:class="{
               'text-red-6': isDirty && cellIsDirty(props.row.id, column.field),
+              'bg-green-1': saving && cellIsDirty(props.row.id, column.field),
             }"
           >
             <template v-if="isObj(props.row[column.field])">
