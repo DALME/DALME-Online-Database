@@ -47,7 +47,7 @@
               <q-popup-edit
                 v-model="props.row[column.field]"
                 v-slot="scope"
-                :validate="validation[schemaTypes[column.field]]"
+                :validate="getValidation(column.field)"
                 @before-show="clearError"
                 @save="
                   (value, prev) =>
@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { mapObjIndexed } from "ramda";
+import { map, keys, mapObjIndexed } from "ramda";
 import { defineComponent, inject, provide, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
@@ -128,6 +128,10 @@ export default defineComponent({
       type: Function,
       required: true,
     },
+    fieldValidation: {
+      type: Object,
+      required: false,
+    },
     updateRequest: {
       type: Function,
       required: true,
@@ -152,9 +156,11 @@ export default defineComponent({
     // Can only open one popup at a time so we can share these.
     const editError = ref(false);
     const editErrorMessage = ref("");
-    const clearError = () => {
-      editError.value = false;
-      editErrorMessage.value = "";
+
+    const isNumber = (val) => !isNaN(parseFloat(val)) && isFinite(val);
+    const isObj = (obj) => {
+      const type = typeof obj;
+      return type === "function" || (type === "object" && !!obj);
     };
 
     const schemaTypes = mapObjIndexed(
@@ -162,31 +168,38 @@ export default defineComponent({
       props.schema.innerType.fields,
     );
 
-    const isObj = (obj) => {
-      const type = typeof obj;
-      return type === "function" || (type === "object" && !!obj);
+    const genericValidation = {
+      number: [
+        { check: (val) => !isNumber(val), error: "Input must be a number." },
+      ],
+      string: [{ check: (val) => val.length === 0, error: "Enter a value." }],
     };
 
-    const isNumber = (val) => !isNaN(parseFloat(val)) && isFinite(val);
-    const validation = {
-      number: (val) => {
-        if (!isNumber(val)) {
+    const clearError = () => {
+      editError.value = false;
+      editErrorMessage.value = "";
+      return true;
+    };
+
+    // TODO: Extract to a useable? So can be used on eg. description.
+    const getValidation = (field) => {
+      const fieldValidators = keys(props.fieldValidation);
+      let validators = genericValidation[schemaTypes[field]];
+      if (props.fieldValidation && fieldValidators.includes(field)) {
+        validators = [...validators, ...props.fieldValidation[field]];
+      }
+      return (val) => {
+        const validated = map(
+          (validator) => (validator.check(val) ? validator.error : ""),
+          validators,
+        ).filter(Boolean);
+        if (validated.length) {
           editError.value = true;
-          editErrorMessage.value = "Input must be a number.";
+          editErrorMessage.value = validated.join("\n");
           return false;
         }
-        clearError();
-        return true;
-      },
-      string: (val) => {
-        if (val.length === 0) {
-          editError.value = true;
-          editErrorMessage.value = "Enter a value.";
-          return false;
-        }
-        clearError();
-        return true;
-      },
+        return clearError();
+      };
     };
 
     const rowsPerPage = 25;
@@ -228,7 +241,7 @@ export default defineComponent({
       rows,
       saving,
       schemaTypes,
-      validation,
+      getValidation,
     };
   },
 });

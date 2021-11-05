@@ -23,6 +23,7 @@ export const languageListSchema = yup.array().of(
         .nullable(),
       iso6393: yup
         .string()
+        .length(3)
         .default(null)
         .nullable()
         .transform((val) => (!val ? null : val)), // Null out empty strings.

@@ -10,6 +10,7 @@
       :no-data-label="noData"
       :fetch-data="fetchData"
       :update-request="request"
+      :field-validation="fieldValidation"
     />
   </div>
 </template>
@@ -61,6 +62,13 @@ export default defineComponent({
       return map(toColumn, keys(columnMap));
     };
 
+    const fieldValidation = {
+      name: [
+        { check: (val) => val.includes("zzz"), error: "No snoozing!" },
+        { check: (val) => val.includes("ZZZ"), error: "No snoring!" },
+      ],
+    };
+
     const fetchData = async () => {
       const request = requests.locales.getLocales();
       await fetchAPI(request);
@@ -86,6 +94,7 @@ export default defineComponent({
       title,
       request,
       fetchData,
+      fieldValidation,
       schema: localeListSchema,
     };
   },
