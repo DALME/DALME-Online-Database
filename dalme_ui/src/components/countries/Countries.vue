@@ -7,6 +7,7 @@
         :columns="columns"
         :no-data-label="noData"
         :filter="filter"
+        :loading="loading"
         :pagination="pagination"
         :title-class="{ 'text-h6': true }"
         row-key="id"
@@ -31,7 +32,7 @@
 
 <script>
 import { map, keys } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 
 import { requests } from "@/api";
 import { countryListSchema } from "@/schemas";
@@ -46,8 +47,8 @@ const columnMap = {
 
 export default defineComponent({
   name: "Countries",
-  async setup(_, context) {
-    const { success, data, fetchAPI } = useAPI(context);
+  setup(_, context) {
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const rows = ref([]);
@@ -78,18 +79,20 @@ export default defineComponent({
           .then((value) => {
             columns.value = getColumns();
             rows.value = value;
+            loading.value = false;
           });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
     return {
-      columns,
-      filter,
-      noData,
-      pagination,
       rows,
       title,
+      filter,
+      noData,
+      columns,
+      loading,
+      pagination,
     };
   },
 });

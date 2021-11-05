@@ -153,7 +153,7 @@ export default defineComponent({
     const saving = ref(false);
     const rows = inject("rows");
 
-    // Can only open one popup at a time so we can share these.
+    // Can only open one popup at a time, so we can share these.
     const editError = ref(false);
     const editErrorMessage = ref("");
 
@@ -178,7 +178,6 @@ export default defineComponent({
     const clearError = () => {
       editError.value = false;
       editErrorMessage.value = "";
-      return true;
     };
 
     // TODO: Extract to a useable? So can be used on eg. description.
@@ -198,7 +197,8 @@ export default defineComponent({
           editErrorMessage.value = validated.join("\n");
           return false;
         }
-        return clearError();
+        clearError();
+        return true;
       };
     };
 

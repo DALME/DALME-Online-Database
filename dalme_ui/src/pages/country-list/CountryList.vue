@@ -1,10 +1,6 @@
 <template>
   <q-page>
-    <SuspenseWithError>
-      <template #default>
-        <Countries />
-      </template>
-    </SuspenseWithError>
+    <Countries />
   </q-page>
 </template>
 
@@ -13,12 +9,10 @@ import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
 import { Countries } from "@/components";
-import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "CountryList",
   components: {
-    SuspenseWithError,
     Countries,
   },
   setup() {

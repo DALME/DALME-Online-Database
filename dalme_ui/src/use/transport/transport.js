@@ -20,7 +20,7 @@ export const provideTransport = (transport, tracked) => {
       field: entry.snapshot.field,
     }));
   });
-  const isDirty = computed(() => dirty.value.length > 1);
+  const isDirty = computed(() => dirty.value.length > 0);
   const cellIsDirty = (id, field) => includes({ id, field }, dirty.value);
 
   const onDiff = (id, field, val, prev) => {
