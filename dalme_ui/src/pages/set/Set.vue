@@ -1,22 +1,23 @@
 <template>
-  <q-page>
+  <Page>
     <div class="full-width full-height">
       <SetDetail />
       <Comments />
     </div>
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 
-import { Comments, SetDetail } from "@/components";
+import { Comments, Page, SetDetail } from "@/components";
 
 export default defineComponent({
   name: "Set",
   components: {
     Comments,
+    Page,
     SetDetail,
   },
   setup() {

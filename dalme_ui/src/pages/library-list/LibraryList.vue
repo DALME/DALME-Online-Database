@@ -1,18 +1,18 @@
 <template>
-  <q-page>
+  <Page>
     <SuspenseWithError>
       <template #default>
         <Library />
       </template>
     </SuspenseWithError>
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Library } from "@/components";
+import { Library, Page } from "@/components";
 import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
@@ -20,6 +20,7 @@ export default defineComponent({
   components: {
     SuspenseWithError,
     Library,
+    Page,
   },
   setup() {
     useMeta({ title: "Library" });

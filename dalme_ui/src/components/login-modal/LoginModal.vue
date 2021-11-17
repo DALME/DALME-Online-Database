@@ -4,6 +4,7 @@
     persistent
     transition-show="scale"
     transition-hide="scale"
+    class="z-max"
   >
     <div class="auth-modal q-pa-md q-ma-md">
       <img class="dalme-logo" src="~assets/dalme_logo.svg" />

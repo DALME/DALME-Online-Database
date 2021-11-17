@@ -1,19 +1,20 @@
 <template>
-  <q-page>
+  <Page>
     <Languages />
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Languages } from "@/components";
+import { Languages, Page } from "@/components";
 
 export default defineComponent({
   name: "LanguageList",
   components: {
     Languages,
+    Page,
   },
   setup() {
     useMeta({ title: "Languages" });

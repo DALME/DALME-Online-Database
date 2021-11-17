@@ -1,19 +1,20 @@
 <template>
-  <q-page>
+  <Page>
     <Tasks :embedded="true" />
     <Tickets :embedded="true" />
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Tasks, Tickets } from "@/components";
+import { Page, Tasks, Tickets } from "@/components";
 
 export default defineComponent({
   name: "Dashboard",
   components: {
+    Page,
     Tasks,
     Tickets,
   },

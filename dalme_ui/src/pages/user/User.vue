@@ -1,22 +1,23 @@
 <template>
-  <q-page>
+  <Page>
     <SuspenseWithError>
       <template #default>
         <UserDetail />
       </template>
     </SuspenseWithError>
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { defineComponent } from "vue";
 
-import { UserDetail } from "@/components";
+import { Page, UserDetail } from "@/components";
 import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "User",
   components: {
+    Page,
     SuspenseWithError,
     UserDetail,
   },

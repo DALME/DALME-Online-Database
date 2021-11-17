@@ -1,18 +1,19 @@
 <template>
-  <q-page>
+  <Page>
     <Tickets />
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Tickets } from "@/components";
+import { Page, Tickets } from "@/components";
 
 export default defineComponent({
   name: "TicketList",
   components: {
+    Page,
     Tickets,
   },
   setup() {

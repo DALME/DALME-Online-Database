@@ -1,19 +1,20 @@
 <template>
-  <q-page>
+  <Page>
     <Countries />
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Countries } from "@/components";
+import { Countries, Page } from "@/components";
 
 export default defineComponent({
   name: "CountryList",
   components: {
     Countries,
+    Page,
   },
   setup() {
     useMeta({ title: "Countries" });

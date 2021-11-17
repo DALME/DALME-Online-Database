@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <Page>
     <div class="full-width full-height">
       <q-splitter :horizontal="$q.screen.lt.sm" v-model="splitterModel">
         <template v-slot:before>
@@ -31,19 +31,20 @@
         </template>
       </q-splitter>
     </div>
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 
-import { Comments, SourceDetail } from "@/components";
+import { Comments, Page, SourceDetail } from "@/components";
 
 export default defineComponent({
   name: "Source",
   components: {
     Comments,
+    Page,
     SourceDetail,
   },
   setup() {
@@ -58,7 +59,9 @@ export default defineComponent({
     provide("id", id);
     provide("hasPages", hasPages);
 
-    return { hasPages, splitterModel, tab };
+    const showModal = ref(false);
+
+    return { hasPages, showModal, splitterModel, tab };
   },
 });
 </script>

@@ -53,9 +53,7 @@ export const provideTransport = (transport, tracked) => {
         const undone = diffs.length < prevDiffs.length;
         const diff = undone ? prevDiffs[0].snapshot : diffs[0].snapshot;
         // TODO: Check to see if prevValue was an object, merge with that.
-        // Although, need to consider the FK situation generally.
-        // Setup all the fields with validation.
-        // But setup fk choices on country if having time.
+        // Although, we need to consider the FK situation generally.
         const value = undone ? diff.old : diff.new;
         const lens = lensProp(diff.field);
         const rowIndex = findIndex(propEq("id", diff.id))(rows.value);

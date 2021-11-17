@@ -1,17 +1,18 @@
 <template>
-  <q-page>
+  <Page>
     <Sets />
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { defineComponent } from "vue";
 
-import { Sets } from "@/components";
+import { Page, Sets } from "@/components";
 
 export default defineComponent({
   name: "SetList",
   components: {
+    Page,
     Sets,
   },
 });

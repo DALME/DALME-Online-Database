@@ -1,19 +1,19 @@
 <template>
-  <Page>
-    <Sources />
-  </Page>
+  <q-page>
+    <FormModal />
+    <slot></slot>
+  </q-page>
 </template>
 
 <script>
 import { defineComponent } from "vue";
 
-import { Page, Sources } from "@/components";
+import { FormModal } from "@/components";
 
 export default defineComponent({
-  name: "SourceList",
+  name: "Page",
   components: {
-    Page,
-    Sources,
+    FormModal,
   },
 });
 </script>

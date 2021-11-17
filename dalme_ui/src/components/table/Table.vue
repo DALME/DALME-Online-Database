@@ -11,6 +11,21 @@
       :title-class="{ 'text-h6': true }"
       row-key="id"
     >
+      <template v-slot:header="props">
+        <q-tr :props="props">
+          <q-th
+            v-for="column in props.cols"
+            :key="column.name"
+            :props="props"
+            :style="{
+              borderBottom: editable.includes(column.name) && '2px solid green',
+            }"
+          >
+            {{ column.label }}
+          </q-th>
+        </q-tr>
+      </template>
+
       <template v-slot:top-right>
         <q-input
           borderless
@@ -33,7 +48,8 @@
             :props="props"
             v-bind:class="{
               'text-red-6': isDirty && cellIsDirty(props.row.id, column.field),
-              'bg-green-1': saving && cellIsDirty(props.row.id, column.field),
+              'bg-green-1':
+                submitting && cellIsDirty(props.row.id, column.field),
             }"
           >
             <template v-if="isObj(props.row[column.field])">
@@ -76,25 +92,22 @@
         </q-tr>
       </template>
     </q-table>
-    <TransportSubmit v-if="isDirty" @submit-transport="handleSubmitTransport" />
-    <OpaqueSpinner :showing="loading || saving" />
+    <OpaqueSpinner :showing="loading || submitting" />
   </q-card>
 </template>
 
 <script>
 import { map, keys, mapObjIndexed } from "ramda";
-import { defineComponent, inject, provide, ref } from "vue";
+import { defineComponent, inject, ref } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
-import { TransportSubmit } from "@/components";
 import { OpaqueSpinner } from "@/components/utils";
-import { useAPI, useNotifier, useTransport } from "@/use";
+import { useAPI, useEditing, useNotifier, useTransport } from "@/use";
 
 export default defineComponent({
   name: "Table",
   components: {
     OpaqueSpinner,
-    TransportSubmit,
   },
   props: {
     // Reactive.
@@ -147,13 +160,19 @@ export default defineComponent({
       resetTransport,
       transportWatcher,
     } = useTransport();
+    const {
+      editingSubmitWatcher,
+      enableSave,
+      isEditingWatcher,
+      resetEditing,
+      submitting,
+    } = useEditing();
 
     const filter = ref("");
-    const enableSave = ref(false);
-    const saving = ref(false);
     const rows = inject("rows");
 
-    // Can only open one popup at a time, so we can share these.
+    // We can only open one popup at a time when doing editing, so we can share
+    // these, no need for any scoping via duplicates.
     const editError = ref(false);
     const editErrorMessage = ref("");
 
@@ -180,7 +199,6 @@ export default defineComponent({
       editErrorMessage.value = "";
     };
 
-    // TODO: Extract to a useable? So can be used on eg. description.
     const getValidation = (field) => {
       const fieldValidators = keys(props.fieldValidation);
       let validators = genericValidation[schemaTypes[field]];
@@ -205,27 +223,34 @@ export default defineComponent({
     const rowsPerPage = 25;
     const pagination = { rowsPerPage };
 
-    provide("enableSave", enableSave);
-
-    transportWatcher(rows);
-
     const handleSubmitTransport = async () => {
-      saving.value = true;
+      // The submitting ref will get flipped by the event handling on the
+      // EditPanel so there's no need to do it here. We do flip it back at the
+      // end of the handler though, that's our responsibility.
+      // submitting.value = true;
       const { success, status, fetchAPI } = useAPI(context);
       const request = props.updateRequest(objDiffs);
       await fetchAPI(request);
       if (success.value && status.value == 201) {
         $notifier.CRUD.inlineUpdateSuccess(props.title);
         resetTransport();
+        resetEditing();
         await props.fetchData();
       } else {
         $notifier.CRUD.inlineUpdateFailed(props.title);
         enableSave.value = true;
       }
-      saving.value = false;
+      submitting.value = false;
     };
 
-    onBeforeRouteLeave(() => resetTransport());
+    isEditingWatcher(isDirty, "inline");
+    editingSubmitWatcher(handleSubmitTransport);
+    transportWatcher(rows);
+
+    onBeforeRouteLeave(() => {
+      resetEditing();
+      resetTransport();
+    });
 
     return {
       cellIsDirty,
@@ -239,7 +264,7 @@ export default defineComponent({
       onDiff,
       pagination,
       rows,
-      saving,
+      submitting,
       schemaTypes,
       getValidation,
     };

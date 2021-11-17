@@ -1,24 +1,25 @@
 <template>
-  <q-page>
+  <Page>
     <SuspenseWithError>
       <template #default>
         <Places />
       </template>
     </SuspenseWithError>
-  </q-page>
+  </Page>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Places } from "@/components";
+import { Page, Places } from "@/components";
 import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "PlaceList",
   components: {
     SuspenseWithError,
+    Page,
     Places,
   },
   setup() {

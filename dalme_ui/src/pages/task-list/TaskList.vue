@@ -1,8 +1,8 @@
 <template>
-  <q-page>
+  <Page>
     <TaskLists />
     <Tasks />
-  </q-page>
+  </Page>
 </template>
 
 <script>
@@ -11,13 +11,14 @@ import { groupBy } from "ramda";
 import { defineComponent, provide, ref } from "vue";
 
 import { requests } from "@/api";
-import { TaskLists, Tasks } from "@/components";
+import { Page, TaskLists, Tasks } from "@/components";
 import { taskListsSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
 export default defineComponent({
   name: "TaskList",
   components: {
+    Page,
     TaskLists,
     Tasks,
   },
