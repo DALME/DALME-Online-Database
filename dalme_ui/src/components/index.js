@@ -1,21 +1,22 @@
+// NOTE: Any imports that break alphabetical order had to be positioned to
+// avoid a null component rendering bug that seems to be related to import
+// resolution within components. Still looking into the cause of this.
 export { default as Agents } from "./agents";
 export { default as Attachments } from "./attachments";
-// NOTE: Don't move CommentForm below Comment or it will fail!
 export { default as CommentForm } from "./comment-form";
 export { default as Comments } from "./comments";
 export { default as Countries } from "./countries";
 export { default as Languages } from "./languages";
 export { default as Library } from "./library";
-// NOTE: Don't move TransportSubmit below Locales or it will fail!
 export { default as TransportSubmit } from "./transport-submit";
 export { default as Table } from "./table";
 export { default as Locales } from "./locales";
 export { default as LoginModal } from "./login-modal";
-// NOTE: Don't move NavLink below Nav or it will fail!
 export { default as NavLink } from "./nav-link";
 export { default as Nav } from "./nav";
 export { default as Places } from "./places";
 export { default as Rights } from "./rights";
+export { default as SchemaForm } from "./schema-form";
 export { default as Sets } from "./sets";
 export { default as SetDetail } from "./set-detail";
 export { default as Sources } from "./sources";

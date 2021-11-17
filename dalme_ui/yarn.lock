@@ -1000,6 +1000,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@formvuelate/plugin-vee-validate@^3.7.1":
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/@formvuelate/plugin-vee-validate/-/plugin-vee-validate-3.7.1.tgz#24a5cd8f9d16c7ed397d76a7381080956c65508d"
+  integrity sha512-EzBz4VIB385Hy6PrJYMERtkt8UotA07V8wgGTRmkSwYWV1xLMhVWKO3bPdnYfD7kGbrh2iHfkb57/1Oyq3KlTw==
+
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.5.0.tgz#1407967d4c6eecd7388f83acf1eaf4d0c6e58ef9"
@@ -1740,6 +1745,11 @@
   version "6.0.0-beta.15"
   resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0-beta.15.tgz#ad7cb384e062f165bcf9c83732125bffbc2ad83d"
   integrity sha512-quBx4Jjpexo6KDiNUGFr/zF/2A4srKM9S9v2uHgMXSU//hjgq1eGzqkIFql8T9gfX5ZaVOUzYBP3jIdIR3PKIA==
+
+"@vue/devtools-api@^6.0.0-beta.15":
+  version "6.0.0-beta.20.1"
+  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0-beta.20.1.tgz#5b499647e929c35baf2a66a399578f9aa4601142"
+  integrity sha512-R2rfiRY+kZugzWh9ZyITaovx+jpU4vgivAEAiz80kvh3yviiTU3CBuGuyWpSwGz9/C7TkSWVM/FtQRGlZ16n8Q==
 
 "@vue/reactivity@3.2.4":
   version "3.2.4"
@@ -3908,6 +3918,11 @@ form-data@^3.0.0:
     asynckit "^0.4.0"
     combined-stream "^1.0.8"
     mime-types "^2.1.12"
+
+formvuelate@^3.7.1:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/formvuelate/-/formvuelate-3.7.1.tgz#d3a78a84d5cc4c7d117188ec978dec4518166f4a"
+  integrity sha512-x4qsRLVVOpoYYCi6/94ywS2UldSST/ztHuRgSheVzfbEUy3gnn2SGxQOCBZBlyodbVHa/YfT1Fsfrwfqa9o59w==
 
 forwarded@0.2.0:
   version "0.2.0"
@@ -7776,6 +7791,13 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
+
+vee-validate@^4.5.5:
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.5.5.tgz#c07190119ffa8b8a3cc2f279ab5cdd2e38910b63"
+  integrity sha512-AAucVxUVC6n1QCGux61ExCbHFQglDDSUxbzGd1nGKQpXJK6F8ncGOStQOaZF+3TnNeuMoW5aQdK4MAz15YpaVA==
+  dependencies:
+    "@vue/devtools-api" "^6.0.0-beta.15"
 
 vendors@^1.0.3:
   version "1.0.4"
