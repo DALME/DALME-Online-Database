@@ -1,6 +1,14 @@
 import { head } from "ramda";
 import * as yup from "yup";
 
+export const taskValidator = yup.object().shape({
+  title: yup.string().required().label("Title"),
+  description: yup.string().required().label("Description"),
+  // owner: yup.number().required(), // TODO: Dupe of owner?
+  // assignedTo: yup.string().default(null).nullable(),
+  // attachments?
+});
+
 export const taskSchema = yup
   .object()
   .shape({
@@ -11,7 +19,7 @@ export const taskSchema = yup
     createdBy: yup.number().required(),
     creationTimestamp: yup.string().required(),
     assignedTo: yup.string().default(null).nullable(),
-    owner: yup.string(),
+    owner: yup.string(), // TODO: Prob required?
     attachments: yup
       .mixed()
       .transform((value) => {

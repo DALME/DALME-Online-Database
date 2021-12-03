@@ -93,13 +93,7 @@
             </div>
 
             <div
-              class="
-                col-xs-12 col-sm-6
-                q-pa-lg
-                row
-                justify-center
-                content-center
-              "
+              class="col-xs-12 col-sm-6 q-pa-lg row justify-center content-center"
             >
               <q-avatar rounded size="15rem">
                 <img :src="user.avatar" />

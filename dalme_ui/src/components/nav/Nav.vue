@@ -9,7 +9,7 @@
         aria-label="Menu"
         @click="toggleNav"
       />
-      <q-toolbar-title class="dalme-logo"> DALME </q-toolbar-title>
+      <q-toolbar-title class="dalme-logo self-end"> DALME </q-toolbar-title>
     </q-toolbar>
   </q-header>
 

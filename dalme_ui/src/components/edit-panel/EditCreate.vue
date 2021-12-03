@@ -86,6 +86,7 @@ export default defineComponent({
   name: "EditCreate",
   setup() {
     const editing = inject("editing");
+    const machine = inject("machine");
     const { form, locked, mode, submitting } = toRefs(editing);
 
     const disabled = computed(
@@ -101,6 +102,7 @@ export default defineComponent({
     return {
       disabled,
       handleClick,
+      machine,
     };
   },
 });

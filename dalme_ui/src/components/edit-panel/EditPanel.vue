@@ -28,6 +28,7 @@ import { defineComponent, inject, provide, ref, toRefs } from "vue";
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
 import { default as EditUpdate } from "./EditUpdate.vue";
+import { default as machine } from "./machines";
 
 export default defineComponent({
   name: "EditPanel",
@@ -38,13 +39,14 @@ export default defineComponent({
   },
   setup() {
     const editing = inject("editing");
+
     const { enableSave, mode, submitting } = toRefs(editing);
-    const position = ref([30, 30]);
-    // TODO: Thread to children fabs.
+    // TODO: Thread to children fabs. Won't be necessary if machine handles it.
     // TODO: https://vueuse.org/core/usedraggable/#usage ?
     const dragging = ref(false);
+    const position = ref([30, 30]);
 
-    provide("editing", editing);
+    provide("machine", machine);
 
     // Flipping `submitting = true` will trigger the editing watcher registered
     // by any component and call their submit handling function. They then have
@@ -56,6 +58,7 @@ export default defineComponent({
       }
     };
 
+    // TODO: Resize
     const move = (event) => {
       dragging.value = event.isFirst !== true && event.isFinal !== true;
       position.value = [

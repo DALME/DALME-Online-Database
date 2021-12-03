@@ -1,5 +1,9 @@
 <template>
-  <SchemaForm :schema="schema" :validation-schema="validationSchema" />
+  <SchemaForm
+    :schema="schema"
+    :validation-schema="validator"
+    @submit="onSubmit"
+  />
 </template>
 
 <script>
@@ -9,7 +13,7 @@ import { ref } from "vue";
 
 const SchemaForm = SchemaFormFactory([
   VeeValidatePlugin({
-    // plugin configuration here
+    // Plugin configuration goes here.
   }),
 ]);
 
@@ -19,7 +23,7 @@ export default {
       type: Object,
       required: true,
     },
-    validationSchema: {
+    validator: {
       type: Object,
       required: true,
     },
@@ -29,6 +33,12 @@ export default {
     const formModel = ref({});
 
     useSchemaForm(formModel);
+
+    const onSubmit = () => null;
+
+    return {
+      onSubmit,
+    };
   },
 };
 </script>

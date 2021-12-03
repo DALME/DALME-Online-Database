@@ -15,7 +15,9 @@
   "dependencies": {
     "@formvuelate/plugin-vee-validate": "^3.7.1",
     "@quasar/extras": "^1.10.7",
+    "@vueuse/components": "^7.1.2",
     "@vueuse/core": "^6.4.1",
+    "@xstate/vue": "^0.8.1",
     "core-js": "^3.6.5",
     "formvuelate": "^3.7.1",
     "js-cookie": "^2.2.1",
@@ -25,6 +27,7 @@
     "string": "^3.3.3",
     "vee-validate": "^4.5.5",
     "vuex": "^4.0.1",
+    "xstate": "^4.26.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {

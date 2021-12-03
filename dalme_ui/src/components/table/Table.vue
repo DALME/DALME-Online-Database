@@ -227,7 +227,6 @@ export default defineComponent({
       // The submitting ref will get flipped by the event handling on the
       // EditPanel so there's no need to do it here. We do flip it back at the
       // end of the handler though, that's our responsibility.
-      // submitting.value = true;
       const { success, status, fetchAPI } = useAPI(context);
       const request = props.updateRequest(objDiffs);
       await fetchAPI(request);

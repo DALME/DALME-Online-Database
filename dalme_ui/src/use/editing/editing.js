@@ -49,7 +49,7 @@ export const provideEditing = (editing) => {
     form,
     isEditingWatcher,
     locked,
-    mode, // Will expose funcs to manipulate this eventually.
+    mode, // TODO: Will expose funcs to manipulate this eventually.
     resetEditing,
     showFormModal,
     submitting,
