@@ -24,6 +24,7 @@ _extra
 
 #certificate stuff for development server
 ssl-certs
+extracted_datasets
 
 TODO*
 dalme/media
