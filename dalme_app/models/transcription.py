@@ -29,5 +29,9 @@ class Transcription(dalmeUuid):
     @property
     def text_blob(self):
         xml_parser = et.XMLParser(recover=True)
-        tr_tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
-        return et.tostring(tr_tree, encoding='utf8', method='text').decode('utf-8')
+        tr_tree = et.fromstring(f'<xml>{self.transcription}</xml>', xml_parser)
+        return et.tostring(tr_tree, encoding='utf8', xml_declaration=False, method='text').decode('utf-8')
+
+    @property
+    def tei(self):
+        return f'<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>{self.transcription}</body></text></TEI>'
