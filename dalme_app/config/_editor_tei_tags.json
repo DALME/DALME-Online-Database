@@ -389,7 +389,8 @@
         "options": [
           "dots",
           "line",
-          "dashes"
+          "dashes",
+          "none"
         ]
       }
     ]
