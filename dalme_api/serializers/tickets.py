@@ -38,7 +38,7 @@ class TicketSerializer(serializers.ModelSerializer):
         ticket = Ticket.objects.create(**validated_data)
         if tags:
             for tag in tags:
-                obj = {'tag_type': 'T', 'tag': tag['value']}
+                obj = {'tag_type': 'T', 'tag': tag}
                 ticket.tags.create(**obj)
         return ticket
 

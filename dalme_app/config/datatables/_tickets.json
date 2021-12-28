@@ -12,7 +12,7 @@
         "description": "description",
         "tags": "tags[].tag",
         "url": "url",
-        "attachments": "attachments.file"
+        "attachments": "file"
       },
       "required_list": [
         "subject",
@@ -47,10 +47,6 @@
       "attachments"
     ],
     "buttons": [
-      {
-        "button": "create",
-        "permissions": "dalme_app.add_ticket"
-      },
       {
         "button": "edit",
         "permissions": "dalme_app.change_ticket"

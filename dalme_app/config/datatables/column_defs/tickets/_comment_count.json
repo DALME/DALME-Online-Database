@@ -4,7 +4,7 @@
   "name": "comment_count",
   "defaultContent": "",
   "visible": true,
-  "orderable": false,
+  "orderable": true,
   "searchable": false,
   "render": "function (data) { return data > 0 ? '<div class=\"align-self-end d-flex align-items-center ml-4\"><i class=\"fas fa-comment fa-lg icon-badge\"></i><span class=\"icon-badge-count\">'+data+'</span></div>' : '';}",
   "width": "19px",

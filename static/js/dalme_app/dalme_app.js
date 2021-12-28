@@ -345,15 +345,47 @@ function task_set_state(task, state) {
 }
 
 function create_ticket() {
+
+    let editor_fields = ['subject', 'description', 'tags', 'url', 'file'];
+    let required_fields = ['subject', 'description', 'tags'];
+    $('#form-field-container').html('')
+
+    for (let i = 0, len = editor_fields.length; i < len; ++i) {
+      if (required_fields.includes(editor_fields[i])) {
+        $('#form-field-container').append('<div class="flex-row-reverse" data-editor-template="' + editor_fields[i]
+            + '"></div>');
+      } else {
+        $('#form-field-container').append('<div class="flex-row-reverse" data-editor-template="' + editor_fields[i]
+            + '"><i class="fas fa-times-circle field_clear_button"></i></div>');}
+    }
+
     ticketForm = new $.fn.dataTable.Editor( {
+          template: "#form-template",
+          formOptions: {
+            main: {
+              buttons: true,
+              focus: null,
+              message: true,
+              onBackground: "none",
+              onBlur: "none",
+              onComplete: "close",
+              onEsc: "none",
+              onFieldError: "focus",
+              onReturn: "none",
+              submit: "all",
+              drawType: false,
+              scope: "row"
+            }
+          },
           ajax: {
             method: "POST",
             url: `${api_endpoint}/tickets/`,
             xhrFields: { withCredentials: true },
             crossDomain: true,
             headers: {
-              "Content-Type": "application/json",
-              'X-CSRFToken': get_cookie("csrftoken")
+              "Content-Type": "application/json-dte; charset=UTF-8",
+              "Accept": "application/json-dte, text/javascript, */*; q=0.01",
+              "X-CSRFToken": get_cookie("csrftoken")
             },
             data: function (data) { return { "data": JSON.stringify( data ) };}
           },
@@ -408,17 +440,168 @@ function create_ticket() {
               }
           ]
     });
+
+
+    ticketForm.on('open', function (e, mode, action) {
+        $('#header-button').insertAfter('.close');
+        $('#header-button').remove();
+        $('.DTE_Header').children('.close').remove();
+        $('.DTE_Header_Content').html('<div class="form_title_text">' + ticketForm.title() + '</div>')
+        $('[data-dte-e="form_error"]').appendTo($('.DTE_Body'));
+        $('.DTE_Footer_Content').append($('#form-button-container').html());
+        $('#form-button-container').remove();
+        $('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-12');
+        $('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-12');
+
+        $('.DTE_Field').each(function() {
+          if (!$(this).find('[data-dte-e="msg-info"]').is(':empty') ) {
+            let info = $(this).find('[data-dte-e="msg-info"]').html();
+            $(this).find('[data-dte-e="msg-label"]').html(info);
+            $(this).find('[data-dte-e="msg-info"]').html('');
+          }
+        });
+
+        $('.field_clear_button').each( function(i, el) {
+          let field = $(el).parent().data('editor-template')
+          $(el).popover({
+              toggle: 'popover',
+              placement: 'right',
+              html: true,
+              title: '',
+              content: '<a href="#" id="' + field + '" class="btn btn-sm btn-danger clear-field mr-1">\
+                  Remove</a><a href="#" class="btn btn-sm btn-primary">Cancel</a>',
+            })
+        })
+
+        $(document).on("click.dalme", ".popover .btn-primary" , function() {
+            $(this).parents(".popover").popover('hide');
+        });
+
+        $(document).on("click.dalme", ".popover .clear-field" , function() {
+            toggle_fields($(this).attr('id'), editor_fields, 'hide');
+            $(this).parents(".popover").popover('hide');
+        });
+
+        toggle_fields(required_fields, editor_fields);
+
+        $("textarea").each( function( i, el ) {
+            $(el).width(500);
+            $(el).height(100);
+        });
+
+    });
+
+    ticketForm.on('close.dalme', function (e) {
+      $('.DTE_Form_Buttons').appendTo($('.DTE_Footer'));
+      $('.DTE_Form_Buttons').removeClass('remove-action-buttons');
+      $('.modal-header').removeClass('d-none');
+      $('.modal-footer').removeClass('d-none');
+      $('.DTE_Form_Info').removeClass('remove-action-info');
+
+      $('#add-attribute-button').off('click.dalme');
+      $('.field_clear_button').popover('dispose');
+      $(document).off("click.dalme", ".popover .btn-primary");
+      $(document).off("click.dalme", ".popover .clear-field");
+
+      $('#form-field-container').html('')
+    });
+
     ticketForm.on('submitSuccess', function(e, json, data, action) {
       toastr.success('The ticket was created successfully.');
       if (typeof table_tickets != 'undefined') {
         table_tickets.ajax.reload().draw();
       }
     });
-    ticketForm.buttons({
+
+    ticketForm.buttons([{
         text: "Create",
-        className: "btn btn-primary",
+        className: "btn btn-success",
         action: function () { this.submit(); }
-      }).title('Create New Issue Ticket').create();
+      },
+      {
+        text: "Cancel",
+        className: "btn btn-primary",
+        action: function () { this.close(); }
+      }]).title('New Ticket').create();
+}
+
+function toggle_fields(target, editor_fields, action) {
+  if (Array.isArray(target) && target.length) {
+    let add_menu_list = [];
+
+    for (let i = 0, len = editor_fields.length; i < len; ++i) {
+      if (target.includes(editor_fields[i])) {
+        toggle_fields(editor_fields[i], editor_fields, 'show')
+      } else {
+        toggle_fields(editor_fields[i], editor_fields, 'hide')
+        add_menu_list.push(editor_fields[i]);
+      }
+    }
+
+    if (add_menu_list.length) {
+      add_menu_list.sort();
+
+      $('#add-attribute-menu-container').html('');
+
+      for (let i = 0, len = add_menu_list.length; i < len; ++i) {
+          $('#add-attribute-menu-container').append('<a class="dropdown-item" href="#" data-menu-field="'
+            + add_menu_list[i] + '">'
+            + add_menu_list[i].replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>');
+      }
+      $('#add-attribute-button').removeClass('d-none');
+      $('#add-attribute-menu-container').on('click.dalme', '.dropdown-item', function () {
+        toggle_fields($(this).data('menu-field'), editor_fields, 'show');
+      });
+
+    } else {
+      $('#add-attribute-button').addClass('d-none');
+    }
+
+  } else if (typeof action != 'undefined') {
+
+    switch (action) {
+
+      case 'hide':
+        ticketForm.field(target).val('');
+        ticketForm.hide(target);
+
+        if ($(ticketForm.field(target).node()).parent().find('.field_clear_button').length) {
+          $(ticketForm.field(target).node()).parent().find('.field_clear_button').addClass('d-none');
+        }
+
+        if (!$('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').length) {
+          $('#add-attribute-menu-container').append('<a class="dropdown-item" href="#" data-menu-field="' + target + '">'
+              + target.replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>');
+
+          $('#add-attribute-menu-container').find('dropdown_item').sort(function(a, b) {
+              return $(a).text().toLowerCase().localeCompare($(b).text().toLowerCase());
+            }).each(function() {
+              $('#add-attribute-menu-container').append(this);
+          });
+        }
+
+        if ($('#add-attribute-button').hasClass('d-none')) {
+          $('#add-attribute-button').removeClass('d-none');
+        }
+
+        break;
+
+      case 'show':
+        ticketForm.show(target);
+
+        if ($(ticketForm.field(target).node()).parent().find('.field_clear_button').length) {
+          $(ticketForm.field(target).node()).parent().find('.field_clear_button').removeClass('d-none');
+        }
+
+        if ($('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').length > 0) {
+          $('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').remove()
+
+          if ($('#add-attribute-menu-container').children().length < 1) {
+            $('#add-attribute-button').addClass('d-none');
+          }
+        }
+    }
+  }
 }
 
 function full_screen_mode(action) {
@@ -450,6 +633,14 @@ function full_screen_mode(action) {
   }
 }
 
+function get_user_avatar(image_path) {
+  if (image_path == "None" || image_path == null || !image_path.length ) {
+    return '<i class="fa fa-user-alt-slash img_avatar mt-1 fa-2x"></i>'
+  } else {
+    return '<img src="'+image_path+'" class="img_avatar" alt="avatar">'
+  }
+}
+
 function enable_comments(model, object) {
   $.ajax({
     method: "GET",
@@ -464,9 +655,9 @@ function enable_comments(model, object) {
     if (data.results.length > 0) {
       $('#comments').prepend('<div id="comments-container"></div>');
       for (let i = 0; i < data.results.length; i++) {
-          var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.results[i].avatar+'</div>';
+          var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+get_user_avatar(data.results[i].creation_user.avatar)+'</div>';
           comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
-          comment += '<b>'+data.results[i].user+'</b> commented on '+data.results[i].creation_timestamp+'</div>';
+          comment += '<b>'+data.results[i].creation_user.username+'</b> commented on '+moment(data.results[i].creation_timestamp).format("DD-MMM-YYYY@HH:MM")+'</div>';
           comment += '<div class="comment-body">'+data.results[i].body+'</div></div></div>';
           $('#comments-container').append(comment);
       }
@@ -490,9 +681,9 @@ function create_comment(model, object) {
         if (!$('#comments-container').length) {
           $('#comments').prepend('<div id="comments-container"></div>');
         };
-        var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+data.avatar+'</div>';
+        var comment = '<div class="d-flex mb-3"><div class="d-inline-block mr-3">'+get_user_avatar(data.creation_user.avatar)+'</div>';
         comment += '<div class="comment-card d-inline-block"><div class="comment-header">';
-        comment += '<b>'+data.user+'</b> commented on '+data.creation_timestamp+'</div>';
+        comment += '<b>'+data.creation_user.username+'</b> commented on '+moment(data.creation_timestamp).format("DD-MMM-YYYY@HH:MM")+'</div>';
         comment += '<div class="comment-body">'+data.body+'</div></div></div>';
         $('#comments-container').append(comment);
         $('#new_comment_text').val("");

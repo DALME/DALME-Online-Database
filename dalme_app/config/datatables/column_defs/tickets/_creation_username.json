@@ -1,9 +1,10 @@
 {
   "title": "Created by",
-  "data": "creation_username",
-  "name": "creation_username",
+  "data": "creation_user",
+  "name": "creation_user",
   "defaultContent": "",
   "visible": true,
-  "orderable": false,
-  "searchable": false
+  "orderable": true,
+  "searchable": false,
+  "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" :  '<a href=\"/users/'+data.username+'\">'+data.full_name+'<\/a>';}"
 }

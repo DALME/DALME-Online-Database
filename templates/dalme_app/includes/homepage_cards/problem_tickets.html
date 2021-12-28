@@ -32,12 +32,12 @@
           {
                 text: 'Subject',
                 className: 'footer-btn',
-                action: function () { table_tickets.order([4,'asc']).draw() }
+                action: function () { table_tickets.order([1,'asc']).draw() }
           },
           {
                 text: 'Status',
                 className: 'footer-btn',
-                action: function () { table_tickets.order([5,'asc']).draw() }
+                action: function () { table_tickets.order([3,'asc']).draw() }
           }
         ]
       }
@@ -51,9 +51,9 @@
             width: "20px"
         },
         {
-            title: "Ticket",
+            title: "Subject",
             targets: 1,
-            data: "ticket",
+            data: "subject",
             visible: 1,
             searchable: 0,
             orderData: [ 5, 4 ],
@@ -68,29 +68,15 @@
             render: function (data, type, row, meta) {return (typeof data == "undefined") ? "" : data.filter(function(a) { if (a.tag !== '0') { return a }}).map(a => '<div class="ticket-tag ticket-'+ a.tag +'">'+ a.tag +'<\/div>'); }
         },
         {
-            title: "Attachments",
-            targets: 3,
-            data: "attachments",
-            visible: 1,
-            orderable: 0,
-            searchable: 0,
-        },
-        {
-            title: "Subject",
-            targets: 4,
-            data: "subject",
-            visible: 0
-        },
-        {
             title: "Status",
-            targets: 5,
+            targets: 3,
             data: "status",
             visible: 0,
             searchable: 0
         },
         {
             title: "Comments",
-            targets: 6,
+            targets: 4,
             data: "comment_count",
             visible: 0,
             searchable: 0

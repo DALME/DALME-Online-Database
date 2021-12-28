@@ -37,7 +37,7 @@
                       <div id="ticket_status" class="ticket-detail-closed"><i class="fa fa-exclamation-circle fa-fw"></i> Closed</div>
                     {% endif %}
                     <div class="record-title-meta">
-                      <a href="/users/{{ object.creation_user.username }}">{{ object.creation_name }}</a> opened this issue on {{ object.creation_timestamp|date:"j-M-Y" }}
+                      <a href="/users/{{ object.creation_user.username }}">{{ object.creation_user.profile.full_name }}</a> opened this issue on {{ object.creation_timestamp|date:"j-M-Y" }}
                       {% if object.comments.count > 0 %}
                         ・ {{ object.comments.count }} comment{{ object.comments.count|pluralize }}
                       {% endif %}
@@ -64,7 +64,7 @@
                   <button class="btn btn-primary ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ object.id }}, $(this).text())">Close</button>
                   {% endif %}
                 {% else %}
-                  <div class="ticket-detail-status">{{ object.modification_timestamp|date:"j-M-Y" }} | {{ object.modification_user.username }}</div>
+                  <div class="ticket-detail-status">{{ object.closing_date|date:"j-M-Y" }} | {{ object.closing_user.username }}</div>
                   {% if perms.dalme_app.can_change_ticket %}
                   <button class="btn btn-danger ml-auto d-flex mr-2" type="button" onclick="ticket_set_state({{ object.id }}, $(this).text())">Open</button>
                   {% endif %}

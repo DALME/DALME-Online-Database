@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from datetime import datetime
 from dalme_api.serializers import TicketSerializer
 from dalme_app.models import Ticket
 from dalme_api.access_policies import TicketAccessPolicy
@@ -19,7 +20,9 @@ class Tickets(DALMEBaseViewSet):
             action = self.request.data['action']
             if action == 'Close':
                 object.status = 1
-                object.save(update_fields=['status', 'modification_user', 'modification_timestamp'])
+                object.closing_user = self.request.user
+                object.closing_date = datetime.now()
+                object.save(update_fields=['status', 'modification_user', 'modification_timestamp', 'closing_user', 'closing_date'])
             elif action == 'Open':
                 object.status = 0
                 object.save(update_fields=['status', 'modification_user', 'modification_timestamp'])

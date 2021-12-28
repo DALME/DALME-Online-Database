@@ -1,10 +1,12 @@
 {
   "title": "Attachments",
-  "data": "attachments",
-  "name": "attachments",
+  "data": "file",
+  "name": "file",
   "defaultContent": "",
   "visible": true,
   "orderable": false,
   "searchable": false,
+  "render": "function ( data, type, row, meta ) {return data == null ? '<i class=\"far fa-square\"></i>' : '<i class=\"fas fa-check-square\"></i>';}",
+  "width": "19px",
   "className": "td-center"
 }

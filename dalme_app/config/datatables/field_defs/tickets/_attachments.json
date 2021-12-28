@@ -1,5 +1,5 @@
 {
-  "name": "attachments.file",
+  "name": "file",
   "label": "Attachments",
   "type": "upload",
   "clearText": "Remove File",
