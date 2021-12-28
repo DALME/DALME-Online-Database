@@ -132,6 +132,10 @@
     "group": "Seizure"
   },
   {
+    "label": "Seizure-Confiscation",
+    "group": "Seizure"
+  },
+  {
     "label": "Testament",
     "group": "Testament"
   },
