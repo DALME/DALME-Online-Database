@@ -96,6 +96,22 @@
     "group": "Inventory"
   },
   {
+    "label": "Account Book–Household",
+    "group": "Account Book"
+  },
+  {
+    "label": "Account Book–Commercial",
+    "group": "Account Book"
+  },
+  {
+    "label": "Account Book–Ecclesiastical",
+    "group": "Account Book"
+  },
+  {
+    "label": "Account Book–Other",
+    "group": "Account Book"
+  },
+  {
     "label": "Guardianship",
     "group": "Guardianship"
   },
