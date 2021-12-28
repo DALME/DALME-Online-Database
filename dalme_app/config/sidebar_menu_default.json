@@ -262,31 +262,6 @@
     "permissions": ["Developers"]
   },
   {
-    "text": "Data Models",
-    "link": "#",
-    "iconClass": "fa-cubes",
-    "itemClass": "models",
-    "dropdown": true,
-    "permissions": ["Developers"]
-  },
-  {
-    "text": "Content Types",
-    "link": "/models/content-types",
-    "iconClass": "fa-cube",
-    "child": true,
-    "permissions": ["Developers"]
-  },
-  {
-    "text": "Attribute Types",
-    "link": "/models/attribute-types",
-    "iconClass": "fa-cube",
-    "child": true,
-    "permissions": ["Developers"]
-  },
-  {
-    "close_dropdown": true
-  },
-  {
     "text": "Tools",
     "link": "#",
     "iconClass": "fa-toolbox",
