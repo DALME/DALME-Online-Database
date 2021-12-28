@@ -8,7 +8,7 @@
         "remove_success": "The image was deleted succesfully."
       },
       "attribute_concordance": {
-        "ref": "ref.ref",
+        "ref": "ref",
         "field8": "field8",
         "field79": "field79",
         "has_image": "has_image",
@@ -51,22 +51,15 @@
     }
   },
   "editor": {
+    "options": {
+      "idSrc": "ref"
+    },
     "fields": [
       "field8",
       "field79",
       "field12",
       "field3",
       "collections"
-    ],
-    "buttons": [
-      {
-        "button": "edit",
-        "permissions": "dalme_app.change_image"
-      },
-      {
-        "button": "remove",
-        "permissions": "dalme_app.delete_image"
-      }
     ]
   }
 }
