@@ -345,216 +345,235 @@ function task_set_state(task, state) {
 }
 
 function create_ticket() {
+    if (typeof ticketForm === 'undefined') {
 
-    let editor_fields = ['subject', 'description', 'tags', 'url', 'file'];
-    let required_fields = ['subject', 'description', 'tags'];
-    $('#form-field-container').html('')
+        let editor_fields = ['subject', 'description', 'tags', 'url', 'file'];
+        let required_fields = ['subject', 'description', 'tags'];
 
-    for (let i = 0, len = editor_fields.length; i < len; ++i) {
-      if (required_fields.includes(editor_fields[i])) {
-        $('#form-field-container').append('<div class="flex-row-reverse" data-editor-template="' + editor_fields[i]
-            + '"></div>');
-      } else {
-        $('#form-field-container').append('<div class="flex-row-reverse" data-editor-template="' + editor_fields[i]
-            + '"><i class="fas fa-times-circle field_clear_button"></i></div>');}
-    }
+        //if (!$('#form-field-container-ticket').children().length) {
+        for (let i = 0, len = editor_fields.length; i < len; ++i) {
+          if (required_fields.includes(editor_fields[i])) {
+            $('#form-field-container-ticket').append('<div class="flex-row-reverse" data-editor-template="' + editor_fields[i]
+                + '"></div>');
+          } else {
+            $('#form-field-container-ticket').append('<div class="flex-row-reverse" data-editor-template="' + editor_fields[i]
+                + '"><i class="fas fa-times-circle field_clear_button"></i></div>');}
+        }
+        //}
 
-    ticketForm = new $.fn.dataTable.Editor( {
-          template: "#form-template",
-          formOptions: {
-            main: {
-              buttons: true,
-              focus: null,
-              message: true,
-              onBackground: "none",
-              onBlur: "none",
-              onComplete: "close",
-              onEsc: "none",
-              onFieldError: "focus",
-              onReturn: "none",
-              submit: "all",
-              drawType: false,
-              scope: "row"
-            }
-          },
-          ajax: {
-            method: "POST",
-            url: `${api_endpoint}/tickets/`,
-            xhrFields: { withCredentials: true },
-            crossDomain: true,
-            headers: {
-              "Content-Type": "application/json-dte; charset=UTF-8",
-              "Accept": "application/json-dte, text/javascript, */*; q=0.01",
-              "X-CSRFToken": get_cookie("csrftoken")
-            },
-            data: function (data) { return { "data": JSON.stringify( data ) };}
-          },
-          fields: [
-              {
-                label: "Subject",
-                name:  "subject"
+        ticketForm = new $.fn.dataTable.Editor( {
+              template: "#form-template-ticket",
+              formOptions: {
+                main: {
+                  buttons: true,
+                  focus: null,
+                  message: true,
+                  onBackground: "none",
+                  onBlur: "none",
+                  onComplete: "close",
+                  onEsc: "none",
+                  onFieldError: "focus",
+                  onReturn: "none",
+                  submit: "all",
+                  drawType: false,
+                  scope: "row"
+                }
               },
-              {
-                label: "Description",
-                name:  "description",
-                type: "textarea"
+              ajax: {
+                method: "POST",
+                url: `${api_endpoint}/tickets/`,
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                headers: {
+                  "Content-Type": "application/json-dte; charset=UTF-8",
+                  "Accept": "application/json-dte, text/javascript, */*; q=0.01",
+                  "X-CSRFToken": get_cookie("csrftoken")
+                },
+                data: function (data) { return { "data": JSON.stringify( data ) };}
               },
-              {
-                label: "Tags",
-                name:  "tags",
-                type: "selectize",
-                opts: {'maxItems': 10, 'plugins': ["remove_button"], 'placeholder': "Tag ticket"},
-                options: [
-                  {"label": "bug", "value": "bug"},
-                  {"label": "feature", "value": "feature"},
-                  {"label": "documentation", "value": "documentation"},
-                  {"label": "question", "value": "question"},
-                  {"label": "content", "value": "content"}
-                ]
-              },
-              {
-                label: "URL",
-                name:  "url",
-                fieldInfo: "A URL related to the ticket, if applicable",
-                type: "text"
-              },
-              {
-                label: "Attachment",
-                name:  "file",
-                fieldInfo: "A file to be attached to the ticket, <i>e.g. a screenshot</i>",
-                type: "upload",
-                ajax: {
-                  method: "POST",
-                  url: `${api_endpoint}/attachments/`,
-                  headers: {
-                    "Content-Type": "application/json",
-                    'X-CSRFToken': get_cookie("csrftoken")
+              fields: [
+                  {
+                    label: "Subject",
+                    name:  "subject"
                   },
-                },
-                display: function ( fileId ) {
-                  return ticketForm.file('Attachment', fileId ).filename;
-                },
-                dragDrop: 'true',
-                dragDropText: "Drag file here",
-                uploadText: "Choose file..."
+                  {
+                    label: "Description",
+                    name:  "description",
+                    type: "textarea"
+                  },
+                  {
+                    label: "Tags",
+                    name:  "tags",
+                    type: "selectize",
+                    opts: {
+                      'maxItems': 10,
+                      'plugins': ["remove_button"],
+                      'placeholder': "Tag ticket",
+                      "valueField": "value",
+                      "labelField": "label",
+                    },
+                    options: [
+                      {"label": "bug", "value": "bug"},
+                      {"label": "feature", "value": "feature"},
+                      {"label": "documentation", "value": "documentation"},
+                      {"label": "question", "value": "question"},
+                      {"label": "content", "value": "content"}
+                    ]
+                  },
+                  {
+                    label: "URL",
+                    name:  "url",
+                    fieldInfo: "A URL related to the ticket, if applicable",
+                    type: "text"
+                  },
+                  {
+                    label: "Attachment",
+                    name:  "file",
+                    fieldInfo: "A file to be attached to the ticket, <i>e.g. a screenshot</i>",
+                    type: "upload",
+                    ajax: {
+                      method: "POST",
+                      url: `${api_endpoint}/attachments/`,
+                      headers: {
+                        "Content-Type": "application/json",
+                        'X-CSRFToken': get_cookie("csrftoken")
+                      },
+                    },
+                    display: function ( fileId ) {
+                      return ticketForm.file('Attachment', fileId ).filename;
+                    },
+                    dragDrop: 'true',
+                    dragDropText: "Drag file here",
+                    uploadText: "Choose file..."
+                  }
+              ]
+        });
+
+
+        ticketForm.on('open.ticket', function (e, mode, action) {
+            let form_ticket = $('#form-template-ticket').parents('.DTE');
+
+            // if (!one_time_ticket_setup) {
+            $('#header-button-ticket').insertAfter('.close');
+            $('#header-button-ticket').remove();
+              // one_time_ticket_setup = true;
+            // }
+
+            $(form_ticket).find('.DTE_Header').children('.close').remove();
+            $(form_ticket).find('.DTE_Header_Content').html('<div class="form_title_text">New Ticket</div>')
+            $(form_ticket).find('[data-dte-e="form_error"]').appendTo($(form_ticket).find('.DTE_Body'));
+            $(form_ticket).find('.DTE_Footer_Content').append($(form_ticket).find('#form-button-container').html());
+            $(form_ticket).find('#form-button-container').remove();
+            $(form_ticket).find('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-12');
+            $(form_ticket).find('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-12');
+
+            $(form_ticket).find('.DTE_Field').each(function() {
+              if (!$(this).find('[data-dte-e="msg-info"]').is(':empty') ) {
+                let info = $(this).find('[data-dte-e="msg-info"]').html();
+                $(this).find('[data-dte-e="msg-label"]').html(info);
+                $(this).find('[data-dte-e="msg-info"]').html('');
               }
-          ]
-    });
+            });
 
+            $(form_ticket).find('.field_clear_button').each( function(i, el) {
+              let field = $(el).parent().data('editor-template')
+              $(el).popover({
+                  toggle: 'popover',
+                  placement: 'right',
+                  html: true,
+                  title: '',
+                  content: '<a href="#" id="' + field + '" class="btn btn-sm btn-danger clear-field mr-1">\
+                      Remove</a><a href="#" class="btn btn-sm btn-primary">Cancel</a>',
+                })
+            })
 
-    ticketForm.on('open', function (e, mode, action) {
-        $('#header-button').insertAfter('.close');
-        $('#header-button').remove();
-        $('.DTE_Header').children('.close').remove();
-        $('.DTE_Header_Content').html('<div class="form_title_text">' + ticketForm.title() + '</div>')
-        $('[data-dte-e="form_error"]').appendTo($('.DTE_Body'));
-        $('.DTE_Footer_Content').append($('#form-button-container').html());
-        $('#form-button-container').remove();
-        $('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-12');
-        $('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-12');
+            $(document).on("click.ticket", ".popover .btn-primary" , function() {
+                $(this).parents(".popover").popover('hide');
+            });
 
-        $('.DTE_Field').each(function() {
-          if (!$(this).find('[data-dte-e="msg-info"]').is(':empty') ) {
-            let info = $(this).find('[data-dte-e="msg-info"]').html();
-            $(this).find('[data-dte-e="msg-label"]').html(info);
-            $(this).find('[data-dte-e="msg-info"]').html('');
+            $(document).on("click.ticket", ".popover .clear-field" , function() {
+                toggle_ticket_fields($(this).attr('id'), editor_fields, 'hide');
+                $(this).parents(".popover").popover('hide');
+            });
+
+            toggle_ticket_fields(required_fields, editor_fields);
+
+            $("textarea").each( function( i, el ) {
+                $(el).width(500);
+                $(el).height(100);
+            });
+        });
+
+        ticketForm.on('close.ticket', function (e) {
+          let form_ticket = $('#form-template-ticket').parents('.DTE');
+
+          $(form_ticket).find('.DTE_Form_Buttons').appendTo($(form_ticket).find('.DTE_Footer'));
+          $(form_ticket).find('.DTE_Form_Buttons').removeClass('remove-action-buttons');
+          $(form_ticket).find('.modal-header').removeClass('d-none');
+          $(form_ticket).find('.modal-footer').removeClass('d-none');
+          $(form_ticket).find('.DTE_Form_Info').removeClass('remove-action-info');
+
+          $('#add-attribute-button-ticket').off('click.ticket');
+          $(form_ticket).find('.field_clear_button').popover('dispose');
+          $(document).off("click.ticket", ".popover .btn-primary");
+          $(document).off("click.ticket", ".popover .clear-field");
+        });
+
+        ticketForm.on('submitSuccess', function(e, json, data, action) {
+          toastr.success('The ticket was created successfully.');
+          if (typeof table_tickets != 'undefined') {
+            table_tickets.ajax.reload().draw();
           }
         });
 
-        $('.field_clear_button').each( function(i, el) {
-          let field = $(el).parent().data('editor-template')
-          $(el).popover({
-              toggle: 'popover',
-              placement: 'right',
-              html: true,
-              title: '',
-              content: '<a href="#" id="' + field + '" class="btn btn-sm btn-danger clear-field mr-1">\
-                  Remove</a><a href="#" class="btn btn-sm btn-primary">Cancel</a>',
-            })
-        })
+        ticketForm.buttons([{
+            text: "Create",
+            className: "btn btn-success",
+            action: function () { this.submit(); }
+          },
+          {
+            text: "Cancel",
+            className: "btn btn-primary",
+            action: function () { this.close(); }
+          }]).create();
 
-        $(document).on("click.dalme", ".popover .btn-primary" , function() {
-            $(this).parents(".popover").popover('hide');
-        });
-
-        $(document).on("click.dalme", ".popover .clear-field" , function() {
-            toggle_fields($(this).attr('id'), editor_fields, 'hide');
-            $(this).parents(".popover").popover('hide');
-        });
-
-        toggle_fields(required_fields, editor_fields);
-
-        $("textarea").each( function( i, el ) {
-            $(el).width(500);
-            $(el).height(100);
-        });
-
-    });
-
-    ticketForm.on('close.dalme', function (e) {
-      $('.DTE_Form_Buttons').appendTo($('.DTE_Footer'));
-      $('.DTE_Form_Buttons').removeClass('remove-action-buttons');
-      $('.modal-header').removeClass('d-none');
-      $('.modal-footer').removeClass('d-none');
-      $('.DTE_Form_Info').removeClass('remove-action-info');
-
-      $('#add-attribute-button').off('click.dalme');
-      $('.field_clear_button').popover('dispose');
-      $(document).off("click.dalme", ".popover .btn-primary");
-      $(document).off("click.dalme", ".popover .clear-field");
-
-      $('#form-field-container').html('')
-    });
-
-    ticketForm.on('submitSuccess', function(e, json, data, action) {
-      toastr.success('The ticket was created successfully.');
-      if (typeof table_tickets != 'undefined') {
-        table_tickets.ajax.reload().draw();
+      } else {
+        ticketForm.create();
       }
-    });
-
-    ticketForm.buttons([{
-        text: "Create",
-        className: "btn btn-success",
-        action: function () { this.submit(); }
-      },
-      {
-        text: "Cancel",
-        className: "btn btn-primary",
-        action: function () { this.close(); }
-      }]).title('New Ticket').create();
 }
 
-function toggle_fields(target, editor_fields, action) {
+function toggle_ticket_fields(target, editor_fields, action) {
   if (Array.isArray(target) && target.length) {
-    let add_menu_list = [];
+    let ticket_menu_list = [];
 
     for (let i = 0, len = editor_fields.length; i < len; ++i) {
       if (target.includes(editor_fields[i])) {
-        toggle_fields(editor_fields[i], editor_fields, 'show')
+        toggle_ticket_fields(editor_fields[i], editor_fields, 'show')
       } else {
-        toggle_fields(editor_fields[i], editor_fields, 'hide')
-        add_menu_list.push(editor_fields[i]);
+        toggle_ticket_fields(editor_fields[i], editor_fields, 'hide')
+        ticket_menu_list.push(editor_fields[i]);
       }
     }
 
-    if (add_menu_list.length) {
-      add_menu_list.sort();
+    if (ticket_menu_list.length) {
+      ticket_menu_list.sort();
 
-      $('#add-attribute-menu-container').html('');
+      $('#add-attribute-menu-container-ticket').html('');
 
-      for (let i = 0, len = add_menu_list.length; i < len; ++i) {
-          $('#add-attribute-menu-container').append('<a class="dropdown-item" href="#" data-menu-field="'
-            + add_menu_list[i] + '">'
-            + add_menu_list[i].replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>');
+      for (let i = 0, len = ticket_menu_list.length; i < len; ++i) {
+          $('#add-attribute-menu-container-ticket').append('<a class="dropdown-item" href="#" data-menu-field="'
+            + ticket_menu_list[i] + '">'
+            + ticket_menu_list[i].replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>');
       }
-      $('#add-attribute-button').removeClass('d-none');
-      $('#add-attribute-menu-container').on('click.dalme', '.dropdown-item', function () {
-        toggle_fields($(this).data('menu-field'), editor_fields, 'show');
+
+      $('#add-attribute-button-ticket').removeClass('d-none');
+
+      $('#add-attribute-menu-container-ticket').on('click.dalme', '.dropdown-item', function () {
+        toggle_ticket_fields($(this).data('menu-field'), editor_fields, 'show');
       });
 
     } else {
-      $('#add-attribute-button').addClass('d-none');
+      $('#add-attribute-button-ticket').addClass('d-none');
     }
 
   } else if (typeof action != 'undefined') {
@@ -569,19 +588,19 @@ function toggle_fields(target, editor_fields, action) {
           $(ticketForm.field(target).node()).parent().find('.field_clear_button').addClass('d-none');
         }
 
-        if (!$('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').length) {
-          $('#add-attribute-menu-container').append('<a class="dropdown-item" href="#" data-menu-field="' + target + '">'
+        if (!$('#add-attribute-menu-container-ticket').find('[data-menu-field="' + target + '"]').length) {
+          $('#add-attribute-menu-container-ticket').append('<a class="dropdown-item" href="#" data-menu-field="' + target + '">'
               + target.replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>');
 
-          $('#add-attribute-menu-container').find('dropdown_item').sort(function(a, b) {
+          $('#add-attribute-menu-container-ticket').find('dropdown_item').sort(function(a, b) {
               return $(a).text().toLowerCase().localeCompare($(b).text().toLowerCase());
             }).each(function() {
-              $('#add-attribute-menu-container').append(this);
+              $('#add-attribute-menu-container-ticket').append(this);
           });
         }
 
-        if ($('#add-attribute-button').hasClass('d-none')) {
-          $('#add-attribute-button').removeClass('d-none');
+        if ($('#add-attribute-button-ticket').hasClass('d-none')) {
+          $('#add-attribute-button-ticket').removeClass('d-none');
         }
 
         break;
@@ -593,11 +612,11 @@ function toggle_fields(target, editor_fields, action) {
           $(ticketForm.field(target).node()).parent().find('.field_clear_button').removeClass('d-none');
         }
 
-        if ($('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').length > 0) {
-          $('#add-attribute-menu-container').find('[data-menu-field="' + target + '"]').remove()
+        if ($('#add-attribute-menu-container-ticket').find('[data-menu-field="' + target + '"]').length > 0) {
+          $('#add-attribute-menu-container-ticket').find('[data-menu-field="' + target + '"]').remove()
 
-          if ($('#add-attribute-menu-container').children().length < 1) {
-            $('#add-attribute-button').addClass('d-none');
+          if ($('#add-attribute-menu-container-ticket').children().length < 1) {
+            $('#add-attribute-button-ticket').addClass('d-none');
           }
         }
     }

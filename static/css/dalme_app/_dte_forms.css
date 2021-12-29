@@ -97,7 +97,8 @@
   margin: 0;
 }
 
-#form-field-container {
+#form-field-container,
+#form-field-container-ticket {
   display: flex;
   flex-direction: column;
   /* padding-left: 1rem; */

@@ -217,21 +217,23 @@ function init_helpers(config_data) {
 }
 
 function general_form_setup(e, mode, action) {
+    let form = $('#form-template').parents('.DTE');
+
     if (!one_time_general_setup) {
       $('#header-button').insertAfter('.close');
       $('#header-button').remove();
       one_time_general_setup = true;
     }
 
-    $('.DTE_Header').children('.close').remove();
-    $('.DTE_Header_Content').html('<div class="form_title_text">' + dt_editor.title() + '</div>')
-    $('[data-dte-e="form_error"]').appendTo($('.DTE_Body'));
-    $('.DTE_Footer_Content').append($('#form-button-container').html());
-    $('#form-button-container').remove();
-    $('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-12');
-    $('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-12');
+    $(form).find('.DTE_Header').children('.close').remove();
+    $(form).find('.DTE_Header_Content').html('<div class="form_title_text">' + dt_editor.title() + '</div>')
+    $(form).find('[data-dte-e="form_error"]').appendTo($(form).find('.DTE_Body'));
+    $(form).find('.DTE_Footer_Content').append($(form).find('#form-button-container').html());
+    $(form).find('#form-button-container').remove();
+    $(form).find('.DTE_Form_Content').find('.col-lg-4').removeClass('col-lg-4').addClass('col-lg-12');
+    $(form).find('.DTE_Form_Content').find('.col-lg-8').removeClass('col-lg-8').addClass('col-lg-12');
 
-    $('.DTE_Field').each(function() {
+    $(form).find('.DTE_Field').each(function() {
       if (!$(this).find('[data-dte-e="msg-info"]').is(':empty') ) {
         let info = $(this).find('[data-dte-e="msg-info"]').html();
         $(this).find('[data-dte-e="msg-label"]').html(info);
@@ -239,7 +241,7 @@ function general_form_setup(e, mode, action) {
       }
     });
 
-    $('.field_clear_button').each( function(i, el) {
+    $(form).find('.field_clear_button').each( function(i, el) {
       let field = $(el).parent().data('editor-template')
       $(el).popover({
           toggle: 'popover',
@@ -261,11 +263,11 @@ function general_form_setup(e, mode, action) {
     });
 
     if (action == 'remove') {
-      $('.modal-header').addClass('d-none');
-      $('.DTE_Form_Buttons').appendTo($('.DTE_Body'));
-      $('.DTE_Form_Buttons').addClass('remove-action-buttons');
-      $('.modal-footer').addClass('d-none');
-      $('.DTE_Form_Info').addClass('remove-action-info');
+      $(form).find('.modal-header').addClass('d-none');
+      $(form).find('.DTE_Form_Buttons').appendTo($(form).find('.DTE_Body'));
+      $(form).find('.DTE_Form_Buttons').addClass('remove-action-buttons');
+      $(form).find('.modal-footer').addClass('d-none');
+      $(form).find('.DTE_Form_Info').addClass('remove-action-info');
     }
 
     if (typeof on_open_function !== 'undefined') {
@@ -289,14 +291,16 @@ function general_form_setup(e, mode, action) {
 }
 
 function general_form_restore(e) {
-  $('.DTE_Form_Buttons').appendTo($('.DTE_Footer'));
-  $('.DTE_Form_Buttons').removeClass('remove-action-buttons');
-  $('.modal-header').removeClass('d-none');
-  $('.modal-footer').removeClass('d-none');
-  $('.DTE_Form_Info').removeClass('remove-action-info');
+  let form = $('#form-template').parents('.DTE');
+
+  $(form).find('.DTE_Form_Buttons').appendTo($(form).find('.DTE_Footer'));
+  $(form).find('.DTE_Form_Buttons').removeClass('remove-action-buttons');
+  $(form).find('.modal-header').removeClass('d-none');
+  $(form).find('.modal-footer').removeClass('d-none');
+  $(form).find('.DTE_Form_Info').removeClass('remove-action-info');
 
   $('#add-attribute-button').off('click.dalme');
-  $('.field_clear_button').popover('dispose');
+  $(form).find('.field_clear_button').popover('dispose');
   $(document).off("click.dalme", ".popover .btn-primary");
   $(document).off("click.dalme", ".popover .clear-field");
 
@@ -318,6 +322,7 @@ function toggle_fields(target, action) {
         add_menu_list.push(editor_fields[i]);
       }
     }
+    
     if (add_menu_list.length) {
       let clean_menu_list = []
       add_menu_list.forEach((x) => { clean_menu_list.push(attribute_concordance_rev[x])});
@@ -330,6 +335,7 @@ function toggle_fields(target, action) {
             + attribute_concordance[clean_menu_list[i]] + '">'
             + clean_menu_list[i].replace('_', ' ').replace(/^\w/, (c) => c.toUpperCase()) + '</a>');
       }
+
       $('#add-attribute-button').removeClass('d-none');
       $('#add-attribute-menu-container').on('click.dalme', '.dropdown-item', function () {
         toggle_fields($(this).data('menu-field'), 'show');
