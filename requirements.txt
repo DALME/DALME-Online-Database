@@ -19,7 +19,7 @@ django-recaptcha==2.0.6
 django-storages==1.10.1
 djangorestframework==3.12.1
 djangosaml2idp==0.7.2
-drf-access-policy==0.7.0
+drf-access-policy==0.8.0
 elasticsearch==7.9.1
 feedparser==5.2.1
 geopy==2.0.0
