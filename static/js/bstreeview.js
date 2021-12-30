@@ -33,8 +33,8 @@
     };
     /**
      * BsTreeview Plugin constructor.
-     * @param {*} element 
-     * @param {*} options 
+     * @param {*} element
+     * @param {*} options
      */
     function bstreeView(element, options) {
         this.element = element;
@@ -71,20 +71,37 @@
                 $('.state-icon', this)
                     .toggleClass(_this.settings.expandIcon)
                     .toggleClass(_this.settings.collapseIcon);
-                // navigate to href if present
-                if (e.target.hasAttribute('href')) {
-                    if (_this.settings.openNodeLinkOnNewTab) {
-                        window.open(e.target.getAttribute('href'), '_blank');
-                    }
-                    else {
-                        window.location = e.target.getAttribute('href');
-                    }
+
+                if ($(e.target).hasClass('b')) {
+                  let filename = $(e.target).text();
+                  let path = '';
+                  let dirs = [];
+
+                  $(e.target).parents('.list-group').each(function(i, el) {
+                      dirs.push($(el).prev().text())
+                  });
+
+                  if (dirs.length) {
+                    path = dirs.reverse().join('/')
+                  }
+
+                  // check if there's an open file with unsaved changes
+                  if (cnf_editor_changed == false || confirm("You have unsaved changes in the current file. Are you sure you want to open a new one?")) {
+                    // update active item
+                    $('.b.active').each(function(i, el) {
+                        $(el).removeClass('active');
+                    });
+
+                    $(e.target).addClass('active');
+
+                    load_config_file(path, filename);
+                  }
                 }
             });
         },
         /**
          * Initialize treeview Data.
-         * @param {*} node 
+         * @param {*} node
          */
         initData: function (node) {
             if (!node.nodes) return;
@@ -103,9 +120,9 @@
         },
         /**
          * Build treeview.
-         * @param {*} parentElement 
-         * @param {*} nodes 
-         * @param {*} depth 
+         * @param {*} parentElement
+         * @param {*} nodes
+         * @param {*} depth
          */
         build: function (parentElement, nodes, depth) {
             var _this = this;

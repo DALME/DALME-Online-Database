@@ -2,14 +2,18 @@
 {% load static i18n %}
 {% load compress %}
 {% block extra_head %}
-{% compress css %}
-  <link href="{% static 'css/dalme_app/_config_editor.css' %}" rel="stylesheet">
-{% endcompress %}
-{% compress js %}
-  <script type="text/javascript" src="{% static 'js/bstreeview.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/dalme_app/config_editor.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
-{% endcompress %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.js" integrity="sha512-RL3kaj0W9BjXTR6ptyJgJ5U+mjMa/6U/s3VcnrIWqJsc6/O2U7Jk6pNl10tRHoM9//SBjWl9huHsM6jjGv8sFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.css" integrity="sha512-nnOk6g+Ad1MdoerOautiVacB6N+rKYkPO0YGCSq/Mgrb45RXtPC7xEK+R+lyWA1GRBbnLBc71npsBTrF5rBEpw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  {% compress css %}
+    <link href="{% static 'css/dalme_app/_config_editor.css' %}" rel="stylesheet">
+  {% endcompress %}
+  {% compress js %}
+    <script type="text/javascript" src="{% static 'js/bstreeview.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_app/config_editor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/Editor-1.9.4/js/editor.selectize.js' %}"></script>
+  {% endcompress %}
+
 {% endblock %}
 {% block extra-dropdowns %}{% endblock %}
 {% block extra-sidebar %}{% endblock %}
@@ -26,43 +30,26 @@
       </ul>
     </div>
     <!-- Tab panes -->
-    <div class="tab-content h-100">
-      <div class="tab-pane transcription-editor active" id="config-editor" role="tabpanel" aria-labelledby="editor-tab">
-        <div class="row h-100">
-
-          <div class="col-md-3">
-            <div id="config-tree">
-            </div>
+    <div class="tab-content">
+      <div class="tab-pane active d-flex" id="config-editor" role="tabpanel" aria-labelledby="editor-tab">
+          <div class="tree-panel">
+            <div id="config-tree"></div>
           </div>
 
-          <div class="col-md-9">
-            <div id="editor-toolbar" class="dropdown d-flex">
-              <div id="editor-left-toolbar" class="align-self-start mr-auto btn-group">
-                <!-- Dropdown - options -->
-                <div class="dropdown-menu" id="xmleditor-options">
-                </div>
-              </div>
-              <div id="editor-right-toolbar" class="align-self-end btn-group">
-                <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
-              </div>
+          <div class="editor-panel">
+            <div class="config-editor-toolbar">
+                <div class="config-editor-title">No file loaded</div>
+                <button class="config-editor-button" onclick="save_config_file();">Save</button>
             </div>
-            <div class="d-flex flex-row">
-              <div id="editor" class="d-flex justify-content-center w-100">
-                  <div class="spinner-border mt-auto mb-auto"></div>
-              </div>
-              <div id="tag-menu" class="accordion">
-              </div>
-            </div>
+            <div id="config-editor-panel" class="d-flex justify-content-center w-100"></div>
           </div>
-
-        </div>
-      </div>
-      <div class="tab-footer">
-        <div id="tab-footer-interface" class="clearfix">
-          <small class="text-muted float-left tab-footer-text" id="transcriber"></small>
-        </div>
       </div>
   </div>
 {% endblock %}
 {% block extra_scripts %}
+  <script>
+    $(document).ready(function () {
+      config_editor_init();
+    });
+  </script>
 {% endblock %}
