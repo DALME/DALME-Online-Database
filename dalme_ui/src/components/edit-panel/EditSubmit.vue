@@ -10,22 +10,18 @@
 </template>
 
 <script>
-import { computed, defineComponent, inject, toRefs } from "vue";
+import { defineComponent } from "vue";
+
+import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "EditSubmit",
+  emits: ["onSubmitEdit"],
   setup(_, context) {
-    const editing = inject("editing");
-    const { enableSave, locked, submitting } = toRefs(editing);
-
-    const disabled = computed(
-      () => !locked.value || (submitting.value && !enableSave.value),
-    );
+    const { disabled, focusActor } = useEditing();
 
     const submitEdit = () => {
-      submitting.value = true;
-      enableSave.value = false;
-      context.emit("submitEdit");
+      context.emit("onSubmitEdit", { actor: focusActor });
     };
 
     return {

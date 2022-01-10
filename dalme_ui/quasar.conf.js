@@ -96,14 +96,12 @@ module.exports = configure(function (ctx) {
       //
       // components: [],
       // directives: [],
-
-      // Quasar plugins
-      plugins: ["Meta", "Notify"],
+      plugins: ["Loading", "LocalStorage", "Meta", "Notify"],
     },
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: ["fadeIn", "fadeOut"],
+    animations: ["fadeIn", "fadeOut", "scale"],
 
     // https://v2.quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {

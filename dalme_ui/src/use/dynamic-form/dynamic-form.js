@@ -2,10 +2,10 @@ import { watch } from "vue";
 
 import forms from "@/forms";
 
-export const useForm = () => {
-  const formWatcher = (form, formSchema, validationSchema) => {
+export const useDynamicForm = () => {
+  const formWatcher = (kind, formSchema, validationSchema) => {
     watch(
-      () => form.value,
+      () => kind.value,
       (value) => {
         if (value) {
           const { schema, validator } = forms[value];
@@ -16,6 +16,7 @@ export const useForm = () => {
           validationSchema.value = null;
         }
       },
+      { immediate: true },
     );
   };
 

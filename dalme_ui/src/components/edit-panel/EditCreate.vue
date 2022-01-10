@@ -80,29 +80,25 @@
 </template>
 
 <script>
-import { computed, defineComponent, inject, toRefs } from "vue";
+import cuid from "cuid";
+import { defineComponent } from "vue";
+
+import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "EditCreate",
   setup() {
-    const editing = inject("editing");
-    const machine = inject("machine");
-    const { form, locked, mode, submitting } = toRefs(editing);
+    const mode = "create";
+    const {
+      machine: { send },
+    } = useEditing();
 
-    const disabled = computed(
-      () => locked.value || mode.value == "inline" || submitting.value,
-    );
-
-    const handleClick = (kind) => {
-      mode.value = "form";
-      form.value = kind;
-      locked.value = true;
-    };
+    const handleClick = (kind) =>
+      send("SPAWN_FORM", { cuid: cuid(), kind, mode });
 
     return {
-      disabled,
+      disabled: false,
       handleClick,
-      machine,
     };
   },
 });

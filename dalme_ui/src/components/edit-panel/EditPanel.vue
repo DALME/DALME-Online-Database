@@ -9,26 +9,25 @@
       v-touch-pan.prevent.mouse="move"
     >
       <!-- ADD -->
-      <EditCreate @submit-edit="handleSubmitEdit" />
+      <EditCreate />
 
       <!-- UPDATE -->
-      <EditUpdate @submit-edit="handleSubmitEdit" />
+      <EditUpdate />
 
       <!-- DELETE -->
 
       <!-- SUBMIT -->
-      <EditSubmit @submit-edit="handleSubmitEdit" />
+      <EditSubmit @on-submit-edit="handleSubmitEdit" />
     </q-fab>
   </q-page-sticky>
 </template>
 
 <script>
-import { defineComponent, inject, provide, ref, toRefs } from "vue";
+import { defineComponent, ref } from "vue";
 
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
 import { default as EditUpdate } from "./EditUpdate.vue";
-import { default as machine } from "./machines";
 
 export default defineComponent({
   name: "EditPanel",
@@ -38,27 +37,9 @@ export default defineComponent({
     EditUpdate,
   },
   setup() {
-    const editing = inject("editing");
-
-    const { enableSave, mode, submitting } = toRefs(editing);
-    // TODO: Thread to children fabs. Won't be necessary if machine handles it.
-    // TODO: https://vueuse.org/core/usedraggable/#usage ?
     const dragging = ref(false);
     const position = ref([30, 30]);
 
-    provide("machine", machine);
-
-    // Flipping `submitting = true` will trigger the editing watcher registered
-    // by any component and call their submit handling function. They then have
-    // the responsibility of resetting this ref as and when they see fit.
-    const handleSubmitEdit = () => {
-      if (!submitting.value) {
-        submitting.value = true;
-        enableSave.value = false;
-      }
-    };
-
-    // TODO: Resize
     const move = (event) => {
       dragging.value = event.isFirst !== true && event.isFinal !== true;
       position.value = [
@@ -67,10 +48,13 @@ export default defineComponent({
       ];
     };
 
+    const handleSubmitEdit = ({ actor }) => {
+      actor.value.send("SAVE");
+    };
+
     return {
       dragging,
       handleSubmitEdit,
-      mode,
       move,
       position,
     };

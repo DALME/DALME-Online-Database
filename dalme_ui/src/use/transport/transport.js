@@ -10,10 +10,14 @@ import {
   set,
 } from "ramda";
 import { computed, inject, provide, ref, watch } from "vue";
+import { useManualRefHistory } from "@vueuse/core";
 
 const TransportSymbol = Symbol();
 
-export const provideTransport = (transport, tracked) => {
+export const provideTransport = () => {
+  const tracked = ref({ id: null, field: null, new: null, old: null });
+  const transport = useManualRefHistory(tracked, { clone: true });
+
   const dirty = computed(() => {
     return transport.history.value.slice(0, -1).map((entry) => ({
       id: entry.snapshot.id,
@@ -46,6 +50,8 @@ export const provideTransport = (transport, tracked) => {
     tracked.value = ref({ id: null, field: null, new: null, old: null });
   };
 
+  const diffCount = computed(() => transport.history.value.slice(0, -1).length);
+
   const transportWatcher = (rows) => {
     watch(
       () => transport.history.value,
@@ -64,11 +70,13 @@ export const provideTransport = (transport, tracked) => {
   };
 
   provide(TransportSymbol, {
+    diffCount,
     onDiff,
     isDirty,
     objDiffs,
     cellIsDirty,
     resetTransport,
+    transport,
     transportWatcher,
   });
 };

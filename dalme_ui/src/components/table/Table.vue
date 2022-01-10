@@ -98,7 +98,7 @@
 
 <script>
 import { map, keys, mapObjIndexed } from "ramda";
-import { defineComponent, inject, ref } from "vue";
+import { defineComponent, inject, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 
 import { OpaqueSpinner } from "@/components/utils";
@@ -153,6 +153,7 @@ export default defineComponent({
   setup(props, context) {
     const $notifier = useNotifier();
     const {
+      diffCount,
       isDirty,
       cellIsDirty,
       objDiffs,
@@ -160,12 +161,12 @@ export default defineComponent({
       resetTransport,
       transportWatcher,
     } = useTransport();
+
     const {
-      editingSubmitWatcher,
-      enableSave,
-      isEditingWatcher,
-      resetEditing,
+      formSubmitWatcher,
+      inline: actor,
       submitting,
+      machine: { send },
     } = useEditing();
 
     const filter = ref("");
@@ -224,30 +225,36 @@ export default defineComponent({
     const pagination = { rowsPerPage };
 
     const handleSubmitTransport = async () => {
-      // The submitting ref will get flipped by the event handling on the
-      // EditPanel so there's no need to do it here. We do flip it back at the
-      // end of the handler though, that's our responsibility.
       const { success, status, fetchAPI } = useAPI(context);
       const request = props.updateRequest(objDiffs);
       await fetchAPI(request);
       if (success.value && status.value == 201) {
+        // send("saving.RESOLVE")
         $notifier.CRUD.inlineUpdateSuccess(props.title);
         resetTransport();
-        resetEditing();
         await props.fetchData();
       } else {
+        // send("saving.REJECT")
         $notifier.CRUD.inlineUpdateFailed(props.title);
-        enableSave.value = true;
       }
-      submitting.value = false;
     };
 
-    isEditingWatcher(isDirty, "inline");
-    editingSubmitWatcher(handleSubmitTransport);
+    watch(
+      () => diffCount.value,
+      (count, prevCount) => {
+        if (prevCount === 0 && count === 1) {
+          send("SPAWN_INLINE");
+        }
+        if (prevCount === 1 && count === 0) {
+          send("DESTROY_INLINE");
+        }
+      },
+    );
+
+    formSubmitWatcher(actor, handleSubmitTransport);
     transportWatcher(rows);
 
     onBeforeRouteLeave(() => {
-      resetEditing();
       resetTransport();
     });
 
@@ -270,3 +277,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.dirty {
+  border: 2.5px solid green;
+}
+</style>
