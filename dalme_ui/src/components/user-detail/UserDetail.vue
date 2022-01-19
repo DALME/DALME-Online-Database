@@ -1,6 +1,6 @@
 <template>
   <div class="q-ma-md full-width full-height">
-    <q-tab-panel name="data">
+    <q-tab-panel v-if="!loading && user" name="data">
       <q-card class="q-ma-md">
         <q-item>
           <q-item-section avatar>
@@ -95,23 +95,35 @@
             <div
               class="col-xs-12 col-sm-6 q-pa-lg row justify-center content-center"
             >
-              <q-avatar rounded size="15rem">
+              <q-avatar v-if="user.avatar" rounded size="15rem">
                 <img :src="user.avatar" />
+              </q-avatar>
+              <q-avatar
+                v-else
+                rounded
+                font-size="1rem"
+                color="grey-3"
+                size="15rem"
+              >
+                No photo
               </q-avatar>
             </div>
           </div>
         </q-card-section>
       </q-card>
     </q-tab-panel>
+    <OpaqueSpinner :showing="loading" />
   </div>
 </template>
 
 <script>
+import { useMeta } from "quasar";
 import { map } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
+import { OpaqueSpinner } from "@/components/utils";
 import { userSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -132,12 +144,17 @@ const getAttributeLabel = (attribute) => {
 
 export default defineComponent({
   name: "UserDetail",
-  async setup(_, context) {
+  components: {
+    OpaqueSpinner,
+  },
+  setup(_, context) {
     const $route = useRoute();
-    const { success, data, fetchAPI } = useAPI(context);
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const user = ref(null);
     const username = $route.params.username;
+
+    useMeta({ title: `User | ${username}` });
 
     const formatGroups = (groups) =>
       map((group) => group.name, groups).join("<br>");
@@ -149,12 +166,13 @@ export default defineComponent({
           .validate(data.value[0], { stripUnknown: true })
           .then((value) => {
             user.value = value;
+            loading.value = false;
           });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
-    return { formatGroups, getAttributeLabel, user };
+    return { formatGroups, loading, getAttributeLabel, user };
   },
 });
 </script>

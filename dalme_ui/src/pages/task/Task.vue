@@ -1,10 +1,6 @@
 <template>
   <Page>
-    <SuspenseWithError>
-      <template #default>
-        <TaskDetail />
-      </template>
-    </SuspenseWithError>
+    <TaskDetail />
   </Page>
 </template>
 
@@ -12,13 +8,11 @@
 import { defineComponent } from "vue";
 
 import { Page, TaskDetail } from "@/components";
-import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "Task",
   components: {
     Page,
-    SuspenseWithError,
     TaskDetail,
   },
 });

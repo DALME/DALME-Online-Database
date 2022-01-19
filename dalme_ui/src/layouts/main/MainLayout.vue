@@ -14,7 +14,7 @@
 import { defineComponent, ref } from "vue";
 
 import { EditIndex, EditPanel, LoginModal, Nav } from "@/components";
-import { provideEditing, provideTransport, provideWindowIndex } from "@/use";
+import { provideEditing, provideTransport } from "@/use";
 
 export default defineComponent({
   name: "MainLayout",
@@ -31,7 +31,6 @@ export default defineComponent({
 
     provideEditing();
     provideTransport();
-    provideWindowIndex();
 
     return {
       onReauthenticate,

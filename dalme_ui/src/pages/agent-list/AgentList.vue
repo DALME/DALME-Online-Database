@@ -1,10 +1,6 @@
 <template>
   <Page>
-    <SuspenseWithError>
-      <template #default>
-        <Agents />
-      </template>
-    </SuspenseWithError>
+    <Agents />
   </Page>
 </template>
 
@@ -13,12 +9,10 @@ import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
 import { Agents, Page } from "@/components";
-import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "AgentList",
   components: {
-    SuspenseWithError,
     Agents,
     Page,
   },

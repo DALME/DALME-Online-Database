@@ -19,7 +19,15 @@ export const taskSchema = yup
     createdBy: yup.number().required(),
     creationTimestamp: yup.string().required(),
     assignedTo: yup.string().default(null).nullable(),
-    owner: yup.string(), // TODO: Prob required?
+    creationUser: yup
+      .object()
+      .shape({
+        id: yup.number().required(),
+        username: yup.string().required(),
+        fullName: yup.string().required(),
+        avatar: yup.string().url().default(null).nullable(),
+      })
+      .camelCase(),
     attachments: yup
       .mixed()
       .transform((value) => {

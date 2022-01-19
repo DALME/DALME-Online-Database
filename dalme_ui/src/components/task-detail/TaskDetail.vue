@@ -8,17 +8,24 @@
 
         <q-item-section>
           <q-item-label class="text-h5">
-            {{ task.title }}
-            <span>#{{ id }}</span>
+            <template v-if="!loading"> {{ task.title }} #{{ id }} </template>
+            <template v-else>
+              <q-skeleton width="30rem" />
+            </template>
           </q-item-label>
-          <q-item-label caption>{{ subheading }}</q-item-label>
+          <q-item-label v-if="subheading" caption>
+            {{ subheading }}
+          </q-item-label>
         </q-item-section>
       </q-item>
 
       <q-separator />
 
       <q-card-section>
-        <p class="text-body1">{{ task.description }}</p>
+        <p v-if="!loading" class="text-body1">
+          {{ task.description || "No description provided." }}
+        </p>
+        <q-skeleton v-else height="10rem" square />
       </q-card-section>
 
       <q-separator />
@@ -26,6 +33,7 @@
       <q-card-actions v-if="isAdmin">
         <q-btn @click="onAction" flat>{{ action }}</q-btn>
       </q-card-actions>
+      <OpaqueSpinner :showing="loading" />
     </q-card>
 
     <Comments />
@@ -33,12 +41,15 @@
 </template>
 
 <script>
-import { defineComponent, provide, readonly, ref } from "vue";
+import { isEmpty } from "ramda";
+import { useMeta } from "quasar";
+import { defineComponent, onMounted, provide, readonly, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
 import { Comments } from "@/components";
+import { OpaqueSpinner } from "@/components/utils";
 import { taskSchema } from "@/schemas";
 import { useAPI, useNotifier } from "@/use";
 
@@ -46,11 +57,12 @@ export default defineComponent({
   name: "TaskDetail",
   components: {
     Comments,
+    OpaqueSpinner,
   },
-  async setup(_, context) {
+  setup(_, context) {
     const $route = useRoute();
     const $store = useStore();
-    const { success, data, fetchAPI } = useAPI(context);
+    const { loading, success, data, fetchAPI } = useAPI(context);
     const {
       success: actionSuccess,
       fetchAPI: actionFetchAPI,
@@ -58,19 +70,21 @@ export default defineComponent({
     } = useAPI(context);
     const $notifier = useNotifier();
 
+    const model = "Task";
+    const id = ref($route.params.id);
+
     const action = ref("");
     const colour = ref("");
-    const task = ref(null);
+    const task = ref({});
     const attachment = ref(null);
-    const id = ref($route.params.id);
+    const subheading = ref("");
     const isAdmin = $store.getters["auth/isAdmin"];
-
-    let subheading = "";
-    const model = "Task";
 
     provide("attachment", attachment);
     provide("model", model);
     provide("id", readonly(id));
+
+    useMeta(() => ({ title: `Task #${id.value}` }));
 
     const onAction = async () => {
       const action = task.value.completed ? "markUndone" : "markDone";
@@ -89,23 +103,26 @@ export default defineComponent({
         await taskSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            subheading =
-              `${value.owner} created this task` +
+            subheading.value =
+              `${value.creationUser.fullName} created this task` +
               ` at ${value.creationTimestamp} in ${value.assignedTo}`;
             action.value = value.completed ? "reopen task" : "complete task";
             colour.value = value.completed
               ? "bg-green-5 text-grey-1"
               : "bg-red-12 text-grey-1";
             task.value = value;
+            loading.value = false;
           });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
     return {
       action,
       colour,
       isAdmin,
+      isEmpty,
+      loading,
       onAction,
       subheading,
       task,

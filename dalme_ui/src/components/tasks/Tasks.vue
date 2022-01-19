@@ -56,6 +56,7 @@
         </template>
       </q-table>
     </q-card>
+    <OpaqueSpinner :showing="loading" />
   </div>
 </template>
 
@@ -77,6 +78,7 @@ import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
+import { OpaqueSpinner } from "@/components/utils";
 import { taskListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -97,6 +99,9 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+  },
+  components: {
+    OpaqueSpinner,
   },
   setup(props, context) {
     const $router = useRouter();

@@ -27,6 +27,7 @@
         </template>
       </q-table>
     </q-card>
+    <OpaqueSpinner :showing="loading" />
   </div>
 </template>
 
@@ -35,6 +36,7 @@ import { map, keys } from "ramda";
 import { defineComponent, onMounted, ref } from "vue";
 
 import { requests } from "@/api";
+import { OpaqueSpinner } from "@/components/utils";
 import { countryListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -47,6 +49,9 @@ const columnMap = {
 
 export default defineComponent({
   name: "Countries",
+  components: {
+    OpaqueSpinner,
+  },
   setup(_, context) {
     const { loading, success, data, fetchAPI } = useAPI(context);
 

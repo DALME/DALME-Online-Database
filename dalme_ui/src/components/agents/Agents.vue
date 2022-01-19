@@ -9,6 +9,7 @@
         :filter="filter"
         :pagination="pagination"
         :title-class="{ 'text-h6': true }"
+        :loading="loading"
         row-key="id"
       >
         <template v-slot:top-right>
@@ -36,14 +37,16 @@
         </template>
       </q-table>
     </q-card>
+    <OpaqueSpinner :showing="loading" />
   </div>
 </template>
 
 <script>
 import { map, keys } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 
 import { requests } from "@/api";
+import { OpaqueSpinner } from "@/components/utils";
 import { agentListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -55,8 +58,11 @@ const columnMap = {
 
 export default defineComponent({
   name: "Agents",
-  async setup(_, context) {
-    const { success, data, fetchAPI } = useAPI(context);
+  components: {
+    OpaqueSpinner,
+  },
+  setup(_, context) {
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
     const rows = ref([]);
@@ -87,14 +93,16 @@ export default defineComponent({
           .then((value) => {
             columns.value = getColumns();
             rows.value = value;
+            loading.value = false;
           });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
     return {
       columns,
       filter,
+      loading,
       noData,
       pagination,
       rows,

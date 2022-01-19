@@ -99,6 +99,7 @@
         </template>
       </q-table>
     </q-card>
+    <OpaqueSpinner :showing="loading" />
   </div>
 </template>
 
@@ -109,6 +110,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 import { requests } from "@/api";
+import { OpaqueSpinner } from "@/components/utils";
 import { attachmentSchema, ticketListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -131,6 +133,9 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+  },
+  components: {
+    OpaqueSpinner,
   },
   setup(props, context) {
     const $store = useStore();

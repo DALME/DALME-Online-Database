@@ -8,21 +8,31 @@
 
         <q-item-section>
           <q-item-label class="text-h5">
-            {{ ticket.subject }}
-            <span>#{{ id }}</span>
+            <template v-if="!loading">
+              {{ ticket.subject }} #{{ id }}
+            </template>
+            <template v-else>
+              <q-skeleton width="30rem" />
+            </template>
           </q-item-label>
-          <q-item-label caption>{{ subheading }}</q-item-label>
+          <q-item-label v-if="subheading" caption>
+            {{ subheading }}
+          </q-item-label>
         </q-item-section>
       </q-item>
 
       <q-separator />
 
       <q-card-section>
-        <p class="text-body1">{{ ticket.description }}</p>
+        <p v-if="!loading" class="text-body1">
+          {{ ticket.description || "No description provided." }}
+        </p>
+        <q-skeleton v-else height="10rem" square />
         <q-badge v-if="ticket.tags" outline color="primary">
           {{ ticket.tags }}
         </q-badge>
       </q-card-section>
+      <OpaqueSpinner :showing="loading" />
     </q-card>
 
     <Attachments v-if="attachment" />
@@ -32,11 +42,12 @@
 
 <script>
 import { useMeta } from "quasar";
-import { defineComponent, readonly, ref, provide } from "vue";
+import { defineComponent, onMounted, readonly, ref, provide } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
 import { Attachments, Comments } from "@/components";
+import { OpaqueSpinner } from "@/components/utils";
 import { ticketDetailSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -45,17 +56,19 @@ export default defineComponent({
   components: {
     Attachments,
     Comments,
+    OpaqueSpinner,
   },
-  async setup(_, context) {
+  setup(_, context) {
     const $route = useRoute();
-    const { success, data, fetchAPI } = useAPI(context);
+    const { loading, success, data, fetchAPI } = useAPI(context);
 
-    let subheading = "";
-    const model = "Ticket";
-    const attachment = ref("");
-    const colour = ref("");
-    const ticket = ref(null);
     const id = ref($route.params.id);
+    const model = "Ticket";
+
+    const attachment = ref(null);
+    const colour = ref("");
+    const ticket = ref({});
+    const subheading = ref("");
 
     provide("attachment", attachment);
     provide("model", model);
@@ -69,7 +82,7 @@ export default defineComponent({
       await ticketDetailSchema
         .validate(data.value, { stripUnknown: true })
         .then((value) => {
-          subheading =
+          subheading.value =
             `${value.creationUser.fullName} opened this issue` +
             ` on ${value.creationTimestamp}`;
           colour.value = value.status
@@ -77,12 +90,13 @@ export default defineComponent({
             : "bg-red-12 text-grey-1";
           ticket.value = value;
           attachment.value = value.file;
+          loading.value = false;
         });
     };
 
-    await fetchData();
+    onMounted(async () => await fetchData());
 
-    return { attachment, colour, subheading, ticket, id };
+    return { attachment, colour, loading, subheading, ticket, id };
   },
 });
 </script>

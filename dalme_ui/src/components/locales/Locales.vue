@@ -12,6 +12,7 @@
       :update-request="request"
       :field-validation="fieldValidation"
     />
+    <OpaqueSpinner :showing="loading" />
   </div>
 </template>
 
@@ -21,6 +22,7 @@ import { defineComponent, onMounted, provide, ref } from "vue";
 
 import { requests } from "@/api";
 import { Table } from "@/components";
+import { OpaqueSpinner } from "@/components/utils";
 import { localeListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -35,6 +37,7 @@ const columnMap = {
 export default defineComponent({
   name: "Locales",
   components: {
+    OpaqueSpinner,
     Table,
   },
   setup(_, context) {

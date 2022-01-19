@@ -1,10 +1,6 @@
 <template>
   <Page>
-    <SuspenseWithError>
-      <template #default>
-        <Library />
-      </template>
-    </SuspenseWithError>
+    <Library />
   </Page>
 </template>
 
@@ -13,12 +9,10 @@ import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
 import { Library, Page } from "@/components";
-import { SuspenseWithError } from "@/components/utils";
 
 export default defineComponent({
   name: "LibraryList",
   components: {
-    SuspenseWithError,
     Library,
     Page,
   },

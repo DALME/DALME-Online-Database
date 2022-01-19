@@ -241,7 +241,7 @@ const routes = [
       },
 
       /* Detail Views */
-      // TODO: Should be able to scope these to children...
+      // TODO: Need to properly scope these...
       {
         component: () => import("pages/rights/Rights.vue"),
         name: "Rights",
@@ -276,7 +276,7 @@ const routes = [
       {
         component: () => import("pages/user/User.vue"),
         name: "User",
-        path: "users/:username",
+        path: "system/users/:username",
         nav: false,
       },
     ],
