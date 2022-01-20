@@ -2,11 +2,18 @@
   <q-btn
     fab
     icon="save"
+    :loading="submitting"
     :disable="disabled"
-    :color="disabled ? 'grey' : 'green'"
+    :color="disabled ? 'grey' : mouseoverSubmit ? 'red' : 'green'"
     :text-color="disabled ? 'black' : 'white'"
-    @click="submitEdit"
-  />
+    @click="handleSubmit"
+    @mouseover="mouseoverSubmit = true"
+    @mouseleave="mouseoverSubmit = false"
+  >
+    <template v-slot:loading>
+      <q-spinner-facebook />
+    </template>
+  </q-btn>
 </template>
 
 <script>
@@ -17,16 +24,26 @@ import { useEditing } from "@/use";
 export default defineComponent({
   name: "EditSubmit",
   emits: ["onSubmitEdit"],
-  setup(_, context) {
-    const { disabled, focusActor } = useEditing();
+  setup() {
+    const {
+      disabled,
+      focus,
+      mouseoverSubmit,
+      submitting,
+      machine: { send },
+    } = useEditing();
 
-    const submitEdit = () => {
-      context.emit("onSubmitEdit", { actor: focusActor });
+    const handleSubmit = () => {
+      if (focus.value) {
+        send("SAVE_FOCUS");
+      }
     };
 
     return {
       disabled,
-      submitEdit,
+      handleSubmit,
+      mouseoverSubmit,
+      submitting,
     };
   },
 });

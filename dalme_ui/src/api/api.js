@@ -5,7 +5,7 @@ import { fetcher } from "./config";
 
 const fetchMachine = createMachine({
   id: fetcher,
-  initial: "loading",
+  initial: "fetching",
   context: {
     request: null,
     data: null,
@@ -13,11 +13,15 @@ const fetchMachine = createMachine({
     error: null,
     apiError: null,
     redirected: null,
+    validation: {
+      validator: null,
+      validated: false,
+    },
     retries: 0,
     maxRetries: 3,
   },
   states: {
-    loading: {
+    fetching: {
       invoke: {
         src: "fetch",
         onDone: {
@@ -34,7 +38,7 @@ const fetchMachine = createMachine({
       on: {
         RETRY: {
           always: [
-            { target: "loading", cond: "canRetry" },
+            { target: "fetching", cond: "canRetry" },
             { target: "fatal" },
           ],
           actions: "incrementRetries",
@@ -42,13 +46,17 @@ const fetchMachine = createMachine({
       },
     },
     success: {
-      target: "final",
+      // TODO: entry: reset context
     },
-    fatal: {
-      target: "final",
-    },
+    fatal: {},
     reauthenticate: {
-      target: "final",
+      // TODO: When state.matches("reauthenticate") ->
+      // Flip reauthenticate bit. ->
+      // When login passes ->
+      // send("PROCEED")
+      on: {
+        PROCEED: { target: "fetching" },
+      },
     },
   },
   actions: {
@@ -68,17 +76,21 @@ const fetchMachine = createMachine({
     }),
   },
   guards: {
-    canRetry: ({ retries, maxRetries }) => retries < maxRetries,
+    canRetry: ({ retries, maxRetries }) => retries <= maxRetries,
     // TODO: Need to integrate reauth logic here.
+    // requiresAuth
   },
   services: {
     fetch: (context) => {
+      // TODO: Use https://github.com/Kong/swrv
       return fetch(context.request, { credentials: "include" }).then(
         (response) => response.json(),
       );
     },
   },
 });
+// TODO: Silence eslint warning for this (unused).
+console.assert(fetchMachine);
 
 // const fetchAPI = (request) => {
 //   const machine = useMachine(fetchMachine, { context: { request } });
@@ -86,7 +98,7 @@ const fetchMachine = createMachine({
 //   const error = computed(() => machine.value.context.error);
 //   const apiError = computed(() => machine.value.context.apiError);
 //   const loading = computed(
-//     () => !["success", "fatal"].some(machine.value.matches),
+//     () => !["fatal", "reauthenticate", "success"].some(machine.value.matches),
 //   );
 //   return {
 //     apiError,

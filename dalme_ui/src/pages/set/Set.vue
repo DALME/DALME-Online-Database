@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { defineComponent, provide, ref } from "vue";
+import { computed, defineComponent, provide } from "vue";
 import { useRoute } from "vue-router";
 
 import { Comments, Page, SetDetail } from "@/components";
@@ -23,7 +23,7 @@ export default defineComponent({
   setup() {
     const $route = useRoute();
 
-    const id = ref($route.params.id);
+    const id = computed(() => $route.params.id);
 
     provide("model", "Set");
     provide("id", id);

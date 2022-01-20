@@ -1,10 +1,11 @@
 <template>
   <q-input
+    autogrow
+    hide-bottom-space
+    debounce="500"
     :error="error"
     :model-value="modelValue"
-    @blur="onBlur"
     @update:modelValue="onUpdate"
-    autogrow
   >
     <template v-slot:error>
       <div>{{ validation.errorMessage }}</div>
@@ -28,13 +29,13 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const error = computed(
-      () => props.validation.meta.touched && props.validation.errors.length > 0,
-    );
-    const onBlur = () => props.validation.setTouched(true);
+    const error = computed(() => props.validation.errors.length > 0);
     const onUpdate = (value) => context.emit("update:modelValue", value);
 
-    return { error, onBlur, onUpdate };
+    return {
+      error,
+      onUpdate,
+    };
   },
 });
 </script>

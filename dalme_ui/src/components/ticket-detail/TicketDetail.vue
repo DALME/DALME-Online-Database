@@ -1,7 +1,7 @@
 <template>
   <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-item :class="colour">
+    <q-card class="q-ma-md" :class="[completed ? 'complete' : 'incomplete']">
+      <q-item>
         <q-item-section avatar>
           <q-avatar icon="subject"> </q-avatar>
         </q-item-section>
@@ -42,7 +42,14 @@
 
 <script>
 import { useMeta } from "quasar";
-import { defineComponent, onMounted, readonly, ref, provide } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  readonly,
+  ref,
+  provide,
+} from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
@@ -62,11 +69,11 @@ export default defineComponent({
     const $route = useRoute();
     const { loading, success, data, fetchAPI } = useAPI(context);
 
-    const id = ref($route.params.id);
+    const id = computed(() => $route.params.id);
     const model = "Ticket";
 
     const attachment = ref(null);
-    const colour = ref("");
+    const completed = ref(null);
     const ticket = ref({});
     const subheading = ref("");
 
@@ -85,9 +92,7 @@ export default defineComponent({
           subheading.value =
             `${value.creationUser.fullName} opened this issue` +
             ` on ${value.creationTimestamp}`;
-          colour.value = value.status
-            ? "bg-green-5 text-grey-1"
-            : "bg-red-12 text-grey-1";
+          completed.value = value.status;
           ticket.value = value;
           attachment.value = value.file;
           loading.value = false;
@@ -96,7 +101,23 @@ export default defineComponent({
 
     onMounted(async () => await fetchData());
 
-    return { attachment, colour, loading, subheading, ticket, id };
+    return {
+      attachment,
+      completed,
+      id,
+      loading,
+      subheading,
+      ticket,
+    };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.complete {
+  border-bottom: 10px solid green;
+}
+.incomplete {
+  border-top: 10px solid red;
+}
+</style>

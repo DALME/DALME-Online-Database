@@ -8,16 +8,18 @@ import {
   keys,
   values,
 } from "ramda";
-import { computed, inject, provide, watch } from "vue";
+import { computed, inject, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
-import { assign, createMachine, spawn } from "xstate";
-import { useMachine } from "@xstate/vue";
+import { assign, createMachine, send, spawn } from "xstate";
+import { useMachine, useSelector } from "@xstate/vue";
+
+import { default as notifier } from "@/notifier";
 
 const MAX_FORMS = 5;
 const EditingSymbol = Symbol();
 
 export const provideEditing = () => {
-  const createFormMachine = (cuid, kind, mode) =>
+  const createFormMachine = (cuid, kind, mode, initialData) =>
     createMachine(
       {
         id: cuid,
@@ -25,30 +27,28 @@ export const provideEditing = () => {
         context: {
           kind,
           mode,
-          dirty: false,
-          validated: true,
+          initialData,
+          validated: false, // TODO: Switch to false when formvuelate issue resolved.
           visible: true,
         },
         on: {
           SAVE: { target: "saving" },
           HIDE: { actions: "hide", internal: true },
           SHOW: { actions: "show", internal: true },
+          VALIDATE: { actions: "validate", internal: true },
         },
         states: {
           editing: {},
           saving: {
             on: {
-              RESOLVE: { target: "success" },
-              REJECT: { target: "failure" },
+              // TODO: respond({ type: 'SUCCESS', message: 'Bla' }, { delay: 10 })
+              // The SAVE must come from the editingMachine, which it does...
+              RESOLVE: { actions: "notifySuccess", target: "complete" },
+              REJECT: { actions: "notifyFailure", target: "editing" },
             },
           },
-          success: {
-            entry: ["notifySuccess"],
-            // TODO: Destroy or not? Set dirty to false.
-          },
-          failure: {
-            entry: ["notifyFailure"],
-            always: [{ target: "editing" }],
+          complete: {
+            type: "final",
           },
         },
       },
@@ -56,9 +56,13 @@ export const provideEditing = () => {
         actions: {
           hide: assign({ visible: false }),
           show: assign({ visible: true }),
-          // TODO: Get the $notifier in here.
-          notifyFailure: (_, event) => console.error(event.message),
-          notifySuccess: (_, event) => console.error(event.message),
+          notifyFailure: (context) =>
+            notifier.CRUD.failure(`Could not create ${context.kind}`),
+          notifySuccess: (context) =>
+            notifier.CRUD.success(`${context.kind} created`),
+          validate: assign({
+            validated: (_, event) => (event.validated ? true : false),
+          }),
         },
       },
     );
@@ -75,24 +79,21 @@ export const provideEditing = () => {
           editing: {},
           saving: {
             on: {
-              RESOLVE: { target: "success" },
-              REJECT: { target: "failure" },
+              RESOLVE: { actions: "notifySuccess", target: "complete" },
+              REJECT: { actions: "notifyFailure", target: "editing" },
             },
           },
-          success: {
-            entry: ["notifySuccess"],
-          },
-          failure: {
-            entry: ["notifyFailure"],
+          complete: {
+            type: "final", // No need for gc, done in Table.vue itself.
           },
         },
       },
       {
         actions: {
-          // TODO: $notifier.CRUD.inlineUpdateSuccess(event.message);
-          notifyFailure: (_, event) => console.error(event.message),
-          // TODO: $notifier.CRUD.inlineUpdateFailed(event.message);
-          notifySuccess: (_, event) => console.error(event.message),
+          debug: () => {},
+          notifyFailure: () =>
+            notifier.CRUD.failure("Couldn't save inline edits"),
+          notifySuccess: () => notifier.CRUD.success("Inline edits saved"),
         },
       },
     );
@@ -104,13 +105,15 @@ export const provideEditing = () => {
       context: {
         detail: false,
         focus: null, // focus : null || "inline" || cuid
-        forms: {},
-        inline: null,
+        forms: {}, // forms : { cuid: actor }
+        inline: null, // inline : null || actor
         maxForms: MAX_FORMS,
       },
       on: {
         DESTROY_FORM: { target: "destroyForm" },
         DESTROY_INLINE: { target: "destroyInline" },
+        RESET: { target: "reset" },
+        SAVE_FOCUS: { actions: "saveFocus", internal: true },
         SET_DETAIL: { actions: "setDetail", internal: true },
         SET_FOCUS: { actions: "setFocus", internal: true },
         SPAWN_FORM: {
@@ -123,7 +126,6 @@ export const provideEditing = () => {
           actions: "spawnInline",
           cond: "noInline",
         },
-        RESET: { target: "reset" },
       },
       states: {
         normal: {},
@@ -150,23 +152,8 @@ export const provideEditing = () => {
     },
     {
       actions: {
-        spawnInline: assign({
-          focus: "inline",
-          inline: spawn(createInlineMachine()),
-        }),
-        spawnForm: assign({
-          focus: (_, event) => event.cuid,
-          forms: (context, event) => {
-            return {
-              [event.cuid]: spawn(
-                createFormMachine(event.cuid, event.kind, event.mode),
-              ),
-              ...context.forms,
-            };
-          },
-        }),
         gcInline: assign({
-          focus: (context, _) =>
+          focus: (context) =>
             context.focus === "inline" ? null : context.focus,
           inline: null,
         }),
@@ -190,6 +177,35 @@ export const provideEditing = () => {
         setFocus: assign({
           focus: (_, event) => event.value,
         }),
+        saveFocus: send(
+          { type: "SAVE" },
+          {
+            to: (context) =>
+              context.focus === "inline"
+                ? context.inline
+                : context.forms[context.focus],
+          },
+        ),
+        spawnInline: assign({
+          focus: "inline",
+          inline: () => spawn(createInlineMachine()),
+        }),
+        spawnForm: assign({
+          focus: (_, event) => event.cuid,
+          forms: (context, event) => {
+            return {
+              [event.cuid]: spawn(
+                createFormMachine(
+                  event.cuid,
+                  event.kind,
+                  event.mode,
+                  event.initialData,
+                ),
+              ),
+              ...context.forms,
+            };
+          },
+        }),
       },
       guards: {
         canSpawn: (context) => keys(context.forms).length < context.maxForms,
@@ -201,11 +217,15 @@ export const provideEditing = () => {
 
   // Main interface.
   const machine = useMachine(editingMachine);
+  const { service } = machine;
 
   // Convenience getters lensing into the machine context.
-  const focus = computed(() => machine.state.value.context.focus);
-  const forms = computed(() => machine.state.value.context.forms);
-  const inline = computed(() => machine.state.value.context.inline);
+  const focus = useSelector(service, (state) => state.context.focus);
+  const forms = useSelector(service, (state) => state.context.forms);
+  const inline = useSelector(service, (state) => state.context.inline);
+  const isDetail = useSelector(service, (state) => state.context.detail);
+
+  const mouseoverSubmit = ref(false);
 
   // Helper functions.
   const hideAll = () => {
@@ -240,8 +260,8 @@ export const provideEditing = () => {
     return any((saving) => saving === true, isSaving);
   });
 
-  // If there's absolutely nothing valid from the global POV, if we're in the
-  // middle of an API call, we can use this to disable the submit button.
+  // If there's absolutely nothing valid from the global POV, or if we're in
+  // the middle of an API call, we can use this to disable the submit button.
   const disabled = computed(() => {
     const validated = mapObjIndexed(
       (actor) => actor.getSnapshot().context.validated,
@@ -258,21 +278,22 @@ export const provideEditing = () => {
 
   // Invokes a particular form's submit callback whenever its actor transitions
   // to the "saving" state.
-  const formSubmitWatcher = (actorState, handleSubmit) => {
+  const formSubmitWatcher = (actor, handleSubmit) => {
     watch(
-      () => actorState.value,
-      async (newActorState) => {
-        if (newActorState.matches("saving")) {
+      () => actor.value,
+      async (newActor) => {
+        if (newActor.value === "saving") {
           await handleSubmit();
         }
       },
     );
   };
 
-  // TODO: Call on all detail pages.
   const editingDetailRouteGuard = () => {
     machine.send("SET_DETAIL", { value: true });
-    onBeforeRouteLeave(() => machine.send("SET_DETAIL", { value: false }));
+    onBeforeRouteLeave(() => {
+      machine.send("SET_DETAIL", { value: false });
+    });
   };
 
   provide(EditingSymbol, {
@@ -284,7 +305,9 @@ export const provideEditing = () => {
     forms,
     hideAll,
     inline,
+    isDetail,
     machine,
+    mouseoverSubmit,
     showAll,
     submitting,
   });

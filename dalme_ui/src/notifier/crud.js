@@ -1,19 +1,19 @@
 import { Notify } from "quasar";
 
 const CRUD = {
-  inlineUpdateSuccess: (info) =>
+  success: (message) =>
     Notify.create({
       color: "green",
-      message: `${info} updated successfully`,
       position: "top",
       icon: "speaker_notes",
+      message,
     }),
-  inlineUpdateFailed: (info) =>
+  failure: (message) =>
     Notify.create({
       color: "red",
-      message: `Failed to update ${info}`,
       position: "top",
       icon: "speaker_notes_off",
+      message,
     }),
 };
 

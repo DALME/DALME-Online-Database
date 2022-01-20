@@ -1,5 +1,10 @@
 <template>
-  <q-page-sticky position="bottom-right" :offset="position" class="z-max">
+  <q-page-sticky
+    v-if="isAdmin"
+    position="bottom-right"
+    :offset="position"
+    class="z-max"
+  >
     <q-fab
       text-color="white"
       icon="keyboard_arrow_left"
@@ -17,13 +22,15 @@
       <!-- DELETE -->
 
       <!-- SUBMIT -->
-      <EditSubmit @on-submit-edit="handleSubmitEdit" />
+      <EditSubmit />
     </q-fab>
   </q-page-sticky>
 </template>
 
 <script>
 import { defineComponent, ref } from "vue";
+
+import { usePermissions } from "@/use";
 
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
@@ -37,6 +44,10 @@ export default defineComponent({
     EditUpdate,
   },
   setup() {
+    const {
+      permissions: { isAdmin },
+    } = usePermissions();
+
     const dragging = ref(false);
     const position = ref([30, 30]);
 
@@ -48,13 +59,9 @@ export default defineComponent({
       ];
     };
 
-    const handleSubmitEdit = ({ actor }) => {
-      actor.value.send("SAVE");
-    };
-
     return {
       dragging,
-      handleSubmitEdit,
+      isAdmin,
       move,
       position,
     };

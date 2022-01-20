@@ -8,11 +8,40 @@ from dalme_api.serializers.users import UserSerializer
 from dalme_app.models import Profile, Task, TaskList
 
 
+class TaskListSerializer(serializers.ModelSerializer):
+    task_count = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = TaskList
+        fields = ('id', 'name', 'group', 'task_count')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        group = Group.objects.get(pk=ret['group'])
+        task_list_groups = group.task_list_group.all()
+        for task_list_group in task_list_groups:
+            tasks = task_list_group.task_set.all()
+            task_ids = [task.pk for task in tasks]
+            if task_list_group.name == ret['name']:
+                ret['task_index'] = task_ids
+
+        ret['group'] = group.name
+        if 'task_count' in ret:
+            task_count = ret['task_count']
+        else:
+            task_count = 0
+        ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div>\
+                       <div class="badge badge-primary badge-pill align-self-end">'+str(task_count)+'</div></div>'
+        return ret
+
+
 class TaskSerializer(serializers.ModelSerializer):
     creation_timestamp = serializers.DateTimeField(format='%d-%b-%Y', required=False)
     completed_date = serializers.DateTimeField(format='%d-%b-%Y', required=False, allow_null=True)
     due_date = serializers.DateField(format='%d-%b-%Y', required=False, allow_null=True)
     creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
+    task_list = TaskListSerializer(required=True)
 
     class Meta:
         model = Task
@@ -68,32 +97,4 @@ class TaskSerializer(serializers.ModelSerializer):
         except Profile.RelatedObjectDoesNotExist:
             ret['owner'] = instance.creation_user.username
 
-        return ret
-
-
-class TaskListSerializer(serializers.ModelSerializer):
-    task_count = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = TaskList
-        fields = ('id', 'name', 'group', 'task_count')
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        group = Group.objects.get(pk=ret['group'])
-        task_list_groups = group.task_list_group.all()
-        for task_list_group in task_list_groups:
-            tasks = task_list_group.task_set.all()
-            task_ids = [task.pk for task in tasks]
-            if task_list_group.name == ret['name']:
-                ret['task_index'] = task_ids
-
-        ret['group'] = group.name
-        if 'task_count' in ret:
-            task_count = ret['task_count']
-        else:
-            task_count = 0
-        ret['name'] = '<div class="d-flex"><div class="align-self-start mr-auto">'+ret['name']+'</div>\
-                       <div class="badge badge-primary badge-pill align-self-end">'+str(task_count)+'</div></div>'
         return ret

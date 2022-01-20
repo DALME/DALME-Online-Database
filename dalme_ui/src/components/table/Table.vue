@@ -1,5 +1,11 @@
 <template>
-  <q-card class="q-ma-md" v-bind:class="{ dirty: isDirty }">
+  <q-card
+    class="table q-ma-md"
+    v-bind:class="{
+      focussed: isFocussed,
+      pulse: mouseoverSubmit && isFocussed,
+    }"
+  >
     <q-table
       :title="title"
       :rows="rows"
@@ -98,11 +104,12 @@
 
 <script>
 import { map, keys, mapObjIndexed } from "ramda";
-import { defineComponent, inject, ref, watch } from "vue";
+import { computed, defineComponent, inject, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
+import { useActor } from "@xstate/vue";
 
 import { OpaqueSpinner } from "@/components/utils";
-import { useAPI, useEditing, useNotifier, useTransport } from "@/use";
+import { useAPI, useEditing, useTransport } from "@/use";
 
 export default defineComponent({
   name: "Table",
@@ -138,7 +145,6 @@ export default defineComponent({
     },
     // Callbacks.
     fetchData: {
-      type: Function,
       required: true,
     },
     fieldValidation: {
@@ -151,7 +157,6 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const $notifier = useNotifier();
     const {
       diffCount,
       isDirty,
@@ -161,19 +166,21 @@ export default defineComponent({
       resetTransport,
       transportWatcher,
     } = useTransport();
-
     const {
+      focus,
       formSubmitWatcher,
-      inline: actor,
+      inline,
+      mouseoverSubmit,
       submitting,
       machine: { send },
     } = useEditing();
 
-    const filter = ref("");
     const rows = inject("rows");
 
-    // We can only open one popup at a time when doing editing, so we can share
-    // these, no need for any scoping via duplicates.
+    const filter = ref("");
+
+    // We can only open one inline popup at a time when doing editing, so we
+    // can share these, no need for any scoping via duplicates.
     const editError = ref(false);
     const editErrorMessage = ref("");
 
@@ -224,26 +231,30 @@ export default defineComponent({
     const rowsPerPage = 25;
     const pagination = { rowsPerPage };
 
-    const handleSubmitTransport = async () => {
+    const actorSend = ref(null);
+    const handleSubmit = async () => {
       const { success, status, fetchAPI } = useAPI(context);
       const request = props.updateRequest(objDiffs);
       await fetchAPI(request);
       if (success.value && status.value == 201) {
-        // send("saving.RESOLVE")
-        $notifier.CRUD.inlineUpdateSuccess(props.title);
+        actorSend.value("RESOLVE");
         resetTransport();
         await props.fetchData();
       } else {
-        // send("saving.REJECT")
-        $notifier.CRUD.inlineUpdateFailed(props.title);
+        actorSend.value("REJECT");
       }
     };
+
+    const isFocussed = computed(() => inline.value && focus.value === "inline");
 
     watch(
       () => diffCount.value,
       (count, prevCount) => {
         if (prevCount === 0 && count === 1) {
           send("SPAWN_INLINE");
+          const actor = useActor(inline.value);
+          actorSend.value = actor.send;
+          formSubmitWatcher(actor.state, handleSubmit);
         }
         if (prevCount === 1 && count === 0) {
           send("DESTROY_INLINE");
@@ -251,7 +262,6 @@ export default defineComponent({
       },
     );
 
-    formSubmitWatcher(actor, handleSubmitTransport);
     transportWatcher(rows);
 
     onBeforeRouteLeave(() => {
@@ -264,9 +274,13 @@ export default defineComponent({
       editError,
       editErrorMessage,
       filter,
-      handleSubmitTransport,
+      focus,
+      handleSubmit,
+      inline,
       isDirty,
+      isFocussed,
       isObj,
+      mouseoverSubmit,
       onDiff,
       pagination,
       rows,
@@ -279,7 +293,17 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.dirty {
-  border: 2.5px solid green;
+.table {
+  border: 0;
+}
+.focussed {
+  border: 2px solid green;
+  transition: border 0.05s linear;
+}
+.pulse {
+  border: 2px solid red;
+  border-radius: 0;
+  transition: border 0.5s linear;
+  transition: border-radius 0.5s linear;
 }
 </style>

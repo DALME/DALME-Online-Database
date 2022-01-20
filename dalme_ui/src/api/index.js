@@ -3,6 +3,7 @@ export { default as requests } from "./requests";
 export {
   apiUrl,
   dbUrl,
+  fetcher,
   loginUrl,
   modalLoginUrl,
   publicUrl,

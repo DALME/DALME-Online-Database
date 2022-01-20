@@ -5,6 +5,22 @@ import { apiUrl, headers } from "./config";
 const endpoint = `${apiUrl}/tasks`;
 
 const tasks = {
+  createTask(data) {
+    const url = `${endpoint}/`;
+    return new Request(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data),
+    });
+  },
+  editTask(id, data) {
+    const url = `${endpoint}/${id}`;
+    return new Request(url, {
+      method: "PUT",
+      headers: headers,
+      body: JSON.stringify(data),
+    });
+  },
   getTasks() {
     return new Request(endpoint);
   },
@@ -23,6 +39,22 @@ const tasks = {
   taskLists() {
     const url = `${apiUrl}/tasklists`;
     return new Request(url);
+  },
+  createTaskList(data) {
+    const url = `${apiUrl}/tasklists/`;
+    return new Request(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data),
+    });
+  },
+  editTaskList(id, data) {
+    const url = `${apiUrl}/tasklists/${id}`;
+    return new Request(url, {
+      method: "PUT",
+      headers: headers,
+      body: JSON.stringify(data),
+    });
   },
   userTasks(userId) {
     // TODO: This does nothing right now, add new endpoint.

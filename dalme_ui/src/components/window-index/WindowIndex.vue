@@ -20,7 +20,10 @@
         clickable
         v-for="(actor, cuid) in actors"
         :key="cuid"
-        :class="{ focussed: cuid === focus }"
+        :class="{
+          focussed: cuid === focus,
+          pulse: !disabled && mouseoverSubmit && cuid === focus,
+        }"
         @click="handleFocus(cuid)"
         v-ripple:blue-3
         class="column q-px-sm"
@@ -69,14 +72,16 @@ import { useActor } from "@xstate/vue";
 import { useEditing } from "@/use";
 
 export default defineComponent({
-  name: "Transport",
+  name: "WindowIndex",
   setup() {
     const {
+      disabled,
       focus,
       forms,
       hideAll,
-      machine: { send, state },
+      mouseoverSubmit,
       showAll,
+      machine: { send, state },
     } = useEditing();
 
     const actors = ref([]);
@@ -87,6 +92,7 @@ export default defineComponent({
       send("SET_FOCUS", { value: cuid });
       actorSend("SHOW");
     };
+    const handleRecenter = () => null;
 
     watch(
       () => state.value,
@@ -101,9 +107,12 @@ export default defineComponent({
 
     return {
       actors,
+      disabled,
       focus,
       handleFocus,
+      handleRecenter,
       hideAll,
+      mouseoverSubmit,
       show,
       showAll,
     };
@@ -115,6 +124,11 @@ export default defineComponent({
 .focussed {
   background: white;
   border-left: 4px solid green;
+  transition: border-left 0.05s linear;
+}
+.pulse {
+  border-left: 8px solid red;
+  transition: border-left 0.5s linear;
 }
 .q-item {
   font-size: 12px;

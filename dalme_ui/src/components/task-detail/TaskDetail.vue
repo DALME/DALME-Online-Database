@@ -1,7 +1,7 @@
 <template>
   <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-item :class="colour">
+    <q-card class="q-ma-md" :class="[completed ? 'complete' : 'incomplete']">
+      <q-item>
         <q-item-section avatar>
           <q-avatar icon="assignment"> </q-avatar>
         </q-item-section>
@@ -43,7 +43,14 @@
 <script>
 import { isEmpty } from "ramda";
 import { useMeta } from "quasar";
-import { defineComponent, onMounted, provide, readonly, ref } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  provide,
+  readonly,
+  ref,
+} from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
@@ -51,7 +58,7 @@ import { requests } from "@/api";
 import { Comments } from "@/components";
 import { OpaqueSpinner } from "@/components/utils";
 import { taskSchema } from "@/schemas";
-import { useAPI, useNotifier } from "@/use";
+import { useAPI, useEditing, useNotifier } from "@/use";
 
 export default defineComponent({
   name: "TaskDetail",
@@ -63,6 +70,7 @@ export default defineComponent({
     const $route = useRoute();
     const $store = useStore();
     const { loading, success, data, fetchAPI } = useAPI(context);
+    const { editingDetailRouteGuard } = useEditing();
     const {
       success: actionSuccess,
       fetchAPI: actionFetchAPI,
@@ -71,10 +79,10 @@ export default defineComponent({
     const $notifier = useNotifier();
 
     const model = "Task";
-    const id = ref($route.params.id);
+    const id = computed(() => $route.params.id);
 
     const action = ref("");
-    const colour = ref("");
+    const completed = ref(null);
     const task = ref({});
     const attachment = ref(null);
     const subheading = ref("");
@@ -106,20 +114,19 @@ export default defineComponent({
             subheading.value =
               `${value.creationUser.fullName} created this task` +
               ` at ${value.creationTimestamp} in ${value.assignedTo}`;
+            completed.value = value.completed;
             action.value = value.completed ? "reopen task" : "complete task";
-            colour.value = value.completed
-              ? "bg-green-5 text-grey-1"
-              : "bg-red-12 text-grey-1";
             task.value = value;
             loading.value = false;
           });
     };
 
+    editingDetailRouteGuard();
     onMounted(async () => await fetchData());
 
     return {
       action,
-      colour,
+      completed,
       isAdmin,
       isEmpty,
       loading,
@@ -131,3 +138,12 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.complete {
+  border-bottom: 10px solid green;
+}
+.incomplete {
+  border-top: 10px solid red;
+}
+</style>

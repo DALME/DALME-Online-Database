@@ -1,24 +1,49 @@
 import { head } from "ramda";
 import * as yup from "yup";
 
-export const taskValidator = yup.object().shape({
+import { taskListSchema } from "@/schemas";
+
+export const taskCreateValidator = yup.object().shape({
   title: yup.string().required().label("Title"),
   description: yup.string().required().label("Description"),
-  // owner: yup.number().required(), // TODO: Dupe of owner?
-  // assignedTo: yup.string().default(null).nullable(),
-  // attachments?
+  taskList: yup.object().nullable().required().label("Task list"),
+  dueDate: yup.string().nullable().label("Date due"),
+});
+
+export const taskUpdateValidator = taskCreateValidator.shape({
+  id: yup.string().required().label("ID"),
+});
+
+export const taskPostSchema = taskCreateValidator.shape({
+  taskList: yup
+    .string()
+    .required()
+    .transform((value) => `${value.id}`),
+});
+
+export const taskPutSchema = taskUpdateValidator.shape({
+  taskList: yup
+    .string()
+    .required()
+    .transform((value) => `${value.id}`),
 });
 
 export const taskSchema = yup
   .object()
   .shape({
     id: yup.number().required(),
+    assignedTo: yup.string().required(),
     completed: yup.boolean().required(),
     title: yup.string().required(),
     description: yup.string().required(),
+    completedDate: yup.string().default(null).nullable(),
     createdBy: yup.number().required(),
     creationTimestamp: yup.string().required(),
-    assignedTo: yup.string().default(null).nullable(),
+    dueDate: yup.string().default(null).nullable(),
+    taskList: taskListSchema.shape({
+      taskCount: yup.number().default(null).nullable(),
+      taskIndex: yup.array().of(yup.number()).default(null).nullable(),
+    }),
     creationUser: yup
       .object()
       .shape({
@@ -46,24 +71,4 @@ export const taskSchema = yup
   })
   .camelCase();
 
-export const taskListSchema = yup.array().of(taskSchema);
-
-export const taskListsSchema = yup.array().of(
-  yup
-    .object()
-    .shape({
-      id: yup.number().required(),
-      group: yup.string().required(),
-      name: yup
-        .string()
-        .transform((value) => {
-          const node = document.createElement("html");
-          node.innerHTML = value;
-          return head(node.getElementsByClassName("mr-auto")).innerText;
-        })
-        .required(),
-      taskCount: yup.number().required(),
-      taskIndex: yup.array().of(yup.number().required()).required(),
-    })
-    .camelCase(),
-);
+export const tasksSchema = yup.array().of(taskSchema);

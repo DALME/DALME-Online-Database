@@ -3,6 +3,7 @@ import attachments from "./attachments";
 import auth from "./auth";
 import comments from "./comments";
 import countries from "./countries";
+import groups from "./groups";
 import languages from "./languages";
 import library from "./library";
 import locales from "./locales";
@@ -20,6 +21,7 @@ const requests = {
   auth,
   comments,
   countries,
+  groups,
   languages,
   library,
   locales,

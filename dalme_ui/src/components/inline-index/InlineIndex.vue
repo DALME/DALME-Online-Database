@@ -2,7 +2,10 @@
   <div
     v-if="show"
     class="container q-py-sm"
-    :class="{ focussed: isFocus }"
+    :class="{
+      focussed: isFocus,
+      pulse: mouseoverSubmit && focus === 'inline',
+    }"
     @click="handleFocus"
   >
     <div class="q-pa-md q-gutter-sm row">
@@ -47,12 +50,13 @@ import { computed, defineComponent, inject, watch } from "vue";
 import { useEditing, useTransport } from "@/use";
 
 export default defineComponent({
-  name: "Transport",
+  name: "InlineIndex",
   setup() {
     const { transport } = useTransport();
     const {
-      machine: { send },
       focus,
+      mouseoverSubmit,
+      machine: { send },
     } = useEditing();
 
     const diffs = computed(() => transport.history.value.slice(0, -1));
@@ -78,9 +82,11 @@ export default defineComponent({
     return {
       diffs,
       disableRedo,
+      focus,
       fromUnixTs,
       handleFocus,
       isFocus,
+      mouseoverSubmit,
       show,
       transport,
     };
@@ -95,6 +101,11 @@ export default defineComponent({
 .focussed {
   background: white;
   border-left: 4px solid green;
+  transition: border-left 0.05s linear;
+}
+.pulse {
+  border-left: 8px solid red;
+  transition: border-left 0.5s linear;
 }
 .q-item {
   font-size: 12px;

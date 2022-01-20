@@ -2,10 +2,35 @@
   <div class="q-ma-md full-width full-height">
     <q-card class="q-ma-md">
       <q-card-section>
-        <div class="text-h6">Lists</div>
+        <div class="row">
+          <div class="text-h6">Task Lists</div>
+          <q-btn
+            v-if="isAdmin"
+            round
+            color="amber"
+            text-color="black"
+            icon="add"
+            size="sm"
+            class="q-ml-auto"
+            @click="handleCreate"
+          >
+            <q-tooltip
+              class="bg-blue"
+              transition-show="scale"
+              transition-hide="scale"
+              anchor="center left"
+              self="center right"
+              :offset="[10, 10]"
+            >
+              Create Task List
+            </q-tooltip>
+          </q-btn>
+        </div>
       </q-card-section>
+
       <q-list v-for="(list, group, idx) in taskLists" :key="idx">
         <q-separator />
+
         <q-item-label
           clickable
           header
@@ -18,7 +43,9 @@
         >
           {{ group }}
         </q-item-label>
+
         <q-separator />
+
         <q-item
           clickable
           class="list"
@@ -47,13 +74,22 @@
 </template>
 
 <script>
+import cuid from "cuid";
 import { defineComponent, inject, ref } from "vue";
 import { useRouter } from "vue-router";
+
+import { useEditing, usePermissions } from "@/use";
 
 export default defineComponent({
   name: "TaskLists",
   setup() {
     const $router = useRouter();
+    const {
+      machine: { send },
+    } = useEditing();
+    const {
+      permissions: { isAdmin },
+    } = usePermissions();
 
     const title = "Task Lists";
     const activeFilters = ref(new Set());
@@ -90,7 +126,26 @@ export default defineComponent({
     const onLoadFilter = $router.currentRoute.value.query.filter;
     if (onLoadFilter) activeFilters.value = new Set(onLoadFilter.split(","));
 
-    return { activeFilters, filter, taskLists, title };
+    const handleCreate = () =>
+      send("SPAWN_FORM", {
+        cuid: cuid(),
+        initialData: {},
+        kind: "taskList",
+        mode: "create",
+      });
+
+    const handleDelete = (id) =>
+      console.log(`Deleting TaskList with id: ${id}`);
+
+    return {
+      activeFilters,
+      filter,
+      handleCreate,
+      handleDelete,
+      isAdmin,
+      taskLists,
+      title,
+    };
   },
 });
 </script>

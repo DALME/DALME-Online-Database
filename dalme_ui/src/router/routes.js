@@ -170,7 +170,7 @@ const routes = [
             component: () => import("pages/ticket-list/TicketList.vue"),
             name: "Tickets",
             path: "tickets",
-            props: { icon: "subject" },
+            props: { icon: "task" },
             nav: true,
           },
           {

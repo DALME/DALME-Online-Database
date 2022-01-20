@@ -79,7 +79,7 @@ import { useStore } from "vuex";
 
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
-import { taskListSchema } from "@/schemas";
+import { tasksSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
 const columnMap = {
@@ -210,7 +210,7 @@ export default defineComponent({
         : requests.tasks.getTasks();
       await fetchAPI(request);
       if (success.value)
-        await taskListSchema
+        await tasksSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             if (!isEmpty(value)) {

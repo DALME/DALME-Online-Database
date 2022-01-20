@@ -115,6 +115,7 @@ class Locales(DALMEBaseViewSet):
     ordering = ['name']
 
     # TODO: Make this generic on DALMEBaseViewSet.
+    # TODO: We can remove this one when we are finished.
     @action(detail=False, methods=['patch'])
     def update_locales(self, request, *args, **kwargs):
         pks = [str(pk) for pk in request.data.keys()]

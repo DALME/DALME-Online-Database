@@ -11,6 +11,7 @@
       color="amber"
       text-color="black"
       icon="bookmark"
+      disabled
     >
       <q-tooltip
         class="bg-blue"
@@ -20,7 +21,7 @@
         self="center right"
         :offset="[10, 10]"
       >
-        Create source
+        Create Source
       </q-tooltip>
     </q-fab-action>
 
@@ -29,6 +30,7 @@
       color="amber"
       text-color="black"
       icon="collections_bookmark"
+      disabled
     >
       <q-tooltip
         class="bg-blue"
@@ -37,7 +39,7 @@
         self="center right"
         :offset="[10, 10]"
       >
-        Create set
+        Create Set
       </q-tooltip>
     </q-fab-action>
 
@@ -55,7 +57,7 @@
         self="center right"
         :offset="[10, 10]"
       >
-        Create task
+        Create Task
       </q-tooltip>
     </q-fab-action>
 
@@ -63,7 +65,8 @@
       :onclick="() => handleClick('ticket')"
       color="amber"
       text-color="black"
-      icon="subject"
+      icon="task"
+      disabled
     >
       <q-tooltip
         class="bg-blue"
@@ -73,7 +76,7 @@
         self="center right"
         :offset="[10, 10]"
       >
-        Create ticket
+        Create Ticket
       </q-tooltip>
     </q-fab-action>
   </q-fab>
@@ -94,7 +97,7 @@ export default defineComponent({
     } = useEditing();
 
     const handleClick = (kind) =>
-      send("SPAWN_FORM", { cuid: cuid(), kind, mode });
+      send("SPAWN_FORM", { cuid: cuid(), kind, mode, initialData: {} });
 
     return {
       disabled: false,
