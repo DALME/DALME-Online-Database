@@ -220,6 +220,6 @@ export default defineComponent({
 .modal-card {
   overflow-y: scroll;
   scroll-snap-type: y proximity;
-  max-height: 30rem;
+  max-height: 50rem;
 }
 </style>

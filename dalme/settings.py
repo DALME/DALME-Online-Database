@@ -17,7 +17,6 @@ def get_ec2_instance_ip():
         return None
     return ip
 
-
 AWS_LOCAL_IP = get_ec2_instance_ip()
 ALLOWED_HOSTS = [
     AWS_LOCAL_IP,
@@ -154,7 +153,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    'django_hosts.middleware.HostsResponseMiddleware'
+    'django_hosts.middleware.HostsResponseMiddleware',
+    'dalme_app.utils.UIAuthMiddleware',
 ]
 
 TEMPLATES = [
@@ -287,7 +287,7 @@ REST_FRAMEWORK = {
         'dalme_api.renderers.DTEJSONRenderer'
     ],
     'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
+        JSON_PARSER,
         'dalme_api.parsers.DTEParser',
     ],
     'DEFAULT_FILTER_BACKENDS': [

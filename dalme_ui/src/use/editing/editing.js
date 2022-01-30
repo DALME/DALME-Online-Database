@@ -272,7 +272,7 @@ export const provideEditing = () => {
       (isEmpty(validated) ||
         !any((value) => value === true, values(validated)));
     const focusValid =
-      inline.value || (focusActor.value && validated[focus.value]);
+      focus.value === "inline" || (focusActor.value && validated[focus.value]);
     return nothingValid || !focusValid || submitting.value;
   });
 

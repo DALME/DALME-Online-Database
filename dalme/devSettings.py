@@ -6,6 +6,8 @@ import saml2
 from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
 from saml2.sigver import get_xmlsec_binary
 
+IS_V2 = bool(os.environ.get('V2', False))
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 DOCKER_ROOT = "/app"
@@ -265,6 +267,7 @@ ELASTICSEARCH_DSL_AUTO_REFRESH = True
 ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
 SEARCH_RESULTS_PER_PAGE = 10
 
+JSON_PARSER = 'djangorestframework_camel_case.parser.CamelCaseJSONParser' if IS_V2 else 'rest_framework.parsers.JSONParser'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
@@ -282,7 +285,7 @@ REST_FRAMEWORK = {
         'dalme_api.renderers.DBRenderer'
     ],
     'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
+        JSON_PARSER,
         'dalme_api.parsers.DTEParser',
     ],
     'DEFAULT_FILTER_BACKENDS': [
@@ -291,6 +294,9 @@ REST_FRAMEWORK = {
         'dalme_api.filter_backends.DalmeOrderingFilter'
     ],
     'EXCEPTION_HANDLER': 'dalme_api.utils.DTE_exception_handler',
+    'JSON_UNDERSCOREIZE': {
+        'no_underscore_before_number': True,
+    },
 }
 
 

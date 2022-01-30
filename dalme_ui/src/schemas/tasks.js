@@ -6,8 +6,12 @@ import { taskListSchema } from "@/schemas";
 export const taskCreateValidator = yup.object().shape({
   title: yup.string().required().label("Title"),
   description: yup.string().required().label("Description"),
-  taskList: yup.object().nullable().required().label("Task list"),
-  dueDate: yup.string().nullable().label("Date due"),
+  taskList: taskListSchema
+    .shape({
+      name: yup.string().required(),
+    })
+    .nullable()
+    .required(),
 });
 
 export const taskUpdateValidator = taskCreateValidator.shape({
@@ -16,17 +20,19 @@ export const taskUpdateValidator = taskCreateValidator.shape({
 
 export const taskPostSchema = taskCreateValidator.shape({
   taskList: yup
-    .string()
+    .mixed()
     .required()
-    .transform((value) => `${value.id}`),
+    .transform((value) => {
+      debugger;
+      parseInt(value);
+    }),
+  assignedTo: yup
+    .mixed()
+    .required()
+    .transform((value) => value.id),
 });
 
-export const taskPutSchema = taskUpdateValidator.shape({
-  taskList: yup
-    .string()
-    .required()
-    .transform((value) => `${value.id}`),
-});
+export const taskPutSchema = taskUpdateValidator;
 
 export const taskSchema = yup
   .object()

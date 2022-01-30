@@ -9,3 +9,4 @@ from .messaging import send_message # NOQA
 from .offline_context_generator import offline_context_generator # NOQA
 from .paginated_formsets import formset_factory # NOQA
 from .search import Search, SearchContext # NOQA
+from .ui_auth_middleware import UIAuthMiddleware

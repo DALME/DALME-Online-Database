@@ -13,6 +13,7 @@ import {
   taskPostSchema,
   taskCreateValidator,
   taskUpdateValidator,
+  userListSchema,
 } from "@/schemas";
 
 const taskFormSchema = {
@@ -27,10 +28,20 @@ const taskFormSchema = {
   taskList: {
     component: markRaw(SelectField),
     label: "Task list",
+    filterable: true,
     getOptions: () =>
       fetcher(requests.tasks.taskLists()).then((response) => response.json()),
     optionLabel: (option) => `${option.name} (${option.group})`,
     optionsSchema: taskListsSchema,
+  },
+  assignedTo: {
+    component: markRaw(SelectField),
+    label: "Assigned to",
+    filterable: true,
+    getOptions: () =>
+      fetcher(requests.users.getUsers()).then((response) => response.json()),
+    optionLabel: "fullName",
+    optionsSchema: userListSchema,
   },
   dueDate: {
     component: markRaw(DateField),

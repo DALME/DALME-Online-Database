@@ -30,8 +30,8 @@ export default defineComponent({
     } = useEditing();
 
     const $route = useRoute();
-    const kind = $route.name.toLowerCase();
     const id = computed(() => $route.params.id);
+    const kind = computed(() => $route.name.toLowerCase());
 
     const getRequest = () => requests.tasks.getTask(id.value);
 
@@ -45,7 +45,7 @@ export default defineComponent({
             send("SPAWN_FORM", {
               cuid: cuid(),
               initialData: value,
-              kind,
+              kind: kind.value,
               mode,
             });
           });

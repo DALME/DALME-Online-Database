@@ -12,7 +12,7 @@
             icon="add"
             size="sm"
             class="q-ml-auto"
-            @click="handleCreate"
+            @click="handleClick"
           >
             <q-tooltip
               class="bg-blue"
@@ -126,7 +126,7 @@ export default defineComponent({
     const onLoadFilter = $router.currentRoute.value.query.filter;
     if (onLoadFilter) activeFilters.value = new Set(onLoadFilter.split(","));
 
-    const handleCreate = () =>
+    const handleClick = () =>
       send("SPAWN_FORM", {
         cuid: cuid(),
         initialData: {},
@@ -140,7 +140,7 @@ export default defineComponent({
     return {
       activeFilters,
       filter,
-      handleCreate,
+      handleClick,
       handleDelete,
       isAdmin,
       taskLists,

@@ -2,6 +2,9 @@
   <q-select
     use-chips
     hide-bottom-space
+    input-debounce="350"
+    :use-input="filterable"
+    :hide-selected="filterable"
     :error="error"
     :model-value="modelValue"
     :options="options"
@@ -35,6 +38,10 @@ export default defineComponent({
       type: Object,
       default: () => ({}),
     },
+    filterable: {
+      type: Boolean,
+      default: false,
+    },
     getOptions: {
       type: Function,
       required: true,
@@ -60,6 +67,21 @@ export default defineComponent({
       await props.optionsSchema
         .validate(data, { stripUnknown: true })
         .then((value) => update(() => (options.value = value)));
+
+      update(() => {
+        const search = val.toLowerCase();
+        options.value = options.value.filter((option) => {
+          const getLabel = () => {
+            try {
+              return props.optionLabel(option);
+            } catch (_) {
+              return option[props.optionLabel];
+            }
+          };
+          const label = getLabel();
+          return label && label.toLowerCase().indexOf(search) > -1;
+        });
+      });
     };
 
     return {
