@@ -18,9 +18,9 @@ import { computed, defineComponent } from "vue";
 import { FormModal } from "@/components";
 import { useEditing } from "@/use";
 
-const X_ORIGIN = 400;
+const X_ORIGIN = window.innerWidth / 3;
 const X_OFFSET = 20;
-const Y_OFFSET = 40;
+const Y_OFFSET = 25;
 
 export default defineComponent({
   name: "Page",

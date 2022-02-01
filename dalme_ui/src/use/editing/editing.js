@@ -276,18 +276,38 @@ export const provideEditing = () => {
     return nothingValid || !focusValid || submitting.value;
   });
 
+  const afterEditingRefresh = ref("false");
+
   // Invokes a particular form's submit callback whenever its actor transitions
   // to the "saving" state.
-  const formSubmitWatcher = (actor, handleSubmit) => {
+  const formSubmitWatcher = (actor, handleSubmit) =>
     watch(
       () => actor.value,
       async (newActor) => {
         if (newActor.value === "saving") {
           await handleSubmit();
+          afterEditingRefresh.value = true;
         }
       },
     );
-  };
+
+  // Make sure any relevant data is refreshed when a form is submitted. This
+  // watcher needs to be instantiated on any page that might need to rerender
+  // as a side-effect after some, unspecified CRUD operation occurs that it has
+  // no precise knowledge of. Not the most satisfying thing to have to do but
+  // probably the simplest for our 'free-floating' editing patterns.
+  const afterEditingRefreshWatcher = (fetchData) =>
+    watch(
+      () => afterEditingRefresh.value,
+      async (newValue, oldValue) => {
+        if (oldValue === false && newValue === true) {
+          await fetchData();
+          if (afterEditingRefresh.value === true) {
+            afterEditingRefresh.value = false;
+          }
+        }
+      },
+    );
 
   const editingDetailRouteGuard = () => {
     machine.send("SET_DETAIL", { value: true });
@@ -297,6 +317,7 @@ export const provideEditing = () => {
   };
 
   provide(EditingSymbol, {
+    afterEditingRefreshWatcher,
     disabled,
     editingDetailRouteGuard,
     formSubmitWatcher,

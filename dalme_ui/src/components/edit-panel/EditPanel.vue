@@ -69,7 +69,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .parent {
   background-color: #2f333c;
   background-image: linear-gradient(59deg, #11587c 54.62%, #1b1b1b);

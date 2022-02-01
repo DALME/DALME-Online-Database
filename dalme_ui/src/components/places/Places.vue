@@ -114,7 +114,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-table tbody td {
   white-space: normal;
 }

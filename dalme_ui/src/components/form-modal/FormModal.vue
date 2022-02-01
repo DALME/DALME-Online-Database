@@ -113,7 +113,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { data, status, success, fetchAPI } = useAPI(context);
+    const { status, success, fetchAPI } = useAPI(context);
     const {
       formRequest,
       formSchema,
@@ -168,11 +168,10 @@ export default defineComponent({
           const request = formRequest.value(value);
           await fetchAPI(request);
           if (success.value & [200, 201].includes(status.value)) {
-            // const message = `${kind.value} ${mode.value}d`;
-            actorSend("RESOLVE"); // send("RESOLVE", { cuid: props.cuid, messsage });
+            actorSend("RESOLVE");
             handleClose();
           } else {
-            actorSend("REJECT"); // send("REJECT", { cuid: props.cuid, message });
+            actorSend("REJECT");
           }
         });
     };

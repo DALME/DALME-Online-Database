@@ -285,6 +285,7 @@ const isObj = (obj) => {
 };
 
 // TODO: Invert to isNully and negate at call sites.
+// => Boolean(value)
 const notNully = (value) => !isNil(value) && !isEmpty(value);
 
 export default defineComponent({
@@ -322,6 +323,7 @@ export default defineComponent({
     const hasChildren = computed(() => notNully(source.value.children));
     const hasPlaces = computed(() => notNully(source.value.places));
 
+    // TODO: This throws an error/warning.
     const hasPages = computedInject("hasPages", (injected) => {
       injected.value = notNully(source.value.pages);
       return notNully(source.value.pages);
@@ -347,8 +349,10 @@ export default defineComponent({
     watch(
       () => $route.params.id,
       async (to) => {
-        id.value = to;
-        await fetchData();
+        if (to) {
+          id.value = to;
+          await fetchData();
+        }
       },
       { immediate: true },
     );

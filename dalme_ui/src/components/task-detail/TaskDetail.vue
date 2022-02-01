@@ -1,6 +1,9 @@
 <template>
   <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md" :class="[completed ? 'complete' : 'incomplete']">
+    <q-card
+      class="q-ma-md"
+      :class="[isNil(completed) ? null : completed ? 'complete' : 'incomplete']"
+    >
       <q-item>
         <q-item-section avatar>
           <q-avatar icon="assignment"> </q-avatar>
@@ -41,7 +44,7 @@
 </template>
 
 <script>
-import { isEmpty } from "ramda";
+import { isEmpty, isNil } from "ramda";
 import { useMeta } from "quasar";
 import {
   computed,
@@ -129,6 +132,7 @@ export default defineComponent({
       completed,
       isAdmin,
       isEmpty,
+      isNil,
       loading,
       onAction,
       subheading,
@@ -141,7 +145,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .complete {
-  border-bottom: 10px solid green;
+  border-top: 10px solid green;
 }
 .incomplete {
   border-top: 10px solid red;

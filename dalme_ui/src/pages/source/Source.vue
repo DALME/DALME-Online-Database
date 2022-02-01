@@ -5,12 +5,7 @@
         <template v-slot:before>
           <q-tabs v-model="tab" class="text-blue" :vertical="$q.screen.gt.xs">
             <q-tab name="data" icon="info" label="Data" />
-            <q-tab
-              v-if="hasPages"
-              name="editor"
-              icon="preview"
-              label="Editor"
-            />
+            <q-tab v-if="hasPages" name="pages" icon="preview" label="Pages" />
           </q-tabs>
         </template>
 

@@ -2,6 +2,7 @@ import textwrap
 
 from rest_framework import serializers
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 
 from dalme_api.serializers.users import UserSerializer
@@ -26,7 +27,11 @@ class TaskListSerializer(serializers.ModelSerializer):
             if task_list_group.name == ret['name']:
                 ret['task_index'] = task_ids
 
-        ret['group'] = group.name
+        if settings.IS_V2:
+            ret['group'] = {"id": group.id, "name": group.name}
+        else:
+            ret['group'] = group.name
+
         if 'task_count' in ret:
             task_count = ret['task_count']
         else:

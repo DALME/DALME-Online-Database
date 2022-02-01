@@ -48,6 +48,13 @@ const tasks = {
       body: JSON.stringify(data),
     });
   },
+  deleteTaskList(id) {
+    const url = `${apiUrl}/tasklists/${id}`;
+    return new Request(url, {
+      method: "DELETE",
+      headers: headers,
+    });
+  },
   editTaskList(id, data) {
     const url = `${apiUrl}/tasklists/${id}`;
     return new Request(url, {

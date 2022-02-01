@@ -28,17 +28,18 @@ export default defineComponent({
       isDetail,
       machine: { send },
     } = useEditing();
-
     const $route = useRoute();
+
     const id = computed(() => $route.params.id);
     const kind = computed(() => $route.name.toLowerCase());
 
     const getRequest = () => requests.tasks.getTask(id.value);
 
-    // TODO: Stubbed for now, will become dynamic.
     const fetchData = async () => {
       await fetchAPI(getRequest());
       if (success.value)
+        // TODO: Stubbed for now, will become dynamic.
+        // const { submitSchema } = useDynamicForm();
         await taskSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {

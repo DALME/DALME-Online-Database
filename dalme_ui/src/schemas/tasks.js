@@ -1,3 +1,4 @@
+import moment from "moment";
 import { head } from "ramda";
 import * as yup from "yup";
 
@@ -11,7 +12,15 @@ export const taskCreateValidator = yup.object().shape({
       name: yup.string().required(),
     })
     .nullable()
-    .required(),
+    .required()
+    .label("Task list"),
+  dueDate: yup
+    .string()
+    .nullable()
+    .transform((value) =>
+      value ? moment(new Date(value)).format("YYYY-MM-DD") : null,
+    )
+    .label("Date due"),
 });
 
 export const taskUpdateValidator = taskCreateValidator.shape({
@@ -22,10 +31,7 @@ export const taskPostSchema = taskCreateValidator.shape({
   taskList: yup
     .mixed()
     .required()
-    .transform((value) => {
-      debugger;
-      parseInt(value);
-    }),
+    .transform((value) => ({ group: value.id, name: value.name })),
   assignedTo: yup
     .mixed()
     .required()

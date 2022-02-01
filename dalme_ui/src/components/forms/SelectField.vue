@@ -4,11 +4,11 @@
     hide-bottom-space
     input-debounce="350"
     :use-input="filterable"
-    :hide-selected="filterable"
     :error="error"
     :model-value="modelValue"
     :options="options"
     :option-label="optionLabel"
+    :option-value="(option) => option"
     :popup-content-style="{ zIndex: '9999 !important' }"
     @filter="handleOptions"
     @update:modelValue="onUpdate"
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { isNil } from "ramda";
 import { computed, defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -79,7 +80,7 @@ export default defineComponent({
             }
           };
           const label = getLabel();
-          return label && label.toLowerCase().indexOf(search) > -1;
+          return !isNil(label) && label.toLowerCase().indexOf(search) > -1;
         });
       });
     };
@@ -87,7 +88,6 @@ export default defineComponent({
     return {
       handleOptions,
       error,
-      // onBlur,
       onUpdate,
       options,
     };

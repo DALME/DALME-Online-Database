@@ -131,12 +131,13 @@ export default defineComponent({
       return map(toColumn, keys(columnMap));
     };
 
-    // TODO: Move to local useTaskFilter hook -> taskFilter
+    // TODO: Move to local useTaskFilter hook.
     const filterTasks = (query, taskLists) => {
       let filter = query.filter.split(",");
 
       const filters = map(
-        (taskList) => map((list) => `${list.group}_${list.name}`, taskList),
+        (taskList) =>
+          map((list) => `${list.group.name}_${list.name}`, taskList),
         taskLists,
       );
       const filterUnion = flatten([keys(filters), values(filters)]);
@@ -254,7 +255,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-table tbody td {
   white-space: normal;
 }

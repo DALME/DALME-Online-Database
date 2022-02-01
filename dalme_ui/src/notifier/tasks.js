@@ -1,6 +1,13 @@
 import { Notify } from "quasar";
 
 const auth = {
+  taskListDeleted: (name) =>
+    Notify.create({
+      color: "green",
+      message: `Task list "${name}" deleted`,
+      icon: "done",
+      position: "top",
+    }),
   taskStatusUpdated: () =>
     Notify.create({
       color: "green",
