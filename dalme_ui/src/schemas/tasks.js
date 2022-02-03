@@ -5,8 +5,8 @@ import * as yup from "yup";
 import { taskListSchema } from "@/schemas";
 
 export const taskCreateValidator = yup.object().shape({
-  title: yup.string().required().label("Title"),
-  description: yup.string().required().label("Description"),
+  title: yup.string().nullable().required().label("Title"),
+  description: yup.string().nullable().required().label("Description"),
   taskList: taskListSchema
     .shape({
       name: yup.string().required(),

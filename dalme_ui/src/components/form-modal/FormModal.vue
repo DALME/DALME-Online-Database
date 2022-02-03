@@ -145,7 +145,7 @@ export default defineComponent({
     const isFocus = computed(() => focus.value === props.cuid);
 
     const positionKey = `form-position:${props.cuid}`;
-    const initialValue = useStorage(
+    const positionValue = useStorage(
       positionKey,
       { x: props.xPos, y: props.yPos },
       localStorage,
@@ -155,7 +155,7 @@ export default defineComponent({
       y,
       style: dragging,
     } = useDraggable(el, {
-      initialValue,
+      initialValue: positionValue,
       onEnd: () => useStorage(positionKey, { x, y }, localStorage),
     });
 
@@ -166,8 +166,8 @@ export default defineComponent({
 
     const handleClose = () => {
       send("DESTROY_FORM", { cuid: props.cuid });
+      positionValue.value = null;
       // TODO: useStorage and can just set the return values to null.
-      window.localStorage.removeItem(positionKey);
       window.localStorage.removeItem(fieldsKey);
     };
     const handleFocus = () => send("SET_FOCUS", { value: props.cuid });
@@ -229,11 +229,11 @@ export default defineComponent({
 .modal-container {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   position: fixed;
-  width: 25rem;
+  width: 30rem;
 }
 .modal-card {
   overflow-y: scroll;
   scroll-snap-type: y proximity;
-  max-height: 50rem;
+  max-height: 35rem;
 }
 </style>

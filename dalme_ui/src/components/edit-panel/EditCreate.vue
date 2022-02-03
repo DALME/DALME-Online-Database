@@ -6,23 +6,32 @@
     :color="disabled ? 'grey' : 'amber'"
     :disable="disabled"
   >
-    <q-fab-action
-      :onClick="() => handleClick('source')"
-      color="amber"
-      text-color="black"
+    <q-fab
+      padding="0.5rem"
       icon="bookmark"
+      text-color="black"
+      direction="left"
+      :color="disabled ? 'grey' : 'orange'"
+      :disable="disabled"
     >
-      <q-tooltip
-        class="bg-blue"
-        transition-show="scale"
-        transition-hide="scale"
-        anchor="center left"
-        self="center right"
-        :offset="[10, 10]"
+      <q-fab-action
+        :onClick="() => handleClick('record')"
+        color="amber"
+        text-color="black"
+        icon="bookmark"
       >
-        Create Source
-      </q-tooltip>
-    </q-fab-action>
+        <q-tooltip
+          class="bg-blue"
+          transition-show="scale"
+          transition-hide="scale"
+          anchor="top middle"
+          self="top middle"
+          :offset="[0, 35]"
+        >
+          Create Record
+        </q-tooltip>
+      </q-fab-action>
+    </q-fab>
 
     <q-fab-action
       :onclick="() => handleClick('set')"

@@ -1,6 +1,5 @@
 <template>
   <q-select
-    use-chips
     hide-bottom-space
     input-debounce="350"
     :use-input="filterable"

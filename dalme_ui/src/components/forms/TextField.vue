@@ -1,6 +1,7 @@
 <template>
   <q-input
     autogrow
+    clearable
     hide-bottom-space
     debounce="500"
     :error="error"

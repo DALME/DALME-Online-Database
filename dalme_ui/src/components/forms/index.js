@@ -1,3 +1,4 @@
+export { default as AttributesField } from "./AttributesField.vue";
 export { default as DateField } from "./DateField.vue";
 export { default as InputField } from "./InputField.vue";
 export { default as SelectField } from "./SelectField.vue";
