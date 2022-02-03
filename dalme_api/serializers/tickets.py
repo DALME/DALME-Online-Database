@@ -26,6 +26,7 @@ class TicketSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret['comment_count'] = instance.comments.count()
+        ret['status'] = bool(instance.status)
         return ret
 
     def to_internal_value(self, data):
@@ -74,6 +75,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
         if ret['file'] is not None:
             attachments += '<a href="/download/{}" class="task-attachment">File</a>'.format(instance.file.file)
         ret['attachments'] = attachments
+        ret['status'] = bool(instance.status)
         return ret
 
     def to_internal_value(self, data):

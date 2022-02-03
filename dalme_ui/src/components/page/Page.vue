@@ -20,7 +20,7 @@ import { useEditing } from "@/use";
 
 const X_ORIGIN = window.innerWidth / 3;
 const X_OFFSET = 20;
-const Y_OFFSET = 25;
+const Y_OFFSET = 30;
 
 export default defineComponent({
   name: "Page",

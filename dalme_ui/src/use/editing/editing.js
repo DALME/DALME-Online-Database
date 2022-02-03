@@ -225,7 +225,10 @@ export const provideEditing = () => {
   const inline = useSelector(service, (state) => state.context.inline);
   const isDetail = useSelector(service, (state) => state.context.detail);
 
+  // Reactive flags.
+  const afterEditingRefresh = ref(false);
   const mouseoverSubmit = ref(false);
+  const recenter = ref(null);
 
   // Helper functions.
   const hideAll = () => {
@@ -276,8 +279,6 @@ export const provideEditing = () => {
     return nothingValid || !focusValid || submitting.value;
   });
 
-  const afterEditingRefresh = ref("false");
-
   // Invokes a particular form's submit callback whenever its actor transitions
   // to the "saving" state.
   const formSubmitWatcher = (actor, handleSubmit) =>
@@ -309,6 +310,19 @@ export const provideEditing = () => {
       },
     );
 
+  // Repositioning a FormModal in the middle of the viewport.
+  const recenterWatcher = (cuid, x, y) =>
+    watch(
+      () => recenter.value,
+      (newRecenter) => {
+        if (!isNil(newRecenter) && newRecenter === cuid) {
+          x.value = window.innerWidth / 3;
+          y.value = window.innerHeight / 10;
+          recenter.value = null;
+        }
+      },
+    );
+
   const editingDetailRouteGuard = () => {
     machine.send("SET_DETAIL", { value: true });
     onBeforeRouteLeave(() => {
@@ -329,6 +343,8 @@ export const provideEditing = () => {
     isDetail,
     machine,
     mouseoverSubmit,
+    recenter,
+    recenterWatcher,
     showAll,
     submitting,
   });

@@ -50,7 +50,7 @@
 
               <q-btn
                 icon="center_focus_weak"
-                @click.stop="handleRecenter"
+                @click.stop="handleRecenter(cuid)"
                 size="8px"
                 round
               >
@@ -80,6 +80,7 @@ export default defineComponent({
       forms,
       hideAll,
       mouseoverSubmit,
+      recenter,
       showAll,
       machine: { send, state },
     } = useEditing();
@@ -92,7 +93,10 @@ export default defineComponent({
       send("SET_FOCUS", { value: cuid });
       actorSend("SHOW");
     };
-    const handleRecenter = () => null;
+    const handleRecenter = (cuid) => {
+      handleFocus(cuid);
+      recenter.value = cuid;
+    };
 
     watch(
       () => state.value,

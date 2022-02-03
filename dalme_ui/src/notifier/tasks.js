@@ -1,6 +1,6 @@
 import { Notify } from "quasar";
 
-const auth = {
+const task = {
   taskListDeleted: (name) =>
     Notify.create({
       color: "green",
@@ -11,17 +11,17 @@ const auth = {
   taskStatusUpdated: () =>
     Notify.create({
       color: "green",
-      message: "Status updated",
+      message: "Task status updated",
       icon: "done",
       position: "top",
     }),
   taskStatusUpdatedError: () =>
     Notify.create({
       color: "red",
-      message: "Status update failed",
+      message: "Task status update failed",
       icon: "cancel",
       position: "top",
     }),
 };
 
-export default auth;
+export default task;

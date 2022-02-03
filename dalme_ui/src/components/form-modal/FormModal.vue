@@ -1,13 +1,13 @@
 <template>
   <teleport to="body">
-    <UseDraggable
+    <div
       class="modal-container"
+      ref="el"
       :class="isFocus ? 'z-max' : 'z-top'"
-      :initialValue="initialPosition"
-      :storage-key="positionKey"
-      storage-type="session"
-      style="position: fixed"
+      :style="`touch-action:none;${dragging}`"
       v-show="visible"
+      @click.stop="handleFocus"
+      v-ripple:blue-1
     >
       <q-card
         class="modal-card q-px-lg q-py-none"
@@ -15,8 +15,6 @@
           focussed: cuid === focus,
           pulse: !disabled && mouseoverSubmit && cuid === focus,
         }"
-        @click="handleFocus"
-        v-ripple:blue-1
       >
         <q-card-section class="q-px-none q-pt-sm">
           <div class="row no-wrap items-center q-pb-sm">
@@ -50,7 +48,7 @@
             class="q-ml-auto"
             color="deep-orange"
             icon="close"
-            @click="confirm = true"
+            @click.stop="confirm = true"
             size="11px"
             round
           >
@@ -58,7 +56,7 @@
           </q-btn>
         </q-card-actions>
       </q-card>
-    </UseDraggable>
+    </div>
 
     <q-dialog v-model="confirm" persistent class="z-max">
       <q-card>
@@ -74,7 +72,7 @@
             label="Discard"
             color="primary"
             v-close-popup
-            @click="handleClose"
+            @click.stop="handleClose"
           />
         </q-card-actions>
       </q-card>
@@ -86,7 +84,7 @@
 
 <script>
 import { computed, defineComponent, ref } from "vue";
-import { UseDraggable } from "@vueuse/components";
+import { useDraggable, useStorage } from "@vueuse/core";
 import { useActor, useSelector } from "@xstate/vue";
 
 import { SchemaForm } from "@/components";
@@ -96,7 +94,6 @@ export default defineComponent({
   name: "FormModal",
   components: {
     SchemaForm,
-    UseDraggable,
   },
   props: {
     cuid: {
@@ -127,11 +124,13 @@ export default defineComponent({
       forms,
       formSubmitWatcher,
       mouseoverSubmit,
+      recenterWatcher,
       submitting,
       machine: { send },
     } = useEditing();
 
     const confirm = ref(false);
+    const el = ref(null);
 
     const actor = forms.value[props.cuid];
     const { send: actorSend, state: actorState } = useActor(actor);
@@ -146,7 +145,19 @@ export default defineComponent({
     const isFocus = computed(() => focus.value === props.cuid);
 
     const positionKey = `form-position:${props.cuid}`;
-    const initialPosition = { x: props.xPos, y: props.yPos };
+    const initialValue = useStorage(
+      positionKey,
+      { x: props.xPos, y: props.yPos },
+      localStorage,
+    );
+    const {
+      x,
+      y,
+      style: dragging,
+    } = useDraggable(el, {
+      initialValue,
+      onEnd: () => useStorage(positionKey, { x, y }, localStorage),
+    });
 
     const fieldsKey = `form-fields:${props.cuid}`;
     const formModel = ref(
@@ -155,6 +166,7 @@ export default defineComponent({
 
     const handleClose = () => {
       send("DESTROY_FORM", { cuid: props.cuid });
+      // TODO: useStorage and can just set the return values to null.
       window.localStorage.removeItem(positionKey);
       window.localStorage.removeItem(fieldsKey);
     };
@@ -177,18 +189,20 @@ export default defineComponent({
     };
 
     formWatcher(kind, mode);
-    formSubmitWatcher(actorState, handleSubmit); // TODO: Use the service not the state.
+    formSubmitWatcher(actorState, handleSubmit);
+    recenterWatcher(props.cuid, x, y);
 
     return {
       confirm,
       disabled,
+      dragging,
+      el,
       focus,
       formModel,
       formSchema,
       handleClose,
       handleFocus,
       handleMinimize,
-      initialPosition,
       isFocus,
       kind,
       mode,
@@ -214,6 +228,7 @@ export default defineComponent({
 }
 .modal-container {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  position: fixed;
   width: 25rem;
 }
 .modal-card {

@@ -31,7 +31,7 @@ const taskFormSchema = {
     filterable: true,
     getOptions: () =>
       fetcher(requests.tasks.taskLists()).then((response) => response.json()),
-    optionLabel: (option) => `${option.name} (${option.group})`,
+    optionLabel: (option) => `${option.name} (${option.group.name})`,
     optionsSchema: taskListsSchema,
   },
   assignedTo: {

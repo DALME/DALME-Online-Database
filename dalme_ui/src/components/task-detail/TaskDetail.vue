@@ -70,16 +70,11 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup(_, context) {
+    const $notifier = useNotifier();
     const $route = useRoute();
     const $store = useStore();
     const { loading, success, data, fetchAPI } = useAPI(context);
     const { editingDetailRouteGuard } = useEditing();
-    const {
-      success: actionSuccess,
-      fetchAPI: actionFetchAPI,
-      status: actionStatus,
-    } = useAPI(context);
-    const $notifier = useNotifier();
 
     const model = "Task";
     const id = computed(() => $route.params.id);
@@ -98,11 +93,12 @@ export default defineComponent({
     useMeta(() => ({ title: `Task #${id.value}` }));
 
     const onAction = async () => {
+      const { success, fetchAPI, status } = useAPI(context);
       const action = task.value.completed ? "markUndone" : "markDone";
-      await actionFetchAPI(requests.tasks.setTaskState(id.value, action));
-      if (actionSuccess.value && actionStatus.value === 201) {
-        await fetchData();
+      await fetchAPI(requests.tasks.setTaskState(id.value, action));
+      if (success.value && status.value === 201) {
         $notifier.tasks.taskStatusUpdated();
+        await fetchData();
       } else {
         $notifier.tasks.taskStatusUpdatedError();
       }

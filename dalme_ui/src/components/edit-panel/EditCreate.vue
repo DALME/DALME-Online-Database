@@ -11,7 +11,6 @@
       color="amber"
       text-color="black"
       icon="bookmark"
-      disabled
     >
       <q-tooltip
         class="bg-blue"

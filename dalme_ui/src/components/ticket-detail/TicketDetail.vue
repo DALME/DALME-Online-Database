@@ -35,6 +35,12 @@
           {{ ticket.tags }}
         </q-badge>
       </q-card-section>
+
+      <q-separator />
+
+      <q-card-actions v-if="isAdmin">
+        <q-btn @click="onAction" flat>{{ action }}</q-btn>
+      </q-card-actions>
       <OpaqueSpinner :showing="loading" />
     </q-card>
 
@@ -55,12 +61,13 @@ import {
   provide,
 } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 
 import { requests } from "@/api";
 import { Attachments, Comments } from "@/components";
 import { OpaqueSpinner } from "@/components/utils";
 import { ticketDetailSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useNotifier } from "@/use";
 
 export default defineComponent({
   name: "TicketDetail",
@@ -70,22 +77,38 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup(_, context) {
+    const $notifier = useNotifier();
     const $route = useRoute();
+    const $store = useStore();
     const { loading, success, data, fetchAPI } = useAPI(context);
 
     const id = computed(() => $route.params.id);
     const model = "Ticket";
 
+    const action = ref("");
     const attachment = ref(null);
     const completed = ref(null);
     const ticket = ref({});
     const subheading = ref("");
+    const isAdmin = $store.getters["auth/isAdmin"];
 
     provide("attachment", attachment);
     provide("model", model);
     provide("id", readonly(id));
 
     useMeta({ title: `Ticket #${id.value}` });
+
+    const onAction = async () => {
+      const { success, fetchAPI, status } = useAPI(context);
+      const action = ticket.value.status ? "markClosed" : "markOpen";
+      await fetchAPI(requests.tickets.setTicketState(id.value, action));
+      if (success.value && status.value === 200) {
+        $notifier.tickets.ticketStatusUpdated();
+        await fetchData();
+      } else {
+        $notifier.tickets.ticketStatusUpdatedError();
+      }
+    };
 
     const fetchData = async () => {
       await fetchAPI(requests.tickets.getTicket(id.value));
@@ -97,20 +120,25 @@ export default defineComponent({
             `${value.creationUser.fullName} opened this issue` +
             ` on ${value.creationTimestamp}`;
           completed.value = value.status;
+          action.value = completed.value ? "reopen ticket" : "close ticket";
           ticket.value = value;
           attachment.value = value.file;
           loading.value = false;
+          console.log(value);
         });
     };
 
     onMounted(async () => await fetchData());
 
     return {
+      action,
       attachment,
       completed,
       id,
+      isAdmin,
       isNil,
       loading,
+      onAction,
       subheading,
       ticket,
     };
