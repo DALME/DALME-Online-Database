@@ -1,14 +1,16 @@
 <template>
   <q-input
-    autogrow
     clearable
     hide-bottom-space
+    reverse-fill-mask
     debounce="500"
-    type="textfield"
+    mask="#.##"
+    fill-mask="0"
     :error="error"
     :model-value="modelValue"
     @update:modelValue="onUpdate"
   >
+    <slot :name="after"></slot>
     <template v-slot:error>
       <div>{{ validation.errorMessage }}</div>
     </template>
@@ -20,7 +22,7 @@ import { isEmpty } from "ramda";
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
-  name: "TextField",
+  name: "DecimalField",
   emits: ["update:modelValue"],
   props: {
     modelValue: {
@@ -38,10 +40,7 @@ export default defineComponent({
     );
     const onUpdate = (value) => context.emit("update:modelValue", value);
 
-    return {
-      error,
-      onUpdate,
-    };
+    return { error, onUpdate };
   },
 });
 </script>

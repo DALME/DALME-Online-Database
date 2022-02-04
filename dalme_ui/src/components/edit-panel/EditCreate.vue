@@ -22,8 +22,6 @@
       >
         <q-tooltip
           class="bg-blue"
-          transition-show="scale"
-          transition-hide="scale"
           anchor="top middle"
           self="top middle"
           :offset="[0, 35]"
@@ -42,7 +40,6 @@
     >
       <q-tooltip
         class="bg-blue"
-        transition-show="scale"
         anchor="center left"
         self="center right"
         :offset="[10, 10]"
@@ -59,8 +56,6 @@
     >
       <q-tooltip
         class="bg-blue"
-        transition-show="scale"
-        transition-hide="scale"
         anchor="center left"
         self="center right"
         :offset="[10, 10]"
@@ -78,8 +73,6 @@
     >
       <q-tooltip
         class="bg-blue"
-        transition-show="scale"
-        transition-hide="scale"
         anchor="center left"
         self="center right"
         :offset="[10, 10]"

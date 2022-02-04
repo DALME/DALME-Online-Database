@@ -1,8 +1,11 @@
-from django.urls import path, include
 from rest_framework import routers
-from dalme_api import api
+
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path, include
+
+from dalme_api import api, v2_api
+
 
 router = routers.DefaultRouter()
 router.register(r'agents', api.Agents, basename='agents')
@@ -34,8 +37,13 @@ router.register(r'transcriptions', api.Transcriptions, basename='transcriptions'
 router.register(r'users', api.Users, basename='users')
 router.register(r'workflow', api.WorkflowManager, basename='workflow')
 
+v2_router = routers.DefaultRouter()
+v2_router.register(r'health-check', v2_api.HealthCheck, basename='health_check')
+v2_router.register(r'attribute_types', v2_api.AttributeTypes, basename='attribute_types')
+
 urlpatterns = [
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
+    path('v2/', include((v2_router.urls, 'v2_dalme_api'), namespace='v2_api_endpoint')),
     path('auth/', api.Auth.as_view(), name='refresh_auth'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

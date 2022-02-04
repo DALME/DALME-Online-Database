@@ -1,6 +1,6 @@
 [
   {
-    "action": ["alter", "retrieve"],
+    "action": ["alter", "retrieve", "ping"],
     "principal": "*",
     "effect": "allow"
   }

@@ -3,7 +3,7 @@
     style="max-width: 300px"
     label="Upload attachment"
     :url="url"
-    @rejected="onRejected"
+    @rejected="handleRejected"
   />
 </template>
 
@@ -12,9 +12,9 @@ export default {
   name: "UploadField",
   setup() {
     const url = "";
-    const onRejected = (rejected) => console.log(rejected);
+    const handleRejected = (rejected) => console.log(rejected);
 
-    return { onRejected, url };
+    return { handleRejected, url };
   },
 };
 </script>

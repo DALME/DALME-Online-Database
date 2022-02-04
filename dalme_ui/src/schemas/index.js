@@ -1,4 +1,5 @@
 export * from "./agents";
+export * from "./attributes";
 export * from "./auth";
 export * from "./comments";
 export * from "./countries";
@@ -7,6 +8,7 @@ export * from "./languages";
 export * from "./library";
 export * from "./locales";
 export * from "./places";
+export * from "./records";
 export * from "./rights";
 export * from "./sets";
 export * from "./sources";

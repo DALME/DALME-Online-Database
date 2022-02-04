@@ -14,10 +14,12 @@
 </template>
 
 <script>
+import { isEmpty } from "ramda";
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
   name: "InputField",
+  emits: ["update:modelValue"],
   props: {
     modelValue: {
       type: String,
@@ -29,7 +31,9 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const error = computed(() => props.validation.errors.length > 0);
+    const error = computed(
+      () => !isEmpty(props.validation) && props.validation.errors.length > 0,
+    );
     const onUpdate = (value) => context.emit("update:modelValue", value);
 
     return { error, onUpdate };

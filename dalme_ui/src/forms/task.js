@@ -49,11 +49,6 @@ const taskFormSchema = {
   },
 };
 
-const taskRequests = {
-  create: (data) => requests.tasks.createTask(data),
-  update: ({ id, ...data }) => requests.tasks.editTask(id, data),
-};
-
 const taskFormValidators = {
   create: taskCreateValidator,
   update: taskUpdateValidator,
@@ -62,6 +57,11 @@ const taskFormValidators = {
 const submitSchemas = {
   create: taskPostSchema,
   update: taskPutSchema,
+};
+
+const taskRequests = {
+  create: (data) => requests.tasks.createTask(data),
+  update: ({ id, ...data }) => requests.tasks.editTask(id, data),
 };
 
 export default {

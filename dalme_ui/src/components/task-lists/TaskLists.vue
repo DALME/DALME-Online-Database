@@ -112,8 +112,6 @@
                 <q-tooltip
                   v-if="taskList.taskCount === 0"
                   class="bg-blue"
-                  transition-show="scale"
-                  transition-hide="scale"
                   anchor="center left"
                   self="center right"
                   :offset="[10, 10]"
@@ -239,6 +237,5 @@ export default defineComponent({
 }
 .group:hover {
   background-color: rgba(255, 190, 190, 0.1);
-  transition: color 0.3s, background-color 0.3s;
 }
 </style>

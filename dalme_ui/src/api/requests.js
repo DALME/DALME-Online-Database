@@ -1,5 +1,6 @@
 import agents from "./agents";
 import attachments from "./attachments";
+import attributes from "./attributes";
 import auth from "./auth";
 import comments from "./comments";
 import countries from "./countries";
@@ -18,6 +19,7 @@ import users from "./users";
 const requests = {
   agents,
   attachments,
+  attributes,
   auth,
   comments,
   countries,

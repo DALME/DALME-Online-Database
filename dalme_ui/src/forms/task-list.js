@@ -25,11 +25,6 @@ const taskListFormSchema = {
   },
 };
 
-const taskListRequests = {
-  create: (data) => requests.tasks.createTaskList(data),
-  update: ({ id, ...data }) => requests.tasks.editTaskList(id, data),
-};
-
 const taskListFormValidators = {
   create: taskListCreateValidator,
   update: taskListUpdateValidator,
@@ -38,6 +33,11 @@ const taskListFormValidators = {
 const submitSchemas = {
   create: taskListPostSchema,
   update: taskListPutSchema,
+};
+
+const taskListRequests = {
+  create: (data) => requests.tasks.createTaskList(data),
+  update: ({ id, ...data }) => requests.tasks.editTaskList(id, data),
 };
 
 export default {

@@ -1,6 +1,5 @@
-// NOTE: Any imports that break alphabetical order had to be positioned to
-// avoid a null component rendering bug that seems to be related to import
-// resolution within components. Still looking into the cause of this.
+// Any imports that break alphabetical order had to be positioned to avoid
+// cirucular resolution within components.
 export { default as Agents } from "./agents";
 export { default as Attachments } from "./attachments";
 export { default as CommentForm } from "./comment-form";

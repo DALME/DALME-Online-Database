@@ -1,31 +1,40 @@
 <template>
-  <q-input
-    autogrow
+  <q-select
     clearable
     hide-bottom-space
-    debounce="500"
-    type="textfield"
+    input-debounce="350"
+    label="True or False"
     :error="error"
     :model-value="modelValue"
+    :options="options"
+    :option-value="(option) => option"
+    :popup-content-style="{ zIndex: '9999 !important' }"
     @update:modelValue="onUpdate"
   >
+    <template v-slot:no-option>
+      <q-item>
+        <q-item-section class="text-grey"> No choices </q-item-section>
+      </q-item>
+    </template>
+
     <template v-slot:error>
       <div>{{ validation.errorMessage }}</div>
     </template>
-  </q-input>
+  </q-select>
 </template>
 
 <script>
 import { isEmpty } from "ramda";
 import { computed, defineComponent } from "vue";
 
+import { booleanOptions } from "@/forms/constants";
+
 export default defineComponent({
-  name: "TextField",
+  name: "BooleanField",
   emits: ["update:modelValue"],
   props: {
     modelValue: {
-      type: String,
-      default: () => "",
+      type: Object,
     },
     validation: {
       type: Object,
@@ -33,6 +42,8 @@ export default defineComponent({
     },
   },
   setup(props, context) {
+    const options = booleanOptions;
+
     const error = computed(
       () => !isEmpty(props.validation) && props.validation.errors.length > 0,
     );
@@ -41,6 +52,7 @@ export default defineComponent({
     return {
       error,
       onUpdate,
+      options,
     };
   },
 });

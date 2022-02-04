@@ -1,5 +1,6 @@
 <template>
   <q-select
+    clearable
     hide-bottom-space
     input-debounce="350"
     :use-input="filterable"
@@ -25,11 +26,12 @@
 </template>
 
 <script>
-import { isNil } from "ramda";
+import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "SelectField",
+  emits: ["update:modelValue"],
   props: {
     modelValue: {
       type: Object,
@@ -59,7 +61,9 @@ export default defineComponent({
   setup(props, context) {
     const options = ref(null);
 
-    const error = computed(() => props.validation.errors.length > 0);
+    const error = computed(
+      () => !isEmpty(props.validation) && props.validation.errors.length > 0,
+    );
     const onUpdate = (value) => context.emit("update:modelValue", value);
 
     const handleOptions = async (val, update) => {

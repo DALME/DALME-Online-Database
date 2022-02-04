@@ -1,9 +1,9 @@
 <template>
   <q-input
+    label="YYYY-MM-DD"
     :model-value="modelValue"
     :error="error"
     @update:modelValue="onUpdate"
-    mask="date"
   >
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
@@ -14,7 +14,11 @@
           transition-hide="scale"
           class="z-max"
         >
-          <q-date :model-value="modelValue" @update:modelValue="onUpdate">
+          <q-date
+            mask="YYYY-MM-DD"
+            :model-value="modelValue"
+            @update:modelValue="onUpdate"
+          >
             <div class="row items-center justify-end">
               <q-btn v-close-popup label="Close" color="primary" flat />
             </div>
@@ -30,10 +34,12 @@
 </template>
 
 <script>
+import { isEmpty } from "ramda";
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
-  name: "InputField",
+  name: "DateField",
+  emits: ["update:modelValue"],
   props: {
     modelValue: {
       type: String,
@@ -45,8 +51,12 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const error = computed(() => props.validation.errors.length > 0);
-    const onUpdate = (value) => context.emit("update:modelValue", value);
+    const error = computed(
+      () => !isEmpty(props.validation) && props.validation.errors.length > 0,
+    );
+    const onUpdate = (value) => {
+      context.emit("update:modelValue", value);
+    };
 
     return { error, onUpdate };
   },

@@ -1,65 +1,31 @@
 import { markRaw } from "vue";
 
-import { fetcher, requests } from "@/api";
-import {
-  AttributesField,
-  InputField,
-  SelectField,
-  TextField,
-} from "@/components/forms";
+import { requests } from "@/api";
+import { AttributesField, BooleanField, InputField } from "@/components/forms";
 import {
   recordCreateValidator,
   recordUpdateValidator,
   recordPostSchema,
   recordPutSchema,
-  userListSchema,
 } from "@/schemas";
 
-const recordFormSchema = [
-  // Step 1
-  [
-    // type
-    {
-      model: "name",
-      component: markRaw(InputField),
-      label: "Name",
-    },
-    {
-      model: "shortName",
-      component: markRaw(InputField),
-      label: "Short name",
-    },
-    // list
-    {
-      model: "description",
-      component: markRaw(TextField),
-      label: "Description",
-    },
-    {
-      model: "owner",
-      component: markRaw(SelectField),
-      label: "Owner",
-      filterable: true,
-      getOptions: () =>
-        fetcher(requests.users.getUsers()).then((response) => response.json()),
-      optionLabel: "fullName",
-      optionsSchema: userListSchema,
-    },
-    // parent
-    // primaryDataset
-  ],
-  // Step 2 - Attributes
-  [
-    {
-      model: "attribute",
-      component: markRaw(AttributesField),
-    },
-  ],
-];
-
-const recordRequests = {
-  create: (data) => requests.sources.createSource(data),
-  update: ({ id, ...data }) => requests.sources.editSource(id, data),
+const recordFormSchema = {
+  name: {
+    component: markRaw(InputField),
+    label: "Name",
+  },
+  shortName: {
+    component: markRaw(InputField),
+    label: "Short name",
+  },
+  hasInventory: {
+    component: markRaw(BooleanField),
+    label: "List",
+  },
+  attributes: {
+    component: markRaw(AttributesField),
+    required: ["parent", "recordType", "language"],
+  },
 };
 
 const recordFormValidators = {
@@ -70,6 +36,11 @@ const recordFormValidators = {
 const submitSchemas = {
   create: recordPostSchema,
   update: recordPutSchema,
+};
+
+const recordRequests = {
+  create: (data) => requests.sources.createSource(data),
+  update: ({ id, ...data }) => requests.sources.editSource(id, data),
 };
 
 export default {

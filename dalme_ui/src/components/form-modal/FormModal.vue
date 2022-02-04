@@ -229,7 +229,8 @@ export default defineComponent({
 .modal-container {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   position: fixed;
-  width: 30rem;
+  min-width: 35rem;
+  max-width: 40rem;
 }
 .modal-card {
   overflow-y: scroll;

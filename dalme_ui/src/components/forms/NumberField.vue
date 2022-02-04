@@ -1,10 +1,9 @@
 <template>
   <q-input
-    autogrow
     clearable
     hide-bottom-space
     debounce="500"
-    type="textfield"
+    fill-mask="0"
     :error="error"
     :model-value="modelValue"
     @update:modelValue="onUpdate"
@@ -20,12 +19,12 @@ import { isEmpty } from "ramda";
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
-  name: "TextField",
+  name: "NumberField",
   emits: ["update:modelValue"],
   props: {
     modelValue: {
       type: String,
-      default: () => "",
+      default: () => "0",
     },
     validation: {
       type: Object,
@@ -38,10 +37,7 @@ export default defineComponent({
     );
     const onUpdate = (value) => context.emit("update:modelValue", value);
 
-    return {
-      error,
-      onUpdate,
-    };
+    return { error, onUpdate };
   },
 });
 </script>
