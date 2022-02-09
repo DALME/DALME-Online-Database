@@ -5,6 +5,10 @@
     :error="error"
     @update:modelValue="onUpdate"
   >
+    <q-tooltip v-if="description" class="bg-blue z-max">
+      {{ description }}
+    </q-tooltip>
+
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
         <q-popup-proxy
@@ -48,6 +52,10 @@ export default defineComponent({
     validation: {
       type: Object,
       default: () => ({}),
+    },
+    description: {
+      type: [Boolean, String],
+      default: () => false,
     },
   },
   setup(props, context) {

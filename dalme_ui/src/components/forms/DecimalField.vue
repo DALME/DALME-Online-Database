@@ -10,7 +10,10 @@
     :model-value="modelValue"
     @update:modelValue="onUpdate"
   >
-    <slot :name="after"></slot>
+    <q-tooltip v-if="description" class="bg-blue z-max">
+      {{ description }}
+    </q-tooltip>
+
     <template v-slot:error>
       <div>{{ validation.errorMessage }}</div>
     </template>
@@ -32,6 +35,10 @@ export default defineComponent({
     validation: {
       type: Object,
       default: () => ({}),
+    },
+    description: {
+      type: [Boolean, String],
+      default: () => false,
     },
   },
   setup(props, context) {

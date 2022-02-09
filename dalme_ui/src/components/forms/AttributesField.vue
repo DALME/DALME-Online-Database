@@ -2,7 +2,11 @@
   <div class="attributes-field column q-my-sm" :class="{ separator: !showing }">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto q-mr-sm">
-        Attributes
+        {{
+          !showing && modelValue !== [[null, null]]
+            ? `Attributes (${modelValue.length})`
+            : "Attributes"
+        }}
       </div>
 
       <q-btn
@@ -41,6 +45,7 @@
             emit-value
             hide-bottom-space
             label="Attribute"
+            class="attribute-select"
             :disable="isRequiredAttribute(attribute)"
             :clearable="!isRequiredAttribute(attribute)"
             :model-value="attribute"
@@ -181,7 +186,7 @@ export default defineComponent({
     TextField,
   },
   setup(props, context) {
-    const showing = ref(false);
+    const showing = ref(true);
     const options = ref(null);
     const optionCount = ref(null);
 
@@ -252,7 +257,8 @@ export default defineComponent({
     };
 
     const initAttributes = async () => {
-      if (!props.required.length > 0) {
+      if (props.required.length === 0) {
+        showing.value = false;
         context.emit("update:modelValue", [[null, null]]);
       } else {
         const { success, data, fetchAPI } = useAPI(context);
@@ -275,7 +281,6 @@ export default defineComponent({
                 }
               }
               context.emit("update:modelValue", newValue);
-              showing.value = true;
             });
       }
     };
@@ -309,5 +314,13 @@ export default defineComponent({
 }
 .attributes-field .q-field--with-bottom {
   padding-bottom: 0;
+}
+.attribute-select {
+}
+.attribute-select .q-select__dropdown-icon {
+  display: none;
+}
+.attribute-select .q-field__native {
+  color: black;
 }
 </style>

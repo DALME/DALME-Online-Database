@@ -11,6 +11,10 @@
     :popup-content-style="{ zIndex: '9999 !important' }"
     @update:modelValue="onUpdate"
   >
+    <q-tooltip v-if="description" class="bg-blue z-max">
+      {{ description }}
+    </q-tooltip>
+
     <template v-slot:no-option>
       <q-item>
         <q-item-section class="text-grey"> No choices </q-item-section>
@@ -39,6 +43,10 @@ export default defineComponent({
     validation: {
       type: Object,
       default: () => ({}),
+    },
+    description: {
+      type: [Boolean, String],
+      default: () => false,
     },
   },
   setup(props, context) {

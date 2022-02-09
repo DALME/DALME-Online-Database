@@ -6,7 +6,7 @@ export const recordCreateValidator = yup
   .shape({
     name: yup.string().nullable().required().label("Name"),
     shortName: yup.string().nullable().required().label("Short name"),
-    list: yup
+    hasInventory: yup
       .boolean()
       .nullable()
       .required()
@@ -14,14 +14,7 @@ export const recordCreateValidator = yup
         isNil(obj) ? null : obj.value === "0" ? false : true,
       )
       .label("List"),
-    description: yup.string().nullable().label("Description"),
-    owner: yup
-      .mixed()
-      .nullable()
-      .required()
-      .transform((value) => value.id)
-      .label("Owner"),
-    attributes: yup.array().of(yup.mixed()),
+    attributes: yup.array().of(yup.mixed()), // TODO: Stubbed.
   })
   .camelCase();
 
