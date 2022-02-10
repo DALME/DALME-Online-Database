@@ -1,6 +1,22 @@
 import moment from "moment";
 import * as yup from "yup";
 
+export const userOptionsSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+      caption: yup.string().email().required(),
+    })
+    .transform((value) => ({
+      // TODO: Only necessary cause I don't have a user.profile.
+      label: value.full_name || `${value.first_name} ${value.last_name}`,
+      value: value.id,
+      caption: value.email,
+    })),
+);
+
 const groupSchema = yup.object().shape({
   id: yup.number().required(),
   name: yup.string().required(),

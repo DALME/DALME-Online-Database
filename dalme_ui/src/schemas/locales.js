@@ -1,5 +1,20 @@
 import * as yup from "yup";
 
+export const localeOptionsSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+      caption: yup.string().required(),
+    })
+    .transform((value) => ({
+      label: value.nam,
+      value: value.id,
+      caption: value.country.name,
+    })),
+);
+
 export const localeListSchema = yup.array().of(
   yup
     .object()

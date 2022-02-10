@@ -77,47 +77,73 @@
           <template v-if="!attribute">
             <q-input disable label="Choose an attribute" />
           </template>
-          <template v-else-if="attribute && attribute.dataType === 'Boolean'">
-            <BooleanField
-              :model-value="value"
-              @update:modelValue="(value) => handleUpdateField(value, idx)"
-            />
-          </template>
-          <template v-else-if="attribute && attribute.dataType === 'Decimal'">
-            <DecimalField
-              :model-value="value"
-              @update:modelValue="(value) => handleUpdateField(value, idx)"
-            />
-          </template>
-          <template v-else-if="attribute && attribute.dataType === 'Number'">
-            <NumberField
-              :model-value="value"
-              @update:modelValue="(value) => handleUpdateField(value, idx)"
-            />
-          </template>
-          <template v-else-if="attribute && attribute.dataType === 'Date'">
-            <DateField
-              :model-value="value"
-              @update:modelValue="(value) => handleUpdateField(value, idx)"
-            />
-          </template>
-          <template v-else-if="attribute && attribute.dataType === 'Text'">
-            <TextField
-              :model-value="value"
-              @update:modelValue="(value) => handleUpdateField(value, idx)"
-            />
-          </template>
-          <template v-else-if="attribute && attribute.dataType === 'Options'">
-            <SelectField
-              :model-value="value"
-              @update:modelValue="(value) => handleUpdateField(value, idx)"
-            />
-          </template>
           <template v-else>
-            <InputField
-              :model-value="value"
-              @update:modelValue="(value) => handleUpdateField(value, idx)"
-            />
+            <template v-if="attribute.dataType === 'Boolean'">
+              <BooleanField
+                :label="attribute.dataType"
+                :model-value="value"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+            </template>
+            <template v-else-if="attribute.dataType === 'Decimal'">
+              <DecimalField
+                :label="attribute.dataType"
+                :model-value="value"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+            </template>
+            <template v-else-if="attribute.dataType === 'Number'">
+              <NumberField
+                :label="attribute.dataType"
+                :model-value="value"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+            </template>
+            <template v-else-if="attribute.dataType === 'Date'">
+              <DateField
+                :label="attribute.dataType"
+                :model-value="value"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+            </template>
+            <template v-else-if="attribute.dataType === 'Text'">
+              <TextField
+                :label="attribute.dataType"
+                :model-value="value"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+            </template>
+            <template v-else-if="attribute.dataType === 'Options'">
+              <SelectField
+                v-if="!getOptionsData(attribute.shortName).multiple"
+                :label="attribute.dataType"
+                :model-value="value"
+                :filterable="getOptionsData(attribute.shortName).filterable"
+                :getOptions="
+                  wrapRequest(getOptionsData(attribute.shortName).request)
+                "
+                :optionsSchema="getOptionsData(attribute.shortName).schema"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+              <MultipleSelectField
+                v-else
+                :label="attribute.dataType"
+                :model-value="value"
+                :filterable="getOptionsData(attribute.shortName).filterable"
+                :getOptions="
+                  wrapRequest(getOptionsData(attribute.shortName).request)
+                "
+                :optionsSchema="getOptionsData(attribute.shortName).schema"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+            </template>
+            <template v-else>
+              <InputField
+                :label="attribute.dataType"
+                :model-value="value"
+                @update:modelValue="(value) => handleUpdateField(value, idx)"
+              />
+            </template>
           </template>
         </div>
         <div class="col-1" v-if="modelValue.length > 1">
@@ -152,18 +178,21 @@ import { isNil, map as rMap } from "ramda";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { string as yString } from "yup";
 
-import { requests } from "@/api";
+import { fetcher, requests } from "@/api";
 import {
   BooleanField,
   DateField,
   DecimalField,
   InputField,
+  MultipleSelectField,
   NumberField,
   SelectField,
   TextField,
 } from "@/components/forms";
 import { attributeTypesSchema } from "@/schemas";
 import { useAPI } from "@/use";
+
+import { attributeFields } from "./attributes";
 
 export default defineComponent({
   props: {
@@ -181,6 +210,7 @@ export default defineComponent({
     DateField,
     DecimalField,
     InputField,
+    MultipleSelectField,
     NumberField,
     SelectField,
     TextField,
@@ -196,6 +226,13 @@ export default defineComponent({
 
     const isRequiredAttribute = (attribute) =>
       !isNil(attribute) && props.required.includes(attribute.shortName);
+
+    const getOptionsData = (shortName) => attributeFields[shortName].options;
+
+    const wrapRequest = (request) =>
+      request
+        ? () => fetcher(request()).then((response) => response.json())
+        : null;
 
     const handleAddField = () => {
       context.emit("update:modelValue", [
@@ -226,9 +263,10 @@ export default defineComponent({
     };
 
     const handleOptions = async (val, update) => {
+      // TODO: Make sure this is optimal and apply to other selectfields
       if (isNil(options.value) || options.value.length !== optionCount.value) {
         const { success, data, fetchAPI } = useAPI(context);
-        const request = requests.attributes.getAttributeTypes();
+        const request = requests.attributeTypes.getAttributeTypes();
         await fetchAPI(request);
         if (success.value)
           await attributeTypesSchema
@@ -262,7 +300,7 @@ export default defineComponent({
         context.emit("update:modelValue", [[null, null]]);
       } else {
         const { success, data, fetchAPI } = useAPI(context);
-        const request = requests.attributes.getAttributeTypesByShortName(
+        const request = requests.attributeTypes.getAttributeTypesByShortName(
           props.required.join(),
         );
         await fetchAPI(request);
@@ -288,15 +326,17 @@ export default defineComponent({
     onMounted(async () => await initAttributes());
 
     return {
+      getOptionsData,
       handleAddField,
+      handleClearAttribute,
       handleOptions,
       handleRemoveField,
-      handleClearAttribute,
       handleUpdateAttribute,
       handleUpdateField,
       isRequiredAttribute,
       options,
       showing,
+      wrapRequest,
       yString,
     };
   },
@@ -314,11 +354,6 @@ export default defineComponent({
 }
 .attributes-field .q-field--with-bottom {
   padding-bottom: 0;
-}
-.attribute-select {
-}
-.attribute-select .q-select__dropdown-icon {
-  display: none;
 }
 .attribute-select .q-field__native {
   color: black;

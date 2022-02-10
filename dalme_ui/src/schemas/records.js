@@ -11,10 +11,10 @@ export const recordCreateValidator = yup
       .nullable()
       .required()
       .transform((obj) =>
-        isNil(obj) ? null : obj.value === "0" ? false : true,
+        isNil(obj) ? null : [0, "0"].includes(obj.value) ? false : true,
       )
       .label("List"),
-    attributes: yup.array().of(yup.mixed()), // TODO: Stubbed.
+    // Here, attributes is omitted as it's handled at the component/field level.
   })
   .camelCase();
 

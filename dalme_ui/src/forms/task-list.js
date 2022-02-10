@@ -3,7 +3,7 @@ import { markRaw } from "vue";
 import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
 import {
-  groupListSchema,
+  groupOptionsSchema,
   taskListCreateValidator,
   taskListUpdateValidator,
   taskListPostSchema,
@@ -20,8 +20,7 @@ const taskListFormSchema = {
     label: "Group",
     getOptions: () =>
       fetcher(requests.groups.getGroups()).then((response) => response.json()),
-    optionLabel: "name",
-    optionsSchema: groupListSchema,
+    optionsSchema: groupOptionsSchema,
   },
 };
 

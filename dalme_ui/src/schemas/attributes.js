@@ -1,21 +1,13 @@
 import { camelCase } from "camel-case";
 import { moment } from "moment";
-import { isNil } from "ramda";
 import * as yup from "yup";
 
+// NOTE: We don't use the usual *Schema naming convention here as it makes
+// things easier when we have to do all the dynamic binding/juggling upstream.
+// Instead just map it directly to AttributeType.short_name (post-camelization).
 export const attributeSchemas = {
-  urlAttributeSchema: yup
-    .string()
-    .url()
-    .nullable()
-    .required()
-    .label("Web address"),
-  mk2IdentifierSchema: yup
-    .string()
-    .uuid()
-    .nullable()
-    .required()
-    .label("Mk.II ID"),
+  urlAttribute: yup.string().url().nullable().required().label("Web address"),
+  mk2Identifier: yup.string().uuid().nullable().required().label("Mk.II ID"),
   mk1Identifier: yup.string().nullable().required().label("Mk.I ID"),
   altIdentifier: yup.string().nullable().required().label("Alt. ID"),
   lastName: yup.string().nullable().required().label("Last name"),
@@ -66,7 +58,7 @@ export const attributeSchemas = {
     .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
     .label("Start date"),
   datasetUsergroup: yup.number().nullable().required().label("DS User Group"),
-  recordType: yup.string().nullable().required().label("Record type"),
+  recordType: yup.number().nullable().required().label("Record type"),
   recordTypePhrase: yup
     .string()
     .nullable()
@@ -105,7 +97,7 @@ export const attributeSchemas = {
     .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
     .label("Date joined"),
   fullName: yup.string().nullable().required().label("Full name"),
-  damUser: yup.number().nullable().required().label("DAM user"),
+  damUser: yup.number().nullable().required().label("DAM user"), // TODO: Options?
   damId: yup.number().nullable().required().label("DAM id"),
   order: yup.number().nullable().required().label("Order"),
   ref: yup.number().nullable().required().label("DAM ID"),
@@ -263,11 +255,15 @@ export const attributeTypeSchema = yup
         ["shortName", "optionsList", "description"],
         (shortName, optionsList, description, schema) => {
           // Make sure certain fields come through as select fields.
-          const forceOptions = ["createdBy", "lastUser", "owner", "sameAs"];
+          const forceOptions = [
+            "createdBy",
+            "lastUser",
+            "owner",
+            "recordType",
+            "sameAs",
+          ];
           const optionsType =
-            isNil(optionsList) && !forceOptions.includes(shortName)
-              ? false
-              : "Options";
+            optionsList || forceOptions.includes(shortName) ? "Options" : false;
 
           // Booleans are a subset of INT so let's sort those out for clarity.
           const booleanType = description.toLowerCase().includes("boolean")

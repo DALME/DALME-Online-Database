@@ -1,6 +1,26 @@
 import { head } from "ramda";
 import * as yup from "yup";
 
+export const taskListOptionsSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+      caption: yup.string().required(),
+    })
+    .transform((value) => {
+      const node = document.createElement("html");
+      node.innerHTML = value.name;
+      const label = head(node.getElementsByClassName("mr-auto")).innerText;
+      return {
+        label,
+        value: value.id,
+        caption: value.group.name,
+      };
+    }),
+);
+
 export const taskListCreateValidator = yup.object().shape({
   name: yup.string().required().label("Name"),
   group: yup.object().nullable().required().label("Group"),

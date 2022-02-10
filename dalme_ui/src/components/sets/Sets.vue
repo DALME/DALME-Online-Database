@@ -123,7 +123,7 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       const setTypeConstant = setMap[setTypeAPI.value];
-      const request = requests.sets.getSets(setTypeConstant, query);
+      const request = requests.sets.getSetsByType(setTypeConstant, query);
       const schema = setListSchema(setType.value);
       await fetchAPI(request);
       if (success.value)

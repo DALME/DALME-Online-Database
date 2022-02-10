@@ -8,31 +8,30 @@ import {
   TextField,
 } from "@/components/forms";
 import {
-  taskListsSchema,
+  taskListOptionsSchema,
   taskPutSchema,
   taskPostSchema,
   taskCreateValidator,
   taskUpdateValidator,
-  userListSchema,
+  userOptionsSchema,
 } from "@/schemas";
 
 const taskFormSchema = {
   title: {
     component: markRaw(InputField),
-    label: "Title",
+    label: "Title *",
   },
   description: {
     component: markRaw(TextField),
-    label: "Description",
+    label: "Description *",
   },
   taskList: {
     component: markRaw(SelectField),
-    label: "Task list",
+    label: "Task list *",
     filterable: true,
     getOptions: () =>
       fetcher(requests.tasks.taskLists()).then((response) => response.json()),
-    optionLabel: (option) => `${option.name} (${option.group.name})`,
-    optionsSchema: taskListsSchema,
+    optionsSchema: taskListOptionsSchema,
   },
   assignedTo: {
     component: markRaw(SelectField),
@@ -40,8 +39,7 @@ const taskFormSchema = {
     filterable: true,
     getOptions: () =>
       fetcher(requests.users.getUsers()).then((response) => response.json()),
-    optionLabel: "fullName",
-    optionsSchema: userListSchema,
+    optionsSchema: userOptionsSchema,
   },
   dueDate: {
     component: markRaw(DateField),

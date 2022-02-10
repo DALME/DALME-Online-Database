@@ -1,6 +1,8 @@
 <template>
   <q-select
+    multiple
     clearable
+    use-chips
     hide-bottom-space
     input-debounce="350"
     popup-content-class="selectfield"
@@ -9,6 +11,7 @@
     :model-value="modelValue"
     :options="options"
     :option-value="(option) => option"
+    :option-label="(option) => option.label"
     :popup-content-style="{ zIndex: '9999 !important' }"
     @filter="handleOptions"
     @update:modelValue="onUpdate"
@@ -23,8 +26,11 @@
           <q-item-label class="text-uppercase text-weight-medium">
             {{ scope.opt.label }}
           </q-item-label>
-          <q-item-label v-if="scope.opt.caption" caption>
-            {{ scope.opt.caption }}
+          <q-item-label
+            v-if="scope.opt.caption"
+            v-html="scope.opt.caption"
+            caption
+          >
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -47,11 +53,12 @@ import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: "SelectField",
+  name: "MultipleSelectField",
   emits: ["update:modelValue"],
   props: {
     modelValue: {
-      type: Object,
+      type: Array,
+      default: () => [],
     },
     validation: {
       type: Object,
@@ -94,7 +101,7 @@ export default defineComponent({
         }
       };
 
-      // TODO: Regulate when this is called (see attributes).
+      // TODO: Regulate when this is called (see attributes),
       await getOptionsPromise().then(async (data) => {
         await props.optionsSchema
           .validate(data, { stripUnknown: true })

@@ -7,7 +7,10 @@ const sets = {
     const url = `${endpoint}/${id}`;
     return new Request(url);
   },
-  getSets(setType, query) {
+  getSets() {
+    return new Request(endpoint);
+  },
+  getSetsByType(setType, query) {
     const url = `${endpoint}/?set_type=${setType}&${query}`;
     return new Request(url);
   },

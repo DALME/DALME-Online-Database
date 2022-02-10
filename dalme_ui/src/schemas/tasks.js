@@ -14,6 +14,7 @@ export const taskCreateValidator = yup.object().shape({
     .nullable()
     .required()
     .label("Task list"),
+  // TODO: assignedTo
   dueDate: yup
     .string()
     .nullable()

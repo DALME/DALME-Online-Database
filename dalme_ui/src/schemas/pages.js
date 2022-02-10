@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-export const groupOptionsSchema = yup.array().of(
+export const pageOptionsSchema = yup.array().of(
   yup
     .object()
     .shape({
@@ -9,8 +9,10 @@ export const groupOptionsSchema = yup.array().of(
       caption: yup.string().required(),
     })
     .transform((value) => ({
-      label: value.name,
+      label: value.id,
       value: value.id,
-      caption: value.description,
+      caption: `Name: ${value.name}<br> DAM ID: ${
+        value.dam_id || "None"
+      }<br> Order: ${value.order}`,
     })),
 );

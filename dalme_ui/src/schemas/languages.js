@@ -1,5 +1,20 @@
 import * as yup from "yup";
 
+export const languageOptionsSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+      caption: yup.string().default(null).nullable(),
+    })
+    .transform((value) => ({
+      label: value.name,
+      value: value.id,
+      caption: value.glottocode,
+    })),
+);
+
 export const languageListSchema = yup.array().of(
   yup
     .object()

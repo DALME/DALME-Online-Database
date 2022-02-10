@@ -3,6 +3,22 @@ import * as yup from "yup";
 
 import { ownerSchema } from "./common";
 
+export const sourceOptionsSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+      caption: yup.string().required(),
+    })
+    .transform((value) => ({
+      // TODO: Not having camel here (and elsewhere) is annoying.
+      label: value.short_name,
+      value: value.id,
+      caption: value.type.name,
+    })),
+);
+
 const defaultRightsSchema = yup.object().shape({
   name: yup.string().required(),
   url: yup.string().required(),

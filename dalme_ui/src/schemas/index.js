@@ -7,6 +7,7 @@ export * from "./groups";
 export * from "./languages";
 export * from "./library";
 export * from "./locales";
+export * from "./pages";
 export * from "./places";
 export * from "./records";
 export * from "./rights";

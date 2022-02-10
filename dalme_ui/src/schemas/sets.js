@@ -2,6 +2,21 @@ import * as yup from "yup";
 
 import { ownerSchema } from "./common";
 
+export const setOptionsSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+      caption: yup.string().nullable(),
+    })
+    .transform((value) => ({
+      label: value.name,
+      value: value.id,
+      caption: value.detail_string,
+    })),
+);
+
 const setTypeSchema = yup.object().shape({
   id: yup.number().required(),
   name: yup.string().required(),

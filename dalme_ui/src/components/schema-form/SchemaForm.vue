@@ -59,8 +59,8 @@ export default {
         // Cache the form state for navigation persistence.
         cacheFormFields(newFormModel);
 
-        // We have to do this manually for the time being (Formvuelate can't
-        // help us as things currently stand).
+        // We have to do this manually for the time being as Formvuelate can't
+        // give us access to the validation data outside of the template.
         const { send: actorSend } = useActor(forms.value[props.cuid]);
         const isValid = await props.validator.isValid(newFormModel);
         actorSend({ type: "VALIDATE", validated: isValid });
