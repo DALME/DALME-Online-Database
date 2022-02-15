@@ -1,27 +1,13 @@
 <template>
   <q-form>
-    <SchemaForm
-      :schema="schema"
-      :validation-schema="validator"
-      useCustomFormWrapper
-    />
+    <SchemaForm :schema="schema" useCustomFormWrapper />
   </q-form>
 </template>
 
 <script>
-import { isEmpty } from "ramda";
-import { SchemaFormFactory, useSchemaForm } from "formvuelate";
-import VeeValidatePlugin from "@formvuelate/plugin-vee-validate";
+import { SchemaForm, useSchemaForm } from "formvuelate";
 import { watch } from "vue";
-import { useActor } from "@xstate/vue";
-
-import { useEditing } from "@/use";
-
-const SchemaForm = SchemaFormFactory([
-  VeeValidatePlugin({
-    fieldBagName: "veeValidateFields",
-  }),
-]);
+import { useStorage } from "@vueuse/core";
 
 export default {
   props: {
@@ -33,10 +19,6 @@ export default {
       type: Object,
       required: true,
     },
-    validator: {
-      type: Object,
-      required: true,
-    },
     formModel: {
       type: Object,
       required: true,
@@ -44,33 +26,18 @@ export default {
   },
   components: { SchemaForm },
   setup(props) {
-    const { forms } = useEditing();
+    const fieldsKey = `form-fields:${props.cuid}`;
 
     useSchemaForm(props.formModel);
-
-    const cacheFormFields = (data) => {
-      const fieldsKey = `form-fields:${props.cuid}`;
-      window.localStorage.setItem(fieldsKey, JSON.stringify(data));
-    };
 
     watch(
       () => props.formModel,
       async (newFormModel) => {
         // Cache the form state for navigation persistence.
-        cacheFormFields(newFormModel);
-
-        // We have to do this manually for the time being as Formvuelate can't
-        // give us access to the validation data outside of the template.
-        const { send: actorSend } = useActor(forms.value[props.cuid]);
-        const isValid = await props.validator.isValid(newFormModel);
-        actorSend({ type: "VALIDATE", validated: isValid });
+        useStorage(fieldsKey, newFormModel);
       },
       { deep: true, immediate: true },
     );
-
-    return {
-      isEmpty,
-    };
   },
 };
 </script>
