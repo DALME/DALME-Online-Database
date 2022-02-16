@@ -19,6 +19,7 @@
     "@vueuse/core": "^6.4.1",
     "@xstate/vue": "^0.8.1",
     "camel-case": "^4.1.2",
+    "change-case": "^4.1.2",
     "core-js": "^3.6.5",
     "cuid": "^2.1.8",
     "formvuelate": "^3.7.1",

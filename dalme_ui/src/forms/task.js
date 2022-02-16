@@ -8,48 +8,50 @@ import {
   TextField,
 } from "@/components/forms";
 import {
+  taskFieldValidation,
   taskListOptionsSchema,
   taskPutSchema,
   taskPostSchema,
-  taskCreateValidator,
-  taskUpdateValidator,
   userOptionsSchema,
 } from "@/schemas";
 
 const taskFormSchema = {
   title: {
+    field: "title",
     component: markRaw(InputField),
     label: "Title *",
+    validation: taskFieldValidation.title,
   },
   description: {
+    field: "description",
     component: markRaw(TextField),
     label: "Description *",
+    validation: taskFieldValidation.description,
   },
   taskList: {
+    field: "taskList",
     component: markRaw(SelectField),
     label: "Task list *",
-    filterable: true,
     getOptions: () =>
       fetcher(requests.tasks.taskLists()).then((response) => response.json()),
     optionsSchema: taskListOptionsSchema,
+    validation: taskFieldValidation.taskList,
   },
   assignedTo: {
+    field: "assignedTo",
     component: markRaw(SelectField),
     label: "Assigned to",
-    filterable: true,
     getOptions: () =>
       fetcher(requests.users.getUsers()).then((response) => response.json()),
     optionsSchema: userOptionsSchema,
+    validation: taskFieldValidation.assignedTo,
   },
   dueDate: {
+    field: "dueDate",
     component: markRaw(DateField),
     label: "Date due",
+    validation: taskFieldValidation.dueDate,
   },
-};
-
-const taskFormValidators = {
-  create: taskCreateValidator,
-  update: taskUpdateValidator,
 };
 
 const submitSchemas = {
@@ -65,6 +67,5 @@ const taskRequests = {
 export default {
   requests: taskRequests,
   schema: taskFormSchema,
-  validators: taskFormValidators,
   submitSchemas,
 };

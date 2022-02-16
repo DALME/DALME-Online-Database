@@ -8,14 +8,13 @@ export const sourceOptionsSchema = yup.array().of(
     .object()
     .shape({
       label: yup.string().required(),
-      value: yup.string().required(),
-      caption: yup.string().required(),
+      value: yup.string().uuid().required(),
+      caption: yup.string().uuid().required(),
     })
     .transform((value) => ({
-      // TODO: Not having camel here (and elsewhere) is annoying.
-      label: value.short_name,
+      label: value.name,
       value: value.id,
-      caption: value.type.name,
+      caption: value.id,
     })),
 );
 

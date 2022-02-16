@@ -35,8 +35,8 @@
     </div>
 
     <template
-      v-for="({ 0: attribute, 1: value }, idx) in modelValue"
-      :key="idx"
+      v-for="({ 0: attribute, 1: field }, idx) in zip(modelValue, fields)"
+      :key="field.key"
     >
       <div class="row flex-center" v-show="showing">
         <div class="col-6 q-pr-sm">
@@ -46,14 +46,14 @@
             hide-bottom-space
             label="Attribute"
             class="attribute-select"
-            :disable="isRequiredAttribute(attribute)"
-            :clearable="!isRequiredAttribute(attribute)"
-            :model-value="attribute"
+            :disable="isRequiredAttribute(attribute[0])"
+            :clearable="!isRequiredAttribute(attribute[0])"
+            :model-value="attribute[0]"
             :options="options"
             :option-label="
               (option) =>
                 option
-                  ? isRequiredAttribute(attribute)
+                  ? isRequiredAttribute(attribute[0])
                     ? `${option.name} *`
                     : option.name
                   : null
@@ -65,82 +65,98 @@
             @update:modelValue="(option) => handleUpdateAttribute(option, idx)"
           >
             <q-tooltip
-              v-if="attribute && attribute.description"
+              v-if="attribute[0] && attribute[0].description"
               class="bg-blue z-max"
               max-width="12rem"
             >
-              {{ attribute.description }}
+              {{ attribute[0].description }}
             </q-tooltip>
           </q-select>
         </div>
         <div class="q-pl-sm col">
-          <template v-if="!attribute">
+          <template v-if="!attribute[0]">
             <q-input disable label="Choose an attribute" />
           </template>
           <template v-else>
-            <template v-if="attribute.dataType === 'Boolean'">
+            <template v-if="attribute[0].dataType === 'Boolean'">
               <BooleanField
-                :label="attribute.dataType"
-                :model-value="value"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute.dataType === 'Decimal'">
+            <template v-else-if="attribute[0].dataType === 'Decimal'">
               <DecimalField
-                :label="attribute.dataType"
-                :model-value="value"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute.dataType === 'Number'">
+            <template v-else-if="attribute[0].dataType === 'Number'">
               <NumberField
-                :label="attribute.dataType"
-                :model-value="value"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute.dataType === 'Date'">
+            <template v-else-if="attribute[0].dataType === 'Date'">
               <DateField
-                :label="attribute.dataType"
-                :model-value="value"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute.dataType === 'Text'">
+            <template v-else-if="attribute[0].dataType === 'Text'">
               <TextField
-                :label="attribute.dataType"
-                :model-value="value"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute.dataType === 'Options'">
+            <template v-else-if="attribute[0].dataType === 'Options'">
               <SelectField
-                v-if="!getOptionsData(attribute.shortName).multiple"
-                :label="attribute.dataType"
-                :model-value="value"
-                :filterable="getOptionsData(attribute.shortName).filterable"
+                v-if="!getOptionsData(attribute[0].shortName).multiple"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :filterable="getOptionsData(attribute[0].shortName).filterable"
                 :getOptions="
-                  wrapRequest(getOptionsData(attribute.shortName).request)
+                  wrapRequest(getOptionsData(attribute[0].shortName).request)
                 "
-                :optionsSchema="getOptionsData(attribute.shortName).schema"
+                :optionsSchema="getOptionsData(attribute[0].shortName).schema"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
               <MultipleSelectField
                 v-else
-                :label="attribute.dataType"
-                :model-value="value"
-                :filterable="getOptionsData(attribute.shortName).filterable"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :filterable="getOptionsData(attribute[0].shortName).filterable"
                 :getOptions="
-                  wrapRequest(getOptionsData(attribute.shortName).request)
+                  wrapRequest(getOptionsData(attribute[0].shortName).request)
                 "
-                :optionsSchema="getOptionsData(attribute.shortName).schema"
+                :optionsSchema="getOptionsData(attribute[0].shortName).schema"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else>
               <InputField
-                :label="attribute.dataType"
-                :model-value="value"
+                :field="`attributes[${idx}]`"
+                :label="attribute[0].dataType"
+                :model-value="attribute[1]"
+                :validation="validators[attribute[0].shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
@@ -155,12 +171,12 @@
               unelevated
               size="xs"
               icon="clear"
-              :text-color="isRequiredAttribute(attribute) ? 'grey' : 'black'"
-              :disable="isRequiredAttribute(attribute)"
+              :text-color="isRequiredAttribute(attribute[0]) ? 'grey' : 'black'"
+              :disable="isRequiredAttribute(attribute[0])"
               @click.stop="handleRemoveField(idx)"
             >
               <q-tooltip
-                v-if="isRequiredAttribute(attribute)"
+                v-if="isRequiredAttribute(attribute[0])"
                 class="bg-blue z-max"
               >
                 Can't delete a required attribute
@@ -174,7 +190,7 @@
 </template>
 
 <script>
-import { isNil, map as rMap } from "ramda";
+import { isNil, map as rMap, zip } from "ramda";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { string as yString } from "yup";
 
@@ -191,6 +207,7 @@ import {
 } from "@/components/forms";
 import { attributeTypesSchema } from "@/schemas";
 import { useAPI } from "@/use";
+import { useFieldArray } from "vee-validate";
 
 import { attributeFields } from "./attributes";
 
@@ -204,6 +221,10 @@ export default defineComponent({
       type: Array,
       default: () => [],
     },
+    validators: {
+      type: Object,
+      required: true,
+    },
   },
   components: {
     BooleanField,
@@ -216,9 +237,13 @@ export default defineComponent({
     TextField,
   },
   setup(props, context) {
+    const empty = { attribute: null, value: null };
+
     const showing = ref(true);
     const options = ref(null);
     const optionCount = ref(null);
+
+    const { fields, push, remove, replace } = useFieldArray("attributes");
 
     const activeAttributes = computed(() =>
       rMap((field) => (field[0] ? field[0].id : null), props.modelValue),
@@ -235,31 +260,36 @@ export default defineComponent({
         : null;
 
     const handleAddField = () => {
-      context.emit("update:modelValue", [
-        ...props.modelValue.slice(0),
-        [null, null],
-      ]);
+      const empty = [null, null];
+      push(empty);
+      context.emit("update:modelValue", [...props.modelValue.slice(0), empty]);
+      context.emit("change");
     };
     const handleClearAttribute = (idx) => {
       const newValue = props.modelValue.slice(0);
       newValue[idx] = [null, null];
       context.emit("update:modelValue", newValue);
+      context.emit("change");
     };
     const handleUpdateAttribute = (option, idx) => {
       const newValue = props.modelValue.slice(0);
       newValue[idx][0] = option ? option : null;
       newValue[idx][1] = null;
       context.emit("update:modelValue", newValue);
+      context.emit("change");
     };
     const handleUpdateField = (value, idx) => {
       const newValue = props.modelValue.slice(0);
       newValue[idx][1] = !isNil(value) ? value : null;
       context.emit("update:modelValue", newValue);
+      context.emit("change");
     };
     const handleRemoveField = (idx) => {
+      remove(idx);
       const newValue = props.modelValue.slice(0);
       newValue.splice(idx, 1);
       context.emit("update:modelValue", newValue);
+      context.emit("change");
     };
 
     const handleOptions = async (val, update) => {
@@ -318,6 +348,7 @@ export default defineComponent({
                   newValue = [[attribute, null], ...newValue];
                 }
               }
+              replace(newValue);
               context.emit("update:modelValue", newValue);
             });
       }
@@ -326,6 +357,7 @@ export default defineComponent({
     onMounted(async () => await initAttributes());
 
     return {
+      fields,
       getOptionsData,
       handleAddField,
       handleClearAttribute,
@@ -338,6 +370,7 @@ export default defineComponent({
       showing,
       wrapRequest,
       yString,
+      zip,
     };
   },
 });

@@ -28,7 +28,7 @@ export const provideEditing = () => {
           kind,
           mode,
           initialData,
-          validated: false, // TODO: Switch to false when formvuelate issue resolved.
+          validated: false,
           visible: true,
         },
         on: {
@@ -224,6 +224,18 @@ export const provideEditing = () => {
   const forms = useSelector(service, (state) => state.context.forms);
   const inline = useSelector(service, (state) => state.context.inline);
   const isDetail = useSelector(service, (state) => state.context.detail);
+  const validated = useSelector(service, (state) =>
+    mapObjIndexed(
+      (actor) => actor.getSnapshot().context.validated,
+      state.context.forms,
+    ),
+  );
+
+  // Dereference the actual actor that is pointed at by the focus selector.
+  const focusActor = computed(() => {
+    if (isNil(focus.value)) return null;
+    return focus.value === "inline" ? inline.value : forms.value[focus.value];
+  });
 
   // Reactive flags.
   const afterEditingRefresh = ref(false);
@@ -242,40 +254,32 @@ export const provideEditing = () => {
     }
   };
 
-  // Track the actual actor object that is under focus.
-  const focusActor = computed(() => {
-    const value = machine.state.value.context.focus;
-    if (isNil(value)) return null;
-    return value === "inline"
-      ? machine.state.value.context.inline
-      : machine.state.value.context.forms[value];
-  });
-
   // Tell us if any actors are in their 'saving' state.
   const submitting = computed(() => {
     const formsSaving = rMap(
       (actor) => actor.getSnapshot().matches("saving"),
       values(forms.value),
     );
+
     const inlineSaving =
       !isNil(inline.value) && inline.value.getSnapshot().matches("saving");
+
     const isSaving = [...formsSaving, inlineSaving];
+
     return any((saving) => saving === true, isSaving);
   });
 
   // If there's absolutely nothing valid from the global POV, or if we're in
   // the middle of an API call, we can use this to disable the submit button.
   const disabled = computed(() => {
-    const validated = mapObjIndexed(
-      (actor) => actor.getSnapshot().context.validated,
-      forms.value,
-    );
     const nothingValid =
       isNil(inline.value) &&
-      (isEmpty(validated) ||
-        !any((value) => value === true, values(validated)));
+      (isEmpty(validated.value) || values(validated.value).includes(false));
+
     const focusValid =
-      focus.value === "inline" || (focusActor.value && validated[focus.value]);
+      focus.value === "inline" ||
+      (focusActor.value && validated.value[focus.value]);
+
     return nothingValid || !focusValid || submitting.value;
   });
 
@@ -310,7 +314,7 @@ export const provideEditing = () => {
       },
     );
 
-  // Repositioning a FormModal in the middle of the viewport.
+  // Reposition a FormModal in the middle of the viewport.
   const recenterWatcher = (cuid, x, y) =>
     watch(
       () => recenter.value,

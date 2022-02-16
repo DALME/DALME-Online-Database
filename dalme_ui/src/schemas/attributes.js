@@ -1,202 +1,221 @@
 import { camelCase } from "camel-case";
 import { moment } from "moment";
+import { isNil } from "ramda";
 import * as yup from "yup";
+
+export const attributeOptionSchema = yup.object().shape({
+  attribute: yup
+    .object()
+    .shape({ shortName: yup.string().required() })
+    .required(),
+  value: yup.mixed().required(),
+});
 
 // NOTE: We don't use the usual *Schema naming convention here as it makes
 // things easier when we have to do all the dynamic binding/juggling upstream.
 // Instead just map it directly to AttributeType.short_name (post-camelization).
 export const attributeSchemas = {
-  urlAttribute: yup.string().url().nullable().required().label("Web address"),
-  mk2Identifier: yup.string().uuid().nullable().required().label("Mk.II ID"),
-  mk1Identifier: yup.string().nullable().required().label("Mk.I ID"),
+  activity: yup.string().nullable().required().label("Activity"),
+  administrativeRegion: yup
+    .string()
+    .nullable()
+    .required()
+    .label("Administrative region"),
+  alpha_2Code: yup.string().nullable().required().label("Alpha-2 Code"),
+  alpha_3Code: yup.string().nullable().required().label("Alpha-3 Code"),
   altIdentifier: yup.string().nullable().required().label("Alt. ID"),
-  lastName: yup.string().nullable().required().label("Last name"),
-  firstName: yup.string().nullable().required().label("First name"),
-  postalCode: yup.string().nullable().required().label("Postal code"),
-  poboxNumber: yup.string().nullable().required().label("PO box"),
-  streetAddress: yup.string().nullable().required().label("Street address"),
-  latitude: yup.string().nullable().required().label("Latitude"),
-  longitude: yup.string().nullable().required().label("Longitude"),
-  elevation: yup.number().nullable().required().label("Elevation"),
-  shortTitle: yup.string().nullable().required().label("Short title"),
-  title: yup.string().nullable().required().label("Title"),
-  language: yup.number().nullable().required().label("Language (ISO)"), // LanguageReference.id
-  languageGc: yup.number().nullable().required().label("Language (GC)"), // LanguageReference.id
-  archivalSeries: yup.string().nullable().required().label("Archival series"),
   archivalNumber: yup.string().nullable().required().label("Archival number"),
-  date: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("Date"),
-  id: yup.string().nullable().required().label("ID"),
-  creationUsername: yup.string().nullable().required().label("Created by"),
-  creationTimestamp: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
-    .label("Created on"),
-  modificationUsername: yup.string().nullable().required().label("Modified by"),
-  modificationTimestamp: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
-    .label("Modified on"),
-  endDate: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("End date"),
-  startDate: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("Start date"),
-  datasetUsergroup: yup.number().nullable().required().label("DS User Group"),
-  recordType: yup.number().nullable().required().label("Record type"),
-  recordTypePhrase: yup
-    .string()
-    .nullable()
-    .required()
-    .label("Record type phrase"),
-  debtPhrase: yup.string().nullable().required().label("Debt phrase"),
-  debtAmount: yup.number().nullable().required().label("Debt amount"),
-  debtUnit: yup.string().nullable().required().label("Debt unit"),
-  debtUnitType: yup.string().nullable().required().label("Debt unit type"),
-  debtSource: yup.string().nullable().required().label("Debt source"),
-  comments: yup.string().nullable().required().label("Comments"),
-  locale: yup.number().nullable().required().label("Locale"), // Locale.id
-  namedPersons: yup.string().nullable().required().label("Named persons"), // TODO: Don't think this is right.
-  parent: yup.string().nullable().required().label("Parent"),
-  hasInventory: yup.boolean().nullable().required().label("List"),
+  archivalSeries: yup.string().nullable().required().label("Archival series"),
+  attachments: yup.string().nullable().required().label("Attachments"),
+  attributeTypes: yup.string().nullable().required().label("Attribute types"),
   author: yup.string().nullable().required().label("Author"),
-  type: yup.string().nullable().required().label("Type"),
-  name: yup.string().nullable().required().label("Name"),
-  shortName: yup.string().nullable().required().label("Short name"),
-  password: yup.string().nullable().required().label("Password"),
-  lastLogin: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
-    .label("Last login"),
-  isSuperuser: yup.boolean().nullable().required().label("Superuser"),
-  username: yup.string().nullable().required().label("Username"),
-  email: yup.string().email().nullable().required().label("Email"),
-  isStaff: yup.boolean().nullable().required().label("Staff"),
-  isActive: yup.boolean().nullable().required().label("Active"),
-  dateJoined: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("Date joined"),
-  fullName: yup.string().nullable().required().label("Full name"),
-  damUser: yup.number().nullable().required().label("DAM user"), // TODO: Options?
-  damId: yup.number().nullable().required().label("DAM id"),
-  order: yup.number().nullable().required().label("Order"),
-  ref: yup.number().nullable().required().label("DAM ID"),
-  hasImage: yup.boolean().nullable().required().label("Image"),
+  authority: yup.string().nullable().required().label("Authority"),
+  collections: yup.string().nullable().required().label("Collections"),
+  comments: yup.string().nullable().required().label("Comments"),
+  contentClass: yup.string().nullable().required().label("Content class"),
+  country: yup.number().nullable().required().label("Country"),
+  createdBy: yup.string().nullable().required().label("Created by (RS)"),
   creationDate: yup
     .string()
     .nullable()
     .required()
     .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
     .label("Creation date"),
-  country: yup.number().nullable().required().label("Country"), // Country.id
-  fileSize: yup.number().nullable().required().label("File size"),
-  field12: yup
+  creationTimestamp: yup
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("Resource date"),
-  field8: yup.string().email().nullable().required().label("Resource title"),
-  field3: yup.string().nullable().required().label("Country (RS-DALME)"),
-  field51: yup.string().nullable().required().label("Original filename"),
-  field79: yup.string().nullable().required().label("Folio"),
-  modified: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("Date modified"),
-  groups: yup.string().nullable().required().label("Groups"),
-  collections: yup.string().nullable().required().label("Collections"),
-  noFolios: yup.number().nullable().required().label("No. folios"),
-  createdBy: yup.number().nullable().required().label("Created by (RS)"), // NOTE: Altered to expect user.id
-  source: yup.string().nullable().required().label("Source"),
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
+    .label("Created on"),
+  creationUsername: yup.string().nullable().required().label("Created by"),
+  damId: yup.number().nullable().required().label("DAM id"),
+  damUser: yup.number().nullable().required().label("DAM user"), // TODO: Options?
   dataType: yup.string().nullable().required().label("Data type"),
-  description: yup.string().nullable().required().label("Description"),
-  sameAs: yup.string().nullable().required().label("Same as"), // TODO: This is an ID but not sure how to generate the options for it.
-  contentClass: yup.string().nullable().required().label("Content class"),
-  attributeTypes: yup.string().nullable().required().label("Attribute types"),
-  dtName: yup.string().nullable().required().label("Datatables name"),
-  field: yup.number().nullable().required().label("Field"),
-  list: yup.number().nullable().required().label("Datatables List"),
-  renderExp: yup.string().nullable().required().label("Render expression"),
-  orderable: yup.number().nullable().required().label("Orderable"),
-  visible: yup.number().nullable().required().label("Visible"),
-  searchable: yup.number().nullable().required().label("Searchable"),
-  dteName: yup.string().nullable().required().label("DTE name"),
-  dteType: yup.string().nullable().required().label("DTE type"),
-  dteOptions: yup.string().nullable().required().label("DTE options"),
-  dteOpts: yup.string().nullable().required().label("DTE opts"),
-  dteMessage: yup.string().nullable().required().label("DTE message"),
-  isFilter: yup.boolean().nullable().required().label("Is filter"),
-  filterType: yup.string().nullable().required().label("Filter type"),
-  filterOptions: yup.string().nullable().required().label("Filter options"),
-  filterLookup: yup.string().nullable().required().label("Filter lookup"),
-  dtClassName: yup.string().nullable().required().label("DT classname"),
-  dtWidth: yup.string().nullable().required().label("DT width"),
-  required: yup.boolean().nullable().required().label("Required"),
-  optionsList: yup.string().nullable().required().label("Options list"),
-  glottocode: yup.string().nullable().required().label("Glottocode"),
-  iso6393: yup.string().nullable().required().label("ISO-693-3"),
-  status: yup.string().nullable().required().label("Status"),
-  result: yup.string().nullable().required().label("Result"),
+  datasetUsergroup: yup.number().nullable().required().label("DS User Group"),
+  date: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("Date"),
   dateDone: yup
     .string()
     .nullable()
     .required()
     .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
     .label("Date done"),
-  traceback: yup.string().nullable().required().label("Traceback"),
-  taskName: yup.string().nullable().required().label("Task name"),
-  alpha_3Code: yup.string().nullable().required().label("Alpha-3 Code"),
-  alpha_2Code: yup.string().nullable().required().label("Alpha-2 Code"),
-  numCode: yup.number().nullable().required().label("Numeric code"),
-  administrativeRegion: yup
+  dateJoined: yup
     .string()
     .nullable()
     .required()
-    .label("Administrative region"),
-  tags: yup.string().nullable().required().label("Tags"),
-  subject: yup.string().nullable().required().label("Subject"),
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("Date joined"),
+  debtAmount: yup.number().nullable().required().label("Debt amount"),
+  debtPhrase: yup.string().nullable().required().label("Debt phrase"),
+  debtSource: yup.string().nullable().required().label("Debt source"),
+  debtUnit: yup.string().nullable().required().label("Debt unit"),
+  debtUnitType: yup.string().nullable().required().label("Debt unit type"),
+  defaultRights: yup
+    .string()
+    .uuid()
+    .nullable()
+    .required()
+    .label("Default rights"),
+  description: yup.string().nullable().required().label("Description"),
+  dtClassName: yup.string().nullable().required().label("DT classname"),
+  dtName: yup.string().nullable().required().label("Datatables name"),
+  dtWidth: yup.string().nullable().required().label("DT width"),
+  dteMessage: yup.string().nullable().required().label("DTE message"),
+  dteName: yup.string().nullable().required().label("DTE name"),
+  dteOptions: yup.string().nullable().required().label("DTE options"),
+  dteOpts: yup.string().nullable().required().label("DTE opts"),
+  dteType: yup.string().nullable().required().label("DTE type"),
+  elevation: yup.number().nullable().required().label("Elevation"),
+  email: yup.string().email().nullable().required().label("Email"),
+  endDate: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("End date"),
+  endpoint: yup.string().nullable().required().label("Endpoint"), // TODO: string().url() ?
+  field12: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("Resource date"),
+  field3: yup.string().nullable().required().label("Country (RS-DALME)"),
+  field51: yup.string().nullable().required().label("Original filename"),
+  field79: yup.string().nullable().required().label("Folio"),
+  field8: yup.string().email().nullable().required().label("Resource title"),
+  field: yup.number().nullable().required().label("Field"),
   file: yup.string().nullable().required().label("File"),
-  attachments: yup.string().nullable().required().label("Attachments"),
+  fileSize: yup.number().nullable().required().label("File size"),
+  filterLookup: yup.string().nullable().required().label("Filter lookup"),
+  filterOptions: yup.string().nullable().required().label("Filter options"),
+  filterType: yup.string().nullable().required().label("Filter type"),
+  firstName: yup.string().nullable().required().label("First name"),
+  format: yup.string().nullable().required().label("Format"),
+  fullName: yup.string().nullable().required().label("Full name"),
+  glottocode: yup.string().nullable().required().label("Glottocode"),
+  groups: yup.string().nullable().required().label("Groups"),
+  hasImage: yup.boolean().nullable().required().label("Image"),
+  hasInventory: yup.boolean().nullable().required().label("List"),
+  hasLanding: yup.boolean().nullable().required().label("Landing"),
   hasPages: yup.boolean().nullable().required().label("Has pages"),
-  parents: yup.string().nullable().required().label("Parents"),
   helpFlag: yup.boolean().nullable().required().label("Help"),
+  id: yup.string().nullable().required().label("ID"),
+  isActive: yup.boolean().nullable().required().label("Active"),
+  isFilter: yup.boolean().nullable().required().label("Is filter"),
+  isPublic: yup.boolean().nullable().required().label("Public"),
+  isStaff: yup.boolean().nullable().required().label("Staff"),
+  isSuperuser: yup.boolean().nullable().required().label("Superuser"),
+  iso6393: yup.string().nullable().required().label("ISO-693-3"),
+  language: yup
+    .array()
+    .of(
+      yup
+        .number()
+        .required()
+        .transform((option) => (isNil(option) ? null : option.value))
+        .label("Language"),
+    )
+    .nullable()
+    .required(),
+  languageGc: yup
+    .array()
+    .of(
+      yup
+        .number()
+        .required()
+        .transform((option) => (isNil(option) ? null : option.value))
+        .label("Language (GC)"),
+    )
+    .nullable()
+    .required(),
+  lastLogin: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
+    .label("Last login"),
   lastModified: yup
     .string()
     .nullable()
     .required()
     .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
     .label("Last modified"),
-  lastUser: yup.number().nullable().required().label("Last user"), // NOTE: Altered to expect user.id
-  activity: yup.string().nullable().required().label("Activity"),
-  authority: yup.string().nullable().required().label("Authority"),
-  format: yup.string().nullable().required().label("Format"),
-  owner: yup.number().nullable().required().label("Owner"), // User.id
-  endpoint: yup.string().nullable().required().label("Endpoint"), // TODO: string().url() ?
-  progress: yup.string().nullable().required().label("Progress"),
-  isPublic: yup.boolean().nullable().required().label("Public"),
+  lastName: yup.string().nullable().required().label("Last name"),
+  lastUser: yup.string().nullable().required().label("Last user"),
+  latitude: yup.string().nullable().required().label("Latitude"),
+  legalPersona: yup.string().nullable().required().label("Legal persona"),
+  licence: yup.string().nullable().required().label("Licence"),
+  list: yup.number().nullable().required().label("Datatables List"),
+  locale: yup
+    .array()
+    .of(
+      yup
+        .number()
+        .required()
+        .transform((option) => (isNil(option) ? null : option.value)),
+    )
+    .nullable()
+    .required()
+    .label("Locale"),
+  longitude: yup.string().nullable().required().label("Longitude"),
+  memberCount: yup.number().min(0).nullable().required().label("Member count"),
+  mk1Identifier: yup.string().nullable().required().label("Mk.I ID"),
+  mk2Identifier: yup.string().uuid().nullable().required().label("Mk.II ID"),
+  modificationTimestamp: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
+    .label("Modified on"),
+  modificationUsername: yup.string().nullable().required().label("Modified by"),
+  modified: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("Date modified"),
+  name: yup.string().nullable().required().label("Name"),
+  namedPersons: yup.string().nullable().required().label("Named persons"), // TODO: Don't think this is right.
+  noFolios: yup.number().nullable().required().label("No. folios"),
+  noticeDisplay: yup
+    .boolean()
+    .nullable()
+    .required()
+    .label("Rights notice display"),
+  numCode: yup.number().nullable().required().label("Numeric code"),
+  optionsList: yup.string().nullable().required().label("Options list"),
+  order: yup.number().nullable().required().label("Order"),
+  orderable: yup.number().nullable().required().label("Orderable"),
+  owner: yup.number().nullable().required().label("Owner"),
+  parent: yup.string().uuid().nullable().required().label("Parent"),
+  parents: yup.string().nullable().required().label("Parents"),
+  password: yup.string().nullable().required().label("Password"),
   permissions: yup
     .number()
     .min(1)
@@ -204,37 +223,67 @@ export const attributeSchemas = {
     .nullable()
     .required()
     .label("Permissions"),
-  setType: yup.number().min(1).max(4).nullable().required().label("Set type"),
+  poboxNumber: yup.string().nullable().required().label("PO box"),
+  postalCode: yup.string().nullable().required().label("Postal code"),
+  progress: yup.string().nullable().required().label("Progress"),
   r1Inheritance: yup.string().nullable().required().label("Direct inheritance"),
   r2Inheritance: yup
     .string()
     .nullable()
     .required()
     .label("Indirect inheritance"),
-  rightsStatus: yup.string().nullable().required().label("Rights status"),
-  rightsNotice: yup.string().nullable().required().label("Rights notice"),
-  licence: yup.string().nullable().required().label("Licence"),
+  recordType: yup
+    .object()
+    .shape({ value: yup.string().required() })
+    .nullable()
+    .required()
+    .label("Record type"),
+  recordTypePhrase: yup
+    .string()
+    .nullable()
+    .required()
+    .label("Record type phrase"),
+  ref: yup.number().nullable().required().label("DAM ID"),
+  religion: yup.string().nullable().required().label("Religion"),
+  renderExp: yup.string().nullable().required().label("Render expression"),
+  required: yup.boolean().nullable().required().label("Required"),
+  result: yup.string().nullable().required().label("Result"),
   rights: yup.string().nullable().required().label("Rights"),
   rightsHolder: yup.string().nullable().required().label("Rights holder"),
-  noticeDisplay: yup
-    .boolean()
+  rightsNotice: yup.string().nullable().required().label("Rights notice"),
+  rightsStatus: yup.string().nullable().required().label("Rights status"),
+  sameAs: yup.string().nullable().required().label("Same as"),
+  searchable: yup.number().nullable().required().label("Searchable"),
+  setType: yup
+    .object()
+    .shape({ value: yup.number().min(1).max(4).required() })
     .nullable()
     .required()
-    .label("Rights notice display"),
-  defaultRights: yup
-    .string()
-    .uuid()
-    .nullable()
-    .required()
-    .label("Default rights"),
-  hasLanding: yup.boolean().nullable().required().label("Landing"),
-  memberCount: yup.number().min(0).nullable().required().label("Member count"),
-  support: yup.string().nullable().required().label("Support"),
-  zoteroKey: yup.string().nullable().required().label("Zotero key"),
-  legalPersona: yup.string().nullable().required().label("Legal persona"),
-  socialStatus: yup.string().nullable().required().label("Social status"),
-  religion: yup.string().nullable().required().label("Religion"),
+    .label("Set type"),
   sex: yup.string().nullable().required().label("Sex"),
+  shortName: yup.string().nullable().required().label("Short name"),
+  shortTitle: yup.string().nullable().required().label("Short title"),
+  socialStatus: yup.string().nullable().required().label("Social status"),
+  source: yup.string().nullable().required().label("Source"),
+  startDate: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("Start date"),
+  status: yup.string().nullable().required().label("Status"),
+  streetAddress: yup.string().nullable().required().label("Street address"),
+  subject: yup.string().nullable().required().label("Subject"),
+  support: yup.string().nullable().required().label("Support"),
+  tags: yup.string().nullable().required().label("Tags"),
+  taskName: yup.string().nullable().required().label("Task name"),
+  title: yup.string().nullable().required().label("Title"),
+  traceback: yup.string().nullable().required().label("Traceback"),
+  type: yup.string().nullable().required().label("Type"),
+  urlAttribute: yup.string().url().nullable().required().label("Web address"),
+  username: yup.string().nullable().required().label("Username"),
+  visible: yup.number().nullable().required().label("Visible"),
+  zoteroKey: yup.string().nullable().required().label("Zotero key"),
 };
 
 export const attributeTypeSchema = yup
@@ -247,7 +296,10 @@ export const attributeTypeSchema = yup
       .required()
       .transform((value) => camelCase(value)),
     description: yup.string().nullable(),
-    optionsList: yup.string().nullable(),
+    optionsList: yup
+      .boolean()
+      .nullable()
+      .transform((value) => (value ? true : false)),
     dataType: yup
       .string()
       .required()

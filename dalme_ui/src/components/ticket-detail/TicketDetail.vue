@@ -124,7 +124,6 @@ export default defineComponent({
           ticket.value = value;
           attachment.value = value.file;
           loading.value = false;
-          console.log(value);
         });
     };
 

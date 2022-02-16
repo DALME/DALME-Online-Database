@@ -4,31 +4,30 @@
     hide-bottom-space
     debounce="500"
     fill-mask="0"
-    :error="error"
-    :model-value="modelValue"
-    @update:modelValue="onUpdate"
+    v-model="value"
+    :error="errorMessage && meta.touched"
+    @blur="handleBlur"
   >
     <q-tooltip v-if="description" class="bg-blue z-max">
       {{ description }}
     </q-tooltip>
 
     <template v-slot:error>
-      <div>{{ validation.errorMessage }}</div>
+      <div>{{ errorMessage }}</div>
     </template>
   </q-input>
 </template>
 
 <script>
-import { isEmpty } from "ramda";
-import { computed, defineComponent } from "vue";
+import { useField } from "vee-validate";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "NumberField",
-  emits: ["update:modelValue"],
   props: {
-    modelValue: {
+    field: {
       type: String,
-      default: () => "0",
+      required: true,
     },
     validation: {
       type: Object,
@@ -39,13 +38,13 @@ export default defineComponent({
       default: () => false,
     },
   },
-  setup(props, context) {
-    const error = computed(
-      () => !isEmpty(props.validation) && props.validation.errors.length > 0,
+  setup(props) {
+    const { errorMessage, meta, handleBlur, value } = useField(
+      props.field,
+      props.validation,
     );
-    const onUpdate = (value) => context.emit("update:modelValue", value);
 
-    return { error, onUpdate };
+    return { errorMessage, meta, handleBlur, value };
   },
 });
 </script>

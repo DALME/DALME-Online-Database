@@ -4,14 +4,14 @@
     hide-bottom-space
     input-debounce="350"
     popup-content-class="selectfield"
-    :use-input="filterable"
-    :error="error"
-    :model-value="modelValue"
+    v-model="value"
+    :error="errorMessage && meta.touched"
     :options="options"
     :option-value="(option) => option"
     :popup-content-style="{ zIndex: '9999 !important' }"
+    :use-input="filterable"
+    @blur="handleBlur"
     @filter="handleOptions"
-    @update:modelValue="onUpdate"
   >
     <q-tooltip v-if="description" class="bg-blue z-max">
       {{ description }}
@@ -20,7 +20,7 @@
     <template v-slot:option="scope">
       <q-item v-bind="scope.itemProps">
         <q-item-section>
-          <q-item-label class="text-uppercase text-weight-medium">
+          <q-item-label class="text-weight-medium">
             {{ scope.opt.label }}
           </q-item-label>
           <q-item-label v-if="scope.opt.caption" caption>
@@ -37,21 +37,22 @@
     </template>
 
     <template v-slot:error>
-      <div>{{ validation.errorMessage }}</div>
+      <div>{{ errorMessage }}</div>
     </template>
   </q-select>
 </template>
 
 <script>
-import { isEmpty, isNil } from "ramda";
-import { computed, defineComponent, ref } from "vue";
+import { useField } from "vee-validate";
+import { isNil } from "ramda";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "SelectField",
-  emits: ["update:modelValue"],
   props: {
-    modelValue: {
-      type: Object,
+    field: {
+      type: String,
+      required: true,
     },
     validation: {
       type: Object,
@@ -63,7 +64,7 @@ export default defineComponent({
     },
     filterable: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     getOptions: {
       type: Function,
@@ -74,13 +75,13 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props, context) {
+  setup(props) {
     const options = ref(null);
 
-    const error = computed(
-      () => !isEmpty(props.validation) && props.validation.errors.length > 0,
+    const { errorMessage, handleBlur, meta, value } = useField(
+      props.field,
+      props.validation,
     );
-    const onUpdate = (value) => context.emit("update:modelValue", value);
 
     const handleOptions = async (val, update) => {
       // TODO: Depending on whether or not FormVueLate is controlling the field,
@@ -113,10 +114,12 @@ export default defineComponent({
     };
 
     return {
+      errorMessage,
+      handleBlur,
       handleOptions,
-      error,
-      onUpdate,
+      meta,
       options,
+      value,
     };
   },
 });

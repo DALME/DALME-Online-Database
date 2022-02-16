@@ -1,26 +1,26 @@
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-export const recordCreateValidator = yup
-  .object()
-  .shape({
-    name: yup.string().nullable().required().label("Name"),
-    shortName: yup.string().nullable().required().label("Short name"),
-    hasInventory: yup
-      .boolean()
-      .nullable()
-      .required()
-      .transform((obj) =>
-        isNil(obj) ? null : [0, "0"].includes(obj.value) ? false : true,
-      )
-      .label("List"),
-    // Here, attributes is omitted as it's handled at the component/field level.
-  })
-  .camelCase();
+import { attributeOptionSchema } from "@/schemas";
 
-export const recordUpdateValidator = recordCreateValidator.shape({
-  id: yup.string().required().label("ID"),
-});
+export const recordFieldValidation = {
+  name: yup.string().nullable().required().label("Name"),
+  shortName: yup.string().nullable().required().label("Short name"),
+  // TODO: sets
+  hasInventory: yup
+    .boolean()
+    .nullable()
+    .required()
+    .transform((option) => (isNil(option) ? null : Boolean(option.value)))
+    .label("List"),
+  parent: yup.string().uuid().default(null).nullable().label("Parent"),
+  attributes: yup
+    .array()
+    .of(attributeOptionSchema)
+    .required()
+    .label("Attributes"),
+  // TODO: pages/folios
+};
 
 export const recordPostSchema = null;
 

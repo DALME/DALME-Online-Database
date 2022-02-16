@@ -23,7 +23,6 @@ import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "EditSubmit",
-  emits: ["onSubmitEdit"],
   setup() {
     const {
       disabled,

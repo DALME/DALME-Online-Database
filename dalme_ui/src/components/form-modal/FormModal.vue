@@ -27,30 +27,24 @@
           </div>
         </q-card-section>
 
-        <SchemaForm
-          :cuid="cuid"
-          :schema="formSchema"
-          :validator="validationSchema"
-          :formModel="formModel"
-        />
+        <SchemaForm :cuid="cuid" :schema="formSchema" :formModel="formModel" />
 
         <q-card-actions class="q-mt-md q-px-none q-pb-md">
           <q-btn
+            round
             class="q-ml-auto"
             icon="minimize"
-            @click.stop="handleMinimize"
             size="11px"
-            round
+            @click.stop="handleMinimize"
           >
             <q-tooltip class="bg-blue z-max"> Minimize </q-tooltip>
           </q-btn>
           <q-btn
-            class="q-ml-auto"
+            round
             color="deep-orange"
             icon="close"
-            @click.stop="confirm = true"
             size="11px"
-            round
+            @click.stop="confirm = true"
           >
             <q-tooltip class="bg-blue z-max"> Discard </q-tooltip>
           </q-btn>
@@ -111,13 +105,8 @@ export default defineComponent({
   },
   setup(props, context) {
     const { status, success, fetchAPI } = useAPI(context);
-    const {
-      formRequest,
-      formSchema,
-      formWatcher,
-      validationSchema,
-      submitSchema,
-    } = useDynamicForm();
+    const { formRequest, formSchema, formWatcher, submitSchema } =
+      useDynamicForm();
     const {
       disabled,
       focus,
@@ -160,15 +149,16 @@ export default defineComponent({
     });
 
     const fieldsKey = `form-fields:${props.cuid}`;
-    const formModel = ref(
-      initialData.value || JSON.parse(localStorage.getItem(fieldsKey)) || {},
+    const formModel = useStorage(
+      fieldsKey,
+      initialData.value || {},
+      localStorage,
     );
 
     const handleClose = () => {
       send("DESTROY_FORM", { cuid: props.cuid });
+      formModel.value = null;
       positionValue.value = null;
-      // TODO: useStorage and can just set the return values to null.
-      window.localStorage.removeItem(fieldsKey);
     };
     const handleFocus = () => send("SET_FOCUS", { value: props.cuid });
     const handleMinimize = () => actorSend("HIDE");
@@ -207,9 +197,7 @@ export default defineComponent({
       kind,
       mode,
       mouseoverSubmit,
-      positionKey,
       submitting,
-      validationSchema,
       visible,
     };
   },
@@ -229,8 +217,8 @@ export default defineComponent({
 .modal-container {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   position: fixed;
-  min-width: 35rem;
-  max-width: 40rem;
+  min-width: 36rem;
+  max-width: 41rem;
 }
 .modal-card {
   overflow-y: scroll;

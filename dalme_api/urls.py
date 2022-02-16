@@ -39,7 +39,9 @@ router.register(r'workflow', api.WorkflowManager, basename='workflow')
 
 v2_router = routers.DefaultRouter()
 v2_router.register(r'health-check', v2_api.HealthCheck, basename='health_check')
+v2_router.register(r'attributes', v2_api.Attributes, basename='attributes')
 v2_router.register(r'attribute_types', v2_api.AttributeTypes, basename='attribute_types')
+v2_router.register(r'sources', v2_api.Sources, basename='sources')
 
 urlpatterns = [
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),

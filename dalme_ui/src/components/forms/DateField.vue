@@ -1,13 +1,19 @@
 <template>
   <q-input
-    label="YYYY-MM-DD"
+    hint="YYYY-MM-DD"
+    mask="####-##-##"
     :model-value="modelValue"
-    :error="error"
+    :error="errorMessage && meta.touched"
+    @blur="handleBlur"
     @update:modelValue="onUpdate"
   >
     <q-tooltip v-if="description" class="bg-blue z-max">
       {{ description }}
     </q-tooltip>
+
+    <template v-slot:error>
+      <div>{{ errorMessage }}</div>
+    </template>
 
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
@@ -30,24 +36,19 @@
         </q-popup-proxy>
       </q-icon>
     </template>
-
-    <template v-slot:error>
-      <div>{{ validation.errorMessage }}</div>
-    </template>
   </q-input>
 </template>
 
 <script>
-import { isEmpty } from "ramda";
-import { computed, defineComponent } from "vue";
+import { useField } from "vee-validate";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "DateField",
-  emits: ["update:modelValue"],
   props: {
-    modelValue: {
+    field: {
       type: String,
-      default: () => "",
+      required: true,
     },
     validation: {
       type: Object,
@@ -57,16 +58,22 @@ export default defineComponent({
       type: [Boolean, String],
       default: () => false,
     },
+    modelValue: {
+      type: String,
+      default: () => "",
+    },
   },
   setup(props, context) {
-    const error = computed(
-      () => !isEmpty(props.validation) && props.validation.errors.length > 0,
+    const { errorMessage, meta, handleBlur } = useField(
+      props.field,
+      props.validation,
     );
+
     const onUpdate = (value) => {
       context.emit("update:modelValue", value);
     };
 
-    return { error, onUpdate };
+    return { errorMessage, meta, onUpdate, handleBlur };
   },
 });
 </script>

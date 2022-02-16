@@ -4,41 +4,35 @@
     hide-bottom-space
     input-debounce="350"
     label="True or False"
-    :error="error"
-    :model-value="modelValue"
+    v-model="value"
+    :error="errorMessage && meta.touched"
     :options="options"
     :option-value="(option) => option"
     :popup-content-style="{ zIndex: '9999 !important' }"
-    @update:modelValue="onUpdate"
+    @blur="handleBlur"
   >
     <q-tooltip v-if="description" class="bg-blue z-max">
       {{ description }}
     </q-tooltip>
 
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="text-grey"> No choices </q-item-section>
-      </q-item>
-    </template>
-
     <template v-slot:error>
-      <div>{{ validation.errorMessage }}</div>
+      <div>{{ errorMessage }}</div>
     </template>
   </q-select>
 </template>
 
 <script>
-import { isEmpty } from "ramda";
-import { computed, defineComponent } from "vue";
+import { useField } from "vee-validate";
+import { defineComponent } from "vue";
 
 import { booleanOptions } from "@/forms/constants";
 
 export default defineComponent({
   name: "BooleanField",
-  emits: ["update:modelValue"],
   props: {
-    modelValue: {
-      type: Object,
+    field: {
+      type: String,
+      required: true,
     },
     validation: {
       type: Object,
@@ -49,18 +43,20 @@ export default defineComponent({
       default: () => false,
     },
   },
-  setup(props, context) {
+  setup(props) {
     const options = booleanOptions;
 
-    const error = computed(
-      () => !isEmpty(props.validation) && props.validation.errors.length > 0,
+    const { errorMessage, meta, handleBlur, value } = useField(
+      props.field,
+      props.validation,
     );
-    const onUpdate = (value) => context.emit("update:modelValue", value);
 
     return {
-      error,
-      onUpdate,
+      errorMessage,
+      meta,
       options,
+      handleBlur,
+      value,
     };
   },
 });

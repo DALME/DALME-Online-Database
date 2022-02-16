@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loading">
-    <q-card class="q-ma-md">
+    <q-card>
       <q-item>
         <q-item-section avatar>
           <q-avatar>
@@ -16,31 +16,31 @@
       <q-separator />
 
       <q-card-section>
-        <div class="row q-my-xs">
+        <div class="row q-mt-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">Type</div>
           <div class="col-8">{{ source.type.name }}</div>
         </div>
 
-        <div class="row q-my-xs">
+        <div class="row q-mt-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">Name</div>
           <div class="col-8">{{ source.name }}</div>
         </div>
 
-        <div class="row q-my-xs">
+        <div class="row q-mt-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">
             Short name
           </div>
           <div class="col-8">{{ source.shortName }}</div>
         </div>
 
-        <div class="row q-my-xs">
+        <div class="row q-mt-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">List</div>
           <div class="col-8">
             <q-icon :name="source.hasInventory ? 'done' : 'close'" />
           </div>
         </div>
 
-        <div class="row q-my-xs">
+        <div class="row q-mt-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">Owner</div>
           <div class="col-8">
             <router-link
@@ -54,7 +54,7 @@
           </div>
         </div>
 
-        <div class="row q-my-xs" v-if="source.parent">
+        <div class="row q-mt-xs" v-if="source.parent">
           <div class="col-2 text-weight-medium text-right q-mr-lg">Parent</div>
           <div class="col-8">
             <router-link
@@ -68,7 +68,7 @@
           </div>
         </div>
 
-        <div class="row q-my-xs" v-if="source.primaryDataset">
+        <div class="row q-mt-xs" v-if="source.primaryDataset">
           <div class="col-2 text-weight-medium text-right q-mr-lg">
             Primary Dataset
           </div>
@@ -86,7 +86,7 @@
       </q-card-section>
     </q-card>
 
-    <q-card class="q-ma-md">
+    <q-card class="q-mt-md">
       <q-item>
         <q-item-section avatar>
           <q-avatar>
@@ -102,14 +102,14 @@
       <q-separator />
 
       <q-card-section v-if="!hasAttributes">
-        <div class="q-my-xs text-center">
+        <div class="q-mt-xs text-center">
           <p>No attributes assigned.</p>
         </div>
       </q-card-section>
       <q-card-section v-else>
         <template v-for="(attribute, idx) in attributes" :key="idx">
           <template v-if="!isNil(attribute.value)">
-            <div class="row q-my-xs">
+            <div class="row q-mt-xs">
               <div class="col-2 text-weight-medium text-right q-mr-lg">
                 {{ getAttributeLabel(attribute.key) }}
               </div>
@@ -133,7 +133,7 @@
       </q-card-section>
     </q-card>
 
-    <q-card class="q-ma-md">
+    <q-card class="q-mt-md">
       <q-item>
         <q-item-section avatar>
           <q-avatar>
@@ -149,12 +149,12 @@
       <q-separator />
 
       <q-card-section>
-        <div class="row q-my-xs">
+        <div class="row q-mt-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">ID</div>
           <div class="col-8">{{ source.id }}</div>
         </div>
 
-        <div class="row q-my-xs">
+        <div class="row q-mt-xs">
           <div class="col-2 text-weight-medium text-right q-mr-lg">Created</div>
           <div class="col-8">
             <router-link
@@ -168,7 +168,7 @@
           </div>
         </div>
 
-        <div class="row q-my-xs" v-if="source.workflow">
+        <div class="row q-mt-xs" v-if="source.workflow">
           <div class="col-2 text-weight-medium text-right q-mr-lg">
             Modified
           </div>
@@ -186,7 +186,7 @@
       </q-card-section>
     </q-card>
 
-    <q-card class="q-ma-md">
+    <q-card class="q-mt-md">
       <q-item>
         <q-item-section avatar>
           <q-avatar>
@@ -202,30 +202,30 @@
       <q-separator />
 
       <q-card-section v-if="!hasDescription">
-        <div class="q-my-xs text-center text-body1">
+        <div class="q-mt-xs text-center text-body1">
           <p>No description assigned.</p>
         </div>
       </q-card-section>
       <q-card-section v-else>
-        <div class="q-my-xs text-left text-body1">
+        <div class="q-mt-xs text-left text-body1">
           {{ source.attributes.description }}
         </div>
       </q-card-section>
     </q-card>
 
-    <q-card v-if="hasChildren" class="q-ma-md">
+    <q-card v-if="hasChildren" class="q-mt-md">
       <SourceChildren :children="source.children" />
     </q-card>
 
-    <q-card v-if="hasPages" class="q-ma-md">
+    <q-card v-if="hasPages" class="q-mt-md">
       <SourcePages :pages="source.pages" />
     </q-card>
 
-    <q-card v-if="hasAgents" class="q-ma-md">
+    <q-card v-if="hasAgents" class="q-mt-md">
       <SourceAgents :agents="source.agents" />
     </q-card>
 
-    <q-card v-if="hasPlaces" class="q-ma-md">
+    <q-card v-if="hasPlaces" class="q-mt-md">
       <SourcePlaces :places="source.places" />
     </q-card>
 
@@ -284,8 +284,6 @@ const isObj = (obj) => {
   return type === "function" || (type === "object" && !!obj);
 };
 
-// TODO: Invert to isNully and negate at call sites.
-// => Boolean(value)
 const notNully = (value) => !isNil(value) && !isEmpty(value);
 
 export default defineComponent({
@@ -322,8 +320,6 @@ export default defineComponent({
     const hasAgents = computed(() => notNully(source.value.agents));
     const hasChildren = computed(() => notNully(source.value.children));
     const hasPlaces = computed(() => notNully(source.value.places));
-
-    // TODO: This throws an error/warning.
     const hasPages = computedInject("hasPages", (injected) => {
       injected.value = notNully(source.value.pages);
       return notNully(source.value.pages);

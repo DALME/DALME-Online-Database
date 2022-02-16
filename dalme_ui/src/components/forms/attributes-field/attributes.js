@@ -1,125 +1,63 @@
 import { keys, reduce } from "ramda";
+import * as yup from "yup";
 
 import { requests } from "@/api";
-import {
-  attributeSchemas,
-  countryOptionsSchema,
-  languageOptionsSchema,
-  localeOptionsSchema,
-  rightsOptionsSchema,
-  sourceOptionsSchema,
-  userOptionsSchema,
-} from "@/schemas";
+import { attributeSchemas } from "@/schemas";
 
-const optionsData = {
-  createdBy: {
-    request: requests.users.getUsers,
-    schema: userOptionsSchema,
-    multiple: false,
-    filterable: true,
-  },
-  lastUser: {
-    request: requests.users.getUsers,
-    schema: userOptionsSchema,
-    multiple: false,
-    filterable: true,
-  },
-  owner: {
-    request: requests.users.getUsers,
-    schema: userOptionsSchema,
-    multiple: false,
-    filterable: true,
-  },
-  parent: {
-    request: requests.sources.getSources,
-    schema: sourceOptionsSchema,
-    multiple: false,
-    filterable: true,
-  },
-  authority: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  country: {
-    request: requests.countries.getCountries,
-    schema: countryOptionsSchema,
-    multiple: false,
-    filterable: true,
-  },
-  defaultRights: {
-    request: requests.rights.getRights,
-    schema: rightsOptionsSchema,
-    multiple: false,
-    filterable: true,
-  },
-  format: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  language: {
-    request: requests.languages.getLanguages,
-    schema: languageOptionsSchema,
-    multiple: true,
-    filterable: true,
-  },
-  languageGc: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  locale: {
-    request: requests.locales.getLocales,
-    schema: localeOptionsSchema,
-    multiple: false,
-    filterable: true,
-  },
-  permissions: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  recordType: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  rightsStatus: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  sameAs: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  setType: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
-  support: {
-    request: null,
-    schema: null,
-    multiple: false,
-    filterable: true,
-  },
+const optionFields = [
+  "authority",
+  "country",
+  "createdBy",
+  "defaultRights",
+  "format",
+  "language",
+  "languageGc",
+  "lastUser",
+  "locale",
+  "owner",
+  "parent",
+  "permissions",
+  "recordType",
+  "rightsStatus",
+  "sameAs",
+  "setType",
+  "support",
+];
+
+const multiple = ["language", "languageGc"];
+
+const optionSchema = yup.object().shape({
+  label: yup.string().required(),
+  value: yup.string().required(),
+  caption: yup.string().default(null).nullable(),
+});
+
+const optionsSchema = yup.array().of(optionSchema);
+
+// Tweak the schema here, if necessary to handle data integrity issues.
+const alternateSchema = {
+  language: yup.array().of(
+    optionSchema.shape({
+      value: yup
+        .string()
+        .required()
+        .transform((value) => (value === "" ? "mis" : value)),
+    }),
+  ),
 };
 
 export const attributeFields = reduce(
   (obj, attribute) => {
     obj[attribute] = {
-      options: optionsData[attribute] || null,
+      options: optionFields.includes(attribute)
+        ? /* eslint-disable */
+          {
+            request: () => requests.attributes.getAttributeOptions(attribute),
+            schema: alternateSchema[attribute] || optionsSchema,
+            multiple: multiple.includes(attribute),
+          }
+        : null,
+      /* eslint-enable */
       validation: attributeSchemas[attribute],
     };
     return obj;

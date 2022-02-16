@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { Comments, Page, SourceDetail } from "@/components";
@@ -45,7 +45,7 @@ export default defineComponent({
   setup() {
     const $route = useRoute();
 
-    const id = computed(() => $route.params.id);
+    const id = ref($route.params.id);
     const hasPages = ref(null);
     const tab = ref("data");
     const splitterModel = ref(10);

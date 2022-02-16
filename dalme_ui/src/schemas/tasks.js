@@ -1,20 +1,20 @@
 import moment from "moment";
-import { head } from "ramda";
+import { head, isNil } from "ramda";
 import * as yup from "yup";
 
 import { taskListSchema } from "@/schemas";
 
-export const taskCreateValidator = yup.object().shape({
+export const taskFieldValidation = {
   title: yup.string().nullable().required().label("Title"),
   description: yup.string().nullable().required().label("Description"),
-  taskList: taskListSchema
-    .shape({
-      name: yup.string().required(),
-    })
+  taskList: yup
+    .string()
     .nullable()
     .required()
+    .transform((option) => {
+      return isNil(option) ? null : option.value;
+    })
     .label("Task list"),
-  // TODO: assignedTo
   dueDate: yup
     .string()
     .nullable()
@@ -22,24 +22,16 @@ export const taskCreateValidator = yup.object().shape({
       value ? moment(new Date(value)).format("YYYY-MM-DD") : null,
     )
     .label("Date due"),
-});
-
-export const taskUpdateValidator = taskCreateValidator.shape({
-  id: yup.string().required().label("ID"),
-});
-
-export const taskPostSchema = taskCreateValidator.shape({
-  taskList: yup
-    .mixed()
-    .required()
-    .transform((value) => ({ group: value.id, name: value.name })),
   assignedTo: yup
-    .mixed()
-    .required()
-    .transform((value) => value.id),
-});
+    .string()
+    .nullable()
+    .transform((option) => (isNil(option) ? null : option.value))
+    .label("Assigned to"),
+};
 
-export const taskPutSchema = taskUpdateValidator;
+export const taskPostSchema = null;
+
+export const taskPutSchema = null;
 
 export const taskSchema = yup
   .object()

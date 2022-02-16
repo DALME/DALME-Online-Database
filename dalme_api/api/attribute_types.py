@@ -13,16 +13,13 @@ class AttributeTypes(DALMEBaseViewSet):
 
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('filter') is not None:
-            filter = self.request.GET['filter'].split(',')
-            filter_q = Q(**{filter[0]: filter[1]})
-            queryset = Content_attributes.objects.filter(filter_q)
-        else:
-            queryset = Attribute_type.objects.all()
-        return queryset
+            filter_v = self.request.GET['filter'].split(',')
+            filter_q = Q(**{filter_v[0]: filter_v[1]})
+            return Content_attributes.objects.filter(filter_q)
+        return super().get_queryset(*args, **kwargs)
 
     def get_serializer_class(self):
-        if self.request.GET.get('filter') is not None and self.request.GET['filter'].split(',')[0] == 'content_type':
-            serializer = ContentXAttributeSerializer
-        else:
-            serializer = self.serializer_class
-        return serializer
+        if self.request.GET.get('filter') is not None:
+            if self.request.GET['filter'].split(',')[0] == 'content_type':
+                return ContentXAttributeSerializer
+        return super().get_serializer_class()

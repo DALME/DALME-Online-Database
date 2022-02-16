@@ -90,7 +90,7 @@ class Sources(DALMEBaseViewSet):
         return Response(result, status)
 
     def get_serializer(self, *args, **kwargs):
-        serializer_class = self.serializer_class
+        serializer_class = super().get_serializer_class()
         fields = {
             'archives': ['id', 'type', 'name', 'short_name', 'is_private', 'no_records', 'attributes', 'sets'],
             'archival_files': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'primary_dataset', 'owner', 'no_records', 'attributes', 'sets'],
@@ -106,14 +106,17 @@ class Sources(DALMEBaseViewSet):
         return serializer_class(*args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('class') is not None:
-            query = {
-                'archives': Q(type=19),
-                'archival_files': Q(type=12),
-                'records': Q(type=13),
-                'bibliography': Q(type__in=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-            }
-            queryset = Source.objects.filter(query[self.request.GET['class']])
+        if self.request.GET.get('class'):
+            queryset = self.get_queryset_by_source_type()
         else:
             queryset = Source.objects.all()
         return queryset.prefetch_related('children', 'attributes', 'sets', 'type')
+
+    def get_queryset_by_source_type(self):
+        query = {
+            'archives': Q(type=19),
+            'archival_files': Q(type=12),
+            'records': Q(type=13),
+            'bibliography': Q(type__in=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+        }
+        return Source.objects.filter(query[self.request.GET['class']])

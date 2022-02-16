@@ -6,62 +6,87 @@ import {
   BooleanField,
   InputField,
   MultipleSelectField,
+  SelectField,
 } from "@/components/forms";
 import {
+  attributeSchemas,
   pageOptionsSchema,
-  recordCreateValidator,
-  recordUpdateValidator,
+  recordFieldValidation,
   recordPostSchema,
   recordPutSchema,
   setOptionsSchema,
+  sourceOptionsSchema,
 } from "@/schemas";
 
 const recordFormSchema = {
   name: {
+    field: "name",
     component: markRaw(InputField),
     label: "Name *",
     description:
       "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
+    validation: recordFieldValidation.name,
   },
   shortName: {
+    field: "shortName",
     component: markRaw(InputField),
     label: "Short name *",
     description:
       "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
+    validation: recordFieldValidation.shortName,
   },
   hasInventory: {
+    field: "hasInventory",
     component: markRaw(BooleanField),
     label: "List *",
     description: "Indicates whether this source contains a list of objects.",
+    validation: recordFieldValidation.hasInventory,
+  },
+  parent: {
+    field: "parent",
+    component: markRaw(SelectField),
+    label: "Parent",
+    description:
+      "Parent record, if applicable, eg: a book for a book chapter, an archival unit for a record, etc.",
+    getOptions: () =>
+      fetcher(requests.sources.getSourceOptionsByType("records")).then(
+        (response) => response.json(),
+      ),
+    optionsSchema: sourceOptionsSchema,
+    validation: recordFieldValidation.parent,
   },
   pages: {
+    field: "pages",
     component: markRaw(MultipleSelectField),
     label: "Folios",
     description: "The pages/folios contained by the source",
-    filterable: true,
     getOptions: () =>
       fetcher(requests.pages.getPages()).then((response) => response.json()),
     optionsSchema: pageOptionsSchema,
+    validation: recordFieldValidation.pages,
   },
   sets: {
+    field: "sets",
     component: markRaw(MultipleSelectField),
     label: "Sets",
     description: "The sets of which the source a member.",
-    filterable: true,
     getOptions: () =>
       fetcher(requests.sets.getSets()).then((response) => response.json()),
     optionsSchema: setOptionsSchema,
+    validation: recordFieldValidation.sets,
   },
   // credits
   attributes: {
+    field: "attributes",
     component: markRaw(AttributesField),
-    required: ["parent", "recordType", "language"],
+    required: ["recordType", "language"],
+    // NOTE: We pass this in here (rather than importing it in the the
+    // component) even though it's a monolithic definition and will be the same
+    // for all instances of the attributes field. That said, there may be a
+    // time we want to override some rules, so let's leave that option open.
+    validators: attributeSchemas,
+    validation: recordFieldValidation.attributes,
   },
-};
-
-const recordFormValidators = {
-  create: recordCreateValidator,
-  update: recordUpdateValidator,
 };
 
 const submitSchemas = {
@@ -77,6 +102,5 @@ const recordRequests = {
 export default {
   requests: recordRequests,
   schema: recordFormSchema,
-  validators: recordFormValidators,
   submitSchemas,
 };

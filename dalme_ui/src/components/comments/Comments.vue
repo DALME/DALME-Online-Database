@@ -1,5 +1,5 @@
 <template>
-  <q-card class="q-ma-md">
+  <q-card class="q-mx-md q-mb-md">
     <q-item>
       <q-item-section avatar>
         <q-avatar icon="comment"> </q-avatar>
