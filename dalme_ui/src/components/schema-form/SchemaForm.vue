@@ -33,7 +33,7 @@ export default {
     const fieldsKey = `form-fields:${props.cuid}`;
     const { forms } = useEditing();
 
-    const { errors, meta } = useForm();
+    const { meta } = useForm();
     useSchemaForm(props.formModel);
 
     watch(
@@ -43,14 +43,6 @@ export default {
         useStorage(fieldsKey, newFormModel, localStorage);
       },
       { deep: true, immediate: true },
-    );
-
-    // TODO: Remove this, is useful for dev
-    watch(
-      () => errors.value,
-      (newErrors) => {
-        console.log(newErrors);
-      },
     );
 
     watch(

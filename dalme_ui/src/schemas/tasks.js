@@ -4,6 +4,7 @@ import * as yup from "yup";
 
 import { taskListSchema } from "@/schemas";
 
+// Field-level validation rules/schemas.
 export const taskFieldValidation = {
   title: yup.string().nullable().required().label("Title"),
   description: yup.string().nullable().required().label("Description"),
@@ -23,16 +24,27 @@ export const taskFieldValidation = {
     )
     .label("Date due"),
   assignedTo: yup
-    .string()
+    .object()
+    .shape({ value: yup.number().nullable() })
     .nullable()
-    .transform((option) => (isNil(option) ? null : option.value))
     .label("Assigned to"),
 };
 
-export const taskPostSchema = null;
+// Edit existing object schema.
+export const taskEditSchema = yup.object().shape({
+  id: yup.number().required(),
+  title: yup.string().required(),
+  description: yup.string().required(),
+  dueDate: yup
+    .string()
+    .nullable()
+    .transform((value) =>
+      value ? moment(new Date(value)).format("YYYY-MM-DD") : null,
+    ),
+  assignedTo: yup.string().nullable(),
+});
 
-export const taskPutSchema = null;
-
+// Full object schema.
 export const taskSchema = yup
   .object()
   .shape({
@@ -59,7 +71,7 @@ export const taskSchema = yup
       })
       .camelCase(),
     attachments: yup
-      .mixed()
+      .mixed() // TODO: What's this supposed to be.
       .transform((value) => {
         if (value) {
           const node = document.createElement("html");
@@ -77,3 +89,10 @@ export const taskSchema = yup
   .camelCase();
 
 export const tasksSchema = yup.array().of(taskSchema);
+
+// API submit schemas.
+export const taskPostSchema = yup.object().shape({});
+
+export const taskPutSchema = taskPostSchema.shape({
+  id: yup.number().required(),
+});

@@ -6,21 +6,42 @@ import { attributeOptionSchema } from "@/schemas";
 export const recordFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
   shortName: yup.string().nullable().required().label("Short name"),
-  // TODO: sets
   hasInventory: yup
-    .boolean()
+    .object()
+    .shape({
+      value: yup
+        .boolean()
+        .nullable()
+        .required()
+        .transform((option) => (isNil(option) ? null : Boolean(option.value))),
+    })
     .nullable()
     .required()
-    .transform((option) => (isNil(option) ? null : Boolean(option.value)))
     .label("List"),
-  parent: yup.string().uuid().default(null).nullable().label("Parent"),
+  parent: yup
+    .object()
+    .shape({ value: yup.string().uuid().nullable() })
+    .nullable()
+    .label("Parent"),
+  sets: yup
+    .array()
+    .of(yup.object().shape({ value: yup.string().uuid().nullable() }))
+    .nullable()
+    .label("Sets"),
+  folios: yup
+    .array()
+    .of(yup.object().shape({ value: yup.string().uuid().nullable() }))
+    .nullable()
+    .label("Folios"),
   attributes: yup
     .array()
     .of(attributeOptionSchema)
     .required()
     .label("Attributes"),
-  // TODO: pages/folios
 };
+
+// Edit existing object schema.
+export const recordEditSchema = null;
 
 export const recordPostSchema = null;
 

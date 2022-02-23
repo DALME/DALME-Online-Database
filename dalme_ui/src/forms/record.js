@@ -75,7 +75,6 @@ const recordFormSchema = {
     optionsSchema: setOptionsSchema,
     validation: recordFieldValidation.sets,
   },
-  // credits
   attributes: {
     field: "attributes",
     component: markRaw(AttributesField),
@@ -87,9 +86,10 @@ const recordFormSchema = {
     validators: attributeSchemas,
     validation: recordFieldValidation.attributes,
   },
+  // credits
 };
 
-const submitSchemas = {
+const recordSubmitSchemas = {
   create: recordPostSchema,
   update: recordPutSchema,
 };
@@ -100,7 +100,8 @@ const recordRequests = {
 };
 
 export default {
+  edit: null,
+  form: recordFormSchema,
   requests: recordRequests,
-  schema: recordFormSchema,
-  submitSchemas,
+  submit: recordSubmitSchemas,
 };

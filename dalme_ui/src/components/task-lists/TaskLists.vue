@@ -196,13 +196,18 @@ export default defineComponent({
         mode: "create",
       });
 
-    const handleEdit = (taskList) =>
+    const handleEdit = (taskList) => {
+      const initial = {
+        ...taskList,
+        group: { value: taskList.group.id, label: taskList.group.name },
+      };
       send("SPAWN_FORM", {
         cuid: cuid(),
-        initialData: taskList,
+        initialData: initial,
         kind: "taskList",
         mode: "update",
       });
+    };
 
     const handleDelete = (taskList) => {
       const { success, fetchAPI } = useAPI(context);

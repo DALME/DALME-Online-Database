@@ -4,32 +4,31 @@ import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
 import {
   groupOptionsSchema,
-  taskListCreateValidator,
-  taskListUpdateValidator,
+  taskListEditSchema,
+  taskListFieldValidation,
   taskListPostSchema,
   taskListPutSchema,
 } from "@/schemas";
 
 const taskListFormSchema = {
   name: {
+    field: "name",
     component: markRaw(InputField),
-    label: "Name",
+    label: "Name *",
+    validation: taskListFieldValidation.name,
   },
   group: {
+    field: "name",
     component: markRaw(SelectField),
-    label: "Group",
+    label: "Group *",
     getOptions: () =>
       fetcher(requests.groups.getGroups()).then((response) => response.json()),
     optionsSchema: groupOptionsSchema,
+    validation: taskListFieldValidation.group,
   },
 };
 
-const taskListFormValidators = {
-  create: taskListCreateValidator,
-  update: taskListUpdateValidator,
-};
-
-const submitSchemas = {
+const taskListSubmitSchemas = {
   create: taskListPostSchema,
   update: taskListPutSchema,
 };
@@ -40,8 +39,8 @@ const taskListRequests = {
 };
 
 export default {
+  edit: taskListEditSchema,
+  form: taskListFormSchema,
   requests: taskListRequests,
-  schema: taskListFormSchema,
-  validators: taskListFormValidators,
-  submitSchemas,
+  submit: taskListSubmitSchemas,
 };

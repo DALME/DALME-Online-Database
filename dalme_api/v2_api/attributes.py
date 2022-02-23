@@ -70,16 +70,16 @@ class Attributes(api.Attributes):
                 {'label': 'Register - quarto', 'value': 'Register - quarto'},
             ],
             'language': [
-                {'label': obj.name, 'value': obj.id, 'caption': obj.iso6393}
+                {'label': obj['name'], 'value': obj['id'], 'caption': obj['iso6393']}
                 for obj in LanguageReference.objects.filter(
                     iso6393__isnull=False
-                ).order_by('name')
+                ).order_by('name').values('id', 'name', 'iso6393')
             ],
             'language_gc': [
-                {'label': obj.name, 'value': obj.id, 'caption': obj.glottocode}
+                {'label': obj['name'], 'value': obj['id'], 'caption': obj['glottocode']}
                 for obj in LanguageReference.objects.filter(
                     glottocode__isnull=False
-                ).order_by('name')
+                ).order_by('name').values('id', 'name', 'glottocode')
             ],
             'locale': [
                 {'label': obj.name, 'value': obj.id}

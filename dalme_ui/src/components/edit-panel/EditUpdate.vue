@@ -15,7 +15,7 @@ import { computed, defineComponent } from "vue";
 import { useRoute } from "vue-router";
 
 import { requests } from "@/api";
-import { taskSchema } from "@/schemas";
+import forms from "@/forms";
 import { useAPI, useEditing } from "@/use";
 
 export default defineComponent({
@@ -37,10 +37,9 @@ export default defineComponent({
 
     const fetchData = async () => {
       await fetchAPI(getRequest());
-      if (success.value)
-        // TODO: Stubbed for now, will become dynamic.
-        // const { submitSchema } = useDynamicForm();
-        await taskSchema
+      const { edit: editSchema } = forms[kind.value];
+      if (success.value) {
+        await editSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             send("SPAWN_FORM", {
@@ -50,6 +49,7 @@ export default defineComponent({
               mode,
             });
           });
+      }
     };
 
     const handleClick = async () => {

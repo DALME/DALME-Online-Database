@@ -8,6 +8,7 @@ import {
   TextField,
 } from "@/components/forms";
 import {
+  taskEditSchema,
   taskFieldValidation,
   taskListOptionsSchema,
   taskPutSchema,
@@ -54,7 +55,7 @@ const taskFormSchema = {
   },
 };
 
-const submitSchemas = {
+const taskSubmitSchemas = {
   create: taskPostSchema,
   update: taskPutSchema,
 };
@@ -65,7 +66,8 @@ const taskRequests = {
 };
 
 export default {
+  edit: taskEditSchema,
+  form: taskFormSchema,
   requests: taskRequests,
-  schema: taskFormSchema,
-  submitSchemas,
+  submit: taskSubmitSchemas,
 };

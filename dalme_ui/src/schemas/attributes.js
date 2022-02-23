@@ -6,7 +6,11 @@ import * as yup from "yup";
 export const attributeOptionSchema = yup.object().shape({
   attribute: yup
     .object()
-    .shape({ shortName: yup.string().required() })
+    .shape({
+      id: yup.number().required(),
+      dataType: yup.string().required(),
+      shortName: yup.string().required(),
+    })
     .required(),
   value: yup.mixed().required(),
 });
@@ -135,25 +139,21 @@ export const attributeSchemas = {
   language: yup
     .array()
     .of(
-      yup
-        .number()
-        .required()
-        .transform((option) => (isNil(option) ? null : option.value))
-        .label("Language"),
+      yup.object().shape({ value: yup.number().required().label("Language") }),
     )
     .nullable()
-    .required(),
+    .required()
+    .transform((value) => (value && value.length > 0 ? value : null))
+    .label("Language"),
   languageGc: yup
     .array()
     .of(
-      yup
-        .number()
-        .required()
-        .transform((option) => (isNil(option) ? null : option.value))
-        .label("Language (GC)"),
+      yup.object().shape({ value: yup.number().required().label("Language") }),
     )
     .nullable()
-    .required(),
+    .required()
+    .transform((value) => (value && value.length > 0 ? value : null))
+    .label("Language (GC)"),
   lastLogin: yup
     .string()
     .nullable()
@@ -234,7 +234,7 @@ export const attributeSchemas = {
     .label("Indirect inheritance"),
   recordType: yup
     .object()
-    .shape({ value: yup.string().required() })
+    .shape({ value: yup.string().nullable().required().label("Record type") })
     .nullable()
     .required()
     .label("Record type"),
@@ -254,12 +254,7 @@ export const attributeSchemas = {
   rightsStatus: yup.string().nullable().required().label("Rights status"),
   sameAs: yup.string().nullable().required().label("Same as"),
   searchable: yup.number().nullable().required().label("Searchable"),
-  setType: yup
-    .object()
-    .shape({ value: yup.number().min(1).max(4).required() })
-    .nullable()
-    .required()
-    .label("Set type"),
+  setType: yup.number().min(1).max(4).nullable().required().label("Set type"),
   sex: yup.string().nullable().required().label("Sex"),
   shortName: yup.string().nullable().required().label("Short name"),
   shortTitle: yup.string().nullable().required().label("Short title"),

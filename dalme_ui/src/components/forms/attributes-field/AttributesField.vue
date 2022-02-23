@@ -3,7 +3,7 @@
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto q-mr-sm">
         {{
-          !showing && modelValue !== [[null, null]]
+          !showing && modelValue !== [empty]
             ? `Attributes (${modelValue.length})`
             : "Attributes"
         }}
@@ -35,25 +35,24 @@
     </div>
 
     <template
-      v-for="({ 0: attribute, 1: field }, idx) in zip(modelValue, fields)"
+      v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
       :key="field.key"
     >
       <div class="row flex-center" v-show="showing">
         <div class="col-6 q-pr-sm">
           <q-select
-            use-input
-            emit-value
+            map-options
             hide-bottom-space
             label="Attribute"
             class="attribute-select"
-            :disable="isRequiredAttribute(attribute[0])"
-            :clearable="!isRequiredAttribute(attribute[0])"
-            :model-value="attribute[0]"
+            :disable="isRequiredAttribute(data.attribute)"
+            :clearable="!isRequiredAttribute(data.attribute)"
+            :model-value="data.attribute"
             :options="options"
             :option-label="
               (option) =>
                 option
-                  ? isRequiredAttribute(attribute[0])
+                  ? isRequiredAttribute(data.attribute)
                     ? `${option.name} *`
                     : option.name
                   : null
@@ -65,98 +64,102 @@
             @update:modelValue="(option) => handleUpdateAttribute(option, idx)"
           >
             <q-tooltip
-              v-if="attribute[0] && attribute[0].description"
+              v-if="data.attribute && data.attribute.description"
               class="bg-blue z-max"
               max-width="12rem"
             >
-              {{ attribute[0].description }}
+              {{ data.attribute.description }}
             </q-tooltip>
           </q-select>
         </div>
         <div class="q-pl-sm col">
-          <template v-if="!attribute[0]">
+          <template v-if="!data.attribute">
             <q-input disable label="Choose an attribute" />
           </template>
           <template v-else>
-            <template v-if="attribute[0].dataType === 'Boolean'">
+            <template v-if="data.attribute.dataType === 'Boolean'">
               <BooleanField
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :validation="validators[attribute[0].shortName]"
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute[0].dataType === 'Decimal'">
+            <template v-else-if="data.attribute.dataType === 'Decimal'">
               <DecimalField
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :validation="validators[attribute[0].shortName]"
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute[0].dataType === 'Number'">
+            <template v-else-if="data.attribute.dataType === 'Number'">
               <NumberField
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :validation="validators[attribute[0].shortName]"
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute[0].dataType === 'Date'">
+            <template v-else-if="data.attribute.dataType === 'Date'">
               <DateField
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :validation="validators[attribute[0].shortName]"
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute[0].dataType === 'Text'">
+            <template v-else-if="data.attribute.dataType === 'Text'">
               <TextField
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :validation="validators[attribute[0].shortName]"
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
-            <template v-else-if="attribute[0].dataType === 'Options'">
+            <template v-else-if="data.attribute.dataType === 'Options'">
               <SelectField
-                v-if="!getOptionsData(attribute[0].shortName).multiple"
+                v-if="!getOptionsData(data.attribute.shortName).multiple"
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :filterable="getOptionsData(attribute[0].shortName).filterable"
-                :getOptions="
-                  wrapRequest(getOptionsData(attribute[0].shortName).request)
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :filterable="
+                  getOptionsData(data.attribute.shortName).filterable
                 "
-                :optionsSchema="getOptionsData(attribute[0].shortName).schema"
-                :validation="validators[attribute[0].shortName]"
+                :getOptions="
+                  wrapRequest(getOptionsData(data.attribute.shortName).request)
+                "
+                :optionsSchema="getOptionsData(data.attribute.shortName).schema"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
               <MultipleSelectField
                 v-else
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :filterable="getOptionsData(attribute[0].shortName).filterable"
-                :getOptions="
-                  wrapRequest(getOptionsData(attribute[0].shortName).request)
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :filterable="
+                  getOptionsData(data.attribute.shortName).filterable
                 "
-                :optionsSchema="getOptionsData(attribute[0].shortName).schema"
-                :validation="validators[attribute[0].shortName]"
+                :getOptions="
+                  wrapRequest(getOptionsData(data.attribute.shortName).request)
+                "
+                :optionsSchema="getOptionsData(data.attribute.shortName).schema"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else>
               <InputField
                 :field="`attributes[${idx}]`"
-                :label="attribute[0].dataType"
-                :model-value="attribute[1]"
-                :validation="validators[attribute[0].shortName]"
+                :label="data.attribute.dataType"
+                :model-value="data.value"
+                :validation="validators[data.attribute.shortName]"
                 @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
@@ -171,12 +174,14 @@
               unelevated
               size="xs"
               icon="clear"
-              :text-color="isRequiredAttribute(attribute[0]) ? 'grey' : 'black'"
-              :disable="isRequiredAttribute(attribute[0])"
+              :text-color="
+                isRequiredAttribute(data.attribute) ? 'grey' : 'black'
+              "
+              :disable="isRequiredAttribute(data.attribute)"
               @click.stop="handleRemoveField(idx)"
             >
               <q-tooltip
-                v-if="isRequiredAttribute(attribute[0])"
+                v-if="isRequiredAttribute(data.attribute)"
                 class="bg-blue z-max"
               >
                 Can't delete a required attribute
@@ -246,7 +251,10 @@ export default defineComponent({
     const { fields, push, remove, replace } = useFieldArray("attributes");
 
     const activeAttributes = computed(() =>
-      rMap((field) => (field[0] ? field[0].id : null), props.modelValue),
+      rMap(
+        (field) => (field.attribute ? field.attribute.id : null),
+        props.modelValue,
+      ),
     );
 
     const isRequiredAttribute = (attribute) =>
@@ -260,27 +268,26 @@ export default defineComponent({
         : null;
 
     const handleAddField = () => {
-      const empty = [null, null];
       push(empty);
       context.emit("update:modelValue", [...props.modelValue.slice(0), empty]);
       context.emit("change");
     };
     const handleClearAttribute = (idx) => {
       const newValue = props.modelValue.slice(0);
-      newValue[idx] = [null, null];
+      newValue[idx] = empty;
       context.emit("update:modelValue", newValue);
       context.emit("change");
     };
     const handleUpdateAttribute = (option, idx) => {
       const newValue = props.modelValue.slice(0);
-      newValue[idx][0] = option ? option : null;
-      newValue[idx][1] = null;
+      newValue[idx].attribute = option ? option : null;
+      newValue[idx].value = null;
       context.emit("update:modelValue", newValue);
       context.emit("change");
     };
     const handleUpdateField = (value, idx) => {
       const newValue = props.modelValue.slice(0);
-      newValue[idx][1] = !isNil(value) ? value : null;
+      newValue[idx].value = !isNil(value) ? value : null;
       context.emit("update:modelValue", newValue);
       context.emit("change");
     };
@@ -293,7 +300,6 @@ export default defineComponent({
     };
 
     const handleOptions = async (val, update) => {
-      // TODO: Make sure this is optimal and apply to other selectfields
       if (isNil(options.value) || options.value.length !== optionCount.value) {
         const { success, data, fetchAPI } = useAPI(context);
         const request = requests.attributeTypes.getAttributeTypes();
@@ -303,7 +309,11 @@ export default defineComponent({
             .validate(data.value, { stripUnknown: true })
             .then((value) =>
               update(() => {
-                options.value = Object.freeze(value);
+                options.value = Object.freeze(
+                  value.filter(
+                    (option) => !activeAttributes.value.includes(option.id),
+                  ),
+                );
                 optionCount.value = value.length;
               }),
             );
@@ -327,7 +337,7 @@ export default defineComponent({
     const initAttributes = async () => {
       if (props.required.length === 0) {
         showing.value = false;
-        context.emit("update:modelValue", [[null, null]]);
+        context.emit("update:modelValue", [empty]);
       } else {
         const { success, data, fetchAPI } = useAPI(context);
         const request = requests.attributeTypes.getAttributeTypesByShortName(
@@ -339,13 +349,15 @@ export default defineComponent({
             .validate(data.value, { stripUnknown: true })
             .then((value) => {
               let newValue = props.modelValue.slice(0);
-              const initial = new Set(rMap((field) => field[0], newValue));
+              const initial = new Set(
+                rMap((field) => field.attribute, newValue),
+              );
               for (let attribute of value) {
                 if (
                   !activeAttributes.value.includes(attribute.id) &&
                   !initial.has(attribute.shortName)
                 ) {
-                  newValue = [[attribute, null], ...newValue];
+                  newValue = [{ attribute, value: null }, ...newValue];
                 }
               }
               replace(newValue);
@@ -357,6 +369,7 @@ export default defineComponent({
     onMounted(async () => await initAttributes());
 
     return {
+      empty,
       fields,
       getOptionsData,
       handleAddField,

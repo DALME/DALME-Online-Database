@@ -12,10 +12,10 @@ export const useDynamicForm = () => {
       () => kind.value,
       (value) => {
         if (value) {
-          const { submitSchemas, requests, schema } = forms[value];
-          formSchema.value = schema;
+          const { requests, form, submit } = forms[value];
+          formSchema.value = form;
           formRequest.value = requests[mode.value];
-          submitSchema.value = submitSchemas[mode.value];
+          submitSchema.value = submit[mode.value];
         } else {
           formSchema.value = null;
         }

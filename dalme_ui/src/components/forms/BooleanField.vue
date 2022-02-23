@@ -7,7 +7,6 @@
     v-model="value"
     :error="errorMessage && meta.touched"
     :options="options"
-    :option-value="(option) => option"
     :popup-content-style="{ zIndex: '9999 !important' }"
     @blur="handleBlur"
   >

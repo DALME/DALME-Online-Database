@@ -13,7 +13,7 @@ import { defineComponent, onMounted, provide, ref } from "vue";
 import { requests } from "@/api";
 import { Page, TaskLists, Tasks } from "@/components";
 import { taskListsSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useEditing } from "@/use";
 
 export default defineComponent({
   name: "TaskList",
@@ -25,8 +25,10 @@ export default defineComponent({
   setup(_, context) {
     useMeta({ title: "Tasks" });
     const { success, data, fetchAPI } = useAPI(context);
+    const { postSubmitRefreshWatcher } = useEditing();
 
     const taskLists = ref([]);
+    provide("taskLists", taskLists);
 
     const fetchData = async () => {
       const request = requests.tasks.taskLists();
@@ -41,7 +43,7 @@ export default defineComponent({
       });
     };
 
-    provide("taskLists", taskLists);
+    postSubmitRefreshWatcher(fetchData);
 
     onMounted(async () => await fetchData());
 

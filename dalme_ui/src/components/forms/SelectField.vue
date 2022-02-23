@@ -7,7 +7,6 @@
     v-model="value"
     :error="errorMessage && meta.touched"
     :options="options"
-    :option-value="(option) => option"
     :popup-content-style="{ zIndex: '9999 !important' }"
     :use-input="filterable"
     @blur="handleBlur"
@@ -95,7 +94,6 @@ export default defineComponent({
         }
       };
 
-      // TODO: Regulate when this is called (see attributes).
       await getOptionsPromise().then(async (data) => {
         await props.optionsSchema
           .validate(data, { stripUnknown: true })

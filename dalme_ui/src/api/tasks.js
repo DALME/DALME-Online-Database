@@ -56,7 +56,7 @@ const tasks = {
     });
   },
   editTaskList(id, data) {
-    const url = `${apiUrl}/tasklists/${id}`;
+    const url = `${apiUrl}/tasklists/${id}/`;
     return new Request(url, {
       method: "PUT",
       headers: headers,

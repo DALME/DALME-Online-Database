@@ -1,6 +1,7 @@
 import { head } from "ramda";
 import * as yup from "yup";
 
+// Object to select/option transformation schema.
 export const taskListOptionsSchema = yup.array().of(
   yup
     .object()
@@ -21,29 +22,18 @@ export const taskListOptionsSchema = yup.array().of(
     }),
 );
 
-export const taskListCreateValidator = yup.object().shape({
-  name: yup.string().required().label("Name"),
-  group: yup.object().nullable().required().label("Group"),
-});
+// Field-level validation rules/schemas.
+export const taskListFieldValidation = {
+  name: yup.string().nullable().required().label("Name"),
+  group: yup.number().nullable().required().label("Group"),
+};
 
-export const taskListUpdateValidator = taskListCreateValidator.shape({
-  id: yup.string().required().label("ID"),
-});
+// Edit existing object schema.
+// In this case it's not needed (we do everything inline as we don't need to
+// call out for the data) but define it here to preserve the overall symmetry.
+export const taskListEditSchema = null;
 
-export const taskListPostSchema = taskListCreateValidator.shape({
-  group: yup
-    .mixed()
-    .required()
-    .transform((value) => value.id),
-});
-
-export const taskListPutSchema = taskListUpdateValidator.shape({
-  group: yup
-    .mixed()
-    .required()
-    .transform((value) => value.id),
-});
-
+// Full object schema.
 export const taskListSchema = yup
   .object()
   .shape({
@@ -66,3 +56,18 @@ export const taskListSchema = yup
   .camelCase();
 
 export const taskListsSchema = yup.array().of(taskListSchema);
+
+// API submit schemas.
+export const taskListPostSchema = yup.object().shape({
+  name: yup.string().required(),
+  group: yup
+    .mixed() // Number barfs with NaN.
+    .required()
+    .transform((option) => {
+      return option.value;
+    }),
+});
+
+export const taskListPutSchema = taskListPostSchema.shape({
+  id: yup.number().required(),
+});

@@ -163,7 +163,7 @@ export default defineComponent({
     const handleFocus = () => send("SET_FOCUS", { value: props.cuid });
     const handleMinimize = () => actorSend("HIDE");
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (postSubmitRefresh) => {
       await submitSchema.value
         .validate(formModel.value, { stripUnknown: true })
         .then(async (value) => {
@@ -171,6 +171,7 @@ export default defineComponent({
           await fetchAPI(request);
           if (success.value & [200, 201].includes(status.value)) {
             actorSend("RESOLVE");
+            postSubmitRefresh.value = true;
             handleClose();
           } else {
             actorSend("REJECT");
@@ -217,8 +218,8 @@ export default defineComponent({
 .modal-container {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   position: fixed;
-  min-width: 36rem;
-  max-width: 41rem;
+  min-width: 40em;
+  max-width: 45rem;
 }
 .modal-card {
   overflow-y: scroll;

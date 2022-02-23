@@ -59,7 +59,7 @@ export const provideEditing = () => {
           notifyFailure: (context) =>
             notifier.CRUD.failure(`Could not create ${context.kind}`),
           notifySuccess: (context) =>
-            notifier.CRUD.success(`${context.kind} created`),
+            notifier.CRUD.success(`${context.kind} saved`),
           validate: assign({
             validated: (_, event) => (event.validated ? true : false),
           }),
@@ -238,7 +238,6 @@ export const provideEditing = () => {
   });
 
   // Reactive flags.
-  const afterEditingRefresh = ref(false);
   const mouseoverSubmit = ref(false);
   const recenter = ref(null);
 
@@ -290,8 +289,7 @@ export const provideEditing = () => {
       () => actor.value,
       async (newActor) => {
         if (newActor.value === "saving") {
-          await handleSubmit();
-          afterEditingRefresh.value = true;
+          await handleSubmit(postSubmitRefresh);
         }
       },
     );
@@ -301,15 +299,14 @@ export const provideEditing = () => {
   // as a side-effect after some, unspecified CRUD operation occurs that it has
   // no precise knowledge of. Not the most satisfying thing to have to do but
   // probably the simplest for our 'free-floating' editing patterns.
-  const afterEditingRefreshWatcher = (fetchData) =>
+  const postSubmitRefresh = ref(false);
+  const postSubmitRefreshWatcher = (fetchData) =>
     watch(
-      () => afterEditingRefresh.value,
+      () => postSubmitRefresh.value,
       async (newValue, oldValue) => {
         if (oldValue === false && newValue === true) {
           await fetchData();
-          if (afterEditingRefresh.value === true) {
-            afterEditingRefresh.value = false;
-          }
+          postSubmitRefresh.value = false;
         }
       },
     );
@@ -335,7 +332,7 @@ export const provideEditing = () => {
   };
 
   provide(EditingSymbol, {
-    afterEditingRefreshWatcher,
+    postSubmitRefreshWatcher,
     disabled,
     editingDetailRouteGuard,
     formSubmitWatcher,
