@@ -38,11 +38,10 @@
       v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
       :key="field.key"
     >
-      <div class="row flex-center" v-show="showing">
+      <div class="row q-mb-sm" v-show="showing">
         <div class="col-6 q-pr-sm">
           <q-select
             map-options
-            hide-bottom-space
             label="Attribute"
             class="attribute-select"
             :disable="isRequiredAttribute(data.attribute)"
@@ -59,6 +58,7 @@
             "
             :option-value="(option) => option"
             :popup-content-style="{ zIndex: '9999 !important' }"
+            :use-input="true"
             @clear="() => handleClearAttribute(idx)"
             @filter="handleOptions"
             @update:modelValue="(option) => handleUpdateAttribute(option, idx)"

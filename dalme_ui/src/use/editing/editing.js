@@ -1,4 +1,5 @@
 import {
+  all,
   any,
   isEmpty,
   isNil,
@@ -273,7 +274,8 @@ export const provideEditing = () => {
   const disabled = computed(() => {
     const nothingValid =
       isNil(inline.value) &&
-      (isEmpty(validated.value) || values(validated.value).includes(false));
+      (isEmpty(validated.value) ||
+        all((value) => value === false)(values(validated.value)));
 
     const focusValid =
       focus.value === "inline" ||
@@ -317,7 +319,7 @@ export const provideEditing = () => {
       () => recenter.value,
       (newRecenter) => {
         if (!isNil(newRecenter) && newRecenter === cuid) {
-          x.value = window.innerWidth / 3;
+          x.value = window.innerWidth / 3.75;
           y.value = window.innerHeight / 10;
           recenter.value = null;
         }

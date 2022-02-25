@@ -129,8 +129,8 @@ const API = (context = null) => {
         redirected.value = response.redirected || false;
         apiError.value = response.error || false;
         data.value = await response.json();
-        if (context) {
-          context.emit("onReauthenticate", status.value === 403);
+        if (context && status.value === 403) {
+          context.emit("onReauthenticate");
         }
       })
       .catch((e) => {

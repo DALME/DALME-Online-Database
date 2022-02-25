@@ -1,7 +1,6 @@
 <template>
   <q-input
     clearable
-    hide-bottom-space
     debounce="500"
     v-model="value"
     :error="errorMessage && meta.touched"

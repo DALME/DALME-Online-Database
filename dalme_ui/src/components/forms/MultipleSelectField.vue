@@ -3,7 +3,6 @@
     multiple
     clearable
     use-chips
-    hide-bottom-space
     input-debounce="350"
     popup-content-class="selectfield"
     v-model="value"

@@ -15,10 +15,26 @@
       :disable="disabled"
     >
       <q-fab-action
+        :onClick="() => handleClick('archive')"
+        color="amber"
+        text-color="black"
+        icon="villa"
+      >
+        <q-tooltip
+          class="bg-blue"
+          anchor="top middle"
+          self="top middle"
+          :offset="[0, 35]"
+        >
+          Create Archive
+        </q-tooltip>
+      </q-fab-action>
+
+      <q-fab-action
         :onClick="() => handleClick('record')"
         color="amber"
         text-color="black"
-        icon="bookmark"
+        icon="format_list_numbered"
       >
         <q-tooltip
           class="bg-blue"

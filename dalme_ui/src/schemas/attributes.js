@@ -173,15 +173,11 @@ export const attributeSchemas = {
   licence: yup.string().nullable().required().label("Licence"),
   list: yup.number().nullable().required().label("Datatables List"),
   locale: yup
-    .array()
-    .of(
-      yup
-        .number()
-        .required()
-        .transform((option) => (isNil(option) ? null : option.value)),
-    )
+    .object()
+    .shape({ id: yup.number().nullable().required().label("Locale") })
     .nullable()
     .required()
+    .transform((option) => (isNil(option) ? null : { id: option.value }))
     .label("Locale"),
   longitude: yup.string().nullable().required().label("Longitude"),
   memberCount: yup.number().min(0).nullable().required().label("Member count"),

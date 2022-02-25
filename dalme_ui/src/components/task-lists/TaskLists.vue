@@ -133,6 +133,7 @@ import { computed, defineComponent, inject, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { requests } from "@/api";
+import forms from "@/forms";
 import { useAPI, useEditing, useNotifier, usePermissions } from "@/use";
 
 export default defineComponent({
@@ -187,7 +188,6 @@ export default defineComponent({
       showing.value = true;
     }
 
-    // TODO: Need to reload on create.
     const handleCreate = () =>
       send("SPAWN_FORM", {
         cuid: cuid(),
@@ -196,17 +196,22 @@ export default defineComponent({
         mode: "create",
       });
 
-    const handleEdit = (taskList) => {
-      const initial = {
-        ...taskList,
-        group: { value: taskList.group.id, label: taskList.group.name },
-      };
-      send("SPAWN_FORM", {
-        cuid: cuid(),
-        initialData: initial,
-        kind: "taskList",
-        mode: "update",
-      });
+    const handleEdit = async ({ id }) => {
+      const { data, success, fetchAPI } = useAPI(context);
+      const { edit: editSchema } = forms.taskList;
+      await fetchAPI(requests.tasks.getTaskList(id));
+      if (success.value) {
+        await editSchema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            send("SPAWN_FORM", {
+              cuid: cuid(),
+              initialData: value,
+              kind: "taskList",
+              mode: "update",
+            });
+          });
+      }
     };
 
     const handleDelete = (taskList) => {

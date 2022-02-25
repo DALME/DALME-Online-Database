@@ -2,7 +2,6 @@
   <q-input
     autogrow
     clearable
-    hide-bottom-space
     debounce="500"
     type="textfield"
     v-model="value"

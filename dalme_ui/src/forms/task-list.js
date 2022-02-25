@@ -15,12 +15,14 @@ const taskListFormSchema = {
     field: "name",
     component: markRaw(InputField),
     label: "Name *",
+    description: "The name of the task list.",
     validation: taskListFieldValidation.name,
   },
   group: {
-    field: "name",
+    field: "group",
     component: markRaw(SelectField),
     label: "Group *",
+    description: "Which group is the task list filed under.",
     getOptions: () =>
       fetcher(requests.groups.getGroups()).then((response) => response.json()),
     optionsSchema: groupOptionsSchema,

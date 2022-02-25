@@ -1,7 +1,6 @@
 <template>
   <q-select
     clearable
-    hide-bottom-space
     input-debounce="350"
     popup-content-class="selectfield"
     v-model="value"

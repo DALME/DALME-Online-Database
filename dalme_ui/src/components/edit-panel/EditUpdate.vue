@@ -33,11 +33,9 @@ export default defineComponent({
     const id = computed(() => $route.params.id);
     const kind = computed(() => $route.name.toLowerCase());
 
-    const getRequest = () => requests.tasks.getTask(id.value);
-
     const fetchData = async () => {
-      await fetchAPI(getRequest());
       const { edit: editSchema } = forms[kind.value];
+      await fetchAPI(requests.tasks.getTask(id.value));
       if (success.value) {
         await editSchema
           .validate(data.value, { stripUnknown: true })

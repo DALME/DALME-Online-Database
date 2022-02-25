@@ -33,8 +33,10 @@ export default {
     const fieldsKey = `form-fields:${props.cuid}`;
     const { forms } = useEditing();
 
-    const { meta } = useForm();
     useSchemaForm(props.formModel);
+    const { meta } = useForm({
+      initialValues: props.formModel,
+    });
 
     watch(
       () => props.formModel,
@@ -48,8 +50,18 @@ export default {
     watch(
       () => meta.value,
       (newMeta) => {
-        const { send } = useActor(forms.value[props.cuid]);
-        send({ type: "VALIDATE", validated: newMeta.valid });
+        if (newMeta.touched && !newMeta.pending) {
+          const { send } = useActor(forms.value[props.cuid]);
+          // TODO: Won't work unless caption is present in options data argh]
+          // We *could* compare them post-transform, but that seems complected?
+          // const hasDiffs =
+          //   newMeta.touched &&
+          //   toRaw(newMeta.initialValues) !== toRaw(props.formModel);
+          send({
+            type: "VALIDATE",
+            validated: newMeta.valid,
+          });
+        }
       },
     );
   },

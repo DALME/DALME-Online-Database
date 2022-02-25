@@ -1,5 +1,6 @@
 export * from "./agents";
 export * from "./attributes";
+export * from "./archives";
 export * from "./auth";
 export * from "./comments";
 export * from "./countries";

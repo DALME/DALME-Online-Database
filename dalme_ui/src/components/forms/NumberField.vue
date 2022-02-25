@@ -1,7 +1,6 @@
 <template>
   <q-input
     clearable
-    hide-bottom-space
     debounce="500"
     fill-mask="0"
     v-model="value"

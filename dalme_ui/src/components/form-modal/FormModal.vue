@@ -218,7 +218,7 @@ export default defineComponent({
 .modal-container {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   position: fixed;
-  min-width: 40em;
+  min-width: 40rem;
   max-width: 45rem;
 }
 .modal-card {

@@ -1,7 +1,6 @@
 <template>
   <q-input
     clearable
-    hide-bottom-space
     reverse-fill-mask
     debounce="500"
     mask="#.##"

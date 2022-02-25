@@ -63,6 +63,10 @@ const tasks = {
       body: JSON.stringify(data),
     });
   },
+  getTaskList(id) {
+    const url = `${apiUrl}/tasklists/${id}`;
+    return new Request(url);
+  },
   userTasks(userId) {
     // TODO: This does nothing right now, add new endpoint.
     const query = `stubbed=${userId}`;
