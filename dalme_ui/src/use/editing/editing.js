@@ -42,8 +42,6 @@ export const provideEditing = () => {
           editing: {},
           saving: {
             on: {
-              // TODO: respond({ type: 'SUCCESS', message: 'Bla' }, { delay: 10 })
-              // The SAVE must come from the editingMachine, which it does...
               RESOLVE: { actions: "notifySuccess", target: "complete" },
               REJECT: { actions: "notifyFailure", target: "editing" },
             },
@@ -238,9 +236,11 @@ export const provideEditing = () => {
     return focus.value === "inline" ? inline.value : forms.value[focus.value];
   });
 
-  // Reactive flags.
+  // Reactive values.
   const mouseoverSubmit = ref(false);
   const recenter = ref(null);
+  const hideEditing = ref(null);
+  const showEditing = ref(null);
 
   // Helper functions.
   const hideAll = () => {
@@ -337,6 +337,7 @@ export const provideEditing = () => {
     postSubmitRefreshWatcher,
     disabled,
     editingDetailRouteGuard,
+    hideEditing,
     formSubmitWatcher,
     focus,
     focusActor,
@@ -349,6 +350,7 @@ export const provideEditing = () => {
     recenter,
     recenterWatcher,
     showAll,
+    showEditing,
     submitting,
   });
 };

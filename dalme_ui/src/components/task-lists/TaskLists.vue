@@ -143,6 +143,7 @@ export default defineComponent({
     const $notifier = useNotifier();
     const $router = useRouter();
     const {
+      showEditing,
       machine: { send },
     } = useEditing();
     const {
@@ -188,13 +189,15 @@ export default defineComponent({
       showing.value = true;
     }
 
-    const handleCreate = () =>
+    const handleCreate = () => {
       send("SPAWN_FORM", {
         cuid: cuid(),
         initialData: {},
         kind: "taskList",
         mode: "create",
       });
+      showEditing.value();
+    };
 
     const handleEdit = async ({ id }) => {
       const { data, success, fetchAPI } = useAPI(context);
@@ -210,6 +213,7 @@ export default defineComponent({
               kind: "taskList",
               mode: "update",
             });
+            showEditing.value();
           });
       }
     };

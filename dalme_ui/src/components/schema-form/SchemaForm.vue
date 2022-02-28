@@ -52,15 +52,12 @@ export default {
       (newMeta) => {
         if (newMeta.touched && !newMeta.pending) {
           const { send } = useActor(forms.value[props.cuid]);
-          // TODO: Won't work unless caption is present in options data argh]
+          // TODO: Won't work unless caption is also present in options data.
           // We *could* compare them post-transform, but that seems complected?
           // const hasDiffs =
           //   newMeta.touched &&
           //   toRaw(newMeta.initialValues) !== toRaw(props.formModel);
-          send({
-            type: "VALIDATE",
-            validated: newMeta.valid,
-          });
+          send({ type: "VALIDATE", validated: newMeta.valid });
         }
       },
     );

@@ -6,6 +6,7 @@
     class="z-max"
   >
     <q-fab
+      ref="el"
       text-color="white"
       icon="keyboard_arrow_left"
       direction="left"
@@ -28,9 +29,9 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 
-import { usePermissions } from "@/use";
+import { useEditing, usePermissions } from "@/use";
 
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
@@ -44,10 +45,12 @@ export default defineComponent({
     EditUpdate,
   },
   setup() {
+    const { hideEditing, showEditing } = useEditing();
     const {
       permissions: { isAdmin },
     } = usePermissions();
 
+    const el = ref(null);
     const dragging = ref(false);
     const position = ref([30, 30]);
 
@@ -59,7 +62,13 @@ export default defineComponent({
       ];
     };
 
+    onMounted(() => {
+      hideEditing.value = el.value.hide;
+      showEditing.value = el.value.show;
+    });
+
     return {
+      el,
       dragging,
       isAdmin,
       move,
