@@ -165,8 +165,8 @@
             </template>
           </template>
         </div>
-        <div class="col-1" v-if="modelValue.length > 1">
-          <div class="row">
+        <div v-if="modelValue.length > 1">
+          <div class="row items-center">
             <q-btn
               class="q-ml-auto"
               flat
