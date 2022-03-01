@@ -5,7 +5,7 @@
     text-color="black"
     :disable="!isDetail"
     :color="!isDetail ? 'grey' : 'amber'"
-    :onclick="handleClick"
+    :onclick="() => handleClick(resource)"
   />
 </template>
 
@@ -31,10 +31,10 @@ export default defineComponent({
     const $route = useRoute();
 
     const id = computed(() => $route.params.id);
-    const kind = computed(() => $route.name.toLowerCase());
+    const resource = computed(() => $route.name.toLowerCase());
 
-    const fetchData = async () => {
-      const { edit: editSchema } = forms[kind.value];
+    const handleClick = async (kind) => {
+      const { edit: editSchema } = forms[kind];
       await fetchAPI(requests.tasks.getTask(id.value));
       if (success.value) {
         await editSchema
@@ -43,21 +43,17 @@ export default defineComponent({
             send("SPAWN_FORM", {
               cuid: cuid(),
               initialData: value,
-              kind: kind.value,
+              kind,
               mode,
             });
           });
       }
     };
 
-    const handleClick = async () => {
-      // TODO: Disable if obj already open.
-      await fetchData();
-    };
-
     return {
       handleClick,
       isDetail,
+      resource,
     };
   },
 });

@@ -3,8 +3,20 @@ import S from "string";
 import { apiUrl, headers } from "./config";
 
 const endpoint = `${apiUrl}/tasks`;
+const v2Endpoint = `${apiUrl}/v2/tasks`;
 
 const tasks = {
+  getTasks() {
+    return new Request(endpoint);
+  },
+  getTask(id) {
+    const url = `${endpoint}/${id}`;
+    return new Request(url);
+  },
+  getUserTasks(userId) {
+    const url = `${v2Endpoint}/?assigned_to=${userId}`;
+    return new Request(url);
+  },
   createTask(data) {
     const url = `${endpoint}/`;
     return new Request(url, {
@@ -21,13 +33,6 @@ const tasks = {
       body: JSON.stringify(data),
     });
   },
-  getTasks() {
-    return new Request(endpoint);
-  },
-  getTask(id) {
-    const url = `${endpoint}/${id}`;
-    return new Request(url);
-  },
   setTaskState(id, action) {
     const url = `${endpoint}/${id}/set_state/`;
     return new Request(url, {
@@ -36,8 +41,12 @@ const tasks = {
       body: JSON.stringify({ action: S(action).underscore().s }),
     });
   },
-  taskLists() {
+  getTaskLists() {
     const url = `${apiUrl}/tasklists`;
+    return new Request(url);
+  },
+  getTaskList(id) {
+    const url = `${apiUrl}/tasklists/${id}`;
     return new Request(url);
   },
   createTaskList(data) {
@@ -62,16 +71,6 @@ const tasks = {
       headers: headers,
       body: JSON.stringify(data),
     });
-  },
-  getTaskList(id) {
-    const url = `${apiUrl}/tasklists/${id}`;
-    return new Request(url);
-  },
-  userTasks(userId) {
-    // TODO: This does nothing right now, add new endpoint.
-    const query = `stubbed=${userId}`;
-    const url = `${endpoint}/?${query}`;
-    return new Request(url);
   },
 };
 

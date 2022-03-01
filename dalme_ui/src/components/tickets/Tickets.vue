@@ -13,7 +13,7 @@
         :loading="loading"
         row-key="id"
       >
-        <template v-slot:top-right>
+        <template v-if="!nothingOwned" v-slot:top-right>
           <q-input
             borderless
             dense
@@ -25,6 +25,10 @@
               <q-icon name="search" />
             </template>
           </q-input>
+        </template>
+
+        <template v-slot:no-data="{ message }">
+          <div>{{ message }}</div>
         </template>
 
         <template v-slot:body-cell-tags="props">
@@ -145,8 +149,11 @@ export default defineComponent({
     const visibleColumns = ref(null);
     const rows = ref([]);
     const filter = ref("");
+    const nothingOwned = ref(false);
 
-    const noData = "No tickets found.";
+    const noData = props.embedded
+      ? "No assigned tickets."
+      : "No tickets found.";
     const title = props.embedded ? "My Issue Tickets" : "Issue Tickets";
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
@@ -200,17 +207,25 @@ export default defineComponent({
       return Promise.all(map(resolveAttachment, tickets));
     };
 
+    const setColumns = () => {
+      columns.value = getColumns();
+      visibleColumns.value = filterVisibleColumns(columns.value);
+    };
+
     const fetchData = async () => {
       const request = props.embedded
-        ? requests.tickets.userTickets($store.getters["auth/userId"])
+        ? requests.tickets.getUserTickets($store.getters["auth/userId"])
         : requests.tickets.getTickets();
       await fetchAPI(request);
       if (success.value)
         await ticketListSchema
           .validate(data.value, { stripUnknown: true })
           .then(async (value) => {
-            columns.value = getColumns();
-            visibleColumns.value = filterVisibleColumns(columns.value);
+            if (value.count > 0) {
+              setColumns();
+            } else {
+              if (props.embedded) nothingOwned.value = true;
+            }
             rows.value = await resolveAttachments(value.results);
             loading.value = false;
           });
@@ -223,6 +238,7 @@ export default defineComponent({
       filter,
       noData,
       openURL,
+      nothingOwned,
       pagination,
       rows,
       title,

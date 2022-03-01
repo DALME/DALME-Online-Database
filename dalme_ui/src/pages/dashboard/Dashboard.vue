@@ -1,6 +1,7 @@
 <template>
   <Page>
     <Tasks :embedded="true" />
+    <Worksets />
     <Tickets :embedded="true" />
   </Page>
 </template>
@@ -9,7 +10,7 @@
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Page, Tasks, Tickets } from "@/components";
+import { Page, Tasks, Tickets, Worksets } from "@/components";
 
 export default defineComponent({
   name: "Dashboard",
@@ -17,6 +18,7 @@ export default defineComponent({
     Page,
     Tasks,
     Tickets,
+    Worksets,
   },
   setup() {
     useMeta({ title: "Dashboard" });

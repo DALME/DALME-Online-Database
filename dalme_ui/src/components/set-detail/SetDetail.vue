@@ -100,31 +100,29 @@
             </div>
             <div class="col-8">{{ set.statText }}</div>
           </div>
-
-          <template v-if="isWorkset">
-            <div class="row q-my-xs" v-if="!isNil(set.worksetProgress)">
-              <div class="col-2 text-weight-medium text-right q-mr-lg">
-                Progress
-              </div>
-              <div class="col-8">
-                <q-linear-progress
-                  size="20px"
-                  :value="set.worksetProgress"
-                  color="teal"
-                >
-                  <div class="absolute-full flex flex-center">
-                    <q-badge
-                      color="white"
-                      text-color="teal"
-                      :label="`${set.worksetProgress * 100}%`"
-                    />
-                  </div>
-                </q-linear-progress>
-              </div>
-            </div>
-          </template>
         </template>
       </q-card-section>
+    </q-card>
+
+    <q-card class="q-ma-md q-pa-md" v-if="isWorkset">
+      <div class="row q-my-xs" v-if="!isNil(set.worksetProgress)">
+        <div class="col-2 text-weight-medium text-right q-mr-lg">Progress</div>
+        <div class="col-8">
+          <q-linear-progress
+            size="20px"
+            :value="set.worksetProgress"
+            color="teal"
+          >
+            <div class="absolute-full flex flex-center">
+              <q-badge
+                color="white"
+                text-color="teal"
+                :label="`${set.worksetProgress * 100}%`"
+              />
+            </div>
+          </q-linear-progress>
+        </div>
+      </div>
     </q-card>
 
     <q-card class="q-ma-md" v-if="hasMembers">

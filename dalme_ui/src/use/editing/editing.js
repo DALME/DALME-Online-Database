@@ -1,5 +1,4 @@
 import {
-  all,
   any,
   isEmpty,
   isNil,
@@ -275,7 +274,7 @@ export const provideEditing = () => {
     const nothingValid =
       isNil(inline.value) &&
       (isEmpty(validated.value) ||
-        all((value) => value === false)(values(validated.value)));
+        values(validated.value).every((value) => !value));
 
     const focusValid =
       focus.value === "inline" ||
@@ -334,7 +333,6 @@ export const provideEditing = () => {
   };
 
   provide(EditingSymbol, {
-    postSubmitRefreshWatcher,
     disabled,
     editingDetailRouteGuard,
     hideEditing,
@@ -347,6 +345,7 @@ export const provideEditing = () => {
     isDetail,
     machine,
     mouseoverSubmit,
+    postSubmitRefreshWatcher,
     recenter,
     recenterWatcher,
     showAll,

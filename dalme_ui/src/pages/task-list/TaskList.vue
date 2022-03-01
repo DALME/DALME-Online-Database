@@ -31,7 +31,7 @@ export default defineComponent({
     provide("taskLists", taskLists);
 
     const fetchData = async () => {
-      const request = requests.tasks.taskLists();
+      const request = requests.tasks.getTaskLists();
       fetchAPI(request).then(() => {
         if (success.value)
           taskListsSchema

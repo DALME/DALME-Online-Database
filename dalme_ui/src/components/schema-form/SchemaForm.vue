@@ -31,6 +31,7 @@ export default {
   components: { SchemaForm },
   setup(props) {
     const fieldsKey = `form-fields:${props.cuid}`;
+    // const { submitSchema } = useDynamicForm();
     const { forms } = useEditing();
 
     useSchemaForm(props.formModel);
@@ -52,11 +53,9 @@ export default {
       (newMeta) => {
         if (newMeta.touched && !newMeta.pending) {
           const { send } = useActor(forms.value[props.cuid]);
-          // TODO: Won't work unless caption is also present in options data.
-          // We *could* compare them post-transform, but that seems complected?
           // const hasDiffs =
-          //   newMeta.touched &&
-          //   toRaw(newMeta.initialValues) !== toRaw(props.formModel);
+          //   submitSchema.value.cast(toRaw(newMeta.initialValues)) !==
+          //   submitSchema.value.cast(toRaw(props.formModel));
           send({ type: "VALIDATE", validated: newMeta.valid });
         }
       },

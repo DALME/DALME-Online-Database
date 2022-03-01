@@ -24,7 +24,7 @@
           focussed: cuid === focus,
           pulse: !disabled && mouseoverSubmit && cuid === focus,
         }"
-        @click="handleFocus(cuid)"
+        @click="() => handleFocus(cuid)"
         v-ripple:blue-3
         class="column q-px-sm"
       >
@@ -50,7 +50,7 @@
 
               <q-btn
                 icon="center_focus_weak"
-                @click.stop="handleRecenter(cuid)"
+                @click.stop="() => handleRecenter(cuid)"
                 size="8px"
                 round
               >

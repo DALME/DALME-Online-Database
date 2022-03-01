@@ -1,6 +1,8 @@
 import { apiUrl } from "./config";
+import { worksetId } from "./constants";
 
 const endpoint = `${apiUrl}/sets`;
+const v2Endpoint = `${apiUrl}/v2/sets`;
 
 const sets = {
   getSet(id) {
@@ -16,6 +18,10 @@ const sets = {
   },
   getSetMembers(id, query) {
     const url = `${endpoint}/${id}/members/?${query}`;
+    return new Request(url);
+  },
+  getUserWorksets(userId) {
+    const url = `${v2Endpoint}/?type=${worksetId}&owner=${userId}`;
     return new Request(url);
   },
 };

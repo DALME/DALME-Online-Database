@@ -1,5 +1,5 @@
 // Any imports that break alphabetical order had to be positioned to avoid
-// cirucular resolution within components.
+// cirucular import errors within components.
 export { default as Agents } from "./agents";
 export { default as Attachments } from "./attachments";
 export { default as CommentForm } from "./comment-form";
@@ -32,3 +32,4 @@ export { default as Tickets } from "./tickets";
 export { default as TicketDetail } from "./ticket-detail";
 export { default as Users } from "./users";
 export { default as UserDetail } from "./user-detail";
+export { default as Worksets } from "./worksets";

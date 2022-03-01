@@ -37,7 +37,9 @@ const taskFormSchema = {
     label: "Task list *",
     description: "Designate the category the task is filed under.",
     getOptions: () =>
-      fetcher(requests.tasks.taskLists()).then((response) => response.json()),
+      fetcher(requests.tasks.getTaskLists()).then((response) =>
+        response.json(),
+      ),
     optionsSchema: taskListOptionsSchema,
     validation: taskFieldValidation.taskList,
   },

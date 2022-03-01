@@ -78,6 +78,7 @@ const worksetSchema = yup
     endpoint: yup.string().required(),
     owner: ownerSchema.required(),
     permissions: permissionSchema.required(),
+    worksetProgress: yup.number().required(),
   })
   .camelCase();
 

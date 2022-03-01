@@ -12,6 +12,10 @@ const tickets = {
     const url = `${endpoint}/${id}`;
     return new Request(url);
   },
+  getUserTickets(userId) {
+    const url = `${endpoint}/?assigned_to=${userId}`;
+    return new Request(url);
+  },
   setTicketState(id, action) {
     const url = `${endpoint}/${id}/set_state/`;
     return new Request(url, {
@@ -19,12 +23,6 @@ const tickets = {
       headers: headers,
       body: JSON.stringify({ action: S(action).underscore().s }),
     });
-  },
-  userTickets(userId) {
-    // TODO: This does nothing right now, add new endpoint.
-    const query = `stubbed=${userId}`;
-    const url = `${endpoint}/?${query}`;
-    return new Request(url);
   },
 };
 

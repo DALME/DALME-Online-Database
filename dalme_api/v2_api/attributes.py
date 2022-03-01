@@ -23,14 +23,12 @@ class Attributes(api.Attributes):
     def get_serializer_class(self):
         if self.request.GET.get('options'):
             return AttributeOptionsSerializer
-
         return super().get_serializer_class()
 
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('options'):
             short_name = self.request.GET['options']
             return self.get_options(short_name)
-
         return super().get_queryset(*args, **kwargs)
 
     def get_options(self, short_name):
@@ -38,11 +36,9 @@ class Attributes(api.Attributes):
             attribute_type = Attribute_type.objects.get(short_name=short_name)
         except Attribute_type.DoesNotExist:
             Response(status=status.HTTP_404_NOT_FOUND)
-
         return self.resolve_data(short_name, attribute_type)
 
     def resolve_data(self, short_name, attribute_type):
-        # TODO: Can use generator expressions?
         return {
             'created_by': self.get_user_options(),
             'last_user': self.get_user_options(),

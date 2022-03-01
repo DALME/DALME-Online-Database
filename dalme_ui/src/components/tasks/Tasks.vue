@@ -13,7 +13,7 @@
         :loading="loading"
         row-key="title"
       >
-        <template v-slot:top-right>
+        <template v-if="!nothingOwned" v-slot:top-right>
           <q-input
             borderless
             dense
@@ -27,6 +27,10 @@
           </q-input>
         </template>
 
+        <template v-slot:no-data="{ message }">
+          <div>{{ message }}</div>
+        </template>
+
         <template v-slot:body-cell-title="props">
           <q-td class="task" :props="props">
             <router-link
@@ -35,7 +39,7 @@
             >
               {{ props.value }}
             </router-link>
-            <div class="details">{{ props.row.description }}</div>
+            <div>{{ props.row.description }}</div>
           </q-td>
         </template>
 
@@ -109,13 +113,14 @@ export default defineComponent({
     const { loading, success, data, fetchAPI } = useAPI(context);
 
     const columns = ref([]);
-    const visibleColumns = ref([]);
+    const visibleColumns = ref(null);
     const rows = ref([]);
     const filteredRows = ref([]);
     const filter = ref("");
     const taskLists = props.embedded ? ref([]) : inject("taskLists");
+    const nothingOwned = ref(false);
 
-    const noData = "No tasks found.";
+    const noData = props.embedded ? "No assigned tasks." : "No tasks found.";
     const title = props.embedded ? "My Tasks" : "Tasks";
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
@@ -192,6 +197,17 @@ export default defineComponent({
       filteredRows.value = final;
     };
 
+    const setColumns = () => {
+      columns.value = getColumns();
+      const excluded = props.embedded
+        ? ["owner", "description", "createdBy"]
+        : ["description", "createdBy"];
+      visibleColumns.value = map(
+        (column) => column.field,
+        rFilter((column) => !excluded.includes(column.field), columns.value),
+      );
+    };
+
     watch(
       () => $router.currentRoute.value.query,
       (query) => {
@@ -207,25 +223,17 @@ export default defineComponent({
 
     const fetchData = async () => {
       const request = props.embedded
-        ? requests.tasks.userTasks($store.getters["auth/userId"])
+        ? requests.tasks.getUserTasks($store.getters["auth/userId"])
         : requests.tasks.getTasks();
       await fetchAPI(request);
       if (success.value)
         await tasksSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            if (!isEmpty(value)) {
-              columns.value = getColumns();
-              const excluded = props.embedded
-                ? ["owner", "description", "createdBy"]
-                : ["description", "createdBy"];
-              visibleColumns.value = map(
-                (column) => column.field,
-                rFilter(
-                  (column) => !excluded.includes(column.field),
-                  columns.value,
-                ),
-              );
+            if (isEmpty(value)) {
+              if (props.embedded) nothingOwned.value = true;
+            } else {
+              setColumns();
             }
             rows.value = value;
             const query = $router.currentRoute.value.query;
@@ -246,6 +254,7 @@ export default defineComponent({
       loading,
       noData,
       openURL,
+      nothingOwned,
       pagination,
       filteredRows,
       title,
