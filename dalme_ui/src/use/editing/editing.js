@@ -240,6 +240,7 @@ export const provideEditing = () => {
   const recenter = ref(null);
   const hideEditing = ref(null);
   const showEditing = ref(null);
+  const editingObjIndex = ref({}); // { kind: { cuid: objId } }
 
   // Helper functions.
   const hideAll = () => {
@@ -335,6 +336,7 @@ export const provideEditing = () => {
   provide(EditingSymbol, {
     disabled,
     editingDetailRouteGuard,
+    editingObjIndex,
     hideEditing,
     formSubmitWatcher,
     focus,
