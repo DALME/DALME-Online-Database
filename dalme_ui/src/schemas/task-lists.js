@@ -53,7 +53,6 @@ export const taskListEditSchema = yup.object().shape({
     .transform((option) => ({ value: option.id, label: option.name }))
     .required(),
 });
-
 // Full object schema.
 export const taskListSchema = yup
   .object()
@@ -72,10 +71,13 @@ export const taskListSchema = yup
 export const taskListsSchema = yup.array().of(taskListSchema);
 
 // API submit schemas.
-export const taskListPostSchema = yup.object().shape({
-  name: yup.string().required(),
-  group: yup.number().required(),
-});
+export const taskListPostSchema = yup
+  .object()
+  .shape({
+    name: yup.string().required(),
+    group: yup.number().required(),
+  })
+  .transform((obj) => ({ ...obj, group: obj.group.value }));
 
 export const taskListPutSchema = taskListPostSchema.shape({
   id: yup.number().required(),

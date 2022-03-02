@@ -6,8 +6,8 @@
 
 <script>
 import { SchemaForm, useSchemaForm } from "formvuelate";
-import { toRaw, watch } from "vue";
 import { useForm } from "vee-validate";
+import { toRaw, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 import { useActor } from "@xstate/vue";
 
@@ -56,9 +56,11 @@ export default {
       (newMeta) => {
         if (newMeta.touched && !newMeta.pending) {
           const { send } = useActor(forms.value[props.cuid]);
-          const hasDiffs =
-            props.submitSchema.cast(toRaw(newMeta.initialValues)) !==
-            props.submitSchema.cast(toRaw(props.formModel));
+
+          const initial = props.submitSchema.cast(toRaw(newMeta.initialValues));
+          const current = props.submitSchema.cast(toRaw(props.formModel));
+          const hasDiffs = JSON.stringify(initial) !== JSON.stringify(current);
+
           send({ type: "VALIDATE", validated: hasDiffs && newMeta.valid });
         }
       },
