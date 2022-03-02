@@ -6,7 +6,7 @@
 
 <script>
 import { SchemaForm, useSchemaForm } from "formvuelate";
-import { watch } from "vue";
+import { toRaw, watch } from "vue";
 import { useForm } from "vee-validate";
 import { useStorage } from "@vueuse/core";
 import { useActor } from "@xstate/vue";
@@ -27,11 +27,14 @@ export default {
       type: Object,
       required: true,
     },
+    submitSchema: {
+      type: Object,
+      required: true,
+    },
   },
   components: { SchemaForm },
   setup(props) {
     const fieldsKey = `form-fields:${props.cuid}`;
-    // const { submitSchema } = useDynamicForm();
     const { forms } = useEditing();
 
     useSchemaForm(props.formModel);
@@ -53,10 +56,10 @@ export default {
       (newMeta) => {
         if (newMeta.touched && !newMeta.pending) {
           const { send } = useActor(forms.value[props.cuid]);
-          // const hasDiffs =
-          //   submitSchema.value.cast(toRaw(newMeta.initialValues)) !==
-          //   submitSchema.value.cast(toRaw(props.formModel));
-          send({ type: "VALIDATE", validated: newMeta.valid });
+          const hasDiffs =
+            props.submitSchema.cast(toRaw(newMeta.initialValues)) !==
+            props.submitSchema.cast(toRaw(props.formModel));
+          send({ type: "VALIDATE", validated: hasDiffs && newMeta.valid });
         }
       },
     );

@@ -1,12 +1,8 @@
-import { ref, watch } from "vue";
+import { watch } from "vue";
 
 import forms from "@/forms";
 
-export const useDynamicForm = () => {
-  const formRequest = ref(null);
-  const formSchema = ref(null);
-  const submitSchema = ref(null);
-
+export const useDynamicForm = (formRequest, formSchema, submitSchema) => {
   const formWatcher = (kind, mode) => {
     watch(
       () => kind.value,
@@ -18,6 +14,8 @@ export const useDynamicForm = () => {
           submitSchema.value = submit[mode.value];
         } else {
           formSchema.value = null;
+          formRequest.value = null;
+          submitSchema.value = null;
         }
       },
       { immediate: true },
@@ -25,9 +23,6 @@ export const useDynamicForm = () => {
   };
 
   return {
-    formSchema,
     formWatcher,
-    formRequest,
-    submitSchema,
   };
 };

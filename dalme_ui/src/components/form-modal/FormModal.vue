@@ -27,7 +27,12 @@
           </div>
         </q-card-section>
 
-        <SchemaForm :cuid="cuid" :schema="formSchema" :formModel="formModel" />
+        <SchemaForm
+          :cuid="cuid"
+          :schema="formSchema"
+          :form-model="formModel"
+          :submit-schema="submitSchema"
+        />
 
         <q-card-actions class="q-mt-md q-px-none q-pb-md">
           <q-btn
@@ -104,9 +109,16 @@ export default defineComponent({
     },
   },
   setup(props, context) {
+    const formRequest = ref(null);
+    const formSchema = ref(null);
+    const submitSchema = ref(null);
+
     const { status, success, fetchAPI } = useAPI(context);
-    const { formRequest, formSchema, formWatcher, submitSchema } =
-      useDynamicForm();
+    const { formWatcher } = useDynamicForm(
+      formRequest,
+      formSchema,
+      submitSchema,
+    );
     const {
       disabled,
       focus,
@@ -199,6 +211,7 @@ export default defineComponent({
       mode,
       mouseoverSubmit,
       submitting,
+      submitSchema,
       visible,
     };
   },
