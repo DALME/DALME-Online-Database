@@ -1,4 +1,4 @@
-import { any, isNil, map as rMap, omit, keys, values } from "ramda";
+import { any, isEmpty, isNil, map as rMap, omit, keys, values } from "ramda";
 import { computed, inject, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { assign, createMachine, send, spawn } from "xstate";
@@ -220,11 +220,11 @@ export const provideEditing = () => {
   const isDetail = useSelector(service, (state) => state.context.detail);
 
   // Reactive values.
+  const editingObjIndex = ref({}); // { kind: { cuid: objId } }
   const mouseoverSubmit = ref(false);
   const recenter = ref(null);
   const hideEditing = ref(null);
   const showEditing = ref(null);
-  const editingObjIndex = ref({}); // { kind: { cuid: objId } }
 
   // TODO: Need a way to broadcast or batch these sends or they could
   // (hypothetically) results in N (where N = keys(forms.value.length))
@@ -257,6 +257,17 @@ export const provideEditing = () => {
     // TODO: any(Boolean, isSaving);
     return any((saving) => saving === true, isSaving);
   });
+
+  // Close the editor when there's no CRUD happening.
+  const noEditing = computed(() => isNil(inline.value) && isEmpty(forms.value));
+  watch(
+    () => noEditing.value,
+    (newValue) => {
+      if (newValue) {
+        hideEditing.value();
+      }
+    },
+  );
 
   // Invokes a particular form's submit callback whenever its actor transitions
   // to the "saving" state.

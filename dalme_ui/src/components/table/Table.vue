@@ -171,6 +171,7 @@ export default defineComponent({
       formSubmitWatcher,
       inline,
       mouseoverSubmit,
+      showEditing,
       submitting,
       machine: { send },
     } = useEditing();
@@ -255,6 +256,7 @@ export default defineComponent({
           const actor = useActor(inline.value);
           actorSend.value = actor.send;
           formSubmitWatcher(actor.state, handleSubmit);
+          showEditing.value(); // Open the edit panel.
         }
         if (prevCount === 1 && count === 0) {
           send("DESTROY_INLINE");
