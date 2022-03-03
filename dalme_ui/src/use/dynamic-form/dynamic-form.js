@@ -8,14 +8,10 @@ export const useDynamicForm = (formRequest, formSchema, submitSchema) => {
       () => kind.value,
       (value) => {
         if (value) {
-          const { requests, form, submit } = forms[value];
+          const { form, requests, submit } = forms[value];
           formSchema.value = form;
           formRequest.value = requests[mode.value];
           submitSchema.value = submit[mode.value];
-        } else {
-          formSchema.value = null;
-          formRequest.value = null;
-          submitSchema.value = null;
         }
       },
       { immediate: true },

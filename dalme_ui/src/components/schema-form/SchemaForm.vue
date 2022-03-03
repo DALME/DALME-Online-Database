@@ -27,10 +27,6 @@ export default {
       type: Object,
       required: true,
     },
-    submitSchema: {
-      type: Object,
-      required: true,
-    },
   },
   components: { SchemaForm },
   setup(props) {
@@ -57,8 +53,8 @@ export default {
         if (newMeta.touched && !newMeta.pending) {
           const { send } = useActor(forms.value[props.cuid]);
 
-          const initial = props.submitSchema.cast(toRaw(newMeta.initialValues));
-          const current = props.submitSchema.cast(toRaw(props.formModel));
+          const initial = toRaw(newMeta.initialValues);
+          const current = toRaw(props.formModel);
           const hasDiffs = JSON.stringify(initial) !== JSON.stringify(current);
 
           send({ type: "VALIDATE", validated: hasDiffs && newMeta.valid });

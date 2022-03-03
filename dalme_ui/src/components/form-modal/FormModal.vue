@@ -27,12 +27,7 @@
           </div>
         </q-card-section>
 
-        <SchemaForm
-          :cuid="cuid"
-          :schema="formSchema"
-          :form-model="formModel"
-          :submit-schema="submitSchema"
-        />
+        <SchemaForm :cuid="cuid" :schema="formSchema" :form-model="formModel" />
 
         <q-card-actions class="q-mt-md q-px-none q-pb-md">
           <q-btn
@@ -211,7 +206,6 @@ export default defineComponent({
       mode,
       mouseoverSubmit,
       submitting,
-      submitSchema,
       visible,
     };
   },

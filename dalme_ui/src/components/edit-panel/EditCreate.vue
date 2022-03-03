@@ -3,16 +3,16 @@
     icon="add"
     text-color="black"
     direction="up"
-    :color="disabled ? 'grey' : 'amber'"
-    :disable="disabled"
+    :color="dragging ? 'grey' : 'amber'"
+    :disable="dragging"
   >
     <q-fab
       padding="0.5rem"
       icon="bookmark"
       text-color="black"
       direction="left"
-      :color="disabled ? 'grey' : 'orange'"
-      :disable="disabled"
+      :color="dragging ? 'grey' : 'orange'"
+      :disable="dragging"
     >
       <q-fab-action
         :onClick="() => handleClick('archive')"
@@ -101,7 +101,7 @@
 
 <script>
 import cuid from "cuid";
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 
 import { useEditing } from "@/use";
 
@@ -113,11 +113,13 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
 
+    const dragging = inject("dragging");
+
     const handleClick = (kind) =>
       send("SPAWN_FORM", { cuid: cuid(), kind, mode, initialData: {} });
 
     return {
-      disabled: false,
+      dragging,
       handleClick,
     };
   },

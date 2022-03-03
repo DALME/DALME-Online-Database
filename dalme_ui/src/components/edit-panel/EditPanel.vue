@@ -11,6 +11,7 @@
       icon="keyboard_arrow_left"
       direction="left"
       class="parent"
+      :color="dragging ? 'grey' : 'initial'"
       :disable="dragging"
       v-touch-pan.prevent.mouse="move"
     >
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, provide, ref } from "vue";
 
 import { useEditing, usePermissions } from "@/use";
 
@@ -55,12 +56,14 @@ export default defineComponent({
     const position = ref([30, 30]);
 
     const move = (event) => {
-      dragging.value = event.isFirst !== true && event.isFinal !== true;
+      dragging.value = event.isFirst !== true && event.isFinal === false;
       position.value = [
         position.value[0] - event.delta.x,
         position.value[1] - event.delta.y,
       ];
     };
+
+    provide("dragging", dragging);
 
     onMounted(() => {
       hideEditing.value = el.value.hide;

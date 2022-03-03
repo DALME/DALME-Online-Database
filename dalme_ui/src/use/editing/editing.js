@@ -11,7 +11,7 @@ import {
 import { computed, inject, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { assign, createMachine, send, spawn } from "xstate";
-import { useMachine, useSelector } from "@xstate/vue";
+import { useActor, useMachine, useSelector } from "@xstate/vue";
 
 import { default as notifier } from "@/notifier";
 
@@ -217,11 +217,18 @@ export const provideEditing = () => {
   const machine = useMachine(editingMachine);
   const { service } = machine;
 
+  // TODO: Should be using this pattern?
+  service.subscribe((state) => {
+    console.log("MACHINE -> :", state);
+  });
+
   // Convenience getters lensing into the machine context.
   const focus = useSelector(service, (state) => state.context.focus);
   const forms = useSelector(service, (state) => state.context.forms);
   const inline = useSelector(service, (state) => state.context.inline);
   const isDetail = useSelector(service, (state) => state.context.detail);
+
+  // TODO: Equivalent to a computed over forms.value?
   const validated = useSelector(service, (state) =>
     mapObjIndexed(
       (actor) => actor.getSnapshot().context.validated,
@@ -243,14 +250,19 @@ export const provideEditing = () => {
   const editingObjIndex = ref({}); // { kind: { cuid: objId } }
 
   // Helper functions.
+  // TODO: Need a way to broadcast or batch these sends or they could
+  // (hypothetically) results in N (where N = keys(forms.value.length))
+  // re-renders as each actor transitions.
   const hideAll = () => {
     for (let actor of values(forms.value)) {
-      actor.send("HIDE");
+      const { send } = useActor(actor);
+      send("HIDE");
     }
   };
   const showAll = () => {
     for (let actor of values(forms.value)) {
-      actor.send("SHOW");
+      const { send } = useActor(actor);
+      send("SHOW");
     }
   };
 
@@ -266,6 +278,7 @@ export const provideEditing = () => {
 
     const isSaving = [...formsSaving, inlineSaving];
 
+    // TODO: any(Boolean, isSaving);
     return any((saving) => saving === true, isSaving);
   });
 
