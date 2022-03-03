@@ -12,7 +12,7 @@
         :loading="loading"
         row-key="id"
       >
-        <template v-if="!nothingOwned" v-slot:top-right>
+        <template v-if="showSearch" v-slot:top-right>
           <q-input
             borderless
             dense
@@ -100,7 +100,7 @@ export default defineComponent({
     const columns = ref([]);
     const rows = ref([]);
     const filter = ref("");
-    const nothingOwned = ref(false);
+    const showSearch = ref(true);
 
     const noData = "No owned worksets.";
     const title = "My Worksets";
@@ -130,7 +130,7 @@ export default defineComponent({
             if (value.length > 0) {
               columns.value = getColumns();
             } else {
-              nothingOwned.value = true;
+              showSearch.value = false;
             }
             rows.value = value;
             loading.value = false;
@@ -144,9 +144,9 @@ export default defineComponent({
       filter,
       noData,
       openURL,
-      nothingOwned,
       pagination,
       rows,
+      showSearch,
       title,
       loading,
     };

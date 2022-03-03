@@ -13,7 +13,7 @@
         :loading="loading"
         row-key="id"
       >
-        <template v-if="!nothingOwned" v-slot:top-right>
+        <template v-if="showSearch" v-slot:top-right>
           <q-input
             borderless
             dense
@@ -149,7 +149,7 @@ export default defineComponent({
     const visibleColumns = ref(null);
     const rows = ref([]);
     const filter = ref("");
-    const nothingOwned = ref(false);
+    const showSearch = ref(true);
 
     const noData = props.embedded
       ? "No assigned tickets."
@@ -224,7 +224,7 @@ export default defineComponent({
             if (value.count > 0) {
               setColumns();
             } else {
-              if (props.embedded) nothingOwned.value = true;
+              if (props.embedded) showSearch.value = false;
             }
             rows.value = await resolveAttachments(value.results);
             loading.value = false;
@@ -236,14 +236,14 @@ export default defineComponent({
     return {
       columns,
       filter,
+      loading,
       noData,
       openURL,
-      nothingOwned,
       pagination,
       rows,
+      showSearch,
       title,
       visibleColumns,
-      loading,
     };
   },
 });

@@ -13,7 +13,7 @@
         :loading="loading"
         row-key="title"
       >
-        <template v-if="!nothingOwned" v-slot:top-right>
+        <template v-if="showSearch" v-slot:top-right>
           <q-input
             borderless
             dense
@@ -118,7 +118,7 @@ export default defineComponent({
     const filteredRows = ref([]);
     const filter = ref("");
     const taskLists = props.embedded ? ref([]) : inject("taskLists");
-    const nothingOwned = ref(false);
+    const showSearch = ref(true);
 
     const noData = props.embedded ? "No assigned tasks." : "No tasks found.";
     const title = props.embedded ? "My Tasks" : "Tasks";
@@ -231,7 +231,7 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             if (isEmpty(value)) {
-              if (props.embedded) nothingOwned.value = true;
+              if (props.embedded) showSearch.value = false;
             } else {
               setColumns();
             }
@@ -251,12 +251,12 @@ export default defineComponent({
     return {
       columns,
       filter,
+      filteredRows,
       loading,
       noData,
       openURL,
-      nothingOwned,
       pagination,
-      filteredRows,
+      showSearch,
       title,
       visibleColumns,
     };
