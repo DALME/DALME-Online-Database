@@ -217,6 +217,7 @@ import { useFieldArray } from "vee-validate";
 import { attributeFields } from "./attributes";
 
 export default defineComponent({
+  name: "AttributesField",
   props: {
     modelValue: {
       type: Array,
