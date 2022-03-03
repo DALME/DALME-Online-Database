@@ -6,7 +6,7 @@
     :disable="!valid"
     :color="!valid ? 'grey' : mouseoverSubmit ? 'red' : 'green'"
     :text-color="!valid ? 'black' : 'white'"
-    @click="handleSubmit"
+    @click.stop="handleSubmit"
     @mouseover="mouseoverSubmit = true"
     @mouseleave="mouseoverSubmit = false"
   >

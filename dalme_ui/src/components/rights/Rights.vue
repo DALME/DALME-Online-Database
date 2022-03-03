@@ -55,7 +55,7 @@
           <q-td :props="props">
             <q-btn
               push
-              @click="openURL(props.value.url)"
+              @click.stop="openURL(props.value.url)"
               :label="props.value.kind"
               target="_blank"
               color="white"

@@ -39,7 +39,7 @@
       <q-separator />
 
       <q-card-actions v-if="isAdmin">
-        <q-btn @click="onAction" flat>{{ action }}</q-btn>
+        <q-btn @click.stop="onAction" flat>{{ action }}</q-btn>
       </q-card-actions>
       <OpaqueSpinner :showing="loading" />
     </q-card>

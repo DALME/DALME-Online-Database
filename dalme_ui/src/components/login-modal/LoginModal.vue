@@ -29,7 +29,7 @@
             <q-icon
               class="cursor-pointer"
               :name="isPassword ? 'visibility_off' : 'visibility'"
-              @click="isPassword = !isPassword"
+              @click.stop="isPassword = !isPassword"
             />
           </template>
         </q-input>

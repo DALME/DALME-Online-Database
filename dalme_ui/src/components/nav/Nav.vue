@@ -7,7 +7,7 @@
         round
         icon="menu"
         aria-label="Menu"
-        @click="toggleNav"
+        @click.stop="toggleNav"
       />
       <q-toolbar-title class="dalme-logo self-end"> DALME </q-toolbar-title>
     </q-toolbar>
@@ -41,7 +41,7 @@
           icon="exit_to_app"
           label="Logout"
           size="sm"
-          @click="logout"
+          @click.stop="logout"
           :loading="submitting"
         >
           <template v-slot:loading>

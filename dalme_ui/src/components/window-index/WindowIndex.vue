@@ -6,13 +6,13 @@
         text-color="black"
         label="Hide All"
         class="q-ml-auto"
-        @click="hideAll"
+        @click.stop="hideAll"
       />
       <q-btn
         color="white"
         text-color="black"
         label="Show All"
-        @click="showAll"
+        @click.stop="showAll"
       />
     </div>
     <q-list separator>
@@ -24,7 +24,7 @@
           focussed: cuid === focus,
           pulse: !disabled && mouseoverSubmit && cuid === focus,
         }"
-        @click="() => handleFocus(cuid)"
+        @click.stop="() => handleFocus(cuid)"
         v-ripple:blue-3
         class="column q-px-sm"
       >
@@ -50,7 +50,7 @@
 
               <q-btn
                 icon="center_focus_weak"
-                @click.stop="() => handleRecenter(cuid)"
+                @click.stop.stop="() => handleRecenter(cuid)"
                 size="8px"
                 round
               >
