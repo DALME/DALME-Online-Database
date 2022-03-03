@@ -5,7 +5,7 @@
 <script>
 import { defineComponent } from "vue";
 
-import { SelectField, TextField } from "@/components/forms";
+// import { SelectField, TextField } from "@/components/forms";
 
 export default defineComponent({
   name: "CreditsField",
@@ -24,8 +24,8 @@ export default defineComponent({
     },
   },
   components: {
-    SelectField,
-    TextField,
+    // SelectField,
+    // TextField,
   },
   setup(props, context) {
     return {};

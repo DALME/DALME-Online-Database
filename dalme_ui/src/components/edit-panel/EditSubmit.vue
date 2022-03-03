@@ -3,9 +3,9 @@
     fab
     icon="save"
     :loading="submitting"
-    :disable="disabled"
-    :color="disabled ? 'grey' : mouseoverSubmit ? 'red' : 'green'"
-    :text-color="disabled ? 'black' : 'white'"
+    :disable="!valid"
+    :color="!valid ? 'grey' : mouseoverSubmit ? 'red' : 'green'"
+    :text-color="!valid ? 'black' : 'white'"
     @click="handleSubmit"
     @mouseover="mouseoverSubmit = true"
     @mouseleave="mouseoverSubmit = false"
@@ -17,7 +17,8 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
+import { useActor } from "@xstate/vue";
 
 import { useEditing } from "@/use";
 
@@ -25,24 +26,31 @@ export default defineComponent({
   name: "EditSubmit",
   setup() {
     const {
-      disabled,
       focus,
+      forms,
       mouseoverSubmit,
       submitting,
       machine: { send },
     } = useEditing();
 
-    const handleSubmit = () => {
+    const valid = computed(() => {
       if (focus.value) {
-        send("SAVE_FOCUS");
+        if (focus.value === "inline") return true;
+        const { state } = useActor(forms.value[focus.value]);
+        if (state.value.context.validated) return true;
       }
+      return false;
+    });
+
+    const handleSubmit = () => {
+      send("SAVE_FOCUS");
     };
 
     return {
-      disabled,
       handleSubmit,
       mouseoverSubmit,
       submitting,
+      valid,
     };
   },
 });

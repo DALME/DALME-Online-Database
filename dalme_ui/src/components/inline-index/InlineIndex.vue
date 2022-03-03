@@ -6,18 +6,18 @@
       focussed: isFocus,
       pulse: mouseoverSubmit && focus === 'inline',
     }"
-    @click="handleFocus"
+    @click.stop="handleFocus"
   >
     <div class="q-pa-md q-gutter-sm row">
       <q-btn
-        @click="transport.undo"
+        @click.stop="transport.undo"
         color="white"
         text-color="black"
         label="Undo"
         class="q-ml-auto"
       />
       <q-btn
-        @click="transport.redo"
+        @click.stop="transport.redo"
         color="white"
         text-color="black"
         label="Redo"
