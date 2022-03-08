@@ -2,31 +2,31 @@
   <div v-if="show" class="q-py-sm">
     <div class="q-pa-md q-gutter-sm row">
       <q-btn
-        color="white"
-        text-color="black"
-        label="Hide All"
         class="q-ml-auto"
+        color="white"
+        label="Hide All"
+        text-color="black"
         @click.stop="hideAll"
       />
       <q-btn
         color="white"
-        text-color="black"
         label="Show All"
+        text-color="black"
         @click.stop="showAll"
       />
     </div>
     <q-list separator>
       <q-item
         clickable
-        v-for="(actor, cuid) in actors"
+        class="column q-px-sm"
         :key="cuid"
         :class="{
           focussed: cuid === focus,
           pulse: !disabled && mouseoverSubmit && cuid === focus,
         }"
-        @click.stop="() => handleFocus(cuid)"
+        v-for="(actor, cuid) in actors"
         v-ripple:blue-3
-        class="column q-px-sm"
+        @click.stop="() => handleFocus(cuid)"
       >
         <div>
           <div class="row items-center">

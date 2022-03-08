@@ -4,12 +4,14 @@ import { fetcher, requests } from "@/api";
 import {
   AttributesField,
   BooleanField,
+  CreditsField,
   InputField,
   MultipleSelectField,
   SelectField,
 } from "@/components/forms";
 import {
   attributeSchemas,
+  creditValidators,
   pageOptionsSchema,
   recordFieldValidation,
   recordPostSchema,
@@ -55,8 +57,8 @@ const recordFormSchema = {
     optionsSchema: sourceOptionsSchema,
     validation: recordFieldValidation.parent,
   },
-  pages: {
-    field: "pages",
+  folios: {
+    field: "folios",
     component: markRaw(MultipleSelectField),
     label: "Folios",
     description: "The pages/folios contained by the source",
@@ -82,11 +84,17 @@ const recordFormSchema = {
     // NOTE: We pass this in here (rather than importing it in the the
     // component) even though it's a monolithic definition and will be the same
     // for all instances of the attributes field. That said, there may be a
-    // time we want to override some rules, so let's leave that option open.
+    // time on another definition when we want to override some rules, so let's
+    // leave that option open.
     validators: attributeSchemas,
     validation: recordFieldValidation.attributes,
   },
-  // credits
+  credits: {
+    field: "credits",
+    component: markRaw(CreditsField),
+    validators: creditValidators,
+    validation: recordFieldValidation.credits,
+  },
 };
 
 const recordSubmitSchemas = {

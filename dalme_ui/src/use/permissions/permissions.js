@@ -9,6 +9,7 @@ export const providePermissions = () => {
   const permissions = { isAdmin: $store.getters["auth/isAdmin"] };
 
   provide(PermissionsSymbol, { permissions });
+  return permissions;
 };
 
 export const usePermissions = () => inject(PermissionsSymbol);

@@ -154,7 +154,7 @@ export default defineComponent({
     const noData = props.embedded
       ? "No assigned tickets."
       : "No tickets found.";
-    const title = props.embedded ? "My Issue Tickets" : "Issue Tickets";
+    const title = props.embedded ? "My Tickets" : "Tickets";
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
 

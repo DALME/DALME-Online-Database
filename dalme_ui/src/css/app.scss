@@ -1,5 +1,9 @@
 // app global css in SCSS form
 
+html,body {
+  height: 100% !important;
+}
+
 a {
   text-decoration: none;
 }

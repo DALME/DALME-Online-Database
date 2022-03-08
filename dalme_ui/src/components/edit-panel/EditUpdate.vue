@@ -31,6 +31,7 @@ export default defineComponent({
     const $route = useRoute();
 
     const id = computed(() => $route.params.id);
+    // TODO: resourceKind (to handle Source/Set polymorphism)
     const resource = computed(() => $route.name.toLowerCase());
 
     const handleClick = async (kind) => {

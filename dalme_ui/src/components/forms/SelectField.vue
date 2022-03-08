@@ -65,7 +65,7 @@ export default defineComponent({
       default: true,
     },
     getOptions: {
-      type: Function,
+      type: [Function, Promise],
       required: true,
     },
     optionsSchema: {

@@ -1,7 +1,7 @@
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-import { attributeOptionSchema } from "@/schemas";
+import { attributeOptionSchema, creditOptionSchema } from "@/schemas";
 
 export const recordFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
@@ -38,6 +38,7 @@ export const recordFieldValidation = {
     .of(attributeOptionSchema)
     .required()
     .label("Attributes"),
+  credits: yup.array().of(creditOptionSchema).nullable().label("Credits"),
 };
 
 // Edit existing object schema.

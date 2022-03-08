@@ -1,10 +1,14 @@
 <template>
   <q-card
     class="table q-ma-md"
-    v-bind:class="{
-      focussed: isFocussed,
-      pulse: mouseoverSubmit && isFocussed,
-    }"
+    v-bind:class="
+      isAdmin
+        ? {
+            focussed: isFocussed,
+            pulse: mouseoverSubmit && isFocussed,
+          }
+        : null
+    "
   >
     <q-table
       :title="title"
@@ -24,7 +28,10 @@
             :key="column.name"
             :props="props"
             :style="{
-              borderBottom: editable.includes(column.name) && '2px solid green',
+              borderBottom:
+                isAdmin && editable.includes(column.name)
+                  ? '2px solid green'
+                  : 'none',
             }"
           >
             {{ column.label }}
@@ -50,13 +57,18 @@
         <q-tr :props="props">
           <q-td
             v-for="column in columns"
+            v-bind:class="
+              isAdmin
+                ? {
+                    'text-red-6':
+                      isDirty && cellIsDirty(props.row.id, column.field),
+                    'bg-green-1':
+                      submitting && cellIsDirty(props.row.id, column.field),
+                  }
+                : null
+            "
             :key="column.field"
             :props="props"
-            v-bind:class="{
-              'text-red-6': isDirty && cellIsDirty(props.row.id, column.field),
-              'bg-green-1':
-                submitting && cellIsDirty(props.row.id, column.field),
-            }"
           >
             <template v-if="isObj(props.row[column.field])">
               {{ props.row[column.field].name }}
@@ -65,7 +77,7 @@
               {{ props.row[column.field] }}
             </template>
 
-            <template v-if="editable.includes(column.field)">
+            <template v-if="isAdmin && editable.includes(column.field)">
               <q-popup-edit
                 v-model="props.row[column.field]"
                 v-slot="scope"
@@ -109,7 +121,7 @@ import { onBeforeRouteLeave } from "vue-router";
 import { useActor } from "@xstate/vue";
 
 import { OpaqueSpinner } from "@/components/utils";
-import { useAPI, useEditing, useTransport } from "@/use";
+import { useAPI, useEditing, usePermissions, useTransport } from "@/use";
 
 export default defineComponent({
   name: "Table",
@@ -158,15 +170,6 @@ export default defineComponent({
   },
   setup(props, context) {
     const {
-      diffCount,
-      isDirty,
-      cellIsDirty,
-      objDiffs,
-      onDiff,
-      resetTransport,
-      transportWatcher,
-    } = useTransport();
-    const {
       focus,
       formSubmitWatcher,
       inline,
@@ -175,6 +178,18 @@ export default defineComponent({
       submitting,
       machine: { send },
     } = useEditing();
+    const {
+      permissions: { isAdmin },
+    } = usePermissions();
+    const {
+      diffCount,
+      isDirty,
+      cellIsDirty,
+      objDiffs,
+      onDiff,
+      resetTransport,
+      transportWatcher,
+    } = useTransport();
 
     const rows = inject("rows");
 
@@ -279,6 +294,7 @@ export default defineComponent({
       focus,
       handleSubmit,
       inline,
+      isAdmin,
       isDirty,
       isFocussed,
       isObj,

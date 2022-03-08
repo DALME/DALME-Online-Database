@@ -243,7 +243,7 @@ import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
 import { sourceDetailSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useEditing } from "@/use";
 
 import SourceAgents from "./SourceAgents.vue";
 import SourceChildren from "./SourceChildren.vue";
@@ -298,6 +298,7 @@ export default defineComponent({
   setup(_, context) {
     const $route = useRoute();
     const { loading, success, data, fetchAPI } = useAPI(context);
+    const { editingDetailRouteGuard } = useEditing();
 
     const source = ref({});
 
@@ -352,6 +353,8 @@ export default defineComponent({
       },
       { immediate: true },
     );
+
+    editingDetailRouteGuard();
 
     return {
       attributes,

@@ -39,6 +39,7 @@ router.register(r'workflow', api.WorkflowManager, basename='workflow')
 
 v2_router = routers.DefaultRouter()
 v2_router.register(r'health-check', v2_api.HealthCheck, basename='health_check')
+v2_router.register(r'agents', v2_api.Agents, basename='agents')
 v2_router.register(r'attributes', v2_api.Attributes, basename='attributes')
 v2_router.register(r'attribute_types', v2_api.AttributeTypes, basename='attribute_types')
 v2_router.register(r'sets', v2_api.Sets, basename='sets')

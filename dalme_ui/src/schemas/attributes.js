@@ -148,7 +148,9 @@ export const attributeSchemas = {
   languageGc: yup
     .array()
     .of(
-      yup.object().shape({ value: yup.number().required().label("Language") }),
+      yup
+        .object()
+        .shape({ value: yup.number().required().label("Language (GC)") }),
     )
     .nullable()
     .required()

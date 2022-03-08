@@ -5,7 +5,7 @@
     <EditIndex />
     <q-page-container class="main-container">
       <router-view />
-      <EditPanel />
+      <EditPanel v-if="isAdmin" />
     </q-page-container>
   </q-layout>
 </template>
@@ -30,10 +30,12 @@ export default defineComponent({
     const onReauthenticate = (value) => (showLoginModal.value = value);
 
     provideEditing();
-    providePermissions();
     provideTransport();
+    const permissions = providePermissions();
+    const { isAdmin } = permissions;
 
     return {
+      isAdmin,
       onReauthenticate,
       showLoginModal,
     };

@@ -13,7 +13,6 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@formvuelate/plugin-vee-validate": "^3.7.1",
     "@quasar/extras": "^1.10.7",
     "@vueuse/components": "^7.1.2",
     "@vueuse/core": "^6.4.1",

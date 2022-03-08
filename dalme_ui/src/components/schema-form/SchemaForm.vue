@@ -7,7 +7,7 @@
 <script>
 import { SchemaForm, useSchemaForm } from "formvuelate";
 import { useForm } from "vee-validate";
-import { toRaw, watch } from "vue";
+import { provide, toRaw, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 import { useActor } from "@xstate/vue";
 
@@ -33,6 +33,8 @@ export default {
     const fieldsKey = `form-fields:${props.cuid}`;
     const { forms } = useEditing();
 
+    provide("cuid", props.cuid);
+
     useSchemaForm(props.formModel);
     const { meta } = useForm({
       initialValues: props.formModel,
@@ -53,6 +55,7 @@ export default {
         if (newMeta.touched && !newMeta.pending) {
           const { send } = useActor(forms.value[props.cuid]);
 
+          // TODO: No, still doesn't work over option.caption.
           const initial = toRaw(newMeta.initialValues);
           const current = toRaw(props.formModel);
           const hasDiffs = JSON.stringify(initial) !== JSON.stringify(current);

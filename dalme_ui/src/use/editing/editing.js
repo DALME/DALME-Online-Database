@@ -19,7 +19,7 @@ export const provideEditing = () => {
           kind,
           mode,
           initialData,
-          validated: false,
+          validated: false, // TODO: This should be a state!
           visible: true,
         },
         on: {
@@ -208,11 +208,6 @@ export const provideEditing = () => {
   const machine = useMachine(editingMachine);
   const { service } = machine;
 
-  // TODO: Should be using this pattern?
-  // service.subscribe((state) => {
-  //   console.log("MACHINE -> :", state);
-  // });
-
   // Convenience getters lensing into the machine context.
   const focus = useSelector(service, (state) => state.context.focus);
   const forms = useSelector(service, (state) => state.context.forms);
@@ -227,8 +222,8 @@ export const provideEditing = () => {
   const showEditing = ref(null);
 
   // TODO: Need a way to broadcast or batch these sends or they could
-  // (hypothetically) results in N (where N = keys(forms.value.length))
-  // re-renders as each actor transitions.
+  // (hypothetically) result in N (where N = keys(forms.value.length))
+  // page re-renders as each actor transitions.
   const hideAll = () => {
     for (let actor of values(forms.value)) {
       const { send } = useActor(actor);
@@ -243,6 +238,7 @@ export const provideEditing = () => {
   };
 
   // Tell us if any actors are in their 'saving' state.
+  // TODO: Should useActor here not, snapshot it.
   const submitting = computed(() => {
     const formsSaving = rMap(
       (actor) => actor.getSnapshot().matches("saving"),
@@ -291,14 +287,14 @@ export const provideEditing = () => {
     watch(
       () => postSubmitRefresh.value,
       async (newValue, oldValue) => {
-        if (oldValue === false && newValue === true) {
+        if (!oldValue && newValue) {
           await fetchData();
           postSubmitRefresh.value = false;
         }
       },
     );
 
-  // Reposition a FormModal in the middle of the viewport.
+  // Reposition a form in the middle of the viewport.
   const recenterWatcher = (cuid, x, y) =>
     watch(
       () => recenter.value,
@@ -311,6 +307,11 @@ export const provideEditing = () => {
       },
     );
 
+  // Inform the editing logic if we are on a detail page. This needs to be
+  // manually instantiated in any detail page setup methods. NOTE: Could
+  // theorectically share a single, abstract DetailPage component at some point
+  // in the refactored future and just call this there, once.
+  // TODO: detailKind will be necessary for the polymorphic pages.
   const editingDetailRouteGuard = () => {
     machine.send("SET_DETAIL", { value: true });
     onBeforeRouteLeave(() => {

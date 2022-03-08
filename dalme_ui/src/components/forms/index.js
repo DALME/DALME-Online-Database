@@ -8,3 +8,4 @@ export { default as SelectField } from "./SelectField.vue";
 export { default as TextField } from "./TextField.vue";
 export { default as AttributesField } from "./attributes-field";
 export { default as CreditsField } from "./credits-field";
+export { default as FoliosField } from "./folios-field";

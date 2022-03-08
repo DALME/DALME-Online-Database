@@ -1,21 +1,23 @@
 <template>
   <div class="attributes-field column q-my-sm" :class="{ separator: !showing }">
     <div class="row items-center q-my-sm">
-      <div class="q-field__label no-pointer-events q-mr-auto q-mr-sm">
+      <div class="q-field__label no-pointer-events q-mr-auto">
         {{
-          !showing && modelValue !== [empty]
+          !showing && modelValue !== [empty()]
             ? `Attributes (${modelValue.length})`
             : "Attributes"
         }}
       </div>
 
+      <q-spinner v-if="loading" color="primary" size="xs" />
       <q-btn
-        v-show="showing"
         round
+        class="q-ml-sm"
         color="amber"
-        text-color="black"
-        size="xs"
         icon="add"
+        size="xs"
+        text-color="black"
+        v-show="showing"
         @click.stop="handleAddField"
       >
         <q-tooltip class="bg-blue z-max"> Add an attribute </q-tooltip>
@@ -34,10 +36,7 @@
       </q-btn>
     </div>
 
-    <template
-      v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
-      :key="field.key"
-    >
+    <template v-for="(data, idx) in modelValue" :key="idx">
       <div class="row q-mb-sm" v-show="showing">
         <div class="col-6 q-pr-sm">
           <q-select
@@ -72,6 +71,7 @@
             </q-tooltip>
           </q-select>
         </div>
+
         <div class="q-pl-sm col">
           <template v-if="!data.attribute">
             <q-input disable label="Choose an attribute" />
@@ -165,29 +165,26 @@
             </template>
           </template>
         </div>
-        <div v-if="modelValue.length > 1">
-          <div class="row items-center">
-            <q-btn
-              class="q-ml-auto"
-              flat
-              round
-              unelevated
-              size="xs"
-              icon="clear"
-              :text-color="
-                isRequiredAttribute(data.attribute) ? 'grey' : 'black'
-              "
-              :disable="isRequiredAttribute(data.attribute)"
-              @click.stop="handleRemoveField(idx)"
+
+        <div v-if="modelValue.length > 1" class="row items-center">
+          <q-btn
+            class="q-ml-auto"
+            flat
+            round
+            unelevated
+            size="xs"
+            icon="clear"
+            :text-color="isRequiredAttribute(data.attribute) ? 'grey' : 'black'"
+            :disable="isRequiredAttribute(data.attribute)"
+            @click.stop="handleRemoveField(idx)"
+          >
+            <q-tooltip
+              v-if="isRequiredAttribute(data.attribute)"
+              class="bg-blue z-max"
             >
-              <q-tooltip
-                v-if="isRequiredAttribute(data.attribute)"
-                class="bg-blue z-max"
-              >
-                Can't delete a required attribute
-              </q-tooltip>
-            </q-btn>
-          </div>
+              Can't delete a required attribute
+            </q-tooltip>
+          </q-btn>
         </div>
       </div>
     </template>
@@ -195,7 +192,8 @@
 </template>
 
 <script>
-import { isNil, map as rMap, zip } from "ramda";
+import { isNil, map as rMap } from "ramda";
+import { useFieldArray } from "vee-validate";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { string as yString } from "yup";
 
@@ -212,7 +210,6 @@ import {
 } from "@/components/forms";
 import { attributeTypesSchema } from "@/schemas";
 import { useAPI } from "@/use";
-import { useFieldArray } from "vee-validate";
 
 import { attributeFields } from "./attributes";
 
@@ -243,13 +240,14 @@ export default defineComponent({
     TextField,
   },
   setup(props, context) {
-    const empty = { attribute: null, value: null };
+    const empty = () => ({ attribute: null, value: null });
+
+    const { push, remove, replace } = useFieldArray("attributes");
 
     const showing = ref(true);
     const options = ref(null);
     const optionCount = ref(null);
-
-    const { fields, push, remove, replace } = useFieldArray("attributes");
+    const loading = ref(false);
 
     const activeAttributes = computed(() =>
       rMap(
@@ -269,22 +267,10 @@ export default defineComponent({
         : null;
 
     const handleAddField = () => {
-      push(empty);
-      context.emit("update:modelValue", [...props.modelValue.slice(0), empty]);
-      context.emit("change");
-    };
-    const handleClearAttribute = (idx) => {
       const newValue = props.modelValue.slice(0);
-      newValue[idx] = empty;
-      context.emit("update:modelValue", newValue);
+      context.emit("update:modelValue", [...newValue, empty()]);
       context.emit("change");
-    };
-    const handleUpdateAttribute = (option, idx) => {
-      const newValue = props.modelValue.slice(0);
-      newValue[idx].attribute = option ? option : null;
-      newValue[idx].value = null;
-      context.emit("update:modelValue", newValue);
-      context.emit("change");
+      push(empty());
     };
     const handleUpdateField = (value, idx) => {
       const newValue = props.modelValue.slice(0);
@@ -293,9 +279,22 @@ export default defineComponent({
       context.emit("change");
     };
     const handleRemoveField = (idx) => {
-      remove(idx);
       const newValue = props.modelValue.slice(0);
       newValue.splice(idx, 1);
+      context.emit("update:modelValue", newValue);
+      context.emit("change");
+      remove(idx);
+    };
+    const handleClearAttribute = (idx) => {
+      const newValue = props.modelValue.slice(0);
+      newValue[idx] = empty();
+      context.emit("update:modelValue", newValue);
+      context.emit("change");
+    };
+    const handleUpdateAttribute = (option, idx) => {
+      const newValue = props.modelValue.slice(0);
+      newValue[idx].attribute = option ? option : null;
+      newValue[idx].value = null;
       context.emit("update:modelValue", newValue);
       context.emit("change");
     };
@@ -338,8 +337,9 @@ export default defineComponent({
     const initAttributes = async () => {
       if (props.required.length === 0) {
         showing.value = false;
-        context.emit("update:modelValue", [empty]);
+        context.emit("update:modelValue", [empty()]);
       } else {
+        loading.value = true;
         const { success, data, fetchAPI } = useAPI(context);
         const request = requests.attributeTypes.getAttributeTypesByShortName(
           props.required.join(),
@@ -363,6 +363,7 @@ export default defineComponent({
               }
               replace(newValue);
               context.emit("update:modelValue", newValue);
+              loading.value = false;
             });
       }
     };
@@ -371,7 +372,6 @@ export default defineComponent({
 
     return {
       empty,
-      fields,
       getOptionsData,
       handleAddField,
       handleClearAttribute,
@@ -380,11 +380,11 @@ export default defineComponent({
       handleUpdateAttribute,
       handleUpdateField,
       isRequiredAttribute,
+      loading,
       options,
       showing,
       wrapRequest,
       yString,
-      zip,
     };
   },
 });
@@ -404,5 +404,8 @@ export default defineComponent({
 }
 .attribute-select .q-field__native {
   color: black;
+}
+div.q-field__bottom {
+  margin-bottom: 5px;
 }
 </style>

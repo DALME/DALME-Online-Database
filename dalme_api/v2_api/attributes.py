@@ -97,7 +97,7 @@ class Attributes(api.Attributes):
                 {'label': 'Owned', 'value': 'Owned'},
                 {'label': 'Public Domain', 'value': 'Public Domain'},
             ],
-            'same_as': None,  # TODO: List all AttributeType, should exclude asame_as in that case
+            'same_as': None,  # TODO: List all AttributeType, should exclude same_as in that case
             'set_type': [
                 {'label': label, 'value': value}
                 for value, label in Set._meta.get_field('set_type').choices
