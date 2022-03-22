@@ -10,4 +10,6 @@ class Agents(api.Agents):
         if qs_as:
             if qs_as == 'credits':
                 qs = qs.filter(user__isnull=False)
+            if qs_as == 'named':
+                qs = qs.filter(user__isnull=True)
         return qs

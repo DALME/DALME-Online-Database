@@ -120,7 +120,7 @@ export default defineComponent({
     const taskLists = props.embedded ? ref([]) : inject("taskLists");
     const showSearch = ref(true);
 
-    const noData = props.embedded ? "No assigned tasks." : "No tasks found.";
+    const noData = props.embedded ? "No assigned tasks" : "No tasks found";
     const title = props.embedded ? "My Tasks" : "Tasks";
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };

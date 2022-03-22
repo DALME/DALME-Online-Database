@@ -2,10 +2,9 @@
   <q-btn
     fab
     icon="save"
-    :loading="submitting"
     :disable="!valid"
-    :color="!valid ? 'grey' : mouseoverSubmit ? 'red' : 'green'"
-    :text-color="!valid ? 'black' : 'white'"
+    :color="valid ? (mouseoverSubmit ? 'red' : 'green') : 'grey'"
+    :text-color="valid ? 'white' : 'black'"
     @click.stop="handleSubmit"
     @mouseover="mouseoverSubmit = true"
     @mouseleave="mouseoverSubmit = false"
@@ -17,8 +16,7 @@
 </template>
 
 <script>
-import { computed, defineComponent } from "vue";
-import { useActor } from "@xstate/vue";
+import { defineComponent } from "vue";
 
 import { useEditing } from "@/use";
 
@@ -26,25 +24,25 @@ export default defineComponent({
   name: "EditSubmit",
   setup() {
     const {
-      focus,
-      forms,
+      // focus,
+      // forms,
       mouseoverSubmit,
       submitting,
       machine: { send },
     } = useEditing();
 
-    const valid = computed(() => {
-      if (focus.value) {
-        if (focus.value === "inline") return true;
-        const { state } = useActor(forms.value[focus.value]);
-        if (state.value.context.validated) return true;
-      }
-      return false;
-    });
+    // TODO: Doesn't work!
+    // const valid = computed(() => {
+    //   if (focus.value) {
+    //     if (focus.value === "inline") return true;
+    //     const actor = forms.value[focus.value];
+    //     return useSelector(actor, (state) => state.context.validated);
+    //   }
+    //   return false;
+    // });
+    const valid = false;
 
-    const handleSubmit = () => {
-      send("SAVE_FOCUS");
-    };
+    const handleSubmit = () => send("SAVE_FOCUS");
 
     return {
       handleSubmit,

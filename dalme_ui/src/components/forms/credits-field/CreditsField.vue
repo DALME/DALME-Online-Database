@@ -38,19 +38,21 @@
 
     <template v-if="showing">
       <template v-if="modelValue.length > 0">
-        <template v-for="(data, idx) in modelValue" :key="idx">
+        <template
+          v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
+          :key="field.key"
+        >
           <div class="row q-mb-sm" v-show="showing">
             <div class="col-6 q-pr-sm">
               <SelectField
                 label="Agent"
                 :field="`credits[${idx}].agent`"
-                :model-value="data.agent"
                 :filterable="true"
-                :getOptions="getAgentOptions(idx)"
-                :optionsSchema="creditAgentOptionsSchema"
+                :getOptions="getAgentOptions"
+                :optionsSchema="agentOptionsSchema"
                 :validation="validators.agent"
+                v-model="data.agent"
                 @clear="() => handleClearAgent(idx)"
-                @update:modelValue="(value) => handleUpdateAgent(value, idx)"
               />
             </div>
             <div class="q-pl-sm col-4">
@@ -58,12 +60,11 @@
                 :field="`credits[${idx}].role`"
                 :disable="!data.agent"
                 :label="data.agent ? 'Role' : 'Choose an agent'"
-                :model-value="data.role"
                 :filterable="false"
                 :getOptions="getRoleOptions(idx)"
                 :optionsSchema="creditRoleOptionsSchema"
                 :validation="validators.role"
-                @update:modelValue="(value) => handleUpdateRole(value, idx)"
+                v-model="data.role"
               />
             </div>
             <div class="q-pl-sm col">
@@ -78,7 +79,6 @@
                   <q-popup-edit
                     buttons
                     fit
-                    persistent
                     anchor="bottom right"
                     class="z-max column"
                     v-model="data.note"
@@ -153,13 +153,14 @@ import {
   map as rMap,
   keys,
   reduce,
+  zip,
 } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, inject, ref } from "vue";
+import { computed, defineComponent, inject, ref, unref } from "vue";
 
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
-import { creditAgentOptionsSchema, creditRoleOptionsSchema } from "@/schemas";
+import { agentOptionsSchema, creditRoleOptionsSchema } from "@/schemas";
 
 export default defineComponent({
   name: "CreditsField",
@@ -179,12 +180,12 @@ export default defineComponent({
   setup(props, context) {
     const empty = () => ({ agent: null, role: null, note: null });
 
-    const { push, remove } = useFieldArray("credits");
+    const { fields, push, replace } = useFieldArray("credits");
 
     const cuid = inject("cuid");
 
     const loading = ref(false);
-    const showing = ref(true);
+    const showing = ref(props.modelValue.length > 0 ? true : false);
 
     const noteError = ref(false);
     const noteErrorMessage = ref("");
@@ -200,35 +201,21 @@ export default defineComponent({
     };
 
     const handleAddField = () => {
-      const newValue = props.modelValue.slice(0);
+      const newValue = unref(props.modelValue);
       context.emit("update:modelValue", [...newValue, empty()]);
-      context.emit("change");
       push(empty());
     };
     const handleRemoveField = (idx) => {
-      const newValue = props.modelValue.slice(0);
+      const newValue = unref(props.modelValue);
       newValue.splice(idx, 1);
       context.emit("update:modelValue", newValue);
-      context.emit("change");
-      remove(idx);
+      replace(newValue);
     };
     const handleClearAgent = (idx) => {
-      const newValue = props.modelValue.slice(0);
+      const newValue = unref(props.modelValue);
       newValue[idx] = empty();
       context.emit("update:modelValue", newValue);
-      context.emit("change");
-    };
-    const handleUpdateAgent = (value, idx) => {
-      const newValue = props.modelValue.slice(0);
-      newValue[idx].agent = !isNil(value) ? value : null;
-      context.emit("update:modelValue", newValue);
-      context.emit("change");
-    };
-    const handleUpdateRole = (value, idx) => {
-      const newValue = props.modelValue.slice(0);
-      newValue[idx].role = !isNil(value) ? value : null;
-      context.emit("update:modelValue", newValue);
-      context.emit("change");
+      replace(newValue);
     };
 
     const credited = computed(() => {
@@ -242,8 +229,7 @@ export default defineComponent({
         }
         return acc;
       };
-      const result = reduce(reducer, {}, props.modelValue);
-      return result;
+      return reduce(reducer, {}, props.modelValue);
     });
 
     const filterRoleOptions = (idx, options) => {
@@ -258,7 +244,7 @@ export default defineComponent({
       }
       return options;
     };
-    const filterAgentOptions = (idx, options) => {
+    const filterAgentOptions = (options) => {
       const agents = !isEmpty(credited.value);
       if (agents) {
         // If an agent is registered for all three roles then they shouldn't
@@ -280,34 +266,34 @@ export default defineComponent({
       return options;
     };
 
-    const getAgentOptions = (idx) =>
+    const getAgentOptions = () =>
       fetcher(requests.agents.getCreditAgents())
         .then((response) => response.json())
-        .then((options) => filterAgentOptions(idx, options));
+        .then((options) => filterAgentOptions(options));
     const getRoleOptions = (idx) =>
       fetcher(requests.choices.getChoices("Source_credit.type"))
         .then((response) => response.json())
         .then((options) => filterRoleOptions(idx, options));
 
     return {
-      creditAgentOptionsSchema,
+      agentOptionsSchema,
       creditRoleOptionsSchema,
       cuid,
       empty,
+      fields,
       filterAgentOptions,
       filterRoleOptions,
       getAgentOptions,
       getRoleOptions,
       handleAddField,
       handleClearAgent,
-      handleUpdateAgent,
-      handleUpdateRole,
       handleRemoveField,
       loading,
       noteError,
       noteErrorMessage,
       noteValidation,
       showing,
+      zip,
     };
   },
 });
@@ -333,7 +319,6 @@ export default defineComponent({
   border-bottom: 1px solid #c2c2c2;
   color: rgba(0, 0, 0, 0.6);
   font-weight: 400;
-  letter-spacing: 0.00937em;
   line-height: 18px;
   margin-bottom: 8px;
   padding-bottom: 17px;

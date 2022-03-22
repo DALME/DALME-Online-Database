@@ -1,7 +1,12 @@
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-import { attributeOptionSchema, creditOptionSchema } from "@/schemas";
+import {
+  agentsFieldSchema,
+  attributesFieldSchema,
+  foliosFieldSchema,
+  creditsFieldSchema,
+} from "@/schemas";
 
 export const recordFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
@@ -28,17 +33,10 @@ export const recordFieldValidation = {
     .of(yup.object().shape({ value: yup.string().uuid().nullable() }))
     .nullable()
     .label("Sets"),
-  folios: yup
-    .array()
-    .of(yup.object().shape({ value: yup.string().uuid().nullable() }))
-    .nullable()
-    .label("Folios"),
-  attributes: yup
-    .array()
-    .of(attributeOptionSchema)
-    .required()
-    .label("Attributes"),
-  credits: yup.array().of(creditOptionSchema).nullable().label("Credits"),
+  attributes: yup.array().of(attributesFieldSchema).label("Attributes"),
+  agents: yup.array().of(agentsFieldSchema).label("Agents"),
+  folios: yup.array().of(foliosFieldSchema).label("Folios"),
+  credits: yup.array().of(creditsFieldSchema).label("Credits"),
 };
 
 // Edit existing object schema.

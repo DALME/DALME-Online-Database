@@ -77,6 +77,13 @@ class Attributes(api.Attributes):
                     glottocode__isnull=False
                 ).order_by('name').values('id', 'name', 'glottocode')
             ],
+            'legal_persona': [
+                # TODO: Determine if it's right to use id here.
+                {'label': obj['value_STR'], 'value': obj['value_STR']}
+                for obj in Attribute.objects.filter(
+                    attribute_type=attribute_type, value_STR__isnull=False
+                ).values('value_STR').distinct()
+            ],
             'locale': [
                 {'label': obj.name, 'value': obj.id}
                 for obj in LocaleReference.objects.all().order_by('name')
@@ -86,6 +93,7 @@ class Attributes(api.Attributes):
                 for value, label in Set._meta.get_field('permissions').choices
             ],
             'record_type': [
+                # TODO: Value might be better served as id here.
                 {'label': obj['value_STR'], 'value': obj['value_STR']}
                 for obj in Attribute.objects.filter(
                     attribute_type=attribute_type, value_STR__isnull=False
@@ -97,7 +105,7 @@ class Attributes(api.Attributes):
                 {'label': 'Owned', 'value': 'Owned'},
                 {'label': 'Public Domain', 'value': 'Public Domain'},
             ],
-            'same_as': None,  # TODO: List all AttributeType, should exclude same_as in that case
+            'same_as': None,  # TODO: List all AttributeType, should exclude `same_as`.
             'set_type': [
                 {'label': label, 'value': value}
                 for value, label in Set._meta.get_field('set_type').choices

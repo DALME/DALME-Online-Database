@@ -3,7 +3,7 @@ import { moment } from "moment";
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-export const attributeOptionSchema = yup.object().shape({
+export const attributesFieldSchema = yup.object().shape({
   attribute: yup
     .object()
     .shape({

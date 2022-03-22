@@ -10,17 +10,36 @@
       v-ripple:blue-1
     >
       <q-card
-        class="modal-card q-px-lg q-py-none"
+        class="modal-card q-px-md q-pt-none q-pb-md"
         :class="{
           focussed: cuid === focus,
-          pulse: !disabled && mouseoverSubmit && cuid === focus,
+          pulse: valid && mouseoverSubmit && cuid === focus,
         }"
       >
         <q-card-section class="q-px-none q-pt-sm">
-          <div class="row no-wrap items-center q-pb-sm">
+          <div class="row no-wrap flex-center q-pb-sm">
             <span class="text-caption text-grey">
               <code>{{ cuid }}</code>
             </span>
+            <q-btn
+              round
+              class="q-ml-auto"
+              icon="minimize"
+              size="xs"
+              @click.stop="handleMinimize"
+            >
+              <q-tooltip class="bg-blue z-max"> Minimize </q-tooltip>
+            </q-btn>
+            <q-btn
+              round
+              class="q-ml-xs"
+              color="deep-orange"
+              icon="close"
+              size="xs"
+              @click.stop="confirm = true"
+            >
+              <q-tooltip class="bg-blue z-max"> Discard </q-tooltip>
+            </q-btn>
           </div>
           <div class="text-h5 text-capitalize text-bold">
             {{ mode }} {{ kind }}
@@ -28,27 +47,6 @@
         </q-card-section>
 
         <SchemaForm :cuid="cuid" :schema="formSchema" :form-model="formModel" />
-
-        <q-card-actions class="q-mt-md q-px-none q-pb-md">
-          <q-btn
-            round
-            class="q-ml-auto"
-            icon="minimize"
-            size="11px"
-            @click.stop="handleMinimize"
-          >
-            <q-tooltip class="bg-blue z-max"> Minimize </q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            color="deep-orange"
-            icon="close"
-            size="11px"
-            @click.stop="confirm = true"
-          >
-            <q-tooltip class="bg-blue z-max"> Discard </q-tooltip>
-          </q-btn>
-        </q-card-actions>
       </q-card>
     </div>
 
@@ -115,7 +113,6 @@ export default defineComponent({
       submitSchema,
     );
     const {
-      disabled,
       focus,
       forms,
       formSubmitWatcher,
@@ -134,6 +131,7 @@ export default defineComponent({
     const kind = useSelector(actor, (state) => state.context.kind);
     const mode = useSelector(actor, (state) => state.context.mode);
     const visible = useSelector(actor, (state) => state.context.visible);
+    const valid = useSelector(actor, (state) => state.context.validated);
     const initialData = useSelector(
       actor,
       (state) => state.context.initialData,
@@ -192,7 +190,6 @@ export default defineComponent({
 
     return {
       confirm,
-      disabled,
       dragging,
       el,
       focus,
@@ -206,6 +203,7 @@ export default defineComponent({
       mode,
       mouseoverSubmit,
       submitting,
+      valid,
       visible,
     };
   },
@@ -230,7 +228,7 @@ export default defineComponent({
   will-change: transform;
 }
 .modal-card {
-  max-height: calc(100vh - 5rem);
+  max-height: calc(100vh - 10rem);
   overflow-y: scroll;
   scroll-snap-type: y proximity;
 }

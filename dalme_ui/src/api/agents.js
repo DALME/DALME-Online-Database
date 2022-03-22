@@ -20,6 +20,10 @@ const agents = {
     const url = `${v2Endpoint}/?as=credits`;
     return new Request(url);
   },
+  getNamedAgents() {
+    const url = `${v2Endpoint}/?as=names`;
+    return new Request(url);
+  },
 };
 
 export default agents;

@@ -2,17 +2,20 @@ import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
 import {
+  AgentsField,
   AttributesField,
   BooleanField,
   CreditsField,
+  FoliosField,
   InputField,
   MultipleSelectField,
   SelectField,
 } from "@/components/forms";
 import {
+  agentValidators,
   attributeValidators,
   creditValidators,
-  pageOptionsSchema,
+  folioValidators,
   recordFieldValidation,
   recordPostSchema,
   recordPutSchema,
@@ -57,16 +60,6 @@ const recordFormSchema = {
     optionsSchema: sourceOptionsSchema,
     validation: recordFieldValidation.parent,
   },
-  folios: {
-    field: "folios",
-    component: markRaw(MultipleSelectField),
-    label: "Folios",
-    description: "The pages/folios contained by the source",
-    getOptions: () =>
-      fetcher(requests.pages.getPages()).then((response) => response.json()),
-    optionsSchema: pageOptionsSchema,
-    validation: recordFieldValidation.pages,
-  },
   sets: {
     field: "sets",
     component: markRaw(MultipleSelectField),
@@ -80,6 +73,7 @@ const recordFormSchema = {
   attributes: {
     field: "attributes",
     component: markRaw(AttributesField),
+    description: "The characteristics of the source.",
     required: ["recordType", "language"],
     // NOTE: We pass this in here (rather than importing it in the the
     // component) even though it's a monolithic definition and will be the same
@@ -89,9 +83,24 @@ const recordFormSchema = {
     validators: attributeValidators,
     validation: recordFieldValidation.attributes,
   },
+  agents: {
+    field: "agents",
+    component: markRaw(AgentsField),
+    description: "People referred to by or involved in the source.",
+    validators: agentValidators,
+    validation: recordFieldValidation.agents,
+  },
+  folios: {
+    field: "folios",
+    component: markRaw(FoliosField),
+    description: "The pages/folios contained by the source.",
+    validators: folioValidators,
+    validation: recordFieldValidation.folios,
+  },
   credits: {
     field: "credits",
     component: markRaw(CreditsField),
+    description: "Editorial persons who contributed to this source.",
     validators: creditValidators,
     validation: recordFieldValidation.credits,
   },
@@ -108,7 +117,7 @@ const recordRequests = {
 };
 
 export default {
-  edit: null,
+  edit: null, // TODO: Schema here.
   form: recordFormSchema,
   requests: recordRequests,
   submit: recordSubmitSchemas,

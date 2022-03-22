@@ -1,4 +1,3 @@
-import { isNil } from "ramda";
 import * as yup from "yup";
 
 export const agentListSchema = yup.array().of(
@@ -19,7 +18,7 @@ export const agentListSchema = yup.array().of(
     .camelCase(),
 );
 
-const creditAgentOptionSchema = yup
+const agentOptionSchema = yup
   .object()
   .shape({
     value: yup.string().uuid().required(),
@@ -32,7 +31,7 @@ const creditAgentOptionSchema = yup
     caption: option.id,
   }));
 
-export const creditAgentOptionsSchema = yup.array().of(creditAgentOptionSchema);
+export const agentOptionsSchema = yup.array().of(agentOptionSchema);
 
 const creditRoleOptionSchema = yup
   .object()
@@ -47,12 +46,24 @@ const creditRoleOptionSchema = yup
 
 export const creditRoleOptionsSchema = yup.array().of(creditRoleOptionSchema);
 
-export const creditOptionSchema = yup.object().shape({
+const legalPersonaOptionSchema = yup.object().shape({
+  value: yup.string().required(),
+  label: yup
+    .string()
+    .required()
+    .transform((value) => value.charAt(0).toUpperCase() + value.slice(1)),
+});
+
+export const legalPersonaOptionsSchema = yup
+  .array()
+  .of(legalPersonaOptionSchema);
+
+export const creditsFieldSchema = yup.object().shape({
   agent: yup
     .object()
     .shape({ value: yup.string().uuid().required() })
-    .required(),
-  role: yup.object().shape({ value: yup.number().required() }).required(),
+    .nullable(),
+  role: yup.object().shape({ value: yup.number().required() }).nullable(),
   note: yup
     .string()
     .nullable()
@@ -63,20 +74,44 @@ export const creditOptionSchema = yup.object().shape({
     ),
 });
 
+export const agentsFieldSchema = yup.object().shape({
+  agent: yup
+    .object()
+    .shape({ value: yup.string().uuid().required() })
+    .nullable(),
+  legalPersona: yup
+    .object()
+    .shape({ value: yup.string().required() })
+    .nullable(),
+});
+
+export const agentValidators = {
+  agent: yup
+    .object()
+    .shape({ value: yup.string().required().label("Agent") })
+    .nullable()
+    .required()
+    .label("Agent"),
+  legalPersona: yup
+    .object()
+    .shape({ value: yup.string().required().label("Legal persona") })
+    .nullable()
+    .required()
+    .label("Legal persona"),
+};
+
 export const creditValidators = {
   agent: yup
     .object()
-    .shape({ id: yup.string().uuid().required().label("Agent") })
+    .shape({ value: yup.string().required().label("Agent") })
     .nullable()
     .required()
-    .transform((option) => (isNil(option) ? null : { id: option.value }))
     .label("Agent"),
   role: yup
     .object()
-    .shape({ id: yup.number().required().label("Role") })
+    .shape({ value: yup.number().required().label("Role") })
     .nullable()
     .required()
-    .transform((option) => (isNil(option) ? null : { id: option.value }))
     .label("Role"),
   // NOTE: We use the inbuilt quasar validation at the field level for this so
   // no need to defined it with yup. We'll leave it here for clarity.

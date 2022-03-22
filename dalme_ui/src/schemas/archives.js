@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { attributeOptionSchema } from "@/schemas";
+import { attributesFieldSchema } from "@/schemas";
 
 // Field-level validation rules/schemas.
 export const archiveFieldValidation = {
@@ -13,7 +13,7 @@ export const archiveFieldValidation = {
     .label("Sets"),
   attributes: yup
     .array()
-    .of(attributeOptionSchema)
+    .of(attributesFieldSchema)
     .required()
     .label("Attributes"),
 };

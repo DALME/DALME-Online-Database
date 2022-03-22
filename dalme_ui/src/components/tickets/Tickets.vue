@@ -151,9 +151,7 @@ export default defineComponent({
     const filter = ref("");
     const showSearch = ref(true);
 
-    const noData = props.embedded
-      ? "No assigned tickets."
-      : "No tickets found.";
+    const noData = props.embedded ? "No assigned tickets" : "No tickets found";
     const title = props.embedded ? "My Tickets" : "Tickets";
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };

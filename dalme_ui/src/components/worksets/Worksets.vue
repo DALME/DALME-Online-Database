@@ -102,7 +102,7 @@ export default defineComponent({
     const filter = ref("");
     const showSearch = ref(true);
 
-    const noData = "No owned worksets.";
+    const noData = "No owned worksets";
     const title = "My Worksets";
     const rowsPerPage = 5;
     const pagination = { rowsPerPage };

@@ -36,15 +36,18 @@
       </q-btn>
     </div>
 
-    <template v-for="(data, idx) in modelValue" :key="idx">
+    <template
+      v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
+      :key="field.key"
+    >
       <div class="row q-mb-sm" v-show="showing">
         <div class="col-6 q-pr-sm">
           <q-select
             map-options
             label="Attribute"
             class="attribute-select"
-            :disable="isRequiredAttribute(data.attribute)"
             :clearable="!isRequiredAttribute(data.attribute)"
+            :disable="isRequiredAttribute(data.attribute)"
             :model-value="data.attribute"
             :options="options"
             :option-label="
@@ -79,55 +82,50 @@
           <template v-else>
             <template v-if="data.attribute.dataType === 'Boolean'">
               <BooleanField
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else-if="data.attribute.dataType === 'Decimal'">
               <DecimalField
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else-if="data.attribute.dataType === 'Number'">
               <NumberField
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else-if="data.attribute.dataType === 'Date'">
               <DateField
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else-if="data.attribute.dataType === 'Text'">
               <TextField
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else-if="data.attribute.dataType === 'Options'">
               <SelectField
                 v-if="!getOptionsData(data.attribute.shortName).multiple"
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :filterable="
                   getOptionsData(data.attribute.shortName).filterable
                 "
@@ -136,13 +134,12 @@
                 "
                 :optionsSchema="getOptionsData(data.attribute.shortName).schema"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
               <MultipleSelectField
                 v-else
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :filterable="
                   getOptionsData(data.attribute.shortName).filterable
                 "
@@ -151,16 +148,14 @@
                 "
                 :optionsSchema="getOptionsData(data.attribute.shortName).schema"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
             <template v-else>
               <InputField
-                :field="`attributes[${idx}]`"
+                v-model="data.value"
+                :field="`attributes[${field.key}]`"
                 :label="data.attribute.dataType"
-                :model-value="data.value"
                 :validation="validators[data.attribute.shortName]"
-                @update:modelValue="(value) => handleUpdateField(value, idx)"
               />
             </template>
           </template>
@@ -192,9 +187,9 @@
 </template>
 
 <script>
-import { isNil, map as rMap } from "ramda";
+import { isNil, map as rMap, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, unref } from "vue";
 import { string as yString } from "yup";
 
 import { fetcher, requests } from "@/api";
@@ -242,12 +237,12 @@ export default defineComponent({
   setup(props, context) {
     const empty = () => ({ attribute: null, value: null });
 
-    const { push, remove, replace } = useFieldArray("attributes");
+    const { fields, push, replace } = useFieldArray("attributes");
 
-    const showing = ref(true);
+    const loading = ref(false);
+    const showing = ref(false);
     const options = ref(null);
     const optionCount = ref(null);
-    const loading = ref(false);
 
     const activeAttributes = computed(() =>
       rMap(
@@ -267,36 +262,28 @@ export default defineComponent({
         : null;
 
     const handleAddField = () => {
-      const newValue = props.modelValue.slice(0);
+      const newValue = unref(props.modelValue);
       context.emit("update:modelValue", [...newValue, empty()]);
-      context.emit("change");
       push(empty());
     };
-    const handleUpdateField = (value, idx) => {
-      const newValue = props.modelValue.slice(0);
-      newValue[idx].value = !isNil(value) ? value : null;
-      context.emit("update:modelValue", newValue);
-      context.emit("change");
-    };
     const handleRemoveField = (idx) => {
-      const newValue = props.modelValue.slice(0);
+      const newValue = unref(props.modelValue);
       newValue.splice(idx, 1);
       context.emit("update:modelValue", newValue);
-      context.emit("change");
-      remove(idx);
+      replace(newValue);
     };
     const handleClearAttribute = (idx) => {
-      const newValue = props.modelValue.slice(0);
+      const newValue = unref(props.modelValue);
       newValue[idx] = empty();
       context.emit("update:modelValue", newValue);
-      context.emit("change");
+      replace(newValue);
     };
     const handleUpdateAttribute = (option, idx) => {
-      const newValue = props.modelValue.slice(0);
+      const newValue = unref(props.modelValue);
       newValue[idx].attribute = option ? option : null;
       newValue[idx].value = null;
       context.emit("update:modelValue", newValue);
-      context.emit("change");
+      replace(newValue);
     };
 
     const handleOptions = async (val, update) => {
@@ -335,8 +322,9 @@ export default defineComponent({
     };
 
     const initAttributes = async () => {
+      // TODO: First clause might never be true... Every source should have
+      // required attributes. In which case `showing` should be true at setup.
       if (props.required.length === 0) {
-        showing.value = false;
         context.emit("update:modelValue", [empty()]);
       } else {
         loading.value = true;
@@ -364,6 +352,7 @@ export default defineComponent({
               replace(newValue);
               context.emit("update:modelValue", newValue);
               loading.value = false;
+              showing.value = true;
             });
       }
     };
@@ -372,19 +361,20 @@ export default defineComponent({
 
     return {
       empty,
+      fields,
       getOptionsData,
       handleAddField,
       handleClearAttribute,
       handleOptions,
       handleRemoveField,
       handleUpdateAttribute,
-      handleUpdateField,
       isRequiredAttribute,
       loading,
       options,
       showing,
       wrapRequest,
       yString,
+      zip,
     };
   },
 });
