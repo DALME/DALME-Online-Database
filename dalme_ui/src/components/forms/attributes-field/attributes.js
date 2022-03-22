@@ -2,7 +2,7 @@ import { keys, reduce } from "ramda";
 import * as yup from "yup";
 
 import { requests } from "@/api";
-import { attributeSchemas } from "@/schemas";
+import { attributeValidators } from "@/schemas";
 
 const optionFields = [
   "authority",
@@ -58,10 +58,10 @@ export const attributeFields = reduce(
           }
         : null,
       /* eslint-enable */
-      validation: attributeSchemas[attribute],
+      validation: attributeValidators[attribute],
     };
     return obj;
   },
   {},
-  keys(attributeSchemas),
+  keys(attributeValidators),
 );

@@ -18,7 +18,7 @@ export const attributeOptionSchema = yup.object().shape({
 // NOTE: We don't use the usual *Schema naming convention here as it makes
 // things easier when we have to do all the dynamic binding/juggling upstream.
 // Instead just map it directly to AttributeType.short_name (post-camelization).
-export const attributeSchemas = {
+export const attributeValidators = {
   activity: yup.string().nullable().required().label("Activity"),
   administrativeRegion: yup
     .string()

@@ -7,7 +7,7 @@ import {
   MultipleSelectField,
 } from "@/components/forms";
 import {
-  attributeSchemas,
+  attributeValidators,
   archiveEditSchema,
   archiveFieldValidation,
   archivePutSchema,
@@ -50,7 +50,7 @@ const archiveFormSchema = {
     // component) even though it's a monolithic definition and will be the same
     // for all instances of the attributes field. That said, there may be a
     // time we want to override some rules, so let's leave that option open.
-    validators: attributeSchemas,
+    validators: attributeValidators,
     validation: archiveFieldValidation.attributes,
   },
 };
