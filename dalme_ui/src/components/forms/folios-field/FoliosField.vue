@@ -72,10 +72,24 @@
                 <q-btn
                   flat
                   round
+                  push
                   icon="search"
                   :color="!data.damId ? 'grey' : 'black'"
                   :disable="!data.damId"
+                  @click.stop="card = true"
                 >
+                  <q-dialog class="z-max" v-model="card" :key="idx">
+                    <q-img :src="getPreview(data.damId.value)">
+                      <template v-slot:error>
+                        <div
+                          class="absolute-full flex flex-center bg-negative text-white"
+                        >
+                          Couldn't load preview
+                        </div>
+                      </template>
+                    </q-img>
+                  </q-dialog>
+
                   <q-tooltip class="bg-blue z-max"> Preview folio </q-tooltip>
                 </q-btn>
               </div>
@@ -132,7 +146,6 @@ export default defineComponent({
       default: () => [],
     },
     validators: {
-      type: Object,
       required: true,
     },
   },
@@ -145,6 +158,7 @@ export default defineComponent({
 
     const { fields, push, replace } = useFieldArray("folios");
 
+    const card = ref(false);
     const loading = ref(false);
     const showing = ref(props.modelValue.length > 0 ? true : false);
 
@@ -182,11 +196,21 @@ export default defineComponent({
         .then((response) => response.json())
         .then((options) => filterImageOptions(options));
 
+    const getPreview = (damId) => {
+      const url = ref(null);
+      fetcher(requests.images.getImageUrl(damId))
+        .then((response) => response.json())
+        .then((data) => (url.value = data.url));
+      return url;
+    };
+
     return {
+      card,
       empty,
       fields,
       filterImageOptions,
       getImageOptions,
+      getPreview,
       handleAddField,
       handleDrag,
       handleRemoveField,
@@ -228,7 +252,4 @@ export default defineComponent({
 .placeholder > p {
   margin: 0;
 }
-// div.q-dialog__title {
-//   font-size: 1rem;
-// }
 </style>

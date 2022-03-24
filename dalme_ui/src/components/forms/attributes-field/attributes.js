@@ -34,7 +34,7 @@ const optionSchema = yup.object().shape({
 
 const optionsSchema = yup.array().of(optionSchema);
 
-// Tweak the schema here, if necessary to handle data integrity issues.
+// Tweak any schemas here, if necessary, to handle data integrity issues.
 const alternateSchema = {
   language: yup.array().of(
     optionSchema.shape({
@@ -46,6 +46,7 @@ const alternateSchema = {
   ),
 };
 
+// TODO: Constrain by object type here.
 export const attributeFields = reduce(
   (obj, attribute) => {
     obj[attribute] = {

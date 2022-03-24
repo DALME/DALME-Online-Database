@@ -311,7 +311,7 @@ export const provideEditing = () => {
   // manually instantiated in any detail page setup methods. NOTE: Could
   // theorectically share a single, abstract DetailPage component at some point
   // in the refactored future and just call this there, once.
-  // TODO: detailKind will be necessary for the polymorphic pages.
+  // TODO: resourceKind will be necessary for the polymorphic pages.
   const editingDetailRouteGuard = () => {
     machine.send("SET_DETAIL", { value: true });
     onBeforeRouteLeave(() => {

@@ -109,7 +109,7 @@
                           type="textarea"
                           :error="noteError"
                           :error-message="noteErrorMessage"
-                          v-model.number="scope.value"
+                          v-model="scope.value"
                           @keyup.enter.stop
                         />
                       </div>
