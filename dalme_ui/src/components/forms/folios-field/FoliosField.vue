@@ -62,8 +62,8 @@
                 v-model="data.damId"
                 :field="`folios[${idx}].damId`"
                 :filterable="true"
-                :getOptions="getDamIdOptions(idx)"
-                :optionsSchema="damIdOptionsSchema"
+                :getOptions="getImageOptions"
+                :optionsSchema="imageOptionsSchema"
                 :validation="validators.damId"
               />
             </div>
@@ -120,8 +120,9 @@ import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
 import { computed, defineComponent, ref, unref } from "vue";
 
-import { fetcher } from "@/api";
+import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
+import { imageOptionsSchema } from "@/schemas";
 
 export default defineComponent({
   name: "FoliosField",
@@ -172,23 +173,24 @@ export default defineComponent({
       return reduce(reducer, new Set(), props.modelValue);
     });
 
-    const filterDamIdOptions = (options) =>
-      // TODO: Might need dam_id here or id, unsure need endpoint.
-      rFilter((option) => !indexed.value.has(option.id), options);
+    const filterImageOptions = (options) =>
+      // TODO: dam_id -> damId when camelCase renderer is added.
+      rFilter((option) => !indexed.value.has(option.dam_id), options);
 
-    const getDamIdOptions = () =>
-      fetcher(null) // TODO: Not sure which endpoint this is...
+    const getImageOptions = () =>
+      fetcher(requests.images.getImageOptions())
         .then((response) => response.json())
-        .then((options) => filterDamIdOptions(options));
+        .then((options) => filterImageOptions(options));
 
     return {
       empty,
       fields,
-      filterDamIdOptions,
-      getDamIdOptions,
+      filterImageOptions,
+      getImageOptions,
       handleAddField,
       handleDrag,
       handleRemoveField,
+      imageOptionsSchema,
       loading,
       showing,
       zip,

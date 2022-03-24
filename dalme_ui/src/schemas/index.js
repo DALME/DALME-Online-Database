@@ -5,6 +5,7 @@ export * from "./auth";
 export * from "./comments";
 export * from "./countries";
 export * from "./groups";
+export * from "./images";
 export * from "./languages";
 export * from "./library";
 export * from "./locales";

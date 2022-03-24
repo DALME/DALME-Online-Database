@@ -1,5 +1,6 @@
-from dalme_app.models import rs_resource, rs_collection
 from rest_framework import serializers
+
+from dalme_app.models import rs_resource, rs_collection
 
 
 class RSCollectionsSerializer(serializers.ModelSerializer):

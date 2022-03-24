@@ -7,6 +7,7 @@ import choices from "./choices";
 import comments from "./comments";
 import countries from "./countries";
 import groups from "./groups";
+import images from "./images";
 import languages from "./languages";
 import library from "./library";
 import locales from "./locales";
@@ -29,6 +30,7 @@ const requests = {
   comments,
   countries,
   groups,
+  images,
   languages,
   library,
   locales,

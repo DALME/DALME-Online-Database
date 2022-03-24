@@ -1,7 +1,4 @@
 from dalme_api import api
-from dalme_app.models import Task
-
-from rest_framework import serializers
 
 
 class Tasks(api.Tasks):

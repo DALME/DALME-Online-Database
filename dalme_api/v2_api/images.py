@@ -1,10 +1,11 @@
+from rest_framework.response import Response
+
 from dalme_api import api
-from dalme_api.v2_serializers import SourceOptionsSerializer
-from dalme_app.models import Source
+from dalme_api.v2_serializers import ImageOptionsSerializer
 
 
-class Sources(api.Sources):
-    """Endpoint for the Source resource."""
+class Images(api.Images):
+    """Endpoint for the Image resource."""
 
     @property
     def options_view(self):
@@ -14,7 +15,7 @@ class Sources(api.Sources):
     def get_serializer_class(self):
         serializer_class = super().get_serializer_class()
         if self.options_view:
-            serializer_class = SourceOptionsSerializer
+            serializer_class = ImageOptionsSerializer
         return serializer_class
 
     def get_serializer(self, *args, **kwargs):
@@ -25,12 +26,13 @@ class Sources(api.Sources):
         return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
         if self.options_view:
-            # Skips any prefectching here for the most minimal payload possible
-            # to load into UI widgets.
-            if self.request.GET.get('class'):
-                qs = self.get_queryset_by_source_type()
-            else:
-                qs = Source.objects.all()
-            return qs.values('id', 'name')
-        return super().get_queryset(*args, **kwargs)
+            qs = qs.values('ref', 'field8')
+        return qs
+
+    # NOTE: Needs override as the v1 logic doesn't respect the MRO correctly.
+    def list(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        result = self.get_serializer(qs, many=True)
+        return Response(result.data)
