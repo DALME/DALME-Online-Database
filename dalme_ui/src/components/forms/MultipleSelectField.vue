@@ -109,8 +109,10 @@ export default defineComponent({
         const search = val.toLowerCase();
         options.value = options.value.filter((option) => {
           return (
-            !isNil(option.label) &&
-            option.label.toLowerCase().indexOf(search) > -1
+            (!isNil(option.label) &&
+              option.label.toString().toLowerCase().indexOf(search) > -1) ||
+            (!isNil(option.caption) &&
+              option.caption.toString().toLowerCase().indexOf(search) > -1)
           );
         });
       });

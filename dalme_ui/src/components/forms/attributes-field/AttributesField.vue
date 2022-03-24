@@ -313,7 +313,7 @@ export default defineComponent({
             const label = option.name;
             return (
               !isNil(label) &&
-              label.toLowerCase().indexOf(search) > -1 &&
+              label.toString().toLowerCase().indexOf(search) > -1 &&
               !activeAttributes.value.includes(option.id)
             );
           }),

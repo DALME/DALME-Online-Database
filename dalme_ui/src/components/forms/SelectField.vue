@@ -1,7 +1,7 @@
 <template>
   <q-select
     clearable
-    input-debounce="350"
+    input-debounce="500"
     popup-content-class="selectfield"
     v-model="value"
     :error="errorMessage && meta.touched"
@@ -101,12 +101,16 @@ export default defineComponent({
 
       update(() => {
         const search = val.toLowerCase();
-        options.value = options.value.filter((option) => {
-          return (
-            !isNil(option.label) &&
-            option.label.toLowerCase().indexOf(search) > -1
-          );
-        });
+        options.value = Object.freeze(
+          options.value.filter((option) => {
+            return (
+              (!isNil(option.label) &&
+                option.label.toString().toLowerCase().indexOf(search) > -1) ||
+              (!isNil(option.caption) &&
+                option.caption.toString().toLowerCase().indexOf(search) > -1)
+            );
+          }),
+        );
       });
     };
 
