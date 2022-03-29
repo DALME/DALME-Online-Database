@@ -39,9 +39,10 @@ export default defineComponent({
   name: "CommentForm",
   emits: ["onSubmitComment"],
   setup(_, context) {
-    const { data, fetchAPI, status } = useAPI(context);
+    const { apiInterface } = useAPI();
     const $notifier = useNotifier();
 
+    const { data, fetchAPI, status } = apiInterface();
     const body = ref("");
     const commentForm = ref("");
     const submitting = ref(false);

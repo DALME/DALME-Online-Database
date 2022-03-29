@@ -21,7 +21,7 @@ const tasks = {
     const url = `${endpoint}/`;
     return new Request(url, {
       method: "POST",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify(data),
     });
   },
@@ -29,7 +29,7 @@ const tasks = {
     const url = `${endpoint}/${id}`;
     return new Request(url, {
       method: "PUT",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify(data),
     });
   },
@@ -37,7 +37,7 @@ const tasks = {
     const url = `${endpoint}/${id}/set_state/`;
     return new Request(url, {
       method: "PATCH",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify({ action: S(action).underscore().s }),
     });
   },
@@ -53,7 +53,7 @@ const tasks = {
     const url = `${apiUrl}/tasklists/`;
     return new Request(url, {
       method: "POST",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify(data),
     });
   },
@@ -61,14 +61,14 @@ const tasks = {
     const url = `${apiUrl}/tasklists/${id}`;
     return new Request(url, {
       method: "DELETE",
-      headers: headers,
+      headers: headers(),
     });
   },
   editTaskList(id, data) {
     const url = `${apiUrl}/tasklists/${id}/`;
     return new Request(url, {
       method: "PUT",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify(data),
     });
   },

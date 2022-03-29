@@ -7,7 +7,7 @@ const comments = {
     const url = `${endpoint}/`;
     return new Request(url, {
       method: "POST",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify(data),
     });
   },

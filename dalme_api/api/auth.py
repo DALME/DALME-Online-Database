@@ -1,4 +1,7 @@
 from django.contrib import auth
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -22,10 +25,7 @@ class Auth(APIView):
         request.session[auth.HASH_SESSION_KEY] = user.get_session_auth_hash()
         request.session.save()
 
-    def get(self, request):
-        """403 stub for testing refresh auth flow."""
-        return Response({'error': 'Not authenticated'}, 403)
-
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         """Login with JSON payload."""
         username = request.data.get('username')

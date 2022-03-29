@@ -94,10 +94,11 @@ export default defineComponent({
   components: {
     OpaqueSpinner,
   },
-  setup(_, context) {
+  setup() {
     const $route = useRoute();
-    const { loading, success, data, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
     const setType = ref("");

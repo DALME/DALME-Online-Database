@@ -9,7 +9,8 @@ export const purlUrl = "https://purl.127.0.0.1.sslip.io:8000";
 
 export const fetcher = (request) => fetch(request, { credentials: "include" });
 
-export let headers = new Headers({
-  "X-CSRFToken": Cookies.get("csrftoken"),
-  "Content-Type": "application/json",
-});
+export let headers = () =>
+  new Headers({
+    "X-CSRFToken": Cookies.get("csrftoken"),
+    "Content-Type": "application/json",
+  });

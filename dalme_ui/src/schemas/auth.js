@@ -5,6 +5,5 @@ export const sessionSchema = yup
   .shape({
     id: yup.number().required(),
     username: yup.string().required(),
-    isAdmin: yup.boolean().required(),
   })
   .camelCase();

@@ -237,6 +237,7 @@ export default defineComponent({
   setup(props, context) {
     const empty = () => ({ attribute: null, value: null });
 
+    const { apiInterface } = useAPI();
     const { fields, push, replace } = useFieldArray("attributes");
 
     const loading = ref(false);
@@ -288,7 +289,7 @@ export default defineComponent({
 
     const handleOptions = async (val, update) => {
       if (isNil(options.value) || options.value.length !== optionCount.value) {
-        const { success, data, fetchAPI } = useAPI(context);
+        const { success, data, fetchAPI } = apiInterface();
         const request = requests.attributeTypes.getAttributeTypes();
         await fetchAPI(request);
         if (success.value)
@@ -328,7 +329,7 @@ export default defineComponent({
         context.emit("update:modelValue", [empty()]);
       } else {
         loading.value = true;
-        const { success, data, fetchAPI } = useAPI(context);
+        const { success, data, fetchAPI } = apiInterface();
         const request = requests.attributeTypes.getAttributeTypesByShortName(
           props.required.join(),
         );

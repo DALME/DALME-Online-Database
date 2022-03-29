@@ -1,4 +1,4 @@
-export { useAPI } from "./api";
+export { provideAPI, useAPI } from "./api";
 export { useDynamicForm } from "./dynamic-form";
 export { provideEditing, useEditing } from "./editing";
 export { useNotifier } from "./notifier";

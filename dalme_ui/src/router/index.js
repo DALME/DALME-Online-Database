@@ -5,7 +5,7 @@ import {
   createWebHashHistory,
 } from "vue-router";
 
-import { API as useAPI, loginUrl, requests } from "@/api";
+import { API as apiInterface, loginUrl, requests } from "@/api";
 import { sessionSchema } from "@/schemas";
 import store from "@/store";
 
@@ -26,7 +26,7 @@ export const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  const { data, fetchAPI, success } = useAPI();
+  const { data, fetchAPI, success } = apiInterface();
   await fetchAPI(requests.auth.session());
   if (success.value) {
     await sessionSchema.validate(data.value).then((value) => {

@@ -17,6 +17,7 @@ class UIAuthMiddleware:
         response = self.get_response(request)
 
         if settings.IS_V2:
+            # TODO: This is brittle, must be easily improved.
             if response.status_code == 500 and not request.user.is_authenticated:
                 return JsonResponse({'error': 'Reauthenticate'}, status=403)
 

@@ -10,7 +10,7 @@ const locales = {
     const url = `${endpoint}/update_locales/`;
     return new Request(url, {
       method: "PATCH",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify(data.value),
     });
   },

@@ -88,9 +88,10 @@ export default defineComponent({
   components: {
     Spinner,
   },
-  setup(props, context) {
-    const { loading, success, data, fetchAPI } = useAPI(context);
+  setup() {
+    const { apiInterface } = useAPI();
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
     const fieldMap = ref(null);

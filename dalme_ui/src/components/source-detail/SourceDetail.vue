@@ -295,16 +295,17 @@ export default defineComponent({
     SourcePlaces,
     OpaqueSpinner,
   },
-  setup(_, context) {
+  setup() {
     const $route = useRoute();
-    const { loading, success, data, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
     const { editingDetailRouteGuard } = useEditing();
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const source = ref({});
 
     const id = inject("id");
 
-    // TODO: Transducer.
+    // TODO: Could use a transducer at some point.
     const attributes = computed(() =>
       rFilter(
         (attribute) => !["description"].includes(attribute.key),

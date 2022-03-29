@@ -101,12 +101,12 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props, context) {
+  setup(props) {
     const formRequest = ref(null);
     const formSchema = ref(null);
     const submitSchema = ref(null);
 
-    const { status, success, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
     const { formWatcher } = useDynamicForm(
       formRequest,
       formSchema,
@@ -122,6 +122,7 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
 
+    const { status, success, fetchAPI } = apiInterface();
     const confirm = ref(false);
     const el = ref(null);
 

@@ -69,16 +69,17 @@ export default defineComponent({
     Comments,
     OpaqueSpinner,
   },
-  setup(_, context) {
+  setup() {
     const $notifier = useNotifier();
     const $route = useRoute();
     const $store = useStore();
-    const { loading, success, data, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
     const { editingDetailRouteGuard } = useEditing();
 
     const model = "Task";
     const id = computed(() => $route.params.id);
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const action = ref("");
     const completed = ref(null);
     const task = ref({});
@@ -93,7 +94,7 @@ export default defineComponent({
     useMeta(() => ({ title: `Task #${id.value}` }));
 
     const onAction = async () => {
-      const { success, fetchAPI, status } = useAPI(context);
+      const { success, fetchAPI, status } = apiInterface();
       const action = task.value.completed ? "markUndone" : "markDone";
       await fetchAPI(requests.tasks.setTaskState(id.value, action));
       if (success.value && status.value === 201) {

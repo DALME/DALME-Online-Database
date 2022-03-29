@@ -20,7 +20,7 @@ const tickets = {
     const url = `${endpoint}/${id}/set_state/`;
     return new Request(url, {
       method: "PATCH",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify({ action: S(action).underscore().s }),
     });
   },

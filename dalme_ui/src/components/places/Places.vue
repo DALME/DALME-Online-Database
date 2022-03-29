@@ -59,9 +59,10 @@ export default defineComponent({
   components: {
     OpaqueSpinner,
   },
-  setup(_, context) {
-    const { loading, success, data, fetchAPI } = useAPI(context);
+  setup() {
+    const { apiInterface } = useAPI();
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
     const filter = ref("");

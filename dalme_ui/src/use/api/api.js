@@ -1,3 +1,11 @@
+import { inject, provide } from "vue";
+
 import { API } from "@/api";
 
-export const useAPI = (context) => API(context);
+const APISymbol = Symbol();
+
+export const provideAPI = (reauthenticate) => {
+  provide(APISymbol, { apiInterface: () => API(reauthenticate) });
+};
+
+export const useAPI = () => inject(APISymbol);

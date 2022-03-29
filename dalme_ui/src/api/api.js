@@ -2,7 +2,7 @@ import { ref } from "vue";
 
 import { fetcher } from "./config";
 
-const API = (context = null) => {
+const API = (reauthenticate) => {
   const loading = ref(false);
   const success = ref(null);
   const status = ref(null);
@@ -22,7 +22,7 @@ const API = (context = null) => {
         redirected.value = response.redirected || false;
         apiError.value = response.error || false;
         data.value = await response.json();
-        context.emit("Reauthenticate", context && status.value === 403);
+        reauthenticate.value = status.value === 403;
       })
       .catch((e) => {
         error.value = e;

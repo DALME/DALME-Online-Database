@@ -76,15 +76,15 @@ export default defineComponent({
     Comments,
     OpaqueSpinner,
   },
-  setup(_, context) {
+  setup() {
+    const model = "Ticket";
+
     const $notifier = useNotifier();
     const $route = useRoute();
     const $store = useStore();
-    const { loading, success, data, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
 
-    const id = computed(() => $route.params.id);
-    const model = "Ticket";
-
+    const { loading, success, data, fetchAPI } = apiInterface();
     const action = ref("");
     const attachment = ref(null);
     const completed = ref(null);
@@ -92,14 +92,16 @@ export default defineComponent({
     const subheading = ref("");
     const isAdmin = $store.getters["auth/isAdmin"];
 
+    const id = computed(() => $route.params.id);
+
+    useMeta({ title: `Ticket #${id.value}` });
+
     provide("attachment", attachment);
     provide("model", model);
     provide("id", readonly(id));
 
-    useMeta({ title: `Ticket #${id.value}` });
-
     const onAction = async () => {
-      const { success, fetchAPI, status } = useAPI(context);
+      const { success, fetchAPI, status } = apiInterface();
       const action = ticket.value.status ? "markClosed" : "markOpen";
       await fetchAPI(requests.tickets.setTicketState(id.value, action));
       if (success.value && status.value === 200) {

@@ -70,11 +70,12 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props, context) {
+  setup(props) {
     const $store = useStore();
     const $notifier = useNotifier();
-    const { data, fetchAPI, status } = useAPI(context);
+    const { apiInterface } = useAPI();
 
+    const { data, fetchAPI, status } = apiInterface();
     const showModal = ref(false);
     const username = ref("");
     const password = ref("");

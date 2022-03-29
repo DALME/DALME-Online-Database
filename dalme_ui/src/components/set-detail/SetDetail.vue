@@ -154,9 +154,10 @@ export default defineComponent({
     SetMembers,
     OpaqueSpinner,
   },
-  setup(_, context) {
-    const { loading, success, data, fetchAPI } = useAPI(context);
+  setup() {
+    const { apiInterface } = useAPI();
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const set = ref({});
     const hasMembers = computed(
       () => set.value.memberCount !== undefined && set.value.memberCount > 0,

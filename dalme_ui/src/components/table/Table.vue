@@ -168,7 +168,8 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props, context) {
+  setup(props) {
+    const { apiInterface } = useAPI();
     const {
       focus,
       formSubmitWatcher,
@@ -196,7 +197,7 @@ export default defineComponent({
     const filter = ref("");
 
     // We can only open one inline popup at a time when doing editing, so we
-    // can share these, no need for any scoping via duplicates.
+    // can share these, no need for any scoping/duplicates/so forth.
     const editError = ref(false);
     const editErrorMessage = ref("");
 
@@ -249,7 +250,7 @@ export default defineComponent({
 
     const actorSend = ref(null);
     const handleSubmit = async () => {
-      const { success, status, fetchAPI } = useAPI(context);
+      const { success, status, fetchAPI } = apiInterface();
       const request = props.updateRequest(objDiffs);
       await fetchAPI(request);
       if (success.value && status.value == 201) {

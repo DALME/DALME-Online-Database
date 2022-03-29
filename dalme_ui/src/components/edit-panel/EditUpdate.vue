@@ -20,15 +20,17 @@ import { useAPI, useEditing } from "@/use";
 
 export default defineComponent({
   name: "EditUpdate",
-  setup(_, context) {
+  setup() {
     const mode = "update";
 
-    const { success, data, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
     const {
       isDetail,
       machine: { send },
     } = useEditing();
     const $route = useRoute();
+
+    const { success, data, fetchAPI } = apiInterface();
 
     const id = computed(() => $route.params.id);
     // TODO: resourceKind (to handle Source/Set polymorphism)

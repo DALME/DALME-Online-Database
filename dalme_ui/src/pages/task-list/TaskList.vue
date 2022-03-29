@@ -22,11 +22,12 @@ export default defineComponent({
     TaskLists,
     Tasks,
   },
-  setup(_, context) {
+  setup() {
     useMeta({ title: "Tasks" });
-    const { success, data, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
     const { postSubmitRefreshWatcher } = useEditing();
 
+    const { success, data, fetchAPI } = apiInterface();
     const taskLists = ref([]);
     provide("taskLists", taskLists);
 

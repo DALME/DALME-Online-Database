@@ -5,13 +5,13 @@ const auth = {
     const url = modalLoginUrl;
     return new Request(url, {
       method: "POST",
-      headers: headers,
+      headers: headers(),
       body: JSON.stringify({ username, password }),
     });
   },
   logout() {
     const url = `${dbUrl}/logout/`;
-    return new Request(url, { method: "POST", headers: headers });
+    return new Request(url, { method: "POST", headers: headers() });
   },
   session() {
     const url = `${apiUrl}/session/retrieve/`;

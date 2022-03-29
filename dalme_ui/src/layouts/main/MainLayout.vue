@@ -1,10 +1,6 @@
 <template>
   <LoginModal :show="showLoginModal" />
-  <q-layout
-    id="layout"
-    view="lHh Lpr lFf"
-    @reauthenticate="handleReauthenticate"
-  >
+  <q-layout id="layout" view="lHh Lpr lFf">
     <Nav />
     <EditIndex />
     <q-page-container class="main-container">
@@ -18,7 +14,12 @@
 import { defineComponent, ref } from "vue";
 
 import { EditIndex, EditPanel, LoginModal, Nav } from "@/components";
-import { provideEditing, providePermissions, provideTransport } from "@/use";
+import {
+  provideAPI,
+  provideEditing,
+  providePermissions,
+  provideTransport,
+} from "@/use";
 
 export default defineComponent({
   name: "MainLayout",
@@ -30,7 +31,7 @@ export default defineComponent({
   },
   setup() {
     const showLoginModal = ref(false);
-    const handleReauthenticate = (value) => (showLoginModal.value = value);
+    provideAPI(showLoginModal);
 
     provideEditing();
     provideTransport();
@@ -39,7 +40,6 @@ export default defineComponent({
 
     return {
       isAdmin,
-      handleReauthenticate,
       showLoginModal,
     };
   },

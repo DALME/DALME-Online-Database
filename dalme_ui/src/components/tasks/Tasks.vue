@@ -107,11 +107,12 @@ export default defineComponent({
   components: {
     OpaqueSpinner,
   },
-  setup(props, context) {
+  setup(props) {
     const $router = useRouter();
     const $store = useStore();
-    const { loading, success, data, fetchAPI } = useAPI(context);
+    const { apiInterface } = useAPI();
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const visibleColumns = ref(null);
     const rows = ref([]);

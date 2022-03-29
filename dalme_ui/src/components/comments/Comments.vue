@@ -65,9 +65,10 @@ export default defineComponent({
     CommentForm,
     Spinner,
   },
-  setup(_, context) {
-    const { loading, success, data, fetchAPI } = useAPI(context);
+  setup() {
+    const { apiInterface } = useAPI();
 
+    const { loading, success, data, fetchAPI } = apiInterface();
     const comments = ref([]);
 
     const model = inject("model");

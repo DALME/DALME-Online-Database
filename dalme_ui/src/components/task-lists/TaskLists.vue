@@ -140,15 +140,16 @@ export default defineComponent({
   name: "TaskLists",
   emits: ["onReload"],
   setup(_, context) {
-    const $notifier = useNotifier();
-    const $router = useRouter();
+    const { apiInterface } = useAPI();
     const {
       showEditing,
       machine: { send },
     } = useEditing();
+    const $notifier = useNotifier();
     const {
       permissions: { isAdmin },
     } = usePermissions();
+    const $router = useRouter();
 
     const title = "Task Lists";
     const activeFilters = ref(new Set());
@@ -200,7 +201,7 @@ export default defineComponent({
     };
 
     const handleEdit = async ({ id }) => {
-      const { data, success, fetchAPI } = useAPI(context);
+      const { data, success, fetchAPI } = apiInterface();
       const { edit: editSchema } = forms.taskList;
       await fetchAPI(requests.tasks.getTaskList(id));
       if (success.value) {
@@ -219,7 +220,7 @@ export default defineComponent({
     };
 
     const handleDelete = (taskList) => {
-      const { success, fetchAPI } = useAPI(context);
+      const { success, fetchAPI } = apiInterface();
       const request = requests.tasks.deleteTaskList(taskList.id);
       fetchAPI(request).then(() => {
         if (success.value) {
