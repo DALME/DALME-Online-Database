@@ -56,7 +56,12 @@ export default defineComponent({
 
     const showModal = ref(false);
 
-    return { hasPages, showModal, splitterModel, tab };
+    return {
+      hasPages,
+      showModal,
+      splitterModel,
+      tab,
+    };
   },
 });
 </script>

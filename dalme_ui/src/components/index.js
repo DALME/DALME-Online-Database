@@ -9,6 +9,7 @@ export { default as InlineIndex } from "./inline-index";
 export { default as WindowIndex } from "./window-index";
 export { default as EditIndex } from "./edit-index";
 export { default as EditPanel } from "./edit-panel";
+export { default as IssueTracker } from "./issue-tracker";
 export { default as Languages } from "./languages";
 export { default as Library } from "./library";
 export { default as Table } from "./table";
