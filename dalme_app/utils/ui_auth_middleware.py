@@ -3,7 +3,7 @@ import json
 from stringcase import snakecase
 
 from django.conf import settings
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, JsonResponse, QueryDict
 
 
 class UIAuthMiddleware:
@@ -17,7 +17,7 @@ class UIAuthMiddleware:
         response = self.get_response(request)
 
         if settings.IS_V2:
-            # TODO: Check if 500 no auth and change status to 403.
-            pass
+            if response.status_code == 500 and not request.user.is_authenticated:
+                return JsonResponse({'error': 'Reauthenticate'}, status=403)
 
         return response

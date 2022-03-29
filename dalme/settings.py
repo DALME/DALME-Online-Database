@@ -154,7 +154,6 @@ MIDDLEWARE = [
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
     'django_hosts.middleware.HostsResponseMiddleware',
-    'dalme_app.utils.UIAuthMiddleware',
 ]
 
 TEMPLATES = [

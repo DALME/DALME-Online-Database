@@ -1,5 +1,4 @@
 import { ref } from "vue";
-import { assign, createMachine } from "xstate";
 
 import { fetcher } from "./config";
 
@@ -14,7 +13,7 @@ const API = (context = null) => {
 
   const fetchAPI = (request) => {
     loading.value = true;
-    error.value = undefined;
+    error.value = false;
 
     return fetcher(request)
       .then(async (response) => {
@@ -23,9 +22,7 @@ const API = (context = null) => {
         redirected.value = response.redirected || false;
         apiError.value = response.error || false;
         data.value = await response.json();
-        if (context && status.value === 403) {
-          context.emit("onReauthenticate");
-        }
+        context.emit("Reauthenticate", context && status.value === 403);
       })
       .catch((e) => {
         error.value = e;

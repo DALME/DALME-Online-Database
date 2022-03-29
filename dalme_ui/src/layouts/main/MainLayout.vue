@@ -1,6 +1,10 @@
 <template>
-  <LoginModal @on-reauthenticate="onReauthenticate" :show="showLoginModal" />
-  <q-layout id="layout" view="lHh Lpr lFf">
+  <LoginModal :show="showLoginModal" />
+  <q-layout
+    id="layout"
+    view="lHh Lpr lFf"
+    @reauthenticate="handleReauthenticate"
+  >
     <Nav />
     <EditIndex />
     <q-page-container class="main-container">
@@ -25,9 +29,8 @@ export default defineComponent({
     Nav,
   },
   setup() {
-    // Reauthentication modal reactivity.
     const showLoginModal = ref(false);
-    const onReauthenticate = (value) => (showLoginModal.value = value);
+    const handleReauthenticate = (value) => (showLoginModal.value = value);
 
     provideEditing();
     provideTransport();
@@ -36,7 +39,7 @@ export default defineComponent({
 
     return {
       isAdmin,
-      onReauthenticate,
+      handleReauthenticate,
       showLoginModal,
     };
   },

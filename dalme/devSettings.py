@@ -143,6 +143,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'dalme_app.utils.UIAuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

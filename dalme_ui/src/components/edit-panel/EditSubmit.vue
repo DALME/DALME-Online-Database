@@ -40,7 +40,7 @@ export default defineComponent({
     //   }
     //   return false;
     // });
-    const valid = false;
+    const valid = true;
 
     const handleSubmit = () => send("SAVE_FOCUS");
 
