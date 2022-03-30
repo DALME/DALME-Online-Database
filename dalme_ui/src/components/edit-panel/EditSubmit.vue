@@ -16,7 +16,8 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { isNil } from "ramda";
+import { defineComponent, ref } from "vue";
 
 import { useEditing } from "@/use";
 
@@ -24,25 +25,28 @@ export default defineComponent({
   name: "EditSubmit",
   setup() {
     const {
-      // focus,
-      // forms,
       mouseoverSubmit,
       submitting,
-      machine: { send },
+      machine: { send, service },
     } = useEditing();
 
-    // TODO: Doesn't work!
-    // const valid = computed(() => {
-    //   if (focus.value) {
-    //     if (focus.value === "inline") return true;
-    //     const actor = forms.value[focus.value];
-    //     return useSelector(actor, (state) => state.context.validated);
-    //   }
-    //   return false;
-    // });
-    const valid = true;
+    const valid = ref(false);
+    service.onTransition(({ context: { focus, forms } }) => {
+      const canSubmit = (focus) => {
+        if (isNil(focus)) return false;
+        if (focus === "inline") return true;
+        const actor = forms[focus];
+        return actor.getSnapshot().context.validated;
+      };
+      valid.value = canSubmit(focus);
+    });
 
-    const handleSubmit = () => send("SAVE_FOCUS");
+    const handleSubmit = () => {
+      // Button will always disabled if state is invalid, but just in case.
+      if (valid.value) {
+        send("SAVE_FOCUS");
+      }
+    };
 
     return {
       handleSubmit,

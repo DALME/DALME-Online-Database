@@ -190,6 +190,7 @@ export const provideEditing = () => {
                   event.mode,
                   event.initialData,
                 ),
+                { sync: true },
               ),
               ...context.forms,
             };
