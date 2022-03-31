@@ -68,6 +68,7 @@ const taskSubmitSchemas = {
 };
 
 const taskRequests = {
+  get: (id) => requests.tasks.getTask(id),
   create: (data) => requests.tasks.createTask(data),
   update: ({ id, ...data }) => requests.tasks.editTask(id, data),
 };

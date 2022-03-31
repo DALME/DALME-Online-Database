@@ -298,7 +298,7 @@ export default defineComponent({
   setup() {
     const $route = useRoute();
     const { apiInterface } = useAPI();
-    const { editingDetailRouteGuard } = useEditing();
+    const { editingDetailRouteGuard, resource } = useEditing();
 
     const { loading, success, data, fetchAPI } = apiInterface();
     const source = ref({});
@@ -339,6 +339,13 @@ export default defineComponent({
         await sourceDetailSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
+            const type = {
+              Archive: "archive",
+              Book: "bibliography",
+              "File unit": "archivalFile",
+              Record: "record",
+            }[value.type.name];
+            resource.value = type;
             source.value = value;
             loading.value = false;
           });

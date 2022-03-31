@@ -207,6 +207,7 @@ import { attributeTypesSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
 import { attributeFields } from "./attributes";
+import { empty } from "./normalize";
 
 export default defineComponent({
   name: "AttributesField",
@@ -235,8 +236,6 @@ export default defineComponent({
     TextField,
   },
   setup(props, context) {
-    const empty = () => ({ attribute: null, value: null });
-
     const { apiInterface } = useAPI();
     const { fields, push, replace } = useFieldArray("attributes");
 
@@ -323,38 +322,46 @@ export default defineComponent({
     };
 
     const initAttributes = async () => {
-      // TODO: First clause might never be true... Every source should have
-      // required attributes. In which case `showing` should be true at setup.
-      if (props.required.length === 0) {
-        context.emit("update:modelValue", [empty()]);
-      } else {
-        loading.value = true;
-        const { success, data, fetchAPI } = apiInterface();
-        const request = requests.attributeTypes.getAttributeTypesByShortName(
-          props.required.join(),
+      if (props.modelValue.length > 0) {
+        const newValue = unref(props.modelValue).sort(
+          (x, y) =>
+            isRequiredAttribute(y.attribute) - isRequiredAttribute(x.attribute),
         );
-        await fetchAPI(request);
-        if (success.value)
-          await attributeTypesSchema
-            .validate(data.value, { stripUnknown: true })
-            .then((value) => {
-              let newValue = props.modelValue.slice(0);
-              const initial = new Set(
-                rMap((field) => field.attribute, newValue),
-              );
-              for (let attribute of value) {
-                if (
-                  !activeAttributes.value.includes(attribute.id) &&
-                  !initial.has(attribute.shortName)
-                ) {
-                  newValue = [{ attribute, value: null }, ...newValue];
+        context.emit("update:modelValue", newValue);
+      } else {
+        // TODO: First clause might never be true... Every source should have
+        // required attributes. In which case `showing` should be true at setup.
+        if (props.required.length === 0) {
+          context.emit("update:modelValue", [empty()]);
+        } else {
+          loading.value = true;
+          const { success, data, fetchAPI } = apiInterface();
+          const request = requests.attributeTypes.getAttributeTypesByShortName(
+            props.required.join(),
+          );
+          await fetchAPI(request);
+          if (success.value)
+            await attributeTypesSchema
+              .validate(data.value, { stripUnknown: true })
+              .then((value) => {
+                let newValue = unref(props.modelValue);
+                const initial = new Set(
+                  rMap((field) => field.attribute, newValue),
+                );
+                for (let attribute of value) {
+                  if (
+                    !activeAttributes.value.includes(attribute.id) &&
+                    !initial.has(attribute.shortName)
+                  ) {
+                    newValue = [{ attribute, value: null }, ...newValue];
+                  }
                 }
-              }
-              replace(newValue);
-              context.emit("update:modelValue", newValue);
-              loading.value = false;
-              showing.value = true;
-            });
+                replace(newValue);
+                context.emit("update:modelValue", newValue);
+                loading.value = false;
+                showing.value = true;
+              });
+        }
       }
     };
 

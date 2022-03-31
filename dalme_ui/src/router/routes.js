@@ -57,7 +57,7 @@ const routes = [
           {
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Bibliography",
-            path: "bibilography",
+            path: "bibilographies",
             props: { icon: "library_books" },
             nav: true,
             meta: {

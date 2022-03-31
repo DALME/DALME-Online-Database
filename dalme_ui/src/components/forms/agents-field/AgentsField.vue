@@ -101,6 +101,8 @@ import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
 import { agentOptionsSchema, legalPersonaOptionsSchema } from "@/schemas";
 
+import { empty } from "./normalize";
+
 export default defineComponent({
   name: "AgentsField",
   props: {
@@ -117,8 +119,6 @@ export default defineComponent({
     SelectField,
   },
   setup(props, context) {
-    const empty = () => ({ agent: null, legalPersona: null, type: "person" });
-
     const { fields, push, replace } = useFieldArray("agents");
 
     const loading = ref(false);

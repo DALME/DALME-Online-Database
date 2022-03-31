@@ -310,9 +310,9 @@ export const provideEditing = () => {
 
   // Inform the editing logic if we are on a detail page. This needs to be
   // manually instantiated in any detail page setup methods. NOTE: Could
-  // theorectically share a single, abstract DetailPage component at some point
-  // in the refactored future and just call this there, once.
-  // TODO: resourceKind will be necessary for the polymorphic pages.
+  // preferably share a single, abstract DetailPage component at some point in
+  // the refactored future and just call this there, once.
+  const resource = ref(null);
   const editingDetailRouteGuard = () => {
     machine.send("SET_DETAIL", { value: true });
     onBeforeRouteLeave(() => {
@@ -335,6 +335,7 @@ export const provideEditing = () => {
     postSubmitRefreshWatcher,
     recenter,
     recenterWatcher,
+    resource,
     showAll,
     showEditing,
     submitting,

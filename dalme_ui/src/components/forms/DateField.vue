@@ -1,6 +1,6 @@
 <template>
   <q-input
-    hint="YYYY-MM-DD"
+    label="Date (YYYY-MM-DD)"
     mask="####-##-##"
     :model-value="modelValue"
     :error="errorMessage && meta.touched"

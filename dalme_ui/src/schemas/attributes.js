@@ -1,5 +1,5 @@
 import { camelCase } from "camel-case";
-import { moment } from "moment";
+import moment from "moment";
 import { isNil } from "ramda";
 import * as yup from "yup";
 

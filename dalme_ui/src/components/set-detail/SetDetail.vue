@@ -144,7 +144,7 @@ import { computed, defineComponent, inject, onMounted, ref } from "vue";
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
 import { setDetailSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useEditing } from "@/use";
 
 import SetMembers from "./SetMembers.vue";
 
@@ -156,6 +156,7 @@ export default defineComponent({
   },
   setup() {
     const { apiInterface } = useAPI();
+    const { editingDetailRouteGuard, resource } = useEditing();
 
     const { loading, success, data, fetchAPI } = apiInterface();
     const set = ref({});
@@ -178,12 +179,15 @@ export default defineComponent({
         await setDetailSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
+            resource.value = value.setType.name.toLowerCase();
             set.value = value;
             loading.value = false;
           });
     };
 
     onMounted(async () => await fetchData());
+
+    editingDetailRouteGuard();
 
     return {
       hasMembers,

@@ -6,8 +6,8 @@ const attributeTypes = {
   getAttributeTypes() {
     return new Request(endpoint);
   },
-  getAttributeTypesByShortName(short_names) {
-    const url = `${endpoint}/?short_names=${short_names}`;
+  getAttributeTypesByShortName(shortNames) {
+    const url = `${endpoint}/?short_names=${shortNames}`;
     return new Request(url);
   },
 };

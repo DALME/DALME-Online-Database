@@ -16,12 +16,16 @@ import {
   attributeValidators,
   creditValidators,
   folioValidators,
+  recordEditSchema,
   recordFieldValidation,
   recordPostSchema,
   recordPutSchema,
   setOptionsSchema,
   sourceOptionsSchema,
 } from "@/schemas";
+
+// TODO: map attributeValidators here to get the subset.
+// const allowedAttributes = [];
 
 const recordFormSchema = {
   name: {
@@ -75,11 +79,7 @@ const recordFormSchema = {
     component: markRaw(AttributesField),
     description: "The characteristics of the source.",
     required: ["recordType", "language"],
-    // NOTE: We pass this in here (rather than importing it in the the
-    // component) even though it's a monolithic definition and will be the same
-    // for all instances of the attributes field. That said, there may be a
-    // time on another definition when we want to override some rules, so let's
-    // leave that option open.
+    // TODO: Constrain by source/set type here.
     validators: attributeValidators,
     validation: recordFieldValidation.attributes,
   },
@@ -106,18 +106,21 @@ const recordFormSchema = {
   },
 };
 
+// TODO: Wrap these in the normalize out schema?
 const recordSubmitSchemas = {
   create: recordPostSchema,
   update: recordPutSchema,
 };
 
 const recordRequests = {
+  get: (id) => requests.sources.getSource(id),
+  // TODO: These two requests don't exist yet.
   create: (data) => requests.sources.createSource(data),
   update: ({ id, ...data }) => requests.sources.editSource(id, data),
 };
 
 export default {
-  edit: null, // TODO: Schema here.
+  edit: recordEditSchema,
   form: recordFormSchema,
   requests: recordRequests,
   submit: recordSubmitSchemas,
