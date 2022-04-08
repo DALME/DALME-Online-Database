@@ -139,7 +139,7 @@ export const attributeValidators = {
   language: yup
     .array()
     .of(
-      yup.object().shape({ value: yup.number().required().label("Language") }),
+      yup.object().shape({ value: yup.string().required().label("Language") }),
     )
     .nullable()
     .required()
@@ -176,14 +176,14 @@ export const attributeValidators = {
   list: yup.number().nullable().required().label("Datatables List"),
   locale: yup
     .object()
-    .shape({ id: yup.number().nullable().required().label("Locale") })
+    .shape({ value: yup.string().nullable().required().label("Locale") })
     .nullable()
     .required()
-    .transform((option) => (isNil(option) ? null : { id: option.value }))
+    .transform((option) => (isNil(option) ? null : option))
     .label("Locale"),
   longitude: yup.string().nullable().required().label("Longitude"),
   memberCount: yup.number().min(0).nullable().required().label("Member count"),
-  mk1Identifier: yup.string().nullable().required().label("Mk.I ID"),
+  mk1Identifier: yup.number().nullable().required().label("Mk.I ID"),
   mk2Identifier: yup.string().uuid().nullable().required().label("Mk.II ID"),
   modificationTimestamp: yup
     .string()

@@ -38,7 +38,7 @@
 
     <template
       v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
-      :key="field.key"
+      :key="`${idx}-${field.key}`"
     >
       <div class="row q-mb-sm" v-show="showing">
         <div class="col-6 q-pr-sm">
@@ -83,7 +83,7 @@
             <template v-if="data.attribute.dataType === 'Boolean'">
               <BooleanField
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :validation="validators[data.attribute.shortName]"
               />
@@ -91,7 +91,7 @@
             <template v-else-if="data.attribute.dataType === 'Decimal'">
               <DecimalField
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :validation="validators[data.attribute.shortName]"
               />
@@ -99,7 +99,7 @@
             <template v-else-if="data.attribute.dataType === 'Number'">
               <NumberField
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :validation="validators[data.attribute.shortName]"
               />
@@ -107,7 +107,7 @@
             <template v-else-if="data.attribute.dataType === 'Date'">
               <DateField
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :validation="validators[data.attribute.shortName]"
               />
@@ -115,7 +115,7 @@
             <template v-else-if="data.attribute.dataType === 'Text'">
               <TextField
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :validation="validators[data.attribute.shortName]"
               />
@@ -124,7 +124,7 @@
               <SelectField
                 v-if="!getOptionsData(data.attribute.shortName).multiple"
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :filterable="
                   getOptionsData(data.attribute.shortName).filterable
@@ -138,7 +138,7 @@
               <MultipleSelectField
                 v-else
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :filterable="
                   getOptionsData(data.attribute.shortName).filterable
@@ -153,7 +153,7 @@
             <template v-else>
               <InputField
                 v-model="data.value"
-                :field="`attributes[${field.key}]`"
+                :field="`attributes[${idx}].value`"
                 :label="data.attribute.dataType"
                 :validation="validators[data.attribute.shortName]"
               />
@@ -221,7 +221,6 @@ export default defineComponent({
       default: () => [],
     },
     validators: {
-      type: Object,
       required: true,
     },
   },
@@ -237,7 +236,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const { apiInterface } = useAPI();
-    const { fields, push, replace } = useFieldArray("attributes");
+    const { fields, push, replace, remove } = useFieldArray("attributes");
 
     const loading = ref(false);
     const showing = ref(false);
@@ -262,28 +261,26 @@ export default defineComponent({
         : null;
 
     const handleAddField = () => {
-      const newValue = unref(props.modelValue);
-      context.emit("update:modelValue", [...newValue, empty()]);
+      const newValue = [...unref(props.modelValue), empty()];
       push(empty());
+      context.emit("update:modelValue", newValue);
     };
     const handleRemoveField = (idx) => {
       const newValue = unref(props.modelValue);
       newValue.splice(idx, 1);
+      remove(idx);
       context.emit("update:modelValue", newValue);
-      replace(newValue);
     };
     const handleClearAttribute = (idx) => {
       const newValue = unref(props.modelValue);
       newValue[idx] = empty();
       context.emit("update:modelValue", newValue);
-      replace(newValue);
     };
     const handleUpdateAttribute = (option, idx) => {
       const newValue = unref(props.modelValue);
       newValue[idx].attribute = option ? option : null;
       newValue[idx].value = null;
       context.emit("update:modelValue", newValue);
-      replace(newValue);
     };
 
     const handleOptions = async (val, update) => {
@@ -323,45 +320,40 @@ export default defineComponent({
 
     const initAttributes = async () => {
       if (props.modelValue.length > 0) {
-        const newValue = unref(props.modelValue).sort(
+        const newValue = unref(props.modelValue);
+        const sorted = newValue.sort(
           (x, y) =>
             isRequiredAttribute(y.attribute) - isRequiredAttribute(x.attribute),
         );
-        context.emit("update:modelValue", newValue);
+        replace(sorted);
+        context.emit("update:modelValue", sorted);
       } else {
-        // TODO: First clause might never be true... Every source should have
-        // required attributes. In which case `showing` should be true at setup.
-        if (props.required.length === 0) {
-          context.emit("update:modelValue", [empty()]);
-        } else {
-          loading.value = true;
-          const { success, data, fetchAPI } = apiInterface();
-          const request = requests.attributeTypes.getAttributeTypesByShortName(
-            props.required.join(),
-          );
-          await fetchAPI(request);
-          if (success.value)
-            await attributeTypesSchema
-              .validate(data.value, { stripUnknown: true })
-              .then((value) => {
-                let newValue = unref(props.modelValue);
-                const initial = new Set(
-                  rMap((field) => field.attribute, newValue),
-                );
-                for (let attribute of value) {
-                  if (
-                    !activeAttributes.value.includes(attribute.id) &&
-                    !initial.has(attribute.shortName)
-                  ) {
-                    newValue = [{ attribute, value: null }, ...newValue];
-                  }
+        loading.value = true;
+        const { success, data, fetchAPI } = apiInterface();
+        const request = requests.attributeTypes.getAttributeTypesByShortName(
+          props.required.join(),
+        );
+        await fetchAPI(request);
+        if (success.value)
+          await attributeTypesSchema
+            .validate(data.value, { stripUnknown: true })
+            .then((value) => {
+              let newValue = unref(props.modelValue);
+              const initial = new Set(
+                rMap((field) => field.attribute, newValue),
+              );
+              for (let attribute of value) {
+                if (
+                  !activeAttributes.value.includes(attribute.id) &&
+                  !initial.has(attribute.shortName)
+                ) {
+                  newValue = [{ attribute, value: null }, ...newValue];
                 }
-                replace(newValue);
-                context.emit("update:modelValue", newValue);
-                loading.value = false;
-                showing.value = true;
-              });
-        }
+              }
+              context.emit("update:modelValue", newValue);
+              loading.value = false;
+              showing.value = true;
+            });
       }
     };
 

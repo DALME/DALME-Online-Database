@@ -7,7 +7,7 @@
 <script>
 import { SchemaForm, useSchemaForm } from "formvuelate";
 import { useForm } from "vee-validate";
-import { provide, toRaw, watch } from "vue";
+import { provide, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 import { useActor } from "@xstate/vue";
 
@@ -51,18 +51,13 @@ export default {
 
     watch(
       () => meta.value,
-      (newMeta) => {
+      async (newMeta) => {
         if (newMeta.touched && !newMeta.pending) {
           const { send } = useActor(forms.value[props.cuid]);
-
-          // TODO: No, still doesn't work over option.caption.
-          const initial = toRaw(newMeta.initialValues);
-          const current = toRaw(props.formModel);
-          const hasDiffs = JSON.stringify(initial) !== JSON.stringify(current);
-
-          send({ type: "VALIDATE", validated: hasDiffs && newMeta.valid });
+          send({ type: "VALIDATE", validated: newMeta.valid });
         }
       },
+      { deep: true },
     );
   },
 };

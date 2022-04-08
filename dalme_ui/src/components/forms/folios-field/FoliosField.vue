@@ -156,16 +156,16 @@ export default defineComponent({
   setup(props, context) {
     const empty = () => ({ folio: null, damId: null });
 
-    const { fields, push, replace } = useFieldArray("folios");
+    const { fields, replace } = useFieldArray("folios");
 
     const card = ref(false);
     const loading = ref(false);
     const showing = ref(props.modelValue.length > 0 ? true : false);
 
     const handleAddField = () => {
-      const newValue = unref(props.modelValue);
-      context.emit("update:modelValue", [...newValue, empty()]);
-      push(empty());
+      const newValue = [...unref(props.modelValue), empty()];
+      context.emit("update:modelValue", newValue);
+      replace(newValue);
     };
     const handleRemoveField = (idx) => {
       const newValue = unref(props.modelValue);
@@ -174,6 +174,7 @@ export default defineComponent({
       replace(newValue);
     };
     const handleDrag = (idx) => {
+      // TODO: Implement dragging re-order.
       console.assert(idx);
     };
 

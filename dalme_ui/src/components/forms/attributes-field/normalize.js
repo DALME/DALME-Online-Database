@@ -36,7 +36,11 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
         }
         // It's a non-ID driven Select value, probably just a string from a
         // simple set of options choices.
-        return { attribute: attributeType, value: data };
+        // debugger;
+        return {
+          attribute: attributeType,
+          value: { label: data, value: data },
+        };
       case "Date":
         return {
           attribute: attributeType,

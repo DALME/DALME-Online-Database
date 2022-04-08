@@ -2,20 +2,14 @@ import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
 import {
-  AgentsField,
   AttributesField,
   BooleanField,
-  CreditsField,
-  FoliosField,
   InputField,
   MultipleSelectField,
   SelectField,
 } from "@/components/forms";
 import {
-  agentValidators,
   attributeValidators,
-  creditValidators,
-  folioValidators,
   recordEditSchema,
   recordFieldValidation,
   recordPostSchema,
@@ -23,9 +17,6 @@ import {
   setOptionsSchema,
   sourceOptionsSchema,
 } from "@/schemas";
-
-// TODO: map attributeValidators here to get the subset.
-// const allowedAttributes = [];
 
 const recordFormSchema = {
   name: {
@@ -83,27 +74,27 @@ const recordFormSchema = {
     validators: attributeValidators,
     validation: recordFieldValidation.attributes,
   },
-  agents: {
-    field: "agents",
-    component: markRaw(AgentsField),
-    description: "People referred to by or involved in the source.",
-    validators: agentValidators,
-    validation: recordFieldValidation.agents,
-  },
-  folios: {
-    field: "folios",
-    component: markRaw(FoliosField),
-    description: "The pages/folios contained by the source.",
-    validators: folioValidators,
-    validation: recordFieldValidation.folios,
-  },
-  credits: {
-    field: "credits",
-    component: markRaw(CreditsField),
-    description: "Editorial persons who contributed to this source.",
-    validators: creditValidators,
-    validation: recordFieldValidation.credits,
-  },
+  // agents: {
+  //   field: "agents",
+  //   component: markRaw(AgentsField),
+  //   description: "People referred to by or involved in the source.",
+  //   validators: agentValidators,
+  //   validation: recordFieldValidation.agents,
+  // },
+  // folios: {
+  //   field: "folios",
+  //   component: markRaw(FoliosField),
+  //   description: "The pages/folios contained by the source.",
+  //   validators: folioValidators,
+  //   validation: recordFieldValidation.folios,
+  // },
+  // credits: {
+  //   field: "credits",
+  //   component: markRaw(CreditsField),
+  //   description: "Editorial persons who contributed to this source.",
+  //   validators: creditValidators,
+  //   validation: recordFieldValidation.credits,
+  // },
 };
 
 // TODO: Wrap these in the normalize out schema?

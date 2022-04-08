@@ -119,15 +119,15 @@ export default defineComponent({
     SelectField,
   },
   setup(props, context) {
-    const { fields, push, replace } = useFieldArray("agents");
+    const { fields, replace } = useFieldArray("agents");
 
     const loading = ref(false);
     const showing = ref(props.modelValue.length > 0 ? true : false);
 
     const handleAddField = () => {
-      const newValue = unref(props.modelValue);
-      context.emit("update:modelValue", [...newValue, empty()]);
-      push(empty());
+      const newValue = [...unref(props.modelValue), empty()];
+      context.emit("update:modelValue", newValue);
+      replace(newValue);
     };
     const handleRemoveField = (idx) => {
       const newValue = unref(props.modelValue);

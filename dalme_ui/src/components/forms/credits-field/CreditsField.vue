@@ -180,7 +180,7 @@ export default defineComponent({
   setup(props, context) {
     const empty = () => ({ agent: null, role: null, note: null });
 
-    const { fields, push, replace } = useFieldArray("credits");
+    const { fields, replace } = useFieldArray("credits");
 
     const cuid = inject("cuid");
 
@@ -201,9 +201,9 @@ export default defineComponent({
     };
 
     const handleAddField = () => {
-      const newValue = unref(props.modelValue);
-      context.emit("update:modelValue", [...newValue, empty()]);
-      push(empty());
+      const newValue = [...unref(props.modelValue), empty()];
+      context.emit("update:modelValue", newValue);
+      replace(newValue);
     };
     const handleRemoveField = (idx) => {
       const newValue = unref(props.modelValue);

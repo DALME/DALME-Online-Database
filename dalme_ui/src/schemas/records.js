@@ -2,12 +2,7 @@ import camelcaseKeys from "camelcase-keys";
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-import {
-  agentsFieldSchema,
-  attributesFieldSchema,
-  foliosFieldSchema,
-  creditsFieldSchema,
-} from "@/schemas";
+import { attributesFieldSchema } from "@/schemas";
 
 export const recordFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
@@ -35,12 +30,28 @@ export const recordFieldValidation = {
     .nullable()
     .label("Sets"),
   attributes: yup.array().of(attributesFieldSchema).label("Attributes"),
-  agents: yup.array().of(agentsFieldSchema).label("Agents"),
-  folios: yup.array().of(foliosFieldSchema).label("Folios"),
-  credits: yup.array().of(creditsFieldSchema).label("Credits"),
+  // agents: yup
+  //   .array()
+  //   .of(agentsFieldSchema)
+  //   .default(null)
+  //   .nullable()
+  //   .label("Agents"),
+  // folios: yup
+  //   .array()
+  //   .of(foliosFieldSchema)
+  //   .default(null)
+  //   .nullable()
+  //   .label("Folios"),
+  // credits: yup
+  //   .array()
+  //   .of(creditsFieldSchema)
+  //   .default(null)
+  //   .nullable()
+  //   .label("Credits"),
 };
 
-// Edit existing object schema.
+// Edit object schema
+// Transforms API data to the correct shape expected by the form.
 export const recordEditSchema = yup
   .object()
   .shape({
