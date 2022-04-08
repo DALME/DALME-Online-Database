@@ -67,12 +67,11 @@ CORS_ALLOWED_ORIGINS = [
     'https://purl.dalme.org',
     'https://db.dalme.org',
     'https://kb.dalme.org',
-    'https://dam.dalme.org'
+    'https://dam.dalme.org',
+    'https://digital.bodleian.ox.ac.uk',  # to test serving of IIIF manifests to external apps
+    'https://storiiies-editor.cogapp.com',  # Apr/2022, for Laura: allow access to IIIF manifests
 ]
 CORS_ALLOW_CREDENTIALS = True
-
-# exclude pages endpoint from CORS to allow external apps to pull IIIF manifests
-CORS_URLS_REGEX = r"^(?!/pages).*$"
 
 ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.urls'
