@@ -1,7 +1,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.6.7/jquery.timeago.min.js" integrity="sha512-RlGrSmkje9EE/FXpJKWf0fvOlg4UULy/blvNsviBX9LFwMj/uewXVoanRbxTIRDXy/0A3fBQppTmJ/qOboJzmA==" crossorigin="anonymous"></script>
 <script>
   $(document).ready(function() {
-    fetch('https://api.github.com/repos/DALME/DALME-Online-Database/commits/develop')
+    fetch('https://api.github.com/repos/DALME/DALME-Online-Database/commits/development')
       .then(response => response.json())
       .then(commits => {
         const last_activity = $.timeago(commits.commit.author.date);
