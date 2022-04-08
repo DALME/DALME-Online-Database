@@ -1928,6 +1928,12 @@ tei-g {
   line-height: 1;
   margin: 0 5px;
 }
+
+tei-num tei-g {
+  font-size: 17px;
+  margin: 0 0;
+}
+
 tei-body span {
   text-decoration: inherit;
 }
