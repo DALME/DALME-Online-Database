@@ -71,6 +71,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+# exclude pages endpoint from CORS to allow external apps to pull IIIF manifests
+CORS_URLS_REGEX = r"^(?!/pages).*$"
+
 ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.urls'
 DEFAULT_HOST = 'public'
