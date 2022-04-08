@@ -70,6 +70,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://dam.dalme.org',
     'https://digital.bodleian.ox.ac.uk',  # to test serving of IIIF manifests to external apps
     'https://storiiies-editor.cogapp.com',  # Apr/2022, for Laura: allow access to IIIF manifests
+    'https://sims2.digitalmappa.org',  # Apr/2022, for Laura: allow access to IIIF manifests
 ]
 CORS_ALLOW_CREDENTIALS = True
 
