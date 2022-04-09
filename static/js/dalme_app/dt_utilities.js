@@ -167,6 +167,10 @@ function build_datatables(data, target, editor) {
   table_options['ajax']['data'] = (function (data) { return { "data": JSON.stringify(data) }; });
   table_options['ajax']['url'] = `${api_endpoint}/${table_options['ajax']['url']}`;
 
+  if (typeof source_type != 'undefined' && source_type == 'records') {
+    table_options['ajax']['url'] = table_options['ajax']['url'] + `&mode=${user_prefs.list_scope}`;
+  }
+
   let editor_buttons = editor ? data[0].editor.buttons : []
   let editor_instance = editor ? dt_editor : null
 
@@ -322,7 +326,7 @@ function toggle_fields(target, action) {
         add_menu_list.push(editor_fields[i]);
       }
     }
-    
+
     if (add_menu_list.length) {
       let clean_menu_list = []
       add_menu_list.forEach((x) => { clean_menu_list.push(attribute_concordance_rev[x])});
@@ -564,8 +568,8 @@ function update_dt_url(data) {
   data = JSON.parse(data['data'])
   var url = remove_param(['search', 'ordering', 'mode'], dt_table.ajax.url())
 
-  if (typeof mode != 'undefined') {
-    url += `&mode=${mode}`;
+  if (typeof source_type != 'undefined' && source_type == 'records') {
+    url += `&mode=${user_prefs.list_scope}`;
   }
 
   if (data['order'].length) {

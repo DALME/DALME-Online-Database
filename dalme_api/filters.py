@@ -33,17 +33,17 @@ class SourceFilter(filters.FilterSet):
     @property
     def qs(self):
         parent = super().qs
-        if self.request.GET.get('mode') is not None:
-            mode = self.request.GET['mode']
-            if mode == 'team':
-                dataset = Set.objects.get(dataset_usergroup=self.request.user.profile.primary_group)
-                return parent.filter(primary_dataset=dataset.id)
-            elif mode == 'all':
-                return parent.filter(is_private=False)
-            else:
-                return parent.filter(owner=self.request.user)
+        mode = self.request.GET['mode'] if self.request.GET.get('mode') is not None else 'all'
+
+        if mode == 'team':
+            rec_ids = Set.objects.get(dataset_usergroup=self.request.user.profile.primary_group).members.values_list('object_id', flat=True)
+            return Source.objects.filter(id__in=rec_ids)
+
+        elif mode == 'all':
+            return parent.filter(is_private=False)
+
         else:
-            return parent
+            return parent.filter(owner=self.request.user)
 
 
 class SetFilter(filters.FilterSet):

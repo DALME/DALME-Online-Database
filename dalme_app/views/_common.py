@@ -13,7 +13,6 @@ class DALMEContextMixin(ContextMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # user = self.request.user
         sidebar_toggle = self.request.user.preferences['interface__sidebar_collapsed']
         page_title = self.get_page_title()
         breadcrumb = self.get_breadcrumb()
@@ -33,19 +32,6 @@ class DALMEContextMixin(ContextMixin):
             'comments': self.comments,
             'form': formset_factory(SearchForm),
             'preferences': self.get_preferences(),
-            # 'page_context': {
-            #     'breadcrumb': self.get_breadcrumb(),
-            #     'user': {
-            #         'id': user.id,
-            #         'username': user.username,
-            #         'full_name': user.profile.full_name,
-            #         'avatar': user.profile.profile_image,
-            #         'groups': [g.name for g in user.groups.all()]
-            #     },
-            #     'preferences': self.get_preferences(),
-            #     'main_menu': main_menu,
-            #     'secondary_menu': secondary_menu
-            # }
         })
 
         return context

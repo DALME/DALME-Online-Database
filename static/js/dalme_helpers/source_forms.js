@@ -28,7 +28,7 @@ function source_form_setup(e, mode, action) {
 
     if (source_type == 'bibliography') {
       let selectize = dt_editor.field('attributes.zotero_key').inst()
-      console.log(selectize)
+      // console.log(selectize)
       selectize.on('change', populate_biblio_fields);
     }
 
