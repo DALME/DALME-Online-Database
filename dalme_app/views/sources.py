@@ -53,7 +53,7 @@ class SourceDetail(DALMEDetailView):
         if self.object.parent:
             source_data['Parent'] = '<a href="/sources/{}">{}</a>'.format(str(self.object.parent.id), self.object.parent.name)
 
-        if self.object.type.id == 12 and self.object.primary_dataset:
+        if self.object.type.id in [12, 13] and self.object.primary_dataset:
             source_data['Primary Dataset'] = '<a href="/sets/{}">{}</a>'.format(str(self.object.primary_dataset.id), self.object.primary_dataset.name)
 
         (attributes, description) = self.get_attributes()

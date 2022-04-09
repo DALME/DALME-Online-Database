@@ -36,7 +36,7 @@ class Source(index.Indexed, dalmeUuidOwned):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.type.id == 13:
+        if self.type.id == 13 and self.primary_dataset is None:
             if self.parent is not None and self.parent.primary_dataset is not None:
                 self.primary_dataset = self.parent.primary_dataset
 
