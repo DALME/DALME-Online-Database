@@ -226,7 +226,7 @@ export default defineComponent({
   min-width: 40rem;
   max-width: 45rem;
   position: fixed;
-  will-change: transform !important;
+  will-change: auto;
 }
 .modal-card {
   max-height: calc(100vh - 10rem);
