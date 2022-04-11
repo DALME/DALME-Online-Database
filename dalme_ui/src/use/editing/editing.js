@@ -1,4 +1,13 @@
-import { any, isEmpty, isNil, map as rMap, omit, keys, values } from "ramda";
+import {
+  any,
+  filter as rFilter,
+  isEmpty,
+  isNil,
+  map as rMap,
+  omit,
+  keys,
+  values,
+} from "ramda";
 import { computed, inject, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { assign, createMachine, send, spawn } from "xstate";
@@ -6,7 +15,7 @@ import { useActor, useMachine, useSelector } from "@xstate/vue";
 
 import { default as notifier } from "@/notifier";
 
-const MAX_FORMS = 5;
+const MAX_MODALS = 10;
 const EditingSymbol = Symbol();
 
 export const provideEditing = () => {
@@ -56,6 +65,31 @@ export const provideEditing = () => {
       },
     );
 
+  const createFolioMachine = (cuid, metadata) => {
+    createMachine(
+      {
+        id: cuid,
+        initial: "render",
+        context: { metadata, visible: true },
+        on: {
+          HIDE: { actions: "hide", internal: true },
+          SHOW: { actions: "show", internal: true },
+        },
+        states: {
+          render: {
+            type: "final",
+          },
+        },
+      },
+      {
+        actions: {
+          hide: assign({ visible: false }),
+          show: assign({ visible: true }),
+        },
+      },
+    );
+  };
+
   const createInlineMachine = () =>
     createMachine(
       {
@@ -94,17 +128,22 @@ export const provideEditing = () => {
       context: {
         detail: false,
         focus: null, // focus : null || "inline" || cuid
-        forms: {}, // forms : { cuid: actor }
+        modals: {}, // modals : { cuid: { kind: 'form' | 'folio', actor } }
         inline: null, // inline : null || actor
-        maxForms: MAX_FORMS,
+        maxModals: MAX_MODALS,
       },
       on: {
-        DESTROY_FORM: { target: "destroyForm" },
+        DESTROY_MODAL: { target: "destroyModal" },
         DESTROY_INLINE: { target: "destroyInline" },
         RESET: { target: "reset" },
-        SAVE_FOCUS: { actions: "saveFocus", internal: true },
+        SAVE_FOCUS: { actions: "saveFocus", internal: true, cond: "saveable" },
         SET_DETAIL: { actions: "setDetail", internal: true },
         SET_FOCUS: { actions: "setFocus", internal: true },
+        SPAWN_FOLIO: {
+          target: "editing",
+          actions: "spawnFolio",
+          cond: "canSpawn",
+        },
         SPAWN_FORM: {
           target: "editing",
           actions: "spawnForm",
@@ -119,22 +158,22 @@ export const provideEditing = () => {
       states: {
         normal: {},
         editing: {},
-        destroyForm: {
-          entry: ["gcForm"],
+        destroyModal: {
+          entry: ["gcModal"],
           always: [
-            { target: "editing", cond: "hasForms" },
+            { target: "editing", cond: "hasModals" },
             { target: "normal" },
           ],
         },
         destroyInline: {
           entry: ["gcInline"],
           always: [
-            { target: "editing", cond: "hasForms" },
+            { target: "editing", cond: "hasModals" },
             { target: "normal" },
           ],
         },
         reset: {
-          entry: ["gcForms"],
+          entry: ["gcModals"],
           always: [{ target: "normal" }],
         },
       },
@@ -146,17 +185,18 @@ export const provideEditing = () => {
             context.focus === "inline" ? null : context.focus,
           inline: null,
         }),
-        gcForm: assign({
+        gcModal: assign({
           focus: (context, event) =>
             context.focus === event.cuid ? null : context.focus,
-          forms: (context, event) => {
-            context.forms[event.cuid].stop();
-            return omit([event.cuid], context.forms);
+          modals: (context, event) => {
+            const { actor } = context.modals[event.cuid];
+            actor.stop();
+            return omit([event.cuid], context.modals);
           },
         }),
-        gcForms: assign({
-          forms: (context) => {
-            rMap((actor) => actor.stop(), values(context.forms));
+        gcModals: assign({
+          modals: (context) => {
+            rMap(({ actor }) => actor.stop(), values(context.modals));
             return {};
           },
         }),
@@ -172,34 +212,52 @@ export const provideEditing = () => {
             to: (context) =>
               context.focus === "inline"
                 ? context.inline
-                : context.forms[context.focus],
+                : context.modals[context.focus].actor,
           },
         ),
+        spawnFolio: assign({
+          focus: (_, event) => event.cuid,
+          modals: (context, event) => {
+            return {
+              [event.cuid]: {
+                kind: "folio",
+                actor: spawn(createFolioMachine(event.cuid, event.metadata), {
+                  sync: true,
+                }),
+              },
+              ...context.modals,
+            };
+          },
+        }),
+        spawnForm: assign({
+          focus: (_, event) => event.cuid,
+          modals: (context, event) => {
+            return {
+              [event.cuid]: {
+                kind: "form",
+                actor: spawn(
+                  createFormMachine(
+                    event.cuid,
+                    event.kind,
+                    event.mode,
+                    event.initialData,
+                  ),
+                  { sync: true },
+                ),
+              },
+              ...context.modals,
+            };
+          },
+        }),
         spawnInline: assign({
           focus: "inline",
           inline: () => spawn(createInlineMachine()),
         }),
-        spawnForm: assign({
-          focus: (_, event) => event.cuid,
-          forms: (context, event) => {
-            return {
-              [event.cuid]: spawn(
-                createFormMachine(
-                  event.cuid,
-                  event.kind,
-                  event.mode,
-                  event.initialData,
-                ),
-                { sync: true },
-              ),
-              ...context.forms,
-            };
-          },
-        }),
       },
       guards: {
-        canSpawn: (context) => keys(context.forms).length < context.maxForms,
-        hasForms: (context) => keys(context.forms).length > 0,
+        saveable: (context) => context.modals[context.focus].kind !== "folio",
+        canSpawn: (context) => keys(context.modals).length < context.maxModals,
+        hasModals: (context) => keys(context.modals).length > 0,
         noInline: (context) => isNil(context.inline),
       },
     },
@@ -211,7 +269,10 @@ export const provideEditing = () => {
 
   // Convenience getters lensing into the machine context.
   const focus = useSelector(service, (state) => state.context.focus);
-  const forms = useSelector(service, (state) => state.context.forms);
+  const modals = useSelector(service, (state) => state.context.modals);
+  const forms = useSelector(service, (state) =>
+    rFilter(({ kind }) => kind === "form", state.context.modals),
+  );
   const inline = useSelector(service, (state) => state.context.inline);
   const isDetail = useSelector(service, (state) => state.context.detail);
 
@@ -223,16 +284,16 @@ export const provideEditing = () => {
   const showEditing = ref(null);
 
   // TODO: Need a way to broadcast or batch these sends or they could
-  // (hypothetically) result in N (where N = keys(forms.value.length))
+  // (hypothetically) result in N (where N = keys(modals).length)
   // page re-renders as each actor transitions.
   const hideAll = () => {
-    for (let actor of values(forms.value)) {
+    for (const { actor } of values(forms.value)) {
       const { send } = useActor(actor);
       send("HIDE");
     }
   };
   const showAll = () => {
-    for (let actor of values(forms.value)) {
+    for (const { actor } of values(forms.value)) {
       const { send } = useActor(actor);
       send("SHOW");
     }
@@ -242,7 +303,7 @@ export const provideEditing = () => {
   // TODO: Should useActor here not, snapshot it.
   const submitting = computed(() => {
     const formsSaving = rMap(
-      (actor) => actor.getSnapshot().matches("saving"),
+      ({ actor }) => actor.getSnapshot().matches("saving"),
       values(forms.value),
     );
 
@@ -252,11 +313,13 @@ export const provideEditing = () => {
     const isSaving = [...formsSaving, inlineSaving];
 
     // TODO: any(Boolean, isSaving);
-    return any((saving) => saving === true, isSaving);
+    return any((saving) => Boolean(saving), isSaving);
   });
 
   // Close the editor when there's no CRUD happening.
-  const noEditing = computed(() => isNil(inline.value) && isEmpty(forms.value));
+  const noEditing = computed(
+    () => isNil(inline.value) && isEmpty(modals.value),
+  );
   watch(
     () => noEditing.value,
     (newValue) => {
@@ -325,8 +388,9 @@ export const provideEditing = () => {
     editingObjIndex,
     hideEditing,
     formSubmitWatcher,
-    focus,
     forms,
+    focus,
+    modals,
     hideAll,
     inline,
     isDetail,

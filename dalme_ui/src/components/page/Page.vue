@@ -28,9 +28,9 @@ export default defineComponent({
     FormModal,
   },
   setup() {
-    const { forms } = useEditing();
+    const { modals } = useEditing();
 
-    const cuids = computed(() => keys(forms.value));
+    const cuids = computed(() => keys(modals.value));
     const xPos = computed(() => X_ORIGIN + cuids.value.length * X_OFFSET);
     const yPos = computed(() => cuids.value.length * Y_OFFSET);
 

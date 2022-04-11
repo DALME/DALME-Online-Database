@@ -126,7 +126,7 @@ export default defineComponent({
     const confirm = ref(false);
     const el = ref(null);
 
-    const actor = forms.value[props.cuid];
+    const { actor } = forms.value[props.cuid];
     const { send: actorSend, state: actorState } = useActor(actor);
 
     const kind = useSelector(actor, (state) => state.context.kind);
@@ -162,7 +162,7 @@ export default defineComponent({
     );
 
     const handleClose = () => {
-      send("DESTROY_FORM", { cuid: props.cuid });
+      send("DESTROY_MODAL", { cuid: props.cuid });
       formModel.value = null;
       positionValue.value = null;
     };

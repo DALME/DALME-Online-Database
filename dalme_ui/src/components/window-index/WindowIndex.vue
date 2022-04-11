@@ -77,7 +77,7 @@ export default defineComponent({
     const {
       disabled,
       focus,
-      forms,
+      modals,
       hideAll,
       mouseoverSubmit,
       recenter,
@@ -89,7 +89,7 @@ export default defineComponent({
     const show = inject("windowIndexShow");
 
     const handleFocus = (cuid) => {
-      const { send: actorSend } = useActor(forms.value[cuid]);
+      const { send: actorSend } = useActor(modals.value[cuid].actor);
       send("SET_FOCUS", { value: cuid });
       actorSend("SHOW");
     };
@@ -101,10 +101,10 @@ export default defineComponent({
     watch(
       () => state.value,
       (newState) => {
-        show.value = keys(newState.context.forms).length > 0;
+        show.value = keys(newState.context.modals).length > 0;
         actors.value = rMap(
-          (actor) => useActor(actor).state,
-          newState.context.forms,
+          ({ actor }) => useActor(actor).state,
+          newState.context.modals,
         );
       },
     );

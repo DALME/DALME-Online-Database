@@ -31,12 +31,12 @@ export default defineComponent({
     } = useEditing();
 
     const valid = ref(false);
-    service.onTransition(({ context: { focus, forms } }) => {
+    service.onTransition(({ context: { focus, modals } }) => {
       const canSubmit = (focus) => {
         if (isNil(focus)) return false;
         if (focus === "inline") return true;
-        const actor = forms[focus];
-        return actor.getSnapshot().context.validated;
+        const { actor } = modals[focus];
+        return actor.getSnapshot().context.validated || false;
       };
       valid.value = canSubmit(focus);
     });
