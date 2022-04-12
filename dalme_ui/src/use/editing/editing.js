@@ -69,12 +69,12 @@ export const provideEditing = () => {
       },
     );
 
-  const createFolioMachine = (cuid, metadata) =>
+  const createFolioMachine = (cuid, key, metadata) =>
     createMachine(
       {
         id: cuid,
         initial: "render",
-        context: { kind: "Folio", mode: "View", metadata, visible: true },
+        context: { kind: "Folio", mode: "View", key, metadata, visible: true },
         on: {
           HIDE: { actions: "hide", internal: true },
           SHOW: { actions: "show", internal: true },
@@ -222,9 +222,10 @@ export const provideEditing = () => {
             return {
               [event.cuid]: {
                 kind: "folio",
-                actor: spawn(createFolioMachine(event.cuid, event.metadata), {
-                  sync: true,
-                }),
+                actor: spawn(
+                  createFolioMachine(event.cuid, event.key, event.metadata),
+                  { sync: true },
+                ),
               },
               ...context.modals,
             };

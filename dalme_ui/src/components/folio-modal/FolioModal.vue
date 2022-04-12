@@ -1,7 +1,6 @@
 <template>
   <BaseModal :cuid="cuid" :x-pos="xPos" :y-pos="yPos">
     <template v-slot:content>
-      <Spinner :showing="!url" />
       <q-img v-if="url" :src="url">
         <template v-slot:error>
           <div class="absolute-full flex flex-center bg-negative text-white">
@@ -9,6 +8,7 @@
           </div>
         </template>
       </q-img>
+      <Spinner :showing="!url" />
     </template>
   </BaseModal>
 </template>

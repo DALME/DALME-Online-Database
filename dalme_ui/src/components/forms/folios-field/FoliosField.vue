@@ -122,6 +122,7 @@ import cuid from "cuid";
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
 import { computed, defineComponent, ref, unref } from "vue";
+import { useActor } from "@xstate/vue";
 
 import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
@@ -147,6 +148,8 @@ export default defineComponent({
     const empty = () => ({ folio: null, damId: null });
 
     const {
+      editingIndex,
+      modals,
       machine: { send },
     } = useEditing();
     const { fields, replace } = useFieldArray("folios");
@@ -169,11 +172,20 @@ export default defineComponent({
       // TODO: Implement dragging re-order.
       console.assert(idx);
     };
-    const handlePreview = (damId) => {
-      send("SPAWN_FOLIO", {
-        cuid: cuid(),
-        metadata: { damId: damId.value },
-      });
+    const handlePreview = ({ value: damId }) => {
+      const key = `folio-${damId}`;
+      const indexed = editingIndex.value[key];
+      if (!isNil(indexed)) {
+        const { send: actorSend } = useActor(modals.value[indexed.cuid].actor);
+        send("SET_FOCUS", { value: indexed.cuid });
+        actorSend("SHOW");
+      } else {
+        send("SPAWN_FOLIO", {
+          cuid: cuid(),
+          key,
+          metadata: { damId },
+        });
+      }
     };
 
     const indexed = computed(() => {
@@ -214,9 +226,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.separator {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
-  padding-bottom: 0.5rem;
+.folios-field {
+  will-transform: auto;
 }
 .folios-field .q-field__after,
 .folios-field .q-field__append {
@@ -241,5 +252,9 @@ export default defineComponent({
 }
 .placeholder > p {
   margin: 0;
+}
+.separator {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
+  padding-bottom: 0.5rem;
 }
 </style>

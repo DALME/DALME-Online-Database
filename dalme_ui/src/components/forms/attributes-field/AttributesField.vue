@@ -381,9 +381,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.separator {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
-  padding-bottom: 0.5rem;
+.attributes-field {
+  will-transform: auto;
 }
 .attributes-field .q-field__after,
 .attributes-field .q-field__append {
@@ -397,5 +396,9 @@ export default defineComponent({
 }
 div.q-field__bottom {
   margin-bottom: 5px;
+}
+.separator {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
+  padding-bottom: 0.5rem;
 }
 </style>
