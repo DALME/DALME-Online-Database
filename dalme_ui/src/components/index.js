@@ -17,6 +17,7 @@ export { default as Table } from "./table";
 export { default as Locales } from "./locales";
 export { default as LoginModal } from "./login-modal";
 export { default as SchemaForm } from "./schema-form";
+export { default as FolioModal } from "./folio-modal";
 export { default as FormModal } from "./form-modal";
 export { default as NavLink } from "./nav-link";
 export { default as Nav } from "./nav";

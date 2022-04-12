@@ -76,20 +76,8 @@
                   icon="search"
                   :color="!data.damId ? 'grey' : 'black'"
                   :disable="!data.damId"
-                  @click.stop="card = true"
+                  @click.stop="() => handlePreview(data.damId)"
                 >
-                  <q-dialog class="z-max" v-model="card" :key="idx">
-                    <q-img :src="getPreview(data.damId.value)">
-                      <template v-slot:error>
-                        <div
-                          class="absolute-full flex flex-center bg-negative text-white"
-                        >
-                          Couldn't load preview
-                        </div>
-                      </template>
-                    </q-img>
-                  </q-dialog>
-
                   <q-tooltip class="bg-blue z-max"> Preview folio </q-tooltip>
                 </q-btn>
               </div>
@@ -130,6 +118,7 @@
 </template>
 
 <script>
+import cuid from "cuid";
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
 import { computed, defineComponent, ref, unref } from "vue";
@@ -137,6 +126,7 @@ import { computed, defineComponent, ref, unref } from "vue";
 import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
 import { imageOptionsSchema } from "@/schemas";
+import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "FoliosField",
@@ -156,9 +146,11 @@ export default defineComponent({
   setup(props, context) {
     const empty = () => ({ folio: null, damId: null });
 
+    const {
+      machine: { send },
+    } = useEditing();
     const { fields, replace } = useFieldArray("folios");
 
-    const card = ref(false);
     const loading = ref(false);
     const showing = ref(props.modelValue.length > 0 ? true : false);
 
@@ -176,6 +168,12 @@ export default defineComponent({
     const handleDrag = (idx) => {
       // TODO: Implement dragging re-order.
       console.assert(idx);
+    };
+    const handlePreview = (damId) => {
+      send("SPAWN_FOLIO", {
+        cuid: cuid(),
+        metadata: { damId: damId.value },
+      });
     };
 
     const indexed = computed(() => {
@@ -197,23 +195,14 @@ export default defineComponent({
         .then((response) => response.json())
         .then((options) => filterImageOptions(options));
 
-    const getPreview = (damId) => {
-      const url = ref(null);
-      fetcher(requests.images.getImageUrl(damId))
-        .then((response) => response.json())
-        .then((data) => (url.value = data.url));
-      return url;
-    };
-
     return {
-      card,
       empty,
       fields,
       filterImageOptions,
       getImageOptions,
-      getPreview,
       handleAddField,
       handleDrag,
+      handlePreview,
       handleRemoveField,
       imageOptionsSchema,
       loading,

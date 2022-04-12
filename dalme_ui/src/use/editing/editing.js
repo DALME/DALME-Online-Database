@@ -65,20 +65,18 @@ export const provideEditing = () => {
       },
     );
 
-  const createFolioMachine = (cuid, metadata) => {
+  const createFolioMachine = (cuid, metadata) =>
     createMachine(
       {
         id: cuid,
         initial: "render",
-        context: { metadata, visible: true },
+        context: { kind: "Folio", mode: "View", metadata, visible: true },
         on: {
           HIDE: { actions: "hide", internal: true },
           SHOW: { actions: "show", internal: true },
         },
         states: {
-          render: {
-            type: "final",
-          },
+          render: {},
         },
       },
       {
@@ -88,7 +86,6 @@ export const provideEditing = () => {
         },
       },
     );
-  };
 
   const createInlineMachine = () =>
     createMachine(
@@ -270,6 +267,9 @@ export const provideEditing = () => {
   // Convenience getters lensing into the machine context.
   const focus = useSelector(service, (state) => state.context.focus);
   const modals = useSelector(service, (state) => state.context.modals);
+  const folios = useSelector(service, (state) =>
+    rFilter(({ kind }) => kind === "folio", state.context.modals),
+  );
   const forms = useSelector(service, (state) =>
     rFilter(({ kind }) => kind === "form", state.context.modals),
   );
@@ -287,20 +287,19 @@ export const provideEditing = () => {
   // (hypothetically) result in N (where N = keys(modals).length)
   // page re-renders as each actor transitions.
   const hideAll = () => {
-    for (const { actor } of values(forms.value)) {
+    for (const { actor } of values(modals.value)) {
       const { send } = useActor(actor);
       send("HIDE");
     }
   };
   const showAll = () => {
-    for (const { actor } of values(forms.value)) {
+    for (const { actor } of values(modals.value)) {
       const { send } = useActor(actor);
       send("SHOW");
     }
   };
 
-  // Tell us if any actors are in their 'saving' state.
-  // TODO: Should useActor here not, snapshot it.
+  // Tell us if any form actors are in their 'saving' state.
   const submitting = computed(() => {
     const formsSaving = rMap(
       ({ actor }) => actor.getSnapshot().matches("saving"),
@@ -387,6 +386,7 @@ export const provideEditing = () => {
     editingDetailRouteGuard,
     editingObjIndex,
     hideEditing,
+    folios,
     formSubmitWatcher,
     forms,
     focus,

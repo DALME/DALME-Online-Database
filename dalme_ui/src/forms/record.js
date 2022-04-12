@@ -4,12 +4,14 @@ import { fetcher, requests } from "@/api";
 import {
   AttributesField,
   BooleanField,
+  FoliosField,
   InputField,
   MultipleSelectField,
   SelectField,
 } from "@/components/forms";
 import {
   attributeValidators,
+  folioValidators,
   recordEditSchema,
   recordFieldValidation,
   recordPostSchema,
@@ -81,13 +83,13 @@ const recordFormSchema = {
   //   validators: agentValidators,
   //   validation: recordFieldValidation.agents,
   // },
-  // folios: {
-  //   field: "folios",
-  //   component: markRaw(FoliosField),
-  //   description: "The pages/folios contained by the source.",
-  //   validators: folioValidators,
-  //   validation: recordFieldValidation.folios,
-  // },
+  folios: {
+    field: "folios",
+    component: markRaw(FoliosField),
+    description: "The pages/folios contained by the source.",
+    validators: folioValidators,
+    validation: recordFieldValidation.folios,
+  },
   // credits: {
   //   field: "credits",
   //   component: markRaw(CreditsField),

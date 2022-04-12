@@ -1,12 +1,14 @@
 <template>
   <q-page>
-    <FormModal
-      v-for="cuid in cuids"
-      :key="cuid"
-      :cuid="cuid"
-      :x-pos="xPos"
-      :y-pos="yPos"
-    />
+    <template v-for="(modal, cuid) in modals" :key="cuid">
+      <FormModal
+        v-if="modal.kind === 'form'"
+        :cuid="cuid"
+        :x-pos="xPos"
+        :y-pos="yPos"
+      />
+      <FolioModal v-else :cuid="cuid" :x-pos="xPos" :y-pos="yPos" />
+    </template>
     <slot></slot>
   </q-page>
 </template>
@@ -15,7 +17,7 @@
 import { keys } from "ramda";
 import { computed, defineComponent } from "vue";
 
-import { FormModal } from "@/components";
+import { FolioModal, FormModal } from "@/components";
 import { useEditing } from "@/use";
 
 const X_ORIGIN = window.innerWidth / 3;
@@ -25,6 +27,7 @@ const Y_OFFSET = 30;
 export default defineComponent({
   name: "Page",
   components: {
+    FolioModal,
     FormModal,
   },
   setup() {
@@ -35,7 +38,7 @@ export default defineComponent({
     const yPos = computed(() => cuids.value.length * Y_OFFSET);
 
     return {
-      cuids,
+      modals,
       xPos,
       yPos,
     };

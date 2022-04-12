@@ -53,7 +53,8 @@ export default {
       () => meta.value,
       async (newMeta) => {
         if (newMeta.touched && !newMeta.pending) {
-          const { send } = useActor(forms.value[props.cuid]);
+          const { actor } = forms.value[props.cuid];
+          const { send } = useActor(actor);
           send({ type: "VALIDATE", validated: newMeta.valid });
         }
       },

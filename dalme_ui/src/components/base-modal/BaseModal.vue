@@ -100,14 +100,14 @@ export default defineComponent({
   setup(props) {
     const {
       focus,
-      forms,
+      modals,
       mouseoverSubmit,
       recenterWatcher,
       submitting,
       machine: { send },
     } = useEditing();
 
-    const { actor } = forms.value[props.cuid];
+    const { actor } = modals.value[props.cuid];
     const { send: actorSend } = useActor(actor);
     const visible = useSelector(actor, (state) => state.context.visible);
     const valid = useSelector(actor, (state) => state.context.validated);
