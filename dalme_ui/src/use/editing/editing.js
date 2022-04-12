@@ -1,10 +1,13 @@
 import {
   any,
+  pipe,
   filter as rFilter,
+  indexBy,
   isEmpty,
   isNil,
   map as rMap,
   omit,
+  prop,
   keys,
   values,
 } from "ramda";
@@ -19,12 +22,13 @@ const MAX_MODALS = 10;
 const EditingSymbol = Symbol();
 
 export const provideEditing = () => {
-  const createFormMachine = (cuid, kind, mode, initialData) =>
+  const createFormMachine = (cuid, key, kind, mode, initialData) =>
     createMachine(
       {
         id: cuid,
         initial: "editing",
         context: {
+          key,
           kind,
           mode,
           initialData,
@@ -235,6 +239,7 @@ export const provideEditing = () => {
                 actor: spawn(
                   createFormMachine(
                     event.cuid,
+                    event.key,
                     event.kind,
                     event.mode,
                     event.initialData,
@@ -277,7 +282,6 @@ export const provideEditing = () => {
   const isDetail = useSelector(service, (state) => state.context.detail);
 
   // Reactive values.
-  const editingObjIndex = ref({}); // { kind: { cuid: objId } }
   const mouseoverSubmit = ref(false);
   const recenter = ref(null);
   const hideEditing = ref(null);
@@ -298,6 +302,18 @@ export const provideEditing = () => {
       send("SHOW");
     }
   };
+
+  // An index of keys to cuids for identifying which objects are already open
+  // in the window index and so preventing duplicates (we can refocus instead).
+  const editingIndex = computed(() => {
+    const process = pipe(
+      rMap(({ actor }) => {
+        return { cuid: actor.machine.id, key: actor.getSnapshot().context.key };
+      }),
+      indexBy(prop("key")),
+    );
+    return process([...values(forms.value), ...values(folios.value)]);
+  });
 
   // Tell us if any form actors are in their 'saving' state.
   const submitting = computed(() => {
@@ -384,7 +400,7 @@ export const provideEditing = () => {
 
   provide(EditingSymbol, {
     editingDetailRouteGuard,
-    editingObjIndex,
+    editingIndex,
     hideEditing,
     folios,
     formSubmitWatcher,

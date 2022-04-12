@@ -116,7 +116,13 @@ export default defineComponent({
     const dragging = inject("dragging");
 
     const handleClick = (kind) =>
-      send("SPAWN_FORM", { cuid: cuid(), kind, mode, initialData: {} });
+      send("SPAWN_FORM", {
+        cuid: cuid(),
+        key: null,
+        kind,
+        mode,
+        initialData: {},
+      });
 
     return {
       dragging,

@@ -105,9 +105,9 @@
                 text-color="black"
                 icon="delete"
                 size="xs"
-                @click.stop="handleDelete(taskList)"
                 :color="taskList.taskCount === 0 ? 'amber' : 'grey'"
-                :disabled="taskList.taskCount > 0"
+                :disable="taskList.taskCount > 0"
+                @click.stop="handleDelete(taskList)"
               >
                 <q-tooltip
                   v-if="taskList.taskCount === 0"
@@ -129,8 +129,10 @@
 
 <script>
 import cuid from "cuid";
+import { isNil } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useActor } from "@xstate/vue";
 
 import { requests } from "@/api";
 import forms from "@/forms";
@@ -142,7 +144,9 @@ export default defineComponent({
   setup(_, context) {
     const { apiInterface } = useAPI();
     const {
+      editingIndex,
       showEditing,
+      modals,
       machine: { send },
     } = useEditing();
     const $notifier = useNotifier();
@@ -193,29 +197,39 @@ export default defineComponent({
     const handleCreate = () => {
       send("SPAWN_FORM", {
         cuid: cuid(),
-        initialData: {},
+        key: null,
         kind: "taskList",
         mode: "create",
+        initialData: {},
       });
       showEditing.value();
     };
 
     const handleEdit = async ({ id }) => {
-      const { data, success, fetchAPI } = apiInterface();
-      const { edit: editSchema } = forms.taskList;
-      await fetchAPI(requests.tasks.getTaskList(id));
-      if (success.value) {
-        await editSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            send("SPAWN_FORM", {
-              cuid: cuid(),
-              initialData: value,
-              kind: "taskList",
-              mode: "update",
+      const key = `form-taskList-${id}`;
+      const indexed = editingIndex.value[key];
+      if (!isNil(indexed)) {
+        const { send: actorSend } = useActor(modals.value[indexed.cuid].actor);
+        send("SET_FOCUS", { value: indexed.cuid });
+        actorSend("SHOW");
+      } else {
+        const { data, success, fetchAPI } = apiInterface();
+        const { edit: editSchema } = forms.taskList;
+        await fetchAPI(requests.tasks.getTaskList(id));
+        if (success.value) {
+          await editSchema
+            .validate(data.value, { stripUnknown: true })
+            .then((value) => {
+              send("SPAWN_FORM", {
+                cuid: cuid(),
+                kind: "taskList",
+                mode: "update",
+                initialData: value,
+                key,
+              });
+              showEditing.value();
             });
-            showEditing.value();
-          });
+        }
       }
     };
 
