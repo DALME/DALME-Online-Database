@@ -138,7 +138,7 @@ export const provideEditing = () => {
         DESTROY_INLINE: { target: "destroyInline" },
         RESET: { target: "reset" },
         SAVE_FOCUS: { actions: "saveFocus", internal: true, cond: "saveable" },
-        SET_DETAIL: { actions: "setDetail", internal: true },
+        SET_IS_DETAIL_PAGE: { actions: "setIsDetailPage", internal: true },
         SET_FOCUS: { actions: "setFocus", internal: true },
         SPAWN_FOLIO: {
           target: "editing",
@@ -201,7 +201,7 @@ export const provideEditing = () => {
             return {};
           },
         }),
-        setDetail: assign({
+        setIsDetailPage: assign({
           detail: (_, event) => event.value,
         }),
         setFocus: assign({
@@ -393,9 +393,9 @@ export const provideEditing = () => {
   // the refactored future and just call this there, once.
   const resource = ref(null);
   const editingDetailRouteGuard = () => {
-    machine.send("SET_DETAIL", { value: true });
+    machine.send("SET_IS_DETAIL_PAGE", { value: true });
     onBeforeRouteLeave(() => {
-      machine.send("SET_DETAIL", { value: false });
+      machine.send("SET_IS_DETAIL_PAGE", { value: false });
     });
   };
 
