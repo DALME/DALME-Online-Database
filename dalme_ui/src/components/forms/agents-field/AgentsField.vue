@@ -184,9 +184,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.separator {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
-  padding-bottom: 0.5rem;
+.agents-field {
+  will-transform: auto;
 }
 .agents-field .q-field__after,
 .agents-field .q-field__append {
@@ -213,5 +212,9 @@ export default defineComponent({
 }
 div.q-dialog__title {
   font-size: 1rem;
+}
+.separator {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
+  padding-bottom: 0.5rem;
 }
 </style>

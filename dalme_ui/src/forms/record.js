@@ -2,15 +2,19 @@ import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
 import {
+  AgentsField,
   AttributesField,
   BooleanField,
+  CreditsField,
   FoliosField,
   InputField,
   MultipleSelectField,
   SelectField,
 } from "@/components/forms";
 import {
+  agentValidators,
   attributeValidators,
+  creditValidators,
   folioValidators,
   recordEditSchema,
   recordFieldValidation,
@@ -76,27 +80,27 @@ const recordFormSchema = {
     validators: attributeValidators,
     validation: recordFieldValidation.attributes,
   },
-  // agents: {
-  //   field: "agents",
-  //   component: markRaw(AgentsField),
-  //   description: "People referred to by or involved in the source.",
-  //   validators: agentValidators,
-  //   validation: recordFieldValidation.agents,
-  // },
-  folios: {
-    field: "folios",
+  agents: {
+    field: "agents",
+    component: markRaw(AgentsField),
+    description: "People referred to by or involved in the source.",
+    validators: agentValidators,
+    validation: recordFieldValidation.agents,
+  },
+  pages: {
+    field: "pages",
     component: markRaw(FoliosField),
     description: "The pages/folios contained by the source.",
     validators: folioValidators,
     validation: recordFieldValidation.folios,
   },
-  // credits: {
-  //   field: "credits",
-  //   component: markRaw(CreditsField),
-  //   description: "Editorial persons who contributed to this source.",
-  //   validators: creditValidators,
-  //   validation: recordFieldValidation.credits,
-  // },
+  credits: {
+    field: "credits",
+    component: markRaw(CreditsField),
+    description: "Editorial persons who contributed to this source.",
+    validators: creditValidators,
+    validation: recordFieldValidation.credits,
+  },
 };
 
 // TODO: Wrap these in the normalize out schema?
@@ -107,7 +111,6 @@ const recordSubmitSchemas = {
 
 const recordRequests = {
   get: (id) => requests.sources.getSource(id),
-  // TODO: These two requests don't exist yet.
   create: (data) => requests.sources.createSource(data),
   update: ({ id, ...data }) => requests.sources.editSource(id, data),
 };

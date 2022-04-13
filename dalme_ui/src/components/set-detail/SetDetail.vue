@@ -185,9 +185,8 @@ export default defineComponent({
           });
     };
 
-    onMounted(async () => await fetchData());
-
     editingDetailRouteGuard();
+    onMounted(async () => await fetchData());
 
     return {
       hasMembers,

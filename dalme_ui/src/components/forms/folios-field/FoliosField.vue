@@ -91,8 +91,8 @@
                 unelevated
                 size="xs"
                 icon="swap_vert"
-                :disable="modelValue.length < 2"
-                :color="modelValue.length < 2 ? 'grey' : 'black'"
+                :disable="true"
+                color="grey"
                 @click.stop.prevent="handleDrag(idx)"
               />
               <q-btn
@@ -121,13 +121,15 @@
 import cuid from "cuid";
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, ref, unref } from "vue";
+import { computed, defineComponent, onMounted, ref, unref } from "vue";
 import { useActor } from "@xstate/vue";
 
 import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
 import { imageOptionsSchema } from "@/schemas";
 import { useEditing } from "@/use";
+
+import { empty } from "./normalize";
 
 export default defineComponent({
   name: "FoliosField",
@@ -145,8 +147,6 @@ export default defineComponent({
     SelectField,
   },
   setup(props, context) {
-    const empty = () => ({ folio: null, damId: null });
-
     const {
       editingIndex,
       modals,
@@ -159,14 +159,14 @@ export default defineComponent({
 
     const handleAddField = () => {
       const newValue = [...unref(props.modelValue), empty()];
-      context.emit("update:modelValue", newValue);
       replace(newValue);
+      context.emit("update:modelValue", newValue);
     };
     const handleRemoveField = (idx) => {
       const newValue = unref(props.modelValue);
       newValue.splice(idx, 1);
-      context.emit("update:modelValue", newValue);
       replace(newValue);
+      context.emit("update:modelValue", newValue);
     };
     const handleDrag = (idx) => {
       // TODO: Implement dragging re-order.
@@ -206,6 +206,15 @@ export default defineComponent({
       fetcher(requests.images.getImageOptions())
         .then((response) => response.json())
         .then((options) => filterImageOptions(options));
+
+    // NOTE: Not sure why we need to do this here but not on AgentsField, but
+    // it doesn't render correctly otherwise.
+    onMounted(async () => {
+      if (props.modelValue.length > 0) {
+        const newValue = unref(props.modelValue);
+        replace(newValue);
+      }
+    });
 
     return {
       empty,

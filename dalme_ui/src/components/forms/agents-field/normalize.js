@@ -1,11 +1,5 @@
-// "agents": [
-//     {
-//         "id": "17a935c3-6203-4674-937d-8ab56826132a",
-//         "name": "<unclear>Connuccio</unclear> condam Guidi bicchierario contrate burgi Sancti Fridiani",
-//         "type": "Person",
-//         "legal_persona": "creditor"
-//     },
-// ]
+import { isEmpty } from "ramda";
+import * as yup from "yup";
 
 export const empty = () => ({
   agent: null,
@@ -13,14 +7,62 @@ export const empty = () => ({
   type: "person",
 });
 
-export const normalizeAgentsInput = (input) => input;
-export const normalizeAgentsOutput = (output) => output;
+export const agentsNormalizeInputSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      agent: yup
+        .object()
+        .shape({
+          value: yup.string().uuid().required(),
+          label: yup.string().required(),
+        })
+        .nullable()
+        .required()
+        .label("Agent"),
+      legalPersona: yup
+        .object()
+        .shape({
+          value: yup.string().required(),
+          label: yup.string().required(),
+        })
+        .nullable()
+        .required()
+        .label("Legal persona"),
+      type: yup
+        .object()
+        .shape({
+          value: yup.string().required(),
+          label: yup.string().required(),
+        })
+        .nullable()
+        .required()
+        .label("Type"),
+    })
+    .camelCase()
+    .transform((data) => ({
+      agent: { value: data.id, label: data.name },
+      legalPersona: { value: data.legalPersona, label: data.legalPersona },
+      type: { value: data.type, label: data.type },
+    })),
+);
 
-// Make sure to purge any values that are just the 'empty' field itself and to
-// null out the payload if there's no data at all.
-// export const normalizeOutputSchema = yup
-//   .array()
-//   .nullable()
-//   .compact((value) => value === empty())
-//   .of(agentFieldOutputSchema)
-//   .transform((final) => (isEmpty(final) ? null : final));
+export const normalizeOutputSchema = yup
+  .array()
+  .nullable()
+  .compact((value) => value === empty())
+  .of(
+    yup
+      .object()
+      .shape({
+        agent: yup.string().uuid().required(),
+        legalPersona: yup.string().required(),
+        type: yup.string().required(),
+      })
+      .transform((data) => ({
+        agent: data.agent.value,
+        legalPersona: data.legalPersona.value,
+        type: data.type.value,
+      })),
+  )
+  .transform((final) => (isEmpty(final) ? null : final));

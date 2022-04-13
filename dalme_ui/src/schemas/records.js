@@ -2,7 +2,14 @@ import camelcaseKeys from "camelcase-keys";
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-import { attributesFieldSchema } from "@/schemas";
+import { agentsNormalizeInputSchema } from "@/components/forms/agents-field/normalize";
+import { foliosNormalizeInputSchema } from "@/components/forms/folios-field/normalize";
+import {
+  agentsFieldSchema,
+  attributesFieldSchema,
+  creditsFieldSchema,
+  foliosFieldSchema,
+} from "@/schemas";
 
 export const recordFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
@@ -30,24 +37,24 @@ export const recordFieldValidation = {
     .nullable()
     .label("Sets"),
   attributes: yup.array().of(attributesFieldSchema).label("Attributes"),
-  // agents: yup
-  //   .array()
-  //   .of(agentsFieldSchema)
-  //   .default(null)
-  //   .nullable()
-  //   .label("Agents"),
-  // folios: yup
-  //   .array()
-  //   .of(foliosFieldSchema)
-  //   .default(null)
-  //   .nullable()
-  //   .label("Folios"),
-  // credits: yup
-  //   .array()
-  //   .of(creditsFieldSchema)
-  //   .default(null)
-  //   .nullable()
-  //   .label("Credits"),
+  agents: yup
+    .array()
+    .of(agentsFieldSchema)
+    .default(null)
+    .nullable()
+    .label("Agents"),
+  pages: yup
+    .array()
+    .of(foliosFieldSchema)
+    .default(null)
+    .nullable()
+    .label("Folios"),
+  credits: yup
+    .array()
+    .of(creditsFieldSchema)
+    .default(null)
+    .nullable()
+    .label("Credits"),
 };
 
 // Edit object schema
@@ -78,43 +85,31 @@ export const recordEditSchema = yup
     // Just minimal validation here for the attributes. We will apply the
     // full transform elsewhere, as it's very complex.
     attributes: yup.mixed(),
-    // agents
-    // folios (how do we do folios vs pages elsewhere, i've forgotten).
-    // TODO: Needs to be ordered by order and normalize the actual order field
-    // if it's nonsensical.
-    // "pages": [
-    //     {
-    //         "id": "2af6be21-1510-42d1-beaf-a5de9f4f391c",
-    //         "name": "4v",
-    //         "dam_id": 5342,
-    //         "order": 10,
-    //         "has_image": true,
-    //         "has_transcription": true
-    //     },
-    // ],
+    agents: agentsNormalizeInputSchema,
+    pages: foliosNormalizeInputSchema,
     // credits
   })
   .camelCase()
-  .transform((validated) => ({
-    ...validated,
+  .transform((data) => ({
+    ...data,
     hasInventory: {
-      value: validated.hasInventory,
-      label: validated.hasInventory ? "True" : "False",
+      value: data.hasInventory,
+      label: data.hasInventory ? "True" : "False",
     },
     parent: {
-      value: validated.parent.id,
-      label: validated.parent.name,
+      value: data.parent.id,
+      label: data.parent.name,
     },
-    sets: validated.sets.map((item) => ({ value: item.id, label: item.name })),
-    // TODO: Remove ALL camelcase hackakge when we sort out the API renderer.
-    // We can't do this in the schema proper as the object shape is dynamic.
-    attributes: camelcaseKeys(validated.attributes),
-    // agents: normalizeAgentsInput(validated.agents),
-    // credits: normalizeCreditsInput(validated.credits),
+    sets: data.sets.map((item) => ({ value: item.id, label: item.name })),
+    // TODO: Remove ALL camelcase hackage when we sort out the API renderer.
+    // Camelize here because we run a function to normalize the attributes, not
+    // a schema like the others (which is why they are omitted here.)
+    attributes: camelcaseKeys(data.attributes),
   }));
 
 // POST data schemas.
 // Normalizes form data for output to the API.
+// folios -> pages
 export const recordPostSchema = yup.object().shape({});
 
 export const recordPutSchema = recordPostSchema.shape({

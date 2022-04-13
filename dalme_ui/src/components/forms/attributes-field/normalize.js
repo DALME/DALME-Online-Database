@@ -15,6 +15,7 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
     switch (attributeType.dataType) {
       case "Options":
         const validator = attributeValidators[attributeType.shortName];
+
         // It's a MultipleSelect value.
         if (validator.type === "array") {
           return {
@@ -25,8 +26,10 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
             }),
           };
         }
-        // It's just a Select value but it comes down from the API wrapped in a
-        // list so we need to unpack it before it's rendered.
+
+        // It's just a select value, but it comes down from the API wrapped in a
+        // list so we need to unpack it and the id comes wrapped in a
+        // stringified JSON object so we also need to parse that before access.
         if (Array.isArray(data)) {
           const { name, id } = data[0];
           return {
@@ -34,18 +37,20 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
             value: { label: name, value: JSON.parse(id).id },
           };
         }
-        // It's a non-ID driven Select value, probably just a string from a
-        // simple set of options choices.
-        // debugger;
+
+        // It's a non-ID driven select value, probably just a (string, string)
+        // tuple making up a simple set of non-FK choices.
         return {
           attribute: attributeType,
           value: { label: data, value: data },
         };
+
       case "Date":
         return {
           attribute: attributeType,
           value: moment(new Date(data.name)).format("YYYY-MM-DD"),
         };
+
       default:
         return { attribute: attributeType, value: data };
     }

@@ -162,6 +162,8 @@ import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
 import { agentOptionsSchema, creditRoleOptionsSchema } from "@/schemas";
 
+import { empty } from "./normalize";
+
 export default defineComponent({
   name: "CreditsField",
   props: {
@@ -178,8 +180,6 @@ export default defineComponent({
     SelectField,
   },
   setup(props, context) {
-    const empty = () => ({ agent: null, role: null, note: null });
-
     const { fields, replace } = useFieldArray("credits");
 
     const cuid = inject("cuid");
@@ -202,20 +202,20 @@ export default defineComponent({
 
     const handleAddField = () => {
       const newValue = [...unref(props.modelValue), empty()];
-      context.emit("update:modelValue", newValue);
       replace(newValue);
+      context.emit("update:modelValue", newValue);
     };
     const handleRemoveField = (idx) => {
       const newValue = unref(props.modelValue);
       newValue.splice(idx, 1);
-      context.emit("update:modelValue", newValue);
       replace(newValue);
+      context.emit("update:modelValue", newValue);
     };
     const handleClearAgent = (idx) => {
       const newValue = unref(props.modelValue);
       newValue[idx] = empty();
-      context.emit("update:modelValue", newValue);
       replace(newValue);
+      context.emit("update:modelValue", newValue);
     };
 
     const credited = computed(() => {
@@ -300,10 +300,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.separator {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
-  padding-bottom: 0.5rem;
-}
 .credits-field .q-field__after,
 .credits-field .q-field__append {
   padding-left: 0 !important;
@@ -329,5 +325,9 @@ export default defineComponent({
 }
 div.q-dialog__title {
   font-size: 1rem;
+}
+.separator {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
+  padding-bottom: 0.5rem;
 }
 </style>

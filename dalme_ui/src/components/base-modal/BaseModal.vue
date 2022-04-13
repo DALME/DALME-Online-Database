@@ -54,7 +54,7 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="close" color="red" text-color="white" size="sm" />
-          <span class="q-ml-sm">Discard form?</span>
+          <span class="q-ml-sm">Close?</span>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -171,7 +171,7 @@ export default defineComponent({
   min-width: 40rem;
   max-width: 45rem;
   position: fixed;
-  will-change: auto;
+  will-change: auto !important;
 }
 .modal-card {
   max-height: calc(100vh - 10rem);
