@@ -75,7 +75,7 @@
                   push
                   icon="search"
                   :color="!data.damId ? 'grey' : 'black'"
-                  :disable="!data.damId"
+                  :disable="!data.damId || !data.hasImage"
                   @click.stop="() => handlePreview(data.damId)"
                 >
                   <q-tooltip class="bg-blue z-max"> Preview folio </q-tooltip>
