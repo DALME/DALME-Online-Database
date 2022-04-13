@@ -3,8 +3,8 @@
     fab
     icon="edit"
     text-color="black"
-    :color="disable ? 'grey' : 'amber'"
-    :disable="disable"
+    :color="!isDetail ? 'grey' : 'amber'"
+    :disabled="!isDetail"
     :loading="loading"
     :onclick="handleClick"
   >
@@ -46,7 +46,6 @@ export default defineComponent({
 
     const id = computed(() => $route.params.id);
     const key = computed(() => `form-${resource.value}-${id.value}`);
-    const disable = computed(() => !isDetail);
 
     const spawnForm = (initialData) =>
       send("SPAWN_FORM", {
@@ -109,7 +108,6 @@ export default defineComponent({
     };
 
     return {
-      disable,
       handleClick,
       isDetail,
       loading,

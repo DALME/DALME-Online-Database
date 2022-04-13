@@ -342,7 +342,7 @@ export default defineComponent({
               const initial = new Set(
                 rMap((field) => field.attribute, newValue),
               );
-              for (let attribute of value) {
+              for (const attribute of value) {
                 if (
                   !activeAttributes.value.includes(attribute.id) &&
                   !initial.has(attribute.shortName)
@@ -350,6 +350,7 @@ export default defineComponent({
                   newValue = [{ attribute, value: null }, ...newValue];
                 }
               }
+              replace(newValue);
               context.emit("update:modelValue", newValue);
               loading.value = false;
               showing.value = true;
