@@ -4,7 +4,7 @@
     icon="edit"
     text-color="black"
     :color="!isDetail ? 'grey' : 'amber'"
-    :disabled="!isDetail"
+    :disable="!isDetail"
     :loading="loading"
     :onclick="handleClick"
   >
