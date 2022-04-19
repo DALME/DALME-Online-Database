@@ -20,7 +20,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <q-tooltip class="bg-blue z-max"> Add a folio </q-tooltip>
+        <Tooltip> Add a folio </Tooltip>
       </q-btn>
 
       <q-btn
@@ -30,9 +30,9 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <q-tooltip class="bg-blue z-max">
+        <Tooltip>
           {{ showing ? "Hide folios" : "Show folios" }}
-        </q-tooltip>
+        </Tooltip>
       </q-btn>
     </div>
 
@@ -78,7 +78,7 @@
                   :disable="!data.damId || !data.hasImage"
                   @click.stop="() => handlePreview(data.damId)"
                 >
-                  <q-tooltip class="bg-blue z-max"> Preview folio </q-tooltip>
+                  <Tooltip> Preview folio </Tooltip>
                 </q-btn>
               </div>
             </div>
@@ -121,7 +121,14 @@
 import cuid from "cuid";
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, onMounted, ref, unref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  onMounted,
+  ref,
+  unref,
+} from "vue";
 import { useActor } from "@xstate/vue";
 
 import { fetcher, requests } from "@/api";
@@ -145,6 +152,9 @@ export default defineComponent({
   components: {
     InputField,
     SelectField,
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
   },
   setup(props, context) {
     const {

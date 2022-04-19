@@ -3,6 +3,7 @@ import { isNil } from "ramda";
 import * as yup from "yup";
 
 import { agentsNormalizeInputSchema } from "@/components/forms/agents-field/normalize";
+import { creditsNormalizeInputSchema } from "@/components/forms/credits-field/normalize";
 import { foliosNormalizeInputSchema } from "@/components/forms/folios-field/normalize";
 import {
   agentsFieldSchema,
@@ -84,10 +85,10 @@ export const recordEditSchema = yup
     ),
     // Just minimal validation here for the attributes. We will apply the
     // full transform elsewhere, as it's very complex.
-    attributes: yup.mixed(),
     agents: agentsNormalizeInputSchema,
+    attributes: yup.mixed(),
+    credits: creditsNormalizeInputSchema,
     pages: foliosNormalizeInputSchema,
-    // credits
   })
   .camelCase()
   .transform((data) => ({
@@ -109,8 +110,31 @@ export const recordEditSchema = yup
 
 // POST data schemas.
 // Normalizes form data for output to the API.
-// folios -> pages
-export const recordPostSchema = yup.object().shape({});
+export const recordPostSchema = yup.object().shape({
+  name: yup.string().required(),
+  shortName: yup.string().required(),
+  // hasInventory: yup.object().shape({
+  //   value: yup.boolean().required(),
+  //   label: yup.string().required(),
+  // }),
+  // parent: yup
+  //   .object()
+  //   .shape({
+  //     value: yup.string().uuid().required(),
+  //     label: yup.string().required(),
+  //   })
+  //   .nullable(),
+  // sets: yup.array().of(
+  //   yup.object().shape({
+  //     value: yup.string().uuid().required(),
+  //     label: yup.string().required(),
+  //   }),
+  // ),
+  // agents: normalizeOutputSchema,
+  // attributes,
+  // credits,
+  // pages,
+});
 
 export const recordPutSchema = recordPostSchema.shape({
   id: yup.string().uuid().required(),

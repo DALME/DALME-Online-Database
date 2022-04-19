@@ -20,7 +20,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <q-tooltip class="bg-blue z-max"> Add a named person </q-tooltip>
+        <Tooltip> Add a named person </Tooltip>
       </q-btn>
 
       <q-btn
@@ -30,9 +30,9 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <q-tooltip class="bg-blue z-max">
+        <Tooltip>
           {{ showing ? "Hide named persons" : "Show named persons" }}
-        </q-tooltip>
+        </Tooltip>
       </q-btn>
     </div>
 
@@ -95,7 +95,13 @@
 <script>
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, ref, unref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  ref,
+  unref,
+} from "vue";
 
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
@@ -117,6 +123,9 @@ export default defineComponent({
   },
   components: {
     SelectField,
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
   },
   setup(props, context) {
     const { fields, replace } = useFieldArray("agents");

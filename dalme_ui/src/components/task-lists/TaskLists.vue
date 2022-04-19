@@ -12,9 +12,9 @@
             :icon="showing ? 'visibility_off' : 'visibility'"
             @click.stop="showing = !showing"
           >
-            <q-tooltip class="bg-blue">
+            <Tooltip>
               {{ showing ? "Hide task lists" : "Show task lists" }}
-            </q-tooltip>
+            </Tooltip>
           </q-btn>
 
           <q-btn
@@ -27,7 +27,7 @@
             class="q-ml-sm"
             @click.stop="handleCreate"
           >
-            <q-tooltip class="bg-blue"> Create Task List </q-tooltip>
+            <Tooltip> Create Task List </Tooltip>
           </q-btn>
         </div>
       </q-card-section>
@@ -90,14 +90,13 @@
                 class="q-ml-auto q-mr-xs"
                 @click.stop="handleEdit(taskList)"
               >
-                <q-tooltip
-                  class="bg-blue"
+                <Tooltip
                   anchor="center left"
                   self="center right"
                   :offset="[10, 10]"
                 >
                   Edit task list
-                </q-tooltip>
+                </Tooltip>
               </q-btn>
 
               <q-btn
@@ -109,15 +108,14 @@
                 :disable="taskList.taskCount > 0"
                 @click.stop="handleDelete(taskList)"
               >
-                <q-tooltip
+                <Tooltip
                   v-if="taskList.taskCount === 0"
-                  class="bg-blue"
                   anchor="center left"
                   self="center right"
                   :offset="[10, 10]"
                 >
                   Delete task list
-                </q-tooltip>
+                </Tooltip>
               </q-btn>
             </div>
           </q-item-section>
@@ -130,7 +128,13 @@
 <script>
 import cuid from "cuid";
 import { isNil } from "ramda";
-import { computed, defineComponent, inject, ref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  inject,
+  ref,
+} from "vue";
 import { useRouter } from "vue-router";
 import { useActor } from "@xstate/vue";
 
@@ -140,6 +144,11 @@ import { useAPI, useEditing, useNotifier, usePermissions } from "@/use";
 
 export default defineComponent({
   name: "TaskLists",
+  components: {
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
+  },
   emits: ["onReload"],
   setup(_, context) {
     const { apiInterface } = useAPI();

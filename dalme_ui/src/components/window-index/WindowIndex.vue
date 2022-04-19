@@ -54,7 +54,7 @@
                 size="8px"
                 round
               >
-                <q-tooltip self="center left">Recenter</q-tooltip>
+                <Tooltip self="center left">Recenter</Tooltip>
               </q-btn>
             </div>
           </div>
@@ -66,13 +66,18 @@
 
 <script>
 import { keys, map as rMap } from "ramda";
-import { defineComponent, inject, ref, watch } from "vue";
+import { defineAsyncComponent, defineComponent, inject, ref, watch } from "vue";
 import { useActor } from "@xstate/vue";
 
 import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "WindowIndex",
+  components: {
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
+  },
   setup() {
     const {
       disabled,

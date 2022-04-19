@@ -20,7 +20,7 @@
         v-show="showing"
         @click.stop="handleAddField"
       >
-        <q-tooltip class="bg-blue z-max"> Add an attribute </q-tooltip>
+        <Tooltip> Add an attribute </Tooltip>
       </q-btn>
 
       <q-btn
@@ -30,9 +30,9 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <q-tooltip class="bg-blue z-max">
+        <Tooltip>
           {{ showing ? "Hide attributes" : "Show attributes" }}
-        </q-tooltip>
+        </Tooltip>
       </q-btn>
     </div>
 
@@ -65,13 +65,9 @@
             @filter="handleOptions"
             @update:modelValue="(option) => handleUpdateAttribute(option, idx)"
           >
-            <q-tooltip
-              v-if="data.attribute && data.attribute.description"
-              class="bg-blue z-max"
-              max-width="12rem"
-            >
+            <Tooltip v-if="data.attribute && data.attribute.description">
               {{ data.attribute.description }}
-            </q-tooltip>
+            </Tooltip>
           </q-select>
         </div>
 
@@ -173,12 +169,9 @@
             :disable="isRequiredAttribute(data.attribute)"
             @click.stop="handleRemoveField(idx)"
           >
-            <q-tooltip
-              v-if="isRequiredAttribute(data.attribute)"
-              class="bg-blue z-max"
-            >
+            <Tooltip v-if="isRequiredAttribute(data.attribute)">
               Can't delete a required attribute
-            </q-tooltip>
+            </Tooltip>
           </q-btn>
         </div>
       </div>
@@ -189,7 +182,14 @@
 <script>
 import { isNil, map as rMap, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, onMounted, ref, unref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  onMounted,
+  ref,
+  unref,
+} from "vue";
 import { string as yString } from "yup";
 
 import { fetcher, requests } from "@/api";
@@ -233,6 +233,9 @@ export default defineComponent({
     NumberField,
     SelectField,
     TextField,
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
   },
   setup(props, context) {
     const { apiInterface } = useAPI();

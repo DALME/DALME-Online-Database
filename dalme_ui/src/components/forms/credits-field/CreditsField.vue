@@ -20,7 +20,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <q-tooltip class="bg-blue z-max"> Add a credit </q-tooltip>
+        <Tooltip> Add a credit </Tooltip>
       </q-btn>
 
       <q-btn
@@ -30,9 +30,9 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <q-tooltip class="bg-blue z-max">
+        <Tooltip>
           {{ showing ? "Hide credits" : "Show credits" }}
-        </q-tooltip>
+        </Tooltip>
       </q-btn>
     </div>
 
@@ -116,7 +116,7 @@
                     </template>
                   </q-popup-edit>
 
-                  <q-tooltip class="bg-blue z-max"> Add note </q-tooltip>
+                  <Tooltip> Add note </Tooltip>
                 </q-btn>
               </div>
             </div>
@@ -156,7 +156,14 @@ import {
   zip,
 } from "ramda";
 import { useFieldArray } from "vee-validate";
-import { computed, defineComponent, inject, ref, unref } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  inject,
+  ref,
+  unref,
+} from "vue";
 
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
@@ -178,6 +185,9 @@ export default defineComponent({
   },
   components: {
     SelectField,
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
   },
   setup(props, context) {
     const { fields, replace } = useFieldArray("credits");

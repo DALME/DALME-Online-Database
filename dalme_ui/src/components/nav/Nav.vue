@@ -16,6 +16,7 @@
   <q-drawer v-model="navOpen" show-if-above bordered class="bg-grey-1">
     <q-list>
       <q-item-label header class="text-grey-8"> DALME </q-item-label>
+
       <template v-for="(route, idx) in routes" :key="idx">
         <NavLink
           v-if="!route.children"
@@ -35,6 +36,27 @@
           />
         </q-expansion-item>
       </template>
+
+      <q-item class="q-mt-auto">
+        <q-toggle
+          dense
+          checked-icon="visibility"
+          unchecked-icon="visibility_off"
+          color="green"
+          v-model="showTips"
+        >
+          <q-icon name="info" color="grey" size="sm" />
+          <q-tooltip
+            class="bg-blue z-max"
+            anchor="center right"
+            self="center left"
+            :offset="[10, 10]"
+          >
+            {{ `${showTips ? "Hide" : "Show"} tooltips` }}
+          </q-tooltip>
+        </q-toggle>
+      </q-item>
+
       <q-item class="logout">
         <q-btn
           color="primary"
@@ -54,13 +76,14 @@
 </template>
 
 <script>
+import { useQuasar } from "quasar";
 import { filter as rFilter, head } from "ramda";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
 import { NavLink } from "@/components";
-import { useNotifier } from "@/use";
+import { useNotifier, useTooltips } from "@/use";
 
 export default defineComponent({
   name: "Nav",
@@ -68,9 +91,11 @@ export default defineComponent({
     NavLink,
   },
   setup() {
+    const $q = useQuasar();
     const $router = useRouter();
     const $store = useStore();
     const $notifier = useNotifier();
+    const { showTips } = useTooltips();
 
     const navOpen = ref(false);
     const submitting = ref(false);
@@ -89,9 +114,11 @@ export default defineComponent({
     };
 
     return {
+      darkMode: $q.dark,
       logout,
       navOpen,
       routes,
+      showTips,
       submitting,
       toggleNav,
     };
@@ -100,9 +127,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.logout {
-  margin-top: auto;
-}
 .q-list {
   display: flex;
   flex-direction: column;

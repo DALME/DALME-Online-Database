@@ -103,7 +103,6 @@ const recordFormSchema = {
   },
 };
 
-// TODO: Wrap these in the normalize out schema?
 const recordSubmitSchemas = {
   create: recordPostSchema,
   update: recordPutSchema,
@@ -112,7 +111,9 @@ const recordSubmitSchemas = {
 const recordRequests = {
   get: (id) => requests.sources.getSource(id),
   create: (data) => requests.sources.createSource(data),
-  update: ({ id, ...data }) => requests.sources.editSource(id, data),
+  update: ({ id, ...data }) => {
+    requests.sources.editSource(id, data);
+  },
 };
 
 export default {

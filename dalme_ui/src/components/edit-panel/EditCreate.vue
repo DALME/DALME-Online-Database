@@ -20,14 +20,9 @@
         text-color="black"
         icon="villa"
       >
-        <q-tooltip
-          class="bg-blue"
-          anchor="top middle"
-          self="top middle"
-          :offset="[0, 35]"
-        >
+        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Archive
-        </q-tooltip>
+        </Tooltip>
       </q-fab-action>
 
       <q-fab-action
@@ -36,14 +31,9 @@
         text-color="black"
         icon="format_list_numbered"
       >
-        <q-tooltip
-          class="bg-blue"
-          anchor="top middle"
-          self="top middle"
-          :offset="[0, 35]"
-        >
+        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Record
-        </q-tooltip>
+        </Tooltip>
       </q-fab-action>
     </q-fab>
 
@@ -54,14 +44,9 @@
       icon="collections_bookmark"
       disabled
     >
-      <q-tooltip
-        class="bg-blue"
-        anchor="center left"
-        self="center right"
-        :offset="[10, 10]"
-      >
+      <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
         Create Set
-      </q-tooltip>
+      </Tooltip>
     </q-fab-action>
 
     <q-fab-action
@@ -70,14 +55,9 @@
       text-color="black"
       icon="assignment"
     >
-      <q-tooltip
-        class="bg-blue"
-        anchor="center left"
-        self="center right"
-        :offset="[10, 10]"
-      >
+      <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
         Create Task
-      </q-tooltip>
+      </Tooltip>
     </q-fab-action>
 
     <q-fab-action
@@ -87,26 +67,26 @@
       icon="task"
       disabled
     >
-      <q-tooltip
-        class="bg-blue"
-        anchor="center left"
-        self="center right"
-        :offset="[10, 10]"
-      >
+      <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
         Create Ticket
-      </q-tooltip>
+      </Tooltip>
     </q-fab-action>
   </q-fab>
 </template>
 
 <script>
 import cuid from "cuid";
-import { defineComponent, inject } from "vue";
+import { defineAsyncComponent, defineComponent, inject } from "vue";
 
 import { useEditing } from "@/use";
 
 export default defineComponent({
   name: "EditCreate",
+  components: {
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
+  },
   setup() {
     const mode = "create";
     const {

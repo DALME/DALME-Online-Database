@@ -14,9 +14,9 @@
     @blur="handleBlur"
     @filter="handleOptions"
   >
-    <q-tooltip v-if="description" class="bg-blue z-max">
+    <Tooltip v-if="description">
       {{ description }}
-    </q-tooltip>
+    </Tooltip>
 
     <template v-slot:option="scope">
       <q-item v-bind="scope.itemProps">
@@ -49,7 +49,7 @@
 <script>
 import { useField } from "vee-validate";
 import { isNil } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineAsyncComponent, defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "MultipleSelectField",
@@ -78,6 +78,11 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+  },
+  components: {
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
   },
   setup(props) {
     const options = ref(null);

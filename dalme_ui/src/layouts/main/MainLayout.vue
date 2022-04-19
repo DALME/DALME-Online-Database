@@ -18,6 +18,7 @@ import {
   provideAPI,
   provideEditing,
   providePermissions,
+  provideTooltips,
   provideTransport,
 } from "@/use";
 
@@ -34,6 +35,7 @@ export default defineComponent({
     provideAPI(showLoginModal);
 
     provideEditing();
+    provideTooltips();
     provideTransport();
     const permissions = providePermissions();
     const { isAdmin } = permissions;

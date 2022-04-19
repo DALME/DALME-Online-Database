@@ -28,7 +28,7 @@
               size="xs"
               @click.stop="handleMinimize"
             >
-              <q-tooltip class="bg-blue z-max"> Minimize </q-tooltip>
+              <Tooltip> Minimize </Tooltip>
             </q-btn>
             <q-btn
               round
@@ -38,7 +38,7 @@
               size="xs"
               @click.stop="confirm = true"
             >
-              <q-tooltip class="bg-blue z-max"> Discard </q-tooltip>
+              <Tooltip> Discard </Tooltip>
             </q-btn>
           </div>
           <div class="text-h5 text-capitalize text-bold">
@@ -54,7 +54,7 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="close" color="red" text-color="white" size="sm" />
-          <span class="q-ml-sm">Close?</span>
+          <span class="q-ml-sm">Close modal?</span>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineAsyncComponent, defineComponent, ref } from "vue";
 import { useDraggable, useStorage } from "@vueuse/core";
 import { useActor, useSelector } from "@xstate/vue";
 
@@ -96,6 +96,11 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+  },
+  components: {
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
   },
   setup(props) {
     const {

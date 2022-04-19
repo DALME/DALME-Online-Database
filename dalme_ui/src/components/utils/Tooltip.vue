@@ -1,0 +1,40 @@
+<template>
+  <q-tooltip
+    class="bg-blue z-max"
+    :anchor="anchor"
+    :self="self"
+    :offset="offset"
+    v-if="showTips"
+  >
+    <slot></slot>
+  </q-tooltip>
+</template>
+
+<script>
+import { defineComponent } from "vue";
+
+import { useTooltips } from "@/use";
+
+export default defineComponent({
+  name: "Tooltip",
+  props: {
+    anchor: {
+      type: String,
+      default: () => "bottom middle",
+    },
+    self: {
+      type: String,
+      default: () => "top middle",
+    },
+    offset: {
+      type: Array,
+      default: () => [14, 14],
+    },
+  },
+  setup() {
+    const { showTips } = useTooltips();
+
+    return { showTips };
+  },
+});
+</script>

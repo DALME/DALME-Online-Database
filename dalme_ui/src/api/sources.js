@@ -27,7 +27,7 @@ const sources = {
     });
   },
   editSource(id, data) {
-    const url = `${endpoint}/${id}`;
+    const url = `${endpoint}/${id}/`;
     return new Request(url, {
       method: "PUT",
       headers: headers(),
