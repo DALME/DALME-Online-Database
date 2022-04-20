@@ -34,6 +34,10 @@
           {{ showing ? "Hide folios" : "Show folios" }}
         </Tooltip>
       </q-btn>
+
+      <Tooltip v-if="description">
+        {{ description }}
+      </Tooltip>
     </div>
 
     <template v-if="showing">
@@ -74,7 +78,7 @@
                   round
                   push
                   icon="search"
-                  :color="!data.damId ? 'grey' : 'black'"
+                  :color="!data.damId || !data.hasImage ? 'grey' : 'black'"
                   :disable="!data.damId || !data.hasImage"
                   @click.stop="() => handlePreview(data.damId)"
                 >
@@ -145,6 +149,10 @@ export default defineComponent({
       type: Array,
       default: () => [],
     },
+    description: {
+      type: [Boolean, String],
+      default: () => false,
+    },
     validators: {
       required: true,
     },
@@ -165,7 +173,7 @@ export default defineComponent({
     const { fields, replace } = useFieldArray("folios");
 
     const loading = ref(false);
-    const showing = ref(props.modelValue.length > 0 ? true : false);
+    const showing = ref(!props.modelValue.length > 0);
 
     const handleAddField = () => {
       const newValue = [...unref(props.modelValue), empty()];
@@ -212,6 +220,7 @@ export default defineComponent({
       // TODO: dam_id -> damId when camelCase renderer is added.
       rFilter((option) => !indexed.value.has(option.dam_id), options);
 
+    // TODO: Use fetchAPI and a schema here please.
     const getImageOptions = () =>
       fetcher(requests.images.getImageOptions())
         .then((response) => response.json())

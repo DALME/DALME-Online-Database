@@ -34,6 +34,10 @@
           {{ showing ? "Hide named persons" : "Show named persons" }}
         </Tooltip>
       </q-btn>
+
+      <Tooltip v-if="description">
+        {{ description }}
+      </Tooltip>
     </div>
 
     <template v-if="showing">
@@ -116,6 +120,10 @@ export default defineComponent({
       type: Array,
       default: () => [],
     },
+    description: {
+      type: [Boolean, String],
+      default: () => false,
+    },
     validators: {
       type: Object,
       required: true,
@@ -131,7 +139,7 @@ export default defineComponent({
     const { fields, replace } = useFieldArray("agents");
 
     const loading = ref(false);
-    const showing = ref(props.modelValue.length > 0 ? true : false);
+    const showing = ref(!props.modelValue.length > 0);
 
     const handleAddField = () => {
       const newValue = [...unref(props.modelValue), empty()];

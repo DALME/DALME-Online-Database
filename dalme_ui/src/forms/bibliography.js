@@ -5,33 +5,35 @@ import {
   AttributesField,
   InputField,
   MultipleSelectField,
+  SelectField,
 } from "@/components/forms";
 import {
   attributeValidators,
-  archiveEditSchema,
-  archiveFieldValidation,
+  bibliographyEditSchema,
+  bibliographyFieldValidation,
+  bibliographyTypeOptionsSchema,
   setOptionsSchema,
   sourceSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = [
   "defaultRights",
-  "email",
-  "locale",
-  "streetAddress",
-  "urlAttribute",
+  "isPrivate",
+  "owner",
+  "parent",
+  "zoteroKey",
 ];
 
-const requiredAttributes = ["locale"];
+const requiredAttributes = ["defaultRights", "zoteroKey"];
 
-const archiveFormSchema = {
+const bibliographyFormSchema = {
   name: {
     field: "name",
     component: markRaw(InputField),
     label: "Name *",
     description:
       "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
-    validation: archiveFieldValidation.name,
+    validation: bibliographyFieldValidation.name,
   },
   shortName: {
     field: "shortName",
@@ -39,7 +41,31 @@ const archiveFormSchema = {
     label: "Short name *",
     description:
       "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
-    validation: archiveFieldValidation.shortName,
+    validation: bibliographyFieldValidation.shortName,
+  },
+  type: {
+    field: "type",
+    component: markRaw(SelectField),
+    label: "Bilbliography type *",
+    description: "The category of bibliography for this source.",
+    getOptions: () =>
+      fetcher(requests.sources.getBibliographyTypes()).then((response) =>
+        response.json(),
+      ),
+    optionsSchema: bibliographyTypeOptionsSchema,
+    validation: bibliographyFieldValidation.type,
+  },
+  primaryDataset: {
+    field: "primaryDataset",
+    component: markRaw(SelectField),
+    label: "Primary dataset",
+    description: "Dataset used to assign permissions.",
+    getOptions: () =>
+      fetcher(requests.sets.getSetsByType("dataset")).then((response) =>
+        response.json(),
+      ),
+    optionsSchema: setOptionsSchema,
+    validation: bibliographyFieldValidation.primaryDataset,
   },
   sets: {
     field: "sets",
@@ -49,7 +75,7 @@ const archiveFormSchema = {
     getOptions: () =>
       fetcher(requests.sets.getSets()).then((response) => response.json()),
     optionsSchema: setOptionsSchema,
-    validation: archiveFieldValidation.sets,
+    validation: bibliographyFieldValidation.sets,
   },
   attributes: {
     field: "attributes",
@@ -58,11 +84,11 @@ const archiveFormSchema = {
     allowed: resourceAttributes,
     required: requiredAttributes,
     validators: attributeValidators,
-    validation: archiveFieldValidation.attributes,
+    validation: bibliographyFieldValidation.attributes,
   },
 };
 
-const archiveRequests = {
+const bibliographyRequests = {
   get: (id) => requests.sources.getSource(id),
   // TODO: Need to include type in here or somewhere else.
   create: (data) => requests.sources.createSource(data),
@@ -70,8 +96,8 @@ const archiveRequests = {
 };
 
 export default {
-  edit: archiveEditSchema,
-  form: archiveFormSchema,
-  requests: archiveRequests,
+  edit: bibliographyEditSchema,
+  form: bibliographyFormSchema,
+  requests: bibliographyRequests,
   submit: sourceSubmitSchemas,
 };

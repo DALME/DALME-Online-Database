@@ -4,11 +4,13 @@ import * as yup from "yup";
 import { requests } from "@/api";
 import { attributeValidators } from "@/schemas";
 
+// TODO: Strip ununsed when we confirm they will never appear in a form.
 const optionFields = [
   "authority",
   "country",
   "createdBy",
   "defaultRights",
+  "endpoint",
   "format",
   "language",
   "languageGc",

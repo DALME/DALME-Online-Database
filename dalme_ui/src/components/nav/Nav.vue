@@ -52,7 +52,7 @@
             self="center left"
             :offset="[10, 10]"
           >
-            {{ `${showTips ? "Hide" : "Show"} tooltips` }}
+            {{ `Tooltips ${showTips ? "on" : "off"}` }}
           </q-tooltip>
         </q-toggle>
       </q-item>

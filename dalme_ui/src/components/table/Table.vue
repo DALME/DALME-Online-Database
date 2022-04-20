@@ -35,6 +35,10 @@
             }"
           >
             {{ column.label }}
+
+            <Tooltip v-if="isAdmin && editable.includes(column.name)">
+              Click on fields in underlined columns to edit data in place.
+            </Tooltip>
           </q-th>
         </q-tr>
       </template>
@@ -116,7 +120,14 @@
 
 <script>
 import { map, keys, mapObjIndexed } from "ramda";
-import { computed, defineComponent, inject, ref, watch } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  inject,
+  ref,
+  watch,
+} from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useActor } from "@xstate/vue";
 
@@ -127,6 +138,9 @@ export default defineComponent({
   name: "Table",
   components: {
     OpaqueSpinner,
+    Tooltip: defineAsyncComponent(() =>
+      import("@/components/utils/Tooltip.vue"),
+    ),
   },
   props: {
     // Reactive.

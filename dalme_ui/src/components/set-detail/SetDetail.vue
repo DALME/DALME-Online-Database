@@ -45,7 +45,7 @@
 
           <div class="row q-my-xs" v-if="!isNil(set.hasLanding)">
             <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Landing
+              Has landing
             </div>
             <div class="col-8">
               <q-icon :name="set.hasLanding ? 'done' : 'close'" size="xs" />

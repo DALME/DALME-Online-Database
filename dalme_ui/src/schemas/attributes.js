@@ -15,10 +15,120 @@ export const attributesFieldSchema = yup.object().shape({
   value: yup.mixed().required(),
 });
 
-// NOTE: We don't use the usual *Schema naming convention here as it makes
-// things easier when we have to do all the dynamic binding/juggling upstream.
-// Instead just map it directly to AttributeType.short_name (post-camelization).
+// Keys mapped to Attribute.short_name (camelized).
 export const attributeValidators = {
+  // Verified/used.
+  archivalNumber: yup.string().nullable().required().label("Archival number"),
+  archivalSeries: yup.string().nullable().required().label("Archival series"),
+  authority: yup.string().nullable().required().label("Authority"),
+  date: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("Date"),
+  defaultRights: yup
+    .string()
+    .uuid()
+    .nullable()
+    .required()
+    .label("Default rights"),
+  description: yup.string().nullable().required().label("Description"),
+  email: yup.string().email().nullable().required().label("Email"),
+  endDate: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("End date"),
+  format: yup.string().nullable().required().label("Format"),
+  hasLanding: yup
+    .boolean()
+    .nullable()
+    .required()
+    .transform((option) => (isNil(option) ? null : option))
+    .label("Has landing"),
+  helpFlag: yup
+    .boolean()
+    .nullable()
+    .required()
+    .transform((option) => (isNil(option) ? null : option))
+    .label("Help flag"),
+  isPrivate: yup
+    .boolean()
+    .nullable()
+    .required()
+    .transform((option) =>
+      isNil(option) ? null : Boolean(parseInt(option.value)),
+    )
+    .label("Is private"),
+  isPublic: yup
+    .boolean()
+    .nullable()
+    .required()
+    .transform((option) =>
+      isNil(option) ? null : Boolean(parseInt(option.value)),
+    )
+    .label("Is public"),
+  language: yup
+    .array()
+    .of(
+      yup.object().shape({ value: yup.string().required().label("Language") }),
+    )
+    .nullable()
+    .required()
+    .transform((value) => (value && value.length > 0 ? value : null))
+    .label("Language"),
+  locale: yup
+    .object()
+    .shape({ value: yup.string().nullable().required().label("Locale") })
+    .nullable()
+    .required()
+    .transform((option) => (isNil(option) ? null : option))
+    .label("Locale"),
+  namedPersons: yup.string().nullable().required().label("Named persons"),
+  owner: yup
+    .object()
+    .shape({ value: yup.number().nullable().required().label("Owner") })
+    .nullable()
+    .required()
+    .label("Owner"),
+  parent: yup
+    .object()
+    .shape({ value: yup.string().uuid().nullable().required().label("Parent") })
+    .nullable()
+    .required()
+    .label("Parent"),
+  recordType: yup
+    .object()
+    .shape({ value: yup.string().nullable().required().label("Record type") })
+    .nullable()
+    .required()
+    .label("Record type"),
+  startDate: yup
+    .string()
+    .nullable()
+    .required()
+    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .label("Start date"),
+  statText: yup.string().nullable().required().label("Stat text"),
+  statTitle: yup.string().nullable().required().label("Stat title"),
+  status: yup.string().nullable().required().label("Status"),
+  streetAddress: yup.string().nullable().required().label("Street address"),
+  support: yup.string().nullable().required().label("Support"),
+  urlAttribute: yup.string().url().nullable().required().label("Web address"),
+  zoteroKey: yup.string().nullable().required().label("Zotero key"),
+
+  // TODO: Temp, remove or move up.
+  endpoint: yup
+    .object()
+    .shape({ value: yup.string().nullable().required().label("Endpoint") })
+    .nullable()
+    .required()
+    .transform((option) => (isNil(option) ? null : option))
+    .label("Endpoint"),
+
+  // Unverified/unused.
   activity: yup.string().nullable().required().label("Activity"),
   administrativeRegion: yup
     .string()
@@ -28,12 +138,9 @@ export const attributeValidators = {
   alpha_2Code: yup.string().nullable().required().label("Alpha-2 Code"),
   alpha_3Code: yup.string().nullable().required().label("Alpha-3 Code"),
   altIdentifier: yup.string().nullable().required().label("Alt. ID"),
-  archivalNumber: yup.string().nullable().required().label("Archival number"),
-  archivalSeries: yup.string().nullable().required().label("Archival series"),
   attachments: yup.string().nullable().required().label("Attachments"),
   attributeTypes: yup.string().nullable().required().label("Attribute types"),
   author: yup.string().nullable().required().label("Author"),
-  authority: yup.string().nullable().required().label("Authority"),
   collections: yup.string().nullable().required().label("Collections"),
   comments: yup.string().nullable().required().label("Comments"),
   contentClass: yup.string().nullable().required().label("Content class"),
@@ -53,15 +160,9 @@ export const attributeValidators = {
     .label("Created on"),
   creationUsername: yup.string().nullable().required().label("Created by"),
   damId: yup.number().nullable().required().label("DAM id"),
-  damUser: yup.number().nullable().required().label("DAM user"), // TODO: Options?
+  damUser: yup.number().nullable().required().label("DAM user"),
   dataType: yup.string().nullable().required().label("Data type"),
   datasetUsergroup: yup.number().nullable().required().label("DS User Group"),
-  date: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("Date"),
   dateDone: yup
     .string()
     .nullable()
@@ -79,13 +180,6 @@ export const attributeValidators = {
   debtSource: yup.string().nullable().required().label("Debt source"),
   debtUnit: yup.string().nullable().required().label("Debt unit"),
   debtUnitType: yup.string().nullable().required().label("Debt unit type"),
-  defaultRights: yup
-    .string()
-    .uuid()
-    .nullable()
-    .required()
-    .label("Default rights"),
-  description: yup.string().nullable().required().label("Description"),
   dtClassName: yup.string().nullable().required().label("DT classname"),
   dtName: yup.string().nullable().required().label("Datatables name"),
   dtWidth: yup.string().nullable().required().label("DT width"),
@@ -95,14 +189,6 @@ export const attributeValidators = {
   dteOpts: yup.string().nullable().required().label("DTE opts"),
   dteType: yup.string().nullable().required().label("DTE type"),
   elevation: yup.number().nullable().required().label("Elevation"),
-  email: yup.string().email().nullable().required().label("Email"),
-  endDate: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("End date"),
-  endpoint: yup.string().nullable().required().label("Endpoint"), // TODO: string().url() ?
   field12: yup
     .string()
     .nullable()
@@ -120,31 +206,18 @@ export const attributeValidators = {
   filterOptions: yup.string().nullable().required().label("Filter options"),
   filterType: yup.string().nullable().required().label("Filter type"),
   firstName: yup.string().nullable().required().label("First name"),
-  format: yup.string().nullable().required().label("Format"),
   fullName: yup.string().nullable().required().label("Full name"),
   glottocode: yup.string().nullable().required().label("Glottocode"),
   groups: yup.string().nullable().required().label("Groups"),
   hasImage: yup.boolean().nullable().required().label("Image"),
   hasInventory: yup.boolean().nullable().required().label("List"),
-  hasLanding: yup.boolean().nullable().required().label("Landing"),
   hasPages: yup.boolean().nullable().required().label("Has pages"),
-  helpFlag: yup.boolean().nullable().required().label("Help"),
   id: yup.string().nullable().required().label("ID"),
   isActive: yup.boolean().nullable().required().label("Active"),
   isFilter: yup.boolean().nullable().required().label("Is filter"),
-  isPublic: yup.boolean().nullable().required().label("Public"),
   isStaff: yup.boolean().nullable().required().label("Staff"),
   isSuperuser: yup.boolean().nullable().required().label("Superuser"),
   iso6393: yup.string().nullable().required().label("ISO-693-3"),
-  language: yup
-    .array()
-    .of(
-      yup.object().shape({ value: yup.string().required().label("Language") }),
-    )
-    .nullable()
-    .required()
-    .transform((value) => (value && value.length > 0 ? value : null))
-    .label("Language"),
   languageGc: yup
     .array()
     .of(
@@ -174,13 +247,6 @@ export const attributeValidators = {
   legalPersona: yup.string().nullable().required().label("Legal persona"),
   licence: yup.string().nullable().required().label("Licence"),
   list: yup.number().nullable().required().label("Datatables List"),
-  locale: yup
-    .object()
-    .shape({ value: yup.string().nullable().required().label("Locale") })
-    .nullable()
-    .required()
-    .transform((option) => (isNil(option) ? null : option))
-    .label("Locale"),
   longitude: yup.string().nullable().required().label("Longitude"),
   memberCount: yup.number().min(0).nullable().required().label("Member count"),
   mk1Identifier: yup.number().nullable().required().label("Mk.I ID"),
@@ -199,7 +265,6 @@ export const attributeValidators = {
     .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
     .label("Date modified"),
   name: yup.string().nullable().required().label("Name"),
-  namedPersons: yup.string().nullable().required().label("Named persons"), // TODO: Don't think this is right.
   noFolios: yup.number().nullable().required().label("No. folios"),
   noticeDisplay: yup
     .boolean()
@@ -210,16 +275,19 @@ export const attributeValidators = {
   optionsList: yup.string().nullable().required().label("Options list"),
   order: yup.number().nullable().required().label("Order"),
   orderable: yup.number().nullable().required().label("Orderable"),
-  owner: yup.number().nullable().required().label("Owner"),
-  parent: yup.string().uuid().nullable().required().label("Parent"),
   parents: yup.string().nullable().required().label("Parents"),
   password: yup.string().nullable().required().label("Password"),
   permissions: yup
-    .number()
-    .min(1)
-    .max(4)
-    .nullable()
-    .required()
+    .object()
+    .shape({
+      value: yup
+        .number()
+        .min(1)
+        .max(4)
+        .nullable()
+        .required()
+        .label("Permissions"),
+    })
     .label("Permissions"),
   poboxNumber: yup.string().nullable().required().label("PO box"),
   postalCode: yup.string().nullable().required().label("Postal code"),
@@ -230,12 +298,6 @@ export const attributeValidators = {
     .nullable()
     .required()
     .label("Indirect inheritance"),
-  recordType: yup
-    .object()
-    .shape({ value: yup.string().nullable().required().label("Record type") })
-    .nullable()
-    .required()
-    .label("Record type"),
   recordTypePhrase: yup
     .string()
     .nullable()
@@ -258,25 +320,13 @@ export const attributeValidators = {
   shortTitle: yup.string().nullable().required().label("Short title"),
   socialStatus: yup.string().nullable().required().label("Social status"),
   source: yup.string().nullable().required().label("Source"),
-  startDate: yup
-    .string()
-    .nullable()
-    .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
-    .label("Start date"),
-  status: yup.string().nullable().required().label("Status"),
-  streetAddress: yup.string().nullable().required().label("Street address"),
-  subject: yup.string().nullable().required().label("Subject"),
-  support: yup.string().nullable().required().label("Support"),
   tags: yup.string().nullable().required().label("Tags"),
   taskName: yup.string().nullable().required().label("Task name"),
   title: yup.string().nullable().required().label("Title"),
   traceback: yup.string().nullable().required().label("Traceback"),
   type: yup.string().nullable().required().label("Type"),
-  urlAttribute: yup.string().url().nullable().required().label("Web address"),
   username: yup.string().nullable().required().label("Username"),
   visible: yup.number().nullable().required().label("Visible"),
-  zoteroKey: yup.string().nullable().required().label("Zotero key"),
 };
 
 export const attributeTypeSchema = yup
@@ -302,6 +352,7 @@ export const attributeTypeSchema = yup
           // Make sure certain fields come through as select fields.
           const forceOptions = [
             "createdBy",
+            "endpoint",
             "lastUser",
             "owner",
             "recordType",

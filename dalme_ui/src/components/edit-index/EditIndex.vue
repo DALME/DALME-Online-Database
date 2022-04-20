@@ -1,5 +1,5 @@
 <template>
-  <q-drawer v-model="show" side="right" bordered class="bg-grey-3">
+  <q-drawer bordered class="bg-grey-3" side="right" v-model="show">
     <q-scroll-area class="fit">
       <WindowIndex />
       <InlineIndex />

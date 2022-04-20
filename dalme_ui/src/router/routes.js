@@ -81,7 +81,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Corpora",
             path: "corpora",
-            props: { icon: "collections" },
+            props: { icon: "local_library" },
             nav: true,
             meta: {
               setType: "corpora",
@@ -92,7 +92,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Collections",
             path: "collections",
-            props: { icon: "collections" },
+            props: { icon: "apps" },
             nav: true,
             meta: {
               setType: "collections",
@@ -103,7 +103,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Datasets",
             path: "datasets",
-            props: { icon: "collections" },
+            props: { icon: "schema" },
             nav: true,
             meta: {
               setType: "datasets",
@@ -114,7 +114,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Worksets",
             path: "worksets",
-            props: { icon: "collections" },
+            props: { icon: "work" },
             nav: true,
             meta: {
               setType: "worksets",

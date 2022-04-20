@@ -20,8 +20,30 @@
         text-color="black"
         icon="villa"
       >
-        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Archive
+        </Tooltip>
+      </q-fab-action>
+
+      <q-fab-action
+        :onClick="() => handleClick('archivalFile')"
+        color="amber"
+        text-color="black"
+        icon="inventory"
+      >
+        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+          Create Archival File
+        </Tooltip>
+      </q-fab-action>
+
+      <q-fab-action
+        :onClick="() => handleClick('bibliography')"
+        color="amber"
+        text-color="black"
+        icon="library_books"
+      >
+        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+          Create Bibliography
         </Tooltip>
       </q-fab-action>
 
@@ -31,23 +53,64 @@
         text-color="black"
         icon="format_list_numbered"
       >
-        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Record
         </Tooltip>
       </q-fab-action>
     </q-fab>
 
-    <q-fab-action
-      :onclick="() => handleClick('set')"
-      color="amber"
-      text-color="black"
+    <q-fab
+      padding="0.5rem"
       icon="collections_bookmark"
-      disabled
+      text-color="black"
+      direction="left"
+      :color="dragging ? 'grey' : 'orange'"
+      :disable="dragging"
     >
-      <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
-        Create Set
-      </Tooltip>
-    </q-fab-action>
+      <q-fab-action
+        :onclick="() => handleClick('corpus')"
+        color="amber"
+        text-color="black"
+        icon="local_library"
+      >
+        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+          Create Corpus
+        </Tooltip>
+      </q-fab-action>
+
+      <q-fab-action
+        :onclick="() => handleClick('collection')"
+        color="amber"
+        text-color="black"
+        icon="apps"
+      >
+        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+          Create Collection
+        </Tooltip>
+      </q-fab-action>
+
+      <q-fab-action
+        :onclick="() => handleClick('dataset')"
+        color="amber"
+        text-color="black"
+        icon="schema"
+      >
+        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+          Create Dataset
+        </Tooltip>
+      </q-fab-action>
+
+      <q-fab-action
+        :onclick="() => handleClick('workset')"
+        color="amber"
+        text-color="black"
+        icon="work"
+      >
+        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+          Create Workset
+        </Tooltip>
+      </q-fab-action>
+    </q-fab>
 
     <q-fab-action
       :onclick="() => handleClick('task')"
@@ -65,7 +128,6 @@
       color="amber"
       text-color="black"
       icon="task"
-      disabled
     >
       <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
         Create Ticket

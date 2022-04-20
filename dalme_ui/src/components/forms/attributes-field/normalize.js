@@ -16,6 +16,11 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
       case "Options":
         const validator = attributeValidators[attributeType.shortName];
 
+        // It's been parsed by another schema into the expected options format.
+        if (data.hasOwnProperty("value") && data.hasOwnProperty("label")) {
+          return { attribute: attributeType, value: data };
+        }
+
         // It's a MultipleSelect value.
         if (validator.type === "array") {
           return {
@@ -60,9 +65,7 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
   return normalized;
 };
 
-// TODO: Eliminate empties.
-export const normalizeAttributesOutput = (attributes) => attributes;
-
+export const normalizeOutputSchema = (attributes) => attributes;
 // export const normalizeOutputSchema = yup
 //   .array()
 //   .nullable()

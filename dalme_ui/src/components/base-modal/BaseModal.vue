@@ -179,7 +179,7 @@ export default defineComponent({
   will-change: auto !important;
 }
 .modal-card {
-  max-height: calc(100vh - 10rem);
+  max-height: calc(100vh - 8rem);
   overflow-y: scroll;
   scroll-snap-type: y proximity;
 }

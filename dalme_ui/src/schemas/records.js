@@ -12,6 +12,7 @@ import {
   foliosFieldSchema,
 } from "@/schemas";
 
+// Field-level validation rules/schemas.
 export const recordFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
   shortName: yup.string().nullable().required().label("Short name"),
@@ -35,9 +36,14 @@ export const recordFieldValidation = {
   sets: yup
     .array()
     .of(yup.object().shape({ value: yup.string().uuid().nullable() }))
+    .default(null)
     .nullable()
     .label("Sets"),
-  attributes: yup.array().of(attributesFieldSchema).label("Attributes"),
+  attributes: yup
+    .array()
+    .of(attributesFieldSchema)
+    .required()
+    .label("Attributes"),
   agents: yup
     .array()
     .of(agentsFieldSchema)
@@ -83,9 +89,9 @@ export const recordEditSchema = yup
         label: yup.string().required(),
       }),
     ),
-    // Just minimal validation here for the attributes. We will apply the
-    // full transform elsewhere, as it's very complex.
     agents: agentsNormalizeInputSchema,
+    // NOTE: Just minimal validation here for the attributes. We apply the full
+    // transform elsewhere, as it's very complex and better suits a function.
     attributes: yup.mixed(),
     credits: creditsNormalizeInputSchema,
     pages: foliosNormalizeInputSchema,
@@ -103,39 +109,7 @@ export const recordEditSchema = yup
     },
     sets: data.sets.map((item) => ({ value: item.id, label: item.name })),
     // TODO: Remove ALL camelcase hackage when we sort out the API renderer.
-    // Camelize here because we run a function to normalize the attributes, not
-    // a schema like the others (which is why they are omitted here.)
+    // Until then, we camelize here because we run a function not a schema to
+    // normalize the attributes so we can't call on yup to camelCase the data.
     attributes: camelcaseKeys(data.attributes),
   }));
-
-// POST data schemas.
-// Normalizes form data for output to the API.
-export const recordPostSchema = yup.object().shape({
-  name: yup.string().required(),
-  shortName: yup.string().required(),
-  // hasInventory: yup.object().shape({
-  //   value: yup.boolean().required(),
-  //   label: yup.string().required(),
-  // }),
-  // parent: yup
-  //   .object()
-  //   .shape({
-  //     value: yup.string().uuid().required(),
-  //     label: yup.string().required(),
-  //   })
-  //   .nullable(),
-  // sets: yup.array().of(
-  //   yup.object().shape({
-  //     value: yup.string().uuid().required(),
-  //     label: yup.string().required(),
-  //   }),
-  // ),
-  // agents: normalizeOutputSchema,
-  // attributes,
-  // credits,
-  // pages,
-});
-
-export const recordPutSchema = recordPostSchema.shape({
-  id: yup.string().uuid().required(),
-});

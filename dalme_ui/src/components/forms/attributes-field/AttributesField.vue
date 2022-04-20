@@ -34,153 +34,181 @@
           {{ showing ? "Hide attributes" : "Show attributes" }}
         </Tooltip>
       </q-btn>
+
+      <Tooltip v-if="description">
+        {{ description }}
+      </Tooltip>
     </div>
 
-    <template
-      v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
-      :key="`${idx}-${field.key}`"
-    >
-      <div class="row q-mb-sm" v-show="showing">
-        <div class="col-6 q-pr-sm">
-          <q-select
-            map-options
-            label="Attribute"
-            class="attribute-select"
-            :clearable="!isRequiredAttribute(data.attribute)"
-            :disable="isRequiredAttribute(data.attribute)"
-            :model-value="data.attribute"
-            :options="options"
-            :option-label="
-              (option) =>
-                option
-                  ? isRequiredAttribute(data.attribute)
-                    ? `${option.name} *`
-                    : option.name
-                  : null
-            "
-            :option-value="(option) => option"
-            :popup-content-style="{ zIndex: '9999 !important' }"
-            :use-input="true"
-            @clear="() => handleClearAttribute(idx)"
-            @filter="handleOptions"
-            @update:modelValue="(option) => handleUpdateAttribute(option, idx)"
-          >
-            <Tooltip v-if="data.attribute && data.attribute.description">
-              {{ data.attribute.description }}
-            </Tooltip>
-          </q-select>
-        </div>
+    <template v-if="showing">
+      <template v-if="modelValue.length > 0">
+        <template
+          v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
+          :key="`${idx}-${field.key}`"
+        >
+          <div class="row q-mb-sm" v-show="showing">
+            <div class="col-6 q-pr-sm">
+              <q-select
+                map-options
+                label="Attribute"
+                class="attribute-select"
+                :clearable="!isRequiredAttribute(data.attribute)"
+                :disable="isRequiredAttribute(data.attribute)"
+                :model-value="data.attribute"
+                :options="options"
+                :option-label="
+                  (option) =>
+                    option
+                      ? isRequiredAttribute(data.attribute)
+                        ? `${option.name} *`
+                        : option.name
+                      : null
+                "
+                :option-value="(option) => option"
+                :popup-content-style="{ zIndex: '9999 !important' }"
+                :use-input="true"
+                @clear="() => handleClearAttribute(idx)"
+                @filter="handleOptions"
+                @update:modelValue="
+                  (option) => handleUpdateAttribute(option, idx)
+                "
+              >
+                <Tooltip v-if="data.attribute && data.attribute.description">
+                  {{ data.attribute.description }}
+                </Tooltip>
+              </q-select>
+            </div>
 
-        <div class="q-pl-sm col">
-          <template v-if="!data.attribute">
-            <q-input disable label="Choose an attribute" />
-          </template>
-          <template v-else>
-            <template v-if="data.attribute.dataType === 'Boolean'">
-              <BooleanField
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :validation="validators[data.attribute.shortName]"
-              />
-            </template>
-            <template v-else-if="data.attribute.dataType === 'Decimal'">
-              <DecimalField
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :validation="validators[data.attribute.shortName]"
-              />
-            </template>
-            <template v-else-if="data.attribute.dataType === 'Number'">
-              <NumberField
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :validation="validators[data.attribute.shortName]"
-              />
-            </template>
-            <template v-else-if="data.attribute.dataType === 'Date'">
-              <DateField
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :validation="validators[data.attribute.shortName]"
-              />
-            </template>
-            <template v-else-if="data.attribute.dataType === 'Text'">
-              <TextField
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :validation="validators[data.attribute.shortName]"
-              />
-            </template>
-            <template v-else-if="data.attribute.dataType === 'Options'">
-              <SelectField
-                v-if="!getOptionsData(data.attribute.shortName).multiple"
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :filterable="
-                  getOptionsData(data.attribute.shortName).filterable
-                "
-                :getOptions="
-                  wrapRequest(getOptionsData(data.attribute.shortName).request)
-                "
-                :optionsSchema="getOptionsData(data.attribute.shortName).schema"
-                :validation="validators[data.attribute.shortName]"
-              />
-              <MultipleSelectField
-                v-else
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :filterable="
-                  getOptionsData(data.attribute.shortName).filterable
-                "
-                :getOptions="
-                  wrapRequest(getOptionsData(data.attribute.shortName).request)
-                "
-                :optionsSchema="getOptionsData(data.attribute.shortName).schema"
-                :validation="validators[data.attribute.shortName]"
-              />
-            </template>
-            <template v-else>
-              <InputField
-                v-model="data.value"
-                :field="`attributes[${idx}].value`"
-                :label="data.attribute.dataType"
-                :validation="validators[data.attribute.shortName]"
-              />
-            </template>
-          </template>
-        </div>
+            <div class="q-pl-sm col">
+              <template v-if="!data.attribute">
+                <q-input disable label="Choose an attribute" />
+              </template>
+              <template v-else>
+                <template v-if="data.attribute.dataType === 'Boolean'">
+                  <BooleanField
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                </template>
+                <template v-else-if="data.attribute.dataType === 'Decimal'">
+                  <DecimalField
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                </template>
+                <template v-else-if="data.attribute.dataType === 'Number'">
+                  <NumberField
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                </template>
+                <template v-else-if="data.attribute.dataType === 'Date'">
+                  <DateField
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                </template>
+                <template v-else-if="data.attribute.dataType === 'Text'">
+                  <TextField
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                </template>
+                <template v-else-if="data.attribute.dataType === 'Options'">
+                  <SelectField
+                    v-if="!getOptionsData(data.attribute.shortName).multiple"
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :filterable="
+                      getOptionsData(data.attribute.shortName).filterable
+                    "
+                    :getOptions="
+                      wrapRequest(
+                        getOptionsData(data.attribute.shortName).request,
+                      )
+                    "
+                    :optionsSchema="
+                      getOptionsData(data.attribute.shortName).schema
+                    "
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                  <MultipleSelectField
+                    v-else
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :filterable="
+                      getOptionsData(data.attribute.shortName).filterable
+                    "
+                    :getOptions="
+                      wrapRequest(
+                        getOptionsData(data.attribute.shortName).request,
+                      )
+                    "
+                    :optionsSchema="
+                      getOptionsData(data.attribute.shortName).schema
+                    "
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                </template>
+                <template v-else>
+                  <InputField
+                    v-model="data.value"
+                    :field="`attributes[${idx}].value`"
+                    :label="data.attribute.dataType"
+                    :validation="validators[data.attribute.shortName]"
+                  />
+                </template>
+              </template>
+            </div>
 
-        <div v-if="modelValue.length > 1" class="row items-center">
-          <q-btn
-            class="q-ml-auto"
-            flat
-            round
-            unelevated
-            size="xs"
-            icon="clear"
-            :text-color="isRequiredAttribute(data.attribute) ? 'grey' : 'black'"
-            :disable="isRequiredAttribute(data.attribute)"
-            @click.stop="handleRemoveField(idx)"
-          >
-            <Tooltip v-if="isRequiredAttribute(data.attribute)">
-              Can't delete a required attribute
-            </Tooltip>
-          </q-btn>
+            <div
+              v-if="!required || modelValue.length > 1"
+              class="row items-center"
+            >
+              <q-btn
+                class="q-ml-auto"
+                flat
+                round
+                unelevated
+                size="xs"
+                icon="clear"
+                :text-color="
+                  isRequiredAttribute(data.attribute) ? 'grey' : 'black'
+                "
+                :disable="isRequiredAttribute(data.attribute)"
+                @click.stop="handleRemoveField(idx)"
+              >
+                <Tooltip v-if="isRequiredAttribute(data.attribute)">
+                  Can't delete a required attribute
+                </Tooltip>
+              </q-btn>
+            </div>
+          </div>
+        </template>
+      </template>
+      <template v-else>
+        <div class="text-subtitle1 placeholder">
+          <p>No attributes defined.</p>
         </div>
-      </div>
+      </template>
     </template>
   </div>
 </template>
 
 <script>
-import { isNil, map as rMap, zip } from "ramda";
+import { isNil, filter as rFilter, map as rMap, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
 import {
   computed,
@@ -213,6 +241,14 @@ export default defineComponent({
   name: "AttributesField",
   props: {
     modelValue: {
+      type: Array,
+      default: () => [],
+    },
+    description: {
+      type: [Boolean, String],
+      default: () => false,
+    },
+    allowed: {
       type: Array,
       default: () => [],
     },
@@ -254,7 +290,9 @@ export default defineComponent({
     );
 
     const isRequiredAttribute = (attribute) =>
-      !isNil(attribute) && props.required.includes(attribute.shortName);
+      !isNil(attribute) &&
+      props.required &&
+      props.required.includes(attribute.shortName);
 
     const getOptionsData = (shortName) => attributeFields[shortName].options;
 
@@ -298,7 +336,9 @@ export default defineComponent({
               update(() => {
                 options.value = Object.freeze(
                   value.filter(
-                    (option) => !activeAttributes.value.includes(option.id),
+                    (option) =>
+                      props.allowed.includes(option.shortName) &&
+                      !activeAttributes.value.includes(option.id),
                   ),
                 );
                 optionCount.value = value.length;
@@ -323,41 +363,46 @@ export default defineComponent({
 
     const initAttributes = async () => {
       if (props.modelValue.length > 0) {
-        const newValue = unref(props.modelValue);
-        const sorted = newValue.sort(
+        // Filter out any non-permitted attributes from editing before sorting.
+        const newValue = rFilter(
+          ({ attribute }) => props.allowed.includes(attribute.shortName),
+          unref(props.modelValue),
+        ).sort(
           (x, y) =>
             isRequiredAttribute(y.attribute) - isRequiredAttribute(x.attribute),
         );
-        replace(sorted);
-        context.emit("update:modelValue", sorted);
+        replace(newValue);
+        context.emit("update:modelValue", newValue);
       } else {
-        loading.value = true;
-        const { success, data, fetchAPI } = apiInterface();
-        const request = requests.attributeTypes.getAttributeTypesByShortName(
-          props.required.join(),
-        );
-        await fetchAPI(request);
-        if (success.value)
-          await attributeTypesSchema
-            .validate(data.value, { stripUnknown: true })
-            .then((value) => {
-              let newValue = unref(props.modelValue);
-              const initial = new Set(
-                rMap((field) => field.attribute, newValue),
-              );
-              for (const attribute of value) {
-                if (
-                  !activeAttributes.value.includes(attribute.id) &&
-                  !initial.has(attribute.shortName)
-                ) {
-                  newValue = [{ attribute, value: null }, ...newValue];
+        if (props.required) {
+          loading.value = true;
+          const { success, data, fetchAPI } = apiInterface();
+          const request = requests.attributeTypes.getAttributeTypesByShortName(
+            props.required.join(),
+          );
+          await fetchAPI(request);
+          if (success.value)
+            await attributeTypesSchema
+              .validate(data.value, { stripUnknown: true })
+              .then((value) => {
+                let newValue = unref(props.modelValue);
+                const initial = new Set(
+                  rMap((field) => field.attribute, newValue),
+                );
+                for (const attribute of value) {
+                  if (
+                    !activeAttributes.value.includes(attribute.id) &&
+                    !initial.has(attribute.shortName)
+                  ) {
+                    newValue = [{ attribute, value: null }, ...newValue];
+                  }
                 }
-              }
-              replace(newValue);
-              context.emit("update:modelValue", newValue);
-              loading.value = false;
-              showing.value = true;
-            });
+                replace(newValue);
+                context.emit("update:modelValue", newValue);
+                loading.value = false;
+                showing.value = true;
+              });
+        }
       }
     };
 
@@ -400,6 +445,19 @@ export default defineComponent({
 }
 div.q-field__bottom {
   margin-bottom: 5px;
+}
+.placeholder {
+  align-items: center;
+  border-bottom: 1px solid #c2c2c2;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+  line-height: 18px;
+  margin-bottom: 8px;
+  padding-bottom: 17px;
+  padding-top: 20px;
+}
+.placeholder > p {
+  margin: 0;
 }
 .separator {
   border-bottom: 1px solid rgba(0, 0, 0, 0.24);

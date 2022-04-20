@@ -99,6 +99,7 @@ export const setMembersSchema = yup.object().shape({
 export const setDetailSchema = yup
   .object()
   .shape({
+    // TODO: Break out into setAttributesSchema. Do same for source.
     id: yup.string().uuid().required(),
     name: yup.string().required(),
     setType: setTypeSchema.required(),
@@ -124,4 +125,25 @@ export const setListSchema = (setType) => {
     worksets: worksetSchema,
   };
   return yup.array().of(setMap[setType]);
+};
+
+// POST/PUT data schemas.
+// Normalizes set form data for output to the API.
+const setPostSchema = yup.object().shape({
+  name: yup.string().required(),
+  description: yup.string().required(),
+  permissions: yup.number().required(),
+  isPublic: yup.boolean().default(null).nullable(),
+  hasLanding: yup.boolean().default(null).nullable(),
+  endpoint: yup.string().default(null).nullable(),
+  // TODO: datasetGroup
+});
+
+const setPutSchema = setPostSchema.shape({
+  id: yup.string().uuid().required(),
+});
+
+export const setSubmitSchemas = {
+  create: setPostSchema,
+  update: setPutSchema,
 };

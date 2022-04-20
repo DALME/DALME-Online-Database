@@ -384,3 +384,40 @@ export const sourceListSchema = (sourceType) => {
     data: yup.array().of(sourceMap[sourceType]),
   });
 };
+
+// POST/PUT data schemas.
+// Normalizes source form data for output to the API.
+const sourcePostSchema = yup.object().shape({
+  name: yup.string().required(),
+  shortName: yup.string().required(),
+  // hasInventory: yup.object().shape({
+  //   value: yup.boolean().required(),
+  //   label: yup.string().required(),
+  // }),
+  // parent: yup
+  //   .object()
+  //   .shape({
+  //     value: yup.string().uuid().required(),
+  //     label: yup.string().required(),
+  //   })
+  //   .nullable(),
+  // sets: yup.array().of(
+  //   yup.object().shape({
+  //     value: yup.string().uuid().required(),
+  //     label: yup.string().required(),
+  //   }),
+  // ),
+  // agents: normalizeOutputSchema,
+  // attributes,
+  // credits,
+  // pages,
+});
+
+const sourcePutSchema = sourcePostSchema.shape({
+  id: yup.string().uuid().required(),
+});
+
+export const sourceSubmitSchemas = {
+  create: sourcePostSchema,
+  update: sourcePutSchema,
+};

@@ -5,33 +5,40 @@ import {
   AttributesField,
   InputField,
   MultipleSelectField,
+  SelectField,
 } from "@/components/forms";
 import {
   attributeValidators,
-  archiveEditSchema,
-  archiveFieldValidation,
+  archivalFileEditSchema,
+  archivalFileFieldValidation,
   setOptionsSchema,
+  sourceOptionsSchema,
   sourceSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = [
-  "defaultRights",
-  "email",
+  "authority",
+  "format",
+  "support",
+  "archivalNumber",
+  "archivalSeries",
+  "isPrivate",
   "locale",
-  "streetAddress",
-  "urlAttribute",
+  "owner",
+  "startDate",
+  "endDate",
 ];
 
-const requiredAttributes = ["locale"];
+const requiredAttributes = ["authority", "format", "support"];
 
-const archiveFormSchema = {
+const archivalFileFormSchema = {
   name: {
     field: "name",
     component: markRaw(InputField),
     label: "Name *",
     description:
       "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
-    validation: archiveFieldValidation.name,
+    validation: archivalFileFieldValidation.name,
   },
   shortName: {
     field: "shortName",
@@ -39,7 +46,32 @@ const archiveFormSchema = {
     label: "Short name *",
     description:
       "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
-    validation: archiveFieldValidation.shortName,
+    validation: archivalFileFieldValidation.shortName,
+  },
+  parent: {
+    field: "parent",
+    component: markRaw(SelectField),
+    label: "Parent",
+    description:
+      "Parent record, if applicable, eg: a book for a book chapter, an archival unit for a record, etc.",
+    getOptions: () =>
+      fetcher(requests.sources.getSourceOptionsByType("archivalFile")).then(
+        (response) => response.json(),
+      ),
+    optionsSchema: sourceOptionsSchema,
+    validation: archivalFileFieldValidation.parent,
+  },
+  primaryDataset: {
+    field: "primaryDataset",
+    component: markRaw(SelectField),
+    label: "Primary dataset",
+    description: "Dataset used to assign permissions.",
+    getOptions: () =>
+      fetcher(requests.sets.getSetsByType("dataset")).then((response) =>
+        response.json(),
+      ),
+    optionsSchema: setOptionsSchema,
+    validation: archivalFileFieldValidation.primaryDataset,
   },
   sets: {
     field: "sets",
@@ -49,7 +81,7 @@ const archiveFormSchema = {
     getOptions: () =>
       fetcher(requests.sets.getSets()).then((response) => response.json()),
     optionsSchema: setOptionsSchema,
-    validation: archiveFieldValidation.sets,
+    validation: archivalFileFieldValidation.sets,
   },
   attributes: {
     field: "attributes",
@@ -58,11 +90,11 @@ const archiveFormSchema = {
     allowed: resourceAttributes,
     required: requiredAttributes,
     validators: attributeValidators,
-    validation: archiveFieldValidation.attributes,
+    validation: archivalFileFieldValidation.attributes,
   },
 };
 
-const archiveRequests = {
+const archivalFileRequests = {
   get: (id) => requests.sources.getSource(id),
   // TODO: Need to include type in here or somewhere else.
   create: (data) => requests.sources.createSource(data),
@@ -70,8 +102,8 @@ const archiveRequests = {
 };
 
 export default {
-  edit: archiveEditSchema,
-  form: archiveFormSchema,
-  requests: archiveRequests,
+  edit: archivalFileEditSchema,
+  form: archivalFileFormSchema,
+  requests: archivalFileRequests,
   submit: sourceSubmitSchemas,
 };

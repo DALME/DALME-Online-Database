@@ -3,7 +3,7 @@
     fab
     icon="edit"
     text-color="black"
-    :color="!isDetail ? 'grey' : 'amber'"
+    :color="underEdit ? 'amber-2' : 'amber'"
     :disable="!isDetail"
     :loading="loading"
     :onclick="handleClick"
@@ -46,6 +46,7 @@ export default defineComponent({
 
     const id = computed(() => $route.params.id);
     const key = computed(() => `form-${resource.value}-${id.value}`);
+    const underEdit = computed(() => !isNil(editingIndex.value[key.value]));
 
     const spawnForm = (initialData) =>
       send("SPAWN_FORM", {
@@ -59,7 +60,7 @@ export default defineComponent({
     // NOTE: This is not very pleasing on the eye.
     const handleClick = async () => {
       const indexed = editingIndex.value[key.value];
-      if (!isNil(indexed)) {
+      if (underEdit.value) {
         const { send: actorSend } = useActor(modals.value[indexed.cuid].actor);
         send("SET_FOCUS", { value: indexed.cuid });
         actorSend("SHOW");
@@ -108,6 +109,7 @@ export default defineComponent({
     };
 
     return {
+      underEdit,
       handleClick,
       isDetail,
       loading,

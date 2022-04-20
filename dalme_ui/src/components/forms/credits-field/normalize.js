@@ -40,7 +40,7 @@ export const creditsNormalizeInputSchema = yup.array().of(
     })),
 );
 
-export const creditsNormalizeOutputSchema = yup
+export const normalizeOutputSchema = yup
   .array()
   .nullable()
   .compact((value) => value === empty())

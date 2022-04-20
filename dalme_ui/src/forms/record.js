@@ -18,11 +18,28 @@ import {
   folioValidators,
   recordEditSchema,
   recordFieldValidation,
-  recordPostSchema,
-  recordPutSchema,
   setOptionsSchema,
   sourceOptionsSchema,
+  sourceSubmitSchemas,
 } from "@/schemas";
+
+const resourceAttributes = [
+  "date",
+  "description",
+  "endDate",
+  "helpFlag",
+  "isPrivate",
+  "isPublic",
+  "language",
+  "locale",
+  "namedPersons",
+  "owner",
+  "recordType",
+  "startDate",
+  "status",
+];
+
+const requiredAttributes = ["language", "recordType"];
 
 const recordFormSchema = {
   name: {
@@ -55,7 +72,7 @@ const recordFormSchema = {
     description:
       "Parent record, if applicable, eg: a book for a book chapter, an archival unit for a record, etc.",
     getOptions: () =>
-      fetcher(requests.sources.getSourceOptionsByType("records")).then(
+      fetcher(requests.sources.getSourceOptionsByType("record")).then(
         (response) => response.json(),
       ),
     optionsSchema: sourceOptionsSchema,
@@ -74,9 +91,9 @@ const recordFormSchema = {
   attributes: {
     field: "attributes",
     component: markRaw(AttributesField),
-    description: "The characteristics of the source.",
-    required: ["recordType", "language"],
-    // TODO: Constrain by source/set type here.
+    description: "Required and optional attributes of this source type.",
+    allowed: resourceAttributes,
+    required: requiredAttributes,
     validators: attributeValidators,
     validation: recordFieldValidation.attributes,
   },
@@ -103,22 +120,15 @@ const recordFormSchema = {
   },
 };
 
-const recordSubmitSchemas = {
-  create: recordPostSchema,
-  update: recordPutSchema,
-};
-
 const recordRequests = {
   get: (id) => requests.sources.getSource(id),
   create: (data) => requests.sources.createSource(data),
-  update: ({ id, ...data }) => {
-    requests.sources.editSource(id, data);
-  },
+  update: ({ id, ...data }) => requests.sources.editSource(id, data),
 };
 
 export default {
   edit: recordEditSchema,
   form: recordFormSchema,
   requests: recordRequests,
-  submit: recordSubmitSchemas,
+  submit: sourceSubmitSchemas,
 };

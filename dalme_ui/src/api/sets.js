@@ -13,7 +13,10 @@ const sets = {
     return new Request(endpoint);
   },
   getSetsByType(setType, query) {
-    const url = `${endpoint}/?set_type=${setType}&${query}`;
+    let url = `${endpoint}/?set_type=${setType}`;
+    if (query) {
+      url = `${url}&${query}`;
+    }
     return new Request(url);
   },
   getSetMembers(id, query) {

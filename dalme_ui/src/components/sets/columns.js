@@ -3,7 +3,7 @@ const collections = {
   memberCount: "Members",
   description: "Description",
   isPublic: "Public",
-  hasLanding: "Landing",
+  hasLanding: "Has landing",
   owner: "Owner",
   permissions: "Permissions",
 };

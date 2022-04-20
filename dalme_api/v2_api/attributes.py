@@ -60,6 +60,10 @@ class Attributes(api.Attributes):
                 {'label': obj.name, 'value': obj.id}
                 for obj in RightsPolicy.objects.all().order_by('name')
             ],
+            'endpoint': [
+                {'label': 'Images', 'value': 'images'},
+                {'label': 'Sources', 'value': 'sources'},
+            ],
             'format': [
                 {'label': 'Charter', 'value': 'Charter'},
                 {'label': 'Register - demi-quarto', 'value': 'Register - demi-quarto'},

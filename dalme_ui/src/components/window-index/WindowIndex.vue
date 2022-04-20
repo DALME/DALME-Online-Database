@@ -34,6 +34,7 @@
               <code>{{ cuid }}</code>
             </span>
           </div>
+
           <div class="row text-subtitle1 text-capitalize text-bold q-mt-xs">
             <div>
               {{ actor.context.mode }}
