@@ -150,7 +150,7 @@
                       {% for row in members %}
                         <tr>
                           <td>{{ row.object_id }}</td>
-                          <td>{{ row.content_object.name }}</td>
+                          <td><a href="/sources/{{ row.object_id }}/">{{ row.content_object.name }}</a></td>
                         </tr>
                       {% endfor %}
                     </tbody>
