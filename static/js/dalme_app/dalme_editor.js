@@ -67,6 +67,7 @@ function startEditor() {
             });
             $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
             $('#author').html('Transcribed by '+data.author);
+            setupTeiRendering()
           });
       };
       $('.panel-top').resizable({
@@ -148,6 +149,7 @@ function changeEditorMode() {
         tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
             $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
         });
+        setupTeiRendering()
       } else {
         $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
         $('#editor').html('No transcription available');
@@ -204,6 +206,7 @@ function changeEditorFolio(target) {
                 $('#editor').html(text);
             });
             $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+            setupTeiRendering()
         } else if (editor_mode == 'xml') {
             saveEditor();
             xmleditor.session.setValue(tr_text);
@@ -547,6 +550,14 @@ function addTag(type, tag, att_array) {
     }
 }
 
+function setupTeiRendering() {
+  if ($('tei-seg[type=brace]').length) { formatBraces(); }
+  if ($('tei-note[type=marginal]').length) { formatMarginalNotes(); }
+  if ($('tei-ref[target]').length) { formatRenvois(); }
+  if ($('tei-ab[type=column]').length) { formatColumns(); }
+  if ($('tei-metamark[function=leader]').length) { formatLeaders(); }
+  $('[data-toggle="tooltip"]').tooltip();
+}
 
 /***** Utility functions *********/
 function setKeybindings() {
@@ -620,6 +631,95 @@ function saveDescription() {
       });
     }
   }
+}
+
+function formatBraces() {
+  $('tei-seg[type=brace]').each(function(index, el) {
+    let target = $(this).attr('target');
+    if (target) {
+      if (target.length > 1 && target.startsWith('#')) target = target.substring(1);
+      $(this).append($(`tei-note#${target}`).remove());
+    }
+  });
+}
+
+function formatMarginalNotes() {
+  $('tei-note[type=marginal]').each(function(index, el) {
+    let margin_top = Math.round($(this).position().top);
+    let note = $(this).remove();
+    $(note).css({ top: `${margin_top}px`});
+    $('.notes_container').append(note);
+  });
+  $('.notes_container').height($('tei-text').height());
+  $('#transcription').on('scroll', function (e) {
+    $('#notebar').scrollTop($(this).scrollTop());
+  });
+  $('#notebar').on('scroll wheel', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  });
+}
+
+function formatColumns() {
+  $(document).on('click', '.ab-column-toggler', (e) => {
+      const parent = e.target.closest('tei-ab');
+      parent.classList.toggle('closed');
+  });
+}
+
+function formatLeaders() {
+  let container_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
+  $('tei-metamark[function=leader]').each(function(index, el) {
+    let sum = 0;
+    let prev_array = [];
+    let next_array = [];
+    let prevSibs = $(this).prevUntil('tei-lb');
+    let prevChild = $(this).prevUntil('*:has(tei-lb)');
+    let nextSibs = $(this).nextUntil('tei-lb');
+    let nextChild = $(this).nextUntil('*:has(tei-lb)');
+    if (prevChild.length < prevSibs.length) {
+      let prev_el = prevChild.length ? prevChild : this;
+      prev_array = $.merge(prevChild, $(prev_el).prev().children().nextUntil('tei-lb'));
+    } else {
+      prev_array = prevSibs;
+    }
+    if (nextChild.length < nextSibs.length) {
+      let next_el = nextChild.length ? nextChild : this;
+      next_array = $.merge(nextChild, $(next_el).next().children().nextUntil('tei-lb'));
+    } else {
+      next_array = nextSibs;
+    }
+    const line_el = $.merge(prev_array, next_array)
+    line_el.each(function(i, elt) { sum += $(this).innerWidth(); });
+    const container_column = $(this).parents('.ab-content');
+    if (container_column.length) {
+      let column_width = container_column.attr('width');
+      if (typeof column_width === typeof undefined || column_width === false) {
+        container_column.attr('width', container_column.innerWidth());
+      }
+      container_width = container_column.attr('width');
+    }
+    let target_width = container_width - sum - 15;
+    target_width = target_width > 10 ? target_width : 10;
+    $(this).width(target_width);
+  });
+}
+
+function formatRenvois() {
+  $('tei-ref[target]').each( function(index, el) {
+    let note_id = $(this).attr('target');
+    if (note_id.length > 1 && note_id.startsWith('#')) note_id = note_id.substring(1);
+    note = $(`tei-note[id='${note_id}']`)
+    if (note.length) {
+      $(this).attr({
+        title: note.html(),
+        'data-toggle': 'tooltip',
+        'data-html': true,
+        'data-template': '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
+      })
+    }
+  })
 }
 
 // function create_named_entity() {
