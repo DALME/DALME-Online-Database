@@ -153,9 +153,29 @@ tei-item > tei-list {
 tei-abbr {
 
 }
-tei-add {
-  font-style: italic;
+tei-add[place="above"] {
+  vertical-align: super;
+  line-height: 90%;
 }
+tei-add[place="below"] {
+  vertical-align: sub;
+  line-height: 90%;
+}
+tei-add[place="below"]:before,
+tei-add[place="below"]:after {
+  content: "\21a7";
+  font-family: 'FontAwesome';
+  font-size: 18px;
+  color: #aaa;
+}
+tei-add[place="above"]:before,
+tei-add[place="above"]:after {
+  content: "\21a5";
+  font-family: 'FontAwesome';
+  font-size: 18px;
+  color: #aaa;
+}
+
 /* tei-add:before {
   content: "»";
 }
