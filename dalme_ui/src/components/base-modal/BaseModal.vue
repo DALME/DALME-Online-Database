@@ -10,41 +10,47 @@
       v-ripple:blue-1
     >
       <q-card
-        class="modal-card q-px-md q-pt-none q-pb-md"
+        class="modal-card q-pt-none q-pb-md"
         :class="{
           focussed: cuid === focus,
           pulse: valid && mouseoverSubmit && cuid === focus,
         }"
       >
-        <q-card-section class="q-px-none q-pt-sm">
-          <div class="row no-wrap flex-center q-pb-sm">
-            <span class="text-caption text-grey">
-              <code>{{ cuid }}</code>
-            </span>
-            <q-btn
-              round
-              class="q-ml-auto"
-              icon="minimize"
-              size="xs"
-              @click.stop="handleMinimize"
-            >
-              <Tooltip> Minimize </Tooltip>
-            </q-btn>
-            <q-btn
-              round
-              class="q-ml-xs"
-              color="deep-orange"
-              icon="close"
-              size="xs"
-              @click.stop="confirm = true"
-            >
-              <Tooltip> Discard </Tooltip>
-            </q-btn>
-          </div>
-          <div class="text-h5 text-capitalize text-bold">
-            <slot name="title"></slot>
-          </div>
+        <q-card-section
+          class="header bg-grey-2 q-py-sm q-px-md row no-wrap flex-center"
+          :class="isFocus ? 'z-max' : 'z-top'"
+        >
+          <span class="text-caption text-grey-8">
+            <code>{{ cuid }}</code>
+          </span>
+
+          <q-btn
+            round
+            class="q-ml-auto"
+            color="white"
+            text-color="black"
+            icon="minimize"
+            size="xs"
+            @click.stop="handleMinimize"
+          >
+            <Tooltip> Minimize </Tooltip>
+          </q-btn>
+
+          <q-btn
+            round
+            class="q-ml-xs"
+            color="deep-orange"
+            icon="close"
+            size="xs"
+            @click.stop="confirm = true"
+          >
+            <Tooltip> Discard </Tooltip>
+          </q-btn>
         </q-card-section>
+
+        <div class="text-h5 text-capitalize text-bold q-pt-sm q-px-md">
+          <slot name="title"></slot>
+        </div>
 
         <slot name="content"></slot>
       </q-card>
@@ -163,9 +169,14 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .focussed {
-  border-radius: 0;
   border-left: 4px solid green;
   transition: border 0.05s linear;
+}
+.header {
+  border-bottom: 1px solid #e0e0e0;
+  opacity: 1;
+  position: sticky;
+  top: 0;
 }
 .pulse {
   border-left: 8px solid red;
@@ -179,8 +190,9 @@ export default defineComponent({
   will-change: auto !important;
 }
 .modal-card {
+  border-radius: 0 !important;
   max-height: calc(100vh - 8rem);
-  overflow-y: scroll;
+  overflow-y: auto;
   scroll-snap-type: y proximity;
 }
 </style>

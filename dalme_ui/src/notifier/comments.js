@@ -5,14 +5,14 @@ const auth = {
     Notify.create({
       color: "green",
       message: "Comment added",
-      position: "top",
+      position: "bottom-right",
       icon: "speaker_notes",
     }),
   commentFailed: () =>
     Notify.create({
       color: "red",
       message: "Comment not added",
-      position: "top",
+      position: "bottom-right",
       icon: "speaker_notes_off",
     }),
 };

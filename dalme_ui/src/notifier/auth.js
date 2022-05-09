@@ -5,21 +5,21 @@ const auth = {
     Notify.create({
       color: "red",
       message: "Authentication failed",
-      position: "top",
+      position: "bottom-right",
       icon: "block",
     }),
   logout: () =>
     Notify.create({
       color: "green",
       message: "Logging out",
-      position: "top",
+      position: "bottom-right",
       icon: "exit_to_app",
     }),
   reauthenticated: () =>
     Notify.create({
       color: "green",
       message: "Reauthenticated",
-      position: "top",
+      position: "bottom-right",
       icon: "lock_open",
     }),
 };

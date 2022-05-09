@@ -4,7 +4,7 @@
     icon="edit"
     text-color="black"
     :color="underEdit ? 'amber-2' : 'amber'"
-    :disable="!isDetail"
+    :disable="!isDetail || underEdit"
     :loading="loading"
     :onclick="handleClick"
   >

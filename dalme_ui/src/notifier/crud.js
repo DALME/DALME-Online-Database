@@ -4,14 +4,14 @@ const CRUD = {
   success: (message) =>
     Notify.create({
       color: "green",
-      position: "top",
+      position: "bottom-right",
       icon: "speaker_notes",
       message,
     }),
   failure: (message) =>
     Notify.create({
       color: "red",
-      position: "top",
+      position: "bottom-right",
       icon: "speaker_notes_off",
       message,
     }),

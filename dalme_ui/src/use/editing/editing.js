@@ -59,7 +59,7 @@ export const provideEditing = () => {
           hide: assign({ visible: false }),
           show: assign({ visible: true }),
           notifyFailure: (context) =>
-            notifier.CRUD.failure(`Could not create ${context.kind}`),
+            notifier.CRUD.failure(`Could not save ${context.kind}`),
           notifySuccess: (context) =>
             notifier.CRUD.success(`${context.kind} saved`),
           validate: assign({

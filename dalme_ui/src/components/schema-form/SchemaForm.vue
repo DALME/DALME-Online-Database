@@ -1,5 +1,5 @@
 <template>
-  <q-form>
+  <q-form class="q-px-md">
     <SchemaForm :schema="schema" useCustomFormWrapper />
   </q-form>
 </template>

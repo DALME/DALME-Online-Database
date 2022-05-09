@@ -6,14 +6,14 @@ const tickets = {
       color: "green",
       message: "Ticket status updated",
       icon: "done",
-      position: "top",
+      position: "bottom-right",
     }),
   ticketStatusUpdatedError: () =>
     Notify.create({
       color: "red",
       message: "Ticket status update failed",
       icon: "cancel",
-      position: "top",
+      position: "bottom-right",
     }),
 };
 
