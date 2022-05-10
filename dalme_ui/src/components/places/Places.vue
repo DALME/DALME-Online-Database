@@ -1,49 +1,26 @@
 <template>
   <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-table
-        :title="title"
-        :rows="rows"
-        :columns="columns"
-        :no-data-label="noData"
-        :filter="filter"
-        :pagination="pagination"
-        :title-class="{ 'text-h6': true }"
-        :loading="loading"
-        row-key="id"
-      >
-        <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
-
-        <template v-slot:body-cell-locale="props">
-          <q-td :props="props">
-            <template v-if="props.value">
-              {{ getLocale(props.value) }}
-            </template>
-          </q-td>
-        </template>
-      </q-table>
-    </q-card>
+    <Table
+      :title="title"
+      :columns="columns"
+      :editable="editable"
+      :loading="loading"
+      :filter="filter"
+      :schema="schema"
+      :no-data-label="noData"
+      :fetch-data="fetchData"
+      :updateRequest="updateRequest"
+    />
     <OpaqueSpinner :showing="loading" />
   </div>
 </template>
 
 <script>
 import { map, keys } from "ramda";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, provide, ref } from "vue";
 
 import { requests } from "@/api";
+import { Table } from "@/components";
 import { OpaqueSpinner } from "@/components/utils";
 import { useAPI } from "@/use";
 import { placeListSchema } from "@/schemas";
@@ -58,6 +35,7 @@ export default defineComponent({
   name: "Places",
   components: {
     OpaqueSpinner,
+    Table,
   },
   setup() {
     const { apiInterface } = useAPI();
@@ -67,10 +45,13 @@ export default defineComponent({
     const rows = ref([]);
     const filter = ref("");
 
+    const updateRequest = requests.places.inlineUpdate;
+    const editable = ["notes"];
+
+    provide("rows", rows);
+
     const noData = "No places found.";
     const title = "Places";
-    const rowsPerPage = 25;
-    const pagination = { rowsPerPage };
 
     const getColumns = () => {
       const toColumn = (key) => ({
@@ -82,9 +63,6 @@ export default defineComponent({
       });
       return map(toColumn, keys(columnMap));
     };
-
-    const getLocale = (value) =>
-      `${value.name}, ${value.administrativeRegion}, ${value.country}`;
 
     const fetchData = async () => {
       const request = requests.places.getPlaces();
@@ -103,20 +81,15 @@ export default defineComponent({
 
     return {
       columns,
+      editable,
+      fetchData,
       filter,
-      getLocale,
       loading,
       noData,
-      pagination,
-      rows,
       title,
+      updateRequest,
+      schema: placeListSchema,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.q-table tbody td {
-  white-space: normal;
-}
-</style>

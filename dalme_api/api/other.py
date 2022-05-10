@@ -1,8 +1,5 @@
 from django.contrib.auth.models import Group
 
-from rest_framework.decorators import action
-from rest_framework.response import Response
-
 from dalme_api.access_policies import (
     AgentAccessPolicy,
     GeneralAccessPolicy,
@@ -113,39 +110,6 @@ class Locales(DALMEBaseViewSet):
     search_fields = ['id', 'name', 'administrative_region', 'country__name']
     ordering_fields = ['id', 'name', 'administrative_region', 'country', 'latitude', 'longitude']
     ordering = ['name']
-
-    # TODO: Make this generic on DALMEBaseViewSet.
-    # TODO: We can remove this one when we are finished.
-    @action(detail=False, methods=['patch'])
-    def update_locales(self, request, *args, **kwargs):
-        pks = [str(pk) for pk in request.data.keys()]
-        for pk in pks:
-            obj = self.queryset.filter(pk=pk)
-            obj_data = request.data[pk]
-
-            # TODO: Temporary until sorting out id/objId POST/PUT via frontend.
-            from stringcase import snakecase
-
-            # Update fields.
-            fields = {
-                snakecase(field): value for field, value in obj_data.items()
-                if not isinstance(value, dict)
-            }
-            obj.update(**fields)
-
-            # Update foreign keys.
-            related = {
-                snakecase(fk_field): value for fk_field, value in obj_data.items()
-                if snakecase(fk_field) not in fields
-            }
-            for fk_field, value in related.items():
-                RelatedModel = LocaleReference._meta.get_field(fk_field).rel.to
-                instance = RelatedModel.objects.get(pk=value.id)
-                obj.update(fk_field=instance)
-
-        return Response(
-            {'message': f'Updated {len(pks)} rows.'}, 201
-        )
 
 
 class Places(DALMEBaseViewSet):

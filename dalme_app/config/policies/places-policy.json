@@ -15,7 +15,7 @@
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy"],
+    "action": ["create", "partial_update", "update", "destroy", "inline_update"],
     "principal": ["group:Administrators"],
     "effect": "allow"
   }

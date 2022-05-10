@@ -1,13 +1,14 @@
 import { apiUrl, headers } from "./config";
 
 const endpoint = `${apiUrl}/places`;
+const v2Endpoint = `${apiUrl}/v2/places`;
 
 const places = {
   getPlaces() {
     return new Request(endpoint);
   },
-  updatePlaces(data) {
-    const url = `${endpoint}/update_places/`;
+  inlineUpdate(data) {
+    const url = `${v2Endpoint}/inline_update/`;
     return new Request(url, {
       method: "PATCH",
       headers: headers(),

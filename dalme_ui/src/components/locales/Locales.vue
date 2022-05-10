@@ -45,10 +45,10 @@ export default defineComponent({
     const rows = ref([]);
     const filter = ref("");
 
+    provide("rows", rows);
+
     const noData = "No locales found.";
     const title = "Locales";
-
-    provide("rows", rows);
 
     const getColumns = () => {
       const toColumn = (key) => ({
@@ -81,7 +81,6 @@ export default defineComponent({
       filter,
       loading,
       noData,
-      rows,
       title,
       fetchData,
       schema: localeListSchema,
@@ -89,9 +88,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.q-table tbody td {
-  white-space: normal;
-}
-</style>

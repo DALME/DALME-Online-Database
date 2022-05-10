@@ -10,7 +10,7 @@
     "effect": "allow"
   },
   {
-    "action": ["create", "partial_update", "update", "destroy", "update_locales"],
+    "action": ["create", "partial_update", "update", "destroy"],
     "principal": ["group:Administrators"],
     "effect": "allow"
   }

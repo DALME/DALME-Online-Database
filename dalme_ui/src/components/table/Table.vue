@@ -30,8 +30,8 @@
             :style="{
               borderBottom:
                 isAdmin && editable.includes(column.name)
-                  ? '2px solid green'
-                  : 'none',
+                  ? '3px solid green'
+                  : '1px solid grey-1',
             }"
           >
             {{ column.label }}
@@ -239,7 +239,11 @@ export default defineComponent({
       number: [
         { check: (val) => !isNumber(val), error: "Input must be a number." },
       ],
-      string: [{ check: (val) => val.length === 0, error: "Enter a value." }],
+      // TODO: Disabled this check so the place.notes field can be nulled
+      // (which is the only inline editable field currently in use). We need to
+      // develop a better, nullable solution for this system, but it's not in
+      // budget right now.
+      // string: [{ check: (val) => val.length === 0, error: "Enter a value." }],
     };
 
     const clearError = () => {

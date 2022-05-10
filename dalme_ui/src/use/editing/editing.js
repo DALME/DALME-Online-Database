@@ -258,7 +258,15 @@ export const provideEditing = () => {
         }),
       },
       guards: {
-        saveable: (context) => context.modals[context.focus].kind !== "folio",
+        saveable: (context) => {
+          if (isNil(context.focus)) {
+            return false;
+          }
+          if (context.focus === "inline") {
+            return true;
+          }
+          return context.modals[context.focus].kind === "folio" ? true : false;
+        },
         canSpawn: (context) => keys(context.modals).length < context.maxModals,
         hasModals: (context) => keys(context.modals).length > 0,
         noInline: (context) => isNil(context.inline),
