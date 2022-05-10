@@ -33,7 +33,7 @@ passlib==1.7.3
 pycurl==7.43.0.5
 requests==2.26.0
 requests-aws4auth==1.0.1
-urllib3==1.26.7
+urllib3==1.25.10
 wagtail==2.13.2
 stringcase==1.2.0
 wagtail-modelchooser==2.3.3
