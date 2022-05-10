@@ -5,12 +5,9 @@
       :columns="columns"
       :loading="loading"
       :filter="filter"
-      :editable="editable"
       :schema="schema"
       :no-data-label="noData"
       :fetch-data="fetchData"
-      :update-request="request"
-      :field-validation="fieldValidation"
     />
     <OpaqueSpinner :showing="loading" />
   </div>
@@ -50,8 +47,6 @@ export default defineComponent({
 
     const noData = "No locales found.";
     const title = "Locales";
-    const request = requests.locales.updateLocales;
-    const editable = ["name", "longitude", "latitude"];
 
     provide("rows", rows);
 
@@ -64,13 +59,6 @@ export default defineComponent({
         sortable: true,
       });
       return map(toColumn, keys(columnMap));
-    };
-
-    const fieldValidation = {
-      name: [
-        { check: (val) => val.includes("zzz"), error: "No snoozing!" },
-        { check: (val) => val.includes("ZZZ"), error: "No snoring!" },
-      ],
     };
 
     const fetchData = async () => {
@@ -90,15 +78,12 @@ export default defineComponent({
 
     return {
       columns,
-      editable,
       filter,
       loading,
       noData,
       rows,
       title,
-      request,
       fetchData,
-      fieldValidation,
       schema: localeListSchema,
     };
   },

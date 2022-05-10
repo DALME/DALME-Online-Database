@@ -155,7 +155,7 @@ export default defineComponent({
     // Static.
     editable: {
       type: Array,
-      required: true,
+      default: () => [],
     },
     noDataLabel: {
       type: String,
@@ -179,7 +179,7 @@ export default defineComponent({
     },
     updateRequest: {
       type: Function,
-      required: true,
+      required: false,
     },
   },
   setup(props) {
@@ -208,12 +208,11 @@ export default defineComponent({
 
     const rows = inject("rows");
 
-    const filter = ref("");
-
     // We can only open one inline popup at a time when doing editing, so we
-    // can share these, no need for any scoping/duplicates/so forth.
+    // can share these, no need for any scoping/duplication etc.
     const editError = ref(false);
     const editErrorMessage = ref("");
+    const filter = ref("");
 
     const isNumber = (val) => !isNaN(parseFloat(val)) && isFinite(val);
     const isObj = (obj) => {
@@ -226,6 +225,16 @@ export default defineComponent({
       props.schema.innerType.fields,
     );
 
+    // The generic validation will be applied to all editable columns but
+    // if you need further checks then provide the fieldValidation prop using
+    // the same format and they will be picked up in turn. For example, in some
+    // component that called Table.vue:
+    //   const fieldValidation = {
+    //     fieldName: [
+    //       { check: (val) => val.includes("zzz"), error: "No snoozing!" },
+    //       { check: (val) => val.includes("ZZZ"), error: "No snoring!" },
+    //     ],
+    //   };
     const genericValidation = {
       number: [
         { check: (val) => !isNumber(val), error: "Input must be a number." },
