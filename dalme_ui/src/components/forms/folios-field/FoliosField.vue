@@ -106,8 +106,40 @@
                 unelevated
                 size="xs"
                 icon="clear"
-                @click.stop="handleRemoveField(idx)"
-              />
+                @click.stop="confirm = true"
+              >
+                <q-dialog v-model="confirm" persistent class="z-max">
+                  <q-card>
+                    <q-card-section class="row items-center">
+                      <q-avatar
+                        icon="warning"
+                        color="red"
+                        text-color="white"
+                        size="sm"
+                      />
+                      <span class="q-ml-sm">
+                        Are you sure you want to remove this folio?
+                      </span>
+                    </q-card-section>
+
+                    <q-card-actions align="right">
+                      <q-btn
+                        flat
+                        label="Cancel"
+                        color="primary"
+                        v-close-popup
+                      />
+                      <q-btn
+                        flat
+                        label="Remove"
+                        color="red"
+                        v-close-popup
+                        @click.stop="handleRemoveField(idx)"
+                      />
+                    </q-card-actions>
+                  </q-card>
+                </q-dialog>
+              </q-btn>
             </div>
           </div>
         </template>
@@ -172,6 +204,7 @@ export default defineComponent({
     } = useEditing();
     const { fields, replace } = useFieldArray("folios");
 
+    const confirm = ref(false);
     const loading = ref(false);
     const showing = ref(!props.modelValue.length > 0);
 
@@ -185,6 +218,7 @@ export default defineComponent({
       newValue.splice(idx, 1);
       replace(newValue);
       context.emit("update:modelValue", newValue);
+      confirm.value = false;
     };
     const handleDrag = (idx) => {
       // TODO: Implement dragging re-order.
@@ -236,6 +270,7 @@ export default defineComponent({
     });
 
     return {
+      confirm,
       empty,
       fields,
       filterImageOptions,
