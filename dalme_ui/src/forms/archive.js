@@ -1,16 +1,11 @@
 import { markRaw } from "vue";
 
-import { fetcher, requests } from "@/api";
-import {
-  AttributesField,
-  InputField,
-  MultipleSelectField,
-} from "@/components/forms";
+import { requests } from "@/api";
+import { AttributesField, InputField } from "@/components/forms";
 import {
   attributeValidators,
   archiveEditSchema,
   archiveFieldValidation,
-  setOptionsSchema,
   sourceSubmitSchemas,
 } from "@/schemas";
 
@@ -19,7 +14,7 @@ const resourceAttributes = [
   "email",
   "locale",
   "streetAddress",
-  "urlAttribute",
+  "url",
 ];
 
 const requiredAttributes = ["locale"];
@@ -40,16 +35,6 @@ const archiveFormSchema = {
     description:
       "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
     validation: archiveFieldValidation.shortName,
-  },
-  sets: {
-    field: "sets",
-    component: markRaw(MultipleSelectField),
-    label: "Sets",
-    description: "The sets of which the source a member.",
-    getOptions: () =>
-      fetcher(requests.sets.getSets()).then((response) => response.json()),
-    optionsSchema: setOptionsSchema,
-    validation: archiveFieldValidation.sets,
   },
   attributes: {
     field: "attributes",

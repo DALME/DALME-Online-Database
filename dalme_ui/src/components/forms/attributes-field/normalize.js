@@ -5,6 +5,10 @@ import { attributeValidators } from "@/schemas";
 export const empty = () => ({ attribute: null, value: null });
 
 // Transform initial attributes data to the correct shape expected by the form.
+// NOTE: I've tried to capture the most general patterns here but due to
+// disrepancies in the API/serializing I've had to add case-by-case transforms
+// to certain editSchemas to shim around data issues. Hopefully future dev will
+// ameliorate these complexities and we will be able to delete plentifully.
 export const normalizeAttributesInput = (attributeTypes, attributes) => {
   const normalized = attributeTypes.map((attributeType) => {
     const data = attributes[attributeType.shortName];
@@ -32,9 +36,25 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
           };
         }
 
-        // It's just a select value, but it comes down from the API wrapped in a
-        // list so we need to unpack it and the id comes wrapped in a
-        // stringified JSON object so we also need to parse that before access.
+        // It just needs to be transformed into a value/label payload while
+        // parsing the JSONified ID field.
+        if (data.hasOwnProperty("id") && data.hasOwnProperty("name")) {
+          try {
+            return {
+              attribute: attributeType,
+              value: { value: JSON.parse(data.id).id, label: data.name },
+            };
+          } catch {
+            return {
+              attribute: attributeType,
+              value: { value: data.id, label: data.name },
+            };
+          }
+        }
+
+        // It just needs to be transformed into a value/label payload, but it
+        // comes down from the API wrapped in a list so we need to unpack it
+        // and parse the JSONified ID field.
         if (Array.isArray(data)) {
           const { name, id } = data[0];
           return {

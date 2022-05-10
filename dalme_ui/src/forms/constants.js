@@ -22,7 +22,7 @@ export const usedAttributes = [
   "status",
   "streetAddress",
   "support",
-  "urlAttribute",
+  "url",
   "zoteroKey",
 ];
 

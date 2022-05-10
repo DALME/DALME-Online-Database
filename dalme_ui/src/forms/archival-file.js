@@ -1,12 +1,7 @@
 import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
-import {
-  AttributesField,
-  InputField,
-  MultipleSelectField,
-  SelectField,
-} from "@/components/forms";
+import { AttributesField, InputField, SelectField } from "@/components/forms";
 import {
   attributeValidators,
   archivalFileEditSchema,
@@ -72,16 +67,6 @@ const archivalFileFormSchema = {
       ),
     optionsSchema: setOptionsSchema,
     validation: archivalFileFieldValidation.primaryDataset,
-  },
-  sets: {
-    field: "sets",
-    component: markRaw(MultipleSelectField),
-    label: "Sets",
-    description: "The sets of which the source a member.",
-    getOptions: () =>
-      fetcher(requests.sets.getSets()).then((response) => response.json()),
-    optionsSchema: setOptionsSchema,
-    validation: archivalFileFieldValidation.sets,
   },
   attributes: {
     field: "attributes",

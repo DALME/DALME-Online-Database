@@ -28,10 +28,11 @@ export const attributeValidators = {
     .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
     .label("Date"),
   defaultRights: yup
-    .string()
-    .uuid()
+    .object()
+    .shape({ value: yup.string().uuid().required().label("Default rights") })
     .nullable()
     .required()
+    .transform((option) => (isNil(option) ? null : option))
     .label("Default rights"),
   description: yup.string().nullable().required().label("Description"),
   email: yup.string().email().nullable().required().label("Email"),
@@ -81,7 +82,7 @@ export const attributeValidators = {
     .label("Language"),
   locale: yup
     .object()
-    .shape({ value: yup.string().nullable().required().label("Locale") })
+    .shape({ value: yup.number().nullable().required().label("Locale") })
     .nullable()
     .required()
     .transform((option) => (isNil(option) ? null : option))
@@ -116,7 +117,7 @@ export const attributeValidators = {
   status: yup.string().nullable().required().label("Status"),
   streetAddress: yup.string().nullable().required().label("Street address"),
   support: yup.string().nullable().required().label("Support"),
-  urlAttribute: yup.string().url().nullable().required().label("Web address"),
+  url: yup.string().url().nullable().required().label("URL"),
   zoteroKey: yup.string().nullable().required().label("Zotero key"),
 
   // TODO: Temp, remove or move up.

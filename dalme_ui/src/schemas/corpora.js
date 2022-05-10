@@ -43,7 +43,6 @@ export const corpusEditSchema = yup
       isPublic: { value: isPublic, label: isPublic ? "True" : "False" },
       owner: { value: owner.id, label: owner.full_name },
     };
-
     return {
       ...data,
       attributes,
