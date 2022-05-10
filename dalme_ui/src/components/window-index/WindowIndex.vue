@@ -6,15 +6,18 @@
         color="white"
         label="Hide All"
         text-color="black"
+        :disable="disableHideAll"
         @click.stop="hideAll"
       />
       <q-btn
         color="white"
         label="Show All"
         text-color="black"
+        :disable="disableShowAll"
         @click.stop="showAll"
       />
     </div>
+
     <q-list separator>
       <q-item
         clickable
@@ -66,8 +69,8 @@
 </template>
 
 <script>
-import { keys, map as rMap } from "ramda";
-import { defineAsyncComponent, defineComponent, inject, ref, watch } from "vue";
+import { all, keys, map as rMap, none, values } from "ramda";
+import { defineAsyncComponent, defineComponent, inject, ref } from "vue";
 import { useActor } from "@xstate/vue";
 
 import { useEditing } from "@/use";
@@ -88,10 +91,9 @@ export default defineComponent({
       mouseoverSubmit,
       recenter,
       showAll,
-      machine: { send, state },
+      machine: { send, service },
     } = useEditing();
 
-    const actors = ref([]);
     const show = inject("windowIndexShow");
 
     const handleFocus = (cuid) => {
@@ -104,20 +106,25 @@ export default defineComponent({
       recenter.value = cuid;
     };
 
-    watch(
-      () => state.value,
-      (newState) => {
-        show.value = keys(newState.context.modals).length > 0;
-        actors.value = rMap(
-          ({ actor }) => useActor(actor).state,
-          newState.context.modals,
-        );
-      },
-    );
+    const actors = ref([]);
+    const disableHideAll = ref(null);
+    const disableShowAll = ref(null);
+    service.onTransition(({ context: { modals } }) => {
+      show.value = keys(modals).length > 0;
+      // TODO: I'm sure all this can be optimized to only traverse once.
+      actors.value = rMap(({ actor }) => useActor(actor).state, modals);
+      const visibility = values(
+        rMap((actor) => actor.context.visible, actors.value),
+      );
+      disableHideAll.value = none(Boolean)(visibility);
+      disableShowAll.value = all(Boolean)(visibility);
+    });
 
     return {
       actors,
       disabled,
+      disableHideAll,
+      disableShowAll,
       focus,
       handleFocus,
       handleRecenter,
