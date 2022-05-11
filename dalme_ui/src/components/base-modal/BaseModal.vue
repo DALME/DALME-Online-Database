@@ -44,7 +44,7 @@
             size="xs"
             @click.stop="confirm = true"
           >
-            <Tooltip> Discard </Tooltip>
+            <Tooltip> Close </Tooltip>
           </q-btn>
         </q-card-section>
 
@@ -67,7 +67,7 @@
           <q-btn flat label="Cancel" color="primary" v-close-popup />
           <q-btn
             flat
-            label="Discard"
+            label="Close"
             color="primary"
             v-close-popup
             @click.stop="handleClose"
