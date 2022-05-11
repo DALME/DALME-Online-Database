@@ -51,11 +51,15 @@ export const ticketSchema = yup
     status: yup.boolean().required(),
     subject: yup.string().required(),
     description: yup.string().default(null).nullable(),
-    tags: yup
-      .string()
-      .transform((_, originalValue) =>
-        head(originalValue).tag !== "0" ? head(originalValue).tag.trim() : "",
-      ),
+    tags: yup.array().of(
+      yup
+        .object()
+        .shape({
+          tag: yup.string().required(),
+          tagTypeName: yup.string().required(),
+        })
+        .camelCase(),
+    ),
     file: yup.string().default(null).nullable(),
     commentCount: yup
       .number()
@@ -80,12 +84,7 @@ export const ticketSchema = yup
   })
   .camelCase();
 
-export const ticketListSchema = yup.object().shape({
-  count: yup.number().required(),
-  next: yup.string().default(null).nullable(),
-  previous: yup.string().default(null).nullable(),
-  results: yup.array().of(ticketSchema),
-});
+export const ticketListSchema = yup.array().of(ticketSchema);
 
 export const ticketFieldValidation = {
   subject: yup.string().nullable().required().label("Subject"),

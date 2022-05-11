@@ -7,6 +7,7 @@ from .places import Places
 from .sets import Sets
 from .sources import Sources
 from .tasks import Tasks
+from .tickets import Tickets
 
 __all__ = [
     'Agents',
@@ -18,4 +19,5 @@ __all__ = [
     'Sets',
     'Sources',
     'Tasks',
+    'Tickets',
 ]

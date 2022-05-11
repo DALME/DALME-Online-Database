@@ -220,12 +220,12 @@ export default defineComponent({
         await ticketListSchema
           .validate(data.value, { stripUnknown: true })
           .then(async (value) => {
-            if (value.count > 0) {
+            if (value.length > 0) {
               setColumns();
             } else {
               if (props.embedded) showSearch.value = false;
             }
-            rows.value = await resolveAttachments(value.results);
+            rows.value = await resolveAttachments(value);
             loading.value = false;
           });
     };
