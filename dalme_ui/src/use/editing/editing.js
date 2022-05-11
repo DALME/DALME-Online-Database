@@ -265,7 +265,7 @@ export const provideEditing = () => {
           if (context.focus === "inline") {
             return true;
           }
-          return context.modals[context.focus].kind === "folio" ? true : false;
+          return context.modals[context.focus].kind === "form";
         },
         canSpawn: (context) => keys(context.modals).length < context.maxModals,
         hasModals: (context) => keys(context.modals).length > 0,
@@ -366,7 +366,7 @@ export const provideEditing = () => {
     );
 
   // Make sure any relevant data is refreshed when a form is submitted. This
-  // watcher needs to be instantiated on any page that might need to rerender
+  // watcher needs to be instantiated on any page that might need to re-render
   // as a side-effect after some, unspecified CRUD operation occurs that it has
   // no precise knowledge of. Not the most satisfying thing to have to do but
   // probably the simplest for our 'free-floating' editing patterns.

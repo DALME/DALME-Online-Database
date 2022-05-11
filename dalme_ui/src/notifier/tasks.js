@@ -6,21 +6,21 @@ const task = {
       color: "green",
       message: `Task list "${name}" deleted`,
       icon: "done",
-      position: "bottom-right",
+      position: "top-right",
     }),
   taskStatusUpdated: () =>
     Notify.create({
       color: "green",
       message: "Task status updated",
       icon: "done",
-      position: "bottom-right",
+      position: "top-right",
     }),
   taskStatusUpdatedError: () =>
     Notify.create({
       color: "red",
       message: "Task status update failed",
       icon: "cancel",
-      position: "bottom-right",
+      position: "top-right",
     }),
 };
 
