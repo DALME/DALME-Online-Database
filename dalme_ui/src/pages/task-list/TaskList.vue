@@ -45,7 +45,6 @@ export default defineComponent({
     };
 
     postSubmitRefreshWatcher(fetchData);
-
     onMounted(async () => await fetchData());
 
     return {

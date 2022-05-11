@@ -75,7 +75,7 @@ import { useStore } from "vuex";
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
 import { setListSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, useEditing } from "@/use";
 
 const columnMap = {
   name: "Workset",
@@ -96,6 +96,7 @@ export default defineComponent({
   setup() {
     const $store = useStore();
     const { apiInterface } = useAPI();
+    const { postSubmitRefreshWatcher } = useEditing();
 
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
@@ -138,6 +139,7 @@ export default defineComponent({
           });
     };
 
+    postSubmitRefreshWatcher(fetchData);
     onMounted(async () => await fetchData());
 
     return {
