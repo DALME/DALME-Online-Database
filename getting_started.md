@@ -55,8 +55,9 @@ $ docker-compose run dalme.web bash
 ```
 
 Note, due to Chrome recently disallowing its users to manually bypass insecure
-SSL connections, in order to demo the site locally you will need to use Firefox
-as your browser.
+SSL connections, in order to demo the site locally you will either need to use
+Firefox as your browser or know about
+[`thisisunsafe`](https://dev.to/brettimus/this-is-unsafe-and-a-bad-idea-5ej4).
 
 Once running, login to the [new DALME editing
 environment](https://db.127.0.0.1.sslip.io:8000/ui).  You will probably have to
