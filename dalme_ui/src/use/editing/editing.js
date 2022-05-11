@@ -128,8 +128,8 @@ export const provideEditing = () => {
       initial: "normal",
       context: {
         detail: false,
-        focus: null, // focus : null || "inline" || cuid
-        modals: {}, // modals : { cuid: { kind: 'form' | 'folio', actor } }
+        focus: null, // focus  : null || "inline" || cuid
+        modals: {}, // modals : { cuid: { kind: 'form' || 'folio', actor } }
         inline: null, // inline : null || actor
         maxModals: MAX_MODALS,
       },
@@ -293,12 +293,11 @@ export const provideEditing = () => {
   // Reactive values.
   const mouseoverSubmit = ref(false);
   const recenter = ref(null);
-  const hideEditing = ref(null);
   const showEditing = ref(null);
 
   // TODO: Need a way to broadcast or batch these sends or they could
   // (hypothetically) result in N (where N = keys(modals).length)
-  // page re-renders as each actor transitions.
+  // page re-renders as each actor transitions?
   const hideAll = () => {
     for (const { actor } of values(modals.value)) {
       const { send } = useActor(actor);
@@ -336,11 +335,11 @@ export const provideEditing = () => {
 
     const isSaving = [...formsSaving, inlineSaving];
 
-    // TODO: any(Boolean, isSaving);
-    return any((saving) => Boolean(saving), isSaving);
+    return any(Boolean)(isSaving);
   });
 
   // Close the editor when there's no CRUD happening.
+  const hideEditing = ref(null); // Receives a method from the edit panel on render.
   const noEditing = computed(
     () => isNil(inline.value) && isEmpty(modals.value),
   );
@@ -348,7 +347,7 @@ export const provideEditing = () => {
     () => noEditing.value,
     (newValue) => {
       if (newValue) {
-        hideEditing.value();
+        hideEditing.value(); // Calls the reference to the edit panel method.
       }
     },
   );

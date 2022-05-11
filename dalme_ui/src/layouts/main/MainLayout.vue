@@ -33,7 +33,6 @@ export default defineComponent({
   setup() {
     const showLoginModal = ref(false);
     provideAPI(showLoginModal);
-
     provideEditing();
     provideTooltips();
     provideTransport();
