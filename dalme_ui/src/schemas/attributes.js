@@ -55,14 +55,6 @@ export const attributeValidators = {
     .required()
     .transform((option) => (isNil(option) ? null : option))
     .label("Help flag"),
-  isPrivate: yup
-    .boolean()
-    .nullable()
-    .required()
-    .transform((option) =>
-      isNil(option) ? null : Boolean(parseInt(option.value)),
-    )
-    .label("Is private"),
   isPublic: yup
     .boolean()
     .nullable()

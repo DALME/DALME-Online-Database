@@ -18,6 +18,7 @@
         size="xs"
         text-color="black"
         v-show="showing"
+        :disable="modelValue.length === allowed.length"
         @click.stop="handleAddField"
       >
         <Tooltip> Add an attribute </Tooltip>

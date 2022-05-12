@@ -28,7 +28,6 @@ const resourceAttributes = [
   "description",
   "endDate",
   "helpFlag",
-  "isPrivate",
   "isPublic",
   "language",
   "locale",
