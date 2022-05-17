@@ -9,9 +9,10 @@ media
 www
 *.env
 db.cnf
-db-test.cnf
+env.*
 *.DS_Store
 data
+sql/
 *.sql
 
 # Elastic Beanstalk Files
@@ -23,10 +24,15 @@ data
 _extra
 
 #certificate stuff for development server
-ssl-certs
+ssl-certs*
 extracted_datasets
 
 TODO*
 dalme/media
 
 .ebignore
+
+node_modules/
+yarn-error.log
+store-flag.d.ts
+config/dev/env*
