@@ -23,10 +23,11 @@ data
 _extra
 
 #certificate stuff for development server
-ssl-certs
+ssl-certs*
 extracted_datasets
 
 TODO*
 dalme/media
 
 .ebignore
+config/dev/env*
