@@ -209,6 +209,19 @@ class WorkflowAccessPolicy(BaseAccessPolicy):
         target = wf.source
         return request.user == target.owner
 
+    def in_target_dataset_usergroup(self, request, view, action):
+        wf = view.get_object()
+        target = wf.source
+        try:
+            ds_ugs = [i.set_id.dataset_usergroup.name for i in target.sets.filter(set_id__set_type=3) if i.set_id.dataset_usergroup is not None]
+            usergroups = [i.name for i in request.user.groups.all()]
+            if not len(list(set(ds_ugs) & set(usergroups))) > 0:
+                return False
+        except: # noqa
+            return False
+
+        return True
+
 
 class UserAccessPolicy(BaseAccessPolicy):
     id = 'users-policy'

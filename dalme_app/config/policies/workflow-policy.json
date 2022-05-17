@@ -19,5 +19,11 @@
     "principal": ["*"],
     "effect": "allow",
     "condition": "owns_wf_target"
+  },
+  {
+    "action": ["partial_update", "update", "change_state"],
+    "principal": ["*"],
+    "effect": "allow",
+    "condition": "in_target_dataset_usergroup"
   }
 ]
