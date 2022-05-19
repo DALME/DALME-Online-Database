@@ -1,6 +1,7 @@
 import * as yup from "yup";
 
-import { ownerSchema } from "./common";
+import { unpackAttributes } from "@/components/forms/attributes-field/normalize";
+import { apiOptionSchema, ownerSchema } from "./common";
 
 export const setOptionsSchema = yup.array().of(
   yup
@@ -129,15 +130,24 @@ export const setListSchema = (setType) => {
 
 // POST/PUT data schemas.
 // Normalizes set form data for output to the API.
-const setPostSchema = yup.object().shape({
-  name: yup.string().required(),
-  description: yup.string().required(),
-  permissions: yup.number().required(),
-  isPublic: yup.boolean().default(null).nullable(),
-  hasLanding: yup.boolean().default(null).nullable(),
-  endpoint: yup.string().default(null).nullable(),
-  // TODO: datasetGroup
-});
+const setPostSchema = yup
+  .object()
+  .shape({
+    name: yup.string().required(),
+    description: yup.string().required(),
+    permissions: apiOptionSchema.required(),
+    owner: apiOptionSchema.default(null).nullable(),
+    endpoint: apiOptionSchema.default(null).nullable(),
+    datasetUsergroup: apiOptionSchema.default(null).nullable(),
+    isPublic: yup.boolean().default(null).nullable(),
+    hasLanding: yup.boolean().default(null).nullable(),
+    statTitle: yup.string().default(null).nullable(),
+    statText: yup.string().default(null).nullable(),
+  })
+  .transform((data) => ({
+    ...data,
+    ...unpackAttributes(data),
+  }));
 
 const setPutSchema = setPostSchema.shape({
   id: yup.string().uuid().required(),

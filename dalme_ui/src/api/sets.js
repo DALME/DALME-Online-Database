@@ -1,10 +1,26 @@
-import { apiUrl } from "./config";
+import { apiUrl, headers } from "./config";
 import { worksetId } from "./constants";
 
 const endpoint = `${apiUrl}/sets`;
 const v2Endpoint = `${apiUrl}/v2/sets`;
 
 const sets = {
+  createSet(data) {
+    const url = `${endpoint}/`;
+    return new Request(url, {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify(data),
+    });
+  },
+  editSet(id, data) {
+    const url = `${endpoint}/${id}/`;
+    return new Request(url, {
+      method: "PUT",
+      headers: headers(),
+      body: JSON.stringify(data),
+    });
+  },
   getSet(id) {
     const url = `${endpoint}/${id}`;
     return new Request(url);

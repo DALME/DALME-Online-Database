@@ -62,7 +62,7 @@ const archivalFileFormSchema = {
     label: "Primary dataset",
     description: "Dataset used to assign permissions.",
     getOptions: () =>
-      fetcher(requests.sets.getSetsByType("dataset")).then((response) =>
+      fetcher(requests.sets.getSetsByType(3)).then((response) =>
         response.json(),
       ),
     optionsSchema: setOptionsSchema,

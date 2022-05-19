@@ -1,10 +1,8 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
-from django.utils import timezone
 from dalme_app.models._templates import dalmeIntid, dalmeUuid, dalmeUuidOwned
 import django.db.models.options as options
-from django_currentuser.middleware import get_current_user
 from wagtail.search import index
 from dalme_app.models.workflow import Workflow
 

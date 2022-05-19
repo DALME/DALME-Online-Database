@@ -47,13 +47,17 @@ export const attributeValidators = {
     .boolean()
     .nullable()
     .required()
-    .transform((option) => (isNil(option) ? null : option))
+    .transform((option) =>
+      isNil(option) ? null : Boolean(parseInt(option.value)),
+    )
     .label("Has landing"),
   helpFlag: yup
     .boolean()
     .nullable()
     .required()
-    .transform((option) => (isNil(option) ? null : option))
+    .transform((option) =>
+      isNil(option) ? null : Boolean(parseInt(option.value)),
+    )
     .label("Help flag"),
   isPublic: yup
     .boolean()
@@ -85,6 +89,9 @@ export const attributeValidators = {
     .shape({ value: yup.number().nullable().required().label("Owner") })
     .nullable()
     .required()
+    .transform((option) =>
+      isNil(option) ? null : { ...option, value: parseInt(option.value) },
+    )
     .label("Owner"),
   parent: yup
     .object()

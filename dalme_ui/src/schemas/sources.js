@@ -390,24 +390,13 @@ export const sourceListSchema = (sourceType) => {
 const sourcePostSchema = yup.object().shape({
   name: yup.string().required(),
   shortName: yup.string().required(),
-  // hasInventory: yup.object().shape({
-  //   value: yup.boolean().required(),
-  //   label: yup.string().required(),
-  // }),
-  // parent: yup
-  //   .object()
-  //   .shape({
-  //     value: yup.string().uuid().required(),
-  //     label: yup.string().required(),
-  //   })
-  //   .nullable(),
-  // sets: yup.array().of(
-  //   yup.object().shape({
-  //     value: yup.string().uuid().required(),
-  //     label: yup.string().required(),
-  //   }),
-  // ),
-  // agents: normalizeOutputSchema,
+  parent: yup.string().uuid().default(null).nullable(),
+  hasInventory: yup.boolean().default(false).required(),
+  isPrivate: yup.boolean().default(false).required(),
+  primaryDataset: yup.string().uuid().default(null).nullable(),
+  // TODO: Make a payload with all these and use that as yer guide.
+  // sets,
+  // agents,
   // attributes,
   // credits,
   // pages,

@@ -6,7 +6,15 @@ import { attributesFieldSchema } from "@/schemas";
 export const worksetFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
   description: yup.string().nullable().required().label("Description"),
-  permissions: yup.string().nullable().required().label("Permissions"),
+  permissions: yup
+    .object()
+    .shape({
+      value: yup.number().required(),
+      label: yup.string().required(),
+    })
+    .nullable()
+    .required()
+    .label("Permissions"),
   attributes: yup
     .array()
     .of(attributesFieldSchema)

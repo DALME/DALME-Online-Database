@@ -54,11 +54,11 @@ const worksetFormSchema = {
   },
 };
 
+const setType = { id: 4 }; // TODO: Magic number.
 const worksetRequests = {
   get: (id) => requests.sets.getSet(id),
-  // TODO: Need to include set_type in here or somewhere else.
-  create: (data) => requests.sets.createSet(data),
-  update: ({ id, ...data }) => requests.sets.editSet(id, data),
+  create: (data) => requests.sets.createSet({ setType, ...data }),
+  update: ({ id, ...data }) => requests.sets.editSet(id, { setType, ...data }),
 };
 
 export default {

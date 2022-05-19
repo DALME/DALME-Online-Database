@@ -1,4 +1,5 @@
 import moment from "moment";
+import { reduce } from "ramda";
 
 import { attributeValidators } from "@/schemas";
 
@@ -14,7 +15,7 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
     const data = attributes[attributeType.shortName];
 
     // NOTE: Until we can refactor the API properly we'll have to capture all
-    // the complextity in this switch statement.
+    // the complexity in this switch statement.
     /* eslint-disable */
     switch (attributeType.dataType) {
       case "Options":
@@ -83,6 +84,29 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
   });
 
   return normalized;
+};
+
+// NOTE: Used for sets where we present optional attributes to the user to
+// maintain similarity with other CRUD instances but where what look like
+// attributes map to actual fields on the model itself. So, here we just need
+// to unpack the attribtutes data structure into a kwargs-like pattern. Also,
+// we only need to handle options and the default here due to the limited
+// 'attribute' fields permitted on sets but if we need to expand it then we can
+// do so in the future.
+export const unpackAttributes = ({ attributes }) => {
+  const reducer = (acc, { attribute, value }) => {
+    /* eslint-disable */
+    switch (attribute.dataType) {
+      case "Boolean":
+        return { ...acc, [attribute.shortName]: value.value };
+      case "Options":
+        return { ...acc, [attribute.shortName]: value.value };
+      default:
+        return { ...acc, [attribute.shortName]: value };
+    }
+    /* eslint-enable */
+  };
+  return attributes ? reduce(reducer, {}, attributes) : {};
 };
 
 export const normalizeOutputSchema = (attributes) => attributes;
