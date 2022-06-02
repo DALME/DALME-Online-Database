@@ -1,5 +1,6 @@
 import moment from "moment";
-import { reduce } from "ramda";
+import { filter as rFilter, isNil, pipe, reduce } from "ramda";
+import * as yup from "yup";
 
 import { attributeValidators } from "@/schemas";
 
@@ -86,6 +87,57 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
   return normalized;
 };
 
+// Transforms attributes data from the form component to the correct shape as
+// expected by the API during POST/PUT operations.
+export const normalizeAttributesOutput = ({ attributes }) => {
+  const normalize = (dataType, value) => {
+    /* eslint-disable */
+    switch (dataType) {
+      case "Boolean":
+        return Boolean(value.value);
+      case "Date":
+        const date = new Date(value);
+        return {
+          value: {
+            y: date.getFullYear(),
+            m: date.getMonth() + 1,
+            d: date.getDate(),
+          },
+        };
+      case "Options":
+        const handleOption = ({ value }) => {
+          try {
+            return { id: yup.string().uuid().validateSync(value) };
+          } catch {
+            try {
+              return { id: yup.number().validateSync(value) };
+            } catch {
+              return value;
+            }
+          }
+        };
+        return Array.isArray(value)
+          ? value.map((option) => handleOption(option))
+          : handleOption(value);
+      default:
+        return value;
+    }
+    /* eslint-enable */
+  };
+
+  const reducer = (acc, { attribute, value }) => {
+    const { shortName, dataType } = attribute;
+    return { ...acc, [shortName]: normalize(dataType, value) };
+  };
+
+  const normalized = pipe(
+    rFilter(({ attribute, value }) => !(isNil(attribute) && isNil(value))),
+    reduce(reducer, {}),
+  )(attributes);
+
+  return normalized;
+};
+
 // NOTE: Used for sets where we present optional attributes to the user to
 // maintain similarity with other CRUD instances but where what look like
 // attributes map to actual fields on the model itself. So, here we just need
@@ -93,7 +145,7 @@ export const normalizeAttributesInput = (attributeTypes, attributes) => {
 // we only need to handle options and the default here due to the limited
 // 'attribute' fields permitted on sets but if we need to expand it then we can
 // do so in the future.
-export const unpackAttributes = ({ attributes }) => {
+export const unpackPseudoAttributes = ({ attributes }) => {
   const reducer = (acc, { attribute, value }) => {
     /* eslint-disable */
     switch (attribute.dataType) {
@@ -108,11 +160,3 @@ export const unpackAttributes = ({ attributes }) => {
   };
   return attributes ? reduce(reducer, {}, attributes) : {};
 };
-
-export const normalizeOutputSchema = (attributes) => attributes;
-// export const normalizeOutputSchema = yup
-//   .array()
-//   .nullable()
-//   .compact((value) => value === empty())
-//   .of(outputSchema)
-//   .transform((final) => (isEmpty(final) ? null : final));

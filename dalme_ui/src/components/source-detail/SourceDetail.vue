@@ -339,13 +339,12 @@ export default defineComponent({
         await sourceDetailSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            const type = {
-              Archive: "archive",
-              Book: "bibliography",
-              "File unit": "archivalFile",
-              Record: "record",
-            }[value.type.name];
-            resource.value = type;
+            resource.value =
+              {
+                archive: "archive",
+                "file unit": "archivalFile",
+                record: "record",
+              }[value.type.name.toLowerCase()] || "bibliography";
             source.value = value;
             loading.value = false;
           });

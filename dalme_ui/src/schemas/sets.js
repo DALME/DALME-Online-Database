@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { unpackAttributes } from "@/components/forms/attributes-field/normalize";
+import { unpackPseudoAttributes } from "@/components/forms/attributes-field/normalize";
 import { apiOptionSchema, ownerSchema } from "./common";
 
 export const setOptionsSchema = yup.array().of(
@@ -146,7 +146,7 @@ const setPostSchema = yup
   })
   .transform((data) => ({
     ...data,
-    ...unpackAttributes(data),
+    ...unpackPseudoAttributes(data),
   }));
 
 const setPutSchema = setPostSchema.shape({
