@@ -25,33 +25,33 @@ fresh just drop the volumes when you spin down with `docker-compose down -v`.
 
 Build and start the container network in the background.
 ```
-$ docker-compose up -d --build
+$ docker compose -f docker-compose.dev.yml up -d --build
 
 # List running containers.
 $ docker ps
 
 # Show the container logs.
-$ docker-compose logs
-$ docker-compose logs dalme.ui
+$ docker compose logs
+$ docker compose logs dalme.ui
 
 # Stop the containers.
-$ docker-compose down
+$ docker compose -f docker-compose.dev.yml down
 
 # Start them again (they are already built).
-$ docker-compose up -d
+$ docker compose -f docker-compose.dev.yml up -d
 
 # Rebuild them.
-$ docker-compose up -d --build --force-recreate
+$ docker compose -f docker-compose.dev.yml up --build --force-recreate
 ```
 
 Run commands against docker containers.
 ```
-# docker-compose run $CONTAINER $COMMAND
-$ docker-compose run dalme.web python manage.py makemigrations
-$ docker-compose run dalme.web python manage.py migrate
+# docker compose -f docker-compose.dev.yml run $CONTAINER $COMMAND
+$ docker compose -f docker-compose.dev.yml run dalme.web python manage.py makemigrations
+$ docker compose -f docker-compose.dev.yml run dalme.web python manage.py migrate
 
 # Shell into a running container.
-$ docker-compose run dalme.web bash
+$ docker compose -f docker-compose.dev.yml run dalme.web bash
 ```
 
 Note, due to Chrome recently disallowing its users to manually bypass insecure
@@ -59,21 +59,14 @@ SSL connections, in order to demo the site locally you will either need to use
 Firefox as your browser or know about
 [`thisisunsafe`](https://dev.to/brettimus/this-is-unsafe-and-a-bad-idea-5ej4).
 
-Once running, login to the [new DALME editing
-environment](https://db.127.0.0.1.sslip.io:8000/ui).  You will probably have to
-bypass an SSL insecure certificate warning and then you are likely see further
-`net::ERR_CERT_AUTHORITY_INVALID` errors due to failing API calls in dev tools
-console. If this is the case, open up one of the failing URLs in a new tab (for
-example, [this one](https://data.127.0.0.1.sslip.io:8000/session/retrieve/) and
-again bypass the SSL certificate warning. Remote calls to the API subdomain
-should then succeed.
+Once running, login to the [new DALME editing environment](https://127.0.0.1.sslip.io:8000/db/).
 
 The main entrypoint URLs are found below.
 ```
 https://127.0.0.1.sslip.io:8000/       # Public site.
 https://127.0.0.1.sslip.io:8000/cms/   # Wagtail CMS.
-https://data.127.0.0.1.sslip.io:8000/  # DALME API.
-https://127.0.0.1.sslip.io:8000/ui     # Vue editing-environment.
+https://127.0.0.1.sslip.io:8000/api/    # DALME API.
+https://127.0.0.1.sslip.io:8000/db/     # Vue editing-environment.
 ```
 Using the [`sslip.io`](http://sslip.io/) DNS resolution is necessary for
 CSRF/cookie signing across local subdomains.

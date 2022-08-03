@@ -211,17 +211,14 @@ DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': os.environ['MYSQL_HOST'],
-        'NAME': os.environ['MYSQL_DATABASE'],
-        'USER': os.environ['MYSQL_USER'],
-        'PASSWORD': os.environ['MYSQL_PASSWORD'],
-        'PORT': os.environ['MYSQL_PORT'],
+        'NAME': os.environ.get('RDS_DB_NAME', os.environ.get('MYSQL_DATABASE', '')),
+        'USER': os.environ.get('RDS_USERNAME', os.environ.get('MYSQL_USER', '')),
+        'PASSWORD': os.environ.get('RDS_PASSWORD', os.environ.get('MYSQL_PASSWORD', '')),
+        'HOST': os.environ.get('RDS_HOSTNAME', os.environ.get('MYSQL_HOST', '')),
+        'PORT': os.environ.get('RDS_PORT', os.environ.get('MYSQL_PORT', '')),
         'CONN_MAX_AGE': 500,
         'OPTIONS': {
             'sql_mode': 'traditional',
-        },
-        'TEST': {
-            'NAME': 'dalme_app_test',
         },
     },
     'dam': {

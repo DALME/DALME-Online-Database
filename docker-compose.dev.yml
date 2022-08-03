@@ -1,12 +1,12 @@
 services:
   dalme.web:
-    image: "web:${TAG:-dev}"
+    image: "web:dev"
     container_name: dalme.web
     build:
       context: ./
-      dockerfile: "./config/${TAG:-dev}/Dockerfile.web"
+      dockerfile: "./config/dev/Dockerfile.web"
     env_file:
-      - "./config/${TAG:-dev}/env.web.dev"
+      - "./config/dev/env.web.dev"
     volumes:
       - ./dalme_api:/opt/app/dalme_api
       - ./dalme_app:/opt/app/dalme_app
@@ -23,13 +23,13 @@ services:
     tty: true
 
   dalme.ui:
-    image: "ui:${TAG:-dev}"
+    image: "ui:dev"
     container_name: dalme.ui
     build:
       context: ./
-      dockerfile: "./config/${TAG:-dev}/Dockerfile.ui"
+      dockerfile: "./config/dev/Dockerfile.ui"
     env_file:
-      - "./config/${TAG:-dev}/env.ui.dev"
+      - "./config/dev/env.ui.dev"
     volumes:
       - ./dalme_ui/src:/opt/ui/src
     networks:
@@ -48,7 +48,7 @@ services:
       MYSQL_DATABASE: dalme_db
       MYSQL_HOST: db
     volumes:
-      - "./config/${TAG:-dev}/my.cnf:/etc/mysql/conf.d/my.cnf:ro"
+      - "./config/dev/my.cnf:/etc/mysql/conf.d/my.cnf:ro"
       - ./sql:/docker-entrypoint-initdb.d
       - db-data:/var/lib/mysql
     networks:
@@ -62,9 +62,9 @@ services:
     image: nginx:mainline
     container_name: dalme.proxy
     env_file:
-      - "./config/${TAG:-dev}/env.web.dev"
+      - "./config/dev/env.web.dev"
     volumes:
-      - "./config/${TAG:-dev}/nginx:/etc/nginx/conf.d"
+      - "./config/dev/nginx:/etc/nginx/conf.d"
       - ./ssl-certs:/var/certs
       - assets:/static
     networks:
