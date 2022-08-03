@@ -1,0 +1,14 @@
+FROM node:16-buster-slim
+
+WORKDIR /opt/ui
+ENV PATH /opt/dalme_ui/node_modules/.bin:$PATH
+
+COPY ./dalme_ui .
+RUN chown -R node:node . && chmod -R 755 .
+USER node
+
+RUN yarn install --silent
+RUN yarn cache clean --force
+
+CMD ["yarn", "dev"]
+STOPSIGNAL SIGINT

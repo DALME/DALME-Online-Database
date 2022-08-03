@@ -1,0 +1,53 @@
+FROM python:3.7-slim-buster
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV LANG=en_US.UTF-8
+
+RUN adduser \
+    --disabled-password \
+    --gecos "Whisky" \
+    --uid 1001 \
+    --gid 0 \
+    --home /home/whisky whisky && \
+    chmod 1777 /home/whisky
+
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    default-libmysqlclient-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libxmlsec1-openssl \
+    vim \
+    xmlsec1
+RUN apt-get clean
+
+WORKDIR /opt/app
+COPY ./manage.py .
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r ./requirements.txt
+
+COPY ./dalme ./dalme
+COPY ./dalme_api ./dalme_api
+COPY ./dalme_app ./dalme_app
+COPY ./dalme_public ./dalme_public
+COPY ./dalme_purl ./dalme_purl
+COPY ./templates ./templates
+COPY ./static ./static
+COPY ssl-certs ./ssl-certs
+
+COPY ./config/dev/gunicorn.conf.py .
+
+RUN mkdir -p /var/log/django && \
+    touch /var/log/django/dalme_app.log && \
+    chmod 777 /var/log/django/dalme_app.log
+
+RUN mkdir -p /var/log/djangoq/ /var/run/djangoq/
+
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "dalme.wsgi"]
+STOPSIGNAL SIGINT

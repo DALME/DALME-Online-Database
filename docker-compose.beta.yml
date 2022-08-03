@@ -1,0 +1,78 @@
+services:
+  dalme.web:
+    image: "web:beta"
+    container_name: dalme.web
+    build:
+      context: ./
+      dockerfile: "./config/beta/Dockerfile.web"
+    env_file:
+      - "./config/beta/env.local"
+    volumes:
+      - ./dalme_api:/opt/app/dalme_api
+      - ./dalme_app:/opt/app/dalme_app
+      - ./dalme_public:/opt/app/dalme_public
+      - ./templates:/opt/app/templates
+    command: >
+      bash -c "python manage.py makemigrations &&
+              python manage.py migrate --noinput &&
+              gunicorn -c gunicorn.conf.py dalme.wsgi"
+    networks:
+      - app-network
+    ports:
+      - "8443"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  dalme.ui:
+    image: "ui:beta"
+    container_name: dalme.ui
+    build:
+      context: ./
+      dockerfile: "./config/beta/Dockerfile.ui"
+    env_file:
+      - "./config/beta/env.local"
+    volumes:
+      - ./dalme_ui/src:/opt/ui/src
+    networks:
+      - app-network
+    depends_on:
+      - dalme.web
+    ports:
+      - "3000"
+
+  dalme.proxy:
+    image: nginx:mainline
+    container_name: dalme.proxy
+    env_file:
+      - "./config/beta/env.local"
+    volumes:
+      - "./config/beta/nginx:/etc/nginx/conf.d"
+      - ./ssl-certs:/var/certs
+      - assets:/static
+    networks:
+      - app-network
+    depends_on:
+      - dalme.web
+    ports:
+      - "8000:443"
+
+  dalme.q:
+    image: "web:beta"
+    container_name: dalme.q
+    env_file:
+      - "./config/beta/env.local"
+    command: "python manage.py qcluster"
+    networks:
+      - app-network
+    depends_on:
+      - dalme.web
+    ports:
+      - "8443"
+
+volumes:
+  assets:
+
+networks:
+  app-network:
+    driver: bridge

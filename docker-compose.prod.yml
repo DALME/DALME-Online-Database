@@ -1,0 +1,57 @@
+x-aws-loadbalancer: "dalme-balancer"
+services:
+  dalme.web:
+    image: "916099420556.dkr.ecr.us-east-1.amazonaws.com/dalme-prod:web"
+    container_name: dalme.web
+    secrets:
+      - dalme-secrets
+    build:
+      context: ./
+      dockerfile: "./config/prod/Dockerfile.web"
+    ports:
+      - "8443"
+    # restart: unless-stopped
+    # stdin_open: true
+    # tty: true
+
+  dalme.ui:
+    image: "916099420556.dkr.ecr.us-east-1.amazonaws.com/dalme-prod:ui"
+    container_name: dalme.ui
+    secrets:
+      - dalme-secrets
+    build:
+      context: ./
+      dockerfile: "./config/prod/Dockerfile.ui"
+    ports:
+      - "3000"
+
+  dalme.proxy:
+    image: "916099420556.dkr.ecr.us-east-1.amazonaws.com/dalme-prod:proxy"
+    container_name: dalme.proxy
+    secrets:
+      - dalme-secrets
+    volumes:
+      - "./config/prod/nginx:/etc/nginx/conf.d"
+      - assets:/static
+    depends_on:
+      - dalme.web
+    ports:
+      - "8000:443"
+
+  dalme.q:
+    image: "916099420556.dkr.ecr.us-east-1.amazonaws.com/dalme-prod:web"
+    container_name: dalme.q
+    command: "python manage.py qcluster"
+
+secrets:
+  dalme-secrets:
+    name: "arn:aws:secretsmanager:us-east-1:916099420556:secret:dalme/prod-d5kyzq"
+    # external: true
+    x-aws-keys:
+      - "*"
+
+volumes:
+  assets:
+
+networks:
+  default:
