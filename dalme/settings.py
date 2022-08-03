@@ -72,7 +72,7 @@ SESSION_COOKIE_DOMAIN = '.dalme.org'
 SESSION_COOKIE_SECURE = True
 
 CSRF_COOKIE_DOMAIN = '.dalme.org'
-CSRF_TRUSTED_ORIGINS = ['.dalme.org']
+CSRF_TRUSTED_ORIGINS = ['https://dalme.org']
 CSRF_COOKIE_SECURE = True
 
 SECURE_SSL_REDIRECT = True
@@ -114,7 +114,7 @@ INSTALLED_APPS = [
     'wagtail.images',
     'wagtail.search',
     'wagtail.admin',
-    'wagtail.core',
+    'wagtail',
     'wagtailmodelchooser',
     'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
@@ -327,6 +327,7 @@ COMPRESS_FILTERS = {
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
 WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
+WAGTAILADMIN_BASE_URL = 'dalme.org/cms'
 
 Q_CLUSTER = {
     'name': 'dalme_q',

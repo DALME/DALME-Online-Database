@@ -7,10 +7,12 @@ from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
 from saml2.sigver import get_xmlsec_binary
 
 IS_V2 = bool(os.environ.get('V2', False))
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 DOCKER_ROOT = "/app"
+HOST = 'https://127.0.0.1.sslip.io:8000'
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
@@ -20,7 +22,6 @@ AWS_REGION = os.environ.get('AWS_DEFAULT_REGION', '')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-# AWS_SQS_URL = os.environ.get('AWS_SQS_QUEUE', '')
 
 RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY', '')
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY', '')
@@ -46,7 +47,7 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
 SESSION_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
-CSRF_TRUSTED_ORIGINS = ['.127.0.0.1.sslip.io:8000']
+CSRF_TRUSTED_ORIGINS = ['https://127.0.0.1.sslip.io:8000']
 
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
@@ -102,7 +103,7 @@ INSTALLED_APPS = [
     'wagtail.images',
     'wagtail.search',
     'wagtail.admin',
-    'wagtail.core',
+    'wagtail',
     'wagtailmodelchooser',
     'dalme_api.application.DalmeAPIConfig',
     'dalme_app.application.DalmeConfig',
@@ -326,6 +327,7 @@ COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
 WAGTAILIMAGES_IMAGE_MODEL = 'dalme_public.DALMEImage'
+WAGTAILADMIN_BASE_URL = '127.0.0.1.sslip.io:8000/cms'
 
 # CELERY_BROKER_URL = 'sqs://'
 # CELERY_BROKER_TRANSPORT_OPTIONS = {
