@@ -17,6 +17,7 @@ def get_ec2_instance_ip():
         return None
     return ip
 
+
 AWS_LOCAL_IP = get_ec2_instance_ip()
 ALLOWED_HOSTS = [
     AWS_LOCAL_IP,
@@ -30,7 +31,11 @@ ALLOWED_HOSTS = [
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DOCKER_ROOT = '/app'
 HOST = 'https://127.0.0.1.sslip.io:8000'
+
+IS_V2 = bool(os.environ.get('V2', False))
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
@@ -131,6 +136,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'dalme_app.utils.UIAuthMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
@@ -146,6 +152,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.csrf',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -203,12 +210,12 @@ SAML_IDP_CONFIG = {
     },
 
     # Signing
-    'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
-    'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
+    'key_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.pem',
+    'cert_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.cert',
     # Encryption
     'encryption_keypairs': [{
-        'key_file': BASE_DIR + '/ssl-certs/dam.dalme.org.pem',
-        'cert_file': BASE_DIR + '/ssl-certs/dam.dalme.org.cert',
+        'key_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.pem',
+        'cert_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.cert',
     }],
     'valid_for': 365 * 24,
 }
@@ -223,7 +230,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('RDS_PASSWORD', ''),
         'HOST': os.environ.get('RDS_HOSTNAME', ''),
         'PORT': os.environ.get('RDS_PORT', ''),
-        'CONN_MAX_AGE': 3600,
+        # 'CONN_MAX_AGE': 3600, see: https://github.com/Koed00/django-q/issues/435
     },
     'dam': {
         'ENGINE': 'django.db.backends.mysql',
@@ -253,6 +260,7 @@ ELASTICSEARCH_DSL_AUTO_REFRESH = True
 ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = 'django_elasticsearch_dsl.signals.RealTimeSignalProcessor'
 SEARCH_RESULTS_PER_PAGE = 10
 
+JSON_PARSER = 'djangorestframework_camel_case.parser.CamelCaseJSONParser' if IS_V2 else 'rest_framework.parsers.JSONParser'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
@@ -266,7 +274,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'dalme_api.renderers.SelectRenderer',
-        'dalme_api.renderers.DTEJSONRenderer'
+        'dalme_api.renderers.DTEJSONRenderer',
+        'dalme_api.renderers.DBRenderer'
     ],
     'DEFAULT_PARSER_CLASSES': [
         JSON_PARSER,
@@ -278,6 +287,9 @@ REST_FRAMEWORK = {
         'dalme_api.filter_backends.DalmeOrderingFilter'
     ],
     'EXCEPTION_HANDLER': 'dalme_api.utils.DTE_exception_handler',
+    'JSON_UNDERSCOREIZE': {
+        'no_underscore_before_number': True,
+    },
 }
 
 DYNAMIC_PREFERENCES = {
