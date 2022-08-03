@@ -46,7 +46,9 @@ class Page(dalmeUuid):
             return None
 
     def get_absolute_url(self):
-        return reverse('page_detail', kwargs={'pk': self.pk})
+        # return reverse('page_detail', kwargs={'pk': self.pk})
+        source = self.sources.first().source
+        return f'{source.get_absolute_url()}{self.name}/'
 
     def get_canvas(self):
         if not self.canvas and self.dam_id is not None:

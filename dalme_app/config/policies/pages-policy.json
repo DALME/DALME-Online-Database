@@ -1,6 +1,6 @@
 [
   {
-    "action": ["create", "list", "retrieve", "has_permission", "get_rights"],
+    "action": ["create", "list", "retrieve", "has_permission", "get_rights", "get_manifest"],
     "principal": ["*"],
     "effect": "allow"
   },
