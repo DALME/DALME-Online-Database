@@ -7,6 +7,6 @@ export const logout = async ({ commit }) => {
   const { fetchAPI, redirected } = apiInterface();
   await fetchAPI(requests.auth.logout());
   if (redirected) {
-    window.location.href = `${loginUrl}?next=/ui/`;
+    window.location.href = `${loginUrl}?next=/db/`;
   }
 };

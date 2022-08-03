@@ -94,7 +94,7 @@ function toggle_tooltips(el) {
 function update_workflow(action, code=0) {
     $.ajax({
         method: "PATCH",
-        url: `${api_endpoint}/workflow/${source_id}/change_state/`,
+        url: `/api/workflow/${source_id}/change_state/`,
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {
@@ -140,7 +140,7 @@ function update_workflow(action, code=0) {
 function create_task_list() {
   $.ajax({
     method: "GET",
-    url: `${api_endpoint}/options/?target=user_groups&format=json`,
+    url: "/api/options/?target=user_groups&format=json",
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {
@@ -152,7 +152,7 @@ function create_task_list() {
     taskListForm = new $.fn.dataTable.Editor( {
           ajax: {
             method: "POST",
-            url: `${api_endpoint}/tasklists/`,
+            url: "/api/tasklists/",
             xhrFields: { withCredentials: true },
             crossDomain: true,
             headers: {
@@ -204,7 +204,7 @@ function create_task_list() {
 function create_task() {
   $.ajax({
     method: "GET",
-    url: `${api_endpoint}/options/?target=active_staff,user_worksets,user_task_lists&format=json`,
+    url: "/api/options/?target=active_staff,user_worksets,user_task_lists&format=json",
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {
@@ -218,7 +218,7 @@ function create_task() {
     taskForm = new $.fn.dataTable.Editor( {
           ajax: {
             method: "POST",
-            url: `${api_endpoint}/tasks/`,
+            url: "/api/tasks/",
             xhrFields: { withCredentials: true },
             crossDomain: true,
             headers: {
@@ -279,7 +279,7 @@ function create_task() {
                 type: "upload",
                 ajax: {
                   method: "POST",
-                  url: `${api_endpoint}/attachments/`,
+                  url: "/api/attachments/",
                   headers: {
                     "Content-Type": "application/json",
                     'X-CSRFToken': get_cookie("csrftoken")
@@ -317,7 +317,7 @@ function task_set_state(task, state) {
     };
     $.ajax({
       method: "PATCH",
-      url: `${api_endpoint}/tasks/${task}/set_state/`,
+      url: `/api/tasks/${task}/set_state/`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: {
@@ -381,7 +381,7 @@ function create_ticket() {
               },
               ajax: {
                 method: "POST",
-                url: `${api_endpoint}/tickets/`,
+                url: "/api/tickets/",
                 xhrFields: { withCredentials: true },
                 crossDomain: true,
                 headers: {
@@ -433,7 +433,7 @@ function create_ticket() {
                     type: "upload",
                     ajax: {
                       method: "POST",
-                      url: `${api_endpoint}/attachments/`,
+                      url: "/api/attachments/",
                       headers: {
                         "Content-Type": "application/json",
                         'X-CSRFToken': get_cookie("csrftoken")
@@ -663,7 +663,7 @@ function get_user_avatar(image_path) {
 function enable_comments(model, object) {
   $.ajax({
     method: "GET",
-    url: `${api_endpoint}/comments/?model=${model}&object=${object}&format=json`,
+    url: `/api/comments/?model=${model}&object=${object}&format=json`,
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {
@@ -688,7 +688,7 @@ function create_comment(model, object) {
   var body = $('#new_comment_text').val();
   $.ajax({
         method: "POST",
-        url: `${api_endpoint}/comments/`,
+        url: "/api/comments/",
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {
@@ -722,7 +722,7 @@ function create_comment(model, object) {
 function ticket_set_state(id, action) {
   $.ajax({
     method: "PATCH",
-    url: `${api_endpoint}/tickets/${id}/set_state/`,
+    url: `/api/tickets/${id}/set_state/`,
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {

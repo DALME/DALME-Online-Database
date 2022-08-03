@@ -19,8 +19,8 @@ class Endpoint(viewsets.GenericViewSet):
         self.get_object()
 
         if format == 'db':
-            return HttpResponseRedirect(f'{settings.DB_ENDPOINT}/sources/{pk}/')
+            return HttpResponseRedirect(f'{settings.HOST}/db/sources/{pk}/')
         elif format in ['api', 'json']:
-            return HttpResponseRedirect(f'{settings.API_ENDPOINT}/sources/{pk}/?format={format}')
+            return HttpResponseRedirect(f'{settings.HOST}/api/sources/{pk}/?format={format}')
         else:
-            return HttpResponseRedirect(f'{settings.HOST_SCHEME}{settings.PARENT_HOST}/collections/records/{pk}/')
+            return HttpResponseRedirect(f'{settings.HOST}/collections/records/{pk}/')

@@ -21,7 +21,7 @@ function add_thumbnails(selected) {
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-      url: `${api_endpoint}/images/${selected[i]['ref']['ref']}/get_preview_url/?format=json`
+      url: `/api/images/${selected[i]['ref']['ref']}/get_preview_url/?format=json`
     }).done(function(data, textStatus, jqXHR) {
         $('#thumb-container').append('<div class="card card-thumbnail" id="thumb_'+selected[i]['ref']['ref']+'">\
           <img src="'+data['preview_url']+'" class="card-img-top" alt="dam_image">\
@@ -53,7 +53,7 @@ function create_source_from_selected() {
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-      url: `${api_endpoint}/images/get_info_for_source/?data=${sel_ids}&format=json`
+      url: `/api/images/get_info_for_source/?data=${sel_ids}&format=json`
     }).done(function(data, textStatus, jqXHR) {
           init_source_editor(data);
     }).fail(function(jqXHR, textStatus, errorThrown) {

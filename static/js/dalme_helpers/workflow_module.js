@@ -5,7 +5,7 @@ function workflow_module_load() {
 function workflow_module_init() {
   $.ajax({
     method: "POST",
-    url: `${api_endpoint}/configs/get/`,
+    url: "/api/configs/get/",
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {

@@ -34,14 +34,14 @@
   $(document).ready(function() {
     $.ajax({
       method: "GET",
-      url: `${api_endpoint}/sources/${source_id}/`,
+      url: `/api/sources/${source_id}/`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: { 'X-CSRFToken': get_cookie("csrftoken") },
     }).done(function(source_data, textStatus, jqXHR) {
       $.ajax({
         method: "POST",
-        url: `${api_endpoint}/configs/get/`,
+        url: "api/configs/get/",
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {

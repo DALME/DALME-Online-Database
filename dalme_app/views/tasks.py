@@ -53,7 +53,7 @@ class TasksList(TemplateView, DALMEContextMixin):
             'task_count': task_count,
             'tables': [
                 ['lists', 'fa-tasks', 'Lists', {
-                    'ajax': '"{}/tasklists/?format=json"'.format(context['api_endpoint']),
+                    'ajax': '"/api/tasklists/?format=json"',
                     'serverSide': 'true',
                     'responsive': 'true',
                     'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>r><'card-body't><'sub-card-footer'i>"''',
@@ -82,7 +82,7 @@ class TasksList(TemplateView, DALMEContextMixin):
                     }
                  ],
                 ['tasks', 'fa-calendar-check', 'Tasks', {
-                    'ajax': '"{}/tasks/?format=json"'.format(context['api_endpoint']),
+                    'ajax': '"/api/tasks/?format=json"',
                     'serverSide': 'true',
                     'responsive': 'true',
                     'dom': '''"<'sub-card-header d-flex'<'card-header-title'><'dt-btn-group'>fr><'card-body't><'sub-card-footer'i>"''',

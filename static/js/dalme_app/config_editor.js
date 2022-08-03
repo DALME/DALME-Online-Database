@@ -4,7 +4,7 @@ function config_editor_init() {
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: { 'X-CSRFToken': get_cookie("csrftoken") },
-      url: `${api_endpoint}/configs/`
+      url: "/api/configs/"
   }).done(function(data, textStatus, jqXHR) {
       $('#config-tree').bstreeview({data: data});
       const container = document.getElementById("config-editor-panel");
@@ -37,7 +37,7 @@ function config_editor_init() {
 function load_config_file(path, filename) {
   $.ajax({
     method: "POST",
-    url: `${api_endpoint}/configs/get/`,
+    url: "/api/configs/get/",
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {
@@ -93,7 +93,7 @@ function save_config_file() {
       } else {
         $.ajax({
           method: "POST",
-          url: `${api_endpoint}/configs/save/`,
+          url: "/api/configs/save/",
           xhrFields: { withCredentials: true },
           crossDomain: true,
           headers: {

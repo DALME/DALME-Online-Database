@@ -32,14 +32,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEBUG = True
 
-HOST_SCHEME = 'https://'
-PARENT_HOST = '127.0.0.1.sslip.io:8000'
-DEFAULT_HOST = 'public'
-
-API_ENDPOINT = 'https://data.127.0.0.1.sslip.io:8443'
-PURL_ENDPOINT = 'https://purl.127.0.0.1.sslip.io:8443'
-DB_ENDPOINT = 'https://db.127.0.0.1.sslip.io:8443'
-
 ALLOWED_HOSTS = ['.127.0.0.1.sslip.io']
 
 USE_HTTPS = True
@@ -65,21 +57,14 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'https://127.0.0.1.sslip.io',
-    'https://db.127.0.0.1.sslip.io',
-    'https://data.127.0.0.1.sslip.io',
-    'https://purl.127.0.0.1.sslip.io',
     'https://127.0.0.1.sslip.io:8000',
-    'https://db.127.0.0.1.sslip.io:8000',
-    'https://data.127.0.0.1.sslip.io:8000',
-    'https://purl.127.0.0.1.sslip.io:8000',
 ]
 CORS_EXPOSE_HEADERS = [
     'Content-Type',
     'X-CSRFToken',
-    'Access-Control-Allow-Origin: https://db.127.0.0.1.sslip.io:8000',
+    'Access-Control-Allow-Origin: https://127.0.0.1.sslip.io:8000',
 ]
 
-ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.devUrls'
 LOGOUT_REDIRECT_URL = 'https://127.0.0.1.sslip.io:8000/'
 
@@ -93,10 +78,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django_hosts',
     'django_elasticsearch_dsl',
-    # 'django_celery_results',
-    # 'django_celery_beat',
     'django_q',
     'djangosaml2idp',
     'corsheaders',
@@ -136,7 +118,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'dalme_app.utils.SubdomainRedirectMiddleware',
-    'django_hosts.middleware.HostsRequestMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -149,7 +130,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
 TEMPLATES = [

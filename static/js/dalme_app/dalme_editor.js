@@ -52,7 +52,7 @@ function startEditor() {
       } else {
           $.ajax({
             method: "GET",
-            url: `${api_endpoint}/transcriptions/${folio_array[0].tr_id}/?format=json`,
+            url: `/api/transcriptions/${folio_array[0].tr_id}/?format=json`,
             xhrFields: { withCredentials: true },
             crossDomain: true,
             headers: {
@@ -191,7 +191,7 @@ function changeEditorFolio(target) {
     } else {
       $.ajax({
         method: "GET",
-        url: `${api_endpoint}/transcriptions/${folio_array[target].tr_id}/?format=json`,
+        url: `/api/transcriptions/${folio_array[target].tr_id}/?format=json`,
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {
@@ -307,7 +307,7 @@ function saveEditor() {
     var page = folio_array[folio].id
     var source = source_id;
     if (id != 'None') {
-      var url = `${api_endpoint}/transcriptions/${id}/`;
+      var url = `/api/transcriptions/${id}/`;
       $.ajax({
         method: "PUT",
         url: url,
@@ -328,7 +328,7 @@ function saveEditor() {
         }
       });
     } else {
-      var url = `${api_endpoint}/transcriptions/`;
+      var url = "/api/transcriptions/";
       $.ajax({
         method: "POST",
         url: url,
@@ -382,7 +382,7 @@ function setTagMenu(action) {
       if (typeof tag_menu_html == 'undefined') {
           $.ajax({
             method: "POST",
-            url: `${api_endpoint}/configs/get/`,
+            url: "/api/configs/get/",
             xhrFields: { withCredentials: true },
             crossDomain: true,
             headers: {
@@ -610,7 +610,7 @@ function saveDescription() {
     if (confirm("Save changes and exit? This action cannot be undone.")) {
       $.ajax({
         method: "PATCH",
-        url: `${api_endpoint}/sources/${source_id}/change_description/`,
+        url: `/api/sources/${source_id}/change_description/`,
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {
@@ -726,7 +726,7 @@ function formatRenvois() {
 //     namedEntityForm = new $.fn.dataTable.Editor( {
 //           ajax: {
 //             method: "POST",
-//             url: `${api_endpoint}/tasklists/`,
+//             url: `/api/tasklists/`,
 //             headers: { 'X-CSRFToken': get_cookie("csrftoken") },
 //             data: function (data) { return { "data": JSON.stringify( data ) }; }
 //           },

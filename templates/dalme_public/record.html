@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__single_column.html" %}
-{% load dalme_public_tags static hosts compress %}
+{% load dalme_public_tags static compress %}
 
 {% block title %}{{ block.super }} &ndash; {{ title }}{% endblock %}
 
@@ -300,8 +300,6 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
 
   {{ data|json_script:"source-data" }}
-  {% host_url 'dashboard' host 'db' as db_url %}
-  {% host_url 'api_endpoint' host 'data' as api_url %}
 
   {% get_citation_data as citation %}
   {{ citation.2 | safe }}
@@ -339,8 +337,6 @@
           })
         },
         data: {
-          api_endpoint: '{{ api_url }}',
-          db_endpoint: '{{ db_url }}',
           showHelp: false,
           showInfoPanel: true,
           showCitePanel: false,
@@ -487,7 +483,7 @@
           },
           renderFolio() {
             const that = this;
-            $.get(`${this.api_endpoint}/pages/${this.folioId}/get_rights/`, function (data) {
+            $.get(`/api/pages/${this.folioId}/get_rights/`, function (data) {
               if (data.rights) {
                 that.showImage = data.rights.hasOwnProperty('show_image') ? data.rights.show_image : false;
                 that.showNotice = data.rights.display_notice;
@@ -503,7 +499,7 @@
           renderImage() {
             if (!window.folio) {
               window.folio = new Diva('diva_viewer', {
-                objectData: `${this.db_endpoint}/pages/${this.folioId}/manifest/`,
+                objectData: `/api/pages/${this.folioId}/get_manifest/`,
                 enableAutoTitle: false,
                 enableFullscreen: false,
                 enableKeyScroll: false,
@@ -528,7 +524,7 @@
               });
             } else {
               this.zoomLevel = 2;
-              window.folio.changeObject(`${this.db_endpoint}/pages/${this.folioId}/manifest/`);
+              window.folio.changeObject(`/api/pages/${this.folioId}/get_manifest/`);
             }
           },
           setResizable(flipView=false) {
@@ -560,7 +556,7 @@
           fetchTranscription() {
             if (this.transcriptionId) {
               const that = this;
-              fetch(`{% host_url 'api_endpoint:transcriptions-list' host 'data' %}${this.transcriptionId}/?format=json`)
+              fetch(`{% url 'api_endpoint:transcriptions-list' %}${this.transcriptionId}/?format=json`)
                 .then(response => response.json())
                 .then(data => {
                   if (data.transcription != '') {

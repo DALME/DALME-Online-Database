@@ -72,10 +72,6 @@
     {% endcompress %}
       {{ preferences|json_script:"user-preferences" }}
       <script>
-        api_endpoint = "{{ api_endpoint }}";
-        db_endpoint = "{{ db_endpoint }}";
-      </script>
-      <script>
         $(document).ready(function () {
             $(document).click(function (event) {
                 var clickover = $(event.target);

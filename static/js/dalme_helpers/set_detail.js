@@ -4,7 +4,7 @@ function set_detail() {
 function edit_set(id) {
       $.ajax({
         method: "GET",
-        url: `${api_endpoint}/options/?target=active_staff,user_groups_1&format=json`,
+        url: "/api/options/?target=active_staff,user_groups_1&format=json",
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {
@@ -17,7 +17,7 @@ function edit_set(id) {
           editSetForm = new $.fn.dataTable.Editor( {
                 ajax: {
                   method: "PATCH",
-                  url: `${api_endpoint}/sets/_id_/`,
+                  url: "/api/sets/_id_/",
                   headers: { 'X-CSRFToken': get_cookie("csrftoken") },
                   data: function (data) { return { "data": JSON.stringify( data ) }; }
                 },
@@ -139,7 +139,7 @@ function delete_set_members(table, id) {
         };
         $.ajax({
           method: "PATCH",
-          url: `${api_endpoint}/sets/${id}/remove_members/`,
+          url: `/api/sets/${id}/remove_members/`,
           xhrFields: { withCredentials: true },
           crossDomain: true,
           headers: {

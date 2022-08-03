@@ -15,7 +15,7 @@ function ws_next() {
   if (workset['next_id'] != 'none') {
     $.ajax({
       method: "PATCH",
-      url: `${api_endpoint}/sets/${workset['workset_id']}/workset_state/`,
+      url: `/api/sets/${workset['workset_id']}/workset_state/`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: {
@@ -46,7 +46,7 @@ function ws_prev() {
 function ws_mark(action) {
   $.ajax({
     method: "PATCH",
-    url: `${api_endpoint}/sets/${workset['workset_id']}/workset_state/`,
+    url: `/api/sets/${workset['workset_id']}/workset_state/`,
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {

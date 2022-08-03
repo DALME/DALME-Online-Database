@@ -1,4 +1,4 @@
-import { apiUrl, dbUrl, modalLoginUrl, headers } from "./config";
+import { apiUrl, coreUrl, modalLoginUrl, headers } from "./config";
 
 const auth = {
   login({ username, password }) {
@@ -10,7 +10,7 @@ const auth = {
     });
   },
   logout() {
-    const url = `${dbUrl}/logout/`;
+    const url = `${coreUrl}/logout/`;
     return new Request(url, { method: "POST", headers: headers() });
   },
   session() {

@@ -17,7 +17,7 @@ function get_cookie(name) {
 function update_session(data) {
     $.ajax({
       method : "POST",
-      url: `${api_endpoint}/session/alter/`,
+      url: "/api/session/alter/",
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: {

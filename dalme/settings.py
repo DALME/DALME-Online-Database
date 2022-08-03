@@ -30,6 +30,7 @@ ALLOWED_HOSTS = [
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+HOST = 'https://127.0.0.1.sslip.io:8000'
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
@@ -62,25 +63,10 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://*.dalme.org',
     'https://dalme.org',
-    'https://data.dalme.org',
-    'https://purl.dalme.org',
-    'https://db.dalme.org',
     'https://kb.dalme.org',
     'https://dam.dalme.org',
-    'https://digital.bodleian.ox.ac.uk',  # to test serving of IIIF manifests to external apps
-    'https://storiiies-editor.cogapp.com',  # Apr/2022, for Laura: allow access to IIIF manifests
-    'https://sims2.digitalmappa.org',  # Apr/2022, for Laura: allow access to IIIF manifests
 ]
 CORS_ALLOW_CREDENTIALS = True
-
-ROOT_HOSTCONF = 'dalme.hosts'
-ROOT_URLCONF = 'dalme.urls'
-DEFAULT_HOST = 'public'
-PARENT_HOST = 'dalme.org'
-HOST_SCHEME = 'https://'
-API_ENDPOINT = 'https://data.dalme.org'
-PURL_ENDPOINT = 'https://purl.dalme.org'
-DB_ENDPOINT = 'https://db.dalme.org'
 
 SESSION_COOKIE_DOMAIN = '.dalme.org'
 SESSION_COOKIE_SECURE = True
@@ -104,7 +90,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django_hosts',
     'django_elasticsearch_dsl',
     'django_q',
     'djangosaml2idp',
@@ -139,7 +124,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'dalme_app.utils.SubdomainRedirectMiddleware',
-    'django_hosts.middleware.HostsRequestMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -153,7 +137,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
 TEMPLATES = [
@@ -191,7 +174,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
-LOGIN_URL = 'https://db.dalme.org/accounts/login/'
+LOGIN_URL = 'https://dalme.org/db/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 

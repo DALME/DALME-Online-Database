@@ -320,8 +320,6 @@ class DALMEPage(Page):
         context.update({
             'header_image': self.header_image,
             'header_position': self.header_position,
-            'api_endpoint': settings.API_ENDPOINT,
-            'db_endpoint': settings.DB_ENDPOINT
         })
         return context
 

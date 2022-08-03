@@ -1,7 +1,7 @@
 function initialize_dt(config, editor, target) {
   $.ajax({
     method: "POST",
-    url: `${api_endpoint}/configs/get/`,
+    url: "/api/configs/get/",
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {
@@ -76,7 +76,7 @@ function build_editor(data, target) {
           return new Promise(function (resolve, reject) {
               $.ajax({
                   method: "POST",
-                  url: `${api_endpoint}/${endpoint}/${data.id}/has_permission/`,
+                  url: `/api/${endpoint}/${data.id}/has_permission/`,
                   xhrFields: { withCredentials: true },
                   crossDomain: true,
                   headers: { 'X-CSRFToken': get_cookie("csrftoken") },
@@ -95,10 +95,10 @@ function build_editor(data, target) {
       dt_editor.on('preSubmit.dalme', function(e, data, action) {
         let ajax_obj = dt_editor.ajax()
         if (Object.keys(data.data).length == 1) {
-          let url = action == 'create' ? `${api_endpoint}/${endpoint}/` : `${api_endpoint}/${endpoint}/${Object.keys(data.data)[0]}/`
+          let url = action == 'create' ? `/api/${endpoint}/` : `/api/${endpoint}/${Object.keys(data.data)[0]}/`
           ajax_obj[action]['url'] = url
         } else {
-          ajax_obj[action]['url'] = `${api_endpoint}/${endpoint}/bulk_${action}/`
+          ajax_obj[action]['url'] = `/api/${endpoint}/bulk_${action}/`
         }
         dt_editor.ajax(ajax_obj)
       });
@@ -165,7 +165,7 @@ function build_datatables(data, target, editor) {
   var table_options = _.merge(data[1].datatables.options, data[0].datatables.options);
   table_options['ajax']['headers']['X-CSRFToken'] = (get_cookie("csrftoken"));
   table_options['ajax']['data'] = (function (data) { return { "data": JSON.stringify(data) }; });
-  table_options['ajax']['url'] = `${api_endpoint}/${table_options['ajax']['url']}`;
+  table_options['ajax']['url'] = `/api/${table_options['ajax']['url']}`;
 
   if (typeof source_type != 'undefined' && source_type == 'records') {
     table_options['ajax']['url'] = table_options['ajax']['url'] + `&mode=${user_prefs.list_scope}`;
@@ -414,7 +414,7 @@ function get_dt_elements({
 
       $.ajax({
         method: "POST",
-        url: `${api_endpoint}/configs/get/`,
+        url: "/api/configs/get/",
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {
@@ -479,14 +479,14 @@ function process_dt_fields(type, fields, overrides) {
                       break;
 
                   case 'api_call':
-                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${opt_object['url']}" + encodeURIComponent(query),\
+                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "/api/${opt_object['url']}" + encodeURIComponent(query),\
                       type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
                       error: function() {callback();},success: function(res) {callback(res);}});})`)
                       delete fields[i]['options'];
                       break;
 
                   case 'api_call_x':
-                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${opt_object['url']}" + encodeURIComponent(query),\
+                      fields[i]['opts']['load'] = eval(`(function(query, callback) {$.ajax({url: "/api/${opt_object['url']}" + encodeURIComponent(query),\
                       type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
                       error: function() {callback();},success: function(res) {callback(res);}});})`)
                       fields[i]['opts']['render'] = eval(`(${opt_object['render']})`)
@@ -498,7 +498,7 @@ function process_dt_fields(type, fields, overrides) {
             if (fields[i]['type'] == "upload") {
               fields[i]['ajax'] = {
                 method: 'POST',
-                url: `${api_endpoint}/attachments/`,
+                url: `/api/attachments/`,
                 xhrFields: { withCredentials: true },
                 crossDomain: true,
                 headers: { 'X-CSRFToken': get_cookie("csrftoken") },

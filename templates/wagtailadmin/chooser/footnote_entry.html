@@ -1,6 +1,5 @@
-{% load i18n l10n wagtailadmin_tags hosts %}
+{% load i18n l10n wagtailadmin_tags %}
 {% include "wagtailadmin/shared/header.html" with title=title icon="list-ol" %}
-{% host_url 'api_endpoint' host 'data' as api_url %}
 
 <div class="nice-padding">
     <form action="{% url 'wagtailadmin_enter_footnote' %}" method="post" novalidate>

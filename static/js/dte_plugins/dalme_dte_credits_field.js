@@ -48,7 +48,7 @@ _fieldTypes.dalmeCredits = {
         valueField: conf.opts.agents['valueField'],
         labelField: conf.opts.agents['labelField'],
         searchField: conf.opts.agents['searchField'],
-        load: eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${conf.opts.agents['url']}" + encodeURIComponent(query),\
+        load: eval(`(function(query, callback) {$.ajax({url: "/api/${conf.opts.agents['url']}" + encodeURIComponent(query),\
         type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
         error: function() {callback();},success: function(res) {callback(res);}});})`),
       });
@@ -60,7 +60,7 @@ _fieldTypes.dalmeCredits = {
         valueField: conf.opts.types['valueField'],
         labelField: conf.opts.types['labelField'],
         searchField: conf.opts.types['searchField'],
-        load: eval(`(function(query, callback) {$.ajax({url: "${api_endpoint}/${conf.opts.types['url']}" + encodeURIComponent(query),\
+        load: eval(`(function(query, callback) {$.ajax({url: "/api/${conf.opts.types['url']}" + encodeURIComponent(query),\
         type: 'GET',xhrFields: { withCredentials: true },crossDomain: true,headers: {"X-CSRFToken": get_cookie("csrftoken")},\
         error: function() {callback();},success: function(res) {callback(res);}});})`),
       });

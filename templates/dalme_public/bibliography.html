@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
-{% load wagtailcore_tags static hosts compress %}
+{% load wagtailcore_tags static compress %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
 
@@ -37,7 +37,6 @@
   {% endcompress %}
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
-  {% host_url 'api_endpoint' host 'data' as api_url %}
   <script>
     Vue.component('beat-loader', VueSpinner.BeatLoader);
     const bibliography_app = new Vue({
@@ -56,7 +55,6 @@
       data: {
         loading: true,
         config: null,
-        api_endpoint: '{{ api_url }}',
         format: 'html',
         template: 'dalme',
         output_format: 'bibliography',
@@ -84,7 +82,7 @@
         createBibliography(key) {
           const that = this;
           return new Promise(async function (resolve, reject) {
-            await fetch(`${that.api_endpoint}/library/?collection=${key}&content=csljson&format=json`)
+            await fetch(`/api/library/?collection=${key}&content=csljson&format=json`)
               .then(response => response.json())
               .then(data => {
                 let citation = new that.cite();

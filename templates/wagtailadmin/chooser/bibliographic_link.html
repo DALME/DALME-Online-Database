@@ -1,6 +1,5 @@
-{% load i18n l10n wagtailadmin_tags hosts %}
+{% load i18n l10n wagtailadmin_tags %}
 {% include "wagtailadmin/shared/header.html" with title="Choose an Entry" icon="openquote" %}
-{% host_url 'api_endpoint' host 'data' as api_url %}
 
 <div class="nice-padding">
     {% include 'wagtailadmin/chooser/_link_types.html' with current='biblio_entry' %}

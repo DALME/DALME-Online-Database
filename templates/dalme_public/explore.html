@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
-{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags hosts %}
+{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}Explore &mdash; {{ block.super }}{% endblock %}
 
@@ -35,14 +35,13 @@
 {% endblock %}
 {% block js_foot %}
   {{ block.super }}
-  {% host_url 'api_endpoint' host 'data' as api_url %}
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
   <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
   <script type="text/javascript" src="{% static 'js/leafletDraw/leaflet.draw.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/leafletZoomBox/L.Control.ZoomBox.min.js' %}"></script>
   <script>
     $(document).ready(function() {
-      const endpoint = "{{ api_url }}/datasets/explore_map/?format=json";
+      const endpoint = "/api/datasets/explore_map/?format=json";
       $.get(endpoint, function(data) {
 
           map = L.map('map_container', {

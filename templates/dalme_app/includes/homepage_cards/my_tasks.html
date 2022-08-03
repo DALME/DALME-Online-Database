@@ -18,7 +18,7 @@
 <script>
   $('#dataTables-tasks').DataTable({
   'ajax': {
-    'url': `${api_endpoint}/tasks/?format=json&filter=assigned_to,${user['id']}`,
+    'url': `/api/tasks/?format=json&filter=assigned_to,${user['id']}`,
     'data': function (data) { return { "data": JSON.stringify( data ) }; }
   },
   serverSide: true,
@@ -38,14 +38,14 @@
                 text: 'Tasks assigned to me',
                 className: 'footer-btn',
                 action: function () {
-                  table_tasks.ajax.url(`${api_endpoint}/tasks/?format=json&filter=assigned_to,${user['id']}`).draw();
+                  table_tasks.ajax.url(`/api/tasks/?format=json&filter=assigned_to,${user['id']}`).draw();
                 }
           },
           {
                 text: 'Tasks I created',
                 className: 'footer-btn',
                 action: function () {
-                  table_tasks.ajax.url(`${api_endpoint}/tasks/?format=json&filter=created_by,${user['id']}`).draw();
+                  table_tasks.ajax.url(`/api/tasks/?format=json&filter=created_by,${user['id']}`).draw();
                 }
           },
         ],
@@ -140,7 +140,7 @@ function restore_detail_pane() {
 function show_task_detail(id) {
   $.ajax({
     method: "GET",
-    url: `${api_endpoint}/tasks/"+id+"/?format=json`,
+    url: "/api/tasks/"+id+"/?format=json",
     xhrFields: { withCredentials: true },
     crossDomain: true,
     headers: {

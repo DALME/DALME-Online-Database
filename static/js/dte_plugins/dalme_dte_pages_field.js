@@ -155,7 +155,7 @@ _fieldTypes.dalmePages = {
       if (query !== '') {
         $.ajax({
           method: "GET",
-          url: `${api_endpoint}/images/?search=${query}`,
+          url: `/api/images/?search=${query}`,
           xhrFields: { withCredentials: true },
           crossDomain: true,
           headers: { 'X-CSRFToken': get_cookie("csrftoken") },

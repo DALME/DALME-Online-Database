@@ -4,7 +4,7 @@ function task_detail() {
 function edit_task(id) {
       $.ajax({
         method: "GET",
-        url: `${api_endpoint}/options/?target=active_staff,user_worksets,user_task_lists&format=json`,
+        url: "/api/options/?target=active_staff,user_worksets,user_task_lists&format=json",
         xhrFields: { withCredentials: true },
         crossDomain: true,
         headers: {
@@ -18,7 +18,7 @@ function edit_task(id) {
           editTaskForm = new $.fn.dataTable.Editor( {
                 ajax: {
                   method: "PATCH",
-                  url: `${api_endpoint}/tasks/_id_/`,
+                  url: "/api/tasks/_id_/",
                   headers: { 'X-CSRFToken': get_cookie("csrftoken") },
                   data: function (data) { return { "data": JSON.stringify( data ) }; }
                 },
@@ -79,7 +79,7 @@ function edit_task(id) {
                       type: "upload",
                       ajax: {
                         method: "POST",
-                        url: `${api_endpoint}/attachments/`,
+                        url: "/api/attachments/",
                         headers: {
                           "Content-Type": "application/json",
                           'X-CSRFToken': get_cookie("csrftoken")
@@ -121,7 +121,7 @@ function delete_task(id) {
   if (conf == true) {
     $.ajax({
       method: "DELETE",
-      url: `${api_endpoint}/tasks/${id}`,
+      url: `/api/tasks/${id}`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: { 'X-CSRFToken': get_cookie("csrftoken") },
@@ -136,7 +136,7 @@ function delete_task(id) {
 function task_change_state(task, action) {
     $.ajax({
       method: "PATCH",
-      url: `${api_endpoint}/tasks/${task}/set_state/`,
+      url: `/api/tasks/${task}/set_state/`,
       xhrFields: { withCredentials: true },
       crossDomain: true,
       headers: {
