@@ -2,9 +2,8 @@ import json
 from rest_framework import viewsets
 from rest_framework.response import Response
 from dalme_api.access_policies import GeneralAccessPolicy
-from dalme_app.utils import zotero
+from pyzotero import zotero
 from django.conf import settings
-from rest_framework.decorators import action
 
 
 class Library(viewsets.ViewSet):
@@ -14,7 +13,6 @@ class Library(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         data = request.GET.get('data')
         collection = request.GET.get('collection')
-        id = request.GET.get('id')
         search = request.GET.get('search')
         content = request.GET.get('content')
         limit = request.GET.get('limit')
