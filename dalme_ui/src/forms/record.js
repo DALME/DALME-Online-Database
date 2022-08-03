@@ -119,10 +119,13 @@ const recordFormSchema = {
   },
 };
 
+const sourceType = { id: 13 }; // TODO: Magic number.
 const recordRequests = {
   get: (id) => requests.sources.getSource(id),
-  create: (data) => requests.sources.createSource(data),
-  update: ({ id, ...data }) => requests.sources.editSource(id, data),
+  create: (data) =>
+    requests.sources.createSource({ type: sourceType, ...data }),
+  update: ({ id, ...data }) =>
+    requests.sources.editSource(id, { type: sourceType, ...data }),
 };
 
 export default {

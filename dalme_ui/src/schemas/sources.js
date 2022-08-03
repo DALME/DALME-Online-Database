@@ -1,6 +1,8 @@
 import { last } from "ramda";
 import * as yup from "yup";
 
+import { normalizeAttributesOutput } from "@/components/forms/attributes-field/normalize";
+
 import { ownerSchema } from "./common";
 
 export const sourceOptionsSchema = yup.array().of(
@@ -387,20 +389,45 @@ export const sourceListSchema = (sourceType) => {
 
 // POST/PUT data schemas.
 // Normalizes source form data for output to the API.
-const sourcePostSchema = yup.object().shape({
-  name: yup.string().required(),
-  shortName: yup.string().required(),
-  parent: yup.string().uuid().default(null).nullable(),
-  hasInventory: yup.boolean().default(false).required(),
-  isPrivate: yup.boolean().default(false).required(),
-  primaryDataset: yup.string().uuid().default(null).nullable(),
-  // TODO: Make a payload with all these and use that as yer guide.
-  // sets,
-  // agents,
-  // attributes,
-  // credits,
-  // pages,
-});
+const sourcePostSchema = yup
+  .object()
+  .shape({
+    name: yup.string().required(),
+    shortName: yup.string().required(),
+    type: yup.object().shape({
+      id: yup.number().nullable().required(),
+    }),
+    parent: yup
+      .object()
+      .shape({ id: yup.string().uuid().required() })
+      .default(null)
+      .nullable(),
+    primaryDataset: yup
+      .object()
+      .shape({ id: yup.string().uuid().required() })
+      .default(null)
+      .nullable(),
+    hasInventory: yup.boolean().default(false).required(),
+    isPrivate: yup.boolean().default(false).required(),
+    attributes: yup.mixed(), // TODO: We can improve this.
+    // sets,
+    // agents,
+    // credits,
+    // pages,
+  })
+  .transform((data) => {
+    return {
+      ...data,
+      type: { id: data.type.value },
+      parent: data.parent ? { id: data.parent.value } : null,
+      primaryDataset: data.primaryDataset
+        ? { id: data.primaryDataset.value }
+        : null,
+      hasInventory: Boolean(data.hasInventory),
+      isPrivate: Boolean(data.isPrivate),
+      attributes: normalizeAttributesOutput(data),
+    };
+  });
 
 const sourcePutSchema = sourcePostSchema.shape({
   id: yup.string().uuid().required(),

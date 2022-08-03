@@ -3,7 +3,7 @@ import { inject, provide, ref } from "vue";
 const TooltipsSymbol = Symbol();
 
 export const provideTooltips = () => {
-  const showTips = ref(true);
+  const showTips = ref(false);
 
   provide(TooltipsSymbol, { showTips });
 };

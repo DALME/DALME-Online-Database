@@ -84,14 +84,32 @@ class SourceSerializer(DynamicSerializer):
 
     class Meta:
         model = Source
-        fields = ('id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'primary_dataset', 'attributes', 'inherited', 'credits',
-                  'no_folios', 'no_images', 'workflow', 'owner', 'sets', 'pages', 'no_records', 'is_private')
+        fields = (
+            'id',
+            'type',
+            'name',
+            'short_name',
+            'parent',
+            'has_inventory',
+            'primary_dataset',
+            'attributes',
+            'inherited',
+            'credits',
+            'no_folios',
+            'no_images',
+            'workflow',
+            'owner',
+            'sets',
+            'pages',
+            'no_records',
+            'is_private',
+        )
         extra_kwargs = {
-                        'parent': {'required': False},
-                        'no_folios': {'required': False},
-                        'no_images': {'required': False},
-                        'primary_dataset': {'required': False}
-                        }
+            'parent': {'required': False},
+            'no_folios': {'required': False},
+            'no_images': {'required': False},
+            'primary_dataset': {'required': False}
+        }
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -173,19 +191,21 @@ class SourceSerializer(DynamicSerializer):
             if data.get(name) is not None:
                 data[name] = data[name]['id']
 
-        if data.get('primary_dataset', {}).get('id') is not None:
-            data['primary_dataset']['name'] = Set.objects.get(pk=data['primary_dataset']['id']).name
+        primary_dataset = data.get('primary_dataset', {})
+        if primary_dataset.get('id') is not None:
+            data['primary_dataset']['name'] = Set.objects.get(pk=primary_dataset['id']).name
 
         if data.get('attributes'):
             _type = data.get('type', False) or self.instance.type
             data['attributes'] = self.process_attributes(_type, data['attributes'])
 
-        if data.get('workflow', {}).get('status') is not None:
-            if data['workflow']['status']['text'] is not None:
-                for key, value in translate_workflow_string(data['workflow']['status']['text']).items():
+        workflow = data.get('workflow', {})
+        if workflow.get('status') is not None:
+            if workflow['status']['text'] is not None:
+                for key, value in translate_workflow_string(workflow['status']['text']).items():
                     data['workflow'][key] = value
             else:
-                data['workflow'].pop('status')
+                workflow.pop('status')
 
         if data.get('credits') is not None and not data.get('credits'):
             data.pop('credits')

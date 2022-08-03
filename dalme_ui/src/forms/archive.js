@@ -47,11 +47,13 @@ const archiveFormSchema = {
   },
 };
 
+const sourceType = { id: 19 }; // TODO: Magic number.
 const archiveRequests = {
   get: (id) => requests.sources.getSource(id),
-  // TODO: Need to include type in here or somewhere else.
-  create: (data) => requests.sources.createSource(data),
-  update: ({ id, ...data }) => requests.sources.editSource(id, data),
+  create: (data) =>
+    requests.sources.createSource({ type: sourceType, ...data }),
+  update: ({ id, ...data }) =>
+    requests.sources.editSource(id, { type: sourceType, ...data }),
 };
 
 export default {

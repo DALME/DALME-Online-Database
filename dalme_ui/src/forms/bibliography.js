@@ -90,7 +90,6 @@ const bibliographyFormSchema = {
 
 const bibliographyRequests = {
   get: (id) => requests.sources.getSource(id),
-  // TODO: Need to include type in here or somewhere else.
   create: (data) => requests.sources.createSource(data),
   update: ({ id, ...data }) => requests.sources.editSource(id, data),
 };
