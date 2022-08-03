@@ -28,9 +28,9 @@ RUN apt-get clean
 
 WORKDIR /opt/app
 COPY ./manage.py .
-COPY ./requirements-beta.txt .
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r ./requirements-beta.txt
+RUN pip install --no-cache-dir -r ./requirements.txt
 
 COPY dalme ./dalme
 COPY dalme_api ./dalme_api
@@ -52,6 +52,4 @@ RUN mkdir -p /var/log/django && \
 
 RUN mkdir -p /var/log/djangoq/ /var/run/djangoq/
 
-#ENTRYPOINT ["/bin/bash", "-c", "/sbin/docker-entrypoint.sh"]
-#CMD ["gunicorn", "-c", "gunicorn.conf.py", "dalme.wsgi"]
 STOPSIGNAL SIGINT

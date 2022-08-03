@@ -1,9 +1,4 @@
-import json
-
-from stringcase import snakecase
-
-from django.conf import settings
-from django.http import HttpResponse, JsonResponse, QueryDict
+from django.http import JsonResponse
 
 
 class UIAuthMiddleware:
@@ -16,9 +11,8 @@ class UIAuthMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
-        if settings.IS_V2:
-            # TODO: This is brittle, must be easily improved.
-            if response.status_code == 500 and not request.user.is_authenticated:
-                return JsonResponse({'error': 'Reauthenticate'}, status=403)
+        # TODO: This is brittle, must be easily improved.
+        if response.status_code == 500 and not request.user.is_authenticated:
+            return JsonResponse({'error': 'Reauthenticate'}, status=403)
 
         return response
