@@ -15,6 +15,12 @@ const images = {
       method: "GET",
     };
   },
+  getImageInfo(iiif_id) {
+    return {
+      url: `${iiif_id}/info.json`,
+      method: "GET",
+    };
+  },
 };
 
 export default images;
