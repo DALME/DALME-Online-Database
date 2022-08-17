@@ -1,0 +1,696 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  CloudMap:
+    Properties:
+      Description: Service Map for Docker Compose project dalme-online-database
+      Name: dalme-online-database.local
+      Vpc: vpc-5f496427
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+  Cluster:
+    Properties:
+      ClusterName: dalme-online-database
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+    Type: AWS::ECS::Cluster
+  DalmeproxyService:
+    DependsOn:
+    - DalmeproxyTCP80Listener
+    - DalmewebService
+    Properties:
+      Cluster:
+        Fn::GetAtt:
+        - Cluster
+        - Arn
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+      - ContainerName: dalme.proxy
+        ContainerPort: 80
+        TargetGroupArn:
+          Ref: DalmeproxyTCP80TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Ref: DefaultNetwork
+          Subnets:
+          - subnet-1fd59c7b
+          - subnet-b0a0289f
+      PlatformVersion: 1.4.0
+      PropagateTags: SERVICE
+      SchedulingStrategy: REPLICA
+      ServiceRegistries:
+      - RegistryArn:
+          Fn::GetAtt:
+          - DalmeproxyServiceDiscoveryEntry
+          - Arn
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.service
+        Value: dalme.proxy
+      TaskDefinition:
+        Ref: DalmeproxyTaskDefinition
+    Type: AWS::ECS::Service
+  DalmeproxyServiceDiscoveryEntry:
+    Properties:
+      Description: '"dalme.proxy" service discovery entry in Cloud Map'
+      DnsConfig:
+        DnsRecords:
+        - TTL: 60
+          Type: A
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: dalme.proxy
+      NamespaceId:
+        Ref: CloudMap
+    Type: AWS::ServiceDiscovery::Service
+  DalmeproxyTCP80Listener:
+    Properties:
+      DefaultActions:
+      - ForwardConfig:
+          TargetGroups:
+          - TargetGroupArn:
+              Ref: DalmeproxyTCP80TargetGroup
+        Type: forward
+      LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:916099420556:loadbalancer/app/dalme2-beta-lb/fd1da57d9b525c65
+      Port: 80
+      Protocol: HTTP
+    Type: AWS::ElasticLoadBalancingV2::Listener
+  DalmeproxyTCP80TargetGroup:
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      TargetType: ip
+      VpcId: vpc-5f496427
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  DalmeproxyTaskDefinition:
+    Properties:
+      ContainerDefinitions:
+      - Command:
+        - '[{"Name":"dalme-secrets","Keys":["*"]}]'
+        Essential: false
+        Image: docker/ecs-secrets-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          SourceVolume: secrets
+        Name: Dalmeproxy_Secrets_InitContainer
+        Secrets:
+        - Name: dalme-secrets
+          ValueFrom: arn:aws:secretsmanager:us-east-1:916099420556:secret:dalme2/beta-0YUCdx
+      - Command:
+        - us-east-1.compute.internal
+        - dalme-online-database.local
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        Name: Dalmeproxy_ResolvConf_InitContainer
+      - DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Dalmeproxy_Secrets_InitContainer
+        - Condition: SUCCESS
+          ContainerName: Dalmeproxy_ResolvConf_InitContainer
+        Essential: true
+        Image: 916099420556.dkr.ecr.us-east-1.amazonaws.com/dalme-prod:proxy@sha256:ffeaab41ea681b142cc2daf15a34e4e1cd8bc432bf724c73e744af7a11e771c2
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          ReadOnly: true
+          SourceVolume: secrets
+        Name: dalme.proxy
+        PortMappings:
+        - ContainerPort: 80
+          HostPort: 80
+          Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn:
+        Ref: DalmeproxyTaskExecutionRole
+      Family: dalme-online-database-dalme.proxy
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+      Volumes:
+      - Name: secrets
+    Type: AWS::ECS::TaskDefinition
+  DalmeproxyTaskExecutionRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - secretsmanager:GetSecretValue
+            - ssm:GetParameters
+            - kms:Decrypt
+            Condition: {}
+            Effect: Allow
+            Principal: {}
+            Resource:
+            - arn:aws:secretsmanager:us-east-1:916099420556:secret:dalme2/beta-0YUCdx
+        PolicyName: dalme.proxyGrantAccessToSecrets
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.service
+        Value: dalme.proxy
+    Type: AWS::IAM::Role
+  Dalmeui3000Listener:
+    Properties:
+      DefaultActions:
+      - ForwardConfig:
+          TargetGroups:
+          - TargetGroupArn:
+              Ref: Dalmeui3000TargetGroup
+        Type: forward
+      LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:916099420556:loadbalancer/app/dalme2-beta-lb/fd1da57d9b525c65
+      Port: 3000
+      Protocol: HTTP
+    Type: AWS::ElasticLoadBalancingV2::Listener
+  Dalmeui3000TargetGroup:
+    Properties:
+      Port: 3000
+      Protocol: HTTP
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      TargetType: ip
+      VpcId: vpc-5f496427
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  DalmeuiService:
+    DependsOn:
+    - Dalmeui3000Listener
+    - DalmewebService
+    Properties:
+      Cluster:
+        Fn::GetAtt:
+        - Cluster
+        - Arn
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+      - ContainerName: dalme.ui
+        ContainerPort: 3000
+        TargetGroupArn:
+          Ref: Dalmeui3000TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Ref: DefaultNetwork
+          Subnets:
+          - subnet-1fd59c7b
+          - subnet-b0a0289f
+      PlatformVersion: 1.4.0
+      PropagateTags: SERVICE
+      SchedulingStrategy: REPLICA
+      ServiceRegistries:
+      - RegistryArn:
+          Fn::GetAtt:
+          - DalmeuiServiceDiscoveryEntry
+          - Arn
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.service
+        Value: dalme.ui
+      TaskDefinition:
+        Ref: DalmeuiTaskDefinition
+    Type: AWS::ECS::Service
+  DalmeuiServiceDiscoveryEntry:
+    Properties:
+      Description: '"dalme.ui" service discovery entry in Cloud Map'
+      DnsConfig:
+        DnsRecords:
+        - TTL: 60
+          Type: A
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: dalme.ui
+      NamespaceId:
+        Ref: CloudMap
+    Type: AWS::ServiceDiscovery::Service
+  DalmeuiTaskDefinition:
+    Properties:
+      ContainerDefinitions:
+      - Command:
+        - '[{"Name":"dalme-secrets","Keys":["*"]}]'
+        Essential: false
+        Image: docker/ecs-secrets-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          SourceVolume: secrets
+        Name: Dalmeui_Secrets_InitContainer
+        Secrets:
+        - Name: dalme-secrets
+          ValueFrom: arn:aws:secretsmanager:us-east-1:916099420556:secret:dalme2/beta-0YUCdx
+      - Command:
+        - us-east-1.compute.internal
+        - dalme-online-database.local
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        Name: Dalmeui_ResolvConf_InitContainer
+      - DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Dalmeui_Secrets_InitContainer
+        - Condition: SUCCESS
+          ContainerName: Dalmeui_ResolvConf_InitContainer
+        Essential: true
+        Image: 916099420556.dkr.ecr.us-east-1.amazonaws.com/dalme-prod:ui@sha256:aa76d049ebd70c2e91cf263015d8a37e9f7f1d777f1caeee16c88986acb868a2
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          ReadOnly: true
+          SourceVolume: secrets
+        Name: dalme.ui
+        PortMappings:
+        - ContainerPort: 3000
+          HostPort: 3000
+      Cpu: "256"
+      ExecutionRoleArn:
+        Ref: DalmeuiTaskExecutionRole
+      Family: dalme-online-database-dalme.ui
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+      Volumes:
+      - Name: secrets
+    Type: AWS::ECS::TaskDefinition
+  DalmeuiTaskExecutionRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - secretsmanager:GetSecretValue
+            - ssm:GetParameters
+            - kms:Decrypt
+            Condition: {}
+            Effect: Allow
+            Principal: {}
+            Resource:
+            - arn:aws:secretsmanager:us-east-1:916099420556:secret:dalme2/beta-0YUCdx
+        PolicyName: dalme.uiGrantAccessToSecrets
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.service
+        Value: dalme.ui
+    Type: AWS::IAM::Role
+  Dalmeweb8443Listener:
+    Properties:
+      DefaultActions:
+      - ForwardConfig:
+          TargetGroups:
+          - TargetGroupArn:
+              Ref: Dalmeweb8443TargetGroup
+        Type: forward
+      LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:916099420556:loadbalancer/app/dalme2-beta-lb/fd1da57d9b525c65
+      Port: 8443
+      Protocol: HTTP
+    Type: AWS::ElasticLoadBalancingV2::Listener
+  Dalmeweb8443TargetGroup:
+    Properties:
+      Port: 8443
+      Protocol: HTTP
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      TargetType: ip
+      VpcId: vpc-5f496427
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  DalmewebAutoScalingRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: application-autoscaling.amazonaws.com
+        Version: 2012-10-17
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - application-autoscaling:*
+            - ecs:DescribeServices
+            - ecs:UpdateService
+            - cloudwatch:GetMetricStatistics
+            Condition: {}
+            Effect: Allow
+            Principal: {}
+            Resource:
+            - Ref: DalmewebService
+        PolicyName: service-autoscaling
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.service
+        Value: dalme.web
+    Type: AWS::IAM::Role
+  DalmewebScalableTarget:
+    DependsOn:
+    - DalmewebService
+    Properties:
+      MaxCapacity: 3
+      MinCapacity: 1
+      ResourceId:
+        Fn::Join:
+        - /
+        - - service
+          - Ref: Cluster
+          - Fn::GetAtt:
+            - DalmewebService
+            - Name
+      RoleARN:
+        Fn::GetAtt:
+        - DalmewebAutoScalingRole
+        - Arn
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+  DalmewebScalingPolicy:
+    Properties:
+      PolicyName: DalmewebScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId:
+        Ref: DalmewebScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 60
+        TargetValue: 85
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  DalmewebService:
+    DependsOn:
+    - Dalmeweb8443Listener
+    Properties:
+      Cluster:
+        Fn::GetAtt:
+        - Cluster
+        - Arn
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+      - ContainerName: dalme.web
+        ContainerPort: 8443
+        TargetGroupArn:
+          Ref: Dalmeweb8443TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Ref: DefaultNetwork
+          Subnets:
+          - subnet-1fd59c7b
+          - subnet-b0a0289f
+      PlatformVersion: 1.4.0
+      PropagateTags: SERVICE
+      SchedulingStrategy: REPLICA
+      ServiceRegistries:
+      - RegistryArn:
+          Fn::GetAtt:
+          - DalmewebServiceDiscoveryEntry
+          - Arn
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.service
+        Value: dalme.web
+      TaskDefinition:
+        Ref: DalmewebTaskDefinition
+    Type: AWS::ECS::Service
+  DalmewebServiceDiscoveryEntry:
+    Properties:
+      Description: '"dalme.web" service discovery entry in Cloud Map'
+      DnsConfig:
+        DnsRecords:
+        - TTL: 60
+          Type: A
+        RoutingPolicy: MULTIVALUE
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: dalme.web
+      NamespaceId:
+        Ref: CloudMap
+    Type: AWS::ServiceDiscovery::Service
+  DalmewebTaskDefinition:
+    Properties:
+      ContainerDefinitions:
+      - Command:
+        - '[{"Name":"dalme-secrets","Keys":["*"]}]'
+        Essential: false
+        Image: docker/ecs-secrets-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          SourceVolume: secrets
+        Name: Dalmeweb_Secrets_InitContainer
+        Secrets:
+        - Name: dalme-secrets
+          ValueFrom: arn:aws:secretsmanager:us-east-1:916099420556:secret:dalme2/beta-0YUCdx
+      - Command:
+        - us-east-1.compute.internal
+        - dalme-online-database.local
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        Name: Dalmeweb_ResolvConf_InitContainer
+      - Command:
+        - bash
+        - -c
+        - |-
+          python manage.py makemigrations &&
+                  python manage.py migrate --noinput &&
+                  /usr/local/bin/supervisord -c /etc/supervisord.conf
+        DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Dalmeweb_Secrets_InitContainer
+        - Condition: SUCCESS
+          ContainerName: Dalmeweb_ResolvConf_InitContainer
+        Essential: true
+        Image: 916099420556.dkr.ecr.us-east-1.amazonaws.com/dalme-prod:web@sha256:e969881fbfeeef916b72f9e20678041706b5d77bc6d8b51f622779b2250770e8
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: dalme-online-database
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          ReadOnly: true
+          SourceVolume: secrets
+        Name: dalme.web
+        PortMappings:
+        - ContainerPort: 8443
+          HostPort: 8443
+      Cpu: "512"
+      ExecutionRoleArn:
+        Ref: DalmewebTaskExecutionRole
+      Family: dalme-online-database-dalme.web
+      Memory: "2048"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+      Volumes:
+      - Name: secrets
+    Type: AWS::ECS::TaskDefinition
+  DalmewebTaskExecutionRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - secretsmanager:GetSecretValue
+            - ssm:GetParameters
+            - kms:Decrypt
+            Condition: {}
+            Effect: Allow
+            Principal: {}
+            Resource:
+            - arn:aws:secretsmanager:us-east-1:916099420556:secret:dalme2/beta-0YUCdx
+        PolicyName: dalme.webGrantAccessToSecrets
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.service
+        Value: dalme.web
+    Type: AWS::IAM::Role
+  Default80Ingress:
+    Properties:
+      CidrIp: 0.0.0.0/0
+      Description: dalme.proxy:80/tcp on default network
+      FromPort: 80
+      GroupId:
+        Ref: DefaultNetwork
+      IpProtocol: TCP
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  Default3000Ingress:
+    Properties:
+      CidrIp: 0.0.0.0/0
+      Description: dalme.ui:3000/ on default network
+      FromPort: 3000
+      GroupId:
+        Ref: DefaultNetwork
+      IpProtocol: "-1"
+      ToPort: 3000
+    Type: AWS::EC2::SecurityGroupIngress
+  Default8443Ingress:
+    Properties:
+      CidrIp: 0.0.0.0/0
+      Description: dalme.web:8443/ on default network
+      FromPort: 8443
+      GroupId:
+        Ref: DefaultNetwork
+      IpProtocol: "-1"
+      ToPort: 8443
+    Type: AWS::EC2::SecurityGroupIngress
+  DefaultNetwork:
+    Properties:
+      GroupDescription: dalme-online-database Security Group for default network
+      Tags:
+      - Key: com.docker.compose.project
+        Value: dalme-online-database
+      - Key: com.docker.compose.network
+        Value: dalme-online-database_default
+      VpcId: vpc-5f496427
+    Type: AWS::EC2::SecurityGroup
+  DefaultNetworkIngress:
+    Properties:
+      Description: Allow communication within network default
+      GroupId:
+        Ref: DefaultNetwork
+      IpProtocol: "-1"
+      SourceSecurityGroupId:
+        Ref: DefaultNetwork
+    Type: AWS::EC2::SecurityGroupIngress
+  LogGroup:
+    Properties:
+      LogGroupName: /docker-compose/dalme-online-database
+    Type: AWS::Logs::LogGroup

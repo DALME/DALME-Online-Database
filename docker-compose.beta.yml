@@ -1,3 +1,6 @@
+# x-aws-loadbalancer: "dalme-balancer"
+# x-aws-vpc: "vpc-25435e"
+# x-aws-cluster: "ClusterName"
 services:
   dalme.web:
     image: "web:beta"
@@ -6,7 +9,7 @@ services:
       context: ./
       dockerfile: "./config/beta/Dockerfile.web"
     env_file:
-      - "./config/beta/env.local"
+      - "./config/beta/env.web.beta"
     volumes:
       - ./dalme_api:/opt/app/dalme_api
       - ./dalme_app:/opt/app/dalme_app
@@ -15,7 +18,10 @@ services:
     command: >
       bash -c "python manage.py makemigrations &&
               python manage.py migrate --noinput &&
-              gunicorn -c gunicorn.conf.py dalme.wsgi"
+              /usr/local/bin/supervisord -c /etc/supervisord.conf"
+    # gunicorn -c gunicorn.conf.py dalme.wsgi
+    # https://github.com/Koed00/django-q/issues/513
+    # ALT: https://stackoverflow.com/questions/56385462/wagtail-schedule-published-pages-management-command
     networks:
       - app-network
     ports:
@@ -31,7 +37,7 @@ services:
       context: ./
       dockerfile: "./config/beta/Dockerfile.ui"
     env_file:
-      - "./config/beta/env.local"
+      - "./config/beta/env.ui.beta"
     volumes:
       - ./dalme_ui/src:/opt/ui/src
     networks:
@@ -45,30 +51,49 @@ services:
     image: nginx:mainline
     container_name: dalme.proxy
     env_file:
-      - "./config/beta/env.local"
+      - "./config/beta/env.web.beta"
     volumes:
       - "./config/beta/nginx:/etc/nginx/conf.d"
       - ./ssl-certs:/var/certs
       - assets:/static
     networks:
       - app-network
+      # Route 53 setup: https://stackoverflow.com/questions/56443460/service-discovery-not-working-with-route-53-and-ecs-nginx-container-hosting-angu
     depends_on:
       - dalme.web
     ports:
       - "8000:443"
+      # for prod check that load balance is forwarding traffic 8000 (host)
+      # https://docs.docker.com/compose/compose-file/#ports
+      # https://docs.nginx.com/nginx/deployment-guides/amazon-web-services/route-53-global-server-load-balancing/
+    restart: on-failure
 
-  dalme.q:
-    image: "web:beta"
-    container_name: dalme.q
-    env_file:
-      - "./config/beta/env.local"
-    command: "python manage.py qcluster"
-    networks:
-      - app-network
-    depends_on:
-      - dalme.web
-    ports:
-      - "8443"
+  # dalme.q:
+  #   image: "web:beta"
+  #   container_name: dalme.q
+  #   env_file:
+  #     - "./config/beta/env.local"
+  #   command: "python manage.py qcluster"
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - dalme.web
+  #   ports:
+  #     - "8443"
+  #   deploy:
+  #     replicas: 2
+  #     restart_policy:
+  #       condition: on-failure
+  #     resources:
+  #       limits:
+  #         cpus: '0.50'
+  #         memory: 50M
+  #       reservations:
+  #         cpus: '0.25'
+  #         memory: 20M
+  #   restart: unless-stopped
+  #   x-aws-autoscaling:
+  #     cpu: 75
 
 volumes:
   assets:
@@ -76,3 +101,5 @@ volumes:
 networks:
   app-network:
     driver: bridge
+
+# x-aws-logs_retention: 10

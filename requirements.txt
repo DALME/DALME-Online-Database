@@ -36,6 +36,7 @@ requests-aws4auth==1.1.2
 urllib3==1.26.11
 wagtail==3.0.1
 stringcase==1.2.0
+supervisor==4.2.4
 wagtail-modelchooser==2.14.1
 Wand===0.6.8
 whitenoise==6.2.0

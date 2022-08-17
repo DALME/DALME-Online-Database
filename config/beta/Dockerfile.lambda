@@ -1,0 +1,39 @@
+FROM public.ecr.aws/lambda/python:3.9
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV LANG=en_US.UTF-8
+
+RUN yum -y install \
+    mysql-devel \
+    libcurl-devel \
+    openssl-devel \
+    libssl-devel \
+    libxml2-devel \
+    libxmlsec1-devel \
+    gcc \
+    nano
+RUN yum clean all
+RUN rm -rf /var/cache/yum
+
+WORKDIR ${LAMBDA_TASK_ROOT}
+COPY ./manage.py .
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r ./requirements.txt
+
+COPY dalme ./dalme
+COPY dalme_api ./dalme_api
+COPY dalme_app ./dalme_app
+COPY dalme_public ./dalme_public
+COPY dalme_purl ./dalme_purl
+COPY templates ./templates
+
+COPY ./config/beta/app.py .
+
+RUN mkdir -p /var/log/django && \
+    touch /var/log/django/dalme_app.log && \
+    chmod 777 /var/log/django/dalme_app.log
+
+CMD [ "app.handler" ]
+STOPSIGNAL SIGINT

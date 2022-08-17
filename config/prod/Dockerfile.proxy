@@ -1,0 +1,6 @@
+FROM nginx:mainline
+
+COPY ./config/prod/nginx /etc/nginx/conf.d
+COPY ./static /static
+
+STOPSIGNAL SIGINT

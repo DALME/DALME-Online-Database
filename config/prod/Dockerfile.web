@@ -1,16 +1,8 @@
-FROM python:3.7-slim-buster
+FROM python:3.9-slim-buster
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV LANG=en_US.UTF-8
-
-RUN adduser \
-    --disabled-password \
-    --gecos "Whisky" \
-    --uid 1001 \
-    --gid 0 \
-    --home /home/whisky whisky && \
-    chmod 1777 /home/whisky
 
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get update && \
@@ -41,13 +33,14 @@ COPY ./templates ./templates
 COPY ./static ./static
 COPY ssl-certs ./ssl-certs
 
-COPY ./config/dev/gunicorn.conf.py .
+COPY ./config/prod/gunicorn.conf.py .
+COPY ./config/prod/supervisord.conf /etc/supervisord.conf
+
+RUN mkdir -p /var/log/supervisord /var/run/supervisord
+RUN mkdir -p /var/log/djangoq /var/run/djangoq
 
 RUN mkdir -p /var/log/django && \
     touch /var/log/django/dalme_app.log && \
     chmod 777 /var/log/django/dalme_app.log
 
-RUN mkdir -p /var/log/djangoq/ /var/run/djangoq/
-
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "dalme.wsgi"]
 STOPSIGNAL SIGINT

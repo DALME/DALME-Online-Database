@@ -13,6 +13,65 @@ git clone https://github.com/DALME/dalme.git
 
 Copy the `env.web.dev` and `env.ui.dev` files to the `config/dev` directory.
 
+`env.web.dev` should contain the following variables:
+
+AWS credentials:
+- AWS_DEFAULT_REGION (e.g. us-east-1)
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- AWS_ES_ENDPOINT (e.g. <endpoint>.us-east-1.es.amazonaws.com)
+- AWS_STORAGE_BUCKET_NAME
+- AWS_SQS_QUEUE
+
+Django settings:
+- SECRET_KEY
+- DJANGO_SETTINGS_MODULE (e.g. dalme.settings.development)
+- DJANGO_SUPERUSER_EMAIL
+- DJANGO_SUPERUSER_NAME
+- DJANGO_SUPERUSER_PASSWORD
+- HOST (e.g. 127.0.0.1.sslip.io:8000)
+- DEBUG (on=1, off=0)
+- EMAIL_HOST (e.g. smtp.gmail.com)
+- EMAIL_USER
+- EMAIL_PASSWORD
+
+Database settings, either for RDS or local MySQL instance (if both are provided the system will prioritize RDS):
+- RDS_DB_NAME or MYSQL_DATABASE
+- RDS_USERNAME or MYSQL_USER
+- RDS_PASSWORD or MYSQL_PASSWORD
+- RDS_HOSTNAME or MYSQL_HOST
+- RDS_PORT or MYSQL_PORT
+
+Gunicorn settings:
+- GUNICORN_BIND
+- GUNICORN_WORKERS
+- GUNICORN_WORKER_CLASS
+- GUNICORN_THREADS
+- GUNICORN_RELOAD
+- GUNICORN_KEYFILE
+- GUNICORN_CERTFILE
+
+DAM access credentials:
+- DAM_API_KEY
+- DAM_API_USER
+- DAM_DB_NAME
+- DAM_HOSTNAME
+- DAM_PORT (e.g. 3306)
+- DAM_USERNAME
+- DAM_PASSWORD
+
+Zotero API information:
+- ZOTERO_LIBRARY_ID
+- ZOTERO_API_KEY
+
+Recaptcha keys:
+- RECAPTCHA_PUBLIC_KEY
+- RECAPTCHA_PRIVATE_KEY
+
+`env.ui.dev` contains a single variable to that sets the environment for the SPA:
+
+- NODE_ENV (e.g. development, beta, production)
+
 Create an `ssl-certs` directory in the project root and copy the
 `dev-localhost.cert` and `dev-localhost.key` there.
 
@@ -42,6 +101,9 @@ $ docker compose -f docker-compose.dev.yml up -d
 
 # Rebuild them.
 $ docker compose -f docker-compose.dev.yml up --build --force-recreate
+
+# prune system (esp. to address 'no space left on device' error arising from lack of available i-nodes)
+$ docker system prune --all
 ```
 
 Run commands against docker containers.

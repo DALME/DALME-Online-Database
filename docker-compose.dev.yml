@@ -12,6 +12,8 @@ services:
       - ./dalme_app:/opt/app/dalme_app
       - ./dalme_public:/opt/app/dalme_public
       - ./templates:/opt/app/templates
+    command: >
+      bash -c "./wait-for-it.sh db:3306 -- gunicorn -c gunicorn.conf.py dalme.wsgi"
     depends_on:
       - dalme.db
     networks:

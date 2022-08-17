@@ -49,5 +49,5 @@ RUN mkdir -p /var/log/django && \
     touch /var/log/django/dalme_app.log && \
     chmod 777 /var/log/django/dalme_app.log
 
-CMD ["./wait-for-it.sh", "db:3306", "--", "gunicorn", "-c", "gunicorn.conf.py", "dalme.wsgi"]
+#CMD ["./wait-for-it.sh", "db:3306", "--", "gunicorn", "-c", "gunicorn.conf.py", "dalme.wsgi"]
 STOPSIGNAL SIGINT

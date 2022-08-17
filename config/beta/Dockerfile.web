@@ -4,14 +4,6 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV LANG=en_US.UTF-8
 
-RUN adduser \
-    --disabled-password \
-    --gecos "Whisky" \
-    --uid 1001 \
-    --gid 0 \
-    --home /home/whisky whisky && \
-    chmod 1777 /home/whisky
-
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get update && \
     apt-get install -y \
@@ -42,14 +34,13 @@ COPY static ./static
 COPY ssl-certs ./ssl-certs
 
 COPY ./config/beta/gunicorn.conf.py .
+COPY ./config/beta/supervisord.conf /etc/supervisord.conf
 
-#COPY ./config/beta/entrypoint.sh /sbin/docker-entrypoint.sh
-#RUN chmod +x /sbin/docker-entrypoint.sh
+RUN mkdir -p /var/log/supervisord /var/run/supervisord
+RUN mkdir -p /var/log/djangoq /var/run/djangoq
 
 RUN mkdir -p /var/log/django && \
     touch /var/log/django/dalme_app.log && \
     chmod 777 /var/log/django/dalme_app.log
-
-RUN mkdir -p /var/log/djangoq/ /var/run/djangoq/
 
 STOPSIGNAL SIGINT
