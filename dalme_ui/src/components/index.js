@@ -34,6 +34,7 @@ export { default as Tasks } from "./tasks";
 export { default as TaskDetail } from "./task-detail";
 export { default as Tickets } from "./tickets";
 export { default as TicketDetail } from "./ticket-detail";
+export { default as TranscriptionEditor } from "./transcription-editor";
 export { default as Users } from "./users";
 export { default as UserDetail } from "./user-detail";
 export { default as Worksets } from "./worksets";
