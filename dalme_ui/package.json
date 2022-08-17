@@ -27,6 +27,7 @@
     "cuid": "^2.1.8",
     "formvuelate": "^3.7.1",
     "moment": "^2.29.1",
+    "openseadragon": "^3.0.0",
     "quasar": "^2.0.0-rc.2",
     "ramda": "^0.27.1",
     "string": "^3.3.3",
