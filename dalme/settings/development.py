@@ -6,12 +6,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # CSRF
 CSRF_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_HTTPONLY = False
 
 # Session
 USE_HTTPS = True
 SESSION_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_HTTPONLY = False
 
 # Static and media file configuration
 COMPRESS_ENABLED = False

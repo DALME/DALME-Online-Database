@@ -6,6 +6,7 @@ from django.contrib.messages import constants as messages
 import saml2
 from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
 from saml2.sigver import get_xmlsec_binary
+from datetime import timedelta
 
 # Environment variables
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
@@ -43,7 +44,8 @@ DAM_DB_HOST = os.environ.get('DAM_HOSTNAME', '')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCKER_ROOT = '/app'
-LOGIN_URL = f'https://{HOST}/db/accounts/login/'
+LOGIN_URL = f'https://{HOST}{HOST_PORT}/db/'
+LOGOUT_URL = f'https://{HOST}{HOST_PORT}/db/?logout=true'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = f'https://{HOST}{HOST_PORT}/'
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
@@ -74,26 +76,11 @@ MESSAGE_TAGS = {
     messages.ERROR: 'error',
 }
 
-# CORS
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    f'https://*.{HOST}',
-    f'https://{HOST}{HOST_PORT}',
-    f'https://kb.{HOST}',
-    f'https://dam.{HOST}',
-]
-
-CORS_EXPOSE_HEADERS = [
-    'Content-Type',
-    'X-CSRFToken',
-    f'Access-Control-Allow-Origin: https://{HOST}{HOST_PORT}',
-]
-
 # CSRF
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_DOMAIN = f'.{HOST}'
 CSRF_TRUSTED_ORIGINS = [f'https://{HOST}{HOST_PORT}']
+CSRF_COOKIE_HTTPONLY = True
 
 # Session
 ALLOWED_HOSTS = [
@@ -103,10 +90,26 @@ ALLOWED_HOSTS = [
 ]
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_DOMAIN = f'.{HOST}'
+SESSION_COOKIE_HTTPONLY = True
 SECURE_SSL_REDIRECT = True
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
+
+# JWT
+REST_SESSION_LOGIN = False
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'dalme-access-token'
+JWT_AUTH_REFRESH_COOKIE = 'dalme-refresh-token'
+JWT_AUTH_REFRESH_COOKIE_PATH = '/api/jwt/token/refresh/'
+JWT_AUTH_SECURE = True
+JWT_AUTH_HTTPONLY = True
+JWT_AUTH_SAMESITE = 'Strict'
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
+
 
 # Apps, middleware, and templates
 INSTALLED_APPS = [
@@ -122,8 +125,9 @@ INSTALLED_APPS = [
     'django_elasticsearch_dsl',
     'django_q',
     'djangosaml2idp',
-    'corsheaders',
+    'dj_rest_auth',
     'rest_framework',
+    'rest_framework.authtoken',
     'compressor',
     'storages',
     'django_filters',
@@ -156,14 +160,13 @@ if DEBUG and ENABLE_DJANGO_EXTENSIONS:
 
 MIDDLEWARE = [
     'dalme_app.utils.SubdomainRedirectMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'dalme_app.utils.JWTSessionAuthentication',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'dalme_app.utils.UIAuthMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'dalme_app.utils.AsyncMiddleware',
@@ -289,8 +292,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
     ),
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
@@ -298,22 +304,24 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'dalme_api.renderers.SelectRenderer',
-        'dalme_api.renderers.DTEJSONRenderer',
         'dalme_api.renderers.DBRenderer'
     ],
     'DEFAULT_PARSER_CLASSES': [
         'djangorestframework_camel_case.parser.CamelCaseJSONParser',
-        'dalme_api.parsers.DTEParser',
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'dalme_api.filter_backends.DalmeOrderingFilter'
     ],
-    'EXCEPTION_HANDLER': 'dalme_api.utils.DTE_exception_handler',
     'JSON_UNDERSCOREIZE': {
         'no_underscore_before_number': True,
     },
+}
+
+# JWT setup
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'dalme_app.utils.JWTUserDetailsSerializer',
 }
 
 # Dynamic preferences
