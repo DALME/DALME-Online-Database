@@ -120,6 +120,7 @@ const pageSchema = yup
     damId: yup.number().default(null).nullable(), // TODO: Unsure if null ok.
     name: yup.string().required(),
     order: yup.number().required(),
+    transcription_id: yup.string().uuid(),
     hasImage: yup.boolean().nullable(),
     hasTranscription: yup.boolean().required(),
   })
