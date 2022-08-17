@@ -53,6 +53,12 @@ const sources = {
       method: "GET",
     };
   },
+  getSourceManifest(id) {
+    return {
+      url: `${endpoint}/${id}/get_manifest/`,
+      method: "GET",
+    };
+  },
 };
 
 export default sources;
