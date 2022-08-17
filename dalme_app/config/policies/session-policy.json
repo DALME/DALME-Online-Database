@@ -1,7 +1,7 @@
 [
   {
     "action": ["alter", "retrieve", "ping"],
-    "principal": "*",
+    "principal": "authenticated",
     "effect": "allow"
   }
 ]

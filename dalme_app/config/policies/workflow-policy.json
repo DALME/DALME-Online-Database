@@ -1,7 +1,7 @@
 [
   {
     "action": ["list", "retrieve", "has_permission"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow"
   },
   {
@@ -16,13 +16,13 @@
   },
   {
     "action": ["create", "partial_update", "update", "destroy", "change_state"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow",
     "condition": "owns_wf_target"
   },
   {
     "action": ["partial_update", "update", "change_state"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow",
     "condition": "in_target_dataset_usergroup"
   }

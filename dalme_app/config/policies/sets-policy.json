@@ -1,7 +1,7 @@
 [
   {
     "action": ["list", "has_permission"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow"
   },
   {
@@ -11,7 +11,7 @@
   },
   {
     "action": ["retrieve", "members"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow",
     "condition": "can_view"
   },
@@ -22,19 +22,19 @@
   },
   {
     "action": ["partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow",
     "condition": "is_owner"
   },
   {
     "action": ["partial_update", "update", "add_members"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow",
     "condition": "can_add"
   },
   {
     "action": ["destroy", "remove_members"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow",
     "condition": "can_delete"
   }

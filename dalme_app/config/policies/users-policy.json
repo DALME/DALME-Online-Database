@@ -1,7 +1,7 @@
 [
   {
     "action": ["list", "retrieve", "has_permission"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow"
   },
   {

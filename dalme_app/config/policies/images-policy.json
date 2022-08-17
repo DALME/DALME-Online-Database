@@ -1,7 +1,7 @@
 [
   {
     "action": ["list", "retrieve", "has_permission", "rs_api"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow"
   }
 ]

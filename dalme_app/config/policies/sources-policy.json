@@ -1,7 +1,7 @@
 [
   {
     "action": ["list", "retrieve", "get_set", "has_permission", "get_manifest"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow"
   },
   {

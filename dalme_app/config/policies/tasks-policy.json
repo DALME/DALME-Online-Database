@@ -1,7 +1,7 @@
 [
   {
     "action": ["create", "list", "retrieve", "has_permission"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow"
   },
   {
@@ -11,7 +11,7 @@
   },
   {
     "action": ["partial_update", "update", "destroy", "set_state"],
-    "principal": ["*"],
+    "principal": ["authenticated"],
     "effect": "allow",
     "condition": "is_creator"
   }
