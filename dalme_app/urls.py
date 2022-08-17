@@ -1,6 +1,5 @@
 from django.urls import path, re_path, include
 from . import views
-from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
@@ -11,10 +10,8 @@ urlpatterns = [
     path('maintenance-mode/', include(maintenance_mode_urls)),
     path('accounts/login/', views.DalmeLogin.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     re_path(r'^\.well-known/acme-challenge/DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8/', lambda request: HttpResponse('DWY9GSDZjOsijpklS3RIAuBvZt2PThO7ameePcaIHm8.LbUmj5n5DqTPM7bapjsa-DennAErlpafYkGP-9eZzzo'), name='hello_world'),
-    path('admin/', admin.site.urls),
     path('agents/', views.AgentList.as_view(), name='agent_list'),
     path('countries/', views.CountryList.as_view(), name='country_list'),
     path('download/<path:path>/', views.DownloadAttachment, name='download_attachment'),
