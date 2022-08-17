@@ -262,7 +262,7 @@ const getAttributeLabel = (attribute) => {
     language: "Language",
     recordTypePhrase: "Record Type Phrase",
     namedPersons: "Named Persons",
-    decscription: "Description",
+    description: "Description",
     debtPhrase: "Debt Phrase",
     debtAmount: "Debt Amount",
     debtUnit: "Debt Unit",
