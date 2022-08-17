@@ -5,10 +5,6 @@ import {
   createWebHashHistory,
 } from "vue-router";
 
-import { API as apiInterface, loginUrl, requests } from "@/api";
-import { sessionSchema } from "@/schemas";
-import store from "@/store";
-
 import routes from "./routes";
 
 const createHistory = process.env.SERVER
@@ -23,19 +19,6 @@ export const router = createRouter({
     process.env.MODE === "ssr" ? void 0 : process.env.VUE_ROUTER_BASE,
   ),
   scrollBehavior: () => ({ left: 0, top: 0 }),
-});
-
-router.beforeEach(async (to) => {
-  const { data, fetchAPI, success } = apiInterface();
-  await fetchAPI(requests.auth.session());
-  if (success.value) {
-    await sessionSchema.validate(data.value).then((value) => {
-      store.dispatch("auth/login", value);
-    });
-  } else {
-    await store.dispatch("auth/logout");
-    window.location.href = `${loginUrl}?next=${to.href}`;
-  }
 });
 
 export default router;

@@ -1,8 +1,7 @@
 import { ref } from "vue";
 import { fetcher } from "../boot/axios";
 
-
-const API = (reauthenticate) => {
+const API = () => {
   const loading = ref(false);
   const success = ref(null);
   const status = ref(null);

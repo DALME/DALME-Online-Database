@@ -1,9 +1,16 @@
 <template>
-  <LoginModal :show="showLoginModal" />
-  <q-layout id="layout" view="lHh Lpr lFf">
-    <Nav />
-    <EditIndex />
-    <q-page-container class="main-container">
+  <LoginModal v-if="showLogin" />
+  <q-layout
+    id="layout"
+    view="lHh Lpr lFf"
+    :class="!reAuthenticate && showLogin ? 'login-background' : null"
+  >
+    <Nav v-if="reAuthenticate || !showLogin" />
+    <EditIndex v-if="reAuthenticate || !showLogin" />
+    <q-page-container
+      class="main-container"
+      v-if="reAuthenticate || !showLogin"
+    >
       <router-view />
       <EditPanel v-if="isAdmin" />
     </q-page-container>
@@ -11,7 +18,9 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, provide, ref, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useRoute } from "vue-router";
 
 import { EditIndex, EditPanel, LoginModal, Nav } from "@/components";
 import {
@@ -31,18 +40,58 @@ export default defineComponent({
     Nav,
   },
   setup() {
-    const showLoginModal = ref(false);
-    provideAPI(showLoginModal);
+    const $store = useAuthStore();
+    const $route = useRoute();
+    const reAuthenticate = ref($store.reAuthenticate);
+    const showLogin = ref(!$store.hasCredentials || reAuthenticate);
+    const updateShowLogin = (val) => {
+      showLogin.value = val;
+    };
+    const logout = () => {
+      $store.logout();
+    };
+    provideAPI();
     provideEditing();
     provideTooltips();
     provideTransport();
     const permissions = providePermissions();
     const { isAdmin } = permissions;
+    provide("showLogin", {
+      showLogin,
+      updateShowLogin,
+    });
+    provide("reAuthenticate", reAuthenticate);
+
+    onMounted(() => {
+      if ($route.query.logout) {
+        logout();
+      }
+    });
 
     return {
       isAdmin,
-      showLoginModal,
+      showLogin,
+      reAuthenticate,
     };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.login-background {
+  background-image: url(/static/images/map_bg.png);
+  background-color: #ddd5c3;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  padding: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

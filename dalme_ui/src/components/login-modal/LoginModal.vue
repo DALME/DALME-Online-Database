@@ -1,82 +1,109 @@
 <template>
   <q-dialog
-    v-model="persistent"
+    v-model="showLogin"
     persistent
     transition-show="scale"
     transition-hide="scale"
-    class="z-max"
+    class="frosted-background"
   >
-    <div class="auth-modal q-pa-md q-ma-md">
-      <img class="dalme-logo" src="~assets/dalme_logo.svg" />
-      <q-form @submit="onSubmit" class="q-gutter-md">
-        <q-input
-          label="Username *"
-          v-model="username"
-          filled
-          lazy-rules
-          :rules="usernameRules"
-        />
+    <q-card class="login-modal">
+      <q-card-section class="login-card-header">
+        <img class="dalme-logo-image" src="~assets/dalme_logo.svg" />
+        <div v-if="reAuthenticate">Please re-authenticate.</div>
+      </q-card-section>
 
-        <q-input
-          v-model="password"
-          label="Password *"
-          filled
-          lazy-rules
-          :type="isPassword ? 'password' : 'text'"
-          :rules="passwordRules"
-        >
-          <template v-slot:append>
-            <q-icon
-              class="cursor-pointer"
-              :name="isPassword ? 'visibility_off' : 'visibility'"
-              @click.stop="isPassword = !isPassword"
-            />
-          </template>
-        </q-input>
+      <q-separator />
 
-        <div class="row justify-end">
-          <q-btn
-            align="between"
-            label="Submit"
-            type="submit"
-            color="primary"
-            :disable="disabled"
-            :loading="submitting"
+      <q-card-section class="login-card-body">
+        <q-form @submit="onSubmit" class="q-gutter-sm">
+          <q-input
+            label="Username"
+            v-model="username"
+            outlined
+            bg-color="white"
+            hide-bottom-space
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            lazy-rules
+            :rules="usernameRules"
+          />
+
+          <q-input
+            v-model="password"
+            label="Password"
+            outlined
+            bg-color="white"
+            lazy-rules
+            hide-bottom-space
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            :type="isPassword ? 'password' : 'text'"
+            :rules="passwordRules"
           >
-            <template v-slot:loading>
-              <q-spinner-facebook />
+            <template v-slot:append>
+              <q-icon
+                class="cursor-pointer"
+                :name="isPassword ? 'visibility_off' : 'visibility'"
+                @click.stop="isPassword = !isPassword"
+              />
             </template>
-          </q-btn>
-        </div>
-      </q-form>
-    </div>
+          </q-input>
+
+          <div class="row justify-center q-mt-lg q-pt-md">
+            <q-btn
+              align="between"
+              label="Login"
+              type="submit"
+              color="primary"
+              padding="sm 5rem"
+              preventClose="true"
+              :disable="disabled"
+              :loading="submitting"
+            >
+              <template v-slot:loading>
+                <q-spinner-facebook />
+              </template>
+            </q-btn>
+          </div>
+          <div class="row justify-center">
+            <q-btn
+              label="Forgot your password?"
+              flat
+              no-caps
+              type="a"
+              color="primary"
+            >
+            </q-btn>
+          </div>
+        </q-form>
+      </q-card-section>
+    </q-card>
   </q-dialog>
 </template>
 
 <script>
 import { any, isEmpty } from "ramda";
-import { computed, defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, inject, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
-import { requests } from "@/api";
-import { sessionSchema } from "@/schemas";
+import { requests, publicUrl } from "@/api";
 import { useAPI, useNotifier } from "@/use";
+import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "LoginModal",
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  setup(props) {
+  setup() {
     const $store = useAuthStore();
     const $notifier = useNotifier();
+    const $route = useRoute();
     const { apiInterface } = useAPI();
-
     const { data, fetchAPI, status } = apiInterface();
-    const showModal = ref(false);
+    const { showLogin, updateShowLogin } = inject("showLogin");
+    const reAuthenticate = inject("reAuthenticate");
     const username = ref("");
     const password = ref("");
     const isPassword = ref(true);
@@ -92,39 +119,27 @@ export default defineComponent({
       (val) => (val && !isEmpty(val)) || "Password is required",
     ];
 
-    const validateSession = async () => {
-      await sessionSchema.validate(data.value).then((value) => {
-        $notifier.auth.reauthenticated();
-        $store.dispatch("auth/login", value);
-      });
-    };
-
-    const reset = () => {
-      username.value = "";
-      password.value = "";
-    };
-
     const onSubmit = async () => {
       submitting.value = true;
-      setTimeout(async () => {
-        await fetchAPI(
-          requests.auth.login({
-            username: username.value,
-            password: password.value,
-          }),
-        );
-        status.value === 200 ? validateSession() : $notifier.auth.authFailed();
+      console.log($route.query);
+      await fetchAPI(
+        requests.auth.login({
+          username: username.value,
+          password: password.value,
+        }),
+      );
+      if (status.value === 200) {
+        $store.login(data.value).then(() => {
+          updateShowLogin(false);
+          if ($route.query.next) {
+            window.location.href = `${publicUrl}${$route.query.next}`;
+          }
+        });
+      } else {
+        $notifier.auth.authFailed();
         submitting.value = false;
-        reset();
-      }, 500);
+      }
     };
-
-    watch(
-      () => props.show,
-      (show) => {
-        showModal.value = show;
-      },
-    );
 
     return {
       disabled,
@@ -132,7 +147,8 @@ export default defineComponent({
       onSubmit,
       password,
       passwordRules,
-      persistent: showModal,
+      reAuthenticate,
+      showLogin,
       submitting,
       username,
       usernameRules,
@@ -142,14 +158,20 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.auth-modal {
-  align-items: center;
-  background: white;
-  display: flex;
-  flex-direction: column;
+.login-modal {
+  min-width: 400px;
 }
-.dalme-logo {
-  margin: 2rem 5rem;
+.dalme-logo-image {
   width: 7.5rem;
+}
+.login-card-header {
+  padding: 50px 25px 40px 25px;
+  background-color: #f5f5f5;
+  min-width: 300px;
+  text-align: center;
+}
+.login-card-body {
+  background-color: #fcfcfc;
+  padding: 25px 40px;
 }
 </style>
