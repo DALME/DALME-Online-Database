@@ -79,7 +79,7 @@ import {
 } from "ramda";
 import { defineComponent, inject, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
@@ -109,7 +109,7 @@ export default defineComponent({
   },
   setup(props) {
     const $router = useRouter();
-    const $store = useStore();
+    const $store = useAuthStore();
     const { apiInterface } = useAPI();
 
     const { loading, success, data, fetchAPI } = apiInterface();
@@ -224,7 +224,7 @@ export default defineComponent({
 
     const fetchData = async () => {
       const request = props.embedded
-        ? requests.tasks.getUserTasks($store.getters["auth/userId"])
+        ? requests.tasks.getUserTasks($store.id)
         : requests.tasks.getTasks();
       await fetchAPI(request);
       if (success.value)

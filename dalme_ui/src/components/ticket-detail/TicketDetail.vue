@@ -61,7 +61,7 @@ import {
   provide,
 } from "vue";
 import { useRoute } from "vue-router";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 import { requests } from "@/api";
 import { Attachments, Comments } from "@/components";
@@ -81,7 +81,7 @@ export default defineComponent({
 
     const $notifier = useNotifier();
     const $route = useRoute();
-    const $store = useStore();
+    const $store = useAuthStore();
     const { apiInterface } = useAPI();
 
     const { loading, success, data, fetchAPI } = apiInterface();
@@ -90,7 +90,7 @@ export default defineComponent({
     const completed = ref(null);
     const ticket = ref({});
     const subheading = ref("");
-    const isAdmin = $store.getters["auth/isAdmin"];
+    const isAdmin = $store.isAdmin;
 
     const id = computed(() => $route.params.id);
 

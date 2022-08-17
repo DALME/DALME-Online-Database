@@ -70,7 +70,7 @@
 import { openURL } from "quasar";
 import { map, keys } from "ramda";
 import { defineComponent, onMounted, ref } from "vue";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
@@ -94,7 +94,7 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup() {
-    const $store = useStore();
+    const $store = useAuthStore();
     const { apiInterface } = useAPI();
     const { postSubmitRefreshWatcher } = useEditing();
 
@@ -121,9 +121,7 @@ export default defineComponent({
     };
 
     const fetchData = async () => {
-      const request = requests.sets.getUserWorksets(
-        $store.getters["auth/userId"],
-      );
+      const request = requests.sets.getUserWorksets($store.id);
       await fetchAPI(request);
       if (success.value)
         await setListSchema("worksets")

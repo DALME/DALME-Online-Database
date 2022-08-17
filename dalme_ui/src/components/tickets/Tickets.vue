@@ -111,7 +111,7 @@
 import { openURL } from "quasar";
 import { filter as rFilter, isNil, map, keys } from "ramda";
 import { defineComponent, onMounted, ref } from "vue";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
@@ -142,7 +142,7 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup(props) {
-    const $store = useStore();
+    const $store = useAuthStore();
     const { apiInterface } = useAPI();
     const { postSubmitRefreshWatcher } = useEditing();
 
@@ -211,10 +211,9 @@ export default defineComponent({
       columns.value = getColumns();
       visibleColumns.value = filterVisibleColumns(columns.value);
     };
-
     const fetchData = async () => {
       const request = props.embedded
-        ? requests.tickets.getUserTickets($store.getters["auth/userId"])
+        ? requests.tickets.getUserTickets($store.id)
         : requests.tickets.getTickets();
       await fetchAPI(request);
       if (success.value)

@@ -1,12 +1,12 @@
 import { inject, provide } from "vue";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 const PermissionsSymbol = Symbol();
 
 export const providePermissions = () => {
-  const $store = useStore();
+  const $store = useAuthStore();
 
-  const permissions = { isAdmin: $store.getters["auth/isAdmin"] };
+  const permissions = { isAdmin: $store.isAdmin };
 
   provide(PermissionsSymbol, { permissions });
   return permissions;

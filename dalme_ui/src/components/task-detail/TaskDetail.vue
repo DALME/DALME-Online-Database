@@ -55,7 +55,7 @@ import {
   ref,
 } from "vue";
 import { useRoute } from "vue-router";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 import { requests } from "@/api";
 import { Comments } from "@/components";
@@ -72,7 +72,7 @@ export default defineComponent({
   setup() {
     const $notifier = useNotifier();
     const $route = useRoute();
-    const $store = useStore();
+    const $store = useAuthStore();
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard } = useEditing();
 
@@ -85,7 +85,7 @@ export default defineComponent({
     const task = ref({});
     const attachment = ref(null);
     const subheading = ref("");
-    const isAdmin = $store.getters["auth/isAdmin"];
+    const isAdmin = $store.isAdmin;
 
     provide("attachment", attachment);
     provide("model", model);

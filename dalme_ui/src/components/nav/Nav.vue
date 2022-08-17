@@ -80,7 +80,7 @@ import { useQuasar } from "quasar";
 import { filter as rFilter, head } from "ramda";
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 import { NavLink } from "@/components";
 import { useNotifier, useTooltips } from "@/use";
@@ -93,7 +93,7 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const $router = useRouter();
-    const $store = useStore();
+    const $store = useAuthStore();
     const $notifier = useNotifier();
     const { showTips } = useTooltips();
 
@@ -109,7 +109,7 @@ export default defineComponent({
       submitting.value = true;
       $notifier.auth.logout();
       setTimeout(() => {
-        $store.dispatch("auth/logout");
+        $store.logout();
       }, 300);
     };
 

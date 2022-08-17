@@ -56,7 +56,7 @@
 <script>
 import { any, isEmpty } from "ramda";
 import { computed, defineComponent, ref, watch } from "vue";
-import { useStore } from "vuex";
+import { useAuthStore } from "@/stores/auth";
 
 import { requests } from "@/api";
 import { sessionSchema } from "@/schemas";
@@ -71,7 +71,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const $store = useStore();
+    const $store = useAuthStore();
     const $notifier = useNotifier();
     const { apiInterface } = useAPI();
 

@@ -13,6 +13,8 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "pinia": "^2.0.17",
+    "pinia-plugin-persistedstate": "^2.1.0",
     "@quasar/extras": "^1.10.7",
     "@vueuse/components": "^7.1.2",
     "@vueuse/core": "^6.4.1",
@@ -31,13 +33,12 @@
     "vee-validate": "^4.5.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
-    "vuex": "^4.0.1",
     "xstate": "^4.26.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
-    "@quasar/app": "^3.0.0-rc.2",
+    "@quasar/app-webpack": "^3.0.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.4.0",
