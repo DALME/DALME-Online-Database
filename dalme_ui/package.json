@@ -13,6 +13,7 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "pinia": "^2.0.17",
     "pinia-plugin-persistedstate": "^2.1.0",
     "@quasar/extras": "^1.10.7",
@@ -25,7 +26,6 @@
     "core-js": "^3.6.5",
     "cuid": "^2.1.8",
     "formvuelate": "^3.7.1",
-    "js-cookie": "^2.2.1",
     "moment": "^2.29.1",
     "quasar": "^2.0.0-rc.2",
     "ramda": "^0.27.1",
