@@ -4,7 +4,10 @@ const endpoint = `${apiUrl}/library`;
 
 const library = {
   getLibrary() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
 };
 

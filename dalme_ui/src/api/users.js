@@ -4,11 +4,16 @@ const endpoint = `${apiUrl}/users`;
 
 const users = {
   getUsers() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
   getUser(username) {
-    const url = `${endpoint}/?username=${username}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/?username=${username}`,
+      method: "GET",
+    };
   },
 };
 

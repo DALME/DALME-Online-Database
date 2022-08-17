@@ -1,4 +1,4 @@
-import { apiUrl, headers } from "./config";
+import { apiUrl } from "./config";
 import { worksetId } from "./constants";
 
 const endpoint = `${apiUrl}/sets`;
@@ -6,42 +6,52 @@ const v2Endpoint = `${apiUrl}/v2/sets`;
 
 const sets = {
   createSet(data) {
-    const url = `${endpoint}/`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/`,
       method: "POST",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
   editSet(id, data) {
-    const url = `${endpoint}/${id}/`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/${id}/`,
       method: "PUT",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
   getSet(id) {
-    const url = `${endpoint}/${id}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/${id}`,
+      method: "GET",
+    };
   },
   getSets() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
   getSetsByType(setType, query) {
     let url = `${endpoint}/?set_type=${setType}`;
     if (query) {
       url = `${url}&${query}`;
     }
-    return new Request(url);
+    return {
+      url: url,
+      method: "GET",
+    };
   },
   getSetMembers(id, query) {
-    const url = `${endpoint}/${id}/members/?${query}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/${id}/members/?${query}`,
+      method: "GET",
+    };
   },
   getUserWorksets(userId) {
-    const url = `${v2Endpoint}/?type=${worksetId}&owner=${userId}`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/?type=${worksetId}&owner=${userId}`,
+      method: "GET",
+    };
   },
 };
 

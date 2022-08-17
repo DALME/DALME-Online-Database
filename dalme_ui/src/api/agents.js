@@ -6,23 +6,29 @@ const v2Endpoint = `${apiUrl}/v2/agents`;
 
 const agents = {
   getAgents(start = 0, length = 25, order = defaultOrder) {
-    const data = JSON.stringify({
+    const data = {
       draw: 1,
       orderable: true,
       order,
       start,
       length,
-    });
-    const url = `${endpoint}/?data=${data}`;
-    return new Request(url);
+    };
+    return {
+      url: `${endpoint}/?data=${data}`,
+      method: "GET",
+    };
   },
   getCreditAgents() {
-    const url = `${v2Endpoint}/?as=credits`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/?as=credits`,
+      method: "GET",
+    };
   },
   getNamedAgents() {
-    const url = `${v2Endpoint}/?as=names`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/?as=names`,
+      method: "GET",
+    };
   },
 };
 

@@ -4,7 +4,10 @@ const endpoint = `${apiUrl}/pages`;
 
 const pages = {
   getPages() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
 };
 

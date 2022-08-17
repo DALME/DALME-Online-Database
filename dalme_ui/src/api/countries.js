@@ -4,7 +4,10 @@ const endpoint = `${apiUrl}/countries`;
 
 const countries = {
   getCountries() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
 };
 

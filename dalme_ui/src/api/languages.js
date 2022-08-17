@@ -4,8 +4,10 @@ const endpoint = `${apiUrl}/languages`;
 
 const languages = {
   getLanguages(orderBy = "name") {
-    const url = `${endpoint}/?order_by=${orderBy}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/?order_by=${orderBy}`,
+      method: "GET",
+    };
   },
 };
 

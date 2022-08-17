@@ -1,21 +1,24 @@
-import { apiUrl, coreUrl, modalLoginUrl, headers } from "./config";
+import { loginUrl, logoutUrl, tokenRefreshUrl } from "./config";
 
 const auth = {
   login({ username, password }) {
-    const url = modalLoginUrl;
-    return new Request(url, {
+    return {
+      url: loginUrl,
       method: "POST",
-      headers: headers(),
-      body: JSON.stringify({ username, password }),
-    });
+      data: { username, password },
+    };
   },
   logout() {
-    const url = `${coreUrl}/logout/`;
-    return new Request(url, { method: "POST", headers: headers() });
+    return {
+      url: logoutUrl,
+      method: "POST",
+    };
   },
-  session() {
-    const url = `${apiUrl}/session/retrieve/`;
-    return new Request(url);
+  refreshToken() {
+    return {
+      url: tokenRefreshUrl,
+      method: "POST",
+    };
   },
 };
 

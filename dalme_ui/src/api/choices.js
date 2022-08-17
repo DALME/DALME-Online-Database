@@ -4,8 +4,10 @@ const endpoint = `${apiUrl}/choices`;
 
 const choices = {
   getChoices(field) {
-    const url = `${endpoint}/?type=model&field=${field}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/?type=model&field=${field}`,
+      method: "GET",
+    };
   },
 };
 

@@ -4,11 +4,16 @@ const endpoint = `${apiUrl}/groups`;
 
 const groups = {
   getGroups() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
   getDatasetGroups() {
-    const url = `${endpoint}/?properties__type=3&format=select`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/?properties__type=3&format=select`,
+      method: "GET",
+    };
   },
 };
 

@@ -1,29 +1,34 @@
 import S from "string";
-
-import { apiUrl, headers } from "./config";
+import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/tickets`;
 const v2Endpoint = `${apiUrl}/v2/tickets`;
 
 const tickets = {
   getTickets() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
   getTicket(id) {
-    const url = `${endpoint}/${id}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/${id}`,
+      method: "GET",
+    };
   },
   getUserTickets(userId) {
-    const url = `${v2Endpoint}/?assigned_to=${userId}`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/?creation_user=${userId}`,
+      method: "GET",
+    };
   },
   setTicketState(id, action) {
-    const url = `${endpoint}/${id}/set_state/`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/${id}/set_state/`,
       method: "PATCH",
-      headers: headers(),
-      body: JSON.stringify({ action: S(action).underscore().s }),
-    });
+      data: { action: S(action).underscore().s },
+    };
   },
 };
 

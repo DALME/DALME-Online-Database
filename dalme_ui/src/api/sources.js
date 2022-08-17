@@ -1,4 +1,4 @@
-import { apiUrl, headers } from "./config";
+import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/sources`;
 const v2Endpoint = `${apiUrl}/v2/sources`;
@@ -12,39 +12,46 @@ const sourceTypeMap = {
 
 const sources = {
   getSource(id) {
-    const url = `${endpoint}/${id}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/${id}`,
+      method: "GET",
+    };
   },
   getSources(sourceType, query) {
     // TODO: Remove sourceTypeAPI from routes and use the above map.
     const url = sourceType
       ? `${endpoint}/?class=${sourceType}&${query}`
       : `${endpoint}/?${query}`;
-    return new Request(url);
+    return {
+      url: url,
+      method: "GET",
+    };
   },
   getSourceOptionsByType(sourceType) {
-    const url = `${v2Endpoint}/?class=${sourceTypeMap[sourceType]}&as=options`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/?class=${sourceTypeMap[sourceType]}&as=options`,
+      method: "GET",
+    };
   },
   createSource(data) {
-    const url = `${endpoint}/`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/`,
       method: "POST",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
   editSource(id, data) {
-    const url = `${endpoint}/${id}/`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/${id}/`,
       method: "PUT",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
   getBibliographyTypes() {
-    const url = `${apiUrl}/content-types/?format=select&id__lt=11`;
-    return new Request(url);
+    return {
+      url: `${apiUrl}/content-types/?format=select&id__lt=11`,
+      method: "GET",
+    };
   },
 };
 

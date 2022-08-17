@@ -4,7 +4,10 @@ const endpoint = `${apiUrl}/rights`;
 
 const rights = {
   getRights() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
 };
 

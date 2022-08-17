@@ -1,11 +1,12 @@
 export { default as API } from "./api";
 export { default as requests } from "./requests";
 export {
+  publicUrl,
   apiUrl,
   coreUrl,
-  fetcher,
-  loginUrl,
-  modalLoginUrl,
-  publicUrl,
   purlUrl,
+  loginUrl,
+  logoutUrl,
+  tokenRefreshUrl,
 } from "./config";
+export { fetcher } from "../boot/axios";

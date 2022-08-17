@@ -117,6 +117,7 @@ import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
 import { attachmentSchema, ticketListSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
+import { fetcher } from "@/boot/axios";
 
 const columnMap = {
   id: "ID",
@@ -153,7 +154,7 @@ export default defineComponent({
     const filter = ref("");
     const showSearch = ref(true);
 
-    const noData = props.embedded ? "No assigned tickets" : "No tickets found";
+    const noData = props.embedded ? "No tickets created" : "No tickets found";
     const title = props.embedded ? "My Tickets" : "Tickets";
     const rowsPerPage = props.embedded ? 5 : 25;
     const pagination = { rowsPerPage };
@@ -192,13 +193,12 @@ export default defineComponent({
     const resolveAttachments = async (tickets) => {
       const resolveAttachment = async (ticket) => {
         if (!isNil(ticket.file)) {
-          const response = await fetch(
+          const response = await fetcher(
             requests.attachments.getAttachment(ticket.file),
           );
           if (response.status === 200) {
-            const data = await response.json();
             await attachmentSchema
-              .validate(data, { stripUnknown: true })
+              .validate(response.data, { stripUnknown: true })
               .then((value) => (ticket.file = value));
           }
         }

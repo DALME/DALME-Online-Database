@@ -4,7 +4,10 @@ const endpoint = `${apiUrl}/locales`;
 
 const locales = {
   getLocales() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
 };
 

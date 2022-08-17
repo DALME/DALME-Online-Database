@@ -1,19 +1,21 @@
-import { apiUrl, headers } from "./config";
+import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/places`;
 const v2Endpoint = `${apiUrl}/v2/places`;
 
 const places = {
   getPlaces() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
   inlineUpdate(data) {
-    const url = `${v2Endpoint}/inline_update/`;
-    return new Request(url, {
+    return {
+      url: `${v2Endpoint}/inline_update/`,
       method: "PATCH",
-      headers: headers(),
-      body: JSON.stringify(data.value),
-    });
+      data: data.value,
+    };
   },
 };
 

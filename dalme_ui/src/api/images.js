@@ -4,12 +4,16 @@ const v2Endpoint = `${apiUrl}/v2/images`;
 
 const images = {
   getImageUrl(damId) {
-    const url = `${v2Endpoint}/${damId}/?as=url`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/${damId}/?as=url`,
+      method: "GET",
+    };
   },
   getImageOptions() {
-    const url = `${v2Endpoint}/?as=options`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/?as=options`,
+      method: "GET",
+    };
   },
 };
 

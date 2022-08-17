@@ -1,76 +1,80 @@
 import S from "string";
-
-import { apiUrl, headers } from "./config";
+import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/tasks`;
 const v2Endpoint = `${apiUrl}/v2/tasks`;
 
 const tasks = {
   getTasks() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
   getTask(id) {
-    const url = `${endpoint}/${id}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/${id}`,
+      method: "GET",
+    };
   },
   getUserTasks(userId) {
-    const url = `${v2Endpoint}/?assigned_to=${userId}`;
-    return new Request(url);
+    return {
+      url: `${v2Endpoint}/?assigned_to=${userId}`,
+      method: "GET",
+    };
   },
   createTask(data) {
-    const url = `${endpoint}/`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/`,
       method: "POST",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
   editTask(id, data) {
-    const url = `${endpoint}/${id}`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/${id}`,
       method: "PUT",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
   setTaskState(id, action) {
-    const url = `${endpoint}/${id}/set_state/`;
-    return new Request(url, {
+    return {
+      url: `${endpoint}/${id}/set_state/`,
       method: "PATCH",
-      headers: headers(),
-      body: JSON.stringify({ action: S(action).underscore().s }),
-    });
+      data: { action: S(action).underscore().s },
+    };
   },
   getTaskLists() {
-    const url = `${apiUrl}/tasklists`;
-    return new Request(url);
+    return {
+      url: `${apiUrl}/tasklists`,
+      method: "GET",
+    };
   },
   getTaskList(id) {
-    const url = `${apiUrl}/tasklists/${id}`;
-    return new Request(url);
+    return {
+      url: `${apiUrl}/tasklists/${id}`,
+      method: "GET",
+    };
   },
   createTaskList(data) {
-    const url = `${apiUrl}/tasklists/`;
-    return new Request(url, {
+    return {
+      url: `${apiUrl}/tasklists/`,
       method: "POST",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
   deleteTaskList(id) {
-    const url = `${apiUrl}/tasklists/${id}`;
-    return new Request(url, {
+    return {
+      url: `${apiUrl}/tasklists/${id}`,
       method: "DELETE",
-      headers: headers(),
-    });
+    };
   },
   editTaskList(id, data) {
-    const url = `${apiUrl}/tasklists/${id}/`;
-    return new Request(url, {
+    return {
+      url: `${apiUrl}/tasklists/${id}/`,
       method: "PUT",
-      headers: headers(),
-      body: JSON.stringify(data),
-    });
+      data: data,
+    };
   },
 };
 

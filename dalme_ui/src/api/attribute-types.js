@@ -4,11 +4,16 @@ const endpoint = `${apiUrl}/v2/attribute_types`;
 
 const attributeTypes = {
   getAttributeTypes() {
-    return new Request(endpoint);
+    return {
+      url: endpoint,
+      method: "GET",
+    };
   },
   getAttributeTypesByShortName(shortNames) {
-    const url = `${endpoint}/?short_names=${shortNames}`;
-    return new Request(url);
+    return {
+      url: `${endpoint}/?short_names=${shortNames}`,
+      method: "GET",
+    };
   },
 };
 
