@@ -453,6 +453,7 @@ class SourceSerializer(DynamicSerializer):
                 'name': folio['sp_name'],
                 'dam_id': folio['sp_dam_id'],
                 'order': folio['sp_order'],
+                'transcription_id': folio['sp_transcription_id'],
                 'has_image': folio['sp_transcription_id'] is not None,
                 'has_transcription': folio['sp_transcription_version'] is not None,
             })

@@ -1,7 +1,7 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from django.urls import reverse
 import requests
+import json
 from dalme_app.models._templates import dalmeUuid
 import django.db.models.options as options
 from dalme_app.models.rights_policy import RightsPolicy
@@ -46,12 +46,13 @@ class Page(dalmeUuid):
             return None
 
     def get_absolute_url(self):
-        # return reverse('page_detail', kwargs={'pk': self.pk})
         source = self.sources.first().source
         return f'{source.get_absolute_url()}{self.name}/'
 
     def get_canvas(self):
-        if not self.canvas and self.dam_id is not None:
+        # need to find way to prevent stored canvas from getting stale
+        # or to determine if it is...
+        if self.dam_id is not None:
             api_params = {
                 "function": "get_resource_data",
                 "param1": self.dam_id
@@ -63,7 +64,9 @@ class Page(dalmeUuid):
             elif type(page_meta_obj) is dict:
                 folio = page_meta_obj['field79']
             canvas = requests.get("https://dam.dalme.org/iiif/{}/canvas/{}".format(self.dam_id, folio))
-            self.canvas = canvas.text
-            return canvas.text
+            canvas_dict = json.loads(canvas.text)
+            canvas_dict['page_id'] = str(self.id)
+            self.canvas = json.dumps(canvas_dict)
+            return self.canvas
         else:
             return self.canvas

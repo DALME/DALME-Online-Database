@@ -94,9 +94,10 @@ class Sources(DALMEBaseViewSet):
     def get_manifest(self, request, *args, **kwargs):
         source = self.get_object()
         pages = source.pages.all()
-        if pages and [page.dam_id for page in pages]:
+        dam_id_list = [page.dam_id for page in pages]
+        if pages and dam_id_list:
             try:
-                canvases = [json.loads(page.get_canvas()) for page in source.pages.all()]
+                canvases = [json.loads(page.get_canvas()) for page in pages]
                 result = {
                   "@context": "http://iiif.io/api/presentation/2/context.json",
                   "@id": source.get_absolute_url(),
@@ -110,14 +111,14 @@ class Sources(DALMEBaseViewSet):
                   "license": "https://creativecommons.org/licenses/by/3.0/",
                   "attribution": "DALME",
                   "thumbnail": {
-                    "@id": f"https://dam.dalme.org/loris/{source.page_set.all[0].dam_id}/full/thm/0/default.jpg",
+                    "@id": f"https://dam.dalme.org/loris/{dam_id_list[0]}/full/thm/0/default.jpg",
                     "@type": "dctypes:Image",
                     "height": 150,
                     "width": 56,
                     "format": "image/jpeg",
                     "service": {
                       "@context": "http://iiif.io/api/image/2/context.json",
-                      "@id": f"https://dam.dalme.org/loris/{source.page_set.all[0].dam_id}",
+                      "@id": f"https://dam.dalme.org/loris/{dam_id_list[0]}",
                       "profile": "http://iiif.io/api/image/2/level1.json"
                     }
                   },
@@ -131,6 +132,8 @@ class Sources(DALMEBaseViewSet):
                   ],
                   "structures": []
                 }
+                status = 201
+
             except Exception as e:
                 result = {'error': str(e)}
                 status = 400
