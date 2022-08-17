@@ -24,5 +24,6 @@ export * from "./sources";
 export * from "./task-lists";
 export * from "./tasks";
 export * from "./tickets";
+export * from "./transcriptions";
 export * from "./users";
 export * from "./worksets";

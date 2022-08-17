@@ -15,6 +15,7 @@ import pages from "./pages";
 import places from "./places";
 import sets from "./sets";
 import sources from "./sources";
+import transcriptions from "./transcriptions";
 import rights from "./rights";
 import tasks from "./tasks";
 import tickets from "./tickets";
@@ -39,6 +40,7 @@ const requests = {
   rights,
   sets,
   sources,
+  transcriptions,
   tasks,
   tickets,
   users,
