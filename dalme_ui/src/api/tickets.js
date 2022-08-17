@@ -3,7 +3,7 @@ import S from "string";
 import { apiUrl, headers } from "./config";
 
 const endpoint = `${apiUrl}/tickets`;
-const v2Endpoint = `${apiUrl}/v2/tasks`;
+const v2Endpoint = `${apiUrl}/v2/tickets`;
 
 const tickets = {
   getTickets() {
