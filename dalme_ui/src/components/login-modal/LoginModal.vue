@@ -89,6 +89,9 @@
 import { any, isEmpty } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { usePrefStore } from "@/stores/preferences";
+
+import { authSchema, preferenceSchema } from "@/schemas";
 
 import { requests, publicUrl } from "@/api";
 import { useAPI, useNotifier } from "@/use";
@@ -97,11 +100,11 @@ import { useRoute } from "vue-router";
 export default defineComponent({
   name: "LoginModal",
   setup() {
-    const $store = useAuthStore();
+    const $authStore = useAuthStore();
     const $notifier = useNotifier();
     const $route = useRoute();
     const { apiInterface } = useAPI();
-    const { data, fetchAPI, status } = apiInterface();
+    const { data, fetchAPI, success } = apiInterface();
     const { showLogin, updateShowLogin } = inject("showLogin");
     const reAuthenticate = inject("reAuthenticate");
     const username = ref("");
@@ -121,20 +124,23 @@ export default defineComponent({
 
     const onSubmit = async () => {
       submitting.value = true;
-      console.log($route.query);
       await fetchAPI(
         requests.auth.login({
           username: username.value,
           password: password.value,
         }),
       );
-      if (status.value === 200) {
-        $store.login(data.value).then(() => {
-          updateShowLogin(false);
-          if ($route.query.next) {
-            window.location.href = `${publicUrl}${$route.query.next}`;
-          }
-        });
+      if (success.value) {
+        await authSchema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            $authStore.login(value.user).then(async () => {
+              updateShowLogin(false);
+              if ($route.query.next) {
+                window.location.href = `${publicUrl}${$route.query.next}`;
+              }
+            });
+          });
       } else {
         $notifier.auth.authFailed();
         submitting.value = false;

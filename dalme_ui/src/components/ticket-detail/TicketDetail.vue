@@ -81,7 +81,7 @@ export default defineComponent({
 
     const $notifier = useNotifier();
     const $route = useRoute();
-    const $store = useAuthStore();
+    const $authStore = useAuthStore();
     const { apiInterface } = useAPI();
 
     const { loading, success, data, fetchAPI } = apiInterface();
@@ -90,7 +90,7 @@ export default defineComponent({
     const completed = ref(null);
     const ticket = ref({});
     const subheading = ref("");
-    const isAdmin = $store.isAdmin;
+    const isAdmin = $authStore.isAdmin;
 
     const id = computed(() => $route.params.id);
 

@@ -143,7 +143,7 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup(props) {
-    const $store = useAuthStore();
+    const $authStore = useAuthStore();
     const { apiInterface } = useAPI();
     const { postSubmitRefreshWatcher } = useEditing();
 
@@ -213,7 +213,7 @@ export default defineComponent({
     };
     const fetchData = async () => {
       const request = props.embedded
-        ? requests.tickets.getUserTickets($store.id)
+        ? requests.tickets.getUserTickets($authStore.userId)
         : requests.tickets.getTickets();
       await fetchAPI(request);
       if (success.value)

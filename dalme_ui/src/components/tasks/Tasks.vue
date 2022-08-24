@@ -109,7 +109,7 @@ export default defineComponent({
   },
   setup(props) {
     const $router = useRouter();
-    const $store = useAuthStore();
+    const $authStore = useAuthStore();
     const { apiInterface } = useAPI();
 
     const { loading, success, data, fetchAPI } = apiInterface();
@@ -224,7 +224,7 @@ export default defineComponent({
 
     const fetchData = async () => {
       const request = props.embedded
-        ? requests.tasks.getUserTasks($store.id)
+        ? requests.tasks.getUserTasks($authStore.userId)
         : requests.tasks.getTasks();
       await fetchAPI(request);
       if (success.value)

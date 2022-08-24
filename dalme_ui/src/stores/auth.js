@@ -1,13 +1,15 @@
 import { defineStore } from "pinia";
 import { API as apiInterface, publicUrl, requests } from "@/api";
+import { usePrefStore } from "@/stores/preferences";
+import { useNotifier } from "@/use";
 import { isNil } from "ramda";
 
 export const useAuthStore = defineStore("auth", {
   state: () => {
     return {
-      id: null,
+      userId: null,
       username: "",
-      full_name: "",
+      fullName: "",
       email: "",
       avatar: "",
       isAdmin: null,
@@ -17,27 +19,30 @@ export const useAuthStore = defineStore("auth", {
     };
   },
   getters: {
-    hasCredentials: (state) => !isNil(state.id),
+    hasCredentials: (state) => !isNil(state.userId),
   },
   actions: {
     async login(data) {
-      this.id = data.user.id;
-      this.username = data.user.username;
-      this.full_name = data.user.full_name;
-      this.email = data.user.email;
-      this.avatar = data.user.avatar;
-      this.isAdmin = data.user.isAdmin;
+      this.userId = data.id;
+      this.username = data.username;
+      this.fullName = data.fullName;
+      this.email = data.email;
+      this.avatar = data.avatar;
+      this.isAdmin = data.isAdmin;
     },
     async logout() {
+      const prefStore = usePrefStore();
+      prefStore.$reset();
       this.$reset();
-      const { fetchAPI, status, redirected } = apiInterface();
+      const { fetchAPI, success, redirected } = apiInterface();
       await fetchAPI(requests.auth.logout());
-      if (status.value === 200) {
+      if (success.value) {
         if (redirected) {
           window.location.href = publicUrl;
         }
       } else {
-        console.log("raise error");
+        const $notifier = useNotifier();
+        $notifier.auth.logoutFailed();
       }
     },
     async processQueue() {

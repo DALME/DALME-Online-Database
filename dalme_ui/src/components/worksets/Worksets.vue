@@ -94,7 +94,7 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup() {
-    const $store = useAuthStore();
+    const $authStore = useAuthStore();
     const { apiInterface } = useAPI();
     const { postSubmitRefreshWatcher } = useEditing();
 
@@ -121,7 +121,7 @@ export default defineComponent({
     };
 
     const fetchData = async () => {
-      const request = requests.sets.getUserWorksets($store.id);
+      const request = requests.sets.getUserWorksets($authStore.userId);
       await fetchAPI(request);
       if (success.value)
         await setListSchema("worksets")

@@ -72,7 +72,7 @@ export default defineComponent({
   setup() {
     const $notifier = useNotifier();
     const $route = useRoute();
-    const $store = useAuthStore();
+    const $authStore = useAuthStore();
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard } = useEditing();
 
@@ -85,7 +85,7 @@ export default defineComponent({
     const task = ref({});
     const attachment = ref(null);
     const subheading = ref("");
-    const isAdmin = $store.isAdmin;
+    const isAdmin = $authStore.isAdmin;
 
     provide("attachment", attachment);
     provide("model", model);

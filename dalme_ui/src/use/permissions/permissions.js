@@ -4,9 +4,8 @@ import { useAuthStore } from "@/stores/auth";
 const PermissionsSymbol = Symbol();
 
 export const providePermissions = () => {
-  const $store = useAuthStore();
-
-  const permissions = { isAdmin: $store.isAdmin };
+  const $authStore = useAuthStore();
+  const permissions = { isAdmin: $authStore.isAdmin };
 
   provide(PermissionsSymbol, { permissions });
   return permissions;

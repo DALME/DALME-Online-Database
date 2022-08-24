@@ -15,6 +15,13 @@ const auth = {
       position: "top-right",
       icon: "exit_to_app",
     }),
+  logoutFailed: () =>
+    Notify.create({
+      color: "red",
+      message: "API logging out failed",
+      position: "top-right",
+      icon: "exit_to_app",
+    }),
   reauthenticated: () =>
     Notify.create({
       color: "green",

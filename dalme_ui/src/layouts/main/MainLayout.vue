@@ -40,15 +40,14 @@ export default defineComponent({
     Nav,
   },
   setup() {
-    const $store = useAuthStore();
+    const $authStore = useAuthStore();
     const $route = useRoute();
-    const reAuthenticate = ref($store.reAuthenticate);
-    const showLogin = ref(!$store.hasCredentials || reAuthenticate);
+    const { reAuthenticate, hasCredentials } = storeToRefs($authStore);
+
+    const showLogin = ref(!hasCredentials.value || reAuthenticate.value);
     const updateShowLogin = (val) => {
       showLogin.value = val;
     };
-    const logout = () => {
-      $store.logout();
     };
     provideAPI();
     provideEditing();
@@ -64,7 +63,7 @@ export default defineComponent({
 
     onMounted(() => {
       if ($route.query.logout) {
-        logout();
+        $authStore.logout();
       }
     });
 
