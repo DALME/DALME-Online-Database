@@ -1,9 +1,18 @@
-import { inject, provide, ref } from "vue";
+import { inject, provide, computed } from "vue";
+import { usePrefStore } from "@/stores/preferences";
 
 const TooltipsSymbol = Symbol();
 
 export const provideTooltips = () => {
-  const showTips = ref(false);
+  const prefStore = usePrefStore();
+  const showTips = computed({
+    get() {
+      return prefStore.ui.tooltipsOn;
+    },
+    set(newValue) {
+      prefStore.ui.tooltipsOn = newValue;
+    },
+  });
 
   provide(TooltipsSymbol, { showTips });
 };
