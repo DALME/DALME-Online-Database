@@ -52,7 +52,6 @@ v2_router.register(r'tickets', v2_api.Tickets, basename='tickets')
 urlpatterns = [
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
     path('v2/', include((v2_router.urls, 'v2_dalme_api'), namespace='v2_api_endpoint')),
-    path('auth/', api.Auth.as_view(), name='refresh_auth'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('jwt/', include('dj_rest_auth.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

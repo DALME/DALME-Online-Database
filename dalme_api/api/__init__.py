@@ -1,6 +1,5 @@
 from .attachments import Attachments
 from .attribute_types import AttributeTypes
-from .auth import Auth
 from .choices import Choices
 from .comments import Comments
 from .configs import Configs
@@ -34,7 +33,6 @@ __all__ = [
     "Attachments",
     "Attributes",
     "AttributeTypes",
-    "Auth",
     "Choices",
     "ContentClasses",
     "ContentTypes",
