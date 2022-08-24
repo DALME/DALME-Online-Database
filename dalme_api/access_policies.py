@@ -225,3 +225,7 @@ class WorkflowAccessPolicy(BaseAccessPolicy):
 
 class UserAccessPolicy(BaseAccessPolicy):
     id = 'users-policy'
+
+    def is_self(self, request, view, action):
+        record = view.get_object()
+        return request.user == record

@@ -8,6 +8,7 @@ from dalme_api.serializers import UserSerializer
 from dalme_api.access_policies import UserAccessPolicy
 from ._common import DALMEBaseViewSet
 from dalme_api.filters import UserFilter
+import json
 
 
 class Users(DALMEBaseViewSet):
@@ -49,3 +50,30 @@ class Users(DALMEBaseViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def get_preferences(self, request, *args, **kwargs):
+        user = self.get_object()
+        try:
+            result = json.dumps(user.profile.preferences)
+            status = 201
+        except Exception as e:
+            result = {'error': str(e)}
+            status = 400
+        return Response(result, status)
+
+    @action(detail=True, methods=['post'])
+    def update_preferences(self, request, *args, **kwargs):
+        user = self.get_object()
+        try:
+            profile = user.profile
+            profile.preferences[request.data['section']][request.data['key']] = request.data['value']
+            profile.save()
+            result = 'OK'
+            status = 201
+
+        except Exception as e:
+            result = {'error': str(e)}
+            status = 400
+
+        return Response(result, status)

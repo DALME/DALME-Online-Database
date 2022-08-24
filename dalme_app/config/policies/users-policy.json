@@ -5,7 +5,13 @@
     "effect": "allow"
   },
   {
-    "action": ["reset_password", "create", "partial_update", "update", "destroy"],
+    "action": ["reset_password", "get_preferences", "update_preferences", "partial_update", "update"],
+    "principal": ["authenticated"],
+    "effect": "allow",
+    "condition": "is_self"
+  },
+  {
+    "action": ["create", "partial_update", "update", "destroy"],
     "principal": ["group:Administrators"],
     "effect": "allow"
   }
