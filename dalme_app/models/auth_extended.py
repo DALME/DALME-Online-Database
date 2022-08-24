@@ -1,3 +1,5 @@
+import json
+import os
 from django.contrib.auth.models import User, Group
 from django.db import models
 from django.urls import reverse
@@ -6,6 +8,13 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+
+with open(os.path.join('dalme_app', 'config', 'default_user_preferences.json'), 'r') as fp:
+    DEFAULT_PREFS = dict(json.load(fp))
+
+
+def default_preferences():
+    return DEFAULT_PREFS
 
 
 class GroupProperties(models.Model):
@@ -43,6 +52,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
     primary_group = models.ForeignKey(Group, to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
+    preferences = models.JSONField(default=default_preferences)
 
     def __str__(self):
         return self.user.username

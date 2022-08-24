@@ -1,0 +1,16 @@
+{
+  "ui": {
+    "tooltipsOn": true,
+    "sidebarCollapsed": false
+  },
+  "sourceEditor": {
+    "fontSize": "14",
+    "highlightWord": true,
+    "showGuides": true,
+    "showGutter": true,
+    "showInvisibles": false,
+    "showLineNumbers": true,
+    "softWrap": true,
+    "theme": "Chrome"
+  }
+}
