@@ -115,8 +115,6 @@ SIMPLE_JWT = {
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'dynamic_preferences',
-    'dynamic_preferences.users.apps.UserPreferencesConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -190,7 +188,6 @@ TEMPLATES = [
                 'dalme_public.context_processors.year',
                 'dalme_public.context_processors.project',
                 'django.template.context_processors.request',
-                'dynamic_preferences.processors.global_preferences',
             ],
             'debug': DEBUG,
         },
@@ -322,16 +319,6 @@ REST_FRAMEWORK = {
 # JWT setup
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'dalme_app.utils.JWTUserDetailsSerializer',
-}
-
-# Dynamic preferences
-DYNAMIC_PREFERENCES = {
-    'MANAGER_ATTRIBUTE': 'preferences',
-    'REGISTRY_MODULE': 'preferences',
-    'ADMIN_ENABLE_CHANGELIST_FORM': False,
-    'SECTION_KEY_SEPARATOR': '__',
-    'ENABLE_CACHE': True,
-    'VALIDATE_NAMES': True,
 }
 
 # Static and media file configuration

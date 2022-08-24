@@ -1,7 +1,6 @@
 import json
 from rest_framework import renderers
 from rest_framework.compat import INDENT_SEPARATORS, LONG_SEPARATORS, SHORT_SEPARATORS
-from dynamic_preferences.registries import global_preferences_registry
 
 
 class DBRenderer(renderers.BaseRenderer):
@@ -26,11 +25,6 @@ class SelectRenderer(renderers.JSONRenderer):
             separators = INDENT_SEPARATORS
 
         select_fields = ['name', 'id']
-
-        global_preferences = global_preferences_registry.manager()
-        if renderer_context.get('model') is not None:
-            if global_preferences['api_settings__model_select_fields'].get(renderer_context['model']) is not None:
-                select_fields = global_preferences['api_settings__model_select_fields'].get(renderer_context['model'])
 
         select_list = []
         if renderer_context.get('select_type') is not None:

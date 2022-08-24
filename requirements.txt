@@ -9,7 +9,6 @@ django-async-messages==0.3.1
 django-compressor==4.0
 django-crispy-forms==1.14.0
 django-currentuser @ https://github.com/asucrews/django-currentuser/archive/refs/heads/master.zip
-django-dynamic-preferences==1.13.0
 django-elasticsearch-dsl==7.2.2
 django-filter==21.1
 django-maintenance-mode==0.16.3
