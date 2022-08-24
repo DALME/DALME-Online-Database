@@ -2,7 +2,7 @@
   <LoginModal v-if="showLogin" />
   <q-layout
     id="layout"
-    view="lHh Lpr lFf"
+    view="hHh Lpr lFf"
     :class="!reAuthenticate && showLogin ? 'login-background' : null"
   >
     <Nav v-if="reAuthenticate || !showLogin" />
