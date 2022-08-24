@@ -96,7 +96,7 @@ module.exports = configure(function (ctx) {
       //
       // components: [],
       // directives: [],
-      plugins: ["Loading", "LocalStorage", "Meta", "Notify"],
+      plugins: ["AppFullscreen", "Dialog", "Loading", "LocalStorage", "Meta", "Notify"],
     },
 
     // animations: 'all', // --- includes all animations
