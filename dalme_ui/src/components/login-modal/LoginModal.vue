@@ -101,12 +101,14 @@ export default defineComponent({
   name: "LoginModal",
   setup() {
     const $authStore = useAuthStore();
+    const $prefStore = usePrefStore();
     const $notifier = useNotifier();
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { data, fetchAPI, success } = apiInterface();
     const { showLogin, updateShowLogin } = inject("showLogin");
     const reAuthenticate = inject("reAuthenticate");
+    const prefSubscription = inject("prefSubscription");
     const username = ref("");
     const password = ref("");
     const isPassword = ref(true);
@@ -135,6 +137,19 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             $authStore.login(value.user).then(async () => {
+              await fetchAPI(
+                requests.users.getUserPreferences($authStore.userId),
+              );
+              if (success.value) {
+                await preferenceSchema
+                  .validate(data.value, { stripUnknown: true })
+                  .then(async (value) => {
+                    await $prefStore.loadPreferences(value);
+                    prefSubscription("subscribe");
+                  });
+              } else {
+                $notifier.users.prefRetrievalFailed();
+              }
               updateShowLogin(false);
               if ($route.query.next) {
                 window.location.href = `${publicUrl}${$route.query.next}`;

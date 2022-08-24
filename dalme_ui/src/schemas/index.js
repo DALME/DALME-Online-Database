@@ -17,6 +17,7 @@ export * from "./library";
 export * from "./locales";
 export * from "./pages";
 export * from "./places";
+export * from "./preferences";
 export * from "./records";
 export * from "./rights";
 export * from "./sets";

@@ -3,6 +3,7 @@ import comments from "./comments";
 import CRUD from "./crud";
 import tasks from "./tasks";
 import tickets from "./tickets";
+import users from "./users";
 
 const notifier = {
   auth,
@@ -10,6 +11,7 @@ const notifier = {
   CRUD,
   tasks,
   tickets,
+  users,
 };
 
 export default notifier;

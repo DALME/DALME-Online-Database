@@ -15,6 +15,19 @@ const users = {
       method: "GET",
     };
   },
+  getUserPreferences(userId) {
+    return {
+      url: `${endpoint}/${userId}/get_preferences/`,
+      method: "GET",
+    };
+  },
+  updateUserPreferences(userId, section, key, value) {
+    return {
+      url: `${endpoint}/${userId}/update_preferences/`,
+      method: "POST",
+      data: { section, key, value },
+    };
+  },
 };
 
 export default users;

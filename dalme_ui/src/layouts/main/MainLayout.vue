@@ -20,7 +20,9 @@
 <script>
 import { defineComponent, provide, ref, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { usePrefStore } from "@/stores/preferences";
 import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
 
 import { EditIndex, EditPanel, LoginModal, Nav } from "@/components";
 import {
@@ -41,6 +43,7 @@ export default defineComponent({
   },
   setup() {
     const $authStore = useAuthStore();
+    const $prefStore = usePrefStore();
     const $route = useRoute();
     const { reAuthenticate, hasCredentials } = storeToRefs($authStore);
 
@@ -48,21 +51,37 @@ export default defineComponent({
     const updateShowLogin = (val) => {
       showLogin.value = val;
     };
+
+    const prefSubscription = (action) => {
+      let unsubscribe = () => {};
+      if (action === "subscribe") {
+        console.log("subscribing");
+        unsubscribe = $prefStore.$subscribe((state) => {
+          $prefStore.updatePreferences($authStore.userId, state);
+        });
+      } else {
+        console.log("unsubscribing");
+        unsubscribe();
+      }
     };
+
     provideAPI();
     provideEditing();
     provideTooltips();
     provideTransport();
     const permissions = providePermissions();
     const { isAdmin } = permissions;
+
     provide("showLogin", {
       showLogin,
       updateShowLogin,
     });
     provide("reAuthenticate", reAuthenticate);
+    provide("prefSubscription", prefSubscription);
 
     onMounted(() => {
       if ($route.query.logout) {
+        prefSubscription();
         $authStore.logout();
       }
     });
