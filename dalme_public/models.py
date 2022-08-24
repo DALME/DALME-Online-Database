@@ -10,7 +10,6 @@ from django.db.models import F
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
-from django.conf import settings
 
 from bs4 import BeautifulSoup as BSoup
 from modelcluster.fields import ParentalKey, ParentalManyToManyField

@@ -2,6 +2,7 @@ from django.utils.functional import cached_property
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from django.forms.formsets import ManagementForm
+from django.forms.renderers import get_default_renderer
 from django.forms import IntegerField, CharField, HiddenInput, BaseFormSet
 
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
@@ -43,10 +44,20 @@ class PaginatedBaseFormSet(BaseFormSet):
         return form
 
 
-def formset_factory(form, formset=PaginatedBaseFormSet, extra=1, can_order=False,
-                    can_delete=False, max_num=None, validate_max=False,
-                    min_num=None, validate_min=False, absolute_max=None,
-                    can_delete_extra=True):
+def formset_factory(
+    form,
+    formset=PaginatedBaseFormSet,
+    extra=1,
+    can_order=False,
+    can_delete=False,
+    max_num=None,
+    validate_max=False,
+    min_num=None,
+    validate_min=False,
+    absolute_max=None,
+    can_delete_extra=True,
+    renderer=None
+):
     if min_num is None:
         min_num = DEFAULT_MIN_NUM
     if max_num is None:
@@ -54,9 +65,7 @@ def formset_factory(form, formset=PaginatedBaseFormSet, extra=1, can_order=False
     if absolute_max is None:
         absolute_max = max_num + DEFAULT_MAX_NUM
     if max_num > absolute_max:
-        raise ValueError(
-            "'absolute_max' must be greater or equal to 'max_num'."
-        )
+        raise ValueError("'absolute_max' must be greater or equal to 'max_num'.")
     attrs = {
         'form': form,
         'extra': extra,
@@ -68,6 +77,7 @@ def formset_factory(form, formset=PaginatedBaseFormSet, extra=1, can_order=False
         'absolute_max': absolute_max,
         'validate_min': validate_min,
         'validate_max': validate_max,
+        "renderer": renderer or get_default_renderer(),
     }
 
     return type(form.__name__ + 'FormSet', (formset,), attrs)

@@ -8,7 +8,6 @@ from elasticsearch_dsl.utils import AttrDict
 
 from dalme_public.serializers import PublicSourceSerializer
 from dalme_public.models import (
-    Collections,
     Essay,
     ExplorePage,
     FeaturedObject,
