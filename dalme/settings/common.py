@@ -2,7 +2,6 @@ import os
 import dj_database_url
 import elasticsearch
 from requests_aws4auth import AWS4Auth
-from django.contrib.messages import constants as messages
 import saml2
 from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
 from saml2.sigver import get_xmlsec_binary
@@ -68,13 +67,6 @@ TIME_ZONE = 'America/New_York'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-MESSAGE_TAGS = {
-    messages.DEBUG: 'info',
-    messages.INFO: 'info',
-    messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',
-    messages.ERROR: 'error',
-}
 
 # CSRF
 CSRF_COOKIE_SECURE = True
@@ -167,7 +159,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'dalme_app.utils.AsyncMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
@@ -289,7 +280,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
     ),

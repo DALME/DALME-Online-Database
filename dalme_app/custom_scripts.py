@@ -7,7 +7,6 @@ import json
 import pandas as pd
 from dalme_app.models import *
 from datetime import date
-from async_messages import messages
 from django.contrib.auth.models import User
 from django.db.models.expressions import RawSQL
 import operator
@@ -134,18 +133,18 @@ def session_info(request, username):
     return output
 
 
-def test_django_q(request):
-    async_task('dalme_app.tasks.test_task', request.user.id, task_name='test_task', hook='dalme_app.utils.send_message')
-
-
-def update_folios_in_dam(request):
-    async_task('dalme_app.tasks.update_rs_folio_field', request.user.id, task_name='update_folios_in_dam', hook='dalme_app.utils.send_message')
-
-
-def rebuild_search_index(request):
-    # async_task('dalme_app.tasks.update_search_index', request.user.id, task_name='rebuild_search_index', hook='dalme_app.utils.send_message')
-    call_command('search_index', '--rebuild', '-f')
-    return 'Process started...'
+# def test_django_q(request):
+#     async_task('dalme_app.tasks.test_task', request.user.id, task_name='test_task', hook='dalme_app.utils.send_message')
+#
+#
+# def update_folios_in_dam(request):
+#     async_task('dalme_app.tasks.update_rs_folio_field', request.user.id, task_name='update_folios_in_dam', hook='dalme_app.utils.send_message')
+#
+#
+# def rebuild_search_index(request):
+#     # async_task('dalme_app.tasks.update_search_index', request.user.id, task_name='rebuild_search_index', hook='dalme_app.utils.send_message')
+#     call_command('search_index', '--rebuild', '-f')
+#     return 'Process started...'
 
 
 def import_languages(request):
