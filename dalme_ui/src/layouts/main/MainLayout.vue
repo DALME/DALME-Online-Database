@@ -55,12 +55,10 @@ export default defineComponent({
     const prefSubscription = (action) => {
       let unsubscribe = () => {};
       if (action === "subscribe") {
-        console.log("subscribing");
         unsubscribe = $prefStore.$subscribe((state) => {
           $prefStore.updatePreferences($authStore.userId, state);
         });
       } else {
-        console.log("unsubscribing");
         unsubscribe();
       }
     };
@@ -72,10 +70,7 @@ export default defineComponent({
     const permissions = providePermissions();
     const { isAdmin } = permissions;
 
-    provide("showLogin", {
-      showLogin,
-      updateShowLogin,
-    });
+    provide("showLogin", { showLogin, updateShowLogin });
     provide("reAuthenticate", reAuthenticate);
     provide("prefSubscription", prefSubscription);
 

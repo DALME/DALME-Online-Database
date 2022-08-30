@@ -248,36 +248,54 @@ const routes = [
         path: "rights/:id",
         props: true,
         nav: false,
+        meta: {
+          navPath: ["Project", "Rights Policies"],
+        },
       },
       {
         component: () => import("pages/set/Set.vue"),
         name: "Set",
         path: "sets/:id",
         nav: false,
+        meta: {
+          navPath: ["Sets"],
+        },
       },
       {
         component: () => import("pages/source/Source.vue"),
         name: "Source",
         path: "sources/:id",
         nav: false,
+        meta: {
+          navPath: ["Sources"],
+        },
       },
       {
         component: () => import("pages/task/Task.vue"),
         name: "Task",
         path: "tasks/:id",
         nav: false,
+        meta: {
+          navPath: ["Project", "Tasks"],
+        },
       },
       {
         component: () => import("pages/ticket/Ticket.vue"),
         name: "Ticket",
         path: "tickets/:id",
         nav: false,
+        meta: {
+          navPath: ["Project", "Tickets"],
+        },
       },
       {
         component: () => import("pages/user/User.vue"),
         name: "User",
         path: "system/users/:username",
         nav: false,
+        meta: {
+          navPath: ["System", "Users"],
+        },
       },
     ],
   },

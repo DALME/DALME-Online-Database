@@ -46,11 +46,7 @@
       >
         <q-menu anchor="bottom right" self="top right">
           <q-list padding class="text-grey-9">
-            <q-item
-              clickable
-              v-close-popup
-              @click="go('https://kb.dalme.org/')"
-            >
+            <q-item clickable v-close-popup @click="openKB">
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="article" size="sm" />
               </q-item-section>
@@ -186,30 +182,38 @@
   </q-header>
 
   <q-drawer
-    v-model="navOpen"
+    :model-value="true"
     :mini="sidebarCollapsed && miniSidebar"
     @mouseover="miniSidebar = false"
     @mouseout="miniSidebar = true"
-    mini-to-overlay
+    :mini-to-overlay="sidebarCollapsed"
     bordered
-    class="bg-grey-1"
+    class="bg-grey-2 text-blue-grey-9"
   >
     <q-list>
-      <template v-for="(route, idx) in routes" :key="idx">
+      <template v-for="(route, idx) in navRoutes" :key="idx">
         <NavLink
           v-if="!route.children"
-          v-bind="{ name: route.name, icon: route.props.icon }"
+          v-bind="{ to: route.name, icon: route.props.icon }"
         />
         <q-expansion-item
+          :model-value="navStore.currentSection == route.name"
           v-else
           expand-separator
           :icon="route.props.icon"
           :label="route.name"
+          :class="
+            navStore.currentSection === route.name ? 'mini-expansion-open' : ''
+          "
+          :header-class="
+            navStore.currentSection === route.name
+              ? 'text-light-blue-10 text-weight-bold'
+              : ''
+          "
         >
           <NavLink
             v-for="(child, idx) in route.children"
-            v-bind="{ name: child.name, icon: child.props.icon }"
-            class="bg-grey-3"
+            v-bind="{ to: child.name, icon: child.props.icon }"
             :key="idx"
           />
         </q-expansion-item>
@@ -219,13 +223,13 @@
 </template>
 
 <script>
-import { useQuasar } from "quasar";
-import { filter as rFilter, head } from "ramda";
-import { defineComponent, ref, computed, inject } from "vue";
-import { useRouter } from "vue-router";
+import { openURL, useQuasar } from "quasar";
+import { computed, defineComponent, inject, provide, ref, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { usePrefStore } from "@/stores/preferences";
+import { useNavStore } from "@/stores/navigation";
 import { storeToRefs } from "pinia";
+import { navRoutes } from "@/router";
 
 import { Dialog, NavLink } from "@/components";
 import { useTooltips } from "@/use";
@@ -237,9 +241,9 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
-    const $router = useRouter();
     const $authStore = useAuthStore();
     const $prefStore = usePrefStore();
+    const navStore = useNavStore();
     const { fullName, username, avatar } = storeToRefs($authStore);
     const { ui } = storeToRefs($prefStore);
 
@@ -254,16 +258,16 @@ export default defineComponent({
 
     const miniSidebar = ref(sidebarCollapsed.value ? true : false);
     const { showTips } = useTooltips();
-    const navOpen = ref(true);
     const submitting = ref(false);
     const isFullscreen = ref(false);
     const searchQuery = ref("");
-    const routes = rFilter(
-      (route) => route.nav,
-      head($router.options.routes).children,
-    );
+    const currentSubsection = ref(navStore.currentSubsection);
 
     const prefSubscription = inject("prefSubscription");
+
+    const openKB = () => {
+      openURL("https://kb.dalme.org/", null, { target: "_blank" });
+    };
 
     const logout = () => {
       $q.dialog({
@@ -295,13 +299,23 @@ export default defineComponent({
       }
     };
 
+    provide("currentSubsection", currentSubsection);
+
+    watch(
+      () => navStore.currentSubsection,
+      () => {
+        console.log("changed", navStore.currentSubsection);
+        currentSubsection.value = navStore.currentSubsection;
+      },
+    );
+
     return {
       darkMode: $q.dark,
       logout,
-      navOpen,
       sidebarCollapsed,
       miniSidebar,
-      routes,
+      navRoutes,
+      navStore,
       showTips,
       submitting,
       isFullscreen,
@@ -310,6 +324,7 @@ export default defineComponent({
       fullName,
       username,
       avatar,
+      openKB,
     };
   },
 });
@@ -331,5 +346,9 @@ export default defineComponent({
 }
 .user-menu {
   min-width: 250px;
+}
+.q-expansion-item--expanded {
+  background: #e0e0e0;
+  color: #616161;
 }
 </style>

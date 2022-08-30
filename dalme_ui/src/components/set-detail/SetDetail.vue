@@ -1,24 +1,22 @@
 <template>
-  <q-tab-panel name="data">
-    <q-card class="q-ma-md">
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar>
-            <q-icon name="folder" />
-          </q-avatar>
-        </q-item-section>
+  <div v-if="!loading">
+    <q-tab-panel name="data">
+      <q-card class="q-ma-md">
+        <q-item>
+          <q-item-section avatar>
+            <q-avatar>
+              <q-icon name="folder" />
+            </q-avatar>
+          </q-item-section>
 
-        <q-item-section>
-          <q-item-label class="text-weight-medium">
-            Set (Collection)
-          </q-item-label>
-        </q-item-section>
-      </q-item>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">Set</q-item-label>
+          </q-item-section>
+        </q-item>
 
-      <q-separator />
+        <q-separator />
 
-      <q-card-section>
-        <template v-if="!loading">
+        <q-card-section>
           <div class="row q-my-xs">
             <div class="col-2 text-weight-medium text-right q-mr-lg">ID</div>
             <div class="col-8">{{ set.id }}</div>
@@ -100,40 +98,41 @@
             </div>
             <div class="col-8">{{ set.statText }}</div>
           </div>
-        </template>
-      </q-card-section>
-    </q-card>
+        </q-card-section>
+      </q-card>
 
-    <q-card class="q-ma-md q-pa-md" v-if="isWorkset">
-      <div class="row q-my-xs" v-if="!isNil(set.worksetProgress)">
-        <div class="col-2 text-weight-medium text-right q-mr-lg">Progress</div>
-        <div class="col-8">
-          <q-linear-progress
-            size="20px"
-            :value="set.worksetProgress"
-            color="teal"
-          >
-            <div class="absolute-full flex flex-center">
-              <q-badge
-                color="white"
-                text-color="teal"
-                :label="`${set.worksetProgress * 100}%`"
-              />
-            </div>
-          </q-linear-progress>
+      <q-card class="q-ma-md q-pa-md" v-if="isWorkset">
+        <div class="row q-my-xs" v-if="!isNil(set.worksetProgress)">
+          <div class="col-2 text-weight-medium text-right q-mr-lg">
+            Progress
+          </div>
+          <div class="col-8">
+            <q-linear-progress
+              size="20px"
+              :value="set.worksetProgress"
+              color="teal"
+            >
+              <div class="absolute-full flex flex-center">
+                <q-badge
+                  color="white"
+                  text-color="teal"
+                  :label="`${set.worksetProgress * 100}%`"
+                />
+              </div>
+            </q-linear-progress>
+          </div>
         </div>
-      </div>
-    </q-card>
+      </q-card>
 
-    <q-card class="q-ma-md" v-if="hasMembers">
-      <SetMembers
-        :memberCount="set.memberCount"
-        :publicMemberCount="set.publicMemberCount"
-      />
-    </q-card>
-
-    <OpaqueSpinner :showing="loading" />
-  </q-tab-panel>
+      <q-card class="q-ma-md" v-if="hasMembers">
+        <SetMembers
+          :memberCount="set.memberCount"
+          :publicMemberCount="set.publicMemberCount"
+        />
+      </q-card>
+    </q-tab-panel>
+  </div>
+  <OpaqueSpinner :showing="loading" />
 </template>
 
 <script>
@@ -145,6 +144,7 @@ import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
 import { setDetailSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
+import { useNavStore } from "@/stores/navigation";
 
 import SetMembers from "./SetMembers.vue";
 
@@ -157,7 +157,7 @@ export default defineComponent({
   setup() {
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard, resource } = useEditing();
-
+    const $navStore = useNavStore();
     const { loading, success, data, fetchAPI } = apiInterface();
     const set = ref({});
     const hasMembers = computed(
@@ -181,6 +181,7 @@ export default defineComponent({
           .then((value) => {
             resource.value = value.setType.name.toLowerCase();
             set.value = value;
+            $navStore.currentSubsection = value.setType.name + "s";
             loading.value = false;
           });
     };

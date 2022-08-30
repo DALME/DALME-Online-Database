@@ -59,6 +59,11 @@ pre {
   background: none;
   backdrop-filter: blur(10px) grayscale(70%);
 }
+
+.q-drawer--mini .q-expansion-item--expanded.mini-expansion-open .q-expansion-item__content {
+  display: inherit !important;
+}
+
 .full-page-height {
   height: calc(100vh - 50px);
 }
