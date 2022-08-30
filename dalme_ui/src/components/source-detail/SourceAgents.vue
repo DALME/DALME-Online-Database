@@ -42,7 +42,7 @@
 
 <script>
 import { keys, map } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, inject, ref } from "vue";
 
 const columnMap = {
   name: "Standard Name",
@@ -52,16 +52,13 @@ const columnMap = {
 
 export default defineComponent({
   name: "SourceAgents",
-  props: {
-    agents: {
-      type: Object,
-      required: true,
-    },
-  },
-  setup(props) {
+  setup() {
     const columns = ref([]);
     const visibleColumns = ref([]);
     const filter = ref("");
+    const source = inject("source");
+    const agents = source.value.agents;
+    console.log(agents);
 
     const noData = "No agents found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
@@ -79,12 +76,13 @@ export default defineComponent({
     columns.value = getColumns();
 
     return {
+      agents,
       columns,
       visibleColumns,
       filter,
       noData,
       pagination,
-      rows: props.agents,
+      rows: agents,
     };
   },
 });

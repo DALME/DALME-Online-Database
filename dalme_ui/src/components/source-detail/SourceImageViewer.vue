@@ -1,6 +1,5 @@
 <template>
-  <div class="iiif-viewer" tabindex="-1">
-    <ViewerToolbar />
+  <div class="image-viewer" tabindex="-1">
     <div id="viewer-container" style="height: 400px"></div>
   </div>
 </template>
@@ -10,11 +9,9 @@ import { computed, inject, defineComponent, onMounted, ref } from "vue";
 import { useAPI } from "@/use";
 import { requests } from "@/api";
 import OpenSeadragon from "openseadragon";
-import ViewerToolbar from "./ViewerToolbar";
 
 export default defineComponent({
-  name: "iiif-viewer",
-  components: { ViewerToolbar },
+  name: "SourceImageViewer",
 
   setup() {
     const { apiInterface } = useAPI();
@@ -23,7 +20,7 @@ export default defineComponent({
     const manifest = ref({});
     const options = inject("viewerOptions");
     const sourceId = inject("id");
-    const folios = inject("folios");
+    const pages = inject("pages");
     const { currentFolio, updateCurrentFolio } = inject("currentFolio");
     const fetchTranscription = inject("fetchTranscription");
 
@@ -45,7 +42,7 @@ export default defineComponent({
             viewer.value.addHandler("page", (event) => {
               updateCurrentFolio(event.page);
               fetchTranscription(
-                folios.value[currentFolio.value].transcriptionId,
+                pages.value[currentFolio.value].transcriptionId,
               );
             });
 
@@ -86,11 +83,7 @@ export default defineComponent({
       fetchManifest();
     });
 
-    return {
-      ViewerToolbar,
-    };
+    return {};
   },
 });
 </script>
-
-<style src="./styles.css" lang="css"></style>

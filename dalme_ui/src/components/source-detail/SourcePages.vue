@@ -1,54 +1,75 @@
 <template>
-  <q-table
-    :rows="rows"
-    :columns="columns"
-    :no-data-label="noData"
-    :filter="filter"
-    :pagination="pagination"
-    :rows-per-page-options="[0]"
-    row-key="id"
-    class="sticky-header"
+  <q-tabs
+    v-model="tab"
+    dense
+    class="text-grey"
+    active-color="primary"
+    indicator-color="primary"
+    align="left"
+    narrow-indicator
   >
-    <template v-slot:top>
-      <q-item-section avatar>
-        <q-avatar>
-          <q-icon name="menu_book" />
-        </q-avatar>
-      </q-item-section>
-      <q-item-label class="text-weight-medium">
-        Pages ({{ pages.length }})
-      </q-item-label>
-      <q-space />
-      <q-input
-        borderless
-        dense
-        debounce="300"
-        v-model="filter"
-        placeholder="Search"
+    <q-tab name="list" label="List" />
+    <q-tab name="editor" label="View/Edit" />
+  </q-tabs>
+  <q-separator />
+  <q-tab-panels v-model="tab" animated>
+    <q-tab-panel name="list">
+      <q-table
+        :rows="rows"
+        :columns="columns"
+        :no-data-label="noData"
+        :filter="filter"
+        :pagination="pagination"
+        :rows-per-page-options="[0]"
+        row-key="id"
+        class="sticky-header"
       >
-        <template v-slot:append>
-          <q-icon name="search" />
+        <template v-slot:top>
+          <q-item-section avatar>
+            <q-avatar>
+              <q-icon name="menu_book" />
+            </q-avatar>
+          </q-item-section>
+          <q-item-label class="text-weight-medium">
+            Folios ({{ pages.length }})
+          </q-item-label>
+          <q-space />
+          <q-input
+            borderless
+            dense
+            debounce="300"
+            v-model="filter"
+            placeholder="Search"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
         </template>
-      </q-input>
-    </template>
 
-    <template v-slot:body-cell-hasImage="props">
-      <q-td :props="props">
-        <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
-      </q-td>
-    </template>
+        <template v-slot:body-cell-hasImage="props">
+          <q-td :props="props">
+            <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
+          </q-td>
+        </template>
 
-    <template v-slot:body-cell-hasTranscription="props">
-      <q-td :props="props">
-        <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
-      </q-td>
-    </template>
-  </q-table>
+        <template v-slot:body-cell-hasTranscription="props">
+          <q-td :props="props">
+            <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
+          </q-td>
+        </template>
+      </q-table>
+    </q-tab-panel>
+    <q-tab-panel name="editor">
+      <SourceEditor />
+    </q-tab-panel>
+  </q-tab-panels>
 </template>
 
 <script>
 import { keys, map } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, inject, provide, ref } from "vue";
+import SourceEditor from "./SourceEditor.vue";
 
 const columnMap = {
   damId: "DAM ID",
@@ -60,18 +81,23 @@ const columnMap = {
 
 export default defineComponent({
   name: "SourcePages",
-  props: {
-    pages: {
-      type: Object,
-      required: true,
-    },
+  components: {
+    SourceEditor,
   },
-  setup(props) {
+  setup() {
     const columns = ref([]);
     const filter = ref("");
+    const source = inject("source");
+    const pages = source.value.pages;
+
+    const currentFolio = ref(0);
+    const updatecurrentFolio = (value) => {
+      currentFolio.value = value;
+    };
 
     const noData = "No pages found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
+    const tab = ref("list");
 
     const getColumns = () => {
       const toColumn = (key) => ({
@@ -85,12 +111,17 @@ export default defineComponent({
     };
     columns.value = getColumns();
 
+    provide("pages", pages);
+    provide("currentFolio", { currentFolio, updatecurrentFolio });
+
     return {
       columns,
       filter,
       noData,
+      pages,
       pagination,
-      rows: props.pages,
+      rows: pages,
+      tab,
     };
   },
 });

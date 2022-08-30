@@ -27,19 +27,19 @@ import {
 } from "vue";
 
 export default defineComponent({
-  name: "ViewerToolbar",
+  name: "SourceEditorToolbar",
 
   setup() {
-    const folios = inject("folios");
+    const pages = inject("pages");
     const { currentFolio } = inject("currentFolio");
     const title = ref("");
 
     watch(currentFolio, () => {
-      title.value = `Folio ${folios.value[currentFolio.value].name}`;
+      title.value = `Folio ${pages[currentFolio.value].name}`;
     });
 
     onBeforeMount(() => {
-      title.value = `Folio ${folios.value[currentFolio.value].name}`;
+      title.value = `Folio ${pages[currentFolio.value].name}`;
     });
 
     return {

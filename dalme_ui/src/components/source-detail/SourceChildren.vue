@@ -12,7 +12,7 @@
     <template v-slot:top>
       <q-item-section avatar>
         <q-avatar>
-          <q-icon name="menu_book" />
+          <q-icon name="account_tree" />
         </q-avatar>
       </q-item-section>
       <q-item-label class="text-weight-medium">
@@ -55,7 +55,7 @@
 
 <script>
 import { keys, map } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, inject, ref } from "vue";
 
 const columnMap = {
   name: "Name",
@@ -66,15 +66,11 @@ const columnMap = {
 
 export default defineComponent({
   name: "SourceChildren",
-  props: {
-    children: {
-      type: Object,
-      required: true,
-    },
-  },
-  setup(props) {
+  setup() {
     const columns = ref([]);
     const filter = ref("");
+    const source = inject("source");
+    const children = source.value.children;
 
     const noData = "No children found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
@@ -92,11 +88,12 @@ export default defineComponent({
     columns.value = getColumns();
 
     return {
+      children,
       columns,
       filter,
       noData,
       pagination,
-      rows: props.children,
+      rows: children,
     };
   },
 });

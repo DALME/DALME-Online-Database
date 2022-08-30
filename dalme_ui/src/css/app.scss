@@ -59,3 +59,6 @@ pre {
   background: none;
   backdrop-filter: blur(10px) grayscale(70%);
 }
+.full-page-height {
+  height: calc(100vh - 50px);
+}

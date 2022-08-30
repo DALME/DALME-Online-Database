@@ -13,7 +13,7 @@ const sourceTypeMap = {
 const sources = {
   getSource(id) {
     return {
-      url: `${endpoint}/${id}`,
+      url: `${endpoint}/${id}/`,
       method: "GET",
     };
   },
@@ -21,7 +21,7 @@ const sources = {
     // TODO: Remove sourceTypeAPI from routes and use the above map.
     const url = sourceType
       ? `${endpoint}/?class=${sourceType}&${query}`
-      : `${endpoint}/?${query}`;
+      : `${endpoint}/?${query}/`;
     return {
       url: url,
       method: "GET",

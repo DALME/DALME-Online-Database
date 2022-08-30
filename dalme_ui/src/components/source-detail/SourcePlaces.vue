@@ -36,7 +36,7 @@
 
 <script>
 import { keys, map } from "ramda";
-import { defineComponent, ref } from "vue";
+import { defineComponent, inject, ref } from "vue";
 
 const columnMap = {
   placename: "Placename",
@@ -45,15 +45,11 @@ const columnMap = {
 
 export default defineComponent({
   name: "SourcePlaces",
-  props: {
-    places: {
-      type: Object,
-      required: true,
-    },
-  },
-  setup(props) {
+  setup() {
     const columns = ref([]);
     const filter = ref("");
+    const source = inject("source");
+    const places = source.value.places;
 
     const noData = "No places found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
@@ -75,7 +71,8 @@ export default defineComponent({
       filter,
       noData,
       pagination,
-      rows: props.places,
+      places,
+      rows: places,
     };
   },
 });
