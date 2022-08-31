@@ -60,10 +60,16 @@ pre {
   backdrop-filter: blur(10px) grayscale(70%);
 }
 
-.q-drawer--mini .q-expansion-item--expanded.mini-expansion-open .q-expansion-item__content {
+.q-drawer--mini .q-expansion-item--expanded.mini-exp-open .q-expansion-item__content {
   display: inherit !important;
 }
 
 .full-page-height {
   height: calc(100vh - 50px);
+}
+.icon-adj {
+  padding: 8px 18px;
+}
+.q-drawer--left.q-drawer--bordered {
+  border-right: 1px solid transparent;
 }

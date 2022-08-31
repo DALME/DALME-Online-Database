@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated>
+  <q-header class="shadow-6">
     <q-toolbar class="q-pl-sm q-pr-none">
       <q-btn flat dense class="q-pl-xs">
         <q-avatar square color="white" size="34px">
@@ -46,14 +46,20 @@
       >
         <q-menu anchor="bottom right" self="top right">
           <q-list padding class="text-grey-9">
-            <q-item clickable v-close-popup @click="openKB">
+            <q-item
+              dense
+              clickable
+              v-close-popup
+              @click="openKB"
+              class="q-pr-lg"
+            >
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="article" size="sm" />
               </q-item-section>
               <q-item-section>Knowledge Base</q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="search_help">
+            <q-item dense clickable v-close-popup @click="search_help">
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="quiz" size="sm"></q-icon>
               </q-item-section>
@@ -62,7 +68,7 @@
 
             <q-separator spaced></q-separator>
 
-            <q-item clickable v-close-popup @click="report_issue">
+            <q-item dense clickable v-close-popup @click="report_issue">
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="bug_report" size="sm"></q-icon>
               </q-item-section>
@@ -81,84 +87,46 @@
         color="blue-grey-3"
       >
         <q-menu fit anchor="bottom right" self="top right">
-          <div class="col q-px-md q-mt-md user-menu">
-            <div class="row justify-center">
-              <q-avatar size="50px" rounded>
+          <div class="col q-px-md q-mt-md q-mb-sm user-menu">
+            <div class="row q-mb-sm justify-center">
+              <q-avatar v-if="!isEmpty(avatar) && !isNil(avatar)" size="50px">
                 <img :src="avatar" />
               </q-avatar>
+              <q-avatar v-else size="50px" icon="account_circle" />
             </div>
             <div class="row justify-center">
-              <div class="text-capitalize text-subtitle1 text-weight-bold">
+              <q-item-label class="text-subtitle2 text-weight-bold">
                 {{ fullName }}
-              </div>
+              </q-item-label>
             </div>
             <div class="row justify-center">
-              <div class="text-caption">{{ username }}</div>
+              <q-item-label caption>{{ username }}</q-item-label>
             </div>
           </div>
-          <q-list padding class="text-grey-9">
+          <q-list padding class="text-grey-9 q-pt-none">
             <q-separator spaced />
-            <q-item clickable v-close-popup>
+            <q-item dense clickable v-close-popup>
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="portrait" size="sm" />
               </q-item-section>
               <q-item-section>Profile</q-item-section>
             </q-item>
-            <q-item clickable v-close-popup>
+            <q-item dense clickable v-close-popup>
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="manage_accounts" size="sm" />
               </q-item-section>
               <q-item-section>Preferences</q-item-section>
             </q-item>
-            <q-item class="q-mt-auto">
-              <q-item-section>
-                <q-item-label class="q-pl-lg">
-                  Tooltips
-                  <span :class="showTips ? 'text-bold' : null">on</span>/<span
-                    :class="!showTips ? 'text-bold' : null"
-                    >off</span
-                  >
-                </q-item-label>
-              </q-item-section>
-              <q-item-section avatar>
-                <q-toggle
-                  dense
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
-                  v-model="showTips"
-                />
-              </q-item-section>
-            </q-item>
-            <q-item class="q-mt-auto">
-              <q-item-section>
-                <q-item-label class="q-pl-lg">
-                  Collapse sidebar
-                  <span :class="sidebarCollapsed ? 'text-bold' : null">on</span
-                  >/<span :class="!sidebarCollapsed ? 'text-bold' : null"
-                    >off</span
-                  >
-                </q-item-label>
-              </q-item-section>
-              <q-item-section avatar>
-                <q-toggle
-                  dense
-                  checked-icon="visibility"
-                  unchecked-icon="visibility_off"
-                  color="green"
-                  v-model="sidebarCollapsed"
-                />
-              </q-item-section>
-            </q-item>
-            <q-separator spaced />
+            <q-separator class="q-mb-sm" />
             <q-item
+              dense
               clickable
               v-close-popup
               @click="logout"
               :loading="submitting"
             >
               <q-item-section class="col-auto q-mr-xs">
-                <q-icon name="exit_to_app" size="sm" />
+                <q-icon name="logout" size="sm" />
                 <template v-slot:loading>
                   <q-spinner-facebook />
                 </template>
@@ -180,7 +148,6 @@
       />
     </q-toolbar>
   </q-header>
-
   <q-drawer
     :model-value="true"
     :mini="sidebarCollapsed && miniSidebar"
@@ -188,7 +155,8 @@
     @mouseout="miniSidebar = true"
     :mini-to-overlay="sidebarCollapsed"
     bordered
-    class="bg-grey-2 text-blue-grey-9"
+    class="bg-grey-2 text-blue-grey-9 shadow-6"
+    :width="220"
   >
     <q-list>
       <template v-for="(route, idx) in navRoutes" :key="idx">
@@ -200,17 +168,20 @@
           :model-value="navStore.currentSection == route.name"
           v-else
           expand-separator
-          :icon="route.props.icon"
           :label="route.name"
-          :class="
-            navStore.currentSection === route.name ? 'mini-expansion-open' : ''
-          "
+          :class="navStore.currentSection === route.name ? 'mini-exp-open' : ''"
           :header-class="
             navStore.currentSection === route.name
-              ? 'text-light-blue-10 text-weight-bold'
-              : ''
+              ? 'icon-adj text-light-blue-10 text-weight-bold'
+              : 'icon-adj'
           "
         >
+          <template v-slot:header>
+            <q-item-section avatar>
+              <q-icon :name="route.props.icon" size="20px" />
+            </q-item-section>
+            <q-item-section>{{ route.name }}</q-item-section>
+          </template>
           <NavLink
             v-for="(child, idx) in route.children"
             v-bind="{ to: child.name, icon: child.props.icon }"
@@ -218,12 +189,54 @@
           />
         </q-expansion-item>
       </template>
+      <q-space />
+      <q-separator />
+      <q-item class="bg-grey-4">
+        <q-item-section avatar class="q-mini-drawer-only mini-prefs-icon">
+          <q-icon name="settings" size="20px" color="grey-6" />
+        </q-item-section>
+        <q-item-section>
+          <q-item dense class="q-pl-none q-pr-sm">
+            <q-item-section>
+              <q-item-label class="q-pl-sm text-caption">
+                Show tooltips
+              </q-item-label>
+            </q-item-section>
+            <q-item-section avatar>
+              <q-toggle
+                dense
+                checked-icon="visibility"
+                unchecked-icon="visibility_off"
+                color="green"
+                v-model="showTips"
+              />
+            </q-item-section>
+          </q-item>
+          <q-item dense class="q-pl-none q-pr-sm">
+            <q-item-section>
+              <q-item-label class="q-pl-sm text-caption">
+                Compact sidebar
+              </q-item-label>
+            </q-item-section>
+            <q-item-section avatar>
+              <q-toggle
+                dense
+                checked-icon="visibility"
+                unchecked-icon="visibility_off"
+                color="green"
+                v-model="sidebarCollapsed"
+              />
+            </q-item-section>
+          </q-item>
+        </q-item-section>
+      </q-item>
     </q-list>
   </q-drawer>
 </template>
 
 <script>
 import { openURL, useQuasar } from "quasar";
+import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, inject, provide, ref, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { usePrefStore } from "@/stores/preferences";
@@ -319,6 +332,8 @@ export default defineComponent({
       showTips,
       submitting,
       isFullscreen,
+      isNil,
+      isEmpty,
       toggleFullscreen,
       searchQuery,
       fullName,
@@ -345,10 +360,17 @@ export default defineComponent({
   background: rgb(87 112 125 / 49%);
 }
 .user-menu {
-  min-width: 250px;
+  min-width: 200px;
 }
 .q-expansion-item--expanded {
-  background: #e0e0e0;
+  background: #ffffff;
   color: #616161;
+}
+.q-list--separator > .q-item-type + .q-item-type {
+  border-top: 1px dotted rgba(0, 0, 0, 0.12);
+}
+.mini-prefs-icon {
+  height: 64px;
+  padding: 8px 2px;
 }
 </style>

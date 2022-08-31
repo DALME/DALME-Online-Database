@@ -3,17 +3,20 @@
     :to="{ name: to }"
     exact
     clickable
-    :class="active ? 'bg-blue-3 text-light-blue-10 text-weight-bold' : null"
-    active-class="bg-blue-3 text-light-blue-10 text-weight-bold"
+    :class="
+      active
+        ? 'icon-adj bg-blue-1 text-light-blue-10 text-weight-bold'
+        : 'icon-adj'
+    "
+    active-class="bg-blue-1 text-light-blue-10 text-weight-bold"
+    exact-active-class="bg-blue-1 text-light-blue-10 text-weight-bold"
     :active="active"
   >
     <q-item-section avatar>
-      <q-icon :name="icon" />
+      <q-icon :name="icon" size="20px" />
     </q-item-section>
 
-    <q-item-section>
-      <q-item-label>{{ to }}</q-item-label>
-    </q-item-section>
+    <q-item-section>{{ to }}</q-item-section>
   </q-item>
 </template>
 
