@@ -7,7 +7,7 @@ const v2Endpoint = `${apiUrl}/v2/tickets`;
 const tickets = {
   getTickets() {
     return {
-      url: endpoint,
+      url: `${endpoint}/`,
       method: "GET",
     };
   },

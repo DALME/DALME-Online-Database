@@ -5,7 +5,7 @@ const endpoint = `${apiUrl}/users`;
 const users = {
   getUsers() {
     return {
-      url: endpoint,
+      url: `${endpoint}/`,
       method: "GET",
     };
   },
