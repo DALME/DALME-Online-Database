@@ -81,6 +81,7 @@ class SourceSerializer(DynamicSerializer):
     owner = UserSerializer(fields=['full_name', 'username', 'id'])
     credits = SourceCreditSerializer(many=True, required=False)
     primary_dataset = SetSerializer(fields=['id', 'name', 'detail_string'], required=False)
+    comment_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Source
@@ -103,13 +104,18 @@ class SourceSerializer(DynamicSerializer):
             'pages',
             'no_records',
             'is_private',
+            'comment_count'
         )
         extra_kwargs = {
             'parent': {'required': False},
             'no_folios': {'required': False},
             'no_images': {'required': False},
-            'primary_dataset': {'required': False}
+            'primary_dataset': {'required': False},
+            'comment_count': {'required': False}
         }
+
+    def get_comment_count(self, obj):
+        return obj.comments.count()
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -164,7 +170,7 @@ class SourceSerializer(DynamicSerializer):
                 })
             ret['places'] = places
 
-        ret['created'] =  {
+        ret['created'] = {
             'timestamp': timezone.localtime(
                 instance.creation_timestamp
             ).strftime('%d-%b-%Y@%H:%M'),
