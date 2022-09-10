@@ -31,7 +31,7 @@ export const ticketDetailSchema = yup
       .shape({
         id: yup.number().required(),
         username: yup.string().required(),
-        fullName: yup.string().required(),
+        fullName: yup.string().nullable(),
         avatar: yup.string().url().default(null).nullable(),
       })
       .camelCase(),
@@ -50,7 +50,13 @@ export const ticketSchema = yup
     id: yup.number().required(),
     status: yup.boolean().required(),
     subject: yup.string().required(),
-    description: yup.string().default(null).nullable(),
+    description: yup
+      .string()
+      .default(null)
+      .nullable()
+      .transform((_, value) => {
+        return value === null ? "" : String(value);
+      }),
     tags: yup.array().of(
       yup
         .object()
