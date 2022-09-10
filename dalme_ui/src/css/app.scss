@@ -67,9 +67,11 @@ pre {
 .full-page-height {
   height: calc(100vh - 50px);
 }
+
 .icon-adj {
   padding: 8px 18px;
 }
+
 .q-drawer--left.q-drawer--bordered {
   border-right: 1px solid transparent;
 }
@@ -101,4 +103,8 @@ pre {
 
 .md-editor-textbox .q-field__control:before {
   border-bottom-style: dashed;
+}
+
+.q-drawer--left .q-item__section--avatar {
+  min-width: 40px;
 }

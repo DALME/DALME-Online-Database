@@ -14,6 +14,7 @@
           standout
           hide-bottom-space
           v-model="searchQuery"
+          debounce="300"
           autocomplete="off"
           autocorrect="off"
           autocapitalize="off"
@@ -318,10 +319,7 @@ export default defineComponent({
 
     watch(
       () => navStore.currentSubsection,
-      () => {
-        console.log("changed", navStore.currentSubsection);
-        currentSubsection.value = navStore.currentSubsection;
-      },
+      () => (currentSubsection.value = navStore.currentSubsection),
     );
 
     return {
