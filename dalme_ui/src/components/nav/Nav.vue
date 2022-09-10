@@ -157,6 +157,8 @@
     bordered
     class="bg-grey-2 text-blue-grey-9 shadow-6"
     :width="220"
+    no-swipe-backdrop
+    no-swipe-close
   >
     <q-list>
       <template v-for="(route, idx) in navRoutes" :key="idx">
