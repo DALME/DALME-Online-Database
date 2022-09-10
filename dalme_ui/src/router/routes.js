@@ -25,7 +25,7 @@ const routes = [
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Archives",
             path: "archives",
-            props: { icon: "villa" },
+            props: { icon: "home_work" },
             nav: true,
             meta: {
               sourceType: "archives",
@@ -47,7 +47,7 @@ const routes = [
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Records",
             path: "records",
-            props: { icon: "format_list_numbered" },
+            props: { icon: "text_snippet" },
             nav: true,
             meta: {
               sourceType: "records",
@@ -58,7 +58,7 @@ const routes = [
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Bibliography",
             path: "bibilographies",
-            props: { icon: "library_books" },
+            props: { icon: "local_library" },
             nav: true,
             meta: {
               sourceType: "bibliography",
@@ -73,7 +73,7 @@ const routes = [
         component: () => import("pages/set-root/SetRoot.vue"),
         name: "Sets",
         path: "sets",
-        props: { icon: "collections_bookmark" },
+        props: { icon: "folder_copy" },
         nav: true,
         redirect: "/sets/datasets",
         children: [
@@ -81,7 +81,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Corpora",
             path: "corpora",
-            props: { icon: "local_library" },
+            props: { icon: "drive_folder_upload" },
             nav: true,
             meta: {
               setType: "corpora",
@@ -92,7 +92,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Collections",
             path: "collections",
-            props: { icon: "apps" },
+            props: { icon: "folder_special" },
             nav: true,
             meta: {
               setType: "collections",
@@ -103,7 +103,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Datasets",
             path: "datasets",
-            props: { icon: "schema" },
+            props: { icon: "topic" },
             nav: true,
             meta: {
               setType: "datasets",
@@ -114,7 +114,7 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Worksets",
             path: "worksets",
-            props: { icon: "work" },
+            props: { icon: "rule_folder" },
             nav: true,
             meta: {
               setType: "worksets",
@@ -137,7 +137,7 @@ const routes = [
             component: () => import("pages/agent-list/AgentList.vue"),
             name: "Agents",
             path: "agents",
-            props: { icon: "recent_actors" },
+            props: { icon: "groups" },
             nav: true,
           },
           {
@@ -155,7 +155,7 @@ const routes = [
         component: () => import("pages/project-root/ProjectRoot.vue"),
         name: "Project",
         path: "project",
-        props: { icon: "work" },
+        props: { icon: "business_center" },
         nav: true,
         redirect: "/project/tasks",
         children: [
@@ -163,14 +163,14 @@ const routes = [
             component: () => import("pages/task-list/TaskList.vue"),
             name: "Tasks",
             path: "tasks",
-            props: { icon: "assignment" },
+            props: { icon: "checklist" },
             nav: true,
           },
           {
             component: () => import("pages/ticket-list/TicketList.vue"),
             name: "Tickets",
             path: "tickets",
-            props: { icon: "task" },
+            props: { icon: "bug_report" },
             nav: true,
           },
           {
@@ -195,7 +195,7 @@ const routes = [
         component: () => import("pages/system-root/SystemRoot.vue"),
         name: "System",
         path: "system",
-        props: { icon: "settings" },
+        props: { icon: "display_settings" },
         nav: true,
         redirect: "/system/locales",
         children: [
@@ -224,7 +224,7 @@ const routes = [
             component: () => import("pages/user-list/UserList.vue"),
             name: "Users",
             path: "users",
-            props: { icon: "groups" },
+            props: { icon: "supervisor_account" },
             nav: true,
           },
           {
