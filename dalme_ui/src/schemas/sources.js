@@ -32,6 +32,13 @@ const localeSchema = yup.object().shape({
   id: yup.object().shape({ id: yup.number().required() }).required(),
 });
 
+const localeOrArrayOfLocaleSchema = yup.lazy((value) => {
+  if (Array.isArray(value)) {
+    return yup.array().of(localeSchema).default(null).nullable();
+  }
+  return localeSchema.default(null).nullable();
+});
+
 const primaryDatasetSchema = yup
   .object()
   .shape({
@@ -265,6 +272,7 @@ export const sourceDetailSchema = yup
       .required(),
     name: yup.string().required(),
     shortName: yup.string().required(),
+    commentCount: yup.number().required(),
     parent: yup
       .object()
       .shape({
@@ -321,7 +329,7 @@ export const sourceDetailSchema = yup
         altIdentifier: yup.string().default(null).nullable(),
         archivalSeries: yup.string().default(null).nullable(),
         archivalNumber: yup.number().default(null).nullable(),
-        locale: localeSchema.default(null).nullable(),
+        locale: localeOrArrayOfLocaleSchema,
         recordType: yup.string().default(null).nullable(), // TODO: Really?
         recordTypePhrase: yup.string().default(null).nullable(),
         namedPersons: yup.string().default(null).nullable(),
