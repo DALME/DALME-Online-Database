@@ -15,6 +15,13 @@ const tickets = {
       icon: "cancel",
       position: "top-right",
     }),
+  ticketListRetrievalFailed: () =>
+    Notify.create({
+      color: "red",
+      message: "Failed to retrieve list of tickets",
+      position: "top-right",
+      icon: "block",
+    }),
 };
 
 export default tickets;
