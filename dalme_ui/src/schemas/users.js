@@ -17,6 +17,21 @@ export const userOptionsSchema = yup.array().of(
     })),
 );
 
+export const userSelectSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      id: yup.string().required(),
+      username: yup.string().required(),
+      fullName: yup.string().required(),
+    })
+    .transform((value) => ({
+      id: value.id,
+      username: value.username,
+      fullName: value.full_name || `${value.first_name} ${value.last_name}`,
+    })),
+);
+
 const groupSchema = yup.object().shape({
   id: yup.number().required(),
   name: yup.string().required(),
