@@ -1,6 +1,6 @@
 <template>
   <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
+    <q-card flat class="q-ma-md">
       <q-table
         :title="title"
         :rows="rows"

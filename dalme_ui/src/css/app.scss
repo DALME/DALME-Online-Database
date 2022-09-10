@@ -76,6 +76,11 @@ pre {
   border-right: 1px solid transparent;
 }
 
+.flat-table .q-table__top {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0;
+}
+
 .box-left-arrow::before {
   content: "";
   position: absolute;
@@ -107,4 +112,18 @@ pre {
 
 .q-drawer--left .q-item__section--avatar {
   min-width: 40px;
+}
+
+.card-title-search {
+  width: 30%;
+}
+
+.card-title-search .q-field__control,
+.card-title-search .q-field__marginal {
+  font-size: 12px;
+  height: 23px;
+}
+
+.card-title-search .q-field__inner {
+  align-self: center;
 }

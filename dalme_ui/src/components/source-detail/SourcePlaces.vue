@@ -1,6 +1,61 @@
 <template>
+  <q-item
+    :dense="overview"
+    class="q-pb-none q-px-sm text-indigo-5"
+    :class="overview ? 'bg-indigo-1' : ''"
+  >
+    <q-item-section side class="q-pr-sm">
+      <q-icon name="place" color="indigo-5" size="xs" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label :class="overview ? 'text-subtitle2' : 'text-h6'">
+        Places
+        <q-badge rounded color="purple-4" align="middle">
+          {{ places.length }}
+        </q-badge>
+      </q-item-label>
+    </q-item-section>
+    <q-space />
+    <q-input
+      :dense="overview"
+      :standout="overview ? 'bg-indigo-3 no-shadow' : false"
+      :bg-color="overview ? 'indigo-1' : 'inherit'"
+      :color="overview ? 'indigo-6' : 'inherit'"
+      placeholder="Filter"
+      hide-bottom-space
+      v-model="filter"
+      debounce="300"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      :class="overview ? 'card-title-search' : ''"
+    >
+      <template v-slot:append>
+        <q-icon
+          v-if="filter === ''"
+          name="search"
+          color="indigo-5"
+          :size="overview ? '14px' : 'sm'"
+        />
+        <q-icon
+          v-else
+          name="highlight_off"
+          class="cursor-pointer"
+          color="indigo-5"
+          :size="overview ? '14px' : 'sm'"
+          @click="filter = ''"
+        />
+      </template>
+    </q-input>
+  </q-item>
+
+  <q-separator class="bg-indigo-5" />
+
   <q-table
-    :rows="rows"
+    :flat="!overview"
+    :dense="overview"
+    :rows="places"
     :columns="columns"
     :no-data-label="noData"
     :filter="filter"
@@ -8,35 +63,14 @@
     :rows-per-page-options="[0]"
     row-key="id"
     class="sticky-header"
-  >
-    <template v-slot:top>
-      <q-item-section avatar>
-        <q-avatar>
-          <q-icon name="menu_book" />
-        </q-avatar>
-      </q-item-section>
-      <q-item-label class="text-weight-medium">
-        Places ({{ places.length }})
-      </q-item-label>
-      <q-space />
-      <q-input
-        borderless
-        dense
-        debounce="300"
-        v-model="filter"
-        placeholder="Search"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-    </template>
-  </q-table>
+    table-colspan="2"
+    wrap-cells
+  />
 </template>
 
 <script>
 import { keys, map } from "ramda";
-import { defineComponent, inject, ref } from "vue";
+import { defineComponent, ref } from "vue";
 
 const columnMap = {
   placename: "Placename",
@@ -45,14 +79,23 @@ const columnMap = {
 
 export default defineComponent({
   name: "SourcePlaces",
-  setup() {
+  props: {
+    places: {
+      type: Object,
+      required: true,
+    },
+    overview: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  setup(props) {
     const columns = ref([]);
     const filter = ref("");
-    const source = inject("source");
-    const places = source.value.places;
 
     const noData = "No places found.";
-    const pagination = { rowsPerPage: 0 }; // All rows.
+    const pagination = { rowsPerPage: props.overview ? 5 : 0 }; // 0 = all rows
 
     const getColumns = () => {
       const toColumn = (key) => ({
@@ -61,6 +104,7 @@ export default defineComponent({
         label: columnMap[key],
         name: key,
         sortable: true,
+        headerClasses: "text-no-wrap",
       });
       return map(toColumn, keys(columnMap));
     };
@@ -71,8 +115,6 @@ export default defineComponent({
       filter,
       noData,
       pagination,
-      places,
-      rows: places,
     };
   },
 });
