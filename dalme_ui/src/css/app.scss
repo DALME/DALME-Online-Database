@@ -73,3 +73,32 @@ pre {
 .q-drawer--left.q-drawer--bordered {
   border-right: 1px solid transparent;
 }
+
+.box-left-arrow::before {
+  content: "";
+  position: absolute;
+  border: 8px solid #d0d0d0;
+  border-color: transparent #d0d0d0 transparent transparent;
+  top: 10px;
+  left: -17px;
+}
+
+.box-left-arrow::after {
+  content: "";
+  position: absolute;
+  border: 8px solid #e0e0e0;
+  border-color: transparent whitesmoke transparent transparent;
+  top: 10px;
+  left: -16px;
+}
+
+.md-editor-textbox .q-field__control {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.md-editor-textbox .q-field__control:before {
+  border-bottom-style: dashed;
+}

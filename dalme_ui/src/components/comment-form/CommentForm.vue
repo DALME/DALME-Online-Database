@@ -1,60 +1,64 @@
 <template>
-  <q-form
-    @submit="onSubmit"
-    ref="commentForm"
-    autocapitalize="off"
-    autocomplete="off"
-    autocorrect="off"
-  >
-    <q-input
-      v-model="body"
-      name="body"
-      :label="label"
-      autogrow
-      clearable
-      filled
-    />
-    <div class="row">
-      <q-space />
-      <q-btn
-        label="Submit"
-        type="submit"
-        color="primary"
-        class="q-mt-md"
-        :disable="disabled"
+  <q-item class="q-py-sm q-pr-lg q-pl-none">
+    <q-item-section top avatar>
+      <q-avatar v-if="authStore.avatar" size="40px">
+        <img :src="authStore.avatar" />
+      </q-avatar>
+      <q-avatar
+        v-else
+        size="40px"
+        icon="account_circle"
+        color="light-blue-3"
+        text-color="blue-9"
       />
-    </div>
-  </q-form>
+    </q-item-section>
+    <q-item-section>
+      <MarkdownEditor
+        ref="commentForm"
+        editable
+        placeholder="Leave a comment..."
+        :help="helpLine"
+        submitLabel="Comment"
+        @on-save-text="onSubmit"
+      />
+    </q-item-section>
+  </q-item>
 </template>
 
 <script>
-import { isEmpty } from "ramda";
-import { computed, defineComponent, inject, ref } from "vue";
+// import { openURL } from "quasar";
+import { defineComponent, inject, ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
 import { requests } from "@/api";
 import { commentPayloadSchema, commentSchema } from "@/schemas";
 import { useAPI, useNotifier } from "@/use";
+import MarkdownEditor from "../markdown-editor/MarkdownEditor.vue";
 
 export default defineComponent({
   name: "CommentForm",
+  components: { MarkdownEditor },
   emits: ["onSubmitComment"],
   setup(_, context) {
     const { apiInterface } = useAPI();
     const $notifier = useNotifier();
+    const authStore = useAuthStore();
 
     const { data, fetchAPI, status } = apiInterface();
-    const body = ref("");
     const commentForm = ref("");
     const submitting = ref(false);
-    const disabled = computed(() => isEmpty(body.value));
-    const label = "Leave a comment...";
+    const helpLine = "Please review the guidelines for commenting";
 
     const model = inject("model");
     const id = inject("id");
 
-    const onSubmit = async () => {
+    // const openKB = () => {
+    //   openURL("https://kb.dalme.org/", null, { target: "_blank" });
+    // };
+
+    const onSubmit = async (text) => {
       submitting.value = true;
-      const payload = { model, body: body.value, object: id.value };
+      const payload = { model, body: text, object: id.value };
       await commentPayloadSchema.validate(payload);
       setTimeout(async () => {
         const request = requests.comments.addComment(payload);
@@ -62,8 +66,7 @@ export default defineComponent({
         /* eslint-disable */
         status.value == 201
           ? commentSchema.validate(data.value).then(() => {
-              body.value = "";
-              commentForm.value.resetValidation();
+              commentForm.value.resetEditor();
               $notifier.comments.commentAdded();
               context.emit("onSubmitComment");
             })
@@ -72,7 +75,13 @@ export default defineComponent({
       }, 250);
       submitting.value = false;
     };
-    return { body, commentForm, disabled, label, onSubmit };
+
+    return {
+      authStore,
+      commentForm,
+      helpLine,
+      onSubmit,
+    };
   },
 });
 </script>

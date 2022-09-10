@@ -22,7 +22,7 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
-    boot: ["axios"],
+    boot: ["axios", "markdown"],
 
     // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ["app.scss"],
@@ -46,12 +46,14 @@ module.exports = configure(function (ctx) {
       vueRouterMode: "history", // available values: 'hash', 'history'
       publicPath: "/db",
 
-      // transpile: false,
+      // transpile: true,
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
       // Applies only if "transpile" is set to true.
-      // transpileDependencies: [],
+      // transpileDependencies: [
+      //   /quasar-ui-qmarkdown[\\/]src/
+      // ],
 
       // rtl: true, // https://v2.quasar.dev/options/rtl-support
       // preloadChunks: true,
@@ -69,6 +71,12 @@ module.exports = configure(function (ctx) {
           .plugin("eslint-webpack-plugin")
           .use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
         chain.resolve.alias.set("@", path.resolve(__dirname, "./src"));
+      },
+
+      vueLoaderOptions: {
+        compilerOptions: {
+          isPreTag: (tag) => tag === 'pre ' || tag === 'q-markdown'
+        }
       },
     },
 
