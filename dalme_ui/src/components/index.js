@@ -3,6 +3,7 @@
 export { default as Agents } from "./agents";
 export { default as Attachments } from "./attachments";
 export { default as BaseModal } from "./base-modal";
+export { default as BasicTable } from "./basic-table";
 export { default as CommentForm } from "./comment-form";
 export { default as Comments } from "./comments";
 export { default as Countries } from "./countries";

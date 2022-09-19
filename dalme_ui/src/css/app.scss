@@ -114,6 +114,25 @@ pre {
   min-width: 40px;
 }
 
+.basic-list .q-table__bottom {
+  min-height: 35px;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+.basic-list .q-table__bottom--nodata {
+  padding-left: 12px;
+}
+
+.basic-list th {
+  padding: 0;
+  border-right: 1px dotted rgba(0, 0, 0, 0.12);
+}
+
+.basic-list thead > tr > th:last-of-type {
+  border-right: none;
+}
+
 .card-title-search {
   width: 30%;
 }
@@ -124,9 +143,54 @@ pre {
   height: 23px;
 }
 
-.card-title-search .q-field__inner {
+.card-title-search .q-field__native {
+  color: #5c6bc0;
+}
+
+.list-title-search {
+  max-width: 250px;
+}
+
+.list-title-search .q-field__control,
+.list-title-search .q-field__marginal {
+  font-size: 13px;
+  height: 28px;
+}
+
+.list-title-search .q-field__native {
+  color: #5c6bc0;
+  font-weight: 500;
+}
+
+.card-title-search .q-field__inner,
+.list-title-search .q-field__inner {
   align-self: center;
 }
+
+.list-title-button {
+  min-height: 2em;
+  padding: 4px 5px 4px 10px;
+}
+
+.list-title-button.btn-icon {
+  padding-right: 10px;
+}
+
+.list-footer-button {
+  min-height: 2em;
+  padding: 4px 10px;
+}
+
+.list-footer-button-group {
+  height: 30px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.detail-card {
+  border-color: #9fa8da;
+}
+
 .page-input input {
   padding: 0;
   font-weight: 500;
