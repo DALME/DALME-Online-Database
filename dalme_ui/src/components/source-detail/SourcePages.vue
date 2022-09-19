@@ -19,7 +19,7 @@
       <q-input
         :dense="overview"
         :standout="overview ? 'bg-indigo-3 no-shadow' : false"
-        :bg-color="overview ? 'indigo-1' : 'inherit'"
+        :bg-color="overview ? 'indigo-2' : 'inherit'"
         :color="overview ? 'indigo-6' : 'inherit'"
         placeholder="Filter"
         hide-bottom-space
@@ -65,23 +65,11 @@
       wrap-cells
     >
       <template v-slot:body-cell-hasImage="props">
-        <q-td :props="props">
-          <q-icon
-            :name="props.value ? 'check_box' : 'disabled_by_default'"
-            :color="props.value ? 'green-9' : 'red-10'"
-            size="xs"
-          />
-        </q-td>
+        <q-td :props="props"><BooleanIcon :value="props.value" /></q-td>
       </template>
 
       <template v-slot:body-cell-hasTranscription="props">
-        <q-td :props="props">
-          <q-icon
-            :name="!props.value ? 'check_box' : 'disabled_by_default'"
-            :color="!props.value ? 'green-9' : 'red-10'"
-            size="xs"
-          />
-        </q-td>
+        <q-td :props="props"><BooleanIcon :value="props.value" /></q-td>
       </template>
     </q-table>
   </template>
@@ -135,15 +123,11 @@
           </template>
 
           <template v-slot:body-cell-hasImage="props">
-            <q-td :props="props">
-              <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
-            </q-td>
+            <q-td :props="props"><BooleanIcon :value="props.value" /></q-td>
           </template>
 
           <template v-slot:body-cell-hasTranscription="props">
-            <q-td :props="props">
-              <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
-            </q-td>
+            <q-td :props="props"><BooleanIcon :value="props.value" /></q-td>
           </template>
         </q-table>
       </q-tab-panel>
@@ -157,6 +141,7 @@
 <script>
 import { keys, map } from "ramda";
 import { defineComponent, provide, ref } from "vue";
+import { BooleanIcon } from "@/components/utils";
 import SourceEditor from "./SourceEditor.vue";
 
 const columnMap = {
@@ -193,6 +178,7 @@ export default defineComponent({
     },
   },
   components: {
+    BooleanIcon,
     SourceEditor,
   },
   setup(props) {

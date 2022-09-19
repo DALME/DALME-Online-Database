@@ -19,7 +19,7 @@
     <q-input
       :dense="overview"
       :standout="overview ? 'bg-indigo-3 no-shadow' : false"
-      :bg-color="overview ? 'indigo-1' : 'inherit'"
+      :bg-color="overview ? 'indigo-2' : 'inherit'"
       :color="overview ? 'indigo-6' : 'inherit'"
       placeholder="Filter"
       hide-bottom-space

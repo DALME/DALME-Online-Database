@@ -19,7 +19,7 @@
     <q-input
       :dense="overview"
       :standout="overview ? 'bg-indigo-3 no-shadow' : false"
-      :bg-color="overview ? 'indigo-1' : 'inherit'"
+      :bg-color="overview ? 'indigo-2' : 'inherit'"
       :color="overview ? 'indigo-6' : 'inherit'"
       placeholder="Filter"
       hide-bottom-space
@@ -70,6 +70,7 @@
     <template v-slot:body-cell-name="props">
       <q-td :props="props">
         <router-link
+          class="text-link"
           :to="{
             name: 'Source',
             params: { id: props.row.id },

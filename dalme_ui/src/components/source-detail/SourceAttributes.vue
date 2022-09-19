@@ -47,6 +47,7 @@
             <div class="col-3 text-weight-medium text-right q-mr-lg">Owner</div>
             <div class="col-8">
               <router-link
+                class="text-link"
                 :to="{
                   name: 'User',
                   params: { username: source.owner.username },
@@ -73,6 +74,7 @@
             </div>
             <div class="col-8">
               <router-link
+                class="text-link"
                 :to="{
                   name: 'Source',
                   params: { id: source.parent.id },
@@ -89,6 +91,7 @@
             </div>
             <div class="col-8">
               <router-link
+                class="text-link"
                 :to="{
                   name: 'Set',
                   params: { id: source.primaryDataset.id },
@@ -155,6 +158,7 @@
             <div class="col-8">
               <span>{{ source.created.timestamp }} by </span>
               <router-link
+                class="text-link"
                 :to="{
                   name: 'User',
                   params: { username: source.created.username },
@@ -172,6 +176,7 @@
             <div class="col-8">
               <span>{{ source.modified.timestamp }} by </span>
               <router-link
+                class="text-link"
                 :to="{
                   params: { username: source.modified.username },
                 }"
@@ -335,9 +340,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped lang="scss">
-.detail-card {
-  border-color: #9fa8da;
-}
-</style>
