@@ -1,15 +1,33 @@
 import S from "string";
+import { equals, isNil } from "ramda";
 import { computed, ref, unref, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { usePrefStore } from "@/stores/preferences";
 
 const transformField = (field) => S(field).underscore().s;
 
-export const usePagination = (fetchData) => {
+export const usePagination = (fetchData, listName, defaults) => {
+  const $prefStore = usePrefStore();
+  const { lists } = storeToRefs($prefStore);
+
+  if (isNil(lists.value[listName])) {
+    lists.value[listName] = {
+      rowsPerPage: 20,
+      visibleColumns: defaults.visibleColumns,
+      sortBy: defaults.sortBy,
+      sortDesc: defaults.sortDesc,
+    };
+  }
+
+  const visibleColumns = ref(lists.value[listName]["visibleColumns"]);
+
   const defaultPagination = {
-    descending: false,
+    descending: lists.value[listName]["sortDesc"],
     page: 1,
-    rowsNumber: null,
-    rowsPerPage: 10,
-    sortBy: null,
+    rowsNumber: 0,
+    rowsTotal: 0,
+    rowsPerPage: lists.value[listName]["rowsPerPage"],
+    sortBy: lists.value[listName]["sortBy"],
   };
 
   const pagination = ref(defaultPagination);
@@ -49,6 +67,21 @@ export const usePagination = (fetchData) => {
 
   const resetPagination = () => (pagination.value = defaultPagination);
 
+  const onChangeFilter = (value) => {
+    filter.value = value;
+    fetchDataPaginated();
+  };
+
+  const onChangePage = (value) => {
+    pagination.value.page = value;
+    fetchDataPaginated();
+  };
+
+  const onChangeRowsPerPage = (value) => {
+    pagination.value.rowsPerPage = value;
+    fetchDataPaginated();
+  };
+
   watch(
     () => pagination.value,
     async (_, prev) => {
@@ -59,12 +92,46 @@ export const usePagination = (fetchData) => {
     { immediate: true },
   );
 
+  watch(
+    [
+      visibleColumns,
+      () => pagination.value.rowsPerPage,
+      () => pagination.value.sortBy,
+      () => pagination.value.sortDesc,
+    ],
+    () => {
+      if (
+        !equals(lists.value[listName]["visibleColumns"], visibleColumns.value)
+      ) {
+        lists.value[listName]["visibleColumns"] = visibleColumns.value;
+      }
+
+      if (
+        pagination.value.rowsPerPage !== lists.value[listName]["rowsPerPage"]
+      ) {
+        lists.value[listName]["rowsPerPage"] = pagination.value.rowsPerPage;
+      }
+
+      if (pagination.value.sortBy !== lists.value[listName]["sortBy"]) {
+        lists.value[listName]["sortBy"] = pagination.value.sortBy;
+      }
+
+      if (pagination.value.sortDesc !== lists.value[listName]["sortDesc"]) {
+        lists.value[listName]["sortDesc"] = pagination.value.sortDesc;
+      }
+    },
+  );
+
   return {
     fetchDataPaginated,
     filter,
+    onChangeFilter,
+    onChangePage,
+    onChangeRowsPerPage,
     onRequest,
     pagination,
     query,
     resetPagination,
+    visibleColumns,
   };
 };
