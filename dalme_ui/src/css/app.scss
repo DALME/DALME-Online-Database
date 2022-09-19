@@ -4,8 +4,16 @@ html,body {
   height: 100% !important;
 }
 
-a {
+a, a:visited {
   text-decoration: none;
+}
+
+a.text-link, a.text-link:visited {
+  color: #5c6bc0;
+}
+
+a.text-link:hover {
+  text-decoration: underline dotted;
 }
 
 h1,h2,h3,h4,h5 {
