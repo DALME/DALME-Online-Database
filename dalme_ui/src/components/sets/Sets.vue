@@ -1,103 +1,88 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-table
-        :title="title"
-        :rows="rows"
-        :columns="columns"
-        :no-data-label="noData"
-        :filter="filter"
-        :title-class="{ 'text-h6': true }"
-        :loading="loading"
-        @request="onRequest"
-        v-model:pagination="pagination"
-        row-key="id"
+  <BasicTable
+    :columns="columns"
+    :filter="filter"
+    :loading="loading"
+    :noData="noData"
+    :onChangeFilter="onChangeFilter"
+    :onChangePage="onChangePage"
+    :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onRequest="onRequest"
+    :pagination="pagination"
+    :rows="rows"
+    :title="title"
+    :visibleColumns="visibleColumns"
+  >
+    <template v-slot:render-cell-name="props">
+      <router-link
+        class="text-subtitle2 text-link"
+        :to="{ name: 'Set', params: { id: props.row.id } }"
       >
-        <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
+        {{ props.row.name }}
+      </router-link>
+    </template>
 
-        <template v-slot:body-cell-name="props">
-          <q-td :props="props">
-            <router-link
-              class="text-subtitle2"
-              :to="{ name: 'Set', params: { id: props.row.id } }"
-            >
-              {{ props.value }}
-            </router-link>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-owner="props">
+      <router-link
+        class="text-link"
+        :to="{ name: 'User', params: { username: props.row.owner.username } }"
+      >
+        {{ props.row.owner.fullName }}
+      </router-link>
+    </template>
 
-        <template v-slot:body-cell-owner="props">
-          <q-td :props="props">
-            <router-link
-              :to="{
-                name: 'User',
-                params: { username: props.value.username },
-              }"
-            >
-              {{ props.value.fullName }}
-            </router-link>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-isPublic="props">
+      <BooleanIcon
+        :value="props.row.isPublic"
+        :onlyTrue="true"
+        trueIcon="public"
+      />
+    </template>
 
-        <template v-slot:body-cell-hasLanding="props">
-          <q-td :props="props">
-            <q-icon :name="props.value ? 'done' : 'close'" />
-          </q-td>
-        </template>
+    <template v-slot:render-cell-hasLanding="props">
+      <BooleanIcon
+        :value="props.row.hasLanding"
+        :onlyTrue="true"
+        trueIcon="check_circle"
+      />
+    </template>
 
-        <template v-slot:body-cell-endpoint="props">
-          <q-td :props="props">
-            <q-badge outline color="primary" label="Outline">
-              {{ props.value }}
-            </q-badge>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-endpoint="props">
+      <q-badge color="blue-grey-1" text-color="blue-grey-7" class="wf-tag">
+        {{ props.row.endpoint }}
+      </q-badge>
+    </template>
 
-        <template v-slot:body-cell-permissions="props">
-          <q-td :props="props">
-            {{ props.value.name }}
-          </q-td>
-        </template>
-      </q-table>
-      <OpaqueSpinner :showing="loading" />
-    </q-card>
-  </div>
+    <template v-slot:render-cell-permissions="props">
+      {{ props.row.permissions.name }}
+    </template>
+
+    <template v-slot:render-cell-datasetUsergroup="props">
+      {{ props.row.datasetUsergroup.name }}
+    </template>
+  </BasicTable>
 </template>
 
 <script>
 import { useMeta } from "quasar";
-import { keys, map } from "ramda";
-import { defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
-
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import { BasicTable } from "@/components";
+import { BooleanIcon, getColumns, getDefaults } from "@/components/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
-
 import { columnsByType } from "./columns";
 
 export default defineComponent({
   name: "Sets",
   components: {
-    OpaqueSpinner,
+    BasicTable,
+    BooleanIcon,
   },
   setup() {
     const $route = useRoute();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
@@ -107,20 +92,12 @@ export default defineComponent({
 
     useMeta(() => ({ title: title.value }));
 
+    const columnMap = computed(() => {
+      return columnsByType($route.meta.setType);
+    });
+
     const noData = "No sets found.";
     const setMap = { corpora: 1, collections: 2, datasets: 3, worksets: 4 };
-
-    const getColumns = () => {
-      const columnMap = columnsByType(setType.value);
-      const toColumn = (key) => ({
-        align: "left",
-        field: key,
-        label: columnMap[key],
-        name: key,
-        sortable: true,
-      });
-      return map(toColumn, keys(columnMap));
-    };
 
     const fetchData = async (query) => {
       const setTypeConstant = setMap[setTypeAPI.value];
@@ -131,8 +108,9 @@ export default defineComponent({
         await schema
           .validate(data.value.data, { stripUnknown: true })
           .then((value) => {
-            columns.value = getColumns();
-            pagination.value.rowsNumber = data.value.recordsTotal;
+            columns.value = getColumns(columnMap.value);
+            pagination.value.rowsNumber = data.value.recordsFiltered;
+            pagination.value.rowsTotal = data.value.recordsTotal;
             rows.value.splice(0, rows.value.length, ...value);
             loading.value = false;
           });
@@ -141,10 +119,18 @@ export default defineComponent({
     const {
       fetchDataPaginated,
       filter,
-      pagination,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
       onRequest,
+      pagination,
       resetPagination,
-    } = usePagination(fetchData);
+      visibleColumns,
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap.value));
+
+    provide("pagination", { pagination, fetchDataPaginated });
+    provide("columns", columns);
+    provide("visibleColumns", visibleColumns);
 
     onBeforeRouteLeave(() => {
       if (loading.value) return false;
@@ -180,10 +166,14 @@ export default defineComponent({
       filter,
       loading,
       noData,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
       onRequest,
       pagination,
       rows,
       title,
+      visibleColumns,
     };
   },
 });

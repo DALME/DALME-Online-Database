@@ -21,13 +21,13 @@ const sets = {
   },
   getSet(id) {
     return {
-      url: `${endpoint}/${id}`,
+      url: `${endpoint}/${id}/`,
       method: "GET",
     };
   },
   getSets() {
     return {
-      url: endpoint,
+      url: `${endpoint}/`,
       method: "GET",
     };
   },
