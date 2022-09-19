@@ -32,13 +32,15 @@
 
       <q-card-actions align="right">
         <q-btn
-          flat
+          unelevated
+          no-caps
           :color="CancelButtonColour"
           :label="CancelButtonLabel"
           @click="onCancelClick"
         />
         <q-btn
-          flat
+          unelevated
+          no-caps
           :color="OkayButtonColour"
           :label="OkayButtonLabel"
           @click="onOkayClick"

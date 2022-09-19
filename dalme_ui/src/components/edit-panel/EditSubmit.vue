@@ -8,6 +8,7 @@
     @click.stop="handleSubmit"
     @mouseover="mouseoverSubmit = true"
     @mouseleave="mouseoverSubmit = false"
+    push
   >
     <template v-slot:loading>
       <q-spinner-facebook />

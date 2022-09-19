@@ -13,7 +13,11 @@
       class="parent"
       :color="dragging ? 'grey' : 'initial'"
       :disable="dragging"
-      v-touch-pan.prevent.mouse="move"
+      v-touch-pan.vertical.prevent.mouse="move"
+      push
+      glossy
+      square
+      padding="md xl md sm"
     >
       <!-- ADD -->
       <EditCreate />
@@ -30,7 +34,7 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, provide, ref } from "vue";
+import { computed, defineComponent, onMounted, provide, ref } from "vue";
 
 import { useEditing, usePermissions } from "@/use";
 
@@ -53,13 +57,18 @@ export default defineComponent({
 
     const el = ref(null);
     const dragging = ref(false);
-    const position = ref([30, 30]);
+    const position = ref([-30, 30]);
+
+    const maxH = computed(() => window.innerHeight - 112);
 
     const move = (event) => {
       dragging.value = event.isFirst !== true && event.isFinal === false;
       position.value = [
-        position.value[0] - event.delta.x,
-        position.value[1] - event.delta.y,
+        position.value[0],
+        0 <= position.value[1] - event.delta.y &&
+        position.value[1] - event.delta.y <= maxH.value
+          ? position.value[1] - event.delta.y
+          : position.value[1],
       ];
     };
 

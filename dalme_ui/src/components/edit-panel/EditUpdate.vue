@@ -7,6 +7,7 @@
     :disable="!isDetail || underEdit"
     :loading="loading"
     :onclick="handleClick"
+    push
   >
     <template v-slot:loading>
       <q-spinner-facebook />

@@ -5,6 +5,7 @@
     direction="up"
     :color="dragging ? 'grey' : 'amber'"
     :disable="dragging"
+    push
   >
     <q-fab
       padding="0.5rem"
@@ -13,12 +14,14 @@
       direction="left"
       :color="dragging ? 'grey' : 'orange'"
       :disable="dragging"
+      push
     >
       <q-fab-action
         :onClick="() => handleClick('archive')"
         color="amber"
         text-color="black"
         icon="villa"
+        push
       >
         <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Archive
@@ -30,6 +33,7 @@
         color="amber"
         text-color="black"
         icon="inventory"
+        push
       >
         <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Archival File
@@ -41,6 +45,7 @@
         color="amber"
         text-color="black"
         icon="library_books"
+        push
       >
         <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Bibliography
@@ -52,6 +57,7 @@
         color="amber"
         text-color="black"
         icon="format_list_numbered"
+        push
       >
         <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Record
@@ -66,12 +72,14 @@
       direction="left"
       :color="dragging ? 'grey' : 'orange'"
       :disable="dragging"
+      push
     >
       <q-fab-action
         :onclick="() => handleClick('corpus')"
         color="amber"
         text-color="black"
         icon="local_library"
+        push
       >
         <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Corpus
@@ -83,6 +91,7 @@
         color="amber"
         text-color="black"
         icon="apps"
+        push
       >
         <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Collection
@@ -94,6 +103,7 @@
         color="amber"
         text-color="black"
         icon="schema"
+        push
       >
         <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Dataset
@@ -105,6 +115,7 @@
         color="amber"
         text-color="black"
         icon="work"
+        push
       >
         <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Workset
@@ -117,6 +128,7 @@
       color="amber"
       text-color="black"
       icon="assignment"
+      push
     >
       <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
         Create Task
@@ -128,6 +140,7 @@
       color="amber"
       text-color="black"
       icon="task"
+      push
     >
       <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
         Create Ticket

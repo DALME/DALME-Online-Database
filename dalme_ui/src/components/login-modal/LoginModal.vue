@@ -55,6 +55,8 @@
 
           <div class="row justify-center q-mt-lg q-pt-md">
             <q-btn
+              unelevated
+              no-caps
               align="between"
               label="Login"
               type="submit"

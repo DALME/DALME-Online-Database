@@ -64,9 +64,16 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
           <q-btn
-            flat
+            unelevated
+            no-caps
+            label="Cancel"
+            color="primary"
+            v-close-popup
+          />
+          <q-btn
+            unelevated
+            no-caps
             label="Close"
             color="primary"
             v-close-popup
