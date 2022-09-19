@@ -14,7 +14,7 @@ const agents = {
       length,
     };
     return {
-      url: `${endpoint}/?data=${data}`,
+      url: `${endpoint}/?data=${JSON.stringify(data)}`,
       method: "GET",
     };
   },

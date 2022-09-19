@@ -1,94 +1,160 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <Table
-      :title="title"
-      :columns="columns"
-      :editable="editable"
-      :loading="loading"
-      :filter="filter"
-      :schema="schema"
-      :no-data-label="noData"
-      :fetch-data="fetchData"
-      :updateRequest="updateRequest"
-    />
-    <OpaqueSpinner :showing="loading" />
-  </div>
+  <BasicTable
+    :columns="columns"
+    :editable="editable"
+    :filter="filter"
+    :loading="loading"
+    :noData="noData"
+    :onChangeFilter="onChangeFilter"
+    :onChangePage="onChangePage"
+    :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onRequest="onRequest"
+    :pagination="pagination"
+    :rows="rows"
+    :schema="schema"
+    :title="title"
+    :updateRequest="updateRequest"
+    :visibleColumns="visibleColumns"
+  >
+    <template v-slot:render-cell-locale="props">
+      <router-link
+        class="text-link"
+        v-if="props.row.locale"
+        :to="{ name: 'Locales', params: { id: props.row.locale.id } }"
+      >
+        {{ props.row.locale.name }}
+      </router-link>
+    </template>
+  </BasicTable>
 </template>
 
 <script>
-import { map, keys } from "ramda";
 import { defineComponent, onMounted, provide, ref } from "vue";
-
+import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { Table } from "@/components";
-import { OpaqueSpinner } from "@/components/utils";
-import { useAPI } from "@/use";
+import BasicTable from "@/components/basic-table/BasicTable.vue";
+import { getColumns, getDefaults } from "@/components/utils";
 import { placeListSchema } from "@/schemas";
+import { useAPI, usePagination } from "@/use";
 
 const columnMap = {
-  standardName: "Standard Name",
-  notes: "Notes",
-  locale: "Locale",
+  standardName: {
+    label: "Standard Name",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: true,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  notes: {
+    label: "Notes",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  locale: {
+    label: "Locale",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  administrativeRegion: {
+    label: "Administrative Region",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  country: {
+    label: "Country",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
 };
 
 export default defineComponent({
   name: "Places",
   components: {
-    OpaqueSpinner,
-    Table,
+    BasicTable,
   },
   setup() {
+    const $route = useRoute();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
-    const filter = ref("");
-
-    const updateRequest = requests.places.inlineUpdate;
-    const editable = ["notes"];
-
-    provide("rows", rows);
-
     const noData = "No places found.";
     const title = "Places";
 
-    const getColumns = () => {
-      const toColumn = (key) => ({
-        align: "left",
-        field: key,
-        label: columnMap[key],
-        name: key,
-        sortable: true,
-      });
-      return map(toColumn, keys(columnMap));
-    };
+    const updateRequest = requests.places.inlineUpdate;
+    const editable = ["notes"];
 
     const fetchData = async () => {
       const request = requests.places.getPlaces();
       await fetchAPI(request);
       if (success.value)
         await placeListSchema
-          .validate(data.value, { stripUnknown: true })
+          .validate(data.value.data, { stripUnknown: true })
           .then((value) => {
-            columns.value = getColumns();
+            columns.value = getColumns(columnMap);
+            pagination.value.rowsNumber = data.value.recordsFiltered;
+            pagination.value.rowsTotal = data.value.recordsTotal;
             rows.value = value;
             loading.value = false;
           });
     };
+
+    const {
+      fetchDataPaginated,
+      filter,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
+      onRequest,
+      pagination,
+      visibleColumns,
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap));
+
+    provide("pagination", { pagination, fetchDataPaginated });
+    provide("columns", columns);
+    provide("visibleColumns", visibleColumns);
 
     onMounted(async () => await fetchData());
 
     return {
       columns,
       editable,
-      fetchData,
       filter,
       loading,
       noData,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
+      onRequest,
+      pagination,
+      rows,
+      schema: placeListSchema,
       title,
       updateRequest,
-      schema: placeListSchema,
+      visibleColumns,
     };
   },
 });

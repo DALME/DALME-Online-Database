@@ -1,126 +1,154 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-table
-        :title="title"
-        :rows="rows"
-        :columns="columns"
-        :no-data-label="noData"
-        :filter="filter"
-        :loading="loading"
-        :pagination="pagination"
-        :title-class="{ 'text-h6': true }"
-        row-key="id"
-      >
-        <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
+  <BasicTable
+    :columns="columns"
+    :filter="filter"
+    :loading="loading"
+    :noData="noData"
+    :onChangeFilter="onChangeFilter"
+    :onChangePage="onChangePage"
+    :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onRequest="onRequest"
+    :pagination="pagination"
+    :rows="rows"
+    :title="title"
+    :visibleColumns="visibleColumns"
+  >
+    <template v-slot:render-cell-type="props">
+      {{ props.row.type.name }}
+    </template>
 
-        <template v-slot:body-cell-type="props">
-          <q-td :props="props">
-            {{ props.value.name }}
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-parent="props">
-          <q-td :props="props">
-            <template v-if="props.value">
-              {{ props.value.name }}
-            </template>
-          </q-td>
-        </template>
-      </q-table>
-    </q-card>
-    <OpaqueSpinner :showing="loading" />
-  </div>
+    <template v-slot:render-cell-parent="props">
+      <template v-if="props.row.parent">
+        {{ props.row.parent.name }}
+      </template>
+    </template>
+  </BasicTable>
 </template>
 
 <script>
-import { map, keys } from "ramda";
-import { defineComponent, onMounted, ref } from "vue";
-
+import { defineComponent, onMounted, provide, ref } from "vue";
+import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import BasicTable from "@/components/basic-table/BasicTable.vue";
+import { getColumns, getDefaults } from "@/components/utils";
 import { languageListSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, usePagination } from "@/use";
 
 const columnMap = {
-  name: "Name",
-  type: "Type",
-  parent: "Parent",
-  iso6393: "ISO-639-3",
-  glottocode: "Glottocode",
+  name: {
+    label: "Name",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: true,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  type: {
+    label: "Type",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  parent: {
+    label: "Parent",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  iso6393: {
+    label: "ISO-639-3",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+    autoWidth: true,
+  },
+  glottocode: {
+    label: "Glottocode",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+    autoWidth: true,
+  },
 };
 
 export default defineComponent({
   name: "Languages",
   components: {
-    OpaqueSpinner,
+    BasicTable,
   },
   setup() {
+    const $route = useRoute();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
-    const filter = ref("");
-
     const noData = "No languages found.";
     const title = "Languages";
-    const rowsPerPage = 25;
-    const pagination = { rowsPerPage };
-
-    const getColumns = () => {
-      const toColumn = (key) => ({
-        align: "left",
-        field: key,
-        label: columnMap[key],
-        name: key,
-        sortable: true,
-      });
-      return map(toColumn, keys(columnMap));
-    };
 
     const fetchData = async () => {
       const request = requests.languages.getLanguages();
       await fetchAPI(request);
       if (success.value)
         await languageListSchema
-          .validate(data.value, { stripUnknown: true })
+          .validate(data.value.data, { stripUnknown: true })
           .then((value) => {
-            columns.value = getColumns();
+            columns.value = getColumns(columnMap);
+            pagination.value.rowsNumber = data.value.recordsFiltered;
+            pagination.value.rowsTotal = data.value.recordsTotal;
             rows.value = value;
             loading.value = false;
           });
     };
 
+    const {
+      fetchDataPaginated,
+      filter,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
+      onRequest,
+      pagination,
+      visibleColumns,
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap));
+
+    provide("pagination", { pagination, fetchDataPaginated });
+    provide("columns", columns);
+    provide("visibleColumns", visibleColumns);
+
     onMounted(async () => await fetchData());
 
     return {
+      columns,
+      filter,
+      loading,
+      noData,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
+      onRequest,
+      pagination,
       rows,
       title,
-      filter,
-      noData,
-      loading,
-      columns,
-      pagination,
+      visibleColumns,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.q-table tbody td {
-  white-space: normal;
-}
-</style>

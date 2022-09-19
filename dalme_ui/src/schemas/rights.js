@@ -21,9 +21,9 @@ export const rightsListSchema = yup.array().of(
       attachments: yup
         .object()
         .shape({
-          id: yup.string().uuid().required(),
-          kind: yup.string().required(),
-          url: yup.string().required(),
+          id: yup.string().uuid().default(null).nullable(),
+          kind: yup.string().default(null).nullable(),
+          url: yup.string().default(null).nullable(),
         })
         .transform((value) => {
           if (value) {
