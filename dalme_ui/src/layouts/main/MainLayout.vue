@@ -52,9 +52,16 @@ export default defineComponent({
     const prefSubscription = (action) => {
       let unsubscribe = () => {};
       if (action === "subscribe") {
-        unsubscribe = $prefStore.$subscribe((state) => {
-          $prefStore.updatePreferences($authStore.userId, state);
-        });
+        unsubscribe = $prefStore.$subscribe(
+          (mutation) => {
+            $prefStore.updatePreferences(
+              $authStore.userId,
+              $route.name,
+              mutation,
+            );
+          },
+          { detached: true },
+        );
       } else {
         unsubscribe();
       }
@@ -75,6 +82,10 @@ export default defineComponent({
       if ($route.query.logout) {
         prefSubscription();
         $authStore.logout();
+      }
+
+      if (!showLogin.value) {
+        prefSubscription("subscribe");
       }
     });
 

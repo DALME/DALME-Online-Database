@@ -144,7 +144,7 @@ export default defineComponent({
               );
               if (success.value) {
                 await preferenceSchema
-                  .validate(data.value, { stripUnknown: true })
+                  .validate(data.value, { stripUnknown: false })
                   .then(async (value) => {
                     await $prefStore.loadPreferences(value);
                     prefSubscription("subscribe");
