@@ -32,6 +32,24 @@ pre {
   margin: 0;
 }
 
+.q-focusable:focus > .q-focus-helper,
+.q-manual-focusable--focused > .q-focus-helper,
+.q-hoverable:hover > .q-focus-helper {
+  opacity: .35 !important;
+}
+
+.q-focusable:focus > .q-focus-helper:before,
+.q-manual-focusable--focused > .q-focus-helper:before,
+.q-hoverable:hover > .q-focus-helper:before {
+  opacity: .15 !important;
+}
+
+.q-focusable:focus > .q-focus-helper:after,
+.q-manual-focusable--focused > .q-focus-helper:after,
+.q-hoverable:hover > .q-focus-helper:after {
+  opacity: .45 !important;
+}
+
 .dalme-logo {
   font-family: Academy Engraved LET, Serif;
   font-size: 27px;
