@@ -1,129 +1,184 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-table
-        :title="title"
-        :rows="rows"
-        :columns="columns"
-        :no-data-label="noData"
-        :filter="filter"
-        :pagination="pagination"
-        :title-class="{ 'text-h6': true }"
-        :loading="loading"
-        row-key="id"
+  <BasicTable
+    :columns="columns"
+    :filter="filter"
+    :loading="loading"
+    :noData="noData"
+    :onChangeFilter="onChangeFilter"
+    :onChangePage="onChangePage"
+    :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onRequest="onRequest"
+    :pagination="pagination"
+    :rows="rows"
+    :title="title"
+    :visibleColumns="visibleColumns"
+  >
+    <template v-slot:render-cell-username="props">
+      <router-link
+        class="text-link"
+        :to="{ name: 'User', params: { username: props.row.username } }"
       >
-        <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
+        {{ props.row.username }}
+      </router-link>
+    </template>
 
-        <template v-slot:body-cell-username="props">
-          <q-td :props="props" class="text-subtitle2">
-            <router-link
-              :to="{
-                name: 'User',
-                params: { username: props.value },
-              }"
-            >
-              {{ props.value }}
-            </router-link>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-id="props">
+      {{ props.row.id }}
+    </template>
 
-        <template v-slot:body-cell-email="props">
-          <q-td :props="props">
-            <a :href="`mailto:${props.value}`">
-              {{ props.value }}
-            </a>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-email="props">
+      <a class="text-link" :href="`mailto:${props.row.email}`">
+        {{ props.row.email }}
+      </a>
+    </template>
 
-        <template v-slot:body-cell-isActive="props">
-          <q-td :props="props">
-            <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
-          </q-td>
-        </template>
+    <template v-slot:render-cell-isActive="props">
+      <BooleanIcon
+        :value="props.row.isActive"
+        :onlyTrue="true"
+        trueIcon="check_circle"
+      />
+    </template>
 
-        <template v-slot:body-cell-isStaff="props">
-          <q-td :props="props">
-            <q-icon :name="props.value ? 'done' : 'close'" size="xs" />
-          </q-td>
-        </template>
-      </q-table>
-    </q-card>
-    <OpaqueSpinner :showing="loading" />
-  </div>
+    <template v-slot:render-cell-isStaff="props">
+      <BooleanIcon
+        :value="props.row.isStaff"
+        :onlyTrue="true"
+        trueIcon="check_circle"
+      />
+    </template>
+  </BasicTable>
 </template>
 
 <script>
-import { map, keys } from "ramda";
-import { defineComponent, onMounted, ref } from "vue";
-
+import { defineComponent, onMounted, provide, ref } from "vue";
+import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import BasicTable from "@/components/basic-table/BasicTable.vue";
+import { BooleanIcon, getColumns, getDefaults } from "@/components/utils";
 import { userListSchema } from "@/schemas";
-import { useAPI } from "@/use";
+import { useAPI, usePagination } from "@/use";
 
 const columnMap = {
-  id: "ID",
-  fullName: "Full Name",
-  email: "Email",
-  username: "Username",
-  lastLogin: "Last Login",
-  isActive: "Active",
-  isStaff: "Staff",
+  id: {
+    label: "ID",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: true,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+    autoWidth: true,
+  },
+  fullName: {
+    label: "Full Name",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  email: {
+    label: "Email",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  username: {
+    label: "Username",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: "text-subtitle2",
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  lastLogin: {
+    label: "Last Login",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  isActive: {
+    label: "Active",
+    align: "center",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+    autoWidth: true,
+  },
+  isStaff: {
+    label: "Staff",
+    align: "center",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+    autoWidth: true,
+  },
 };
 
 export default defineComponent({
   name: "Users",
   components: {
-    OpaqueSpinner,
+    BasicTable,
+    BooleanIcon,
   },
   setup() {
+    const $route = useRoute();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
-    const filter = ref("");
-
     const noData = "No users found.";
     const title = "Users";
-    const rowsPerPage = 25;
-    const pagination = { rowsPerPage };
-
-    const getColumns = () => {
-      const toColumn = (key) => ({
-        align: "left",
-        field: key,
-        label: columnMap[key],
-        name: key,
-        sortable: true,
-      });
-      return map(toColumn, keys(columnMap));
-    };
 
     const fetchData = async () => {
       const request = requests.users.getUsers();
       await fetchAPI(request);
       if (success.value)
         await userListSchema
-          .validate(data.value, { stripUnknown: true })
+          .validate(data.value.data, { stripUnknown: true })
           .then((value) => {
-            columns.value = getColumns();
+            columns.value = getColumns(columnMap);
+            pagination.value.rowsNumber = data.value.recordsFiltered;
+            pagination.value.rowsTotal = data.value.recordsTotal;
             rows.value = value;
             loading.value = false;
           });
     };
+
+    const {
+      fetchDataPaginated,
+      filter,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
+      onRequest,
+      pagination,
+      visibleColumns,
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap));
+
+    provide("pagination", { pagination, fetchDataPaginated });
+    provide("columns", columns);
+    provide("visibleColumns", visibleColumns);
 
     onMounted(async () => await fetchData());
 
@@ -132,16 +187,15 @@ export default defineComponent({
       filter,
       loading,
       noData,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
+      onRequest,
       pagination,
       rows,
       title,
+      visibleColumns,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.q-table tbody td {
-  white-space: normal;
-}
-</style>
