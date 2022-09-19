@@ -1,131 +1,130 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-tab-panel v-if="!loading && user" name="data">
-      <q-card class="q-ma-md">
-        <q-item>
-          <q-item-section avatar>
-            <q-avatar>
-              <q-icon name="person" />
-            </q-avatar>
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label class="text-weight-medium"> Profile </q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-separator />
-
-        <q-card-section>
-          <div class="row">
-            <div class="col-xs-12 col-sm-6">
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  First Name
-                </div>
-                <div class="col-6">{{ user.firstName }}</div>
+  <div v-if="!loading && user">
+    <div class="row q-pa-md">
+      <div class="col-12 col-md-9 q-pr-md">
+        <q-card flat bordered class="detail-card">
+          <q-item dense class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5">
+            <q-item-section side class="q-pr-sm">
+              <q-icon name="person" color="indigo-5" size="xs" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-subtitle2">
+                {{ user.profile.fullName || "Profile" }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-separator class="bg-indigo-3" />
+          <q-card-section>
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                First Name
               </div>
-
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  Last Name
-                </div>
-                <div class="col-6">{{ user.lastName }}</div>
+              <div class="col-8">{{ user.firstName }}</div>
+            </div>
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                Last Name
               </div>
-
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  User ID
-                </div>
-                <div class="col-6">{{ user.id }}</div>
+              <div class="col-8">{{ user.lastName }}</div>
+            </div>
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                User ID
               </div>
+              <div class="col-8">{{ user.id }}</div>
+            </div>
 
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  Staff
-                </div>
-                <div class="col-6">
-                  <q-icon :name="user.isStaff ? 'done' : 'close'" size="xs" />
-                </div>
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                Staff
               </div>
-
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  Superuser
-                </div>
-                <div class="col-6">
-                  <q-icon
-                    :name="user.isSuperuser ? 'done' : 'close'"
-                    size="xs"
-                  />
-                </div>
-              </div>
-
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  Active
-                </div>
-                <div class="col-6">
-                  <q-icon :name="user.isActive ? 'done' : 'close'" size="xs" />
-                </div>
-              </div>
-
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  Joined
-                </div>
-                <div class="col-6">{{ user.dateJoined }}</div>
-              </div>
-
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  Last login
-                </div>
-                <div class="col-6">{{ user.lastLogin }}</div>
-              </div>
-
-              <div class="row q-my-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  Groups
-                </div>
-                <div class="col-6" v-html="formatGroups(user.groups)"></div>
+              <div class="col-8">
+                <BooleanIcon :value="user.isStaff" size="20px" />
               </div>
             </div>
 
-            <div
-              class="col-xs-12 col-sm-6 q-pa-lg row justify-center content-center"
-            >
-              <q-avatar v-if="user.avatar" rounded size="15rem">
-                <img :src="user.avatar" />
-              </q-avatar>
-              <q-avatar
-                v-else
-                rounded
-                font-size="1rem"
-                color="grey-3"
-                size="15rem"
-              >
-                No photo
-              </q-avatar>
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                Superuser
+              </div>
+              <div class="col-8">
+                <BooleanIcon :value="user.isSuperuser" size="20px" />
+              </div>
             </div>
-          </div>
-        </q-card-section>
-      </q-card>
-    </q-tab-panel>
-    <OpaqueSpinner :showing="loading" />
+
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                Active
+              </div>
+              <div class="col-8">
+                <BooleanIcon :value="user.isActive" size="20px" />
+              </div>
+            </div>
+
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                Joined
+              </div>
+              <div class="col-6">{{ user.dateJoined }}</div>
+            </div>
+
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                Last login
+              </div>
+              <div class="col-8">{{ user.lastLogin }}</div>
+            </div>
+
+            <div class="row q-mt-xs">
+              <div class="col-3 text-weight-medium text-right q-mr-lg">
+                Groups
+              </div>
+              <div class="col-8" v-html="formatGroups(user.groups)"></div>
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
+      <div class="col-12 col-md-3">
+        <q-card flat bordered class="detail-card full-height bg-grey-2">
+          <q-card-section
+            class="justify-center content-center q-pa-none full-height"
+          >
+            <q-img
+              v-if="user.avatar"
+              :src="user.avatar"
+              fit="cover"
+              class="q-mx-auto q-my-auto full-height avatar-image"
+            />
+            <q-icon
+              v-else
+              name="no_accounts"
+              color="grey-4"
+              size="15rem"
+              class="column q-mx-auto q-my-auto full-height"
+            />
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+    <div v-if="showPrefs" class="row q-pl-md q-pr-md q-pb-md">
+      <UserPreferences />
+    </div>
   </div>
+  <OpaqueSpinner :showing="loading" />
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { map } from "ramda";
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
+import { useAuthStore } from "@/stores/auth";
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import { BooleanIcon, OpaqueSpinner } from "@/components/utils";
 import { userSchema } from "@/schemas";
 import { useAPI } from "@/use";
+import UserPreferences from "./UserPreferences.vue";
 
 const getAttributeLabel = (attribute) => {
   return {
@@ -145,15 +144,20 @@ const getAttributeLabel = (attribute) => {
 export default defineComponent({
   name: "UserDetail",
   components: {
+    BooleanIcon,
     OpaqueSpinner,
+    UserPreferences,
   },
   setup() {
     const $route = useRoute();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
+    const $authStore = useAuthStore();
+
     const user = ref(null);
     const username = $route.params.username;
+    const tab = ref("general");
+    const showPrefs = computed(() => username === $authStore.username);
 
     useMeta({ title: `User | ${username}` });
 
@@ -173,15 +177,14 @@ export default defineComponent({
 
     onMounted(async () => await fetchData());
 
-    return { formatGroups, loading, getAttributeLabel, user };
+    return { formatGroups, loading, getAttributeLabel, tab, showPrefs, user };
   },
 });
 </script>
 
-<style lang="scss" scoped>
-img {
-  border: 1px solid #eee;
-  width: 100% !important;
-  height: auto !important;
+<style scoped lang="scss">
+.avatar-image {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 </style>

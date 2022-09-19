@@ -106,13 +106,26 @@
           </div>
           <q-list padding class="text-grey-9 q-pt-none">
             <q-separator spaced />
-            <q-item dense clickable v-close-popup>
+            <q-item
+              :to="{ name: 'User', params: { username: username } }"
+              dense
+              clickable
+              v-close-popup
+            >
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="portrait" size="sm" />
               </q-item-section>
               <q-item-section>Profile</q-item-section>
             </q-item>
-            <q-item dense clickable v-close-popup>
+            <q-item
+              :to="{
+                name: 'User',
+                params: { username: username, prefs: true },
+              }"
+              dense
+              clickable
+              v-close-popup
+            >
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="manage_accounts" size="sm" />
               </q-item-section>
