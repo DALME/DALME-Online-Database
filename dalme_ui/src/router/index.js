@@ -59,7 +59,11 @@ router.beforeEach((to, from) => {
   const currentSection = navSection || navPathSection;
   let currentSubsection = navSubsection || navPathSubsection;
 
-  if (from.matched.length > 2 && from.matched[1].name == currentSection) {
+  if (
+    from.matched.length > 2 &&
+    from.matched[1].name == currentSection &&
+    to.matched.length < 3
+  ) {
     currentSubsection = from.matched[2].name;
   }
 
