@@ -71,7 +71,11 @@ const workflowSchema = yup
       user: yup.string().required(),
       username: yup.string().required(),
     }),
-    status: yup.object().shape({ text: yup.string().required() }),
+    status: yup.object().shape({
+      cssClass: yup.string().required(),
+      text: yup.string().required(),
+      titleText: yup.string().required(),
+    }),
   })
   .camelCase();
 
@@ -151,7 +155,7 @@ export const archiveSourceSchema = yup
     attributes: yup
       .object()
       .shape({
-        archiveUrl: yup
+        url: yup
           .string()
           .url()
           .default(null)
@@ -206,7 +210,11 @@ export const recordSourceSchema = yup
         }),
         helpFlag: yup.boolean().required(),
         isPublic: yup.boolean().required(),
-        status: yup.object().shape({ text: yup.string().required() }),
+        status: yup.object().shape({
+          cssClass: yup.string().required(),
+          text: yup.string().required(),
+          titleText: yup.string().required(),
+        }),
       })
       .required()
       .camelCase(),

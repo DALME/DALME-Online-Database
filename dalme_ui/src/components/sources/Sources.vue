@@ -1,221 +1,186 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card flat class="q-ma-md">
-      <q-table
-        :title="title"
-        :rows="rows"
-        :columns="columns"
-        :no-data-label="noData"
-        :filter="filter"
-        :title-class="{ 'text-h6': true }"
-        :loading="loading"
-        @request="onRequest"
-        v-model:pagination="pagination"
-        row-key="id"
+  <BasicTable
+    :columns="columns"
+    :filter="filter"
+    :loading="loading"
+    :noData="noData"
+    :onChangeFilter="onChangeFilter"
+    :onChangePage="onChangePage"
+    :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onRequest="onRequest"
+    :pagination="pagination"
+    :rows="rows"
+    :title="title"
+    :visibleColumns="visibleColumns"
+  >
+    <template v-slot:render-cell-name="props">
+      <router-link
+        class="text-subtitle2 text-link"
+        :to="{ name: 'Source', params: { id: props.row.id } }"
       >
-        <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
+        {{ props.row.name }}
+      </router-link>
+    </template>
 
-        <template v-slot:body-cell-name="props">
-          <q-td :props="props">
-            <router-link
-              class="text-subtitle2"
-              :to="{ name: 'Source', params: { id: props.row.id } }"
-            >
-              {{ props.value }}
-            </router-link>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-primaryDataset="props">
+      <router-link
+        class="text-link"
+        :to="{ name: 'Set', params: { id: props.row.primaryDataset.id } }"
+      >
+        {{ props.row.primaryDataset.name }}
+      </router-link>
+    </template>
 
-        <template v-slot:body-cell-primaryDataset="props">
-          <q-td :props="props">
-            <router-link :to="{ name: 'Set', params: { id: props.value.id } }">
-              {{ props.value.name }}
-            </router-link>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-noRecords="props">
+      {{ props.row.noRecords }}
+    </template>
 
-        <template v-slot:body-cell-noRecords="props">
-          <q-td :props="props">
-            {{ props.value }}
-          </q-td>
-        </template>
+    <template v-slot:render-cell-defaultRights="props">
+      <router-link
+        v-if="props.row.attributes.defaultRights"
+        class="text-link"
+        :to="{
+          name: 'Rights',
+          params: {
+            id: props.row.attributes.defaultRights.id.id,
+          },
+        }"
+      >
+        {{ props.row.attributes.defaultRights.name }}
+      </router-link>
+    </template>
 
-        <template v-slot:body-cell-defaultRights="props">
-          <q-td :props="props">
-            <router-link
-              v-if="props.row.attributes.defaultRights"
-              :to="{
-                name: 'Rights',
-                params: {
-                  id: props.row.attributes.defaultRights.id.id,
-                },
-              }"
-            >
-              {{ props.row.attributes.defaultRights.name }}
-            </router-link>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-url="props">
+      <a
+        v-if="props.row.attributes.url"
+        :href="props.row.attributes.url"
+        class="text-link"
+        target="_blank"
+      >
+        Visit Website
+      </a>
+    </template>
 
-        <template v-slot:body-cell-archiveUrl="props">
-          <q-td :props="props">
-            <a
-              v-if="props.row.attributes.archiveUrl"
-              :href="props.row.attributes.archiveUrl"
-              target="_blank"
-            >
-              Visit Website
-            </a>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-owner="props">
+      <router-link
+        class="text-link"
+        :to="{
+          name: 'User',
+          params: { username: props.row.owner.username },
+        }"
+      >
+        {{ props.row.owner.fullName }}
+      </router-link>
+    </template>
 
-        <template v-slot:body-cell-owner="props">
-          <q-td :props="props">
-            <router-link
-              :to="{
-                name: 'User',
-                params: { username: props.value.username },
-              }"
-            >
-              {{ props.value.fullName }}
-            </router-link>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-locale="props">
+      {{ getLocale(props.row.attributes.locale) }}
+    </template>
 
-        <template v-slot:body-cell-locale="props">
-          <q-td :props="props">
-            {{ getLocale(props.row.attributes.locale) }}
-          </q-td>
-        </template>
+    <template v-slot:render-cell-recordType="props">
+      {{ props.row.attributes.recordType }}
+    </template>
 
-        <template v-slot:body-cell-recordType="props">
-          <q-td :props="props">
-            {{ props.row.attributes.recordType }}
-          </q-td>
-        </template>
+    <template v-slot:render-cell-date="props">
+      <span v-html="renderDate(props.row.attributes)"></span>
+    </template>
 
-        <template v-slot:body-cell-date="props">
-          <q-td :props="props">
-            <span v-html="renderDate(props.row.attributes)"></span>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-language="props">
+      {{ props.row.attributes.language[0].name }}
+    </template>
 
-        <template v-slot:body-cell-language="props">
-          <q-td :props="props">
-            {{ props.row.attributes.language[0].name }}
-          </q-td>
-        </template>
+    <template v-slot:render-cell-status="props">
+      <WorkflowTag :status="props.row.workflow.status" />
+    </template>
 
-        <template v-slot:body-cell-status="props">
-          <q-td :props="props">
-            <q-badge outline color="primary">
-              {{ props.row.workflow.status.text }}
-            </q-badge>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-helpFlag="props">
+      <q-icon
+        v-if="props.row.workflow.helpFlag"
+        name="flag"
+        class="text-red"
+        size="xs"
+      />
+    </template>
 
-        <template v-slot:body-cell-helpFlag="props">
-          <q-td :props="props">
-            <q-icon
-              v-if="props.row.workflow.helpFlag"
-              name="error"
-              class="text-red"
-              size="sm"
-            />
-          </q-td>
-        </template>
+    <template v-slot:render-cell-activity="props">
+      <span>
+        <router-link
+          class="text-link"
+          :to="{
+            name: 'User',
+            params: { username: props.row.workflow.activity.username },
+          }"
+        >
+          {{ props.row.workflow.activity.user }}
+        </router-link>
+        <br />
+        {{ props.row.workflow.activity.timestamp }}
+      </span>
+    </template>
 
-        <template v-slot:body-cell-activity="props">
-          <q-td :props="props">
-            <span>
-              <router-link
-                :to="{
-                  name: 'User',
-                  params: { username: props.row.workflow.activity.username },
-                }"
-              >
-                {{ props.row.workflow.activity.user }}
-              </router-link>
-              <br />
-              {{ props.row.workflow.activity.timestamp }}
-            </span>
-          </q-td>
-        </template>
+    <template v-slot:render-cell-isPrivate="props">
+      <BooleanIcon
+        :value="props.row.isPrivate"
+        :onlyTrue="true"
+        :onlyTrueGreen="false"
+        trueIcon="lock"
+      />
+    </template>
 
-        <template v-slot:body-cell-isPrivate="props">
-          <q-td :props="props">
-            <q-icon :name="props.row.isPrivate ? 'done' : 'close'" />
-          </q-td>
-        </template>
+    <template v-slot:render-cell-isPublic="props">
+      <BooleanIcon
+        :value="props.row.workflow.isPublic"
+        :onlyTrue="true"
+        trueIcon="public"
+      />
+    </template>
 
-        <template v-slot:body-cell-isPublic="props">
-          <q-td :props="props">
-            <q-icon :name="props.row.isPublic ? 'done' : 'close'" />
-          </q-td>
-        </template>
+    <template v-slot:render-cell-authority="props">
+      {{ props.row.attributes.authority }}
+    </template>
 
-        <template v-slot:body-cell-authority="props">
-          <q-td :props="props">
-            {{ props.row.attributes.authority }}
-          </q-td>
-        </template>
+    <template v-slot:render-cell-format="props">
+      {{ props.row.attributes.format }}
+    </template>
 
-        <template v-slot:body-cell-format="props">
-          <q-td :props="props">
-            {{ props.row.attributes.format }}
-          </q-td>
-        </template>
+    <template v-slot:render-cell-support="props">
+      {{ props.row.attributes.support }}
+    </template>
 
-        <template v-slot:body-cell-support="props">
-          <q-td :props="props">
-            {{ props.row.attributes.support }}
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-zoteroKey="props">
-          <q-td :props="props">
-            {{ props.row.attributes.zoteroKey }}
-          </q-td>
-        </template>
-      </q-table>
-      <OpaqueSpinner :showing="loading" />
-    </q-card>
-  </div>
+    <template v-slot:render-cell-zoteroKey="props">
+      {{ props.row.attributes.zoteroKey }}
+    </template>
+  </BasicTable>
 </template>
 
 <script>
 import { useMeta } from "quasar";
-import { keys, map } from "ramda";
-import { defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
-
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import { BasicTable } from "@/components";
+
+import {
+  BooleanIcon,
+  getColumns,
+  getDefaults,
+  WorkflowTag,
+} from "@/components/utils";
+
 import { sourceListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
-
 import { columnsByType } from "./columns";
 
 export default defineComponent({
   name: "Sources",
   components: {
-    OpaqueSpinner,
+    BasicTable,
+    BooleanIcon,
+    WorkflowTag,
   },
   setup() {
     const $route = useRoute();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
@@ -225,19 +190,11 @@ export default defineComponent({
 
     useMeta(() => ({ title: title.value }));
 
-    const noData = "No sources found.";
-    const getColumns = () => {
-      const columnMap = columnsByType(sourceType.value);
-      const toColumn = (key) => ({
-        align: "left",
-        field: key,
-        label: columnMap[key],
-        name: key,
-        sortable: true,
-      });
-      return map(toColumn, keys(columnMap));
-    };
+    const columnMap = computed(() => {
+      return columnsByType($route.meta.sourceType);
+    });
 
+    const noData = "No sources found.";
     const renderDate = (attributes) => {
       if (attributes.startDate && attributes.endDate) {
         return `${attributes.startDate.name}<br>${attributes.endDate.name}`;
@@ -260,8 +217,9 @@ export default defineComponent({
         await schema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            columns.value = getColumns();
-            pagination.value.rowsNumber = value.recordsTotal;
+            columns.value = getColumns(columnMap.value);
+            pagination.value.rowsNumber = value.recordsFiltered;
+            pagination.value.rowsTotal = value.recordsTotal;
             rows.value.splice(0, rows.value.length, ...value.data);
             loading.value = false;
           });
@@ -270,10 +228,18 @@ export default defineComponent({
     const {
       fetchDataPaginated,
       filter,
-      pagination,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
       onRequest,
+      pagination,
       resetPagination,
-    } = usePagination(fetchData);
+      visibleColumns,
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap.value));
+
+    provide("pagination", { pagination, fetchDataPaginated });
+    provide("columns", columns);
+    provide("visibleColumns", visibleColumns);
 
     onBeforeRouteLeave(() => {
       if (loading.value) return false;
@@ -311,15 +277,19 @@ export default defineComponent({
 
     return {
       columns,
-      filter,
       getLocale,
+      filter,
       loading,
       noData,
+      onChangeFilter,
+      onChangePage,
+      onChangeRowsPerPage,
       onRequest,
       pagination,
       renderDate,
       rows,
       title,
+      visibleColumns,
     };
   },
 });
