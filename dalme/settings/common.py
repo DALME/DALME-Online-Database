@@ -288,7 +288,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+        # 'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
         'dalme_api.renderers.SelectRenderer',
         'dalme_api.renderers.DBRenderer'

@@ -55,7 +55,7 @@ class Users(DALMEBaseViewSet):
     def get_preferences(self, request, *args, **kwargs):
         user = self.get_object()
         try:
-            result = json.dumps(user.profile.preferences)
+            result = user.profile.preferences
             status = 201
         except Exception as e:
             result = {'error': str(e)}
@@ -67,7 +67,13 @@ class Users(DALMEBaseViewSet):
         user = self.get_object()
         try:
             profile = user.profile
-            profile.preferences[request.data['section']][request.data['key']] = request.data['value']
+            if not profile.preferences.get(request.data['section']):
+                profile.preferences[request.data['section']] = {
+                    request.data['key']: request.data['value']
+                }
+            else:
+                profile.preferences[request.data['section']][request.data['key']] = request.data['value']
+
             profile.save()
             result = 'OK'
             status = 201
