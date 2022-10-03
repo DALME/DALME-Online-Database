@@ -1,10 +1,10 @@
 <template>
-  <BasicTable
+  <Table
     :columns="columns"
-    :filter="filter"
+    :search="search"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
     :onRequest="onRequest"
@@ -60,7 +60,7 @@
     <template v-slot:render-cell-datasetUsergroup="props">
       {{ props.row.datasetUsergroup.name }}
     </template>
-  </BasicTable>
+  </Table>
 </template>
 
 <script>
@@ -68,7 +68,7 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { BasicTable } from "@/components";
+import { Table } from "@/components";
 import { BooleanIcon, getColumns, getDefaults } from "@/components/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
@@ -77,7 +77,7 @@ import { columnsByType } from "./columns";
 export default defineComponent({
   name: "Sets",
   components: {
-    BasicTable,
+    Table,
     BooleanIcon,
   },
   setup() {
@@ -118,12 +118,12 @@ export default defineComponent({
 
     const {
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
+      search,
       resetPagination,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap.value));
@@ -163,15 +163,15 @@ export default defineComponent({
 
     return {
       columns,
-      filter,
       loading,
       noData,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
       rows,
+      search,
       title,
       visibleColumns,
     };

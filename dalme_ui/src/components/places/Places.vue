@@ -1,11 +1,11 @@
 <template>
-  <BasicTable
+  <Table
     :columns="columns"
     :editable="editable"
-    :filter="filter"
+    :search="search"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
     :onRequest="onRequest"
@@ -25,75 +25,23 @@
         {{ props.row.locale.name }}
       </router-link>
     </template>
-  </BasicTable>
+  </Table>
 </template>
 
 <script>
-import { defineComponent, onMounted, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import BasicTable from "@/components/basic-table/BasicTable.vue";
+import Table from "@/components/table/Table.vue";
 import { getColumns, getDefaults } from "@/components/utils";
 import { placeListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
-
-const columnMap = {
-  standardName: {
-    label: "Standard Name",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: true,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  notes: {
-    label: "Notes",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  locale: {
-    label: "Locale",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  administrativeRegion: {
-    label: "Administrative Region",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  country: {
-    label: "Country",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-};
+import { columnMap } from "./columns";
 
 export default defineComponent({
   name: "Places",
   components: {
-    BasicTable,
+    Table,
   },
   setup() {
     const $route = useRoute();
@@ -107,8 +55,8 @@ export default defineComponent({
     const updateRequest = requests.places.inlineUpdate;
     const editable = ["notes"];
 
-    const fetchData = async () => {
-      const request = requests.places.getPlaces();
+    const fetchData = async (query) => {
+      const request = requests.places.getPlaces(query);
       await fetchAPI(request);
       if (success.value)
         await placeListSchema
@@ -124,12 +72,12 @@ export default defineComponent({
 
     const {
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
+      search,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap));
 
@@ -137,21 +85,19 @@ export default defineComponent({
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
 
-    onMounted(async () => await fetchData());
-
     return {
       columns,
       editable,
-      filter,
       loading,
       noData,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
       rows,
       schema: placeListSchema,
+      search,
       title,
       updateRequest,
       visibleColumns,

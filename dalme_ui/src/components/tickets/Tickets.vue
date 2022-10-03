@@ -118,18 +118,7 @@ import { OpaqueSpinner } from "@/components/utils";
 import { attachmentSchema, ticketListSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
 import { fetcher } from "@/boot/axios";
-
-const columnMap = {
-  id: "ID",
-  status: "Status",
-  subject: "Ticket",
-  file: "Attachments",
-  tags: "Tags",
-  commentCount: "Comments",
-  creationUser: "Created by",
-  creationTimestamp: "Created on",
-  closingDate: "Closed on",
-};
+import { columnMap } from "./columns";
 
 export default defineComponent({
   name: "Tickets",

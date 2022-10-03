@@ -86,15 +86,7 @@ import { OpaqueSpinner } from "@/components/utils";
 import { tasksSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
-const columnMap = {
-  id: "ID",
-  completed: "Status",
-  title: "Task",
-  assignedTo: "Assigned to",
-  attachments: "Attachments",
-  owner: "Owner",
-  creationTimestamp: "Dates",
-};
+import { columnMap } from "./columns";
 
 export default defineComponent({
   name: "Tasks",

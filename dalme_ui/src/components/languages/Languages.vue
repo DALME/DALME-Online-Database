@@ -1,10 +1,10 @@
 <template>
-  <BasicTable
+  <Table
     :columns="columns"
-    :filter="filter"
+    :search="search"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
     :onRequest="onRequest"
@@ -22,77 +22,23 @@
         {{ props.row.parent.name }}
       </template>
     </template>
-  </BasicTable>
+  </Table>
 </template>
 
 <script>
-import { defineComponent, onMounted, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import BasicTable from "@/components/basic-table/BasicTable.vue";
+import Table from "@/components/table/Table.vue";
 import { getColumns, getDefaults } from "@/components/utils";
 import { languageListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
-
-const columnMap = {
-  name: {
-    label: "Name",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: true,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  type: {
-    label: "Type",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  parent: {
-    label: "Parent",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  iso6393: {
-    label: "ISO-639-3",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-    autoWidth: true,
-  },
-  glottocode: {
-    label: "Glottocode",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-    autoWidth: true,
-  },
-};
+import { columnMap } from "./columns";
 
 export default defineComponent({
   name: "Languages",
   components: {
-    BasicTable,
+    Table,
   },
   setup() {
     const $route = useRoute();
@@ -103,8 +49,8 @@ export default defineComponent({
     const noData = "No languages found.";
     const title = "Languages";
 
-    const fetchData = async () => {
-      const request = requests.languages.getLanguages();
+    const fetchData = async (query) => {
+      const request = requests.languages.getLanguages(query);
       await fetchAPI(request);
       if (success.value)
         await languageListSchema
@@ -120,12 +66,12 @@ export default defineComponent({
 
     const {
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
+      search,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap));
 
@@ -133,18 +79,16 @@ export default defineComponent({
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
 
-    onMounted(async () => await fetchData());
-
     return {
       columns,
-      filter,
       loading,
       noData,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
+      search,
       rows,
       title,
       visibleColumns,
