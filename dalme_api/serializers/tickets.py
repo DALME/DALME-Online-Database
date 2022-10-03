@@ -11,23 +11,19 @@ from django.utils import timezone
 
 class TicketSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, required=False)
+    file = AttachmentSerializer(required=False)
     creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
     modification_user = UserSerializer(fields=['full_name', 'username', 'id'], required=False)
     closing_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
+    assigned_to = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
 
     class Meta:
         model = Ticket
-        fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file', 'closing_user', 'closing_date',
-                  'creation_user', 'creation_timestamp', 'modification_user', 'modification_timestamp')
+        fields = ('id', 'assigned_to', 'subject', 'description', 'status', 'tags', 'url', 'file', 'closing_user', 'closing_date',
+                  'comment_count', 'creation_user', 'creation_timestamp', 'modification_user', 'modification_timestamp')
         extra_kwargs = {
             'tags': {'required': False}
             }
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret['comment_count'] = instance.comments.count()
-        ret['status'] = bool(instance.status)
-        return ret
 
     def to_internal_value(self, data):
         if data.get('tags') is not None:
@@ -55,8 +51,8 @@ class TicketDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file', 'comments', 'closing_user', 'closing_date',
-                  'creation_user', 'creation_timestamp', 'modification_user', 'modification_timestamp', 'assigned_to')
+        fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file', 'comments', 'comment_count', 'closing_user',
+                  'closing_date', 'creation_user', 'creation_timestamp', 'modification_user', 'modification_timestamp', 'assigned_to')
         extra_kwargs = {
             'tags': {'required': False}
             }

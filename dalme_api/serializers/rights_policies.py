@@ -1,17 +1,28 @@
 from dalme_app.models import RightsPolicy
 from rest_framework import serializers
+from dalme_api.serializers.users import UserSerializer
+from dalme_api.serializers.others import AttachmentSerializer
 
 
 class RightsPolicySerializer(serializers.ModelSerializer):
+    attachments = AttachmentSerializer(required=False)
+    comment_count = serializers.SerializerMethodField(required=False)
+    creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
+    modification_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
 
     class Meta:
         model = RightsPolicy
-        fields = ('id', 'name', 'rights_holder', 'rights_status', 'rights', 'public_display', 'notice_display', 'rights_notice', 'licence', 'attachments')
+        fields = ('id', 'name', 'rights_holder', 'rights_status', 'rights', 'public_display',
+                  'notice_display', 'rights_notice', 'licence', 'attachments', 'creation_timestamp',
+                  'creation_user', 'modification_user', 'modification_timestamp', 'comment_count')
         extra_kwargs = {
                         'rights_notice': {'required': False},
                         'licence': {'required': False},
                         'attachments': {'required': False}
                         }
+
+    def get_comment_count(self, obj):
+        return obj.comments.count()
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
