@@ -5,8 +5,25 @@ export const useNavStore = defineStore("navigation", {
     return {
       currentSection: "",
       currentSubsection: "",
+      breadcrumbTail: [],
+      currentPageIcon: "",
     };
   },
-  getters: {},
-  actions: {},
+  getters: {
+    breadcrumb: (state) => {
+      return [state.currentSection, state.currentSubsection].concat(
+        state.breadcrumbTail,
+      );
+    },
+  },
+  actions: {
+    resetBreadcrumbTail() {
+      this.breadcrumbTail = [];
+    },
+  },
+  persist: {
+    afterRestore: (ctx) => {
+      ctx.store.resetBreadcrumbTail();
+    },
+  },
 });
