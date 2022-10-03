@@ -1,9 +1,7 @@
 <template>
-  <q-page-sticky
+  <div
     v-if="isAdmin"
-    position="bottom-right"
-    :offset="position"
-    class="z-max"
+    class="row flex-center fixed-bottom-right edit-sticky z-max"
   >
     <q-fab
       ref="el"
@@ -30,7 +28,7 @@
       <!-- SUBMIT -->
       <EditSubmit />
     </q-fab>
-  </q-page-sticky>
+  </div>
 </template>
 
 <script>
@@ -94,5 +92,9 @@ export default defineComponent({
 .parent {
   background-color: #2f333c;
   background-image: linear-gradient(59deg, #11587c 54.62%, #1b1b1b);
+}
+.edit-sticky {
+  margin-right: -30px;
+  margin-bottom: 30px;
 }
 </style>
