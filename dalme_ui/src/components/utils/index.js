@@ -1,3 +1,4 @@
+export { default as Chooser } from "./Chooser.vue";
 export { default as BooleanIcon } from "./BooleanIcon.vue";
 export { default as DetailPopover } from "./DetailPopover.vue";
 export { getColumns, getDefaults } from "./processColumns.js";
