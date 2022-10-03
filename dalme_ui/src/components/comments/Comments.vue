@@ -1,21 +1,12 @@
 <template>
-  <q-card flat class="q-mb-md">
-    <q-item class="q-pb-none q-px-sm text-indigo-5">
-      <q-item-section side>
-        <q-icon name="comment" color="indigo-5" size="xs" />
-      </q-item-section>
-      <q-item-section>
-        <q-item-label class="text-h6">Comments</q-item-label>
-      </q-item-section>
-    </q-item>
-    <q-separator class="bg-indigo-5" />
-    <q-card-section v-if="comments.length" class="q-pb-none">
+  <q-card flat>
+    <q-card-section v-if="comments.length" class="comments-container">
       <div
         v-for="(comment, idx) in comments"
         :key="idx"
-        class="comment_threadline q-mt-sm q-pb-lg"
+        class="comment_thread q-mt-none q-pb-lg"
       >
-        <q-item class="q-pb-sm q-pt-none q-pr-lg q-pl-none">
+        <q-item class="q-pb-sm q-pt-none q-px-none">
           <q-item-section top avatar>
             <q-avatar v-if="comment.creationUser.avatar" size="40px">
               <img :src="comment.creationUser.avatar" />
@@ -31,16 +22,11 @@
           <q-item-section>
             <q-card flat bordered class="box-left-arrow">
               <q-card-section class="bg-grey-2 q-py-sm">
-                <UserPopover v-bind="comment.creationUser" />
-                commented
-                {{
-                  formatDate(
-                    comment.creationTimestamp,
-                    ["on ", ""],
-                    null,
-                    (withTime = true),
-                  )
-                }}
+                <DetailPopover
+                  :userData="comment.creationUser"
+                  :showAvatar="false"
+                />
+                commented {{ formatDate(comment.creationTimestamp) }}
               </q-card-section>
               <q-separator />
               <q-card-section class="text-body2">
@@ -50,9 +36,9 @@
           </q-item-section>
         </q-item>
       </div>
+      <slot name="comment-stream-end" />
     </q-card-section>
-    <q-separator />
-    <q-card-section>
+    <q-card-section class="q-pt-sm q-px-none">
       <CommentForm @on-submit-comment="handleCommented" />
     </q-card-section>
     <Spinner :showing="loading" />
@@ -65,7 +51,7 @@ import MarkdownEditor from "../markdown-editor/MarkdownEditor.vue";
 
 import { requests } from "@/api";
 import { CommentForm } from "@/components";
-import UserPopover from "../user-popover/UserPopover.vue";
+import { DetailPopover } from "@/components/utils";
 import { formatDate, Spinner } from "@/components/utils";
 import { commentsSchema } from "@/schemas";
 import { useAPI } from "@/use";
@@ -74,9 +60,9 @@ export default defineComponent({
   name: "Comments",
   components: {
     CommentForm,
+    DetailPopover,
     MarkdownEditor,
     Spinner,
-    UserPopover,
   },
   setup() {
     const { apiInterface } = useAPI();
@@ -97,7 +83,7 @@ export default defineComponent({
         await commentsSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            comments.value = value.results;
+            comments.value = value.data;
             loading.value = false;
           });
     };

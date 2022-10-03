@@ -1,5 +1,5 @@
 <template>
-  <q-item class="q-py-sm q-pr-lg q-pl-none">
+  <q-item class="q-py-sm q-px-none">
     <q-item-section top avatar>
       <q-avatar v-if="authStore.avatar" size="40px">
         <img :src="authStore.avatar" />
