@@ -1,13 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
-
 from django.db.models import Count
-
 from dalme_api.serializers import TaskSerializer, TaskListSerializer
 from dalme_api.access_policies import TaskAccessPolicy, TaskListAccessPolicy
 from dalme_app.models import Task, TaskList
-
 from ._common import DALMEBaseViewSet
+from dalme_api.filters import TaskFilter
 
 
 class Tasks(DALMEBaseViewSet):
@@ -15,6 +13,10 @@ class Tasks(DALMEBaseViewSet):
     permission_classes = (TaskAccessPolicy,)
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    filterset_class = TaskFilter
+    search_fields = ['title', 'description']
+    ordering_fields = ['id', 'title', 'description', 'completed', 'creation_user', 'creation_timestamp', 'assigned_to']
+    ordering = ['id']
 
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):

@@ -8,7 +8,6 @@ from dalme_api.serializers import UserSerializer
 from dalme_api.access_policies import UserAccessPolicy
 from ._common import DALMEBaseViewSet
 from dalme_api.filters import UserFilter
-import json
 
 
 class Users(DALMEBaseViewSet):
@@ -18,8 +17,9 @@ class Users(DALMEBaseViewSet):
     serializer_class = UserSerializer
     filterset_class = UserFilter
     search_fields = ['username', 'email', 'profile__full_name', 'first_name', 'last_name']
-    ordering_fields = ['id', 'username', 'email', 'profile__full_name', 'last_login', 'date_joined', 'is_staff', 'is_active', 'is_superuser', 'first_name']
-    ordering = ['id']
+    ordering_fields = ['id', 'username', 'email', 'profile__full_name', 'last_login', 'date_joined',
+                       'is_staff', 'is_active', 'is_superuser', 'first_name']
+    ordering = ['-is_active', 'id']
 
     @action(detail=True, methods=['post'])
     def reset_password(self, request, *args, **kwargs):

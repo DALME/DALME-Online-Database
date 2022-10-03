@@ -7,7 +7,10 @@ from dalme_api.access_policies import (
     LocaleAccessPolicy,
     PlaceAccessPolicy
 )
-from dalme_api.filters import ContentTypeFilter
+from dalme_api.filters import (
+    ContentTypeFilter,
+    RightsPolicyFilter
+)
 from dalme_api.serializers import (
     AgentSerializer,
     ContentClassSerializer,
@@ -138,3 +141,8 @@ class Rights(DALMEBaseViewSet):
     permission_classes = (RightsAccessPolicy,)
     queryset = RightsPolicy.objects.all()
     serializer_class = RightsPolicySerializer
+    filterset_class = RightsPolicyFilter
+    search_fields = ['name', 'rights_holder', 'rights', 'licence']
+    ordering_fields = ['id', 'name', 'rights_holder', 'public_display', 'creation_user',
+                       'creation_timestamp', 'notice_display']
+    ordering = ['id']

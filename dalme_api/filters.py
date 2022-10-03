@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
 
-from dalme_app.models import Source, Set, Content_type, Ticket
+from dalme_app.models import Content_type, RightsPolicy, Source, Set, Task, Ticket
 
 
 class ContentTypeFilter(filters.FilterSet):
@@ -47,6 +47,15 @@ class SourceFilter(filters.FilterSet):
             return parent.filter(owner=self.request.user)
 
 
+class RightsPolicyFilter(filters.FilterSet):
+
+    class Meta:
+        model = RightsPolicy
+        fields = ['id', 'name', 'rights_holder', 'rights_status', 'rights', 'public_display',
+                  'notice_display', 'licence', 'creation_timestamp',
+                  'creation_user', 'modification_user', 'modification_timestamp']
+
+
 class SetFilter(filters.FilterSet):
 
     class Meta:
@@ -70,12 +79,20 @@ class SetFilter(filters.FilterSet):
             return parent
 
 
+class TaskFilter(filters.FilterSet):
+
+    class Meta:
+        model = Task
+        fields = ['id', 'title', 'description', 'completed', 'url', 'file',
+                  'creation_user', 'creation_timestamp', 'assigned_to']
+
+
 class TicketFilter(filters.FilterSet):
-    tags = filters.CharFilter(field_name='tags__tag', lookup_expr='icontains')
+    # tags = filters.CharFilter(field_name='tags__tag', lookup_expr='icontains')
 
     class Meta:
         model = Ticket
-        fields = ['id', 'subject', 'description', 'status', 'tags', 'url', 'file',
+        fields = ['id', 'subject', 'description', 'status', 'url', 'file',
                   'creation_user', 'creation_timestamp', 'assigned_to']
 
 

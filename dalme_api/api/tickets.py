@@ -5,6 +5,7 @@ from dalme_api.serializers import TicketSerializer
 from dalme_app.models import Ticket
 from dalme_api.access_policies import TicketAccessPolicy
 from ._common import DALMEBaseViewSet
+from dalme_api.filters import TicketFilter
 
 
 class Tickets(DALMEBaseViewSet):
@@ -12,6 +13,10 @@ class Tickets(DALMEBaseViewSet):
     permission_classes = (TicketAccessPolicy,)
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    filterset_class = TicketFilter
+    search_fields = ['subject', 'description']
+    ordering_fields = ['id', 'subject', 'description', 'status', 'creation_user', 'creation_timestamp', 'assigned_to']
+    ordering = ['id']
 
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):
