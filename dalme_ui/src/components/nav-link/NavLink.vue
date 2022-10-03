@@ -1,22 +1,23 @@
 <template>
   <q-item
+    dense
     :to="{ name: to }"
     exact
     clickable
     :class="
       active
-        ? 'icon-adj bg-blue-1 text-light-blue-10 text-weight-bold'
+        ? 'icon-adj bg-blue-1 text-light-blue-10 text-weight-600'
         : 'icon-adj'
     "
-    active-class="bg-blue-1 text-light-blue-10 text-weight-bold"
-    exact-active-class="bg-blue-1 text-light-blue-10 text-weight-bold"
+    active-class="bg-blue-1 text-light-blue-10 text-weight-600"
+    exact-active-class="bg-blue-1 text-light-blue-10 text-weight-600"
     :active="active"
   >
-    <q-item-section avatar>
-      <q-icon :name="icon" size="20px" />
+    <q-item-section side class="q-pr-sm">
+      <q-icon :name="icon" size="16px" />
     </q-item-section>
 
-    <q-item-section>{{ to }}</q-item-section>
+    <q-item-section class="q-pr-sm">{{ to }}</q-item-section>
   </q-item>
 </template>
 
