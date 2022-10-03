@@ -46,31 +46,33 @@ class Workflow(models.Model):
         stage_dict = dict(self.PROCESSING_STAGES)
         if 1 <= self.wf_status <= 3:
             if self.wf_status != 2:
-                status_text = self.get_wf_status_display()
-                status_text_alt = ''
-                css_class = 'tag-wf-' + status_text
+                return {
+                    'text': self.get_wf_status_display(),
+                    'tag': self.get_wf_status_display()
+                    }
             else:
-                if getattr(self, self.get_stage_display() + '_done'):
-                    status_text = 'awaiting ' + stage_dict[self.stage + 1]
-                    status_text_alt = 'begin ' + stage_dict[self.stage + 1]
-                    css_class = 'tag-wf-awaiting'
+                if getattr(self, f'{self.get_stage_display()}_done'):
+                    return {
+                        'text': f'awaiting {stage_dict[self.stage + 1]}',
+                        'tag': 'awaiting'
+                        }
                 else:
-                    status_text = self.get_stage_display() + ' in progress'
-                    status_text_alt = ''
-                    css_class = 'tag-wf-in_progress'
+                    return {
+                        'text': f'{self.get_stage_display()} in progress',
+                        'tag': 'in_progress'
+                        }
         else:
-            status_text = 'unknown'
-            status_text_alt = ''
-            css_class = 'tag-wf-unknown'
-        return {'text': status_text, 'css_class': css_class, 'text_alt': status_text_alt, 'title_text': status_text.capitalize()}
+            return {
+                'text': 'unknown',
+                'tag': 'unknown'
+                }
 
     @property
     def stage_done(self):
         if self.wf_status == 2:
-            stage_done = getattr(self, self.get_stage_display() + '_done')
+            return getattr(self, f'{self.get_stage_display()}_done')
         else:
-            stage_done = True
-        return stage_done
+            return True
 
 
 class Work_log(models.Model):
