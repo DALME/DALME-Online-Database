@@ -91,7 +91,7 @@ export default defineComponent({
                 await fetchAPI(request);
                 if (success.value)
                   await attributeTypesSchema
-                    .validate(data.value, { stripUnknown: true })
+                    .validate(data.value.data, { stripUnknown: true })
                     .then((attributeTypes) => {
                       const normalized = {
                         ...value,

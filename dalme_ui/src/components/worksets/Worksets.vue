@@ -125,7 +125,7 @@ export default defineComponent({
       await fetchAPI(request);
       if (success.value)
         await setListSchema("worksets")
-          .validate(data.value, { stripUnknown: true })
+          .validate(data.value.data, { stripUnknown: true })
           .then(async (value) => {
             if (value.length > 0) {
               columns.value = getColumns();
