@@ -1,12 +1,17 @@
 import S from "string";
-import { equals, isNil } from "ramda";
+import { equals, isNil, isEmpty } from "ramda";
 import { computed, ref, unref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { usePrefStore } from "@/stores/preferences";
 
 const transformField = (field) => S(field).underscore().s;
 
-export const usePagination = (fetchData, listName, defaults) => {
+export const usePagination = (
+  fetchData,
+  listName,
+  defaults,
+  embedded = false,
+) => {
   const $prefStore = usePrefStore();
   const { lists } = storeToRefs($prefStore);
 
@@ -26,13 +31,13 @@ export const usePagination = (fetchData, listName, defaults) => {
     page: 1,
     rowsNumber: 0,
     rowsTotal: 0,
-    rowsPerPage: lists.value[listName]["rowsPerPage"],
+    rowsPerPage: embedded ? 5 : lists.value[listName]["rowsPerPage"],
     sortBy: lists.value[listName]["sortBy"],
   };
 
   const pagination = ref(defaultPagination);
-
-  const filter = ref("");
+  const search = ref("");
+  const activeFilters = ref({});
 
   const query = computed(() => {
     const pageData = unref(pagination);
@@ -42,22 +47,25 @@ export const usePagination = (fetchData, listName, defaults) => {
       const ordering = transformField(pageData.sortBy);
       params.append("ordering", `${pageData.descending ? "-" : ""}${ordering}`);
     }
-    if (filter.value) {
-      params.append("search", filter.value);
+
+    if (search.value) {
+      params.append("search", search.value);
     }
 
-    const paging = {
-      start: (pageData.page - 1) * pageData.rowsPerPage,
-      length:
-        pageData.rowsPerPage === 0 ? pageData.rowsNumber : pageData.rowsPerPage,
-    };
-    params.append("data", JSON.stringify(paging));
+    if (!isEmpty(activeFilters.value)) {
+      for (const field in activeFilters.value) {
+        params.append(field, activeFilters.value[field]);
+      }
+    }
+
+    params.append("offset", (pageData.page - 1) * pageData.rowsPerPage);
+    params.append("limit", pageData.rowsPerPage);
 
     return params.toString();
   });
 
   const onRequest = async (event) => {
-    filter.value = event.filter;
+    search.value = event.search;
     pagination.value = event.pagination;
   };
 
@@ -67,8 +75,8 @@ export const usePagination = (fetchData, listName, defaults) => {
 
   const resetPagination = () => (pagination.value = defaultPagination);
 
-  const onChangeFilter = (value) => {
-    filter.value = value;
+  const onChangeSearch = (value) => {
+    search.value = value;
     fetchDataPaginated();
   };
 
@@ -79,6 +87,23 @@ export const usePagination = (fetchData, listName, defaults) => {
 
   const onChangeRowsPerPage = (value) => {
     pagination.value.rowsPerPage = value;
+    fetchDataPaginated();
+  };
+
+  const onChangeFilters = (filter) => {
+    if (
+      filter.field in activeFilters.value &&
+      activeFilters.value[filter.field] === filter.value
+    ) {
+      delete activeFilters.value[filter.field];
+    } else {
+      activeFilters.value[filter.field] = filter.value;
+    }
+    fetchDataPaginated();
+  };
+
+  const onClearFilters = () => {
+    activeFilters.value = [];
     fetchDataPaginated();
   };
 
@@ -123,15 +148,18 @@ export const usePagination = (fetchData, listName, defaults) => {
   );
 
   return {
+    activeFilters,
     fetchDataPaginated,
-    filter,
-    onChangeFilter,
+    onChangeSearch,
     onChangePage,
     onChangeRowsPerPage,
+    onChangeFilters,
+    onClearFilters,
     onRequest,
     pagination,
     query,
     resetPagination,
+    search,
     visibleColumns,
   };
 };
