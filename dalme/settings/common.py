@@ -277,8 +277,8 @@ SEARCH_RESULTS_PER_PAGE = 10
 
 # Django DRF
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 25,
+    'DEFAULT_PAGINATION_CLASS': 'dalme_api.paginators.DALMELimitOffsetPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
