@@ -22,9 +22,9 @@ export const usePrefStore = defineStore("preferences", {
     },
     async updatePreferences(userId, route, mutation) {
       const { newValue, key, target } = mutation.events;
-      let useKey = Array.isArray(target) ? route : key;
-      let useValue = Array.isArray(target) ? target : newValue;
+      const useKey = Array.isArray(target) ? route : key;
       const section = this.getSectionfromKey(useKey);
+      const useValue = Array.isArray(target) ? this[section][useKey] : newValue;
       const $notifier = useNotifier();
       const { fetchAPI, success } = apiInterface();
       if (!isEmpty(section) && !isNil(section)) {
