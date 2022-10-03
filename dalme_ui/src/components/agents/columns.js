@@ -1,0 +1,32 @@
+export const columnMap = {
+  standardName: {
+    label: "Standard Name",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: true,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  type: {
+    label: "Type",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+  user: {
+    label: "User",
+    align: "left",
+    sortable: true,
+    sortOrder: "ad",
+    isSortDefault: false,
+    classes: null,
+    headerClasses: "text-no-wrap",
+    isDefaultVisible: true,
+  },
+};

@@ -1,10 +1,10 @@
 <template>
-  <BasicTable
+  <Table
     :columns="columns"
-    :filter="filter"
+    :search="search"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
     :onRequest="onRequest"
@@ -20,55 +20,23 @@
     <template v-slot:render-cell-type="props">
       {{ props.row.type.name }}
     </template>
-  </BasicTable>
+  </Table>
 </template>
 
 <script>
-import { defineComponent, onMounted, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import BasicTable from "@/components/basic-table/BasicTable.vue";
+import Table from "@/components/table/Table.vue";
 import { getColumns, getDefaults } from "@/components/utils";
 import { agentListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
-
-const columnMap = {
-  standardName: {
-    label: "Standard Name",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: true,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  type: {
-    label: "Type",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  user: {
-    label: "User",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-};
+import { columnMap } from "./columns";
 
 export default defineComponent({
   name: "Agents",
   components: {
-    BasicTable,
+    Table,
   },
   setup() {
     const $route = useRoute();
@@ -79,8 +47,8 @@ export default defineComponent({
     const noData = "No agents found.";
     const title = "Agents";
 
-    const fetchData = async () => {
-      const request = requests.agents.getAgents();
+    const fetchData = async (query) => {
+      const request = requests.agents.getAgents(query);
       await fetchAPI(request);
       if (success.value)
         await agentListSchema
@@ -96,12 +64,12 @@ export default defineComponent({
 
     const {
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
+      search,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap));
 
@@ -109,19 +77,17 @@ export default defineComponent({
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
 
-    onMounted(async () => await fetchData());
-
     return {
       columns,
-      filter,
       loading,
       noData,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
       rows,
+      search,
       title,
       visibleColumns,
     };
