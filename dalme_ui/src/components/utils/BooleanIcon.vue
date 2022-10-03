@@ -3,14 +3,14 @@
     <q-icon
       v-if="value"
       :name="trueIcon"
-      :color="onlyTrueGreen ? 'green-7' : 'red-6'"
+      :color="onlyTrueGreen ? trueColour : falseColour"
       :size="size"
     />
   </div>
   <div v-else>
     <q-icon
       :name="value ? trueIcon : falseIcon"
-      :color="value ? 'green-7' : 'red-6'"
+      :color="value ? trueColour : falseColour"
       :size="size"
     />
   </div>
@@ -41,6 +41,16 @@ export default defineComponent({
       type: String,
       required: false,
       default: "disabled_by_default",
+    },
+    trueColour: {
+      type: String,
+      required: false,
+      default: "green-7",
+    },
+    falseColour: {
+      type: String,
+      required: false,
+      default: "red-6",
     },
     value: {
       type: Boolean,
