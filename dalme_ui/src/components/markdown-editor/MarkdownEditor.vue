@@ -1,313 +1,165 @@
 <template>
   <q-card v-if="editable" flat bordered class="box-left-arrow">
-    <q-card-section class="bg-grey-2 q-py-xs q-px-sm row">
-      <q-space />
-      <div class="row">
-        <q-btn
-          color="grey-7"
-          flat
-          icon="text_format"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertEnclosure(['### ', ''])"
+    <div class="bg-grey-2 q-pt-xs q-px-sm row justify-between items-center">
+      <div class="column">
+        <q-tabs
+          v-model="mdTab"
+          dense
+          shrink
+          class="text-grey md-editor-tabs"
+          active-color="light-blue-10"
+          active-bg-color="white"
+          indicator-color="transparent"
+          align="left"
+          narrow-indicator
+          no-caps
+          content-class="q-px-sm"
         >
-          <Tooltip>Add heading</Tooltip>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="format_bold"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertEnclosure(['**', '**'])"
-        >
-          <Tooltip>Add bold text</Tooltip>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="format_italic"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertEnclosure(['*', '*'])"
-        >
-          <Tooltip>Add italic text</Tooltip>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="format_strikethrough"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertEnclosure(['~~', '~~'])"
-        >
-          <Tooltip>Add strike-through text</Tooltip>
-        </q-btn>
-        <q-separator vertical class="q-mr-sm" />
-        <q-btn
-          color="grey-7"
-          flat
-          icon="format_quote"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertPrefix('> ')"
-        >
-          <Tooltip>Insert a quote</Tooltip>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="code"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-        >
-          <Tooltip>Insert code</Tooltip>
-          <q-menu cover>
-            <q-list dense>
-              <q-item
-                dense
-                v-for="(option, idx) in codeOptions"
-                :key="idx"
-                clickable
-                v-close-popup
-                @click="
-                  insertEnclosure([
-                    '\`\`\`' + option.value + '\\n',
-                    '\\n\`\`\`',
-                  ])
-                "
-              >
-                <q-item-section>
-                  <span v-text="option.label" />
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="insert_link"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertEnclosure(['[', '](url)'])"
-        >
-          <Tooltip>Insert a link</Tooltip>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="sticky_note_2"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertEnclosure([':::\n', '\n:::'])"
-        >
-          <Tooltip>Insert a note</Tooltip>
-        </q-btn>
-        <q-separator vertical class="q-mr-sm" />
-        <q-btn
-          color="grey-7"
-          flat
-          icon="format_list_bulleted"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertPrefix('- ')"
-        >
-          <Tooltip>Add a bulleted list</Tooltip>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="format_list_numbered"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertPrefix('numbered')"
-        >
-          <Tooltip>Add a numbered list</Tooltip>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="checklist"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-          @click="insertPrefix('- [ ] ')"
-        >
-          <Tooltip>Add a task list</Tooltip>
-        </q-btn>
-        <q-separator vertical class="q-mr-sm" />
-        <q-btn
-          color="grey-7"
-          flat
-          icon="people"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-        >
-          <Tooltip>Directly mention a user or team</Tooltip>
-          <q-menu anchor="top left" self="top left">
-            <q-input
-              dense
-              square
-              filled
-              hide-bottom-space
-              v-model="filterUsers"
-              debounce="300"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-              spellcheck="false"
-              label="Filter"
-            >
-              <template v-slot:append>
-                <q-icon
-                  v-if="filterUsers === ''"
-                  name="search"
-                  color="blue-grey-7"
-                  size="xs"
-                />
-                <q-icon
-                  v-else
-                  name="highlight_off"
-                  class="cursor-pointer"
-                  color="blue-grey-7"
-                  size="xs"
-                  @click="filterUsers = ''"
-                />
-              </template>
-            </q-input>
-            <q-list>
-              <template v-for="(entry, idx) in users" :key="idx">
-                <q-item
-                  dense
-                  clickable
-                  v-close-popup
-                  @click="insertText('@' + entry.username)"
-                >
-                  <q-item-section>
-                    <div class="row items-center">
-                      <span
-                        class="text-weight-medium q-mr-sm"
-                        v-text="entry.username"
-                      />
-                      <span
-                        class="text-caption text-grey-6"
-                        v-text="entry.fullName"
-                      />
-                    </div>
-                  </q-item-section>
-                </q-item>
-                <q-separator />
-              </template>
-            </q-list>
-          </q-menu>
-        </q-btn>
-        <q-btn
-          color="grey-7"
-          flat
-          icon="bug_report"
-          size="12px"
-          padding="5px 5px"
-          class="q-mr-sm"
-        >
-          <Tooltip>Reference another issue ticket</Tooltip>
-          <q-menu anchor="top left" self="top left">
-            <q-input
-              dense
-              square
-              filled
-              hide-bottom-space
-              v-model="filterTickets"
-              debounce="300"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-              spellcheck="false"
-              label="Filter"
-            >
-              <template v-slot:append>
-                <q-icon
-                  v-if="filterTickets === ''"
-                  name="search"
-                  color="blue-grey-7"
-                  size="xs"
-                />
-                <q-icon
-                  v-else
-                  name="highlight_off"
-                  class="cursor-pointer"
-                  color="blue-grey-7"
-                  size="xs"
-                  @click="filterTickets = ''"
-                />
-              </template>
-            </q-input>
-            <q-list>
-              <template v-for="(entry, idx) in tickets" :key="idx">
-                <q-item
-                  dense
-                  clickable
-                  v-close-popup
-                  @click="insertText('#' + entry.id)"
-                >
-                  <q-item-section>
-                    <div class="row items-center">
-                      <q-icon
-                        :name="
-                          entry.status == 0
-                            ? 'fas fa-exclamation-circle'
-                            : 'fas fa-check-circle'
-                        "
-                        :color="entry.status == 0 ? 'green-8' : 'red-8'"
-                        class="q-mr-sm"
-                      />
-                      <span
-                        class="text-grey-6 q-mr-sm"
-                        v-text="'#' + entry.id"
-                      />
-                      <span
-                        class="text-grey-8 text-weight-bold q-mr-sm"
-                        v-text="entry.subject"
-                      />
-                    </div>
-                  </q-item-section>
-                </q-item>
-                <q-separator />
-              </template>
-            </q-list>
-          </q-menu>
-        </q-btn>
+          <q-tab name="write" label="Write" />
+          <q-tab name="preview" label="Preview" :disable="disabled" />
+        </q-tabs>
       </div>
-    </q-card-section>
+      <div class="column">
+        <div class="row">
+          <q-btn
+            color="grey-7"
+            flat
+            icon="text_format"
+            class="md-editor-button"
+            @click="insertEnclosure(['### ', ''])"
+          >
+            <Tooltip>Add heading</Tooltip>
+          </q-btn>
+          <q-btn
+            color="grey-7"
+            flat
+            icon="format_bold"
+            class="md-editor-button"
+            @click="insertEnclosure(['**', '**'])"
+          >
+            <Tooltip>Add bold text</Tooltip>
+          </q-btn>
+          <q-btn
+            color="grey-7"
+            flat
+            icon="format_italic"
+            class="md-editor-button"
+            @click="insertEnclosure(['*', '*'])"
+          >
+            <Tooltip>Add italic text</Tooltip>
+          </q-btn>
+          <q-btn
+            color="grey-7"
+            flat
+            icon="format_strikethrough"
+            class="md-editor-button"
+            @click="insertEnclosure(['~~', '~~'])"
+          >
+            <Tooltip>Add strike-through text</Tooltip>
+          </q-btn>
+          <q-separator vertical class="q-mr-sm" />
+          <q-btn
+            color="grey-7"
+            flat
+            icon="format_quote"
+            class="md-editor-button"
+            @click="insertPrefix('> ')"
+          >
+            <Tooltip>Insert a quote</Tooltip>
+          </q-btn>
+          <q-btn color="grey-7" flat icon="code" class="md-editor-button">
+            <Tooltip>Insert code</Tooltip>
+            <q-menu cover>
+              <q-list dense>
+                <q-item
+                  dense
+                  v-for="(option, idx) in codeOptions"
+                  :key="idx"
+                  clickable
+                  v-close-popup
+                  @click="
+                    insertEnclosure([
+                      '\`\`\`' + option.value + '\\n',
+                      '\\n\`\`\`',
+                    ])
+                  "
+                >
+                  <q-item-section>
+                    <span v-text="option.label" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+          <q-btn
+            color="grey-7"
+            flat
+            icon="insert_link"
+            class="md-editor-button"
+            @click="insertEnclosure(['[', '](url)'])"
+          >
+            <Tooltip>Insert a link</Tooltip>
+          </q-btn>
+          <q-btn
+            color="grey-7"
+            flat
+            icon="sticky_note_2"
+            class="md-editor-button"
+            @click="insertEnclosure([':::\n', '\n:::'])"
+          >
+            <Tooltip>Insert a note</Tooltip>
+          </q-btn>
+          <q-separator vertical class="q-mr-sm" />
+          <q-btn
+            color="grey-7"
+            flat
+            icon="format_list_bulleted"
+            class="md-editor-button"
+            @click="insertPrefix('- ')"
+          >
+            <Tooltip>Add a bulleted list</Tooltip>
+          </q-btn>
+          <q-btn
+            color="grey-7"
+            flat
+            icon="format_list_numbered"
+            class="md-editor-button"
+            @click="insertPrefix('numbered')"
+          >
+            <Tooltip>Add a numbered list</Tooltip>
+          </q-btn>
+          <q-btn
+            color="grey-7"
+            flat
+            icon="checklist"
+            class="md-editor-button"
+            @click="insertPrefix('- [ ] ')"
+          >
+            <Tooltip>Add a task list</Tooltip>
+          </q-btn>
+          <q-separator vertical class="q-mr-sm" />
+          <Chooser
+            icon="people"
+            color="grey-7"
+            returnField="username"
+            class="q-mr-sm"
+            toolTip="Directly mention a user or team"
+            target="users"
+            classes="md-editor-button"
+            @itemChosen="onUserSelected"
+          />
+          <Chooser
+            icon="bug_report"
+            color="grey-7"
+            toolTip="Reference another issue ticket"
+            target="tickets"
+            classes="md-editor-button"
+            @itemChosen="onTicketSelected"
+          />
+        </div>
+      </div>
+    </div>
     <q-separator />
-    <q-tabs
-      v-model="mdTab"
-      dense
-      shrink
-      class="text-grey md-editor-tabs"
-      active-color="light-blue-10"
-      active-bg-color="white"
-      indicator-color="transparent"
-      align="left"
-      narrow-indicator
-      no-caps
-      content-class="q-px-sm"
-      style="max-width: 180px"
-    >
-      <q-tab name="write" label="Write" />
-      <q-tab name="preview" label="Preview" :disable="disabled" />
-    </q-tabs>
     <q-tab-panels
       v-model="mdTab"
       keep-alive
@@ -368,7 +220,7 @@
 
 <script>
 import { openURL } from "quasar";
-import { filter, isEmpty, isNil } from "ramda";
+import { isEmpty, isNil } from "ramda";
 import {
   computed,
   defineAsyncComponent,
@@ -376,9 +228,7 @@ import {
   onMounted,
   ref,
 } from "vue";
-import { requests } from "@/api";
-import { useAPI, useNotifier } from "@/use";
-import { ticketListSchema, userSelectSchema } from "@/schemas";
+import { Chooser } from "@/components/utils";
 
 export default defineComponent({
   name: "MarkdownEditor",
@@ -406,15 +256,13 @@ export default defineComponent({
     },
   },
   components: {
+    Chooser,
     Tooltip: defineAsyncComponent(() =>
       import("@/components/utils/Tooltip.vue"),
     ),
   },
   emits: ["onSaveText"],
   setup(props, context) {
-    const { apiInterface } = useAPI();
-    const { data, fetchAPI, success } = apiInterface();
-    const $notifier = useNotifier();
     const buttonLabel = props.submitLabel || "Save";
     const mdText = ref(
       !isEmpty(props.text) && !isNil(props.text) ? props.text : "",
@@ -423,11 +271,7 @@ export default defineComponent({
     const input = ref(null);
     const mdTab = ref("write");
     const disabled = computed(() => isEmpty(mdText.value));
-    const userList = ref([]);
-    const ticketList = ref([]);
     const textareaEl = ref(null);
-    const filterUsers = ref("");
-    const filterTickets = ref("");
     const codeOptions = [
       { label: "CSS", value: "css" },
       { label: "HTML", value: "html" },
@@ -437,33 +281,8 @@ export default defineComponent({
       { label: "XML/TEI", value: "xml" },
     ];
 
-    const users = computed(() => {
-      if (isEmpty(filterUsers.value)) {
-        return userList.value;
-      } else {
-        return filter(
-          (user) =>
-            user.username.includes(filterUsers.value) ||
-            user.fullName.includes(filterUsers.value),
-          userList.value,
-        );
-      }
-    });
-
-    const tickets = computed(() => {
-      if (isEmpty(filterTickets.value)) {
-        return ticketList.value;
-      } else {
-        return filter(
-          (ticket) =>
-            ticket.creationUser.fullName.includes(filterTickets.value) ||
-            ticket.creationUser.username.includes(filterTickets.value) ||
-            ticket.description.includes(filterTickets.value) ||
-            ticket.subject.includes(filterTickets.value),
-          ticketList.value,
-        );
-      }
-    });
+    const onUserSelected = (value) => insertText("@" + value);
+    const onTicketSelected = (value) => insertText("#" + value);
 
     const openMarkdown = () => {
       openURL("https://docs.requarks.io/en/editors/markdown", null, {
@@ -543,33 +362,6 @@ export default defineComponent({
       }
     };
 
-    const getUserList = async () => {
-      await fetchAPI(requests.users.getUsers());
-      if (success.value) {
-        await userSelectSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            userList.value = value;
-          });
-      } else {
-        $notifier.users.userListRetrievalFailed();
-      }
-    };
-
-    const getTicketList = async () => {
-      await fetchAPI(requests.tickets.getTickets());
-      if (success.value) {
-        ticketList.value = data.value;
-        await ticketListSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            ticketList.value = value;
-          });
-      } else {
-        $notifier.tickets.ticketListRetrievalFailed();
-      }
-    };
-
     const onSubmit = () => {
       context.emit("onSaveText", mdText.value);
     };
@@ -581,8 +373,6 @@ export default defineComponent({
     if (props.editable) {
       onMounted(() => {
         textareaEl.value = input.value.getNativeElement();
-        getUserList();
-        getTicketList();
       });
     }
 
@@ -591,10 +381,6 @@ export default defineComponent({
       codeOptions,
       disabled,
       extendMarkdown,
-      filterUsers,
-      filterTickets,
-      getUserList,
-      getTicketList,
       insertEnclosure,
       insertPrefix,
       insertText,
@@ -603,11 +389,11 @@ export default defineComponent({
       mdText,
       onSubmit,
       openMarkdown,
+      onUserSelected,
+      onTicketSelected,
       pHolder,
       resetEditor,
       textareaEl,
-      tickets,
-      users,
     };
   },
 });
