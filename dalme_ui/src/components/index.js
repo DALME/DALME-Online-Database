@@ -1,9 +1,9 @@
 // Any imports that break alphabetical order had to be positioned to avoid
 // cirucular import errors within components.
+export { default as Table } from "./table";
 export { default as Agents } from "./agents";
 export { default as Attachments } from "./attachments";
 export { default as BaseModal } from "./base-modal";
-export { default as BasicTable } from "./basic-table";
 export { default as CommentForm } from "./comment-form";
 export { default as Comments } from "./comments";
 export { default as Countries } from "./countries";
@@ -15,7 +15,6 @@ export { default as EditPanel } from "./edit-panel";
 export { default as IssueTracker } from "./issue-tracker";
 export { default as Languages } from "./languages";
 export { default as Library } from "./library";
-export { default as Table } from "./table";
 export { default as Locales } from "./locales";
 export { default as LoginModal } from "./login-modal";
 export { default as SchemaForm } from "./schema-form";
