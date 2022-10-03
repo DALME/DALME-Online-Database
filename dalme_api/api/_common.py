@@ -1,4 +1,3 @@
-import json
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -39,34 +38,6 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
             return Response({'data': results}, 200)
         except Exception as e:
             return Response({'error': str(e)}, 400)
-
-    def list(self, request, *args, **kwargs):
-        full_queryset = self.get_queryset()
-        queryset = self.filter_queryset(full_queryset)
-        if request.GET.get('data') is not None:
-            dt_request = json.loads(request.GET['data'])
-            if dt_request.get('length') != -1:
-                page = self.paginate_queryset(queryset, dt_request.get('start'), dt_request.get('length'))
-            else:
-                page = queryset
-            serializer = self.get_serializer(page, many=True)
-            result = {
-                'draw': int(dt_request.get('draw', 1)),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-                'recordsTotal': full_queryset.count(),
-                'recordsFiltered': queryset.count(),
-                'data': serializer.data
-                }
-        else:
-            serializer = self.get_serializer(queryset, many=True)
-            result = serializer.data
-        return Response(result)
-
-    def paginate_queryset(self, queryset, start, length):
-        if start is not None and length is not None:
-            page = queryset[start:start+length]
-            if page is not None:
-                queryset = page
-        return queryset
 
     def get_renderer_context(self):
         context = {
