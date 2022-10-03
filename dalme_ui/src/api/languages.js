@@ -1,19 +1,14 @@
 import { apiUrl } from "./config";
-import { defaultOrder } from "./constants";
 
 const endpoint = `${apiUrl}/languages`;
 
 const languages = {
-  getLanguages(start = 0, length = 25, order = defaultOrder) {
-    const data = {
-      draw: 1,
-      orderable: true,
-      order,
-      start,
-      length,
-    };
+  getLanguages(query = false) {
+    const url = query
+      ? `${endpoint}/?${query}`
+      : `${endpoint}/?limit=0&offset=0`;
     return {
-      url: `${endpoint}/?data=${JSON.stringify(data)}`,
+      url: url,
       method: "GET",
     };
   },

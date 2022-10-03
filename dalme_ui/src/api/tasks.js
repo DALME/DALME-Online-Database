@@ -5,9 +5,12 @@ const endpoint = `${apiUrl}/tasks`;
 const v2Endpoint = `${apiUrl}/v2/tasks`;
 
 const tasks = {
-  getTasks() {
+  getTasks(query = false) {
+    const url = query
+      ? `${endpoint}/?${query}`
+      : `${endpoint}/?limit=0&offset=0`;
     return {
-      url: endpoint,
+      url: url,
       method: "GET",
     };
   },

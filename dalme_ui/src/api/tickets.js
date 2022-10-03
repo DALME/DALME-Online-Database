@@ -2,24 +2,26 @@ import S from "string";
 import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/tickets`;
-const v2Endpoint = `${apiUrl}/v2/tickets`;
 
 const tickets = {
-  getTickets() {
+  getTickets(query = false) {
+    const url = query
+      ? `${endpoint}/?${query}`
+      : `${endpoint}/?limit=0&offset=0`;
     return {
-      url: `${endpoint}/`,
+      url: url,
       method: "GET",
     };
   },
   getTicket(id) {
     return {
-      url: `${endpoint}/${id}`,
+      url: `${endpoint}/${id}/`,
       method: "GET",
     };
   },
   getUserTickets(userId) {
     return {
-      url: `${v2Endpoint}/?creation_user=${userId}`,
+      url: `${endpoint}/?creation_user=${userId}`,
       method: "GET",
     };
   },

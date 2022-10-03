@@ -1,32 +1,26 @@
 import { apiUrl } from "./config";
-import { defaultOrder } from "./constants";
 
 const endpoint = `${apiUrl}/agents`;
-const v2Endpoint = `${apiUrl}/v2/agents`;
 
 const agents = {
-  getAgents(start = 0, length = 25, order = defaultOrder) {
-    const data = {
-      draw: 1,
-      orderable: true,
-      order,
-      start,
-      length,
-    };
+  getAgents(query = false) {
+    const url = query
+      ? `${endpoint}/?${query}`
+      : `${endpoint}/?limit=0&offset=0`;
     return {
-      url: `${endpoint}/?data=${JSON.stringify(data)}`,
+      url: url,
       method: "GET",
     };
   },
   getCreditAgents() {
     return {
-      url: `${v2Endpoint}/?as=credits`,
+      url: `${endpoint}/?as=credits`,
       method: "GET",
     };
   },
   getNamedAgents() {
     return {
-      url: `${v2Endpoint}/?as=names`,
+      url: `${endpoint}/?as=names`,
       method: "GET",
     };
   },

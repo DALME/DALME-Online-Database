@@ -1,5 +1,4 @@
 import { apiUrl } from "./config";
-import { worksetId } from "./constants";
 
 const endpoint = `${apiUrl}/sets`;
 const v2Endpoint = `${apiUrl}/v2/sets`;
@@ -25,9 +24,12 @@ const sets = {
       method: "GET",
     };
   },
-  getSets() {
+  getSets(query = false) {
+    const url = query
+      ? `${endpoint}/?${query}`
+      : `${endpoint}/?limit=0&offset=0`;
     return {
-      url: `${endpoint}/`,
+      url: url,
       method: "GET",
     };
   },
@@ -49,7 +51,7 @@ const sets = {
   },
   getUserWorksets(userId) {
     return {
-      url: `${v2Endpoint}/?type=${worksetId}&owner=${userId}`,
+      url: `${v2Endpoint}/?type=4&owner=${userId}`,
       method: "GET",
     };
   },
