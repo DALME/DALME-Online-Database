@@ -33,5 +33,9 @@ class Ticket(dalmeIntid):
     def get_absolute_url(self):
         return reverse('ticket_detail', kwargs={'pk': self.pk})
 
+    @property
+    def comment_count(self):
+        return self.comments.count()
+
     class Meta:
         ordering = ["status", "creation_timestamp"]
