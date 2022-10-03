@@ -1,63 +1,52 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-card-section>
-        <div class="row">
-          <div class="text-h6">Task Lists</div>
-
+  <q-btn-dropdown
+    unelevated
+    no-caps
+    label="Task Lists"
+    size="12px"
+    menu-anchor="bottom left"
+    menu-self="top left"
+    class="bg-indigo-1 text-indigo-9 table-toolbar-button"
+    content-class="menu-shadow"
+  >
+    <q-list bordered separator class="text-grey-9 task-list-menu">
+      <q-item dense class="q-pr-sm">
+        <q-item-section class="text-weight-bold">Task lists</q-item-section>
+        <q-item-section avatar>
           <q-btn
-            round
-            class="q-ml-auto"
-            size="sm"
-            :icon="showing ? 'visibility_off' : 'visibility'"
-            @click.stop="showing = !showing"
-          >
-            <Tooltip>
-              {{ showing ? "Hide task lists" : "Show task lists" }}
-            </Tooltip>
-          </q-btn>
+            flat
+            dense
+            size="xs"
+            color="grey-6"
+            icon="close"
+            @click="clearActiveFilters"
+          />
+        </q-item-section>
+      </q-item>
 
-          <q-btn
-            v-if="isAdmin"
-            round
-            color="amber"
-            text-color="black"
-            icon="add"
-            size="sm"
-            class="q-ml-sm"
-            @click.stop="handleCreate"
-          >
-            <Tooltip> Create Task List </Tooltip>
-          </q-btn>
-        </div>
-      </q-card-section>
-
-      <q-list
-        v-show="showing"
-        v-for="(list, group, idx) in taskLists"
-        :key="idx"
-      >
-        <q-separator />
-
-        <q-item-label
+      <template v-for="(list, group, idx) in taskLists" :key="idx">
+        <q-item
+          dense
           clickable
-          header
-          class="group"
-          style="cursor: pointer"
-          v-ripple.center="{ color: 'yellow' }"
           :group="group"
-          :class="{ active: activeFilters && activeFilters.has(group) }"
+          :class="
+            activeFilters && activeFilters.has(group)
+              ? 'text-weight-bold bg-indigo-1 text-indigo-5'
+              : 'text-weight-600 text-grey-7'
+          "
           @click.stop="filter"
         >
-          {{ group }}
-        </q-item-label>
-
-        <q-separator />
+          <q-item-section side class="q-pr-xs">
+            <q-icon name="o_group" size="xs" />
+          </q-item-section>
+          <q-item-section class="text-13">
+            {{ `${group} group` }}
+          </q-item-section>
+        </q-item>
 
         <q-item
+          dense
           clickable
-          class="list"
-          v-ripple:yellow
           v-for="(taskList, idx) in list"
           :key="idx"
           :group="group"
@@ -65,29 +54,30 @@
           :active="
             activeFilters && activeFilters.has(`${group}_${taskList.name}`)
           "
-          active-class="bg-teal-1 text-grey-8"
+          class="q-pr-sm"
+          active-class="text-weight-bold bg-indigo-1 text-indigo-5"
           @click.stop="filter"
         >
-          <q-item-section>{{ taskList.name }}</q-item-section>
-
-          <q-item-section>
-            <q-badge
-              transparent
-              color="primary"
-              class="q-ml-auto"
-              :label="taskList.taskCount"
-            />
+          <q-item-section class="inset-item">
+            {{ taskList.name }}
           </q-item-section>
 
-          <q-item-section class="col-grow" v-if="isAdmin">
+          <q-item-section class="col-grow">
             <div class="row q-ml-sm">
+              <q-badge
+                rounded
+                color="indigo-2"
+                class="text-detail text-weight-600 text-indigo-5 q-mx-sm q-my-xs"
+                :label="taskList.taskCount"
+              />
               <q-btn
-                round
-                color="amber"
-                text-color="black"
-                icon="edit"
-                size="xs"
-                class="q-ml-auto q-mr-xs"
+                v-if="isAdmin"
+                flat
+                dense
+                size="sm"
+                color="grey-6"
+                icon="o_edit"
+                class="q-ml-auto q-mr-xs strong-focus outlined-item"
                 @click.stop="handleEdit(taskList)"
               >
                 <Tooltip
@@ -100,11 +90,13 @@
               </q-btn>
 
               <q-btn
-                round
-                text-color="black"
-                icon="delete"
-                size="xs"
-                :color="taskList.taskCount === 0 ? 'amber' : 'grey'"
+                v-if="isAdmin"
+                flat
+                dense
+                size="sm"
+                :color="taskList.taskCount > 0 ? 'grey-4' : 'grey-6'"
+                icon="o_delete"
+                class="strong-focus outlined-item"
                 :disable="taskList.taskCount > 0"
                 @click.stop="handleDelete(taskList)"
               >
@@ -120,9 +112,23 @@
             </div>
           </q-item-section>
         </q-item>
-      </q-list>
-    </q-card>
-  </div>
+      </template>
+
+      <q-item
+        v-if="isAdmin"
+        clickable
+        v-close-popup
+        dense
+        class="text-grey-8"
+        @click.stop="handleCreate"
+      >
+        <q-item-section side class="q-pr-xs">
+          <q-icon name="o_playlist_add" size="xs" />
+        </q-item-section>
+        <q-item-section class="text-weight-600">New Task List</q-item-section>
+      </q-item>
+    </q-list>
+  </q-btn-dropdown>
 </template>
 
 <script>
@@ -137,7 +143,6 @@ import {
 } from "vue";
 import { useRouter } from "vue-router";
 import { useActor } from "@xstate/vue";
-
 import { requests } from "@/api";
 import forms from "@/forms";
 import { useAPI, useEditing, useNotifier, usePermissions } from "@/use";
@@ -166,7 +171,6 @@ export default defineComponent({
 
     const title = "Task Lists";
     const activeFilters = ref(new Set());
-    const showing = ref(false);
     const taskLists = inject("taskLists");
 
     const filter = (e) => {
@@ -200,7 +204,6 @@ export default defineComponent({
     const isFiltered = computed(() => $router.currentRoute.value.query.filter);
     if (isFiltered.value) {
       activeFilters.value = new Set(isFiltered.value.split(","));
-      showing.value = true;
     }
 
     const handleCreate = () => {
@@ -253,14 +256,24 @@ export default defineComponent({
       });
     };
 
+    const clearActiveFilters = () => {
+      console.log("clear active filters");
+      activeFilters.value = new Set();
+      const { filter } = $router.currentRoute.value.query;
+      const newFilters = Array.from(activeFilters.value).join(",");
+      $router.push({
+        query: { ...(newFilters && { filter: newFilters }) },
+      });
+    };
+
     return {
       activeFilters,
+      clearActiveFilters,
       filter,
       handleCreate,
       handleEdit,
       handleDelete,
       isAdmin,
-      showing,
       taskLists,
       title,
     };
@@ -269,11 +282,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.group.active {
-  background: #e0f2f1 !important;
-  color: #616161 !important;
+.task-list-menu {
+  min-width: 300px;
 }
-.group:hover {
-  background-color: rgba(255, 190, 190, 0.1);
+.inset-item {
+  padding-left: 22px;
 }
 </style>

@@ -1,6 +1,8 @@
 <template>
   <Page>
-    <TaskDetail />
+    <div class="full-width full-height q-px-content-visual">
+      <TaskDetail />
+    </div>
   </Page>
 </template>
 

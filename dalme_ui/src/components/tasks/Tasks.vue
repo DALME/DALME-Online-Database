@@ -1,67 +1,128 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card class="q-ma-md">
-      <q-table
-        :title="title"
-        :rows="filteredRows"
-        :columns="columns"
-        :visible-columns="visibleColumns"
-        :no-data-label="noData"
-        :filter="filter"
-        :pagination="pagination"
-        :title-class="{ 'text-h6': true }"
-        :loading="loading"
-        row-key="title"
+  <Table
+    grid
+    :columns="columns"
+    :embedded="embedded"
+    :search="search"
+    :filterList="filterList"
+    :loading="loading"
+    :noData="noData"
+    :onChangeSearch="onChangeSearch"
+    :onChangePage="onChangePage"
+    :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onChangeFilters="onChangeFilters"
+    :onClearFilters="onClearFilters"
+    :onRequest="onRequest"
+    :pagination="pagination"
+    :rows="filteredRows"
+    :sortList="sortList"
+    :title="title"
+    :visibleColumns="visibleColumns"
+  >
+    <template v-slot:toolbar-special>
+      <TaskLists @on-reload="context.emit('onReloadTaskLists')" />
+    </template>
+
+    <template v-slot:grid-avatar="props">
+      <q-icon
+        :name="props.row.completed ? 'check_circle_outline' : 'error_outline'"
+        :color="props.row.completed ? 'green-8' : 'red-8'"
+        size="22px"
+      />
+    </template>
+
+    <template v-slot:grid-main="props">
+      <DetailPopover
+        linkClass="text-h7 title-link"
+        :linkTarget="{ name: 'Task', params: { id: props.row.id } }"
+        :linkText="props.row.title"
       >
-        <template v-if="showSearch" v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
+        <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
+          {{ props.row.creationUser.username }}
+          {{ formatDate(props.row.creationTimestamp, false) }}
+        </div>
+        <div class="text-h8 q-mb-xs">{{ props.row.title }}</div>
+        <div class="text-detail ellipsis-3-lines">
+          {{ props.row.description }}
+        </div>
+        <div>
+          <Tag
+            v-if="props.row.workset"
+            :name="`Workset: ${props.row.workset}`"
+            colour="light-blue-1"
+            textColour="light-blue-9"
+            size="sm"
+            module="standalone"
+            class="q-mt-sm"
+          />
+        </div>
+      </DetailPopover>
+      <Tag
+        v-if="props.row.overdueStatus"
+        name="overdue"
+        colour="red-1"
+        textColour="red-6"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+    </template>
 
-        <template v-slot:no-data="{ message }">
-          <div>{{ message }}</div>
-        </template>
+    <template v-slot:grid-detail="props">
+      <div class="text-detail text-weight-medium text-grey-8">
+        <span
+          v-text="
+            `Created ${formatDate(props.row.creationTimestamp, false)} by `
+          "
+        />
+        <DetailPopover showAvatar :userData="props.row.creationUser" />
+        <span
+          v-if="props.row.completed && props.row.completedDate"
+          v-text="`, completed ${formatDate(props.row.completedDate, false)}`"
+        />
+      </div>
+    </template>
 
-        <template v-slot:body-cell-title="props">
-          <q-td class="task" :props="props">
-            <router-link
-              class="text-subtitle1"
-              :to="{ name: 'Task', params: { id: props.row.id } }"
-            >
-              {{ props.value }}
-            </router-link>
-            <div>{{ props.row.description }}</div>
-          </q-td>
-        </template>
+    <template v-slot:grid-counter="props">
+      <q-icon
+        v-if="props.row.commentCount"
+        name="chat_bubble_outline"
+        size="17px"
+        class="text-weight-bold q-mr-xs"
+      />
+      <div
+        v-if="props.row.commentCount"
+        class="text-grey-8 text-weight-bold text-detail"
+      >
+        {{ props.row.commentCount }}
+      </div>
+    </template>
 
-        <template v-slot:body-cell-attachments="props">
-          <q-td :props="props"> </q-td>
-        </template>
-
-        <template v-slot:body-cell-completed="props">
-          <q-td :props="props">
-            <q-btn
-              round
-              :color="props.value ? 'green' : 'red'"
-              text-color="white"
-              :icon="props.value ? 'check_circle_outline' : 'error'"
-              size="xs"
-            />
-          </q-td>
-        </template>
-      </q-table>
-    </q-card>
-    <OpaqueSpinner :showing="loading" />
-  </div>
+    <template v-slot:grid-counter-extra="props">
+      <q-btn
+        v-if="props.row.file"
+        flat
+        dense
+        @click.stop="openURL(props.row.file.source)"
+        target="_blank"
+        color="blue-gray-6"
+        size="sm"
+        icon="o_text_snippet"
+        text-color="blue-gray-6"
+      />
+      <q-btn
+        v-if="props.row.url"
+        flat
+        dense
+        @click.stop="openURL(props.row.url)"
+        target="_blank"
+        color="blue-gray-6"
+        size="sm"
+        icon="link"
+        text-color="blue-gray-6"
+      />
+    </template>
+  </Table>
 </template>
 
 <script>
@@ -77,16 +138,22 @@ import {
   keys,
   values,
 } from "ramda";
-import { defineComponent, inject, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { defineComponent, inject, provide, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import { Table, TaskLists } from "@/components";
+import {
+  DetailPopover,
+  formatDate,
+  getColumns,
+  getDefaults,
+  Tag,
+} from "@/components/utils";
 import { tasksSchema } from "@/schemas";
-import { useAPI } from "@/use";
-
+import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";
+import { filterList, sortList } from "./filters";
 
 export default defineComponent({
   name: "Tasks",
@@ -97,37 +164,24 @@ export default defineComponent({
     },
   },
   components: {
-    OpaqueSpinner,
+    DetailPopover,
+    Table,
+    Tag,
+    TaskLists,
   },
-  setup(props) {
+  emits: ["onReloadTaskLists"],
+  setup(props, context) {
+    const $route = useRoute();
     const $router = useRouter();
     const $authStore = useAuthStore();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
-    const visibleColumns = ref(null);
     const rows = ref([]);
     const filteredRows = ref([]);
-    const filter = ref("");
     const taskLists = props.embedded ? ref([]) : inject("taskLists");
-    const showSearch = ref(true);
-
     const noData = props.embedded ? "No assigned tasks" : "No tasks found";
     const title = props.embedded ? "My Tasks" : "Tasks";
-    const rowsPerPage = props.embedded ? 5 : 25;
-    const pagination = { rowsPerPage };
-
-    const getColumns = () => {
-      const toColumn = (key) => ({
-        align: "left",
-        field: key,
-        label: columnMap[key],
-        name: key,
-        sortable: true,
-      });
-      return map(toColumn, keys(columnMap));
-    };
 
     // TODO: Move to local useTaskFilter hook.
     const filterTasks = (query, taskLists) => {
@@ -190,17 +244,6 @@ export default defineComponent({
       filteredRows.value = final;
     };
 
-    const setColumns = () => {
-      columns.value = getColumns();
-      const excluded = props.embedded
-        ? ["owner", "description", "createdBy"]
-        : ["description", "createdBy"];
-      visibleColumns.value = map(
-        (column) => column.field,
-        rFilter((column) => !excluded.includes(column.field), columns.value),
-      );
-    };
-
     watch(
       () => $router.currentRoute.value.query,
       (query) => {
@@ -214,54 +257,75 @@ export default defineComponent({
       },
     );
 
-    const fetchData = async () => {
+    const fetchData = async (query) => {
       const request = props.embedded
         ? requests.tasks.getUserTasks($authStore.userId)
-        : requests.tasks.getTasks();
+        : requests.tasks.getTasks(query);
       await fetchAPI(request);
       if (success.value)
         await tasksSchema
-          .validate(data.value, { stripUnknown: true })
+          .validate(data.value.data, { stripUnknown: true })
           .then((value) => {
-            if (isEmpty(value)) {
-              if (props.embedded) showSearch.value = false;
-            } else {
-              setColumns();
-            }
+            columns.value = getColumns(columnMap);
+            pagination.value.rowsNumber = data.value.recordsFiltered;
+            pagination.value.rowsTotal = data.value.recordsTotal;
             rows.value = value;
             const query = $router.currentRoute.value.query;
             taskLists !== undefined &&
             !isEmpty(taskLists.value) &&
             !isEmpty(query)
               ? filterTasks(query, taskLists.value)
-              : (filteredRows.value = value);
+              : (filteredRows.value = rows.value);
             loading.value = false;
           });
     };
 
-    onMounted(async () => await fetchData());
+    const {
+      activeFilters,
+      fetchDataPaginated,
+      onChangeSearch,
+      onChangePage,
+      onChangeRowsPerPage,
+      onRequest,
+      onChangeFilters,
+      onClearFilters,
+      pagination,
+      search,
+      visibleColumns,
+    } = usePagination(
+      fetchData,
+      $route.name,
+      getDefaults(columnMap),
+      props.embedded,
+    );
+
+    provide("pagination", { pagination, fetchDataPaginated });
+    provide("columns", columns);
+    provide("visibleColumns", visibleColumns);
+    provide("activeFilters", activeFilters);
 
     return {
+      context,
       columns,
-      filter,
       filteredRows,
+      filterList,
+      formatDate,
       loading,
       noData,
       openURL,
+      onChangeSearch,
+      onChangePage,
+      onChangeRowsPerPage,
+      onChangeFilters,
+      onClearFilters,
+      onRequest,
       pagination,
-      showSearch,
+      rows,
+      search,
+      sortList,
       title,
       visibleColumns,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.q-table tbody td {
-  white-space: normal;
-}
-.task {
-  width: 70%;
-}
-</style>
