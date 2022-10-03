@@ -1,5 +1,6 @@
 // Any imports that break alphabetical order had to be positioned to avoid
 // cirucular import errors within components.
+export { default as DetailCard } from "./detail-card";
 export { default as Table } from "./table";
 export { default as Agents } from "./agents";
 export { default as Attachments } from "./attachments";
