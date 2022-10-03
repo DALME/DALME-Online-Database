@@ -15,15 +15,6 @@ class RightsPolicySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if ret['attachments'] is not None:
-            a_pill = '<a href="/download/{}" class="task-attachment">File</a>'.format(instance.attachments.file)
-            ret['attachments'] = {
-                'pill': a_pill,
-                'file': {
-                    'file_id': ret.pop('attachments'),
-                    'filename': instance.attachments.filename
-                }
-            }
         ret['rights_status'] = {
             'name': instance.get_rights_status_display(),
             'id': ret.pop('rights_status')

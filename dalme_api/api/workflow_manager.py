@@ -29,14 +29,6 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_modified = timezone.now()
                 object.save()
                 self.update_log(object, stage_name + ': marked as done')
-                next_stage = stage + 1
-                result['prev_stage_name'] = stage_name
-                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
-                if stage == 4:
-                    result['status_html'] = '<div class="wf-manager-status tag-wf-awaiting">awaiting parsing</div>'
-                else:
-                    result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\',' + str(next_stage) + ')">\
-                    begin ' + stage_dict[next_stage] + '</button>'
             elif action == 'begin_stage':
                 stage = int(self.request.data['code'])
                 stage_name = stage_dict[stage]
@@ -45,11 +37,6 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_modified = timezone.now()
                 object.save()
                 self.update_log(object, stage_name + ': work commenced')
-                result['stage_name'] = stage_name
-                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
-                result['status_html'] = '<div class="wf-manager-status tag-wf-in_progress">' + stage_name + ' in progress</div>\
-                <button class="wf-manager-status_btn tag-wf-in_progress" role="button" onclick="update_workflow(\'stage_done\', ' + str(stage) + ')">\
-                <i class="far fa-check-square fa-fw"></i> DONE</button>'
             elif action == 'toggle_help':
                 if object.help_flag:
                     object.help_flag = False
@@ -76,24 +63,6 @@ class WorkflowManager(viewsets.ModelViewSet):
                 object.last_modified = timezone.now()
                 object.save()
                 self.update_log(object, 'status changed from "' + status_dict[prev_status] + '" to "' + status_dict[status] + '"')
-                status_name = status_dict[status]
-                result['mod_html'] = '<i class="far fa-history fa-fw"></i> Now | <a href="/users/' + request.user.username + '">' + request.user.profile.full_name + '</a>'
-                if status != 2:
-                    result['status_html'] = '<div class="wf-manager-status tag-wf-' + status_name + '">' + status_name + '</div>'
-                else:
-                    stage = object.stage
-                    stage_name = stage_dict[stage]
-                    if getattr(object, stage_name + '_done'):
-                        if stage == 4:
-                            result['status_html'] = '<div class="wf-manager-status tag-wf-awaiting">awaiting parsing</div>'
-                        else:
-                            next_stage = stage + 1
-                            result['status_html'] = '<button class="wf-manager-status_btn tag-wf-awaiting" role="button" onclick="update_workflow(\'begin_stage\', ' + str(next_stage) + ')">\
-                            begin ' + stage_dict[next_stage] + '</button>'
-                    else:
-                        result['status_html'] = '<div class="wf-manager-status tag-wf-in_progress">' + stage_name + ' in progress</div>\
-                        <button class="wf-manager-status_btn tag-wf-in_progress" role="button" onclick="update_workflow(\'stage_done\', ' + str(stage) + ')">\
-                        <i class="far fa-check-square fa-fw"></i> DONE</button>'
             result['message'] = 'Update succesful.'
             status = 201
         except Exception as e:

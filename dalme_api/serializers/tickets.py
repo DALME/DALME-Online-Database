@@ -61,23 +61,6 @@ class TicketDetailSerializer(serializers.ModelSerializer):
             'tags': {'required': False}
             }
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret['comment_count'] = instance.comments.count()
-        ticket = '<div class="d-flex align-items-center"><i class="fa fa-exclamation-circle ticket-status-{} fa-fw"></i>'.format(ret['status'])
-        ticket += '<a href="/tickets/'+str(ret['id'])+'" class="ticket_subject">'+ret['subject']+'</a>'
-        if ret['comment_count'] > 0:
-            ticket += '<i class="fas fa-comment fa-lg icon-badge ml-2"></i><span class="icon-badge-count">{}</span></div>'.format(ret['comment_count'])
-        ret['ticket'] = ticket
-        attachments = ''
-        if ret['url'] is not None:
-            attachments += '<a href="{}" class="task-attachment">URL</a>'.format(ret['url'])
-        if ret['file'] is not None:
-            attachments += '<a href="/download/{}" class="task-attachment">File</a>'.format(instance.file.file)
-        ret['attachments'] = attachments
-        ret['status'] = bool(instance.status)
-        return ret
-
     def to_internal_value(self, data):
         if data.get('tags') is not None:
             self.context['tags'] = data.pop('tags')
