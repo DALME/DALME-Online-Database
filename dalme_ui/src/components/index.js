@@ -17,6 +17,7 @@ export { default as IssueTracker } from "./issue-tracker";
 export { default as Languages } from "./languages";
 export { default as Library } from "./library";
 export { default as Locales } from "./locales";
+export { default as LogViewer } from "./log-viewer";
 export { default as LoginModal } from "./login-modal";
 export { default as SchemaForm } from "./schema-form";
 export { default as FolioModal } from "./folio-modal";
