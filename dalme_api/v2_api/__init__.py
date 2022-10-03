@@ -1,4 +1,3 @@
-from .agents import Agents
 from .attributes import Attributes
 from .attribute_types import AttributeTypes
 from .health_check import HealthCheck
@@ -10,7 +9,6 @@ from .tasks import Tasks
 from .tickets import Tickets
 
 __all__ = [
-    'Agents',
     'Attributes',
     'AttributeTypes',
     'HealthCheck',

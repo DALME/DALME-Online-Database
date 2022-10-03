@@ -45,6 +45,16 @@ class Agents(DALMEBaseViewSet):
     ordering_fields = ['id', 'standard_name', 'type']
     ordering = ['type', 'standard_name']
 
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs_as = self.request.GET.get('as')
+        if qs_as:
+            if qs_as == 'credits':
+                qs = qs.filter(user__isnull=False)
+            if qs_as == 'named':
+                qs = qs.filter(user__isnull=True)
+        return qs
+
 
 class Attributes(DALMEBaseViewSet):
     """ API endpoint for managing attributes """
