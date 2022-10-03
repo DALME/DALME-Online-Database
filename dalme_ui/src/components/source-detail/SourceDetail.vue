@@ -1,66 +1,125 @@
 <template>
   <div v-if="!loading">
     <div class="row">
-      <div class="column full-page-height">
-        <q-tabs
-          v-model="tab"
-          class="bg-indigo-1 text-indigo-4"
-          :vertical="$q.screen.gt.xs"
-          active-color="indigo-5"
-          active-bg-color="indigo-2"
-          indicator-color="indigo-5"
-        >
-          <q-tab name="info" icon="info" class="side-tab">
-            <Tooltip anchor="center right" self="center left" :offset="[2, 0]">
-              Info
-            </Tooltip>
-          </q-tab>
-          <q-tab
-            v-if="hasChildren"
-            name="children"
-            icon="account_tree"
-            class="side-tab"
-          >
-            <Tooltip anchor="center right" self="center left" :offset="[2, 0]">
-              Children
-            </Tooltip>
-          </q-tab>
-          <q-tab
-            v-if="hasPages"
-            name="folios"
-            icon="auto_stories"
-            class="side-tab"
-          >
-            <Tooltip anchor="center right" self="center left" :offset="[2, 0]">
-              Folios
-            </Tooltip>
-          </q-tab>
-          <q-tab
-            v-if="hasAgents || hasPlaces"
-            name="entities"
-            icon="person_pin_circle"
-            class="side-tab"
-          >
-            <Tooltip anchor="center right" self="center left" :offset="[2, 0]">
-              Entities (e.g. Agents, Places)
-            </Tooltip>
-          </q-tab>
-          <q-tab name="comments" icon="forum" class="side-tab">
-            <q-badge
-              v-if="commentCount > 0"
-              color="purple-5"
-              rounded
-              class="tab-badge"
-            >
-              {{ commentCount }}
-            </q-badge>
-            <Tooltip anchor="center right" self="center left" :offset="[2, 0]">
-              Comments
-            </Tooltip>
-          </q-tab>
-        </q-tabs>
+      <div class="col-grow q-py-lg">
+        <div class="row items-center text-h5">
+          {{ source.name }}
+          <Tag
+            v-if="source.hasInventory"
+            name="list"
+            colour="green-1"
+            textColour="green-8"
+            size="xs"
+            module="standalone"
+            class="q-ml-sm"
+          />
+        </div>
+        <div class="row detail-row-subheading text-grey-8">
+          <span>Created</span> {{ formatDate(source.created.timestamp) }} by
+          <DetailPopover
+            :userData="{
+              username: source.created.username,
+              fullName: source.created.user,
+            }"
+            :showAvatar="false"
+          />
+          <span>, last modified</span>
+          {{ formatDate(source.modified.timestamp) }} by
+          <DetailPopover
+            :userData="{
+              username: source.modified.username,
+              fullName: source.modified.user,
+            }"
+            :showAvatar="false"
+          />
+        </div>
       </div>
-      <q-separator vertical class="tab-vertical-separator bg-indigo-2" />
+      <div v-if="resource === 'record'" class="col-auto q-py-lg">
+        <WorkflowManager :data="source.workflow" />
+      </div>
+    </div>
+    <div class="row">
+      <q-tabs
+        v-model="tab"
+        dense
+        no-caps
+        inline-label
+        switch-indicator
+        align="left"
+        class="bg-white text-grey-8 tab-container"
+        active-class="active-tab"
+      >
+        <q-tab name="info" icon="o_info" label="Info" />
+        <q-tab
+          v-if="hasChildren"
+          name="children"
+          label="Children"
+          icon="o_account_tree"
+        >
+          <q-badge
+            color="indigo-1"
+            rounded
+            class="text-grey-8 q-mx-xs"
+            :label="source.children.length"
+          />
+        </q-tab>
+        <q-tab
+          v-if="hasPages"
+          name="folios"
+          label="Folios"
+          icon="o_import_contacts"
+          class="side-tab"
+        >
+          <q-badge
+            color="indigo-1"
+            rounded
+            class="text-grey-8 q-mx-xs"
+            :label="source.pages.length"
+          />
+        </q-tab>
+        <q-tab
+          v-if="hasAgents || hasPlaces"
+          name="entities"
+          label="Entities"
+          icon="o_person_pin_circle"
+          class="side-tab"
+        >
+          <q-badge
+            color="indigo-1"
+            rounded
+            class="text-grey-8 q-mx-xs"
+            :label="entityCount"
+          />
+        </q-tab>
+        <q-tab name="comments" icon="o_forum" label="Discussion">
+          <q-badge
+            v-if="commentCount > 0"
+            color="indigo-1"
+            rounded
+            class="text-grey-8 q-mx-xs"
+            :label="commentCount"
+          />
+        </q-tab>
+        <q-tab name="log" icon="o_work_history" label="Work Log" />
+        <q-space />
+        <BooleanIcon
+          v-if="resource === 'record'"
+          :value="source.workflow.isPublic"
+          :onlyTrue="true"
+          trueIcon="public"
+          trueColour="light-green-7"
+        />
+        <BooleanIcon
+          v-if="resource === 'record'"
+          :value="source.workflow.helpFlag"
+          :onlyTrue="true"
+          trueIcon="flag"
+          trueColour="red-4"
+          class="q-ml-xs"
+        />
+      </q-tabs>
+    </div>
+    <div class="row q-pt-sm">
       <div class="col">
         <q-tab-panels
           v-model="tab"
@@ -68,16 +127,16 @@
           transition-prev="jump-up"
           transition-next="jump-up"
         >
-          <q-tab-panel name="info" class="q-pt-none">
+          <q-tab-panel name="info" class="q-pt-none q-px-none">
             <SourceAttributes />
           </q-tab-panel>
-          <q-tab-panel name="children" class="q-pt-none">
+          <q-tab-panel name="children" class="q-pt-none q-px-none">
             <SourceChildren :children="source.children" />
           </q-tab-panel>
-          <q-tab-panel name="folios" class="q-pt-none">
+          <q-tab-panel name="folios" class="q-pt-none q-px-none">
             <SourcePages :pages="source.pages" />
           </q-tab-panel>
-          <q-tab-panel name="entities" class="q-pt-none">
+          <q-tab-panel name="entities" class="q-pt-none q-px-none">
             <div v-if="hasAgents">
               <SourceAgents :agents="source.agents" />
             </div>
@@ -85,8 +144,11 @@
               <SourcePlaces :places="source.places" />
             </div>
           </q-tab-panel>
-          <q-tab-panel name="comments" class="q-pt-none">
+          <q-tab-panel name="comments" class="q-pt-md q-px-lg">
             <Comments />
+          </q-tab-panel>
+          <q-tab-panel name="log" class="q-pt-md q-px-lg">
+            <LogViewer :data="source.workflow" />
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -97,46 +159,42 @@
 
 <script>
 import { useMeta } from "quasar";
-import { isEmpty, isNil } from "ramda";
-import {
-  computed,
-  defineAsyncComponent,
-  defineComponent,
-  inject,
-  provide,
-  ref,
-  watch,
-} from "vue";
-import { useRoute } from "vue-router";
+import { computed, defineComponent, inject, provide, ref, watch } from "vue";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { useNavStore } from "@/stores/navigation";
-
 import { requests } from "@/api";
 import { sourceDetailSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
-
-import { OpaqueSpinner } from "@/components/utils";
-import { Comments } from "@/components";
+import {
+  BooleanIcon,
+  DetailPopover,
+  formatDate,
+  notNully,
+  OpaqueSpinner,
+  Tag,
+} from "@/components/utils";
+import { Comments, LogViewer, WorkflowManager } from "@/components";
 import SourceAttributes from "./SourceAttributes.vue";
 import SourceAgents from "./SourceAgents.vue";
 import SourceChildren from "./SourceChildren.vue";
 import SourcePages from "./SourcePages.vue";
 import SourcePlaces from "./SourcePlaces.vue";
 
-const notNully = (value) => !isNil(value) && !isEmpty(value);
-
 export default defineComponent({
   name: "SourceDetail",
   components: {
+    BooleanIcon,
+    DetailPopover,
     Comments,
+    LogViewer,
     OpaqueSpinner,
     SourceAttributes,
     SourceAgents,
     SourceChildren,
     SourcePages,
     SourcePlaces,
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
-    ),
+    Tag,
+    WorkflowManager,
   },
   setup() {
     const $route = useRoute();
@@ -149,11 +207,16 @@ export default defineComponent({
     const id = inject("id");
 
     const tab = ref("info");
-    const hasAttributes = computed(() => !isNil(source.value.attributes));
+    const hasAttributes = computed(() => notNully(source.value.attributes));
     const hasAgents = computed(() => notNully(source.value.agents));
     const hasChildren = computed(() => notNully(source.value.children));
     const hasPlaces = computed(() => notNully(source.value.places));
     const hasPages = computed(() => notNully(source.value.pages));
+    const entityCount = computed(() => {
+      let agentsCount = hasAgents.value ? source.value.agents.length : 0;
+      let placesCount = hasPlaces.value ? source.value.places.length : 0;
+      return agentsCount + placesCount;
+    });
     const commentCount = computed(() => source.value.commentCount);
 
     provide("model", "Source");
@@ -182,6 +245,7 @@ export default defineComponent({
               }[value.type.name.toLowerCase()] || "bibliography";
             source.value = value;
             $navStore.currentSubsection = value.type.name + "s";
+            $navStore.breadcrumbTail.push(value.shortName);
             loading.value = false;
           });
     };
@@ -191,6 +255,7 @@ export default defineComponent({
       async (to) => {
         if (to) {
           id.value = to;
+          $navStore.resetBreadcrumbTail();
           await fetchData();
         }
       },
@@ -199,33 +264,24 @@ export default defineComponent({
 
     editingDetailRouteGuard();
 
+    onBeforeRouteLeave(() => {
+      $navStore.resetBreadcrumbTail();
+    });
+
     return {
       commentCount,
+      entityCount,
+      formatDate,
       hasAgents,
       hasAttributes,
       hasChildren,
       hasPages,
       hasPlaces,
       loading,
+      resource,
       source,
       tab,
     };
   },
 });
 </script>
-
-<style scoped lang="scss">
-.tab-vertical-separator {
-  margin-left: -2px;
-  z-index: 1;
-  width: 2px;
-}
-.side-tab {
-  z-index: 2;
-}
-.tab-badge {
-  position: absolute;
-  top: 3px;
-  right: -1px;
-}
-</style>

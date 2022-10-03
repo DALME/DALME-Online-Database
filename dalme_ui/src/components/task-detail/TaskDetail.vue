@@ -1,51 +1,130 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card
-      class="q-ma-md"
-      :class="[isNil(completed) ? null : completed ? 'complete' : 'incomplete']"
-    >
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar icon="assignment"> </q-avatar>
-        </q-item-section>
+  <div v-if="!loading && !isEmpty(task)">
+    <div class="row">
+      <div class="col-grow q-py-lg">
+        <div class="row items-center text-h5">
+          {{ task.title }}
+        </div>
+        <div class="row detail-row-subheading text-grey-8">
+          <q-chip
+            :icon="task.completed ? 'o_check_circle' : 'o_error_outline'"
+            :label="task.completed ? 'Completed' : 'Incomplete'"
+            :color="task.completed ? 'red-6' : 'green-7'"
+            text-color="white"
+            size="sm"
+            class="q-ml-none q-mr-xs"
+          />
+          <DetailPopover :userData="task.creationUser" :showAvatar="false" />
+          created this task {{ formatDate(task.creationTimestamp) }}
+        </div>
+      </div>
+      <div v-if="isAdmin" class="col-auto q-py-lg">
+        <q-btn
+          dense
+          outline
+          no-caps
+          :color="buttonColours.colour"
+          :class="`action-button bg-${buttonColours.colour}`"
+          :text-color="buttonColours.text"
+          :label="capitalize(action)"
+          @click.stop="onAction"
+        />
+      </div>
+    </div>
+    <q-separator class="q-mb-lg" />
+    <div class="row">
+      <div class="col-9 q-pr-md">
+        <q-card flat class="q-mb-md">
+          <q-card-section
+            :class="
+              task.commentCount > 0
+                ? 'q-pt-none q-pr-none'
+                : 'q-pt-none q-pr-none comments-container'
+            "
+          >
+            <div class="comment_thread q-mt-none q-pb-lg">
+              <q-item class="q-pb-sm q-pt-none q-px-none">
+                <q-item-section top avatar>
+                  <q-avatar v-if="task.creationUser.avatar" size="40px">
+                    <img :src="task.creationUser.avatar" />
+                  </q-avatar>
+                  <q-avatar
+                    v-else
+                    size="40px"
+                    icon="account_circle"
+                    color="grey-4"
+                    text-color="grey-6"
+                  />
+                </q-item-section>
+                <q-item-section>
+                  <q-card flat bordered class="box-left-arrow">
+                    <q-card-section class="bg-grey-2 q-py-sm">
+                      <DetailPopover
+                        :userData="task.creationUser"
+                        :showAvatar="false"
+                      />
+                      commented {{ formatDate(task.creationTimestamp) }}
+                    </q-card-section>
+                    <q-separator />
+                    <q-card-section class="text-body2">
+                      <MarkdownEditor
+                        v-if="task.description"
+                        :text="task.description"
+                      />
+                      <span v-else>No description provided.</span>
+                    </q-card-section>
+                  </q-card>
+                </q-item-section>
+              </q-item>
+            </div>
+            <Comments>
+              <template v-if="task.completed" v-slot:comment-stream-end>
+                <div class="comment_thread row items-center q-mt-none q-pb-lg">
+                  <div class="closing-dot bg-deep-purple-6">
+                    <q-icon name="o_check_circle" color="white" size="20px" />
+                  </div>
+                  <div class="closing-dot-label">
+                    this task was completed {{ formatDate(task.completedDate) }}
+                  </div>
+                </div>
+              </template>
+            </Comments>
+          </q-card-section>
+        </q-card>
+      </div>
+      <div class="col-3 q-pl-md">
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+          Assignees
+        </div>
+        <div class="q-mb-sm text-13">
+          <span>No one assigned</span>
+        </div>
+        <q-separator class="q-my-md" />
 
-        <q-item-section>
-          <q-item-label class="text-h5">
-            <template v-if="!loading"> {{ task.title }} #{{ id }} </template>
-            <template v-else>
-              <q-skeleton width="30rem" />
-            </template>
-          </q-item-label>
-          <q-item-label v-if="subheading" caption>
-            {{ subheading }}
-          </q-item-label>
-        </q-item-section>
-      </q-item>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+          Attachments
+        </div>
+        <div class="q-mb-sm text-13">
+          <Attachments v-if="attachment" />
+          <span v-else>None yet</span>
+        </div>
+        <q-separator class="q-my-md" />
 
-      <q-separator />
-
-      <q-card-section>
-        <p v-if="!loading" class="text-body1">
-          {{ task.description || "No description provided." }}
-        </p>
-        <q-skeleton v-else height="10rem" square />
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-actions v-if="isAdmin">
-        <q-btn @click.stop="onAction" flat>{{ action }}</q-btn>
-      </q-card-actions>
-      <OpaqueSpinner :showing="loading" />
-    </q-card>
-
-    <Comments />
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+          Links
+        </div>
+        <div class="q-mb-sm text-13">
+          <span>None yet</span>
+        </div>
+      </div>
+    </div>
   </div>
+  <OpaqueSpinner :showing="loading" />
 </template>
 
 <script>
 import { isEmpty, isNil } from "ramda";
-import { useMeta } from "quasar";
+import { useMeta, format } from "quasar";
 import {
   computed,
   defineComponent,
@@ -54,44 +133,51 @@ import {
   readonly,
   ref,
 } from "vue";
-import { useRoute } from "vue-router";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-
+import { useNavStore } from "@/stores/navigation";
 import { requests } from "@/api";
-import { Comments } from "@/components";
-import { OpaqueSpinner } from "@/components/utils";
+import { Attachments, Comments, MarkdownEditor } from "@/components";
+import { DetailPopover, formatDate, OpaqueSpinner } from "@/components/utils";
 import { taskSchema } from "@/schemas";
 import { useAPI, useEditing, useNotifier } from "@/use";
 
 export default defineComponent({
   name: "TaskDetail",
   components: {
+    Attachments,
     Comments,
+    DetailPopover,
+    MarkdownEditor,
     OpaqueSpinner,
   },
   setup() {
     const $notifier = useNotifier();
     const $route = useRoute();
     const $authStore = useAuthStore();
+    const $navStore = useNavStore();
     const { apiInterface } = useAPI();
-    const { editingDetailRouteGuard } = useEditing();
-
-    const model = "Task";
-    const id = computed(() => $route.params.id);
-
     const { loading, success, data, fetchAPI } = apiInterface();
+    const { capitalize } = format;
+    const { editingDetailRouteGuard } = useEditing();
+    const model = "Task";
     const action = ref("");
-    const completed = ref(null);
-    const task = ref({});
     const attachment = ref(null);
-    const subheading = ref("");
+    const task = ref({});
     const isAdmin = $authStore.isAdmin;
+    const id = computed(() => $route.params.id);
+    const buttonColours = computed(() =>
+      action.value === "reopen task"
+        ? { colour: "green-1", text: "green-7" }
+        : { colour: "deep-purple-1", text: "deep-purple-6" },
+    );
+
+    useMeta(() => ({ title: `Task #${id.value}` }));
+    $navStore.breadcrumbTail.push(`#${id.value}`);
 
     provide("attachment", attachment);
     provide("model", model);
     provide("id", readonly(id));
-
-    useMeta(() => ({ title: `Task #${id.value}` }));
 
     const onAction = async () => {
       const { success, fetchAPI, status } = apiInterface();
@@ -111,40 +197,40 @@ export default defineComponent({
         await taskSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            subheading.value =
-              `${value.creationUser.fullName} created this task` +
-              ` at ${value.creationTimestamp} in ${value.assignedTo}`;
-            completed.value = value.completed;
             action.value = value.completed ? "reopen task" : "complete task";
             task.value = value;
+            attachment.value = value.file;
             loading.value = false;
           });
     };
 
     editingDetailRouteGuard();
     onMounted(async () => await fetchData());
+    onBeforeRouteLeave(() => {
+      $navStore.resetBreadcrumbTail();
+    });
 
     return {
       action,
-      completed,
+      attachment,
+      buttonColours,
+      capitalize,
+      formatDate,
       isAdmin,
       isEmpty,
       isNil,
       loading,
       onAction,
-      subheading,
       task,
-      id,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.complete {
-  border-top: 10px solid green;
-}
-.incomplete {
-  border-top: 10px solid red;
+.action-button {
+  padding: 0px 10px 0px 10px;
+  font-weight: 600;
+  font-size: 14px;
 }
 </style>

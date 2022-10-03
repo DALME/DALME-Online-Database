@@ -1,57 +1,149 @@
 <template>
-  <div class="q-ma-md full-width full-height">
-    <q-card
-      class="q-ma-md"
-      :class="[isNil(completed) ? null : completed ? 'complete' : 'incomplete']"
-    >
-      <q-item>
-        <q-item-section avatar>
-          <q-avatar icon="subject"> </q-avatar>
-        </q-item-section>
+  <div v-if="!loading && !isEmpty(ticket)">
+    <div class="row">
+      <div class="col-grow q-py-lg">
+        <div class="row items-center text-h5">
+          {{ ticket.subject }}
+          <span class="q-ml-sm text-grey-7">#{{ id }}</span>
+        </div>
+        <div class="row detail-row-subheading text-grey-8">
+          <q-chip
+            :icon="ticket.status ? 'o_check_circle' : 'o_error_outline'"
+            :label="ticket.status ? 'Closed' : 'Open'"
+            :color="ticket.status ? 'deep-purple-6' : 'green-7'"
+            text-color="white"
+            size="sm"
+            class="q-ml-none q-mr-xs"
+          />
+          <DetailPopover :userData="ticket.creationUser" :showAvatar="false" />
+          created this ticket {{ formatDate(ticket.creationTimestamp) }}
+        </div>
+      </div>
+      <div v-if="isAdmin" class="col-auto q-py-lg">
+        <q-btn
+          dense
+          outline
+          no-caps
+          :color="buttonColours.colour"
+          :class="`action-button bg-${buttonColours.colour}`"
+          :text-color="buttonColours.text"
+          :label="capitalize(action)"
+          @click.stop="onAction"
+        />
+      </div>
+    </div>
+    <q-separator class="q-mb-lg" />
+    <div class="row">
+      <div class="col-9 q-pr-md">
+        <q-card flat class="q-mb-md">
+          <q-card-section
+            :class="
+              ticket.commentCount > 0
+                ? 'q-pt-none q-pr-none'
+                : 'q-pt-none q-pr-none comments-container'
+            "
+          >
+            <div class="comment_thread q-mt-none q-pb-lg">
+              <q-item class="q-pb-sm q-pt-none q-px-none">
+                <q-item-section top avatar>
+                  <q-avatar v-if="ticket.creationUser.avatar" size="40px">
+                    <img :src="ticket.creationUser.avatar" />
+                  </q-avatar>
+                  <q-avatar
+                    v-else
+                    size="40px"
+                    icon="account_circle"
+                    color="grey-4"
+                    text-color="grey-6"
+                  />
+                </q-item-section>
+                <q-item-section>
+                  <q-card flat bordered class="box-left-arrow">
+                    <q-card-section class="bg-grey-2 q-py-sm">
+                      <DetailPopover
+                        :userData="ticket.creationUser"
+                        :showAvatar="false"
+                      />
+                      commented {{ formatDate(ticket.creationTimestamp) }}
+                    </q-card-section>
+                    <q-separator />
+                    <q-card-section class="text-body2">
+                      <MarkdownEditor
+                        v-if="ticket.description"
+                        :text="ticket.description"
+                      />
+                      <span v-else>No description provided.</span>
+                    </q-card-section>
+                  </q-card>
+                </q-item-section>
+              </q-item>
+            </div>
+            <Comments>
+              <template v-if="ticket.status" v-slot:comment-stream-end>
+                <div class="comment_thread row items-center q-mt-none q-pb-lg">
+                  <div class="closing-dot bg-deep-purple-6">
+                    <q-icon name="o_check_circle" color="white" size="20px" />
+                  </div>
+                  <div class="closing-dot-label">
+                    <DetailPopover :userData="ticket.closingUser" />
+                    closed this ticket {{ formatDate(ticket.closingDate) }}
+                  </div>
+                </div>
+              </template>
+            </Comments>
+          </q-card-section>
+        </q-card>
+      </div>
+      <div class="col-3 q-pl-md">
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+          Assignees
+        </div>
+        <div class="q-mb-sm text-13">
+          <span>No one assigned</span>
+        </div>
+        <q-separator class="q-my-md" />
 
-        <q-item-section>
-          <q-item-label class="text-h5">
-            <template v-if="!loading">
-              {{ ticket.subject }} #{{ id }}
-            </template>
-            <template v-else>
-              <q-skeleton width="30rem" />
-            </template>
-          </q-item-label>
-          <q-item-label v-if="subheading" caption>
-            {{ subheading }}
-          </q-item-label>
-        </q-item-section>
-      </q-item>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Tags</div>
+        <div class="q-mb-sm text-13">
+          <template v-if="!isEmpty(cleanTags(ticket.tags))">
+            <Tag
+              v-for="(tag, idx) in cleanTags(ticket.tags)"
+              :key="idx"
+              :name="tag.tag"
+              :type="tag.tag"
+              size="xs"
+              module="ticket"
+              class="q-ml-sm"
+            />
+          </template>
+          <span v-else>None yet</span>
+        </div>
+        <q-separator class="q-my-md" />
 
-      <q-separator />
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+          Attachments
+        </div>
+        <div class="q-mb-sm text-13">
+          <Attachments v-if="attachment" />
+          <span v-else>None yet</span>
+        </div>
+        <q-separator class="q-my-md" />
 
-      <q-card-section>
-        <p v-if="!loading" class="text-body1">
-          {{ ticket.description || "No description provided." }}
-        </p>
-        <q-skeleton v-else height="10rem" square />
-        <q-badge v-if="ticket.tags" outline color="primary">
-          {{ ticket.tags }}
-        </q-badge>
-      </q-card-section>
-
-      <q-separator />
-
-      <q-card-actions v-if="isAdmin">
-        <q-btn @click.stop="onAction" flat>{{ action }}</q-btn>
-      </q-card-actions>
-      <OpaqueSpinner :showing="loading" />
-    </q-card>
-
-    <Attachments v-if="attachment" />
-    <Comments />
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+          Links
+        </div>
+        <div class="q-mb-sm text-13">
+          <span>None yet</span>
+        </div>
+      </div>
+    </div>
   </div>
+  <OpaqueSpinner :showing="loading" />
 </template>
 
 <script>
-import { isNil } from "ramda";
-import { useMeta } from "quasar";
+import { filter as rFilter, isEmpty, isNil } from "ramda";
+import { useMeta, format } from "quasar";
 import {
   computed,
   defineComponent,
@@ -60,12 +152,17 @@ import {
   ref,
   provide,
 } from "vue";
-import { useRoute } from "vue-router";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-
+import { useNavStore } from "@/stores/navigation";
 import { requests } from "@/api";
-import { Attachments, Comments } from "@/components";
-import { OpaqueSpinner } from "@/components/utils";
+import { Attachments, Comments, MarkdownEditor } from "@/components";
+import {
+  DetailPopover,
+  formatDate,
+  OpaqueSpinner,
+  Tag,
+} from "@/components/utils";
 import { ticketDetailSchema } from "@/schemas";
 import { useAPI, useNotifier } from "@/use";
 
@@ -74,27 +171,33 @@ export default defineComponent({
   components: {
     Attachments,
     Comments,
+    DetailPopover,
+    MarkdownEditor,
     OpaqueSpinner,
+    Tag,
   },
   setup() {
-    const model = "Ticket";
-
     const $notifier = useNotifier();
     const $route = useRoute();
     const $authStore = useAuthStore();
+    const $navStore = useNavStore();
     const { apiInterface } = useAPI();
-
     const { loading, success, data, fetchAPI } = apiInterface();
+    const { capitalize } = format;
+    const model = "Ticket";
     const action = ref("");
     const attachment = ref(null);
-    const completed = ref(null);
     const ticket = ref({});
-    const subheading = ref("");
     const isAdmin = $authStore.isAdmin;
-
     const id = computed(() => $route.params.id);
+    const buttonColours = computed(() =>
+      action.value === "reopen ticket"
+        ? { colour: "green-1", text: "green-7" }
+        : { colour: "deep-purple-1", text: "deep-purple-6" },
+    );
 
     useMeta({ title: `Ticket #${id.value}` });
+    $navStore.breadcrumbTail.push(`#${id.value}`);
 
     provide("attachment", attachment);
     provide("model", model);
@@ -112,46 +215,67 @@ export default defineComponent({
       }
     };
 
+    const cleanTags = (tags) => {
+      return rFilter((tag) => tag.tag, tags);
+    };
+
     const fetchData = async () => {
       await fetchAPI(requests.tickets.getTicket(id.value));
-      if (success.value);
-      await ticketDetailSchema
-        .validate(data.value, { stripUnknown: true })
-        .then((value) => {
-          subheading.value =
-            `${value.creationUser.fullName} opened this issue` +
-            ` on ${value.creationTimestamp}`;
-          completed.value = value.status;
-          action.value = completed.value ? "reopen ticket" : "close ticket";
-          ticket.value = value;
-          attachment.value = value.file;
-          loading.value = false;
-        });
+      if (success.value)
+        await ticketDetailSchema
+          .validate(data.value, { stripUnknown: true })
+          .then((value) => {
+            action.value = value.status ? "reopen ticket" : "close ticket";
+            ticket.value = value;
+            attachment.value = value.file;
+            loading.value = false;
+          });
     };
 
     onMounted(async () => await fetchData());
 
+    onBeforeRouteLeave(() => {
+      $navStore.resetBreadcrumbTail();
+    });
+
     return {
       action,
       attachment,
-      completed,
+      buttonColours,
+      capitalize,
+      cleanTags,
+      formatDate,
       id,
       isAdmin,
+      isEmpty,
       isNil,
       loading,
       onAction,
-      subheading,
       ticket,
     };
   },
 });
 </script>
 
-<style lang="scss" scoped>
-.complete {
-  border-top: 10px solid green;
+<style lang="scss">
+.closing-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  justify-content: center;
+  flex-shrink: 0;
+  align-items: center;
+  display: inline-flex;
+  position: relative;
+  left: 55px;
 }
-.incomplete {
-  border-top: 10px solid red;
+.closing-dot-label {
+  padding-left: 65px;
+  padding-bottom: 2px;
+}
+.action-button {
+  padding: 0px 10px 0px 10px;
+  font-weight: 600;
+  font-size: 14px;
 }
 </style>

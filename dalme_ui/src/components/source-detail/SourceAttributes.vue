@@ -1,250 +1,177 @@
 <template>
   <div class="row q-pt-md">
-    <div class="col-12 col-md-6 q-pr-md">
-      <q-card flat bordered class="detail-card">
-        <q-item dense class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5">
-          <q-item-section side class="q-pr-sm">
-            <q-icon name="bookmark" color="indigo-5" size="xs" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-subtitle2">Source</q-item-label>
-          </q-item-section>
-        </q-item>
+    <div class="col-9 q-pr-md">
+      <DetailCard icon="bookmark" title="Source" padContainer>
+        <div class="row q-mt-xs">
+          <div class="col-3 text-weight-medium text-right q-mr-lg">Name</div>
+          <div class="col-8">{{ source.name }}</div>
+        </div>
 
-        <q-separator class="bg-indigo-3" />
-
-        <q-card-section>
-          <div class="row q-mt-xs">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">Name</div>
-            <div class="col-8">{{ source.name }}</div>
+        <div class="row q-mt-xs">
+          <div class="col-3 text-weight-medium text-right q-mr-lg">
+            Short name
           </div>
+          <div class="col-8">{{ source.shortName }}</div>
+        </div>
 
-          <div class="row q-mt-xs">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">
-              Short name
-            </div>
-            <div class="col-8">{{ source.shortName }}</div>
+        <div class="row q-mt-xs">
+          <div class="col-3 text-weight-medium text-right q-mr-lg">Type</div>
+          <div class="col-8">
+            {{ source.type.name }}
+            <q-chip
+              v-if="source.hasInventory"
+              dense
+              size="10px"
+              outline
+              color="green-9"
+              class="text-bold"
+            >
+              LIST
+            </q-chip>
           </div>
+        </div>
 
-          <div class="row q-mt-xs">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">Type</div>
-            <div class="col-8">
-              {{ source.type.name }}
-              <q-chip
-                v-if="source.hasInventory"
-                dense
-                size="10px"
-                outline
-                color="green-9"
-                class="text-bold"
-              >
-                LIST
-              </q-chip>
-            </div>
+        <div class="row q-mt-xs">
+          <div class="col-3 text-weight-medium text-right q-mr-lg">Owner</div>
+          <div class="col-8">
+            <router-link
+              class="text-link"
+              :to="{
+                name: 'User',
+                params: { username: source.owner.username },
+              }"
+            >
+              {{ source.owner.fullName }}
+            </router-link>
+            <q-chip
+              v-if="source.isPrivate"
+              dense
+              size="10px"
+              outline
+              color="red-10"
+              class="q-ml-sm text-bold"
+            >
+              PRIVATE
+            </q-chip>
           </div>
+        </div>
 
-          <div class="row q-mt-xs">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">Owner</div>
-            <div class="col-8">
-              <router-link
-                class="text-link"
-                :to="{
-                  name: 'User',
-                  params: { username: source.owner.username },
-                }"
-              >
-                {{ source.owner.fullName }}
-              </router-link>
-              <q-chip
-                v-if="source.isPrivate"
-                dense
-                size="10px"
-                outline
-                color="red-10"
-                class="q-ml-sm text-bold"
-              >
-                PRIVATE
-              </q-chip>
-            </div>
+        <div class="row q-mt-xs" v-if="source.parent">
+          <div class="col-3 text-weight-medium text-right q-mr-lg">Parent</div>
+          <div class="col-8">
+            <router-link
+              class="text-link"
+              :to="{
+                name: 'Source',
+                params: { id: source.parent.id },
+              }"
+            >
+              {{ source.parent.name }}
+            </router-link>
           </div>
+        </div>
 
-          <div class="row q-mt-xs" v-if="source.parent">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">
-              Parent
-            </div>
-            <div class="col-8">
-              <router-link
-                class="text-link"
-                :to="{
-                  name: 'Source',
-                  params: { id: source.parent.id },
-                }"
-              >
-                {{ source.parent.name }}
-              </router-link>
-            </div>
+        <div class="row q-mt-xs" v-if="source.primaryDataset">
+          <div class="col-3 text-weight-medium text-right q-mr-lg">
+            Primary Dataset
           </div>
-
-          <div class="row q-mt-xs" v-if="source.primaryDataset">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">
-              Primary Dataset
-            </div>
-            <div class="col-8">
-              <router-link
-                class="text-link"
-                :to="{
-                  name: 'Set',
-                  params: { id: source.primaryDataset.id },
-                }"
-              >
-                {{ source.primaryDataset.name }}
-              </router-link>
-              <br />
-              <span class="text-caption text-grey-8">
-                {{ source.primaryDataset.detailString }}
-              </span>
-            </div>
+          <div class="col-8">
+            <router-link
+              class="text-link"
+              :to="{
+                name: 'Set',
+                params: { id: source.primaryDataset.id },
+              }"
+            >
+              {{ source.primaryDataset.name }}
+            </router-link>
+            <br />
+            <span class="text-caption text-grey-8">
+              {{ source.primaryDataset.detailString }}
+            </span>
           </div>
-        </q-card-section>
-      </q-card>
+        </div>
+      </DetailCard>
 
-      <q-card flat bordered class="detail-card q-mt-md">
-        <q-item dense class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5">
-          <q-item-section side class="q-pr-sm">
-            <q-icon name="subject" color="indigo-5" size="xs" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-subtitle2"> Description </q-item-label>
-          </q-item-section>
-        </q-item>
+      <DetailCard
+        icon="subject"
+        title="Description"
+        noData="No description assigned."
+        padContainer
+        class="q-mt-md"
+      >
+        <MarkdownEditor
+          v-if="hasDescription"
+          :text="source.attributes.description"
+        />
+      </DetailCard>
 
-        <q-separator class="bg-indigo-5" />
-
-        <q-card-section v-if="!hasDescription">
-          No description assigned.
-        </q-card-section>
-
-        <q-card-section v-else>
-          <MarkdownEditor :text="source.attributes.description" />
-        </q-card-section>
-      </q-card>
-
-      <q-card v-if="hasPages" flat bordered class="detail-card q-mt-md">
+      <DetailCard
+        v-if="hasPages"
+        icon="auto_stories"
+        title="Folios"
+        showFilter
+        class="q-mt-md"
+      >
         <SourcePages overview :pages="source.pages" />
-      </q-card>
+      </DetailCard>
 
-      <q-card flat bordered class="detail-card q-mt-md">
-        <q-item dense class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5">
-          <q-item-section side class="q-pr-sm">
-            <q-icon name="info" color="indigo-5" size="xs" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-subtitle2"> Metadata </q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-separator class="bg-indigo-5" />
-
-        <q-card-section>
-          <div class="row q-mt-xs">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">ID</div>
-            <div class="col-8">{{ source.id }}</div>
-          </div>
-
-          <div class="row q-mt-xs">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">
-              Created
-            </div>
-            <div class="col-8">
-              <span>{{ source.created.timestamp }} by </span>
-              <router-link
-                class="text-link"
-                :to="{
-                  name: 'User',
-                  params: { username: source.created.username },
-                }"
-              >
-                {{ source.created.user }}
-              </router-link>
-            </div>
-          </div>
-
-          <div class="row q-mt-xs" v-if="source.workflow">
-            <div class="col-3 text-weight-medium text-right q-mr-lg">
-              Modified
-            </div>
-            <div class="col-8">
-              <span>{{ source.modified.timestamp }} by </span>
-              <router-link
-                class="text-link"
-                :to="{
-                  params: { username: source.modified.username },
-                }"
-              >
-                {{ source.modified.user }}
-              </router-link>
-            </div>
-          </div>
-        </q-card-section>
-      </q-card>
-    </div>
-    <div class="col-12 col-md-6">
-      <q-card flat bordered class="detail-card">
-        <q-item dense class="q-pb-none q-px-sm bg-indigo-1 text-indigo-5">
-          <q-item-section side class="q-pr-sm">
-            <q-icon name="assignment" color="indigo-5" size="xs" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label class="text-subtitle2"> Attributes </q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-separator class="bg-indigo-5" />
-
-        <q-card-section v-if="!hasAttributes">
-          <div class="row q-mt-xs">
-            <div class="col-3 q-mr-lg" />
-            <div class="col-8">No attributes assigned.</div>
-          </div>
-        </q-card-section>
-        <q-card-section v-else>
-          <template v-for="(attribute, idx) in attributes" :key="idx">
-            <template v-if="!isNil(attribute.value)">
-              <div class="row q-mt-xs">
-                <div class="col-3 text-weight-medium text-right q-mr-lg">
-                  {{ getAttributeLabel(attribute.key) }}
-                </div>
-                <div v-if="attribute.key === 'url'">
-                  <a :href="attribute.value" target="_blank">
-                    {{ attribute.value }}
-                  </a>
-                </div>
-                <div v-else-if="Array.isArray(attribute.value)" class="col-8">
-                  {{ attribute.value[0].name }}
-                </div>
-                <div v-else-if="isObj(attribute.value)" class="col-8">
-                  {{ attribute.value.name }}
-                </div>
-                <div v-else class="col-8">
-                  {{ attribute.value }}
-                </div>
-              </div>
-            </template>
-          </template>
-        </q-card-section>
-      </q-card>
-
-      <q-card v-if="hasChildren" flat bordered class="detail-card q-mt-md">
+      <DetailCard
+        v-if="hasChildren"
+        icon="account_tree"
+        title="Children"
+        showFilter
+        class="q-mt-md"
+      >
         <SourceChildren overview :children="source.children" />
-      </q-card>
+      </DetailCard>
 
-      <q-card v-if="hasAgents" flat bordered class="detail-card q-mt-md">
+      <DetailCard
+        v-if="hasAgents"
+        icon="people"
+        title="Agents"
+        showFilter
+        class="q-mt-md"
+      >
         <SourceAgents overview :agents="source.agents" />
-      </q-card>
+      </DetailCard>
 
-      <q-card v-if="hasPlaces" flat bordered class="detail-card q-mt-md">
+      <DetailCard
+        v-if="hasPlaces"
+        icon="place"
+        title="Places"
+        showFilter
+        class="q-mt-md"
+      >
         <SourcePlaces overview :places="source.places" />
-      </q-card>
+      </DetailCard>
+    </div>
+
+    <div class="col-3 q-pl-md">
+      <template v-for="(value, name) in source.attributes" :key="name">
+        <template v-if="!isNil(value) && name !== 'description'">
+          <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+            {{ getAttributeLabel(name) }}
+          </div>
+          <div v-if="name === 'url'" class="text-13">
+            <a :href="value" target="_blank">{{ value }}</a>
+          </div>
+          <div v-else-if="Array.isArray(value)" class="text-13">
+            {{ value[0].name }}
+          </div>
+          <div v-else-if="isObj(value)" class="text-13">
+            {{ value.name }}
+          </div>
+          <div v-else class="text-13">
+            {{ value }}
+          </div>
+          <q-separator class="q-my-md" />
+        </template>
+      </template>
+      <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
+        Unique Id
+      </div>
+      <div class="q-mb-sm text-13">{{ source.id }}</div>
     </div>
   </div>
 </template>
@@ -252,7 +179,7 @@
 <script>
 import { computed, defineComponent, inject } from "vue";
 import { filter as rFilter, isNil, map } from "ramda";
-import MarkdownEditor from "../markdown-editor/MarkdownEditor.vue";
+import { DetailCard, MarkdownEditor } from "@/components";
 import SourceAgents from "./SourceAgents.vue";
 import SourceChildren from "./SourceChildren.vue";
 import SourcePages from "./SourcePages.vue";
@@ -295,6 +222,7 @@ const isObj = (obj) => {
 export default defineComponent({
   name: "SourceAttributes",
   components: {
+    DetailCard,
     MarkdownEditor,
     SourceAgents,
     SourceChildren,

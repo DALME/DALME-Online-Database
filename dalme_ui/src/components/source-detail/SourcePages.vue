@@ -1,57 +1,7 @@
 <template>
   <template v-if="overview">
-    <q-item
-      :dense="overview"
-      class="q-pb-none q-px-sm text-indigo-5"
-      :class="overview ? 'bg-indigo-1' : ''"
-    >
-      <q-item-section side class="q-pr-sm">
-        <q-icon name="auto_stories" color="indigo-5" size="xs" />
-      </q-item-section>
-      <q-item-section>
-        <q-item-label :class="overview ? 'text-subtitle2' : 'text-h6'">
-          Folios
-          <q-badge rounded color="purple-4" align="middle">
-            {{ pages.length }}
-          </q-badge>
-        </q-item-label>
-      </q-item-section>
-      <q-input
-        :dense="overview"
-        :standout="overview ? 'bg-indigo-3 no-shadow' : false"
-        :bg-color="overview ? 'indigo-2' : 'inherit'"
-        :color="overview ? 'indigo-6' : 'inherit'"
-        placeholder="Filter"
-        hide-bottom-space
-        v-model="filter"
-        debounce="300"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        :class="overview ? 'card-title-search' : ''"
-      >
-        <template v-slot:append>
-          <q-icon
-            v-if="filter === ''"
-            name="search"
-            color="indigo-5"
-            :size="overview ? '14px' : 'sm'"
-          />
-          <q-icon
-            v-else
-            name="highlight_off"
-            class="cursor-pointer"
-            color="indigo-5"
-            :size="overview ? '14px' : 'sm'"
-            @click="filter = ''"
-          />
-        </template>
-      </q-input>
-    </q-item>
-    <q-separator class="bg-indigo-5" />
     <q-table
-      :flat="!overview"
+      flat
       :dense="overview"
       :rows="pages"
       :columns="columns"
@@ -74,21 +24,26 @@
     </q-table>
   </template>
   <template v-else>
-    <q-tabs
-      v-model="tab"
-      dense
-      class="text-grey"
-      active-color="primary"
-      indicator-color="primary"
-      align="left"
-      narrow-indicator
-    >
-      <q-tab name="list" label="List" />
-      <q-tab name="editor" label="View/Edit" />
-    </q-tabs>
-    <q-separator />
-    <q-tab-panels v-model="tab" animated>
-      <q-tab-panel name="list">
+    <q-layout view="lHr LpR lFr" container style="height: 500px">
+      <q-drawer
+        v-model="leftDrawer"
+        side="left"
+        :mini="leftMini"
+        mini-to-overlay
+        class="detail-drawer-left"
+        width="300"
+        mini-width="40"
+      >
+        <div class="row q-pt-sm q-pl-sm">
+          <q-icon
+            name="o_auto_stories"
+            size="20px"
+            :color="leftMini ? 'grey-7' : 'indigo-6'"
+            class="cursor-pointer"
+            @click="leftMini = !leftMini"
+          />
+          <span class="text-h7 q-ml-sm q-mini-drawer-hide">Folios</span>
+        </div>
         <q-table
           :rows="pages"
           :columns="columns"
@@ -97,7 +52,7 @@
           :pagination="pagination"
           :rows-per-page-options="[0]"
           row-key="id"
-          class="sticky-header"
+          class="sticky-header q-mini-drawer-hide"
         >
           <template v-slot:top>
             <q-item-section avatar>
@@ -130,17 +85,32 @@
             <q-td :props="props"><BooleanIcon :value="props.value" /></q-td>
           </template>
         </q-table>
-      </q-tab-panel>
-      <q-tab-panel name="editor">
-        <SourceEditor />
-      </q-tab-panel>
-    </q-tab-panels>
+      </q-drawer>
+
+      <q-drawer
+        v-model="rightDrawer"
+        side="right"
+        :mini="rightMini"
+        mini-to-overlay
+        class="detail-drawer-right"
+        width="300"
+        mini-width="40"
+      >
+        <!-- drawer content -->
+      </q-drawer>
+
+      <q-page-container>
+        <q-page class="q-px-sm">
+          <SourceEditor />
+        </q-page>
+      </q-page-container>
+    </q-layout>
   </template>
 </template>
 
 <script>
 import { keys, map } from "ramda";
-import { defineComponent, provide, ref } from "vue";
+import { defineComponent, inject, provide, ref } from "vue";
 import { BooleanIcon } from "@/components/utils";
 import SourceEditor from "./SourceEditor.vue";
 
@@ -183,7 +153,11 @@ export default defineComponent({
   },
   setup(props) {
     const columns = ref([]);
-    const filter = ref("");
+    const filter = props.overview ? inject("cardFilter") : ref("");
+    const leftDrawer = ref(true);
+    const rightDrawer = ref(true);
+    const leftMini = ref(true);
+    const rightMini = ref(true);
 
     const currentFolio = ref(0);
     const updatecurrentFolio = (value) => {
@@ -217,6 +191,10 @@ export default defineComponent({
       noData,
       pagination,
       tab,
+      leftDrawer,
+      rightDrawer,
+      leftMini,
+      rightMini,
     };
   },
 });
