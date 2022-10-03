@@ -46,7 +46,6 @@ v2_router.register(r'places', v2_api.Places, basename='places')
 v2_router.register(r'sets', v2_api.Sets, basename='sets')
 v2_router.register(r'sources', v2_api.Sources, basename='sources')
 v2_router.register(r'tasks', v2_api.Tasks, basename='tasks')
-v2_router.register(r'tickets', v2_api.Tickets, basename='tickets')
 
 urlpatterns = [
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
