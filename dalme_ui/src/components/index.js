@@ -37,5 +37,4 @@ export { default as Tickets } from "./tickets";
 export { default as TicketDetail } from "./ticket-detail";
 export { default as Users } from "./users";
 export { default as UserDetail } from "./user-detail";
-export { default as UserPopover } from "./user-popover";
 export { default as Worksets } from "./worksets";

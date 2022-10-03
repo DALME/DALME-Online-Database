@@ -1,4 +1,5 @@
 export { default as BooleanIcon } from "./BooleanIcon.vue";
+export { default as DetailPopover } from "./DetailPopover.vue";
 export { getColumns, getDefaults } from "./processColumns.js";
 export { formatDate } from "./formatDate.js";
 export { default as OpaqueSpinner } from "./OpaqueSpinner.vue";
