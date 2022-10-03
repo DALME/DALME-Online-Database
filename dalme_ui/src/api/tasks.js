@@ -49,7 +49,7 @@ const tasks = {
   },
   getTaskLists() {
     return {
-      url: `${apiUrl}/tasklists`,
+      url: `${apiUrl}/tasklists/`,
       method: "GET",
     };
   },

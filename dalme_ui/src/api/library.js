@@ -5,7 +5,7 @@ const endpoint = `${apiUrl}/library`;
 const library = {
   getLibrary() {
     return {
-      url: endpoint,
+      url: `${endpoint}/`,
       method: "GET",
     };
   },
