@@ -69,6 +69,7 @@ router.beforeEach((to, from) => {
 
   $navStore.currentSection = currentSection;
   $navStore.currentSubsection = currentSubsection;
+  $navStore.currentPageIcon = to.meta.icon || "layers";
 });
 
 export default router;

@@ -7,7 +7,7 @@ const routes = [
         component: () => import("pages/dashboard/Dashboard.vue"),
         name: "Dashboard",
         path: "",
-        props: { icon: "dashboard" },
+        meta: { icon: "o_space_dashboard" },
         nav: true,
       },
 
@@ -17,7 +17,7 @@ const routes = [
         component: () => import("pages/source-root/SourceRoot.vue"),
         name: "Sources",
         path: "sources",
-        props: { icon: "bookmark" },
+        meta: { icon: "o_bookmarks" },
         nav: true,
         redirect: "/sources/records",
         children: [
@@ -25,9 +25,9 @@ const routes = [
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Archives",
             path: "archives",
-            props: { icon: "home_work" },
             nav: true,
             meta: {
+              icon: "o_home_work",
               sourceType: "archives",
               sourceTypeAPI: "archives",
             },
@@ -36,9 +36,9 @@ const routes = [
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Archival Files",
             path: "archival-files",
-            props: { icon: "inventory" },
             nav: true,
             meta: {
+              icon: "o_inventory_2",
               sourceType: "archivalFiles",
               sourceTypeAPI: "archival_files",
             },
@@ -47,9 +47,9 @@ const routes = [
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Records",
             path: "records",
-            props: { icon: "text_snippet" },
             nav: true,
             meta: {
+              icon: "o_text_snippet",
               sourceType: "records",
               sourceTypeAPI: "records",
             },
@@ -58,9 +58,9 @@ const routes = [
             component: () => import("pages/source-list/SourceList.vue"),
             name: "Bibliography",
             path: "bibilographies",
-            props: { icon: "local_library" },
             nav: true,
             meta: {
+              icon: "o_local_library",
               sourceType: "bibliography",
               sourceTypeAPI: "bibliography",
             },
@@ -73,7 +73,7 @@ const routes = [
         component: () => import("pages/set-root/SetRoot.vue"),
         name: "Sets",
         path: "sets",
-        props: { icon: "folder_copy" },
+        meta: { icon: "o_folder_copy" },
         nav: true,
         redirect: "/sets/datasets",
         children: [
@@ -81,9 +81,9 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Corpora",
             path: "corpora",
-            props: { icon: "drive_folder_upload" },
             nav: true,
             meta: {
+              icon: "o_drive_folder_upload",
               setType: "corpora",
               setTypeAPI: "corpora",
             },
@@ -92,9 +92,9 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Collections",
             path: "collections",
-            props: { icon: "folder_special" },
             nav: true,
             meta: {
+              icon: "o_folder_special",
               setType: "collections",
               setTypeAPI: "collections",
             },
@@ -103,9 +103,9 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Datasets",
             path: "datasets",
-            props: { icon: "topic" },
             nav: true,
             meta: {
+              icon: "o_topic",
               setType: "datasets",
               setTypeAPI: "datasets",
             },
@@ -114,9 +114,9 @@ const routes = [
             component: () => import("pages/set-list/SetList.vue"),
             name: "Worksets",
             path: "worksets",
-            props: { icon: "rule_folder" },
             nav: true,
             meta: {
+              icon: "o_rule_folder",
               setType: "worksets",
               setTypeAPI: "worksets",
             },
@@ -129,7 +129,7 @@ const routes = [
         component: () => import("pages/entity-root/EntityRoot.vue"),
         name: "Entities",
         path: "entities",
-        props: { icon: "api" },
+        meta: { icon: "o_hive" },
         nav: true,
         redirect: "/entities/agents",
         children: [
@@ -137,14 +137,14 @@ const routes = [
             component: () => import("pages/agent-list/AgentList.vue"),
             name: "Agents",
             path: "agents",
-            props: { icon: "groups" },
+            meta: { icon: "o_groups" },
             nav: true,
           },
           {
             component: () => import("pages/place-list/PlaceList.vue"),
             name: "Places",
             path: "places",
-            props: { icon: "place" },
+            meta: { icon: "o_place" },
             nav: true,
           },
         ],
@@ -155,7 +155,7 @@ const routes = [
         component: () => import("pages/project-root/ProjectRoot.vue"),
         name: "Project",
         path: "project",
-        props: { icon: "business_center" },
+        meta: { icon: "o_business_center" },
         nav: true,
         redirect: "/project/tasks",
         children: [
@@ -163,28 +163,28 @@ const routes = [
             component: () => import("pages/task-list/TaskList.vue"),
             name: "Tasks",
             path: "tasks",
-            props: { icon: "checklist" },
+            meta: { icon: "checklist" },
             nav: true,
           },
           {
             component: () => import("pages/ticket-list/TicketList.vue"),
             name: "Tickets",
             path: "tickets",
-            props: { icon: "bug_report" },
+            meta: { icon: "o_bug_report" },
             nav: true,
           },
           {
             component: () => import("pages/library-list/LibraryList.vue"),
             name: "Library",
             path: "library",
-            props: { icon: "menu_book" },
+            meta: { icon: "menu_book" },
             nav: true,
           },
           {
             component: () => import("pages/rights-list/RightsList.vue"),
             name: "Rights Policies",
             path: "rights",
-            props: { icon: "copyright" },
+            meta: { icon: "copyright" },
             nav: true,
           },
         ],
@@ -195,7 +195,7 @@ const routes = [
         component: () => import("pages/system-root/SystemRoot.vue"),
         name: "System",
         path: "system",
-        props: { icon: "display_settings" },
+        meta: { icon: "o_settings_applications" },
         nav: true,
         redirect: "/system/locales",
         children: [
@@ -203,35 +203,35 @@ const routes = [
             component: () => import("pages/locale-list/LocaleList.vue"),
             name: "Locales",
             path: "locales",
-            props: { icon: "location_city" },
+            meta: { icon: "location_city" },
             nav: true,
           },
           {
             component: () => import("pages/country-list/CountryList.vue"),
             name: "Countries",
             path: "countries",
-            props: { icon: "flag" },
+            meta: { icon: "o_flag" },
             nav: true,
           },
           {
             component: () => import("pages/language-list/LanguageList.vue"),
             name: "Languages",
             path: "languages",
-            props: { icon: "translate" },
+            meta: { icon: "o_g_translate" },
             nav: true,
           },
           {
             component: () => import("pages/user-list/UserList.vue"),
             name: "Users",
             path: "users",
-            props: { icon: "supervisor_account" },
+            meta: { icon: "o_supervisor_account" },
             nav: true,
           },
           {
             component: {},
             name: "Admin",
             path: "admin",
-            props: { icon: "admin_panel_settings" },
+            meta: { icon: "o_admin_panel_settings" },
             nav: true,
             beforeEnter(_) {
               window.location.replace("/admin");
@@ -250,6 +250,7 @@ const routes = [
         nav: false,
         meta: {
           navPath: ["Project", "Rights Policies"],
+          icon: "attribution",
         },
       },
       {
@@ -259,6 +260,7 @@ const routes = [
         nav: false,
         meta: {
           navPath: ["Sets"],
+          icon: "o_folder",
         },
       },
       {
@@ -268,6 +270,7 @@ const routes = [
         nav: false,
         meta: {
           navPath: ["Sources"],
+          icon: "bookmark_border",
         },
       },
       {
@@ -277,6 +280,7 @@ const routes = [
         nav: false,
         meta: {
           navPath: ["Project", "Tasks"],
+          icon: "add_task",
         },
       },
       {
@@ -286,6 +290,7 @@ const routes = [
         nav: false,
         meta: {
           navPath: ["Project", "Tickets"],
+          icon: "o_pest_control",
         },
       },
       {
@@ -295,6 +300,7 @@ const routes = [
         nav: false,
         meta: {
           navPath: ["System", "Users"],
+          icon: "person_outline",
         },
       },
     ],
