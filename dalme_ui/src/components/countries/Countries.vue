@@ -1,10 +1,10 @@
 <template>
-  <BasicTable
+  <Table
     :columns="columns"
-    :filter="filter"
+    :search="search"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
     :onRequest="onRequest"
@@ -16,64 +16,19 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import BasicTable from "@/components/basic-table/BasicTable.vue";
+import Table from "@/components/table/Table.vue";
 import { getColumns, getDefaults } from "@/components/utils";
 import { countryListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
-
-const columnMap = {
-  name: {
-    label: "Name",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: true,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-  },
-  alpha2Code: {
-    label: "Alpha 2 Code",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-    autoWidth: true,
-  },
-  alpha3Code: {
-    label: "Alpha 3 Code",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-    autoWidth: true,
-  },
-  numCode: {
-    label: "Numeric Code",
-    align: "left",
-    sortable: true,
-    sortOrder: "ad",
-    isSortDefault: false,
-    classes: null,
-    headerClasses: "text-no-wrap",
-    isDefaultVisible: true,
-    autoWidth: true,
-  },
-};
+import { columnMap } from "./columns";
 
 export default defineComponent({
   name: "Countries",
   components: {
-    BasicTable,
+    Table,
   },
   setup() {
     const $route = useRoute();
@@ -84,8 +39,8 @@ export default defineComponent({
     const noData = "No countries found.";
     const title = "Countries";
 
-    const fetchData = async () => {
-      const request = requests.countries.getCountries();
+    const fetchData = async (query) => {
+      const request = requests.countries.getCountries(query);
       await fetchAPI(request);
       if (success.value)
         await countryListSchema
@@ -101,12 +56,12 @@ export default defineComponent({
 
     const {
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
+      search,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap));
 
@@ -114,18 +69,16 @@ export default defineComponent({
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
 
-    onMounted(async () => await fetchData());
-
     return {
       columns,
-      filter,
       loading,
       noData,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
       onRequest,
       pagination,
+      search,
       rows,
       title,
       visibleColumns,
