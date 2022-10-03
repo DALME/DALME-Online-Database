@@ -34,8 +34,7 @@ export const commentSchema = yup
   .camelCase();
 
 export const commentsSchema = yup.object().shape({
-  count: yup.number().required(),
-  next: yup.string().nullable(),
-  previous: yup.string().nullable(),
-  results: yup.array().of(commentSchema),
+  data: yup.array().of(commentSchema),
+  recordsFiltered: yup.number().required(),
+  recordsTotal: yup.number().required(),
 });

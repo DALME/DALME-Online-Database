@@ -1,12 +1,5 @@
-import moment from "moment";
-import { head } from "ramda";
 import * as yup from "yup";
-
-export const attachmentSchema = yup.object().shape({
-  filename: yup.string().required(),
-  source: yup.string().required(),
-  type: yup.string().required(),
-});
+import { attachmentSchema, userRefSchema } from "@/schemas";
 
 export const ticketDetailSchema = yup
   .object()
@@ -14,33 +7,34 @@ export const ticketDetailSchema = yup
     id: yup.number().required(),
     status: yup.boolean().required(),
     subject: yup.string().required(),
-    description: yup.string().default(null).nullable(),
-    tags: yup
+    description: yup
       .string()
-      .transform((_, originalValue) =>
-        head(originalValue).tag !== "0" ? head(originalValue).tag.trim() : "",
-      ),
-    file: attachmentSchema.default(null).nullable(),
-    commentCount: yup
-      .number()
       .default(null)
       .nullable()
-      .transform((value) => (value === 0 ? null : value)),
-    creationUser: yup
-      .object()
-      .shape({
-        id: yup.number().required(),
-        username: yup.string().required(),
-        fullName: yup.string().nullable(),
-        avatar: yup.string().url().default(null).nullable(),
-      })
-      .camelCase(),
-    creationTimestamp: yup
-      .string()
-      .transform((value) => moment(new Date(value)).format("DD-MMM-YYYY")),
-    closingDate: yup
-      .string()
-      .transform((value) => moment(new Date(value)).format("DD-MMM-YYYY")),
+      .transform((_, value) => {
+        return value === null ? "" : String(value);
+      }),
+    tags: yup.array().of(
+      yup
+        .object()
+        .shape({
+          tag: yup
+            .string()
+            // necessary to deal with malformed tags
+            .nullable()
+            .transform((value) => (value === "0" ? null : value)),
+          tagTypeName: yup.string().required(),
+        })
+        .camelCase(),
+    ),
+    file: attachmentSchema.default(null).nullable(),
+    commentCount: yup.number().default(0).nullable(),
+    creationUser: userRefSchema.required(),
+    creationTimestamp: yup.string(),
+    modificationUser: userRefSchema.required(),
+    modificationTimestamp: yup.string(),
+    closingUser: userRefSchema.default(null).nullable(),
+    closingDate: yup.string().default(null).nullable(),
   })
   .camelCase();
 
@@ -61,32 +55,23 @@ export const ticketSchema = yup
       yup
         .object()
         .shape({
-          tag: yup.string().required(),
-          tagTypeName: yup.string().required(),
+          tag: yup
+            .string()
+            // necessary to deal with malformed tags
+            .nullable()
+            .transform((value) => (value === "0" ? null : value)),
         })
         .camelCase(),
     ),
-    file: yup.string().default(null).nullable(),
-    commentCount: yup
-      .number()
-      .default(null)
-      .nullable()
-      .transform((value) => (value === 0 ? null : value)),
-    creationUser: yup
-      .object()
-      .shape({
-        id: yup.number().required(),
-        username: yup.string().required(),
-        fullName: yup.string().required(),
-        avatar: yup.string().url().default(null).nullable(),
-      })
-      .camelCase(),
-    creationTimestamp: yup
-      .string()
-      .transform((value) => moment(new Date(value)).format("DD-MMM-YYYY")),
-    closingDate: yup
-      .string()
-      .transform((value) => moment(new Date(value)).format("DD-MMM-YYYY")),
+    file: attachmentSchema.default(null).nullable(),
+    commentCount: yup.number().default(0).nullable(),
+    creationUser: userRefSchema.required(),
+    creationTimestamp: yup.string(),
+    modificationUser: userRefSchema.required(),
+    modificationTimestamp: yup.string(),
+    closingUser: userRefSchema.default(null).nullable(),
+    closingDate: yup.string().default(null).nullable(),
+    url: yup.string().url().default(null).nullable(),
   })
   .camelCase();
 

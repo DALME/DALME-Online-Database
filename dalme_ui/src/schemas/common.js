@@ -1,6 +1,12 @@
 import { isNil } from "ramda";
 import * as yup from "yup";
 
+export const attachmentSchema = yup.object().shape({
+  filename: yup.string().required(),
+  source: yup.string().required(),
+  type: yup.string().required(),
+});
+
 export const apiOptionSchema = yup
   .object()
   .shape({
@@ -27,3 +33,10 @@ export const ownerSchema = yup
     fullName: yup.string().nullable(),
   })
   .camelCase();
+
+export const userRefSchema = yup.object().shape({
+  id: yup.number().required(),
+  username: yup.string().required(),
+  fullName: yup.string().required(),
+  avatar: yup.string().default(null).nullable(),
+});

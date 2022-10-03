@@ -1,8 +1,8 @@
 import moment from "moment";
-import { head, isNil } from "ramda";
+import { isNil } from "ramda";
 import * as yup from "yup";
 
-import { taskListSchema } from "@/schemas";
+import { attachmentSchema, taskListSchema, userRefSchema } from "@/schemas";
 
 // Field-level validation rules/schemas.
 export const taskFieldValidation = {
@@ -49,42 +49,25 @@ export const taskSchema = yup
   .object()
   .shape({
     id: yup.number().required(),
-    assignedTo: yup.string().required(),
+    assignedTo: userRefSchema.default(null).nullable(),
     completed: yup.boolean().required(),
     title: yup.string().required(),
     description: yup.string().required(),
     completedDate: yup.string().default(null).nullable(),
-    createdBy: yup.number().required(),
     creationTimestamp: yup.string().required(),
+    creationUser: userRefSchema.required(),
+    modificationTimestamp: yup.string().required(),
+    modificationUser: userRefSchema.required(),
     dueDate: yup.string().default(null).nullable(),
+    overdueStatus: yup.boolean().default(null).nullable(),
+    url: yup.string().url().default(null).nullable(),
+    workset: yup.number().default(null).nullable(),
+    file: attachmentSchema.default(null).nullable(),
+    commentCount: yup.number().default(null).nullable(),
     taskList: taskListSchema.shape({
       taskCount: yup.number().default(null).nullable(),
       taskIndex: yup.array().of(yup.number()).default(null).nullable(),
     }),
-    creationUser: yup
-      .object()
-      .shape({
-        id: yup.number().required(),
-        username: yup.string().required(),
-        fullName: yup.string().required(),
-        avatar: yup.string().url().default(null).nullable(),
-      })
-      .camelCase(),
-    attachments: yup
-      .mixed() // TODO: What's this supposed to be.
-      .transform((value) => {
-        if (value) {
-          const node = document.createElement("html");
-          node.innerHTML = value;
-          const link = head(node.getElementsByTagName("a"));
-          const url = link.getAttribute("href");
-          const kind = link.innerText;
-          return { url, kind };
-        }
-        return value;
-      })
-      .default(null)
-      .nullable(),
   })
   .camelCase();
 

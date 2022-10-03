@@ -72,14 +72,21 @@ const datasetSchema = yup
 const worksetSchema = yup
   .object()
   .shape({
-    id: yup.string().uuid().required(),
-    name: yup.string().required(),
-    memberCount: yup.number().required(),
+    creationTimestamp: yup.string().required(),
+    datasetUsergroup: yup.string().default(null).nullable(),
     description: yup.string().required(),
+    detailString: yup.string().required(),
     endpoint: yup.string().required(),
+    hasLanding: yup.boolean().default(null).nullable(),
+    id: yup.string().uuid().required(),
+    isPublic: yup.boolean().default(null).nullable(),
+    memberCount: yup.number().required(),
+    name: yup.string().required(),
     owner: ownerSchema.required(),
     permissions: permissionSchema.required(),
     worksetProgress: yup.number().required(),
+    publicMemberCount: yup.number().required(),
+    setType: setTypeSchema.required(),
   })
   .camelCase();
 

@@ -10,7 +10,6 @@ import {
 import {
   taskEditSchema,
   taskFieldValidation,
-  taskListOptionsSchema,
   taskPutSchema,
   taskPostSchema,
   userOptionsSchema,
@@ -40,7 +39,6 @@ const taskFormSchema = {
       fetcher(requests.tasks.getTaskLists()).then((response) =>
         response.json(),
       ),
-    optionsSchema: taskListOptionsSchema,
     validation: taskFieldValidation.taskList,
   },
   assignedTo: {

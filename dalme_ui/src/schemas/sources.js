@@ -3,7 +3,7 @@ import * as yup from "yup";
 
 import { normalizeAttributesOutput } from "@/components/forms/attributes-field/normalize";
 
-import { ownerSchema } from "./common";
+import { ownerSchema, userRefSchema } from "./common";
 
 export const sourceOptionsSchema = yup.array().of(
   yup
@@ -54,6 +54,13 @@ const languageSchema = yup.object().shape({
   id: yup.object().shape({ id: yup.number().required() }).required(),
 });
 
+const logEventSchema = yup.object().shape({
+  event: yup.string().required(),
+  id: yup.number().required(),
+  timestamp: yup.string().required(),
+  user: userRefSchema.required(),
+});
+
 const workflowSchema = yup
   .object()
   .shape({
@@ -66,16 +73,39 @@ const workflowSchema = yup
     markupDone: yup.boolean().required(),
     reviewDone: yup.boolean().required(),
     parsingDone: yup.boolean().default(null).nullable(),
-    activity: yup.object().shape({
-      timestamp: yup.string().required(),
-      user: yup.string().required(),
-      username: yup.string().required(),
-    }),
-    status: yup.object().shape({
-      cssClass: yup.string().required(),
-      text: yup.string().required(),
-      titleText: yup.string().required(),
-    }),
+    lastModified: yup.string().required(),
+    lastUser: yup
+      .object()
+      .shape({
+        profile: yup
+          .object()
+          .shape({
+            fullName: yup.string().required(),
+            primaryGroup: yup
+              .object()
+              .shape({
+                description: yup.string().required(),
+                id: yup.number().required(),
+                name: yup.string().required(),
+              })
+              .required()
+              .camelCase(),
+          })
+          .required()
+          .camelCase(),
+        username: yup.string().required(),
+      })
+      .required()
+      .camelCase(),
+    status: yup
+      .object()
+      .shape({
+        text: yup.string().required(),
+        tag: yup.string().required(),
+      })
+      .required()
+      .camelCase(),
+    workLog: yup.array().of(logEventSchema).default(null).nullable(),
   })
   .camelCase();
 
@@ -200,24 +230,7 @@ export const recordSourceSchema = yup
     noFolios: yup.number().required(),
     owner: ownerSchema.required(),
     isPrivate: yup.boolean().required(),
-    workflow: yup
-      .object()
-      .shape({
-        activity: yup.object().shape({
-          timestamp: yup.string().required(),
-          user: yup.string().required(),
-          username: yup.string().required(),
-        }),
-        helpFlag: yup.boolean().required(),
-        isPublic: yup.boolean().required(),
-        status: yup.object().shape({
-          cssClass: yup.string().required(),
-          text: yup.string().required(),
-          titleText: yup.string().required(),
-        }),
-      })
-      .required()
-      .camelCase(),
+    workflow: workflowSchema.default(null).nullable(),
     attributes: yup
       .object()
       .shape({

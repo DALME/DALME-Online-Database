@@ -32,7 +32,7 @@ export const userSelectSchema = yup.array().of(
     })),
 );
 
-const groupSchema = yup.object().shape({
+export const groupSchema = yup.object().shape({
   id: yup.number().required(),
   name: yup.string().required(),
   description: yup.string().required(),
@@ -42,6 +42,8 @@ export const userSchema = yup
   .object()
   .shape({
     id: yup.number().required(),
+    username: yup.string().required(),
+    fullName: yup.string().nullable(),
     firstName: yup.string().required(),
     lastName: yup.string().required(),
     email: yup.string().email().required(),
@@ -65,30 +67,43 @@ export const userSchema = yup
       .object()
       .shape({
         fullName: yup.string().required(),
+        primaryGroup: yup
+          .object()
+          .shape({
+            id: yup.number().required(),
+            name: yup.string().required(),
+            description: yup.string().required(),
+          })
+          .default(null)
+          .nullable(),
       })
-      .required()
+      .default(null)
+      .nullable()
       .camelCase(),
     avatar: yup.string().default(null).nullable(),
   })
   .camelCase();
 
-export const userListSchema = yup.array().of(
-  yup
-    .object()
-    .shape({
-      id: yup.number().required(),
-      username: yup.string().required(),
-      // TODO: Should be required but I don't have a profile.
-      fullName: yup.string().nullable(),
-      email: yup.string().required(),
-      lastLogin: yup
-        .string()
-        .required()
-        .transform((value) =>
-          moment(new Date(value)).format("DD-MMM-YYYY HH:mm"),
-        ),
-      isActive: yup.boolean().required(),
-      isStaff: yup.boolean().required(),
-    })
-    .camelCase(),
-);
+export const userListSchema = yup.array().of(userSchema);
+
+// export const userListSchema = yup.array().of(
+//   yup
+//     .object()
+//     .shape({
+//       id: yup.number().required(),
+//       username: yup.string().required(),
+//       // TODO: Should be required but I don't have a profile.
+//       fullName: yup.string().nullable(),
+//       email: yup.string().required(),
+//       lastLogin: yup
+//         .string()
+//         .required()
+//         .transform((value) =>
+//           moment(new Date(value)).format("DD-MMM-YYYY HH:mm"),
+//         ),
+//       isActive: yup.boolean().required(),
+//       isStaff: yup.boolean().required(),
+//       avatar: yup.string().default(null).nullable(),
+//     })
+//     .camelCase(),
+// );
