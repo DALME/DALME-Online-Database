@@ -99,9 +99,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.comment_threadline {
-  background: linear-gradient(#e0e0e0, #e0e0e0) no-repeat 70px/2px 100%;
-}
-</style>

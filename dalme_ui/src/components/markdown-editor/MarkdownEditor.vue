@@ -399,35 +399,47 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .md-editor-tabs {
-  max-width: 180px;
-  margin-top: -36px;
+  margin-bottom: -1px;
 }
 .md-editor-tabs .q-tab.q-tab--active {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  border-left: 1px solid #e0e0e0;
-  border-top: 1px solid #e0e0e0;
-  border-right: 1px solid #e0e0e0;
+  border-left: 1px solid rgb(209, 209, 209);
+  border-top: 1px solid rgb(209, 209, 209);
+  border-right: 1px solid rgb(209, 209, 209);
   border-bottom: 1px solid white;
-  margin-bottom: -1px;
 }
 .md-panels .q-field--outlined .q-field__control:before {
-  border-color: #e0e0e0;
-  border-bottom: none;
+  border-color: rgb(209, 209, 209);
+  border-bottom-style: dashed;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 .md-editor-footer {
   display: flex;
   border-top: none;
-  border-left: 1px solid rgba(0, 0, 0, 0.24);
-  border-right: 1px solid rgba(0, 0, 0, 0.24);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.24);
+  border-left: 1px solid rgb(209, 209, 209);
+  border-right: 1px solid rgb(209, 209, 209);
+  border-bottom: 1px solid rgb(209, 209, 209);
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
+}
+.md-editor-textbox .q-field__control {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.md-editor-button {
+  font-size: 11px;
+  padding: 4px;
+  margin-right: 2px;
+}
+.md-editor-button:last-of-type {
+  margin-right: 0;
 }
 </style>

@@ -346,32 +346,95 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
-.q-list {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+<style lang="scss">
 .q-toolbar {
   background-color: #2f333c;
-  background-image: linear-gradient(78deg, #11587c 1%, #1b1b1b);
+  background-image: linear-gradient(180deg, #072034 10%, #1b1b1b);
   background-size: cover;
-}
-.tbar-separator {
-  background: rgb(87 112 125 / 49%);
 }
 .user-menu {
   min-width: 200px;
 }
-.q-expansion-item--expanded {
-  background: #ffffff;
-  color: #616161;
+.menu-breadcrumb {
+  font-size: 20px;
 }
-.q-list--separator > .q-item-type + .q-item-type {
-  border-top: 1px dotted rgba(0, 0, 0, 0.12);
+.menu-bar {
+  gap: 8px;
+  margin-top: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
-.mini-prefs-icon {
-  height: 64px;
-  padding: 8px 2px;
+.menu-button {
+  position: relative;
+  display: flex;
+  padding: 0px 9px 0px 6px;
+  font-size: 14px !important;
+  font-weight: 500;
+  line-height: 30px;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: transparent;
+  border: 0;
+  border-radius: 6px;
+  align-items: center;
+  list-style: none !important;
+}
+.menu-button::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
+  content: "";
+  transform: translateX(-50%) translateY(-50%);
+}
+.menu-button.active::after {
+  position: absolute;
+  right: 50%;
+  bottom: calc(50% - 27px);
+  width: 100%;
+  height: 2px;
+  content: "";
+  background: #3f51b5;
+  border-radius: 6px;
+  transform: translate(50%, -50%);
+}
+.menu-button.active {
+  font-weight: 700;
+}
+.menu-button [data-content]::before {
+  display: block;
+  height: 0;
+  font-weight: 600;
+  visibility: hidden;
+  content: attr(data-content);
+}
+.menu-search .q-field__control {
+  height: 30px;
+  border: 1px solid rgb(87, 96, 106);
+}
+.menu-search .q-field__native,
+.menu-search .q-field__marginal {
+  height: 28px;
+}
+.menu-search .q-field__native::placeholder {
+  color: rgb(226, 226, 226);
+}
+.menu-search.q-field--standout.q-field--dark.q-field--highlighted
+  .q-field__native::placeholder {
+  color: rgb(20, 20, 20);
+}
+.menu-search.q-field--standout.q-field--dark .q-field__control {
+  background: rgba(255, 255, 255, 0.01);
+}
+.menu-search.q-field--standout.q-field--dark.q-field--highlighted
+  .q-field__control {
+  background: rgb(255, 255, 255);
+}
+.page-header-button {
+  border: 1px solid rgb(209, 209, 209);
+  border-radius: 4px;
+  height: 32px;
 }
 </style>

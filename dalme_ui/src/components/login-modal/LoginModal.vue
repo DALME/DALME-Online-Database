@@ -180,7 +180,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .login-modal {
   min-width: 400px;
 }
@@ -196,5 +196,9 @@ export default defineComponent({
 .login-card-body {
   background-color: #fcfcfc;
   padding: 25px 40px;
+}
+.frosted-background > .q-dialog__backdrop {
+  background: none;
+  backdrop-filter: blur(10px) grayscale(70%);
 }
 </style>

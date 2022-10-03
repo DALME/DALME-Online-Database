@@ -53,3 +53,8 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss">
+.icon-adj {
+  padding: 8px 18px;
+}
+</style>
