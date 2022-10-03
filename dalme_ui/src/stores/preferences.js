@@ -50,8 +50,5 @@ export const usePrefStore = defineStore("preferences", {
       return null;
     },
   },
-  persist: {
-    // https://prazdevs.github.io/pinia-plugin-persistedstate/guide/config.html
-    storage: sessionStorage, // default is localStorage
-  },
+  persist: true,
 });
