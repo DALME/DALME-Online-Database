@@ -1,6 +1,8 @@
 <template>
   <Page>
-    <div class="full-width full-height"><SourceDetail /></div>
+    <div class="full-width full-height q-px-content-visual">
+      <SourceDetail />
+    </div>
   </Page>
 </template>
 

@@ -1,18 +1,111 @@
 <template>
-  <BasicTable
+  <Table
+    grid
     :columns="columns"
-    :filter="filter"
+    :search="search"
+    :filterList="filterList"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onChangeFilters="onChangeFilters"
+    :onClearFilters="onClearFilters"
     :onRequest="onRequest"
     :pagination="pagination"
     :rows="rows"
+    :sortList="sortList"
     :title="title"
     :visibleColumns="visibleColumns"
   >
+    <template v-slot:grid-avatar="props">
+      <q-icon
+        :name="getStatusIcon(props.row.rightsStatus.id)"
+        :color="getStatusColours(props.row.rightsStatus.id).text"
+        size="22px"
+      />
+    </template>
+
+    <template v-slot:grid-main="props">
+      <DetailPopover
+        linkClass="text-h7 title-link"
+        :linkTarget="{ name: 'Rights', params: { id: props.row.id } }"
+        :linkText="props.row.name"
+      >
+        <div class="text-detail text-weight-medium text-grey-8 q-mb-sm">
+          Created by {{ props.row.creationUser.username }}
+          {{ formatDate(props.row.creationTimestamp, false) }}
+        </div>
+        <div v-if="props.row.rightsHolder" class="text-h8 q-mb-xs">
+          <span class="text-grey-7">Rights Holder:</span>
+          {{ props.row.rightsHolder }}
+        </div>
+        <div v-if="props.row.rights" class="text-detail q-mb-xs">
+          {{ props.row.rights }}
+        </div>
+        <div v-if="props.row.licence" class="text-detail q-mb-xs">
+          <b>Licence:</b> {{ props.row.licence }}
+        </div>
+        <div v-if="props.row.rightsNotice" class="text-detail q-mb-xs">
+          <b>Notice:</b> {{ props.row.rightsNotice }}
+        </div>
+      </DetailPopover>
+      <Tag
+        v-if="props.row.licence"
+        name="licence"
+        colour="orange-1"
+        textColour="orange-8"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+      <Tag
+        v-if="props.row.publicDisplay"
+        :name="props.row.noticeDisplay ? 'display+notice' : 'display'"
+        colour="light-blue-1"
+        textColour="light-blue-8"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+    </template>
+
+    <template v-slot:grid-detail="props">
+      <div class="text-detail text-weight-medium text-grey-8">
+        <span v-if="props.row.rights" v-text="props.row.rights" />
+        <span v-else>No rights specified</span>
+      </div>
+    </template>
+
+    <template v-slot:grid-counter="props">
+      <q-icon
+        name="chat_bubble_outline"
+        size="17px"
+        v-if="props.row.commentCount"
+        class="text-weight-bold q-mr-xs"
+      />
+      <div
+        v-if="props.row.commentCount"
+        class="text-grey-8 text-weight-bold text-detail"
+      >
+        {{ props.row.commentCount }}
+      </div>
+    </template>
+
+    <template v-slot:grid-counter-extra="props">
+      <q-btn
+        v-if="props.row.attachments"
+        flat
+        dense
+        @click.stop="openURL(props.row.attachments.source)"
+        target="_blank"
+        color="blue-gray-6"
+        size="sm"
+        icon="o_text_snippet"
+        text-color="blue-gray-6"
+      />
+    </template>
+
     <template v-slot:render-cell-name="props">
       <router-link
         class="text-link"
@@ -55,28 +148,40 @@
         text-color="blue-gray-6"
       />
     </template>
-  </BasicTable>
+  </Table>
 </template>
 
 <script>
 import { openURL } from "quasar";
-import { defineComponent, onMounted, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
+import { useConstantStore } from "@/stores/constants";
 import { requests } from "@/api";
-import BasicTable from "@/components/basic-table/BasicTable.vue";
-import { BooleanIcon, getColumns, getDefaults } from "@/components/utils";
+import { Table } from "@/components";
+import {
+  BooleanIcon,
+  DetailPopover,
+  formatDate,
+  getColumns,
+  getDefaults,
+  Tag,
+} from "@/components/utils";
 import { rightsListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";
+import { filterList, sortList } from "./filters";
 
 export default defineComponent({
   name: "Rights",
   components: {
-    BasicTable,
+    DetailPopover,
     BooleanIcon,
+    Table,
+    Tag,
   },
   setup() {
     const $route = useRoute();
+    const $constantStore = useConstantStore();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
@@ -84,8 +189,11 @@ export default defineComponent({
     const noData = "No rights found.";
     const title = "Rights";
 
-    const fetchData = async () => {
-      const request = requests.rights.getRights();
+    const getStatusIcon = (id) => $constantStore.rightsIconById[id];
+    const getStatusColours = (id) => $constantStore.rightsColoursById[id];
+
+    const fetchData = async (query) => {
+      const request = requests.rights.getRights(query);
       await fetchAPI(request);
       if (success.value)
         await rightsListSchema
@@ -100,34 +208,43 @@ export default defineComponent({
     };
 
     const {
+      activeFilters,
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
+      onChangeFilters,
+      onClearFilters,
       onRequest,
       pagination,
+      search,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap));
 
     provide("pagination", { pagination, fetchDataPaginated });
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
-
-    onMounted(async () => await fetchData());
+    provide("activeFilters", activeFilters);
 
     return {
       columns,
-      filter,
+      filterList,
+      formatDate,
+      getStatusIcon,
+      getStatusColours,
       loading,
       noData,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
+      onChangeFilters,
+      onClearFilters,
       openURL,
       onRequest,
       pagination,
       rows,
+      search,
+      sortList,
       title,
       visibleColumns,
     };

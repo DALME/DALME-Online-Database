@@ -1,18 +1,91 @@
 <template>
-  <BasicTable
+  <Table
+    grid
     :columns="columns"
-    :filter="filter"
+    :search="search"
+    :filterList="filterList"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onChangeFilters="onChangeFilters"
+    :onClearFilters="onClearFilters"
     :onRequest="onRequest"
     :pagination="pagination"
     :rows="rows"
+    :sortList="sortList"
     :title="title"
     :visibleColumns="visibleColumns"
   >
+    <template v-slot:grid-avatar="props">
+      <q-avatar v-if="notNully(props.row.avatar)" size="24px">
+        <img :src="props.row.avatar" />
+      </q-avatar>
+      <q-icon v-else name="account_circle" size="sm" />
+    </template>
+
+    <template v-slot:grid-main="props">
+      <DetailPopover
+        linkClass="text-h7 title-link"
+        :linkTarget="{ name: 'User', params: { username: props.row.username } }"
+        :linkText="props.row.fullName"
+      >
+        <div class="text-h8 q-mb-xs">
+          {{ props.row.username }}
+        </div>
+      </DetailPopover>
+      <Tag
+        v-if="props.row.isActive"
+        name="active"
+        colour="light-green-1"
+        textColour="light-green-9"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+      <Tag
+        v-if="props.row.isStaff"
+        name="staff"
+        colour="light-blue-1"
+        textColour="light-blue-8"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+      <Tag
+        v-if="props.row.isSuperuser"
+        name="super"
+        colour="orange-1"
+        textColour="orange-8"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+    </template>
+
+    <template v-slot:grid-detail="props">
+      <span class="text-detail text-weight-medium text-grey-8">
+        #{{ props.row.id }} | {{ props.row.username }} |
+        <a class="text-link" :href="`mailto:${props.row.email}`">
+          {{ props.row.email }}
+        </a>
+      </span>
+    </template>
+
+    <template v-slot:grid-counter="props">
+      <div class="text-detail text-weight-medium text-grey-8 q-ml-auto">
+        Joined {{ formatDate(props.row.dateJoined, false) }}
+      </div>
+    </template>
+
+    <template v-slot:grid-counter-extra="props">
+      <div class="text-detail text-weight-medium text-grey-8 q-ml-auto">
+        Last active
+        {{ formatDate(props.row.lastLogin, false) }}
+      </div>
+    </template>
+
     <template v-slot:render-cell-username="props">
       <router-link
         class="text-link"
@@ -47,24 +120,35 @@
         trueIcon="check_circle"
       />
     </template>
-  </BasicTable>
+  </Table>
 </template>
 
 <script>
-import { defineComponent, onMounted, provide, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import BasicTable from "@/components/basic-table/BasicTable.vue";
-import { BooleanIcon, getColumns, getDefaults } from "@/components/utils";
+import Table from "@/components/table/Table.vue";
+import {
+  BooleanIcon,
+  DetailPopover,
+  formatDate,
+  getColumns,
+  getDefaults,
+  notNully,
+  Tag,
+} from "@/components/utils";
 import { userListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";
+import { filterList, sortList } from "./filters";
 
 export default defineComponent({
   name: "Users",
   components: {
-    BasicTable,
     BooleanIcon,
+    DetailPopover,
+    Table,
+    Tag,
   },
   setup() {
     const $route = useRoute();
@@ -75,8 +159,8 @@ export default defineComponent({
     const noData = "No users found.";
     const title = "Users";
 
-    const fetchData = async () => {
-      const request = requests.users.getUsers();
+    const fetchData = async (query) => {
+      const request = requests.users.getUsers(query);
       await fetchAPI(request);
       if (success.value)
         await userListSchema
@@ -91,33 +175,41 @@ export default defineComponent({
     };
 
     const {
+      activeFilters,
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
+      onChangeFilters,
+      onClearFilters,
       onRequest,
       pagination,
+      search,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap));
 
     provide("pagination", { pagination, fetchDataPaginated });
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
-
-    onMounted(async () => await fetchData());
+    provide("activeFilters", activeFilters);
 
     return {
       columns,
-      filter,
       loading,
+      filterList,
+      formatDate,
       noData,
-      onChangeFilter,
+      notNully,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
+      onChangeFilters,
+      onClearFilters,
       onRequest,
       pagination,
       rows,
+      search,
+      sortList,
       title,
       visibleColumns,
     };

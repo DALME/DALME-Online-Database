@@ -1,18 +1,94 @@
 <template>
-  <BasicTable
+  <Table
+    grid
+    useExpansion
     :columns="columns"
-    :filter="filter"
+    :search="search"
+    :filterList="filterList"
     :loading="loading"
     :noData="noData"
-    :onChangeFilter="onChangeFilter"
+    :onChangeSearch="onChangeSearch"
     :onChangePage="onChangePage"
     :onChangeRowsPerPage="onChangeRowsPerPage"
+    :onChangeFilters="onChangeFilters"
+    :onClearFilters="onClearFilters"
     :onRequest="onRequest"
     :pagination="pagination"
     :rows="rows"
+    :sortList="sortList"
     :title="title"
     :visibleColumns="visibleColumns"
   >
+    <template v-slot:grid-avatar="props">
+      <Tag
+        mini
+        module="workflow"
+        size="22px"
+        :type="props.row.workflow.status.tag"
+        :wfStage="props.row.workflow.stage"
+        :wfStatus="props.row.workflow.wfStatus"
+      />
+    </template>
+
+    <template v-slot:grid-main="props">
+      <DetailPopover
+        linkClass="text-h7 title-link"
+        :linkTarget="{ name: 'Source', params: { id: props.row.id } }"
+        :linkText="props.row.name"
+      >
+        <div class="text-h8 q-mb-xs">
+          {{ props.row.name }}
+        </div>
+      </DetailPopover>
+      <Tag
+        v-if="props.row.workflow.isPublic"
+        name="public"
+        colour="light-blue-1"
+        textColour="light-blue-9"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+      <Tag
+        v-if="props.row.isPrivate"
+        name="private"
+        colour="deep-orange-1"
+        textColour="deep-orange-8"
+        size="xs"
+        module="standalone"
+        class="q-ml-sm"
+      />
+    </template>
+
+    <template v-slot:grid-detail="props">
+      <span class="text-detail text-weight-medium text-grey-8">
+        {{ props.row.attributes.recordType }} |
+        <span v-html="renderDate(props.row.attributes)"></span>
+      </span>
+    </template>
+
+    <template v-slot:grid-counter="props">
+      <q-icon
+        name="o_import_contacts"
+        size="17px"
+        v-if="props.row.noFolios"
+        class="text-weight-bold q-mr-xs"
+      />
+      <div class="text-grey-8 text-weight-bold text-detail">
+        {{ props.row.noFolios }}
+      </div>
+    </template>
+
+    <template v-slot:grid-counter-extra="props">
+      <q-icon
+        name="flag"
+        size="17px"
+        v-if="props.row.workflow.helpFlag"
+        color="red-4"
+        class="text-weight-bold q-mr-xs"
+      />
+    </template>
+
     <template v-slot:render-cell-name="props">
       <router-link
         class="text-subtitle2 text-link"
@@ -90,7 +166,11 @@
     </template>
 
     <template v-slot:render-cell-status="props">
-      <WorkflowTag :status="props.row.workflow.status" />
+      <Tag
+        :name="props.row.workflow.status.text"
+        :type="props.row.workflow.status.tag"
+        module="workflow"
+      />
     </template>
 
     <template v-slot:render-cell-helpFlag="props">
@@ -108,13 +188,13 @@
           class="text-link"
           :to="{
             name: 'User',
-            params: { username: props.row.workflow.activity.username },
+            params: { username: props.row.workflow.lastUser.username },
           }"
         >
-          {{ props.row.workflow.activity.user }}
+          {{ props.row.workflow.lastUser.profile.fullName }}
         </router-link>
         <br />
-        {{ props.row.workflow.activity.timestamp }}
+        {{ props.row.workflow.lastModified }}
       </span>
     </template>
 
@@ -150,7 +230,7 @@
     <template v-slot:render-cell-zoteroKey="props">
       {{ props.row.attributes.zoteroKey }}
     </template>
-  </BasicTable>
+  </Table>
 </template>
 
 <script>
@@ -158,25 +238,26 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { BasicTable } from "@/components";
-
+import { Table } from "@/components";
 import {
   BooleanIcon,
+  DetailPopover,
   getColumns,
   getDefaults,
-  WorkflowTag,
+  Tag,
 } from "@/components/utils";
-
 import { sourceListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnsByType } from "./columns";
+import { filtersByType, sortByType } from "./filters";
 
 export default defineComponent({
   name: "Sources",
   components: {
-    BasicTable,
     BooleanIcon,
-    WorkflowTag,
+    DetailPopover,
+    Table,
+    Tag,
   },
   setup() {
     const $route = useRoute();
@@ -194,10 +275,18 @@ export default defineComponent({
       return columnsByType($route.meta.sourceType);
     });
 
+    const filterList = computed(() => {
+      return filtersByType($route.meta.sourceType);
+    });
+
+    const sortList = computed(() => {
+      return sortByType($route.meta.sourceType);
+    });
+
     const noData = "No sources found.";
     const renderDate = (attributes) => {
       if (attributes.startDate && attributes.endDate) {
-        return `${attributes.startDate.name}<br>${attributes.endDate.name}`;
+        return `${attributes.startDate.name} – ${attributes.endDate.name}`;
       }
       if (attributes.startDate) {
         return attributes.startDate.name;
@@ -226,13 +315,16 @@ export default defineComponent({
     };
 
     const {
+      activeFilters,
       fetchDataPaginated,
-      filter,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
+      onChangeFilters,
+      onClearFilters,
       onRequest,
       pagination,
+      search,
       resetPagination,
       visibleColumns,
     } = usePagination(fetchData, $route.name, getDefaults(columnMap.value));
@@ -240,6 +332,7 @@ export default defineComponent({
     provide("pagination", { pagination, fetchDataPaginated });
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
+    provide("activeFilters", activeFilters);
 
     onBeforeRouteLeave(() => {
       if (loading.value) return false;
@@ -278,16 +371,20 @@ export default defineComponent({
     return {
       columns,
       getLocale,
-      filter,
+      filterList,
       loading,
       noData,
-      onChangeFilter,
+      onChangeSearch,
       onChangePage,
       onChangeRowsPerPage,
+      onChangeFilters,
+      onClearFilters,
       onRequest,
       pagination,
       renderDate,
       rows,
+      search,
+      sortList,
       title,
       visibleColumns,
     };

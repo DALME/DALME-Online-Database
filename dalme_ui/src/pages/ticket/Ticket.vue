@@ -1,6 +1,8 @@
 <template>
   <Page>
-    <TicketDetail />
+    <div class="full-width full-height q-px-content-visual">
+      <TicketDetail />
+    </div>
   </Page>
 </template>
 

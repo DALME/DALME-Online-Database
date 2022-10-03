@@ -232,7 +232,7 @@ const records = {
   },
   status: {
     label: "Status",
-    align: "center",
+    align: "left",
     sortable: true,
     sortOrder: "ad",
     isSortDefault: false,
