@@ -1,5 +1,6 @@
 // Any imports that break alphabetical order had to be positioned to avoid
 // cirucular import errors within components.
+export { default as MarkdownEditor } from "./markdown-editor";
 export { default as DetailCard } from "./detail-card";
 export { default as Table } from "./table";
 export { default as Agents } from "./agents";
@@ -22,7 +23,6 @@ export { default as LoginModal } from "./login-modal";
 export { default as SchemaForm } from "./schema-form";
 export { default as FolioModal } from "./folio-modal";
 export { default as FormModal } from "./form-modal";
-export { default as MarkdownEditor } from "./markdown-editor";
 export { default as NavLink } from "./nav-link";
 export { default as Nav } from "./nav";
 export { default as Page } from "./page";
