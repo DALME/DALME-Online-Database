@@ -61,14 +61,12 @@
 
 <script>
 import { defineComponent, inject, onMounted, ref } from "vue";
-import { date as qDate } from "quasar";
-import { format as timeagoFormat } from "timeago.js";
 import MarkdownEditor from "../markdown-editor/MarkdownEditor.vue";
 
 import { requests } from "@/api";
 import { CommentForm } from "@/components";
 import UserPopover from "../user-popover/UserPopover.vue";
-import { Spinner } from "@/components/utils";
+import { formatDate, Spinner } from "@/components/utils";
 import { commentsSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -102,28 +100,6 @@ export default defineComponent({
             comments.value = value.results;
             loading.value = false;
           });
-    };
-
-    const formatDate = (
-      string,
-      prefixes = null,
-      suffixes = null,
-      withTime = false,
-    ) => {
-      let date = null;
-      const format = withTime ? "D MMM YYYY @ H:mm" : "D MMM YYYY";
-      if (qDate.isValid(string)) {
-        if (qDate.getDateDiff(Date.now(), string, "days") > 7) {
-          date = qDate.formatDate(string, format);
-          if (prefixes) date = `${prefixes[0]}${date}`;
-          if (suffixes) date = `${date}${suffixes[0]}`;
-        } else {
-          date = timeagoFormat(string);
-          if (prefixes) date = `${prefixes[1]}${date}`;
-          if (suffixes) date = `${date}${suffixes[1]}`;
-        }
-      }
-      return date;
     };
 
     onMounted(async () => await fetchData());
