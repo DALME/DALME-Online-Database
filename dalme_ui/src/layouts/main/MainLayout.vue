@@ -2,14 +2,13 @@
   <LoginModal v-if="showLogin" />
   <q-layout
     id="layout"
-    view="hHh Lpr lFr"
+    view="hHr Lpr lFr"
     :class="!reAuthenticate && showLogin ? 'login-background' : null"
   >
     <Nav v-if="reAuthenticate || !showLogin" />
-    <EditIndex v-if="reAuthenticate || !showLogin" />
+    <EditPanel v-if="reAuthenticate || !showLogin" />
     <q-page-container v-if="reAuthenticate || !showLogin">
       <router-view />
-      <EditPanel v-if="isAdmin" />
     </q-page-container>
   </q-layout>
 </template>

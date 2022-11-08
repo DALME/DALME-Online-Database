@@ -1,6 +1,6 @@
 <template>
-  <q-header class="bg-grey-1 no-shadow">
-    <q-toolbar class="q-px-lg q-py-sm">
+  <q-header class="no-shadow">
+    <div class="main-toolbar row flex-center q-px-lg q-py-xs">
       <q-btn flat dense class="q-pl-xs">
         <q-avatar square color="white" size="34px">
           <img src="~assets/dalme_logo.svg" alt="DALME" />
@@ -81,32 +81,38 @@
       </q-btn>
 
       <q-btn flat dense color="blue-grey-2" size="12px" class="q-pr-none">
-        <q-avatar v-if="!isEmpty(avatar) && !isNil(avatar)" size="24px">
-          <img :src="avatar" />
+        <q-avatar
+          v-if="!isEmpty(auth.avatar) && !isNil(auth.avatar)"
+          size="24px"
+        >
+          <img :src="auth.avatar" />
         </q-avatar>
         <q-icon v-else name="account_circle" size="sm" />
         <q-icon name="arrow_drop_down" size="xs" style="margin-left: -3px" />
         <q-menu fit anchor="bottom right" self="top right">
           <div class="col q-px-md q-mt-md q-mb-sm user-menu">
             <div class="row q-mb-sm justify-center">
-              <q-avatar v-if="!isEmpty(avatar) && !isNil(avatar)" size="50px">
-                <img :src="avatar" />
+              <q-avatar
+                v-if="!isEmpty(auth.avatar) && !isNil(auth.avatar)"
+                size="50px"
+              >
+                <img :src="auth.avatar" />
               </q-avatar>
               <q-avatar v-else size="50px" icon="account_circle" />
             </div>
             <div class="row justify-center">
               <q-item-label class="text-subtitle2 text-weight-bold">
-                {{ fullName }}
+                {{ auth.fullName }}
               </q-item-label>
             </div>
             <div class="row justify-center">
-              <q-item-label caption>{{ username }}</q-item-label>
+              <q-item-label caption>{{ auth.username }}</q-item-label>
             </div>
           </div>
           <q-list padding class="text-grey-9 q-pt-none">
             <q-separator spaced />
             <q-item
-              :to="{ name: 'User', params: { username: username } }"
+              :to="{ name: 'User', params: { username: auth.username } }"
               dense
               clickable
               v-close-popup
@@ -119,7 +125,7 @@
             <q-item
               :to="{
                 name: 'User',
-                params: { username: username, prefs: true },
+                params: { username: auth.username, prefs: true },
               }"
               dense
               clickable
@@ -149,104 +155,142 @@
           </q-list>
         </q-menu>
       </q-btn>
-    </q-toolbar>
-    <q-toolbar dense class="q-px-content q-pt-sm bg-grey-1 text-grey-9">
-      <q-icon :name="pageIcon" color="grey-7" size="sm" class="q-pt-xs" />
-      <q-breadcrumbs
-        separator-color="grey-9"
-        gutter="xs"
-        class="menu-breadcrumb q-ml-sm q-mr-auto text-indigo-6"
-      >
-        <template v-for="(route, idx) in breadcrumbs" :key="idx">
-          <q-breadcrumbs-el
-            v-if="idx < breadcrumbs.length - 1"
-            :label="route"
-            :to="{ name: route }"
-          />
-          <q-breadcrumbs-el v-else class="text-weight-bold" :label="route" />
-        </template>
-      </q-breadcrumbs>
-      <q-item dense class="q-px-sm page-header-button q-mr-sm">
-        <q-item-section class="text-caption text-weight-medium">
-          Tooltips
-        </q-item-section>
-        <q-item-section class="items-end">
-          <q-toggle
-            dense
-            checked-icon="visibility"
-            unchecked-icon="visibility_off"
-            color="green"
-            v-model="showTips"
-          />
-        </q-item-section>
-      </q-item>
-      <q-btn
-        flat
-        dense
-        size="12px"
-        color="grey-7"
-        :icon="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-        @click="toggleFullscreen"
-        class="page-header-button"
-      />
-    </q-toolbar>
-    <q-toolbar class="q-px-content bg-grey-1 text-grey-9 menu-bar">
-      <template v-for="(route, idx) in navRoutes" :key="idx">
-        <q-btn
-          v-if="!route.children"
-          dense
-          flat
-          no-caps
-          no-wrap
-          :class="
-            navStore.currentSection === route.name
-              ? 'text-grey-9 menu-button active'
-              : 'text-grey-9 menu-button'
-          "
-          size="sm"
-          :to="{ name: route.name }"
-          :active="navStore.currentSection === route.name"
-        >
-          <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
-          <span :data-content="route.name" class="q-pl-sm text-menu">
-            {{ route.name }}
-          </span>
-        </q-btn>
+    </div>
+    <div class="menu-container row bg-grey-2 q-mb-md">
+      <div class="q-pl-content col-grow">
+        <transition name="collapse">
+          <div v-if="!compactMode" class="title-bar row q-pt-none text-grey-9">
+            <q-icon :name="pageIcon" color="grey-7" size="sm" class="pg-icn" />
+            <q-breadcrumbs
+              separator-color="grey-9"
+              gutter="xs"
+              class="menu-breadcrumb q-ml-xs q-mr-auto text-indigo-6"
+            >
+              <template v-for="(route, idx) in breadcrumbs" :key="idx">
+                <q-breadcrumbs-el
+                  v-if="idx < breadcrumbs.length - 1"
+                  :label="route"
+                  :to="{ name: route }"
+                />
+                <q-breadcrumbs-el
+                  v-else
+                  class="text-weight-bold"
+                  :label="route"
+                />
+              </template>
+              <q-spinner-facebook v-if="globalLoading" size="sm" />
+            </q-breadcrumbs>
+          </div>
+        </transition>
+        <q-toolbar class="row text-grey-9 bg-grey-2 menu-bar">
+          <template v-for="(route, idx) in navRoutes" :key="idx">
+            <q-btn
+              v-if="!route.children"
+              dense
+              flat
+              no-caps
+              no-wrap
+              :class="
+                nav.currentSection === route.name
+                  ? 'text-grey-9 menu-button active'
+                  : 'text-grey-9 menu-button'
+              "
+              size="sm"
+              :to="{ name: route.name }"
+              :active="nav.currentSection === route.name"
+            >
+              <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
+              <span :data-content="route.name" class="q-pl-sm text-menu">
+                {{ route.name }}
+              </span>
+            </q-btn>
 
-        <q-btn
-          v-else
-          dense
-          flat
-          no-caps
-          no-wrap
-          :class="
-            navStore.currentSection === route.name
-              ? 'text-grey-9 menu-button active'
-              : 'text-grey-9 menu-button'
-          "
-          size="sm"
-          :active="navStore.currentSection === route.name"
-        >
-          <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
-          <span :data-content="route.name" class="q-pl-sm text-menu">
-            {{ route.name }}
-          </span>
-          <q-menu
-            class="menu-shadow"
-            transition-show="scale"
-            transition-hide="scale"
+            <q-btn
+              v-else
+              dense
+              flat
+              no-caps
+              no-wrap
+              :class="
+                nav.currentSection === route.name
+                  ? 'text-grey-9 menu-button active'
+                  : 'text-grey-9 menu-button'
+              "
+              size="sm"
+              :active="nav.currentSection === route.name"
+            >
+              <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
+              <span :data-content="route.name" class="q-pl-sm text-menu">
+                {{ route.name }}
+              </span>
+              <q-menu
+                class="menu-shadow"
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-list dense bordered style="min-width: 100px">
+                  <NavLink
+                    v-for="(child, idx) in route.children"
+                    v-bind="{ to: child.name, icon: child.meta.icon }"
+                    :key="idx"
+                  />
+                </q-list>
+              </q-menu>
+            </q-btn>
+          </template>
+        </q-toolbar>
+      </div>
+      <div class="q-pr-content col-auto">
+        <div class="row flex-center title-bar-end">
+          <q-btn
+            flat
+            dense
+            size="12px"
+            :color="showTips ? 'green-7' : 'grey-7'"
+            class="page-header-button q-mr-sm"
+            :class="{ 'bg-green-1': showTips }"
+            @click="showTips = !showTips"
           >
-            <q-list dense bordered style="min-width: 100px">
-              <NavLink
-                v-for="(child, idx) in route.children"
-                v-bind="{ to: child.name, icon: child.meta.icon }"
-                :key="idx"
-              />
-            </q-list>
-          </q-menu>
-        </q-btn>
-      </template>
-    </q-toolbar>
+            <q-icon
+              :name="showTips ? 'o_speaker_notes_off' : 'o_speaker_notes'"
+              size="16px"
+            />
+            <Tooltip>Tooltips</Tooltip>
+          </q-btn>
+          <q-btn
+            flat
+            dense
+            size="12px"
+            :color="compactMode ? 'indigo-7' : 'grey-7'"
+            :icon="compactMode ? 'present_to_all' : 'present_to_all'"
+            class="page-header-button q-mr-sm"
+            :class="{ 'rotate-180': compactMode, 'bg-indigo-1': compactMode }"
+            :disable="compactModeDisable"
+            @click="compactMode = !compactMode"
+          >
+            <Tooltip>Compact mode</Tooltip>
+          </q-btn>
+          <q-btn
+            flat
+            dense
+            size="12px"
+            :color="isFullscreen ? 'indigo-7' : 'grey-7'"
+            :icon="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+            class="page-header-button"
+            :class="{ 'bg-indigo-1': isFullscreen }"
+            @click="toggleFullscreen"
+          >
+            <Tooltip>Full screen</Tooltip>
+          </q-btn>
+        </div>
+      </div>
+    </div>
+    <div
+      class="strip-approach"
+      :style="stripApproachStyle"
+      @mouseenter="editPanel.stripApproachHover = true"
+      @mouseleave="editPanel.stripApproachHover = false"
+    />
   </q-header>
 </template>
 
@@ -254,30 +298,38 @@
 import { openURL, useQuasar } from "quasar";
 import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, inject, provide, ref, watch } from "vue";
-import { useAuthStore } from "@/stores/auth";
-import { useNavStore } from "@/stores/navigation";
-import { storeToRefs } from "pinia";
 import { navRoutes } from "@/router";
 import { Dialog, NavLink } from "@/components";
-import { useTooltips } from "@/use";
+import { Tooltip } from "@/components/utils";
+import { useStores, useTooltips } from "@/use";
 
 export default defineComponent({
   name: "Nav",
   components: {
     NavLink,
+    Tooltip,
   },
   setup() {
     const $q = useQuasar();
-    const $authStore = useAuthStore();
-    const navStore = useNavStore();
-    const { fullName, username, avatar } = storeToRefs($authStore);
+    const {
+      auth,
+      compactMode,
+      compactModeDisable,
+      globalLoading,
+      isFullscreen,
+      nav,
+      editPanel,
+    } = useStores();
+
     const { showTips } = useTooltips();
     const submitting = ref(false);
-    const isFullscreen = ref(false);
     const searchQuery = ref("");
-    const currentSubsection = ref(navStore.currentSubsection);
-
+    const currentSubsection = ref(nav.currentSubsection);
     const prefSubscription = inject("prefSubscription");
+
+    const stripApproachStyle = computed(() =>
+      compactMode.value ? "top: 55px" : "top: 95px",
+    );
 
     const openKB = () => {
       openURL("https://kb.dalme.org/", null, { target: "_blank" });
@@ -312,23 +364,27 @@ export default defineComponent({
       }
     };
 
-    const breadcrumbs = computed(() => navStore.breadcrumb);
-    const pageIcon = computed(() => navStore.currentPageIcon);
+    const breadcrumbs = computed(() => nav.breadcrumb);
+    const pageIcon = computed(() => nav.currentPageIcon);
 
     provide("currentSubsection", currentSubsection);
 
     watch(
-      () => navStore.currentSubsection,
-      () => (currentSubsection.value = navStore.currentSubsection),
+      () => nav.currentSubsection,
+      () => (currentSubsection.value = nav.currentSubsection),
     );
 
     return {
-      avatar,
+      auth,
       breadcrumbs,
+      compactMode,
+      compactModeDisable,
+      editPanel,
       darkMode: $q.dark,
       logout,
+      globalLoading,
       navRoutes,
-      navStore,
+      nav,
       showTips,
       submitting,
       isFullscreen,
@@ -336,8 +392,7 @@ export default defineComponent({
       isEmpty,
       toggleFullscreen,
       searchQuery,
-      fullName,
-      username,
+      stripApproachStyle,
       pageIcon,
       openKB,
     };
@@ -346,7 +401,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.q-toolbar {
+.q-header {
+  background-color: white;
+}
+.main-toolbar {
   background-color: #2f333c;
   background-image: linear-gradient(180deg, #072034 10%, #1b1b1b);
   background-size: cover;
@@ -354,13 +412,15 @@ export default defineComponent({
 .user-menu {
   min-width: 200px;
 }
+.menu-container {
+  border-bottom: 1px solid rgb(209, 209, 209);
+}
 .menu-breadcrumb {
   font-size: 20px;
 }
 .menu-bar {
+  padding: 0;
   gap: 8px;
-  margin-top: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 .menu-button {
   position: relative;
@@ -435,5 +495,27 @@ export default defineComponent({
   border: 1px solid rgb(209, 209, 209);
   border-radius: 4px;
   height: 32px;
+  width: 32px;
+  z-index: 1;
+}
+.title-bar {
+  height: 45px;
+  min-height: 0px;
+  align-items: flex-end;
+}
+.title-bar-end {
+  height: 45px;
+  align-items: flex-end;
+  padding-bottom: 3px;
+}
+.pg-icn {
+  padding-bottom: 2px;
+}
+.strip-approach {
+  position: absolute;
+  right: 0;
+  top: 95px;
+  width: 80px;
+  height: 65px;
 }
 </style>

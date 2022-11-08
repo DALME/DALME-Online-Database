@@ -251,6 +251,8 @@ const routes = [
         meta: {
           navPath: ["Project", "Rights Policies"],
           icon: "attribution",
+          allowCompactMode: false,
+          preserveCompactMode: false,
         },
       },
       {
@@ -261,6 +263,8 @@ const routes = [
         meta: {
           navPath: ["Sets"],
           icon: "o_folder",
+          allowCompactMode: true,
+          preserveCompactMode: true,
         },
       },
       {
@@ -271,6 +275,9 @@ const routes = [
         meta: {
           navPath: ["Sources"],
           icon: "bookmark_border",
+          allowCompactMode: true,
+          preserveCompactMode: true,
+          usesPersistedUi: true,
         },
       },
       {
@@ -281,6 +288,8 @@ const routes = [
         meta: {
           navPath: ["Project", "Tasks"],
           icon: "add_task",
+          allowCompactMode: false,
+          preserveCompactMode: false,
         },
       },
       {
@@ -291,6 +300,8 @@ const routes = [
         meta: {
           navPath: ["Project", "Tickets"],
           icon: "o_pest_control",
+          allowCompactMode: false,
+          preserveCompactMode: false,
         },
       },
       {
@@ -301,6 +312,8 @@ const routes = [
         meta: {
           navPath: ["System", "Users"],
           icon: "person_outline",
+          allowCompactMode: false,
+          preserveCompactMode: false,
         },
       },
     ],
