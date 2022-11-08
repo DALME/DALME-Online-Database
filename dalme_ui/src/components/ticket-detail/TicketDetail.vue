@@ -1,7 +1,7 @@
 <template>
   <div v-if="!loading && !isEmpty(ticket)">
-    <div class="row">
-      <div class="col-grow q-py-lg">
+    <div class="info-area row">
+      <div class="col-grow">
         <div class="row items-center text-h5">
           {{ ticket.subject }}
           <span class="q-ml-sm text-grey-7">#{{ id }}</span>
@@ -19,7 +19,7 @@
           created this ticket {{ formatDate(ticket.creationTimestamp) }}
         </div>
       </div>
-      <div v-if="isAdmin" class="col-auto q-py-lg">
+      <div v-if="isAdmin" class="col-auto">
         <q-btn
           dense
           outline
@@ -59,7 +59,7 @@
                 </q-item-section>
                 <q-item-section>
                   <q-card flat bordered class="box-left-arrow">
-                    <q-card-section class="bg-grey-2 q-py-sm">
+                    <q-card-section class="bg-grey-2 comment-head">
                       <DetailPopover
                         :userData="ticket.creationUser"
                         :showAvatar="false"

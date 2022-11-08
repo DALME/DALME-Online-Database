@@ -218,9 +218,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import { storeToRefs } from "pinia";
-import { usePrefStore } from "@/stores/preferences";
-import { useAPI } from "@/use";
+import { useAPI, useStores } from "@/use";
 
 const themeList = [
   { label: "Chrome", value: "ace/theme/chrome", type: "Light theme" },
@@ -252,11 +250,10 @@ export default defineComponent({
   setup() {
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
-    const $prefStore = usePrefStore();
-    const { ui, sourceEditor } = storeToRefs($prefStore);
+    const { ui, sourceEditor } = useStores();
     const tab = ref("ui");
-    const tooltipsOn = ref(ui.value.tooltipsOn);
-    const sidebarCollapsed = ref(ui.value.sidebarCollapsed);
+    const tooltipsOn = ref(ui.general.tooltipsOn);
+    const sidebarCollapsed = ref(ui.general.sidebarCollapsed);
     const theme = ref(sourceEditor.value.theme);
     const fontSize = ref(sourceEditor.value.fontSize);
     const highlightWord = ref(sourceEditor.value.highlightWord);

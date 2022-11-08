@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!embedded" class="row q-mb-lg">
+  <div v-if="!embedded" class="row q-mb-md">
     <div class="table-toolbar-button-group col-grow">
       <slot name="tableToolbar-special" />
       <q-btn-dropdown

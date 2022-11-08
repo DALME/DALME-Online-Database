@@ -1,5 +1,5 @@
 <template>
-  <div class="q-py-lg q-px-content full-width full-height">
+  <div class="q-pb-lg q-pt-xs q-px-content full-width full-height">
     <TableToolbar
       :title="title"
       :embedded="embedded"
@@ -40,7 +40,7 @@
         v-model:expanded="expanded"
         row-key="id"
         class="basic-list no-border-radius-top no-border-top"
-        table-header-class="bg-grey-1"
+        table-header-class="bg-grey-2"
         table-header-style="height: 35px"
       >
         <template v-slot:bottom="scope">
