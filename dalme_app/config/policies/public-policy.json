@@ -1,7 +1,7 @@
 [
   {
     "action": ["retrieve"],
-    "principal": ["authenticated"],
+    "principal": ["*"],
     "effect": "allow"
   }
 ]

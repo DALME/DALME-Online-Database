@@ -1,6 +1,11 @@
 [
   {
-    "action": ["create", "list", "retrieve"],
+    "action": ["retrieve", "check_version"],
+    "principal": ["*"],
+    "effect": "allow"
+  },
+  {
+    "action": ["create", "list", "retrieve", "check_version"],
     "principal": ["authenticated"],
     "effect": "allow"
   },

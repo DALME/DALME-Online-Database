@@ -1,5 +1,10 @@
 [
   {
+    "action": ["get_rights", "get_manifest"],
+    "principal": ["*"],
+    "effect": "allow"
+  },
+  {
     "action": ["create", "list", "retrieve", "has_permission", "get_rights", "get_manifest"],
     "principal": ["authenticated"],
     "effect": "allow"
