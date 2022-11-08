@@ -164,6 +164,11 @@ const pageSchema = yup
     transcriptionId: yup.string().uuid(),
     hasImage: yup.boolean().nullable(),
     hasTranscription: yup.boolean().required(),
+    manifestUrl: yup.string().url().default(null).nullable(),
+    thumbnailUrl: yup.string().url().default(null).nullable(),
+    transcriptionAuthor: yup.string().default(null).nullable(),
+    transcriptionText: yup.string().default(null).nullable(),
+    transcriptionVersion: yup.number().default(null).nullable(),
   })
   .camelCase();
 
