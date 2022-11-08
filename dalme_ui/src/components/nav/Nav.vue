@@ -292,12 +292,11 @@ export default defineComponent({
           closeIcon: false,
           message: "Do you want to end your current session?",
           icon: "exit_to_app",
-          OkayButtonLabel: "Log out",
-          CancelButtonColour: "blue-grey-5",
+          okayButtonLabel: "Log out",
         },
       }).onOk(() => {
         prefSubscription();
-        $authStore.logout();
+        auth.logout();
       });
     };
 

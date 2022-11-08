@@ -1,5 +1,6 @@
 // Any imports that break alphabetical order had to be positioned to avoid
 // cirucular import errors within components.
+export { default as Dialog } from "./dialog";
 export { default as MarkdownEditor } from "./markdown-editor";
 export { default as DetailCard } from "./detail-card";
 export { default as Table } from "./table";
@@ -9,7 +10,6 @@ export { default as BaseModal } from "./base-modal";
 export { default as CommentForm } from "./comment-form";
 export { default as Comments } from "./comments";
 export { default as Countries } from "./countries";
-export { default as Dialog } from "./dialog";
 export { default as InlineIndex } from "./inline-index";
 export { default as WindowIndex } from "./window-index";
 export { default as EditIndex } from "./edit-index";
