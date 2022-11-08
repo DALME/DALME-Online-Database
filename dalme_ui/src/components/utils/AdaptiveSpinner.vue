@@ -1,14 +1,14 @@
 <template>
-  <div class="spinner-container" :style="spinnerStyle">
-    <q-spinner-facebook size="2em" :thickness="3" />
+  <div ref="el" class="spinner-container" :style="spinnerStyle">
+    <q-spinner-bars :size="spinnerSize" />
   </div>
 </template>
 
 <script>
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 
 export default defineComponent({
-  name: "Spinner",
+  name: "AdaptiveSpinner",
   props: {
     top: {
       type: Number,
@@ -28,19 +28,35 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const el = ref(null);
     /* eslint-disable */
     const spinnerStyle = computed(
       () => `top: ${props.top}px; right: ${props.right}px; bottom: ${props.bottom}px; left: ${props.left}px`
     );
     /* eslint-enable */
+    const spinnerSize = ref("2rem");
 
-    return { spinnerStyle };
+    onMounted(() => {
+      spinnerSize.value = `${el.value.clientWidth / 10}px`;
+    });
+
+    return {
+      el,
+      spinnerSize,
+      spinnerStyle,
+    };
   },
 });
 </script>
 
 <style lang="scss" scoped>
 .spinner-container {
-  position: absolute;
+  position: relative;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  color: #5c5c5c2e;
 }
 </style>

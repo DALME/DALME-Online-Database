@@ -41,8 +41,8 @@
     <q-card-section class="q-pt-sm q-px-none">
       <CommentForm @on-submit-comment="handleCommented" />
     </q-card-section>
-    <Spinner :showing="loading" />
   </q-card>
+  <AdaptiveSpinner v-else />
 </template>
 
 <script>
@@ -52,7 +52,7 @@ import MarkdownEditor from "../markdown-editor/MarkdownEditor.vue";
 import { requests } from "@/api";
 import { CommentForm } from "@/components";
 import { DetailPopover } from "@/components/utils";
-import { formatDate, Spinner } from "@/components/utils";
+import { formatDate, AdaptiveSpinner } from "@/components/utils";
 import { commentsSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
@@ -62,7 +62,7 @@ export default defineComponent({
     CommentForm,
     DetailPopover,
     MarkdownEditor,
-    Spinner,
+    AdaptiveSpinner,
   },
   setup() {
     const { apiInterface } = useAPI();
@@ -84,7 +84,7 @@ export default defineComponent({
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
             comments.value = value.data;
-            loading.value = false;
+            // loading.value = false;
           });
     };
 

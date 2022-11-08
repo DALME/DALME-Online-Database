@@ -1,3 +1,4 @@
+export { default as AdaptiveSpinner } from "./AdaptiveSpinner.vue";
 export { default as Chooser } from "./Chooser.vue";
 export { default as BooleanIcon } from "./BooleanIcon.vue";
 export { default as DetailPopover } from "./DetailPopover.vue";
