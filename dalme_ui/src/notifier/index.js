@@ -4,6 +4,7 @@ import CRUD from "./crud";
 import tasks from "./tasks";
 import tickets from "./tickets";
 import users from "./users";
+import transcriptions from "./transcriptions";
 
 const notifier = {
   auth,
@@ -12,6 +13,7 @@ const notifier = {
   tasks,
   tickets,
   users,
+  transcriptions,
 };
 
 export default notifier;
