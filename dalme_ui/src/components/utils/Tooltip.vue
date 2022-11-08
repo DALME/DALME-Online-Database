@@ -6,13 +6,13 @@
     :offset="offset"
     v-if="showTips"
   >
-    <slot></slot>
+    <slot />
+    {{ text }}
   </q-tooltip>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-
 import { useTooltips } from "@/use";
 
 export default defineComponent({
@@ -29,6 +29,9 @@ export default defineComponent({
     offset: {
       type: Array,
       default: () => [14, 14],
+    },
+    text: {
+      type: String,
     },
   },
   setup() {

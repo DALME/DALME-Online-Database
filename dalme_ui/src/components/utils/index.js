@@ -1,13 +1,13 @@
+export { default as Tooltip } from "./Tooltip.vue";
 export { default as AdaptiveSpinner } from "./AdaptiveSpinner.vue";
 export { default as Chooser } from "./Chooser.vue";
 export { default as BooleanIcon } from "./BooleanIcon.vue";
 export { default as DetailPopover } from "./DetailPopover.vue";
 export { getColumns, getDefaults } from "./processColumns.js";
 export { formatDate } from "./formatDate.js";
-export { notNully } from "./utilities.js";
+export { notNully, formatUuid } from "./utilities.js";
 export { default as OpaqueSpinner } from "./OpaqueSpinner.vue";
 export { resolveAttachments } from "./resolveAttachments.js";
 export { default as Spinner } from "./Spinner.vue";
 export { default as SuspenseWithError } from "./SuspenseWithError.vue";
 export { default as Tag } from "./Tag.vue";
-export { default as Tooltip } from "./Tooltip.vue";
