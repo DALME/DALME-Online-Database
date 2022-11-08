@@ -20,14 +20,9 @@ export default defineComponent({
   setup() {
     const $route = useRoute();
     const id = ref($route.params.id);
-    const showModal = ref(false);
 
     provide("model", "Source");
     provide("id", id);
-
-    return {
-      showModal,
-    };
   },
 });
 </script>
