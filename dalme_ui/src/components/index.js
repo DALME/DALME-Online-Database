@@ -34,6 +34,7 @@ export { default as Rights } from "./rights";
 export { default as Sets } from "./sets";
 export { default as SetDetail } from "./set-detail";
 export { default as WorkflowManager } from "./workflow-manager";
+export { default as SourceEditor } from "./source-editor";
 export { default as Sources } from "./sources";
 export { default as SourceDetail } from "./source-detail";
 export { default as TaskLists } from "./task-lists";
