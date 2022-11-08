@@ -1,14 +1,14 @@
 import json
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dalme_api.access_policies import GeneralAccessPolicy
+from dalme_api.access_policies import LibraryAccessPolicy
 from pyzotero import zotero
 from django.conf import settings
 
 
 class Library(viewsets.ViewSet):
     """ API endpoint for accessing DALME Zotero Library """
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = (LibraryAccessPolicy,)
 
     def list(self, request, *args, **kwargs):
         data = request.GET.get('data')
