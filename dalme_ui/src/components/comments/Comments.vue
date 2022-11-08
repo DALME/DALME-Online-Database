@@ -1,6 +1,6 @@
 <template>
-  <q-card flat>
-    <q-card-section v-if="comments.length" class="comments-container">
+  <q-card v-if="comments.length && !loading" flat>
+    <q-card-section class="comments-container">
       <div
         v-for="(comment, idx) in comments"
         :key="idx"
@@ -21,7 +21,9 @@
           </q-item-section>
           <q-item-section>
             <q-card flat bordered class="box-left-arrow">
-              <q-card-section class="bg-grey-2 q-py-sm">
+              <q-card-section
+                class="comment-head bg-grey-2 q-py-none flex-center"
+              >
                 <DetailPopover
                   :userData="comment.creationUser"
                   :showAvatar="false"

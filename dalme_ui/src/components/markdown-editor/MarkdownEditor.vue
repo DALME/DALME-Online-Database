@@ -1,7 +1,7 @@
 <template>
   <q-card v-if="editable" flat bordered class="box-left-arrow">
-    <div class="bg-grey-2 q-pt-xs q-px-sm row justify-between items-center">
-      <div class="column">
+    <div class="bg-grey-2 q-px-sm row justify-between items-center">
+      <div class="column q-pt-xs">
         <q-tabs
           v-model="mdTab"
           dense
@@ -401,7 +401,16 @@ export default defineComponent({
 
 <style lang="scss">
 .md-editor-tabs {
+  height: 29px !important;
   margin-bottom: -1px;
+}
+.md-editor-tabs.q-tabs--dense .q-tab {
+  min-height: 30px;
+}
+.md-editor-tabs .q-tab__label {
+  font-size: 12px;
+  line-height: 1.715em;
+  font-weight: 500;
 }
 .md-editor-tabs .q-tab.q-tab--active {
   border-top-left-radius: 5px;

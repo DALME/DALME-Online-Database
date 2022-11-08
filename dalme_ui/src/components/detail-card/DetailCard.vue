@@ -1,6 +1,6 @@
 <template>
   <q-card flat bordered class="detail-card">
-    <q-item dense class="q-pb-none q-px-sm bg-grey-1 text-grey-7">
+    <q-item dense class="q-pb-none q-px-sm bg-grey-2 text-grey-7">
       <q-item-section v-if="icon" side class="q-pr-sm">
         <q-icon :name="icon" color="grey-6" size="xs" />
       </q-item-section>
