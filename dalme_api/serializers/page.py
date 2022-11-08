@@ -6,9 +6,11 @@ class PageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = ('id', 'name', 'order', 'dam_id')
+        fields = ('id', 'name', 'order', 'dam_id', 'thumbnail_url', 'manifest_url')
         extra_kwargs = {
             'dam_id': {'required': False},
+            'thumbnail_url': {'required': False},
+            'manifest_url': {'required': False}
             }
 
     def run_validation(self, data):

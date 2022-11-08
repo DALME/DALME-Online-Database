@@ -5,7 +5,7 @@ import json
 from dalme_app.models._templates import dalmeUuid
 import django.db.models.options as options
 from dalme_app.models.rights_policy import RightsPolicy
-from dalme_app.models.resourcespace import rs_api_query
+from dalme_app.models.resourcespace import rs_resource, rs_api_query
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
 
@@ -22,6 +22,18 @@ class Page(dalmeUuid):
 
     def __str__(self):
         return self.name
+
+    @property
+    def manifest_url(self):
+        return f'https://dam.dalme.org/loris/{self.dam_id}/info.json'
+
+    @property
+    def thumbnail_url(self):
+        try:
+            thumbnail = rs_resource.objects.get(ref=self.dam_id).get_image_url('thm')
+        except (KeyError, ValueError):
+            thumbnail = None
+        return thumbnail
 
     def get_rights(self):
         try:

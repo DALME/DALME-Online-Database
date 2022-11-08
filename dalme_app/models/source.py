@@ -197,3 +197,20 @@ class Source_pages(dalmeIntid):
     source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='source_pages')
     page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
     transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='source_pages')
+
+    @property
+    def page_data(self):
+        return {
+            'id': self.page.id,
+            'name': self.page.name,
+            'dam_id': self.page.dam_id,
+            'order': self.page.order,
+            'transcription_id': self.transcription.id if self.transcription else None,
+            'has_image': self.page is not None,
+            'has_transcription': self.transcription is not None,
+            'transcription_text': self.transcription.transcription if self.transcription is not None else None,
+            'transcription_version': self.transcription.version if self.transcription is not None else None,
+            'transcription_author': self.transcription.author if self.transcription is not None else None,
+            'thumbnail_url': self.page.thumbnail_url,
+            'manifest_url': self.page.manifest_url
+        }

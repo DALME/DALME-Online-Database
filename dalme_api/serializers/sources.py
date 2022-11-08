@@ -443,25 +443,4 @@ class SourceSerializer(DynamicSerializer):
 
     @staticmethod
     def get_folios(instance):
-        folio_list = []
-        folios = instance.source_pages.all().values(
-            sp_id=F('page__pk'),
-            sp_name=F('page__name'),
-            sp_transcription_id=F('transcription__pk'),
-            sp_transcription_version=F('transcription__version'),
-            sp_order=F('page__order'),
-            sp_dam_id=F('page__dam_id')
-        ).order_by('sp_order')
-
-        for folio in folios:
-            folio_list.append({
-                'id': folio['sp_id'],
-                'name': folio['sp_name'],
-                'dam_id': folio['sp_dam_id'],
-                'order': folio['sp_order'],
-                'transcription_id': folio['sp_transcription_id'],
-                'has_image': folio['sp_transcription_id'] is not None,
-                'has_transcription': folio['sp_transcription_version'] is not None,
-            })
-
-        return folio_list
+        return [page.page_data for page in instance.source_pages.all()]
