@@ -1,0 +1,272 @@
+<template>
+  <q-drawer
+    :width="parseInt(250)"
+    :mini-width="parseInt(0)"
+    class="index-drawer"
+    side="right"
+    v-model="isAdmin"
+    :mini="!editPanel.drawerExpanded"
+    mini-to-overlay
+    @mouseover="showPanel = true"
+    @mouseleave="showPanel = false"
+  >
+    <div
+      class="id-edit-panel"
+      :class="{ 'edit-on': ongoingEdit }"
+      :style="editPanel.drawerStripApproach ? 'left: -33px' : 'left: -13px'"
+    >
+      <Tooltip
+        anchor="center left"
+        self="center right"
+        text="Editing tools"
+        :offset="[5, 0]"
+      />
+      <q-icon name="more_vert" />
+      <q-btn
+        :icon="editPanel.drawerKeepOpen ? 'lock' : 'lock_open'"
+        :class="editPanel.drawerKeepOpen ? 'orange-on' : 'orange-off'"
+        class="short"
+        square
+        @click.stop="editPanel.drawerKeepOpen = !editPanel.drawerKeepOpen"
+      />
+      <div class="q-mini-drawer-hide edit-button-container">
+        <EditCreate />
+        <EditUpdate />
+        <q-btn
+          icon="edit_note"
+          :class="{ 'edit-on': currentFolioEditOn }"
+          :disable="!showEditFolioBtn"
+          square
+          @click="editBus.emit('toggleEditor')"
+        />
+        <EditSubmit />
+      </div>
+    </div>
+    <div v-show="showContent" class="edit-content-holder">
+      <WindowIndex />
+      <FolioIndex />
+      <InlineIndex />
+    </div>
+  </q-drawer>
+</template>
+
+<script>
+import { computed, defineComponent, onMounted } from "vue";
+import { useEditing, useStores } from "@/use";
+import { default as EditCreate } from "./EditCreate.vue";
+import { default as EditSubmit } from "./EditSubmit.vue";
+import { default as EditUpdate } from "./EditUpdate.vue";
+import { default as FolioIndex } from "./FolioIndex.vue";
+import { default as InlineIndex } from "./InlineIndex.vue";
+import { default as WindowIndex } from "./WindowIndex.vue";
+import { Tooltip } from "@/components/utils";
+
+export default defineComponent({
+  name: "EditIndex",
+  components: {
+    EditCreate,
+    EditSubmit,
+    EditUpdate,
+    FolioIndex,
+    InlineIndex,
+    WindowIndex,
+    Tooltip,
+  },
+  setup() {
+    const { isAdmin, showEditFolioBtn, currentFolioEditOn, editPanel } =
+      useStores();
+    const { editBus, hideEditing, showEditing } = useEditing();
+
+    const showPanel = computed({
+      get: () => editPanel.value.drawerExpanded,
+      set: (value) => {
+        if (!editPanel.value.drawerKeepOpen)
+          editPanel.value.drawerExpanded = value;
+      },
+    });
+
+    const showContent = computed({
+      get: () =>
+        editPanel.value.inlineIndexShow ||
+        editPanel.value.windowIndexShow ||
+        editPanel.value.folioIndexShow,
+      set: () =>
+        editPanel.value.inlineIndexShow ||
+        editPanel.value.windowIndexShow ||
+        editPanel.value.folioIndexShow,
+    });
+
+    const ongoingEdit = computed(
+      () =>
+        editPanel.value.folioIndexShow ||
+        editPanel.value.inlineIndexShow ||
+        editPanel.value.windowIndexShow,
+    );
+
+    const openEditing = () => (showPanel.value = true);
+    const closeEditing = () => (showPanel.value = false);
+
+    onMounted(() => {
+      hideEditing.value = closeEditing;
+      showEditing.value = openEditing;
+    });
+
+    return {
+      editPanel,
+      showEditFolioBtn,
+      currentFolioEditOn,
+      isAdmin,
+      showContent,
+      showPanel,
+      editBus,
+      ongoingEdit,
+    };
+  },
+});
+</script>
+
+<style lang="scss">
+#layout > .q-drawer-container > aside {
+  margin-top: 102px;
+  margin-bottom: 21px !important;
+  background: transparent !important;
+  bottom: auto;
+}
+.index-drawer {
+  display: flex;
+  flex-direction: column;
+  overflow: initial;
+}
+.index-drawer::before {
+  content: "";
+  height: 7px;
+  width: 264px;
+  position: absolute;
+  top: 15px;
+  left: 5px;
+  box-shadow: rgb(79 79 79 / 17%) -5px 2px 20px 17px;
+  z-index: -1;
+}
+.id-edit-panel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  align-items: center;
+  height: 37px;
+  width: 263px;
+  background-color: #ffca82;
+  color: #a85e00;
+  font-size: 18px;
+  border-bottom-left-radius: 12px;
+  border-top-left-radius: 12px;
+  border-top: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+  border-bottom: 1px solid #c87001;
+  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset;
+  position: absolute;
+  left: -13px;
+}
+.id-edit-panel > i:first-of-type {
+  align-self: center;
+  width: 13px;
+}
+.id-edit-panel > button:first-of-type {
+  width: 27px;
+  height: 27px;
+  min-height: 20px;
+  font-size: 8px;
+  align-self: center;
+  padding: 0 0 0 1px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  color: #a85e00;
+  border-top: 1px solid #c87001;
+  border-bottom: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+}
+.id-edit-panel > button:first-of-type::before {
+  box-shadow: none;
+}
+.edit-button-container {
+  display: flex;
+  flex-direction: row;
+  width: 222px;
+  align-self: end;
+  border-top: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+  background-color: #ffca82;
+}
+.edit-button-container button,
+.edit-button-container a.q-btn {
+  display: flex;
+  flex-grow: 1;
+  height: 30px;
+  min-height: 30px;
+  border-radius: 0;
+  border: none;
+  padding: 0;
+  box-shadow: 1px 1px 0px 0px #ffffff4d inset, -1px -1px 0px 0px #5757573d inset;
+  color: #a85e00;
+}
+.edit-button-container button::before,
+.edit-button-container a.q-btn::before {
+  box-shadow: none;
+}
+.edit-button-container a.q-btn .q-fab__icon-holder {
+  min-width: 20px;
+  min-height: 20px;
+  position: inherit;
+}
+.edit-button-container a.q-btn i {
+  font-size: 20px;
+}
+.edit-button-container button.disabled {
+  background-color: #ffe1b8;
+  color: #bb894a;
+  box-shadow: 1px 1px 0px 0px #5757571f inset, 0px -1px 0px 0px #ffffffe8 inset;
+}
+.edit-content-holder {
+  margin-top: 37px;
+  background-color: #ffffffd1;
+  backdrop-filter: blur(5px) grayscale(70%);
+  border-bottom: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+  border-bottom-left-radius: 4px;
+}
+.edit-content-holder .q-item:last-of-type {
+  border-bottom-left-radius: 3px;
+}
+.edit-header {
+  display: flex;
+  height: 22px;
+  border-top: 1px solid #c87001;
+  border-bottom: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.index-drawer button.orange {
+  background-color: #ffca82;
+  color: #a85e00;
+}
+.index-drawer button.orange-on {
+  background-color: #ffca82;
+  color: #a85e00;
+  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset;
+}
+.index-drawer button.orange-off {
+  background-color: #ffe1b8;
+  color: #bb894a;
+  box-shadow: 1px 1px 0px 0px #5757573d inset, 0px -1px 0px 0px #ffffff7d inset;
+}
+.edit-button-container button.disabled.editing {
+  background-color: #fdd3c7;
+  color: #a74646;
+  box-shadow: 1px 1px 0px 0px #5757572b inset, 0px -1px 0px 0px #fffefe9c inset;
+}
+.edit-on {
+  background-color: #ffbfac;
+  color: #a80000;
+}
+</style>

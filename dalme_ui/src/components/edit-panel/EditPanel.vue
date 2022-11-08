@@ -1,44 +1,69 @@
 <template>
   <div
     v-if="isAdmin"
-    class="row flex-center fixed-bottom-right edit-sticky z-max"
+    class="edit-panel-strip"
+    :class="{ 'edit-on': ongoingEdit }"
+    :style="stripStyle"
+    @mouseover="showStrip = true"
+    @mouseleave="showStrip = false"
   >
-    <q-fab
-      ref="el"
-      text-color="white"
-      icon="keyboard_arrow_left"
-      direction="left"
-      class="parent"
-      :color="dragging ? 'grey' : 'initial'"
-      :disable="dragging"
-      v-touch-pan.vertical.prevent.mouse="move"
-      push
-      glossy
+    <Tooltip
+      anchor="center left"
+      self="center right"
+      text="Editing tools"
+      :offset="[5, 0]"
+    />
+    <q-icon name="more_vert" />
+    <q-btn
+      :icon="editPanel.stripKeepOpen ? 'lock' : 'lock_open'"
+      :class="editPanel.stripKeepOpen ? 'on' : ''"
       square
-      padding="md xl md sm"
-    >
-      <!-- ADD -->
+      @click.stop="editPanel.stripKeepOpen = !editPanel.stripKeepOpen"
+    />
+    <div class="q-mini-drawer-hide strip-button-container">
       <EditCreate />
-
-      <!-- UPDATE -->
       <EditUpdate />
-
-      <!-- DELETE -->
-
-      <!-- SUBMIT -->
+      <q-btn
+        icon="edit_note"
+        :class="{ 'edit-on': currentFolioEditOn }"
+        :disable="!showEditFolioBtn"
+        square
+        @click="eventBus.emit('toggleEditor')"
+      />
       <EditSubmit />
-    </q-fab>
+    </div>
+    <q-btn
+      :icon="editPanel.drawerExpanded ? 'list_alt' : 'list_alt'"
+      :class="editPanel.drawerExpanded ? 'on' : ''"
+      :disabled="!ongoingEdit"
+      class="drawer-control"
+      square
+      @click.stop="editPanel.drawerExpanded = !editPanel.drawerExpanded"
+    />
   </div>
+  <transition name="collapse">
+    <div
+      v-show="editPanel.drawerExpanded"
+      class="edit-content-holder"
+      :style="holderStyle"
+    >
+      <WindowIndex />
+      <FolioIndex />
+      <InlineIndex />
+    </div>
+  </transition>
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, provide, ref } from "vue";
-
-import { useEditing, usePermissions } from "@/use";
-
+import { computed, defineComponent, onMounted } from "vue";
+import { useEditing, useStores } from "@/use";
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
 import { default as EditUpdate } from "./EditUpdate.vue";
+import { default as FolioIndex } from "./FolioIndex.vue";
+import { default as InlineIndex } from "./InlineIndex.vue";
+import { default as WindowIndex } from "./WindowIndex.vue";
+import { Tooltip } from "@/components/utils";
 
 export default defineComponent({
   name: "EditPanel",
@@ -46,55 +71,233 @@ export default defineComponent({
     EditCreate,
     EditSubmit,
     EditUpdate,
+    FolioIndex,
+    InlineIndex,
+    WindowIndex,
+    Tooltip,
   },
   setup() {
-    const { hideEditing, showEditing } = useEditing();
     const {
-      permissions: { isAdmin },
-    } = usePermissions();
+      isAdmin,
+      showEditFolioBtn,
+      currentFolioEditOn,
+      editPanel,
+      compactMode,
+      eventBus,
+    } = useStores();
+    const { hideEditing, showEditing } = useEditing();
 
-    const el = ref(null);
-    const dragging = ref(false);
-    const position = ref([-30, 30]);
+    const showStrip = computed({
+      get: () => editPanel.value.stripExpanded,
+      set: (value) => {
+        if (!editPanel.value.stripKeepOpen)
+          editPanel.value.stripExpanded = value;
+      },
+    });
 
-    const maxH = computed(() => window.innerHeight - 112);
+    const top = computed(() => (compactMode.value ? 57 : 102));
+    const right = computed(() =>
+      showStrip.value ? 0 : editPanel.value.stripApproachHover ? -223 : -250,
+    );
+    const stripStyle = computed(
+      () => `top: ${top.value}px; right: ${right.value}px`,
+    );
+    const holderStyle = computed(() => {
+      let r = showStrip.value ? 0 : -250;
+      return `top: ${top.value}px; right: ${r}px`;
+    });
 
-    const move = (event) => {
-      dragging.value = event.isFirst !== true && event.isFinal === false;
-      position.value = [
-        position.value[0],
-        0 <= position.value[1] - event.delta.y &&
-        position.value[1] - event.delta.y <= maxH.value
-          ? position.value[1] - event.delta.y
-          : position.value[1],
-      ];
-    };
+    const ongoingEdit = computed(
+      () =>
+        editPanel.value.folioIndexShow ||
+        editPanel.value.inlineIndexShow ||
+        editPanel.value.windowIndexShow,
+    );
 
-    provide("dragging", dragging);
+    const openEditing = () => (showStrip.value = true);
+    const closeEditing = () => (showStrip.value = false);
 
     onMounted(() => {
-      hideEditing.value = el.value.hide;
-      showEditing.value = el.value.show;
+      hideEditing.value = closeEditing;
+      showEditing.value = openEditing;
     });
 
     return {
-      el,
-      dragging,
+      editPanel,
+      showEditFolioBtn,
+      currentFolioEditOn,
       isAdmin,
-      move,
-      position,
+      holderStyle,
+      showStrip,
+      stripStyle,
+      eventBus,
+      ongoingEdit,
     };
   },
 });
 </script>
 
-<style lang="scss" scoped>
-.parent {
-  background-color: #2f333c;
-  background-image: linear-gradient(59deg, #11587c 54.62%, #1b1b1b);
+<style lang="scss">
+.edit-panel-strip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  align-items: center;
+  height: 37px;
+  width: 263px;
+  background-color: #ffca82;
+  color: #a85e00;
+  font-size: 18px;
+  border-radius: 12px 0 0 12px;
+  border-top: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+  border-bottom: 1px solid #c87001;
+  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset,
+    rgb(79 79 79 / 17%) 0px 0px 20px 6px;
+  position: absolute;
+  z-index: 9998;
+  transition: all 0.5s ease-in-out;
 }
-.edit-sticky {
-  margin-right: -30px;
-  margin-bottom: 30px;
+.edit-panel-strip > i:first-of-type {
+  align-self: center;
+  width: 13px;
+}
+.edit-panel-strip > button,
+.edit-panel-strip > a.q-btn {
+  width: 27px;
+  height: 27px;
+  min-height: 20px;
+  font-size: 8px;
+  padding: 0 0 0 1px;
+  border-style: solid;
+  border-color: #c87001;
+  background-color: #ffe1b8;
+  color: #bb894a;
+}
+.edit-panel-strip > button:first-of-type {
+  align-self: center;
+  border-radius: 8px 0 0 8px;
+  border-width: 1px 0 1px 1px;
+  margin-right: -1px;
+  box-shadow: 1px 1px 0px 0px #5757573d inset, 0px -1px 0px 0px #ffffff7d inset;
+}
+.edit-panel-strip > button.drawer-control {
+  align-self: end;
+  border-radius: 8px 8px 0 0;
+  border-width: 0 0 1px 0;
+  position: absolute;
+  right: 98px;
+  margin-bottom: -1px;
+  box-shadow: 1px 1px 0px 0px #5757573d inset, -1px -1px 0px 0px #ffffff7d inset,
+    1px 0px 0px 0px #5757573d, -1px 0 0px 0px #ffffff7d;
+}
+.edit-panel-strip > button.on {
+  background-color: #ffca82;
+  color: #a85e00;
+  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset;
+}
+.edit-panel-strip > button.drawer-control.on {
+  border-bottom: none;
+  border-top: 1px solid #a55e002b;
+  box-shadow: 1px 1px 0px 0px #ffffff7d inset, -1px 0 0px 0px #5757573d inset,
+    -1px 0 0px 0px #5757573d, 1px 0px 0px 0px #ffffff7d;
+}
+.edit-panel-strip button::before,
+.strip-button-container a.q-btn::before {
+  box-shadow: none;
+}
+.edit-panel-strip button.disabled,
+.edit-panel-strip button[disabled] {
+  opacity: 1 !important;
+}
+.strip-button-container {
+  display: flex;
+  flex-direction: row;
+  width: 222px;
+  height: 35px;
+  align-self: end;
+  border-left: 1px solid #c87001;
+  background-color: #ffdaa8;
+}
+.strip-button-container button,
+.strip-button-container a.q-btn {
+  display: flex;
+  flex-grow: 1;
+  min-height: 30px;
+  border-radius: 0;
+  padding: 0;
+  color: #a85e00;
+  background-color: #ffca82;
+  width: 55px;
+  box-shadow: 1px 1px 0px 0px #ffffff4d inset, -1px -1px 0px 0px #5757573d inset;
+}
+.strip-button-container button:nth-of-type(1) {
+  padding-right: 8px;
+}
+.strip-button-container button:nth-of-type(2) {
+  padding-left: 8px;
+}
+.strip-button-container a.q-btn .q-fab__icon-holder {
+  min-width: 20px;
+  min-height: 20px;
+  position: inherit;
+}
+.strip-button-container a.q-btn i {
+  font-size: 20px;
+}
+.strip-button-container button.disabled {
+  background-color: #ffe1b8 !important;
+  color: #bb894a !important;
+  box-shadow: 1px 1px 0px 0px #5757571f inset, -1px -1px 0px 0px #ffffffe8 inset;
+}
+.edit-content-holder {
+  margin-top: 37px;
+  width: 223px;
+  background-color: #ffffffd1;
+  backdrop-filter: blur(5px) grayscale(70%);
+  border-bottom: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+  border-bottom-left-radius: 4px;
+  z-index: 9999;
+  position: absolute;
+  right: 0;
+  transition: all 0.5s ease-in-out;
+  box-shadow: rgb(79 79 79 / 17%) -7px 10px 20px 0px;
+}
+.edit-content-holder .q-item:last-of-type {
+  border-bottom-left-radius: 3px;
+}
+.edit-header {
+  display: flex;
+  height: 22px;
+  border-top: 1px solid #c87001;
+  border-bottom: 1px solid #c87001;
+  border-left: 1px solid #c87001;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.edit-panel-strip button.orange {
+  background-color: #ffca82;
+  color: #a85e00;
+}
+.edit-panel-strip button.orange-on {
+  background-color: #ffca82;
+  color: #a85e00;
+  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset;
+}
+.edit-panel-strip button.orange-off {
+  background-color: #ffe1b8;
+  color: #bb894a;
+  box-shadow: 1px 1px 0px 0px #5757573d inset, 0px -1px 0px 0px #ffffff7d inset;
+}
+.strip-button-container button.disabled.editing {
+  background-color: #fdd3c7;
+  color: #a74646;
+  box-shadow: 1px 1px 0px 0px #5757572b inset, 0px -1px 0px 0px #fffefe9c inset;
+}
+.edit-on {
+  background-color: #ffbfac;
+  color: #a80000;
 }
 </style>

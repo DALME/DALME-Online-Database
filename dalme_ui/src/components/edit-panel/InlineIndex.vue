@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="show"
+    v-if="editPanel.inlineIndexShow"
     class="container q-py-sm"
     :class="{
       focussed: isFocus,
@@ -45,9 +45,8 @@
 
 <script>
 import moment from "moment";
-import { computed, defineComponent, inject, watch } from "vue";
-
-import { useEditing, useTransport } from "@/use";
+import { computed, defineComponent, watch } from "vue";
+import { useEditing, useStores, useTransport } from "@/use";
 
 export default defineComponent({
   name: "InlineIndex",
@@ -64,9 +63,7 @@ export default defineComponent({
       transport.canRedo.value ? false : true,
     );
     const isFocus = computed(() => focus.value === "inline");
-
-    const show = inject("inlineIndexShow");
-
+    const { editPanel } = useStores();
     const fromUnixTs = (unixTs) =>
       moment.unix(unixTs / 1000).format("YYYY-MM-DD HH:mm:ss");
 
@@ -75,7 +72,7 @@ export default defineComponent({
     watch(
       () => diffs.value,
       (newDiffs) => {
-        show.value = newDiffs.length > 0;
+        editPanel.value.inlineIndexShow = newDiffs.length > 0;
       },
     );
 
@@ -87,7 +84,7 @@ export default defineComponent({
       handleFocus,
       isFocus,
       mouseoverSubmit,
-      show,
+      editPanel,
       transport,
     };
   },

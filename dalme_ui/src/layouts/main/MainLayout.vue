@@ -21,7 +21,7 @@ import { usePrefStore } from "@/stores/preferences";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { EditIndex, EditPanel, LoginModal, Nav } from "@/components";
+import { EditPanel, LoginModal, Nav } from "@/components";
 import {
   provideAPI,
   provideEditing,
@@ -33,7 +33,6 @@ import {
 export default defineComponent({
   name: "MainLayout",
   components: {
-    EditIndex,
     EditPanel,
     LoginModal,
     Nav,

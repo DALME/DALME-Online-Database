@@ -1,20 +1,15 @@
 <template>
-  <q-fab
-    icon="add"
-    text-color="black"
-    direction="up"
-    :color="dragging ? 'grey' : 'amber'"
-    :disable="dragging"
-    push
-  >
+  <q-fab ref="cFab" icon="data_saver_on" direction="down" square>
     <q-fab
       padding="0.5rem"
       icon="bookmark"
+      label="Record"
+      external-label
+      label-position="right"
       text-color="black"
       direction="left"
-      :color="dragging ? 'grey' : 'orange'"
-      :disable="dragging"
-      push
+      color="orange"
+      :hide-label="false"
     >
       <q-fab-action
         :onClick="() => handleClick('archive')"
@@ -70,9 +65,7 @@
       icon="collections_bookmark"
       text-color="black"
       direction="left"
-      :color="dragging ? 'grey' : 'orange'"
-      :disable="dragging"
-      push
+      color="orange"
     >
       <q-fab-action
         :onclick="() => handleClick('corpus')"
@@ -151,8 +144,7 @@
 
 <script>
 import cuid from "cuid";
-import { defineAsyncComponent, defineComponent, inject } from "vue";
-
+import { defineAsyncComponent, defineComponent, ref } from "vue";
 import { useEditing } from "@/use";
 
 export default defineComponent({
@@ -164,13 +156,13 @@ export default defineComponent({
   },
   setup() {
     const mode = "create";
+    const cFab = ref(null);
     const {
       machine: { send },
     } = useEditing();
 
-    const dragging = inject("dragging");
-
-    const handleClick = (kind) =>
+    const handleClick = (kind) => {
+      cFab.value.hide();
       send("SPAWN_FORM", {
         cuid: cuid(),
         key: null,
@@ -178,9 +170,10 @@ export default defineComponent({
         mode,
         initialData: {},
       });
+    };
 
     return {
-      dragging,
+      cFab,
       handleClick,
     };
   },

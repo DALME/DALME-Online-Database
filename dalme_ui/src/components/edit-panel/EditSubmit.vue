@@ -1,14 +1,13 @@
 <template>
   <q-btn
-    fab
     icon="save"
+    size="11px"
     :disable="!valid"
-    :color="valid ? (mouseoverSubmit ? 'red' : 'green') : 'grey'"
-    :text-color="valid ? 'white' : 'black'"
+    :color="valid ? (mouseoverSubmit ? 'red-10' : 'light-green-8') : 'none'"
+    :text-color="valid ? (mouseoverSubmit ? 'red-2' : 'light-green-2') : 'none'"
     @click.stop="handleSubmit"
     @mouseover="mouseoverSubmit = true"
     @mouseleave="mouseoverSubmit = false"
-    push
   >
     <template v-slot:loading>
       <q-spinner-facebook />
@@ -19,7 +18,6 @@
 <script>
 import { isNil } from "ramda";
 import { defineComponent, ref } from "vue";
-
 import { useEditing } from "@/use";
 
 export default defineComponent({
@@ -32,6 +30,7 @@ export default defineComponent({
     } = useEditing();
 
     const valid = ref(false);
+
     service.onTransition(({ context: { focus, modals } }) => {
       const canSubmit = (focus) => {
         if (isNil(focus)) return false;

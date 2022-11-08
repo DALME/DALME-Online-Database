@@ -1,13 +1,12 @@
 <template>
   <q-btn
-    fab
-    icon="edit"
-    text-color="black"
-    :color="underEdit ? 'amber-2' : 'amber'"
+    square
+    size="11px"
+    :icon="underEdit ? 'edit_off' : 'edit'"
+    :class="underEdit ? 'editing' : 'orange'"
     :disable="!isDetail || underEdit"
     :loading="loading"
     :onclick="handleClick"
-    push
   >
     <template v-slot:loading>
       <q-spinner-facebook />
@@ -21,7 +20,6 @@ import { isNil, keys } from "ramda";
 import { computed, defineComponent } from "vue";
 import { useRoute } from "vue-router";
 import { useActor } from "@xstate/vue";
-
 import { requests } from "@/api";
 import { normalizeAttributesInput } from "@/components/forms/attributes-field/normalize";
 import forms from "@/forms";
@@ -32,7 +30,6 @@ export default defineComponent({
   name: "EditUpdate",
   setup() {
     const mode = "update";
-
     const { apiInterface } = useAPI();
     const {
       editingIndex,
@@ -44,7 +41,6 @@ export default defineComponent({
     const $route = useRoute();
 
     const { success, data, fetchAPI, loading } = apiInterface();
-
     const id = computed(() => $route.params.id);
     const key = computed(() => `form-${resource.value}-${id.value}`);
     const underEdit = computed(() => !isNil(editingIndex.value[key.value]));
