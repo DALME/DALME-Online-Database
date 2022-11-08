@@ -131,14 +131,18 @@
                 class="mb-2 ml-1"
                 id="imageCheckbox"
                 @input="setHasImage"
-                v-model="hasImage">
+                v-model="hasImage"
+                value="true"
+              >
                 Show only records with images
               </b-form-checkbox>
               <b-form-checkbox
                 class="mb-2 ml-1"
                 id="transcriptionCheckbox"
                 @input="setHasTranscription"
-                v-model="hasTranscription">
+                v-model="hasTranscription"
+                value="true"
+              >
                 Show only records with transcriptions
               </b-form-checkbox>
             </b-form>
@@ -192,19 +196,19 @@
             <div class="grid-row-wrapper compact u-contents">
               <span class="inventory-field name">
                 <a :href="recordUrl(record)">
-                  ${record.name}<span class="short-name"> ${record.short_name}</span>
+                  ${record.name}<span class="short-name"> ${record.shortName}</span>
                 </a>
               </span>
-              <span class="inventory-field record-type">${record.record_type}</span>
+              <span class="inventory-field record-type">${record.recordType}</span>
               <span class="inventory-field date">${record.date}</span>
               <span class="inventory-field icons">
                 <i
                   class="fas fa-book-open fa-sm ml-auto"
-                  v-bind:class="{ active: record.no_folios > 0 }">
+                  v-bind:class="{ active: record.noFolios > 0 }">
                 </i>
                 <i
                   class="fas fa-sm fa-images"
-                  v-bind:class="{ active: record.has_transcriptions }">
+                  v-bind:class="{ active: record.hasTranscriptions }">
                 </i>
               </span>
             </div>
@@ -221,7 +225,7 @@
                 <div class="u-flex inventory-details">
                   <div class="u-flex mb-1">
                     <span class="name">${record.name}</span>
-                    <span class="short-name ml-auto">${record.short_name}</span>
+                    <span class="short-name ml-auto">${record.shortName}</span>
                   </div>
                   <div class="u-flex">
                     <div class="mr-auto">
@@ -229,22 +233,22 @@
                     </div>
                     <div class="u-flex inventory-metadata flex-column">
                       <span class="city">${record.date}</span>
-                      <span class="folios" v-if="record.no_folios > 1">${record.no_folios} Folios</span>
-                      <span class="folios" v-else>${record.no_folios} Folio</span>
+                      <span class="folios" v-if="record.noFolios > 1">${record.noFolios} Folios</span>
+                      <span class="folios" v-else>${record.noFolios} Folio</span>
                     </div>
                   </div>
                 </div>
                 <div class="u-flex icons">
                   <div class="u-flex first">
                     <i class="fas fa-book-open"></i>
-                    <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
-                      ${record.no_folios}
+                    <span class="icon-count" :class="record.noFolios === 0 ? 'red' : ''">
+                      ${record.noFolios}
                     </span>
                   </div>
                   <div class="u-flex second">
                     <i class="fas fa-feather-alt fa-flip-horizontal"></i>
-                    <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
-                      ${record.no_transcriptions}
+                    <span class="icon-count" :class="record.noTranscriptions === 0 ? 'red' : record.noTranscriptions === record.noFolios ? '' : 'yellow'">
+                      ${record.noTranscriptions}
                     </span>
                   </div>
                 </div>
@@ -267,20 +271,20 @@
                         <div class="u-flex icons">
                           <div class="u-flex first">
                             <i class="fas fa-book-open"></i>
-                            <span class="icon-count" :class="record.no_folios === 0 ? 'red' : ''">
-                              ${record.no_folios}
+                            <span class="icon-count" :class="record.noFolios === 0 ? 'red' : ''">
+                              ${record.noFolios}
                             </span>
                           </div>
                           <div class="u-flex first">
                             <i class="fas fa-images"></i>
-                            <span class="icon-count" :class="record.no_images === 0 ? 'red' : record.no_images === record.no_folios ? '' : 'yellow'">
-                              ${record.no_images}
+                            <span class="icon-count" :class="record.noImages === 0 ? 'red' : record.noImages === record.noFolios ? '' : 'yellow'">
+                              ${record.noImages}
                             </span>
                           </div>
                           <div class="u-flex first">
                             <i class="fas fa-feather-alt fa-flip-horizontal"></i>
-                            <span class="icon-count" :class="record.no_transcriptions === 0 ? 'red' : record.no_transcriptions === record.no_folios ? '' : 'yellow'">
-                              ${record.no_transcriptions}
+                            <span class="icon-count" :class="record.noTranscriptions === 0 ? 'red' : record.noTranscriptions === record.noFolios ? '' : 'yellow'">
+                              ${record.noTranscriptions}
                             </span>
                           </div>
                           <div class="u-flex">
@@ -297,7 +301,7 @@
                       </div>
 
                       <div class="u-flex bottom">
-                        <span class="short-name">${record.short_name}</span>
+                        <span class="short-name">${record.shortName}</span>
                         <span class="city">${record.date}</span>
                       </div>
                   </a>
@@ -527,10 +531,10 @@
           this.filterData('source_type', value);
         },
         setHasImage() {
-          this.filterData('has_image', !this.hasImage);
+          this.filterData('has_image', this.hasImage);
         },
         setHasTranscription() {
-          this.filterData('has_transcription', !this.hasTranscription);
+          this.filterData('has_transcription', this.hasTranscription);
         },
         setLocale() {
           const value = this.locale ? this.locale : '';
@@ -602,21 +606,21 @@
               this.count = data.count;
               this.totalPages = data.totalPages;
               this.currentPage = data.currentPage;
-              this.pageNumbers = data.page_numbers;
-              this.pageStart = data.page_start,
-              this.pageEnd = data.page_end,
-              this.showFirst = !data.page_numbers.includes(1);
-              this.showLast = !data.page_numbers.includes(data.totalPages);
+              this.pageNumbers = data.pageNumbers;
+              this.pageStart = data.pageStart,
+              this.pageEnd = data.pageEnd,
+              this.showFirst = !data.pageNumbers.includes(1);
+              this.showLast = !data.pageNumbers.includes(data.totalPages);
               this.fetching = false;
               // this.updateCollection();
             });
         },
         async fetchThumbnails() {
           const records = this.records.filter(record =>
-            record.image_ref !== null // && !(record.id in this.thumbnails)
+            record.imageRef !== null // && !(record.id in this.thumbnails)
           );
           await Promise.all(records.map(record => {
-            fetch(`${this.thumbnailEndpoint}/?image_ref=${record.image_ref}&size=${this.thumbSize}`)
+            fetch(`${this.thumbnailEndpoint}/?image_ref=${record.imageRef}&size=${this.thumbSize}`)
               .then(response => response.json())
               .then(data => {
                 this.thumbnails[record.id] = data.image_url;
