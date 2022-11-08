@@ -1,5 +1,4 @@
 import { watch } from "vue";
-
 import forms from "@/forms";
 
 export const useDynamicForm = (formRequest, formSchema, submitSchema) => {

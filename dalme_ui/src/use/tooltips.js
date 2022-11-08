@@ -7,10 +7,10 @@ export const provideTooltips = () => {
   const prefStore = usePrefStore();
   const showTips = computed({
     get() {
-      return prefStore.ui.tooltipsOn;
+      return prefStore.general.tooltipsOn;
     },
     set(newValue) {
-      prefStore.ui.tooltipsOn = newValue;
+      prefStore.general.tooltipsOn = newValue;
     },
   });
 

@@ -15,13 +15,15 @@ import { computed, inject, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { assign, createMachine, send, spawn } from "xstate";
 import { useActor, useMachine, useSelector } from "@xstate/vue";
-
 import { default as notifier } from "@/notifier";
+import { useUiStore } from "@/stores/ui";
 
 const MAX_MODALS = 10;
 const EditingSymbol = Symbol();
 
 export const provideEditing = () => {
+  const ui = useUiStore();
+
   const createFormMachine = (cuid, key, kind, mode, initialData) =>
     createMachine(
       {
