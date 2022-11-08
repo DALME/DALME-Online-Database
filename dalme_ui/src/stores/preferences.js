@@ -6,7 +6,7 @@ import { isEmpty, isNil } from "ramda";
 export const usePrefStore = defineStore("preferences", {
   state: () => {
     return {
-      ui: {
+      general: {
         tooltipsOn: true,
         sidebarCollapsed: false,
       },
