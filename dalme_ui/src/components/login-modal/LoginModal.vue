@@ -9,17 +9,20 @@
     <q-card class="login-modal">
       <q-card-section class="login-card-header">
         <img class="dalme-logo-image" src="~assets/dalme_logo.svg" />
-        <div v-if="reAuthenticate">Please re-authenticate.</div>
       </q-card-section>
-
       <q-separator />
-
       <q-card-section class="login-card-body">
+        <div class="login-card-text">
+          <span v-if="reAuthenticate">Please re-authenticate</span>
+          <span v-else>Please log in</span>
+        </div>
         <q-form @submit="onSubmit" class="q-gutter-sm">
           <q-input
-            label="Username"
+            placeholder="Username"
             v-model="username"
+            dense
             outlined
+            color="indigo-6"
             bg-color="white"
             hide-bottom-space
             autocomplete="off"
@@ -32,8 +35,10 @@
 
           <q-input
             v-model="password"
-            label="Password"
+            placeholder="Password"
+            dense
             outlined
+            color="indigo-6"
             bg-color="white"
             lazy-rules
             hide-bottom-space
@@ -53,14 +58,14 @@
             </template>
           </q-input>
 
-          <div class="row justify-center q-mt-lg q-pt-md">
+          <div class="row justify-center q-mt-sm q-pt-md">
             <q-btn
               unelevated
               no-caps
-              align="between"
-              label="Login"
+              label="Log in"
               type="submit"
-              color="primary"
+              class="login-modal-button"
+              color="indigo-6"
               padding="sm 5rem"
               preventClose="true"
               :disable="disabled"
@@ -71,15 +76,16 @@
               </template>
             </q-btn>
           </div>
-          <div class="row justify-center">
-            <q-btn
-              label="Forgot your password?"
-              flat
-              no-caps
-              type="a"
-              color="primary"
+          <div class="row justify-center text-indigo-6 login-modal-link">
+            <a href="" class="text-link">Recover password</a>
+            <span v-if="reAuthenticate" class="text-grey-7 q-mx-sm">|</span>
+            <a
+              v-if="reAuthenticate"
+              @click="logout"
+              class="text-link cursor-pointer"
             >
-            </q-btn>
+              Log out
+            </a>
           </div>
         </q-form>
       </q-card-section>
@@ -183,20 +189,64 @@ export default defineComponent({
   min-width: 400px;
 }
 .dalme-logo-image {
-  width: 7.5rem;
+  align-self: center;
+  width: 16rem;
+  filter: grayscale(1) invert(1);
+  transform: rotate(-35deg);
+  opacity: 0.4;
+  position: relative;
+  top: -10%;
 }
 .login-card-header {
-  padding: 50px 25px 40px 25px;
-  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
   min-width: 300px;
   text-align: center;
+  height: 200px;
+  background-color: #343e72;
+  background-image: linear-gradient(59deg, #343e72 54.62%, #1b1b1b);
+}
+.login-card-logo {
+  align-self: center;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.login-card-text {
+  font-size: 16px;
+  font-weight: 300;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 .login-card-body {
   background-color: #fcfcfc;
-  padding: 25px 40px;
+  padding: 0px 60px 20px;
+}
+.login-card-body .text-negative {
+  color: #c3747c !important;
+}
+.login-card-body .q-field--error .q-field__bottom {
+  color: #9a4f57 !important;
+  margin-bottom: 0;
+}
+.login-card-body .q-field__bottom {
+  padding: 6px 12px 0;
+  display: none;
+}
+.login-card-body .q-field__marginal {
+  font-size: 18px;
+}
+.login-modal-link {
+  font-size: 12px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.login-modal-button {
+  font-weight: 400;
+  padding: 4px 4rem !important;
 }
 .frosted-background > .q-dialog__backdrop {
-  background: none;
-  backdrop-filter: blur(10px) grayscale(70%);
+  backdrop-filter: blur(5px) grayscale(70%);
 }
 </style>
