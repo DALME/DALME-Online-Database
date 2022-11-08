@@ -1,5 +1,5 @@
 {
-  "ui": {
+  "general": {
     "tooltipsOn": true,
     "sidebarCollapsed": false
   },
