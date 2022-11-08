@@ -2,6 +2,7 @@
 // cirucular import errors within components.
 export { default as Dialog } from "./dialog";
 export { default as MarkdownEditor } from "./markdown-editor";
+export { default as TeiEditor } from "./tei-editor";
 export { default as IiifViewer } from "./iiif-viewer";
 export { default as DetailCard } from "./detail-card";
 export { default as Table } from "./table";
