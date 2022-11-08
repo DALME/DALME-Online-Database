@@ -4,10 +4,10 @@ import {
   createWebHistory,
   createWebHashHistory,
 } from "vue-router";
-
 import { filter as rFilter, head } from "ramda";
 import routes from "./routes";
 import { useNavStore } from "@/stores/navigation";
+import { useUiStore } from "@/stores/ui";
 
 const createHistory = process.env.SERVER
   ? createMemoryHistory
@@ -45,7 +45,9 @@ const navSubsections = rFilter((route) => route.children, navRoutes)
   });
 
 router.beforeEach((to, from) => {
-  const $navStore = useNavStore();
+  const nav = useNavStore();
+  const ui = useUiStore();
+
   const navSection = navSections.includes(to.matched[1].name)
     ? to.matched[1].name
     : null;
@@ -67,9 +69,12 @@ router.beforeEach((to, from) => {
     currentSubsection = from.matched[2].name;
   }
 
-  $navStore.currentSection = currentSection;
-  $navStore.currentSubsection = currentSubsection;
-  $navStore.currentPageIcon = to.meta.icon || "layers";
+  nav.resetBreadcrumbTail();
+  nav.currentSection = currentSection;
+  nav.currentSubsection = currentSubsection;
+  nav.currentPageIcon = to.meta.icon || "layers";
+
+  ui.resetViewState(to.meta || null);
 });
 
 export default router;

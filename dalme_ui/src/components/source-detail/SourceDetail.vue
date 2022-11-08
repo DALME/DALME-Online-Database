@@ -183,11 +183,11 @@ import SourcePlaces from "./SourcePlaces.vue";
 export default defineComponent({
   name: "SourceDetail",
   components: {
+    AdaptiveSpinner,
     BooleanIcon,
     DetailPopover,
     Comments,
     LogViewer,
-    OpaqueSpinner,
     SourceAttributes,
     SourceAgents,
     SourceChildren,
@@ -200,8 +200,13 @@ export default defineComponent({
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard, resource } = useEditing();
-    const $navStore = useNavStore();
-    const { loading, success, data, fetchAPI } = apiInterface();
+    const { nav, ui } = useStores();
+    ui.mergeValues({
+      view: {
+        tab: "info",
+      },
+    });
+    const { success, data, fetchAPI } = apiInterface();
     const source = ref({});
 
     const id = inject("id");

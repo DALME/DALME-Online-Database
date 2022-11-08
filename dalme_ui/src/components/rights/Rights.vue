@@ -155,7 +155,6 @@
 import { openURL } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useConstantStore } from "@/stores/constants";
 import { requests } from "@/api";
 import { Table } from "@/components";
 import {
@@ -167,7 +166,7 @@ import {
   Tag,
 } from "@/components/utils";
 import { rightsListSchema } from "@/schemas";
-import { useAPI, usePagination } from "@/use";
+import { useAPI, useConstants, usePagination } from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
@@ -181,7 +180,7 @@ export default defineComponent({
   },
   setup() {
     const $route = useRoute();
-    const $constantStore = useConstantStore();
+    const { rightsIconById, rightsColoursById } = useConstants();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
@@ -189,8 +188,8 @@ export default defineComponent({
     const noData = "No rights found.";
     const title = "Rights";
 
-    const getStatusIcon = (id) => $constantStore.rightsIconById[id];
-    const getStatusColours = (id) => $constantStore.rightsColoursById[id];
+    const getStatusIcon = (id) => rightsIconById[id];
+    const getStatusColours = (id) => rightsColoursById[id];
 
     const fetchData = async (query) => {
       const request = requests.rights.getRights(query);

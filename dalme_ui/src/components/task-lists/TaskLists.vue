@@ -145,7 +145,7 @@ import { useRouter } from "vue-router";
 import { useActor } from "@xstate/vue";
 import { requests } from "@/api";
 import forms from "@/forms";
-import { useAPI, useEditing, useNotifier, usePermissions } from "@/use";
+import { useAPI, useEditing, useNotifier, useStores } from "@/use";
 
 export default defineComponent({
   name: "TaskLists",
@@ -164,9 +164,7 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
     const $notifier = useNotifier();
-    const {
-      permissions: { isAdmin },
-    } = usePermissions();
+    const { isAdmin } = useStores();
     const $router = useRouter();
 
     const title = "Task Lists";
@@ -259,7 +257,7 @@ export default defineComponent({
     const clearActiveFilters = () => {
       console.log("clear active filters");
       activeFilters.value = new Set();
-      const { filter } = $router.currentRoute.value.query;
+      // const { filter } = $router.currentRoute.value.query;
       const newFilters = Array.from(activeFilters.value).join(",");
       $router.push({
         query: { ...(newFilters && { filter: newFilters }) },

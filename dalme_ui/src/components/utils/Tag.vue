@@ -11,7 +11,7 @@
 
 <script>
 import { computed, defineComponent } from "vue";
-import { useConstantStore } from "@/stores/constants";
+import { useConstants } from "@/use";
 
 export default defineComponent({
   name: "Tag",
@@ -56,11 +56,15 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const $constantStore = useConstantStore();
+    const {
+      ticketTagColours,
+      ticketTagIcon,
+      workflowTagColours,
+      workflowIconbyStage,
+      workflowIconbyStatus,
+    } = useConstants();
     const converter =
-      props.module === "workflow"
-        ? $constantStore.workflowTagColours
-        : $constantStore.ticketTagColours;
+      props.module === "workflow" ? workflowTagColours : ticketTagColours;
 
     const tagColours = computed(() =>
       props.module === "standalone"
@@ -71,12 +75,12 @@ export default defineComponent({
     const miniIcon = computed(() => {
       if (props.module === "workflow") {
         if (props.wfStatus === 2) {
-          return $constantStore.workflowIconbyStage[props.wfStage];
+          return workflowIconbyStage[props.wfStage];
         } else {
-          return $constantStore.workflowIconbyStatus[props.wfStatus];
+          return workflowIconbyStatus[props.wfStatus];
         }
       } else {
-        return $constantStore.ticketTagIcon[props.type];
+        return ticketTagIcon[props.type];
       }
     });
 

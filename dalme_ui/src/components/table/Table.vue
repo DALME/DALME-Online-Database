@@ -236,7 +236,7 @@ import TableToolbar from "./TableToolbar.vue";
 import TablePager from "./TablePager.vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useActor } from "@xstate/vue";
-import { useAPI, useEditing, usePermissions, useTransport } from "@/use";
+import { useAPI, useEditing, useStores, useTransport } from "@/use";
 
 export default defineComponent({
   name: "Table",
@@ -351,9 +351,7 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
 
-    const {
-      permissions: { isAdmin },
-    } = usePermissions();
+    const { isAdmin } = useStores();
 
     const {
       diffCount,

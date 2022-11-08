@@ -90,26 +90,20 @@
 <script>
 import { any, isEmpty } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
-import { usePrefStore } from "@/stores/preferences";
-
 import { authSchema, preferenceSchema } from "@/schemas";
-
 import { requests, publicUrl } from "@/api";
-import { useAPI, useNotifier } from "@/use";
+import { useAPI, useNotifier, useStores } from "@/use";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "LoginModal",
   setup() {
-    const $authStore = useAuthStore();
-    const $prefStore = usePrefStore();
+    const { auth, prefs, reAuthenticate } = useStores();
     const $notifier = useNotifier();
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { data, fetchAPI, success } = apiInterface();
     const { showLogin, updateShowLogin } = inject("showLogin");
-    const reAuthenticate = inject("reAuthenticate");
     const prefSubscription = inject("prefSubscription");
     const username = ref("");
     const password = ref("");
@@ -126,6 +120,11 @@ export default defineComponent({
       (val) => (val && !isEmpty(val)) || "Password is required",
     ];
 
+    const logout = () => {
+      prefSubscription();
+      auth.logout();
+    };
+
     const onSubmit = async () => {
       submitting.value = true;
       await fetchAPI(
@@ -138,15 +137,13 @@ export default defineComponent({
         await authSchema
           .validate(data.value, { stripUnknown: true })
           .then((value) => {
-            $authStore.login(value.user).then(async () => {
-              await fetchAPI(
-                requests.users.getUserPreferences($authStore.userId),
-              );
+            auth.login(value.user).then(async () => {
+              await fetchAPI(requests.users.getUserPreferences(auth.userId));
               if (success.value) {
                 await preferenceSchema
                   .validate(data.value, { stripUnknown: false })
                   .then(async (value) => {
-                    await $prefStore.loadPreferences(value);
+                    await prefs.loadPreferences(value);
                     prefSubscription("subscribe");
                   });
               } else {
@@ -167,6 +164,7 @@ export default defineComponent({
     return {
       disabled,
       isPassword,
+      logout,
       onSubmit,
       password,
       passwordRules,

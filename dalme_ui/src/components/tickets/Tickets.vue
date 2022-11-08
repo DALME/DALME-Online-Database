@@ -256,8 +256,6 @@ import { openURL } from "quasar";
 import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
 import { defineComponent, provide, ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
-import { useConstantStore } from "@/stores/constants";
 import { requests } from "@/api";
 import { Table } from "@/components";
 import {
@@ -269,7 +267,13 @@ import {
   Tag,
 } from "@/components/utils";
 import { ticketListSchema } from "@/schemas";
-import { useAPI, useEditing, usePagination } from "@/use";
+import {
+  useAPI,
+  useConstants,
+  useEditing,
+  usePagination,
+  useStores,
+} from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
@@ -291,8 +295,8 @@ export default defineComponent({
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
-    const $authStore = useAuthStore();
-    const $constantStore = useConstantStore();
+    const { userId } = useStores();
+    const { ticketTagColours } = useConstants();
     const { postSubmitRefreshWatcher } = useEditing();
     const columns = ref([]);
     const rows = ref([]);
@@ -306,7 +310,7 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       const request = props.embedded
-        ? requests.tickets.getUserTickets($authStore.userId)
+        ? requests.tickets.getUserTickets(userId.value)
         : requests.tickets.getTickets(query);
       await fetchAPI(request);
       if (success.value)
@@ -405,8 +409,8 @@ export default defineComponent({
       search,
       sortList,
       tagsFilter,
-      ticketTagColours: $constantStore.ticketTagColours,
-      tagList: Object.keys($constantStore.ticketTagColours),
+      ticketTagColours,
+      tagList: Object.keys(ticketTagColours),
       title,
       visibleColumns,
     };

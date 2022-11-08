@@ -9,7 +9,6 @@
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-
 import { Page, Tasks, Tickets, Worksets } from "@/components";
 
 export default defineComponent({

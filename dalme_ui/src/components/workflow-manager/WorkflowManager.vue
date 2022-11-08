@@ -37,7 +37,7 @@
 
 <script>
 import { computed, defineComponent } from "vue";
-import { useConstantStore } from "@/stores/constants";
+import { useConstants } from "@/use";
 
 export default defineComponent({
   name: "WorkflowManager",
@@ -48,13 +48,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const $constantStore = useConstantStore();
-    const colours = computed(
-      () => $constantStore.workflowTagColours[props.data.status.tag],
-    );
-    const icon = computed(
-      () => $constantStore.workflowIconbyStage[props.data.stage],
-    );
+    const { workflowTagColours, workflowIconbyStage } = useConstants();
+    const colours = computed(() => workflowTagColours[props.data.status.tag]);
+    const icon = computed(() => workflowIconbyStage[props.data.stage]);
 
     return {
       colours,

@@ -24,7 +24,7 @@
 import S from "string";
 import { format } from "quasar";
 import { computed, defineComponent } from "vue";
-import { useConstantStore } from "@/stores/constants";
+import { useConstants } from "@/use";
 import { DetailPopover, formatDate, notNully } from "@/components/utils";
 
 export default defineComponent({
@@ -39,22 +39,28 @@ export default defineComponent({
     DetailPopover,
   },
   setup(props) {
-    const $constantStore = useConstantStore();
+    const {
+      workflowIconbyLabel,
+      workflowIconbyStage,
+      workflowStagesByName,
+      workflowStagesById,
+      workflowTagColours,
+    } = useConstants();
     const { capitalize } = format;
 
     const getStageState = (stageId) => {
       if (
         props.data.stage === stageId - 1 &&
-        props.data[`${$constantStore.workflowStagesById[stageId - 1]}Done`]
+        props.data[`${workflowStagesById[stageId - 1]}Done`]
       ) {
         return "Awaiting";
       } else if (
         props.data.stage === stageId &&
-        !props.data[`${$constantStore.workflowStagesById[stageId]}Done`]
+        !props.data[`${workflowStagesById[stageId]}Done`]
       ) {
         return "In progress";
       } else {
-        return props.data[`${$constantStore.workflowStagesById[stageId]}Done`]
+        return props.data[`${workflowStagesById[stageId]}Done`]
           ? "Completed"
           : "Pending";
       }
@@ -99,39 +105,37 @@ export default defineComponent({
 
     const workLog = computed(() => {
       const eventLog = props.data.workLog;
-      const stageNames = Object.keys($constantStore.workflowStagesByName);
+      const stageNames = Object.keys(workflowStagesByName);
       let stageControl = ["ingestion"];
       let log = [
         {
           title: "Ingestion",
           subtitle: getStageState(1),
-          icon: $constantStore.workflowIconbyStage[1],
+          icon: workflowIconbyStage[1],
           timestamp: notNully(eventLog)
             ? new Date(eventLog[0].timestamp)
             : null,
           isStage: true,
           colour:
-            $constantStore.workflowTagColours[
-              S(getStageState(1)).underscore().s
-            ]["text"],
+            workflowTagColours[S(getStageState(1)).underscore().s]["text"],
         },
       ];
 
       eventLog.forEach((entry) => {
         const [stage, text] = getLogEntryMeta(entry);
         if (stageNames.includes(stage)) {
-          let stageId = $constantStore.workflowStagesByName[stage];
+          let stageId = workflowStagesByName[stage];
           if (!stageControl.includes(stage)) {
             log.push({
               title: capitalize(stage),
               subtitle: getStageState(stageId),
-              icon: $constantStore.workflowIconbyStage[stageId],
+              icon: workflowIconbyStage[stageId],
               timestamp: new Date(entry.timestamp),
               isStage: true,
               colour:
-                $constantStore.workflowTagColours[
-                  S(getStageState(stageId)).underscore().s
-                ]["text"],
+                workflowTagColours[S(getStageState(stageId)).underscore().s][
+                  "text"
+                ],
             });
             stageControl.push(stage);
           }
@@ -143,35 +147,35 @@ export default defineComponent({
             isStage: false,
             user: entry.user,
             colour:
-              $constantStore.workflowTagColours[
-                S(getStageState(stageId)).underscore().s
-              ]["text"],
+              workflowTagColours[S(getStageState(stageId)).underscore().s][
+                "text"
+              ],
           });
         } else {
           log.push({
             title: text,
             subtitle: formatDate(entry.timestamp, true),
-            icon: $constantStore.workflowIconbyLabel[stage],
+            icon: workflowIconbyLabel[stage],
             timestamp: new Date(entry.timestamp),
             isStage: false,
             user: entry.user,
-            colour: $constantStore.workflowTagColours[stage]["text"],
+            colour: workflowTagColours[stage]["text"],
           });
         }
       });
 
       stageNames.forEach((stageName) => {
         if (!stageControl.includes(stageName)) {
-          let stageId = $constantStore.workflowStagesByName[stageName];
+          let stageId = workflowStagesByName[stageName];
           log.push({
             title: capitalize(stageName),
             subtitle: getStageState(stageId),
-            icon: $constantStore.workflowIconbyStage[stageId],
+            icon: workflowIconbyStage[stageId],
             isStage: true,
             colour:
-              $constantStore.workflowTagColours[
-                S(getStageState(stageId)).underscore().s
-              ]["text"],
+              workflowTagColours[S(getStageState(stageId)).underscore().s][
+                "text"
+              ],
           });
           stageControl.push(stageName);
         }
