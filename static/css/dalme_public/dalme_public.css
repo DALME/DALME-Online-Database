@@ -130,6 +130,24 @@ a.u-lozenge:hover {
   margin: 0.8rem 0 0.5rem 0;
   color: #3a5d82;
 }
+
+.u-subsection h4 {
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.05rem;
+  margin: 0.8rem 0 0.5rem 0.5rem;
+  color: #3a5d82;
+  list-style: circle;
+  display: list-item;
+  list-style-position: inside;
+}
+
+
+.u-subsection-end {
+  margin-bottom: 30px;;
+}
+
 .u-subsection i {
   margin-left: auto;
   align-self: center;

@@ -53,6 +53,7 @@ from dalme_public.blocks import (
     SocialBlock,
     SponsorBlock,
     SubsectionBlock,
+    SubsectionEndMarkerBlock,
 )
 
 from dalme_app.utils import Search, formset_factory, SearchContext
@@ -310,6 +311,7 @@ class DALMEPage(Page):
         ('embed', EmbedBlock(icon='media')),
         ('html', blocks.RawHTMLBlock()),
         ('subsection', SubsectionBlock()),
+        ('subsection_end_marker', SubsectionEndMarkerBlock()),
     ], null=True)
 
     class Meta:

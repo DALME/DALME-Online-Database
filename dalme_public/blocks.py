@@ -152,7 +152,15 @@ class SponsorBlock(blocks.StructBlock):
 class SubsectionBlock(blocks.StructBlock):
     subsection = blocks.CharBlock()
     collapsed = blocks.BooleanBlock(required=False, default=True)
+    minor_heading = blocks.BooleanBlock(required=False, default=False)
+
+    class Meta:
+        icon = 'collapse-down'
+        template = 'dalme_public/blocks/_subsection.html'
+
+
+class SubsectionEndMarkerBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'collapse-up'
-        template = 'dalme_public/blocks/_subsection.html'
+        template = 'dalme_public/blocks/_subsection_end.html'

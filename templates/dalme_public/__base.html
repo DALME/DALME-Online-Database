@@ -1,327 +1,331 @@
 {% load static dalme_public_tags wagtailimages_tags wagtailuserbar wagtailcore_tags compress %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
-  <head>
-    {% block meta %}
-      <meta charset="utf-8"/>
-      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-      <meta name="description" content=""/>
-      <meta name="viewport" content="width=device-width, initial-scale=1"/>
-      <link rel="apple-touch-icon" sizes="180x180" href="{% static '/icons/apple-touch-icon.png' %}">
-      <link rel="icon" type="image/png" sizes="32x32" href="{% static '/icons/favicon-32x32.png' %}">
-      <link rel="icon" type="image/png" sizes="16x16" href="{% static '/icons/favicon-16x16.png' %}">
-      <link rel="manifest" href="{% static '/icons/site_public.webmanifest' %}">
-      <link rel="mask-icon" href="{% static '/icons/safari-pinned-tab.svg' %}" color="#912643">
-      <link rel="shortcut icon" href="{% static '/icons/favicon.ico' %}">
-      <meta name="apple-mobile-web-app-title" content="DALME">
-      <meta name="application-name" content="DALME">
-      <meta name="msapplication-TileColor" content="#b91d47">
-      <meta name="msapplication-TileImage" content="{% static '/icons/mstile-144x144.png' %}">
-      <meta name="msapplication-config" content="{% static '/icons/browserconfig.xml' %}">
-      <meta name="theme-color" content="#ffffff">
-    {% endblock %}
-    <title>
-      {% block title %}DALME{% endblock %}
-    </title>
-    {% block styles %}
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-      <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-vue.min.css' %}" />
-      <script async defer data-domain="dalme.org" src="https://plausible.io/js/plausible.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/snarkdown@2.0.0/dist/snarkdown.umd.js" integrity="sha256-QqCCWG2y306e9DZ9VbcdrkacMAz1nubFmYCkac3I3AM=" crossorigin="anonymous"></script>
-      {% compress css %}
-      <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public.css' %}" />
-      {% endcompress %}
-    {% endblock %}
-  </head>
 
-  {% with page.get_verbose_name|lower as page_name %}
-    <body id="body" class="{{ page_name }} u-flex u-type-sans">
-      {% block banner %}{% endblock %}
-      <header
-        class="{{ page_name }}"
-        role="banner"
-        {% if header_image or page.header_image %}
-          {% if header_image %}
-            {% image header_image original as header_background %}
-            {% get_header_image_styles header_background header_position as styles %}
-          {% else %}
-            {% image page.header_image original as header_background %}
-            {% get_header_image_styles header_background page.header_position as styles %}
-          {% endif %}
-          style="{{ styles }}"
-        {% endif %}>
-          {% include "dalme_public/includes/_nav.html" %}
-          {% block header_extra %}{% endblock %}
-      </header>
+<head>
+  {% block meta %}
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static '/icons/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static '/icons/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static '/icons/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static '/icons/site_public.webmanifest' %}">
+  <link rel="mask-icon" href="{% static '/icons/safari-pinned-tab.svg' %}" color="#912643">
+  <link rel="shortcut icon" href="{% static '/icons/favicon.ico' %}">
+  <meta name="apple-mobile-web-app-title" content="DALME">
+  <meta name="application-name" content="DALME">
+  <meta name="msapplication-TileColor" content="#b91d47">
+  <meta name="msapplication-TileImage" content="{% static '/icons/mstile-144x144.png' %}">
+  <meta name="msapplication-config" content="{% static '/icons/browserconfig.xml' %}">
+  <meta name="theme-color" content="#ffffff">
+  {% endblock %}
+  <title>
+    {% block title %}DALME{% endblock %}
+  </title>
+  {% block styles %}
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-vue.min.css' %}" />
+  <script async defer data-domain="dalme.org" src="https://plausible.io/js/plausible.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/snarkdown@2.0.0/dist/snarkdown.umd.js"
+    integrity="sha256-QqCCWG2y306e9DZ9VbcdrkacMAz1nubFmYCkac3I3AM=" crossorigin="anonymous"></script>
+  {% compress css %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public.css' %}" />
+  {% endcompress %}
+  {% endblock %}
+</head>
 
-      <main
-        id="main"
-        class="{{ page_name }} {{ page.title|slugify }}{% if records or record %} browser{% endif %}{% if record %} viewer{% endif %}"
-        role="main">
-        {% block content %}{% endblock %}
-      </main>
+{% with page.get_verbose_name|lower as page_name %}
 
-      <footer class="u-flex" id="footer-app">
-        {% footer %}
-      </footer>
+<body id="body" class="{{ page_name }} u-flex u-type-sans">
+  {% block banner %}{% endblock %}
+  <header class="{{ page_name }}" role="banner" {% if header_image or page.header_image %} {% if header_image %} {%
+    image header_image original as header_background %} {% get_header_image_styles header_background header_position as
+    styles %} {% else %} {% image page.header_image original as header_background %} {% get_header_image_styles
+    header_background page.header_position as styles %} {% endif %} style="{{ styles }}" {% endif %}>
+    {% include "dalme_public/includes/_nav.html" %}
+    {% block header_extra %}{% endblock %}
+  </header>
 
-      <!-- LIGHTBOX MODAL -->
-      <div class="modal fade" id="lightbox" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <img src="" class="lightbox-image">
-            </div>
-            <div class="modal-footer">
-              <div class="lightbox-caption"></div>
-            </div>
-          </div>
+  <main id="main"
+    class="{{ page_name }} {{ page.title|slugify }}{% if records or record %} browser{% endif %}{% if record %} viewer{% endif %}"
+    role="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="u-flex" id="footer-app">
+    {% footer %}
+  </footer>
+
+  <!-- LIGHTBOX MODAL -->
+  <div class="modal fade" id="lightbox" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <img src="" class="lightbox-image">
+        </div>
+        <div class="modal-footer">
+          <div class="lightbox-caption"></div>
         </div>
       </div>
-      {% block js_foot %}
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-        <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw==" crossorigin="anonymous"></script>
-        {% compress js %}
-          <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
-        {% endcompress %}
-        <script>
-          $(document).ready(function() {
-            api_endpoint = "{{ api_endpoint }}";
-            db_endpoint = "{{ db_endpoint }}";
+    </div>
+  </div>
+  {% block js_foot %}
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script src="https://kit.fontawesome.com/04c8493f39.js" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"
+    integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw=="
+    crossorigin="anonymous"></script>
+  {% compress js %}
+  <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+  {% endcompress %}
+  <script>
+    $(document).ready(function () {
+      api_endpoint = "{{ api_endpoint }}";
+      db_endpoint = "{{ db_endpoint }}";
 
-            // Hamburger menu
-            $('body').on('click', '#hamburger', function(e) {
-              const menu = $(e.target).closest('nav').find('ul');
-              if (menu.css('display') === 'none') {
-                menu.css({ display: 'flex' })
-              } else {
-                menu.css({ display: 'none' })
-              }
-            });
+      // Hamburger menu
+      $('body').on('click', '#hamburger', function (e) {
+        const menu = $(e.target).closest('nav').find('ul');
+        if (menu.css('display') === 'none') {
+          menu.css({ display: 'flex' })
+        } else {
+          menu.css({ display: 'none' })
+        }
+      });
 
-            // Format footnotes
-            const fn_sources = $('[data-footnote]');
-            if (fn_sources.length) {
-              const footnotes = $('<ol>');
-              $.each(fn_sources, function(index, value) {
-                const fn_source = $(value);
-                const number = index + 1;
-                const content = fn_source.attr('data-footnote');
-                const id = fn_source.attr('data-note_id');
+      // Format footnotes
+      const fn_sources = $('[data-footnote]');
+      if (fn_sources.length) {
+        const footnotes = $('<ol>');
+        $.each(fn_sources, function (index, value) {
+          const fn_source = $(value);
+          const number = index + 1;
+          const content = fn_source.attr('data-footnote');
+          const id = fn_source.attr('data-note_id');
 
-                const callout = $('<sup>', { id: `fn_${number}` });
-                $('<a>', { href: `#${id}`, class: 'footnote_callout' }).text(number).appendTo(callout);
+          const callout = $('<sup>', { id: `fn_${number}` });
+          $('<a>', { href: `#${id}`, class: 'footnote_callout' }).text(number).appendTo(callout);
 
-                const footnote = $('<li>', { id: id });
-                const fn_text = $('<p>').html(window.snarkdown(content));
-                $('<a>', {
-                  href: `#fn_${number}`,
-                  class: 'footnote_back_link',
-                  title: `Jump back to footnote ${number} in the text.`
-                }).text('↩︎').appendTo(fn_text);
-                footnote.append(fn_text);
-                footnotes.append(footnote);
-                fn_source.replaceWith(callout);
-              });
-              const footnote_section = $('<div>', { class: 'footnote_list' });
-              footnote_section.append('<hr>');
-              footnote_section.append(footnotes);
-              $('.content').append(footnote_section);
-            }
+          const footnote = $('<li>', { id: id });
+          const fn_text = $('<p>').html(window.snarkdown(content));
+          $('<a>', {
+            href: `#fn_${number}`,
+            class: 'footnote_back_link',
+            title: `Jump back to footnote ${number} in the text.`
+          }).text('↩︎').appendTo(fn_text);
+          footnote.append(fn_text);
+          footnotes.append(footnote);
+          fn_source.replaceWith(callout);
+        });
+        const footnote_section = $('<div>', { class: 'footnote_list' });
+        footnote_section.append('<hr>');
+        footnote_section.append(footnotes);
+        $('.content').append(footnote_section);
+      }
 
-            // Subsections initialize.
-            const subsections = $('.block-subsection');
-            $.each(subsections, function(index, value) {
-              const subsection = $(value);
-              const sub_container = $('<div/>').attr({class: 'subsection-container'});
-              const nextSubsection = subsection.nextAll('.block-subsection:first');
-              if (nextSubsection.length) {
-                sub_container.append(subsection.nextUntil(nextSubsection).detach());
-              } else {
-                sub_container.append(subsection.nextAll().detach());
-              }
-              sub_container.insertAfter(subsection);
-              if (subsection.find('i').hasClass('fa-caret-left')) {
-                sub_container.hide();
-              }
-            });
+      // Subsections initialize.
+      const subsections = $('.block-subsection');
+      $.each(subsections, function (index, value) {
+        const subsection = $(value);
+        const subContainer = $('<div/>').attr({ class: 'subsection-container' });
+        const subsectionBlock = subsection.nextUntil('.block-subsection, .block-subsection_end_marker');
+        console.log(subsectionBlock);
+        if (subsectionBlock.length) {
+          subContainer.append(subsectionBlock.detach());
+        } else {
+          subContainer.append(subsection.nextAll().detach());
+        }
+        subContainer.insertAfter(subsection);
+        if (subsection.find('i').hasClass('fa-caret-left')) {
+          subContainer.hide();
+        }
+      });
 
-            // Collections initialize.
-            const collections = $('section.collection');
-            $.each(collections, function(index, value) {
-              const collection = $(value);
-              if (collection.find('i').hasClass('fa-caret-left')) {
-                collection.children().not('.u-subsection').hide();
-              }
-            });
+      // Collections initialize.
+      const collections = $('section.collection');
+      $.each(collections, function (index, value) {
+        const collection = $(value);
+        if (collection.find('i').hasClass('fa-caret-left')) {
+          collection.children().not('.u-subsection').hide();
+        }
+      });
 
-            $('body').on('click', '#handle', function(e) {
-              const target = $(e.target);
-              let icon = null;
-              if (e.target.localName === 'div') {
-                icon = target.find('i');
-              } else if (e.target.localName === 'h3') {
-                icon = target.parent().next();
-              } else {
-                icon = target;
-              }
+      $('body').on('click', '#handle', function (e) {
+        const target = $(e.target);
+        let icon = null;
+        if (e.target.localName === 'div') {
+          icon = target.find('i');
+        } else if (e.target.localName === 'h3' || e.target.localName === 'h4') {
+          icon = target.parent().next();
+        } else {
+          icon = target;
+        }
 
-              // Collections.
-              icon.hasClass('fa-caret-left')
-                ? icon.removeClass('fa-caret-left').addClass('fa-caret-down')
-                : icon.removeClass('fa-caret-down').addClass('fa-caret-left');
-              icon.closest('section')
-                .attr('data-collapsed', function(index, attr) {
-                  return attr === 'true' ? 'false' : 'true';
-                });
-              if (icon.hasClass('corpus')) {
-                const collection = $(icon).closest('section.corpus');
-                const nodes = collection.children().not('.u-subsection');
-                icon.hasClass('fa-caret-left')
-                  ? nodes.hide()
-                  : nodes.show();
-              }
-
-              // Subsections collapsing logic.
-              if (icon.hasClass('subsection')) {
-                const subsection = $(icon).closest('.block-subsection');
-                if (icon.hasClass('fa-caret-left')) {
-                  subsection.next().hide();
-                } else {
-                  subsection.next().show();
-                }
-              }
-            });
-
-            $('body').on('click', '.inline-image', function(e) {
-              $('.lightbox-image').attr('src', $(this).find('img').attr('src'));
-              $('.lightbox-caption').html($(this).find('.caption').html());
-              $('#lightbox').modal('show');
-            });
-
-            // share footer button
-            const share_app = new Vue({
-              el: '#footer-app',
-              delimiters: ['${', '}'],
-              created() {
-                const clipboard_copy = new ClipboardJS('#clip_copy');
-              },
-              data: {
-                page_title: '{{ page.title|default_if_none:"Home" }}',
-                page_url: '{{ request.build_absolute_uri }}',
-              },
-              computed: {
-                sms() {
-                  return `sms://&body=${this.page_url}`;
-                },
-                email() {
-                  let subject = `DALME - ${this.page_title}`;
-                  let body = `The Documentary Archaelogy of Late Medieval Europe - ${this.page_title}: ${this.page_url}`;
-                  return `mailto:?subject=${subject}&body=${body}`;
-                }
-              }
-            });
+        // Collections.
+        icon.hasClass('fa-caret-left')
+          ? icon.removeClass('fa-caret-left').addClass('fa-caret-down')
+          : icon.removeClass('fa-caret-down').addClass('fa-caret-left');
+        icon.closest('section')
+          .attr('data-collapsed', function (index, attr) {
+            return attr === 'true' ? 'false' : 'true';
           });
-        </script>
-      {% endblock %}
-      {% if page.citable and not records and not record and not search %}
-          {% get_citation_data as citation %}
-          {{ citation.2 | safe }}
-          {{ citation | json_script:"citation_data" }}
-          <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
-          <script>
-            const cite_app = new Vue({
-              el: '#cite-container',
-              delimiters: ['${', '}'],
-              directives: {
-                onClickaway: window.VueClickaway.directive,
-              },
-              created() {
-                const Cite = require('citation-js');
-                this.styles = this.citationData[0];
-                this.config = Cite.plugins.config.get('@csl');
-                this.loadTemplates().then(() => {
-                  this.citation = new Cite(this.citationData[1]);
-                  setTimeout(() => this.template = 'chicago_16', 100);
-                })
-              },
-              data: {
-                showCitePanel: false,
-                showCopied: false,
-                popoverPlacement: 'right',
-                format: 'html',
-                template: 'apa',
-                output_format: 'bibliography',
-                lang: 'en-US',
-                citation: null,
-                config: null,
-                styles: null
-              },
-              computed: {
-                citationData() {
-                  const node = document.getElementById('citation_data');
-                  document.getElementsByTagName("BODY")[0].removeChild(node);
-                  return JSON.parse(node.textContent);
-                },
-                formatted_citation() {
-                  return this.citation.format(this.output_format, {
-                    format: this.format,
-                    template: this.template,
-                    lang: this.lang
-                  });
+        if (icon.hasClass('corpus')) {
+          const collection = $(icon).closest('section.corpus');
+          const nodes = collection.children().not('.u-subsection');
+          icon.hasClass('fa-caret-left')
+            ? nodes.hide()
+            : nodes.show();
+        }
+
+        // Subsections collapsing logic.
+        if (icon.hasClass('subsection')) {
+          const subsection = $(icon).closest('.block-subsection');
+          if (icon.hasClass('fa-caret-left')) {
+            subsection.next().hide();
+          } else {
+            subsection.next().show();
+          }
+        }
+      });
+
+      $('body').on('click', '.inline-image', function (e) {
+        $('.lightbox-image').attr('src', $(this).find('img').attr('src'));
+        $('.lightbox-caption').html($(this).find('.caption').html());
+        $('#lightbox').modal('show');
+      });
+
+      // share footer button
+      const share_app = new Vue({
+        el: '#footer-app',
+        delimiters: ['${', '}'],
+        created() {
+          const clipboard_copy = new ClipboardJS('#clip_copy');
+        },
+        data: {
+          page_title: '{{ page.title|default_if_none:"Home" }}',
+          page_url: '{{ request.build_absolute_uri }}',
+        },
+        computed: {
+          sms() {
+            return `sms://&body=${this.page_url}`;
+          },
+          email() {
+            let subject = `DALME - ${this.page_title}`;
+            let body = `The Documentary Archaelogy of Late Medieval Europe - ${this.page_title}: ${this.page_url}`;
+            return `mailto:?subject=${subject}&body=${body}`;
+          }
+        }
+      });
+    });
+  </script>
+  {% endblock %}
+  {% if page.citable and not records and not record and not search %}
+  {% get_citation_data as citation %}
+  {{ citation.2 | safe }}
+  {{ citation | json_script:"citation_data" }}
+  <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js"
+    integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
+  <script>
+    const cite_app = new Vue({
+      el: '#cite-container',
+      delimiters: ['${', '}'],
+      directives: {
+        onClickaway: window.VueClickaway.directive,
+      },
+      created() {
+        const Cite = require('citation-js');
+        this.styles = this.citationData[0];
+        this.config = Cite.plugins.config.get('@csl');
+        this.loadTemplates().then(() => {
+          this.citation = new Cite(this.citationData[1]);
+          setTimeout(() => this.template = 'chicago_16', 100);
+        })
+      },
+      data: {
+        showCitePanel: false,
+        showCopied: false,
+        popoverPlacement: 'right',
+        format: 'html',
+        template: 'apa',
+        output_format: 'bibliography',
+        lang: 'en-US',
+        citation: null,
+        config: null,
+        styles: null
+      },
+      computed: {
+        citationData() {
+          const node = document.getElementById('citation_data');
+          document.getElementsByTagName("BODY")[0].removeChild(node);
+          return JSON.parse(node.textContent);
+        },
+        formatted_citation() {
+          return this.citation.format(this.output_format, {
+            format: this.format,
+            template: this.template,
+            lang: this.lang
+          });
+        }
+      },
+      methods: {
+        async loadTemplates() {
+          const that = this;
+          await Promise.all(this.styles.map(style => {
+            if (style.file) {
+              var xhttp = new XMLHttpRequest();
+              xhttp.onreadystatechange = function () {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                  let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
+                  that.config.templates.add(style.name, xml_data);
                 }
-              },
-              methods: {
-                async loadTemplates() {
-                  const that = this;
-                  await Promise.all(this.styles.map(style => {
-                    if (style.file) {
-                      var xhttp = new XMLHttpRequest();
-                      xhttp.onreadystatechange = function() {
-                        if (xhttp.readyState == 4 && xhttp.status == 200) {
-                          let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
-                          that.config.templates.add(style.name, xml_data);
-                        }
-                      };
-                      xhttp.open("GET", `/static/citation_styles/${style.file}`, true);
-                      xhttp.send();
-                    }
-                  }));
-                },
-                downloadCitation(format) {
-                  const blob = new Blob([this.citation.format(this.output_format, {
-                        format: 'text',
-                        template: this.template,
-                        lang: this.lang
-                      })], {
-                        encoding: 'UTF-8',
-                        type: 'text/plain;charset=UTF-8'
-                      })
-                  const link = document.createElement('a');
-                  link.href = URL.createObjectURL(blob)
-                  link.download = format == 'bibtex' ? 'citation.bib' : 'citation.ris';
-                  link.click()
-                  URL.revokeObjectURL(link.href)
-                },
-                showCopiedTooltip() {
-                  this.showCitePanel = false;
-                  this.showCopied = true;
-                  setTimeout(() => this.showCopied = false, 800)
-                },
-                closeCitePanel() {
-                  this.showCitePanel = false;
-                },
-              }
-            });
-          </script>
-      {% endif %}
-    </body>
-  {% endwith %}
-  {% wagtailuserbar 'bottom-right' %}
+              };
+              xhttp.open("GET", `/static/citation_styles/${style.file}`, true);
+              xhttp.send();
+            }
+          }));
+        },
+        downloadCitation(format) {
+          const blob = new Blob([this.citation.format(this.output_format, {
+            format: 'text',
+            template: this.template,
+            lang: this.lang
+          })], {
+            encoding: 'UTF-8',
+            type: 'text/plain;charset=UTF-8'
+          })
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob)
+          link.download = format == 'bibtex' ? 'citation.bib' : 'citation.ris';
+          link.click()
+          URL.revokeObjectURL(link.href)
+        },
+        showCopiedTooltip() {
+          this.showCitePanel = false;
+          this.showCopied = true;
+          setTimeout(() => this.showCopied = false, 800)
+        },
+        closeCitePanel() {
+          this.showCitePanel = false;
+        },
+      }
+    });
+  </script>
+  {% endif %}
+</body>
+{% endwith %}
+{% wagtailuserbar 'bottom-right' %}
+
 </html>
