@@ -30,9 +30,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEBUG = True
 
-API_ENDPOINT = 'https://data.127.0.0.1.sslip.io:8443'
-PURL_ENDPOINT = 'https://purl.127.0.0.1.sslip.io:8443'
-DB_ENDPOINT = 'https://db.127.0.0.1.sslip.io:8443'
+API_ENDPOINT = 'https://data.127.0.0.1.sslip.io:8000'
+PURL_ENDPOINT = 'https://purl.127.0.0.1.sslip.io:8000'
+DB_ENDPOINT = 'https://db.127.0.0.1.sslip.io:8000'
 
 ALLOWED_HOSTS = [
     '127.0.0.1:8000',
@@ -41,14 +41,18 @@ ALLOWED_HOSTS = [
     '.127.0.0.1.sslip.io',
     '.127.0.0.1.sslip.io:8443',
     'db.127.0.0.1.sslip.io:8443',
+    '.127.0.0.1.sslip.io:8000',
+    'db.127.0.0.1.sslip.io:8000',
     'db.127.0.0.1.sslip.io',
     'data.127.0.0.1.sslip.io:8443',
+    'data.127.0.0.1.sslip.io:8000',
     'data.127.0.0.1.sslip.io',
     'purl.127.0.0.1.sslip.io:8443',
+    'purl.127.0.0.1.sslip.io:8000',
     'purl.127.0.0.1.sslip.io'
 ]
 
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
@@ -60,13 +64,18 @@ CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
     '.127.0.0.1.sslip.io',
     '.127.0.0.1.sslip.io:8443',
+    '.127.0.0.1.sslip.io:8000',
     'data.127.0.0.1.sslip.io',
     'data.127.0.0.1.sslip.io:8443',
+    'data.127.0.0.1.sslip.io:8000',
     'db.127.0.0.1.sslip.io',
     'db.127.0.0.1.sslip.io:8443',
+    'db.127.0.0.1.sslip.io:8000',
     '127.0.0.1.sslip.io',
     '127.0.0.1.sslip.io:8443',
+    '127.0.0.1.sslip.io:8000',
     'purl.127.0.0.1.sslip.io:8443',
+    'purl.127.0.0.1.sslip.io:8000',
     'purl.127.0.0.1.sslip.io'
 ]
 CSRF_COOKIE_DOMAIN = '.127.0.0.1.sslip.io'
@@ -75,21 +84,26 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'https://*.127.0.0.1.sslip.io:8443',
+    'https://*.127.0.0.1.sslip.io:8000',
     'https://*.127.0.0.1.sslip.io',
     'https://127.0.0.1.sslip.io:8443',
+    'https://127.0.0.1.sslip.io:8000',
     'http://127.0.0.1.sslip.io',
     'https://data.127.0.0.1.sslip.io:8443',
+    'https://data.127.0.0.1.sslip.io:8000',
     'http://data.127.0.0.1.sslip.io',
     'https://db.127.0.0.1.sslip.io:8443',
+    'https://db.127.0.0.1.sslip.io:8000',
     'http://db.127.0.0.1.sslip.io',
     'https://purl.127.0.0.1.sslip.io:8443',
+    'https://purl.127.0.0.1.sslip.io:8000',
     'http://purl.127.0.0.1.sslip.io'
 ]
 
 ROOT_HOSTCONF = 'dalme.hosts'
 ROOT_URLCONF = 'dalme.devUrls'
 DEFAULT_HOST = 'public'
-PARENT_HOST = '127.0.0.1.sslip.io:8443'
+PARENT_HOST = '127.0.0.1.sslip.io:8000'
 HOST_SCHEME = 'https://'
 
 INSTALLED_APPS = [
@@ -195,7 +209,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 awsauth = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
-LOGIN_URL = 'https://db.127.0.0.1.sslip.io:8443/accounts/login/'
+LOGIN_URL = 'https://db.127.0.0.1.sslip.io:8000/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'https://dalme.org'
 
@@ -238,15 +252,21 @@ SAML_IDP_CONFIG = {
 
 DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'OPTIONS': {
+    #         'read_default_file': os.path.join(BASE_DIR, 'db.cnf'),
+    #         'sql_mode': 'traditional',
+    #     }
+    # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, 'db.cnf'),
-            'sql_mode': 'traditional',
-        },
-        'TEST': {
-            'NAME': 'dalme_app_test',
-        },
+        'NAME': os.environ.get('DB_DATABASE', ''),
+        'USER': os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', ''),
+        'PORT': os.environ.get('DB_PORT', ''),
+        'CONN_MAX_AGE': 3600,
     },
     'dam': {
         'ENGINE': 'django.db.backends.mysql',
