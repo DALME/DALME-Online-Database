@@ -1,6 +1,7 @@
-from .agent import Agent, Organization, Person  # noqa: F401
-from .attachment import Attachment  # noqa: F401
-from .attribute import (  # noqa: F401
+"""Interface for the dalme_app.models module."""
+from .agent import Agent, Organization, Person
+from .attachment import Attachment
+from .attribute import (
     Attribute,
     AttributeValueBool,
     AttributeValueDate,
@@ -11,46 +12,114 @@ from .attribute import (  # noqa: F401
     AttributeValueStr,
     AttributeValueTxt,
 )
-from .attribute_type import AttributeType  # noqa: F401
-from .auth_extensions import GroupProperties, Profile  # noqa: F401
-from .collection import Collection, CollectionMembership  # noqa: F401
-from .comment import Comment  # noqa: F401
-from .concept import Concept  # noqa: F401
-from .content import ContentAttributes, ContentTypeExtended  # noqa: F401
-from .entity_phrase import EntityPhrase  # noqa: F401
-from .headword import Headword  # noqa: F401
-from .location import Location  # noqa: F401
-from .object import Object, ObjectAttribute  # noqa: F401
-from .options_list import OptionsList  # noqa: F401
-from .page import Page  # noqa: F401
-from .permission import Permission  # noqa: F401
-from .place import Place  # noqa: F401
-from .public_register import PublicRegister  # noqa: F401
-from .publication import Publication  # noqa: F401
-from .record import Folio, Record, RecordGroup  # noqa: F401
+from .attribute_type import AttributeType
+from .auth_extensions import GroupProperties, Profile
+from .collection import Collection, CollectionMembership
+from .comment import Comment
+from .concept import Concept
+from .content import ContentAttributes, ContentTypeExtended
+from .entity_phrase import EntityPhrase
+from .headword import Headword
+from .location import Location
+from .object import Object, ObjectAttribute
+from .options_list import OptionsList
+from .page import Page
+from .permission import Permission
+from .place import Place
+from .public_register import PublicRegister
+from .publication import Publication
+from .record import Folio, Record, RecordGroup
 from .reference import (
-    AttributeReference,  # noqa: F401
-    CountryReference,  # noqa: F401
-    LanguageReference,  # noqa: F401
-    LocaleReference,  # noqa: F401
+    AttributeReference,
+    CountryReference,
+    LanguageReference,
+    LocaleReference,
 )
-from .relationship import Relationship, RelationshipType  # noqa: F401
+from .relationship import Relationship
 from .resourcespace import (
-    rs_api_query,  # noqa: F401
-    rs_collection,  # noqa: F401
-    rs_collection_resource,  # noqa: F401
-    rs_resource,  # noqa: F401
-    rs_resource_data,  # noqa: F401
-    rs_resource_type_field,  # noqa: F401
-    rs_user,  # noqa: F401
+    rs_api_query,
+    rs_collection,
+    rs_collection_resource,
+    rs_resource,
+    rs_resource_data,
+    rs_resource_type_field,
+    rs_user,
 )
-from .rights_policy import RightsPolicy  # noqa: F401
-from .saved_search import SavedSearch  # noqa: F401
-from .scope import Scope, ScopeType  # noqa: F401
-from .tag import Tag  # noqa: F401
-from .task import Task, TaskList  # noqa: F401
-from .ticket import Ticket  # noqa: F401
-from .token import Token  # noqa: F401
-from .transcription import Transcription  # noqa: F401
-from .wordform import Wordform  # noqa: F401
-from .workflow import Workflow, WorkLog  # noqa: F401
+from .rights_policy import RightsPolicy
+from .saved_search import SavedSearch
+from .scope import Scope, ScopeType
+from .tag import Tag
+from .task import Task, TaskList
+from .tenant import Domain, Tenant, TenantRole
+from .ticket import Ticket
+from .token import Token
+from .transcription import Transcription
+from .wordform import Wordform
+from .workflow import Workflow, WorkLog
+
+__all__ = [
+    'Agent',
+    'Attachment',
+    'Attribute',
+    'AttributeReference',
+    'AttributeType',
+    'AttributeValueBool',
+    'AttributeValueDate',
+    'AttributeValueDec',
+    'AttributeValueFkey',
+    'AttributeValueInt',
+    'AttributeValueJson',
+    'AttributeValueStr',
+    'AttributeValueTxt',
+    'Collection',
+    'CollectionMembership',
+    'Comment',
+    'Concept',
+    'ContentAttributes',
+    'ContentTypeExtended',
+    'CountryReference',
+    'Domain',
+    'EntityPhrase',
+    'Folio',
+    'GroupProperties',
+    'Headword',
+    'LanguageReference',
+    'LocaleReference',
+    'Location',
+    'Object',
+    'ObjectAttribute',
+    'OptionsList',
+    'Organization',
+    'Page',
+    'Permission',
+    'Person',
+    'Place',
+    'Profile',
+    'PublicRegister',
+    'Publication',
+    'Record',
+    'RecordGroup',
+    'Relationship',
+    'RightsPolicy',
+    'SavedSearch',
+    'Scope',
+    'ScopeType',
+    'Tag',
+    'Task',
+    'TaskList',
+    'Tenant',
+    'TenantRole',
+    'Ticket',
+    'Token',
+    'Transcription',
+    'Wordform',
+    'WorkLog',
+    'Workflow',
+    'rs_api_query',
+    'rs_collection',
+    'rs_collection_resource',
+    'rs_resource',
+    'rs_resource_data',
+    'rs_resource_type_field',
+    'rs_user',
+]

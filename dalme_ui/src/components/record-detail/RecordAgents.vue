@@ -76,7 +76,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .q-table__top {
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   padding: 0;

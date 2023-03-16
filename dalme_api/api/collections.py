@@ -1,3 +1,4 @@
+"""API endpoint for managing collections."""
 import json
 
 from rest_framework.decorators import action

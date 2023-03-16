@@ -1,3 +1,4 @@
+"""Serializers for place data."""
 from dalme_api.serializers.tags import TagSerializer
 from dalme_app.models import Place
 
@@ -13,7 +14,7 @@ class PlaceSerializer(DynamicSerializer):
     location = LocationSerializer(field_set='attribute')
     tags = TagSerializer(many=True, required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Place
         fields = ('id', 'name', 'attributes', 'location', 'comment_count', 'tags')
         field_sets = {

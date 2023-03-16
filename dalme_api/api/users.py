@@ -1,3 +1,4 @@
+"""API endpoint for managing users."""
 import json
 import pathlib
 
@@ -114,7 +115,6 @@ class Users(DALMEBaseViewSet):
         try:
             if request.data:
                 prefs = user.profile.preferences if user.profile.preferences else DEFAULT_PREFS
-
                 if prefs.get(request.data['section']) is None:
                     prefs[request.data['section']] = {request.data['key']: request.data['value']}
                 else:

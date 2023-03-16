@@ -1,0 +1,102 @@
+ci:
+  autofix_commit_msg: '[pre-commit.ci] Auto-fixes from pre-commit.ci hooks'
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] Pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  submodules: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+    - id: check-added-large-files
+    - id: check-ast
+    - id: check-merge-conflict
+    - id: debug-statements
+    - id: detect-private-key
+    - id: end-of-file-fixer
+      exclude: '^(static/.*|media/.*|tf/.*README.md$|tf/.terragrunt-cache/.*)'
+    - id: forbid-new-submodules
+    - id: trailing-whitespace
+      exclude: '^(static/.*|media/.*)'
+
+  # JavaScript
+  - repo: local
+    hooks:
+    - id: eslint
+      name: eslint
+      entry: make ui.lint
+      language: system
+      types_or: [javascript, vue]
+      require_serial: true
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.3
+    hooks:
+    - id: prettier
+      types_or: [javascript, vue, scss, html, json]
+
+  # Python
+  # Needs to run before anything else (for Python).
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  # - repo: https://github.com/psf/black
+  #   rev: 23.1.0
+  #   hooks:
+  #   - id: black
+
+  # Documentation
+  - repo: local
+    hooks:
+    - id: docs
+      name: docs
+      entry: make docs.render
+      language: system
+      types_or: [python, markdown, rst]
+      files: ^dalme_docs/
+      require_serial: true
+
+  # Terraform
+  - repo: local
+    hooks:
+    - id: tf-fmt
+      name: terraform fmt
+      entry: make -s deploy.tf.fmt
+      language: system
+      types_or: [hcl, terraform]
+      require_serial: true
+    - id: tf-hclfmt
+      name: terraform hclfmt
+      entry: make -s deploy.tf.hclfmt
+      language: system
+      types_or: [hcl, terraform]
+      require_serial: true
+    - id: tf-lint
+      name: terraform lint
+      entry: make -s deploy.tf.tflint
+      language: system
+      types_or: [hcl, terraform]
+      require_serial: true
+    - id: tf-validate
+      name: terraform validate
+      entry: make -s deploy.tf.validate
+      language: system
+      types_or: [hcl, terraform]
+      require_serial: true
+    - id: tf-docs
+      name: terraform docs
+      entry: make -s deploy.tf.docs
+      language: system
+      types_or: [hcl, terraform]
+      require_serial: true
+    - id: tfsec
+      name: terraform tfsec
+      entry: make -s deploy.tf.tfsec
+      language: system
+      types_or: [hcl, terraform]
+      require_serial: true

@@ -1,3 +1,4 @@
+"""Define API filtering logic and utilities."""
 from django_filters import rest_framework as filters
 
 from django.contrib.auth.models import User
@@ -11,7 +12,7 @@ class ContentTypeFilter(filters.FilterSet):
 
     id__lt = filters.NumberFilter(field_name='id', lookup_expr='lt')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = ContentTypeExtended
         fields = ['id']
 
@@ -29,7 +30,7 @@ class RecordFilter(filters.FilterSet):
     review_done = filters.BooleanFilter(field_name='workflow__review_done')
     parsing_done = filters.BooleanFilter(field_name='workflow__parsing_done')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Record
         fields = [
             'name',
@@ -41,7 +42,7 @@ class RecordFilter(filters.FilterSet):
 class RightsPolicyFilter(filters.FilterSet):
     """Filter for Rights endpoint."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = RightsPolicy
         fields = [
             'id',
@@ -62,7 +63,7 @@ class RightsPolicyFilter(filters.FilterSet):
 class CollectionFilter(filters.FilterSet):
     """Filter for Collections endpoint."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Collection
         fields = ['name', 'is_published']
 
@@ -72,7 +73,7 @@ class TaskFilter(filters.FilterSet):
 
     user = filters.CharFilter(label='user', method='for_user')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Task
         fields = [
             'id',
@@ -99,7 +100,7 @@ class TasklistFilter(filters.FilterSet):
 
     user = filters.CharFilter(label='user', method='for_user')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = TaskList
         fields = [
             'id',
@@ -126,7 +127,7 @@ class TicketFilter(filters.FilterSet):
 
     # tags = filters.CharFilter(field_name='tags__tag', lookup_expr='icontains')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Ticket
         fields = [
             'id',
@@ -145,7 +146,7 @@ class UserFilter(filters.FilterSet):
 
     groups = filters.CharFilter(label='groups', method='check_groups')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = User
         fields = [
             'id',
@@ -162,8 +163,8 @@ class UserFilter(filters.FilterSet):
     def check_groups(self, queryset, name, value):  # noqa: ARG002
         """Return combined group queryset."""
         request_groups = value.split(',') if ',' in value else [value]
-
         qs = queryset.none()
         for group in request_groups:
             qs = qs | queryset.filter(groups__name=group)
+
         return qs.distinct()

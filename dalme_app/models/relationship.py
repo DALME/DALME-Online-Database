@@ -1,4 +1,7 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
+"""Model relationship data."""
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
@@ -17,10 +20,10 @@ class RelationshipType(dalmeIntid):
     source = models.CharField(max_length=255, blank=True)
     is_directed = models.BooleanField(default=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['id']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
 

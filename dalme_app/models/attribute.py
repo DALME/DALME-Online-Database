@@ -1,3 +1,4 @@
+"""Model attribute data."""
 import calendar
 import datetime
 
@@ -28,7 +29,7 @@ class Attribute(dalmeUuid):
         related_name='attributes',
     )
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return f'{self.attribute_type.name}: {self.value}'
 
     @property
@@ -75,7 +76,7 @@ class AttributeValueBool(Attribute):
 
     value = models.BooleanField()
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return str(self.value)
 
 
@@ -94,7 +95,7 @@ class AttributeValueDate(Attribute):
     date = models.DateField(null=True)
     text = models.CharField(max_length=255, blank=True)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.text
 
     @property
@@ -123,11 +124,7 @@ class AttributeValueDate(Attribute):
                 date = datetime.date(self.year, self.month, self.day)
             except ValueError:
                 date = parse(
-                    '{}-{}-{}'.format(
-                        str(self.year),
-                        str(self.month).zfill(2),
-                        str(self.day).zfill(2),
-                    ),
+                    f'{self.year!s}-{str(self.month).zfill(2)}-{str(self.day).zfill(2)}',
                 )
             if date is not None:
                 self.date = date
@@ -185,7 +182,7 @@ class AttributeValueDec(Attribute):
 
     value = models.DecimalField(max_digits=9, decimal_places=2)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return str(self.value)
 
 
@@ -200,7 +197,7 @@ class AttributeValueFkey(Attribute):
     )
     target_id = models.CharField(max_length=36, db_index=True)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return str(self.value)
 
 
@@ -209,7 +206,7 @@ class AttributeValueInt(Attribute):
 
     value = models.IntegerField()
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return str(self.value)
 
 
@@ -218,7 +215,7 @@ class AttributeValueJson(Attribute):
 
     value = models.JSONField()
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return '<DATA OBJECT>'
 
 
@@ -227,7 +224,7 @@ class AttributeValueStr(Attribute):
 
     value = models.CharField(max_length=255)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.value
 
 
@@ -236,5 +233,5 @@ class AttributeValueTxt(Attribute):
 
     value = models.TextField()
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.value

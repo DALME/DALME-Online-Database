@@ -1,3 +1,4 @@
+"""Model agent data."""
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
@@ -42,3 +43,6 @@ class Person(Agent):
         related_name='person_record',
         null=True,
     )
+
+    def __str__(self):
+        return self.standard_name

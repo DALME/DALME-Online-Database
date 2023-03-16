@@ -1,3 +1,4 @@
+"""Model content data."""
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
@@ -21,10 +22,10 @@ class ContentTypeExtended(ContentType):
     can_add = models.BooleanField(default=False)
     can_remove = models.BooleanField(default=False)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['id']
 
 
@@ -49,5 +50,5 @@ class ContentAttributes(dalmeIntid):
     override_description = models.TextField(blank=True)
     override_options = models.ForeignKey('OptionsList', on_delete=models.SET_NULL, null=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         unique_together = ('content_type', 'attribute_type')

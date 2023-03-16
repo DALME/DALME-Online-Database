@@ -1,3 +1,4 @@
+"""Serializers for task data."""
 from rest_framework import serializers
 
 from dalme_api.serializers.attachments import AttachmentSerializer
@@ -14,7 +15,7 @@ class TaskListSerializer(serializers.ModelSerializer):
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = TaskList
         fields = (
             'id',
@@ -42,7 +43,7 @@ class TaskSerializer(serializers.ModelSerializer):
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Task
         fields = (
             'id',

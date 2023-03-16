@@ -1,3 +1,4 @@
+"""Define tasks for dalme_app."""
 from django.contrib.messages import constants
 from django.core.management import call_command
 
@@ -33,7 +34,7 @@ def update_search_index():
 
 def wagtail_publish_pages():
     """Publish schaduled Wagtail pages."""
-    call_command('publish_scheduled_pages')
+    call_command('publish_scheduled')
 
 
 def test_task(user_id):

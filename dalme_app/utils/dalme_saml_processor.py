@@ -1,3 +1,4 @@
+"""Process the response object for SAML functionality."""
 from djangosaml2idp.processors import BaseProcessor
 
 

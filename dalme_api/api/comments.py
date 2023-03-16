@@ -1,3 +1,4 @@
+"""API endpoint for managing comments."""
 import contextlib
 
 from rest_framework import viewsets
@@ -23,12 +24,14 @@ class Comments(viewsets.ModelViewSet):
         if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
             model = apps.get_model(app_label='dalme_app', model_name=self.request.GET['model'])
             obj_pk = self.request.GET['object']
+
             if isinstance(obj_pk, str):
                 with contextlib.suppress(ValueError):
                     obj_pk = int(obj_pk)
 
             instance = model.objects.get(pk=obj_pk)
             return instance.comments.all()
+
         return self.queryset
 
     def create(self, request, *args, **kwargs):  # noqa: ARG002

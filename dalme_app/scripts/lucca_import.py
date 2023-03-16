@@ -1,9 +1,12 @@
-from dalme_app.models import * # noqa
-from django.contrib.auth.models import User
+import os
+
 import pandas as pd
 import regex as re
-import os
 from django_currentuser.middleware import _set_current_user
+
+from django.contrib.auth.models import User
+
+from dalme_app.models import *  # noqa
 
 ######################################
 # to avoid timeouts, disable the syncing
@@ -42,7 +45,7 @@ _set_current_user(ghp)
 
 def run_commands():
     # define general variables
-    # target_set = Set.objects.get(pk='bad41158-9f01-4ac2-8bc6-8d71e096dbd9') # noqa DEVELOP
+    # target_set = Set.objects.get(pk='bad41158-9f01-4ac2-8bc6-8d71e096dbd9') # DEVELOP
     target_set = Set.objects.get(pk='1c8a6c02-886a-4863-9b22-6c610a44d120') # noqa PRODUCTION
 
     # delete old Lucca records
@@ -55,7 +58,7 @@ def run_commands():
             'description': 'Role played by an agent in a particular legal process.',
             'data_type': 'STR',
             'creation_user': ghp,
-            'modification_user': ghp
+            'modification_user': ghp,
         },
         {
             'name': 'Social status',
@@ -63,7 +66,7 @@ def run_commands():
             'description': "Title, profession, or other descriptor indicating an agent's social status.",
             'data_type': 'STR',
             'creation_user': ghp,
-            'modification_user': ghp
+            'modification_user': ghp,
         },
         {
             'name': 'Religion',
@@ -71,7 +74,7 @@ def run_commands():
             'description': 'An agents stated religious affiliation.',
             'data_type': 'STR',
             'creation_user': ghp,
-            'modification_user': ghp
+            'modification_user': ghp,
         },
         {
             'name': 'Sex',
@@ -79,7 +82,7 @@ def run_commands():
             'description': 'An agents sex.',
             'data_type': 'STR',
             'creation_user': ghp,
-            'modification_user': ghp
+            'modification_user': ghp,
         }]
 
     for at in attribute_types:
@@ -130,7 +133,7 @@ def run_commands():
         Workflow.objects.create( # noqa
             source=source,
             last_modified=source.modification_timestamp,
-            last_user=ghp
+            last_user=ghp,
         )
 
         # add attributes
@@ -165,7 +168,7 @@ def run_commands():
             source.comments.create(
                 body=comments,
                 creation_user=dls,
-                modification_user=dls
+                modification_user=dls,
             )
 
         # create pages
@@ -195,7 +198,7 @@ def run_commands():
 
                 if legal_persona and name_phrase:
                     agent, created = Agent.objects.get_or_create(standard_name=name_phrase[:254], type=1) # noqa
-                    entity_phrase = agent.instances.create(transcription_id=transcription) # noqa
+                    entity_phrase = agent.instances.create(transcription_id=transcription)
 
                     attribute_lp = Attribute_type.objects.get(short_name='legal_persona') # noqa
                     entity_phrase.attributes.create(**{'attribute_type': attribute_lp, 'value_STR': legal_persona})
@@ -276,7 +279,7 @@ def convert_datasets():
     locales = {}
 
     # for index, row in acts.head(10).iterrows():
-    for index, row in acts.iterrows():
+    for _index, row in acts.iterrows():
         act_id = row['Act ID']
         if act_id not in ignore:
             if act_id <= 2024:
@@ -293,14 +296,14 @@ def convert_datasets():
                 'parent': Source.objects.get(pk=register_conc[row["subsource_number"]]), # noqa
                 'has_inventory': True,
                 'comments': get_value(row['Unified Comments']),
-                'owner': dls
+                'owner': dls,
             }
 
             attributes = {
                 'mk1_identifier': {'value_INT': act_id},
                 'language': {'value_JSON': {'id': 618, 'class': 'LanguageReference'}},
                 'record_type': {'value_STR': get_value(row['Modern Act Type Classification'])},
-                'debt_unit_type': {'value_STR': get_value(row['Debt Unit Type'])}
+                'debt_unit_type': {'value_STR': get_value(row['Debt Unit Type'])},
             }
 
             attributes = add_dates(attributes, row)
@@ -412,7 +415,7 @@ def add_dates(attributes, row):
                 'value_DATE_d': end_date_d,
                 'value_DATE_m': end_date_m,
                 'value_DATE_y': end_date_y,
-            }
+            },
         })
 
     return attributes

@@ -1,7 +1,10 @@
+"""API endpoint for managing issue tickets."""
 from datetime import datetime
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from django.utils import timezone
 
 from dalme_api.access_policies import TicketAccessPolicy
 from dalme_api.filters import TicketFilter
@@ -37,7 +40,9 @@ class Tickets(DALMEBaseViewSet):
             if action == 'Close':
                 obj.status = 1
                 obj.closing_user = self.request.user
-                obj.closing_date = datetime.datetime.now(tz=datetime.UTC).date()
+                obj.closing_date = datetime.now(
+                    tz=timezone.get_current_timezone(),
+                ).date()
                 obj.save(
                     update_fields=[
                         'status',

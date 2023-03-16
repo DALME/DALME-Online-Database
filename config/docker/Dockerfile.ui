@@ -1,0 +1,21 @@
+# ; -*- mode: dockerfile;-*-
+# vim: set ft=dockerfile:
+FROM node:18-bookworm-slim as base
+WORKDIR /opt/build
+COPY ./dalme_ui/package.json ./dalme_ui/yarn.lock .
+RUN yarn install --silent
+
+FROM node:18-bookworm-slim as reqs
+WORKDIR /opt/ui
+COPY --from=base /opt/build/node_modules ./node_modules
+ENV PATH /opt/ui/node_modules/.bin:$PATH
+COPY ./dalme_ui .
+
+FROM reqs as development
+CMD ["yarn", "dev"]
+
+FROM reqs as ci
+RUN yarn build
+
+FROM reqs as production
+RUN yarn build

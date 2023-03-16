@@ -1,3 +1,5 @@
+"""Model dalme_public data."""
+import contextlib
 import json
 import textwrap
 from datetime import datetime, timedelta
@@ -25,6 +27,7 @@ from django.db.models.functions import Coalesce
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
+from django.utils import timezone
 
 from dalme_app.forms import SearchForm
 from dalme_app.models import Collection as DalmeCollection
@@ -75,9 +78,9 @@ class RecordChooser(Chooser):
 class SetFieldPanel(FieldPanel):
     def on_form_bound(self):
         qs = DalmeCollection.objects.filter(published=True)
-        self.form.fields['source_set'].queryset = qs  # type: ignore
-        self.form.fields['source_set'].empty_label = '--------'  # type: ignore
-        super().on_form_bound()  # type: ignore
+        self.form.fields['source_set'].queryset = qs
+        self.form.fields['source_set'].empty_label = '--------'
+        super().on_form_bound()
 
 
 class DALMEImage(AbstractImage):
@@ -95,7 +98,7 @@ class CustomRendition(AbstractRendition):
 @register_snippet
 class Footer(models.Model):
     pages = StreamField([('page', FooterPageChooserBlock())], null=True, use_json_field=True)
-    copyright = models.CharField(max_length=255, blank=True, null=True)
+    copyright = models.CharField(max_length=255, blank=True, null=True)  # noqa: A003
     social = StreamField([('social', SocialBlock())], null=True, use_json_field=True)
 
     panels = [
@@ -108,7 +111,7 @@ class Footer(models.Model):
         return "Site Footer"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+        if self.id is None and self._meta.model.objects.exists():
             msg = 'The site can only have one footer.'
             raise ValidationError(msg)
 
@@ -150,7 +153,7 @@ class SearchPage(models.Model):
         return "Search Page"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+        if self.id is None and self._meta.model.objects.exists():
             msg = 'There can only be one search page.'
             raise ValidationError(msg)
 
@@ -206,7 +209,7 @@ class ExplorePage(models.Model):
         return "Explore Page Content"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+        if self.id is None and self._meta.model.objects.exists():
             msg = 'There can only be one Explore page.'
             raise ValidationError(msg)
 
@@ -238,7 +241,7 @@ class RecordBrowser(models.Model):
         return "Record Browser"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+        if self.id is None and self._meta.model.objects.exists():
             msg = 'There can only be one Record Browser page.'
             raise ValidationError(msg)
 
@@ -270,7 +273,7 @@ class RecordViewer(models.Model):
         return "Record Viewer"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+        if self.id is None and self._meta.model.objects.exists():
             msg = 'There can only be one Record Viewer page.'
             raise ValidationError(msg)
 
@@ -354,15 +357,18 @@ class DALMEPage(Page):
     @property
     def title_switch(self):
         """Utility to reduce OR coalescing in templates.
+
         Prefer the short_title if a Page has one, if not fallback to title.
+
         """
         try:
             if self.short_title in ['Object', 'Essay', 'Inventory']:
                 return self.smart_truncate(self.title)
-            else:
-                return self.short_title or self.title
         except AttributeError:
             return self.title
+        else:
+            return self.short_title or self.title
+
 
 
 class FeaturedPage(DALMEPage):
@@ -398,7 +404,7 @@ class FeaturedPage(DALMEPage):
     def author(self):
         if self.alternate_author:
             return self.alternate_author
-        return self.owner.profile.full_name  # type: ignore
+        return self.owner.profile.full_name
 
     @property
     def scheduled_publication(self):
@@ -433,29 +439,36 @@ class FeaturedPage(DALMEPage):
             if qs.exists():
                 model = self._meta.label.split('.')[-1]
                 title = qs.first().title
-                raise ValidationError(
-                    f'{model}: {title} is already scheduled for publication at: {self.go_live_at}'  # noqa
-                )
+                msg = f'{model}: {title} is already scheduled for publication at: {self.go_live_at}'
+                raise ValidationError(msg)
 
-        if self.source_set and self.source:  # type: ignore
+        if self.source_set and self.source:
             try:
                 # TODO: There must be a better way to determine Set membership
                 # than this but the (bi-directional) generic relations make it
-                # tough.
+                # tough. UPDATE 2023: Can't we just do this?
+                #
+                # if not self.source_set.members.filter(content_object__pk=self.source.pk).exists():
+                #     msg = f'{self.source} is not a member of: {self.source_set}'
+                #     raise ValidationError(msg) from exc
+                # return super().clean()
+                #
+                # Let's capture it with a regression test and see.
                 next(
                     source.content_object
-                    for source in self.source_set.members.all()  # type: ignore
-                    if source.content_object.pk == self.source.pk  # type: ignore
+                    for source in self.source_set.members.all()
+                    if source.content_object.pk == self.source.pk
                 )
-            except StopIteration:
+            except StopIteration as exc:
                 msg = f'{self.source} is not a member of: {self.source_set}'
-                raise ValidationError(
-                    msg,  # type: ignore
-                )
+                raise ValidationError(msg) from exc
+
         return super().clean()
 
 
 class Home(DALMEPage):
+    template = "home.html"
+
     learn_more_page = models.ForeignKey(
         'wagtailcore.Page',
         null=True,
@@ -536,7 +549,7 @@ class Flat(DALMEPage):
 
     def serve(self, request):
         if self.show_contact_form:
-            form = forms.ContactForm(label_suffix='')  # type: ignore
+            form = forms.ContactForm(label_suffix='')
 
             if request.method == 'POST':
                 form = forms.ContactForm(request.POST, label_suffix='')
@@ -585,7 +598,7 @@ class Features(DALMEPage):
             queryset=self.get_children()
             .live()
             .specific()
-            .annotate(  # type: ignore
+            .annotate(
                 published=Coalesce('go_live_at', 'first_published_at'),
             )
             .order_by('-published'),
@@ -726,7 +739,7 @@ class Corpus(Orderable, ClusterableModel):
     title = models.CharField(max_length=255)
     description = RichTextField()
 
-    page = ParentalKey('dalme_public.Collections', related_name='corpora')  # type: ignore
+    page = ParentalKey('dalme_public.Collections', related_name='corpora')
     collections = ParentalManyToManyField(
         'dalme_public.Collection',
         related_name='corpora',
@@ -756,8 +769,8 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
 
         context.update(
             {
-                'header_image': search_snippet.header_image,  # type: ignore
-                'header_position': search_snippet.header_position,  # type: ignore
+                'header_image': search_snippet.header_image,
+                'header_position': search_snippet.header_position,
                 'query': False,
                 'advanced': False,
                 'form': search_formset(form_kwargs={'fields': search_context.fields}),
@@ -774,31 +787,39 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         if pk:
             saved_search = SavedSearch.objects.filter(id=pk)
             if saved_search.exists():
-                saved_search = json.loads(saved_search.first().search)  # type: ignore
+                saved_search = json.loads(saved_search.first().search)
                 saved_search.pop('csrfmiddlewaretoken')
                 saved_search['form-SAVE'] = ''
                 request.POST = saved_search
                 request.method = 'POST'
 
         if request.method != 'POST' and request.session.get('public-search-post', False):
-            default_ts = datetime.timestamp(datetime.now() - timedelta(seconds=86401))
-            stored_dt = datetime.fromtimestamp(request.session.get('public-search-ts', default_ts))
-            delta = datetime.now() - stored_dt
-            if delta.seconds < 86400:
+            seconds = 86401
+            default_ts = datetime.timestamp(
+                datetime.now(tz=timezone.get_current_timezone()) - timedelta(seconds=seconds),
+            )
+            stored_dt = datetime.fromtimestamp(
+                request.session.get('public-search-ts', default_ts),
+                tz=timezone.get_current_timezone(),
+            )
+            delta = datetime.now(tz=timezone.get_current_timezone()) - stored_dt
+            if delta.seconds < seconds:
                 request.POST = request.session['public-search-post']
                 request.method = 'POST'
 
         if request.method == 'POST':
             formset = search_formset(request.POST, form_kwargs={'fields': search_context.fields})
             request.session['public-search-post'] = request.POST
-            request.session['public-search-ts'] = datetime.timestamp(datetime.now())
+            request.session['public-search-ts'] = datetime.timestamp(
+                datetime.now(tz=timezone.get_current_timezone()),
+            )
             if formset.is_valid():
                 search_obj = Search(
                     data=formset.cleaned_data,
                     public=True,
                     page=request.POST.get('form-PAGE', 1),
                     highlight=True,
-                    search_context=search_context.context,  # type: ignore
+                    search_context=search_context.context,
                 )
                 context.update(
                     {
@@ -808,7 +829,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
                         'results': search_obj.results,
                         'paginator': search_obj.paginator,
                         'errors': search_obj.errors,
-                        'paginated': search_obj.paginator.get('num_pages', 0) > 1,  # type: ignore
+                        'paginated': search_obj.paginator.get('num_pages', 0) > 1,
                     },
                 )
 
@@ -819,23 +840,22 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         )
 
     @route(r'^records/$', name='records')
-    def records(self, request, scoped=True):
+    def records(self, request, scoped=True):  # noqa: ARG002
         context = self.get_context(request)
         browser_snippet = RecordBrowser.objects.first()
 
         context.update(
             {
-                'header_image': browser_snippet.header_image,  # type: ignore
-                'header_position': browser_snippet.header_position,  # type: ignore
+                'header_image': browser_snippet.header_image,
+                'header_position': browser_snippet.header_position,
                 'records': True,
                 'browse_mode': request.session.get('public-browse-mode', 'wide'),
             },
         )
 
-        try:
-            context.update({'set_id': self.source_set.id})  # type: ignore
-        except AttributeError:
-            pass
+        with contextlib.suppress(AttributeError):
+            context.update({'set_id': self.source_set.id})
+
 
         return TemplateResponse(
             request,
@@ -845,7 +865,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
 
     @route(rf'^records/({UUID_RE})/$', name='record')
     @route(rf'^records/({UUID_RE})/({FOLIO_RE})/$', name='record_folio')
-    def record(self, request, pk, folio=None, scoped=True):
+    def record(self, request, pk, folio=None, scoped=True):  # noqa: ARG002
         qs = Record.objects.filter(pk=pk)
         if not qs.exists():
             raise Http404
@@ -867,7 +887,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             .order_by('pageOrder')
         )
 
-        initial_folio_index = next((i for i, item in enumerate(pages) if item["pageName"] == folio), 0) if folio else 0
+        initial_folio_index = next(
+            (i for i, item in enumerate(pages) if item["pageName"] == folio), 0,
+        ) if folio else 0
 
         context = self.get_context(request)
         viewer_snippet = RecordViewer.objects.first()
@@ -879,8 +901,8 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         data = PublicRecordSerializer(source).data
         context.update(
             {
-                'header_image': viewer_snippet.header_image,  # type: ignore
-                'header_position': viewer_snippet.header_position,  # type: ignore
+                'header_image': viewer_snippet.header_image,
+                'header_position': viewer_snippet.header_position,
                 'record': True,
                 'from_search': from_search,
                 'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
@@ -895,10 +917,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             },
         )
 
-        try:
-            context.update({'set_id': self.source_set.id})  # type: ignore
-        except AttributeError:
-            pass
+        with contextlib.suppress(AttributeError):
+            context.update({'set_id': self.source_set.id})
+
 
         return TemplateResponse(
             request,
@@ -931,7 +952,7 @@ class Collections(SearchEnabled):
 
     def get_context(self, request):
         context = super().get_context(request)
-        context['corpora'] = [(corpus, corpus.collections.all()) for corpus in self.corpora.all()]  # type: ignore
+        context['corpora'] = [(corpus, corpus.collections.all()) for corpus in self.corpora.all()]
         return context
 
     @route(r'^explore/$', name='explore')
@@ -941,8 +962,8 @@ class Collections(SearchEnabled):
 
         context.update(
             {
-                'header_image': explorer_snippet.header_image,  # type: ignore
-                'header_position': explorer_snippet.header_position,  # type: ignore
+                'header_image': explorer_snippet.header_image,
+                'header_position': explorer_snippet.header_position,
                 'explore': True,
             },
         )

@@ -1,9 +1,12 @@
-import datetime
+"""Add values to the template context for dalme_public."""
+from datetime import datetime
+
+from django.utils import timezone
 
 
 def year(request):  # noqa: ARG001
     """Return current year."""
-    return {'year': datetime.datetime.now(tz=datetime.UTC).year}
+    return {'year': datetime.now(tz=timezone.get_current_timezone()).year}
 
 
 def project(request):  # noqa: ARG001

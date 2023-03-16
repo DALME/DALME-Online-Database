@@ -1,5 +1,6 @@
+from django.contrib.auth.models import Group, User
+
 from dalme_app.models import *
-from django.contrib.auth.models import User, Group
 
 # 0. Temporarily change middleware in model_templates
 #           return User.objects.get(pk=1)
@@ -25,43 +26,43 @@ def run_commands():
                 'id': 14,
                 'name': 'Équipe Ferrand',
                 'description': 'Grants access to sources added by Guilhem Ferrand.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'name': 'Ferrand Sources',
                 'description': 'Contains sources added by Guilhem Ferrand.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'AD Aveyron'
-            ]
+                'AD Aveyron',
+            ],
         },
         {
             'group': {
                 'name': 'Équipe Saussus',
                 'description': 'Grants access to sources added by Lise Saussus.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'name': 'Saussus Sources',
                 'description': 'Contains sources added by Lise Saussus.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'ADN'
+                'ADN',
             ],
-            'members': [56]
+            'members': [56],
         },
         {
             'group': {
                 'id': 12,
                 'name': 'Squadra LOC-GLOB',
                 'description': 'Grants access to sources added by the LOC-GLOB team.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'id': '15ecfc2e-6043-4e85-bed1-5f6b2f26c62f',
@@ -69,88 +70,88 @@ def run_commands():
                 'description': 'Contains sources added by the LOC-GLOB team.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'ACBormio', 'ASBg', 'ASCM', 'ASOM', 'ASSo', 'ASTo'
+                'ACBormio', 'ASBg', 'ASCM', 'ASOM', 'ASSo', 'ASTo',
             ],
-            'members': [58, 57]
+            'members': [58, 57],
         },
         {
             'group': {
                 'name': 'Squadra Seche',
                 'description': 'Grants access to sources added by Giuseppe Seche.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'name': 'Seche Sources',
                 'description': 'Contains sources added by Giuseppe Seche.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'AS Pisa', 'ASCa'
-            ]
+                'AS Pisa', 'ASCa',
+            ],
         },
         {
             'group': {
                 'name': 'Équipe Laumonier',
                 'description': 'Grants access to sources added by Lucie Laumonier.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'name': 'Laumonier Sources',
                 'description': 'Contains sources added by Lucie Laumonier.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'AD Hérault'
-            ]
+                'AD Hérault',
+            ],
         },
         {
             'group': {
                 'name': 'Harvard Team',
                 'description': 'Grants access to sources added by the Harvard DALME team.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'name': 'Harvard Sources',
                 'description': 'Contains sources added by the Harvard DALME team.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'ACSG', 'ACU', 'AD Haute Garonne', 'ADBR', 'AMM', 'AN', 'AS Bologna', 'AS Messina', 'ASF', 'ASGe', 'ASL', 'BHSA', 'GStA'
+                'ACSG', 'ACU', 'AD Haute Garonne', 'ADBR', 'AMM', 'AN', 'AS Bologna', 'AS Messina', 'ASF', 'ASGe', 'ASL', 'BHSA', 'GStA',
             ],
-            'members': [1, 5, 35, 36, 37, 38, 52, 64]
+            'members': [1, 5, 35, 36, 37, 38, 52, 64],
         },
         {
             'group': {
                 'name': 'Team Lester-Morreale',
                 'description': 'Grants access to sources added by Anne Lester and Laura Morreale.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'name': 'Lester-Morreale Sources',
                 'description': 'Contains sources added by Anne Lester and Laura Morreale.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'AD Somme'
+                'AD Somme',
             ],
-            'members': [35]
+            'members': [35],
         },
         {
             'group': {
                 'name': 'Equipo Belenguer',
                 'description': 'Grants access to sources added by Antonio Belenguer.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'id': '002edb8f-7fd2-433a-b5d6-df8def749cee',
@@ -158,18 +159,18 @@ def run_commands():
                 'description': 'Contains sources added by Antonio Belenguer.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'APPV', 'AR Mallorca', 'AR València'
-            ]
+                'APPV', 'AR Mallorca', 'AR València',
+            ],
         },
         {
             'group': {
                 'id': 13,
                 'name': 'Hinds Team',
                 'description': 'Grants access to sources added by Sarah Hinds.',
-                'type': 3
+                'type': 3,
             },
             'dataset': {
                 'id': '5ef056a0-b060-4b5e-9f66-5e05434d7352',
@@ -177,90 +178,90 @@ def run_commands():
                 'description': 'Contains sources added by Sarah Hinds.',
                 'set_type': 3,
                 'endpoint': 'sources',
-                'permissions': 2
+                'permissions': 2,
             },
             'archives': [
-                'TNA'
+                'TNA',
             ],
-            'members': [65]
+            'members': [65],
         },
         {
             'group': {
                 'id': 1,
                 'name': 'Super Administrators',
                 'description': 'DB: reserved group that provides full system access.',
-                'type': 1
-            }
+                'type': 1,
+            },
         },
         {
             'group': {
                 'id': 5,
                 'name': 'Administrators',
                 'description': 'General: members have access to admin backends in DB, DAM, Knowledge Base, and Public website. They pass most regular permissions checks.',
-                'type': 1
-            }
+                'type': 1,
+            },
         },
         {
             'group': {
                 'id': 2,
                 'name': 'Developers',
                 'description': 'DB: Special group reserved for backend system access.',
-                'type': 1
-            }
+                'type': 1,
+            },
         },
         {
             'group': {
                 'id': 7,
                 'name': 'Web Editors',
                 'description': 'Public Website: members can see most content and approve pages for publication.',
-                'type': 5
-            }
+                'type': 5,
+            },
         },
         {
             'group': {
                 'id': 8,
                 'name': 'Editors',
                 'description': 'DB: members can perform limited editorial tasks, such as managing lists (locales, countries, languages).',
-                'type': 1
-            }
+                'type': 1,
+            },
         },
         {
             'group': {
                 'id': 4,
                 'name': 'Users',
                 'description': 'DB: members can log-in, add and work on their own content, and view other content not marked as private.',
-                'type': 1
-            }
+                'type': 1,
+            },
         },
         {
             'group': {
                 'id': 10,
                 'name': 'DAM Editors',
                 'description': 'DAM: members can add, edit, and delete most content.',
-                'type': 2
-            }
+                'type': 2,
+            },
         },
         {
             'group': {
                 'id': 11,
                 'name': 'DAM Users',
                 'description': 'DAM: members can search and view content, as well as create their own private collections.',
-                'type': 2
-            }
+                'type': 2,
+            },
         },
         {
             'group': {
                 'name': 'KB Users',
                 'description': 'Knowledge Base: members can view and create content.',
-                'type': 4
-            }
+                'type': 4,
+            },
         },
         {
             'group': {
                 'name': 'Web Users',
                 'description': 'Public Website: members can only see their own content and create new pages (which must be approved by an editor before publication).',
-                'type': 5
-            }
+                'type': 5,
+            },
         },
     ]
     remove_groups = [3, 6, 9, 15, 16]

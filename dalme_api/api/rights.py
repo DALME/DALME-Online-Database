@@ -1,3 +1,4 @@
+"""API endpoint for managing rights."""
 from dalme_api.access_policies import RightsAccessPolicy
 from dalme_api.filters import RightsPolicyFilter
 from dalme_api.serializers import RightsPolicySerializer

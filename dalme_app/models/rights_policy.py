@@ -1,3 +1,4 @@
+"""Model rights policy data."""
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -34,10 +35,10 @@ class RightsPolicy(dalmeUuid):
     attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
     comments = GenericRelation('Comment')
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['name']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
     def get_url(self):

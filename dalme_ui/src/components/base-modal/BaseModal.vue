@@ -149,7 +149,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .modal-container {
   min-width: 45rem;
   max-width: 50rem;

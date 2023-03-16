@@ -1,9 +1,17 @@
-from dalme_public.forms import SavedSearchLinkChooserForm, FootnoteChooserForm, BibliographyLinkChooserForm
+"""Define views for dalme_public."""
+import urllib
+
 from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.admin.views import chooser
-from django.urls import reverse
+
 from django.http import HttpResponseRedirect
-import urllib
+from django.urls import reverse
+
+from dalme_public.forms import (
+    BibliographyLinkChooserForm,
+    FootnoteChooserForm,
+    SavedSearchLinkChooserForm,
+)
 
 
 def saved_search(request):
@@ -13,7 +21,11 @@ def saved_search(request):
     }
 
     if request.method == 'POST':
-        form = SavedSearchLinkChooserForm(request.POST, initial=initial_data, prefix='saved-search-chooser')
+        form = SavedSearchLinkChooserForm(
+            request.POST,
+            initial=initial_data,
+            prefix='saved-search-chooser',
+        )
 
         if form.is_valid():
             result = {
@@ -24,20 +36,24 @@ def saved_search(request):
                 'prefer_this_title_as_link_text': ('link_text' in form.changed_data),
             }
             return render_modal_workflow(
-                request, None, None,
-                None, json_data={'step': 'saved_search_chosen', 'result': result}
+                request,
+                None,
+                None,
+                None,
+                json_data={'step': 'saved_search_chosen', 'result': result},
             )
     else:
-        form = SavedSearchLinkChooserForm(initial=initial_data, prefix='saved-search-chooser')
+        form = SavedSearchLinkChooserForm(
+            initial=initial_data,
+            prefix='saved-search-chooser',
+        )
 
     return render_modal_workflow(
         request,
         'wagtailadmin/chooser/saved_search_link.html',
         None,
-        chooser.shared_context(request, {
-            'form': form,
-        }),
-        json_data={'step': 'saved_search'}
+        chooser.shared_context(request, {'form': form}),
+        json_data={'step': 'saved_search'},
     )
 
 
@@ -48,7 +64,11 @@ def biblio_entry(request):
     }
 
     if request.method == 'POST':
-        form = BibliographyLinkChooserForm(request.POST, initial=initial_data, prefix='bibliography-chooser')
+        form = BibliographyLinkChooserForm(
+            request.POST,
+            initial=initial_data,
+            prefix='bibliography-chooser',
+        )
 
         if form.is_valid():
             result = {
@@ -60,19 +80,20 @@ def biblio_entry(request):
             }
             return render_modal_workflow(
                 request, None, None,
-                None, json_data={'step': 'biblio_chosen', 'result': result}
+                None, json_data={'step': 'biblio_chosen', 'result': result},
             )
     else:
-        form = BibliographyLinkChooserForm(initial=initial_data, prefix='bibliography-chooser')
+        form = BibliographyLinkChooserForm(
+            initial=initial_data,
+            prefix='bibliography-chooser',
+        )
 
     return render_modal_workflow(
         request,
         'wagtailadmin/chooser/bibliographic_link.html',
         None,
-        chooser.shared_context(request, {
-            'form': form
-        }),
-        json_data={'step': 'biblio_entry'}
+        chooser.shared_context(request, {'form': form}),
+        json_data={'step': 'biblio_entry'},
     )
 
 
@@ -108,11 +129,14 @@ def enter_footnote(request):
         if form.is_valid():
             result = {
                 'note_id': form.cleaned_data['note_id'],
-                'text': form.cleaned_data['text']
+                'text': form.cleaned_data['text'],
             }
             return render_modal_workflow(
-                request, None, None,
-                None, json_data={'step': 'footnote_entered', 'result': result}
+                request,
+                None,
+                None,
+                None,
+                json_data={'step': 'footnote_entered', 'result': result},
             )
     else:
         form = FootnoteChooserForm(initial=initial_data, prefix='footnote')
@@ -123,7 +147,7 @@ def enter_footnote(request):
         None,  # js template
         chooser.shared_context(request, {
             'form': form,
-            'title': title
+            'title': title,
         }),
-        json_data={'step': 'enter_footnote'}
+        json_data={'step': 'enter_footnote'},
     )

@@ -1,0 +1,35 @@
+# ; -*- mode: dockerfile;-*-
+# vim: set ft=dockerfile:
+FROM python:3.11-slim-bookworm as base
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc && \
+    apt-get clean
+
+FROM base as reqs
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+WORKDIR /opt/build
+COPY ./dalme_docs/requirements.txt ./
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements.txt
+
+FROM python:3.11-slim-bookworm as install
+COPY --from=reqs /opt/build/wheels ./wheels
+RUN pip install --user --no-cache-dir --upgrade pip
+RUN pip install --no-cache ./wheels/*
+COPY --from=node:18-bookworm-slim /usr/local/include/node /usr/local/include/node
+COPY --from=node:18-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=node:18-bookworm-slim /usr/local/bin/node /usr/local/bin/node
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
+RUN npm install -g typedoc
+ENV PATH="${PATH}:/usr/local/lib/node_modules"
+
+FROM install as serve
+WORKDIR /opt/docs
+RUN mkdir -p _static _templates
+CMD ["sphinx-autobuild", "--host", "0.0.0.0", "--port", "8002", ".", "/opt/docs/_build/html"]
+STOPSIGNAL SIGINT
+
+FROM install as render
+COPY ./dalme_docs /opt/docs/
+RUN mkdir -p /opt/docs/_static /opt/docs/_templates
+RUN sphinx-build -b html -nW /opt/docs /opt/docs/_build/html

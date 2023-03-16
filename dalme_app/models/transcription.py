@@ -1,3 +1,4 @@
+"""Model transcription data."""
 import lxml.etree as et
 
 from django.db import models
@@ -16,12 +17,12 @@ class Transcription(dalmeUuid):
     version = models.IntegerField(default=1)
     count_ignore = models.BooleanField(default=False)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return str(self.id)
 
     def save(self, *args, **kwargs):
         """Save record."""
-        # set count_ignore flag
+        # Set count_ignore flag.
         xml_parser = et.XMLParser(recover=True)
         tree = et.fromstring(f'<xml>{self.transcription}</xml>', xml_parser)
         tags = len(tree)

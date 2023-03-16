@@ -1,3 +1,6 @@
+"""Customize the database router."""
+
+
 class ModelDatabaseRouter:
     """Allows each model to set its own db target."""
 

@@ -1,3 +1,4 @@
+"""Model reference data."""
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -26,10 +27,10 @@ class CountryReference(dalmeIntid):
     alpha_2_code = models.CharField(max_length=2)
     num_code = models.IntegerField()
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['name']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
     def get_url(self):
@@ -41,7 +42,13 @@ class LanguageReference(dalmeIntid):
     """Stores information about languages and dialects."""
 
     glottocode = models.CharField(max_length=25, unique=True)
-    iso6393 = models.CharField(max_length=25, unique=True, blank=True)
+    iso6393 = models.CharField(
+        max_length=25,
+        unique=True,
+        null=True,
+        blank=True,
+        default=None,
+    )
     name = models.CharField(max_length=255)
     is_dialect = models.BooleanField(default=False)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
@@ -52,10 +59,10 @@ class LanguageReference(dalmeIntid):
         related_query_name='language',
     )
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['name']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
     def get_url(self):
@@ -78,11 +85,11 @@ class LocaleReference(dalmeIntid):
         related_query_name='locale',
     )
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['country', 'name']
         unique_together = ('name', 'administrative_region')
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return f'{self.name}, {self.administrative_region}, {self.country!s}'
 
     def get_url(self):

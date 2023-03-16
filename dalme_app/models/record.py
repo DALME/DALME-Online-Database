@@ -1,3 +1,4 @@
+"""Model record data."""
 from wagtail.search import index
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -7,7 +8,6 @@ from django.db.models import options
 from django.urls import reverse
 
 from dalme_app.models.templates import dalmeIntid, dalmeOwned, dalmeUuid
-from dalme_app.models.workflow import Workflow
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
@@ -19,7 +19,7 @@ class RecordGroup(dalmeUuid, dalmeOwned):
     short_name = models.CharField(max_length=55)
     parent = GenericForeignKey('parent_type', 'parent_id')
     parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    parent_id = models.CharField(max_length=36, db_index=True, null=True)  # noqa: DJ001
+    parent_id = models.CharField(max_length=36, db_index=True, null=True)
     attributes = GenericRelation('Attribute', related_query_name='record_group')
     children = GenericRelation('Record', related_query_name='record_group')
     permissions = GenericRelation('Permission', related_query_name='record_group')
@@ -51,7 +51,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     short_name = models.CharField(max_length=55)
     parent = GenericForeignKey('parent_type', 'parent_id')
     parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-    parent_id = models.CharField(max_length=36, db_index=True, null=True)  # noqa: DJ001
+    parent_id = models.CharField(max_length=36, db_index=True, null=True)
     attributes = GenericRelation('Attribute', related_query_name='record')
     pages = models.ManyToManyField('Page', db_index=True, through='Folio')
     tags = GenericRelation('Tag')
@@ -71,7 +71,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
 
     search_fields = [index.FilterField('name')]
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
     def get_absolute_url(self):
@@ -83,7 +83,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
         """Return boolean indicating whether the record has been published."""
         try:
             return self.workflow.is_public
-        except Workflow.DoesNotExist:
+        except self._meta.get_field('workflow').related_model.DoesNotExist:
             return False
 
     @property
@@ -238,3 +238,6 @@ class Folio(dalmeIntid):
             'thumbnail_url': self.page.thumbnail_url,
             'manifest_url': self.page.manifest_url,
         }
+
+    def __str__(self):
+        return self.pk

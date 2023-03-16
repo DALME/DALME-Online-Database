@@ -254,7 +254,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .task-list-menu {
   min-width: 300px;
 }

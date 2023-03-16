@@ -3,7 +3,6 @@ import attachments from "./attachments";
 import attributes from "./attributes";
 import attributeTypes from "./attribute-types";
 import auth from "./auth";
-import choices from "./choices";
 import comments from "./comments";
 import countries from "./countries";
 import collections from "./collections";
@@ -29,7 +28,6 @@ const requests = {
   attributes,
   attributeTypes,
   auth,
-  choices,
   comments,
   countries,
   collections,

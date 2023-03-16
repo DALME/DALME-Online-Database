@@ -1,0 +1,72 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+
+infra.build:
+	docker compose up -d --build
+.PHONY: infra.build
+
+infra.hooks.install:
+	$(VENV_BIN)/pre-commit install
+.PHONY: infra.hooks.install
+
+infra.hooks.update:
+	$(VENV_BIN)/pre-commit autoupdate
+.PHONY: infra.hooks.update
+
+infra.env:
+	@$(MAKE) infra.pg.check || $(MAKE) infra.pg.warn
+	@$(MAKE) infra.pyenv.check || $(MAKE) infra.pyenv.warn
+	@$(MAKE) infra.pyenv.local || $(MAKE) infra.pyenv.install
+	pyenv exec python -m venv $(VENV)
+	$(VENV_BIN)/pip install --upgrade pip
+.PHONY: infra.env
+
+infra.log:
+	docker compose logs --follow
+.PHONY: infra.log
+
+infra.pg.check:
+	@postgres --version
+.PHONY: infra.pg.check
+
+infra.pg.warn:
+	$(error 'ERROR: Install postgres so psycopg can be compiled locally))
+.PHONY: infra.pg.warn
+
+infra.pyenv.check:
+	@command -v 'pyenv' >/dev/null 2>&1
+.PHONY: infra.pyenv.check
+
+infra.pyenv.local:
+	pyenv local $(PY)
+.PHONY: infra.pyenv.local
+
+infra.pyenv.install:
+	pyenv install $(PY)
+	@$(MAKE) infra.pyenv.local
+.PHONY: infra.pyenv.install
+
+infra.pyenv.warn:
+	$(error 'ERROR: Install pyenv')
+.PHONY: infra.pyenv.warn
+
+infra.rebuild:
+	docker compose up -d --build --force-recreate
+.PHONY: infra.rebuild
+
+infra.start:
+	docker compose up -d
+.PHONY: infra.start
+
+infra.stop:
+	docker compose stop
+.PHONY: infra.stop
+
+infra.help:
+	@echo "  infra.build            build the containers"
+	@echo "  infra.log              tail the container logs"
+	@echo "  infra.rebuild          rebuild the containers"
+	@echo "  infra.start            spin up the container network"
+	@echo "  infra.stop             stop the container network"
+	@echo ""
+.PHONY: infra.help

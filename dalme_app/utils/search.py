@@ -1,3 +1,4 @@
+"""Define search utilities."""
 import json
 import math
 import pathlib
@@ -146,7 +147,7 @@ class Search:
 
             if not bool_sets['must']:
                 query_object['must'] = [
-                    Q('term', short_name__isnull=False)
+                    Q('term', short_name__isnull=False),
                 ]  # prevents returning of single folios as results
 
         return query_object
@@ -339,7 +340,7 @@ class Search:
 class SearchContext:
     """Search context manager."""
 
-    def __init__(self, **kwargs):  # noqa: D107
+    def __init__(self, **kwargs):
         self.public = kwargs.pop('public', False)
 
     @cached_property
@@ -397,7 +398,6 @@ class SearchContext:
     def language(self):
         """Return languages as options."""
         filter_options = {'attribute_type': 15}
-
         if self.public:
             filter_options.update({'records__workflow__is_public': True})
 

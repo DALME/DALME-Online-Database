@@ -1,3 +1,4 @@
+"""Serializers for dalme_public."""
 from rest_framework import serializers
 
 from dalme_app.models import Attribute, Collection, CollectionMembership, Record
@@ -7,7 +8,7 @@ from dalme_app.utils import DalmeDate
 class PublicAttributeSerializer(serializers.ModelSerializer):
     """Record attribute serializer for web frontend."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Attribute
         fields = ('name', 'value')
 
@@ -35,7 +36,7 @@ class PublicCollectionMembershipSerializer(serializers.ModelSerializer):
 
     name = serializers.CharField(source='collection_id.name', read_only=True, required=False, max_length=255)
 
-    class Meta:  # noqa: D106
+    class Meta:
         list_serializer_class = PublicFilteredCollectionsSerializer
         model = CollectionMembership
         fields = ('collection_id', 'name')
@@ -53,7 +54,7 @@ class PublicRecordSerializer(serializers.ModelSerializer):
     attributes = PublicAttributeSerializer(many=True, required=False)
     collections = PublicCollectionMembershipSerializer(many=True, required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Record
         fields = (
             'id',
@@ -115,8 +116,8 @@ class PublicRecordSerializer(serializers.ModelSerializer):
                 result['date'] = DalmeDate(dates['date']).format_as('mys')
                 result['full_date'] = DalmeDate(dates['date']).format_as('dmyl')
             else:
-                result['date'] = DalmeDate(list(dates.values())[0]).format_as('mys')
-                result['full_date'] = DalmeDate(list(dates.values())[0]).format_as('dmyl')
+                result['date'] = DalmeDate(next(iter(dates.values()))).format_as('mys')
+                result['full_date'] = DalmeDate(next(iter(dates.values()))).format_as('dmyl')
         else:
             result['date'] = '—'
             result['full_date'] = 'N/A'
@@ -165,6 +166,6 @@ class PublicRecordSerializer(serializers.ModelSerializer):
 class PublicCollectionSerializer(serializers.ModelSerializer):
     """Collections serializer for web frontend."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Collection
         fields = '__all__'

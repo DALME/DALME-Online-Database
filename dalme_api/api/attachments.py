@@ -1,3 +1,4 @@
+"""API endpoint for managing attachments."""
 from rest_framework import viewsets
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -31,4 +32,5 @@ class Attachments(viewsets.ModelViewSet):
         except Exception as e:  # noqa: BLE001
             result = {'error': 'There was an error processing the file: ' + str(e)}
             status = 400
+
         return Response(result, status)

@@ -1,6 +1,5 @@
 from dalme_app.models import *
 
-
 # fix duplicate credits before adding constraint to db
 # def step_1():
 #     credits = Source_credit.objects.all()

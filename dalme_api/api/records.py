@@ -1,3 +1,4 @@
+"""API endpoint for managing records."""
 import json
 import pathlib
 

@@ -1,3 +1,4 @@
+"""Serializers for locale data."""
 from dalme_app.models import LocaleReference
 
 from .base_classes import DynamicSerializer
@@ -9,7 +10,7 @@ class LocaleReferenceSerializer(DynamicSerializer):
 
     country = CountryReferenceSerializer(field_set='attribute')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = LocaleReference
         fields = ('id', 'name', 'administrative_region', 'country', 'latitude', 'longitude')
         field_sets = {

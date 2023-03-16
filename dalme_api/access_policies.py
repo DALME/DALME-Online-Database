@@ -1,3 +1,4 @@
+"""Define authorization rules and resources."""
 import json
 import pathlib
 
@@ -63,7 +64,7 @@ class BaseAccessPolicy(AccessPolicy):
     def get_targets(self, view, arg=None):
         """Return target object(s)."""
         if len(self.targets) == 0:
-            if type(view) is dict:
+            if isinstance(view, dict):
                 self.targets = [view.get('object', {})]
 
             elif hasattr(view, 'object'):

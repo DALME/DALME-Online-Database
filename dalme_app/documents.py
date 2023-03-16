@@ -1,3 +1,4 @@
+"""Define Elasticsearch documents."""
 from contextlib import suppress
 
 from django_elasticsearch_dsl import Document, fields
@@ -14,7 +15,7 @@ from dalme_app.models import Folio, Record
 class JoinField(fields.DEDField, dsl_Join):
     """Join field class."""
 
-    def __init__(self, *args, **kwargs):  # noqa: D107
+    def __init__(self, *args, **kwargs):
         public = kwargs.pop('public', False)
         self._public = public
         kwargs['relations'] = {'PublicRecord': 'PublicFolio'} if public else {'FullRecord': 'FullFolio'}
@@ -98,10 +99,10 @@ class PublicRecord(PublicRecordBase):
     collections = fields.ObjectField()
     geo_location = fields.GeoPointField()
 
-    class Index:  # noqa: D106
+    class Index:
         name = 'public_records'
 
-    class Django:  # noqa: D106
+    class Django:
         model = Record
 
     def update(self, thing, refresh=None, action='index', parallel=False, **kwargs):
@@ -156,10 +157,10 @@ class PublicFolio(PublicRecordBase):
         index_prefixes={},
     )
 
-    class Index:  # noqa: D106
+    class Index:
         name = 'public_records'
 
-    class Django:  # noqa: D106
+    class Django:
         model = Folio
 
     def get_queryset(self):
@@ -185,7 +186,7 @@ class PublicFolio(PublicRecordBase):
 class FullRecord(FullRecordBase, PublicRecord):
     """Record document."""
 
-    class Index:  # noqa: D106
+    class Index:
         name = 'full_records'
 
     def get_queryset(self):
@@ -197,7 +198,7 @@ class FullRecord(FullRecordBase, PublicRecord):
 class FullFolio(FullRecordBase, PublicFolio):
     """Folio document."""
 
-    class Index:  # noqa: D106
+    class Index:
         name = 'full_records'
 
     def get_queryset(self):

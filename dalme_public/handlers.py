@@ -1,9 +1,16 @@
-from wagtail.rich_text import LinkHandler
-from wagtail.admin.rich_text.converters.html_to_contentstate import LinkElementHandler, InlineEntityElementHandler
-from django.utils.html import escape
-from dalme_app.models import SavedSearch
-from draftjs_exporter.dom import DOM
+"""Define custom rewrite handlers."""
 import re
+
+from draftjs_exporter.dom import DOM
+from wagtail.admin.rich_text.converters.html_to_contentstate import (
+    InlineEntityElementHandler,
+    LinkElementHandler,
+)
+from wagtail.rich_text import LinkHandler
+
+from django.utils.html import escape
+
+from dalme_app.models import SavedSearch
 
 UUIDv4 = r'^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}$'
 
@@ -36,12 +43,12 @@ class SavedSearchElementHandler(LinkElementHandler):
             return {
                 'id': _id,
                 'url': f'/collections/search/{_id}/',
-                'parentId': 'saved_search'
+                'parentId': 'saved_search',
             }
 
         return {
             'id': str(saved_search.id),
-            'url': f'/collections/search/{str(saved_search.id)}/',
+            'url': f'/collections/search/{saved_search.id!s}/',
             'parentId': 'saved_search',
         }
 

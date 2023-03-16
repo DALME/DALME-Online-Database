@@ -1,3 +1,4 @@
+"""Serializers for record data."""
 from dalme_app.models import Folio, Record
 
 from .attributes import AttributeSerializer
@@ -14,7 +15,7 @@ class RecordFolioSerializer(DynamicSerializer):
     page = PageSerializer()
     transcription = TranscriptionSerializer()
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Folio
         fields = ('id', 'page', 'transcription', 'page_data')
 
@@ -30,7 +31,7 @@ class RecordSerializer(DynamicSerializer):
     modification_user = UserSerializer(field_set='attribute', required=False)
     folios = RecordFolioSerializer(many=True, fields=['page_data'], required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Record
         fields = [
             'id',

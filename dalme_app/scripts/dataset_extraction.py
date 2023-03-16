@@ -1,8 +1,10 @@
-from dalme_app.models import *  # noqa
-from django.contrib.auth.models import User # noqa
-import os
 import csv
+import os
 import shutil
+
+from django.contrib.auth.models import User  # noqa
+
+from dalme_app.models import *  # noqa
 
 
 def extract():
@@ -23,7 +25,7 @@ def extract():
     targets = Attribute.objects.filter( # noqa
         attribute_type=15,  # language
         # attribute_type=36,  # locale
-        value_STR='Italian'
+        value_STR='Italian',
         # value_JSON__id='141'  # Marseille || field is JSON blob with id and table name
     )
 

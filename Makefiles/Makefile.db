@@ -1,0 +1,73 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+DB_VOLUME := pgdata
+
+db.drop:
+	@$(MAKE) infra.stop
+	docker rm -f $$(docker ps -a -q)
+	docker volume rm $(PROJECT)_$(DB_VOLUME)
+	@$(MAKE) infra.start
+.PHONY: db.drop
+
+db.migrate:
+	docker compose run --rm \
+		$(PROJECT).web \
+		python manage.py migrate_schemas $(args)
+.PHONY: db.migrate
+
+db.migrate.fake:
+	docker compose run --rm \
+		$(PROJECT).web \
+		python manage.py migrate_schemas --fake $(args)
+.PHONY: db.migrate.fake
+
+db.migrations.make:
+	docker compose run --rm \
+		$(PROJECT).web \
+		python manage.py makemigrations
+.PHONY: db.migrations.make
+
+db.migrations.empty:
+ifndef app
+	$(error Target app not specified. \
+		Usage: make db.migrations.empty app='dalme_app')
+else
+	docker compose run --rm \
+		$(PROJECT).web \
+		python manage.py migrations.make --empty $(app)
+endif
+.PHONY: db.migrations.empty
+
+db.migrations.merge:
+	docker compose run --rm \
+		$(PROJECT).web \
+		python manage.py migrations.make --merge
+.PHONY: db.migrations.merge
+
+db.migrations.show:
+	docker compose run --rm \
+		$(PROJECT).web \
+		python manage.py showmigrations
+.PHONY: db.migrations.show
+
+db.shell:
+	PGPASSWORD=$(PROJECT) \
+		docker compose exec \
+		$(PROJECT).db \
+		psql -wx \
+		--username $(PROJECT) \
+		--dbname $(PROJECT)
+.PHONY: db.shell
+
+db.help:
+	@echo "  db.drop                drop the db volume"
+	@echo "  db.migrations.empty    generate an empty database revision"
+	@echo "  db.migrations.make     generate a database revision"
+	@echo "  db.migrations.merge    merge database revisions"
+	@echo "  db.migrations.show     show database revision state"
+	@echo "  db.migrate             apply all upgrades to the database schema"
+	@echo "  db.migrate.fake        run faked migrations"
+	@echo "  db.migrate.revert      revert migrations for an app"
+	@echo "  db.shell               shell into to psql on the service"
+	@echo ""
+.PHONY: db.help

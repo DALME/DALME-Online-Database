@@ -49,7 +49,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .spinner-container {
   position: relative;
   display: flex;

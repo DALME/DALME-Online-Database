@@ -1,3 +1,4 @@
+"""API endpoint for managing locales."""
 from dalme_api.access_policies import LocaleAccessPolicy
 from dalme_api.serializers import LocaleReferenceSerializer
 from dalme_app.models import LocaleReference

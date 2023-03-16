@@ -1,12 +1,14 @@
+"""Define custom templatetags for dalme_public."""
 import json
 import os
 import urllib
 from calendar import month_name
-from datetime import date
+from datetime import datetime
 
 from elasticsearch_dsl.utils import AttrDict
 
 from django import template
+from django.utils import timezone
 
 from dalme_public.models import (
     Essay,
@@ -149,7 +151,7 @@ def get_header_image_styles(context, header_image, header_position):
     value = False
     count = 0
 
-    while not value and count < 4:
+    while not value and count < 4:  # noqa: PLR2004
         value = gradients.get(page.slug, False)
         page = page.get_parent()
 
@@ -244,31 +246,31 @@ def get_recent_features(context):
 
         if i == 0:
             year_control = year
-            m_idx = months.index(month) - 1  # type: ignore
+            m_idx = months.index(month) - 1
             year_set.append({'url': obj.url, 'month': month})
             continue
 
         if year == year_control:
-            if month != months[m_idx]:  # type: ignore
-                while month != months[m_idx]:  # type: ignore
-                    year_set.append({'url': None, 'month': months[m_idx]})  # type: ignore
-                    m_idx -= 1  # type: ignore
+            if month != months[m_idx]:
+                while month != months[m_idx]:
+                    year_set.append({'url': None, 'month': months[m_idx]})
+                    m_idx -= 1
 
             year_set.append({'url': obj.url, 'month': month})
-            m_idx -= 1  # type: ignore
+            m_idx -= 1
 
         else:
             results[year_control] = year_set
             year_control = year
             year_set = [{'url': obj.url, 'month': month}]
-            m_idx = months.index(month) - 1  # type: ignore
+            m_idx = months.index(month) - 1
 
         results[year_control] = year_set
 
     if results:
         return {'title': title, 'features': results}
-    else:
-        return None
+
+    return None
 
 
 @register.simple_tag()
@@ -287,9 +289,10 @@ def get_snippet(obj, width):
 
 @register.simple_tag(takes_context=True)
 def get_citation_data(context):
-    accessed = date.today()
+    today = datetime.now(tz=timezone.get_current_timezone()).date()
+    accessed = today
     page = context['page']
-    published = page.first_published_at or date.today()
+    published = page.first_published_at or today
     page_class = page.get_verbose_name()
     formats = None
     record = context.get('record', False)
@@ -411,7 +414,7 @@ def get_citation_data(context):
                 },
             )
 
-    coins_tokens = [f'{k}={urllib.parse.quote(v)}' for (k, v) in coins_list]  # type: ignore
+    coins_tokens = [f'{k}={urllib.parse.quote(v)}' for (k, v) in coins_list]
     coins_span = f'<span class="Z3988" title="{"&".join(coins_tokens)}"></span>'
 
     return [formats, citation, coins_span]
@@ -454,9 +457,9 @@ def explore_map_text():
 
 @register.filter
 def to_dict(target):
-    if type(target) is AttrDict:
+    if isinstance(target, AttrDict):
         return target.to_dict()
-    if type(target) is list and type(target[0]) is tuple:
+    if isinstance(target, list) and isinstance(target[0], tuple):
         return {i[0]: i[1] for i in target}
     return None
 
@@ -477,7 +480,7 @@ def in_list(value, list_string):
 
 
 @register.filter
-def get_highlights(meta, context):
+def get_highlights(meta, context):  # noqa: C901,PLR0912
     highlights = []
     if 'highlight' in meta:
         fields = list(meta.highlight.to_dict().keys())
@@ -511,13 +514,13 @@ def get_highlights(meta, context):
 def js_trans(value, mode=None):
     if mode == 'bool':
         return 'true' if value else 'false'
-    elif value is None:
+    if value is None:
         return 'null'
-    elif value is False:
+    if value is False:
         return 'false'
-    elif value is True:
+    if value is True:
         return 'true'
-    elif (
+    if (
         type(value) in [int, list, dict]
         or value.startswith('"')
         and value.endswith('"')
@@ -525,5 +528,4 @@ def js_trans(value, mode=None):
         and value.endswith('\'')
     ):
         return value
-    else:
-        return value if value.startswith('"') and value.endswith('"') else f'"{value}"'
+    return value if value.startswith('"') and value.endswith('"') else f'"{value}"'

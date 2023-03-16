@@ -1,3 +1,4 @@
+"""Serializers for group data."""
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
@@ -22,7 +23,7 @@ class GroupSerializer(DynamicSerializer, WritableNestedModelSerializer):
         required=False,
     )
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Group
         fields = ('id', 'name', 'group_type', 'description')
         field_sets = {

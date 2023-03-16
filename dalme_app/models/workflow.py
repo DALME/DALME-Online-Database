@@ -1,3 +1,4 @@
+"""Model workform data."""
 from django_currentuser.middleware import get_current_user
 
 from django.contrib.auth.models import User
@@ -44,7 +45,7 @@ class Workflow(models.Model):
     review_done = models.BooleanField(default=False)
     is_public = models.BooleanField(default=False)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return f'Workflow: {self.record.id}'
 
     @property
@@ -66,7 +67,7 @@ class Workflow(models.Model):
 
 
 class WorkLog(models.Model):
-    """Stores log information."""
+    """Model workflow log data."""
 
     id = models.AutoField(primary_key=True, unique=True, db_index=True)  # noqa: A003
     record = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE, related_name='work_log')
@@ -74,5 +75,5 @@ class WorkLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return f'{self.timestamp}: {self.record.id} ({self.user.username}) - {self.event}'

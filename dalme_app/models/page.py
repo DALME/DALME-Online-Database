@@ -1,12 +1,14 @@
+"""Model page data."""
 import json
 
 import requests
 
+from django.apps import apps
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from dalme_app.models.resourcespace import rs_api_query, rs_resource
+from dalme_app.models.resourcespace import rs_api_query
 from dalme_app.models.templates import dalmeUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
@@ -21,10 +23,10 @@ class Page(dalmeUuid):
     canvas = models.TextField(blank=True)
     tags = GenericRelation('Tag')
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['order']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
     @property
@@ -35,6 +37,7 @@ class Page(dalmeUuid):
     @property
     def thumbnail_url(self):
         """Return the thumbnail's url for the image associated with the page (if any)."""
+        rs_resource = apps.get_model(app_label='dalme_app', model_name='rs_resource')
         try:
             thumbnail = rs_resource.objects.get(ref=self.dam_id).get_image_url('thm')
         except (KeyError, ValueError):
@@ -71,8 +74,6 @@ class Page(dalmeUuid):
 
     def get_canvas(self):
         """Return IIIF canvas associated with the page."""
-        # need to find way to prevent stored canvas from getting stale
-        # or to determine if it is...
         if self.dam_id is not None:
             api_params = {
                 'function': 'get_resource_data',
@@ -81,9 +82,9 @@ class Page(dalmeUuid):
             page_meta = rs_api_query(**api_params)
             page_meta_obj = page_meta.json()
 
-            if type(page_meta_obj) is list:
+            if isinstance(page_meta_obj, list):
                 folio = page_meta_obj[0]['field79']
-            elif type(page_meta_obj) is dict:
+            elif isinstance(page_meta_obj, dict):
                 folio = page_meta_obj['field79']
 
             canvas = requests.get(f'https://dam.dalme.org/iiif/{self.dam_id}/canvas/{folio}')

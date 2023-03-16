@@ -1,3 +1,4 @@
+"""Interface for dalme_api.serializers.agents module."""
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 from dalme_api.serializers.users import UserSerializer
@@ -11,7 +12,7 @@ class AgentSerializer(DynamicSerializer, WritableNestedModelSerializer):
 
     user = UserSerializer(required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Agent
         fields = ('id', 'agent_type', 'name', 'user')
         extra_kwargs = {

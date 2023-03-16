@@ -1,6 +1,7 @@
-import json
+
+from django.contrib.auth.models import User
+
 from dalme_app.models import *
-from django.contrib.auth.models import User, Group
 
 
 def run_commands():
@@ -31,7 +32,7 @@ def step_1():
         'Vito Vitale',
         'Bianca Fadda',
         'Gabriella Olla Repetto',
-        'Philippe Wolff'
+        'Philippe Wolff',
         ]
 
     try:
@@ -49,29 +50,29 @@ def step_2():
             'first_name': 'Guilhem',
             'last_name': 'Ferrand',
             'email': 'guilhem.ferrand0154@orange.fr',
-            'full_name': 'Guilhem Ferrand'
+            'full_name': 'Guilhem Ferrand',
         },
         {
             'username': 'laumo',
             'first_name': 'Lucie',
             'last_name': 'Laumonier',
             'email': 'laumo001@umn.edu',
-            'full_name': 'Lucie Laumonier'
+            'full_name': 'Lucie Laumonier',
         },
         {
             'username': 'anbegon',
             'first_name': 'Antonio',
             'last_name': 'Belenguer González',
             'email': 'anbegon@alumni.uv.es',
-            'full_name': 'Antonio Belenguer González'
+            'full_name': 'Antonio Belenguer González',
         },
         {
             'username': 'seche.giuseppe',
             'first_name': 'Giuseppe',
             'last_name': 'Seche',
             'email': 'seche.giuseppe@gmail.com',
-            'full_name': 'Giuseppe Seche'
-        }
+            'full_name': 'Giuseppe Seche',
+        },
     ]
     try:
         for entry in _users:

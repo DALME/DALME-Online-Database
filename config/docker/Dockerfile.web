@@ -1,0 +1,127 @@
+# ; -*- mode: dockerfile;-*-
+# vim: set ft=dockerfile:
+FROM python:3.11-slim-bookworm as base
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    default-libmysqlclient-dev \
+    libcurl4-openssl-dev \
+    libmariadbd-dev \
+    libpq-dev \
+    libssl-dev \
+    python3-dev && \
+    apt-get clean
+
+### Development stages
+FROM base as dev-reqs
+WORKDIR /opt/build
+COPY ./requirements.txt ./requirements-dev.txt ./
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements-dev.txt
+
+FROM python:3.11-slim-bookworm as install-dev
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    libxmlsec1 \
+    libxmlsec1-dev \
+    libxmlsec1-openssl \
+    libmariadbd-dev \
+    libpq-dev \
+    vim \
+    xmlsec1 && \
+    apt-get clean
+COPY --from=dev-reqs /opt/build/wheels ./wheels
+RUN pip install --user --no-cache-dir --upgrade pip
+RUN pip install --no-cache ./wheels/*
+
+### TARGET: development
+FROM install-dev as development
+ENV ENV development
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONBREAKPOINT ipdb.set_trace
+WORKDIR /opt/web
+RUN mkdir /opt/web/www
+COPY ./config/env.web.dev ./.env
+COPY ./tenants ./tenants
+COPY ./static ./static
+COPY ./manage.py ./
+CMD ["python", "manage.py", "runserver_plus", "0.0.0.0:8001"]
+STOPSIGNAL SIGINT
+
+### TARGET: ci
+FROM install-dev as ci
+ENV ENV ci
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ARG DAM_DB_NAME
+ARG DAM_DB_USER
+ARG DAM_DB_PASSWORD
+ARG DAM_DB_HOST
+ENV DAM_DB_NAME=$DAM_DB_NAME \
+    DAM_DB_USER=$DAM_DB_USER \
+    DAM_DB_PASSWORD=$DAM_DB_PASSWORD \
+    DAM_DB_HOST=$DAM_DB_HOST \
+    DAM_DB_PORT=$DAM_DB_PORT
+ARG POSTGRES_DB
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
+ARG POSTGRES_HOST
+ARG POSTGRES_PORT
+ENV POSTGRES_DB=$POSTGRES_DB \
+    POSTGRES_USER=$POSTGRES_USER \
+    POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+    POSTGRES_HOST=$POSTGRES_HOST \
+    POSTGRES_PORT=$POSTGRES_PORT
+ENV LOG_LEVEL ERROR
+WORKDIR /opt/web
+RUN mkdir /opt/web/www
+COPY ./dalme ./dalme
+COPY ./dalme_api ./dalme_api
+COPY ./dalme_app ./dalme_app
+COPY ./dalme_public ./dalme_public
+COPY ./dalme_purl ./dalme_purl
+COPY ./templates ./templates
+COPY ./tenants ./tenants
+COPY ./tests ./tests
+COPY ./static ./static
+COPY ./manage.py ./
+COPY ./pyproject.toml ./
+
+### Production stages
+FROM base as reqs
+WORKDIR /opt/build
+COPY ./requirements.txt ./
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir ./wheels -r requirements.txt
+
+FROM python:3.11-slim-bookworm as install
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    libxmlsec1 \
+    libxmlsec1-dev \
+    libxmlsec1-openssl \
+    libmariadbd-dev \
+    libpq-dev \
+    xmlsec1 && \
+    apt-get clean
+COPY --from=reqs /opt/build/wheels ./wheels
+RUN pip install --user --no-cache-dir --upgrade pip
+RUN pip install --no-cache ./wheels/*
+
+### TARGET: production
+FROM install as production
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV LANG=en_US.UTF-8
+WORKDIR /opt/web
+COPY ./dalme ./dalme
+COPY ./dalme_api ./dalme_api
+COPY ./dalme_app ./dalme_app
+COPY ./dalme_public ./dalme_public
+COPY ./dalme_purl ./dalme_purl
+COPY ./templates ./templates
+COPY ./tenants ./tenants
+COPY ./static ./static
+COPY ./manage.py ./
+STOPSIGNAL SIGTERM

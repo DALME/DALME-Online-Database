@@ -13,7 +13,7 @@
       <q-separator />
       <q-card-section class="login-card-body">
         <div class="login-card-text">
-          <span v-if="reAuthenticate">Please re-authenticate</span>
+          <span v-if="reauthenticate">Please re-authenticate</span>
           <span v-else>Please log in</span>
         </div>
         <q-form @submit="onSubmit" class="q-gutter-sm">
@@ -78,8 +78,8 @@
           </div>
           <div class="row justify-center text-indigo-6 login-modal-link">
             <a href="" class="text-link">Recover password</a>
-            <span v-if="reAuthenticate" class="text-grey-7 q-mx-sm">|</span>
-            <a v-if="reAuthenticate" @click="logout" class="text-link cursor-pointer"> Log out </a>
+            <span v-if="reauthenticate" class="text-grey-7 q-mx-sm">|</span>
+            <a v-if="reauthenticate" @click="logout" class="text-link cursor-pointer"> Log out </a>
           </div>
         </q-form>
       </q-card-section>
@@ -91,24 +91,27 @@
 import { any, isEmpty } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 import { authSchema } from "@/schemas";
-import { requests, publicUrl } from "@/api";
+import { requests } from "@/api";
 import { useAPI, useEventHandling, useStores } from "@/use";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "LoginModal",
   setup() {
-    const { auth, reAuthenticate } = useStores();
+    const { auth, reauthenticate } = useStores();
     const { notifier } = useEventHandling();
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { data, fetchAPI, success } = apiInterface();
-    const { showLogin, updateShowLogin } = inject("showLogin");
+
+    const showLogin = inject("showLogin");
     const prefSubscription = inject("prefSubscription");
+
     const username = ref("");
     const password = ref("");
     const isPassword = ref(true);
     const submitting = ref(false);
+
     const disabled = computed(() => any(isEmpty)([username.value, password.value]));
 
     const usernameRules = [(val) => (val && !isEmpty(val)) || "Username is required"];
@@ -131,9 +134,9 @@ export default defineComponent({
         await authSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           auth.login(value.user).then(() => {
             prefSubscription("subscribe");
-            updateShowLogin(false);
+            showLogin.value = false;
             if ($route.query.next) {
-              window.location.href = `${publicUrl}${$route.query.next}`;
+              window.location.href = $route.query.next;
             }
           });
         });
@@ -150,7 +153,7 @@ export default defineComponent({
       onSubmit,
       password,
       passwordRules,
-      reAuthenticate,
+      reauthenticate,
       showLogin,
       submitting,
       username,

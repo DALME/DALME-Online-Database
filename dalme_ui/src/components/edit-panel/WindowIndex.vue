@@ -125,7 +125,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .index-header {
   width: 100%;
   display: flex;

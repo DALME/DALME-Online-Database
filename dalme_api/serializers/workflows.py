@@ -1,3 +1,4 @@
+"""Serializers for workflow data."""
 from rest_framework import serializers
 
 from dalme_api.serializers.users import UserSerializer
@@ -9,7 +10,7 @@ class WorklogSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(field_set='attribute', required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = WorkLog
         fields = ('id', 'event', 'timestamp', 'user')
 
@@ -20,7 +21,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
     last_user = UserSerializer(field_set='attribute', required=False)
     work_log = WorklogSerializer(many=True, read_only=True, required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Workflow
         fields = (
             'help_flag',

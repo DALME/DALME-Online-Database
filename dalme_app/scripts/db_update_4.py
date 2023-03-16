@@ -1,11 +1,9 @@
-import json
-import datetime
-from dalme_app.models import *
-from django.contrib.auth.models import User, Group
-import calendar
-from django.utils.dateparse import parse_date
-from django.db import IntegrityError
+
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db import IntegrityError
+
+from dalme_app.models import *
 
 
 def run_commands():
@@ -43,7 +41,7 @@ def run_commands():
 
 def step_1():
     transcriptions = Transcription.objects.all()
-    print('Starting: {} transcriptions to process.'.format(transcriptions.count()))
+    print(f'Starting: {transcriptions.count()} transcriptions to process.')
     count = 0
     for t in transcriptions:
         text = t.transcription
@@ -54,7 +52,7 @@ def step_1():
         t.save()
         count += 1
         if (count % 100 == 0):
-            print('{} transcriptions processed.'.format(str(count)))
+            print(f'{count!s} transcriptions processed.')
     return '1. Simple lookups completed.'
 
 
@@ -70,7 +68,7 @@ def step_2():
                     tr_id = fol.sources.first().transcription.id
                     text = fol.sources.first().transcription.transcription
                     text = text.replace('<hi rend="indent1">', '<hi rend="indent">')
-                    tr = Transcription.objects.filter(pk=tr_id).update(transcription=text)
+                    Transcription.objects.filter(pk=tr_id).update(transcription=text)
 
     return '2. Florence indents fixed.'
 

@@ -5,6 +5,8 @@ import { useAuthStore } from "stores/auth";
 
 const fetcher = axios.create();
 fetcher.defaults.headers.post["Content-Type"] = "application/json";
+fetcher.defaults.xsrfCookieName = "csrftoken";
+fetcher.defaults.xsrfHeaderName = "X-CSRFToken";
 
 export default boot(({ store }) => {
   fetcher.interceptors.response.use(
@@ -30,7 +32,7 @@ export default boot(({ store }) => {
             authStore.isRefreshing = true;
             const refresh = await axios.post(tokenRefreshUrl);
             if (!refresh.status === 200) {
-              authStore.reAuthenticate = true;
+              authStore.reauthenticate = true;
             }
             authStore.isRefreshing = false;
             authStore.processQueue();
@@ -38,7 +40,7 @@ export default boot(({ store }) => {
 
           return retryRequest;
         } catch (refreshError) {
-          authStore.reAuthenticate = true;
+          authStore.reauthenticate = true;
           return Promise.reject(refreshError);
         }
       } else {

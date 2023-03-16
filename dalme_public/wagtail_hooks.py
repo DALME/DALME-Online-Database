@@ -1,17 +1,29 @@
-from dalme_public.handlers import (link_entity_decorator, SavedSearchLinkHandler, SavedSearchElementHandler,
-                                   footnote_decorator, FootnoteElementHandler,
-                                   BibliographyElementHandler, BibliographyLinkHandler)
-from django.utils.html import format_html
-from django.urls import reverse
-from wagtail.admin.rich_text.converters.html_to_contentstate import PageLinkElementHandler, ExternalLinkElementHandler
-from wagtail import hooks
+"""Define hooks for wagtail."""
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
-from django.templatetags.static import static
+from wagtail import hooks
+from wagtail.admin.rich_text.converters.html_to_contentstate import (
+    ExternalLinkElementHandler,
+    PageLinkElementHandler,
+)
+
 from django.shortcuts import redirect
+from django.templatetags.static import static
+from django.urls import reverse
+from django.utils.html import format_html
+
+from dalme_public.handlers import (
+    BibliographyElementHandler,
+    BibliographyLinkHandler,
+    FootnoteElementHandler,
+    SavedSearchElementHandler,
+    SavedSearchLinkHandler,
+    footnote_decorator,
+    link_entity_decorator,
+)
 
 
 @hooks.register('construct_settings_menu')
-def hide_users_menu_item(request, menu_items):
+def hide_users_menu_item(request, menu_items):  # noqa: ARG001
     menu_items[:] = [item for item in menu_items if item.name not in ['users', 'groups']]
 
 
@@ -31,13 +43,16 @@ def global_admin_js():
 
 
 @hooks.register('before_serve_page')
-def redirects(page, request, serve_args, serve_kwargs):
+def redirects(page, request, serve_args, serve_kwargs):  # noqa: ARG001
     if page.is_root():
         home = page.get_children().live().first()
         return redirect(home.url, permanent=False)
-    if page._meta.label == 'dalme_public.Section':
+
+    if page._meta.label == 'dalme_public.Section':  # noqa: SLF001
         url = page.get_children().live().first().url
         return redirect(url, permanent=False)
+
+    return None
 
 
 @hooks.register('insert_editor_js')
@@ -54,7 +69,7 @@ def editor_js():
         reverse('wagtailadmin_chooser_page_reroute'),
         reverse('wagtailadmin_choose_page_saved_search'),
         reverse('wagtailadmin_choose_bibliography'),
-        reverse('wagtailadmin_enter_footnote')
+        reverse('wagtailadmin_enter_footnote'),
     ) + """
         <script>
             $(document).ready(function () {
@@ -104,8 +119,8 @@ def register_add_ons(features):
             'a[linktype="biblio_entry"]': BibliographyElementHandler('LINK'),
         },
         'to_database_format': {
-            'entity_decorators': {'LINK': link_entity_decorator}
-        }
+            'entity_decorators': {'LINK': link_entity_decorator},
+        },
     })
     features.register_link_type(SavedSearchLinkHandler)
     features.register_link_type(BibliographyLinkHandler)
@@ -122,7 +137,7 @@ def register_footnote(features):
         'icon': [
             "M917.5,83.3c0-10.7-10.3-19.4-23-19.4H123.7c-12.7,0-23,8.7-23,19.4v854.4c0,10.7,10.3,19.4,23,19.4h770.8c12.7,0,23-8.7,23-19.4L917.5,83.3L917.5,83.3z",
             "M962.1,84.4c0-32.2-30.8-58.3-68.9-58.3H125.1c-38.1,0-68.9,26.1-68.9,58.3v854.5c0,32.2,30.9,58.3,68.9,58.3h768.1c38.1,0,68.9-26.1,68.9-58.3L962.1,84.4L962.1,84.4z M884.1,907.3c0,9.9-9.5,17.9-21.2,17.9H151.1c-11.7,0-21.2-8-21.2-17.9v-789c0-9.9,9.5-17.9,21.2-17.9h711.8c11.7,0,21.2,8,21.2,17.9L884.1,907.3L884.1,907.3z",
-            "M429.9,420.5h360.4v70H429.9V420.5z M223.7,530.3h566.6v70H223.7V530.3z M223.7,642.5h566.6v70H223.7V642.5z M223.7,753.3h566.6v70H223.7V753.3z M268.4,182.4h117.3v306.8H268.4V182.4z M225.8,285.1h42.5v-64.8h-42.5V285.1z"
+            "M429.9,420.5h360.4v70H429.9V420.5z M223.7,530.3h566.6v70H223.7V530.3z M223.7,642.5h566.6v70H223.7V642.5z M223.7,753.3h566.6v70H223.7V753.3z M268.4,182.4h117.3v306.8H268.4V182.4z M225.8,285.1h42.5v-64.8h-42.5V285.1z",
         ],
         'description': 'Insert footnote',
     }
@@ -131,8 +146,8 @@ def register_footnote(features):
         'draftail', feature_name, draftail_features.EntityFeature(
             control,
             js=['js/dalme_public_footnote.js'],
-            css={'all': ['css/dalme_public/dalme_public_footnote.css']}
-        )
+            css={'all': ['css/dalme_public/dalme_public_footnote.css']},
+        ),
     )
 
     features.register_converter_rule('contentstate', feature_name, {

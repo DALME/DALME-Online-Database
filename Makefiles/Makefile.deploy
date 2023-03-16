@@ -1,0 +1,251 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+ENVIRONMENT := staging
+IAMLIVE := true
+TF_LOG := WARN
+TF_PROVIDER := "~> 5.0"
+
+CLUSTER := $(PROJECT)-ecs-cluster-$(ENVIRONMENT)
+SERVICE := $(PROJECT)-ecs-service-$(ENVIRONMENT)
+
+deploy.confirm.destroy:
+	@echo "CAUTION - Are you certain? Confirm with 'destroy' [destroy/N] " && \
+		read ans && [ $${ans:-N} = destroy ]
+.PHONY: deploy.confirm.destroy
+
+deploy.apply:
+	docker compose run --rm \
+		-e IAMLIVE=$(IAMLIVE) \
+		$(PROJECT).deploy \
+		terragrunt run-all apply \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.apply
+
+deploy.apply.module:
+	docker compose run --rm \
+		-e IAMLIVE=$(IAMLIVE) \
+		$(PROJECT).deploy \
+		terragrunt apply \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.apply.module
+
+deploy.destroy: deploy.confirm.destroy
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt run-all destroy \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-ignore-external-dependencies \
+		--terragrunt-log-level $(TF_LOG) \
+		--terragrunt-non-interactive
+.PHONY: deploy.destroy
+
+deploy.destroy.module: deploy.confirm.destroy
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt destroy \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-ignore-external-dependencies \
+		--terragrunt-log-level $(TF_LOG) \
+		--terragrunt-non-interactive
+.PHONY: deploy.destroy.module
+
+deploy.ecs:
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		ecs deploy $(CLUSTER) $(SERVICE) \
+		--timeout -1
+.PHONY: deploy.ecs
+
+deploy.ensure.cache:
+	@mkdir -p $(HOME)/.terraform.d/plugin-cache
+.PHONY: deploy.ensure.cache
+
+deploy.init: deploy.ensure.cache
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt run-all init \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONT: deploy.init
+
+deploy.init.module: deploy.ensure.cache
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt init \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.init.module
+
+deploy.init.upgrade: deploy.ensure.cache
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt run-all init -upgrade \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONT: deploy.init.upgrade
+
+deploy.lint: deploy.tf.format deploy.tf.tflint deploy.tf.validate \
+	deploy.tf.docs deploy.tf.tfsec
+.PHONY: deploy.lint
+
+deploy.output:
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt run-all output \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.output
+
+deploy.plan:
+	docker compose run --rm \
+		-e IAMLIVE=$(IAMLIVE) \
+		$(PROJECT).deploy \
+		terragrunt run-all plan \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.plan
+
+deploy.plan.module:
+	docker compose run --rm \
+		-e IAMLIVE=$(IAMLIVE) \
+		$(PROJECT).deploy \
+		terragrunt plan \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.plan.module
+
+deploy.shell:
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		bash
+.PHONY: deploy.shell
+
+deploy.state.list:
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt state list \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.state.list
+
+deploy.state.rm:
+ifndef resource
+	$(error Supply state resources to delete. \
+		Usage: make deploy.state.rm \
+		resource='aws_ecs_task_definition.example' \
+		region=us-east-1 \
+		module=ecs)
+else
+	docker compose run --rm \
+		$(PROJECT).deploy \
+		terragrunt state rm \
+		$(resource) \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-log-level $(TF_LOG)
+endif
+.PHONY: deploy.state.rm
+
+deploy.tf.docs:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		terraform-docs \
+		markdown \
+		--recursive \
+		--output-mode inject \
+		--output-file README.md \
+		/opt/tf
+.PHONY: deploy.tf.docs
+
+deploy.tf.fmt:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		terraform fmt -diff -write
+.PHONY: deploy.tf.fmt
+
+deploy.tf.format: deploy.tf.fmt deploy.tf.hclfmt
+.PHONY: deploy.tf.format
+
+deploy.tf.graph:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		terragrunt graph-dependencies \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.tf.graph
+
+deploy.tf.hclfmt:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		terragrunt hclfmt -diff -write
+.PHONY: deploy.tf.hclfmt
+
+deploy.tf.tflint:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		tflint \
+		--config=/opt/tf/.tflint.hcl \
+		--no-module \
+		--recursive
+.PHONY: deploy.tf.tflint
+
+deploy.tf.tfsec:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		tfsec .
+.PHONY: deploy.tf.tfsec
+
+deploy.tf.update.message:
+	@echo "You must call 'make deploy.init.update' \
+		to install the new dependencies."
+.PHONY: deploy.tf.update.message
+
+deploy.tf.update.provider:
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		tfupdate provider aws modules -r
+	@$(MAKE) deploy.tf.update.message
+.PHONY: deploy.tf.update.provider
+
+deploy.tf.update.module:
+ifndef args
+	$(error Supply a module version and module name pair. \
+		Usage: make deploy.tf.update.module \
+		args='3.15.1 terraform-aws-modules/s3-bucket/aws')
+else
+	docker compose run -T --rm \
+		$(PROJECT).deploy \
+		tfupdate module -r --version $(args) modules
+endif
+	@$(MAKE) deploy.tf.update.message
+.PHONY: deploy.tf.update.module
+
+deploy.tf.validate:
+	docker compose run -T --rm \
+		-e TF_DISABLE_INIT=true \
+		-e TF_SKIP_OUTPUTS=true \
+		$(PROJECT).deploy \
+		terragrunt run-all validate \
+		--terragrunt-working-dir $(ENVIRONMENT) \
+		--terragrunt-log-level $(TF_LOG)
+.PHONY: deploy.tf.validate
+
+deploy.help:
+	@echo "  deploy.apply           provision the infrastructure"
+	@echo "  deploy.apply.module    provision a single resource module"
+	@echo "  deploy.ecs             update the ecs service/task"
+	@echo "  deploy.destroy         delete all resources in a deploy environment"
+	@echo "  deploy.destroy.module  delete a single resource module"
+	@echo "  deploy.init.module     initialize a single resource module"
+	@echo "  deploy.init.upgrade    re-init/upgrade terraform providers"
+	@echo "  deploy.lint            invoke all terraform linters"
+	@echo "  deploy.output          extract values of terraform output variables"
+	@echo "  deploy.perms           list iam permissions used by the last provision"
+	@echo "  deploy.plan            generate a full provisioning scheme"
+	@echo "  deploy.plan.module     generate a provisioning scheme for a single terraform module"
+	@echo "  deploy.state.list      detail the resources in the state for a module"
+	@echo "  deploy.state.rm        do some surgery on the state for a module"
+	@echo "  deploy.shell           shell into the deploy container"
+	@echo ""
+.PHONY: deploy.help

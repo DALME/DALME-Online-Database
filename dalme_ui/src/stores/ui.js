@@ -9,9 +9,11 @@ export const useUiStore = defineStore(
   () => {
     // stores
     const auth = useAuthStore();
+
     // event bus
     const eventBus = new EventBus();
-    //state
+
+    // state
     // const eventBus = ref(new EventBus());
     const previousPath = ref("");
     const currentPath = ref("");

@@ -6,9 +6,10 @@ _extra
 # local environment
 env
 devEnv
-venv
+*venv
 *.env
 env.*
+!env.hcl
 
 # local dev database dumps
 sql/
@@ -41,7 +42,7 @@ node_modules
 yarn-error.log
 store-flag.d.ts
 .quasar
-/dist
+dist
 
 # Log files
 npm-debug.log*
@@ -73,3 +74,7 @@ __pycache__/
 *.ntvs*
 *.njsproj
 *.sln
+
+# Miscellaneous
+apply-perms.temp
+.infracost/

@@ -1,6 +1,8 @@
 import json
-from dalme_app.models import *
+
 from django.contrib.auth.models import User
+
+from dalme_app.models import *
 
 # 1. General database clean-up
 # delete the following tables manually:
@@ -135,7 +137,7 @@ def step_6():
             'en': 511,
             'fr': 54,
             'it': 76,
-            'la': 618
+            'la': 618,
         }
         for target in targets:
             if len(target.value_STR) == 3:
@@ -144,7 +146,7 @@ def step_6():
                 lang_id = lang_dict[target.value_STR]
             str_value = {
                 'class': 'LanguageReference',
-                'id': str(lang_id)
+                'id': str(lang_id),
             }
             target.value_STR = json.dumps(str_value)
             target.save()
@@ -170,7 +172,7 @@ def step_7():
                     value = value[0]
                     str_value = {
                         'class': 'LocaleReference',
-                        'id': str(value.id)
+                        'id': str(value.id),
                     }
                     target.value_STR = json.dumps(str_value)
                     target.save()
@@ -196,7 +198,7 @@ def step_8():
             value = CountryReference.objects.get(name=target.value_STR)
             str_value = {
                 'class': 'CountryReference',
-                'id': str(value.id)
+                'id': str(value.id),
             }
             target.value_STR = json.dumps(str_value)
             target.save()
@@ -242,7 +244,7 @@ def step_11():
     users = User.objects.all()
     for user in users:
         try:
-            test = (user.profile is not None)
+            pass
         except:
             user.delete()
     try:

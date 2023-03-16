@@ -207,7 +207,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .action-button {
   padding: 0px 10px 0px 10px;
   font-weight: 600;

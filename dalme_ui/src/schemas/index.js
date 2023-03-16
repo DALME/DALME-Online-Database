@@ -22,7 +22,6 @@ export * from "./places";
 export * from "./workflow";
 export * from "./records";
 export * from "./rights";
-export * from "./sources";
 export * from "./tickets";
 export * from "./transcriptions";
 export * from "./worksets";

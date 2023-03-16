@@ -1,3 +1,4 @@
+"""Serializers for content data."""
 from dalme_app.models import ContentAttributes, ContentTypeExtended
 
 from .attribute_types import AttributeTypeSerializer
@@ -9,7 +10,7 @@ class ContentTypeSerializer(DynamicSerializer):
 
     attribute_types = AttributeTypeSerializer(many=True, required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = ContentTypeExtended
         fields = (
             'id',
@@ -36,7 +37,7 @@ class ContentAttributesSerializer(DynamicSerializer):
     content_type = ContentTypeSerializer(required=False)
     attribute_type = AttributeTypeSerializer(required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = ContentAttributes
         fields = (
             'id',

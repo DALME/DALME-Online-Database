@@ -1,3 +1,4 @@
+"""Define ORM signals for dalme_app."""
 from django_currentuser.middleware import get_current_user
 
 from django.contrib.contenttypes.models import ContentType

@@ -1,3 +1,4 @@
+"""Serializers for image data."""
 from rest_framework import serializers
 
 from dalme_app.models import rs_collection, rs_resource
@@ -6,7 +7,7 @@ from dalme_app.models import rs_collection, rs_resource
 class RSCollectionsSerializer(serializers.ModelSerializer):
     """Serializer for RS/DAM collections."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = rs_collection
         fields = ('ref', 'name', 'user', 'theme', 'theme2', 'theme3')
 
@@ -21,7 +22,7 @@ class RSCollectionsSerializer(serializers.ModelSerializer):
 class RSImageSerializer(serializers.ModelSerializer):
     """Serializer for RS/DAM images."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = rs_resource
         fields = (
             'ref',
@@ -42,7 +43,7 @@ class ImageUrlSerializer(serializers.ModelSerializer):
     dam_id = serializers.IntegerField(source='ref')
     title = serializers.CharField(source='field8')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = rs_resource
         fields = ['dam_id', 'title']
 
@@ -59,6 +60,6 @@ class ImageOptionsSerializer(serializers.ModelSerializer):
     dam_id = serializers.IntegerField(source='ref')
     title = serializers.CharField(source='field8')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = rs_resource
         fields = ['dam_id', 'title']

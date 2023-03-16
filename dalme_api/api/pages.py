@@ -1,3 +1,4 @@
+"""API endpoint for managing pages."""
 import json
 import pathlib
 

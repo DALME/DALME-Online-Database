@@ -1,3 +1,4 @@
+"""Model public register data."""
 from django_currentuser.middleware import get_current_user
 
 from django.contrib.auth.models import User
@@ -24,8 +25,8 @@ class PublicRegister(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['created']
 
-    def __str__(self):  # noqa: D105
-        return self.title
+    def __str__(self):
+        return self.pk

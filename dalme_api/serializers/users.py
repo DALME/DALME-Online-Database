@@ -1,3 +1,4 @@
+"""Serializers for user data."""
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
@@ -15,7 +16,7 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     avatar = serializers.URLField(max_length=255, source='profile.profile_image', required=False)
     preferences = serializers.JSONField(source='profile.preferences', required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = User
         fields = (
             'id',

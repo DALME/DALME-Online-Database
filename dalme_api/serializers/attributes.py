@@ -1,3 +1,4 @@
+"""Serializers for attribute data."""
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -15,7 +16,7 @@ from .base_classes import DynamicSerializer
 class AttributeListSerializer(serializers.ListSerializer):
     """Overrides basic list serializer to ensure item serializer is initialized for each instance."""
 
-    def __init__(self, *args, **kwargs):  # noqa: D107
+    def __init__(self, *args, **kwargs):
         self.child = kwargs.pop('child', None)
         self.allow_empty = kwargs.pop('allow_empty', True)
         self.max_length = kwargs.pop('max_length', None)
@@ -92,11 +93,11 @@ class AttributeSerializer(DynamicSerializer, WritableNestedModelSerializer):
     id = serializers.ReadOnlyField()  # noqa: A003
     attribute_type = serializers.ReadOnlyField(source='attribute_type.id')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Attribute
         fields = ('id', 'name', 'label', 'description', 'value', 'attribute_type', 'data_type')
 
-    def __init__(self, instance=None, data=empty, **kwargs):  # noqa: D107
+    def __init__(self, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
 
         if not isinstance(instance, list) or not isinstance(data, list):

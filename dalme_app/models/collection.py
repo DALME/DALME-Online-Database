@@ -1,3 +1,4 @@
+"""Model collection data."""
 from collections import Counter
 
 from django.contrib.auth.models import Group
@@ -8,10 +9,12 @@ from django.db.models import options
 
 from dalme_app.models.templates import dalmeBasic, dalmeOwned, dalmeUuid
 
+from .scoped import ScopedBase
+
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Collection(dalmeUuid, dalmeOwned):
+class Collection(ScopedBase, dalmeUuid, dalmeOwned):
     """Stores collection information."""
 
     name = models.CharField(max_length=255)
@@ -28,7 +31,7 @@ class Collection(dalmeUuid, dalmeOwned):
     permissions = GenericRelation('Permission', related_query_name='collection')
     comments = GenericRelation('Comment')
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
     @property
@@ -92,7 +95,7 @@ class Collection(dalmeUuid, dalmeOwned):
         return None
 
 
-class CollectionMembership(dalmeBasic):
+class CollectionMembership(ScopedBase, dalmeBasic):
     """Links collections and members."""
 
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='members')
@@ -100,6 +103,6 @@ class CollectionMembership(dalmeBasic):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=36, db_index=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         unique_together = ('content_type', 'object_id', 'collection')
         ordering = ['collection', 'id']

@@ -117,28 +117,28 @@ export const dalmeTeiBehaviours = {
       ],
     ],
     gap: (e) => {
-      e = setExtent(e); // eslint-disable-line
+      setExtent(e);
     },
     space: (e) => {
-      e = setExtent(e); // eslint-disable-line
+      setExtent(e);
     },
     unclear: (e) => {
-      e = setTitle(e); // eslint-disable-line
+      setTitle(e);
     },
     supplied: (e) => {
-      e = setTitle(e); // eslint-disable-line
+      setTitle(e);
     },
     add: (e) => {
-      e = setTitle(e); // eslint-disable-line
+      setTitle(e);
     },
     abbr: (e) => {
-      e = setTitle(e); // eslint-disable-line
+      setTitle(e);
     },
     w: (e) => {
-      e = setTitle(e); // eslint-disable-line
+      setTitle(e);
     },
     quote: (e) => {
-      e = setTitle(e); // eslint-disable-line
+      setTitle(e);
     },
     g: (e) => {
       let ref = e.getAttribute("ref", false);
@@ -192,7 +192,7 @@ export const dalmeTeiBehaviours = {
           /* eslint-disable */
           tooltip.setAttribute(
             "data-template",
-            '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
+            '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
           );
           e.innerHTML = '<i class="fas fa-sticky-note"></i>';
           e.appendChild(tooltip);

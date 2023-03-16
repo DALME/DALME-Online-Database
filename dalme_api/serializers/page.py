@@ -1,3 +1,4 @@
+"""Serializers for page data."""
 from dalme_app.models import Page
 
 from .base_classes import DynamicSerializer
@@ -6,7 +7,7 @@ from .base_classes import DynamicSerializer
 class PageSerializer(DynamicSerializer):
     """Serializer for pages."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Page
         fields = ('id', 'name', 'order', 'dam_id', 'thumbnail_url', 'manifest_url')
         field_sets = {

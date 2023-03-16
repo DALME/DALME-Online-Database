@@ -1,3 +1,4 @@
+"""Model comment data."""
 import textwrap
 
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -7,12 +8,12 @@ from django.db.models import options
 
 from dalme_app.models.templates import dalmeIntid
 
+from .scoped import ScopedBase
+
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Comment(dalmeIntid):
-    """Stores comment information."""
-
+class Comment(ScopedBase, dalmeIntid):
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=55, db_index=True)
@@ -20,12 +21,11 @@ class Comment(dalmeIntid):
 
     @property
     def snippet(self):
-        """Return a snippet of the comment."""
-        body_snippet = textwrap.shorten(self.body, width=35, placeholder='...')
-        return f'{self.creation_user.username} - {body_snippet}'
+        body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
+        return f"{self.creation_user.username} - {body_snippet}..."
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.snippet
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['creation_timestamp']

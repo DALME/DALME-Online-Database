@@ -324,7 +324,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .record-actions {
   border-bottom: 1px solid #d1d1d1;
   margin-top: auto;

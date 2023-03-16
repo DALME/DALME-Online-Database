@@ -1,3 +1,4 @@
+"""Define URLs for dalme_purl."""
 from rest_framework import routers
 
 from django.urls import include, path

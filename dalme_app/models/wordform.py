@@ -1,3 +1,4 @@
+"""Model wordform data."""
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -15,5 +16,5 @@ class Wordform(dalmeUuid):
     headword_id = models.ForeignKey('Headword', to_field='id', db_index=True, on_delete=models.PROTECT)
     tags = GenericRelation('Tag')
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.normalized_form

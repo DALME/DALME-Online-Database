@@ -1,3 +1,4 @@
+"""Serializers for ticket data."""
 from django_currentuser.middleware import get_current_user
 from rest_framework import serializers
 from rest_framework.utils import model_meta
@@ -22,7 +23,7 @@ class TicketSerializer(serializers.ModelSerializer):
     closing_user = UserSerializer(field_set='attribute', required=False)
     assigned_to = UserSerializer(field_set='attribute', required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Ticket
         fields = (
             'id',
@@ -73,7 +74,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
     closing_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Ticket
         fields = (
             'id',
@@ -107,7 +108,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
             self.context['file'] = data.pop('file')
         return super().to_internal_value(data)
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # noqa: C901,PLR0912
         """Update ticket data."""
         serializers.raise_errors_on_nested_writes('update', self, validated_data)
         info = model_meta.get_field_info(instance)
@@ -163,6 +164,27 @@ class TicketDetailSerializer(serializers.ModelSerializer):
 
             if new_tags:
                 for tag in new_tags:
-                    instance.tags.create(**{'tag': tag})
+                    instance.tags.create(tag=tag)
 
         return super().update(instance, validated_data)
+
+    @staticmethod
+    def process_tags(instance, tags):
+        if instance.tags.all().exists():
+            new_tags = []
+            current_tags = {i.tag: i.id for i in instance.tags.all()}
+            for tag in tags:
+                if current_tags.get(tag) is None:
+                    new_tags.append(tag)
+                else:
+                    current_tags.pop(tag)
+
+            if len(current_tags) > 0:
+                for tag in current_tags.values():
+                    Tag.objects.get(id=tag).delete()
+        else:
+            new_tags = tags
+
+        if new_tags:
+            for tag in new_tags:
+                instance.tags.create(tag=tag)

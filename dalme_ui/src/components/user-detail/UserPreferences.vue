@@ -281,7 +281,6 @@ export default defineComponent({
     };
 
     return {
-      // loading,
       onSubmit,
       tab,
       tooltipsOn,

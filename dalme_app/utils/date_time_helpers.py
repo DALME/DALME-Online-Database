@@ -1,3 +1,4 @@
+"""Define date/time helpers and utilities."""
 import calendar
 import datetime  # noqa: F401
 import re
@@ -22,11 +23,11 @@ TIME_CHUNKS = {
 class DalmeDate:
     """Class for formatting dates throughout the app.
 
-    format string should include elements desired from `dmy` and
+    Format string should include elements desired from `dmy` and
     length: s (short), l(long). e.g. mys (month-year, short)
     """
 
-    def __init__(self, data):  # noqa: D107
+    def __init__(self, data):
         if not data:
             self.raise_error('No date supplied.')
 
@@ -60,7 +61,7 @@ class DalmeDate:
         ret = []
 
         for obj in data:
-            obj = eval(obj) if type(obj) is not dict else obj  # noqa: PGH001, PLW2901
+            obj = eval(obj) if not isinstance(obj, dict) else obj  # noqa: PGH001, PLW2901
             assert 'day' in obj, 'Invalid date: `day` attribute missing.'
             assert 'month' in obj, 'Invalid date: `month` attribute missing.'
             assert 'year' in obj, 'Invalid date: `year` attribute missing.'

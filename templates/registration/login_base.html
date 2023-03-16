@@ -34,9 +34,9 @@
 
   <!-- DALME CSS START -->
   {% compress css %}
-    <link href="{% static 'css/common/sb-admin-2.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/common/general.css' %}" rel="stylesheet">
-    <link href="{% static 'css/commmon/login.css' %}" rel="stylesheet">
+    <link href="{% static '/css/common/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static '/css/common/general.css' %}" rel="stylesheet">
+    <link href="{% static '/css/commmon/login.css' %}" rel="stylesheet">
   {% endcompress %}
   <!-- DALME CSS END -->
 
@@ -45,7 +45,7 @@
     <div class="container-fluid login-container">
       <div class="card login-card mx-auto mt-5 mb-5">
         <div class="login-card-header">
-          <img class="" height="80" src="{% static 'images/dalme_logo.svg'%}" alt="DALME">
+          <img class="" height="80" src="{% static '/images/dalme_logo.svg'%}" alt="DALME">
         </div>
         {% block content %}{% endblock %}
       </div>

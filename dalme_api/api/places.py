@@ -1,3 +1,4 @@
+"""API endpoint for managing places."""
 from dalme_api.access_policies import PlaceAccessPolicy
 from dalme_api.serializers import PlaceSerializer
 from dalme_app.models import Place

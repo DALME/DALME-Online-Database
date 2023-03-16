@@ -1,3 +1,4 @@
+"""Model tag data."""
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -34,8 +35,8 @@ class Tag(dalmeUuid):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=55, blank=True, db_index=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         unique_together = ('tag', 'object_id')
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.tag

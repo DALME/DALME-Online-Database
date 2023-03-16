@@ -1,3 +1,4 @@
+"""API endpoint for managing datasets."""
 import numpy as np
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -56,21 +57,32 @@ class Datasets(viewsets.GenericViewSet):
                             'coverage': years,
                             'collections': collections,
                         }
+
         # CLASSIFICATION:
-        # we need to classify the values we want to show on the map as neither a linear nor log scales look
-        # good otherwise. The parameters were determined visually: the smallest possible circle is 3px in
-        # radius (otherwise they are hard to see). The largest that's okay is about 19px. Size differences
-        # of less than 2px (radius, i.e 4 in diametre) are imperceptible, so that gives us 9 sizes between
-        # 3px and 19px in increments of 2px. Process:
-        values = [v['count'] for k, v in place_data.items()]  # get the list of all values in the sample
-        # create 9 bins using a geometric progression, instead of logarithmic so that each point is a constant
-        # multiple of the previous one
+        # We need to classify the values we want to show on the map as neither
+        # a linear nor log scales look good otherwise. The parameters were
+        # determined visually: the smallest possible circle is 3px in radius
+        # (otherwise they are hard to see). The largest that's okay is about
+        # 19px. Size differences of less than 2px (radius, i.e 4 in diametre)
+        # are imperceptible, so that gives us 9 sizes between 3px and 19px in
+        # increments of 2px.
+
+        # Get the list of all values in the sample.
+        values = [v['count'] for k, v in place_data.items()]
+
+        # Create 9 bins using a geometric progression, instead of logarithmic
+        # so that each point is a constant multiple of the previous one.
         bins = np.geomspace(min(values), max(values), 9)
-        _, bins = np.histogram(values, bins)  # classify using histogram
-        # build an index — this works because numpy's bins are open on the upper limit (except the last one)
+
+        # Classify the bins with a histogram.
+        _, bins = np.histogram(values, bins)
+
+        # Build an index — this works because numpy's bins are open on the
+        # upper limit (except the last one).
         bin_index = np.digitize(values, bins)
 
-        # now we iterate over the results and assign a radius which is the (bin index * 2 ) + 1 (see explanation above)
+        # Now we iterate over the results and assign a radius which is the (bin
+        # index * 2 ) + 1 (see explanation above).
         dataset = []
         for loc, data in place_data.items():
             dates = list(set(data.pop('coverage', [])))

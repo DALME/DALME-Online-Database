@@ -6,9 +6,11 @@ import {
 } from "vue-router";
 import { head, isEmpty, filter as rFilter } from "ramda";
 import routes from "./routes";
+import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
-// import { provideErrorHandling } from "@/use";
+import Cookies from "js-cookie";
+import { isNil } from "ramda";
 
 const createHistory = process.env.SERVER
   ? createMemoryHistory
@@ -32,6 +34,10 @@ export const navRoutes = (menu = null) => {
 };
 
 router.beforeEach((_, from) => {
+  const auth = useAuthStore();
+  if (isNil(Cookies.get("csrftoken"))) {
+    auth.setCSRFToken();
+  }
   const views = useViewStore();
   if (from && !isEmpty(from.meta) && !from.meta.resetStateOnLoad && !isEmpty(views.view)) {
     views.saveViewState(from.fullPath);

@@ -1,6 +1,12 @@
-import { loginUrl, logoutUrl, tokenRefreshUrl } from "./config";
+import { CSRFUrl, loginUrl, logoutUrl, tokenRefreshUrl } from "./config";
 
 const auth = {
+  CSRF() {
+    return {
+      url: CSRFUrl,
+      method: "GET",
+    };
+  },
   login({ username, password }) {
     return {
       url: loginUrl,

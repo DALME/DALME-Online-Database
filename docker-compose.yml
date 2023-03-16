@@ -1,0 +1,192 @@
+services:
+  dalme.dns:
+    image: strm/dnsmasq
+    container_name: dalme.dns
+    networks:
+      - app-network
+    volumes:
+      - ./config/dnsmasq.conf:/etc/dnsmasq.conf
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+
+  dalme.web:
+    image: dalme.web:dev
+    container_name: dalme.web
+    build:
+      context: ./
+      dockerfile: ./config/docker/Dockerfile.web
+      target: "development"
+    environment:
+      ENV_FILE: .env
+      LOG_LEVEL: ERROR
+      POSTGRES_DB: dalme
+      POSTGRES_HOST: dalme.db
+      POSTGRES_PASSWORD: dalme
+      POSTGRES_USER: dalme
+    depends_on:
+      - dalme.db
+    networks:
+      - app-network
+    volumes:
+      - ./dalme:/opt/web/dalme
+      - ./dalme_api:/opt/web/dalme_api
+      - ./dalme_app:/opt/web/dalme_app
+      - ./dalme_purl:/opt/web/dalme_purl
+      - ./dalme_public:/opt/web/dalme_public
+      - ./templates:/opt/web/templates
+      - ./tests:/opt/web/tests
+      - ./pyproject.toml:/opt/web/pyproject.toml
+      - ipython-data:/root/.ipython/profile_default
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    expose:
+      - "8001"
+
+  dalme.ui:
+    image: dalme.ui:dev
+    container_name: dalme.ui
+    build:
+      context: ./
+      dockerfile: ./config/docker/Dockerfile.ui
+      target: "development"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./dalme_ui/src:/opt/ui/src
+    networks:
+      - app-network
+    ports:
+      - "3000"
+
+  dalme.db:
+    image: postgres:15
+    container_name: dalme.db
+    environment:
+      POSTGRES_DB: dalme
+      POSTGRES_USER: dalme
+      POSTGRES_PASSWORD: dalme
+      POSTGRES_HOST: dalme.db
+    volumes:
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./sql/postgresql:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    cap_add:
+      - SYS_NICE
+    expose:
+      - "5432"
+
+  dalme.proxy:
+    image: nginx:mainline
+    container_name: dalme.proxy
+    command: [nginx-debug, "-g", "daemon off;"]
+    depends_on:
+      - dalme.web
+    volumes:
+      - "./config/nginx/development/nginx.conf:/etc/nginx/nginx.conf:ro"
+      - assets:/static
+    networks:
+      - app-network
+    ports:
+      - "8000:80"
+
+  dalme.es:
+    image: elasticsearch:7.8.0
+    container_name: dalme.es
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - app-network
+    ports:
+      - "9200:9200"
+
+  dalme.deploy:
+    image: dalme.deploy:dev
+    container_name: dalme.deploy
+    build:
+      context: ./
+      dockerfile: ./config/docker/Dockerfile.deploy
+    volumes:
+      - ./tf:/opt/tf
+      - ~/.aws:/root/.aws:rw
+      - ~/.iamlive:/root/.iamlive:rw
+      - ~/.terraform.d:/root/.terraform.d:rw
+
+  dalme.docs:
+    image: "dalme.docs:dev"
+    container_name: dalme.docs
+    build:
+      context: ./
+      dockerfile: "./config/docker/Dockerfile.docs"
+      target: "serve"
+    depends_on:
+      - dalme.web
+    volumes:
+      - ./dalme_docs:/opt/docs
+    networks:
+      - app-network
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+
+  dalme.pgadmin:
+    container_name: dalme.pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    volumes:
+     - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - app-network
+    ports:
+      - "5050:80"
+
+  rs.db:
+    image: mysql:8.0.19
+    container_name: rs.db
+    platform: linux/amd64
+    environment:
+      MYSQL_DATABASE: resourcespace
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: dalme
+      MYSQL_PASSWORD: dalme
+      MYSQL_HOST: rs.db
+    volumes:
+      - ./config/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - ./sql/rs:/docker-entrypoint-initdb.d
+      - rsdata:/var/lib/mysql
+    networks:
+      - app-network
+    ports:
+      - "3306"
+    cap_add:
+      - SYS_NICE
+
+volumes:
+  assets:
+  esdata:
+  pgdata:
+  rsdata:
+  ipython-data:
+  pgadmin-data:
+
+networks:
+  app-network:
+    driver: bridge

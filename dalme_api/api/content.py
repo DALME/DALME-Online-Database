@@ -1,3 +1,4 @@
+"""API endpoint for managing ContentTypes."""
 from dalme_api.access_policies import GeneralAccessPolicy
 from dalme_api.filters import ContentTypeFilter
 from dalme_api.serializers import ContentTypeSerializer

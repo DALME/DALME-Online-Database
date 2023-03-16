@@ -1,4 +1,5 @@
-import datetime
+"""Model task data."""
+from datetime import datetime
 
 from django_currentuser.middleware import get_current_user
 
@@ -36,10 +37,10 @@ class Task(dalmeIntid):
     resources = models.ManyToManyField('Collection', blank=True, related_name='tasks')
     assignees = models.ManyToManyField(User, blank=True, related_name='task_assignations')
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['creation_timestamp']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.title
 
     @property
@@ -50,7 +51,8 @@ class Task(dalmeIntid):
     @property
     def overdue(self):
         """Return boolean indicating whether task is overdue."""
-        if self.due_date and datetime.datetime.now(tz=datetime.UTC).date() > self.due_date:
+        date = datetime.now(tz=timezone.get_current_timezone()).date()
+        if self.due_date and date > self.due_date:
             return True
         return None
 
@@ -62,7 +64,8 @@ class Task(dalmeIntid):
         """Save record."""
         # If Task is being marked complete, set the completed_date and completed_by
         if self.completed:
-            self.completed_date = timezone.now()
+            date = datetime.now(tz=timezone.get_current_timezone()).date()
+            self.completed_date = date
             self.completed_by = get_current_user()
         super().save(*args, **kwargs)
 
@@ -82,18 +85,18 @@ class TaskList(dalmeIntid, dalmeOwned):
     )
     permissions = GenericRelation('Permission', related_query_name='tasklist')
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['name']
         verbose_name_plural = 'Task Lists'
         unique_together = ('name', 'team_link', 'owner')
+
+    def __str__(self):
+        return self.name
 
     @property
     def task_count(self):
         """Return number of tasks in list."""
         return self.tasks.count()
-
-    def __str__(self):  # noqa: D105
-        return self.name
 
     def save(self, *args, **kwargs):
         """Save record."""

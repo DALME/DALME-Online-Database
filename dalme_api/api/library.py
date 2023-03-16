@@ -1,3 +1,4 @@
+"""API endpoint for accessing DALME Zotero Library."""
 import json
 
 from pyzotero import zotero
@@ -55,25 +56,21 @@ class Library(viewsets.ViewSet):
                     queryset = queryset_generator.everything(
                         queryset_generator.collection_items_top(collection, **paras),
                     )
+
+            elif not limit:
+                queryset = queryset_generator.everything(queryset_generator.top(**paras))
             else:
-                if not limit:
-                    queryset = queryset_generator.everything(queryset_generator.top(**paras))
-                else:
-                    queryset = queryset_generator.top(**paras)
+                queryset = queryset_generator.top(**paras)
 
             result = queryset if content else [i['data'] for i in queryset]
 
         return Response(result)
 
     def paginate_queryset(self, queryset, start, length):
-        if start is not None and length is not None:
-            page = queryset.top(
-                limit=length,
-                start=start,
-            )
-            queryset = page if page is not None else queryset.everything(queryset.top())
-
-        return queryset
+        if start is None and length is None:
+            return queryset
+        page = queryset.top(limit=length, start=start)
+        return page if page is not None else queryset.everything(queryset.top())
 
     # def get_renderer_context(self):
     #     context = {
@@ -82,8 +79,8 @@ class Library(viewsets.ViewSet):
     #         'kwargs': getattr(self, 'kwargs', {}),
     #         'request': getattr(self, 'request', None),
     #         'model': 'Library'
-    #         }
-
+    #     }
+    #
     #     return context
 
     def retrieve(self, request, pk=None):

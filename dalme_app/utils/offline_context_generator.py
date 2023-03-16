@@ -1,3 +1,4 @@
+"""Define offline context for django compressor."""
 import os
 import pathlib
 

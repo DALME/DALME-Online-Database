@@ -1,3 +1,4 @@
+"""Define URLs for dalme_api."""
 from rest_framework import routers
 
 from django.conf import settings
@@ -17,7 +18,7 @@ router.register(r'content-types', api.ContentTypes, basename='content_types')
 router.register(r'countries', api.Countries, basename='countries')
 router.register(r'datasets', api.Datasets, basename='datasets')
 router.register(r'groups', api.Groups, basename='groups')
-router.register(r'health-check', api.HealthCheck, basename='health_check')
+router.register(r'ping', api.Ping, basename='ping')
 router.register(r'images', api.Images, basename='images')
 router.register(r'languages', api.Languages, basename='languages')
 router.register(r'library', api.Library, basename='library')
@@ -37,6 +38,7 @@ router.register(r'workflow', api.Workflows, basename='workflow')
 
 urlpatterns = [
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
+    path('csrf', api.csrf),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('jwt/', include('dj_rest_auth.urls')),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),

@@ -287,7 +287,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .credits-field .q-field__after,
 .credits-field .q-field__append {
   padding-left: 0 !important;

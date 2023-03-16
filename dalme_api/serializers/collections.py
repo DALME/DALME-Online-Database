@@ -1,3 +1,4 @@
+"""Serializers for collection data."""
 from rest_framework import serializers
 
 from django.db import models
@@ -13,7 +14,7 @@ from .records import RecordSerializer  # noqa: F401
 class CollectionMemberList(serializers.ListSerializer):
     """Ensures item-appropriate serializer is used for each instance in list."""
 
-    def __init__(self, *args, **kwargs):  # noqa: D107
+    def __init__(self, *args, **kwargs):
         self.child = kwargs.pop('child', None)
         self.allow_empty = kwargs.pop('allow_empty', True)
         self.max_length = kwargs.pop('max_length', None)
@@ -42,7 +43,7 @@ class CollectionMemberList(serializers.ListSerializer):
 class CollectionMemberSerializer(serializers.ModelSerializer):
     """Serializer for mixed content type collection members."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = CollectionMembership
         fields = ('content_object',)
         list_serializer_class = CollectionMemberList
@@ -60,7 +61,7 @@ class CollectionSerializer(DynamicSerializer):
     modification_user = UserSerializer(field_set='attribute', required=False)
     is_private = serializers.BooleanField()
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Collection
         fields = (
             'id',

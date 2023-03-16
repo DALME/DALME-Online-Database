@@ -1,11 +1,13 @@
-from dalme_app.models import * # noqa
-import lxml.etree as et
 import csv
+
+import lxml.etree as et
+
+from dalme_app.models import *  # noqa
 
 
 def run():
     transcriptions = Transcription.objects.all() # noqa
-    print('Starting: {} transcriptions to process.'.format(transcriptions.count()))
+    print(f'Starting: {transcriptions.count()} transcriptions to process.')
     fixed_braces = []
     problem_braces = []
     xml_parser = et.XMLParser(recover=True)
@@ -21,7 +23,7 @@ def run():
                 'transcription': str(t.id),
                 'source_id': str(source.id),
                 'source_name': source.name,
-                'folio': t.source_pages.first().page.name
+                'folio': t.source_pages.first().page.name,
             }
             tree = et.fromstring('<xml>' + text + '</xml>', xml_parser)
             braces = tree.xpath("//seg[@type='brace']", namespaces=ns)
@@ -55,7 +57,7 @@ def run():
 
         count += 1
         if (count % 100 == 0):
-            print('{} transcriptions processed.'.format(str(count)))
+            print(f'{count!s} transcriptions processed.')
 
     for name, results in {'fixed_braces': fixed_braces, 'problem_braces': problem_braces}.items():
         keys = results[0].keys()
@@ -69,7 +71,7 @@ def run():
 
 def run1():
     transcriptions = Transcription.objects.all() # noqa
-    print('Starting: {} transcriptions to process.'.format(transcriptions.count()))
+    print(f'Starting: {transcriptions.count()} transcriptions to process.')
     results = []
     orphans = []
     for t in transcriptions:
@@ -86,7 +88,7 @@ def run1():
                     'transcription': str(t.id),
                     'source_id': str(source.id),
                     'source_name': source.name,
-                    'folio': t.source_pages.first().page.name
+                    'folio': t.source_pages.first().page.name,
                 })
             except AttributeError:
                 orphans.append(str(t.id))
@@ -104,7 +106,7 @@ def run1():
 
 def run2():
     transcriptions = Transcription.objects.all() # noqa
-    print('Starting: {} transcriptions to process.'.format(transcriptions.count()))
+    print(f'Starting: {transcriptions.count()} transcriptions to process.')
     results = []
     orphans = []
     xml_parser = et.XMLParser(recover=True)
@@ -120,7 +122,7 @@ def run2():
                     'transcription': str(t.id),
                     'source_id': str(source.id),
                     'source_name': source.name,
-                    'folio': t.source_pages.first().page.name
+                    'folio': t.source_pages.first().page.name,
                 })
             except AttributeError:
                 orphans.append(str(t.id))

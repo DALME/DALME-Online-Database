@@ -1,3 +1,4 @@
+"""Model attribute type data."""
 from django.db import models
 
 from dalme_app.models.templates import dalmeIntid
@@ -27,10 +28,10 @@ class AttributeType(dalmeIntid):
     same_as = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     options = models.ForeignKey('OptionsList', on_delete=models.SET_NULL, null=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['id']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
     def get_options(self):

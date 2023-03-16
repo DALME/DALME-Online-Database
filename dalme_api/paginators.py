@@ -1,3 +1,4 @@
+"""Define API paginators."""
 from collections import OrderedDict
 from contextlib import suppress
 
@@ -71,6 +72,10 @@ class DALMELimitOffsetPagination(LimitOffsetPagination):
         """Return page limit."""
         if self.limit_query_param:
             with suppress(KeyError, ValueError):
-                return _positive_int(request.query_params[self.limit_query_param], strict=False, cutoff=self.max_limit)
+                return _positive_int(
+                    request.query_params[self.limit_query_param],
+                    strict=False,
+                    cutoff=self.max_limit,
+                )
 
         return self.default_limit

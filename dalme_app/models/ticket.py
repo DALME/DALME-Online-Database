@@ -1,3 +1,4 @@
+"""Model ticket data."""
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
@@ -36,10 +37,10 @@ class Ticket(dalmeIntid):
     closing_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     closing_date = models.DateTimeField(null=True, blank=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['status', 'creation_timestamp']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return str(self.id) + ' - ' + self.title + ' (' + self.get_status_display + ')'
 
     def get_absolute_url(self):

@@ -1,3 +1,4 @@
+"""Define top-level application URLs."""
 from maintenance_mode import urls as maintenance_mode_urls
 from wagtail import views
 from wagtail.admin import urls as wagtailadmin_urls
@@ -6,24 +7,27 @@ from wagtail.documents import urls as wagtaildocs_urls
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-
-# from dalme_app import urls as core_urls
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
 from django.urls import include, path, re_path, reverse
 
 from dalme_api import urls as api_urls
 from dalme_public import api
-from dalme_public.views import biblio_entry, enter_footnote, reroute_chooser, saved_search
+from dalme_public.views import (
+    biblio_entry,
+    enter_footnote,
+    reroute_chooser,
+    saved_search,
+)
 from dalme_purl import urls as purl_urls
 
 
-def to_dalme_login():
+def to_dalme_login(_request):
     """Redirect request to login page."""
     return auth_views.redirect_to_login(reverse('wagtailadmin_home'), login_url=settings.LOGIN_URL)
 
 
-def to_dalme_logout():
+def to_dalme_logout(_request):
     """Redirect request to logout page."""
     return redirect(settings.LOGOUT_URL)
 
@@ -51,9 +55,3 @@ urlpatterns = [
     re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve'),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
-
-# if settings.DEBUG:
-#     import debug_toolbar
-#     urlpatterns = [
-#         path('__debug__/', include(debug_toolbar.urls)),
-#     ] + urlpatterns

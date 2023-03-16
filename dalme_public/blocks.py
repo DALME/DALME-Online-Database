@@ -1,3 +1,4 @@
+"""Define custom CMS blocks."""
 from wagtail import blocks
 from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.images.blocks import ImageChooserBlock
@@ -23,7 +24,7 @@ class BibliographyBlock(blocks.StructBlock):
             ('BKW2PVCM', 'Glossaries and dictionaries'),
             ('QM9AZNT3', 'Methodology'),
             ('SLIT6LID', 'Studies'),
-            ('FRLVXUWL', 'Other resources')
+            ('FRLVXUWL', 'Other resources'),
         ],
     )
 
@@ -44,7 +45,7 @@ class ChartEmbedBlock(blocks.StructBlock):
         choices=[
             ('left', 'Left-aligned'),
             ('right', 'Right-aligned'),
-            ('full', 'Full-width')
+            ('full', 'Full-width'),
         ],
     )
 
@@ -54,11 +55,11 @@ class ChartEmbedBlock(blocks.StructBlock):
 
 
 class DocumentBlock(blocks.StructBlock):
-    type = blocks.ChoiceBlock(
+    type = blocks.ChoiceBlock(  # noqa: A003
         choices=[
             ('document', 'Document'),
             ('publication', 'Publication'),
-            ('talk', 'Talk')
+            ('talk', 'Talk'),
         ],
     )
     title = blocks.CharBlock()
@@ -108,7 +109,7 @@ class InlineImageBlock(blocks.StructBlock):
     alignment = blocks.ChoiceBlock(
         choices=[
             ('left', 'Left-aligned'),
-            ('right', 'Right-aligned')
+            ('right', 'Right-aligned'),
         ],
     )
     show_caption = blocks.BooleanBlock(required=False, default=True)
@@ -160,7 +161,6 @@ class SubsectionBlock(blocks.StructBlock):
 
 
 class SubsectionEndMarkerBlock(blocks.StructBlock):
-
     class Meta:
         icon = 'collapse-up'
         template = 'dalme_public/blocks/_subsection_end.html'

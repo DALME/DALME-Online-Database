@@ -1,3 +1,4 @@
+"""Model relationship scope data."""
 from django.db import models
 from django.db.models import options
 
@@ -14,10 +15,10 @@ class ScopeType(dalmeIntid):
     description = models.TextField()
     source = models.CharField(max_length=255, blank=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         ordering = ['id']
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.name
 
 

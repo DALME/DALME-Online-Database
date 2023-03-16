@@ -1,3 +1,4 @@
+"""API endpoint for managing user groups."""
 from django.contrib.auth.models import Group
 
 from dalme_api.access_policies import GeneralAccessPolicy

@@ -1,3 +1,4 @@
+"""Define API filters."""
 from rest_framework.filters import OrderingFilter
 
 from django.db.models import OuterRef, Subquery

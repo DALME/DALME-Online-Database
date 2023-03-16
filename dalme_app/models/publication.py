@@ -1,3 +1,4 @@
+"""Model publication data."""
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options

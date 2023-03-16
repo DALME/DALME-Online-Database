@@ -1,3 +1,4 @@
+"""Model permission data."""
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -34,5 +35,5 @@ class Permission(dalmeUuid):
     can_add = models.BooleanField(default=False)
     can_remove = models.BooleanField(default=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         unique_together = ('content_type', 'object_id', 'principal_type', 'principal_id')

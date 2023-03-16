@@ -1,3 +1,4 @@
+"""Define JWT auth utilities."""
 import json
 from contextlib import suppress
 
@@ -5,6 +6,9 @@ from rest_framework import serializers
 
 from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
+
+from dalme_app.models import TenantRole
+from dalme_app.tenant import get_current_tenant
 
 
 class JWTUserDetailsSerializer(serializers.ModelSerializer):
@@ -16,7 +20,7 @@ class JWTUserDetailsSerializer(serializers.ModelSerializer):
     preferences = serializers.JSONField(source='profile.preferences', required=False)
     groups = serializers.SerializerMethodField()
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = auth.models.User
         fields = ['id', 'username', 'full_name', 'email', 'avatar', 'is_admin', 'preferences', 'groups']
         read_only_fields = ('email', 'is_admin', 'groups')
@@ -38,8 +42,14 @@ class JWTUserDetailsSerializer(serializers.ModelSerializer):
 class JWTSessionAuthentication(MiddlewareMixin):
     """Session authentication for JWT tokens."""
 
-    def __init__(self, get_response):  # noqa: D107
+    def __init__(self, get_response):
         super().__init__(get_response)
+
+    def is_tenant_user(self, user):
+        """Verify the request user is registered with the request tenant."""
+        return TenantRole.objects.filter(
+            user=user, tenant=get_current_tenant(),
+        ).exists()
 
     def process_request(self, request):
         """Process the request and add session login."""
@@ -50,7 +60,7 @@ class JWTSessionAuthentication(MiddlewareMixin):
                 password = payload.get('password')
                 if username and password:
                     user = auth.authenticate(request, username=username, password=password)
-                    if user is not None and user.is_active:
+                    if user is not None and user.is_active and self.is_tenant_user(user) or user.is_superuser:
                         auth.login(request, user)
                         self.create_session(request, user)
 

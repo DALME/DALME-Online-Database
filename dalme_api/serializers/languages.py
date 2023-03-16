@@ -1,3 +1,4 @@
+"""Serializers for language data."""
 from dalme_app.models import LanguageReference
 
 from .base_classes import DynamicSerializer
@@ -6,7 +7,7 @@ from .base_classes import DynamicSerializer
 class LanguageReferenceSerializer(DynamicSerializer):
     """Serializer for languages."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = LanguageReference
         fields = ('id', 'glottocode', 'iso6393', 'name', 'is_dialect', 'parent')
         field_sets = {

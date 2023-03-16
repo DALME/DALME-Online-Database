@@ -1,3 +1,4 @@
+"""Define filters for dalme_public."""
 import calendar
 import itertools
 
@@ -115,7 +116,7 @@ class RecordOrderingFilter(django_filters.OrderingFilter):
             record_type=Subquery(record_types.values('attributevaluestr__value')[:1]),
         ).distinct()
 
-    def filter(self, qs, value):
+    def filter(self, qs, value):  # noqa: A003
         qs = super().filter(qs, value=[])
         # For now any duplicates that remain here after filtering are
         # eliminated on the endpoint itself before going down the wire.
@@ -200,7 +201,7 @@ class RecordFilter(django_filters.FilterSet):
             'order_by',
         ]
 
-    def filter_type(self, queryset, name, value):
+    def filter_type(self, queryset, name, value):  # noqa: ARG002
         # Now we can re-use the type map when a request comes in for filtering.
         type_map = _map_record_types()
         record_types = []
@@ -209,9 +210,11 @@ class RecordFilter(django_filters.FilterSet):
                 record_types.append(type_map[idx])
             except KeyError:
                 continue
-        return queryset.filter(**{'attributes__attributevaluestr__value__in': record_types})
+        return queryset.filter(
+            attributes__attributevaluestr__value__in=record_types,
+        )
 
-    def filter_date_range(self, queryset, name, value):
+    def filter_date_range(self, queryset, name, value):  # noqa: ARG002
         queryset = queryset.filter(
             attributes__attribute_type__id__in=[19, 25, 26],
         ).distinct()
@@ -224,7 +227,7 @@ class RecordFilter(django_filters.FilterSet):
 
         return queryset
 
-    def filter_corpus(self, queryset, name, value):
+    def filter_corpus(self, queryset, name, value):  # noqa: ARG002
         try:
             corpus = Corpus.objects.get(pk=value)
         except Corpus.DoesNotExist:
@@ -235,22 +238,22 @@ class RecordFilter(django_filters.FilterSet):
             ],
         )
 
-    def filter_collection(self, queryset, name, value):
+    def filter_collection(self, queryset, name, value):  # noqa: ARG002
         try:
             collection = Collection.objects.get(pk=value)
         except Collection.DoesNotExist:
             return queryset.none()
         return queryset.filter(collections__collection_id=collection.source_set.pk)
 
-    def filter_image(self, queryset, name, value):
+    def filter_image(self, queryset, name, value):  # noqa: ARG002
         value = value == 'true'
         return queryset.exclude(folios__page__dam_id__isnull=value)
 
-    def filter_transcription(self, queryset, name, value):
+    def filter_transcription(self, queryset, name, value):  # noqa: ARG002
         value = value == 'true'
         return queryset.exclude(folios__transcription__isnull=value)
 
-    def filter_locale(self, queryset, name, value):
+    def filter_locale(self, queryset, name, value):  # noqa: ARG002
         return queryset.filter(attributes__attribute_type=36, attributes__attributevaluefkey__locale__id=str(value))
 
 

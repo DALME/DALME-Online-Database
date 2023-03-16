@@ -1,3 +1,4 @@
+"""Define pagination logic for formsets."""
 from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet, CharField, HiddenInput, IntegerField
 from django.forms.formsets import ManagementForm
@@ -48,7 +49,7 @@ class PaginatedBaseFormSet(BaseFormSet):
         return form
 
 
-def formset_factory(
+def formset_factory(  # noqa: PLR0913
     form,
     formset=PaginatedBaseFormSet,
     extra=1,

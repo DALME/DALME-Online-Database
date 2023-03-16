@@ -1,3 +1,4 @@
+"""Serializers for location data."""
 from dalme_api.serializers.tags import TagSerializer
 from dalme_app.models import Location
 
@@ -14,7 +15,7 @@ class LocationSerializer(DynamicSerializer):
     creation_user = UserSerializer(field_set='attribute')
     modification_user = UserSerializer(field_set='attribute')
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = Location
         fields = (
             'id',

@@ -1,3 +1,4 @@
+"""Model resourcespace data."""
 import hashlib
 import json
 import os
@@ -51,8 +52,6 @@ def rs_api_query(**kwargs):
 
 
 class rs_resource(models.Model):  # noqa: N801
-    """Django model representation of existing RS table."""
-
     ref = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=200, blank=True)
     resource_type = models.IntegerField(null=True)
@@ -99,12 +98,12 @@ class rs_resource(models.Model):  # noqa: N801
     modified = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     collections = models.ManyToManyField('rs_collection', through='rs_collection_resource')
 
-    class Meta:  # noqa: D106
+    class Meta:
         managed = False
         db_table = 'resource'
         in_db = 'dam'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.ref
 
     def get_image_url(self, size='scr'):
@@ -120,12 +119,10 @@ class rs_resource(models.Model):  # noqa: N801
 
 
 class rs_resource_data(models.Model):  # noqa: N801
-    """Django model representation of existing RS table."""
-
-    django_id = models.IntegerField(primary_key=True, db_column='django_id')
+    django_id = models.IntegerField(primary_key=True, db_column="django_id")
     resource = models.ForeignKey(
         'rs_resource',
-        db_column='resource',
+        db_column="resource",
         to_field='ref',
         on_delete=models.CASCADE,
         related_name='resource_data',
@@ -139,18 +136,16 @@ class rs_resource_data(models.Model):  # noqa: N801
     )
     value = models.TextField()
 
-    class Meta:  # noqa: D106
+    class Meta:
         managed = False
         db_table = 'resource_data'
         in_db = 'dam'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.django_id
 
 
 class rs_collection(models.Model):  # noqa: N801
-    """Django model representation of existing RS table."""
-
     ref = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100, blank=True)
     user = models.IntegerField(null=True)
@@ -185,12 +180,12 @@ class rs_collection(models.Model):  # noqa: N801
     theme19 = models.CharField(max_length=100, blank=True)
     theme20 = models.CharField(max_length=100, blank=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         managed = False
         db_table = 'collection'
         in_db = 'dam'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.ref
 
 
@@ -220,18 +215,16 @@ class rs_collection_resource(models.Model):  # noqa: N801
     purchase_price = models.FloatField(max_length=10, default='0.00')
     sortorder = models.IntegerField(null=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         managed = False
         db_table = 'collection_resource'
         in_db = 'dam'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return f'{self.resource.ref-{self.collection.ref}}'
 
 
 class rs_user(models.Model):  # noqa: N801
-    """Django model representation of existing RS table."""
-
     DAM_USERGROUPS = (
         (2, 'General User'),
         (4, 'Archivist'),
@@ -269,18 +262,16 @@ class rs_user(models.Model):  # noqa: N801
     wp_authrequest = models.CharField(max_length=50, blank=True)
     csrf_token = models.CharField(max_length=255, blank=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         managed = False
         db_table = 'user'
         in_db = 'dam'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.ref
 
 
 class rs_resource_type_field(models.Model):  # noqa: N801
-    """Django model representation of existing RS table."""
-
     ref = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50, blank=True)
     title = models.CharField(max_length=400, blank=True)
@@ -320,10 +311,10 @@ class rs_resource_type_field(models.Model):  # noqa: N801
     fits_field = models.CharField(max_length=255, blank=True)
     personal_data = models.IntegerField(default='0')
 
-    class Meta:  # noqa: D106
+    class Meta:
         managed = False
         db_table = 'resource_type_field'
         in_db = 'dam'
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.ref

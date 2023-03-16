@@ -1,0 +1,54 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+NODE_MODULES := $(UI)/node_modules
+
+ui.build:
+	docker compose up -d --no-deps --build $(PROJECT).ui
+.PHONY: ui.build
+
+ui.init: ui.install
+.PHONY: ui.init
+
+ui.install:
+	yarn --cwd $(UI) install
+.PHONY: ui.install
+
+ui.lint:
+	# NOTE: Using compose run causes an error in CI so just use run here.
+	docker run --rm \
+		$(PROJECT).ui:dev \
+		yarn lint
+.PHONY: ui.lint
+
+ui.open:
+	open http://localhost:$(PROXY_PORT)/db
+.PHONY: ui.open
+
+ui.shell:
+	docker compose run --rm \
+		$(PROJECT).ui \
+		bash
+.PHONY: ui.shell
+
+ui.sync: ui.install ui.build
+.PHONY: ui.sync
+
+ui.test:
+	yarn --cwd $(UI) coverage
+.PHONY: ui.test
+
+# ui.test.watch:
+#   yarn --cwd $(UI) watch
+# .PHONY ui.test.watch
+
+ui.help:
+	@echo "  ui.build               rebuild the ui service"
+	@echo "  ui.install             install the ui requirements"
+	@echo "  ui.lint                invoke eslint over the ui code"
+	@echo "  ui.open                view the ui in your browser"
+	@echo "  ui.shell               shell into the ui container"
+	@echo "  ui.sync                install the ui dependencies and rebuild the service"
+	@echo "  ui.test                run the ui test suite"
+	@echo "  ui.test.watch          re-run the test suite on code changes"
+	@echo ""
+.PHONY: ui.help

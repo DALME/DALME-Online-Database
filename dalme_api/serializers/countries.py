@@ -1,3 +1,4 @@
+"""Serializers for country data."""
 from dalme_app.models import CountryReference
 
 from .base_classes import DynamicSerializer
@@ -6,7 +7,7 @@ from .base_classes import DynamicSerializer
 class CountryReferenceSerializer(DynamicSerializer):
     """Serializer for countries."""
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = CountryReference
         fields = ('id', 'name', 'alpha_2_code', 'alpha_3_code', 'num_code')
         field_sets = {

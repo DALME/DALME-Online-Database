@@ -1,3 +1,4 @@
+"""Model extended auth data."""
 import json
 import pathlib
 
@@ -21,7 +22,11 @@ def default_preferences():
 
 
 class GroupProperties(models.Model):
-    """Extension of group model to accomodate additional group related data."""
+    """One-to-one extension of group model.
+
+    Accomodates additional group related data, including group types.
+
+    """
 
     ADMIN = 1
     DAM = 2
@@ -40,18 +45,23 @@ class GroupProperties(models.Model):
     group_type = models.IntegerField(choices=GROUP_TYPES)
     description = models.CharField(max_length=255)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.group.name
 
 
 class Profile(models.Model):
-    """Extension of user model to accomodate additional user related data."""
+    """One-to-one extension of user model.
+
+    Accomodate additional user related data, including permissions of
+    associated accounts on other platforms.
+
+    """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
     preferences = models.JSONField(default=default_preferences)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self):
         return self.user.username
 
     def get_absolute_url(self):
@@ -62,9 +72,7 @@ class Profile(models.Model):
     def profile_image(self):
         """Return url to avatar image."""
         try:
-            if self.user.wagtail_userprofile.avatar is not None and self.user.wagtail_userprofile.avatar:
-                return settings.MEDIA_URL + str(self.user.wagtail_userprofile.avatar)
-            else:  # noqa: RET505
-                return None
+            avatar = self.user.wagtail_userprofile.avatar
         except ObjectDoesNotExist:
             return None
+        return settings.MEDIA_URL + str(avatar) if avatar else None

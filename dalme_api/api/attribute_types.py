@@ -1,3 +1,4 @@
+"""API endpoint for managing attribute types."""
 from stringcase import snakecase
 
 from django.db.models import Q

@@ -1,3 +1,4 @@
+"""API endpoint for managing DAM images."""
 import json
 from json import JSONDecodeError
 

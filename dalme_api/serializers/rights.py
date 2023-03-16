@@ -1,3 +1,4 @@
+"""Serializers for rights data."""
 from rest_framework import serializers
 
 from dalme_app.models import RightsPolicy
@@ -15,7 +16,7 @@ class RightsPolicySerializer(DynamicSerializer):
     creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
     modification_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = RightsPolicy
         fields = (
             'id',
@@ -69,7 +70,7 @@ class RightsPolicySerializer(DynamicSerializer):
         """Transform incoming data."""
         if data.get('attachments') is not None:
             if data['attachments'].get('file') is not None:
-                if type(data['attachments']['file']) is dict and data['attachments']['file'].get('file_id') is not None:
+                if isinstance(data['attachments']['file'], dict) and data['attachments']['file'].get('file_id') is not None:
                     data['attachments'] = data['attachments']['file']['file_id']
                 else:
                     data['attachments'] = data['attachments']['file']

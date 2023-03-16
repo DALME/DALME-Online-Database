@@ -1,3 +1,4 @@
+"""Define forms for dalme_public."""
 from captcha import fields, widgets
 
 from django import forms
@@ -41,9 +42,10 @@ class ContactForm(forms.Form):
         )
         try:
             email.send(fail_silently=False)
-            return True, ''
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return False, e
+
+        return True, ''
 
 
 class RecordFilterForm(forms.Form):
@@ -66,7 +68,7 @@ class RecordFilterForm(forms.Form):
 
 
 class SavedSearchLinkChooserForm(forms.Form):
-    id = forms.ChoiceField(required=True, choices=[], label='Saved search')
+    id = forms.ChoiceField(required=True, choices=[], label='Saved search')  # noqa: A003
     link_text = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
@@ -76,7 +78,7 @@ class SavedSearchLinkChooserForm(forms.Form):
 
 
 class BibliographyLinkChooserForm(forms.Form):
-    id = forms.CharField(required=True, label='Entry')
+    id = forms.CharField(required=True, label='Entry')  # noqa: A003
     link_text = forms.CharField(required=False)
 
 

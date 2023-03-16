@@ -1,0 +1,471 @@
+name: Deploy
+on:
+  workflow_dispatch:
+    branches:
+      - ocp/development.v2
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP: dalme
+  ROLE: gha-oidc-role
+  ACCOUNT: ${{ github.repository_owner == 'DALME' && 701541878387 || 800895234148 }}
+  ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+  REGION: ${{ github.repository_owner == 'DALME' && 'us-east-1' || 'eu-west-2' }}
+  ROLE_SESSION: GithubActionsOIDCDeploy
+  TAG: ${{ github.ref_name == 'main' && 'latest' || 'staging' }}
+  TF_ROOT: ./tf
+  TF_VERSION: 1.5.5
+  TG_VERSION: 0.50.12
+
+permissions:
+  contents: write
+  id-token: write  # OIDC permission.
+
+jobs:
+  build_app:
+    name: 'Build Web'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v2
+
+      - id: set-oidc-role
+        run: |
+          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        id: oidc-credentials
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
+          role-session-name: ${{ env.ROLE_SESSION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.APP }}.web
+          tags: |
+            type=raw,priority=200,value=${{ env.TAG }}
+            type=sha,priority=100,prefix=,format=long
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.web
+          push: true
+          cache-from: |
+            type=gha,scope=web.production
+            type=gha,scope=web.install
+            type=gha,scope=web.reqs
+            type=gha,scope=web.base
+          cache-to: |
+            type=gha,scope=web.production,mode=max
+          target: production
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build_proxy:
+    name: 'Build Proxy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v2
+
+      - id: set-oidc-role
+        run: |
+          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        id: oidc-credentials
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
+          role-session-name: ${{ env.ROLE_SESSION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.ACCOUNT }}.dkr.ecr.${{ env.REGION }}.amazonaws.com/${{ env.APP }}.proxy
+          tags: |
+            type=raw,priority=200,value=${{ env.TAG }}
+            type=sha,priority=100,prefix=,format=long
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.proxy
+          push: true
+          cache-from: |
+            type=gha,scope=proxy.serve
+          cache-to: |
+            type=gha,scope=proxy.serve,mode=max
+          target: serve
+          tags: ${{ steps.meta.outputs.tags }}
+
+  build_ui:
+    name: 'Build UI'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v2
+
+      - id: set-oidc-role
+        run: |
+          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        id: oidc-credentials
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
+          role-session-name: ${{ env.ROLE_SESSION }}
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.ui
+          load: true
+          push: false
+          cache-from: |
+            type=gha,scope=ui.production
+            type=gha,scope=ui.reqs
+            type=gha,scope=ui.base
+          cache-to: |
+            type=gha,scope=ui.production,mode=max
+          target: production
+          tags: ${{ env.APP }}.ui:build
+
+      - uses: shrink/actions-docker-extract@v2
+        id: extract
+        with:
+          image: ${{ env.APP }}.ui:build
+          path: /opt/ui/dist/spa/.
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: build-artifact
+          path: ${{ steps.extract.outputs.destination }}
+          if-no-files-found: error
+
+  should-provision-tf:
+    name: 'Provision?'
+    runs-on: ubuntu-latest
+    needs:
+      - build_app
+      - build_proxy
+      - build_ui
+    outputs:
+      apply: ${{ steps.changed-tf.outputs.any_changed  }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: changed-tf
+        uses: tj-actions/changed-files@v39
+        with:
+          since_last_remote_commit: true
+          files: tf/**/*.{tf,hcl}
+
+  # We ensure OIDC gets provisioned first so that any changes we might have
+  # made to the overall permissions profile (that this pipeline is itself
+  # using) are provisioned ready to handle the demands of the other modules.
+  provision-oidc:
+    name: 'Provision OIDC'
+    runs-on: ubuntu-latest
+    needs:
+      - should-provision-tf
+    if: needs.should-provision-tf.outputs.apply == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: set-oidc-role
+        run: |
+          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        id: oidc-credentials
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
+          role-session-name: ${{ env.ROLE_SESSION }}
+          output-credentials: true
+
+      - id: write-oidc-vars
+        env:
+          AUTO_VARS: terraform.auto.tfvars
+        run: |
+          vars=${{ env.TF_ROOT }}/${{ env.AUTO_VARS }}
+          token=${{ steps.oidc-credentials.outputs.aws-session-token }}
+          session=${{ env.ROLE_SESSION }}
+          echo "oidc_session_name = \"${session}\"" >> ${vars}
+          echo "oidc_web_identity_token = \"${token}\"" >> ${vars}
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - id: setup-terragrunt
+        uses: autero1/action-terragrunt@v1.3.2
+        with:
+          terragrunt_version: ${{ env.TG_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: set-oidc-module
+        run: >
+          echo "MODULE=${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}/${{ env.REGION }}/oidc"
+          >> $GITHUB_OUTPUT
+
+      - id: tf-plan-oidc
+        run: >
+          terragrunt plan
+          --terragrunt-non-interactive
+          --terragrunt-working-dir ${{ steps.set-oidc-module.outputs.MODULE }}
+
+      - id: tf-apply-oidc
+        run: >
+          terragrunt apply
+          -auto-approve
+          --terragrunt-non-interactive
+          --terragrunt-working-dir ${{ steps.set-oidc-module.outputs.MODULE }}
+
+  provision-modules:
+    name: 'Provision Modules'
+    runs-on: ubuntu-latest
+    needs:
+      - should-provision-tf
+      - provision-oidc
+    if: >
+      always() &&
+      !failure() &&
+      !cancelled() &&
+      needs.should-provision-tf.outputs.apply == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: set-oidc-role
+        run: |
+          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        id: oidc-credentials
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
+          role-session-name: ${{ env.ROLE_SESSION }}
+          output-credentials: true
+
+      - id: write-oidc-vars
+        env:
+          AUTO_VARS: terraform.auto.tfvars
+        run: |
+          vars=${{ env.TF_ROOT }}/${{ env.AUTO_VARS }}
+          token=${{ steps.oidc-credentials.outputs.aws-session-token }}
+          session=${{ env.ROLE_SESSION }}
+          echo "oidc_session_name = \"${session}\"" >> ${vars}
+          echo "oidc_web_identity_token = \"${token}\"" >> ${vars}
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - id: setup-terragrunt
+        uses: autero1/action-terragrunt@v1.3.2
+        with:
+          terragrunt_version: ${{ env.TG_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: set-oidc-module
+        run: >
+          echo "MODULE=${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}/${{ env.REGION }}/oidc"
+          >> $GITHUB_OUTPUT
+
+      # Must be run-all here to handle dependency graphs.
+      - id: tf-plan-module
+        run: >
+          terragrunt run-all plan
+          --terragrunt-non-interactive
+          --terragrunt-working-dir ${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}
+          --terragrunt-exclude-dir ${{ steps.set-oidc-module.outputs.MODULE }}
+
+      # Must be run-all here to handle dependency graphs.
+      - id: tf-apply-module
+        run: >
+          terragrunt run-all apply
+          --terragrunt-non-interactive
+          --terragrunt-working-dir ${{ env.TF_ROOT }}/${{ env.ENVIRONMENT }}
+          --terragrunt-exclude-dir ${{ steps.set-oidc-module.outputs.MODULE }}
+
+  deploy:
+    name: 'Deploy'
+    needs: provision-modules
+    if: always() && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-oidc-role
+        run: |
+          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        id: oidc-credentials
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
+          role-session-name: ${{ env.ROLE_SESSION }}
+
+      - uses: brunocascio/ecs-deploy@v2.0.0
+        id: ecs-deploy
+        env:
+          ECS_CLUSTER: ecs-cluster
+          ECS_SERVICE: ecs-service
+        with:
+          args: >
+            deploy
+            ${{ env.APP }}-${{ env.ECS_CLUSTER }}-${{ env.ENVIRONMENT }}
+            ${{ env.APP }}-${{ env.ECS_SERVICE }}-${{ env.ENVIRONMENT }}
+            --task=${{ env.APP }}-task-definition-web-${{ env.ENVIRONMENT }}
+            --timeout=600
+
+      - uses: actions/download-artifact@master
+        id: artifact
+        if: steps.ecs-deploy.outcome == 'success'
+        with:
+          name: build-artifact
+          path: ${{ runner.temp }}/dist
+
+      - id: assets-deploy
+        if: steps.artifact.outcome == 'success'
+        env:
+          BUCKET: assets
+        run: >
+          aws s3 sync
+          ${{ runner.temp }}/dist
+          s3://${{ env.APP }}-${{ env.BUCKET }}-${{ env.ENVIRONMENT }}-${{ env.ACCOUNT }}
+          --delete
+
+  invalidate:
+    name: 'Invalidate Cloudfront'
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-oidc-role
+        run: |
+          name=${{ env.APP }}-${{ env.ROLE }}-${{ env.ENVIRONMENT }}
+          echo "ROLE=arn:aws:iam::${{ env.ACCOUNT }}:role/${name}" >> $GITHUB_OUTPUT
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        id: oidc-credentials
+        with:
+          aws-region: ${{ env.REGION }}
+          role-to-assume: ${{ steps.set-oidc-role.outputs.ROLE }}
+          role-session-name: ${{ env.ROLE_SESSION }}
+          output-credentials: true
+
+      - id: set-distribution
+        env:
+          FILTER: '.ResourceTagMappingList[].ResourceARN'
+          NAME: cloudfront
+          REGION: us-east-1  # Always the case for cloudfront.
+        run: >
+          echo "DISTRIBUTION=$(aws
+          resourcegroupstaggingapi
+          get-resources
+          --tag-filters Key=Name,Values=${{ env.APP }}-${{ env.NAME }}-${{ env.ENVIRONMENT }}
+          --resource-type-filters ${{ env.NAME }}
+          --region=${{ env.REGION }}
+          | jq -r ${{ env.FILTER }}
+          | sed 's:.*/::')"
+          >> $GITHUB_OUTPUT
+
+      - uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          DISTRIBUTION: ${{ steps.set-distribution.outputs.DISTRIBUTION }}
+          AWS_REGION: us-east-1
+          PATHS: '/db/index.html'
+
+  should-deploy-docs:
+    name: 'Docs?'
+    runs-on: ubuntu-latest
+    needs: deploy
+    outputs:
+      deploy: ${{ steps.changed-docs.outputs.any_changed  }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: changed-docs
+        uses: tj-actions/changed-files@v39
+        with:
+          since_last_remote_commit: true
+          files: dalme_docs/**/*.{md,py,rst,txt}
+          files_ignore: dalme_docs/README.md
+
+  deploy_docs:
+    name: 'Deploy Docs'
+    needs:
+      - should-deploy-docs
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' &&
+      github.ref_name == 'development.ocp' &&
+      needs.should-deploy-docs.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v2
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.docs
+          load: true
+          cache-from: |
+            type=gha,scope=docs.render
+            type=gha,scope=docs.install
+            type=gha,scope=docs.reqs
+            type=gha,scope=docs.base
+          cache-to: |
+            type=gha,scope=docs.render,mode=max
+          target: render
+          tags: ${{ env.APP }}.docs:render
+
+      - uses: shrink/actions-docker-extract@v2
+        id: extract
+        with:
+          image: ${{ env.APP }}.docs:render
+          path: /opt/docs/_build/html/.
+
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ steps.extract.outputs.destination }}
+          force_orphan: true

@@ -3,13 +3,13 @@
   <q-layout
     id="layout"
     view="lHr lpR lFr"
-    :class="!reAuthenticate && showLogin ? 'login-background' : null"
+    :class="!reauthenticate && showLogin ? 'login-background' : null"
   >
-    <NavBar v-if="reAuthenticate || !showLogin" />
-    <EditPanel v-if="reAuthenticate || !showLogin" />
+    <NavBar v-if="reauthenticate || !showLogin" />
+    <EditPanel v-if="reauthenticate || !showLogin" />
     <AppDrawer />
     <UserDrawer />
-    <q-page-container v-if="reAuthenticate || !showLogin">
+    <q-page-container v-if="reauthenticate || !showLogin">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -18,7 +18,7 @@
 <script>
 import { defineComponent, provide, ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { find, propEq } from "ramda";
+import { find, isNotNil, propEq } from "ramda";
 import { EditPanel, LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
 import {
   provideAPI,
@@ -39,11 +39,10 @@ export default defineComponent({
   },
   setup() {
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
-    const { auth, ui, hasCredentials, reAuthenticate, userDrawerOpen, appDrawerOpen } =
+    const { auth, ui, hasCredentials, reauthenticate, userDrawerOpen, appDrawerOpen } =
       provideStores();
     const $route = useRoute();
-    const showLogin = ref(!hasCredentials.value || reAuthenticate.value);
-    const updateShowLogin = (val) => (showLogin.value = val);
+    const showLogin = ref(!hasCredentials.value || reauthenticate.value);
     const userDrawerEl = ref(null);
 
     const prefSubscription = (action) => {
@@ -63,7 +62,7 @@ export default defineComponent({
     const outsideDrawerClick = (e) => {
       e.stopPropagation();
       const openDrawer = find(propEq(true, "value"))([userDrawerOpen, appDrawerOpen]);
-      if (e.target.classList.contains("q-dialog__backdrop") && openDrawer != "undefined") {
+      if (e.target.classList.contains("q-dialog__backdrop") && isNotNil(openDrawer)) {
         openDrawer.value = false;
       }
     };
@@ -72,7 +71,7 @@ export default defineComponent({
     provideEditing();
     provideTransport();
 
-    provide("showLogin", { showLogin, updateShowLogin });
+    provide("showLogin", showLogin);
     provide("prefSubscription", prefSubscription);
     provide("userDrawerEl", userDrawerEl);
 
@@ -90,7 +89,7 @@ export default defineComponent({
 
     return {
       showLogin,
-      reAuthenticate,
+      reauthenticate,
     };
   },
 });

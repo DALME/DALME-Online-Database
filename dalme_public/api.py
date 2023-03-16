@@ -1,3 +1,4 @@
+"""API endpoints for dalme_public resources."""
 from rest_framework import pagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly

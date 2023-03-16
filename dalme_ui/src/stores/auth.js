@@ -29,7 +29,7 @@ export const useAuthStore = defineStore(
       lists: {},
     });
     const groups = ref([]);
-    const reAuthenticate = ref(false);
+    const reauthenticate = ref(false);
     const isRefreshing = ref(false);
     const requestQueue = ref([]);
 
@@ -53,7 +53,7 @@ export const useAuthStore = defineStore(
         lists: {},
       };
       groups.value = [];
-      reAuthenticate.value = false;
+      reauthenticate.value = false;
       isRefreshing.value = false;
       requestQueue.value = [];
     };
@@ -65,12 +65,17 @@ export const useAuthStore = defineStore(
       email.value = data.email;
       avatar.value = data.avatar;
       isAdmin.value = data.isAdmin;
-      reAuthenticate.value = false;
+      reauthenticate.value = false;
       isRefreshing.value = false;
       groups.value = data.groups;
       if (notNully(data.preferences)) {
         preferences.value = data.preferences;
       }
+    };
+
+    const setCSRFToken = async () => {
+      const { fetchAPI } = apiInterface();
+      await fetchAPI(requests.auth.CSRF());
     };
 
     const logout = async () => {
@@ -123,7 +128,7 @@ export const useAuthStore = defineStore(
       isAdmin,
       preferences,
       groups,
-      reAuthenticate,
+      reauthenticate,
       isRefreshing,
       requestQueue,
       hasCredentials,
@@ -131,6 +136,7 @@ export const useAuthStore = defineStore(
       logout,
       processQueue,
       updatePreferences,
+      setCSRFToken,
       $reset,
     };
   },

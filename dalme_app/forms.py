@@ -1,3 +1,4 @@
+"""Define dalme_app forms."""
 from django import forms
 
 
@@ -9,14 +10,12 @@ class SearchForm(forms.Form):
         ('must_not', 'NOT'),
         ('should', 'OR'),
     )
-
     QUERY_TYPES = (
         ('match_phrase', 'the following word(s)'),
         ('match', 'word(s) similar to'),
         ('prefix', 'word(s) beginning with'),
         ('term', 'exactly this expression'),
     )
-
     RANGE_TYPES = (
         ('value', 'exactly'),
         ('lt', 'before'),
@@ -32,7 +31,6 @@ class SearchForm(forms.Form):
                     <b>NOT:</b> the current clause must not match<br/> \
                     <b>OR:</b> either the current or previous clauses must match<br/></p>',
     )
-
     field = forms.ChoiceField(
         required=False,
         widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),
@@ -98,7 +96,7 @@ class SearchForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, **kwargs):  # noqa: D107
+    def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', [])
         super().__init__(*args, **kwargs)
         self.fields['field'].choices = fields

@@ -1,3 +1,4 @@
+"""Serializers for options data."""
 from rest_framework import serializers
 
 
@@ -9,10 +10,10 @@ class OptionsSerializer(serializers.Serializer):
     group = serializers.CharField(required=False)
     detail = serializers.CharField(required=False)
 
-    class Meta:  # noqa: D106
+    class Meta:
         fields = ['label', 'value', 'group', 'detail']
 
-    def __init__(self, *args, **kwargs):  # noqa: D107
+    def __init__(self, *args, **kwargs):
         self.concordance = kwargs.pop('concordance', None)
         super().__init__(*args, **kwargs)
 

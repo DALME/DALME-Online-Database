@@ -1,6 +1,9 @@
-# This file contains templates for models, used in dalme_app.models. These templates
-# are used to more easily associate common data points with those models, things like
-# timestamps and unique IDs.
+"""Define model templates.
+
+These mixins and utilities are used to more easily associate common data points
+with system data models; things like timestamps and unique IDs.
+
+"""
 import uuid
 
 from django_currentuser.middleware import get_current_user
@@ -36,10 +39,10 @@ class dalmeBasic(models.Model):  # noqa: N801
     creation_timestamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     modification_timestamp = models.DateTimeField(auto_now=True, null=True, blank=True)
 
-    class Meta:  # noqa: D106
+    class Meta:
         abstract = True
 
-    def class_name(self):  # noqa: D102
+    def class_name(self):
         return self.__class__.__name__
 
 
@@ -48,7 +51,7 @@ class dalmeUuid(dalmeBasic):  # noqa: N801
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)  # noqa: A003
 
-    class Meta:  # noqa: D106
+    class Meta:
         abstract = True
 
 
@@ -57,7 +60,7 @@ class dalmeIntid(dalmeBasic):  # noqa: N801
 
     id = models.AutoField(primary_key=True, unique=True, db_index=True)  # noqa: A003
 
-    class Meta:  # noqa: D106
+    class Meta:
         abstract = True
 
 
@@ -71,7 +74,7 @@ class dalmeOwned(dalmeBasic):  # noqa: N801
         null=True,
     )
 
-    class Meta:  # noqa: D106
+    class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):

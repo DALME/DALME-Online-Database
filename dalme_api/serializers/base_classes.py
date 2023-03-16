@@ -1,3 +1,4 @@
+"""Base serializer functionality."""
 from rest_framework import serializers
 
 from dalme_app.models import Workflow
@@ -6,7 +7,7 @@ from dalme_app.models import Workflow
 class DynamicSerializer(serializers.ModelSerializer):
     """A serializer that takes an additional `fields` argument that indicates which fields should be included."""
 
-    def __init__(self, *args, **kwargs):  # noqa: D107
+    def __init__(self, *args, **kwargs):
         if 'fields' in kwargs and 'field_set' in kwargs:
             msg = '`fields` and `field_set` cannot be used concurrently.'
             raise AssertionError(msg)
@@ -35,7 +36,7 @@ def translate_workflow_string(data):
     stage_by_name = {label: number for number, label in stage_by_no.items()}
     status_by_name = {label: number for number, label in status_by_no.items()}
 
-    if type(data) is str:
+    if isinstance(data, str):
         str_elements = data.strip().split(' ')
         if len(str_elements) == 1:
             status = status_by_name[str_elements[0].strip().lower()]
