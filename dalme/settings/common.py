@@ -29,11 +29,16 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 ENABLE_DJANGO_EXTENSIONS = bool(int(os.environ.get("ENABLE_DJANGO_EXTENSIONS", "0")))
-DB_NAME = os.environ.get('RDS_DB_NAME', os.environ.get('MYSQL_DATABASE', ''))
-DB_USER = os.environ.get('RDS_USERNAME', os.environ.get('MYSQL_USER', ''))
-DB_PASSWORD = os.environ.get('RDS_PASSWORD', os.environ.get('MYSQL_PASSWORD', ''))
-DB_HOST = os.environ.get('RDS_HOSTNAME', os.environ.get('MYSQL_HOST', ''))
-DB_PORT = os.environ.get('RDS_PORT', os.environ.get('MYSQL_PORT', ''))
+# DB_NAME = os.environ.get('RDS_DB_NAME', os.environ.get('MYSQL_DATABASE', ''))
+# DB_USER = os.environ.get('RDS_USERNAME', os.environ.get('MYSQL_USER', ''))
+# DB_PASSWORD = os.environ.get('RDS_PASSWORD', os.environ.get('MYSQL_PASSWORD', ''))
+# DB_HOST = os.environ.get('RDS_HOSTNAME', os.environ.get('MYSQL_HOST', ''))
+# DB_PORT = os.environ.get('RDS_PORT', os.environ.get('MYSQL_PORT', ''))
+DB_NAME = os.environ.get('RDS_DB_NAME', os.environ.get('DB_DATABASE', ''))
+DB_USER = os.environ.get('RDS_USERNAME', os.environ.get('DB_USER', ''))
+DB_PASSWORD = os.environ.get('RDS_PASSWORD', os.environ.get('DB_PASSWORD', ''))
+DB_HOST = os.environ.get('RDS_HOSTNAME', os.environ.get('DB_HOST', ''))
+DB_PORT = os.environ.get('RDS_PORT', os.environ.get('DB_PORT', ''))
 DAM_DB_NAME = os.environ.get('DAM_DB_NAME', '')
 DAM_DB_USER = os.environ.get('DAM_USERNAME', '')
 DAM_DB_PASSWORD = os.environ.get('DAM_PASSWORD', '')
@@ -101,7 +106,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
-
 
 # Apps, middleware, and templates
 INSTALLED_APPS = [
@@ -236,16 +240,18 @@ SAML_IDP_CONFIG = {
 DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        # 'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': DB_NAME,
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
         'PORT': DB_PORT,
         # 'CONN_MAX_AGE': 3600, see: https://github.com/Koed00/django-q/issues/435
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
-        },
+        # 'OPTIONS': {
+        #     'options': '-c search_path=dalme_db'
+        #     # 'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
+        # },
     },
     'dam': {
         'ENGINE': 'django.db.backends.mysql',

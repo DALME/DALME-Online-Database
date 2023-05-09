@@ -1,4 +1,6 @@
-FROM python:3.9-slim-buster
+FROM python:3.9-buster
+# TO DO: this ideally should be slim-buster, but we 
+# need the dev tools to compile psycog2 from source
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
