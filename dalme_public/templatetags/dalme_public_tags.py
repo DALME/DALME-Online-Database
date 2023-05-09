@@ -425,11 +425,13 @@ def get_citation_data(context):
                 'title': page.title,
                 'URL': page.get_full_url(context['request'])
             })
+    try:
+        coins_tokens = [f'{k}={urllib.parse.quote(v)}' for (k, v) in coins_list]
+        coins_span = f'<span class="Z3988" title="{"&".join(coins_tokens)}"></span>'
 
-    coins_tokens = [f'{k}={urllib.parse.quote(v)}' for (k, v) in coins_list]
-    coins_span = f'<span class="Z3988" title="{"&".join(coins_tokens)}"></span>'
-
-    return [formats, citation, coins_span]
+        return [formats, citation, coins_span]
+    except:
+        return None
 
 
 @register.simple_tag
