@@ -56,5 +56,7 @@ module.exports = {
       },
     ],
     "vue/no-multiple-template-root": "off",
+    "vue/multi-word-component-names": "off",
+    "vue/no-reserved-component-names": "off",
   },
 };
