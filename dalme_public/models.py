@@ -15,25 +15,21 @@ from bs4 import BeautifulSoup as BSoup
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
 
-from wagtail.admin.edit_handlers import (
+from wagtail.admin.panels import (
     FieldPanel,
     InlinePanel,
-    MultiFieldPanel,
-    PageChooserPanel,
-    StreamFieldPanel,
+    MultiFieldPanel
 )
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
-from wagtail.core import blocks
+from wagtail import blocks
 
-from wagtail.core.models import Orderable, Page
-from wagtail.core.fields import RichTextField, StreamField
+from wagtail.models import Orderable, Page
+from wagtail.fields import RichTextField, StreamField
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
-from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.images.models import Image, AbstractImage, AbstractRendition
 from wagtail.snippets.models import register_snippet
 from wagtailmodelchooser import register_model_chooser, Chooser
-from wagtailmodelchooser.edit_handlers import ModelChooserPanel
 
 from dalme_app.models import Set as DALMESet, Source, SavedSearch
 from dalme_public.serializers import PublicSourceSerializer
@@ -52,6 +48,7 @@ from dalme_public.blocks import (
     SocialBlock,
     SponsorBlock,
     SubsectionBlock,
+    SubsectionEndMarkerBlock,
 )
 
 from dalme_app.utils import Search, formset_factory, SearchContext
@@ -107,14 +104,14 @@ class CustomRendition(AbstractRendition):
 
 @register_snippet
 class Footer(models.Model):
-    pages = StreamField([('page', FooterPageChooserBlock())], null=True)
+    pages = StreamField([('page', FooterPageChooserBlock())], null=True, use_json_field=True)
     copyright = models.CharField(max_length=255, blank=True, null=True)
-    social = StreamField([('social', SocialBlock())], null=True)
+    social = StreamField([('social', SocialBlock())], null=True, use_json_field=True)
 
     panels = [
-        StreamFieldPanel('pages'),
+        FieldPanel('pages'),
         FieldPanel('copyright'),
-        StreamFieldPanel('social'),
+        FieldPanel('social'),
     ]
 
     def __str__(self):
@@ -130,7 +127,7 @@ class SearchPage(models.Model):
     help_content = StreamField([
             ('text', blocks.RichTextBlock()),
             ('html', blocks.RawHTMLBlock()),
-        ], null=True)
+        ], null=True, use_json_field=True)
 
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
@@ -149,9 +146,9 @@ class SearchPage(models.Model):
     )
 
     panels = [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
-        StreamFieldPanel('help_content'),
+        FieldPanel('help_content'),
     ]
 
     def __str__(self):
@@ -168,7 +165,7 @@ class ExplorePage(models.Model):
             ('text', blocks.RichTextBlock()),
             ('heading', blocks.CharBlock()),
             ('html', blocks.RawHTMLBlock()),
-        ], null=True)
+        ], null=True, use_json_field=True)
 
     text_after = StreamField([
             ('inline_image', InlineImageBlock()),
@@ -176,7 +173,7 @@ class ExplorePage(models.Model):
             ('heading', blocks.CharBlock()),
             ('html', blocks.RawHTMLBlock()),
             ('embed', EmbedBlock(icon='media')),
-        ], null=True)
+        ], null=True, use_json_field=True)
 
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
@@ -195,10 +192,10 @@ class ExplorePage(models.Model):
     )
 
     panels = [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
-        StreamFieldPanel('text_before'),
-        StreamFieldPanel('text_after'),
+        FieldPanel('text_before'),
+        FieldPanel('text_after'),
     ]
 
     def __str__(self):
@@ -228,7 +225,7 @@ class RecordBrowser(models.Model):
     )
 
     panels = [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
     ]
 
@@ -259,7 +256,7 @@ class RecordViewer(models.Model):
     )
 
     panels = [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
     ]
 
@@ -309,7 +306,8 @@ class DALMEPage(Page):
         ('embed', EmbedBlock(icon='media')),
         ('html', blocks.RawHTMLBlock()),
         ('subsection', SubsectionBlock()),
-    ], null=True)
+        ('subsection_end_marker', SubsectionEndMarkerBlock()),
+    ], null=True, use_json_field=True)
 
     class Meta:
         abstract = True
@@ -456,8 +454,8 @@ class Home(DALMEPage):
         on_delete=models.SET_NULL,
         related_name='+',
     )
-    sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
-    banners = StreamField([('banners', AnnouncementBannerBlock())], null=True)
+    sponsors = StreamField([('sponsors', SponsorBlock())], null=True, use_json_field=True)
+    banners = StreamField([('banners', AnnouncementBannerBlock())], null=True, use_json_field=True)
 
     subpage_types = [
         'dalme_public.Section',
@@ -466,11 +464,11 @@ class Home(DALMEPage):
     ]
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
-        PageChooserPanel('learn_more_page'),
-        StreamFieldPanel('banners'),
-        StreamFieldPanel('body'),
-        StreamFieldPanel('sponsors'),
+        FieldPanel('header_image'),
+        FieldPanel('learn_more_page'),
+        FieldPanel('banners'),
+        FieldPanel('body'),
+        FieldPanel('sponsors'),
     ]
 
     def get_context(self, request):
@@ -519,12 +517,12 @@ class Flat(DALMEPage):
     subpage_types = ['dalme_public.Flat']
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
         FieldPanel('show_contact_form'),
         FieldPanel('citable'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
     ]
 
     def serve(self, request):
@@ -560,10 +558,10 @@ class Features(DALMEPage):
     ]
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
     ]
 
     def get_context(self, request):
@@ -584,10 +582,10 @@ class Bibliography(DALMEPage):
     subpage_types = ['dalme_public.Flat']
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
     ]
 
 
@@ -613,14 +611,14 @@ class FeaturedObject(FeaturedPage):
     template = 'dalme_public/feature.html'
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
-        ImageChooserPanel('front_page_image'),
-        ModelChooserPanel('source'),
+        FieldPanel('front_page_image'),
+        FieldPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
         FieldPanel('citable'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
     ]
 
     class Meta:
@@ -650,14 +648,14 @@ class FeaturedInventory(FeaturedPage):
     template = 'dalme_public/feature.html'
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
-        ImageChooserPanel('front_page_image'),
-        ModelChooserPanel('source'),
+        FieldPanel('front_page_image'),
+        FieldPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
         FieldPanel('citable'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
     ]
 
     class Meta:
@@ -688,14 +686,14 @@ class Essay(FeaturedPage):
     template = 'dalme_public/feature.html'
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
-        ImageChooserPanel('front_page_image'),
+        FieldPanel('front_page_image'),
         FieldPanel('source'),
         SetFieldPanel('source_set'),
         FieldPanel('alternate_author'),
         FieldPanel('citable'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
     ]
 
     class Meta:
@@ -883,11 +881,11 @@ class Collections(SearchEnabled):
     ]
 
     content_panels = DALMEPage.content_panels + [
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
         FieldPanel('citable'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
         MultiFieldPanel(
             [InlinePanel('corpora', min_num=1, label='Corpus')],
             heading='Corpora',
@@ -935,10 +933,10 @@ class Collection(SearchEnabled):
 
     content_panels = DALMEPage.content_panels + [
         SetFieldPanel('source_set'),
-        ImageChooserPanel('header_image'),
+        FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('citable'),
-        StreamFieldPanel('body'),
+        FieldPanel('body'),
     ]
 
     def get_context(self, request):

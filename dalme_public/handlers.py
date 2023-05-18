@@ -1,4 +1,4 @@
-from wagtail.core.rich_text import LinkHandler
+from wagtail.rich_text import LinkHandler
 from wagtail.admin.rich_text.converters.html_to_contentstate import LinkElementHandler, InlineEntityElementHandler
 from django.utils.html import escape
 from dalme_app.models import SavedSearch

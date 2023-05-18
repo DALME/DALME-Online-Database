@@ -4,7 +4,7 @@ from dalme_public.handlers import (link_entity_decorator, SavedSearchLinkHandler
 from django.utils.html import format_html
 from django.urls import reverse
 from wagtail.admin.rich_text.converters.html_to_contentstate import PageLinkElementHandler, ExternalLinkElementHandler
-from wagtail.core import hooks
+from wagtail import hooks
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
 from django.templatetags.static import static
 from django.shortcuts import redirect
