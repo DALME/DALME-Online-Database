@@ -13,6 +13,7 @@ env.*
 data
 sql/
 *.sql
+.vscode
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
