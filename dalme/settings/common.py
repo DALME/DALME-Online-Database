@@ -94,14 +94,18 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_REFERRER_POLICY = 'origin-when-cross-origin'
 
 # JWT
-REST_SESSION_LOGIN = False
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'dalme-access-token'
-JWT_AUTH_REFRESH_COOKIE = 'dalme-refresh-token'
-JWT_AUTH_REFRESH_COOKIE_PATH = '/api/jwt/token/refresh/'
-JWT_AUTH_SECURE = True
-JWT_AUTH_HTTPONLY = True
-JWT_AUTH_SAMESITE = 'Strict'
+REST_AUTH = {
+    'USE_JWT': True,
+    'SESSION_LOGIN': True,
+    'JWT_AUTH_COOKIE': 'dalme-access-token',
+    'JWT_AUTH_REFRESH_COOKIE': 'dalme-refresh-token',
+    'JWT_AUTH_REFRESH_COOKIE_PATH': '/api/jwt/token/refresh/',
+    'JWT_AUTH_SECURE': True,
+    'JWT_AUTH_HTTPONLY': True,
+    'JWT_AUTH_SAMESITE': 'Strict',
+    'USER_DETAILS_SERIALIZER': 'dalme_app.utils.JWTUserDetailsSerializer',
+}
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -308,11 +312,6 @@ REST_FRAMEWORK = {
     'JSON_UNDERSCOREIZE': {
         'no_underscore_before_number': True,
     },
-}
-
-# JWT setup
-REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'dalme_app.utils.JWTUserDetailsSerializer',
 }
 
 # Static and media file configuration
