@@ -1,6 +1,6 @@
 -r requirements.txt
 
-django-extensions==3.2.0
-flake8==5.0.3
-ipdb==0.13.9
-ipython==8.4.0
+django-extensions==3.2.1
+flake8==6.0.0
+ipdb==0.13.13
+ipython==8.13.2
