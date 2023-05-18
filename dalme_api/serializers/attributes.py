@@ -21,7 +21,7 @@ class AttributeSerializer(serializers.ModelSerializer):
                 return {label: {
                         'name': object.name,
                         'url': object.get_url(),
-                        'id': json.dumps(instance.value_JSON)
+                        'id': instance.value_JSON
                         }}
             except ObjectDoesNotExist:
                 instance.delete()
