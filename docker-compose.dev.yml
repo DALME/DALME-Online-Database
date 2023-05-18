@@ -58,6 +58,27 @@ services:
     cap_add:
       - SYS_NICE
 
+  rs.db:
+    image: mysql:8.0.19
+    platform: linux/amd64
+    container_name: rs.db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: dalme
+      MYSQL_PASSWORD: dalme
+      MYSQL_DATABASE: resourcespace
+      MYSQL_HOST: rs
+    volumes:
+      - "./config/dev/my.cnf:/etc/mysql/conf.d/my.cnf:ro"
+      - ./sql/rs:/docker-entrypoint-initdb.d
+      - rsdata:/var/lib/mysql
+    networks:
+      - app-network
+    ports:
+      - "3306"
+    cap_add:
+      - SYS_NICE
+
   dalme.proxy:
     image: nginx:mainline
     container_name: dalme.proxy
@@ -77,6 +98,7 @@ services:
 volumes:
   assets:
   pgdata:
+  rsdata:
 
 networks:
   app-network:

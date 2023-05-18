@@ -1,4 +1,5 @@
-FROM python:3.9-buster
+FROM python:3.11.3-buster
+#FROM python:3.9-buster
 # TO DO: this ideally should be slim-buster, but we 
 # need the dev tools to compile psycog2 from source
 
@@ -14,7 +15,7 @@ RUN adduser \
     --home /home/whisky whisky && \
     chmod 1777 /home/whisky
 
-RUN rm -rf /var/lib/apt/lists/*
+RUN rm -rf /var/lib/apt/lists/*#
 RUN apt-get update && \
     apt-get install -y \
     build-essential \
@@ -30,7 +31,7 @@ RUN apt-get clean
 
 WORKDIR /opt/app
 COPY ./manage.py .
-COPY ./requirements.txt ./requirements-dev.txt .
+COPY ./requirements.txt ./requirements-dev.txt ./
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r ./requirements-dev.txt
 
