@@ -3,8 +3,8 @@ import * as yup from "yup";
 export const authSchema = yup
   .object()
   .shape({
-    accessToken: yup.string().required(),
-    refreshToken: yup.string(),
+    access: yup.string().required(),
+    refresh: yup.string(),
     user: yup
       .object()
       .shape({
