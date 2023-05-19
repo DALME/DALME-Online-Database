@@ -20,6 +20,7 @@ import { EditPanel, LoginModal, Nav } from "@/components";
 import {
   provideAPI,
   provideEditing,
+  provideEventHandling,
   provideTooltips,
   provideTransport,
   provideStores,
@@ -33,6 +34,7 @@ export default defineComponent({
     Nav,
   },
   setup() {
+    const { initEventHandler } = provideEventHandling();
     const { auth, prefs, ui, hasCredentials, reAuthenticate } = provideStores();
     const $route = useRoute();
     const showLogin = ref(!hasCredentials.value || reAuthenticate.value);
@@ -61,6 +63,8 @@ export default defineComponent({
     provide("prefSubscription", prefSubscription);
 
     onMounted(() => {
+      // initEventHandler();
+
       if ($route.query.logout) {
         prefSubscription();
         auth.logout();
