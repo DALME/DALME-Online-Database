@@ -1,38 +1,41 @@
 <template>
-  <q-btn-dropdown
-    dense
-    outline
-    :icon="icon"
-    :color="colours.colour"
-    :text-color="colours.text"
-    :class="`workflow-button bg-${colours.colour}`"
-    :label="data.status.text"
-  >
-    <q-card>
-      <q-card-section horizontal>
-        <q-card-section>somthing</q-card-section>
-        <q-card-section>
-          <q-list dense separator class="text-grey-9">
-            <q-item clickable v-close-popup>
-              <q-item-section>
-                <q-item-label>Mark stage as done/Start stage</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup>
-              <q-item-section>
-                <q-item-label>Flag for assistance</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup>
-              <q-item-section>
-                <q-item-label>Place under assessment</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
+  <div class="column">
+    <q-btn-dropdown
+      dense
+      outline
+      split
+      size="sm"
+      :icon="icon"
+      :text-color="colours.text"
+      :class="`workflow-button bg-grey-2`"
+      :label="data.status.text"
+    >
+      <q-card>
+        <q-card-section horizontal>
+          <q-card-section>somthing</q-card-section>
+          <q-card-section>
+            <q-list dense separator class="text-grey-9">
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-item-label> Mark stage as done/Start stage </q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-item-label>Flag for assistance</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-item-label>Place under assessment</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-card-section>
         </q-card-section>
-      </q-card-section>
-    </q-card>
-  </q-btn-dropdown>
+      </q-card>
+    </q-btn-dropdown>
+  </div>
 </template>
 
 <script>
@@ -61,11 +64,15 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.workflow-button {
+.workflow-button > button {
+  padding-right: 10px;
+}
+.workflow-button > button span {
   font-weight: 600;
   font-size: 12px;
+  text-transform: capitalize;
 }
-.workflow-button i:first-of-type {
+.workflow-button button:not(.q-btn-dropdown__arrow-container) i:first-of-type {
   font-size: 18px;
   font-weight: 200;
   margin-left: 5px;

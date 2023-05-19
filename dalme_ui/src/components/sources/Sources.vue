@@ -21,6 +21,7 @@
   >
     <template v-slot:grid-avatar="props">
       <Tag
+        v-if="sourceType === 'records'"
         mini
         module="workflow"
         size="22px"
@@ -28,6 +29,7 @@
         :wfStage="props.row.workflow.stage"
         :wfStatus="props.row.workflow.wfStatus"
       />
+      <q-icon v-else :name="currentPageIcon" size="sm" />
     </template>
 
     <template v-slot:grid-main="props">
@@ -40,30 +42,35 @@
           {{ props.row.name }}
         </div>
       </DetailPopover>
-      <Tag
-        v-if="props.row.workflow.isPublic"
-        name="public"
-        colour="light-blue-1"
-        textColour="light-blue-9"
-        size="xs"
-        module="standalone"
-        class="q-ml-sm"
-      />
-      <Tag
-        v-if="props.row.isPrivate"
-        name="private"
-        colour="deep-orange-1"
-        textColour="deep-orange-8"
-        size="xs"
-        module="standalone"
-        class="q-ml-sm"
-      />
+      <template v-if="sourceType === 'records'">
+        <Tag
+          v-if="props.row.workflow.isPublic"
+          name="public"
+          colour="light-blue-1"
+          textColour="light-blue-9"
+          size="xs"
+          module="standalone"
+          class="q-ml-sm"
+        />
+        <Tag
+          v-if="props.row.isPrivate"
+          name="private"
+          colour="deep-orange-1"
+          textColour="deep-orange-8"
+          size="xs"
+          module="standalone"
+          class="q-ml-sm"
+        />
+      </template>
     </template>
 
     <template v-slot:grid-detail="props">
       <span class="text-detail text-weight-medium text-grey-8">
         {{ props.row.attributes.recordType }} |
-        <span v-html="renderDate(props.row.attributes)"></span>
+        <span
+          v-if="sourceType === 'records'"
+          v-html="renderDate(props.row.attributes)"
+        />
       </span>
     </template>
 
@@ -83,7 +90,7 @@
       <q-icon
         name="flag"
         size="17px"
-        v-if="props.row.workflow.helpFlag"
+        v-if="sourceType === 'records' && props.row.workflow.helpFlag"
         color="red-4"
         class="text-weight-bold q-mr-xs"
       />
@@ -247,7 +254,7 @@ import {
   Tag,
 } from "@/components/utils";
 import { sourceListSchema } from "@/schemas";
-import { useAPI, usePagination } from "@/use";
+import { useAPI, usePagination, useStores } from "@/use";
 import { columnsByType } from "./columns";
 import { filtersByType, sortByType } from "./filters";
 
@@ -261,6 +268,7 @@ export default defineComponent({
   },
   setup() {
     const $route = useRoute();
+    const { currentPageIcon } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
@@ -276,6 +284,7 @@ export default defineComponent({
     });
 
     const filterList = computed(() => {
+      console.log($route.meta.sourceType);
       return filtersByType($route.meta.sourceType);
     });
 
@@ -370,6 +379,7 @@ export default defineComponent({
 
     return {
       columns,
+      currentPageIcon,
       getLocale,
       filterList,
       loading,
@@ -385,6 +395,7 @@ export default defineComponent({
       rows,
       search,
       sortList,
+      sourceType,
       title,
       visibleColumns,
     };
