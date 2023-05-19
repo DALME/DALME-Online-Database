@@ -1,68 +1,90 @@
 const routes = [
   {
     path: "/",
-    component: () => import("layouts/main/MainLayout.vue"),
+    component: () => import("layouts/MainLayout.vue"),
     children: [
       {
-        component: () => import("pages/dashboard/Dashboard.vue"),
+        component: () => import("pages/Dashboard.vue"),
         name: "Dashboard",
         path: "",
-        meta: { icon: "o_space_dashboard" },
+        meta: {
+          navPath: ["Dashboard", null],
+          icon: "o_space_dashboard",
+        },
         nav: true,
       },
 
       /* Sections */
       {
         // Sources
-        component: () => import("pages/source-root/SourceRoot.vue"),
+        component: () => import("pages/Sources.vue"),
         name: "Sources",
         path: "sources",
-        meta: { icon: "o_bookmarks" },
+        meta: {
+          navPath: ["Sources", null],
+          icon: "o_bookmarks",
+        },
         nav: true,
-        redirect: "/sources/records",
         children: [
           {
-            component: () => import("pages/source-list/SourceList.vue"),
+            component: () => import("components/sources/Sources.vue"),
             name: "Archives",
             path: "archives",
             nav: true,
             meta: {
+              navPath: ["Sources", "Archives"],
               icon: "o_home_work",
               sourceType: "archives",
               sourceTypeAPI: "archives",
             },
           },
           {
-            component: () => import("pages/source-list/SourceList.vue"),
+            component: () => import("components/sources/Sources.vue"),
             name: "Archival Files",
             path: "archival-files",
             nav: true,
             meta: {
+              navPath: ["Sources", "Archival Files"],
               icon: "o_inventory_2",
               sourceType: "archivalFiles",
               sourceTypeAPI: "archival_files",
             },
           },
           {
-            component: () => import("pages/source-list/SourceList.vue"),
+            component: () => import("components/sources/Sources.vue"),
             name: "Records",
             path: "records",
             nav: true,
             meta: {
+              navPath: ["Sources", "Records"],
               icon: "o_text_snippet",
               sourceType: "records",
               sourceTypeAPI: "records",
             },
           },
           {
-            component: () => import("pages/source-list/SourceList.vue"),
+            component: () => import("components/sources/Sources.vue"),
             name: "Bibliography",
             path: "bibilographies",
             nav: true,
             meta: {
+              navPath: ["Sources", "Bibliography"],
               icon: "o_local_library",
               sourceType: "bibliography",
               sourceTypeAPI: "bibliography",
+            },
+          },
+          {
+            component: () =>
+              import("components/source-detail/SourceDetail.vue"),
+            name: "Source",
+            path: ":id",
+            nav: false,
+            meta: {
+              navPath: ["Sources", null],
+              icon: "bookmark_border",
+              allowCompactMode: true,
+              viewDefaults: { tab: "info" },
             },
           },
         ],
@@ -70,55 +92,73 @@ const routes = [
 
       {
         // Sets
-        component: () => import("pages/set-root/SetRoot.vue"),
+        component: () => import("pages/Sets.vue"),
         name: "Sets",
         path: "sets",
-        meta: { icon: "o_folder_copy" },
+        meta: {
+          navPath: ["Sets", null],
+          icon: "o_folder_copy",
+        },
         nav: true,
-        redirect: "/sets/datasets",
         children: [
           {
-            component: () => import("pages/set-list/SetList.vue"),
+            component: () => import("components/sets/Sets.vue"),
             name: "Corpora",
             path: "corpora",
             nav: true,
             meta: {
+              navPath: ["Sets", "Corpora"],
               icon: "o_drive_folder_upload",
               setType: "corpora",
               setTypeAPI: "corpora",
             },
           },
           {
-            component: () => import("pages/set-list/SetList.vue"),
+            component: () => import("components/sets/Sets.vue"),
             name: "Collections",
             path: "collections",
             nav: true,
             meta: {
+              navPath: ["Sets", "Collections"],
               icon: "o_folder_special",
               setType: "collections",
               setTypeAPI: "collections",
             },
           },
           {
-            component: () => import("pages/set-list/SetList.vue"),
+            component: () => import("components/sets/Sets.vue"),
             name: "Datasets",
             path: "datasets",
             nav: true,
             meta: {
+              navPath: ["Sets", "Datasets"],
               icon: "o_topic",
               setType: "datasets",
               setTypeAPI: "datasets",
             },
           },
           {
-            component: () => import("pages/set-list/SetList.vue"),
+            component: () => import("components/sets/Sets.vue"),
             name: "Worksets",
             path: "worksets",
             nav: true,
             meta: {
+              navPath: ["Sets", "Worksets"],
               icon: "o_rule_folder",
               setType: "worksets",
               setTypeAPI: "worksets",
+            },
+          },
+          {
+            component: () => import("components/set-detail/SetDetail.vue"),
+            name: "Set",
+            path: ":id",
+            nav: false,
+            meta: {
+              navPath: ["Sets", null],
+              icon: "o_folder",
+              allowCompactMode: true,
+              preserveCompactMode: true,
             },
           },
         ],
@@ -126,195 +166,238 @@ const routes = [
 
       {
         // Entities
-        component: () => import("pages/entity-root/EntityRoot.vue"),
+        component: () => import("pages/Entities.vue"),
         name: "Entities",
         path: "entities",
-        meta: { icon: "o_hive" },
+        meta: {
+          navPath: ["Entities", null],
+          icon: "o_hive",
+        },
         nav: true,
-        redirect: "/entities/agents",
         children: [
           {
-            component: () => import("pages/agent-list/AgentList.vue"),
+            component: () => import("pages/Agents.vue"),
             name: "Agents",
             path: "agents",
-            meta: { icon: "o_groups" },
             nav: true,
+            meta: {
+              navPath: ["Entities", "Agents"],
+              icon: "o_groups",
+            },
           },
           {
-            component: () => import("pages/place-list/PlaceList.vue"),
+            component: () => import("pages/Places.vue"),
             name: "Places",
             path: "places",
-            meta: { icon: "o_place" },
             nav: true,
+            meta: {
+              navPath: ["Entities", "Places"],
+              icon: "o_place",
+            },
           },
         ],
       },
 
       {
         // Project
-        component: () => import("pages/project-root/ProjectRoot.vue"),
+        component: () => import("pages/Project.vue"),
         name: "Project",
         path: "project",
-        meta: { icon: "o_business_center" },
+        meta: {
+          navPath: ["Project", null],
+          icon: "o_business_center",
+        },
         nav: true,
-        redirect: "/project/tasks",
         children: [
           {
-            component: () => import("pages/task-list/TaskList.vue"),
-            name: "Tasks",
+            component: () => import("pages/Tasks.vue"),
             path: "tasks",
-            meta: { icon: "checklist" },
             nav: true,
+            children: [
+              {
+                component: () => import("components/tasks/Tasks.vue"),
+                name: "Tasks",
+                path: "",
+                nav: true,
+                meta: {
+                  navPath: ["Project", "Tasks"],
+                  icon: "checklist",
+                },
+              },
+              {
+                component: () =>
+                  import("components/task-detail/TaskDetail.vue"),
+                name: "Task",
+                path: ":id",
+                nav: false,
+                meta: {
+                  navPath: ["Project", "Tasks"],
+                  icon: "add_task",
+                  allowCompactMode: false,
+                  preserveCompactMode: false,
+                },
+              },
+            ],
           },
           {
-            component: () => import("pages/ticket-list/TicketList.vue"),
-            name: "Tickets",
+            component: () => import("pages/Tickets.vue"),
             path: "tickets",
-            meta: { icon: "o_bug_report" },
             nav: true,
+            children: [
+              {
+                component: () => import("components/tickets/Tickets.vue"),
+                name: "Tickets",
+                path: "",
+                nav: true,
+                meta: {
+                  navPath: ["Project", "Tickets"],
+                  icon: "o_bug_report",
+                },
+              },
+              {
+                component: () =>
+                  import("components/ticket-detail/TicketDetail.vue"),
+                name: "Ticket",
+                path: ":id",
+                nav: false,
+                meta: {
+                  navPath: ["Project", "Tickets"],
+                  icon: "o_pest_control",
+                  allowCompactMode: false,
+                  preserveCompactMode: false,
+                },
+              },
+            ],
           },
           {
-            component: () => import("pages/library-list/LibraryList.vue"),
+            component: () => import("pages/Library.vue"),
             name: "Library",
             path: "library",
-            meta: { icon: "menu_book" },
             nav: true,
+            meta: {
+              navPath: ["Project", "Library"],
+              icon: "menu_book",
+            },
           },
           {
-            component: () => import("pages/rights-list/RightsList.vue"),
-            name: "Rights Policies",
+            component: () => import("pages/Rights.vue"),
             path: "rights",
-            meta: { icon: "copyright" },
             nav: true,
+            children: [
+              {
+                component: () => import("components/rights/Rights.vue"),
+                name: "Rights Policies",
+                path: "",
+                nav: true,
+                meta: {
+                  navPath: ["Project", "Rights Policies"],
+                  icon: "copyright",
+                },
+              },
+              {
+                component: () =>
+                  import("components/rights-detail/RightsDetail.vue"),
+                name: "Rights",
+                path: ":id",
+                props: true,
+                nav: false,
+                meta: {
+                  navPath: ["Project", "Rights Policies"],
+                  icon: "attribution",
+                  allowCompactMode: false,
+                  preserveCompactMode: false,
+                },
+              },
+            ],
           },
         ],
       },
 
       {
         // System
-        component: () => import("pages/system-root/SystemRoot.vue"),
+        component: () => import("pages/System.vue"),
         name: "System",
         path: "system",
-        meta: { icon: "o_settings_applications" },
+        meta: {
+          navPath: ["System", null],
+          icon: "o_settings_applications",
+        },
         nav: true,
-        redirect: "/system/locales",
         children: [
           {
-            component: () => import("pages/locale-list/LocaleList.vue"),
+            component: () => import("pages/Locales.vue"),
             name: "Locales",
             path: "locales",
-            meta: { icon: "location_city" },
             nav: true,
+            meta: {
+              navPath: ["System", "Locales"],
+              icon: "location_city",
+            },
           },
           {
-            component: () => import("pages/country-list/CountryList.vue"),
+            component: () => import("pages/Countries.vue"),
             name: "Countries",
             path: "countries",
-            meta: { icon: "o_flag" },
             nav: true,
+            meta: {
+              navPath: ["System", "Countries"],
+              icon: "o_flag",
+            },
           },
           {
-            component: () => import("pages/language-list/LanguageList.vue"),
+            component: () => import("pages/Languages.vue"),
             name: "Languages",
             path: "languages",
-            meta: { icon: "o_g_translate" },
             nav: true,
+            meta: {
+              navPath: ["System", "Languages"],
+              icon: "o_g_translate",
+            },
           },
           {
-            component: () => import("pages/user-list/UserList.vue"),
-            name: "Users",
+            component: () => import("pages/Users.vue"),
             path: "users",
-            meta: { icon: "o_supervisor_account" },
             nav: true,
+            children: [
+              {
+                component: () => import("components/users/Users.vue"),
+                name: "Users",
+                path: "",
+                nav: true,
+                meta: {
+                  navPath: ["System", "Users"],
+                  icon: "o_supervisor_account",
+                },
+              },
+              {
+                component: () =>
+                  import("components/user-detail/UserDetail.vue"),
+                name: "User",
+                path: ":username",
+                nav: false,
+                meta: {
+                  navPath: ["System", "Users"],
+                  icon: "person_outline",
+                  allowCompactMode: false,
+                  preserveCompactMode: false,
+                },
+              },
+            ],
           },
           {
             component: {},
             name: "Admin",
             path: "admin",
-            meta: { icon: "o_admin_panel_settings" },
             nav: true,
+            meta: {
+              navPath: ["System", "Admin"],
+              icon: "o_admin_panel_settings",
+            },
             beforeEnter(_) {
               window.location.replace("/admin");
             },
           },
         ],
-      },
-
-      /* Detail Views */
-      // TODO: Need to properly scope these...
-      {
-        component: () => import("pages/rights/Rights.vue"),
-        name: "Rights",
-        path: "rights/:id",
-        props: true,
-        nav: false,
-        meta: {
-          navPath: ["Project", "Rights Policies"],
-          icon: "attribution",
-          allowCompactMode: false,
-          preserveCompactMode: false,
-        },
-      },
-      {
-        component: () => import("pages/set/Set.vue"),
-        name: "Set",
-        path: "sets/:id",
-        nav: false,
-        meta: {
-          navPath: ["Sets"],
-          icon: "o_folder",
-          allowCompactMode: true,
-          preserveCompactMode: true,
-        },
-      },
-      {
-        component: () => import("pages/source/Source.vue"),
-        name: "Source",
-        path: "sources/:id",
-        nav: false,
-        meta: {
-          navPath: ["Sources"],
-          icon: "bookmark_border",
-          allowCompactMode: true,
-          preserveCompactMode: true,
-          usesPersistedUi: true,
-        },
-      },
-      {
-        component: () => import("pages/task/Task.vue"),
-        name: "Task",
-        path: "tasks/:id",
-        nav: false,
-        meta: {
-          navPath: ["Project", "Tasks"],
-          icon: "add_task",
-          allowCompactMode: false,
-          preserveCompactMode: false,
-        },
-      },
-      {
-        component: () => import("pages/ticket/Ticket.vue"),
-        name: "Ticket",
-        path: "tickets/:id",
-        nav: false,
-        meta: {
-          navPath: ["Project", "Tickets"],
-          icon: "o_pest_control",
-          allowCompactMode: false,
-          preserveCompactMode: false,
-        },
-      },
-      {
-        component: () => import("pages/user/User.vue"),
-        name: "User",
-        path: "system/users/:username",
-        nav: false,
-        meta: {
-          navPath: ["System", "Users"],
-          icon: "person_outline",
-          allowCompactMode: false,
-          preserveCompactMode: false,
-        },
       },
     ],
   },
