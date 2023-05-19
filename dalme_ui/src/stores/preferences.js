@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { API as apiInterface, requests } from "@/api";
-import { useNotifier } from "@/use";
+import notifier from "@/notifier";
 import { isEmpty, isNil } from "ramda";
 
 export const usePrefStore = defineStore("preferences", {
@@ -25,7 +25,6 @@ export const usePrefStore = defineStore("preferences", {
       const useKey = Array.isArray(target) ? route : key;
       const section = this.getSectionfromKey(useKey);
       const useValue = Array.isArray(target) ? this[section][useKey] : newValue;
-      const $notifier = useNotifier();
       const { fetchAPI, success } = apiInterface();
       if (!isEmpty(section) && !isNil(section)) {
         await fetchAPI(
@@ -37,7 +36,7 @@ export const usePrefStore = defineStore("preferences", {
           ),
         );
         if (!success.value) {
-          $notifier.users.prefUpdateFailed();
+          notifier.users.prefUpdateFailed();
         }
       }
     },
