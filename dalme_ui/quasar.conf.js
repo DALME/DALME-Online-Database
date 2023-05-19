@@ -23,6 +23,7 @@ module.exports = configure(function (ctx) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: ["axios", "markdown"],
+    // boot: ["axios", "markdown", "errorHandling"],
 
     // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ["app.scss"],
@@ -76,8 +77,8 @@ module.exports = configure(function (ctx) {
 
       vueLoaderOptions: {
         compilerOptions: {
-          isPreTag: (tag) => tag === 'pre ' || tag === 'q-markdown'
-        }
+          isPreTag: (tag) => tag === "pre " || tag === "q-markdown",
+        },
       },
     },
 
@@ -105,7 +106,14 @@ module.exports = configure(function (ctx) {
       //
       // components: [],
       // directives: [],
-      plugins: ["AppFullscreen", "Dialog", "Loading", "LocalStorage", "Meta", "Notify"],
+      plugins: [
+        "AppFullscreen",
+        "Dialog",
+        "Loading",
+        "LocalStorage",
+        "Meta",
+        "Notify",
+      ],
     },
 
     // animations: 'all', // --- includes all animations
