@@ -124,6 +124,7 @@
 </template>
 
 <script>
+import { useMeta } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
@@ -151,6 +152,7 @@ export default defineComponent({
     Tag,
   },
   setup() {
+    useMeta({ title: "Users" });
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();

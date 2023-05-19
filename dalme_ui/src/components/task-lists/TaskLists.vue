@@ -145,7 +145,7 @@ import { useRouter } from "vue-router";
 import { useActor } from "@xstate/vue";
 import { requests } from "@/api";
 import forms from "@/forms";
-import { useAPI, useEditing, useNotifier, useStores } from "@/use";
+import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
 
 export default defineComponent({
   name: "TaskLists",
@@ -163,7 +163,7 @@ export default defineComponent({
       modals,
       machine: { send },
     } = useEditing();
-    const $notifier = useNotifier();
+    const { notifier } = useEventHandling();
     const { isAdmin } = useStores();
     const $router = useRouter();
 
@@ -248,14 +248,13 @@ export default defineComponent({
       const request = requests.tasks.deleteTaskList(taskList.id);
       fetchAPI(request).then(() => {
         if (success.value) {
-          $notifier.tasks.taskListDeleted(taskList.name);
+          notifier.tasks.taskListDeleted(taskList.name);
           context.emit("onReload");
         }
       });
     };
 
     const clearActiveFilters = () => {
-      console.log("clear active filters");
       activeFilters.value = new Set();
       // const { filter } = $router.currentRoute.value.query;
       const newFilters = Array.from(activeFilters.value).join(",");

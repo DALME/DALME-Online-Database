@@ -24,12 +24,11 @@
           <q-item-label class="text-weight-medium">
             {{ scope.opt.label }}
           </q-item-label>
-          <q-item-label
+          <div
             v-if="scope.opt.caption"
             v-html="scope.opt.caption"
             caption
-          >
-          </q-item-label>
+          ></div>
         </q-item-section>
       </q-item>
     </template>

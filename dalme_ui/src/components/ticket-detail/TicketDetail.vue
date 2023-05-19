@@ -1,5 +1,8 @@
 <template>
-  <div v-if="!loading && !isEmpty(ticket)">
+  <div
+    v-if="!loading && !isEmpty(ticket)"
+    class="full-width full-height q-px-content-visual"
+  >
     <div class="info-area row">
       <div class="col-grow">
         <div class="row items-center text-h5">
@@ -153,8 +156,6 @@ import {
   provide,
 } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import { useNavStore } from "@/stores/navigation";
 import { requests } from "@/api";
 import { Attachments, Comments, MarkdownEditor } from "@/components";
 import {
@@ -164,7 +165,7 @@ import {
   Tag,
 } from "@/components/utils";
 import { ticketDetailSchema } from "@/schemas";
-import { useAPI, useNotifier } from "@/use";
+import { useAPI, useEventHandling, useStores } from "@/use";
 
 export default defineComponent({
   name: "TicketDetail",
@@ -177,10 +178,9 @@ export default defineComponent({
     Tag,
   },
   setup() {
-    const $notifier = useNotifier();
+    const { notifier } = useEventHandling();
     const $route = useRoute();
-    const $authStore = useAuthStore();
-    const $navStore = useNavStore();
+    const { isAdmin, nav } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
@@ -188,7 +188,6 @@ export default defineComponent({
     const action = ref("");
     const attachment = ref(null);
     const ticket = ref({});
-    const isAdmin = $authStore.isAdmin;
     const id = computed(() => $route.params.id);
     const buttonColours = computed(() =>
       action.value === "reopen ticket"
@@ -197,7 +196,7 @@ export default defineComponent({
     );
 
     useMeta({ title: `Ticket #${id.value}` });
-    $navStore.breadcrumbTail.push(`#${id.value}`);
+    nav.breadcrumbTail.push(`#${id.value}`);
 
     provide("attachment", attachment);
     provide("model", model);
@@ -208,10 +207,10 @@ export default defineComponent({
       const action = ticket.value.status ? "markClosed" : "markOpen";
       await fetchAPI(requests.tickets.setTicketState(id.value, action));
       if (success.value && status.value === 200) {
-        $notifier.tickets.ticketStatusUpdated();
+        notifier.tickets.ticketStatusUpdated();
         await fetchData();
       } else {
-        $notifier.tickets.ticketStatusUpdatedError();
+        notifier.tickets.ticketStatusUpdatedError();
       }
     };
 
@@ -235,7 +234,7 @@ export default defineComponent({
     onMounted(async () => await fetchData());
 
     onBeforeRouteLeave(() => {
-      $navStore.resetBreadcrumbTail();
+      nav.resetBreadcrumbTail();
     });
 
     return {

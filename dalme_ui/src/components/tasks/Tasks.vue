@@ -20,7 +20,7 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:toolbar-special>
-      <TaskLists @on-reload="context.emit('onReloadTaskLists')" />
+      <TaskLists @on-reload="fetchTaskLists" />
     </template>
 
     <template v-slot:grid-avatar="props">
@@ -126,19 +126,20 @@
 </template>
 
 <script>
-import { openURL } from "quasar";
+import { openURL, useMeta } from "quasar";
 import {
   filter as rFilter,
   flatten,
   has,
   isEmpty,
+  groupBy,
   map,
   mapObjIndexed,
   partition,
   keys,
   values,
 } from "ramda";
-import { defineComponent, inject, provide, ref, watch } from "vue";
+import { defineComponent, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { requests } from "@/api";
@@ -150,8 +151,8 @@ import {
   getDefaults,
   Tag,
 } from "@/components/utils";
-import { tasksSchema } from "@/schemas";
-import { useAPI, usePagination } from "@/use";
+import { taskListsSchema, tasksSchema } from "@/schemas";
+import { useAPI, usePagination, useEditing } from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
@@ -171,15 +172,17 @@ export default defineComponent({
   },
   emits: ["onReloadTaskLists"],
   setup(props, context) {
+    if (!props.embedded) useMeta({ title: "Tasks" });
     const $route = useRoute();
     const $router = useRouter();
     const $authStore = useAuthStore();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
+    const { postSubmitRefreshWatcher } = useEditing();
     const columns = ref([]);
     const rows = ref([]);
     const filteredRows = ref([]);
-    const taskLists = props.embedded ? ref([]) : inject("taskLists");
+    const taskLists = ref([]);
     const noData = props.embedded ? "No assigned tasks" : "No tasks found";
     const title = props.embedded ? "My Tasks" : "Tasks";
 
@@ -250,7 +253,7 @@ export default defineComponent({
         if (isEmpty(query)) {
           filteredRows.value = rows.value;
         } else {
-          if (taskLists !== undefined && !isEmpty(taskLists.value)) {
+          if (taskLists.value !== undefined && !isEmpty(taskLists.value)) {
             filterTasks(query, taskLists.value);
           }
         }
@@ -271,13 +274,27 @@ export default defineComponent({
             pagination.value.rowsTotal = data.value.recordsTotal;
             rows.value = value;
             const query = $router.currentRoute.value.query;
-            taskLists !== undefined &&
+            taskLists.value !== undefined &&
             !isEmpty(taskLists.value) &&
             !isEmpty(query)
               ? filterTasks(query, taskLists.value)
               : (filteredRows.value = rows.value);
             loading.value = false;
           });
+    };
+
+    const fetchTaskLists = async () => {
+      const { loading, success, data, fetchAPI } = apiInterface();
+      const request = requests.tasks.getTaskLists();
+      fetchAPI(request).then(() => {
+        if (success.value)
+          taskListsSchema
+            .validate(data.value.data, { stripUnknown: true })
+            .then((value) => {
+              const grouped = groupBy((tasklist) => tasklist.group.name, value);
+              taskLists.value = grouped;
+            });
+      });
     };
 
     const {
@@ -303,6 +320,10 @@ export default defineComponent({
     provide("columns", columns);
     provide("visibleColumns", visibleColumns);
     provide("activeFilters", activeFilters);
+    provide("taskLists", taskLists);
+
+    postSubmitRefreshWatcher(fetchTaskLists);
+    onMounted(async () => await fetchTaskLists());
 
     return {
       context,
@@ -310,6 +331,7 @@ export default defineComponent({
       filteredRows,
       filterList,
       formatDate,
+      fetchTaskLists,
       loading,
       noData,
       openURL,

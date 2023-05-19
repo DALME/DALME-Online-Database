@@ -138,8 +138,8 @@
 <script>
 import { isNil } from "ramda";
 import { useMeta } from "quasar";
-import { computed, defineComponent, inject, onMounted, ref } from "vue";
-
+import { useRoute } from "vue-router";
+import { computed, defineComponent, provide, onMounted, ref } from "vue";
 import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components/utils";
 import { setDetailSchema } from "@/schemas";
@@ -155,6 +155,8 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup() {
+    const $route = useRoute();
+    const id = ref($route.params.id);
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard, resource } = useEditing();
     const $navStore = useNavStore();
@@ -166,8 +168,6 @@ export default defineComponent({
     const isWorkset = computed(
       () => set.value.setType && set.value.setType.name === "Workset",
     );
-
-    const id = inject("id");
 
     useMeta(() => ({
       title: set.value ? set.value.name : `Set ${id.value}`,
@@ -186,6 +186,7 @@ export default defineComponent({
           });
     };
 
+    provide("id", id);
     editingDetailRouteGuard();
     onMounted(async () => await fetchData());
 

@@ -1,6 +1,6 @@
 <template>
   <div ref="el" class="spinner-container" :style="spinnerStyle">
-    <q-spinner-bars :size="spinnerSize" />
+    <q-spinner-dots :size="spinnerSize" />
   </div>
 </template>
 

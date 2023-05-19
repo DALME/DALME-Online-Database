@@ -98,14 +98,14 @@ import { any, isEmpty } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 import { authSchema, preferenceSchema } from "@/schemas";
 import { requests, publicUrl } from "@/api";
-import { useAPI, useNotifier, useStores } from "@/use";
+import { useAPI, useEventHandling, useStores } from "@/use";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "LoginModal",
   setup() {
     const { auth, prefs, reAuthenticate } = useStores();
-    const $notifier = useNotifier();
+    const { notifier } = useEventHandling();
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { data, fetchAPI, success } = apiInterface();
@@ -153,7 +153,7 @@ export default defineComponent({
                     prefSubscription("subscribe");
                   });
               } else {
-                $notifier.users.prefRetrievalFailed();
+                notifier.users.prefRetrievalFailed();
               }
               updateShowLogin(false);
               if ($route.query.next) {
@@ -162,7 +162,7 @@ export default defineComponent({
             });
           });
       } else {
-        $notifier.auth.authFailed();
+        notifier.auth.authFailed();
         submitting.value = false;
       }
     };

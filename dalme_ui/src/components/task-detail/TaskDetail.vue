@@ -1,5 +1,8 @@
 <template>
-  <div v-if="!loading && !isEmpty(task)">
+  <div
+    v-if="!loading && !isEmpty(task)"
+    class="full-width full-height q-px-content-visual"
+  >
     <div class="info-area row">
       <div class="col-grow">
         <div class="row items-center text-h5">
@@ -134,13 +137,11 @@ import {
   ref,
 } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import { useNavStore } from "@/stores/navigation";
 import { requests } from "@/api";
 import { Attachments, Comments, MarkdownEditor } from "@/components";
 import { DetailPopover, formatDate, OpaqueSpinner } from "@/components/utils";
 import { taskSchema } from "@/schemas";
-import { useAPI, useEditing, useNotifier } from "@/use";
+import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
 
 export default defineComponent({
   name: "TaskDetail",
@@ -152,10 +153,9 @@ export default defineComponent({
     OpaqueSpinner,
   },
   setup() {
-    const $notifier = useNotifier();
+    const { notifier } = useEventHandling();
     const $route = useRoute();
-    const $authStore = useAuthStore();
-    const $navStore = useNavStore();
+    const { isAdmin, nav } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
@@ -164,7 +164,6 @@ export default defineComponent({
     const action = ref("");
     const attachment = ref(null);
     const task = ref({});
-    const isAdmin = $authStore.isAdmin;
     const id = computed(() => $route.params.id);
     const buttonColours = computed(() =>
       action.value === "reopen task"
@@ -173,7 +172,7 @@ export default defineComponent({
     );
 
     useMeta(() => ({ title: `Task #${id.value}` }));
-    $navStore.breadcrumbTail.push(`#${id.value}`);
+    nav.breadcrumbTail.push(`#${id.value}`);
 
     provide("attachment", attachment);
     provide("model", model);
@@ -184,10 +183,10 @@ export default defineComponent({
       const action = task.value.completed ? "markUndone" : "markDone";
       await fetchAPI(requests.tasks.setTaskState(id.value, action));
       if (success.value && status.value === 201) {
-        $notifier.tasks.taskStatusUpdated();
+        notifier.tasks.taskStatusUpdated();
         await fetchData();
       } else {
-        $notifier.tasks.taskStatusUpdatedError();
+        notifier.tasks.taskStatusUpdatedError();
       }
     };
 
@@ -207,7 +206,7 @@ export default defineComponent({
     editingDetailRouteGuard();
     onMounted(async () => await fetchData());
     onBeforeRouteLeave(() => {
-      $navStore.resetBreadcrumbTail();
+      nav.resetBreadcrumbTail();
     });
 
     return {

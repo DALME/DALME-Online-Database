@@ -252,7 +252,7 @@
 </template>
 
 <script>
-import { openURL } from "quasar";
+import { useMeta, openURL } from "quasar";
 import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
 import { defineComponent, provide, ref } from "vue";
@@ -292,6 +292,7 @@ export default defineComponent({
     Tag,
   },
   setup(props, context) {
+    if (!props.embedded) useMeta({ title: "Issue Tickets" });
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
