@@ -1,28 +1,24 @@
 import { defineStore } from "pinia";
-import { isEmpty, mergeDeepLeft } from "ramda";
+import { useViewStore } from "@/stores/views";
+import { useNavStore } from "@/stores/navigation";
 
-export const useUiStore = defineStore("uiStore", {
+export const useUiStore = defineStore("ui", {
   state: () => {
     return {
       globalLoading: false,
       compactMode: false,
-      compactModeDisable: true,
+      allowCompactMode: false,
       isFullscreen: false,
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
-      view: {
-        viewLoading: false,
-      },
-      editPanel: {
-        stripExpanded: false,
-        stripKeepOpen: false,
-        drawerExpanded: false,
-        folioIndexShow: false,
-        inlineIndexShow: false,
-        windowIndexShow: false,
-        currentFolioEdit: false,
-        stripApproachHover: false,
-      },
+      stripExpanded: false,
+      stripKeepOpen: false,
+      drawerExpanded: false,
+      folioIndexShow: false,
+      inlineIndexShow: false,
+      windowIndexShow: false,
+      currentFolioEdit: false,
+      stripApproachHover: false,
     };
   },
   getters: {
@@ -35,27 +31,11 @@ export const useUiStore = defineStore("uiStore", {
 
     /** @returns {number} */
     containerWidth(state) {
-      const folioDrawerWidth = state.view.folioDrawerMini ? 0 : 149;
-      const chrome = folioDrawerWidth + 42 + 42;
+      const views = useViewStore();
+      let chrome = 84;
+      if ("folioDrawerMini" in views.view && views.view.folioDrawerMini.value)
+        chrome = chrome + 149;
       return this.windowWidth - chrome;
-    },
-
-    /** @returns {boolean} */
-    showEditFolioBtn(state) {
-      return (
-        "tab" in state.view &&
-        state.view.tab === "folios" &&
-        "folios" in state.view &&
-        state.view.folios.length > 0
-      );
-    },
-
-    /** @returns {boolean} */
-    currentFolioEditOn(state) {
-      return (
-        this.showEditFolioBtn &&
-        state.view.folios[state.view.currentFolio].editOn
-      );
     },
   },
   actions: {
@@ -68,36 +48,13 @@ export const useUiStore = defineStore("uiStore", {
       window.addEventListener("resize", this.onWindowResize);
     },
 
-    resetViewState(meta) {
-      if (!isEmpty(meta)) {
-        const allowCompactMode = meta.allowCompactMode || false;
-        const preserveCompactMode = meta.preserveCompactMode || false;
-        const usesPersistedUi = meta.usesPersistedUi || false;
-
-        if (!allowCompactMode) {
-          this.compactModeDisable = true;
-          this.compactMode = false;
-        } else {
-          this.compactModeDisable = false;
-          if (!preserveCompactMode) {
-            this.compactMode = false;
-          }
-        }
-        if (!usesPersistedUi) {
-          console.log("resetting viewPersistence");
-          this.view = {};
-        }
-      } else {
-        console.log("full reset!");
-        this.reset();
-      }
-      this.editPanel.folioIndexShow = false;
-      this.editPanel.currentFolioEdit = false;
-    },
-
-    mergeValues(values) {
-      let partial = mergeDeepLeft(this.$state, values);
-      this.$patch(partial);
+    setUiState(target) {
+      const nav = useNavStore();
+      this.allowCompactMode = target.meta.allowCompactMode || false;
+      this.compactMode = nav.isSameRoute ? this.compactMode : false;
+      this.stripExpanded = this.stripKeepOpen ? true : false;
+      this.drawerExpanded = nav.isSameRoute ? this.drawerExpanded : false;
+      this.currentFolioEdit = nav.isSameRoute ? this.currentFolioEdit : false;
     },
   },
   persist: true,
