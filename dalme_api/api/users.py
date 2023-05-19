@@ -1,3 +1,5 @@
+import json
+import os
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
 from django.http import HttpRequest
@@ -31,7 +33,7 @@ class Users(DALMEBaseViewSet):
             request.META['SERVER_NAME'] = 'db.dalme.org'
             request.META['SERVER_PORT'] = '443'
             form.save(
-                request=request,
+                request=request,  # type:ignore
                 use_https=settings.USE_HTTPS,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 email_template_name='registration/password_reset_email.html'
@@ -46,7 +48,10 @@ class Users(DALMEBaseViewSet):
     def update(self, request, *args, **kwargs):
         partial = True
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial, fields=['id', 'is_superuser', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'groups', 'profile'])
+        serializer = self.get_serializer(instance, data=request.data, partial=partial, fields=[
+            'id', 'is_superuser', 'username', 'first_name', 'last_name',
+            'email', 'is_staff', 'is_active', 'groups', 'profile'
+            ])
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
@@ -56,6 +61,13 @@ class Users(DALMEBaseViewSet):
         user = self.get_object()
         try:
             result = user.profile.preferences
+
+            if result is None or result == '':
+                with open(os.path.join('dalme_app', 'config', 'default_user_preferences.json'), 'r') as fp:
+                    result = json.load(fp)
+
+                user.profile.preferences = result
+
             status = 201
         except Exception as e:
             result = {'error': str(e)}
