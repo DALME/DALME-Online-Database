@@ -147,7 +147,7 @@
               <q-item-section class="col-auto q-mr-xs">
                 <q-icon name="logout" size="sm" />
                 <template v-slot:loading>
-                  <q-spinner-facebook />
+                  <q-spinner-oval size="sm" />
                 </template>
               </q-item-section>
               <q-item-section>Log out</q-item-section>
@@ -164,21 +164,27 @@
             <q-breadcrumbs
               separator-color="grey-9"
               gutter="xs"
-              class="menu-breadcrumb q-ml-xs q-mr-auto text-indigo-6"
+              class="menu-breadcrumb q-ml-xs q-mr-auto"
             >
               <template v-for="(route, idx) in breadcrumbs" :key="idx">
                 <q-breadcrumbs-el
-                  v-if="idx < breadcrumbs.length - 1"
+                  v-if="idx === 0"
+                  :label="route"
+                  class="text-indigo-6"
+                />
+                <q-breadcrumbs-el
+                  v-else-if="idx < breadcrumbs.length - 1"
                   :label="route"
                   :to="{ name: route }"
+                  class="text-indigo-6"
                 />
                 <q-breadcrumbs-el
                   v-else
-                  class="text-weight-bold"
+                  class="text-indigo-6 text-weight-bold"
                   :label="route"
                 />
               </template>
-              <q-spinner-facebook v-if="globalLoading" size="sm" />
+              <q-spinner-oval v-if="globalLoading" size="xs" />
             </q-breadcrumbs>
           </div>
         </transition>
@@ -229,11 +235,19 @@
                 transition-hide="scale"
               >
                 <q-list dense bordered style="min-width: 100px">
-                  <NavLink
-                    v-for="(child, idx) in route.children"
-                    v-bind="{ to: child.name, icon: child.meta.icon }"
-                    :key="idx"
-                  />
+                  <template v-for="(child, idx) in route.children" :key="idx">
+                    <NavLink
+                      v-if="child.nav && !child.children"
+                      v-bind="{ to: child.name, icon: child.meta.icon }"
+                    />
+                    <NavLink
+                      v-else-if="child.nav"
+                      v-bind="{
+                        to: child.children[0].name,
+                        icon: child.children[0].meta.icon,
+                      }"
+                    />
+                  </template>
                 </q-list>
               </q-menu>
             </q-btn>
@@ -242,6 +256,19 @@
       </div>
       <div class="q-pr-content col-auto">
         <div class="row flex-center title-bar-end">
+          <q-btn
+            v-show="allowCompactMode"
+            flat
+            dense
+            size="12px"
+            :color="compactMode ? 'indigo-7' : 'grey-7'"
+            :icon="compactMode ? 'present_to_all' : 'present_to_all'"
+            class="page-header-button q-mr-sm"
+            :class="{ 'rotate-180': compactMode, 'bg-indigo-1': compactMode }"
+            @click="compactMode = !compactMode"
+          >
+            <Tooltip>Compact mode</Tooltip>
+          </q-btn>
           <q-btn
             flat
             dense
@@ -261,19 +288,6 @@
             flat
             dense
             size="12px"
-            :color="compactMode ? 'indigo-7' : 'grey-7'"
-            :icon="compactMode ? 'present_to_all' : 'present_to_all'"
-            class="page-header-button q-mr-sm"
-            :class="{ 'rotate-180': compactMode, 'bg-indigo-1': compactMode }"
-            :disable="compactModeDisable"
-            @click="compactMode = !compactMode"
-          >
-            <Tooltip>Compact mode</Tooltip>
-          </q-btn>
-          <q-btn
-            flat
-            dense
-            size="12px"
             :color="isFullscreen ? 'indigo-7' : 'grey-7'"
             :icon="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
             class="page-header-button"
@@ -288,8 +302,8 @@
     <div
       class="strip-approach"
       :style="stripApproachStyle"
-      @mouseenter="editPanel.stripApproachHover = true"
-      @mouseleave="editPanel.stripApproachHover = false"
+      @mouseenter="stripApproachHover = true"
+      @mouseleave="stripApproachHover = false"
     />
   </q-header>
 </template>
@@ -313,12 +327,12 @@ export default defineComponent({
     const $q = useQuasar();
     const {
       auth,
+      allowCompactMode,
       compactMode,
-      compactModeDisable,
       globalLoading,
       isFullscreen,
       nav,
-      editPanel,
+      stripApproachHover,
     } = useStores();
 
     const { showTips } = useTooltips();
@@ -376,10 +390,10 @@ export default defineComponent({
 
     return {
       auth,
+      allowCompactMode,
       breadcrumbs,
       compactMode,
-      compactModeDisable,
-      editPanel,
+      stripApproachHover,
       darkMode: $q.dark,
       logout,
       globalLoading,

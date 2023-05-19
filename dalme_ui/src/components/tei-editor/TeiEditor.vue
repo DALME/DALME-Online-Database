@@ -40,6 +40,7 @@
   <q-tab-panels
     v-model="view.editorTab"
     keep-alive
+    keep-alive-exclude="TeiRenderer"
     animated
     transition-prev="jump-up"
     transition-next="jump-up"
@@ -149,7 +150,7 @@
       class="render-panel"
       :style="`height: ${editorHeight}px`"
     >
-      <TeiRenderer />
+      <TeiRenderer :text="currentFolioData.editorSession.getValue()" />
     </q-tab-panel>
   </q-tab-panels>
 </template>
@@ -168,7 +169,7 @@ import {
   watch,
 } from "vue";
 import { requests } from "@/api";
-import { useAPI, useNotifier, useStores } from "@/use";
+import { useAPI, useEventHandling, useStores } from "@/use";
 import { TeiRenderer } from "@/components";
 import ace from "ace-builds";
 import "ace-builds/src-noconflict/mode-xml";
@@ -181,14 +182,14 @@ export default defineComponent({
     TeiRenderer,
   },
   setup(_, context) {
-    const { view, sourceEditor } = useStores();
+    const { currentFolioData, sourceEditor, view } = useStores();
     const { apiInterface } = useAPI();
     const { status, data, fetchAPI } = apiInterface();
-    const notifier = useNotifier();
+    const { notifier } = useEventHandling();
     const { editorHeight, editorWidth } = inject("editorDimensions");
-    const disabled = computed(() =>
-      isEmpty(view.value.currentFolio.transcription),
-    );
+    const disabled = computed(() => {
+      return isEmpty(currentFolioData.value.transcription);
+    });
     const tagFilter = ref("");
     var editor = null;
 
@@ -197,31 +198,31 @@ export default defineComponent({
       isEmpty(tagFilter.value)
         ? sortBy(prop("name"), teiTags)
         : rFilter(
-            (tag) => (
-              tag.name.toLowerCase().includes(tagFilter.value.toLowerCase())
-              // tag.help.toLowerCase().includes(tagFilter.value.toLowerCase())
-              // tag.tagName.toLowerCase().includes(tagFilter.value.toLowerCase())
-            ),
+            (tag) =>
+              tag.name.toLowerCase().includes(tagFilter.value.toLowerCase()),
+            // tag.help.toLowerCase().includes(tagFilter.value.toLowerCase())
+            // tag.tagName.toLowerCase().includes(tagFilter.value.toLowerCase())
             sortBy(prop("name"), teiTags),
           ),
     );
     /* eslint-enable */
 
-    const cFolio = computed(() => view.value.folios[view.value.currentFolio]);
-
     const checkVersion = async () => {
       await fetchAPI(
         requests.transcriptions.checkVersion(
-          cFolio.value.transcriptionId,
-          cFolio.value.transcriptionVersion,
+          currentFolioData.value.transcriptionId,
+          currentFolioData.value.transcriptionVersion,
         ),
       );
       if (status.value !== 200) {
         if (status.value === 205) {
           console.log(data.value);
-          cFolio.value.transcriptionVersion = data.value.transcriptionVersion;
-          cFolio.value.transcriptionAuthor = data.value.transcriptionAuthor;
-          cFolio.value.transcriptionText = data.value.transcriptionText;
+          currentFolioData.value.transcriptionVersion =
+            data.value.transcriptionVersion;
+          currentFolioData.value.transcriptionAuthor =
+            data.value.transcriptionAuthor;
+          currentFolioData.value.transcriptionText =
+            data.value.transcriptionText;
           return true;
         } else {
           notifier.transcriptions.versionCheckFailed(data.value.error);
@@ -234,20 +235,20 @@ export default defineComponent({
 
     const updateStoreText = () => {
       return new Promise((resolve) => {
-        cFolio.value.tei = editor.getValue();
+        currentFolioData.value.tei = editor.getValue();
         resolve();
       });
     };
 
     const onTabSwitch = (value) => {
-      if (value === "preview") cFolio.value.tei = editor.getValue();
+      if (value === "preview") currentFolioData.value.tei = editor.getValue();
     };
 
     const loadSession = () => {
       return new Promise((resolve) => {
         checkVersion().then((result) => {
           if (result) {
-            editor.setSession(cFolio.value.editorSession);
+            editor.setSession(currentFolioData.value.editorSession);
             resolve();
           } else {
             console.log("STALE TRANSCRIPTION!");
@@ -258,9 +259,14 @@ export default defineComponent({
 
     const createSession = () => {
       return new Promise((resolve) => {
-        cFolio.value.editorSession = ace.createEditSession(cFolio.value.tei);
+        currentFolioData.value.editorSession = ace.createEditSession(
+          currentFolioData.value.tei,
+        );
         loadSession().then(() => {
-          editor.session.once("change", () => (cFolio.value.hasChanges = true));
+          editor.session.once(
+            "change",
+            () => (currentFolioData.value.hasChanges = true),
+          );
           editor.session.setOptions({
             mode: "ace/mode/xml",
             useWorker: false,
@@ -272,53 +278,50 @@ export default defineComponent({
     };
 
     const insertTag = (type, tag, attributes) => {
-      let tagAttributes = [];
-      if (tag === "note" || tag === "seg") let specialAttributes = {};
+      let tagAtt = [];
+      let spAtt = {};
 
       if (attributes) {
-        attributes =
-          attributes.includes("-") ? attributes.split("-") : [attributes];
+        attributes = attributes.includes("-")
+          ? attributes.split("-")
+          : [attributes];
 
         attributes.forEach((attribute) => {
           let att = attribute.split("|");
           if (att.length === 2) {
-            tagAttributes.push([att[0], att[1]]);
+            tagAtt.push([att[0], att[1]]);
           } else {
             let att_value;
-            if (att[1] === "text") {
-              att_value = $("#"+att[2]).val();
-              $("#"+att[2]).val("");
-            }
-            if (att[1] === "choice") {
-              att_value = $("#"+att[2]).find("option:selected").text();
-              $("#"+att[2])[0].selectedIndex = 0;
-            }
+            // if (att[1] === "text") {
+            //   att_value = $("#"+att[2]).val();
+            //   $("#"+att[2]).val("");
+            // }
+            // if (att[1] === "choice") {
+            //   att_value = $("#"+att[2]).find("option:selected").text();
+            //   $("#"+att[2])[0].selectedIndex = 0;
+            // }
 
             if (tag === "note" || tag === "seg") {
-              specialAttributes[att[0]] = att_value;
+              spAtt[att[0]] = att_value;
             } else {
-              tagAttributes.push([att[0], att_value]);
+              tagAtt.push([att[0], att_value]);
             }
           }
         });
-
       }
 
       if (tag === "seg") {
-        tagAttributes.push(["target", specialAttributes["target"]]);
-        tagAttributes.push(["rend", specialAttributes["rend"]]);
+        tagAtt.push(["target", spAtt["target"]]);
+        tagAtt.push(["rend", spAtt["rend"]]);
       }
 
       if (tag === "note") {
-        if (specialAttributes["type"] === "renvoi") {
-          const noteRef = `<ref target="${specialAttributes['target']}"/>`;
-          const noteOutput =
-            `\n\n<note xml:id="${specialAttributes['target']}">${specialAttributes['text']}</note>`;
-
-          editor.session.insert(
-            editor.getCursorPosition(),
-            noteRef,
-          );
+        if (spAtt["type"] === "renvoi") {
+          /* eslint-disable */
+          const noteRef = `<ref target="${spAtt["target"]}"/>`;
+          const noteOutput = `\n\n<note xml:id="${spAtt["target"]}">${spAtt["text"]}</note>`;
+          /* eslint-enable */
+          editor.session.insert(editor.getCursorPosition(), noteRef);
           editor.session.insert(
             {
               row: editor.session.getLength(),
@@ -327,21 +330,18 @@ export default defineComponent({
             noteOutput,
           );
         } else {
-          const tagOutput =
-            `<note type="${specialAttributes['type']}">${specialAttributes['text']}</note>`;
-
-          editor.session.insert(
-            editor.getCursorPosition(),
-            tagOutput,
-          )
+          /* eslint-disable */
+          const tagOutput = `<note type="${spAtt["type"]}">${spAtt["text"]}</note>`;
+          /* eslint-enable */
+          editor.session.insert(editor.getCursorPosition(), tagOutput);
         }
       } else {
         let tagOutput = "<" + tag;
 
-        if (tagAttributes.length !== 0) {
-          tagAttributes.forEach((attribute) => {
+        if (tagAtt.length !== 0) {
+          tagAtt.forEach((attribute) => {
             if (attribute[1] !== "" && attribute[1] !== "Join") {
-              tagOutput += " " + attribute[0] + '="' + attribute[1] + '"';
+              tagOutput += " " + attribute[0] + '="' + attribute[1] + '"'; // eslint-disable-line
             }
           });
         }
@@ -352,22 +352,20 @@ export default defineComponent({
           editor.session.replace(range, tagOutput);
         } else {
           tagOutput += "/>";
-          editor.session.insert(
-            editor.getCursorPosition(),
-            tagOutput,
-          );
+          editor.session.insert(editor.getCursorPosition(), tagOutput);
         }
 
         if (tag === "seg") {
-          const noteOutput =
-            `\n\n<note type="brace" xml:id="${specialAttributes['target']}">${specialAttributes['text']}</note>`;
+          /* eslint-disable */
+          const noteOutput = `\n\n<note type="brace" xml:id="${spAtt["target"]}">${spAtt["text"]}</note>`;
+          /* eslint-enable */
           editor.session.insert(
             {
               row: editor.session.getLength(),
               column: 0,
             },
             noteOutput,
-          )
+          );
         }
       }
     };
@@ -414,6 +412,13 @@ export default defineComponent({
       editor.resize();
     });
 
+    watch(
+      () => view.value.editorTab,
+      () => {
+        if (view.value.editorTab === "preview") updateStoreText();
+      },
+    );
+
     context.expose({
       updateStoreText,
       createSession,
@@ -421,7 +426,9 @@ export default defineComponent({
     });
 
     return {
+      currentFolioData,
       disabled,
+      editor,
       editorHeight,
       editorWidth,
       tagFilter,

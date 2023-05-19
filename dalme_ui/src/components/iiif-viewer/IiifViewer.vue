@@ -4,28 +4,28 @@
     :style="`height: ${viewerHeight}px; width: ${viewerWidth}px`"
   >
     <div
-      v-if="view.folioCount > 1"
+      v-if="folioCount > 1"
       :class="`viewer-toolbar ${tbVertAlt ? 'toolbar-v' : 'toolbar-h'}`"
       :style="navPosition"
     >
       <q-btn
-        :disabled="view.currentFolio === 0"
+        :disabled="view.currentFolioRef === 0"
         icon="first_page"
         @click="changeFolio('first')"
       />
       <q-btn
-        :disabled="view.currentFolio === 0"
+        :disabled="view.currentFolioRef === 0"
         icon="navigate_before"
         @click="changeFolio('prev')"
       />
-      <div class="viewer-current-folio">{{ cFolio.name }}</div>
+      <div class="viewer-current-folio">{{ currentFolioData.name }}</div>
       <q-btn
-        :disabled="view.currentFolio === view.folioCount - 1"
+        :disabled="view.currentFolioRef === folioCount - 1"
         icon="navigate_next"
         @click="changeFolio('next')"
       />
       <q-btn
-        :disabled="view.currentFolio === view.folioCount - 1"
+        :disabled="view.currentFolioRef === folioCount - 1"
         icon="last_page"
         @click="changeFolio('last')"
       />
@@ -38,13 +38,13 @@
         icon="zoom_in"
         @click="zoom('in')"
         class="zoom-btn"
-        :disabled="cFolio.viewerZoom >= maxZoomLevel"
+        :disabled="currentFolioData.viewerZoom >= maxZoomLevel"
       />
       <q-btn
         icon="zoom_out"
         @click="zoom('out')"
         class="zoom-btn"
-        :disabled="cFolio.viewerZoom <= minZoomLevel"
+        :disabled="currentFolioData.viewerZoom <= minZoomLevel"
       />
       <q-btn icon="aspect_ratio" @click="zoom('full')" />
       <q-btn icon="expand" @click="zoom('fitV')" />
@@ -60,7 +60,7 @@
         @click="changeSplitView"
       />
       <q-btn
-        v-if="view.folioCount > 1"
+        v-if="folioCount > 1"
         icon="o_auto_stories"
         :class="view.folioDrawerMini ? '' : 'crossed-out'"
         @click="changeDrawerMini"
@@ -80,6 +80,7 @@ import {
   onMounted,
   ref,
   watch,
+  nextTick,
 } from "vue";
 import { useStores } from "@/use";
 import OpenSeadragon from "openseadragon";
@@ -90,8 +91,7 @@ export default defineComponent({
   setup(_, context) {
     var viewer = null;
     const { viewerHeight, viewerWidth } = inject("viewerDimensions");
-    const { view } = useStores();
-    const cFolio = computed(() => view.value.folios[view.value.currentFolio]);
+    const { currentFolioData, folioCount, view } = useStores();
 
     const tbHorAlt = computed(
       () => view.value.splitterHorizontal && viewerHeight.value < 198,
@@ -107,25 +107,25 @@ export default defineComponent({
     const toolPosition = computed(() => "top: 5px; left: 5px");
     const zoomPosition = computed(() => {
       let top = tbHorAlt.value ? 5 : 42;
-      let left = tbHorAlt.value ? (view.value.folioCount > 1 ? 71 : 41) : 5;
+      let left = tbHorAlt.value ? (folioCount.value > 1 ? 71 : 41) : 5;
       return `top: ${top}px; left: ${left}px`;
     });
 
     const minZoomLevel = ref(0.5);
     const maxZoomLevel = ref(8);
     const defaultZoomLevel = computed(() =>
-      cFolio.value.viewerZoom ? cFolio.value.viewerZoom : 0,
+      currentFolioData.value.viewerZoom ? currentFolioData.value.viewerZoom : 0,
     );
 
     const zoom = (type) => {
-      if (type === "full") console.log(cFolio.value.ref - 1);
+      if (type === "full") console.log(currentFolioData.value.ref - 1);
       if (type === "out") {
-        let level = cFolio.value.viewerZoom - 0.25;
+        let level = currentFolioData.value.viewerZoom - 0.25;
         if (level <= minZoomLevel.value) level = minZoomLevel.value;
         viewer.viewport.zoomTo(level);
       }
       if (type === "in") {
-        let level = cFolio.value.viewerZoom + 0.25;
+        let level = currentFolioData.value.viewerZoom + 0.25;
         if (level >= maxZoomLevel.value) level = maxZoomLevel.value;
         viewer.viewport.zoomTo(level);
       }
@@ -146,13 +146,14 @@ export default defineComponent({
     };
 
     const loadFolio = () => {
-      if (!isEmpty(view.value)) {
-        viewer.open(cFolio.value.manifestUrl);
+      if (!isEmpty(currentFolioData.value)) {
+        viewer.open(currentFolioData.value.manifestUrl);
         viewer.viewport.zoomTo(defaultZoomLevel.value);
       }
     };
 
-    onMounted(() => {
+    onMounted(async () => {
+      await nextTick();
       viewer = markRaw(
         OpenSeadragon({
           id: "viewer-container",
@@ -168,21 +169,21 @@ export default defineComponent({
           defaultZoomLevel: defaultZoomLevel.value,
           sequenceMode: false,
           prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-          tileSources: [cFolio.value.manifestUrl],
+          tileSources: [currentFolioData.value.manifestUrl],
         }),
       );
-      if (cFolio.value.viewerZoom) {
-        viewer.viewport.zoomTo(cFolio.value.viewerZoom);
+      if (currentFolioData.value.viewerZoom) {
+        viewer.viewport.zoomTo(currentFolioData.value.viewerZoom);
       } else {
-        cFolio.value.viewerZoom = viewer.viewport.getZoom(true);
+        currentFolioData.value.viewerZoom = viewer.viewport.getZoom(true);
       }
       viewer.addHandler("zoom", (evt) => {
-        cFolio.value.viewerZoom = evt.zoom;
+        currentFolioData.value.viewerZoom = evt.zoom;
       });
     });
 
     watch(
-      () => view.value.currentFolio,
+      () => view.value.currentFolioRef,
       () => loadFolio(),
     );
 
@@ -195,7 +196,8 @@ export default defineComponent({
       changeFolio,
       changeSplitView,
       changeDrawerMini,
-      cFolio,
+      currentFolioData,
+      folioCount,
       minZoomLevel,
       maxZoomLevel,
       navPosition,
@@ -203,9 +205,9 @@ export default defineComponent({
       zoomPosition,
       tbHorAlt,
       tbVertAlt,
-      view,
       viewerHeight,
       viewerWidth,
+      view,
       zoom,
     };
   },

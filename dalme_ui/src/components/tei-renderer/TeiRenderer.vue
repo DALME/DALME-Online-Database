@@ -12,14 +12,22 @@ import {
   watch,
 } from "vue";
 import { useConstants, useStores } from "@/use";
+import { notNully } from "@/components/utils";
 import CETEI from "CETEIcean";
 import { dalmeTeiBehaviours } from "./behaviours.js";
 import { createPopper } from "@popperjs/core";
 
 export default defineComponent({
   name: "TeiRenderer",
-  setup() {
-    const { view } = useStores();
+  props: {
+    text: {
+      type: String,
+      required: false,
+      default: "",
+    },
+  },
+  setup(props) {
+    const { currentFolioData, view } = useStores();
     const { teiSelectors } = useConstants();
     const renderedContent = ref("");
     const hasBraces = ref(false);
@@ -31,22 +39,29 @@ export default defineComponent({
 
     teiRenderer.addBehaviors(dalmeTeiBehaviours);
     /* eslint-disable */
-    const teiDoc = computed(
-      () => {
-        let transcription = "";
-        try {
-          transcription = view.value.folios[view.value.currentFolio].tei;
-        } finally {
-          return `<TEI xmlns="http://www.tei-c.org/ns/1.0">\
-                    <text>\
-                      <body>${transcription.replace(/\n/g, "<lb/>")}</body>\
-                    </text>\
-                  </TEI>`;
-        }
+    // const teiDoc = computed(() => {
+    //   let transcription = "";
+    //   try {
+    //     transcription = currentFolioData.value.tei;
+    //   } finally {
+    //     return `<TEI xmlns="http://www.tei-c.org/ns/1.0">\
+    //                 <text>\
+    //                   <body>${transcription.replace(/\n/g, "<lb/>")}</body>\
+    //                 </text>\
+    //               </TEI>`;
+    //   }
+    // });
+    const teiDoc = computed(() => {
+      return `<TEI xmlns="http://www.tei-c.org/ns/1.0">\
+                  <text>\
+                    <body>${props.text.replace(/\n/g, "<lb/>")}</body>\
+                  </text>\
+                </TEI>`;
     });
     /* eslint-disable */
     const generateTei = () => {
-      teiRenderer.makeHTML5(teiDoc.value, processTei, addSpans);
+      if (notNully(currentFolioData.value))
+        teiRenderer.makeHTML5(teiDoc.value, processTei, addSpans);
     };
 
     const addSpans = (newElement) => {
@@ -62,17 +77,21 @@ export default defineComponent({
     };
 
     const processTei = (html) => {
-      hasBraces.value =
-        Boolean(html.querySelectorAll(teiSelectors.braces).length);
+      hasBraces.value = Boolean(
+        html.querySelectorAll(teiSelectors.braces).length,
+      );
       hasMarginalNotes.value = Boolean(
         html.querySelectorAll(teiSelectors.marginalNotes).length,
       );
-      hasRenvois.value =
-        Boolean(html.querySelectorAll(teiSelectors.renvois).length);
-      hasColumns.value =
-        Boolean(html.querySelectorAll(teiSelectors.columns).length);
-      hasLeaders.value =
-        Boolean(html.querySelectorAll(teiSelectors.leaders).length);
+      hasRenvois.value = Boolean(
+        html.querySelectorAll(teiSelectors.renvois).length,
+      );
+      hasColumns.value = Boolean(
+        html.querySelectorAll(teiSelectors.columns).length,
+      );
+      hasLeaders.value = Boolean(
+        html.querySelectorAll(teiSelectors.leaders).length,
+      );
       applyFixes(html).then((result) => {
         renderedContent.value = result.outerHTML;
       });
@@ -124,39 +143,39 @@ export default defineComponent({
         // set up marginal leaders
         // if (hasLeaders.value) {
         //   html.querySelectorAll(teiSelectors.leaders).forEach((el) => {
-            // let sum = 0;
-            // let prev_array = [];
-            // let next_array = [];
-            // let prevSibs = prevUntil(el, "tei-lb");
-            // let prevChild = prevUntil(el, "*:has(tei-lb)");
-            // let nextSibs = nextUntil(el, "tei-lb");
-            // let nextChild = nextUntil(el, "*:has(tei-lb)");
-            // if (prevChild.length < prevSibs.length) {
-            //   let prev_el = prevChild.length ? prevChild : el;
-            //   prev_array = $.merge(prevChild, $(prev_el).prev().children().nextUntil('tei-lb'));
-            // } else {
-            //   prev_array = prevSibs;
-            // }
-            // if (nextChild.length < nextSibs.length) {
-            //   let next_el = nextChild.length ? nextChild : this;
-            //   next_array = $.merge(nextChild, $(next_el).next().children().nextUntil('tei-lb'));
-            // } else {
-            //   next_array = nextSibs;
-            // }
-            // const line_el = $.merge(prev_array, next_array)
-            // line_el.each(function(i, elt) { sum += $(this).innerWidth(); });
-            // const container_column = $(this).parents('.ab-content');
-            // if (container_column.length) {
-            //   let column_width = container_column.attr('width');
-            //   if (typeof column_width === typeof undefined || column_width === false) {
-            //     container_column.attr('width', container_column.innerWidth());
-            //   }
-            //   container_width = container_column.attr('width');
-            // }
-            // let target_width = container_width - sum - 15;
-            // target_width = target_width > 10 ? target_width : 10;
-            // $(this).width(target_width);
-          // });
+        // let sum = 0;
+        // let prev_array = [];
+        // let next_array = [];
+        // let prevSibs = prevUntil(el, "tei-lb");
+        // let prevChild = prevUntil(el, "*:has(tei-lb)");
+        // let nextSibs = nextUntil(el, "tei-lb");
+        // let nextChild = nextUntil(el, "*:has(tei-lb)");
+        // if (prevChild.length < prevSibs.length) {
+        //   let prev_el = prevChild.length ? prevChild : el;
+        //   prev_array = $.merge(prevChild, $(prev_el).prev().children().nextUntil('tei-lb'));
+        // } else {
+        //   prev_array = prevSibs;
+        // }
+        // if (nextChild.length < nextSibs.length) {
+        //   let next_el = nextChild.length ? nextChild : this;
+        //   next_array = $.merge(nextChild, $(next_el).next().children().nextUntil('tei-lb'));
+        // } else {
+        //   next_array = nextSibs;
+        // }
+        // const line_el = $.merge(prev_array, next_array)
+        // line_el.each(function(i, elt) { sum += $(this).innerWidth(); });
+        // const container_column = $(this).parents('.ab-content');
+        // if (container_column.length) {
+        //   let column_width = container_column.attr('width');
+        //   if (typeof column_width === typeof undefined || column_width === false) {
+        //     container_column.attr('width', container_column.innerWidth());
+        //   }
+        //   container_width = container_column.attr('width');
+        // }
+        // let target_width = container_width - sum - 15;
+        // target_width = target_width > 10 ? target_width : 10;
+        // $(this).width(target_width);
+        // });
         // }
         /* eslint-enable */
         // set up renvois
@@ -261,10 +280,12 @@ export default defineComponent({
     // },
 
     onMounted(() => generateTei());
+
     watch(
-      () => view.value.currentFolio,
+      () => view.value.currentFolioRef,
       () => generateTei(),
     );
+
     watch(renderedContent, async () => {
       await nextTick();
       applyTooltips();

@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="editPanel.inlineIndexShow"
+    v-if="inlineIndexShow"
     class="container q-py-sm"
     :class="{
       focussed: isFocus,
@@ -63,7 +63,7 @@ export default defineComponent({
       transport.canRedo.value ? false : true,
     );
     const isFocus = computed(() => focus.value === "inline");
-    const { editPanel } = useStores();
+    const { inlineIndexShow } = useStores();
     const fromUnixTs = (unixTs) =>
       moment.unix(unixTs / 1000).format("YYYY-MM-DD HH:mm:ss");
 
@@ -72,7 +72,7 @@ export default defineComponent({
     watch(
       () => diffs.value,
       (newDiffs) => {
-        editPanel.value.inlineIndexShow = newDiffs.length > 0;
+        inlineIndexShow.value = newDiffs.length > 0;
       },
     );
 
@@ -84,7 +84,7 @@ export default defineComponent({
       handleFocus,
       isFocus,
       mouseoverSubmit,
-      editPanel,
+      inlineIndexShow,
       transport,
     };
   },

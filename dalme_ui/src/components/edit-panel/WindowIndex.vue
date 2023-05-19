@@ -1,5 +1,5 @@
 <template>
-  <div v-if="editPanel.windowIndexShow">
+  <div v-if="windowIndexShow">
     <div class="index-header">
       <div class="index-title">WINDOWS</div>
       <div class="index-btn-group">
@@ -105,7 +105,7 @@ export default defineComponent({
       showAll,
       machine: { send, service },
     } = useEditing();
-    const { editPanel } = useStores();
+    const { windowIndexShow } = useStores();
     const handleFocus = (cuid) => {
       const { send: actorSend } = useActor(modals.value[cuid].actor);
       send("SET_FOCUS", { value: cuid });
@@ -122,7 +122,7 @@ export default defineComponent({
     const disableShowAll = ref(null);
 
     service.onTransition(({ context: { modals } }) => {
-      editPanel.value.windowIndexShow = keys(modals).length > 0;
+      windowIndexShow.value = keys(modals).length > 0;
       // TODO: I'm sure all this can be optimized to only traverse once.
       actors.value = rMap(({ actor }) => useActor(actor).state, modals);
       const visibility = values(
@@ -143,7 +143,7 @@ export default defineComponent({
       hideAll,
       editorModeIcons,
       mouseoverSubmit,
-      editPanel,
+      windowIndexShow,
       showAll,
     };
   },

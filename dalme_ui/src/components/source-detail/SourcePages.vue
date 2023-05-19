@@ -57,8 +57,6 @@ export default defineComponent({
     const noData = "No folios found.";
     const pagination = { rowsPerPage: 0 }; // All rows.
 
-    props.pages.forEach((p, i) => (p.ref = i));
-
     provide("pages", props.pages);
     provide("columns", columns);
 

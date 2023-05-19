@@ -21,7 +21,7 @@
           grid
           hide-bottom
           card-container-class="q-pa-none"
-          :rows="pages"
+          :rows="view.folios"
           :columns="columns"
           no-data-label="No folios found."
           row-key="id"
@@ -32,7 +32,7 @@
             <q-card
               bordered
               :class="
-                props.row.ref === view.currentFolio
+                props.row.ref === view.currentFolioRef
                   ? 'grid-card text-weight-medium current-folio'
                   : 'grid-card text-weight-medium cursor-pointer'
               "
@@ -61,7 +61,7 @@
           unit="px"
           :horizontal="view.splitterHorizontal"
           separator-class="splitter-separator"
-          :limits="splitterLimits"
+          :limits="view.splitterLimits"
           :style="`height: ${containerHeight}px; width: ${containerWidth}px`"
         >
           <template v-slot:before>
@@ -84,15 +84,15 @@
           </template>
 
           <template v-slot:after>
-            <div v-show="cFolio.editOn" class="editor-box">
+            <div v-show="currentFolioData.editOn" class="editor-box">
               <TeiEditor ref="editor" />
             </div>
             <div
-              v-show="!cFolio.editOn"
+              v-show="!currentFolioData.editOn"
               class="render-panel"
               :style="`height: ${editorHeight}px`"
             >
-              <TeiRenderer />
+              <TeiRenderer :text="currentFolioData.tei" />
             </div>
           </template>
         </q-splitter>
@@ -109,10 +109,13 @@ import {
   nextTick,
   provide,
   ref,
+  onBeforeUnmount,
+  onUnmounted,
   // watch,
 } from "vue";
-import { useStores } from "@/use";
+import { useEventHandling, useStores } from "@/use";
 import { IiifViewer, TeiEditor, TeiRenderer } from "@/components";
+import { notNully } from "@/components/utils";
 
 export default defineComponent({
   name: "SourceEditor",
@@ -122,39 +125,51 @@ export default defineComponent({
     TeiRenderer,
   },
   setup() {
-    const { containerHeight, containerWidth, ui, view, eventBus } = useStores();
+    const {
+      currentFolioData,
+      containerHeight,
+      containerWidth,
+      folioCount,
+      ui,
+      views,
+      view,
+    } = useStores();
+    const { eventBus } = useEventHandling();
     const columns = inject("columns");
     const pages = inject("pages");
     const pagination = ref({ rowsPerPage: 0 });
 
-    pages.forEach((page, idx) => {
-      page.ref = idx;
-      page.editorTab = "write";
-      page.editOn = false;
-      page.editorSession = null;
-      page.tei = page.transcriptionText;
-      page.hasChanges = false;
-      page.viewerZoom = 0;
+    const getFolios = () => {
+      pages.forEach((page, idx) => {
+        page.ref = idx;
+        page.editorTab = "write";
+        page.editOn = false;
+        page.editorSession = null;
+        page.tei = page.transcriptionText;
+        page.hasChanges = false;
+        page.viewerZoom = 0;
+      });
+      return pages;
+    };
+
+    views.mergeValues({
+      folios: getFolios(),
+      currentFolioRef: 0,
+      folioDrawerMini: true,
+      showTagMenu: false,
+      splitterHorizontal: true,
+      editorSplitter: 0,
+      lastSplitter: 0,
+      editorTab: "write",
     });
 
-    ui.mergeValues({
-      view: {
-        folios: pages,
-        currentFolio: 0,
-        folioDrawerMini: true,
-        folioCount: pages.length,
-        showTagMenu: false,
-        splitterHorizontal: true,
-        editorSplitter: 0,
-        lastSplitter: 0,
-      },
+    const drawer = ref(folioCount.value > 1);
+    const folioChooser = computed(() => folioCount.value > 1);
+    const tagMenuDrawer = computed(() => {
+      return view.value.showTagMenu ? 250 : 0;
     });
 
-    const drawer = ref(pages.length > 1);
     const editor = ref(null);
-    const folioChooser = computed(() => pages.length > 1);
-    const tagMenuDrawer = computed(() => (view.value.showTagMenu ? 250 : 0));
-    const cFolio = computed(() => view.value.folios[view.value.currentFolio]);
 
     if (!view.value.editorSplitter) {
       view.value.editorSplitter = Math.round(containerHeight.value / 2);
@@ -163,19 +178,19 @@ export default defineComponent({
     /* eslint-disable */
     const editorHeight = computed(() =>
       view.value.splitterHorizontal
-        ? cFolio.value.editOn
+        ? currentFolioData.value.editOn
           ? Math.round(containerHeight.value - view.value.editorSplitter - 60)
           : Math.round(containerHeight.value - view.value.editorSplitter - 8)
-        : cFolio.value.editOn
-          ? Math.round(containerHeight.value - 54)
-          : containerHeight.value
+        : currentFolioData.value.editOn
+        ? Math.round(containerHeight.value - 54)
+        : containerHeight.value,
     );
     /* eslint-enable */
     const editorWidth = computed(() =>
       view.value.splitterHorizontal
-        ? containerWidth.value - tagMenuDrawer.value - 2
+        ? containerWidth.value - view.value.tagMenuDrawer - 2
         : Math.round(containerWidth.value - view.value.editorSplitter) -
-          tagMenuDrawer.value -
+          view.value.tagMenuDrawer -
           8,
     );
 
@@ -224,26 +239,27 @@ export default defineComponent({
     const toggleSplitter = () => {
       let targetSplit = nextSplitterPixels.value
         ? nextSplitterPixels.value
-        : (view.value.splitterHorizontal //eslint-disable-line
-            ? Math.round(containerWidth.value / 2)  //eslint-disable-line
-            : Math.round(containerHeight.value / 2));  //eslint-disable-line
+        : view.value.splitterHorizontal //eslint-disable-line
+        ? Math.round(containerWidth.value / 2) //eslint-disable-line
+        : Math.round(containerHeight.value / 2); //eslint-disable-line
       view.value.lastSplitter = currentSplitterPercentage.value;
       view.value.splitterHorizontal = !view.value.splitterHorizontal;
       view.value.editorSplitter = targetSplit;
     };
 
-    const toggleMini = () =>
-      (view.value.folioDrawerMini = !view.value.folioDrawerMini);
+    const toggleMini = () => {
+      view.value.folioDrawerMini = !view.value.folioDrawerMini;
+    };
 
     const toggleEditor = () => {
       return new Promise((resolve) => {
-        if (!cFolio.value.editOn) {
+        if (!currentFolioData.value.editOn) {
           editor.value.createSession().then(() => {
-            cFolio.value.editOn = true;
+            currentFolioData.value.editOn = true;
           });
         } else {
           console.log("save and stuff");
-          cFolio.value.editOn = false;
+          currentFolioData.value.editOn = false;
         }
         resolve();
       });
@@ -254,13 +270,13 @@ export default defineComponent({
       if (Number.isInteger(para)) targetFolio = para;
       if (para === "first") targetFolio = 0;
       if (para === "last") targetFolio = pages.length - 1;
-      if (para === "prev") targetFolio = view.value.currentFolio - 1;
-      if (para === "next") targetFolio = view.value.currentFolio + 1;
+      if (para === "prev") targetFolio = view.value.currentFolioRef - 1;
+      if (para === "next") targetFolio = view.value.currentFolioRef + 1;
 
-      if (cFolio.value.editOn) await editor.value.updateStoreText();
-      view.value.currentFolio = targetFolio;
+      if (currentFolioData.value.editOn) await editor.value.updateStoreText();
+      view.value.currentFolioRef = targetFolio;
       await nextTick();
-      if (cFolio.value.editOn) await editor.value.loadSession();
+      if (currentFolioData.value.editOn) await editor.value.loadSession();
     };
 
     eventBus.on("changeFolio", (folio) => changeFolio(folio));
@@ -270,8 +286,17 @@ export default defineComponent({
     provide("viewerDimensions", { viewerHeight, viewerWidth });
     provide("folioDrawerOpen", drawer);
 
+    onBeforeUnmount(() => {
+      console.log("editor beforeUnmount");
+    });
+    onUnmounted(() => {
+      console.log("editor unmounted");
+    });
+
     return {
+      notNully,
       changeFolio,
+      currentFolioData,
       columns,
       drawer,
       editor,
@@ -279,7 +304,6 @@ export default defineComponent({
       containerWidth,
       editorHeight,
       editorWidth,
-      cFolio,
       folioChooser,
       pages,
       pagination,

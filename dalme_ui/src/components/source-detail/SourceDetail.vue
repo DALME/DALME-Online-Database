@@ -1,193 +1,197 @@
 <template>
-  <div class="row">
-    <div class="col-grow">
-      <transition name="collapse">
-        <div v-if="!ui.compactMode" class="info-area row">
-          <div class="column">
-            <div class="row items-center text-h5">
-              <template v-if="!ui.globalLoading">
-                {{ source.name }}
-                <Tag
-                  v-if="source.hasInventory"
-                  name="list"
-                  colour="green-1"
-                  textColour="green-8"
-                  size="xs"
-                  module="standalone"
-                  class="q-ml-sm"
-                />
-              </template>
-              <q-skeleton v-else width="350px" height="30px" type="rect" />
-            </div>
-            <div class="row detail-row-subheading text-grey-8">
-              <template v-if="!ui.globalLoading">
-                <span>Created</span>
-                {{ formatDate(source.created.timestamp) }} by
-                <DetailPopover
-                  :userData="{
-                    username: source.created.username,
-                    fullName: source.created.user,
-                  }"
-                  :showAvatar="false"
-                />
-                <span>, last modified</span>
-                {{ formatDate(source.modified.timestamp) }} by
-                <DetailPopover
-                  :userData="{
-                    username: source.modified.username,
-                    fullName: source.modified.user,
-                  }"
-                  :showAvatar="false"
-                />
-              </template>
-              <q-skeleton v-else width="500px" height="12px" type="rect" />
+  <div class="full-width full-height q-px-content-visual">
+    <div class="row">
+      <div class="col-grow">
+        <transition name="collapse">
+          <div v-if="!ui.compactMode" class="info-area row">
+            <div class="column">
+              <div class="row items-center text-h5">
+                <template v-if="!ui.globalLoading">
+                  {{ source.name }}
+                  <Tag
+                    v-if="source.hasInventory"
+                    name="list"
+                    colour="green-1"
+                    textColour="green-8"
+                    size="xs"
+                    module="standalone"
+                    class="q-ml-sm"
+                  />
+                </template>
+                <q-skeleton v-else width="350px" height="30px" type="rect" />
+              </div>
+              <div class="row detail-row-subheading text-grey-8">
+                <template v-if="!ui.globalLoading">
+                  <span>Created</span>
+                  {{ formatDate(source.created.timestamp) }} by
+                  <DetailPopover
+                    :userData="{
+                      username: source.created.username,
+                      fullName: source.created.user,
+                    }"
+                    :showAvatar="false"
+                  />
+                  <span>, last modified</span>
+                  {{ formatDate(source.modified.timestamp) }} by
+                  <DetailPopover
+                    :userData="{
+                      username: source.modified.username,
+                      fullName: source.modified.user,
+                    }"
+                    :showAvatar="false"
+                  />
+                </template>
+                <q-skeleton v-else width="500px" height="12px" type="rect" />
+              </div>
             </div>
           </div>
-        </div>
-      </transition>
-      <div class="row">
-        <q-tabs
-          v-model="ui.view.tab"
-          dense
-          no-caps
-          inline-label
-          switch-indicator
-          align="left"
-          class="bg-white text-grey-8 tab-container"
-          active-class="active-tab"
-        >
-          <q-tab name="info" icon="o_info" label="Info" />
-          <template v-if="!ui.globalLoading">
-            <q-tab
-              v-if="hasChildren"
-              name="children"
-              label="Children"
-              icon="o_account_tree"
-            >
-              <q-badge
-                color="indigo-1"
-                rounded
-                class="text-grey-8 q-mx-xs"
-                :label="source.children.length"
-              />
-            </q-tab>
-            <q-tab
-              v-if="hasPages"
-              name="folios"
-              label="Folios"
-              icon="o_import_contacts"
-              class="side-tab"
-            >
-              <q-badge
-                color="indigo-1"
-                rounded
-                class="text-grey-8 q-mx-xs"
-                :label="source.pages.length"
-              />
-            </q-tab>
-            <q-tab
-              v-if="hasAgents || hasPlaces"
-              name="entities"
-              label="Entities"
-              icon="o_person_pin_circle"
-              class="side-tab"
-            >
-              <q-badge
-                color="indigo-1"
-                rounded
-                class="text-grey-8 q-mx-xs"
-                :label="entityCount"
-              />
-            </q-tab>
-            <q-tab name="comments" icon="o_forum" label="Discussion">
-              <q-badge
-                v-if="commentCount > 0"
-                color="indigo-1"
-                rounded
-                class="text-grey-8 q-mx-xs"
-                :label="commentCount"
-              />
-            </q-tab>
-            <q-tab name="log" icon="o_work_history" label="Work Log" />
-          </template>
-          <q-spinner-facebook v-else size="sm" class="q-ml-md" />
-        </q-tabs>
-      </div>
-    </div>
-    <template v-if="!ui.globalLoading">
-      <div v-if="resource === 'record'" class="col-auto record-actions">
-        <div
-          :class="
-            ui.compactMode
-              ? 'row transition-all'
-              : 'transition-all column justify-between'
-          "
-          :style="ui.compactMode ? 'height: 37px' : 'height: 100px'"
-        >
-          <WorkflowManager :data="source.workflow" />
-          <div class="row self-end">
-            <BooleanIcon
-              v-if="resource === 'record'"
-              :value="!source.workflow.isPublic"
-              :onlyTrue="true"
-              trueIcon="public"
-              trueColour="light-green-7"
-            />
-            <BooleanIcon
-              v-if="resource === 'record'"
-              :value="!source.workflow.helpFlag"
-              :onlyTrue="true"
-              trueIcon="flag"
-              trueColour="red-4"
-              class="q-ml-xs"
-            />
-          </div>
+        </transition>
+        <div class="row">
+          <q-tabs
+            v-model="view.tab"
+            dense
+            no-caps
+            inline-label
+            switch-indicator
+            align="left"
+            class="bg-white text-grey-8 tab-container"
+            active-class="active-tab"
+          >
+            <q-tab name="info" icon="o_info" label="Info" />
+            <template v-if="!ui.globalLoading">
+              <q-tab
+                v-if="hasChildren"
+                name="children"
+                label="Children"
+                icon="o_account_tree"
+              >
+                <q-badge
+                  color="indigo-1"
+                  rounded
+                  class="text-grey-8 q-mx-xs"
+                  :label="source.children.length"
+                />
+              </q-tab>
+              <q-tab
+                v-if="hasPages"
+                name="folios"
+                label="Folios"
+                icon="o_import_contacts"
+                class="side-tab"
+              >
+                <q-badge
+                  color="indigo-1"
+                  rounded
+                  class="text-grey-8 q-mx-xs"
+                  :label="source.pages.length"
+                />
+              </q-tab>
+              <q-tab
+                v-if="hasAgents || hasPlaces"
+                name="entities"
+                label="Entities"
+                icon="o_person_pin_circle"
+                class="side-tab"
+              >
+                <q-badge
+                  color="indigo-1"
+                  rounded
+                  class="text-grey-8 q-mx-xs"
+                  :label="entityCount"
+                />
+              </q-tab>
+              <q-tab name="comments" icon="o_forum" label="Discussion">
+                <q-badge
+                  v-if="commentCount > 0"
+                  color="indigo-1"
+                  rounded
+                  class="text-grey-8 q-mx-xs"
+                  :label="commentCount"
+                />
+              </q-tab>
+              <q-tab name="log" icon="o_work_history" label="Work Log" />
+            </template>
+            <q-spinner-oval v-else size="sm" class="q-ml-md" />
+          </q-tabs>
         </div>
       </div>
-    </template>
-  </div>
-  <div class="row q-pt-sm">
-    <div class="col">
       <template v-if="!ui.globalLoading">
-        <q-tab-panels
-          v-model="ui.view.tab"
-          animated
-          transition-prev="jump-up"
-          transition-next="jump-up"
-        >
-          <q-tab-panel name="info" class="q-pt-none q-px-none">
-            <SourceAttributes />
-          </q-tab-panel>
-          <q-tab-panel name="children" class="q-pt-none q-px-none">
-            <SourceChildren :children="source.children" />
-          </q-tab-panel>
-          <q-tab-panel name="folios" class="q-pt-sm q-px-none">
-            <SourcePages :pages="source.pages" />
-          </q-tab-panel>
-          <q-tab-panel name="entities" class="q-pt-none q-px-none">
-            <div v-if="hasAgents">
-              <SourceAgents :agents="source.agents" />
+        <div v-if="resource === 'record'" class="col-auto record-actions">
+          <div class="row transition-all">
+            <div class="row q-mr-sm">
+              <BooleanIcon
+                v-if="resource === 'record'"
+                :value="!source.workflow.isPublic"
+                :onlyTrue="true"
+                trueIcon="public"
+                trueColour="light-green-7"
+              />
+              <BooleanIcon
+                v-if="resource === 'record'"
+                :value="!source.workflow.helpFlag"
+                :onlyTrue="true"
+                trueIcon="flag"
+                trueColour="red-4"
+                class="q-ml-xs"
+              />
             </div>
-            <div v-if="hasPlaces" class="q-mt-md">
-              <SourcePlaces :places="source.places" />
-            </div>
-          </q-tab-panel>
-          <q-tab-panel name="comments" class="q-pt-md q-px-lg">
-            <Comments />
-          </q-tab-panel>
-          <q-tab-panel name="log" class="q-pt-md q-px-lg">
-            <LogViewer :data="source.workflow" />
-          </q-tab-panel>
-        </q-tab-panels>
+            <WorkflowManager :data="source.workflow" />
+          </div>
+        </div>
       </template>
-      <AdaptiveSpinner v-else />
+    </div>
+    <div class="row q-pt-sm">
+      <div class="col">
+        <template v-if="!ui.globalLoading">
+          <q-tab-panels
+            v-model="view.tab"
+            animated
+            transition-prev="jump-up"
+            transition-next="jump-up"
+            keep-alive
+          >
+            <q-tab-panel name="info" class="q-pt-none q-px-none">
+              <SourceAttributes />
+            </q-tab-panel>
+            <q-tab-panel name="children" class="q-pt-none q-px-none">
+              <SourceChildren :children="source.children" />
+            </q-tab-panel>
+            <q-tab-panel name="folios" class="q-pt-sm q-px-none">
+              <SourcePages :pages="source.pages" />
+            </q-tab-panel>
+            <q-tab-panel name="entities" class="q-pt-none q-px-none">
+              <div v-if="hasAgents">
+                <SourceAgents :agents="source.agents" />
+              </div>
+              <div v-if="hasPlaces" class="q-mt-md">
+                <SourcePlaces :places="source.places" />
+              </div>
+            </q-tab-panel>
+            <q-tab-panel name="comments" class="q-pt-md q-px-lg">
+              <Comments @on-count-changed="updateCommentCount" />
+            </q-tab-panel>
+            <q-tab-panel name="log" class="q-pt-md q-px-lg">
+              <LogViewer :data="source.workflow" />
+            </q-tab-panel>
+          </q-tab-panels>
+        </template>
+        <AdaptiveSpinner v-else />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { useMeta } from "quasar";
-import { computed, defineComponent, inject, provide, ref, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  provide,
+  ref,
+  watch,
+  onBeforeUnmount,
+  onUnmounted,
+} from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { sourceDetailSchema } from "@/schemas";
@@ -227,15 +231,10 @@ export default defineComponent({
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard, resource } = useEditing();
-    const { nav, ui } = useStores();
-    ui.mergeValues({
-      view: {
-        tab: "info",
-      },
-    });
+    const { nav, ui, view } = useStores();
     const { success, data, fetchAPI } = apiInterface();
     const source = ref({});
-    const id = inject("id");
+    const id = ref($route.params.id);
     const hasAttributes = computed(() => notNully(source.value.attributes));
     const hasAgents = computed(() => notNully(source.value.agents));
     const hasChildren = computed(() => notNully(source.value.children));
@@ -246,9 +245,10 @@ export default defineComponent({
       let placesCount = hasPlaces.value ? source.value.places.length : 0;
       return agentsCount + placesCount;
     });
-    const commentCount = computed(() => source.value.commentCount);
+    const commentCount = ref(0);
 
     provide("model", "Source");
+    provide("id", id);
     provide("source", source);
     provide("hasAttributes", hasAttributes);
     provide("hasPages", hasPages);
@@ -275,10 +275,15 @@ export default defineComponent({
               }[value.type.name.toLowerCase()] || "bibliography";
             if (resource.value === "record") ui.compactModeDisable = false;
             source.value = value;
+            commentCount.value = value.commentCount;
             nav.currentSubsection = value.type.name + "s";
             nav.breadcrumbTail.push(value.shortName);
             ui.globalLoading = false;
           });
+    };
+
+    const updateCommentCount = (cnt) => {
+      commentCount.value = cnt;
     };
 
     watch(
@@ -290,13 +295,22 @@ export default defineComponent({
           await fetchData();
         }
       },
-      { immediate: true },
+      { immediate: true, flush: "post" },
     );
 
     editingDetailRouteGuard();
 
+    onBeforeUnmount(() => {
+      console.log("sourceDetail beforeUnmount");
+    });
+    onUnmounted(() => {
+      console.log("sourceDetail unmounted");
+    });
+
     return {
       commentCount,
+      updateCommentCount,
+      view,
       entityCount,
       formatDate,
       hasAgents,
@@ -315,5 +329,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .record-actions {
   border-bottom: 1px solid #d1d1d1;
+  margin-top: auto;
+  padding-bottom: 6px;
 }
 </style>

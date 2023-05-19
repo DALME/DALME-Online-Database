@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!isEmpty(folioList)"
+    v-if="notNully(folioList)"
     class="container q-py-sm"
     :class="{
       focussed: isFocus,
@@ -13,7 +13,7 @@
     </div>
     <q-list separator>
       <q-item
-        :clickable="folio.ref !== view.currentFolio"
+        :clickable="folio.ref !== view.currentFolioRef"
         v-for="folio in folioList"
         :key="folio.id"
         class="column q-px-sm"
@@ -28,10 +28,11 @@
 </template>
 
 <script>
-import { filter as rFilter, isEmpty } from "ramda";
+import { filter as rFilter } from "ramda";
 import moment from "moment";
 import { computed, defineComponent, watch } from "vue";
-import { useEditing, useStores, useTransport } from "@/use";
+import { useEditing, useEventHandling, useStores, useTransport } from "@/use";
+import { notNully } from "@/components/utils";
 
 export default defineComponent({
   name: "FolioIndex",
@@ -47,12 +48,13 @@ export default defineComponent({
       transport.canRedo.value ? false : true,
     );
     const isFocus = computed(() => focus.value === "inline");
-    const { view, editPanel, eventBus } = useStores();
+    const { folioIndexShow, folioCount, view } = useStores();
+    const { eventBus } = useEventHandling();
     const fromUnixTs = (unixTs) =>
       moment.unix(unixTs / 1000).format("YYYY-MM-DD HH:mm:ss");
 
     const folioList = computed(() => {
-      if ("folios" in view.value) {
+      if (folioCount.value) {
         return rFilter((folio) => folio.editOn, view.value.folios);
       } else {
         return null;
@@ -62,7 +64,7 @@ export default defineComponent({
     const handleFocus = () => send("SET_FOCUS", { value: "inline" });
 
     watch(folioList, () => {
-      editPanel.value.folioIndexShow = !isEmpty(folioList.value);
+      folioIndexShow.value = notNully(folioList.value);
     });
 
     return {
@@ -71,13 +73,12 @@ export default defineComponent({
       focus,
       fromUnixTs,
       handleFocus,
-      isEmpty,
+      notNully,
       isFocus,
       mouseoverSubmit,
-      editPanel,
       transport,
-      view,
       folioList,
+      view,
     };
   },
 });

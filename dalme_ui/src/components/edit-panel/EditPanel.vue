@@ -15,10 +15,10 @@
     />
     <q-icon name="more_vert" />
     <q-btn
-      :icon="editPanel.stripKeepOpen ? 'lock' : 'lock_open'"
-      :class="editPanel.stripKeepOpen ? 'on' : ''"
+      :icon="stripKeepOpen ? 'lock' : 'lock_open'"
+      :class="stripKeepOpen ? 'on' : ''"
       square
-      @click.stop="editPanel.stripKeepOpen = !editPanel.stripKeepOpen"
+      @click.stop="stripKeepOpen = !stripKeepOpen"
     />
     <div class="q-mini-drawer-hide strip-button-container">
       <EditCreate />
@@ -33,17 +33,17 @@
       <EditSubmit />
     </div>
     <q-btn
-      :icon="editPanel.drawerExpanded ? 'list_alt' : 'list_alt'"
-      :class="editPanel.drawerExpanded ? 'on' : ''"
+      :icon="drawerExpanded ? 'list_alt' : 'list_alt'"
+      :class="drawerExpanded ? 'on' : ''"
       :disabled="!ongoingEdit"
       class="drawer-control"
       square
-      @click.stop="editPanel.drawerExpanded = !editPanel.drawerExpanded"
+      @click.stop="drawerExpanded = !drawerExpanded"
     />
   </div>
   <transition name="collapse">
     <div
-      v-show="editPanel.drawerExpanded"
+      v-show="drawerExpanded"
       class="edit-content-holder"
       :style="holderStyle"
     >
@@ -56,7 +56,7 @@
 
 <script>
 import { computed, defineComponent, onMounted } from "vue";
-import { useEditing, useStores } from "@/use";
+import { useEditing, useEventHandling, useStores } from "@/use";
 import { default as EditCreate } from "./EditCreate.vue";
 import { default as EditSubmit } from "./EditSubmit.vue";
 import { default as EditUpdate } from "./EditUpdate.vue";
@@ -81,23 +81,28 @@ export default defineComponent({
       isAdmin,
       showEditFolioBtn,
       currentFolioEditOn,
-      editPanel,
+      drawerExpanded,
+      stripExpanded,
+      stripKeepOpen,
+      stripApproachHover,
+      folioIndexShow,
+      inlineIndexShow,
+      windowIndexShow,
       compactMode,
-      eventBus,
     } = useStores();
+    const { eventBus } = useEventHandling();
     const { hideEditing, showEditing } = useEditing();
 
     const showStrip = computed({
-      get: () => editPanel.value.stripExpanded,
+      get: () => stripExpanded.value,
       set: (value) => {
-        if (!editPanel.value.stripKeepOpen)
-          editPanel.value.stripExpanded = value;
+        if (!stripKeepOpen.value) stripExpanded.value = value;
       },
     });
 
     const top = computed(() => (compactMode.value ? 57 : 102));
     const right = computed(() =>
-      showStrip.value ? 0 : editPanel.value.stripApproachHover ? -223 : -250,
+      showStrip.value ? 0 : stripApproachHover.value ? -223 : -250,
     );
     const stripStyle = computed(
       () => `top: ${top.value}px; right: ${right.value}px`,
@@ -109,9 +114,7 @@ export default defineComponent({
 
     const ongoingEdit = computed(
       () =>
-        editPanel.value.folioIndexShow ||
-        editPanel.value.inlineIndexShow ||
-        editPanel.value.windowIndexShow,
+        folioIndexShow.value || inlineIndexShow.value || windowIndexShow.value,
     );
 
     const openEditing = () => (showStrip.value = true);
@@ -123,13 +126,14 @@ export default defineComponent({
     });
 
     return {
-      editPanel,
       showEditFolioBtn,
       currentFolioEditOn,
+      drawerExpanded,
       isAdmin,
       holderStyle,
       showStrip,
       stripStyle,
+      stripKeepOpen,
       eventBus,
       ongoingEdit,
     };
