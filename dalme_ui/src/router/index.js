@@ -4,10 +4,12 @@ import {
   createWebHistory,
   createWebHashHistory,
 } from "vue-router";
-import { filter as rFilter, head } from "ramda";
+import { head, isEmpty } from "ramda";
 import routes from "./routes";
 import { useNavStore } from "@/stores/navigation";
 import { useUiStore } from "@/stores/ui";
+import { useViewStore } from "@/stores/views";
+// import { provideErrorHandling } from "@/use";
 
 const createHistory = process.env.SERVER
   ? createMemoryHistory
@@ -23,58 +25,27 @@ export const router = createRouter({
   scrollBehavior: () => ({ left: 0, top: 0 }),
 });
 
-export const navRoutes = rFilter(
-  (route) => route.nav,
-  head(router.options.routes).children,
-);
+export const navRoutes = head(router.options.routes).children;
 
-const navSections = navRoutes.map((value) => {
-  return value.name;
+router.beforeEach((_, from) => {
+  const views = useViewStore();
+  if (
+    from &&
+    !isEmpty(from.meta) &&
+    !from.meta.resetStateOnLoad &&
+    !isEmpty(views.view)
+  ) {
+    views.saveViewState(from.fullPath);
+  }
 });
 
-const navSubsections = rFilter((route) => route.children, navRoutes)
-  .reduce(
-    (previousValue, currentValue) => [
-      ...previousValue,
-      ...currentValue.children,
-    ],
-    [],
-  )
-  .map((value) => {
-    return value.name;
-  });
-
-router.beforeEach((to, from) => {
+router.beforeResolve(async (to) => {
   const nav = useNavStore();
   const ui = useUiStore();
-
-  const navSection = navSections.includes(to.matched[1].name)
-    ? to.matched[1].name
-    : null;
-  const navSubsection =
-    to.matched.length > 2 && navSubsections.includes(to.matched[2].name)
-      ? to.matched[2].name
-      : null;
-  const navPathLen = to.meta.navPath ? to.meta.navPath.length : 0;
-  const navPathSection = navPathLen > 0 ? to.meta.navPath[0] : "";
-  const navPathSubsection = navPathLen > 1 ? to.meta.navPath[1] : "";
-  const currentSection = navSection || navPathSection;
-  let currentSubsection = navSubsection || navPathSubsection;
-
-  if (
-    from.matched.length > 2 &&
-    from.matched[1].name == currentSection &&
-    to.matched.length < 3
-  ) {
-    currentSubsection = from.matched[2].name;
-  }
-
-  nav.resetBreadcrumbTail();
-  nav.currentSection = currentSection;
-  nav.currentSubsection = currentSubsection;
-  nav.currentPageIcon = to.meta.icon || "layers";
-
-  ui.resetViewState(to.meta || null);
+  const views = useViewStore();
+  await nav.setPageState(to);
+  ui.setUiState(to);
+  views.setViewState(to);
 });
 
 export default router;
