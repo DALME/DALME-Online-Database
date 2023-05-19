@@ -12,7 +12,7 @@ const comments = {
   },
   getComments(model, id) {
     return {
-      url: `${endpoint}/?model=${model}&object=${id}`,
+      url: `${endpoint}/?model=${model}&object=${id}&limit=0&offset=0`,
       method: "GET",
     };
   },
