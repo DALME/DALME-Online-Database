@@ -1,5 +1,3 @@
-*.cert
-*.key
 env
 devEnv
 venv
@@ -16,6 +14,11 @@ sql/
 *.sql
 .vscode
 
+# comment out for EB deploy
+*.cert
+*.key
+ssl-certs*
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
@@ -23,9 +26,6 @@ sql/
 
 # Local misc. files
 _extra
-
-#certificate stuff for development server
-ssl-certs*
 extracted_datasets
 
 TODO*
