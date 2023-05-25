@@ -842,11 +842,11 @@ body.home main .statement p {
 }
 .main-image .caption {
   color: #aaa;
-  margin: 3px 3px 0 auto;
+  margin: 3px auto 0 auto;
   font-family: "Open Sans", sans-serif;
   font-size: 12px;
   line-height: 1.5;
-  text-align: right;
+  text-align: center;
   max-width: 75%;
 }
 
