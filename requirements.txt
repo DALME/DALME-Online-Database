@@ -30,9 +30,9 @@ mysqlclient==2.0.1
 pandas==1.1.4
 passlib==1.7.3
 pycurl==7.43.0.5
-requests==2.26.0
+requests==2.24.0
 requests-aws4auth==1.0.1
-urllib3==1.26.7
+urllib3==1.25.10
 wagtail==2.13.2
 wagtail-modelchooser==2.3.3
 Wand===0.6.5
