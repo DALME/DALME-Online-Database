@@ -73,9 +73,9 @@
 <script>
 import { defineComponent, inject, onMounted, ref } from "vue";
 import { requests } from "@/api";
-import { MarkdownEditor } from "@/components";
-import { DetailPopover } from "@/components/utils";
-import { formatDate, AdaptiveSpinner } from "@/components/utils";
+import MarkdownEditor from "@/components/markdown-editor/MarkdownEditor.vue";
+import { AdaptiveSpinner, DetailPopover } from "@/components/widgets";
+import { formatDate } from "@/utils";
 import { commentPayloadSchema, commentsSchema, commentSchema } from "@/schemas";
 import { useAPI, useEventHandling, useStores } from "@/use";
 

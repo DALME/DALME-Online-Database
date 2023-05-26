@@ -12,7 +12,7 @@ import {
   watch,
 } from "vue";
 import { useConstants, useStores } from "@/use";
-import { notNully } from "@/components/utils";
+import { notNully } from "@/utils";
 import CETEI from "CETEIcean";
 import { dalmeTeiBehaviours } from "./behaviours.js";
 import { createPopper } from "@popperjs/core";

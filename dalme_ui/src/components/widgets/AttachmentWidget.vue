@@ -39,8 +39,7 @@
 
 <script>
 import { defineComponent, inject } from "vue";
-
-import { OpaqueSpinner } from "@/components/utils";
+import { OpaqueSpinner } from "@/components/widgets";
 
 export default defineComponent({
   name: "AttachmentWidget",

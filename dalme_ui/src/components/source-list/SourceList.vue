@@ -20,7 +20,7 @@
     :visibleColumns="visibleColumns"
   >
     <template v-slot:grid-avatar="props">
-      <Tag
+      <TagWidget
         v-if="sourceType === 'records'"
         mini
         module="workflow"
@@ -43,7 +43,7 @@
         </div>
       </DetailPopover>
       <template v-if="sourceType === 'records'">
-        <Tag
+        <TagWidget
           v-if="props.row.workflow.isPublic"
           name="public"
           colour="light-blue-1"
@@ -52,7 +52,7 @@
           module="standalone"
           class="q-ml-sm"
         />
-        <Tag
+        <TagWidget
           v-if="props.row.isPrivate"
           name="private"
           colour="deep-orange-1"
@@ -173,7 +173,7 @@
     </template>
 
     <template v-slot:render-cell-status="props">
-      <Tag
+      <TagWidget
         :name="props.row.workflow.status.text"
         :type="props.row.workflow.status.tag"
         module="workflow"
@@ -206,7 +206,7 @@
     </template>
 
     <template v-slot:render-cell-isPrivate="props">
-      <BooleanIcon
+      <BooleanWidget
         :value="props.row.isPrivate"
         :onlyTrue="true"
         :onlyTrueGreen="false"
@@ -215,7 +215,7 @@
     </template>
 
     <template v-slot:render-cell-isPublic="props">
-      <BooleanIcon
+      <BooleanWidget
         :value="props.row.workflow.isPublic"
         :onlyTrue="true"
         trueIcon="public"
@@ -245,14 +245,13 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { DataTable } from "@/components";
+import { getColumns, getDefaults } from "@/utils";
 import {
-  BooleanIcon,
+  BooleanWidget,
+  DataTable,
   DetailPopover,
-  getColumns,
-  getDefaults,
-  Tag,
-} from "@/components/utils";
+  TagWidget,
+} from "@/components";
 import { sourceListSchema } from "@/schemas";
 import { useAPI, usePagination, useStores } from "@/use";
 import { columnsByType } from "./columns";
@@ -261,10 +260,10 @@ import { filtersByType, sortByType } from "./filters";
 export default defineComponent({
   name: "SourceList",
   components: {
-    BooleanIcon,
+    BooleanWidget,
     DetailPopover,
     DataTable,
-    Tag,
+    TagWidget,
   },
   setup() {
     const $route = useRoute();

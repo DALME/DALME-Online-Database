@@ -7,7 +7,7 @@
     @mouseover="showStrip = true"
     @mouseleave="showStrip = false"
   >
-    <Tooltip
+    <TooltipWidget
       anchor="center left"
       self="center right"
       text="Editing tools"
@@ -63,7 +63,7 @@ import { default as EditUpdate } from "./EditUpdate.vue";
 import { default as FolioIndex } from "./FolioIndex.vue";
 import { default as InlineIndex } from "./InlineIndex.vue";
 import { default as WindowIndex } from "./WindowIndex.vue";
-import { Tooltip } from "@/components/utils";
+import { TooltipWidget } from "@/components";
 
 export default defineComponent({
   name: "EditPanel",
@@ -74,7 +74,7 @@ export default defineComponent({
     FolioIndex,
     InlineIndex,
     WindowIndex,
-    Tooltip,
+    TooltipWidget,
   },
   setup() {
     const {

@@ -8,7 +8,7 @@
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
-  name: "Spinner",
+  name: "SimpleSpinner",
   props: {
     top: {
       type: Number,
@@ -30,7 +30,8 @@ export default defineComponent({
   setup(props) {
     /* eslint-disable */
     const spinnerStyle = computed(
-      () => `top: ${props.top}px; right: ${props.right}px; bottom: ${props.bottom}px; left: ${props.left}px`
+      () =>
+        `top: ${props.top}px; right: ${props.right}px; bottom: ${props.bottom}px; left: ${props.left}px`,
     );
     /* eslint-enable */
 

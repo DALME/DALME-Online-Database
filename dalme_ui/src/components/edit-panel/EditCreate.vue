@@ -18,9 +18,13 @@
         icon="villa"
         push
       >
-        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <TooltipWidget
+          anchor="bottom middle"
+          self="bottom middle"
+          :offset="[0, 35]"
+        >
           Create Archive
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
 
       <q-fab-action
@@ -30,9 +34,13 @@
         icon="inventory"
         push
       >
-        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <TooltipWidget
+          anchor="bottom middle"
+          self="bottom middle"
+          :offset="[0, 35]"
+        >
           Create Archival File
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
 
       <q-fab-action
@@ -42,9 +50,13 @@
         icon="library_books"
         push
       >
-        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <TooltipWidget
+          anchor="bottom middle"
+          self="bottom middle"
+          :offset="[0, 35]"
+        >
           Create Bibliography
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
 
       <q-fab-action
@@ -54,9 +66,13 @@
         icon="format_list_numbered"
         push
       >
-        <Tooltip anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
+        <TooltipWidget
+          anchor="bottom middle"
+          self="bottom middle"
+          :offset="[0, 35]"
+        >
           Create Record
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
     </q-fab>
 
@@ -74,9 +90,9 @@
         icon="local_library"
         push
       >
-        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Corpus
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
 
       <q-fab-action
@@ -86,9 +102,9 @@
         icon="apps"
         push
       >
-        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Collection
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
 
       <q-fab-action
@@ -98,9 +114,9 @@
         icon="schema"
         push
       >
-        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Dataset
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
 
       <q-fab-action
@@ -110,9 +126,9 @@
         icon="work"
         push
       >
-        <Tooltip anchor="top middle" self="top middle" :offset="[0, 35]">
+        <TooltipWidget anchor="top middle" self="top middle" :offset="[0, 35]">
           Create Workset
-        </Tooltip>
+        </TooltipWidget>
       </q-fab-action>
     </q-fab>
 
@@ -123,9 +139,13 @@
       icon="assignment"
       push
     >
-      <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
+      <TooltipWidget
+        anchor="center left"
+        self="center right"
+        :offset="[10, 10]"
+      >
         Create Task
-      </Tooltip>
+      </TooltipWidget>
     </q-fab-action>
 
     <q-fab-action
@@ -135,24 +155,27 @@
       icon="task"
       push
     >
-      <Tooltip anchor="center left" self="center right" :offset="[10, 10]">
+      <TooltipWidget
+        anchor="center left"
+        self="center right"
+        :offset="[10, 10]"
+      >
         Create Ticket
-      </Tooltip>
+      </TooltipWidget>
     </q-fab-action>
   </q-fab>
 </template>
 
 <script>
 import cuid from "cuid";
-import { defineAsyncComponent, defineComponent, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { useEditing } from "@/use";
+import { TooltipWidget } from "@/components";
 
 export default defineComponent({
   name: "EditCreate",
   components: {
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
-    ),
+    TooltipWidget,
   },
   setup() {
     const mode = "create";

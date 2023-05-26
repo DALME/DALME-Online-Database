@@ -25,7 +25,8 @@ import S from "string";
 import { format } from "quasar";
 import { computed, defineComponent } from "vue";
 import { useConstants } from "@/use";
-import { DetailPopover, formatDate, notNully } from "@/components/utils";
+import { DetailPopover } from "@/components";
+import { formatDate, notNully } from "@/utils";
 
 export default defineComponent({
   name: "LogViewer",

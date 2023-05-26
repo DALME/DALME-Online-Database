@@ -9,9 +9,9 @@
     :error="errorMessage && meta.touched"
     @blur="handleBlur"
   >
-    <Tooltip v-if="description">
+    <TooltipWidget v-if="description">
       {{ description }}
-    </Tooltip>
+    </TooltipWidget>
 
     <template v-slot:error>
       <span>{{ errorMessage }}</span>
@@ -21,7 +21,7 @@
 
 <script>
 import { useField } from "vee-validate";
-import { defineAsyncComponent, defineComponent } from "vue";
+import { defineComponent, defineAsyncComponent } from "vue";
 
 export default defineComponent({
   name: "DecimalField",
@@ -40,8 +40,8 @@ export default defineComponent({
     },
   },
   components: {
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
+    TooltipWidget: defineAsyncComponent(() =>
+      import("@/components/widgets/TooltipWidget.vue"),
     ),
   },
   setup(props) {

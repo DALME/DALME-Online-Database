@@ -8,7 +8,7 @@
               <div class="row items-center text-h5">
                 <template v-if="!ui.globalLoading">
                   {{ source.name }}
-                  <Tag
+                  <TagWidget
                     v-if="source.hasInventory"
                     name="list"
                     colour="green-1"
@@ -119,14 +119,14 @@
         <div v-if="resource === 'record'" class="col-auto record-actions">
           <div class="row transition-all">
             <div class="row q-mr-sm">
-              <BooleanIcon
+              <BooleanWidget
                 v-if="resource === 'record'"
                 :value="!source.workflow.isPublic"
                 :onlyTrue="true"
                 trueIcon="public"
                 trueColour="light-green-7"
               />
-              <BooleanIcon
+              <BooleanWidget
                 v-if="resource === 'record'"
                 :value="!source.workflow.helpFlag"
                 :onlyTrue="true"
@@ -198,13 +198,14 @@ import { sourceDetailSchema } from "@/schemas";
 import { useAPI, useEditing, useStores } from "@/use";
 import {
   AdaptiveSpinner,
-  BooleanIcon,
+  BooleanWidget,
+  CommentWidget,
   DetailPopover,
-  formatDate,
-  notNully,
-  Tag,
-} from "@/components/utils";
-import { CommentWidget, LogViewer, WorkflowManager } from "@/components";
+  LogViewer,
+  TagWidget,
+  WorkflowManager,
+} from "@/components";
+import { formatDate, notNully } from "@/utils";
 import SourceAttributes from "./SourceAttributes.vue";
 import SourceAgents from "./SourceAgents.vue";
 import SourceChildren from "./SourceChildren.vue";
@@ -215,7 +216,7 @@ export default defineComponent({
   name: "SourceDetail",
   components: {
     AdaptiveSpinner,
-    BooleanIcon,
+    BooleanWidget,
     DetailPopover,
     CommentWidget,
     LogViewer,
@@ -224,7 +225,7 @@ export default defineComponent({
     SourceChildren,
     SourcePages,
     SourcePlaces,
-    Tag,
+    TagWidget,
     WorkflowManager,
   },
   setup() {

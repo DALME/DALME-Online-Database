@@ -21,7 +21,7 @@
         :disable="modelValue.length === allowed.length"
         @click.stop="handleAddField"
       >
-        <Tooltip> Add an attribute </Tooltip>
+        <TooltipWidget> Add an attribute </TooltipWidget>
       </q-btn>
 
       <q-btn
@@ -31,14 +31,14 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <Tooltip>
+        <TooltipWidget>
           {{ showing ? "Hide attributes" : "Show attributes" }}
-        </Tooltip>
+        </TooltipWidget>
       </q-btn>
 
-      <Tooltip v-if="description">
+      <TooltipWidget v-if="description">
         {{ description }}
-      </Tooltip>
+      </TooltipWidget>
     </div>
 
     <template v-if="showing">
@@ -74,9 +74,11 @@
                   (option) => handleUpdateAttribute(option, idx)
                 "
               >
-                <Tooltip v-if="data.attribute && data.attribute.description">
+                <TooltipWidget
+                  v-if="data.attribute && data.attribute.description"
+                >
                   {{ data.attribute.description }}
-                </Tooltip>
+                </TooltipWidget>
               </q-select>
             </div>
 
@@ -191,9 +193,9 @@
                 :disable="isRequiredAttribute(data.attribute)"
                 @click.stop="handleRemoveField(idx)"
               >
-                <Tooltip v-if="isRequiredAttribute(data.attribute)">
+                <TooltipWidget v-if="isRequiredAttribute(data.attribute)">
                   Can't delete a required attribute
-                </Tooltip>
+                </TooltipWidget>
               </q-btn>
             </div>
           </div>
@@ -213,8 +215,8 @@ import { isNil, filter as rFilter, map as rMap, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
 import {
   computed,
-  defineAsyncComponent,
   defineComponent,
+  defineAsyncComponent,
   onMounted,
   ref,
   unref,
@@ -270,8 +272,8 @@ export default defineComponent({
     NumberField,
     SelectField,
     TextField,
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
+    TooltipWidget: defineAsyncComponent(() =>
+      import("@/components/widgets/TooltipWidget.vue"),
     ),
   },
   setup(props, context) {

@@ -231,7 +231,7 @@
 <script>
 import { isEmpty, keys, map, mapObjIndexed } from "ramda";
 import { computed, defineComponent, inject, provide, ref, watch } from "vue";
-import { OpaqueSpinner } from "@/components/utils";
+import { OpaqueSpinner } from "@/components";
 import TableToolbar from "./TableToolbar.vue";
 import TablePager from "./TablePager.vue";
 import { onBeforeRouteLeave } from "vue-router";

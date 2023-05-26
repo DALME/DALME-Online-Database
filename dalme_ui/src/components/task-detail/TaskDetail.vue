@@ -138,8 +138,14 @@ import {
 } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { AttachmentWidget, CommentWidget, MarkdownEditor } from "@/components";
-import { DetailPopover, formatDate, OpaqueSpinner } from "@/components/utils";
+import {
+  AttachmentWidget,
+  CommentWidget,
+  DetailPopover,
+  MarkdownEditor,
+  OpaqueSpinner,
+} from "@/components";
+import { formatDate } from "@/utils";
 import { taskSchema } from "@/schemas";
 import { useAPI, useEditing, useEventHandling, useStores } from "@/use";
 

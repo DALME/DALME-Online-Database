@@ -267,7 +267,7 @@
             :class="{ 'rotate-180': compactMode, 'bg-indigo-1': compactMode }"
             @click="compactMode = !compactMode"
           >
-            <Tooltip>Compact mode</Tooltip>
+            <TooltipWidget>Compact mode</TooltipWidget>
           </q-btn>
           <q-btn
             flat
@@ -282,7 +282,7 @@
               :name="showTips ? 'o_speaker_notes_off' : 'o_speaker_notes'"
               size="16px"
             />
-            <Tooltip>Tooltips</Tooltip>
+            <TooltipWidget>Tooltips</TooltipWidget>
           </q-btn>
           <q-btn
             flat
@@ -294,7 +294,7 @@
             :class="{ 'bg-indigo-1': isFullscreen }"
             @click="toggleFullscreen"
           >
-            <Tooltip>Full screen</Tooltip>
+            <TooltipWidget>Full screen</TooltipWidget>
           </q-btn>
         </div>
       </div>
@@ -313,16 +313,15 @@ import { openURL, useQuasar } from "quasar";
 import { isEmpty, isNil } from "ramda";
 import { computed, defineComponent, inject, provide, ref, watch } from "vue";
 import { navRoutes } from "@/router";
-import { CustomDialog } from "@/components";
+import { CustomDialog, TooltipWidget } from "@/components";
 import NavLink from "./NavLink.vue";
-import { Tooltip } from "@/components/utils";
 import { useStores, useTooltips } from "@/use";
 
 export default defineComponent({
   name: "NavBar",
   components: {
     NavLink,
-    Tooltip,
+    TooltipWidget,
   },
   setup() {
     const $q = useQuasar();

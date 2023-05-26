@@ -71,7 +71,7 @@
               unelevated
               round
             >
-              <Tooltip self="center left">Recenter</Tooltip>
+              <TooltipWidget self="center left">Recenter</TooltipWidget>
             </q-btn>
           </div>
         </q-item-section>
@@ -82,16 +82,15 @@
 
 <script>
 import { all, keys, map as rMap, none, values } from "ramda";
-import { defineAsyncComponent, defineComponent, ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { useActor } from "@xstate/vue";
 import { useConstants, useEditing, useStores } from "@/use";
+import { TooltipWidget } from "@/components";
 
 export default defineComponent({
   name: "WindowIndex",
   components: {
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
-    ),
+    TooltipWidget,
   },
   setup() {
     const { editorModeIcons } = useConstants();

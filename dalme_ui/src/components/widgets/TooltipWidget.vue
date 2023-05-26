@@ -16,7 +16,7 @@ import { defineComponent } from "vue";
 import { useTooltips } from "@/use";
 
 export default defineComponent({
-  name: "Tooltip",
+  name: "TooltipWidget",
   props: {
     anchor: {
       type: String,

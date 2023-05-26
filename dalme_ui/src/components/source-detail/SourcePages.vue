@@ -15,11 +15,11 @@
       wrap-cells
     >
       <template v-slot:body-cell-hasImage="props">
-        <q-td :props="props"><BooleanIcon :value="props.value" /></q-td>
+        <q-td :props="props"><BooleanWidget :value="props.value" /></q-td>
       </template>
 
       <template v-slot:body-cell-hasTranscription="props">
-        <q-td :props="props"><BooleanIcon :value="props.value" /></q-td>
+        <q-td :props="props"><BooleanWidget :value="props.value" /></q-td>
       </template>
     </q-table>
   </template>
@@ -30,8 +30,8 @@
 
 <script>
 import { defineComponent, inject, provide, ref } from "vue";
-import { BooleanIcon, getColumns } from "@/components/utils";
-import { SourceEditor } from "@/components";
+import { getColumns } from "@/utils";
+import { BooleanWidget, SourceEditor } from "@/components";
 import { columnMap } from "./pageColumns";
 
 export default defineComponent({
@@ -48,7 +48,7 @@ export default defineComponent({
     },
   },
   components: {
-    BooleanIcon,
+    BooleanWidget,
     SourceEditor,
   },
   setup(props) {

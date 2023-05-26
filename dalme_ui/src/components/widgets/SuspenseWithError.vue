@@ -18,7 +18,6 @@
 
 <script>
 import { defineComponent, ref, onErrorCaptured } from "vue";
-
 import logger from "@/logger";
 
 export default defineComponent({

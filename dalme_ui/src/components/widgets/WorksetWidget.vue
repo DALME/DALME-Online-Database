@@ -71,9 +71,8 @@ import { openURL } from "quasar";
 import { map, keys } from "ramda";
 import { defineComponent, onMounted, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
-
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import { OpaqueSpinner } from "@/components/widgets";
 import { setListSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
 

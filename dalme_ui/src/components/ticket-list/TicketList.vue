@@ -71,7 +71,7 @@
           </template>
         </q-list>
       </q-btn-dropdown>
-      <Chooser
+      <ChooserWidget
         showHeader
         toggleIcon
         showSelectedItem
@@ -81,7 +81,7 @@
         @itemChosen="setAuthor"
         :clearFilters="onClearFilters"
       />
-      <Chooser
+      <ChooserWidget
         showHeader
         toggleIcon
         showSelectedItem
@@ -119,7 +119,7 @@
           {{ props.row.description }}
         </div>
       </DetailPopover>
-      <Tag
+      <TagWidget
         v-for="(tag, idx) in cleanTags(props.row.tags)"
         :key="idx"
         :name="tag.tag"
@@ -191,7 +191,7 @@
     </template>
 
     <template v-slot:render-cell-tags="props">
-      <Tag
+      <TagWidget
         v-for="(tag, idx) in cleanTags(props.row.tags)"
         :key="idx"
         :name="tag.tag"
@@ -257,15 +257,13 @@ import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
 import { defineComponent, provide, ref } from "vue";
 import { requests } from "@/api";
-import { DataTable } from "@/components";
 import {
-  Chooser,
+  ChooserWidget,
+  DataTable,
   DetailPopover,
-  formatDate,
-  getColumns,
-  getDefaults,
-  Tag,
-} from "@/components/utils";
+  TagWidget,
+} from "@/components";
+import { formatDate, getColumns, getDefaults } from "@/utils";
 import { ticketListSchema } from "@/schemas";
 import {
   useAPI,
@@ -286,10 +284,10 @@ export default defineComponent({
     },
   },
   components: {
-    Chooser,
+    ChooserWidget,
     DetailPopover,
     DataTable,
-    Tag,
+    TagWidget,
   },
   setup(props, context) {
     if (!props.embedded) useMeta({ title: "Issue Tickets" });

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { isEmpty, mergeDeepLeft } from "ramda";
-import { notNully } from "@/components/utils";
+import { notNully } from "@/utils";
 import { useNavStore } from "@/stores/navigation";
 
 class ViewState {

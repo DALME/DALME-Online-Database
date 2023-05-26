@@ -103,10 +103,10 @@
         class="btn-icon table-toolbar-button"
         @click="isEditModeOn = !isEditModeOn"
       >
-        <Tooltip v-if="editable">
+        <TooltipWidget v-if="editable">
           Click on this button to enable editing data in place for supported
           columns (marked with this same icon).
-        </Tooltip>
+        </TooltipWidget>
       </q-btn>
       <q-btn-dropdown
         v-if="!showGrid"
@@ -145,7 +145,7 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <Tooltip>Select which columns should be displayed.</Tooltip>
+        <TooltipWidget>Select which columns should be displayed.</TooltipWidget>
       </q-btn-dropdown>
       <q-btn-dropdown
         unelevated
@@ -179,7 +179,9 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <Tooltip>Select how many records to display per page.</Tooltip>
+        <TooltipWidget
+          >Select how many records to display per page.</TooltipWidget
+        >
       </q-btn-dropdown>
       <q-btn
         v-if="grid"
@@ -191,7 +193,7 @@
         class="btn-icon table-toolbar-button"
         @click="showGrid = !showGrid"
       >
-        <Tooltip>Switch between table and grid view.</Tooltip>
+        <TooltipWidget>Switch between table and grid view.</TooltipWidget>
       </q-btn>
     </div>
   </div>
@@ -281,14 +283,8 @@
 <script>
 import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
-import {
-  computed,
-  defineAsyncComponent,
-  defineComponent,
-  inject,
-  ref,
-  watch,
-} from "vue";
+import { computed, defineComponent, inject, ref, watch } from "vue";
+import { TooltipWidget } from "@/components";
 
 export default defineComponent({
   name: "TableToolbar",
@@ -328,9 +324,7 @@ export default defineComponent({
     },
   },
   components: {
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
-    ),
+    TooltipWidget,
   },
   emits: [
     "changeRowsPerPage",

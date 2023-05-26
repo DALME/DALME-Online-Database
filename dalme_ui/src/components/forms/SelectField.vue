@@ -11,9 +11,9 @@
     @blur="handleBlur"
     @filter="handleOptions"
   >
-    <Tooltip v-if="description">
+    <TooltipWidget v-if="description">
       {{ description }}
-    </Tooltip>
+    </TooltipWidget>
 
     <template v-slot:option="scope">
       <q-item v-bind="scope.itemProps">
@@ -43,7 +43,7 @@
 <script>
 import { useField } from "vee-validate";
 import { isNil } from "ramda";
-import { defineAsyncComponent, defineComponent, ref } from "vue";
+import { defineComponent, defineAsyncComponent, ref } from "vue";
 
 export default defineComponent({
   name: "SelectField",
@@ -74,8 +74,8 @@ export default defineComponent({
     },
   },
   components: {
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
+    TooltipWidget: defineAsyncComponent(() =>
+      import("@/components/widgets/TooltipWidget.vue"),
     ),
   },
   setup(props) {

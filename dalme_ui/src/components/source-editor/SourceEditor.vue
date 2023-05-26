@@ -115,7 +115,7 @@ import {
 } from "vue";
 import { useEventHandling, useStores } from "@/use";
 import { IiifViewer, TeiEditor, TeiRenderer } from "@/components";
-import { notNully } from "@/components/utils";
+import { notNully } from "@/utils";
 
 export default defineComponent({
   name: "SourceEditor",

@@ -20,7 +20,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <Tooltip> Add a credit </Tooltip>
+        <TooltipWidget> Add a credit </TooltipWidget>
       </q-btn>
 
       <q-btn
@@ -30,14 +30,14 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <Tooltip>
+        <TooltipWidget>
           {{ showing ? "Hide credits" : "Show credits" }}
-        </Tooltip>
+        </TooltipWidget>
       </q-btn>
 
-      <Tooltip v-if="description">
+      <TooltipWidget v-if="description">
         {{ description }}
-      </Tooltip>
+      </TooltipWidget>
     </div>
 
     <template v-if="showing">
@@ -120,7 +120,7 @@
                     </template>
                   </q-popup-edit>
 
-                  <Tooltip> Add note </Tooltip>
+                  <TooltipWidget> Add note </TooltipWidget>
                 </q-btn>
               </div>
             </div>
@@ -162,13 +162,12 @@ import {
 import { useFieldArray } from "vee-validate";
 import {
   computed,
-  defineAsyncComponent,
   defineComponent,
+  defineAsyncComponent,
   inject,
   ref,
   unref,
 } from "vue";
-
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
 import { agentOptionsSchema, creditRoleOptionsSchema } from "@/schemas";
@@ -193,8 +192,8 @@ export default defineComponent({
   },
   components: {
     SelectField,
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
+    TooltipWidget: defineAsyncComponent(() =>
+      import("@/components/widgets/TooltipWidget.vue"),
     ),
   },
   setup(props, context) {

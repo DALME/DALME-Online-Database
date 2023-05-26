@@ -109,7 +109,7 @@
         <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Tags</div>
         <div class="q-mb-sm text-13">
           <template v-if="!isEmpty(cleanTags(ticket.tags))">
-            <Tag
+            <TagWidget
               v-for="(tag, idx) in cleanTags(ticket.tags)"
               :key="idx"
               :name="tag.tag"
@@ -157,13 +157,15 @@ import {
 } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { AttachmentWidget, CommentWidget, MarkdownEditor } from "@/components";
 import {
+  AttachmentWidget,
+  CommentWidget,
   DetailPopover,
-  formatDate,
+  MarkdownEditor,
   OpaqueSpinner,
-  Tag,
-} from "@/components/utils";
+  TagWidget,
+} from "@/components";
+import { formatDate } from "@/utils";
 import { ticketDetailSchema } from "@/schemas";
 import { useAPI, useEventHandling, useStores } from "@/use";
 
@@ -175,7 +177,7 @@ export default defineComponent({
     DetailPopover,
     MarkdownEditor,
     OpaqueSpinner,
-    Tag,
+    TagWidget,
   },
   setup() {
     const { notifier } = useEventHandling();

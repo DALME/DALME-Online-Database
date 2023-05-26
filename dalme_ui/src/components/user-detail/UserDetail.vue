@@ -39,7 +39,7 @@
                 Staff
               </div>
               <div class="col-8">
-                <BooleanIcon :value="user.isStaff" size="20px" />
+                <BooleanWidget :value="user.isStaff" size="20px" />
               </div>
             </div>
 
@@ -48,7 +48,7 @@
                 Superuser
               </div>
               <div class="col-8">
-                <BooleanIcon :value="user.isSuperuser" size="20px" />
+                <BooleanWidget :value="user.isSuperuser" size="20px" />
               </div>
             </div>
 
@@ -57,7 +57,7 @@
                 Active
               </div>
               <div class="col-8">
-                <BooleanIcon :value="user.isActive" size="20px" />
+                <BooleanWidget :value="user.isActive" size="20px" />
               </div>
             </div>
 
@@ -118,10 +118,9 @@ import { useMeta } from "quasar";
 import { map } from "ramda";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-
 import { useAuthStore } from "@/stores/auth";
 import { requests } from "@/api";
-import { BooleanIcon, OpaqueSpinner } from "@/components/utils";
+import { BooleanWidget, OpaqueSpinner } from "@/components";
 import { userSchema } from "@/schemas";
 import { useAPI } from "@/use";
 import UserPreferences from "./UserPreferences.vue";
@@ -144,7 +143,7 @@ const getAttributeLabel = (attribute) => {
 export default defineComponent({
   name: "UserDetail",
   components: {
-    BooleanIcon,
+    BooleanWidget,
     OpaqueSpinner,
     UserPreferences,
   },

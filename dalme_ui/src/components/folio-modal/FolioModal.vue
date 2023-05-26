@@ -8,7 +8,7 @@
           </div>
         </template>
       </q-img>
-      <Spinner :showing="!url" />
+      <SimpleSpinner :showing="!url" />
     </template>
   </BaseModal>
 </template>
@@ -16,17 +16,15 @@
 <script>
 import { defineComponent, onMounted, ref } from "vue";
 import { useSelector } from "@xstate/vue";
-
 import { requests } from "@/api";
-import { BaseModal } from "@/components";
-import { Spinner } from "@/components/utils";
+import { BaseModal, SimpleSpinner } from "@/components";
 import { useAPI, useEditing } from "@/use";
 
 export default defineComponent({
   name: "FormModal",
   components: {
     BaseModal,
-    Spinner,
+    SimpleSpinner,
   },
   props: {
     cuid: {

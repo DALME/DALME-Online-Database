@@ -14,7 +14,7 @@ import { computed, defineComponent } from "vue";
 import { useConstants } from "@/use";
 
 export default defineComponent({
-  name: "Tag",
+  name: "TagWidget",
   props: {
     colour: {
       type: String,

@@ -9,9 +9,9 @@
     :popup-content-style="{ zIndex: '9999 !important' }"
     @blur="handleBlur"
   >
-    <Tooltip v-if="description">
+    <TooltipWidget v-if="description">
       {{ description }}
-    </Tooltip>
+    </TooltipWidget>
 
     <template v-slot:error>
       <div>{{ errorMessage }}</div>
@@ -21,8 +21,7 @@
 
 <script>
 import { useField } from "vee-validate";
-import { defineAsyncComponent, defineComponent } from "vue";
-
+import { defineComponent, defineAsyncComponent } from "vue";
 import { booleanOptions } from "@/forms/constants";
 
 export default defineComponent({
@@ -42,8 +41,8 @@ export default defineComponent({
     },
   },
   components: {
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
+    TooltipWidget: defineAsyncComponent(() =>
+      import("@/components/widgets/TooltipWidget.vue"),
     ),
   },
   setup(props) {

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { API as apiInterface, publicUrl, requests } from "@/api";
 import { usePrefStore } from "@/stores/preferences";
-import { useEventHandling } from "@/use";
+// import { useEventHandling } from "@/use";
 import { isNil } from "ramda";
 
 export const useAuthStore = defineStore("auth", {
@@ -40,10 +40,11 @@ export const useAuthStore = defineStore("auth", {
         if (redirected) {
           window.location.href = publicUrl;
         }
-      } else {
-        const { notifier } = useEventHandling();
-        notifier.auth.logoutFailed();
       }
+      // } else {
+      //   const { notifier } = useEventHandling();
+      //   notifier.auth.logoutFailed();
+      // }
     },
     async processQueue() {
       await this.requestQueue.forEach((callback) => callback());

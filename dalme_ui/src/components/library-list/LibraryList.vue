@@ -41,7 +41,7 @@
 import { map, keys } from "ramda";
 import { defineComponent, onMounted, ref } from "vue";
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import { OpaqueSpinner } from "@/components";
 import { libraryListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 

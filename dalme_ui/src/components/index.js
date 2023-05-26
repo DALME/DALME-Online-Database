@@ -1,5 +1,6 @@
 // Any imports that break alphabetical order had to be positioned to avoid
 // cirucular import errors within components.
+export * from "./widgets";
 export { default as CustomDialog } from "./custom-dialog";
 export { default as MarkdownEditor } from "./markdown-editor";
 export { default as TeiRenderer } from "./tei-renderer";
@@ -8,9 +9,7 @@ export { default as IiifViewer } from "./iiif-viewer";
 export { default as DetailCard } from "./detail-card";
 export { default as DataTable } from "./data-table";
 export { default as AgentList } from "./agent-list";
-export { default as AttachmentWidget } from "./attachment-widget";
 export { default as BaseModal } from "./base-modal";
-export { default as CommentWidget } from "./comment-widget";
 export { default as CountryList } from "./country-list";
 export { default as EditPanel } from "./edit-panel";
 export { default as IssueTracker } from "./issue-tracker";
@@ -40,4 +39,3 @@ export { default as TicketList } from "./ticket-list";
 export { default as TicketDetail } from "./ticket-detail";
 export { default as Users } from "./user-list";
 export { default as UserDetail } from "./user-detail";
-export { default as WorksetWidget } from "./workset-widget";

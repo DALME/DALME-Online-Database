@@ -11,7 +11,7 @@
     padding="5px 5px"
     :loading="loading"
   >
-    <Tooltip v-if="toolTip">{{ toolTip }}</Tooltip>
+    <TooltipWidget v-if="toolTip">{{ toolTip }}</TooltipWidget>
     <q-menu
       anchor="bottom right"
       self="top right"
@@ -161,8 +161,8 @@
 import { filter as rFilter, isEmpty, isNil } from "ramda";
 import {
   computed,
-  defineAsyncComponent,
   defineComponent,
+  defineAsyncComponent,
   onMounted,
   ref,
   watch,
@@ -172,7 +172,7 @@ import { ticketListSchema, userListSchema } from "@/schemas";
 import { useAPI } from "@/use";
 
 export default defineComponent({
-  name: "Chooser",
+  name: "ChooserWidget",
   props: {
     bordered: {
       type: Boolean,
@@ -266,8 +266,8 @@ export default defineComponent({
     },
   },
   components: {
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
+    TooltipWidget: defineAsyncComponent(() =>
+      import("@/components/widgets/TooltipWidget.vue"),
     ),
   },
   emits: ["itemChosen"],

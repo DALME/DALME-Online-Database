@@ -35,7 +35,7 @@
           {{ props.row.username }}
         </div>
       </DetailPopover>
-      <Tag
+      <TagWidget
         v-if="props.row.isActive"
         name="active"
         colour="light-green-1"
@@ -44,7 +44,7 @@
         module="standalone"
         class="q-ml-sm"
       />
-      <Tag
+      <TagWidget
         v-if="props.row.isStaff"
         name="staff"
         colour="light-blue-1"
@@ -53,7 +53,7 @@
         module="standalone"
         class="q-ml-sm"
       />
-      <Tag
+      <TagWidget
         v-if="props.row.isSuperuser"
         name="super"
         colour="orange-1"
@@ -106,7 +106,7 @@
     </template>
 
     <template v-slot:render-cell-isActive="props">
-      <BooleanIcon
+      <BooleanWidget
         :value="props.row.isActive"
         :onlyTrue="true"
         trueIcon="check_circle"
@@ -114,7 +114,7 @@
     </template>
 
     <template v-slot:render-cell-isStaff="props">
-      <BooleanIcon
+      <BooleanWidget
         :value="props.row.isStaff"
         :onlyTrue="true"
         trueIcon="check_circle"
@@ -128,16 +128,13 @@ import { useMeta } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { DataTable } from "@/components";
+import { formatDate, getColumns, getDefaults, notNully } from "@/utils";
 import {
-  BooleanIcon,
+  BooleanWidget,
+  DataTable,
   DetailPopover,
-  formatDate,
-  getColumns,
-  getDefaults,
-  notNully,
-  Tag,
-} from "@/components/utils";
+  TagWidget,
+} from "@/components";
 import { userListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";
@@ -146,10 +143,10 @@ import { filterList, sortList } from "./filters";
 export default defineComponent({
   name: "UserList",
   components: {
-    BooleanIcon,
+    BooleanWidget,
     DetailPopover,
     DataTable,
-    Tag,
+    TagWidget,
   },
   setup() {
     useMeta({ title: "Users" });

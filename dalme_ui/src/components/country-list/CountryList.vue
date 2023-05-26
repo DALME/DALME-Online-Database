@@ -20,7 +20,7 @@ import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { DataTable } from "@/components";
-import { getColumns, getDefaults } from "@/components/utils";
+import { getColumns, getDefaults } from "@/utils";
 import { countryListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";

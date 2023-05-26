@@ -20,7 +20,7 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "BooleanIcon",
+  name: "BooleanWidget",
   props: {
     onlyTrue: {
       type: Boolean,

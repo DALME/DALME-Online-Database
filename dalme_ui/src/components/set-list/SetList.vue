@@ -32,7 +32,7 @@
     </template>
 
     <template v-slot:render-cell-isPublic="props">
-      <BooleanIcon
+      <BooleanWidget
         :value="props.row.isPublic"
         :onlyTrue="true"
         trueIcon="public"
@@ -40,7 +40,7 @@
     </template>
 
     <template v-slot:render-cell-hasLanding="props">
-      <BooleanIcon
+      <BooleanWidget
         :value="props.row.hasLanding"
         :onlyTrue="true"
         trueIcon="check_circle"
@@ -68,8 +68,8 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { DataTable } from "@/components";
-import { BooleanIcon, getColumns, getDefaults } from "@/components/utils";
+import { BooleanWidget, DataTable } from "@/components";
+import { getColumns, getDefaults } from "@/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnsByType } from "./columns";
@@ -78,7 +78,7 @@ export default defineComponent({
   name: "SetList",
   components: {
     DataTable,
-    BooleanIcon,
+    BooleanWidget,
   },
   setup() {
     const $route = useRoute();

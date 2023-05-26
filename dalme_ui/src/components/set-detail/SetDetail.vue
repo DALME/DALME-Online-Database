@@ -141,11 +141,10 @@ import { useMeta } from "quasar";
 import { useRoute } from "vue-router";
 import { computed, defineComponent, provide, onMounted, ref } from "vue";
 import { requests } from "@/api";
-import { OpaqueSpinner } from "@/components/utils";
+import { OpaqueSpinner } from "@/components";
 import { setDetailSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
 import { useNavStore } from "@/stores/navigation";
-
 import SetMembers from "./SetMembers.vue";
 
 export default defineComponent({

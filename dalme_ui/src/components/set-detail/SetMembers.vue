@@ -55,15 +55,14 @@
     </template>
   </q-table>
 
-  <Spinner :showing="loading" />
+  <SimpleSpinner :showing="loading" />
 </template>
 
 <script>
 import { keys, map } from "ramda";
 import { defineComponent, inject, ref } from "vue";
-
 import { requests } from "@/api";
-import { Spinner } from "@/components/utils";
+import { SimpleSpinner } from "@/components";
 import { setMembersSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 
@@ -86,7 +85,7 @@ export default defineComponent({
     },
   },
   components: {
-    Spinner,
+    SimpleSpinner,
   },
   setup() {
     const { apiInterface } = useAPI();

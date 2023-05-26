@@ -20,7 +20,7 @@
         text-color="black"
         @click.stop="handleAddField"
       >
-        <Tooltip> Add a folio </Tooltip>
+        <TooltipWidget> Add a folio </TooltipWidget>
       </q-btn>
 
       <q-btn
@@ -30,14 +30,14 @@
         :icon="showing ? 'visibility_off' : 'visibility'"
         @click.stop="showing = !showing"
       >
-        <Tooltip>
+        <TooltipWidget>
           {{ showing ? "Hide folios" : "Show folios" }}
-        </Tooltip>
+        </TooltipWidget>
       </q-btn>
 
-      <Tooltip v-if="description">
+      <TooltipWidget v-if="description">
         {{ description }}
-      </Tooltip>
+      </TooltipWidget>
     </div>
 
     <template v-if="showing">
@@ -82,7 +82,7 @@
                   :disable="!data.damId || !data.hasImage"
                   @click.stop="() => handlePreview(data.damId)"
                 >
-                  <Tooltip> Preview folio </Tooltip>
+                  <TooltipWidget> Preview folio </TooltipWidget>
                 </q-btn>
               </div>
             </div>
@@ -159,14 +159,13 @@ import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
 import {
   computed,
-  defineAsyncComponent,
   defineComponent,
+  defineAsyncComponent,
   onMounted,
   ref,
   unref,
 } from "vue";
 import { useActor } from "@xstate/vue";
-
 import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
 import { imageOptionsSchema } from "@/schemas";
@@ -192,8 +191,8 @@ export default defineComponent({
   components: {
     InputField,
     SelectField,
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
+    TooltipWidget: defineAsyncComponent(() =>
+      import("@/components/widgets/TooltipWidget.vue"),
     ),
   },
   setup(props, context) {

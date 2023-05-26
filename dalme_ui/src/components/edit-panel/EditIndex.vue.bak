@@ -15,7 +15,7 @@
       :class="{ 'edit-on': ongoingEdit }"
       :style="editPanel.drawerStripApproach ? 'left: -33px' : 'left: -13px'"
     >
-      <Tooltip
+      <TooltipWidget
         anchor="center left"
         self="center right"
         text="Editing tools"

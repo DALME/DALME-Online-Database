@@ -28,7 +28,7 @@
             class="md-editor-button"
             @click="insertEnclosure(['### ', ''])"
           >
-            <Tooltip>Add heading</Tooltip>
+            <TooltipWidget>Add heading</TooltipWidget>
           </q-btn>
           <q-btn
             color="grey-7"
@@ -37,7 +37,7 @@
             class="md-editor-button"
             @click="insertEnclosure(['**', '**'])"
           >
-            <Tooltip>Add bold text</Tooltip>
+            <TooltipWidget>Add bold text</TooltipWidget>
           </q-btn>
           <q-btn
             color="grey-7"
@@ -46,7 +46,7 @@
             class="md-editor-button"
             @click="insertEnclosure(['*', '*'])"
           >
-            <Tooltip>Add italic text</Tooltip>
+            <TooltipWidget>Add italic text</TooltipWidget>
           </q-btn>
           <q-btn
             color="grey-7"
@@ -55,7 +55,7 @@
             class="md-editor-button"
             @click="insertEnclosure(['~~', '~~'])"
           >
-            <Tooltip>Add strike-through text</Tooltip>
+            <TooltipWidget>Add strike-through text</TooltipWidget>
           </q-btn>
           <q-separator vertical class="q-mr-sm" />
           <q-btn
@@ -65,10 +65,10 @@
             class="md-editor-button"
             @click="insertPrefix('> ')"
           >
-            <Tooltip>Insert a quote</Tooltip>
+            <TooltipWidget>Insert a quote</TooltipWidget>
           </q-btn>
           <q-btn color="grey-7" flat icon="code" class="md-editor-button">
-            <Tooltip>Insert code</Tooltip>
+            <TooltipWidget>Insert code</TooltipWidget>
             <q-menu cover>
               <q-list dense>
                 <q-item
@@ -98,7 +98,7 @@
             class="md-editor-button"
             @click="insertEnclosure(['[', '](url)'])"
           >
-            <Tooltip>Insert a link</Tooltip>
+            <TooltipWidget>Insert a link</TooltipWidget>
           </q-btn>
           <q-btn
             color="grey-7"
@@ -107,7 +107,7 @@
             class="md-editor-button"
             @click="insertEnclosure([':::\n', '\n:::'])"
           >
-            <Tooltip>Insert a note</Tooltip>
+            <TooltipWidget>Insert a note</TooltipWidget>
           </q-btn>
           <q-separator vertical class="q-mr-sm" />
           <q-btn
@@ -117,7 +117,7 @@
             class="md-editor-button"
             @click="insertPrefix('- ')"
           >
-            <Tooltip>Add a bulleted list</Tooltip>
+            <TooltipWidget>Add a bulleted list</TooltipWidget>
           </q-btn>
           <q-btn
             color="grey-7"
@@ -126,7 +126,7 @@
             class="md-editor-button"
             @click="insertPrefix('numbered')"
           >
-            <Tooltip>Add a numbered list</Tooltip>
+            <TooltipWidget>Add a numbered list</TooltipWidget>
           </q-btn>
           <q-btn
             color="grey-7"
@@ -135,10 +135,10 @@
             class="md-editor-button"
             @click="insertPrefix('- [ ] ')"
           >
-            <Tooltip>Add a task list</Tooltip>
+            <TooltipWidget>Add a task list</TooltipWidget>
           </q-btn>
           <q-separator vertical class="q-mr-sm" />
-          <Chooser
+          <ChooserWidget
             icon="people"
             color="grey-7"
             returnField="username"
@@ -148,7 +148,7 @@
             classes="md-editor-button"
             @itemChosen="onUserSelected"
           />
-          <Chooser
+          <ChooserWidget
             icon="bug_report"
             color="grey-7"
             toolTip="Reference another issue ticket"
@@ -190,7 +190,7 @@
             @click="openMarkdown"
             class="no-undeline cursor-pointer"
           >
-            <Tooltip>Styling with Markdown is supported</Tooltip>
+            <TooltipWidget>Styling with Markdown is supported</TooltipWidget>
           </q-icon>
         </div>
       </q-tab-panel>
@@ -221,14 +221,8 @@
 <script>
 import { openURL } from "quasar";
 import { isEmpty, isNil } from "ramda";
-import {
-  computed,
-  defineAsyncComponent,
-  defineComponent,
-  onMounted,
-  ref,
-} from "vue";
-import { Chooser } from "@/components/utils";
+import { computed, defineComponent, onMounted, ref } from "vue";
+import { ChooserWidget, TooltipWidget } from "@/components/widgets";
 
 export default defineComponent({
   name: "MarkdownEditor",
@@ -256,10 +250,8 @@ export default defineComponent({
     },
   },
   components: {
-    Chooser,
-    Tooltip: defineAsyncComponent(() =>
-      import("@/components/utils/Tooltip.vue"),
-    ),
+    ChooserWidget,
+    TooltipWidget,
   },
   emits: ["onSaveText"],
   setup(props, context) {

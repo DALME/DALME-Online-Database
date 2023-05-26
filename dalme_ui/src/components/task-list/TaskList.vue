@@ -46,7 +46,7 @@
           {{ props.row.description }}
         </div>
         <div>
-          <Tag
+          <TagWidget
             v-if="props.row.workset"
             :name="`Workset: ${props.row.workset}`"
             colour="light-blue-1"
@@ -57,7 +57,7 @@
           />
         </div>
       </DetailPopover>
-      <Tag
+      <TagWidget
         v-if="props.row.overdueStatus"
         name="overdue"
         colour="red-1"
@@ -143,14 +143,13 @@ import { defineComponent, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { requests } from "@/api";
-import { DataTable, TasklistList } from "@/components";
 import {
+  DataTable,
   DetailPopover,
-  formatDate,
-  getColumns,
-  getDefaults,
-  Tag,
-} from "@/components/utils";
+  TagWidget,
+  TasklistList,
+} from "@/components";
+import { formatDate, getColumns, getDefaults } from "@/utils";
 import { taskListsSchema, tasksSchema } from "@/schemas";
 import { useAPI, usePagination, useEditing } from "@/use";
 import { columnMap } from "./columns";
@@ -167,7 +166,7 @@ export default defineComponent({
   components: {
     DetailPopover,
     DataTable,
-    Tag,
+    TagWidget,
     TasklistList,
   },
   emits: ["onReloadTaskLists"],

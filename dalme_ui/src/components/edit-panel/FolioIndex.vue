@@ -32,7 +32,7 @@ import { filter as rFilter } from "ramda";
 import moment from "moment";
 import { computed, defineComponent, watch } from "vue";
 import { useEditing, useEventHandling, useStores, useTransport } from "@/use";
-import { notNully } from "@/components/utils";
+import { notNully } from "@/utils";
 
 export default defineComponent({
   name: "FolioIndex",
