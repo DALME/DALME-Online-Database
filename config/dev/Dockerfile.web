@@ -1,7 +1,4 @@
-FROM python:3.11.3-buster
-#FROM python:3.9-buster
-# TO DO: this ideally should be slim-buster, but we 
-# need the dev tools to compile psycog2 from source
+FROM python:3.11.3-slim-buster
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -18,6 +15,7 @@ RUN adduser \
 RUN rm -rf /var/lib/apt/lists/*#
 RUN apt-get update && \
     apt-get install -y \
+    gcc libpq-dev python3-dev \
     build-essential \
     default-libmysqlclient-dev \
     libcurl4-openssl-dev \
@@ -25,7 +23,6 @@ RUN apt-get update && \
     libxml2-dev \
     libxmlsec1-dev \
     libxmlsec1-openssl \
-    vim \
     xmlsec1
 RUN apt-get clean
 
