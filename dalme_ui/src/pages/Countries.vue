@@ -1,20 +1,20 @@
 <template>
-  <Page>
-    <Countries />
-  </Page>
+  <PageContainer>
+    <CountryList />
+  </PageContainer>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
-import { Countries, Page } from "@/components";
+import { CountryList, PageContainer } from "@/components";
 
 export default defineComponent({
-  name: "Countries",
+  name: "CountriesPageContainer",
   components: {
-    Countries,
-    Page,
+    CountryList,
+    PageContainer,
   },
   setup() {
     useMeta({ title: "Countries" });

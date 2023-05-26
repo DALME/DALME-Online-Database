@@ -30,7 +30,7 @@ export const useUiStore = defineStore("ui", {
     },
 
     /** @returns {number} */
-    containerWidth(state) {
+    containerWidth() {
       const views = useViewStore();
       let chrome = 84;
       if ("folioDrawerMini" in views.view && views.view.folioDrawerMini.value)

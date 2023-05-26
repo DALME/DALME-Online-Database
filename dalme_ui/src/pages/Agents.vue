@@ -1,20 +1,19 @@
 <template>
-  <Page>
-    <Agents />
-  </Page>
+  <PageContainer>
+    <AgentList />
+  </PageContainer>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-
-import { Agents, Page } from "@/components";
+import { AgentList, PageContainer } from "@/components";
 
 export default defineComponent({
-  name: "Agents",
+  name: "AgentsPageContainer",
   components: {
-    Agents,
-    Page,
+    AgentList,
+    PageContainer,
   },
   setup() {
     useMeta({ title: "Agents" });

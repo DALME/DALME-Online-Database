@@ -1,20 +1,19 @@
 <template>
-  <Page>
-    <Library />
-  </Page>
+  <PageContainer>
+    <LibraryList />
+  </PageContainer>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-
-import { Library, Page } from "@/components";
+import { LibraryList, PageContainer } from "@/components";
 
 export default defineComponent({
-  name: "Library",
+  name: "LibraryPageContainer",
   components: {
-    Library,
-    Page,
+    LibraryList,
+    PageContainer,
   },
   setup() {
     useMeta({ title: "Library" });

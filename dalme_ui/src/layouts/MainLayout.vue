@@ -5,7 +5,7 @@
     view="hHr Lpr lFr"
     :class="!reAuthenticate && showLogin ? 'login-background' : null"
   >
-    <Nav v-if="reAuthenticate || !showLogin" />
+    <NavBar v-if="reAuthenticate || !showLogin" />
     <EditPanel v-if="reAuthenticate || !showLogin" />
     <q-page-container v-if="reAuthenticate || !showLogin">
       <router-view />
@@ -16,7 +16,7 @@
 <script>
 import { defineComponent, provide, ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { EditPanel, LoginModal, Nav } from "@/components";
+import { EditPanel, LoginModal, NavBar } from "@/components";
 import {
   provideAPI,
   provideEditing,
@@ -31,10 +31,10 @@ export default defineComponent({
   components: {
     EditPanel,
     LoginModal,
-    Nav,
+    NavBar,
   },
   setup() {
-    const { initEventHandler } = provideEventHandling();
+    const { initEventHandler } = provideEventHandling(); // eslint-disable-line
     const { auth, prefs, ui, hasCredentials, reAuthenticate } = provideStores();
     const $route = useRoute();
     const showLogin = ref(!hasCredentials.value || reAuthenticate.value);

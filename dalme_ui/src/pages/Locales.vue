@@ -1,20 +1,19 @@
 <template>
-  <Page>
-    <Locales />
-  </Page>
+  <PageContainer>
+    <LocaleList />
+  </PageContainer>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-
-import { Locales, Page } from "@/components";
+import { LocaleList, PageContainer } from "@/components";
 
 export default defineComponent({
-  name: "Locales",
+  name: "LocalesPageContainer",
   components: {
-    Locales,
-    Page,
+    LocaleList,
+    PageContainer,
   },
   setup() {
     useMeta({ title: "Locales" });

@@ -118,28 +118,28 @@ export const dalmeTeiBehaviours = {
       ],
     ],
     gap: (e) => {
-      e = setExtent(e);
+      e = setExtent(e); // eslint-disable-line
     },
     space: (e) => {
-      e = setExtent(e);
+      e = setExtent(e); // eslint-disable-line
     },
     unclear: (e) => {
-      e = setTitle(e);
+      e = setTitle(e); // eslint-disable-line
     },
     supplied: (e) => {
-      e = setTitle(e);
+      e = setTitle(e); // eslint-disable-line
     },
     add: (e) => {
-      e = setTitle(e);
+      e = setTitle(e); // eslint-disable-line
     },
     abbr: (e) => {
-      e = setTitle(e);
+      e = setTitle(e); // eslint-disable-line
     },
     w: (e) => {
-      e = setTitle(e);
+      e = setTitle(e); // eslint-disable-line
     },
     quote: (e) => {
-      e = setTitle(e);
+      e = setTitle(e); // eslint-disable-line
     },
     g: (e) => {
       let ref = e.getAttribute("ref", false);

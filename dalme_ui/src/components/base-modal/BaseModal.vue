@@ -38,7 +38,7 @@ import { computed, defineAsyncComponent, defineComponent, ref } from "vue";
 import { useDraggable, useStorage } from "@vueuse/core";
 import { useActor, useSelector } from "@xstate/vue";
 import { useEditing } from "@/use";
-import { Dialog } from "@/components";
+import { CustomDialog } from "@/components";
 
 export default defineComponent({
   name: "BaseModal",
@@ -115,11 +115,13 @@ export default defineComponent({
         <span class="text-weight-medium">${modalTitle.value}</span>?`;
       if (valid.value)
         /* eslint-disable */
-        message = message + '<br /> <span class="text-red-10 text-weight-medium">\
+        message =
+          message +
+          '<br /> <span class="text-red-10 text-weight-medium">\
           Your changes will be lost.</span>';
-        /* eslint-enable */
+      /* eslint-enable */
       $q.dialog({
-        component: Dialog,
+        component: CustomDialog,
         componentProps: {
           isPersistent: true,
           title: "Close window",

@@ -81,7 +81,7 @@
                 </q-item-section>
               </q-item>
             </div>
-            <Comments>
+            <CommentWidget>
               <template v-if="ticket.status" v-slot:comment-stream-end>
                 <div class="comment_thread row items-center q-mt-none q-pb-lg">
                   <div class="closing-dot bg-deep-purple-6">
@@ -93,7 +93,7 @@
                   </div>
                 </div>
               </template>
-            </Comments>
+            </CommentWidget>
           </q-card-section>
         </q-card>
       </div>
@@ -127,7 +127,7 @@
           Attachments
         </div>
         <div class="q-mb-sm text-13">
-          <Attachments v-if="attachment" />
+          <AttachmentWidget v-if="attachment" />
           <span v-else>None yet</span>
         </div>
         <q-separator class="q-my-md" />
@@ -157,7 +157,7 @@ import {
 } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import { Attachments, Comments, MarkdownEditor } from "@/components";
+import { AttachmentWidget, CommentWidget, MarkdownEditor } from "@/components";
 import {
   DetailPopover,
   formatDate,
@@ -170,8 +170,8 @@ import { useAPI, useEventHandling, useStores } from "@/use";
 export default defineComponent({
   name: "TicketDetail",
   components: {
-    Attachments,
-    Comments,
+    AttachmentWidget,
+    CommentWidget,
     DetailPopover,
     MarkdownEditor,
     OpaqueSpinner,

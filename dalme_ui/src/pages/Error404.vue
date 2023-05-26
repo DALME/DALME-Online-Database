@@ -25,7 +25,7 @@ import { useMeta } from "quasar";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "Error404",
+  name: "Error404PageContainer",
   setup() {
     useMeta({ title: "404" });
   },

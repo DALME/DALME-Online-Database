@@ -27,7 +27,8 @@ const routes = [
         nav: true,
         children: [
           {
-            component: () => import("components/sources/Sources.vue"),
+            component: () =>
+              import("src/components/source-list/SourceList.vue"),
             name: "Archives",
             path: "archives",
             nav: true,
@@ -39,7 +40,8 @@ const routes = [
             },
           },
           {
-            component: () => import("components/sources/Sources.vue"),
+            component: () =>
+              import("src/components/source-list/SourceList.vue"),
             name: "Archival Files",
             path: "archival-files",
             nav: true,
@@ -51,7 +53,8 @@ const routes = [
             },
           },
           {
-            component: () => import("components/sources/Sources.vue"),
+            component: () =>
+              import("src/components/source-list/SourceList.vue"),
             name: "Records",
             path: "records",
             nav: true,
@@ -63,7 +66,8 @@ const routes = [
             },
           },
           {
-            component: () => import("components/sources/Sources.vue"),
+            component: () =>
+              import("src/components/source-list/SourceList.vue"),
             name: "Bibliography",
             path: "bibilographies",
             nav: true,
@@ -102,7 +106,7 @@ const routes = [
         nav: true,
         children: [
           {
-            component: () => import("components/sets/Sets.vue"),
+            component: () => import("src/components/set-list/SetList.vue"),
             name: "Corpora",
             path: "corpora",
             nav: true,
@@ -114,7 +118,7 @@ const routes = [
             },
           },
           {
-            component: () => import("components/sets/Sets.vue"),
+            component: () => import("src/components/set-list/SetList.vue"),
             name: "Collections",
             path: "collections",
             nav: true,
@@ -126,7 +130,7 @@ const routes = [
             },
           },
           {
-            component: () => import("components/sets/Sets.vue"),
+            component: () => import("src/components/set-list/SetList.vue"),
             name: "Datasets",
             path: "datasets",
             nav: true,
@@ -138,7 +142,7 @@ const routes = [
             },
           },
           {
-            component: () => import("components/sets/Sets.vue"),
+            component: () => import("src/components/set-list/SetList.vue"),
             name: "Worksets",
             path: "worksets",
             nav: true,
@@ -215,7 +219,8 @@ const routes = [
             nav: true,
             children: [
               {
-                component: () => import("components/tasks/Tasks.vue"),
+                component: () =>
+                  import("src/components/task-list/TaskList.vue"),
                 name: "Tasks",
                 path: "",
                 nav: true,
@@ -245,7 +250,8 @@ const routes = [
             nav: true,
             children: [
               {
-                component: () => import("components/tickets/Tickets.vue"),
+                component: () =>
+                  import("src/components/ticket-list/TicketList.vue"),
                 name: "Tickets",
                 path: "",
                 nav: true,
@@ -285,7 +291,8 @@ const routes = [
             nav: true,
             children: [
               {
-                component: () => import("components/rights/Rights.vue"),
+                component: () =>
+                  import("src/components/rights-list/RightsList.vue"),
                 name: "Rights Policies",
                 path: "",
                 nav: true,
@@ -360,7 +367,8 @@ const routes = [
             nav: true,
             children: [
               {
-                component: () => import("components/users/Users.vue"),
+                component: () =>
+                  import("src/components/user-list/UserList.vue"),
                 name: "Users",
                 path: "",
                 nav: true,

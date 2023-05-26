@@ -1,15 +1,15 @@
 <template>
-  <Page>
+  <PageContainer>
     <router-view />
-  </Page>
+  </PageContainer>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { Page } from "@/components";
+import { PageContainer } from "@/components";
 
 export default defineComponent({
-  name: "Tickets",
-  components: { Page },
+  name: "TicketsPageContainer",
+  components: { PageContainer },
 });
 </script>

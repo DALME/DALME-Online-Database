@@ -168,7 +168,7 @@
               </div>
             </q-tab-panel>
             <q-tab-panel name="comments" class="q-pt-md q-px-lg">
-              <Comments @on-count-changed="updateCommentCount" />
+              <CommentWidget @on-count-changed="updateCommentCount" />
             </q-tab-panel>
             <q-tab-panel name="log" class="q-pt-md q-px-lg">
               <LogViewer :data="source.workflow" />
@@ -204,7 +204,7 @@ import {
   notNully,
   Tag,
 } from "@/components/utils";
-import { Comments, LogViewer, WorkflowManager } from "@/components";
+import { CommentWidget, LogViewer, WorkflowManager } from "@/components";
 import SourceAttributes from "./SourceAttributes.vue";
 import SourceAgents from "./SourceAgents.vue";
 import SourceChildren from "./SourceChildren.vue";
@@ -217,7 +217,7 @@ export default defineComponent({
     AdaptiveSpinner,
     BooleanIcon,
     DetailPopover,
-    Comments,
+    CommentWidget,
     LogViewer,
     SourceAttributes,
     SourceAgents,
