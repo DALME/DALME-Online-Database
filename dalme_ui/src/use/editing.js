@@ -24,6 +24,7 @@ export const provideEditing = () => {
   const createFormMachine = (cuid, key, kind, mode, initialData) =>
     createMachine(
       {
+        predictableActionArguments: true,
         id: cuid,
         initial: "editing",
         context: {
@@ -71,6 +72,7 @@ export const provideEditing = () => {
   const createFolioMachine = (cuid, key, metadata) =>
     createMachine(
       {
+        predictableActionArguments: true,
         id: cuid,
         initial: "render",
         context: { kind: "Folio", mode: "View", key, metadata, visible: true },
@@ -93,6 +95,7 @@ export const provideEditing = () => {
   const createInlineMachine = () =>
     createMachine(
       {
+        predictableActionArguments: true,
         id: "inline",
         initial: "editing",
         on: {
@@ -123,6 +126,7 @@ export const provideEditing = () => {
 
   const editingMachine = createMachine(
     {
+      predictableActionArguments: true,
       id: "editing",
       initial: "normal",
       context: {
