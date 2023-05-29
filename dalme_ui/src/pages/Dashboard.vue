@@ -1,7 +1,7 @@
 <template>
   <PageContainer>
     <TaskList :embedded="true" />
-    <WorksetWidget />
+    <SetList :embedded="true" />
     <TicketList :embedded="true" />
   </PageContainer>
 </template>
@@ -9,12 +9,7 @@
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-import {
-  PageContainer,
-  TaskList,
-  TicketList,
-  WorksetWidget,
-} from "@/components";
+import { PageContainer, TaskList, TicketList, SetList } from "@/components";
 
 export default defineComponent({
   name: "DashBoard",
@@ -22,7 +17,7 @@ export default defineComponent({
     PageContainer,
     TaskList,
     TicketList,
-    WorksetWidget,
+    SetList,
   },
   setup() {
     useMeta({ title: "Dashboard" });
