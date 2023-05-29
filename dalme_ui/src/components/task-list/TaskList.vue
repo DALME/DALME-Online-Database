@@ -283,7 +283,7 @@ export default defineComponent({
     };
 
     const fetchTaskLists = async () => {
-      const { loading, success, data, fetchAPI } = apiInterface();
+      const { success, data, fetchAPI } = apiInterface();
       const request = requests.tasks.getTaskLists();
       fetchAPI(request).then(() => {
         if (success.value)

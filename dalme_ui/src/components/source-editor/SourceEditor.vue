@@ -130,7 +130,7 @@ export default defineComponent({
       containerHeight,
       containerWidth,
       folioCount,
-      ui,
+      // ui,
       views,
       view,
     } = useStores();
@@ -165,9 +165,9 @@ export default defineComponent({
 
     const drawer = ref(folioCount.value > 1);
     const folioChooser = computed(() => folioCount.value > 1);
-    const tagMenuDrawer = computed(() => {
-      return view.value.showTagMenu ? 250 : 0;
-    });
+    // const tagMenuDrawer = computed(() => {
+    //   return view.value.showTagMenu ? 250 : 0;
+    // });
 
     const editor = ref(null);
 

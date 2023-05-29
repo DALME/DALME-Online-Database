@@ -436,6 +436,7 @@ export default defineComponent({
       teiTagsFiltered,
       onTabSwitch,
       view,
+      insertTag,
     };
   },
 });

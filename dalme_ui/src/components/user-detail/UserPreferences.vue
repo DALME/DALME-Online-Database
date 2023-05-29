@@ -218,7 +218,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import { useAPI, useStores } from "@/use";
+import { useStores } from "@/use";
 
 const themeList = [
   { label: "Chrome", value: "ace/theme/chrome", type: "Light theme" },
@@ -248,8 +248,8 @@ const themeList = [
 export default defineComponent({
   name: "UserPreferences",
   setup() {
-    const { apiInterface } = useAPI();
-    const { loading, success, data, fetchAPI } = apiInterface();
+    // const { apiInterface } = useAPI();
+    // const { loading, success, data, fetchAPI } = apiInterface();
     const { ui, sourceEditor } = useStores();
     const tab = ref("ui");
     const tooltipsOn = ref(ui.general.tooltipsOn);
@@ -286,7 +286,7 @@ export default defineComponent({
     };
 
     return {
-      loading,
+      // loading,
       onSubmit,
       tab,
       tooltipsOn,
