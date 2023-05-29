@@ -9,7 +9,6 @@
     :class="buttonClasses"
     no-caps
     padding="5px 5px"
-    :loading="loading"
   >
     <TooltipWidget v-if="toolTip">{{ toolTip }}</TooltipWidget>
     <q-menu
@@ -154,6 +153,9 @@
         </q-item>
       </q-list>
     </q-menu>
+    <q-inner-loading :showing="loading">
+      <q-spinner-facebook size="20px" color="grey-6"></q-spinner-facebook>
+    </q-inner-loading>
   </q-btn>
 </template>
 
