@@ -1,10 +1,9 @@
 from rest_framework import status
 from rest_framework.response import Response
-
 from django.contrib.auth.models import User
-
-from dalme_api import api
-from dalme_api.v2_serializers import AttributeOptionsSerializer
+from ._common import DALMEBaseViewSet
+from dalme_api.serializers import SimpleAttributeSerializer, AttributeOptionsSerializer
+from dalme_api.access_policies import GeneralAccessPolicy
 from dalme_app.models import (
     Attribute,
     Attribute_type,
@@ -17,8 +16,11 @@ from dalme_app.models import (
 )
 
 
-class Attributes(api.Attributes):
-    """Endpoint for the Attribute resource."""
+class Attributes(DALMEBaseViewSet):
+    """ API endpoint for managing attributes """
+    permission_classes = (GeneralAccessPolicy,)
+    queryset = Attribute.objects.all().order_by('attribute_type')
+    serializer_class = SimpleAttributeSerializer
 
     def get_serializer_class(self):
         if self.request.GET.get('options'):

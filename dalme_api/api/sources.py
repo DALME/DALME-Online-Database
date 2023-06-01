@@ -2,7 +2,7 @@ import json
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_api.serializers import SourceSerializer
+from dalme_api.serializers import SourceSerializer, SourceOptionsSerializer
 from dalme_app.models import Attribute, Attribute_type, Source
 from dalme_api.access_policies import SourceAccessPolicy
 from dalme_api.filters import SourceFilter
@@ -14,7 +14,8 @@ class Sources(DALMEBaseViewSet):
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
     filterset_class = SourceFilter
-    search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name', 'primary_dataset__name', 'attributes__value_STR']
+    search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name',
+                     'primary_dataset__name', 'attributes__value_STR']
     ordering_fields = ['name', 'short_name', 'owner', 'primary_dataset', 'no_records', 'is_private', 'attributes.authority',
                        'attributes.format', 'attributes.locale', 'attributes.country', 'attributes.default_rights',
                        'attributes.archival_series', 'attributes.archival_number', 'attributes.date', 'attributes.start_date',
@@ -37,35 +38,10 @@ class Sources(DALMEBaseViewSet):
     # '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
     # '$' Regex search.
 
-    # @action(detail=False, methods=['get'])
-    # def get_set(self, request, *args, **kwargs):
-    #     data_dict = {}
-    #     if request.GET.get('data') is not None:
-    #         dt_data = json.loads(request.GET['data'])
-    #         if hasattr(self, 'search_dict'):
-    #             search_dict = self.search_dict
-    #         else:
-    #             search_dict = {}
-    #         queryset = self.get_queryset()
-    #         try:
-    #             if dt_data['search']['value']:
-    #                 queryset = self.filter_on_search(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-    #             if request.GET.get('filters') is not None:
-    #                 queryset = self.filter_on_filters(queryset=queryset, filters=ast.literal_eval(request.GET['filters']))
-    #             queryset = self.get_ordered_queryset(queryset=queryset, dt_data=dt_data, search_dict=search_dict)
-    #             query_list = list(queryset.values_list('id', flat=True))
-    #             data_dict['data'] = query_list
-    #         except Exception as e:
-    #             data_dict['error'] = 'The following error occured while trying to fetch the set: ' + str(e)
-    #     else:
-    #         data_dict['error'] = 'There was no data in the request.'
-    #     return Response(data_dict)
-
-    #     # @action(detail=True, methods=['post'])
-    #     # def add_identity_phrase(self, request, *args, **kwargs):
-    #     #     result = {}
-    #     #     object = get_object_or_404(self.queryset, pk=kwargs.get('pk'))
-    #     #     try:
+    @property
+    def options_view(self):
+        q_as = self.request.GET.get('as')
+        return q_as == 'options'
 
     @action(detail=True, methods=['patch'])
     def change_description(self, request, *args, **kwargs):
@@ -99,38 +75,38 @@ class Sources(DALMEBaseViewSet):
             try:
                 canvases = [json.loads(page.get_canvas()) for page in pages]
                 result = {
-                  "@context": "http://iiif.io/api/presentation/2/context.json",
-                  "@id": source.get_absolute_url(),
-                  "@type": "sc:Manifest",
-                  "label": source.name,
-                  "metadata": [],
-                  "description": [{
-                    "@value": f"Manifest for {source.name}",
-                    "@language": "en"
-                  }],
-                  "license": "https://creativecommons.org/licenses/by/3.0/",
-                  "attribution": "DALME",
-                  "thumbnail": {
-                    "@id": f"https://dam.dalme.org/loris/{dam_id_list[0]}/full/thm/0/default.jpg",
-                    "@type": "dctypes:Image",
-                    "height": 150,
-                    "width": 56,
-                    "format": "image/jpeg",
-                    "service": {
-                      "@context": "http://iiif.io/api/image/2/context.json",
-                      "@id": f"https://dam.dalme.org/loris/{dam_id_list[0]}",
-                      "profile": "http://iiif.io/api/image/2/level1.json"
-                    }
-                  },
-                  "sequences": [
-                    {
-                      "@id": source.id,
-                      "@type": "sc:Canvas",
-                      "label": "Folios",
-                      "canvases": canvases
-                    }
-                  ],
-                  "structures": []
+                    "@context": "http://iiif.io/api/presentation/2/context.json",
+                    "@id": source.get_absolute_url(),
+                    "@type": "sc:Manifest",
+                    "label": source.name,
+                    "metadata": [],
+                    "description": [{
+                        "@value": f"Manifest for {source.name}",
+                        "@language": "en"
+                    }],
+                    "license": "https://creativecommons.org/licenses/by/3.0/",
+                    "attribution": "DALME",
+                    "thumbnail": {
+                        "@id": f"https://dam.dalme.org/loris/{dam_id_list[0]}/full/thm/0/default.jpg",
+                        "@type": "dctypes:Image",
+                        "height": 150,
+                        "width": 56,
+                        "format": "image/jpeg",
+                        "service": {
+                            "@context": "http://iiif.io/api/image/2/context.json",
+                            "@id": f"https://dam.dalme.org/loris/{dam_id_list[0]}",
+                            "profile": "http://iiif.io/api/image/2/level1.json"
+                        }
+                    },
+                    "sequences": [
+                        {
+                            "@id": source.id,
+                            "@type": "sc:Canvas",
+                            "label": "Folios",
+                            "canvases": canvases
+                        }
+                    ],
+                    "structures": []
                 }
                 status = 201
 
@@ -144,6 +120,12 @@ class Sources(DALMEBaseViewSet):
 
         return Response(result, status)
 
+    def get_serializer_class(self):
+        serializer_class = super().get_serializer_class()
+        if self.options_view:
+            serializer_class = SourceOptionsSerializer
+        return serializer_class
+
     def get_serializer(self, *args, **kwargs):
         serializer_class = super().get_serializer_class()
         fields = {
@@ -153,19 +135,28 @@ class Sources(DALMEBaseViewSet):
             'bibliography': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'owner', 'attributes', 'sets', 'no_records', 'primary_dataset']
         }
 
-        if self.request.GET.get('format') == 'select':
+        if self.options_view:
+            serializer_class = self.get_serializer_class()
+            kwargs.setdefault('context', self.get_serializer_context())
+
+        elif self.request.GET.get('format') == 'select':
             kwargs['fields'] = ['id', 'name']
+
         elif self.request.GET.get('class') is not None:
             kwargs['fields'] = fields[self.request.GET['class']]
 
-        return serializer_class(*args, **kwargs)
+        return serializer_class(*args, **kwargs)  # type: ignore
 
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('class'):
             queryset = self.get_queryset_by_source_type()
         else:
             queryset = Source.objects.all()
-        return queryset.prefetch_related('children', 'attributes', 'sets', 'type')
+
+        if self.options_view:
+            return super().get_queryset(*args, **kwargs)
+        else:
+            return queryset.prefetch_related('children', 'attributes', 'sets', 'type')
 
     def get_queryset_by_source_type(self):
         query = {

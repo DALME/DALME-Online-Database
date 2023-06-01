@@ -28,6 +28,12 @@ from dalme_app.models import (
 from ._common import DynamicSerializer, translate_workflow_string
 
 
+class SourceOptionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Source
+        fields = ['id', 'name']
+
+
 class SimpleSourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Source
@@ -319,7 +325,8 @@ class SourceSerializer(DynamicSerializer):
                 new_credits = []
                 for i, credit in enumerate(validated_data):
                     if current_credits.filter(source=instance.id, agent=credit['agent']['id']).exists():
-                        current_credits_dict.pop(current_credits.get(source=instance.id, agent=credit['agent']['id']).id)
+                        current_credits_dict.pop(current_credits.get(
+                            source=instance.id, agent=credit['agent']['id']).id)
                     else:
                         new_credits.append(credit)
 
@@ -399,7 +406,8 @@ class SourceSerializer(DynamicSerializer):
                     Set_x_content.objects.create(set_id=set, content_object=instance)
 
     def process_attributes(self, source_type, data):
-        multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(content_type=source_type) if not i.unique]
+        multi_attributes = [i.attribute_type.short_name for i in Content_attributes.objects.filter(
+            content_type=source_type) if not i.unique]
 
         if type(data) is dict:
             attributes = []

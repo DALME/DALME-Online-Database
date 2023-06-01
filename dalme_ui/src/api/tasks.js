@@ -2,7 +2,6 @@ import S from "string";
 import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/tasks`;
-const v2Endpoint = `${apiUrl}/v2/tasks`;
 
 const tasks = {
   getTasks(query = false) {
@@ -22,7 +21,7 @@ const tasks = {
   },
   getUserTasks(userId) {
     return {
-      url: `${v2Endpoint}/?assigned_to=${userId}`,
+      url: `${endpoint}/?assigned_to=${userId}`,
       method: "GET",
     };
   },

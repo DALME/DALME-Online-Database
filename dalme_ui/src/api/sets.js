@@ -1,7 +1,6 @@
 import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/sets`;
-const v2Endpoint = `${apiUrl}/v2/sets`;
 
 const sets = {
   createSet(data) {
@@ -51,7 +50,7 @@ const sets = {
   },
   getUserWorksets(userId) {
     return {
-      url: `${v2Endpoint}/?type=4&owner=${userId}`,
+      url: `${endpoint}/?type=4&owner=${userId}`,
       method: "GET",
     };
   },

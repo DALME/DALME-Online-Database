@@ -1,7 +1,6 @@
 import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/sources`;
-const v2Endpoint = `${apiUrl}/v2/sources`;
 
 const sourceTypeMap = {
   archive: "archives",
@@ -29,7 +28,7 @@ const sources = {
   },
   getSourceOptionsByType(sourceType) {
     return {
-      url: `${v2Endpoint}/?class=${sourceTypeMap[sourceType]}&as=options`,
+      url: `${endpoint}/?class=${sourceTypeMap[sourceType]}&as=options`,
       method: "GET",
     };
   },

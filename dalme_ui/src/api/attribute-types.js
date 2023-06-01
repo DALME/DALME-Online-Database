@@ -1,6 +1,6 @@
 import { apiUrl } from "./config";
 
-const endpoint = `${apiUrl}/v2/attribute_types`;
+const endpoint = `${apiUrl}/attribute_types`;
 
 const attributeTypes = {
   getAttributeTypes() {

@@ -1,7 +1,7 @@
 import { snakeCase } from "change-case";
 import { apiUrl } from "./config";
 
-const endpoint = `${apiUrl}/v2/attributes`;
+const endpoint = `${apiUrl}/attributes`;
 
 const attributes = {
   getAttributeOptions(shortName) {

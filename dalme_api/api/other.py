@@ -20,12 +20,10 @@ from dalme_api.serializers import (
     LanguageReferenceSerializer,
     LocaleReferenceSerializer,
     PlaceSerializer,
-    RightsPolicySerializer,
-    SimpleAttributeSerializer
+    RightsPolicySerializer
 )
 from dalme_app.models import (
     Agent,
-    Attribute,
     Content_class,
     Content_type,
     CountryReference,
@@ -57,13 +55,6 @@ class Agents(DALMEBaseViewSet):
             if qs_as == 'named':
                 qs = qs.filter(user__isnull=True)
         return qs
-
-
-class Attributes(DALMEBaseViewSet):
-    """ API endpoint for managing attributes """
-    permission_classes = (GeneralAccessPolicy,)
-    queryset = Attribute.objects.all().order_by('attribute_type')
-    serializer_class = SimpleAttributeSerializer
 
 
 class ContentClasses(DALMEBaseViewSet):

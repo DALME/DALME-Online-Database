@@ -2,7 +2,7 @@ import json
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from dalme_api.serializers import RSImageSerializer
+from dalme_api.serializers import ImageOptionsSerializer, ImageUrlSerializer, RSImageSerializer
 from dalme_app.models import rs_resource, rs_api_query, Source
 from dalme_api.access_policies import ImageAccessPolicy
 from ._common import DALMEBaseViewSet
@@ -15,12 +15,44 @@ class Images(DALMEBaseViewSet):
     queryset = rs_resource.objects.filter(resource_type=1, archive=0, ref__gte=0)
     serializer_class = RSImageSerializer
 
-    filterset_fields = ['ref', 'title', 'resource_type', 'country', 'field12', 'field8', 'field3', 'field51', 'field79', 'collections']
+    filterset_fields = ['ref', 'title', 'resource_type', 'country',
+                        'field12', 'field8', 'field3', 'field51', 'field79', 'collections']
     search_fields = ['ref', 'title', 'country', 'field12', 'field8', 'field3', 'field51', 'field79']
     ordering_fields = ['ref', 'title', 'country', 'field12', 'field8', 'field3', 'field51', 'field79']
     ordering = ['ref']
 
     search_dict = {'collections': 'collections__name'}
+
+    @property
+    def options_view(self):
+        q_as = self.request.GET.get('as')
+        return q_as == 'options'
+
+    @property
+    def url_view(self):
+        q_as = self.request.GET.get('as')
+        return q_as == 'url'
+
+    def get_serializer_class(self):
+        serializer_class = super().get_serializer_class()
+        if self.options_view:
+            serializer_class = ImageOptionsSerializer
+        if self.url_view:
+            serializer_class = ImageUrlSerializer
+        return serializer_class
+
+    def get_serializer(self, *args, **kwargs):
+        if self.options_view:
+            serializer_class = self.get_serializer_class()
+            kwargs.setdefault('context', self.get_serializer_context())
+            return serializer_class(*args, **kwargs)  # type: ignore
+        return super().get_serializer(*args, **kwargs)
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        if self.options_view:
+            qs = qs.values('ref', 'field8')
+        return qs
 
     @action(detail=False)
     def rs_api(self, request, *args, **kwargs):
@@ -28,7 +60,7 @@ class Images(DALMEBaseViewSet):
             'q': 'param1',
             'n': 'param5',
             'size': 'param8'
-            }
+        }
         try:
             query_params = {}
 
@@ -39,7 +71,7 @@ class Images(DALMEBaseViewSet):
             # row_cutoff = query_params.get('param5', '20')  # this is to deal with a bug/feature in the RS API that returns 0s for records exceeding the row count requested
             response = rs_api_query(**query_params)
             try:
-                result = json.loads(response.text) # [:int(row_cutoff)]
+                result = json.loads(response.text)  # [:int(row_cutoff)]
                 status = 201
             except JSONDecodeError:
                 result = 'Your search did not return any results.'
@@ -52,35 +84,43 @@ class Images(DALMEBaseViewSet):
         return Response(result, status)
 
     def list(self, request, *args, **kwargs):
-        query_params = {}
-        if request.GET.get('search') is not None:
-            query_params['param1'] = request.GET['search']
-        if request.GET.get('data') is not None:
-            dt_request = json.loads(request.GET['data'])
-            # query_params['param5'] = dt_request['length']
-        try:
-            response = rs_api_query(**query_params)
-            try:
-                queryset = json.loads(response.text)
-                if request.GET.get('data') is not None:
-                    page = queryset[dt_request.get('start'):(dt_request.get('start') + dt_request.get('length'))]
-                    result = {
-                        'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
-                        'recordsTotal': len(queryset),
-                        'recordsFiltered': len(queryset),
-                        'data': page
-                        }
-                    status = 200
-                else:
-                    result = queryset[:25]
-                    status = 200
-            except JSONDecodeError:
-                result = 'Your search did not return any results.'
-                status = 201
-        except Exception as e:
-            result = {'error': 'The following error occured while trying to fetch the data: ' + str(e)}
-            status = 400
-        return Response(result, status)
+        if self.options_view:
+            qs = self.get_queryset()
+            result = self.get_serializer(qs, many=True)
+            return Response(result.data)
+        return super().list(request, *args, **kwargs)
+
+    # def list(self, request, *args, **kwargs):
+    #     query_params = {}
+    #     if request.GET.get('search') is not None:
+    #         query_params['param1'] = request.GET['search']
+    #     if request.GET.get('data') is not None:
+    #         dt_request = json.loads(request.GET['data'])
+    #         # query_params['param5'] = dt_request['length']
+    #     try:
+    #         response = rs_api_query(**query_params)
+    #         try:
+    #             queryset = json.loads(response.text)
+    #             if request.GET.get('data') is not None:
+    #                 page = queryset[dt_request.get('start'):(dt_request.get('start') + dt_request.get('length'))]
+    #                 result = {
+    #                     # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+    #                     'draw': int(dt_request.get('draw')),
+    #                     'recordsTotal': len(queryset),
+    #                     'recordsFiltered': len(queryset),
+    #                     'data': page
+    #                 }
+    #                 status = 200
+    #             else:
+    #                 result = queryset[:25]
+    #                 status = 200
+    #         except JSONDecodeError:
+    #             result = 'Your search did not return any results.'
+    #             status = 201
+    #     except Exception as e:
+    #         result = {'error': 'The following error occured while trying to fetch the data: ' + str(e)}
+    #         status = 400
+    #     return Response(result, status)
 
     @action(detail=False)
     def get_info_for_source(self, request):
@@ -137,7 +177,8 @@ class Images(DALMEBaseViewSet):
                     src_title_short = ''
                 shelf_number = source_data.get('shelfnumber', '')
                 source_data['name'] = '{} ({} {} {})'.format(src_title, short_archive, short_series, shelf_number)
-                source_data['short_name'] = '{} {} {} ({})'.format(short_archive, short_series, shelf_number, src_title_short)
+                source_data['short_name'] = '{} {} {} ({})'.format(
+                    short_archive, short_series, shelf_number, src_title_short)
                 result = {'data': {'source_fields': source_data, 'folios': folios}}
                 status = 201
             except Exception as e:

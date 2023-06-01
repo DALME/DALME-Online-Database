@@ -1,13 +1,14 @@
 from .attachments import Attachments
+from .attributes import Attributes
 from .attribute_types import AttributeTypes
 from .choices import Choices
 from .comments import Comments
 from .configs import Configs
 from .datasets import Datasets
+from .health_check import HealthCheck
 from .images import Images
 from .other import (
     Agents,
-    Attributes,
     ContentClasses,
     ContentTypes,
     Countries,
@@ -41,6 +42,7 @@ __all__ = [
     "Configs",
     "Datasets",
     "Groups",
+    "HealthCheck",
     "Images",
     "Languages",
     "Library",

@@ -1,7 +1,6 @@
 import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/places`;
-const v2Endpoint = `${apiUrl}/v2/places`;
 
 const places = {
   getPlaces(query = false) {
@@ -15,7 +14,7 @@ const places = {
   },
   inlineUpdate(data) {
     return {
-      url: `${v2Endpoint}/inline_update/`,
+      url: `${endpoint}/inline_update/`,
       method: "PATCH",
       data: data.value,
     };
