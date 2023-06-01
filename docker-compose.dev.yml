@@ -58,6 +58,19 @@ services:
     cap_add:
       - SYS_NICE
 
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+    networks:
+      - app-network
+    ports:
+      - "5050:80"
+
   rs.db:
     image: mysql:8.0.19
     platform: linux/amd64
@@ -99,6 +112,8 @@ volumes:
   assets:
   pgdata:
   rsdata:
+  pgadmindata:
+
 
 networks:
   app-network:
