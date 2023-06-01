@@ -315,7 +315,7 @@ def get_citation_data(context):
     formats = None
     record = context.get('record', False)
 
-    with open(os.path.join('dalme_app', 'config', '_citation_formats.json'), 'r', encoding='utf-8') as fp:
+    with open(os.path.join('static', 'citation_styles', 'citation_formats.json'), 'r', encoding='utf-8') as fp:
         formats = json.load(fp)
 
     coins_list = [
@@ -417,10 +417,10 @@ def get_citation_data(context):
             citation.update({
                 'author': [{'literal': author}],
                 'issued': {'date-parts': [[
-                        published.year,
-                        published.month,
-                        published.day
-                    ]]},
+                    published.year,
+                    published.month,
+                    published.day
+                ]]},
                 'title': page.title,
                 'URL': page.get_full_url(context['request'])
             })
@@ -525,7 +525,8 @@ def get_highlights(meta, context):
                         fields = hit.meta.highlight.to_dict().keys()
                         for field in fields:
                             for fragment in hit.meta.highlight[field]:
-                                highlights.append({'field': f'Folio {hit.folio}', 'fragment': fragment, 'link': hit.folio})
+                                highlights.append({'field': f'Folio {hit.folio}',
+                                                  'fragment': fragment, 'link': hit.folio})
 
                     except AttributeError:
                         pass
