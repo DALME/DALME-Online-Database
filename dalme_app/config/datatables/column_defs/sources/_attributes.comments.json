@@ -1,9 +1,0 @@
-{
-    "title": "Comments",
-    "data": "attributes.comments",
-    "name": "comments",
-    "defaultContent": "",
-    "visible": false,
-    "orderable": true,
-    "searchable": true
-}

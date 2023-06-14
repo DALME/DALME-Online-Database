@@ -1,9 +1,0 @@
-{
-  "name": "field3",
-  "label": "Country",
-  "type": "selectize",
-  "opts": {
-    "placeholder": "Select country"
-  },
-  "options": {}
-}

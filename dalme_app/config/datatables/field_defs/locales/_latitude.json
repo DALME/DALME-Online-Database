@@ -1,6 +1,0 @@
-{
-    "name": "latitude",
-    "label": "Latitude",
-    "type": "text",
-    "fieldInfo": "EPSG:3857 (Google/Web Mercator) | WGS-84"
-}

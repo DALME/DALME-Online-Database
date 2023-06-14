@@ -1,8 +1,0 @@
-{
-    "title": "Full name",
-    "data": "profile.full_name",
-    "defaultContent": "",
-    "visible": true,
-    "orderable": true,
-    "searchable": true
-}

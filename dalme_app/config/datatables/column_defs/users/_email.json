@@ -1,9 +1,0 @@
-{
-    "title": "Email",
-    "data": "email",
-    "defaultContent": "",
-    "visible": true,
-    "orderable": true,
-    "searchable": true,
-    "render": "function ( data, type, row, meta ) {return '<a href=\"mailto:'+data+'\">'+data+'<\/a>';}"
-}

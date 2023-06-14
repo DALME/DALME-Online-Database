@@ -1,6 +1,0 @@
-{
-  "label": "URL",
-  "name":  "url",
-  "fieldInfo": "A URL related to the ticket, if applicable",
-  "type": "text"
-}

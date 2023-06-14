@@ -1,4 +1,0 @@
-{
-  "action": "function() { save_set(\"add\") }",
-  "text": "<i class=\"fa fa-folder-plus fa-fw dt_menu_icon\"></i> Add Sources to Set..."
-}

@@ -1,6 +1,0 @@
-{
-    "name": "stat_text",
-    "label": "Public Stat Text",
-    "type": "text",
-    "fieldInfo": "Content of the text stat in the At-a-glance panel"
-}

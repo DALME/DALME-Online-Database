@@ -1,6 +1,0 @@
-{
-    "name": "rights_notice",
-    "label": "Notice",
-    "type": "textarea",
-    "fieldInfo": "Localization-aware content of notices in JSON format"
-}

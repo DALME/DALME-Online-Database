@@ -1,9 +1,0 @@
-{
-    "title": "Record type",
-    "data": "attributes.record_type",
-    "name": "record_type",
-    "defaultContent": "",
-    "visible": true,
-    "orderable": true,
-    "searchable": true
-}
