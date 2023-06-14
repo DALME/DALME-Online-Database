@@ -1,12 +1,15 @@
-from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
-from dalme_app.models._templates import dalmeUuid
-import django.db.models.options as options
+from django.db import models
+from django.db.models import options
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+from dalme_app.models.templates import dalmeUuid
+
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
 class RightsPolicy(dalmeUuid):
+    """Stores information about rights concerning archival images."""
+
     COPYRIGHTED = 1
     ORPHANED = 2
     OWNED = 3
@@ -19,19 +22,24 @@ class RightsPolicy(dalmeUuid):
         (PUBLIC_DOMAIN, 'Public Domain'),
         (UNKNOWN, 'Unknown'),
     )
+
     name = models.CharField(max_length=100)
     rights_status = models.IntegerField(choices=RIGHTS_STATUS, default=5)
-    rights = models.TextField(blank=True, default=None)
+    rights = models.TextField(blank=True)
     rights_notice = models.JSONField(null=True)
-    licence = models.TextField(blank=True, null=True, default=None)
-    rights_holder = models.CharField(max_length=255, null=True, default=None)
+    licence = models.TextField(blank=True)
+    rights_holder = models.CharField(max_length=255, blank=True)
     notice_display = models.BooleanField(default=False)
     public_display = models.BooleanField(default=True)
     attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
     comments = GenericRelation('Comment')
 
-    def __str__(self):
+    class Meta:  # noqa: D106
+        ordering = ['name']
+
+    def __str__(self):  # noqa: D105
         return self.name
 
     def get_url(self):
-        return '/rights/' + str(self.id)
+        """Return url for instance."""
+        return f'/rights/{self.id}'

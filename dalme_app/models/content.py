@@ -1,53 +1,60 @@
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from dalme_app.models._templates import dalmeIntid
-import django.db.models.options as options
+from django.db.models import options
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+from dalme_app.models.templates import dalmeIntid
 
-
-class Content_attributes(dalmeIntid):
-    content_type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='attribute_type_list')
-    attribute_type = models.ForeignKey('Attribute_type', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='content_types')
-    order = models.IntegerField(db_index=True, null=True)
-    required = models.BooleanField(default=False)
-    unique = models.BooleanField(default=True)
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Content_class(dalmeIntid):
-    name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55, unique=True)
-    description = models.TextField()
+class ContentTypeExtended(dalmeIntid):
+    """Extends ContentType to store extra information."""
 
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['id']
-
-
-class Content_type(dalmeIntid):
-    content_class = models.ForeignKey('Content_class', to_field='id', db_index=True, on_delete=models.PROTECT)
+    content_type = models.OneToOneField(
+        ContentType,
+        on_delete=models.CASCADE,
+        related_name='extended',
+        null=True,
+    )
     name = models.CharField(max_length=255, unique=True)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
-    attribute_types = models.ManyToManyField('Attribute_type', through='Content_attributes')
+    attribute_types = models.ManyToManyField('AttributeType', through='ContentAttributeTypes')
     has_pages = models.BooleanField(default=False, db_index=True)
     has_inventory = models.BooleanField(default=False)
-    parents = models.CharField(max_length=255, blank=True, default=None, null=True)
-    r1_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
-    r2_inheritance = models.CharField(max_length=255, blank=True, default=None, null=True)
+    parents = models.CharField(max_length=255, blank=True)
+    parents_list = models.ManyToManyField('ContentTypeExtended', related_name='children')
+    can_view = models.BooleanField(default=True)
+    can_edit = models.BooleanField(default=False)
+    can_delete = models.BooleanField(default=False)
+    can_add = models.BooleanField(default=False)
+    can_remove = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return self.name
 
-    class Meta:
+    class Meta:  # noqa: D106
         ordering = ['id']
 
-    @property
-    def inheritance(self):
-        inheritance = {}
-        if self.r1_inheritance:
-            inheritance['r1'] = self.r1_inheritance.split(',')
-        if self.r2_inheritance:
-            inheritance['r2'] = self.r2_inheritance.split(',')
-        return inheritance
+
+class ContentAttributeTypes(dalmeIntid):
+    """Links attribute types with content types and stores related metadata."""
+
+    content_type = models.ForeignKey(
+        'ContentTypeExtended',
+        to_field='id',
+        db_index=True,
+        on_delete=models.CASCADE,
+        related_name='attribute_type_list',
+    )
+    attribute_type = models.ForeignKey(
+        'AttributeType',
+        to_field='id',
+        db_index=True,
+        on_delete=models.CASCADE,
+        related_name='content_types',
+    )
+    order = models.IntegerField(db_index=True, null=True)
+    required = models.BooleanField(default=False)
+    unique = models.BooleanField(default=True)
+    options_source = models.JSONField(null=True)

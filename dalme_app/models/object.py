@@ -1,17 +1,22 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from dalme_app.models._templates import dalmeUuid
-import django.db.models.options as options
+from django.db.models import options
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+from dalme_app.models.templates import dalmeUuid
+
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
 class Object(dalmeUuid):
+    """Stores object information."""
+
     concept = models.ForeignKey('Concept', db_index=True, on_delete=models.CASCADE)
-    instances = GenericRelation('Entity_phrase')
+    instances = GenericRelation('EntityPhrase')
     tags = GenericRelation('Tag')
 
 
-class Object_attribute(dalmeUuid):
-    object = models.ForeignKey('Object', db_index=True, on_delete=models.CASCADE)
+class ObjectAttribute(dalmeUuid):
+    """Stores attribute concepts for objects."""
+
+    obj = models.ForeignKey('Object', db_index=True, on_delete=models.CASCADE)
     attribute_concept = models.ForeignKey('Concept', db_index=True, on_delete=models.CASCADE)

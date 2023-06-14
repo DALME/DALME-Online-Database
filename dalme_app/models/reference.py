@@ -1,36 +1,44 @@
 from django.db import models
-from dalme_app.models._templates import dalmeIntid, dalmeUuid
-import django.db.models.options as options
+from django.db.models import options
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+from dalme_app.models.templates import dalmeIntid, dalmeUuid
+
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
 class AttributeReference(dalmeUuid):
+    """Stores information about the provenance of attribute definitions."""
+
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
     description = models.TextField()
     data_type = models.CharField(max_length=15)
     source = models.CharField(max_length=255)
-    term_type = models.CharField(max_length=55, blank=True, default=None)
+    term_type = models.CharField(max_length=55, blank=True)
 
 
 class CountryReference(dalmeIntid):
+    """Stores country information."""
+
     name = models.CharField(max_length=255, unique=True)
     alpha_3_code = models.CharField(max_length=3)
     alpha_2_code = models.CharField(max_length=2)
     num_code = models.IntegerField()
 
-    class Meta:
-        ordering = ["name"]
+    class Meta:  # noqa: D106
+        ordering = ['name']
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return self.name
 
     def get_url(self):
-        return '/countries/' + str(self.id)
+        """Return url for instance."""
+        return f'/countries/{self.id}'
 
 
 class LanguageReference(dalmeIntid):
+    """Stores information about languages and dialects."""
+
     LANGUAGE = 1
     DIALECT = 2
     LANG_TYPES = (
@@ -39,34 +47,38 @@ class LanguageReference(dalmeIntid):
     )
 
     glottocode = models.CharField(max_length=25, unique=True)
-    iso6393 = models.CharField(max_length=25, unique=True, blank=True, null=True, default=None)
+    iso6393 = models.CharField(max_length=25, unique=True, blank=True)
     name = models.CharField(max_length=255)
     type = models.IntegerField(choices=LANG_TYPES)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
 
-    class Meta:
-        ordering = ["name"]
+    class Meta:  # noqa: D106
+        ordering = ['name']
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return self.name
 
     def get_url(self):
-        return '/languages/' + str(self.id)
+        """Return url for instance."""
+        return f'/languages/{self.id}'
 
 
 class LocaleReference(dalmeIntid):
+    """Stores information about geographic locales."""
+
     name = models.CharField(max_length=255)
     administrative_region = models.CharField(max_length=255)
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
 
-    class Meta:
+    class Meta:  # noqa: D106
         ordering = ['country', 'name']
         unique_together = ('name', 'administrative_region')
 
-    def __str__(self):
-        return f'{self.name}, {self.administrative_region}, {str(self.country)}'
+    def __str__(self):  # noqa: D105
+        return f'{self.name}, {self.administrative_region}, {self.country!s}'
 
     def get_url(self):
-        return '/locales/' + str(self.id)
+        """Return url for instance."""
+        return f'/locales/{self.id}'

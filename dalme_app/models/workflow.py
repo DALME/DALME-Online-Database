@@ -1,12 +1,15 @@
+from django_currentuser.middleware import get_current_user
+
 from django.contrib.auth.models import User
 from django.db import models
-from django_currentuser.middleware import get_current_user
-import django.db.models.options as options
+from django.db.models import options
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
 class Workflow(models.Model):
+    """Stores information about the processing workflow for sources."""
+
     ASSESSING = 1
     PROCESSING = 2
     DONE = 3
@@ -18,14 +21,14 @@ class Workflow(models.Model):
     WORKFLOW_STATUS = (
         (ASSESSING, 'assessing'),
         (PROCESSING, 'processing'),
-        (DONE, 'processed')
+        (DONE, 'processed'),
     )
     PROCESSING_STAGES = (
         (INGESTION, 'ingestion'),
         (TRANSCRIPTION, 'transcription'),
         (MARKUP, 'markup'),
         (REVIEW, 'review'),
-        (PARSING, 'parsing')
+        (PARSING, 'parsing'),
     )
 
     source = models.OneToOneField('Source', on_delete=models.CASCADE, related_name='workflow', primary_key=True)
@@ -41,43 +44,35 @@ class Workflow(models.Model):
     review_done = models.BooleanField(default=False)
     is_public = models.BooleanField(default=False)
 
+    def __str__(self):  # noqa: D105
+        return f'Workflow: {self.source.id}'
+
     @property
     def status(self):
+        """Return a string indicating the current status of the associated source."""
         stage_dict = dict(self.PROCESSING_STAGES)
-        if 1 <= self.wf_status <= 3:
-            if self.wf_status != 2:
-                return {
-                    'text': self.get_wf_status_display(),
-                    'tag': self.get_wf_status_display()
-                    }
-            else:
-                if getattr(self, f'{self.get_stage_display()}_done'):
-                    return {
-                        'text': f'awaiting {stage_dict[self.stage + 1]}',
-                        'tag': 'awaiting'
-                        }
-                else:
-                    return {
-                        'text': f'{self.get_stage_display()} in progress',
-                        'tag': 'in_progress'
-                        }
-        else:
-            return {
-                'text': 'unknown',
-                'tag': 'unknown'
-                }
+        if 1 <= self.wf_status <= 3:  # noqa: PLR2004
+            if self.wf_status != 2:  # noqa: PLR2004
+                return self.get_wf_status_display()
+            if getattr(self, f'{self.get_stage_display()}_done'):
+                return f'awaiting {stage_dict[self.stage + 1]}'
+            return f'{self.get_stage_display()} in progress'
+        return 'unknown'
 
     @property
     def stage_done(self):
-        if self.wf_status == 2:
-            return getattr(self, f'{self.get_stage_display()}_done')
-        else:
-            return True
+        """Return boolean indicating whether the current stage is done."""
+        return getattr(self, f'{self.get_stage_display()}_done') if self.wf_status == 2 else True  # noqa: PLR2004
 
 
-class Work_log(models.Model):
-    id = models.AutoField(primary_key=True, unique=True, db_index=True)
-    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE, related_name="work_log")
+class WorkLog(models.Model):
+    """Stores log information."""
+
+    id = models.AutoField(primary_key=True, unique=True, db_index=True)  # noqa: A003
+    source = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE, related_name='work_log')
     event = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
+
+    def __str__(self):  # noqa: D105
+        return f'{self.timestamp}: {self.source.id} ({self.user.username}) - {self.event}'

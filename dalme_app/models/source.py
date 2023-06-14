@@ -1,180 +1,170 @@
+from wagtail.search import index
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import options
 from django.urls import reverse
-from dalme_app.models._templates import dalmeIntid, dalmeUuid, dalmeUuidOwned
-import django.db.models.options as options
-from wagtail.search import index
+
+from dalme_app.models.templates import dalmeIntid, dalmeOwned, dalmeUuid
 from dalme_app.models.workflow import Workflow
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Source(index.Indexed, dalmeUuidOwned):
-    type = models.ForeignKey('Content_type', to_field='id', db_index=True, on_delete=models.PROTECT, db_column="type")
+class Source(index.Indexed, dalmeUuid, dalmeOwned):
+    """Stores information about sources."""
+
+    type = models.ForeignKey(
+        'ContentTypeExtended',
+        to_field='id',
+        db_index=True,
+        on_delete=models.PROTECT,
+        db_column='type',
+    )
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, related_name='children')
     has_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation('Attribute', related_query_name='sources')
-    pages = models.ManyToManyField('Page', db_index=True, through='Source_pages')
+    pages = models.ManyToManyField('Page', db_index=True, through='SourcePages')
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
-    sets = GenericRelation('Set_x_content', related_query_name='source')
-    primary_dataset = models.ForeignKey('Set', db_index=True, on_delete=models.PROTECT, related_query_name='set_members', null=True)
+    collections = GenericRelation('CollectionMembership', related_query_name='source')
+    permissions = GenericRelation('Permission', related_query_name='source')
+
+    # TODO: remove after migration
     is_private = models.BooleanField(default=False, db_index=True)
+    primary_dataset = models.ForeignKey(
+        'Set',
+        db_index=True,
+        on_delete=models.PROTECT,
+        related_query_name='set_members',
+        null=True,
+    )
 
-    search_fields = [
-        index.FilterField('name'),
-    ]
+    search_fields = [index.FilterField('name')]
 
-    class Meta:
+    class Meta:  # noqa: D106
         unique_together = ('type', 'name')
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return self.name
 
-    def save(self, *args, **kwargs):
-        if self.type.id == 13 and self.primary_dataset is None:
-            if self.parent is not None and self.parent.primary_dataset is not None:
-                self.primary_dataset = self.parent.primary_dataset
-
-            # if self.id is not None:
-            #     Workflow.objects.update_or_create(source=self, defaults={
-            #         'last_modified': timezone.now(),
-            #         'last_user': get_current_user()
-            #     })
-
-        super().save(*args, **kwargs)
-
     def get_absolute_url(self):
+        """Return absolute url for instance."""
         return reverse('source_detail', kwargs={'pk': self.pk})
 
     @property
     def is_public(self):
+        """Return boolean indicating whether source is public or not."""
         try:
             return self.workflow.is_public
         except Workflow.DoesNotExist:
             return False
 
-    @property
-    def inherited(self):
-        inheritance = self.type.inheritance
-        if self.parent and inheritance.get('r1') is not None:
-            r1_inherited = self.parent.attributes.filter(attribute_type__in=inheritance['r1'])
-            if self.parent.parent and inheritance.get('r2') is not None:
-                r2_inherited = self.parent.inherited.filter(attribute_type__in=inheritance['r2'])
-                return r1_inherited | r2_inherited
-            else:
-                return r1_inherited
+    # TODO: enable after migration
+    # @property
+    # def is_private(self):
+    #    """Return boolean indicating whether source is private or not."""
+    #    if self.permissions.filter(is_default=True).exists():
+    #        return not self.permissions.filter(is_default=True).first().get('can_view', True)
+    #    return False
+
+    def get_related_resources(self, content_type):
+        """Return list of resources of type:content_type associated with source, if any."""
+        res_list = []
+        for page in self.folios.all().select_related('transcription'):
+            if page.transcription:
+                res_list.append(page.transcription.entity_phrases.filter(content_type=content_type))
+
+        return list(res_list[0].union(*res_list[1:])) if len(res_list) > 0 else None
 
     def agents(self):
-        ep_list = [i.transcription.entity_phrases.filter(content_type=104) for i in self.source_pages.all().select_related('transcription') if i.transcription]
-        if len(ep_list) > 0:
-            return [i for i in ep_list[0].union(*ep_list[1:])]
+        """Return list of agents associated with source, if any."""
+        return self.get_related_resources(104)
 
     def places(self):
-        ep_list = [i.transcription.entity_phrases.filter(content_type=115) for i in self.source_pages.all().select_related('transcription') if i.transcription]
-        if len(ep_list) > 0:
-            return [i.content_object for i in ep_list[0].union(*ep_list[1:])]
+        """Return list of places associated with source, if any."""
+        return self.get_related_resources(115)
 
     def objects(self):
-        ep_list = [i.transcription.entity_phrases.filter(content_type=118) for i in self.source_pages.all().select_related('transcription') if i.transcription]
-        if len(ep_list) > 0:
-            return [i for i in ep_list[0].union(*ep_list[1:])]
+        """Return list of objects associated with source, if any."""
+        return self.get_related_resources(118)
 
     @property
     def has_images(self):
-        if self.pages.exclude(dam_id__isnull=True).count() > 0:
-            return True
-        else:
-            return False
+        """Return boolean indicating whether source has associated images."""
+        return self.pages.exclude(dam_id__isnull=True).exists()
 
     @property
     def no_images(self):
-        if self.pages.exclude(dam_id__isnull=True).exists():
-            return self.pages.exclude(dam_id__isnull=True).count()
-        else:
-            return 0
+        """Return count of images associated with source, if any."""
+        return self.pages.exclude(dam_id__isnull=True).count() if self.has_images else 0
 
     @property
     def no_records(self):
+        """Return count of records associated with source, if any."""
         return self.children.count()
 
     @property
     def has_transcriptions(self):
-        if self.source_pages.all().select_related('transcription').exists():
-            return True
-        else:
-            return False
+        """Return boolean indicating whether source has associated transcriptions."""
+        return self.folios.all().select_related('transcription').exists()
 
     @property
     def no_transcriptions(self):
-        if self.source_pages.exclude(transcription__count_ignore=True).exists():
-            return self.source_pages.exclude(transcription__count_ignore=True).count()
-        else:
-            return 0
+        """Return count of transcriptions associated with source, if any."""
+        return self.folios.exclude(transcription__count_ignore=True).count() if self.has_transcriptions else 0
 
     @property
     def no_folios(self):
-        if self.pages.all().exists():
-            return self.pages.all().count()
-        else:
-            return 0
+        """Return count of folios associated with source, if any."""
+        return self.pages.all().count() if self.pages.all().exists() else 0
 
     def get_purl(self):
-        if self.workflow.is_public:
-            return f'https://purl.dalme.org/{self.id}/'
-        else:
-            return None
+        """Return source's permanent url."""
+        return f'https://purl.dalme.org/{self.id}/' if self.workflow.is_public else None
 
     def get_credit_line(self):
+        """Return credit line for the source, if applicable."""
+
         def get_people_string(_list):
             if len(_list) == 1:
-                return '{}'.format(_list[0])
-            elif len(_list) == 2:
-                return '{} and {}'.format(_list[0], _list[1])
-            else:
-                return '{}, and {}'.format(', '.join(_list[:-1]), _list[-1])
+                return f'{_list[0]}'
+            if len(_list) == 2:  # noqa: PLR2004
+                return f'{_list[0]} and {_list[1]}'
+            return f'{", ".join(_list[:-1])}, and {_list[-1]}'
 
         try:
             editors = [i.agent.standard_name for i in self.credits.all() if i.type == 1]
-            corrections = [i.agent.standard_name for i in self.credits.all() if i.type == 2]
-            contributors = [i.agent.standard_name for i in self.credits.all() if i.type == 3]
+            corrections = [i.agent.standard_name for i in self.credits.all() if i.type == 2]  # noqa: PLR2004
+            contributors = [i.agent.standard_name for i in self.credits.all() if i.type == 3]  # noqa: PLR2004
 
             if not editors:
                 try:
                     editors = [self.owner.agent.first().standard_name]
-                except: # NOQA
+                except:  # noqa: E722
                     editors = ['the DALME Team']
 
-            editors_string = get_people_string(editors)
-            corrections_string = get_people_string(corrections) if corrections else False
-            contributors_string = get_people_string(contributors) if contributors else False
+            ed_str = get_people_string(editors)
+            cor_str = get_people_string(corrections) if corrections else False
+            cont_str = get_people_string(contributors) if contributors else False
 
-            credit_line = f'Edited by {editors_string}'
+            cline = f'Edited by {ed_str}'
+            cline = cline + f', with corrections by {cor_str}' if corrections else cline
+            cline = cline + f', and contributions by {cont_str}' if corrections and contributors else cline
+            cline = cline + f', with contributions by {cont_str}' if contributors and not corrections else cline
+            cline = cline + '.'
 
-            if corrections:
-                credit_line += f', with corrections by {corrections_string}'
-                if contributors:
-                    credit_line += f', and contributions by {contributors_string}.'
-                else:
-                    credit_line += '.'
-            elif contributors:
-                credit_line += f', with contributions by {contributors_string}.'
-            else:
-                credit_line += '.'
+            return {'credit_line': cline, 'authors': editors, 'contributors': corrections + contributors}
 
-            return {
-                'credit_line': credit_line,
-                'authors': editors,
-                'contributors': corrections + contributors
-            }
-
-        except: # NOQA
+        except:  # noqa: E722
             return 'Edited by the DALME Team.'
 
 
-class Source_credit(dalmeUuid):
+class SourceCredits(dalmeUuid):
+    """Store information about credit and authorship of transcriptions."""
+
     EDITOR = 1
     CORRECTIONS = 2
     CONTRIBUTOR = 3
@@ -184,22 +174,56 @@ class Source_credit(dalmeUuid):
         (CONTRIBUTOR, 'Contributor'),
     )
 
-    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='credits')
-    agent = models.ForeignKey('Agent', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='credits')
     type = models.IntegerField(choices=CREDIT_TYPES)
-    note = models.CharField(max_length=255, blank=True, null=True)
+    note = models.CharField(max_length=255, blank=True)
+    source = models.ForeignKey(
+        'Source',
+        to_field='id',
+        db_index=True,
+        on_delete=models.CASCADE,
+        related_name='credits',
+    )
+    agent = models.ForeignKey(
+        'Agent',
+        to_field='id',
+        db_index=True,
+        on_delete=models.CASCADE,
+        related_name='credits',
+    )
 
-    class Meta:
+    class Meta:  # noqa: D106
         unique_together = ('source', 'agent', 'type')
 
 
-class Source_pages(dalmeIntid):
-    source = models.ForeignKey('Source', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='source_pages')
-    page = models.ForeignKey('Page', to_field='id', db_index=True, on_delete=models.CASCADE, related_name='sources')
-    transcription = models.ForeignKey('Transcription', to_field='id', db_index=True, on_delete=models.SET_NULL, null=True, related_name='source_pages')
+class SourcePages(dalmeIntid):
+    """Links sources, pages, and transcriptions."""
+
+    source = models.ForeignKey(
+        'Source',
+        to_field='id',
+        db_index=True,
+        on_delete=models.CASCADE,
+        related_name='folios',
+    )
+    page = models.ForeignKey(
+        'Page',
+        to_field='id',
+        db_index=True,
+        on_delete=models.CASCADE,
+        related_name='sources',
+    )
+    transcription = models.ForeignKey(
+        'Transcription',
+        to_field='id',
+        db_index=True,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='folios',
+    )
 
     @property
     def page_data(self):
+        """Return a dictionary with aggregated folio/page information."""
         return {
             'id': self.page.id,
             'name': self.page.name,
@@ -212,5 +236,5 @@ class Source_pages(dalmeIntid):
             'transcription_version': self.transcription.version if self.transcription is not None else None,
             'transcription_author': self.transcription.author if self.transcription is not None else None,
             'thumbnail_url': self.page.thumbnail_url,
-            'manifest_url': self.page.manifest_url
+            'manifest_url': self.page.manifest_url,
         }

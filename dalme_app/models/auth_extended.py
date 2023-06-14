@@ -1,71 +1,71 @@
 import json
-import os
-from django.contrib.auth.models import User, Group
-from django.db import models
-from django.urls import reverse
-import django.db.models.options as options
+import pathlib
+
 from django.conf import settings
+from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
+from django.db.models import options
+from django.urls import reverse
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
-with open(os.path.join('dalme_app', 'config', 'default_user_preferences.json'), 'r') as fp:
+
+with pathlib.Path('static/snippets/default_user_preferences.json').open() as fp:
     DEFAULT_PREFS = dict(json.load(fp))
 
 
 def default_preferences():
+    """Return user default preferences."""
     return DEFAULT_PREFS
 
 
 class GroupProperties(models.Model):
-    """
-    One-to-one extension of group model to accomodate additional group related
-    data, including group types.
-    """
+    """Extension of group model to accomodate additional group related data."""
+
     ADMIN = 1
     DAM = 2
-    DATASET = 3
+    TEAM = 3
     KNOWLEDGEBASE = 4
     WEBSITE = 5
     GROUP_TYPES = (
         (ADMIN, 'Admin'),
         (DAM, 'DAM'),
-        (DATASET, 'Dataset'),
+        (TEAM, 'Team'),
         (KNOWLEDGEBASE, 'Knowledge Base'),
-        (WEBSITE, 'Website')
+        (WEBSITE, 'Website'),
     )
 
     group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name='properties')
     type = models.IntegerField(choices=GROUP_TYPES)
     description = models.CharField(max_length=255)
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return self.group.name
 
 
 class Profile(models.Model):
-    """
-    One-to-one extension of user model to accomodate additional user related
-    data, including permissions of associated accounts on other platforms.
-    """
+    """Extension of user model to accomodate additional user related data."""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
     primary_group = models.ForeignKey(Group, to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
     preferences = models.JSONField(default=default_preferences)
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return self.user.username
 
     def get_absolute_url(self):
+        """Return instance absolute url."""
         return reverse('user_detail', kwargs={'username': self.user.username})
 
     @property
     def profile_image(self):
+        """Return url to avatar image."""
         try:
-            if self.user.wagtail_userprofile.avatar is not None and self.user.wagtail_userprofile.avatar != '':
+            if self.user.wagtail_userprofile.avatar is not None and self.user.wagtail_userprofile.avatar:
                 return settings.MEDIA_URL + str(self.user.wagtail_userprofile.avatar)
-            else:
+            else:  # noqa: RET505
                 return None
         except ObjectDoesNotExist:
             return None

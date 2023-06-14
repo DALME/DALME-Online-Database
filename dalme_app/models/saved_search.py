@@ -1,10 +1,13 @@
 from django.db import models
-from dalme_app.models._templates import dalmeUuidOwned
-import django.db.models.options as options
+from django.db.models import options
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)
+from dalme_app.models.templates import dalmeOwned, dalmeUuid
+
+options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class SavedSearch(dalmeUuidOwned):
+class SavedSearch(dalmeUuid, dalmeOwned):
+    """Stores saved searches."""
+
     name = models.CharField(max_length=255)
     search = models.JSONField()
