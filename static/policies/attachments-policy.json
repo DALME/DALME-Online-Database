@@ -13,6 +13,6 @@
     "action": ["partial_update", "update", "destroy"],
     "principal": ["*"],
     "effect": "allow",
-    "condition": "is_owner"
+    "condition": ["user_must_be:owner"]
   }
 ]

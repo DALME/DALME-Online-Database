@@ -18,6 +18,6 @@
     "action": ["partial_update", "update", "destroy"],
     "principal": ["authenticated"],
     "effect": "allow",
-    "condition": "can_edit_parent_source"
+    "condition": ["parent_as_proxy"]
   }
 ]

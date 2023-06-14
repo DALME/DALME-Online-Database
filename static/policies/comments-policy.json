@@ -13,6 +13,6 @@
     "action": ["partial_update", "update", "destroy"],
     "principal": ["authenticated"],
     "effect": "allow",
-    "condition": "is_creator"
+    "condition": ["user_must_be:creator"]
   }
 ]
