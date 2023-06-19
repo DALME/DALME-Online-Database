@@ -1,32 +1,54 @@
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from dalme_app.models.templates import dalmeUuid
+from dalme_app.models.templates import dalmeIntid, dalmeUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
+
+
+class RelationshipType(dalmeIntid):
+    """Stores relationship type definitions."""
+
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=55, unique=True)
+    description = models.TextField()
+    source = models.CharField(max_length=255, blank=True)
+    is_directed = models.BooleanField(default=False)
+
+    class Meta:  # noqa: D106
+        ordering = ['id']
+
+    def __str__(self):  # noqa: D105
+        return self.name
 
 
 class Relationship(dalmeUuid):
     """Stores information about relationships between resources."""
 
+    source = GenericForeignKey('source_content_type', 'source_object_id')
+    target = GenericForeignKey('target_content_type', 'target_object_id')
     source_content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         null=True,
-        related_name='relationship_sources',
+        related_name='rel_sources',
     )
-    source_object_id = models.UUIDField(null=True, db_index=True)
-    source_object = GenericForeignKey('source_content_type', 'source_object_id')
+    source_object_id = models.CharField(max_length=36, db_index=True)
     target_content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         null=True,
-        related_name='relationship_targets',
+        related_name='rel_targets',
     )
-    target_object_id = models.UUIDField(null=True, db_index=True)
-    target_object = GenericForeignKey('target_content_type', 'target_object_id')
-    attributes = GenericRelation('Attribute')
-    scope = models.ForeignKey('Scope', on_delete=models.CASCADE, null=True)
+    target_object_id = models.CharField(max_length=36, db_index=True)
+    rel_type = models.ForeignKey(
+        'RelationshipType',
+        db_index=True,
+        on_delete=models.CASCADE,
+        db_column='rel_type',
+        related_name='relationships',
+    )
+    scopes = models.ManyToManyField('Scope', db_index=True)
     notes = models.TextField(blank=True)

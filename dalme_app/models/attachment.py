@@ -13,7 +13,7 @@ class Attachment(dalmeUuid, dalmeOwned):
     """Stores attachment information."""
 
     file = models.FileField(upload_to='attachments/%Y/%m/')
-    type = models.CharField(max_length=255, blank=True)
+    type = models.CharField(max_length=255, blank=True)  # noqa: A003
 
     @property
     def filename(self):

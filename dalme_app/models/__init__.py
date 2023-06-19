@@ -20,6 +20,7 @@ from .content import ContentAttributeTypes, ContentTypeExtended  # noqa: F401
 from .entity_phrase import EntityPhrase  # noqa: F401
 from .headword import Headword  # noqa: F401
 from .object import Object, ObjectAttribute  # noqa: F401
+from .options_list import OptionsList  # noqa: F401
 from .page import Page  # noqa: F401
 from .permission import Permission  # noqa: F401
 from .place import Place  # noqa: F401
@@ -30,7 +31,7 @@ from .reference import (
     LanguageReference,  # noqa: F401
     LocaleReference,  # noqa: F401
 )
-from .relationship import Relationship  # noqa: F401
+from .relationship import Relationship, RelationshipType  # noqa: F401
 from .resourcespace import (
     rs_api_query,  # noqa: F401
     rs_collection,  # noqa: F401
@@ -42,9 +43,8 @@ from .resourcespace import (
 )
 from .rights_policy import RightsPolicy  # noqa: F401
 from .saved_search import SavedSearch  # noqa: F401
-from .scope import Scope  # noqa: F401
-from .set import Set, Set_x_content  # noqa: F401
-from .source import Source, SourceCredits, SourcePages  # noqa: F401
+from .scope import Scope, ScopeType  # noqa: F401
+from .source import Source, SourcePages  # noqa: F401
 from .tag import Tag  # noqa: F401
 from .task import Task, TaskList  # noqa: F401
 from .ticket import Ticket  # noqa: F401

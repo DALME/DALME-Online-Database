@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from dalme_app.models.reference import LanguageReference
 from dalme_app.models.templates import dalmeBasic, dalmeOwned, dalmeUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
@@ -48,25 +47,34 @@ class Collection(dalmeUuid, dalmeOwned):
         """Return a list of languages represented in the collection (if members are all source records)."""
         if self.membership_type() == 'source':
             query = models.Q(source__attributes__attribute_type=15)
+
             if published:
                 query.add(models.Q(source__workflow__is_public=True), models.Q.AND)
-            return [
-                [LanguageReference.objects.get(pk=i).name, i]
-                for i in set(self.members.filter(query).values_list('source__attributes__value_JSON__id', flat=True))
-            ]
+
+            return list(
+                self.members.filter(query)
+                .distinct()
+                .order_by('source__attributes__attributevaluefkey__language__name')
+                .values_list(
+                    'source__attributes__attributevaluefkey__language__name',
+                    'source__attributes__attributevaluefkey__language__id',
+                ),
+            )
+
         return None
 
     def get_time_coverage(self, published=False):
         """Return a list of years and counts represented in the collection (if members are all source records)."""
         if self.membership_type() == 'source':
             query = models.Q(source__attributes__attribute_type__in=[19, 25, 26])
+
             if published:
                 query.add(models.Q(source__workflow__is_public=True), models.Q.AND)
 
             years = (
                 self.members.filter(query)
-                .order_by('source__attributes__value_DATE_y')
-                .values_list('source__attributes__value_DATE_y', flat=True)
+                .order_by('source__attributes__attributevaluedate__year')
+                .values_list('source__attributes__attributevaluedate__year', flat=True)
             )
 
             return dict(Counter(years))
@@ -82,5 +90,5 @@ class CollectionMembership(dalmeBasic):
     object_id = models.CharField(max_length=36, db_index=True)
 
     class Meta:  # noqa: D106
-        unique_together = ('content_type', 'object_id', 'collection_id')
-        ordering = ['collection_id', 'id']
+        unique_together = ('content_type', 'object_id', 'collection')
+        ordering = ['collection', 'id']

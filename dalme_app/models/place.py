@@ -11,7 +11,7 @@ class Place(dalmeUuid):
     """Stores place information."""
 
     standard_name = models.CharField(max_length=255)
-    type = models.IntegerField(db_index=True, null=True)
+    type = models.IntegerField(db_index=True, null=True)  # noqa: A003
     attributes = GenericRelation('Attribute')
     instances = GenericRelation('EntityPhrase')
     locale = models.ForeignKey('LocaleReference', on_delete=models.SET_NULL, null=True)

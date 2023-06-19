@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
@@ -49,8 +50,14 @@ class LanguageReference(dalmeIntid):
     glottocode = models.CharField(max_length=25, unique=True)
     iso6393 = models.CharField(max_length=25, unique=True, blank=True)
     name = models.CharField(max_length=255)
-    type = models.IntegerField(choices=LANG_TYPES)
+    type = models.IntegerField(choices=LANG_TYPES)  # noqa: A003
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    as_attribute_value = GenericRelation(
+        'AttributeValueFkey',
+        content_type_field='target_content_type',
+        object_id_field='target_id',
+        related_query_name='language',
+    )
 
     class Meta:  # noqa: D106
         ordering = ['name']
@@ -71,6 +78,12 @@ class LocaleReference(dalmeIntid):
     country = models.ForeignKey('CountryReference', on_delete=models.SET_NULL, null=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
+    as_attribute_value = GenericRelation(
+        'AttributeValueFkey',
+        content_type_field='target_content_type',
+        object_id_field='target_id',
+        related_query_name='locale',
+    )
 
     class Meta:  # noqa: D106
         ordering = ['country', 'name']

@@ -10,13 +10,8 @@ from django.db import models
 
 
 def get_current_username():
-    """Return current user's name (necessary to run migrations)."""
+    """Return current user's name."""
     return get_current_user().username
-
-
-# def get_current_user():
-#     """Return current user (necessary to run migrations)."""
-#     return User.objects.get(pk=1)
 
 
 class dalmeBasic(models.Model):  # noqa: N801

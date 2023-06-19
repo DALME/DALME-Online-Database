@@ -37,7 +37,7 @@ class GroupProperties(models.Model):
     )
 
     group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name='properties')
-    type = models.IntegerField(choices=GROUP_TYPES)
+    type = models.IntegerField(choices=GROUP_TYPES)  # noqa: A003
     description = models.CharField(max_length=255)
 
     def __str__(self):  # noqa: D105
@@ -49,7 +49,6 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
-    primary_group = models.ForeignKey(Group, to_field='id', db_index=True, on_delete=models.SET_NULL, null=True)
     preferences = models.JSONField(default=default_preferences)
 
     def __str__(self):  # noqa: D105

@@ -24,21 +24,8 @@ class Task(dalmeIntid):
     due_date = models.DateField(blank=True, null=True)
     completed = models.BooleanField(default=False)
     completed_date = models.DateTimeField(blank=True, null=True)
-
-    # TODO: what's position?
-    position = models.CharField(max_length=255, blank=True)
     url = models.CharField(max_length=255, blank=True)
     comments = GenericRelation('Comment', related_query_name='tasks')
-    # TODO: doesn't creation_user cover this?
-    created_by = models.ForeignKey(
-        User,
-        null=True,
-        on_delete=models.CASCADE,
-        related_name='task_created_by',
-        default=get_current_user,
-    )
-
-    # TODO: new fields
     completed_by = models.ForeignKey(
         User,
         null=True,
@@ -48,17 +35,6 @@ class Task(dalmeIntid):
     files = models.ManyToManyField('Attachment', blank=True, related_name='tasks')
     resources = models.ManyToManyField('Collection', blank=True, related_name='tasks')
     assignees = models.ManyToManyField(User, blank=True, related_name='task_assignations')
-
-    # TODO: delete these after data migration
-    assigned_to = models.ForeignKey(
-        User,
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE,
-        related_name='task_assigned_to',
-    )
-    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-    workset = models.ForeignKey('Collection', on_delete=models.PROTECT, null=True)
 
     class Meta:  # noqa: D106
         ordering = ['priority', 'creation_timestamp']

@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models import options
 
 from dalme_app.models.resourcespace import rs_api_query, rs_resource
-from dalme_app.models.rights_policy import RightsPolicy
 from dalme_app.models.templates import dalmeUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
@@ -53,12 +52,11 @@ class Page(dalmeUuid):
                 parent_rights = source.parent.parent.attributes.filter(attribute_type=144)
 
             if parent_rights.exists():
-                rpo = RightsPolicy.objects.get(pk=parent_rights.first().value_JSON['id'])
                 return {
-                    'show_image': rpo.public_display,
-                    'status': rpo.get_rights_status_display(),
-                    'display_notice': rpo.notice_display,
-                    'notice': rpo.rights_notice,
+                    'show_image': parent_rights.value.public_display,
+                    'status': parent_rights.value.get_rights_status_display(),
+                    'display_notice': parent_rights.value.notice_display,
+                    'notice': parent_rights.value.rights_notice,
                 }
             else:  # noqa: RET505
                 return None

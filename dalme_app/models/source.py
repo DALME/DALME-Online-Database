@@ -14,33 +14,35 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 class Source(index.Indexed, dalmeUuid, dalmeOwned):
     """Stores information about sources."""
 
-    type = models.ForeignKey(
+    name = models.CharField(max_length=255)
+    short_name = models.CharField(max_length=55)
+    type = models.ForeignKey(  # noqa: A003
         'ContentTypeExtended',
         to_field='id',
         db_index=True,
         on_delete=models.PROTECT,
         db_column='type',
     )
-    name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55)
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, related_name='children')
-    has_inventory = models.BooleanField(default=False, db_index=True)
     attributes = GenericRelation('Attribute', related_query_name='sources')
     pages = models.ManyToManyField('Page', db_index=True, through='SourcePages')
     tags = GenericRelation('Tag')
     comments = GenericRelation('Comment')
     collections = GenericRelation('CollectionMembership', related_query_name='source')
     permissions = GenericRelation('Permission', related_query_name='source')
-
-    # TODO: remove after migration
-    is_private = models.BooleanField(default=False, db_index=True)
-    primary_dataset = models.ForeignKey(
-        'Set',
-        db_index=True,
-        on_delete=models.PROTECT,
-        related_query_name='set_members',
-        null=True,
+    relationships_as_source = GenericRelation(
+        'Relationship',
+        content_type_field='source_content_type',
+        object_id_field='source_object_id',
     )
+    relationships_as_target = GenericRelation(
+        'Relationship',
+        content_type_field='target_content_type',
+        object_id_field='target_object_id',
+    )
+
+    # TODO: remove:
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, related_name='children')
+    has_inventory = models.BooleanField(default=False, db_index=True)
 
     search_fields = [index.FilterField('name')]
 
@@ -62,13 +64,12 @@ class Source(index.Indexed, dalmeUuid, dalmeOwned):
         except Workflow.DoesNotExist:
             return False
 
-    # TODO: enable after migration
-    # @property
-    # def is_private(self):
-    #    """Return boolean indicating whether source is private or not."""
-    #    if self.permissions.filter(is_default=True).exists():
-    #        return not self.permissions.filter(is_default=True).first().get('can_view', True)
-    #    return False
+    @property
+    def is_private(self):
+        """Return boolean indicating whether source is private or not."""
+        if self.permissions.filter(is_default=True).exists():
+            return not self.permissions.filter(is_default=True).first().get('can_view', True)
+        return False
 
     def get_related_resources(self, content_type):
         """Return list of resources of type:content_type associated with source, if any."""
@@ -128,17 +129,35 @@ class Source(index.Indexed, dalmeUuid, dalmeOwned):
     def get_credit_line(self):
         """Return credit line for the source, if applicable."""
 
-        def get_people_string(_list):
-            if len(_list) == 1:
-                return f'{_list[0]}'
-            if len(_list) == 2:  # noqa: PLR2004
-                return f'{_list[0]} and {_list[1]}'
-            return f'{", ".join(_list[:-1])}, and {_list[-1]}'
+        def get_people_string(p_list):
+            if len(p_list) == 1:
+                return f'{p_list[0]}'
+            if len(p_list) == 2:  # noqa: PLR2004
+                return f'{p_list[0]} and {p_list[1]}'
+            return f'{", ".join(p_list[:-1])}, and {p_list[-1]}'
 
         try:
-            editors = [i.agent.standard_name for i in self.credits.all() if i.type == 1]
-            corrections = [i.agent.standard_name for i in self.credits.all() if i.type == 2]  # noqa: PLR2004
-            contributors = [i.agent.standard_name for i in self.credits.all() if i.type == 3]  # noqa: PLR2004
+            editors = [
+                r.source.standard_name
+                for r in self.relationships_as_target.filter(
+                    rel_type__short_name='authorship',
+                    scopes__parameters__credit='editor',
+                )
+            ]
+            corrections = [
+                r.source.standard_name
+                for r in self.relationships_as_target.filter(
+                    rel_type__short_name='authorship',
+                    scopes__parameters__credit='corrections',
+                )
+            ]
+            contributors = [
+                r.source.standard_name
+                for r in self.relationships_as_target.filter(
+                    rel_type__short_name='authorship',
+                    scopes__parameters__credit='contributor',
+                )
+            ]
 
             if not editors:
                 try:
@@ -160,39 +179,6 @@ class Source(index.Indexed, dalmeUuid, dalmeOwned):
 
         except:  # noqa: E722
             return 'Edited by the DALME Team.'
-
-
-class SourceCredits(dalmeUuid):
-    """Store information about credit and authorship of transcriptions."""
-
-    EDITOR = 1
-    CORRECTIONS = 2
-    CONTRIBUTOR = 3
-    CREDIT_TYPES = (
-        (EDITOR, 'Editor'),
-        (CORRECTIONS, 'Corrections'),
-        (CONTRIBUTOR, 'Contributor'),
-    )
-
-    type = models.IntegerField(choices=CREDIT_TYPES)
-    note = models.CharField(max_length=255, blank=True)
-    source = models.ForeignKey(
-        'Source',
-        to_field='id',
-        db_index=True,
-        on_delete=models.CASCADE,
-        related_name='credits',
-    )
-    agent = models.ForeignKey(
-        'Agent',
-        to_field='id',
-        db_index=True,
-        on_delete=models.CASCADE,
-        related_name='credits',
-    )
-
-    class Meta:  # noqa: D106
-        unique_together = ('source', 'agent', 'type')
 
 
 class SourcePages(dalmeIntid):

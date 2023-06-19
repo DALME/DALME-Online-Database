@@ -19,19 +19,14 @@ class Agent(dalmeUuid):
     )
 
     standard_name = models.CharField(max_length=255)
-    type = models.IntegerField(choices=AGENT_TYPES)
+    type = models.IntegerField(choices=AGENT_TYPES)  # noqa: A003
     attributes = GenericRelation('Attribute')
     instances = GenericRelation('EntityPhrase')
-    relations = GenericRelation(
-        'Relationship',
-        content_type_field='source_content_type',
-        object_id_field='source_object_id',
-    )
     notes = models.TextField(blank=True)
     tags = GenericRelation('Tag')
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         User,
         on_delete=models.SET_NULL,
-        related_name='agent',
+        related_name='agent_record',
         null=True,
     )
