@@ -2,7 +2,7 @@ bibtexparser==1.4.0
 boto3==1.26.135
 dj-database-url==2.0.0
 dj-rest-auth==4.0.0
-Django==4.2.1
+Django==4.2.2
 django-compressor==4.3.1
 django-currentuser @ https://github.com/asucrews/django-currentuser/archive/refs/heads/master.zip
 django-elasticsearch-dsl==7.3
@@ -16,6 +16,7 @@ djangorestframework-camel-case==1.4.2
 djangorestframework-simplejwt==5.2.2
 djangosaml2idp==0.7.2
 drf-access-policy==1.5.0
+drf-writable-nested==0.7.0
 elasticsearch==7.17.9
 elasticsearch-dsl==7.4.1
 geopy==2.3.0
