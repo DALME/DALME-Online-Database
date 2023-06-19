@@ -7,7 +7,7 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0004_attribute_value_models'),
+        ('dalme_app', '0005_attribute_value_models'),
     ]
     # this is a workaround for an issue filtering over generic relations in postgres
     # when UUID foreign keys are stored in text/char fields
@@ -17,4 +17,6 @@ class Migration(migrations.Migration):  # noqa: D101
     operations = [
         migrations.RunSQL("CREATE CAST (character varying AS uuid) WITH INOUT AS IMPLICIT;"),
         migrations.RunSQL("CREATE CAST (uuid AS character varying) WITH INOUT AS IMPLICIT;"),
+        migrations.RunSQL("CREATE CAST (character varying AS integer) WITH INOUT AS IMPLICIT;"),
+        migrations.RunSQL("CREATE CAST (integer AS character varying) WITH INOUT AS IMPLICIT;"),
     ]

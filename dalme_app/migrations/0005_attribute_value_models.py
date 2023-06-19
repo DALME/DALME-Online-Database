@@ -10,7 +10,7 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0003_name_normalization'),
+        ('dalme_app', '0004_model_changes'),
     ]
 
     operations = [
@@ -49,11 +49,29 @@ class Migration(migrations.Migration):  # noqa: D101
                         to='dalme_app.attribute',
                     ),
                 ),
-                ('value_day', models.IntegerField(null=True)),
-                ('value_month', models.IntegerField(null=True)),
-                ('value_year', models.IntegerField(null=True)),
-                ('value_date', models.DateField(null=True)),
-                ('value_str', models.CharField(max_length=255, blank=True)),
+                (
+                    'day',
+                    models.PositiveSmallIntegerField(
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(31),
+                        ],
+                    ),
+                ),
+                (
+                    'month',
+                    models.PositiveSmallIntegerField(
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(12),
+                        ],
+                    ),
+                ),
+                ('year', models.IntegerField(null=True)),
+                ('date', models.DateField(null=True)),
+                ('text', models.CharField(max_length=255, blank=True)),
             ],
             options={
                 'abstract': False,
@@ -165,11 +183,6 @@ class Migration(migrations.Migration):  # noqa: D101
             },
             bases=('dalme_app.attribute',),
         ),
-        migrations.AddField(
-            model_name='attributetype',
-            name='options_source',
-            field=models.JSONField(null=True),
-        ),
         migrations.AlterField(
             model_name='attribute',
             name='object_id',
@@ -207,27 +220,33 @@ class Migration(migrations.Migration):  # noqa: D101
                 max_length=15,
             ),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
             model_name='attributetype',
             name='options_list',
-            field=models.CharField(blank=True, default='', max_length=255),
-            preserve_default=False,
-        ),
-        migrations.AlterField(
-            model_name='attributetype',
-            name='same_as',
-            field=models.ForeignKey(
-                db_column='same_as',
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                to='dalme_app.attributetype',
-            ),
         ),
         migrations.AlterField(
             model_name='attributetype',
             name='source',
             field=models.CharField(blank=True, default='', max_length=255),
             preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='attributetype',
+            name='options',
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to='dalme_app.optionslist',
+            ),
+        ),
+        migrations.AddField(
+            model_name='contentattributetypes',
+            name='options_override',
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to='dalme_app.optionslist',
+            ),
         ),
         migrations.CreateModel(
             name='AttributeValueFkey',
@@ -258,9 +277,12 @@ class Migration(migrations.Migration):  # noqa: D101
             },
             bases=('dalme_app.attribute',),
         ),
+        # the next two commands are necessary because when migrating from MySQL to Postgres
+        # certain constrints were created as indices and Postgres doesn't look for indices
+        # when altering constraints, so we drop the index and recreate it as a constraint proper
         migrations.RunSQL("DROP INDEX idx_16430_dalme_app_attribute_object_id_attribute_type_c83849ec;"),
         migrations.RunSQL(
-            'ALTER TABLE public.dalme_app_attribute ADD CONSTRAINT idx_16430_dalme_app_attribute_object_id_attribute_type_c83849ec UNIQUE(object_id, attribute_type, "value_STR");'
+            'ALTER TABLE public.dalme_app_attribute ADD CONSTRAINT idx_16430_dalme_app_attribute_object_id_attribute_type_c83849ec UNIQUE(object_id, attribute_type, "value_STR");',
         ),
         migrations.AlterUniqueTogether(
             name='attribute',

@@ -14,7 +14,7 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0001_initial'),
+        ('dalme_app', '0002_pre_cleaning'),
     ]
 
     operations = [
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):  # noqa: D101
                 ('name', models.CharField(max_length=255)),
                 ('description', models.TextField()),
                 ('use_as_workset', models.BooleanField(default=False)),
-                ('published', models.BooleanField(default=False)),
+                ('is_published', models.BooleanField(default=False)),
                 (
                     'creation_user',
                     models.ForeignKey(

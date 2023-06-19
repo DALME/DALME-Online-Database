@@ -10,7 +10,7 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0002_collections_refactoring'),
+        ('dalme_app', '0003_collections_refactoring'),
     ]
 
     operations = [
@@ -46,13 +46,57 @@ class Migration(migrations.Migration):  # noqa: D101
             old_name='Content_attributes',
             new_name='ContentAttributeTypes',
         ),
+        migrations.CreateModel(
+            name='OptionsList',
+            fields=[
+                ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
+                ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
+                ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
+                ('name', models.CharField(max_length=255)),
+                (
+                    'type',
+                    models.CharField(
+                        choices=[
+                            ('db_records', 'DB Records'),
+                            ('field_choices', 'Field Choices'),
+                            ('static_list', 'Static List'),
+                        ],
+                        max_length=15,
+                    ),
+                ),
+                ('description', models.TextField()),
+                ('payload', models.JSONField()),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
         migrations.AlterField(
             model_name='attributetype',
             name='same_as',
             field=models.ForeignKey(
-                db_column='same_as',
                 null=True,
-                on_delete=django.db.models.deletion.CASCADE,
+                on_delete=django.db.models.deletion.SET_NULL,
                 to='dalme_app.attributetype',
             ),
         ),
@@ -91,6 +135,7 @@ class Migration(migrations.Migration):  # noqa: D101
                     ('JSON', 'JSON (data)'),
                     ('FK-UUID', 'FK-UUID (DALME record)'),
                     ('FK-INT', 'FK-INT (DALME record)'),
+                    ('RREL', 'RREL (reverse relation)'),
                 ],
                 max_length=15,
             ),
@@ -179,6 +224,11 @@ class Migration(migrations.Migration):  # noqa: D101
             model_name='contenttypeextended',
             name='can_remove',
             field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='contenttypeextended',
+            name='is_abstract',
+            field=models.BooleanField(default=True),
         ),
         migrations.DeleteModel(
             name='Content_class',
@@ -288,11 +338,6 @@ class Migration(migrations.Migration):  # noqa: D101
             model_name='scope',
             old_name='type',
             new_name='scope_type',
-        ),
-        migrations.AddField(
-            model_name='contentattributetypes',
-            name='options_source',
-            field=models.JSONField(null=True),
         ),
         migrations.AddField(
             model_name='task',
@@ -431,10 +476,9 @@ class Migration(migrations.Migration):  # noqa: D101
             field=models.TextField(blank=True, default=''),
             preserve_default=False,
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
             model_name='task',
             name='position',
-            field=models.CharField(blank=True, max_length=255),
         ),
         migrations.AlterField(
             model_name='task',
@@ -478,5 +522,188 @@ class Migration(migrations.Migration):  # noqa: D101
         migrations.AlterUniqueTogether(
             name='tasklist',
             unique_together={('team_link', 'slug')},
+        ),
+        migrations.AlterField(
+            model_name='agent',
+            name='user',
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='agent_record',
+                to=settings.AUTH_USER_MODEL,
+            ),
+        ),
+        migrations.AlterField(
+            model_name='relationship',
+            name='source_content_type',
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='rel_sources',
+                to='contenttypes.contenttype',
+            ),
+        ),
+        migrations.AlterField(
+            model_name='relationship',
+            name='source_object_id',
+            field=models.CharField(db_index=True, default=None, max_length=36),
+            preserve_default=False,
+        ),
+        migrations.AlterField(
+            model_name='relationship',
+            name='target_content_type',
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='rel_targets',
+                to='contenttypes.contenttype',
+            ),
+        ),
+        migrations.AlterField(
+            model_name='relationship',
+            name='target_object_id',
+            field=models.CharField(db_index=True, default=None, max_length=36),
+            preserve_default=False,
+        ),
+        migrations.CreateModel(
+            name='RelationshipType',
+            fields=[
+                ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
+                ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
+                ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
+                ('name', models.CharField(max_length=255)),
+                ('short_name', models.CharField(max_length=55, unique=True)),
+                ('description', models.TextField()),
+                ('source', models.CharField(blank=True, max_length=255)),
+                ('is_directed', models.BooleanField(default=False)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                'ordering': ['id'],
+            },
+        ),
+        migrations.AddField(
+            model_name='relationship',
+            name='rel_type',
+            field=models.ForeignKey(
+                db_column='rel_type',
+                default=None,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='relationships',
+                to='dalme_app.relationshiptype',
+            ),
+            preserve_default=False,
+        ),
+        migrations.RemoveField(
+            model_name='relationship',
+            name='scope',
+        ),
+        migrations.RemoveField(
+            model_name='scope',
+            name='scope_range',
+        ),
+        migrations.AddField(
+            model_name='relationship',
+            name='scopes',
+            field=models.ManyToManyField(db_index=True, to='dalme_app.scope'),
+        ),
+        migrations.AddField(
+            model_name='scope',
+            name='notes',
+            field=models.TextField(blank=True),
+        ),
+        migrations.AddField(
+            model_name='scope',
+            name='parameters',
+            field=models.JSONField(default={}),
+            preserve_default=False,
+        ),
+        migrations.CreateModel(
+            name='ScopeType',
+            fields=[
+                ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
+                ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
+                ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
+                ('name', models.CharField(max_length=255)),
+                ('short_name', models.CharField(max_length=55, unique=True)),
+                ('description', models.TextField()),
+                ('source', models.CharField(blank=True, max_length=255)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={
+                'ordering': ['id'],
+            },
+        ),
+        migrations.AlterField(
+            model_name='scope',
+            name='scope_type',
+            field=models.ForeignKey(
+                db_column='scope_type',
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='scopes',
+                to='dalme_app.scopetype',
+            ),
+        ),
+        migrations.AddField(
+            model_name='contentattributetypes',
+            name='description_override',
+            field=models.TextField(blank=True),
+        ),
+        migrations.AddField(
+            model_name='contentattributetypes',
+            name='label_override',
+            field=models.CharField(blank=True, max_length=255),
+        ),
+        migrations.AddField(
+            model_name='attributetype',
+            name='is_local',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.RenameField(
+            model_name='contentattributetypes',
+            old_name='required',
+            new_name='is_required',
+        ),
+        migrations.AlterUniqueTogether(
+            name='contentattributetypes',
+            unique_together={('content_type', 'attribute_type')},
         ),
     ]
