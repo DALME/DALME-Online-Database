@@ -12,8 +12,7 @@
   {
     "action": ["retrieve", "members"],
     "principal": ["authenticated"],
-    "effect": "allow",
-    "condition": "can_view"
+    "effect": "allow"
   },
   {
     "action": ["create", "partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
@@ -21,21 +20,27 @@
     "effect": "allow"
   },
   {
-    "action": ["partial_update", "update", "destroy", "workset_state", "remove_members", "add_members"],
+    "action": ["partial_update", "update"],
     "principal": ["authenticated"],
     "effect": "allow",
-    "condition": "is_owner"
+    "condition_expression": ["(user_must_be:owner or has_perm:can_edit)"]
   },
   {
-    "action": ["partial_update", "update", "add_members"],
+    "action": ["add_members"],
     "principal": ["authenticated"],
     "effect": "allow",
-    "condition": "can_add"
+    "condition_expression": ["(user_must_be:owner or has_perm:can_add)"]
   },
   {
-    "action": ["destroy", "remove_members"],
+    "action": ["remove_members"],
     "principal": ["authenticated"],
     "effect": "allow",
-    "condition": "can_delete"
+    "condition_expression": ["(user_must_be:owner or has_perm:can_remove)"]
+  },
+  {
+    "action": ["destroy"],
+    "principal": ["authenticated"],
+    "effect": "allow",
+    "condition_expression": ["(user_must_be:owner or has_perm:can_delete)"]
   }
 ]

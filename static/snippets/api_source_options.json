@@ -2,52 +2,77 @@
     "search_fields": [
         "type__name",
         "name",
-        "short_name",
-        "owner__profile__full_name",
-        "primary_dataset__name",
-        "attributes__value_STR"
+        "short_name"
     ],
     "ordering_fields": [
         "name",
         "short_name",
-        "owner",
-        "primary_dataset",
         "no_records",
-        "is_private",
-        "attributes.authority",
-        "attributes.format",
-        "attributes.locale",
-        "attributes.country",
-        "attributes.default_rights",
-        "attributes.archival_series",
-        "attributes.archival_number",
-        "attributes.date",
-        "attributes.start_date",
-        "attributes.end_date",
-        "attributes.support",
-        "attributes.named_persons",
-        "attributes.description"
+        "is_private"
     ],
     "ordering_aggregates": {
-        "no_records": {
-            "function": "Count",
-            "expression": "children"
-        },
         "no_folios": {
             "function": "Count",
             "expression": "pages"
         }
     },
-    "serializer_fields": {
+    "serializer_fields": [
+        "id",
+        "type",
+        "name",
+        "short_name",
+        "parent",
+        "attributes",
+        "no_folios",
+        "no_images",
+        "workflow",
+        "pages",
+        "no_records",
+        "is_private",
+        "comment_count",
+        "folios",
+        "creation_timestamp",
+        "creation_user",
+        "modification_timestamp",
+        "modification_user"
+    ],
+    "serializer_extra_kwargs": {
+        "parent": {
+            "required": false
+        },
+        "no_folios": {
+            "required": false
+        },
+        "no_images": {
+            "required": false
+        },
+        "comment_count": {
+            "required": false
+        }
+    },
+    "serializer_field_sets": {
+        "collection_member": [
+            "id",
+            "type",
+            "name"
+        ],
+        "options": [
+            "id",
+            "name"
+        ],
+        "attribute": [
+            "id",
+            "type",
+            "name",
+            "short_name"
+        ],
         "archives": [
             "id",
             "type",
             "name",
             "short_name",
-            "is_private",
             "no_records",
             "attributes",
-            "children",
             "creation_timestamp",
             "creation_user",
             "modification_timestamp",
@@ -60,11 +85,8 @@
             "short_name",
             "parent",
             "is_private",
-            "primary_dataset",
-            "owner",
             "no_records",
             "attributes",
-            "children",
             "creation_timestamp",
             "creation_user",
             "modification_timestamp",
@@ -76,17 +98,12 @@
             "name",
             "short_name",
             "parent",
-            "has_inventory",
             "pages",
             "folios",
             "is_private",
-            "owner",
             "no_folios",
             "workflow",
             "attributes",
-            "credits",
-            "agents",
-            "places",
             "creation_timestamp",
             "creation_user",
             "modification_timestamp",
@@ -99,11 +116,8 @@
             "short_name",
             "parent",
             "is_private",
-            "owner",
             "attributes",
             "no_records",
-            "primary_dataset",
-            "children",
             "creation_timestamp",
             "creation_user",
             "modification_timestamp",
