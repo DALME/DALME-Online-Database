@@ -1,5 +1,3 @@
-from contextlib import suppress
-
 from django.conf import settings
 from django.db import migrations
 
@@ -9,9 +7,11 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
     OptionsList = apps.get_model("dalme_app", "OptionsList")  # noqa: N806
     AttributeType = apps.get_model("dalme_app", "AttributeType")  # noqa: N806
 
+    print('\n\nCreating options entryes for attributes...', end='')  # noqa: T201
+
     auth_list = OptionsList.objects.create(
         name='record authority',
-        type='static_list',
+        payload_type='static_list',
         description='List of authority sources for records.',
         payload=[
             {'label': 'Chancery', 'value': 'Chancery'},
@@ -26,7 +26,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
 
     format_list = OptionsList.objects.create(
         name='record format',
-        type='static_list',
+        payload_type='static_list',
         description='List of formats for records.',
         payload=[
             {'label': 'Charter', 'value': 'Charter'},
@@ -40,7 +40,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
 
     record_type_list = OptionsList.objects.create(
         name='record types',
-        type='static_list',
+        payload_type='static_list',
         description='List of record types.',
         payload=[
             {'label': 'Inventory-Comanda', 'value': 'Inventory-Comanda', 'group': 'Inventory'},
@@ -121,7 +121,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
 
     support_list = OptionsList.objects.create(
         name='record support',
-        type='static_list',
+        payload_type='static_list',
         description='List of support types for records.',
         payload=[
             {'label': 'Hybrid', 'value': 'Hybrid'},
@@ -136,7 +136,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
 
     rights_status_list = OptionsList.objects.create(
         name='rights status',
-        type='static_list',
+        payload_type='static_list',
         description='List of valid status values for rights policies.',
         payload=[
             {'label': 'Copyrighted', 'value': 'Copyrighted'},
@@ -151,7 +151,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
 
     user_list = OptionsList.objects.create(
         name='full user list',
-        type='db_records',
+        payload_type='db_records',
         description='Full list of active system users.',
         payload={
             'app': 'auth',
@@ -170,7 +170,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
 
     rights_status_list = OptionsList.objects.create(
         name='rights status list',
-        type='field_choices',
+        payload_type='field_choices',
         description='List of possible status values for rights policies.',
         payload={
             'app': 'dalme_app',
@@ -182,140 +182,14 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
     rights_status.options = rights_status_list
     rights_status.save(update_fields=['options'])
 
+    # type options for Publication
 
-def fix_attribute_types(apps, schema_editor):  # noqa: ARG001
-    """Fix attribute types."""
-    AttributeType = apps.get_model("dalme_app", "AttributeType")  # noqa: N806
+    # type options for Organization
 
-    renames = {
-        'creation_username': 'creation_user',
-        'modification_username': 'modification_user',
-        'is_public': 'is_published',
-        'required': 'is_required',
-        'options_list': 'options',
-    }
-    to_fkey = [
-        'owner',
-        'parent',
-        'creation_username',
-        'modification_username',
-        'type',
-        'same_as',
-        'last_user',
-        'is_public',
-    ]
-    to_bool = [
-        'has_inventory',
-        'is_superuser',
-        'is_staff',
-        'is_active',
-        'has_image',
-        'required',
-        'has_pages',
-        'help_flag',
-        'has_landing',
-        'notice_display',
-    ]
-    to_int = ['rights_status']
-    to_rrel = [
-        'comments',
-        'named_persons',
-        'collections',
-        'attribute_types',
-        'permissions',
-        'groups',
-        'tags',
-        'attachments',
-    ]
-    to_json = ['options_list']
+    # type for Location?
 
-    to_local = [
-        'id',
-        'creation_user',
-        'modification_user',
-        'creation_timestamp',
-        'modification_timestamp',
-        'owner',
-        'type',
-        'name',
-        'short_name',
-        'password',
-        'last_login',
-        'is_superuser',
-        'username',
-        'email',
-        'is_staff',
-        'is_active',
-        'date_joined',
-        'full_name',
-        'file_size',
-        'required',
-        'glottocode',
-        'iso6393',
-        'alpha_3_code',
-        'alpha_2_code',
-        'num_code',
-        'administrative_region',
-        'subject',
-        'file',
-        'last_modified',
-        'last_user',
-        'rights_status',
-        'rights_notice',
-        'licence',
-        'rights',
-        'rights_holder',
-        'notice_display',
-        'default_rights',
-        'last_name',
-        'first_name',
-        'latitude',
-        'longitude',
-        'has_image',
-        'no_folios',
-        'same_as',
-        'options',
-        'has_pages',
-        'help_flag',
-        'member_count',
-        'is_required',
-    ]
-
-    for at_name in to_fkey:
-        at = AttributeType.objects.get(short_name=at_name)
-        at.data_type = 'FKEY'
-        at.save(update_fields=['data_type'])
-
-    for at_name in to_bool:
-        at = AttributeType.objects.get(short_name=at_name)
-        at.data_type = 'BOOL'
-        at.save(update_fields=['data_type'])
-
-    for at_name in to_int:
-        at = AttributeType.objects.get(short_name=at_name)
-        at.data_type = 'INT'
-        at.save(update_fields=['data_type'])
-
-    for at_name in to_rrel:
-        at = AttributeType.objects.get(short_name=at_name)
-        at.data_type = 'RREL'
-        at.save(update_fields=['data_type'])
-
-    for at_name in to_json:
-        at = AttributeType.objects.get(short_name=at_name)
-        at.data_type = 'JSON'
-        at.save(update_fields=['data_type'])
-
-    for old, new in renames.items():
-        at = AttributeType.objects.get(short_name=old)
-        at.short_name = new
-        at.save(update_fields=['short_name'])
-
-    for at_name in to_local:
-        with suppress(Exception):
-            at = AttributeType.objects.get(short_name=at_name)
-            at.is_local = True
-            at.save(update_fields=['is_local'])
+    print(' \033[94m\033[1mOK\033[0m')  # noqa: T201
+    print('  Overall migration...', end='')  # noqa: T201
 
 
 class Migration(migrations.Migration):  # noqa: D101
@@ -324,10 +198,9 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0010_data_m_attributes'),
+        ('dalme_app', '0014_remove_unused'),
     ]
 
     operations = [
         migrations.RunPython(create_attribute_options),
-        migrations.RunPython(fix_attribute_types),
     ]

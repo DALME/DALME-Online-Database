@@ -9,6 +9,8 @@ def collection_attribute_types(apps, schema_editor):  # noqa: ARG001
 
     user_obj = User.objects.get(pk=1)
 
+    print('\n\nCreating new attribute types `collection_metadata` and `workset_progress`...', end='')  # noqa: T201
+
     AttributeType.objects.create(
         name='Collection metadata',
         short_name='collection_metadata',
@@ -29,6 +31,8 @@ def collection_attribute_types(apps, schema_editor):  # noqa: ARG001
         modification_user=user_obj,
     )
 
+    print(' \033[94m\033[1mOK\033[0m')  # noqa: T201
+
 
 def sets_to_collections(apps, schema_editor):  # noqa: ARG001
     """Migrate sets to collections."""
@@ -41,14 +45,18 @@ def sets_to_collections(apps, schema_editor):  # noqa: ARG001
     CollectionMembership = apps.get_model("dalme_app", "CollectionMembership")  # noqa: N806
     Comment = apps.get_model("dalme_app", "Comment")  # noqa: N806
     Set_x_content = apps.get_model("dalme_app", "Set_x_content")  # noqa: N806
-    Source = apps.get_model("dalme_app", "Source")  # noqa: N806
+    Record = apps.get_model("dalme_app", "Record")  # noqa: N806
     User = apps.get_model("auth", "User")  # noqa: N806
 
     user_obj = User.objects.get(pk=1)
+    new_col_ct = ContentType.objects.get(app_label='dalme_app', model='collection')
+    group_ct = ContentType.objects.get(app_label='auth', model='group')
+    record_ct = ContentType.objects.get(app_label='dalme_app', model='record')
+
     sets = Set.objects.all()
     count = 0
 
-    print(f'\n  Starting: {len(sets)} sets to process.')  # noqa: T201
+    print(f'Migrating {len(sets)} sets...', end='')  # noqa: T201
 
     for target in sets:
         # create new collection and populate basic attributes + transfer metadata
@@ -56,7 +64,6 @@ def sets_to_collections(apps, schema_editor):  # noqa: ARG001
         new_collection = Collection.objects.create(
             id=target.id,
             name=target.name,
-            description=target.description,
             use_as_workset=use_as_ws,
             is_published=target.is_public,
             creation_user=target.creation_user,
@@ -71,11 +78,15 @@ def sets_to_collections(apps, schema_editor):  # noqa: ARG001
 
         new_collection.save(update_fields=['team_link'])
 
-        # create entry in dict for matching later
-        # SET_MATCH_DICT[target.id] = new_collection.id
-        new_col_ct = ContentType.objects.get(app_label='dalme_app', model='collection')
-        group_ct = ContentType.objects.get(app_label='auth', model='group')
-        source_ct = ContentType.objects.get(app_label='dalme_app', model='source')
+        if target.description:
+            Attribute.objects.create(
+                content_type=new_col_ct,
+                object_id=new_collection.id,
+                attribute_type=AttributeType.objects.get(short_name='description'),
+                value_TXT=target.description,
+                creation_user=user_obj,
+                modification_user=user_obj,
+            )
 
         # create attributes based on set type
         # stat_title & stat_text => to json-field attribute
@@ -108,8 +119,8 @@ def sets_to_collections(apps, schema_editor):  # noqa: ARG001
         for member in members:
             CollectionMembership.objects.create(
                 collection=new_collection,
-                content_type=source_ct,
-                object_id=Source.objects.get(pk=member.object_id).id,
+                content_type=record_ct,
+                object_id=Record.objects.get(pk=member.object_id).id,
                 creation_user=member.creation_user,
                 modification_user=member.modification_user,
                 creation_timestamp=member.creation_timestamp,
@@ -154,42 +165,9 @@ def sets_to_collections(apps, schema_editor):  # noqa: ARG001
 
         count += 1
 
-    print(f'  Process completed: {count} collections created.')  # noqa: T201
-
-
-def set_source_permissions(apps, schema_editor):  # noqa: ARG001
-    """Set source permissions."""
-    Permission = apps.get_model("dalme_app", "Permission")  # noqa: N806
-    ContentType = apps.get_model('contenttypes', 'ContentType')  # noqa: N806
-    Source = apps.get_model("dalme_app", "Source")  # noqa: N806
-    User = apps.get_model("auth", "User")  # noqa: N806
-
-    user_obj = User.objects.get(pk=1)
-    group_ct = ContentType.objects.get(app_label='auth', model='group')
-    source_ct = ContentType.objects.get(app_label='dalme_app', model='source')
-
-    for source in Source.objects.all():
-        if source.is_private:
-            Permission.objects.create(
-                content_type=source_ct,
-                object_id=source.id,
-                is_default=True,
-                can_view=False,
-                creation_user=user_obj,
-                modification_user=user_obj,
-            )
-        elif source.primary_dataset is not None:
-            ds_group = source.primary_dataset.dataset_usergroup
-            Permission.objects.create(
-                content_type=source_ct,
-                object_id=source.id,
-                principal_type=group_ct,
-                principal_id=ds_group.id,
-                can_view=True,
-                can_edit=True,
-                creation_user=user_obj,
-                modification_user=user_obj,
-            )
+    print(' \033[94m\033[1mOK\033[0m')  # noqa: T201
+    print(f'{count} collections created.')  # noqa: T201
+    print('  Overall migration...', end='')  # noqa: T201
 
 
 class Migration(migrations.Migration):  # noqa: D101
@@ -198,11 +176,10 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0007_data_m_contenttypes'),
+        ('dalme_app', '0006_update_content_types'),
     ]
 
     operations = [
         migrations.RunPython(collection_attribute_types),
         migrations.RunPython(sets_to_collections),
-        migrations.RunPython(set_source_permissions),
     ]

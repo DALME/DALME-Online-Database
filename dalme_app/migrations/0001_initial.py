@@ -9,7 +9,7 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import dalme_app.models.auth_extended
+import dalme_app.models.auth_extensions
 import dalme_app.models.templates
 
 
@@ -1614,7 +1614,7 @@ class Migration(migrations.Migration):  # noqa: D101
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('full_name', models.CharField(blank=True, max_length=50)),
-                ('preferences', models.JSONField(default=dalme_app.models.auth_extended.default_preferences)),
+                ('preferences', models.JSONField(default=dalme_app.models.auth_extensions.default_preferences)),
                 (
                     'primary_group',
                     models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='auth.group'),

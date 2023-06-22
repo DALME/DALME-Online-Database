@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import migrations
 
 
-def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
+def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915, C901, PLR0912
     """Migrate attribute values to new system."""
     ContentType = apps.get_model('contenttypes', 'ContentType')  # noqa: N806
     Attribute = apps.get_model("dalme_app", "Attribute")  # noqa: N806
@@ -22,26 +22,42 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
 
     user_obj = User.objects.get(pk=1)
     attributes = Attribute.objects.all()
-    count_date = 0
-    count_dec = 0
-    count_int = 0
-    count_json = 0
-    count_txt = 0
-    count_str = 0
-    count_fkey = 0
 
-    print(f'\n  Starting: {len(attributes)} records to process, including:')  # noqa: T201
-    print(f"\tDATE - {len(attributes.filter(attribute_type__data_type='DATE'))} records")  # noqa: T201
-    print(f"\tDEC - {len(attributes.filter(attribute_type__data_type='DEC'))} records")  # noqa: T201
-    print(f"\tINT - {len(attributes.filter(attribute_type__data_type='INT'))} records")  # noqa: T201
-    print(f"\tJSON - {len(attributes.filter(attribute_type__data_type='JSON'))} records")  # noqa: T201
-    print(f"\tTXT - {len(attributes.filter(attribute_type__data_type='TXT'))} records")  # noqa: T201
-    print(  # noqa: T201
-        f"\tFKEY - {len(attributes.filter(attribute_type__data_type__in=['FK-UUID', 'FK-INT']))} records",
-    )
-    print(f"\tSTR - {len(attributes.filter(attribute_type__data_type='STR'))} records")  # noqa: T201
+    stats = {
+        'DATE': {
+            'initial': len(attributes.filter(attribute_type__data_type='DATE')),
+            'count': 0,
+        },
+        'DEC': {
+            'initial': len(attributes.filter(attribute_type__data_type='DEC')),
+            'count': 0,
+        },
+        'INT': {
+            'initial': len(attributes.filter(attribute_type__data_type='INT')),
+            'count': 0,
+        },
+        'JSON': {
+            'initial': len(attributes.filter(attribute_type__data_type='JSON')),
+            'count': 0,
+        },
+        'TXT': {
+            'initial': len(attributes.filter(attribute_type__data_type='TXT')),
+            'count': 0,
+        },
+        'FKEY': {
+            'initial': len(attributes.filter(attribute_type__data_type__in=['FK-UUID', 'FK-INT'])),
+            'count': 0,
+        },
+        'STR': {
+            'initial': len(attributes.filter(attribute_type__data_type='STR')),
+            'count': 0,
+        },
+    }
 
-    for att in attributes:
+    att_count = len(attributes)
+    print(f'\n\nStarting migration of {att_count} attribute records')  # noqa: T201
+
+    for i, att in enumerate(attributes):
         dtype = att.attribute_type.data_type
 
         if dtype == 'DATE':
@@ -59,7 +75,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
             )
             new_val.save_base(raw=True)
 
-            count_date += 1
+            stats[dtype]['count'] += 1
 
         elif dtype == 'DEC':
             new_val = AttributeValueDec(
@@ -72,7 +88,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
             )
             new_val.save_base(raw=True)
 
-            count_dec += 1
+            stats[dtype]['count'] += 1
 
         elif dtype == 'INT':
             new_val = AttributeValueInt(
@@ -85,7 +101,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
             )
             new_val.save_base(raw=True)
 
-            count_int += 1
+            stats[dtype]['count'] += 1
 
         elif dtype == 'JSON':
             new_val = AttributeValueJson(
@@ -98,7 +114,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
             )
             new_val.save_base(raw=True)
 
-            count_json += 1
+            stats[dtype]['count'] += 1
 
         elif dtype == 'TXT':
             new_val = AttributeValueTxt(
@@ -111,7 +127,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
             )
             new_val.save_base(raw=True)
 
-            count_txt += 1
+            stats[dtype]['count'] += 1
 
         elif dtype == 'FK-UUID' or dtype == 'FK-INT':
             _id = att.value_JSON['id'] if dtype == 'FK-UUID' else int(att.value_JSON['id'])
@@ -129,7 +145,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
             )
             new_val.save_base(raw=True)
 
-            count_fkey += 1
+            stats['FKEY']['count'] += 1
 
         elif dtype == 'STR':
             new_val = AttributeValueStr(
@@ -142,7 +158,13 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
             )
             new_val.save_base(raw=True)
 
-            count_str += 1
+            stats[dtype]['count'] += 1
+
+        if i % 1000 == 0:
+            print(f'{round(i*100/att_count)}% completed     ', end='\r', flush=True)  # noqa: T201
+
+    print('Migration completed... \033[94m\033[1mOK\033[0m', end='\r', flush=True)  # noqa: T201
+    print('Changing `FK-UUID` and `FK-INT` to `FKEY`...', end='')  # noqa: T201
 
     # update data types:
     for atype in AttributeType.objects.filter(data_type__in=['FK-UUID', 'FK-INT']):
@@ -150,15 +172,20 @@ def migrate_attributes(apps, schema_editor):  # noqa: ARG001, PLR0915
         atype.modification_user = user_obj
         atype.save()
 
-    total = count_date + count_dec + count_int + count_json + count_txt + count_str + count_fkey
-    print(f'\n  Process completed: {total} records processed, including:')  # noqa: T201
-    print(f"\tDATE - {count_date} records")  # noqa: T201
-    print(f"\tDEC - {count_dec} records")  # noqa: T201
-    print(f"\tINT - {count_int} records")  # noqa: T201
-    print(f"\tJSON - {count_json} records")  # noqa: T201
-    print(f"\tTXT - {count_txt} records")  # noqa: T201
-    print(f"\tFKEY - {count_fkey} records")  # noqa: T201
-    print(f"\tSTR - {count_str} records")  # noqa: T201
+    print(' \033[94m\033[1mOK\033[0m')  # noqa: T201
+    print('Verifying  stats:')  # noqa: T201
+
+    total = 0
+    for key, val in stats.items():
+        total += val["count"]
+        print(f'{key}: {val["initial"]} total, {val["count"]} migrated', end='')  # noqa: T201
+        if val["initial"] == val["count"]:
+            print(' \033[96m\033[1mOK\033[0m')  # noqa: T201
+        else:
+            print(' \033[93m\033[1mMISMATCH\033[0m')  # noqa: T201
+
+    print(f'{att_count} attributes to migrate, {total} migrated')  # noqa: T201
+    print('  Overall migration...', end='')  # noqa: T201
 
 
 class Migration(migrations.Migration):  # noqa: D101
@@ -167,7 +194,7 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0009_data_m_misc'),
+        ('dalme_app', '0008_data_m_misc'),
     ]
 
     operations = [
