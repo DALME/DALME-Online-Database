@@ -1,15 +1,20 @@
-from dalme_app.models import Ticket, Tag, Attachment
-from rest_framework import serializers
-from dalme_api.serializers.others import TagSerializer, AttachmentSerializer
-from dalme_api.serializers.users import UserSerializer
-from dalme_api.serializers.comments import CommentSerializer
-from django.contrib.auth.models import User
-from rest_framework.utils import model_meta
 from django_currentuser.middleware import get_current_user
+from rest_framework import serializers
+from rest_framework.utils import model_meta
+
+from django.contrib.auth.models import User
 from django.utils import timezone
+
+from dalme_api.serializers.attachments import AttachmentSerializer
+from dalme_api.serializers.comments import CommentSerializer
+from dalme_api.serializers.tags import TagSerializer
+from dalme_api.serializers.users import UserSerializer
+from dalme_app.models import Attachment, Tag, Ticket
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    """Serializer for tickets."""
+
     tags = TagSerializer(many=True, required=False)
     file = AttachmentSerializer(required=False)
     creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
@@ -17,20 +22,37 @@ class TicketSerializer(serializers.ModelSerializer):
     closing_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
     assigned_to = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Ticket
-        fields = ('id', 'assigned_to', 'subject', 'description', 'status', 'tags', 'url', 'file', 'closing_user', 'closing_date',
-                  'comment_count', 'creation_user', 'creation_timestamp', 'modification_user', 'modification_timestamp')
+        fields = (
+            'id',
+            'assigned_to',
+            'subject',
+            'description',
+            'status',
+            'tags',
+            'url',
+            'file',
+            'closing_user',
+            'closing_date',
+            'comment_count',
+            'creation_user',
+            'creation_timestamp',
+            'modification_user',
+            'modification_timestamp',
+        )
         extra_kwargs = {
-            'tags': {'required': False}
-            }
+            'tags': {'required': False},
+        }
 
     def to_internal_value(self, data):
+        """Transform incoming data."""
         if data.get('tags') is not None:
             self.context['tags'] = data.pop('tags')
         return super().to_internal_value(data)
 
     def create(self, validated_data):
+        """Create new ticket."""
         tags = self.context.get('tags')
         ticket = Ticket.objects.create(**validated_data)
         if tags:
@@ -41,6 +63,8 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketDetailSerializer(serializers.ModelSerializer):
+    """Serializer for single instance tickets."""
+
     tags = TagSerializer(many=True, required=False)
     file = AttachmentSerializer(required=False)
     creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
@@ -49,15 +73,32 @@ class TicketDetailSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
     closing_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Ticket
-        fields = ('id', 'subject', 'description', 'status', 'tags', 'url', 'file', 'comments', 'comment_count', 'closing_user',
-                  'closing_date', 'creation_user', 'creation_timestamp', 'modification_user', 'modification_timestamp', 'assigned_to')
+        fields = (
+            'id',
+            'subject',
+            'description',
+            'status',
+            'tags',
+            'url',
+            'file',
+            'comments',
+            'comment_count',
+            'closing_user',
+            'closing_date',
+            'creation_user',
+            'creation_timestamp',
+            'modification_user',
+            'modification_timestamp',
+            'assigned_to',
+        )
         extra_kwargs = {
-            'tags': {'required': False}
-            }
+            'tags': {'required': False},
+        }
 
     def to_internal_value(self, data):
+        """Transform incoming data."""
         if data.get('tags') is not None:
             self.context['tags'] = data.pop('tags')
         if data.get('assigned_to') is not None:
@@ -67,6 +108,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
+        """Update ticket data."""
         serializers.raise_errors_on_nested_writes('update', self, validated_data)
         info = model_meta.get_field_info(instance)
         assigned_to = self.context.get('assigned_to')
@@ -77,10 +119,12 @@ class TicketDetailSerializer(serializers.ModelSerializer):
         validated_data['modification_user'] = get_current_user()
 
         if validated_data.get('status') is not None and validated_data['status'] == 1:
-            validated_data.update({
-                'closing_user': get_current_user(),
-                'closing_date': timezone.now(),
-            })
+            validated_data.update(
+                {
+                    'closing_user': get_current_user(),
+                    'closing_date': timezone.now(),
+                },
+            )
 
         if assigned_to:
             validated_data['assigned_to'] = User.objects.get(id=assigned_to)
@@ -104,7 +148,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
         if tags:
             if instance.tags.all().exists():
                 new_tags = []
-                current_tags = dict((i.tag, i.id) for i in instance.tags.all())
+                current_tags = {i.tag: i.id for i in instance.tags.all()}
                 for tag in tags:
                     if current_tags.get(tag) is None:
                         new_tags.append(tag)

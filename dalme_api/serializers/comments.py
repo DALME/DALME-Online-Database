@@ -1,11 +1,14 @@
-from dalme_app.models import Comment
 from rest_framework import serializers
+
 from dalme_api.serializers.users import UserSerializer
+from dalme_app.models import Comment
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'])
+    """Serializer for comments."""
 
-    class Meta:
+    creation_user = UserSerializer(field_set='attribute')
+
+    class Meta:  # noqa: D106
         model = Comment
         fields = ('body', 'creation_timestamp', 'creation_user')

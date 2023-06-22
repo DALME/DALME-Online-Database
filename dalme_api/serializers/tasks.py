@@ -1,44 +1,69 @@
 from rest_framework import serializers
-from dalme_api.serializers.users import UserSerializer
+
+from dalme_api.serializers.attachments import AttachmentSerializer
+from dalme_api.serializers.collections import CollectionSerializer
+from dalme_api.serializers.users import GroupSerializer, UserSerializer
 from dalme_app.models import Task, TaskList
-from dalme_api.serializers.others import GroupSerializer
-from dalme_api.serializers.others import AttachmentSerializer
 
 
 class TaskListSerializer(serializers.ModelSerializer):
-    task_count = serializers.IntegerField(required=False)
-    group = GroupSerializer(required=False)
+    """Serializer for task lists."""
 
-    class Meta:
+    team_link = GroupSerializer(field_set='attribute', required=False)
+    owner = UserSerializer(field_set='attribute')
+    creation_user = UserSerializer(field_set='attribute', required=False)
+    modification_user = UserSerializer(field_set='attribute', required=False)
+
+    class Meta:  # noqa: D106
         model = TaskList
-        fields = ('id', 'name', 'group', 'task_count')
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        group = instance.group
-        task_list_groups = group.task_list_group.all()
-        for task_list_group in task_list_groups:
-            tasks = task_list_group.task_set.all()
-            task_ids = [task.pk for task in tasks]
-            if task_list_group.name == ret['name']:
-                ret['task_index'] = task_ids
-        return ret
+        fields = (
+            'id',
+            'name',
+            'slug',
+            'team_link',
+            'owner',
+            'task_count',
+            'owner',
+            'creation_user',
+            'creation_timestamp',
+            'modification_user',
+            'modification_timestamp',
+        )
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
-    modification_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
+    """Serializer for tasks."""
+
     task_list = TaskListSerializer(required=True)
-    assigned_to = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
-    comment_count = serializers.SerializerMethodField(required=False)
-    file = AttachmentSerializer(required=False)
+    completed_by = UserSerializer(field_set='attribute', required=False)
+    files = AttachmentSerializer(many=True, required=False)
+    assignees = UserSerializer(many=True, field_set='attribute', required=False)
+    resources = CollectionSerializer(many=True, field_set='attribute', required=False)
+    creation_user = UserSerializer(field_set='attribute', required=False)
+    modification_user = UserSerializer(field_set='attribute', required=False)
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Task
-        fields = ('id', 'title', 'task_list', 'due_date', 'completed', 'completed_date',
-                  'assigned_to', 'description', 'workset', 'url', 'creation_timestamp',
-                  'overdue_status', 'file', 'creation_user', 'comment_count',
-                  'modification_user', 'modification_timestamp')
-
-    def get_comment_count(self, obj):
-        return obj.comments.count()
+        fields = (
+            'id',
+            'title',
+            'task_list',
+            'description',
+            'due_date',
+            'completed',
+            'completed_date',
+            'completed_by',
+            'overdue',
+            'files',
+            'resources',
+            'assignees',
+            'comment_count',
+            'creation_timestamp',
+            'creation_user',
+            'modification_user',
+            'modification_timestamp',
+        )
+        extra_kwargs = {
+            'overdue': {'required': False},
+            'comment_count': {'required': False},
+        }
