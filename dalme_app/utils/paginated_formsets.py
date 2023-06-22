@@ -1,9 +1,9 @@
-from django.utils.functional import cached_property
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext as _
+from django.forms import BaseFormSet, CharField, HiddenInput, IntegerField
 from django.forms.formsets import ManagementForm
 from django.forms.renderers import get_default_renderer
-from django.forms import IntegerField, CharField, HiddenInput, BaseFormSet
+from django.utils.functional import cached_property
+from django.utils.translation import gettext as _
 
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
 INITIAL_FORM_COUNT = 'INITIAL_FORMS'
@@ -33,14 +33,18 @@ class PaginatedBaseFormSet(BaseFormSet):
                     code='missing_management_form',
                 )
         else:
-            form = PaginatedManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
-                TOTAL_FORM_COUNT: self.total_form_count(),
-                INITIAL_FORM_COUNT: self.initial_form_count(),
-                MIN_NUM_FORM_COUNT: self.min_num,
-                MAX_NUM_FORM_COUNT: self.max_num,
-                PAGE_NUM: 1,
-                SAVE_NAME: None,
-            })
+            form = PaginatedManagementForm(
+                auto_id=self.auto_id,
+                prefix=self.prefix,
+                initial={
+                    TOTAL_FORM_COUNT: self.total_form_count(),
+                    INITIAL_FORM_COUNT: self.initial_form_count(),
+                    MIN_NUM_FORM_COUNT: self.min_num,
+                    MAX_NUM_FORM_COUNT: self.max_num,
+                    PAGE_NUM: 1,
+                    SAVE_NAME: None,
+                },
+            )
         return form
 
 
@@ -56,7 +60,7 @@ def formset_factory(
     validate_min=False,
     absolute_max=None,
     can_delete_extra=True,
-    renderer=None
+    renderer=None,
 ):
     if min_num is None:
         min_num = DEFAULT_MIN_NUM
@@ -65,7 +69,8 @@ def formset_factory(
     if absolute_max is None:
         absolute_max = max_num + DEFAULT_MAX_NUM
     if max_num > absolute_max:
-        raise ValueError("'absolute_max' must be greater or equal to 'max_num'.")
+        msg = "'absolute_max' must be greater or equal to 'max_num'."
+        raise ValueError(msg)
     attrs = {
         'form': form,
         'extra': extra,

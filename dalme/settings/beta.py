@@ -1,5 +1,6 @@
 import os
-from .common import *  # NOQA
+
+from .common import *  # noqa: F403
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -22,7 +23,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': '/var/tmp/django_cache',
-    }
+    },
 }
 
 if "LOG_TO_STDOUT" in os.environ:
@@ -50,7 +51,7 @@ else:
             'file': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
-                'filename': '/var/log/django/dalme_app.log'
+                'filename': '/var/log/django/dalme_app.log',
             },
         },
         'loggers': {

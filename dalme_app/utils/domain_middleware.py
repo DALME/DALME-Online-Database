@@ -2,10 +2,12 @@ from django.http import HttpResponsePermanentRedirect
 
 
 class SubdomainRedirectMiddleware:
-    def __init__(self, get_response):
+    """Middleware to redirect between subdomains."""
+
+    def __init__(self, get_response):  # noqa: D107
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request):  # noqa: D102
         host = request.get_host()
         if host in ['www.dalme.org', 'public.dalme.org']:
             return HttpResponsePermanentRedirect('https://dalme.org' + request.path)

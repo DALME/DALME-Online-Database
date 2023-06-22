@@ -1,11 +1,13 @@
 import os
+from datetime import timedelta
+from pathlib import Path
+
 import dj_database_url
 import elasticsearch
-from requests_aws4auth import AWS4Auth
 import saml2
+from requests_aws4auth import AWS4Auth
 from saml2.saml import NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED
 from saml2.sigver import get_xmlsec_binary
-from datetime import timedelta
 
 # Environment variables
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
@@ -29,11 +31,6 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
 ENABLE_DJANGO_EXTENSIONS = bool(int(os.environ.get("ENABLE_DJANGO_EXTENSIONS", "0")))
-# DB_NAME = os.environ.get('RDS_DB_NAME', os.environ.get('MYSQL_DATABASE', ''))
-# DB_USER = os.environ.get('RDS_USERNAME', os.environ.get('MYSQL_USER', ''))
-# DB_PASSWORD = os.environ.get('RDS_PASSWORD', os.environ.get('MYSQL_PASSWORD', ''))
-# DB_HOST = os.environ.get('RDS_HOSTNAME', os.environ.get('MYSQL_HOST', ''))
-# DB_PORT = os.environ.get('RDS_PORT', os.environ.get('MYSQL_PORT', ''))
 DB_NAME = os.environ.get('RDS_DB_NAME', os.environ.get('DB_DATABASE', ''))
 DB_USER = os.environ.get('RDS_USERNAME', os.environ.get('DB_USER', ''))
 DB_PASSWORD = os.environ.get('RDS_PASSWORD', os.environ.get('DB_PASSWORD', ''))
@@ -45,18 +42,23 @@ DAM_DB_PASSWORD = os.environ.get('DAM_PASSWORD', '')
 DAM_DB_HOST = os.environ.get('DAM_HOSTNAME', '')
 
 # Routing
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCKER_ROOT = '/app'
 LOGIN_URL = f'https://{HOST}{HOST_PORT}/db/'
 LOGOUT_URL = f'https://{HOST}{HOST_PORT}/db/?logout=true'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = f'https://{HOST}{HOST_PORT}/'
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
-MEDIA_URL = 'https://%s/media/' % AWS_S3_CUSTOM_DOMAIN
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+MEDIA_ROOT = PROJECT_ROOT / 'media'
+# MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
+STATIC_ROOT = BASE_DIR / 'www' / 'static'
+# STATIC_ROOT = os.path.join(BASE_DIR, "www", 'static')
 WAGTAILADMIN_BASE_URL = f'{HOST}{HOST_PORT}/cms'
 
 # Defaults
@@ -83,7 +85,7 @@ CSRF_COOKIE_HTTPONLY = True
 ALLOWED_HOSTS = [
     f'.{HOST}',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
 ]
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_DOMAIN = f'.{HOST}'
@@ -175,7 +177,8 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        # 'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -196,10 +199,10 @@ TEMPLATES = [
 # Authentication
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 AWSAUTH = AWS4Auth(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, 'es')
 
@@ -219,7 +222,7 @@ SAML_IDP_CONFIG = {
                 ],
                 'single_logout_service': [
                     (f'https://{HOST}{HOST_PORT}/idp/slo/post/', saml2.BINDING_HTTP_POST),
-                    (f'https://{HOST}{HOST_PORT}/idp/slo/redirect/', saml2.BINDING_HTTP_REDIRECT)
+                    (f'https://{HOST}{HOST_PORT}/idp/slo/redirect/', saml2.BINDING_HTTP_REDIRECT),
                 ],
             },
             'name_id_format': [NAMEID_FORMAT_EMAILADDRESS, NAMEID_FORMAT_UNSPECIFIED],
@@ -228,15 +231,16 @@ SAML_IDP_CONFIG = {
             'want_authn_requests_signed': False,
         },
     },
-
     # Signing
     'key_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.pem',
     'cert_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.cert',
     # Encryption
-    'encryption_keypairs': [{
-        'key_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.pem',
-        'cert_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.cert',
-    }],
+    'encryption_keypairs': [
+        {
+            'key_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.pem',
+            'cert_file': f'{DOCKER_ROOT}/ssl-certs/dam.dalme.org.cert',
+        },
+    ],
     'valid_for': 365 * 24,
 }
 
@@ -244,18 +248,12 @@ SAML_IDP_CONFIG = {
 DATABASE_ROUTERS = ['dalme_app.utils.ModelDatabaseRouter']
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.mysql',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': DB_NAME,
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
         'PORT': DB_PORT,
-        # 'CONN_MAX_AGE': 3600, see: https://github.com/Koed00/django-q/issues/435
-        # 'OPTIONS': {
-        #     'options': '-c search_path=dalme_db'
-        #     # 'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
-        # },
     },
     'dam': {
         'ENGINE': 'django.db.backends.mysql',
@@ -263,7 +261,7 @@ DATABASES = {
         'USER': DAM_DB_USER,
         'PASSWORD': DAM_DB_PASSWORD,
         'HOST': DAM_DB_HOST,
-    }
+    },
 }
 
 DATABASES['default'].update(dj_database_url.config(conn_max_age=500))  # ??
@@ -291,12 +289,10 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication'
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'DEFAULT_RENDERER_CLASSES': [
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
@@ -307,7 +303,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
-        'dalme_api.filter_backends.DalmeOrderingFilter'
+        'dalme_api.filter_backends.DalmeOrderingFilter',
     ],
     'JSON_UNDERSCOREIZE': {
         'no_underscore_before_number': True,
@@ -326,9 +322,8 @@ COMPRESS_STORAGE = 'compressor.storage.BrotliCompressorFileStorage'
 COMPRESS_OFFLINE_CONTEXT = 'dalme_app.utils.offline_context_generator'
 COMPRESS_FILTERS = {
     'css': ['compressor.filters.cssmin.rCSSMinFilter'],
-    'js': ['compressor.filters.jsmin.JSMinFilter']
+    'js': ['compressor.filters.jsmin.JSMinFilter'],
 }
-
 # Wagtail configuration
 SITE_ID = 1
 WAGTAIL_SITE_NAME = 'DALME'
@@ -348,6 +343,6 @@ Q_CLUSTER = {
     'sqs': {
         'aws_region': AWS_REGION,
         'aws_access_key_id': AWS_ACCESS_KEY_ID,
-        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY
-    }
+        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY,
+    },
 }

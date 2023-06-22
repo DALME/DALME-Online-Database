@@ -1,17 +1,20 @@
 import requests
-from .common import *  # NOQA
+
+from .common import *  # noqa: F403
 
 
 def get_ec2_instance_ip():
-    """Try to obtain the IP address of the current EC2 instance in AWS"""
+    """Try to obtain the IP address of the current EC2 instance in AWS."""
     try:
         ip = requests.get('http://169.254.169.254/latest/meta-data/local-ipv4', timeout=0.01).text
     except requests.exceptions.ConnectionError:
         return None
-    return ip
+    else:
+        return ip
+
 
 # Hosting
-ALLOWED_HOSTS.append(get_ec2_instance_ip()) # NOQA
+ALLOWED_HOSTS.append(get_ec2_instance_ip())  # noqa: F405
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -30,7 +33,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'cache_table',
-    }
+    },
 }
 
 LOGGING = {
@@ -44,7 +47,7 @@ LOGGING = {
         },
         'logfile': {
             'class': 'logging.handlers.WatchedFileHandler',
-            'filename': '/opt/python/log/dalme_app.log'
+            'filename': '/opt/python/log/dalme_app.log',
         },
     },
     'loggers': {
@@ -61,7 +64,7 @@ LOGGING = {
         'dalme_app': {
             'handlers': ['logfile'],
             'level': 'ERROR',
-            'propagate': False
+            'propagate': False,
         },
     },
 }

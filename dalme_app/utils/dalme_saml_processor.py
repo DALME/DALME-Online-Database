@@ -1,12 +1,11 @@
 from djangosaml2idp.processors import BaseProcessor
-from typing import Dict
 
 
 class SAMLProcessor(BaseProcessor):
-    """ subclasses the default djangosaml2idp processor
-    to allow for special fields to be included in response """
+    """Subclasses the default djangosaml2idp processor to allow for special fields to be included in response."""
 
-    def create_identity(self, user, sp_attribute_mapping: Dict[str, str]) -> Dict[str, str]:
+    def create_identity(self, user, sp_attribute_mapping: dict[str, str]) -> dict[str, str]:
+        """Add extra fields to the response."""
         results = {}
         for user_attr, out_attr in sp_attribute_mapping.items():
             attr_lst = user_attr.split('.')
