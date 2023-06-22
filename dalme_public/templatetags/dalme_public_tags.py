@@ -1,31 +1,29 @@
-from calendar import month_name
-import os
 import json
+import os
 import urllib
+from calendar import month_name
+from datetime import date
 
-from django import template
 from elasticsearch_dsl.utils import AttrDict
 
-from dalme_public.serializers import PublicSourceSerializer
+from django import template
+
 from dalme_public.models import (
     Essay,
     ExplorePage,
-    FeaturedObject,
     FeaturedInventory,
+    FeaturedObject,
     Features,
     Footer,
     Home,
-    SearchPage
+    SearchPage,
 )
-
-from datetime import date
+from dalme_public.serializers import PublicRecordSerializer
 
 register = template.Library()
 
 
-@register.inclusion_tag(
-    'dalme_public/includes/_footer.html', takes_context=True
-)
+@register.inclusion_tag('dalme_public/includes/_footer.html', takes_context=True)
 def footer(context):
     return {
         'footer': Footer.objects.first(),
@@ -42,10 +40,7 @@ def classname(obj):
 @register.simple_tag
 def get_nav():
     home = Home.objects.first()
-    return [
-        page.specific for page in
-        (home, *home.get_children().live().filter(show_in_menus=True))
-    ]
+    return [page.specific for page in (home, *home.get_children().live().filter(show_in_menus=True))]
 
 
 @register.simple_tag(takes_context=True)
@@ -54,9 +49,8 @@ def nav_active(context, tab):
     tab = tab.specific
     if page == tab:
         return True
-    if not isinstance(tab, Home):
-        if page in [desc.specific for desc in tab.get_descendants()]:
-            return True
+    if not isinstance(tab, Home) and page in [desc.specific for desc in tab.get_descendants()]:
+        return True
     return False
 
 
@@ -67,7 +61,7 @@ def get_breadcrumbs_nav(context):
         {
             'title': ancestor.specific.title_switch,
             'url': ancestor.specific.url,
-            'active': False
+            'active': False,
         }
         for ancestor in page.get_ancestors()[1:]
     ]
@@ -103,7 +97,7 @@ def get_breadcrumbs_nav(context):
                 {
                     'title': 'Browse Records',
                     'url': url,
-                    'active': True if records else False,
+                    'active': bool(records),
                 },
             ]
 
@@ -137,20 +131,18 @@ def get_breadcrumbs_nav(context):
 @register.simple_tag(takes_context=True)
 def get_flat_nav(context):
     page = context['page']
-    if not page.show_in_menus:
-        return [p.specific for p in page.get_parent().get_siblings().live().filter(show_in_menus=True)]
-    else:
-        return [p.specific for p in page.get_siblings().live().filter(show_in_menus=True)]
+    target = page if page.show_in_menus else page.get_parent()
+    return [p.specific for p in target.get_siblings().live().filter(show_in_menus=True)]
 
 
 @register.simple_tag(takes_context=True)
 def get_header_image_styles(context, header_image, header_position):
     gradients = {
-        'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',  # noqa
-        'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(63, 101, 68, 0.9) 100%',  # noqa
-        'features': '125deg, rgba(99, 98, 58, 0.7) 0%, rgba(138, 71, 71, 0.9) 100%',  # noqa
-        'collections': '125deg, rgba(95, 81, 111, 0.7) 0%, rgba(23, 62, 101, 0.9) 100%',  # noqa
-        'about': '125deg, rgba(105, 102, 63, 0.6) 0%, rgba(146, 106, 16, 0.9) 100%',  # noqa
+        'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',
+        'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(63, 101, 68, 0.9) 100%',
+        'features': '125deg, rgba(99, 98, 58, 0.7) 0%, rgba(138, 71, 71, 0.9) 100%',
+        'collections': '125deg, rgba(95, 81, 111, 0.7) 0%, rgba(23, 62, 101, 0.9) 100%',
+        'about': '125deg, rgba(105, 102, 63, 0.6) 0%, rgba(146, 106, 16, 0.9) 100%',
         'generic': '59deg, #11587c 54.62%, #1b1b1b',
     }
     page = context['page']
@@ -177,22 +169,26 @@ def get_source_details(context):
     result = {}
 
     if source:
-        data = PublicSourceSerializer(source).data
-        result.update({
-            'source': source,
-            'name': data['name'],
-            'short_name': data['short_name'],
-            'date': data.get('date'),
-            'locale': data.get('locale'),
-            'language': data.get('language'),
-            'url': f'/collections/records/{source.pk}/'
-        })
+        data = PublicRecordSerializer(source).data
+        result.update(
+            {
+                'source': source,
+                'name': data['name'],
+                'short_name': data['short_name'],
+                'date': data.get('date'),
+                'locale': data.get('locale'),
+                'language': data.get('language'),
+                'url': f'/collections/records/{source.pk}/',
+            },
+        )
 
     if source_set:
-        result.update({
-            'source_set': source_set,
-            'collection_url': f"/collections/{source_set.name.replace(' ', '-').lower()}/"
-        })
+        result.update(
+            {
+                'source_set': source_set,
+                'collection_url': f"/collections/{source_set.name.replace(' ', '-').lower()}/",
+            },
+        )
 
     return result if result else None
 
@@ -202,10 +198,8 @@ def get_features_filter_q(context, key, value):
     params = f'?{key}={value}' if value != 'all' else ''
     for param_key, param_value in context['request'].GET.items():
         if param_key != key:
-            if not params:
-                params += f'?{param_key}={param_value}'
-            else:
-                params += f'&{param_key}={param_value}'
+            ag = '&' if params else '?'
+            params += f'{ag}{param_key}={param_value}'
     return params
 
 
@@ -250,54 +244,39 @@ def get_recent_features(context):
 
         if i == 0:
             year_control = year
-            m_idx = months.index(month) - 1
-            year_set.append({
-                'url': obj.url,
-                'month': month
-            })
+            m_idx = months.index(month) - 1  # type: ignore
+            year_set.append({'url': obj.url, 'month': month})
             continue
 
         if year == year_control:
-            if month != months[m_idx]:
-                while month != months[m_idx]:
-                    year_set.append({
-                        'url': None,
-                        'month': months[m_idx]
-                    })
-                    m_idx -= 1
+            if month != months[m_idx]:  # type: ignore
+                while month != months[m_idx]:  # type: ignore
+                    year_set.append({'url': None, 'month': months[m_idx]})  # type: ignore
+                    m_idx -= 1  # type: ignore
 
-            year_set.append({
-                'url': obj.url,
-                'month': month
-            })
-            m_idx -= 1
+            year_set.append({'url': obj.url, 'month': month})
+            m_idx -= 1  # type: ignore
 
         else:
             results[year_control] = year_set
             year_control = year
-            year_set = [{
-                'url': obj.url,
-                'month': month
-            }]
-            m_idx = months.index(month) - 1
+            year_set = [{'url': obj.url, 'month': month}]
+            m_idx = months.index(month) - 1  # type: ignore
 
         results[year_control] = year_set
 
     if results:
-        return {
-            'title': title,
-            'features': results
-        }
+        return {'title': title, 'features': results}
     else:
         return None
 
 
 @register.simple_tag()
 def collection_date_range(collection):
-    years = sorted(collection.source_set.get_public_time_coverage().keys())
     try:
+        years = sorted(collection.source_set.get_time_coverage(published=True).keys())
         return f'{years[0]} - {years[-1]}' if len(years) > 1 else f'{years[0]}+'
-    except IndexError:
+    except (IndexError, AttributeError):
         return 'Unknown'
 
 
@@ -315,7 +294,7 @@ def get_citation_data(context):
     formats = None
     record = context.get('record', False)
 
-    with open(os.path.join('static', 'citation_styles', 'citation_formats.json'), 'r', encoding='utf-8') as fp:
+    with open(os.path.join('static', 'citation_styles', 'citation_formats.json'), encoding='utf-8') as fp:
         formats = json.load(fp)
 
     coins_list = [
@@ -333,28 +312,29 @@ def get_citation_data(context):
         'editor': [
             {'family': 'Smail', 'given': 'Daniel Lord'},
             {'family': 'Pizzorno', 'given': 'Gabriel H.'},
-            {'family': 'Morreale', 'given': 'Laura'}
+            {'family': 'Morreale', 'given': 'Laura'},
         ],
         "accessed": {"date-parts": [[accessed.year, accessed.month, accessed.day]]},
     }
 
     if page_class == 'Collections' and not record:
-        coins_list += [
-            ('rft.genre', 'book'),
-            ('rft.identifier', 'https://dalme.org'),
-        ]
-        citation.update({
-            'type': 'book',
-            'title': 'The Documentary Archaeology of Late Medieval Europe',
-            'URL': 'https://dalme.org',
-            'issued': {'date-parts': [[published.year]]}
-        })
+        coins_list += [('rft.genre', 'book'), ('rft.identifier', 'https://dalme.org')]
+        citation.update(
+            {
+                'type': 'book',
+                'title': 'The Documentary Archaeology of Late Medieval Europe',
+                'URL': 'https://dalme.org',
+                'issued': {'date-parts': [[published.year]]},
+            },
+        )
     else:
         coins_list.append(('rft.genre', 'bookitem'))
-        citation.update({
-            'type': 'chapter',
-            'container-title': 'The Documentary Archaeology of Late Medieval Europe',
-        })
+        citation.update(
+            {
+                'type': 'chapter',
+                'container-title': 'The Documentary Archaeology of Late Medieval Europe',
+            },
+        )
 
         if record:
             title = context['data']['name'].strip()
@@ -362,18 +342,17 @@ def get_citation_data(context):
             authors = context['data']['get_credit_line']['authors']
             contributors = context['data']['get_credit_line']['contributors']
 
-            coins_list += [
-                ('rft.atitle', title),
-                ('rft.identifier', purl),
-            ]
+            coins_list += [('rft.atitle', title), ('rft.identifier', purl)]
             for author in authors:
                 coins_list.append(('rft.au', author))
 
-            citation.update({
-                'author': [{'literal': i} for i in authors],
-                'title': title,
-                'URL': purl
-            })
+            citation.update(
+                {
+                    'author': [{'literal': i} for i in authors],
+                    'title': title,
+                    'URL': purl,
+                },
+            )
 
             if contributors:
                 citation['contributor'] = [{'literal': i} for i in contributors]
@@ -381,16 +360,15 @@ def get_citation_data(context):
                     coins_list.append(('rft.contributor', contributor))
 
         elif page_class == 'Flat':
-            coins_list += [
-                ('rft.atitle', page.title),
-                ('rft.identifier', page.get_full_url(context['request'])),
-            ]
+            coins_list += [('rft.atitle', page.title), ('rft.identifier', page.get_full_url(context['request']))]
 
-            citation.update({
-                'issued': {'date-parts': [[published.year, published.month, published.day]]},
-                'title': page.title,
-                'URL': page.get_full_url(context['request'])
-            })
+            citation.update(
+                {
+                    'issued': {'date-parts': [[published.year, published.month, published.day]]},
+                    'title': page.title,
+                    'URL': page.get_full_url(context['request']),
+                },
+            )
 
         elif page_class == 'Collection':
             coins_list += [
@@ -399,33 +377,41 @@ def get_citation_data(context):
                 ('rft.au', page.source_set.owner.profile.full_name),
             ]
 
-            citation.update({
-                'author': [{'literal': page.source_set.owner.profile.full_name}],
-                'issued': {'date-parts': [[published.year]]},
-                'title': page.title,
-                'URL': page.get_full_url(context['request'])
-            })
+            citation.update(
+                {
+                    'author': [{'literal': page.source_set.owner.profile.full_name}],
+                    'issued': {'date-parts': [[published.year]]},
+                    'title': page.title,
+                    'URL': page.get_full_url(context['request']),
+                },
+            )
 
         else:
             author = page.alternate_author if page.alternate_author is not None else page.author
             coins_list += [
                 ('rft.atitle', page.title),
                 ('rft.identifier', page.get_full_url(context['request'])),
-                ('rft.au', author)
+                ('rft.au', author),
             ]
 
-            citation.update({
-                'author': [{'literal': author}],
-                'issued': {'date-parts': [[
-                    published.year,
-                    published.month,
-                    published.day
-                ]]},
-                'title': page.title,
-                'URL': page.get_full_url(context['request'])
-            })
+            citation.update(
+                {
+                    'author': [{'literal': author}],
+                    'issued': {
+                        'date-parts': [
+                            [
+                                published.year,
+                                published.month,
+                                published.day,
+                            ],
+                        ],
+                    },
+                    'title': page.title,
+                    'URL': page.get_full_url(context['request']),
+                },
+            )
 
-    coins_tokens = [f'{k}={urllib.parse.quote(v)}' for (k, v) in coins_list]
+    coins_tokens = [f'{k}={urllib.parse.quote(v)}' for (k, v) in coins_list]  # type: ignore
     coins_span = f'<span class="Z3988" title="{"&".join(coins_tokens)}"></span>'
 
     return [formats, citation, coins_span]
@@ -433,12 +419,12 @@ def get_citation_data(context):
 
 @register.simple_tag
 def relative_url(value, field_name, urlencode=None):
-    url = '?{}={}'.format(field_name, value)
+    url = f'?{field_name}={value}'
     if urlencode:
         querystring = urlencode.split('&')
         filtered_querystring = filter(lambda p: p.split('=')[0] != field_name, querystring)
         encoded_querystring = '&'.join(filtered_querystring)
-        url = '{}&{}'.format(url, encoded_querystring)
+        url = f'{url}&{encoded_querystring}'
     return url
 
 
@@ -447,15 +433,11 @@ def dd_record_name(name, part=''):
     try:
         name_string = name.split('(')
         if part == 'loc':
-
             try:
                 return name_string[1][:-1]
-
             except IndexError:
                 return 'Archival location not available'
-
         return name_string[0]
-
     except AttributeError:
         return name
 
@@ -476,6 +458,7 @@ def to_dict(target):
         return target.to_dict()
     if type(target) is list and type(target[0]) is tuple:
         return {i[0]: i[1] for i in target}
+    return None
 
 
 @register.simple_tag
@@ -486,18 +469,10 @@ def dict_key_lookup(_dict, key):
 @register.filter
 def in_list(value, list_string):
     _list = []
-    conversions = {
-        'none': None,
-        'blank': '',
-        'empty': ' '
-    }
-
+    conversions = {'none': None, 'blank': '', 'empty': ' '}
     for item in list_string.split(','):
-        if item in conversions:
-            _list.append(conversions[item])
-        else:
-            _list.append(item)
-
+        target = conversions[item] if item in conversions else item
+        _list.append(target)
     return value in _list
 
 
@@ -510,7 +485,6 @@ def get_highlights(meta, context):
             for fragment in meta.highlight[field]:
                 try:
                     highlights.append({'field': context[field]['label'], 'fragment': fragment})
-
                 except KeyError:
                     field_tokens = field.split('.')
                     field_tokens.pop(-1)
@@ -525,12 +499,11 @@ def get_highlights(meta, context):
                         fields = hit.meta.highlight.to_dict().keys()
                         for field in fields:
                             for fragment in hit.meta.highlight[field]:
-                                highlights.append({'field': f'Folio {hit.folio}',
-                                                  'fragment': fragment, 'link': hit.folio})
-
+                                highlights.append(
+                                    {'field': f'Folio {hit.folio}', 'fragment': fragment, 'link': hit.folio},
+                                )
                     except AttributeError:
                         pass
-
     return highlights
 
 
@@ -544,9 +517,13 @@ def js_trans(value, mode=None):
         return 'false'
     elif value is True:
         return 'true'
-    elif (type(value) in [int, list, dict]
-          or value.startswith('"') and value.endswith('"')
-          or value.startswith('\'') and value.endswith('\'')):
+    elif (
+        type(value) in [int, list, dict]
+        or value.startswith('"')
+        and value.endswith('"')
+        or value.startswith('\'')
+        and value.endswith('\'')
+    ):
         return value
     else:
         return value if value.startswith('"') and value.endswith('"') else f'"{value}"'

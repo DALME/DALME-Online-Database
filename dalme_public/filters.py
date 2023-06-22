@@ -1,11 +1,11 @@
 import calendar
 import itertools
 
-from django.db.models import OuterRef, Q, Subquery
-
 import django_filters
 
-from dalme_app.models import Attribute, Source, LocaleReference
+from django.db.models import OuterRef, Q, Subquery
+
+from dalme_app.models import Attribute, LocaleReference, Record
 from dalme_public import forms
 from dalme_public.models import (
     Collection,
@@ -15,11 +15,10 @@ from dalme_public.models import (
     FeaturedObject,
 )
 
-
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 
 
-def _map_source_types():
+def _map_record_types():
     # We have to filter over 'value_STR' rather than, say, 'pk' because of the
     # sideways denormalization scheme: there is no unique, one-to-one mapping
     # between Attributes with the same 'value_STR'. Compare:
@@ -36,58 +35,56 @@ def _map_source_types():
     # in. See the `filter_type` method below.
 
     return {
-        str(idx): attr['value_STR']
-        for idx, attr in enumerate(Attribute.objects.filter(
-            attribute_type__short_name='record_type',
-            object_id__in=Source.objects.filter(type=13, workflow__is_public=True).values('id')
-        ).values('value_STR').distinct())
+        str(idx): attr['attributevaluestr__value']
+        for idx, attr in enumerate(
+            Attribute.objects.filter(
+                attribute_type__short_name='record_type',
+                object_id__in=Record.objects.filter(workflow__is_public=True).values('id'),
+            )
+            .values('attributevaluestr__value')
+            .distinct(),
+        )
     }
 
 
 def corpus_choices():
-    return [
-        (corpus.pk, corpus.title)
-        for corpus in Corpus.objects.all().order_by('title')
-    ]
+    return [(corpus.pk, corpus.title) for corpus in Corpus.objects.all().order_by('title')]
 
 
 def collection_choices():
-    return [
-        (collection.pk, collection.title)
-        for collection in Collection.objects.all().order_by('title')
-    ]
+    return [(collection.pk, collection.title) for collection in Collection.objects.all().order_by('title')]
 
 
-def source_type_choices():
-    type_map = _map_source_types()
-    return sorted(list(type_map.items()), key=lambda choice: choice[1])
+def record_type_choices():
+    type_map = _map_record_types()
+    return sorted(type_map.items(), key=lambda choice: choice[1])
 
 
 def locale_choices():
-    locales = [int(i) for i in Attribute.objects.filter(
-        attribute_type=36,
-        sources__type=13,
-        sources__workflow__is_public=True
-    ).values_list(
-        'value_JSON__id',
-        flat=True
-    ).distinct()]
-
-    return [
-        (i.id, i.name)
-        for i in LocaleReference.objects.filter(id__in=locales)
-        .order_by('name')
+    locales = [
+        int(i)
+        for i in Attribute.objects.filter(
+            attribute_type=36,
+            record__workflow__is_public=True,
+        )
+        .values_list(
+            'attributevaluefkey__locale__id',
+            flat=True,
+        )
+        .distinct()
     ]
 
+    return [(i.id, i.name) for i in LocaleReference.objects.filter(id__in=locales).order_by('name')]
 
-class SourceOrderingFilter(django_filters.OrderingFilter):
+
+class RecordOrderingFilter(django_filters.OrderingFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.extra['choices'] += [
             ('name', 'Name'),
             ('-name', 'Name (descending)'),
-            ('source_type', 'Type'),
-            ('-source_type', 'Type (descending)'),
+            ('record_type', 'Type'),
+            ('-recordtype', 'Type (descending)'),
             ('date', 'Date'),
             ('-date', 'Date (descending)'),
         ]
@@ -101,25 +98,25 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
     @staticmethod
     def annotate_dates(qs):
         dates = Attribute.objects.filter(
-            Q(sources=OuterRef('pk'), attribute_type__short_name='date')
-            | Q(sources=OuterRef('pk'), attribute_type__short_name='start_date')
-            | Q(sources=OuterRef('pk'), attribute_type__short_name='end_date')
+            Q(records=OuterRef('pk'), attribute_type__short_name='date')
+            | Q(records=OuterRef('pk'), attribute_type__short_name='start_date')
+            | Q(records=OuterRef('pk'), attribute_type__short_name='end_date'),
         )
-        qs = qs.annotate(source_date=Subquery(dates.values('value_DATE_y')[:1]))
+        qs = qs.annotate(record_date=Subquery(dates.values('attributevaluedate__year')[:1]))
         return qs.distinct()
 
     @staticmethod
-    def annotate_source_type(qs):
+    def annotate_record_type(qs):
         record_types = Attribute.objects.filter(
-            sources=OuterRef('pk'),
-            attribute_type__short_name='record_type'
+            records=OuterRef('pk'),
+            attribute_type__short_name='record_type',
         )
         return qs.annotate(
-            source_type=Subquery(record_types.values('value_STR')[:1])
+            record_type=Subquery(record_types.values('attributevaluestr__value')[:1]),
         ).distinct()
 
     def filter(self, qs, value):
-        qs = super().filter(qs, value=list())
+        qs = super().filter(qs, value=[])
         # For now any duplicates that remain here after filtering are
         # eliminated on the endpoint itself before going down the wire.
         # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#distinct
@@ -128,10 +125,10 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
             self.parent.annotated = True
             qs = self.annotate_dates(qs)
 
-        source_type = self.get_value('source_type', value)
-        if source_type:
+        record_type = self.get_value('record_type', value)
+        if record_type:
             self.parent.annotated = True
-            qs = self.annotate_source_type(qs)
+            qs = self.annotate_record_type(qs)
 
         name = self.get_value('name', value)
         if name:
@@ -140,7 +137,7 @@ class SourceOrderingFilter(django_filters.OrderingFilter):
         return qs
 
 
-class SourceFilter(django_filters.FilterSet):
+class RecordFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.annotated = False
         super().__init__(*args, **kwargs)
@@ -149,51 +146,51 @@ class SourceFilter(django_filters.FilterSet):
 
     name = django_filters.CharFilter(
         label='Name',
-        lookup_expr='icontains'
+        lookup_expr='icontains',
     )
-    source_type = django_filters.MultipleChoiceFilter(
+    record_type = django_filters.MultipleChoiceFilter(
         label='Type',
-        choices=source_type_choices,
-        method='filter_type'
+        choices=record_type_choices,
+        method='filter_type',
     )
     date_range = django_filters.DateFromToRangeFilter(
         label='Date Range',
-        method='filter_date_range'
+        method='filter_date_range',
     )
     corpus = django_filters.ChoiceFilter(
         label='Corpus',
         choices=corpus_choices,
-        method='filter_corpus'
+        method='filter_corpus',
     )
     collection = django_filters.ChoiceFilter(
         label='Collection',
         choices=collection_choices,
-        method='filter_collection'
+        method='filter_collection',
     )
     has_image = django_filters.ChoiceFilter(
         label='Has Image',
         method='filter_image',
-        choices=BOOLEAN_CHOICES
+        choices=BOOLEAN_CHOICES,
     )
     has_transcription = django_filters.ChoiceFilter(
         label='Has Transcription',
         method='filter_transcription',
-        choices=BOOLEAN_CHOICES
+        choices=BOOLEAN_CHOICES,
     )
     locale = django_filters.ChoiceFilter(
         label='Locale',
         choices=locale_choices,
-        method='filter_locale'
+        method='filter_locale',
     )
 
-    order_by = SourceOrderingFilter()
+    order_by = RecordOrderingFilter()
 
     class Meta:
-        model = Source
-        form = forms.SourceFilterForm
+        model = Record
+        form = forms.RecordFilterForm
         fields = [
             'name',
-            'source_type',
+            'record_type',
             'date_range',
             'corpus',
             'collection',
@@ -205,25 +202,25 @@ class SourceFilter(django_filters.FilterSet):
 
     def filter_type(self, queryset, name, value):
         # Now we can re-use the type map when a request comes in for filtering.
-        type_map = _map_source_types()
-        source_types = []
+        type_map = _map_record_types()
+        record_types = []
         for idx in value:
             try:
-                source_types.append(type_map[idx])
+                record_types.append(type_map[idx])
             except KeyError:
                 continue
-        return queryset.filter(**{'attributes__value_STR__in': source_types})
+        return queryset.filter(**{'attributes__attributevaluestr__value__in': record_types})
 
     def filter_date_range(self, queryset, name, value):
         queryset = queryset.filter(
-            attributes__attribute_type__id__in=[19, 25, 26]
+            attributes__attribute_type__id__in=[19, 25, 26],
         ).distinct()
 
         after, before = value
         if after:
-            queryset = queryset.filter(attributes__value_DATE_y__gte=after)
+            queryset = queryset.filter(attributes__attributevaluedate__year__gte=after)
         if before:
-            queryset = queryset.filter(attributes__value_DATE_y__lte=before)
+            queryset = queryset.filter(attributes__attributevaluedate__year__lte=before)
 
         return queryset
 
@@ -233,10 +230,9 @@ class SourceFilter(django_filters.FilterSet):
         except Corpus.DoesNotExist:
             return queryset.none()
         return queryset.filter(
-            sets__set_id__in=[
-                collection.specific.source_set.pk
-                for collection in corpus.collections.all()
-            ]
+            collections__collection_id__in=[
+                collection.specific.source_set.pk for collection in corpus.collections.all()
+            ],
         )
 
     def filter_collection(self, queryset, name, value):
@@ -244,18 +240,18 @@ class SourceFilter(django_filters.FilterSet):
             collection = Collection.objects.get(pk=value)
         except Collection.DoesNotExist:
             return queryset.none()
-        return queryset.filter(sets__set_id=collection.source_set.pk)
+        return queryset.filter(collections__collection_id=collection.source_set.pk)
 
     def filter_image(self, queryset, name, value):
-        value = True if value == 'true' else False
-        return queryset.exclude(source_pages__page__dam_id__isnull=value)
+        value = value == 'true'
+        return queryset.exclude(folios__page__dam_id__isnull=value)
 
     def filter_transcription(self, queryset, name, value):
-        value = True if value == 'true' else False
-        return queryset.exclude(source_pages__transcription__isnull=value)
+        value = value == 'true'
+        return queryset.exclude(folios__transcription__isnull=value)
 
     def filter_locale(self, queryset, name, value):
-        return queryset.filter(attributes__attribute_type=36, attributes__value_JSON__id=str(value))
+        return queryset.filter(attributes__attribute_type=36, attributes__attributevaluefkey__locale__id=str(value))
 
 
 class FeaturedFilter(django_filters.FilterSet):
@@ -276,20 +272,20 @@ class FeaturedFilter(django_filters.FilterSet):
         order = self.data.get('order_by', 'date')
         if order == 'date':
             grouped = []
-            qs = reversed(sorted(qs, key=lambda obj: obj.last_published_at))
+            qs = sorted(qs, key=lambda obj: obj.last_published_at, reverse=True)
             by_year = [
                 (key, list(values))
                 for key, values in itertools.groupby(
-                    qs, key=lambda obj: obj.last_published_at.year
+                    qs,
+                    key=lambda obj: obj.last_published_at.year,
                 )
             ]
             for year, values in by_year:
                 by_month = [
                     (key, list(values))
                     for key, values in itertools.groupby(
-                        values, key=lambda obj: calendar.month_name[
-                            obj.last_published_at.month
-                        ]
+                        values,
+                        key=lambda obj: calendar.month_name[obj.last_published_at.month],
                     )
                 ]
                 grouped.append((year, by_month))
@@ -298,7 +294,8 @@ class FeaturedFilter(django_filters.FilterSet):
             grouped = [
                 (key, list(values))
                 for key, values in itertools.groupby(
-                    qs, key=lambda obj: f'{obj.author}'
+                    qs,
+                    key=lambda obj: f'{obj.author}',
                 )
             ]
 

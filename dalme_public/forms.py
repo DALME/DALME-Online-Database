@@ -1,6 +1,8 @@
+from captcha import fields, widgets
+
 from django import forms
 from django.core.mail import EmailMessage
-from captcha import fields, widgets
+
 from dalme_app.models import SavedSearch
 
 
@@ -26,7 +28,7 @@ class ContactForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control'}),
     )
     captcha = fields.ReCaptchaField(
-        widget=widgets.ReCaptchaV2Checkbox()
+        widget=widgets.ReCaptchaV2Checkbox(),
     )
 
     def save(self):
@@ -35,7 +37,7 @@ class ContactForm(forms.Form):
             self.cleaned_data['message'],
             f"{self.cleaned_data['name']} <{self.cleaned_data['email']}>",
             ['projectdalme@gmail.com'],
-            reply_to=[self.cleaned_data['email']]
+            reply_to=[self.cleaned_data['email']],
         )
         try:
             email.send(fail_silently=False)
@@ -44,7 +46,7 @@ class ContactForm(forms.Form):
             return False, e
 
 
-class SourceFilterForm(forms.Form):
+class RecordFilterForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
@@ -54,7 +56,8 @@ class SourceFilterForm(forms.Form):
                 after, before = date_range.split(',')
             except ValueError:
                 self.add_error(
-                    'date_range', 'Incorrect date format, should be: YYYY,YYYY'
+                    'date_range',
+                    'Incorrect date format, should be: YYYY,YYYY',
                 )
 
             cleaned_data['date_range'] = [after, before]

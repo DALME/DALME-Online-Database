@@ -6,8 +6,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):  # noqa: D101
     dependencies = [
-        ('dalme_app', '0007_attribute_migration'),
+        ('dalme_app', '0013_data_m_local_values'),
         ('dalme_public', '0002_alter_bibliography_body_alter_collection_body_and_more'),
+    ]
+
+    run_before = [
+        ('dalme_app', '0014_remove_unused'),
     ]
 
     operations = [

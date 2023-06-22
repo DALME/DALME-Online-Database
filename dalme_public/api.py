@@ -1,18 +1,17 @@
-from django.core.paginator import InvalidPage
-from django.http import JsonResponse
-from django.views import View
-
 from rest_framework import pagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from dalme_app.models import Source, rs_resource
-from dalme_public.serializers import PublicSourceSerializer
-from dalme_public.filters import SourceFilter
-from dalme_public.models import Corpus, Collection
-from dalme_public.filters import _map_source_types, locale_choices
+from django.core.paginator import InvalidPage
+from django.http import JsonResponse
+from django.views import View
+
+from dalme_app.models import Record, rs_resource
 from dalme_app.utils import Search, SearchContext
+from dalme_public.filters import RecordFilter, _map_record_types, locale_choices
+from dalme_public.models import Collection, Corpus
+from dalme_public.serializers import PublicRecordSerializer
 
 
 class DALMEPagination(pagination.PageNumberPagination):
@@ -63,44 +62,28 @@ class DALMEPagination(pagination.PageNumberPagination):
             result_end = total_count
         start_page = max(current_page - adjacent_pages, 1) if max(current_page - adjacent_pages, 1) >= 3 else 1
         end_page = current_page + adjacent_pages if current_page + adjacent_pages <= num_pages else num_pages
-        page_numbers = [i for i in range(start_page, end_page + 1)]
+        page_numbers = list(range(start_page, end_page + 1))
 
-        return Response({
-            'results': data,
-            'next': self.get_next_link(),
-            'previous': self.get_previous_link(),
-            'count': total_count,
-            'totalPages': num_pages,
-            'currentPage': current_page,
-            'page_numbers': page_numbers,
-            'page_start': start_offset + 1,
-            'page_end': result_end - 1 if result_end != total_count else result_end,
-        })
-
-
-class PublicRecordSerializer(PublicSourceSerializer):
-    @staticmethod
-    def get_image(instance):
-        page = instance.pages.exclude(dam_id__isnull=True).first()
-        if page:
-            # resource = rs_resource.objects.get(ref=page.dam_id)
-            # return resource.ref
-            return page.dam_id
-        return None
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data.update({
-            'image_ref': self.get_image(instance),
-        })
-        return data
+        return Response(
+            {
+                'results': data,
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link(),
+                'count': total_count,
+                'totalPages': num_pages,
+                'currentPage': current_page,
+                'page_numbers': page_numbers,
+                'page_start': start_offset + 1,
+                'page_end': result_end - 1 if result_end != total_count else result_end,
+            },
+        )
 
 
 class Thumbnail(View):
     def get_data(self):
         try:
             thumbnail = rs_resource.objects.get(
-                ref=self.request.GET['image_ref']
+                ref=self.request.GET['image_ref'],
             ).get_image_url(self.request.GET['size'])
         except (KeyError, ValueError):
             thumbnail = None
@@ -110,12 +93,12 @@ class Thumbnail(View):
         return JsonResponse(self.get_data())
 
 
-class SourceList(ListAPIView):
-    model = Source
-    queryset = Source.objects.filter(type=13, workflow__is_public=True)
+class RecordList(ListAPIView):
+    model = Record
+    queryset = Record.objects.filter(workflow__is_public=True)
     serializer_class = PublicRecordSerializer
     pagination_class = DALMEPagination
-    filterset_class = SourceFilter
+    filterset_class = RecordFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def list(self, request, *args, **kwargs):
@@ -139,30 +122,32 @@ class SourceList(ListAPIView):
                 highlight=False,
                 search_context=search_context.context,
                 as_queryset=True,
-                sort='name'
+                sort='name',
             )
             qs = search_obj.results
 
         else:
             qs = super().get_queryset(*args, **kwargs).order_by('name')
             qs = qs.prefetch_related(
-                'attributes', 'attributes__attribute_type'
+                'attributes',
+                'attributes__attribute_type',
             )
 
         self.filterset = self.filterset_class(
-            self.request.GET, queryset=qs
+            self.request.GET,
+            queryset=qs,
         )
         qs = self.filterset.qs.distinct()
 
         if self.filterset.annotated:
             # Currently necessary because of the inability to eliminate
-            # dupes when ordering across the Source - Attribute traversal.
+            # dupes when ordering across the Record - Attribute traversal.
             seen = set()
             filtered = []
-            for source in qs:
-                if source.pk not in seen:
-                    filtered.append(source)
-                    seen.add(source.pk)
+            for record in qs:
+                if record.pk not in seen:
+                    filtered.append(record)
+                    seen.add(record.pk)
             qs = filtered
 
             # Sorting by 'name' happens on the Order filter itself as we
@@ -170,19 +155,20 @@ class SourceList(ListAPIView):
             order_by = self.request.GET.get('order_by')
             if order_by.endswith('date'):
                 qs = sorted(
-                    qs, key=lambda item: item.source_date or 9999
+                    qs,
+                    key=lambda item: item.record_date or 9999,
                 )
-            if order_by.endswith('source_type'):
-                qs = sorted(qs, key=lambda item: item.source_type or '')
+            if order_by.endswith('record_type'):
+                qs = sorted(qs, key=lambda item: item.record_type or '')
             if order_by.startswith('-'):
                 qs.reverse()
 
         return qs
 
 
-class SourceDetail(RetrieveAPIView):
-    model = Source
-    queryset = Source.objects.all()
+class RecordDetail(RetrieveAPIView):
+    model = Record
+    queryset = Record.objects.all()
     serializer_class = PublicRecordSerializer
     lookup_url_kwarg = 'pk'
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -190,37 +176,34 @@ class SourceDetail(RetrieveAPIView):
 
 class FilterChoices(View):
     def corpus_choices(self):
-        choices = [
-            {'value': corpus.pk, 'text': corpus.title}
-            for corpus in Corpus.objects.all().order_by('title')
-        ]
-        return [{'value': '', 'text': 'Filter by corpus', 'disabled': True}] + choices
+        choices = [{'value': corpus.pk, 'text': corpus.title} for corpus in Corpus.objects.all().order_by('title')]
+        return [{'value': '', 'text': 'Filter by corpus', 'disabled': True}, *choices]
 
     def collection_choices(self):
         choices = [
             {'value': collection.pk, 'text': collection.title}
             for collection in Collection.objects.all().order_by('title')
         ]
-        return [{'value': '', 'text': 'Filter by collection', 'disabled': True}] + choices
+        return [{'value': '', 'text': 'Filter by collection', 'disabled': True}, *choices]
 
-    def source_type_choices(self):
-        types = _map_source_types()
-        choices = sorted([
-            {'value': str(idx), 'text': value}
-            for idx, value in types.items()
-        ], key=lambda choice: choice['text'])
-        return [{'value': '', 'text': 'Filter by record type', 'disabled': True}] + choices
+    def record_type_choices(self):
+        types = _map_record_types()
+        choices = sorted(
+            [{'value': str(idx), 'text': value} for idx, value in types.items()],
+            key=lambda choice: choice['text'],
+        )
+        return [{'value': '', 'text': 'Filter by record type', 'disabled': True}, *choices]
 
     def locale_choices_as_dict(self):
         choices = [{'value': i[0], 'text': i[1]} for i in locale_choices()]
-        return [{'value': '', 'text': 'Filter by locale', 'disabled': True}] + choices
+        return [{'value': '', 'text': 'Filter by locale', 'disabled': True}, *choices]
 
     @property
     def methods(self):
         return {
             'corpusChoices': self.corpus_choices,
             'collectionChoices': self.collection_choices,
-            'sourceTypeChoices': self.source_type_choices,
+            'recordTypeChoices': self.record_type_choices,
             'localeChoices': self.locale_choices_as_dict,
         }
 

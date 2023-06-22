@@ -1,38 +1,35 @@
-import textwrap
 import json
+import textwrap
 from datetime import datetime, timedelta
-
-from django.contrib import messages
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.db.models.functions import Coalesce
-from django.db.models import F
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render
-from django.template.response import TemplateResponse
+from urllib import parse
 
 from bs4 import BeautifulSoup as BSoup
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.models import ClusterableModel
-
-from wagtail.admin.panels import (
-    FieldPanel,
-    InlinePanel,
-    MultiFieldPanel
-)
-from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail import blocks
-
-from wagtail.models import Orderable, Page
-from wagtail.fields import RichTextField, StreamField
+from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
+from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.embeds.blocks import EmbedBlock
+from wagtail.fields import RichTextField, StreamField
 from wagtail.images.blocks import ImageChooserBlock
-from wagtail.images.models import Image, AbstractImage, AbstractRendition
+from wagtail.images.models import AbstractImage, AbstractRendition, Image
+from wagtail.models import Orderable, Page
 from wagtail.snippets.models import register_snippet
-from wagtailmodelchooser import register_model_chooser, Chooser
+from wagtailmodelchooser import Chooser, register_model_chooser
 
-from dalme_app.models import Set as DALMESet, Source, SavedSearch
-from dalme_public.serializers import PublicSourceSerializer
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import F
+from django.db.models.functions import Coalesce
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render
+from django.template.response import TemplateResponse
+
+from dalme_app.forms import SearchForm
+from dalme_app.models import Collection as DalmeCollection
+from dalme_app.models import Record, SavedSearch
+from dalme_app.utils import Search, SearchContext, formset_factory
 from dalme_public import forms
 from dalme_public.blocks import (
     AnnouncementBannerBlock,
@@ -42,18 +39,15 @@ from dalme_public.blocks import (
     DocumentBlock,
     ExternalResourceBlock,
     FooterPageChooserBlock,
-    MainImageBlock,
     InlineImageBlock,
+    MainImageBlock,
     PersonBlock,
     SocialBlock,
     SponsorBlock,
     SubsectionBlock,
     SubsectionEndMarkerBlock,
 )
-
-from dalme_app.utils import Search, formset_factory, SearchContext
-from dalme_app.forms import SearchForm
-from urllib import parse
+from dalme_public.serializers import PublicRecordSerializer
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -67,12 +61,12 @@ HEADER_POSITION = (
 
 
 @register_model_chooser
-class SourceChooser(Chooser):
-    model = Source
+class RecordChooser(Chooser):
+    model = Record
     modal_template = 'dalme_public/includes/_source_chooser_modal.html'
 
     def get_queryset(self, request):
-        qs = Source.objects.filter(type=13, workflow__is_public=True).order_by('name')
+        qs = Record.objects.filter(type=13, workflow__is_public=True).order_by('name')
         if request.GET.get('search'):
             qs = qs.filter(name__icontains=request.GET['search'])
         return qs
@@ -80,26 +74,22 @@ class SourceChooser(Chooser):
 
 class SetFieldPanel(FieldPanel):
     def on_form_bound(self):
-        qs = DALMESet.objects.filter(set_type=DALMESet.COLLECTION)
-        self.form.fields['source_set'].queryset = qs
-        self.form.fields['source_set'].empty_label = '--------'
-        super().on_form_bound()
+        qs = DalmeCollection.objects.filter(published=True)
+        self.form.fields['source_set'].queryset = qs  # type: ignore
+        self.form.fields['source_set'].empty_label = '--------'  # type: ignore
+        super().on_form_bound()  # type: ignore
 
 
 class DALMEImage(AbstractImage):
     caption = models.CharField(max_length=255, null=True, blank=True)
-    admin_form_fields = Image.admin_form_fields + ('caption',)
+    admin_form_fields = (*Image.admin_form_fields, 'caption')
 
 
 class CustomRendition(AbstractRendition):
-    image = models.ForeignKey(
-        DALMEImage, on_delete=models.CASCADE, related_name='renditions'
-    )
+    image = models.ForeignKey(DALMEImage, on_delete=models.CASCADE, related_name='renditions')
 
     class Meta:
-        unique_together = (
-            ('image', 'filter_spec', 'focal_point_key'),
-        )
+        unique_together = ('image', 'filter_spec', 'focal_point_key')
 
 
 @register_snippet
@@ -118,16 +108,21 @@ class Footer(models.Model):
         return "Site Footer"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('The site can only have one footer.')
+        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+            msg = 'The site can only have one footer.'
+            raise ValidationError(msg)
 
 
 @register_snippet
 class SearchPage(models.Model):
-    help_content = StreamField([
+    help_content = StreamField(
+        [
             ('text', blocks.RichTextBlock()),
             ('html', blocks.RawHTMLBlock()),
-        ], null=True, use_json_field=True)
+        ],
+        null=True,
+        use_json_field=True,
+    )
 
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
@@ -135,14 +130,14 @@ class SearchPage(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
-        help_text='The image that will display in the header.'
+        help_text='The image that will display in the header.',
     )
 
     header_position = models.CharField(
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        help_text='Position of the header image within its container.'
+        help_text='Position of the header image within its container.',
     )
 
     panels = [
@@ -155,25 +150,34 @@ class SearchPage(models.Model):
         return "Search Page"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('There can only be one search page.')
+        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+            msg = 'There can only be one search page.'
+            raise ValidationError(msg)
 
 
 @register_snippet
 class ExplorePage(models.Model):
-    text_before = StreamField([
+    text_before = StreamField(
+        [
             ('text', blocks.RichTextBlock()),
             ('heading', blocks.CharBlock()),
             ('html', blocks.RawHTMLBlock()),
-        ], null=True, use_json_field=True)
+        ],
+        null=True,
+        use_json_field=True,
+    )
 
-    text_after = StreamField([
+    text_after = StreamField(
+        [
             ('inline_image', InlineImageBlock()),
             ('text', blocks.RichTextBlock()),
             ('heading', blocks.CharBlock()),
             ('html', blocks.RawHTMLBlock()),
             ('embed', EmbedBlock(icon='media')),
-        ], null=True, use_json_field=True)
+        ],
+        null=True,
+        use_json_field=True,
+    )
 
     header_image = models.ForeignKey(
         'dalme_public.DALMEImage',
@@ -181,14 +185,14 @@ class ExplorePage(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
-        help_text='The image that will display in the header.'
+        help_text='The image that will display in the header.',
     )
 
     header_position = models.CharField(
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        help_text='Position of the header image within its container.'
+        help_text='Position of the header image within its container.',
     )
 
     panels = [
@@ -202,8 +206,9 @@ class ExplorePage(models.Model):
         return "Explore Page Content"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('There can only be one Explore page.')
+        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+            msg = 'There can only be one Explore page.'
+            raise ValidationError(msg)
 
 
 @register_snippet
@@ -214,14 +219,14 @@ class RecordBrowser(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
-        help_text='The image that will display in the header.'
+        help_text='The image that will display in the header.',
     )
 
     header_position = models.CharField(
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        help_text='Position of the header image within its container.'
+        help_text='Position of the header image within its container.',
     )
 
     panels = [
@@ -233,8 +238,9 @@ class RecordBrowser(models.Model):
         return "Record Browser"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('There can only be one Record Browser page.')
+        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+            msg = 'There can only be one Record Browser page.'
+            raise ValidationError(msg)
 
 
 @register_snippet
@@ -245,14 +251,14 @@ class RecordViewer(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
-        help_text='The image that will display in the header.'
+        help_text='The image that will display in the header.',
     )
 
     header_position = models.CharField(
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        help_text='Position of the header image within its container.'
+        help_text='Position of the header image within its container.',
     )
 
     panels = [
@@ -264,8 +270,9 @@ class RecordViewer(models.Model):
         return "Record Viewer"
 
     def clean(self):
-        if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('There can only be one Record Viewer page.')
+        if self.id is None and self._meta.model.objects.exists():  # type: ignore
+            msg = 'There can only be one Record Viewer page.'
+            raise ValidationError(msg)
 
 
 class DALMEPage(Page):
@@ -275,58 +282,61 @@ class DALMEPage(Page):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
-        help_text='The image that will display in the header.'
+        help_text='The image that will display in the header.',
     )
     header_position = models.CharField(
         max_length=6,
         choices=HEADER_POSITION,
         default='top',
-        help_text='Position of the header image within its container.'
+        help_text='Position of the header image within its container.',
     )
     short_title = models.CharField(
         max_length=63,
         null=True,
         blank=True,
-        help_text='An optional short title that will be displayed in certain space constrained contexts.'  # noqa
+        help_text='An optional short title that will be displayed in certain space constrained contexts.',
     )
 
-    body = StreamField([
-        ('main_image', MainImageBlock()),
-        ('carousel', CarouselBlock(ImageChooserBlock())),
-        ('chart_embed', ChartEmbedBlock()),
-        ('inline_image', InlineImageBlock()),
-        ('text', blocks.RichTextBlock()),
-        ('heading', blocks.CharBlock()),
-        ('pullquote', blocks.RichTextBlock(icon='openquote')),
-        ('page', blocks.PageChooserBlock()),
-        ('bibliography', BibliographyBlock()),
-        ('document', DocumentBlock()),
-        ('person', PersonBlock()),
-        ('external_resource', ExternalResourceBlock()),
-        ('embed', EmbedBlock(icon='media')),
-        ('html', blocks.RawHTMLBlock()),
-        ('subsection', SubsectionBlock()),
-        ('subsection_end_marker', SubsectionEndMarkerBlock()),
-    ], null=True, use_json_field=True)
+    body = StreamField(
+        [
+            ('main_image', MainImageBlock()),
+            ('carousel', CarouselBlock(ImageChooserBlock())),
+            ('chart_embed', ChartEmbedBlock()),
+            ('inline_image', InlineImageBlock()),
+            ('text', blocks.RichTextBlock()),
+            ('heading', blocks.CharBlock()),
+            ('pullquote', blocks.RichTextBlock(icon='openquote')),
+            ('page', blocks.PageChooserBlock()),
+            ('bibliography', BibliographyBlock()),
+            ('document', DocumentBlock()),
+            ('person', PersonBlock()),
+            ('external_resource', ExternalResourceBlock()),
+            ('embed', EmbedBlock(icon='media')),
+            ('html', blocks.RawHTMLBlock()),
+            ('subsection', SubsectionBlock()),
+            ('subsection_end_marker', SubsectionEndMarkerBlock()),
+        ],
+        null=True,
+        use_json_field=True,
+    )
 
     class Meta:
         abstract = True
 
     def get_context(self, request):
         context = super().get_context(request)
-        context.update({
-            'header_image': self.header_image,
-            'header_position': self.header_position,
-        })
+        context.update(
+            {
+                'header_image': self.header_image,
+                'header_position': self.header_position,
+            },
+        )
         return context
 
     @property
     def main_image(self):
         try:
-            field = next(
-                field for field in self.body
-                if field.block.name in ['carousel', 'main_image']
-            )
+            field = next(field for field in self.body if field.block.name in ['carousel', 'main_image'])
         except StopIteration:
             return None
         if field.block.name == 'main_image':
@@ -339,11 +349,11 @@ class DALMEPage(Page):
     @staticmethod
     def smart_truncate(content, length=25, suffix='...'):
         # credit: https://stackoverflow.com/questions/250357/truncate-a-string-without-ending-in-the-middle-of-a-word
-        return content if len(content) <= length else ' '.join(content[:length+1].split(' ')[0:-1]).rstrip() + suffix
+        return content if len(content) <= length else ' '.join(content[: length + 1].split(' ')[0:-1]).rstrip() + suffix
 
     @property
     def title_switch(self):
-        """ Utility to reduce OR coalescing in templates.
+        """Utility to reduce OR coalescing in templates.
         Prefer the short_title if a Page has one, if not fallback to title.
         """
         try:
@@ -360,12 +370,12 @@ class FeaturedPage(DALMEPage):
         max_length=127,
         null=True,
         blank=True,
-        help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.'  # noqa
+        help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.',
     )
 
     citable = models.BooleanField(
         default=True,
-        help_text='Check this box to show the "Cite" menu for this page.'
+        help_text='Check this box to show the "Cite" menu for this page.',
     )
 
     front_page_image = models.ForeignKey(
@@ -373,7 +383,7 @@ class FeaturedPage(DALMEPage):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        help_text='The image that will display on the front page.'
+        help_text='The image that will display on the front page.',
     )
 
     class Meta:
@@ -388,13 +398,14 @@ class FeaturedPage(DALMEPage):
     def author(self):
         if self.alternate_author:
             return self.alternate_author
-        return self.owner.profile.full_name
+        return self.owner.profile.full_name  # type: ignore
 
     @property
     def scheduled_publication(self):
         revisions = self.revisions.filter(approved_go_live_at__isnull=False).order_by('-created_at')
         if revisions.exists():
             return revisions.first().approved_go_live_at  # .strftime('%d-%b-%Y@%H:%M')
+        return None
 
     @property
     def front_image(self):
@@ -402,25 +413,22 @@ class FeaturedPage(DALMEPage):
 
     def snippet(self, width=200):
         try:
-            text = next(
-                field for field in self.body
-                if field.block.name == 'text'
-            )
+            text = next(field for field in self.body if field.block.name == 'text')
         except StopIteration:
             return ''
         return textwrap.shorten(
             BSoup(text.value.source, 'html.parser').get_text(),
             width=width,
-            placeholder='...'
+            placeholder='...',
         )
 
     def resolve_source_url(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def clean(self):
         if self.go_live_at:
             qs = self._meta.model.objects.filter(
-                go_live_at=self.go_live_at
+                go_live_at=self.go_live_at,
             ).exclude(pk=self.pk)
             if qs.exists():
                 model = self._meta.label.split('.')[-1]
@@ -429,19 +437,20 @@ class FeaturedPage(DALMEPage):
                     f'{model}: {title} is already scheduled for publication at: {self.go_live_at}'  # noqa
                 )
 
-        if self.source_set and self.source:
+        if self.source_set and self.source:  # type: ignore
             try:
                 # TODO: There must be a better way to determine Set membership
                 # than this but the (bi-directional) generic relations make it
                 # tough.
                 next(
                     source.content_object
-                    for source in self.source_set.members.all()
-                    if source.content_object.pk == self.source.pk
+                    for source in self.source_set.members.all()  # type: ignore
+                    if source.content_object.pk == self.source.pk  # type: ignore
                 )
             except StopIteration:
+                msg = f'{self.source} is not a member of: {self.source_set}'
                 raise ValidationError(
-                    f'{self.source} is not a member of: {self.source_set}'
+                    msg,  # type: ignore
                 )
         return super().clean()
 
@@ -460,10 +469,11 @@ class Home(DALMEPage):
     subpage_types = [
         'dalme_public.Section',
         'dalme_public.Features',
-        'dalme_public.Collections'
+        'dalme_public.Collections',
     ]
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('learn_more_page'),
         FieldPanel('banners'),
@@ -489,34 +499,33 @@ class Section(DALMEPage):
     parent_page_types = ['dalme_public.Home']
     subpage_types = [
         'dalme_public.Flat',
-        'dalme_public.Bibliography'
+        'dalme_public.Bibliography',
     ]
 
-    content_panels = DALMEPage.content_panels + [
-        FieldPanel('short_title'),
-    ]
+    content_panels = [*DALMEPage.content_panels, FieldPanel('short_title')]
 
 
 class Flat(DALMEPage):
     show_contact_form = models.BooleanField(
         default=False,
-        help_text='Check this box to show a contact form on the page.'
+        help_text='Check this box to show a contact form on the page.',
     )
 
     citable = models.BooleanField(
         default=False,
-        help_text='Check this box to show the "Cite" menu for this page.'
+        help_text='Check this box to show the "Cite" menu for this page.',
     )
 
     parent_page_types = [
         'dalme_public.Section',
         'dalme_public.Collection',
         'dalme_public.Flat',
-        'dalme_public.Collections'
+        'dalme_public.Collections',
     ]
     subpage_types = ['dalme_public.Flat']
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
@@ -527,7 +536,7 @@ class Flat(DALMEPage):
 
     def serve(self, request):
         if self.show_contact_form:
-            form = forms.ContactForm(label_suffix='')
+            form = forms.ContactForm(label_suffix='')  # type: ignore
 
             if request.method == 'POST':
                 form = forms.ContactForm(request.POST, label_suffix='')
@@ -543,7 +552,9 @@ class Flat(DALMEPage):
                     return HttpResponseRedirect(self.url)
 
             return render(
-                request, 'dalme_public/flat.html', {'page': self, 'form': form}
+                request,
+                'dalme_public/flat.html',
+                {'page': self, 'form': form},
             )
 
         return super().serve(request)
@@ -554,10 +565,11 @@ class Features(DALMEPage):
     subpage_types = [
         'dalme_public.FeaturedObject',
         'dalme_public.FeaturedInventory',
-        'dalme_public.Essay'
+        'dalme_public.Essay',
     ]
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
@@ -566,12 +578,17 @@ class Features(DALMEPage):
 
     def get_context(self, request):
         from dalme_public.filters import FeaturedFilter
+
         context = super().get_context(request)
         filtered = FeaturedFilter(
             request.GET,
-            queryset=self.get_children().live().specific().annotate(
-                published=Coalesce('go_live_at', 'first_published_at')
-            ).order_by('-published')
+            queryset=self.get_children()
+            .live()
+            .specific()
+            .annotate(  # type: ignore
+                published=Coalesce('go_live_at', 'first_published_at'),
+            )
+            .order_by('-published'),
         )
         context['featured'] = filtered.qs
         return context
@@ -581,7 +598,8 @@ class Bibliography(DALMEPage):
     parent_page_types = ['dalme_public.Section']
     subpage_types = ['dalme_public.Flat']
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
@@ -592,25 +610,26 @@ class Bibliography(DALMEPage):
 class FeaturedObject(FeaturedPage):
     short_title = 'Object'
     source = models.ForeignKey(
-        'dalme_app.Source',
+        'dalme_app.Record',
         related_name='featured_objects',
         on_delete=models.SET_NULL,
         null=True,
     )
     source_set = models.ForeignKey(
-        'dalme_app.Set',
+        'dalme_app.Collection',
         related_name='featured_objects',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text='Optional, select a particular public set for the source associated with this object. The source must be a member of the set chosen or the page will not validate.'  # noqa
+        help_text='Optional, select a particular public set for the source associated with this object. The source must be a member of the set chosen or the page will not validate.',
     )
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
     template = 'dalme_public/feature.html'
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('front_page_image'),
@@ -629,25 +648,26 @@ class FeaturedObject(FeaturedPage):
 class FeaturedInventory(FeaturedPage):
     short_title = 'Inventory'
     source = models.ForeignKey(
-        'dalme_app.Source',
+        'dalme_app.Record',
         related_name='featured_inventories',
         on_delete=models.SET_NULL,
         null=True,
     )
     source_set = models.ForeignKey(
-        'dalme_app.Set',
+        'dalme_app.Collection',
         related_name='featured_inventories',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.'  # noqa
+        help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.',
     )
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
     template = 'dalme_public/feature.html'
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('front_page_image'),
@@ -666,26 +686,27 @@ class FeaturedInventory(FeaturedPage):
 class Essay(FeaturedPage):
     short_title = 'Essay'
     source = models.ForeignKey(
-        'dalme_app.Source',
+        'dalme_app.Record',
         related_name='essays',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
     source_set = models.ForeignKey(
-        'dalme_app.Set',
+        'dalme_app.Collection',
         related_name='essays',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text='Optional, select a particular public set for the source associated with this essay. The source must be a member of the set chosen or the page will not validate.'  # noqa
+        help_text='Optional, select a particular public set for the source associated with this essay. The source must be a member of the set chosen or the page will not validate.',
     )
 
     parent_page_types = ['dalme_public.Features']
     subpage_types = []
     template = 'dalme_public/feature.html'
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('front_page_image'),
@@ -705,9 +726,10 @@ class Corpus(Orderable, ClusterableModel):
     title = models.CharField(max_length=255)
     description = RichTextField()
 
-    page = ParentalKey('dalme_public.Collections', related_name='corpora')
+    page = ParentalKey('dalme_public.Collections', related_name='corpora')  # type: ignore
     collections = ParentalManyToManyField(
-        'dalme_public.Collection', related_name='corpora'
+        'dalme_public.Collection',
+        related_name='corpora',
     )
 
     panels = [
@@ -721,7 +743,6 @@ class Corpus(Orderable, ClusterableModel):
 
 
 class SearchEnabled(RoutablePageMixin, DALMEPage):
-
     class Meta:
         abstract = True
 
@@ -733,31 +754,33 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         search_formset = formset_factory(SearchForm)
         search_snippet = SearchPage.objects.first()
 
-        context.update({
-            'header_image': search_snippet.header_image,
-            'header_position': search_snippet.header_position,
-            'query': False,
-            'advanced': False,
-            'form': search_formset(form_kwargs={'fields': search_context.fields}),
-            'results': [],
-            'paginator': {},
-            'errors': False,
-            'paginated': False,
-            'suggestion': None,
-            'search': True,
-            'search_context': search_context.context
-        })
+        context.update(
+            {
+                'header_image': search_snippet.header_image,  # type: ignore
+                'header_position': search_snippet.header_position,  # type: ignore
+                'query': False,
+                'advanced': False,
+                'form': search_formset(form_kwargs={'fields': search_context.fields}),
+                'results': [],
+                'paginator': {},
+                'errors': False,
+                'paginated': False,
+                'suggestion': None,
+                'search': True,
+                'search_context': search_context.context,
+            },
+        )
 
         if pk:
             saved_search = SavedSearch.objects.filter(id=pk)
             if saved_search.exists():
-                saved_search = json.loads(saved_search.first().search)
+                saved_search = json.loads(saved_search.first().search)  # type: ignore
                 saved_search.pop('csrfmiddlewaretoken')
                 saved_search['form-SAVE'] = ''
                 request.POST = saved_search
                 request.method = 'POST'
 
-        if not request.method == 'POST' and request.session.get('public-search-post', False):
+        if request.method != 'POST' and request.session.get('public-search-post', False):
             default_ts = datetime.timestamp(datetime.now() - timedelta(seconds=86401))
             stored_dt = datetime.fromtimestamp(request.session.get('public-search-ts', default_ts))
             delta = datetime.now() - stored_dt
@@ -775,20 +798,24 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
                     public=True,
                     page=request.POST.get('form-PAGE', 1),
                     highlight=True,
-                    search_context=search_context.context
+                    search_context=search_context.context,  # type: ignore
                 )
-                context.update({
-                    'query': True,
-                    'advanced': formset.cleaned_data[0].get('field_value', '') != '',
-                    'form': formset,
-                    'results': search_obj.results,
-                    'paginator': search_obj.paginator,
-                    'errors': search_obj.errors,
-                    'paginated': search_obj.paginator.get('num_pages', 0) > 1
-                })
+                context.update(
+                    {
+                        'query': True,
+                        'advanced': formset.cleaned_data[0].get('field_value', '') != '',
+                        'form': formset,
+                        'results': search_obj.results,
+                        'paginator': search_obj.paginator,
+                        'errors': search_obj.errors,
+                        'paginated': search_obj.paginator.get('num_pages', 0) > 1,  # type: ignore
+                    },
+                )
 
         return render(
-            request, 'dalme_public/search.html', context
+            request,
+            'dalme_public/search.html',
+            context,
         )
 
     @route(r'^records/$', name='records')
@@ -796,41 +823,49 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         context = self.get_context(request)
         browser_snippet = RecordBrowser.objects.first()
 
-        context.update({
-            'header_image': browser_snippet.header_image,
-            'header_position': browser_snippet.header_position,
-            'records': True,
-            'browse_mode': request.session.get('public-browse-mode', 'wide')
-        })
+        context.update(
+            {
+                'header_image': browser_snippet.header_image,  # type: ignore
+                'header_position': browser_snippet.header_position,  # type: ignore
+                'records': True,
+                'browse_mode': request.session.get('public-browse-mode', 'wide'),
+            },
+        )
 
         try:
-            context.update({'set_id': self.source_set.id})
+            context.update({'set_id': self.source_set.id})  # type: ignore
         except AttributeError:
             pass
 
         return TemplateResponse(
-          request, 'dalme_public/records.html', context
+            request,
+            'dalme_public/records.html',
+            context,
         )
 
     @route(rf'^records/({UUID_RE})/$', name='record')
     @route(rf'^records/({UUID_RE})/({FOLIO_RE})/$', name='record_folio')
     def record(self, request, pk, folio=None, scoped=True):
-        qs = Source.objects.filter(pk=pk)
+        qs = Record.objects.filter(pk=pk)
         if not qs.exists():
-            raise Http404()
+            raise Http404
 
         source = qs.first()
 
         if not source.workflow.is_public:
-            raise Http404()
+            raise Http404
 
-        pages = source.source_pages.all().values(
-            pageId=F('page__pk'),
-            pageName=F('page__name'),
-            transcriptionId=F('transcription__pk'),
-            pageOrder=F('page__order'),
-            pageImageId=F('page__dam_id')
-        ).order_by('pageOrder')
+        pages = (
+            source.folios.all()
+            .values(
+                pageId=F('page__pk'),
+                pageName=F('page__name'),
+                transcriptionId=F('transcription__pk'),
+                pageOrder=F('page__order'),
+                pageImageId=F('page__dam_id'),
+            )
+            .order_by('pageOrder')
+        )
 
         initial_folio_index = next((i for i, item in enumerate(pages) if item["pageName"] == folio), 0) if folio else 0
 
@@ -841,63 +876,62 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         if request.META.get('HTTP_REFERER') and 'search' in request.META.get('HTTP_REFERER'):
             from_search = True
 
-        data = PublicSourceSerializer(source).data
-        context.update({
-            'header_image': viewer_snippet.header_image,
-            'header_position': viewer_snippet.header_position,
-            'record': True,
-            'from_search': from_search,
-            'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
-            'render_mode': request.session.get('public-render-mode', 'scholarly'),
-            'purl': source.get_purl(),
-            'title': self.smart_truncate(data['name'], length=35),
-            'data': {
-                'folios': list(pages),
-                **data,
+        data = PublicRecordSerializer(source).data
+        context.update(
+            {
+                'header_image': viewer_snippet.header_image,  # type: ignore
+                'header_position': viewer_snippet.header_position,  # type: ignore
+                'record': True,
+                'from_search': from_search,
+                'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
+                'render_mode': request.session.get('public-render-mode', 'scholarly'),
+                'purl': source.get_purl(),
+                'title': self.smart_truncate(data['name'], length=35),
+                'data': {
+                    'folios': list(pages),
+                    **data,
+                },
+                'initial_folio_index': initial_folio_index,
             },
-            'initial_folio_index': initial_folio_index
-        })
+        )
 
         try:
-            context.update({'set_id': self.source_set.id})
+            context.update({'set_id': self.source_set.id})  # type: ignore
         except AttributeError:
             pass
 
         return TemplateResponse(
-          request, 'dalme_public/record.html', context
+            request,
+            'dalme_public/record.html',
+            context,
         )
 
 
 class Collections(SearchEnabled):
     citable = models.BooleanField(
         default=True,
-        help_text='Check this box to show the "Cite" menu for this page.'
+        help_text='Check this box to show the "Cite" menu for this page.',
     )
 
     parent_page_types = ['dalme_public.Home']
     subpage_types = [
         'dalme_public.Collection',
-        'dalme_public.Flat'
+        'dalme_public.Flat',
     ]
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('short_title'),
         FieldPanel('citable'),
         FieldPanel('body'),
-        MultiFieldPanel(
-            [InlinePanel('corpora', min_num=1, label='Corpus')],
-            heading='Corpora',
-        ),
+        MultiFieldPanel([InlinePanel('corpora', min_num=1, label='Corpus')], heading='Corpora'),
     ]
 
     def get_context(self, request):
         context = super().get_context(request)
-        context['corpora'] = [
-            (corpus, corpus.collections.all())
-            for corpus in self.corpora.all()
-        ]
+        context['corpora'] = [(corpus, corpus.collections.all()) for corpus in self.corpora.all()]  # type: ignore
         return context
 
     @route(r'^explore/$', name='explore')
@@ -905,33 +939,37 @@ class Collections(SearchEnabled):
         context = self.get_context(request)
         explorer_snippet = ExplorePage.objects.first()
 
-        context.update({
-            'header_image': explorer_snippet.header_image,
-            'header_position': explorer_snippet.header_position,
-            'explore': True
-        })
+        context.update(
+            {
+                'header_image': explorer_snippet.header_image,  # type: ignore
+                'header_position': explorer_snippet.header_position,  # type: ignore
+                'explore': True,
+            },
+        )
 
         return TemplateResponse(
-          request, 'dalme_public/explore.html', context
+            request,
+            'dalme_public/explore.html',
+            context,
         )
 
 
 class Collection(SearchEnabled):
-    set_type = DALMESet.COLLECTION
     source_set = models.ForeignKey(
-        'dalme_app.Set',
+        'dalme_app.Collection',
         related_name='public_collections',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
     citable = models.BooleanField(
         default=True,
-        help_text='Check this box to show the "Cite" menu for this page.'
+        help_text='Check this box to show the "Cite" menu for this page.',
     )
 
     parent_page_types = ['dalme_public.Collections']
     subpage_types = ['dalme_public.Flat']
 
-    content_panels = DALMEPage.content_panels + [
+    content_panels = [
+        *DALMEPage.content_panels,
         SetFieldPanel('source_set'),
         FieldPanel('header_image'),
         FieldPanel('header_position'),
@@ -950,27 +988,22 @@ class Collection(SearchEnabled):
     @property
     def stats(self):
         stats_dict = {
-            'records': self.source_set.get_public_member_count(),
-            'languages': self.source_set.get_public_languages(),
-            'coverage': self.source_set.get_public_time_coverage(),
+            'records': self.source_set.member_count(published=True),
+            'languages': self.source_set.get_languages(published=True),
+            'coverage': self.source_set.get_time_coverage(published=True),
         }
-        if self.source_set.stat_title is not None:
+        stats = self.source_set.attributes.filter(attribute_type__short_name='collection_metadata')
+        if len(stats) > 0:
+            ((key, value),) = stats[0].value.items()
             stats_dict['other'] = {
-                    'label': self.source_set.stat_title,
-                    'text': self.source_set.stat_text
-                }
+                'label': key,
+                'text': value,
+            }
         return stats_dict
 
     @property
     def count(self):
-        return self.source_set.get_public_member_count()
-
-    @property
-    def alias_type(self):
-        try:
-            return self.source_set.set_type
-        except AttributeError:
-            return None
+        return self.source_set.member_count(published=True)
 
     @property
     def sources(self):
@@ -979,9 +1012,4 @@ class Collection(SearchEnabled):
     def clean(self):
         if self.source_set:
             self.slug = self.source_set.name.replace(' ', '-').lower()
-        if self.alias_type is not None and self.set_type != self.alias_type:
-            mismatch = f'{self.set_type} != {self.alias_type}'
-            raise ValidationError(
-                f'{self._meta.model.__name__}.set_type mismatch: {mismatch}'
-            )
         return super().clean()
