@@ -37,7 +37,7 @@ class GroupProperties(models.Model):
     )
 
     group = models.OneToOneField(Group, on_delete=models.CASCADE, related_name='properties')
-    type = models.IntegerField(choices=GROUP_TYPES)  # noqa: A003
+    group_type = models.IntegerField(choices=GROUP_TYPES)
     description = models.CharField(max_length=255)
 
     def __str__(self):  # noqa: D105

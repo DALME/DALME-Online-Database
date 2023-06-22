@@ -15,9 +15,8 @@ class Collection(dalmeUuid, dalmeOwned):
     """Stores collection information."""
 
     name = models.CharField(max_length=255)
-    description = models.TextField()
     use_as_workset = models.BooleanField(default=False)
-    published = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=False)
     team_link = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
@@ -32,6 +31,11 @@ class Collection(dalmeUuid, dalmeOwned):
     def __str__(self):  # noqa: D105
         return self.name
 
+    @property
+    def comment_count(self):
+        """Return count of comments."""
+        return self.comments.count()
+
     def membership_type(self):
         """Return the type of members of the collection."""
         types = list({m.content_type.model for m in self.members.all()})
@@ -39,42 +43,42 @@ class Collection(dalmeUuid, dalmeOwned):
 
     def member_count(self, published=False):
         """Return the count of members in the collection."""
-        if published and self.membership_type() == 'source':
-            return self.members.filter(source__workflow__is_public=True).count()
+        if published and self.membership_type() == 'record':
+            return self.members.filter(record__workflow__is_public=True).count()
         return self.members.all().count()
 
     def get_languages(self, published=False):
-        """Return a list of languages represented in the collection (if members are all source records)."""
-        if self.membership_type() == 'source':
-            query = models.Q(source__attributes__attribute_type=15)
+        """Return a list of languages represented in the collection (if all members are records)."""
+        if self.membership_type() == 'record':
+            query = models.Q(record__attributes__attribute_type=15)
 
             if published:
-                query.add(models.Q(source__workflow__is_public=True), models.Q.AND)
+                query.add(models.Q(record__workflow__is_public=True), models.Q.AND)
 
             return list(
                 self.members.filter(query)
                 .distinct()
-                .order_by('source__attributes__attributevaluefkey__language__name')
+                .order_by('record__attributes__attributevaluefkey__language__name')
                 .values_list(
-                    'source__attributes__attributevaluefkey__language__name',
-                    'source__attributes__attributevaluefkey__language__id',
+                    'record__attributes__attributevaluefkey__language__name',
+                    'record__attributes__attributevaluefkey__language__id',
                 ),
             )
 
         return None
 
     def get_time_coverage(self, published=False):
-        """Return a list of years and counts represented in the collection (if members are all source records)."""
-        if self.membership_type() == 'source':
-            query = models.Q(source__attributes__attribute_type__in=[19, 25, 26])
+        """Return a list of years and counts represented in the collection (if all members are records)."""
+        if self.membership_type() == 'record':
+            query = models.Q(record__attributes__attribute_type__in=[19, 25, 26])
 
             if published:
-                query.add(models.Q(source__workflow__is_public=True), models.Q.AND)
+                query.add(models.Q(record__workflow__is_public=True), models.Q.AND)
 
             years = (
                 self.members.filter(query)
-                .order_by('source__attributes__attributevaluedate__year')
-                .values_list('source__attributes__attributevaluedate__year', flat=True)
+                .order_by('record__attributes__attributevaluedate__year')
+                .values_list('record__attributes__attributevaluedate__year', flat=True)
             )
 
             return dict(Counter(years))

@@ -7,21 +7,14 @@ from dalme_app.models.templates import dalmeIntid
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class ContentTypeExtended(dalmeIntid):
+class ContentTypeExtended(ContentType):
     """Extends ContentType to store extra information."""
 
-    content_type = models.OneToOneField(
-        ContentType,
-        on_delete=models.CASCADE,
-        related_name='extended',
-        null=True,
-    )
     name = models.CharField(max_length=255, unique=True)
-    short_name = models.CharField(max_length=55)
     description = models.TextField()
     is_abstract = models.BooleanField(default=True)
-    attribute_types = models.ManyToManyField('AttributeType', through='ContentAttributeTypes')
-    parents = models.ManyToManyField('ContentTypeExtended', related_name='children')
+    attribute_types = models.ManyToManyField('AttributeType', through='ContentAttributes')
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     can_view = models.BooleanField(default=True)
     can_edit = models.BooleanField(default=False)
     can_delete = models.BooleanField(default=False)
@@ -35,29 +28,26 @@ class ContentTypeExtended(dalmeIntid):
         ordering = ['id']
 
 
-class ContentAttributeTypes(dalmeIntid):
+class ContentAttributes(dalmeIntid):
     """Links attribute types with content types and stores related metadata."""
 
     content_type = models.ForeignKey(
         'ContentTypeExtended',
-        to_field='id',
         db_index=True,
         on_delete=models.CASCADE,
-        related_name='attribute_type_list',
+        related_name='attributes_list',
     )
     attribute_type = models.ForeignKey(
         'AttributeType',
-        to_field='id',
         db_index=True,
         on_delete=models.CASCADE,
-        related_name='content_types',
+        related_name='contenttypes',
     )
-    order = models.IntegerField(db_index=True, null=True)
-    required = models.BooleanField(default=False)
-    unique = models.BooleanField(default=True)
-    options_override = models.ForeignKey('OptionsList', on_delete=models.SET_NULL, null=True)
-    label_override = models.CharField(max_length=255, blank=True)
-    description_override = models.TextField(blank=True)
+    is_required = models.BooleanField(default=False)
+    is_unique = models.BooleanField(default=True)
+    override_label = models.CharField(max_length=255, blank=True)
+    override_description = models.TextField(blank=True)
+    override_options = models.ForeignKey('OptionsList', on_delete=models.SET_NULL, null=True)
 
     class Meta:  # noqa: D106
         unique_together = ('content_type', 'attribute_type')

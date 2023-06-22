@@ -18,7 +18,7 @@ class Task(dalmeIntid):
     """Stores information about tasks."""
 
     title = models.CharField(max_length=140)
-    task_list = models.ForeignKey('TaskList', on_delete=models.CASCADE)
+    task_list = models.ForeignKey('TaskList', on_delete=models.CASCADE, related_name='tasks')
     description = models.TextField(blank=True)
     priority = models.PositiveIntegerField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
@@ -86,6 +86,11 @@ class TaskList(dalmeIntid, dalmeOwned):
         verbose_name_plural = 'Task Lists'
         # Prevents (at the database level) creation of two lists with the same slug in the same group
         unique_together = ('team_link', 'slug')
+
+    @property
+    def task_count(self):
+        """Return number of tasks in list."""
+        return self.tasks.count()
 
     def __str__(self):  # noqa: D105
         return self.name

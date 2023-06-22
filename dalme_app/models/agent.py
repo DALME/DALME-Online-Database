@@ -18,15 +18,27 @@ class Agent(dalmeUuid):
         (ORGANIZATION, 'Organization'),
     )
 
-    standard_name = models.CharField(max_length=255)
-    type = models.IntegerField(choices=AGENT_TYPES)  # noqa: A003
+    name = models.CharField(max_length=255)
+    agent_type = models.IntegerField(choices=AGENT_TYPES)
     attributes = GenericRelation('Attribute')
     instances = GenericRelation('EntityPhrase')
-    notes = models.TextField(blank=True)
+    comments = GenericRelation('Comment')
     tags = GenericRelation('Tag')
+
+
+class Organization(Agent):
+    """Stores information about organizations."""
+
+    short_name = models.CharField(max_length=55)
+    location = models.ForeignKey('Location', on_delete=models.PROTECT, null=True)
+
+
+class Person(Agent):
+    """Stores information about people."""
+
     user = models.OneToOneField(
         User,
         on_delete=models.SET_NULL,
-        related_name='agent_record',
+        related_name='person_record',
         null=True,
     )

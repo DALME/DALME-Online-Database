@@ -24,7 +24,7 @@ class Ticket(dalmeIntid):
     status = models.IntegerField(choices=STATUS, default=0)
     tags = GenericRelation('Tag')
     url = models.CharField(max_length=255, blank=True)
-    file = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    files = models.ManyToManyField('Attachment', blank=True, related_name='tickets')
     comments = GenericRelation('Comment')
     assigned_to = models.ForeignKey(
         User,

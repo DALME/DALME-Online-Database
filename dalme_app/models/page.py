@@ -45,11 +45,11 @@ class Page(dalmeUuid):
     def get_rights(self):
         """Return the rights information for the image associated with the page (if any)."""
         try:
-            source = self.sources.first().source
-            parent_rights = source.parent.attributes.filter(attribute_type=144)
+            record = self.records.first().record
+            parent_rights = record.parent.attributes.filter(attribute_type=144)
 
             if not parent_rights.exists():
-                parent_rights = source.parent.parent.attributes.filter(attribute_type=144)
+                parent_rights = record.parent.parent.attributes.filter(attribute_type=144)
 
             if parent_rights.exists():
                 return {
@@ -66,8 +66,8 @@ class Page(dalmeUuid):
 
     def get_absolute_url(self):
         """Return the absolute url for the instance."""
-        source = self.sources.first().source
-        return f'{source.get_absolute_url()}{self.name}/'
+        record = self.records.first().record
+        return f'{record.get_absolute_url()}{self.name}/'
 
     def get_canvas(self):
         """Return IIIF canvas associated with the page."""

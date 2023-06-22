@@ -26,13 +26,13 @@ class OptionsList(dalmeIntid):
     ]
     """
 
-    LIST_TYPES = (
+    PAYLOAD_TYPES = (
         ('db_records', 'DB Records'),
         ('field_choices', 'Field Choices'),
         ('static_list', 'Static List'),
     )
 
     name = models.CharField(max_length=255)
-    type = models.CharField(max_length=15, choices=LIST_TYPES)  # noqa: A003
+    payload_type = models.CharField(max_length=15, choices=PAYLOAD_TYPES)
     description = models.TextField()
     payload = models.JSONField()

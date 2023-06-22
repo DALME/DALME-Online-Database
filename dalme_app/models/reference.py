@@ -40,17 +40,10 @@ class CountryReference(dalmeIntid):
 class LanguageReference(dalmeIntid):
     """Stores information about languages and dialects."""
 
-    LANGUAGE = 1
-    DIALECT = 2
-    LANG_TYPES = (
-        (LANGUAGE, 'Language'),
-        (DIALECT, 'Dialect'),
-    )
-
     glottocode = models.CharField(max_length=25, unique=True)
     iso6393 = models.CharField(max_length=25, unique=True, blank=True)
     name = models.CharField(max_length=255)
-    type = models.IntegerField(choices=LANG_TYPES)  # noqa: A003
+    is_dialect = models.BooleanField(default=False)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     as_attribute_value = GenericRelation(
         'AttributeValueFkey',

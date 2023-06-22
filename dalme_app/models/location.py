@@ -7,13 +7,22 @@ from dalme_app.models.templates import dalmeUuid
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Place(dalmeUuid):
-    """Stores place information."""
+class Location(dalmeUuid):
+    """Stores location information."""
 
-    name = models.CharField(max_length=255)
+    ADDRESS = 1
+    COUNTRY = 2
+    GEOMETRY = 3
+    LOCALE = 4
+    LOCATION_TYPES = (
+        (ADDRESS, 'Address'),
+        (COUNTRY, 'Country'),
+        (GEOMETRY, 'Geometry'),
+        (LOCALE, 'Locale'),
+    )
+
+    location_type = models.IntegerField(choices=LOCATION_TYPES)
     attributes = GenericRelation('Attribute')
-    instances = GenericRelation('EntityPhrase')
-    location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
     comments = GenericRelation('Comment')
     tags = GenericRelation('Tag')
 

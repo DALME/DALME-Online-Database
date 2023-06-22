@@ -1,4 +1,4 @@
-from .agent import Agent  # noqa: F401
+from .agent import Agent, Organization, Person  # noqa: F401
 from .attachment import Attachment  # noqa: F401
 from .attribute import (  # noqa: F401
     Attribute,
@@ -12,19 +12,22 @@ from .attribute import (  # noqa: F401
     AttributeValueTxt,
 )
 from .attribute_type import AttributeType  # noqa: F401
-from .auth_extended import GroupProperties, Profile  # noqa: F401
+from .auth_extensions import GroupProperties, Profile  # noqa: F401
 from .collection import Collection, CollectionMembership  # noqa: F401
 from .comment import Comment  # noqa: F401
 from .concept import Concept  # noqa: F401
-from .content import ContentAttributeTypes, ContentTypeExtended  # noqa: F401
+from .content import ContentAttributes, ContentTypeExtended  # noqa: F401
 from .entity_phrase import EntityPhrase  # noqa: F401
 from .headword import Headword  # noqa: F401
+from .location import Location  # noqa: F401
 from .object import Object, ObjectAttribute  # noqa: F401
 from .options_list import OptionsList  # noqa: F401
 from .page import Page  # noqa: F401
 from .permission import Permission  # noqa: F401
 from .place import Place  # noqa: F401
 from .public_register import PublicRegister  # noqa: F401
+from .publication import Publication  # noqa: F401
+from .record import Folio, Record, RecordGroup  # noqa: F401
 from .reference import (
     AttributeReference,  # noqa: F401
     CountryReference,  # noqa: F401
@@ -44,7 +47,6 @@ from .resourcespace import (
 from .rights_policy import RightsPolicy  # noqa: F401
 from .saved_search import SavedSearch  # noqa: F401
 from .scope import Scope, ScopeType  # noqa: F401
-from .source import Source, SourcePages  # noqa: F401
 from .tag import Tag  # noqa: F401
 from .task import Task, TaskList  # noqa: F401
 from .ticket import Ticket  # noqa: F401

@@ -54,6 +54,8 @@ class Attribute(dalmeUuid):
     @property
     def value(self):
         """Return attribute value."""
+        if self.attribute_type.data_type == 'RREL':
+            return None
         store = getattr(self, f'attributevalue{self.attribute_type.data_type.lower()}')
         return store.value
 
