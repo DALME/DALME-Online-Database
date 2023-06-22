@@ -1,24 +1,41 @@
-import math
-import os
 import json
-from django.conf import settings
-from dalme_app.documents import * # NOQA
-from django.utils.functional import cached_property
-from elasticsearch_dsl.query import Q
+import math
+import pathlib
+from contextlib import suppress
+
 import elasticsearch.exceptions as es_exceptions
-from dalme_app.documents import PublicSource, FullSource
-from dalme_app.models import Attribute, LanguageReference, Set
-from dalme_app.forms import SearchForm
 from dateutil.parser import parse
+from elasticsearch_dsl.query import Q
+
+from django.conf import settings
+from django.utils.functional import cached_property
+
+from dalme_app.documents import *  # noqa: F403
+from dalme_app.documents import FullRecord, PublicRecord
+from dalme_app.forms import SearchForm
+from dalme_app.models import Attribute, Collection
 
 
-class Search():
+class Search:
+    """Search query including ancillary logic."""
 
-    def __init__(self, data=None, public=False, page=1, highlight=True, as_queryset=False,
-                 fragment_size=150, boundary_max_scan=100, sort=False, order=False, search_context=False):
+    def __init__(  # noqa: PLR0913
+        self,
+        data=None,
+        public=False,
+        page=1,
+        highlight=True,
+        as_queryset=False,
+        fragment_size=150,
+        boundary_max_scan=100,
+        sort=False,
+        order=False,
+        search_context=False,
+    ):
+        """Initialize class."""
         self.errors = []
-        self.results_per_page = getattr(settings, "SEARCH_RESULTS_PER_PAGE", 10)
-        self.searchindex = PublicSource if public else FullSource
+        self.results_per_page = getattr(settings, 'SEARCH_RESULTS_PER_PAGE', 10)
+        self.searchindex = PublicRecord if public else FullRecord
         self.adjacent_pages = 1
         self.highlight = highlight
         self.highlight_fields = {}
@@ -47,6 +64,7 @@ class Search():
 
     @cached_property
     def get_results(self):
+        """Perform query."""
         query = self.build_query()
         if not query:
             self.errors.append('No query could be built from the request.')
@@ -69,22 +87,21 @@ class Search():
         if self.sort:
             sqs = sqs.sort(self.sort)
 
-        return self.paginate(sqs, self.page, self.results_per_page, self.adjacent_pages)
+        return self.paginate(sqs)
 
-    def paginate(self, sqs, page, results_per_page, adjacent_pages):
+    def paginate(self, sqs):
+        """Paginate search results."""
         try:
             total_count = sqs.count()
             num_pages = math.ceil(total_count / self.results_per_page)
             start_offset = (self.page - 1) * self.results_per_page
-
             result_end = start_offset + self.results_per_page + 1
-            if result_end > total_count:
-                result_end = total_count
-
-            start_page = max(self.page - self.adjacent_pages, 1) if max(self.page - self.adjacent_pages, 1) >= 3 else 1
+            result_end = total_count if result_end > total_count else result_end
+            start_page = max(self.page - self.adjacent_pages, 1)
+            start_page = start_page if start_page >= 3 else 1  # noqa: PLR2004
             end_page = self.page + self.adjacent_pages if self.page + self.adjacent_pages <= num_pages else num_pages
-            page_numbers = [i for i in range(start_page, end_page + 1)]
-
+            page_numbers = list(range(start_page, end_page + 1))
+            sqs = sqs[start_offset : start_offset + self.results_per_page]
             paginator = {
                 'total_count': total_count,
                 'result_start': start_offset + 1,
@@ -97,10 +114,8 @@ class Search():
                 'show_first': 1 not in page_numbers,
                 'show_last': num_pages not in page_numbers,
                 'has_previous': self.page > start_page,
-                'has_next': self.page < end_page
+                'has_next': self.page < end_page,
             }
-
-            sqs = sqs[start_offset:start_offset + self.results_per_page]
 
             return (paginator, sqs.execute())
 
@@ -112,25 +127,49 @@ class Search():
             if e.error == 'parsing_exception':
                 self.errors.append(f'There was an error parsing your query: {e.info}')
             else:
-                self.errors.append(f'Error ({e.error}): {e.info["error"]["reason"]}')
+                self.errors.append(f"Error ({e.error}): {e.info['error']['reason']}")
             return ({}, [])
 
-    def build_query(self):
-        data = self.clean_data(self.data, self.search_context)
-        if data is None:
-            return False
+    @staticmethod
+    def get_query_object(bool_sets):
+        """Take bool sets and return query object."""
+        query_object = {}
 
+        if bool_sets['must']:
+            query_object['must'] = bool_sets['must']
+
+        if bool_sets['should']:
+            query_object['should'] = bool_sets['should']
+
+        if bool_sets['must_not']:
+            query_object['must_not'] = bool_sets['must_not']
+
+            if not bool_sets['must']:
+                query_object['must'] = [
+                    Q('term', short_name__isnull=False)
+                ]  # prevents returning of single folios as results
+
+        return query_object
+
+    @staticmethod
+    def get_join(row, data, first=False):
+        """Calculate join."""
+        join = row.get('join_type', False)
+        if first and len(data) > 1:
+            join = data[1].get('join_type', False)
+            if join and join == 'must_not':
+                join = 'must'
+
+        return join
+
+    def get_bool_sets(self, data):
+        """Calculate bool sets."""
         bool_sets = {'must': [], 'should': [], 'must_not': []}
         child_rel = False
         child_highlight = False
 
         for i, row in enumerate(data):
-            join = row.get('join_type', False)
-            if i == 0 and len(data) > 1:
-                join = data[1].get('join_type', False)
-                if join and join == 'must_not':
-                    join = 'must'
-
+            join = self.get_join(row, data, i == 0)
             method = getattr(self, row.get('field_type'), False)
 
             if row.get('child_relationship', False):
@@ -153,104 +192,106 @@ class Search():
                 if error:
                     self.errors.append(error)
 
+        return bool_sets
+
+    def build_query(self):
+        """Build query."""
+        data = self.clean_data(self.data, self.search_context)
+
+        if data is None:
+            return False
+
+        bool_sets = self.get_bool_sets(data)
         if bool_sets['must'] or bool_sets['should'] or bool_sets['must_not']:
-            query_object = {}
-
-            if bool_sets['must']:
-                query_object['must'] = bool_sets['must']
-
-            if bool_sets['should']:
-                query_object['should'] = bool_sets['should']
-
-            if bool_sets['must_not']:
-                query_object['must_not'] = bool_sets['must_not']
-
-                if not bool_sets['must']:
-                    query_object['must'] = [Q('term', type=13)]  # prevents search from returning single folios as results
-
-            return Q('bool', **query_object)
+            return Q('bool', **self.get_query_object(bool_sets))
 
         return False
 
     @staticmethod
     def clean_data(data, context):
+        """Clean form data."""
         clean_data = []
         falsy = [None, '', ' ', 'none', False, 'null']
         for i, row in enumerate(data):
-            if not row:
-                data.pop(i)
-            elif row.get('field_value') in falsy and row.get('query') in falsy:
+            if not row or (row.get('field_value') in falsy and row.get('query') in falsy):
                 data.pop(i)
 
-        if len(data) == 1 and data[0]['field_value'] == '':
+        if len(data) == 1 and not data[0]['field_value']:
             querystring = data[0]['query'].strip()
             has_digits = any(char.isdigit() for char in querystring)
             if has_digits:
-                try:
+                with suppress(ValueError):
                     querystring = parse(querystring).strftime('%Y-%m-%d')
                     fields = [field for field, props in context.items() if props['type'] == 'date']
                     for field in fields:
-                        clean_data.append({
-                            'field': field,
-                            'field_type': context[field]['type'],
-                            'field_value': querystring,
-                            'query_type': False,
-                            'join_type': 'or',
-                            'range_type': 'value',
-                            'child_relationship': False,
-                            'highlight': context[field].get('highlight', {})
-                        })
-                except ValueError:
-                    pass
+                        clean_data.append(
+                            {
+                                'field': field,
+                                'field_type': context[field]['type'],
+                                'field_value': querystring,
+                                'query_type': False,
+                                'join_type': 'or',
+                                'range_type': 'value',
+                                'child_relationship': False,
+                                'highlight': context[field].get('highlight', {}),
+                            },
+                        )
 
             for field, props in context.items():
                 if props['type'] != 'date':
-                    clean_data.append({
-                        'field': field,
-                        'field_type': context[field]['type'],
-                        'field_value': querystring,
-                        'query_type': 'match_phrase',
-                        'join_type': 'should',
-                        'range_type': False,
-                        'child_relationship': context[field].get('child_relationship', False),
-                        'highlight': context[field].get('highlight', {})
-                    })
+                    clean_data.append(
+                        {
+                            'field': field,
+                            'field_type': context[field]['type'],
+                            'field_value': querystring,
+                            'query_type': 'match_phrase',
+                            'join_type': 'should',
+                            'range_type': False,
+                            'child_relationship': context[field].get('child_relationship', False),
+                            'highlight': context[field].get('highlight', {}),
+                        },
+                    )
         else:
             for row in data:
-                clean_data.append({
-                    'field': row['field'],
-                    'field_type': context[row['field']]['type'],
-                    'field_value': row['field_value'],
-                    'query_type': row['query_type'],
-                    'join_type': row['join_type'],
-                    'range_type': row['range_type'],
-                    'child_relationship': context[row['field']].get('child_relationship', False),
-                    'highlight': context[row['field']].get('highlight', {})
-                })
+                clean_data.append(
+                    {
+                        'field': row['field'],
+                        'field_type': context[row['field']]['type'],
+                        'field_value': row['field_value'],
+                        'query_type': row['query_type'],
+                        'join_type': row['join_type'],
+                        'range_type': row['range_type'],
+                        'child_relationship': context[row['field']].get('child_relationship', False),
+                        'highlight': context[row['field']].get('highlight', {}),
+                    },
+                )
+
         return clean_data if clean_data else None
 
     @staticmethod
     def date(data):
+        """Process date-type data."""
         try:
             query_date = parse(data['field_value'].strip()).strftime('%Y-%m-%d')
-            query_object = {
-                data['range_type']: query_date
-            }
+            query_object = {data['range_type']: query_date}
             query = 'term' if data['range_type'] == 'value' else 'range'
             query = Q(query, **{data['field']: query_object})
             highlight = {data['field']: data['highlight']} if data.get('highlight', False) else False
-
-            return query, highlight, False
+            errors = False
 
         except ValueError:
-            errors = [(
-                'Value "{}" could not be parsed into a date for field "{}". \
-                Try reformatting it, for example as "DD-MM-YYYY"'.format(data['field_value'], data['field'])
-            )]
-            return False, False, errors
+            query, highlight = False, False
+            errors = [
+                f'Value "{data["field_value"]}" could not be parsed into a date for field "{data["field"]}". \
+                Try reformatting it, for example as "DD-MM-YYYY"',
+            ]
+
+        else:
+            return query, highlight, errors
 
     @staticmethod
     def keyword(data):
+        """Process keyword-type data."""
         query_object = {'value': data['field_value']}
         query = Q('term', **{data['field']: query_object})
         highlight = {data['field']: data['highlight']} if data.get('highlight', False) else False
@@ -259,41 +300,35 @@ class Search():
 
     @staticmethod
     def text(data):
+        """Process text-type data."""
         querystring = data['field_value'].strip()
         query = 'match_phrase_prefix' if data['query_type'] == 'prefix' and ' ' in querystring else data['query_type']
-        field = f'{data["field"]}.keyword' if query == 'term' else data['field']
+        field = f"{data['field']}.keyword" if query == 'term' else data['field']
         keyname = 'value' if query in ['term', 'prefix'] else 'query'
         query_object = {keyname: querystring}
+
         if query == 'match':
-            query_object.update({
-                'query': querystring,
-                'lenient': True,
-                'operator': 'OR',
-                'fuzziness': 'AUTO',
-                'max_expansions': 10,
-                'prefix_length': 2,
-            })
+            query_object.update(
+                {
+                    'query': querystring,
+                    'lenient': True,
+                    'operator': 'OR',
+                    'fuzziness': 'AUTO',
+                    'max_expansions': 10,
+                    'prefix_length': 2,
+                },
+            )
 
         query = Q({query: {field: query_object}})
         highlight = {field: data['highlight']} if data.get('highlight', False) else False
 
         if data.get('child_relationship', False):
-
-            child_object = {
-                'type': data['child_relationship'],
-                'query': query
-            }
+            child_object = {'type': data['child_relationship'], 'query': query}
 
             if data.get('highlight', False):
                 highlight = data['highlight']
-                highlight.update({
-                    'fields': {field: {}}
-                })
-                child_object.update({
-                    'inner_hits': {
-                        'highlight': highlight
-                    }
-                })
+                highlight.update({'fields': {field: {}}})
+                child_object.update({'inner_hits': {'highlight': highlight}})
 
             query = Q({'has_child': child_object})
             highlight = False
@@ -301,19 +336,23 @@ class Search():
         return query, highlight, False
 
 
-class SearchContext():
+class SearchContext:
+    """Search context manager."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs):  # noqa: D107
         self.public = kwargs.pop('public', False)
 
     @cached_property
     def fields(self):
+        """Return list of field, label tuples."""
         return [(field, props['label']) for field, props in self.context['fields'].items()]
 
     @cached_property
     def context(self):
-        filename = 'public_source.json' if self.public else 'full_source.json'
-        with open(os.path.join('dalme_app', 'config', 'search', filename), 'r') as fp:
+        """Return context object."""
+        filename = 'search_public_record.json' if self.public else 'search_record.json'
+        path = pathlib.Path('static/snippets') / filename
+        with path.open() as fp:
             field_data = json.load(fp)
 
         for field, props in field_data.items():
@@ -325,68 +364,62 @@ class SearchContext():
         options = {
             'join_types': [{'value': i[0], 'text': i[1]} for i in SearchForm.JOIN_TYPES],
             'query_types': [{'value': i[0], 'text': i[1]} for i in SearchForm.QUERY_TYPES],
-            'range_types': [{'value': i[0], 'text': i[1]} for i in SearchForm.RANGE_TYPES]
+            'range_types': [{'value': i[0], 'text': i[1]} for i in SearchForm.RANGE_TYPES],
         }
 
         return {
             'session_var': session_var,
             'fields': field_data,
-            'options': options
+            'options': options,
         }
 
     def get_options(self, field):
+        """Return options for keyword fields."""
         if '.' in field:
             field_tokens = field.split('.')
             field = field_tokens[0] if field_tokens[0] != 'attributes' else field_tokens[1]
 
         method = getattr(self, field, 'Invalid field')
-
         return method()
 
     def collections(self):
-        filter_options = {'set_type': 2}
+        """Return collections as options."""
+        filter_options = {}
 
         if self.public:
-            filter_options.update({'is_public': True})
+            filter_options.update({'published': True})
 
-        return [{'value': i, 'text': i}
-                for i in Set.objects.filter(**filter_options)
-                .order_by('name')
-                .values_list('name', flat=True)
-                ]
-
-    def language(self):
-        filter_options = {
-            'attribute_type': 15,
-            'sources__type': 13,
-        }
-
-        if self.public:
-            filter_options.update({'sources__workflow__is_public': True})
-
-        languages = [
-            int(i) for i in Attribute.objects.filter(**filter_options)
-            .values_list('value_JSON__id', flat=True)
-            .distinct()
+        return [
+            {'value': i, 'text': i}
+            for i in Collection.objects.filter(**filter_options).order_by('name').values_list('name', flat=True)
         ]
 
-        return [{'value': i.name, 'text': i.name}
-                for i in LanguageReference.objects.filter(id__in=languages)
-                .order_by('name')
-                ]
-
-    def record_type(self):
-        filter_options = {
-            'attribute_type': 28,
-            'sources__type': 13,
-        }
+    def language(self):
+        """Return languages as options."""
+        filter_options = {'attribute_type': 15}
 
         if self.public:
-            filter_options.update({'sources__workflow__is_public': True})
+            filter_options.update({'records__workflow__is_public': True})
 
-        return [{'value': i, 'text': i}
-                for i in Attribute.objects.filter(**filter_options)
-                .order_by('value_STR')
-                .values_list('value_STR', flat=True)
-                .distinct()
-                ]
+        return [
+            {'value': i, 'text': i}
+            for i in Attribute.objects.filter(**filter_options)
+            .distinct()
+            .order_by('value__name')
+            .values_list('value__name', flat=True)
+        ]
+
+    def record_type(self):
+        """Return record types as options."""
+        filter_options = {'attribute_type': 28}
+
+        if self.public:
+            filter_options.update({'records__workflow__is_public': True})
+
+        return [
+            {'value': i, 'text': i}
+            for i in Attribute.objects.filter(**filter_options)
+            .order_by('value')
+            .values_list('value', flat=True)
+            .distinct()
+        ]

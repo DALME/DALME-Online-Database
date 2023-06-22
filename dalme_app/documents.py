@@ -1,40 +1,47 @@
+from contextlib import suppress
+
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
-from elasticsearch_dsl import Join as dsl_Join
 from elasticsearch_dsl import Index, Mapping, normalizer
-from dalme_app.models import Source, Source_pages, LocaleReference
+from elasticsearch_dsl import Join as dsl_Join
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-import lxml.etree as et
-from datetime import date
+
+from dalme_app.models import Folio, Record
 
 
 class JoinField(fields.DEDField, dsl_Join):
-    def __init__(self, multi=False, required=False, *args, **kwargs):
+    """Join field class."""
+
+    def __init__(self, *args, **kwargs):  # noqa: D107
         public = kwargs.pop('public', False)
         self._public = public
-        kwargs['relations'] = {'PublicSource': 'PublicFolio'} if public else {'FullSource': 'FullFolio'}
+        kwargs['relations'] = {'PublicRecord': 'PublicFolio'} if public else {'FullRecord': 'FullFolio'}
         super().__init__(*args, **kwargs)
 
-    def get_value_from_instance(self, instance, field_value_to_ignore=None):
+    def get_value_from_instance(self, instance):
+        """Return value depending on instance type."""
         if not instance:
             return None
 
-        if isinstance(instance, Source):
-            return 'PublicSource' if self._public else 'FullSource'
+        if isinstance(instance, Record):
+            return 'PublicRecord' if self._public else 'FullRecord'
 
-        if isinstance(instance, Source_pages):
+        if isinstance(instance, Folio):
             return {
                 'name': 'PublicFolio' if self._public else 'FullFolio',
-                'parent': str(instance.source.id)
+                'parent': str(instance.record.id),
             }
+
+        return None
 
 
 basic_normalizer = normalizer(
     'basic_normalizer',
     type='custom',
     char_filter=[],
-    filter=['lowercase', 'asciifolding']
+    filter=['lowercase', 'asciifolding'],
 )
 
 dynamic_template = {
@@ -42,185 +49,157 @@ dynamic_template = {
         'match_mapping_type': 'string',
         'mapping': {
             'type': 'keyword',
-            'normaliser': basic_normalizer
-        }
-    }
+            'normaliser': basic_normalizer,
+        },
+    },
 }
 
 analysis = {'normalizer': basic_normalizer}
-
 default_mapping = Mapping()
 default_mapping.meta('dynamic_templates', **dynamic_template)
+public_records = Index('public_records')
+public_records.mapping(default_mapping)
+public_records.settings(analysis=analysis)
+full_records = public_records.clone('full_records')
 
-public_sources = Index('public_sources')
-public_sources.mapping(default_mapping)
-public_sources.settings(analysis=analysis)
-full_sources = public_sources.clone('full_sources')
 
+@public_records.document
+class PublicRecordBase(Document):
+    """Base public record document."""
 
-@public_sources.document
-class PublicSourceBase(Document):
     join_field = JoinField(public=True)
 
 
-@full_sources.document
-class FullSourceBase(Document):
+@full_records.document
+class FullRecordBase(Document):
+    """Base record document."""
+
     join_field = JoinField()
 
 
 @registry.register_document
-class PublicSource(PublicSourceBase):
-    id = fields.KeywordField(attr='id')
+class PublicRecord(PublicRecordBase):
+    """Published record document."""
+
+    id = fields.KeywordField(attr='id')  # noqa: A003
     name = fields.TextField(
         attr='name',
-        fields={'keyword': fields.KeywordField(
-            normalizer=basic_normalizer
-        )},
-        index_prefixes={}
+        fields={'keyword': fields.KeywordField(normalizer=basic_normalizer)},
+        index_prefixes={},
     )
-    type = fields.IntegerField(attr='type.id')
     is_private = fields.BooleanField(attr='is_private')
     is_public = fields.BooleanField()
     parent = fields.TextField(
         attr='parent.name',
-        fields={'keyword': fields.KeywordField(
-            normalizer=basic_normalizer
-        )},
-        index_prefixes={}
+        fields={'keyword': fields.KeywordField(normalizer=basic_normalizer)},
+        index_prefixes={},
     )
     attributes = fields.ObjectField()
     collections = fields.ObjectField()
-    credits = fields.ObjectField()
     geo_location = fields.GeoPointField()
 
-    class Index:
-        name = 'public_sources'
+    class Index:  # noqa: D106
+        name = 'public_records'
 
-    class Django:
-        model = Source
+    class Django:  # noqa: D106
+        model = Record
 
     def update(self, thing, refresh=None, action='index', parallel=False, **kwargs):
-        if isinstance(thing, models.Model) and not thing.is_public and action == "index":
-            action = "delete"
+        """Update index."""
+        if isinstance(thing, models.Model) and not thing.is_published and action == 'index':
+            action = 'delete'
             kwargs = {**kwargs, 'raise_on_error': False}
         return super().update(thing, refresh, action, parallel, **kwargs)
 
     def get_queryset(self):
-        return Source.objects.filter(type=13, workflow__is_public=True)
+        """Return record queryset."""
+        return Record.objects.filter(workflow__is_public=True)
 
     def prepare_is_public(self, instance):
-        return instance.is_public
+        """Return boolean indicating published status."""
+        return instance.is_published
 
     def prepare_attributes(self, instance):
-        attribute_list = []
-        dates_list = []
-        for attribute in instance.attributes.all():
-            label = attribute.attribute_type.short_name
-            if attribute.attribute_type.data_type == 'DATE':
-                if attribute.value_DATE:
-                    dates_list.append(attribute.value_DATE.strftime('%Y-%m-%d'))
-                elif attribute.value_DATE_y:
-                    d = attribute.value_DATE_d or 1
-                    m = attribute.value_DATE_m or 1
-                    y = attribute.value_DATE_y
-                    dates_list.append(date(y, m, d).strftime('%Y-%m-%d'))
-
-            elif attribute.attribute_type.data_type == 'TXT':
-                attribute_list.append((label, attribute.value_TXT))
-
-            else:
-                attribute_list.append((label, str(attribute)))
-
-        if dates_list:
-            attribute_list.append(('date', dates_list))
-
-        if attribute_list:
-            return dict(attribute_list)
+        """Prepare document attributes for indexing."""
+        attributes = instance.attributes.all()
+        if attributes:
+            return {a.label: str(a.value) for a in instance.attributes.all()}
+        return None
 
     def prepare_collections(self, instance):
-        cols = instance.sets.filter(set_id__set_type=2)
+        """Prepare collection for indexing."""
+        cols = instance.collections.filter(is_published=True)
         if cols.exists():
             return [{'name': i.set_id.name} for i in cols]
-        else:
-            return [{'name': 'none'}]
+        return [{'name': 'none'}]
 
     def prepare_credits(self, instance):
-        credit_list = []
-        for credit in instance.credits.all():
-            agent = credit.agent.standard_name
-            type = credit.get_type_display()
-            credit_list.append({
-                'agent': f'{agent} ({type})',
-                'type': type
-            })
-        return credit_list
+        """Prepare document credits for indexing."""
+        return instance.get_credits()
 
     def prepare_geo_location(self, instance):
+        """Prepare document location info for indexing."""
         locales = instance.attributes.filter(attribute_type=36)
         if locales.exists():
-            loc_id = locales[0].value_JSON['id']
-            locale = LocaleReference.objects.get(id=loc_id)
-            return f'{locale.latitude},{locale.longitude}'
+            locale = locales.first()
+            return f'{locale.value.latitude},{locale.value.longitude}'
+        return None
 
 
 @registry.register_document
-class PublicFolio(PublicSourceBase):
+class PublicFolio(PublicRecordBase):
+    """Published folio document."""
+
     folio = fields.KeywordField(attr='page.name')
     transcription = fields.TextField(
-        fields={'keyword': fields.KeywordField(
-            normalizer=basic_normalizer
-        )},
-        index_prefixes={}
+        fields={'keyword': fields.KeywordField(normalizer=basic_normalizer)},
+        index_prefixes={},
     )
 
-    class Index:
-        name = 'public_sources'
+    class Index:  # noqa: D106
+        name = 'public_records'
 
-    class Django:
-        model = Source_pages
+    class Django:  # noqa: D106
+        model = Folio
 
     def get_queryset(self):
-        return Source_pages.objects.filter(source__type=13, source__workflow__is_public=True)
+        """Return folio queryset."""
+        return Folio.objects.filter(record__workflow__is_public=True)
 
     def _prepare_action(self, object_instance, action):
         return {
             '_op_type': action,
-            '_index': self._index._name,
+            '_index': self._index._name,  # noqa: SLF001
             '_id': self.generate_id(object_instance),
-            '_routing': str(object_instance.source.id),
-            '_source': (
-                self.prepare(object_instance) if action != 'delete' else None
-            ),
+            '_routing': str(object_instance.record.id),
+            '_record': (self.prepare(object_instance) if action != 'delete' else None),
         }
 
     def prepare_transcription(self, instance):
-        xml_parser = et.XMLParser(recover=True)
-        try:
-            try:
-                tree = et.fromstring('<xml>' + instance.transcription.transcription + '</xml>', xml_parser)
-                return et.tostring(tree, encoding='unicode', xml_declaration=False, method='text')
-
-            except AttributeError:
-                pass
-        except ObjectDoesNotExist:
-            pass
+        """Prepare folio transcription for indexing."""
+        with suppress(ObjectDoesNotExist):
+            return instance.transcription.text_blob
 
 
 @registry.register_document
-class FullSource(FullSourceBase, PublicSource):
+class FullRecord(FullRecordBase, PublicRecord):
+    """Record document."""
 
-    class Index:
-        name = 'full_sources'
+    class Index:  # noqa: D106
+        name = 'full_records'
 
     def get_queryset(self):
-        return Source.objects.all()
+        """Return record queryset."""
+        return Record.objects.all()
 
 
 @registry.register_document
-class FullFolio(FullSourceBase, PublicFolio):
+class FullFolio(FullRecordBase, PublicFolio):
+    """Folio document."""
 
-    class Index:
-        name = 'full_sources'
+    class Index:  # noqa: D106
+        name = 'full_records'
 
     def get_queryset(self):
-        return Source_pages.objects.all()
+        """Return folio queryset."""
+        return Folio.objects.all()
