@@ -1,5 +1,7 @@
-from django.urls import path, include
 from rest_framework import routers
+
+from django.urls import include, path
+
 from dalme_purl import api
 
 router = routers.DefaultRouter()
