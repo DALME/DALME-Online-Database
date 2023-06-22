@@ -1,77 +1,53 @@
 import json
-from rest_framework.response import Response
+import pathlib
+
 from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from dalme_api.access_policies import PageAccessPolicy
 from dalme_api.serializers import PageSerializer
 from dalme_app.models import Page
-from dalme_api.access_policies import PageAccessPolicy
-from ._common import DALMEBaseViewSet
+
+from .base_viewset import DALMEBaseViewSet
+
+with pathlib.Path('static/snippets/iiif_manifest.json').open() as fp:
+    MANIFEST = json.load(fp)
 
 
 class Pages(DALMEBaseViewSet):
-    """ API endpoint for managing pages """
+    """API endpoint for managing pages."""
+
     permission_classes = (PageAccessPolicy,)
     queryset = Page.objects.all()
     serializer_class = PageSerializer
 
     @action(detail=True, methods=['post', 'get'])
-    def get_rights(self, request, *args, **kwargs):
-        object = self.get_object()
+    def get_rights(self, request, *args, **kwargs):  # noqa: ARG002
+        """Return rights information for page."""
         try:
-            result = {'rights': object.get_rights()}
-            status = 201
-        except Exception as e:
-            result = {'error': str(e)}
-            status = 400
-        return Response(result, status)
+            return Response({'rights': self.get_object().get_rights()}, 201)
+        except Exception as e:  # noqa: BLE001
+            return Response({'error': str(e)}, 400)
 
     @action(detail=True, methods=['post', 'get'])
-    def get_manifest(self, request, *args, **kwargs):
+    def get_manifest(self, request, *args, **kwargs):  # noqa: ARG002
+        """Return IIIF manifest for page."""
         page = self.get_object()
-        if page.dam_id is not None:
-            try:
-                canvas = json.loads(page.get_canvas())
-                result = {
-                  "@context": "http://iiif.io/api/presentation/2/context.json",
-                  "@id": page.get_absolute_url(),
-                  "@type": "sc:Manifest",
-                  "label": page.name,
-                  "metadata": [],
-                  "description": [{
-                    "@value": f"Manifest for {page.name}",
-                    "@language": "en"
-                  }],
-                  "license": "https://creativecommons.org/licenses/by/3.0/",
-                  "attribution": "DALME",
-                  "thumbnail": {
-                    "@id": f"https://dam.dalme.org/loris/{page.dam_id}/full/thm/0/default.jpg",
-                    "@type": "dctypes:Image",
-                    "height": 150,
-                    "width": 56,
-                    "format": "image/jpeg",
-                    "service": {
-                      "@context": "http://iiif.io/api/image/2/context.json",
-                      "@id": f"https://dam.dalme.org/loris/{page.dam_id}",
-                      "profile": "http://iiif.io/api/image/2/level1.json"
-                    }
-                  },
-                  "sequences": [
-                    {
-                      "@id": page.id,
-                      "@type": "sc:Canvas",
-                      "label": "Folio",
-                      "canvases": [canvas]
-                    }
-                  ],
-                  "structures": []
-                }
-                status = 201
 
-            except Exception as e:
-                result = {'error': str(e)}
-                status = 400
+        if not page.dam_id:
+            return Response({'error': 'This page does not have an associated image in the DAM'}, 400)
 
-        else:
-            result = {'error': 'This page does not have an image associated in the DAM'}
-            status = 400
+        try:
+            result = MANIFEST.copy()
+            result = MANIFEST.copy()
+            result['@id'] = page.get_absolute_url()
+            result['label'] = page.name
+            result['description'][0]['@value'] = f'Manifest for {page.name}'
+            result['thumbnail']['@id'] = f'https://dam.dalme.org/loris/{page.dam_id}/full/thm/0/default.jpg'
+            result['thumbnail']['service']['@id'] = f'https://dam.dalme.org/loris/{page.dam_id}'
+            result['sequences']['@id'] = page.id
+            result['sequences']['canvases'] = [json.loads(page.get_canvas())]
+            return Response(result, 201)
 
-        return Response(result, status)
+        except Exception as e:  # noqa: BLE001
+            return Response(str(e), 400)

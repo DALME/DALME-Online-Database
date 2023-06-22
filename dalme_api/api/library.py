@@ -1,27 +1,27 @@
 import json
+
+from pyzotero import zotero
 from rest_framework import viewsets
 from rest_framework.response import Response
-from dalme_api.access_policies import LibraryAccessPolicy
-from pyzotero import zotero
+
 from django.conf import settings
+
+from dalme_api.access_policies import LibraryAccessPolicy
 
 
 class Library(viewsets.ViewSet):
-    """ API endpoint for accessing DALME Zotero Library """
+    """API endpoint for accessing DALME Zotero Library."""
+
     permission_classes = (LibraryAccessPolicy,)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):  # noqa: A003, ARG002
+        """Return list of bibliographic sources."""
         data = request.GET.get('data')
         collection = request.GET.get('collection')
         search = request.GET.get('search')
         content = request.GET.get('content')
         limit = request.GET.get('limit')
-
-        queryset_generator = zotero.Zotero(
-            settings.ZOTERO_LIBRARY_ID,
-            'group',
-            settings.ZOTERO_API_KEY
-        )
+        queryset_generator = zotero.Zotero(settings.ZOTERO_LIBRARY_ID, 'group', settings.ZOTERO_API_KEY)
 
         if data:
             record_total = queryset_generator.count_items()
@@ -29,15 +29,16 @@ class Library(viewsets.ViewSet):
             page = self.paginate_queryset(
                 queryset_generator,
                 dt_request.get('start'),
-                dt_request.get('length')
+                dt_request.get('length'),
             )
 
             result = {
-                'draw': int(dt_request.get('draw')),  # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
+                'draw': int(dt_request.get('draw')),
                 'recordsTotal': record_total,
                 'recordsFiltered': page.count_items(),
-                'data': [i['data'] for i in page]
-                }
+                'data': [i['data'] for i in page],
+            }
         else:
             paras = {}
             if limit:
@@ -52,7 +53,7 @@ class Library(viewsets.ViewSet):
                     queryset = queryset_generator.collection_items_top(collection, **paras)
                 else:
                     queryset = queryset_generator.everything(
-                        queryset_generator.collection_items_top(collection, **paras)
+                        queryset_generator.collection_items_top(collection, **paras),
                     )
             else:
                 if not limit:
@@ -68,27 +69,22 @@ class Library(viewsets.ViewSet):
         if start is not None and length is not None:
             page = queryset.top(
                 limit=length,
-                start=start
+                start=start,
             )
-            if page is not None:
-                queryset = page
-            else:
-                queryset = queryset.everything(
-                    queryset.top()
-                )
+            queryset = page if page is not None else queryset.everything(queryset.top())
 
         return queryset
 
-    def get_renderer_context(self):
-        context = {
-            'view': self,
-            'args': getattr(self, 'args', ()),
-            'kwargs': getattr(self, 'kwargs', {}),
-            'request': getattr(self, 'request', None),
-            'model': 'Library'
-            }
+    # def get_renderer_context(self):
+    #     context = {
+    #         'view': self,
+    #         'args': getattr(self, 'args', ()),
+    #         'kwargs': getattr(self, 'kwargs', {}),
+    #         'request': getattr(self, 'request', None),
+    #         'model': 'Library'
+    #         }
 
-        return context
+    #     return context
 
     def retrieve(self, request, pk=None):
         content = request.GET.get('content')
@@ -100,7 +96,7 @@ class Library(viewsets.ViewSet):
         queryset_generator = zotero.Zotero(
             settings.ZOTERO_LIBRARY_ID,
             'group',
-            settings.ZOTERO_API_KEY
+            settings.ZOTERO_API_KEY,
         )
 
         result = queryset_generator.item(pk, **paras)

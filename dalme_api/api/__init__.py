@@ -1,62 +1,56 @@
+from .agents import Agents
 from .attachments import Attachments
-from .attributes import Attributes
 from .attribute_types import AttributeTypes
-from .choices import Choices
+from .attributes import Attributes
+from .collections import Collections
 from .comments import Comments
-from .configs import Configs
+from .content import ContentTypes
+from .countries import Countries
 from .datasets import Datasets
+from .groups import Groups
 from .health_check import HealthCheck
 from .images import Images
-from .other import (
-    Agents,
-    ContentClasses,
-    ContentTypes,
-    Countries,
-    Groups,
-    Languages,
-    Locales,
-    Places,
-    Rights,
-)
+from .languages import Languages
+from .library import Library
+from .locales import Locales
+from .locations import Locations
 from .pages import Pages
+from .places import Places
+from .records import Records
+from .rights import Rights
 from .session import Session
-from .sets import Sets
-from .sources import Sources
-from .tasks import Tasks, TaskLists
+from .tasks import TaskLists, Tasks
 from .tickets import Tickets
 from .transcriptions import Transcriptions
 from .users import Users
-from .workflow_manager import WorkflowManager
-from .library import Library
+from .workflows import Workflows
 
 __all__ = [
     "Agents",
     "Attachments",
     "Attributes",
     "AttributeTypes",
-    "Choices",
-    "ContentClasses",
     "ContentTypes",
+    "Collections",
     "Countries",
     "Comments",
-    "Configs",
     "Datasets",
     "Groups",
     "HealthCheck",
     "Images",
     "Languages",
+    "Locations",
     "Library",
     "Locales",
     "Pages",
     "Places",
     "Rights",
     "Session",
-    "Sets",
-    "Sources",
+    "Records",
     "Tasks",
     "TaskLists",
     "Tickets",
     "Transcriptions",
     "Users",
-    "WorkflowManager",
+    "Workflows",
 ]

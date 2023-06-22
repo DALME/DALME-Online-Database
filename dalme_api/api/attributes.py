@@ -1,132 +1,65 @@
-from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from ._common import DALMEBaseViewSet
-from dalme_api.serializers import SimpleAttributeSerializer, AttributeOptionsSerializer
-from dalme_api.access_policies import GeneralAccessPolicy
-from dalme_app.models import (
-    Attribute,
-    Attribute_type,
-    CountryReference,
-    LanguageReference,
-    LocaleReference,
-    RightsPolicy,
-    Set,
-    Source,
-)
+
+from django.apps import apps
+
+from dalme_api.access_policies import AttributeAccessPolicy
+from dalme_api.serializers import AttributeSerializer, OptionsSerializer
+from dalme_app.models import Attribute, AttributeType
+
+from .base_viewset import DALMEBaseViewSet
 
 
 class Attributes(DALMEBaseViewSet):
-    """ API endpoint for managing attributes """
-    permission_classes = (GeneralAccessPolicy,)
+    """API endpoint for managing attributes and options."""
+
+    permission_classes = (AttributeAccessPolicy,)
     queryset = Attribute.objects.all().order_by('attribute_type')
-    serializer_class = SimpleAttributeSerializer
+    serializer_class = AttributeSerializer
 
-    def get_serializer_class(self):
-        if self.request.GET.get('options'):
-            return AttributeOptionsSerializer
-        return super().get_serializer_class()
+    def get_object(self):
+        """Return the object the view is displaying."""
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        if lookup_url_kwarg in self.kwargs and str(self.kwargs[lookup_url_kwarg]).isdigit():
+            lookup_value = self.kwargs[lookup_url_kwarg]
+            filter_kwargs = {self.lookup_field: lookup_value}
+            queryset = AttributeType.objects.all()
+            obj = get_object_or_404(queryset, **filter_kwargs)
+            self.check_object_permissions(self.request, obj)
+            return obj
+        return super().get_object()
 
-    def get_queryset(self, *args, **kwargs):
-        if self.request.GET.get('options'):
-            short_name = self.request.GET['options']
-            return self.get_options(short_name)
-        return super().get_queryset(*args, **kwargs)
-
-    def get_options(self, short_name):
-        try:
-            attribute_type = Attribute_type.objects.get(short_name=short_name)
-        except Attribute_type.DoesNotExist:
-            Response(status=status.HTTP_404_NOT_FOUND)
-        return self.resolve_data(short_name, attribute_type)
-
-    def resolve_data(self, short_name, attribute_type):
-        return {
-            'created_by': self.get_user_options(),
-            'last_user': self.get_user_options(),
-            'owner': self.get_user_options(),
-            'parent': [
-                {'label': obj.short_name, 'value': obj.id}
-                for obj in Source.objects.all().order_by('name')
-            ],
-            'authority': [
-                {'label': 'Church', 'value': 'Church'},
-                {'label': 'Court', 'value': 'Court'},
-                {'label': 'Notary', 'value': 'Notary'},
-            ],
-            'country': [
-                {'label': obj.name, 'value': obj.name}
-                for obj in CountryReference.objects.all().order_by('name')
-            ],
-            'default_rights': [
-                {'label': obj.name, 'value': obj.id}
-                for obj in RightsPolicy.objects.all().order_by('name')
-            ],
-            'endpoint': [
-                {'label': 'Images', 'value': 'images'},
-                {'label': 'Sources', 'value': 'sources'},
-            ],
-            'format': [
-                {'label': 'Charter', 'value': 'Charter'},
-                {'label': 'Register - demi-quarto', 'value': 'Register - demi-quarto'},
-                {'label': 'Register - quarto', 'value': 'Register - quarto'},
-            ],
-            'language': [
-                {'label': obj['name'], 'value': obj['id'], 'caption': obj['iso6393']}
-                for obj in LanguageReference.objects.filter(
-                    iso6393__isnull=False
-                ).order_by('name').values('id', 'name', 'iso6393')
-            ],
-            'language_gc': [
-                {'label': obj['name'], 'value': obj['id'], 'caption': obj['glottocode']}
-                for obj in LanguageReference.objects.filter(
-                    glottocode__isnull=False
-                ).order_by('name').values('id', 'name', 'glottocode')
-            ],
-            'legal_persona': [
-                # TODO: Determine if it's right to use id here.
-                {'label': obj['value_STR'], 'value': obj['value_STR']}
-                for obj in Attribute.objects.filter(
-                    attribute_type=attribute_type, value_STR__isnull=False
-                ).values('value_STR').distinct()
-            ],
-            'locale': [
-                {'label': obj.name, 'value': obj.id}
-                for obj in LocaleReference.objects.all().order_by('name')
-            ],
-            'permissions': [
-                {'label': label, 'value': value}
-                for value, label in Set._meta.get_field('permissions').choices
-            ],
-            'record_type': [
-                # TODO: Value might be better served as id here.
-                {'label': obj['value_STR'], 'value': obj['value_STR']}
-                for obj in Attribute.objects.filter(
-                    attribute_type=attribute_type, value_STR__isnull=False
-                ).values('value_STR').distinct()
-            ],
-            'rights_status': [
-                {'label': 'Copyrighted', 'value': 'Copyrighted'},
-                {'label': 'Orphaned', 'value': 'Orphaned'},
-                {'label': 'Owned', 'value': 'Owned'},
-                {'label': 'Public Domain', 'value': 'Public Domain'},
-            ],
-            'same_as': None,  # TODO: List all AttributeType, should exclude `same_as`.
-            'set_type': [
-                {'label': label, 'value': value}
-                for value, label in Set._meta.get_field('set_type').choices
-            ],
-            'support': [
-                {'label': 'Paper', 'value': 'Paper'},
-                {'label': 'Parchment', 'value': 'Parchment'},
-                {'label': 'Vellum', 'value': 'Vellum'},
-            ],
-        }[short_name]
+    @action(detail=True, methods=['get'])
+    def options(self, request, *args, **kwargs):  # noqa: ARG002
+        """Return options for attribute."""
+        options = self.get_options(self.get_object())
+        if options is not None:
+            return Response(options, 201)
+        return Response({'error': 'No options could be retrieved.'}, 400)
 
     @staticmethod
-    def get_user_options():
-        return [
-            {'label': obj.profile.full_name, 'value': obj.id, 'caption': obj.email}
-            # TODO: Only need the isnull check as jhrr doesn't have a profile.
-            for obj in User.objects.filter(profile__isnull=False)
-        ]
+    def get_options(attribute):
+        """Return list of options for an attribute."""
+        options = attribute.get_options()
+        try:
+            if options.type == 'db_records':
+                model = apps.get_model(options.payload.get('app'), options.payload.get('model'))
+                filters = options.payload.get('filters')
+                queryset = model.objects.filter(**filters) if filters else model.objects.all()
+                serializer = OptionsSerializer(queryset, many=True, concordance=options.payload.get('concordance'))
+                return serializer.data
+
+            if options.type == 'field_choices':
+                model = apps.get_model(options.payload.get('app'), options.payload.get('model'))
+                choices = getattr(model, options.payload.get('choices'))
+                data = [{'label': i[1], 'value': i[0]} for i in choices]
+                serializer = OptionsSerializer(data, many=True)
+                return serializer.data
+
+            if options.type == 'static_list':
+                serializer = OptionsSerializer(options.payload, many=True)
+                return serializer.data
+
+        except AttributeError:
+            return None

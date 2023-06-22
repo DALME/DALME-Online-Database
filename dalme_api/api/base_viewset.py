@@ -1,49 +1,71 @@
 from rest_framework import viewsets
-from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 class DALMEBaseViewSet(viewsets.ModelViewSet):
-    """ Generic viewset. Should be subclassed for specific API endpoints. """
+    """Generic viewset. Should be subclassed for specific API endpoints."""
+
+    permission_classes = ()
+    queryset = None
+    serializer_class = None
+    options_serializer_class = None
+    url_serializer_class = None
+
+    @property
+    def options_view(self):
+        """Return boolean indicating whether the request is for options values."""
+        q_as = self.request.GET.get('as')
+        return q_as == 'options'
+
+    @property
+    def url_view(self):
+        """Return boolean indicating whether the request is for url values."""
+        q_as = self.request.GET.get('as')
+        return q_as == 'url'
 
     @action(detail=True, methods=['post'])
-    def has_permission(self, request, pk=None):
-        pc = self.permission_classes[0]  # type: ignore
+    def has_permission(self, request, pk=None):  # noqa: ARG002
+        """Test if user has permission to perform action."""
+        pc = self.permission_classes[0]
         pc().has_permission(request, self)
         return Response(200)
 
     @action(detail=False, methods=['delete'])
-    def bulk_remove(self, request, *args, **kwargs):
+    def bulk_remove(self, request, *args, **kwargs):  # noqa: ARG002
+        """Remove records in bulk."""
         try:
-            for id in list(request.data.keys()):
-                self.kwargs['pk'] = id
+            for obj_id in list(request.data.keys()):
+                self.kwargs['pk'] = obj_id
                 instance = self.get_object()
                 instance.delete()
             return Response(200)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
 
     @action(detail=False, methods=['put', 'patch'])
-    def bulk_edit(self, request, *args, **kwargs):
-        partial = True if request.method == 'PATCH' else False
+    def bulk_edit(self, request, *args, **kwargs):  # noqa: ARG002
+        """Edit records in bulk."""
+        partial = request.method == 'PATCH'
         results = []
         try:
-            for id, props in request.data.items():
-                self.kwargs['pk'] = id
+            for obj_id, props in request.data.items():
+                self.kwargs['pk'] = obj_id
                 instance = self.get_object()
                 serializer = self.get_serializer(instance, data=props, partial=partial)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 results.append(serializer.data)
             return Response({'data': results}, 200)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return Response({'error': str(e)}, 400)
 
     @action(detail=False, methods=['patch'])
-    def inline_update(self, request, *args, **kwargs):
-        pks = [str(pk) for pk in request.data.keys()]
+    def inline_update(self, request, *args, **kwargs):  # noqa: ARG002
+        """Edit records inline."""
+        pks = [str(pk) for pk in request.data]
         for pk in pks:
-            obj = self.queryset.filter(pk=pk)  # type: ignore
+            obj = self.queryset.filter(pk=pk)
             obj_data = request.data[pk]
 
             # Update fields.
@@ -73,29 +95,15 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
 
         return Response({'message': f'Updated {len(pks)} rows.'}, 201)
 
-    def get_renderer_context(self):
-        context = {
-            'view': self,
-            'args': getattr(self, 'args', ()),
-            'kwargs': getattr(self, 'kwargs', {}),
-            'request': getattr(self, 'request', None),
-            'model': self.get_serializer().Meta.model.__name__
-        }
-        if self.request.GET.get('select_type') is not None:
-            context['select_type'] = self.request.GET['select_type']
-        return context
-
     def get_serializer(self, *args, **kwargs):
+        """Return serializer."""
         serializer_class = self.get_serializer_class()
         kwargs['context'] = self.get_serializer_context()
-        return serializer_class(*args, **kwargs)  # type: ignore
 
-    def get_serializer_class(self):
-        return self.serializer_class
+        if self.options_view:
+            kwargs['field_set'] = 'option'
 
-    def get_serializer_context(self):
-        return {
-            'request': self.request,
-            'format': self.format_kwarg,
-            'view': self
-        }
+        if self.url_view:
+            kwargs['field_set'] = 'url'
+
+        return serializer_class(*args, **kwargs)

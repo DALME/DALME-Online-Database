@@ -8,10 +8,12 @@ from dalme_api.serializers.users import UserSerializer
 
 class HealthCheck(viewsets.ViewSet):
     """Determine if the API is up and running."""
+
     permission_classes = (SessionAccessPolicy,)
 
     @action(detail=False, methods=['get'])
     def ping(self, request):
+        """Respond to ping."""
         if request.user.is_authenticated:
             owner = UserSerializer(request.user, fields=['username', 'id'])
             data = {'status': 'ok', 'user': owner.data}
