@@ -1,38 +1,43 @@
 from rest_framework.filters import OrderingFilter
-from django.db.models import Count, OuterRef, Subquery
-from dalme_app.models import Attribute, Attribute_type
+
+from django.db.models import OuterRef, Subquery
+
+from dalme_app.models import Attribute, AttributeType
 
 
 class DalmeOrderingFilter(OrderingFilter):
+    """Ordering filter."""
 
     def filter_queryset(self, request, queryset, view):
+        """Return filtered queryset."""
         ordering = self.get_ordering(request, queryset, view)
         ordering_aggregates = getattr(view, 'ordering_aggregates', [])
 
         if ordering:
             _ordering = []
-            for f in ordering:
-                cf = self.clean_field(f)
+            for flt in ordering:
+                cf = self.clean_field(flt)
                 if cf.startswith('attributes.'):
-                    type = Attribute_type.objects.get(short_name=cf[11:])
-                    attributes = Attribute.objects.filter(object_id=OuterRef('pk'), attribute_type=type)
-                    if type.data_type == 'DATE':
-                        queryset = queryset.annotate(
-                            **{cf + '_d': Subquery(attributes.values('value_DATE_d'))}
-                        ).annotate(
-                            **{cf + '_m': Subquery(attributes.values('value_DATE_m'))}
-                        ).annotate(
-                            **{cf + '_y': Subquery(attributes.values('value_DATE_y'))}
+                    att_type = AttributeType.objects.get(short_name=cf[11:])
+                    attributes = Attribute.objects.filter(object_id=OuterRef('pk'), attribute_type=att_type)
+                    if att_type.data_type == 'DATE':
+                        queryset = (
+                            queryset.annotate(**{cf + '_d': Subquery(attributes.values('value_DATE_d'))})
+                            .annotate(**{cf + '_m': Subquery(attributes.values('value_DATE_m'))})
+                            .annotate(**{cf + '_y': Subquery(attributes.values('value_DATE_y'))})
                         )
-                        _ordering += [f + '_y', f + '_m', f + '_d']
+                        _ordering += [f'{flt}_y', f'{flt}_m', f'{flt}_d']
+
                     else:
                         queryset = queryset.annotate(**{cf: Subquery(attributes.values('value_STR'))})
-                        _ordering.append(f)
+                        _ordering.append(flt)
+
                 elif cf in ordering_aggregates:
                     queryset = queryset.annotate(**self.get_annotation(cf, ordering_aggregates[cf]))
-                    _ordering.append(f + '_a')
+                    _ordering.append(f'{flt}_a')
+
                 else:
-                    _ordering.append(f)
+                    _ordering.append(flt)
 
             return queryset.order_by(*_ordering)
 
@@ -40,10 +45,10 @@ class DalmeOrderingFilter(OrderingFilter):
 
     @staticmethod
     def get_annotation(key, para):
-        return {key + '_a': eval(para['function'] + '(\'' + para['expression'] + '\')')}
+        """Return annotation expression."""
+        return {f'{key}_a': eval(f"{para['function']}('{para['expression']}')")}  # noqa: PGH001
 
     @staticmethod
     def clean_field(field):
-        if field.startswith('-'):
-            field = field[1:]
-        return field
+        """Return clean field."""
+        return field[1:] if field.startswith('-') else field

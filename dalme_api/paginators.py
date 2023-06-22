@@ -1,15 +1,17 @@
+from collections import OrderedDict
+from contextlib import suppress
+
 from rest_framework.pagination import LimitOffsetPagination, _positive_int
 from rest_framework.response import Response
-from collections import OrderedDict
 
 
 class DALMELimitOffsetPagination(LimitOffsetPagination):
-    """ Subclasses LimitOffsetPagination to add metadata to
-    response if requested """
+    """Subclasses LimitOffsetPagination to add metadata to response if requested."""
 
     total_count = None
 
-    def paginate_queryset(self, queryset, request, view=None):
+    def paginate_queryset(self, queryset, request, view=None):  # noqa: ARG002
+        """Paginate the passed queryset."""
         self.limit = self.get_limit(request)
         self.total_count = self.get_count(queryset)
         self.count = self.get_count(queryset)
@@ -24,9 +26,10 @@ class DALMELimitOffsetPagination(LimitOffsetPagination):
         if self.count == 0 or self.offset > self.count:
             return []
 
-        return list(queryset[self.offset:self.offset + self.limit])
+        return list(queryset[self.offset : self.offset + self.limit])
 
     def get_paginated_response(self, data_object):
+        """Return paginated response object."""
         try:
             data, queryset, instance = data_object
         except ValueError:
@@ -38,7 +41,7 @@ class DALMELimitOffsetPagination(LimitOffsetPagination):
         response_obj = [
             ('recordsFiltered', self.count),
             ('recordsTotal', self.total_count),
-            ('data', data)
+            ('data', data),
         ]
 
         if self.request.GET.get('meta') is not None and instance is not None:
@@ -47,14 +50,9 @@ class DALMELimitOffsetPagination(LimitOffsetPagination):
         return Response(OrderedDict(response_obj))
 
     def get_limit(self, request):
+        """Return page limit."""
         if self.limit_query_param:
-            try:
-                return _positive_int(
-                    request.query_params[self.limit_query_param],
-                    strict=False,
-                    cutoff=self.max_limit
-                )
-            except (KeyError, ValueError):
-                pass
+            with suppress(KeyError, ValueError):
+                return _positive_int(request.query_params[self.limit_query_param], strict=False, cutoff=self.max_limit)
 
         return self.default_limit
