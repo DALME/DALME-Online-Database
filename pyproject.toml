@@ -5,6 +5,7 @@ ignore = [
   "D100",   # missing docstring in public module
   "D104",   # missing docstring in public package
   "FBT002", # boolean default in function definition
+  "RUF012", # mutable-class-default annotated with ClassVar
 ]
 ignore-init-module-imports = true
 line-length = 120 # to match black's config
