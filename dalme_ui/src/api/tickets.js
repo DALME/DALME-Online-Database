@@ -5,9 +5,7 @@ const endpoint = `${apiUrl}/tickets`;
 
 const tickets = {
   getTickets(query = false) {
-    const url = query
-      ? `${endpoint}/?${query}`
-      : `${endpoint}/?limit=0&offset=0`;
+    const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=0&offset=0`;
     return {
       url: url,
       method: "GET",

@@ -74,17 +74,12 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   setup(props) {
     const options = ref(null);
 
-    const { errorMessage, handleBlur, meta, value } = useField(
-      props.field,
-      props.validation,
-    );
+    const { errorMessage, handleBlur, meta, value } = useField(props.field, props.validation);
 
     const handleOptions = async (val, update) => {
       // TODO: Depending on whether or not FormVueLate is controlling the field,

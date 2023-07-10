@@ -9,11 +9,7 @@
       >
         <template v-slot:title>
           {{ entry.title }}
-          <DetailPopover
-            v-if="!entry.isStage"
-            showAvatar
-            :userData="entry.user"
-          />
+          <DetailPopover v-if="!entry.isStage" showAvatar :userData="entry.user" />
         </template>
       </q-timeline-entry>
     </template>
@@ -61,9 +57,7 @@ export default defineComponent({
       ) {
         return "In progress";
       } else {
-        return props.data[`${workflowStagesById[stageId]}Done`]
-          ? "Completed"
-          : "Pending";
+        return props.data[`${workflowStagesById[stageId]}Done`] ? "Completed" : "Pending";
       }
     };
 
@@ -80,14 +74,10 @@ export default defineComponent({
         text = "Record created by";
       } else if (entry.event.startsWith("public")) {
         stage = "publication";
-        text = entry.event.endsWith("True")
-          ? "Record published by"
-          : "Record unpublished by";
+        text = entry.event.endsWith("True") ? "Record published by" : "Record unpublished by";
       } else if (entry.event.startsWith("help")) {
         stage = "help";
-        text = entry.event.endsWith("True")
-          ? "Help flag raised by"
-          : "Help flag dismissed by";
+        text = entry.event.endsWith("True") ? "Help flag raised by" : "Help flag dismissed by";
       } else if (entry.event.startsWith("status")) {
         if (entry.event.endsWith("assessing")) {
           stage = "assessing";
@@ -113,12 +103,9 @@ export default defineComponent({
           title: "Ingestion",
           subtitle: getStageState(1),
           icon: workflowIconbyStage[1],
-          timestamp: notNully(eventLog)
-            ? new Date(eventLog[0].timestamp)
-            : null,
+          timestamp: notNully(eventLog) ? new Date(eventLog[0].timestamp) : null,
           isStage: true,
-          colour:
-            workflowTagColours[S(getStageState(1)).underscore().s]["text"],
+          colour: workflowTagColours[S(getStageState(1)).underscore().s]["text"],
         },
       ];
 
@@ -133,10 +120,7 @@ export default defineComponent({
               icon: workflowIconbyStage[stageId],
               timestamp: new Date(entry.timestamp),
               isStage: true,
-              colour:
-                workflowTagColours[S(getStageState(stageId)).underscore().s][
-                  "text"
-                ],
+              colour: workflowTagColours[S(getStageState(stageId)).underscore().s]["text"],
             });
             stageControl.push(stage);
           }
@@ -147,10 +131,7 @@ export default defineComponent({
             timestamp: new Date(entry.timestamp),
             isStage: false,
             user: entry.user,
-            colour:
-              workflowTagColours[S(getStageState(stageId)).underscore().s][
-                "text"
-              ],
+            colour: workflowTagColours[S(getStageState(stageId)).underscore().s]["text"],
           });
         } else {
           log.push({
@@ -173,10 +154,7 @@ export default defineComponent({
             subtitle: getStageState(stageId),
             icon: workflowIconbyStage[stageId],
             isStage: true,
-            colour:
-              workflowTagColours[S(getStageState(stageId)).underscore().s][
-                "text"
-              ],
+            colour: workflowTagColours[S(getStageState(stageId)).underscore().s]["text"],
           });
           stageControl.push(stageName);
         }

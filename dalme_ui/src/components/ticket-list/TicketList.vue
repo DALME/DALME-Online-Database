@@ -31,9 +31,7 @@
       >
         <q-list bordered separator class="text-grey-9">
           <q-item dense class="q-pr-sm">
-            <q-item-section class="text-weight-bold">
-              Filter by Tag
-            </q-item-section>
+            <q-item-section class="text-weight-bold"> Filter by Tag </q-item-section>
             <q-item-section avatar>
               <q-btn
                 flat
@@ -58,11 +56,7 @@
               @click="onChangeFilterTags(tag)"
             >
               <q-item-section side>
-                <q-icon
-                  name="circle"
-                  :color="ticketTagColours[tag]['text']"
-                  size="xs"
-                />
+                <q-icon name="circle" :color="ticketTagColours[tag]['text']" size="xs" />
               </q-item-section>
               <q-item-section>
                 {{ tag }}
@@ -72,24 +66,22 @@
         </q-list>
       </q-btn-dropdown>
       <ChooserWidget
-        showHeader
-        toggleIcon
-        showSelectedItem
+        header="Filter by Author"
+        toggle
+        show-selected
         label="Author"
-        headerText="Filter by Author"
         target="users"
-        @itemChosen="setAuthor"
-        :clearFilters="onClearFilters"
+        @item-chosen="setAuthor"
+        :clear-filters="onClearFilters"
       />
       <ChooserWidget
-        showHeader
-        toggleIcon
-        showSelectedItem
+        header="Filter by Assignee"
+        toggle
+        show-selected
         label="Assignee"
-        headerText="Filter by Assignee"
         target="users"
-        @itemChosen="setAssignee"
-        :clearFilters="onClearFilters"
+        @item-chosen="setAssignee"
+        :clear-filters="onClearFilters"
       />
     </template>
 
@@ -133,18 +125,11 @@
     <template v-slot:grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
         <span
-          v-text="
-            `#${props.row.id} opened ${formatDate(
-              props.row.creationTimestamp,
-              false,
-            )} by `
-          "
+          v-text="`#${props.row.id} opened ${formatDate(props.row.creationTimestamp, false)} by `"
         />
         <DetailPopover showAvatar :userData="props.row.creationUser" />
         <template v-if="props.row.status && props.row.closingUser">
-          <span
-            v-text="`, closed ${formatDate(props.row.closingDate, false)} by `"
-          />
+          <span v-text="`, closed ${formatDate(props.row.closingDate, false)} by `" />
           <DetailPopover :userData="props.row.closingUser" />
         </template>
       </div>
@@ -157,10 +142,7 @@
         v-if="props.row.commentCount"
         class="text-weight-bold q-mr-xs"
       />
-      <div
-        v-if="props.row.commentCount"
-        class="text-grey-8 text-weight-bold text-detail"
-      >
+      <div v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </div>
     </template>
@@ -237,10 +219,7 @@
         v-if="props.row.commentCount"
         class="text-weight-bold q-mr-xs"
       />
-      <span
-        v-if="props.row.commentCount"
-        class="text-grey-8 text-weight-bold text-detail"
-      >
+      <span v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </span>
     </template>
@@ -257,21 +236,10 @@ import { useRoute } from "vue-router";
 import { filter as rFilter } from "ramda";
 import { defineComponent, provide, ref } from "vue";
 import { requests } from "@/api";
-import {
-  ChooserWidget,
-  DataTable,
-  DetailPopover,
-  TagWidget,
-} from "@/components";
+import { ChooserWidget, DataTable, DetailPopover, TagWidget } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { ticketListSchema } from "@/schemas";
-import {
-  useAPI,
-  useConstants,
-  useEditing,
-  usePagination,
-  useStores,
-} from "@/use";
+import { useAPI, useConstants, useEditing, usePagination, useStores } from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
@@ -313,15 +281,13 @@ export default defineComponent({
         : requests.tickets.getTickets(query);
       await fetchAPI(request);
       if (success.value)
-        await ticketListSchema
-          .validate(data.value.data, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns(columnMap);
-            pagination.value.rowsNumber = data.value.recordsFiltered;
-            pagination.value.rowsTotal = data.value.recordsTotal;
-            rows.value = value;
-            loading.value = false;
-          });
+        await ticketListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns(columnMap);
+          pagination.value.rowsNumber = data.value.filtered;
+          pagination.value.rowsTotal = data.value.count;
+          rows.value = value;
+          loading.value = false;
+        });
     };
 
     const {
@@ -336,12 +302,7 @@ export default defineComponent({
       pagination,
       search,
       visibleColumns,
-    } = usePagination(
-      fetchData,
-      $route.name,
-      getDefaults(columnMap),
-      props.embedded,
-    );
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap), props.embedded);
 
     const setAuthor = (value) => {
       onChangeFilters({

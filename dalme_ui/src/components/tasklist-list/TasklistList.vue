@@ -13,14 +13,7 @@
       <q-item dense class="q-pr-sm">
         <q-item-section class="text-weight-bold">Task lists</q-item-section>
         <q-item-section avatar>
-          <q-btn
-            flat
-            dense
-            size="xs"
-            color="grey-6"
-            icon="close"
-            @click="clearActiveFilters"
-          />
+          <q-btn flat dense size="xs" color="grey-6" icon="close" @click="clearActiveFilters" />
         </q-item-section>
       </q-item>
 
@@ -51,9 +44,7 @@
           :key="idx"
           :group="group"
           :list="taskList.name"
-          :active="
-            activeFilters && activeFilters.has(`${group}_${taskList.name}`)
-          "
+          :active="activeFilters && activeFilters.has(`${group}_${taskList.name}`)"
           class="q-pr-sm"
           active-class="text-weight-bold bg-indigo-1 text-indigo-5"
           @click.stop="filter"
@@ -80,11 +71,7 @@
                 class="q-ml-auto q-mr-xs strong-focus outlined-item"
                 @click.stop="handleEdit(taskList)"
               >
-                <TooltipWidget
-                  anchor="center left"
-                  self="center right"
-                  :offset="[10, 10]"
-                >
+                <TooltipWidget anchor="center left" self="center right" :offset="[10, 10]">
                   Edit task list
                 </TooltipWidget>
               </q-btn>
@@ -171,9 +158,7 @@ export default defineComponent({
       const { filter } = $router.currentRoute.value.query;
       const prevFilter = filter ? new Set(filter.split(",")) : new Set();
       const clicked = list ? `${group}_${list}` : group;
-      prevFilter.has(clicked)
-        ? prevFilter.delete(clicked)
-        : prevFilter.add(clicked);
+      prevFilter.has(clicked) ? prevFilter.delete(clicked) : prevFilter.add(clicked);
 
       if (list && prevFilter.has(group)) prevFilter.delete(group);
       if (group && !list) {
@@ -220,18 +205,16 @@ export default defineComponent({
         const { edit: editSchema } = forms.taskList;
         await fetchAPI(requests.tasks.getTaskList(id));
         if (success.value) {
-          await editSchema
-            .validate(data.value, { stripUnknown: true })
-            .then((value) => {
-              send("SPAWN_FORM", {
-                cuid: cuid(),
-                kind: "taskList",
-                mode: "update",
-                initialData: value,
-                key,
-              });
-              showEditing.value();
+          await editSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+            send("SPAWN_FORM", {
+              cuid: cuid(),
+              kind: "taskList",
+              mode: "update",
+              initialData: value,
+              key,
             });
+            showEditing.value();
+          });
         }
       }
     };

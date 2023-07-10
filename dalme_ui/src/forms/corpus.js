@@ -1,12 +1,7 @@
 import { markRaw } from "vue";
 
 import { requests } from "@/api";
-import {
-  AttributesField,
-  InputField,
-  SelectField,
-  TextField,
-} from "@/components/forms";
+import { AttributesField, InputField, SelectField, TextField } from "@/components/forms";
 import { permissionOptions } from "@/forms/constants";
 import {
   attributeValidators,

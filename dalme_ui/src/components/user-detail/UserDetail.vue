@@ -9,76 +9,58 @@
             </q-item-section>
             <q-item-section>
               <q-item-label class="text-subtitle2">
-                {{ user.profile.fullName || "Profile" }}
+                {{ user.fullName || "Profile" }}
               </q-item-label>
             </q-item-section>
           </q-item>
           <q-separator class="bg-indigo-3" />
           <q-card-section>
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                First Name
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">First Name</div>
               <div class="col-8">{{ user.firstName }}</div>
             </div>
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                Last Name
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">Last Name</div>
               <div class="col-8">{{ user.lastName }}</div>
             </div>
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                User ID
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">User ID</div>
               <div class="col-8">{{ user.id }}</div>
             </div>
 
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                Staff
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">Staff</div>
               <div class="col-8">
                 <BooleanWidget :value="user.isStaff" size="20px" />
               </div>
             </div>
 
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                Superuser
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">Superuser</div>
               <div class="col-8">
                 <BooleanWidget :value="user.isSuperuser" size="20px" />
               </div>
             </div>
 
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                Active
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">Active</div>
               <div class="col-8">
                 <BooleanWidget :value="user.isActive" size="20px" />
               </div>
             </div>
 
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                Joined
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">Joined</div>
               <div class="col-6">{{ user.dateJoined }}</div>
             </div>
 
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                Last login
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">Last login</div>
               <div class="col-8">{{ user.lastLogin }}</div>
             </div>
 
             <div class="row q-mt-xs">
-              <div class="col-3 text-weight-medium text-right q-mr-lg">
-                Groups
-              </div>
+              <div class="col-3 text-weight-medium text-right q-mr-lg">Groups</div>
               <div class="col-8" v-html="formatGroups(user.groups)"></div>
             </div>
           </q-card-section>
@@ -86,9 +68,7 @@
       </div>
       <div class="col-12 col-md-3">
         <q-card flat bordered class="detail-card full-height bg-grey-2">
-          <q-card-section
-            class="justify-center content-center q-pa-none full-height"
-          >
+          <q-card-section class="justify-center content-center q-pa-none full-height">
             <q-img
               v-if="user.avatar"
               :src="user.avatar"
@@ -160,18 +140,15 @@ export default defineComponent({
 
     useMeta({ title: `User | ${username}` });
 
-    const formatGroups = (groups) =>
-      map((group) => group.name, groups).join("<br>");
+    const formatGroups = (groups) => map((group) => group.name, groups).join("<br>");
 
     const fetchData = async () => {
       await fetchAPI(requests.users.getUser(username));
       if (success.value)
-        await userSchema
-          .validate(data.value[0], { stripUnknown: true })
-          .then((value) => {
-            user.value = value;
-            loading.value = false;
-          });
+        await userSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          user.value = value;
+          loading.value = false;
+        });
     };
 
     onMounted(async () => await fetchData());

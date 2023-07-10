@@ -25,11 +25,7 @@
       />
     </div>
     <q-list separator>
-      <q-item
-        v-for="entry in diffs"
-        :key="entry.timestamp"
-        class="column q-px-sm"
-      >
+      <q-item v-for="entry in diffs" :key="entry.timestamp" class="column q-px-sm">
         <div>
           <code>{{ entry.snapshot }}</code>
         </div>
@@ -44,7 +40,7 @@
 </template>
 
 <script>
-import moment from "moment";
+import { DateTime } from "luxon";
 import { computed, defineComponent, watch } from "vue";
 import { useEditing, useStores, useTransport } from "@/use";
 
@@ -59,14 +55,10 @@ export default defineComponent({
     } = useEditing();
 
     const diffs = computed(() => transport.history.value.slice(0, -1));
-    const disableRedo = computed(() =>
-      transport.canRedo.value ? false : true,
-    );
+    const disableRedo = computed(() => (transport.canRedo.value ? false : true));
     const isFocus = computed(() => focus.value === "inline");
     const { inlineIndexShow } = useStores();
-    const fromUnixTs = (unixTs) =>
-      moment.unix(unixTs / 1000).format("YYYY-MM-DD HH:mm:ss");
-
+    const fromUnixTs = (unixTs) => DateTime.fromMillis(unixTs).toISO();
     const handleFocus = () => send("SET_FOCUS", { value: "inline" });
 
     watch(

@@ -70,12 +70,8 @@
 
     <template v-slot:grid-detail="props">
       <div class="text-detail text-weight-medium text-grey-8">
-        <span
-          v-text="
-            `Created ${formatDate(props.row.creationTimestamp, false)} by `
-          "
-        />
-        <DetailPopover showAvatar :userData="props.row.creationUser" />
+        <span v-text="`Created ${formatDate(props.row.creationTimestamp, false)} by `" />
+        <!-- <DetailPopover showAvatar :userData="props.row.creationUser" /> -->
         <span
           v-if="props.row.completed && props.row.completedDate"
           v-text="`, completed ${formatDate(props.row.completedDate, false)}`"
@@ -90,10 +86,7 @@
         size="17px"
         class="text-weight-bold q-mr-xs"
       />
-      <div
-        v-if="props.row.commentCount"
-        class="text-grey-8 text-weight-bold text-detail"
-      >
+      <div v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </div>
     </template>
@@ -143,12 +136,7 @@ import { defineComponent, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { requests } from "@/api";
-import {
-  DataTable,
-  DetailPopover,
-  TagWidget,
-  TasklistList,
-} from "@/components";
+import { DataTable, DetailPopover, TagWidget, TasklistList } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { taskListsSchema, tasksSchema } from "@/schemas";
 import { useAPI, usePagination, useEditing } from "@/use";
@@ -190,8 +178,7 @@ export default defineComponent({
       let filter = query.filter.split(",");
 
       const filters = map(
-        (taskList) =>
-          map((list) => `${list.group.name}_${list.name}`, taskList),
+        (taskList) => map((list) => `${list.group.name}_${list.name}`, taskList),
         taskLists,
       );
       const filterUnion = flatten([keys(filters), values(filters)]);
@@ -212,13 +199,10 @@ export default defineComponent({
 
       const filterByGroup = (group) => {
         const sublists = taskLists[group];
-        return new Set(
-          flatten(map((sublist) => values(sublist.taskIndex), sublists)),
-        );
+        return new Set(flatten(map((sublist) => values(sublist.taskIndex), sublists)));
       };
 
-      const filterByLists = (group, lists) =>
-        map((list) => filterByList(group, list), lists);
+      const filterByLists = (group, lists) => map((list) => filterByList(group, list), lists);
 
       const filterByList = (group, list) => {
         const sublist = taskLists[group].find((item) => list === item.name);
@@ -226,9 +210,7 @@ export default defineComponent({
       };
 
       const IDs = mapObjIndexed((lists, group) => {
-        return isEmpty(lists)
-          ? filterByGroup(group)
-          : filterByLists(group, lists);
+        return isEmpty(lists) ? filterByGroup(group) : filterByLists(group, lists);
       }, filterSpace);
 
       const merged = new Set();
@@ -265,21 +247,17 @@ export default defineComponent({
         : requests.tasks.getTasks(query);
       await fetchAPI(request);
       if (success.value)
-        await tasksSchema
-          .validate(data.value.data, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns(columnMap);
-            pagination.value.rowsNumber = data.value.recordsFiltered;
-            pagination.value.rowsTotal = data.value.recordsTotal;
-            rows.value = value;
-            const query = $router.currentRoute.value.query;
-            taskLists.value !== undefined &&
-            !isEmpty(taskLists.value) &&
-            !isEmpty(query)
-              ? filterTasks(query, taskLists.value)
-              : (filteredRows.value = rows.value);
-            loading.value = false;
-          });
+        await tasksSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns(columnMap);
+          pagination.value.rowsNumber = data.value.filtered;
+          pagination.value.rowsTotal = data.value.count;
+          rows.value = value;
+          const query = $router.currentRoute.value.query;
+          taskLists.value !== undefined && !isEmpty(taskLists.value) && !isEmpty(query)
+            ? filterTasks(query, taskLists.value)
+            : (filteredRows.value = rows.value);
+          loading.value = false;
+        });
     };
 
     const fetchTaskLists = async () => {
@@ -287,12 +265,10 @@ export default defineComponent({
       const request = requests.tasks.getTaskLists();
       fetchAPI(request).then(() => {
         if (success.value)
-          taskListsSchema
-            .validate(data.value.data, { stripUnknown: true })
-            .then((value) => {
-              const grouped = groupBy((tasklist) => tasklist.group.name, value);
-              taskLists.value = grouped;
-            });
+          taskListsSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+            const grouped = groupBy((tasklist) => tasklist.teamLink.name, value);
+            taskLists.value = grouped;
+          });
       });
     };
 
@@ -308,12 +284,7 @@ export default defineComponent({
       pagination,
       search,
       visibleColumns,
-    } = usePagination(
-      fetchData,
-      $route.name,
-      getDefaults(columnMap),
-      props.embedded,
-    );
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap), props.embedded);
 
     provide("pagination", { pagination, fetchDataPaginated });
     provide("columns", columns);

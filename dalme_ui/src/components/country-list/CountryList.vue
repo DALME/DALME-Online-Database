@@ -43,15 +43,13 @@ export default defineComponent({
       const request = requests.countries.getCountries(query);
       await fetchAPI(request);
       if (success.value)
-        await countryListSchema
-          .validate(data.value.data, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns(columnMap);
-            pagination.value.rowsNumber = data.value.recordsFiltered;
-            pagination.value.rowsTotal = data.value.recordsTotal;
-            rows.value = value;
-            loading.value = false;
-          });
+        await countryListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns(columnMap);
+          pagination.value.rowsNumber = data.value.filtered;
+          pagination.value.rowsTotal = data.value.count;
+          rows.value = value;
+          loading.value = false;
+        });
     };
 
     const {

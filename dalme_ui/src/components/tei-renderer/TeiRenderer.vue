@@ -3,14 +3,7 @@
 </template>
 
 <script>
-import {
-  computed,
-  defineComponent,
-  nextTick,
-  onMounted,
-  ref,
-  watch,
-} from "vue";
+import { computed, defineComponent, nextTick, onMounted, ref, watch } from "vue";
 import { useConstants, useStores } from "@/use";
 import { notNully } from "@/utils";
 import CETEI from "CETEIcean";
@@ -77,21 +70,11 @@ export default defineComponent({
     };
 
     const processTei = (html) => {
-      hasBraces.value = Boolean(
-        html.querySelectorAll(teiSelectors.braces).length,
-      );
-      hasMarginalNotes.value = Boolean(
-        html.querySelectorAll(teiSelectors.marginalNotes).length,
-      );
-      hasRenvois.value = Boolean(
-        html.querySelectorAll(teiSelectors.renvois).length,
-      );
-      hasColumns.value = Boolean(
-        html.querySelectorAll(teiSelectors.columns).length,
-      );
-      hasLeaders.value = Boolean(
-        html.querySelectorAll(teiSelectors.leaders).length,
-      );
+      hasBraces.value = Boolean(html.querySelectorAll(teiSelectors.braces).length);
+      hasMarginalNotes.value = Boolean(html.querySelectorAll(teiSelectors.marginalNotes).length);
+      hasRenvois.value = Boolean(html.querySelectorAll(teiSelectors.renvois).length);
+      hasColumns.value = Boolean(html.querySelectorAll(teiSelectors.columns).length);
+      hasLeaders.value = Boolean(html.querySelectorAll(teiSelectors.leaders).length);
       applyFixes(html).then((result) => {
         renderedContent.value = result.outerHTML;
       });
@@ -118,9 +101,7 @@ export default defineComponent({
             el.style.top = `${Math.round(el.getBoundingClientRect().top)}px`;
             notesContainer.append(el);
           });
-          notesContainer.style.height = `${
-            html.querySelector("tei-text").offsetHeight
-          }px`;
+          notesContainer.style.height = `${html.querySelector("tei-text").offsetHeight}px`;
           // $('#transcription').on('scroll', function (e) {
           //   $('#notebar').scrollTop($(this).scrollTop());
           // });

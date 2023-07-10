@@ -9,13 +9,7 @@ import {
   sourceSubmitSchemas,
 } from "@/schemas";
 
-const resourceAttributes = [
-  "defaultRights",
-  "email",
-  "locale",
-  "streetAddress",
-  "url",
-];
+const resourceAttributes = ["defaultRights", "email", "locale", "streetAddress", "url"];
 
 const requiredAttributes = ["locale"];
 
@@ -24,16 +18,14 @@ const archiveFormSchema = {
     field: "name",
     component: markRaw(InputField),
     label: "Name *",
-    description:
-      "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
+    description: "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
     validation: archiveFieldValidation.name,
   },
   shortName: {
     field: "shortName",
     component: markRaw(InputField),
     label: "Short name *",
-    description:
-      "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
+    description: "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
     validation: archiveFieldValidation.shortName,
   },
   attributes: {
@@ -50,10 +42,8 @@ const archiveFormSchema = {
 const sourceType = { id: 19 }; // TODO: Magic number.
 const archiveRequests = {
   get: (id) => requests.sources.getSource(id),
-  create: (data) =>
-    requests.sources.createSource({ type: sourceType, ...data }),
-  update: ({ id, ...data }) =>
-    requests.sources.editSource(id, { type: sourceType, ...data }),
+  create: (data) => requests.sources.createSource({ type: sourceType, ...data }),
+  update: ({ id, ...data }) => requests.sources.editSource(id, { type: sourceType, ...data }),
 };
 
 export default {

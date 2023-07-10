@@ -42,11 +42,7 @@ export default defineComponent({
     const submitSchema = ref(null);
 
     const { apiInterface } = useAPI();
-    const { formWatcher } = useDynamicForm(
-      formRequest,
-      formSchema,
-      submitSchema,
-    );
+    const { formWatcher } = useDynamicForm(formRequest, formSchema, submitSchema);
     const {
       forms,
       formSubmitWatcher,
@@ -60,17 +56,10 @@ export default defineComponent({
 
     const kind = useSelector(actor, (state) => state.context.kind);
     const mode = useSelector(actor, (state) => state.context.mode);
-    const initialData = useSelector(
-      actor,
-      (state) => state.context.initialData,
-    );
+    const initialData = useSelector(actor, (state) => state.context.initialData);
 
     const fieldsKey = `form-fields:${props.cuid}`;
-    const formModel = useStorage(
-      fieldsKey,
-      initialData.value || {},
-      localStorage,
-    );
+    const formModel = useStorage(fieldsKey, initialData.value || {}, localStorage);
 
     const handleSubmit = async (postSubmitRefresh) => {
       await submitSchema.value

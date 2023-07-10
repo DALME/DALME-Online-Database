@@ -49,9 +49,7 @@ const setExtent = (e) => {
     } else if (unit.startsWith("line") || unit.startsWith("page")) {
       if (quantity) {
         let qual = tagName === "SPACE" ? " blank " : " ";
-        content = reason
-          ? `${quantity} ${unit} (${reason})`
-          : `${quantity}${qual}${unit}`;
+        content = reason ? `${quantity} ${unit} (${reason})` : `${quantity}${qual}${unit}`;
       } else {
         content = extent;
       }
@@ -109,6 +107,7 @@ export const dalmeTeiBehaviours = {
           content.setAttribute("n", colNum);
           content.innerHTML = e.innerHTML;
           const div = document.createElement("div");
+          // eslint-disable-next-line max-len
           div.innerHTML = `<div><span class="label">C${colNum}</span><i class="fa fa-caret-down"></i><i class="fa fa-caret-right"></i></div>`;
           div.className = "ab-column-toggler";
           e.innerHTML = "";

@@ -1,12 +1,7 @@
 <template>
   <q-page>
     <template v-for="(modal, cuid) in modals" :key="cuid">
-      <FormModal
-        v-if="modal.kind === 'form'"
-        :cuid="cuid"
-        :x-pos="xPos"
-        :y-pos="yPos"
-      />
+      <FormModal v-if="modal.kind === 'form'" :cuid="cuid" :x-pos="xPos" :y-pos="yPos" />
       <FolioModal v-else :cuid="cuid" :x-pos="xPos" :y-pos="yPos" />
     </template>
     <slot></slot>

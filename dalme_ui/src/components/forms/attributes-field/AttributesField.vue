@@ -3,9 +3,7 @@
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
         {{
-          !showing && modelValue !== [empty()]
-            ? `Attributes (${modelValue.length})`
-            : "Attributes"
+          !showing && modelValue !== [empty()] ? `Attributes (${modelValue.length})` : "Attributes"
         }}
       </div>
 
@@ -70,13 +68,9 @@
                 :use-input="true"
                 @clear="() => handleClearAttribute(idx)"
                 @filter="handleOptions"
-                @update:modelValue="
-                  (option) => handleUpdateAttribute(option, idx)
-                "
+                @update:modelValue="(option) => handleUpdateAttribute(option, idx)"
               >
-                <TooltipWidget
-                  v-if="data.attribute && data.attribute.description"
-                >
+                <TooltipWidget v-if="data.attribute && data.attribute.description">
                   {{ data.attribute.description }}
                 </TooltipWidget>
               </q-select>
@@ -133,17 +127,9 @@
                     v-model="data.value"
                     :field="`attributes[${idx}].value`"
                     :label="data.attribute.dataType"
-                    :filterable="
-                      getOptionsData(data.attribute.shortName).filterable
-                    "
-                    :getOptions="
-                      wrapRequest(
-                        getOptionsData(data.attribute.shortName).request,
-                      )
-                    "
-                    :optionsSchema="
-                      getOptionsData(data.attribute.shortName).schema
-                    "
+                    :filterable="getOptionsData(data.attribute.shortName).filterable"
+                    :getOptions="wrapRequest(getOptionsData(data.attribute.shortName).request)"
+                    :optionsSchema="getOptionsData(data.attribute.shortName).schema"
                     :validation="validators[data.attribute.shortName]"
                   />
                   <MultipleSelectField
@@ -151,17 +137,9 @@
                     v-model="data.value"
                     :field="`attributes[${idx}].value`"
                     :label="data.attribute.dataType"
-                    :filterable="
-                      getOptionsData(data.attribute.shortName).filterable
-                    "
-                    :getOptions="
-                      wrapRequest(
-                        getOptionsData(data.attribute.shortName).request,
-                      )
-                    "
-                    :optionsSchema="
-                      getOptionsData(data.attribute.shortName).schema
-                    "
+                    :filterable="getOptionsData(data.attribute.shortName).filterable"
+                    :getOptions="wrapRequest(getOptionsData(data.attribute.shortName).request)"
+                    :optionsSchema="getOptionsData(data.attribute.shortName).schema"
                     :validation="validators[data.attribute.shortName]"
                   />
                 </template>
@@ -176,10 +154,7 @@
               </template>
             </div>
 
-            <div
-              v-if="!required || modelValue.length > 1"
-              class="row items-center"
-            >
+            <div v-if="!required || modelValue.length > 1" class="row items-center">
               <q-btn
                 class="q-ml-auto"
                 flat
@@ -187,9 +162,7 @@
                 unelevated
                 size="xs"
                 icon="clear"
-                :text-color="
-                  isRequiredAttribute(data.attribute) ? 'grey' : 'black'
-                "
+                :text-color="isRequiredAttribute(data.attribute) ? 'grey' : 'black'"
                 :disable="isRequiredAttribute(data.attribute)"
                 @click.stop="handleRemoveField(idx)"
               >
@@ -213,14 +186,7 @@
 <script>
 import { isNil, filter as rFilter, map as rMap, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import {
-  computed,
-  defineComponent,
-  defineAsyncComponent,
-  onMounted,
-  ref,
-  unref,
-} from "vue";
+import { computed, defineComponent, defineAsyncComponent, onMounted, ref, unref } from "vue";
 import { string as yString } from "yup";
 
 import { fetcher, requests } from "@/api";
@@ -272,9 +238,7 @@ export default defineComponent({
     NumberField,
     SelectField,
     TextField,
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   setup(props, context) {
     const { apiInterface } = useAPI();
@@ -286,23 +250,16 @@ export default defineComponent({
     const optionCount = ref(null);
 
     const activeAttributes = computed(() =>
-      rMap(
-        (field) => (field.attribute ? field.attribute.id : null),
-        props.modelValue,
-      ),
+      rMap((field) => (field.attribute ? field.attribute.id : null), props.modelValue),
     );
 
     const isRequiredAttribute = (attribute) =>
-      !isNil(attribute) &&
-      props.required &&
-      props.required.includes(attribute.shortName);
+      !isNil(attribute) && props.required && props.required.includes(attribute.shortName);
 
     const getOptionsData = (shortName) => attributeFields[shortName].options;
 
     const wrapRequest = (request) =>
-      request
-        ? () => fetcher(request()).then((response) => response.json())
-        : null;
+      request ? () => fetcher(request()).then((response) => response.json()) : null;
 
     const handleAddField = () => {
       const newValue = [...unref(props.modelValue), empty()];
@@ -333,20 +290,18 @@ export default defineComponent({
         const request = requests.attributeTypes.getAttributeTypes();
         await fetchAPI(request);
         if (success.value)
-          await attributeTypesSchema
-            .validate(data.value, { stripUnknown: true })
-            .then((value) =>
-              update(() => {
-                options.value = Object.freeze(
-                  value.filter(
-                    (option) =>
-                      props.allowed.includes(option.shortName) &&
-                      !activeAttributes.value.includes(option.id),
-                  ),
-                );
-                optionCount.value = value.length;
-              }),
-            );
+          await attributeTypesSchema.validate(data.value, { stripUnknown: true }).then((value) =>
+            update(() => {
+              options.value = Object.freeze(
+                value.filter(
+                  (option) =>
+                    props.allowed.includes(option.shortName) &&
+                    !activeAttributes.value.includes(option.id),
+                ),
+              );
+              optionCount.value = value.length;
+            }),
+          );
       }
 
       update(() => {
@@ -370,10 +325,7 @@ export default defineComponent({
         const newValue = rFilter(
           ({ attribute }) => props.allowed.includes(attribute.shortName),
           unref(props.modelValue),
-        ).sort(
-          (x, y) =>
-            isRequiredAttribute(y.attribute) - isRequiredAttribute(x.attribute),
-        );
+        ).sort((x, y) => isRequiredAttribute(y.attribute) - isRequiredAttribute(x.attribute));
         replace(newValue);
         context.emit("update:modelValue", newValue);
       } else {
@@ -386,12 +338,10 @@ export default defineComponent({
           await fetchAPI(request);
           if (success.value)
             await attributeTypesSchema
-              .validate(data.value, { stripUnknown: true })
+              .validate(data.value.data, { stripUnknown: true })
               .then((value) => {
                 let newValue = unref(props.modelValue);
-                const initial = new Set(
-                  rMap((field) => field.attribute, newValue),
-                );
+                const initial = new Set(rMap((field) => field.attribute, newValue));
                 for (const attribute of value) {
                   if (
                     !activeAttributes.value.includes(attribute.id) &&

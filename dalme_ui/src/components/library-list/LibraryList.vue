@@ -13,13 +13,7 @@
         row-key="id"
       >
         <template v-slot:top-right>
-          <q-input
-            borderless
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Search"
-          >
+          <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
             <template v-slot:append>
               <q-icon name="search" />
             </template>
@@ -84,8 +78,7 @@ export default defineComponent({
 
     const formatCreators = (creators) =>
       map(
-        (creator) =>
-          `${creator.creatorType}: ${creator.firstName} ${creator.lastName}`,
+        (creator) => `${creator.creatorType}: ${creator.firstName} ${creator.lastName}`,
         creators,
       ).join(", ");
 
@@ -93,13 +86,11 @@ export default defineComponent({
       const request = requests.library.getLibrary();
       await fetchAPI(request);
       if (success.value)
-        await libraryListSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns();
-            rows.value = value;
-            loading.value = false;
-          });
+        await libraryListSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns();
+          rows.value = value;
+          loading.value = false;
+        });
     };
 
     onMounted(async () => await fetchData());

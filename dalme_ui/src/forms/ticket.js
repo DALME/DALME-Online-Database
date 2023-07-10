@@ -1,11 +1,6 @@
 import { markRaw } from "vue";
 import { fetcher, requests } from "@/api";
-import {
-  InputField,
-  MultipleSelectField,
-  SelectField,
-  TextField,
-} from "@/components/forms";
+import { InputField, MultipleSelectField, SelectField, TextField } from "@/components/forms";
 import { statusOptions, ticketTagOptions } from "@/forms/constants";
 import {
   ticketTagOptionsSchema,
@@ -13,7 +8,7 @@ import {
   ticketFieldValidation,
   ticketSubmitSchemas,
   ticketStatusOptionsSchema,
-  userOptionsSchema,
+  usersAsOptionsSchema,
 } from "@/schemas";
 
 const ticketFormSchema = {
@@ -45,9 +40,8 @@ const ticketFormSchema = {
     component: markRaw(SelectField),
     label: "Assigned to",
     description: "Who is responsible for the ticket.",
-    getOptions: () =>
-      fetcher(requests.users.getUsers()).then((response) => response.json()),
-    optionsSchema: userOptionsSchema,
+    getOptions: () => fetcher(requests.users.getUsers()).then((response) => response.json()),
+    optionsSchema: usersAsOptionsSchema,
     validation: ticketFieldValidation.assignedTo,
   },
   tags: {

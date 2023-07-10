@@ -1,18 +1,13 @@
 import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
-import {
-  DateField,
-  InputField,
-  SelectField,
-  TextField,
-} from "@/components/forms";
+import { DateField, InputField, SelectField, TextField } from "@/components/forms";
 import {
   taskEditSchema,
   taskFieldValidation,
   taskPutSchema,
   taskPostSchema,
-  userOptionsSchema,
+  usersAsOptionsSchema,
 } from "@/schemas";
 
 const taskFormSchema = {
@@ -35,10 +30,7 @@ const taskFormSchema = {
     component: markRaw(SelectField),
     label: "Task list *",
     description: "Designate the category the task is filed under.",
-    getOptions: () =>
-      fetcher(requests.tasks.getTaskLists()).then((response) =>
-        response.json(),
-      ),
+    getOptions: () => fetcher(requests.tasks.getTaskLists()).then((response) => response.json()),
     validation: taskFieldValidation.taskList,
   },
   assignedTo: {
@@ -46,9 +38,8 @@ const taskFormSchema = {
     component: markRaw(SelectField),
     label: "Assigned to",
     description: "Who is responsible for the task.",
-    getOptions: () =>
-      fetcher(requests.users.getUsers()).then((response) => response.json()),
-    optionsSchema: userOptionsSchema,
+    getOptions: () => fetcher(requests.users.getUsers()).then((response) => response.json()),
+    optionsSchema: usersAsOptionsSchema,
     validation: taskFieldValidation.assignedTo,
   },
   dueDate: {

@@ -7,13 +7,7 @@
       <q-item-section>
         <q-item-label class="text-subtitle2">
           {{ title }}
-          <q-badge
-            v-if="badgeValue"
-            rounded
-            color="purple-4"
-            align="middle"
-            label="badgeValue"
-          />
+          <q-badge v-if="badgeValue" rounded color="purple-4" align="middle" label="badgeValue" />
         </q-item-label>
       </q-item-section>
       <template v-if="showFilter">
@@ -32,12 +26,7 @@
           color="blue-9"
         >
           <template v-slot:append>
-            <q-icon
-              v-if="cardFilter === ''"
-              name="search"
-              color="blue-grey-5"
-              size="14px"
-            />
+            <q-icon v-if="cardFilter === ''" name="search" color="blue-grey-5" size="14px" />
             <q-icon
               v-else
               name="highlight_off"

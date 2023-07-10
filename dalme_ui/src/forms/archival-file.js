@@ -31,16 +31,14 @@ const archivalFileFormSchema = {
     field: "name",
     component: markRaw(InputField),
     label: "Name *",
-    description:
-      "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
+    description: "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
     validation: archivalFileFieldValidation.name,
   },
   shortName: {
     field: "shortName",
     component: markRaw(InputField),
     label: "Short name *",
-    description:
-      "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
+    description: "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
     validation: archivalFileFieldValidation.shortName,
   },
   parent: {
@@ -48,10 +46,11 @@ const archivalFileFormSchema = {
     component: markRaw(SelectField),
     label: "Parent",
     description:
+      // eslint-disable-next-line max-len
       "Parent record, if applicable, eg: a book for a book chapter, an archival unit for a record, etc.",
     getOptions: () =>
-      fetcher(requests.sources.getSourceOptionsByType("archivalFile")).then(
-        (response) => response.json(),
+      fetcher(requests.sources.getSourceOptionsByType("archivalFile")).then((response) =>
+        response.json(),
       ),
     optionsSchema: sourceOptionsSchema,
     validation: archivalFileFieldValidation.parent,
@@ -61,10 +60,7 @@ const archivalFileFormSchema = {
     component: markRaw(SelectField),
     label: "Primary dataset",
     description: "Dataset used to assign permissions.",
-    getOptions: () =>
-      fetcher(requests.sets.getSetsByType(3)).then((response) =>
-        response.json(),
-      ),
+    getOptions: () => fetcher(requests.sets.getSetsByType(3)).then((response) => response.json()),
     optionsSchema: setOptionsSchema,
     validation: archivalFileFieldValidation.primaryDataset,
   },

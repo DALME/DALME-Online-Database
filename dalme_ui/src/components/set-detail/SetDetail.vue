@@ -33,27 +33,21 @@
           </div>
 
           <div class="row q-my-xs" v-if="!isNil(set.isPublic)">
-            <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Public
-            </div>
+            <div class="col-2 text-weight-medium text-right q-mr-lg">Public</div>
             <div class="col-8">
               <q-icon :name="set.isPublic ? 'done' : 'close'" size="xs" />
             </div>
           </div>
 
           <div class="row q-my-xs" v-if="!isNil(set.hasLanding)">
-            <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Has landing
-            </div>
+            <div class="col-2 text-weight-medium text-right q-mr-lg">Has landing</div>
             <div class="col-8">
               <q-icon :name="set.hasLanding ? 'done' : 'close'" size="xs" />
             </div>
           </div>
 
           <div class="row q-my-xs">
-            <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Endpoint
-            </div>
+            <div class="col-2 text-weight-medium text-right q-mr-lg">Endpoint</div>
             <div class="col-8">{{ set.endpoint }}</div>
           </div>
 
@@ -72,30 +66,22 @@
           </div>
 
           <div class="row q-my-xs" v-if="set.permissions">
-            <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Permissions
-            </div>
+            <div class="col-2 text-weight-medium text-right q-mr-lg">Permissions</div>
             <div class="col-8">{{ set.permissions.name }}</div>
           </div>
 
           <div class="row q-my-xs" v-if="!isNil(set.description)">
-            <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Description
-            </div>
+            <div class="col-2 text-weight-medium text-right q-mr-lg">Description</div>
             <div class="col-8">{{ set.description }}</div>
           </div>
 
           <div class="row q-my-xs" v-if="!isNil(set.statTitle)">
-            <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Stat Title
-            </div>
+            <div class="col-2 text-weight-medium text-right q-mr-lg">Stat Title</div>
             <div class="col-8">{{ set.statTitle }}</div>
           </div>
 
           <div class="row q-my-xs" v-if="!isNil(set.statText)">
-            <div class="col-2 text-weight-medium text-right q-mr-lg">
-              Stat Text
-            </div>
+            <div class="col-2 text-weight-medium text-right q-mr-lg">Stat Text</div>
             <div class="col-8">{{ set.statText }}</div>
           </div>
         </q-card-section>
@@ -103,21 +89,11 @@
 
       <q-card class="q-ma-md q-pa-md" v-if="isWorkset">
         <div class="row q-my-xs" v-if="!isNil(set.worksetProgress)">
-          <div class="col-2 text-weight-medium text-right q-mr-lg">
-            Progress
-          </div>
+          <div class="col-2 text-weight-medium text-right q-mr-lg">Progress</div>
           <div class="col-8">
-            <q-linear-progress
-              size="20px"
-              :value="set.worksetProgress"
-              color="teal"
-            >
+            <q-linear-progress size="20px" :value="set.worksetProgress" color="teal">
               <div class="absolute-full flex flex-center">
-                <q-badge
-                  color="white"
-                  text-color="teal"
-                  :label="`${set.worksetProgress * 100}%`"
-                />
+                <q-badge color="white" text-color="teal" :label="`${set.worksetProgress * 100}%`" />
               </div>
             </q-linear-progress>
           </div>
@@ -125,10 +101,7 @@
       </q-card>
 
       <q-card class="q-ma-md" v-if="hasMembers">
-        <SetMembers
-          :memberCount="set.memberCount"
-          :publicMemberCount="set.publicMemberCount"
-        />
+        <SetMembers :memberCount="set.memberCount" :publicMemberCount="set.publicMemberCount" />
       </q-card>
     </q-tab-panel>
   </div>
@@ -164,9 +137,7 @@ export default defineComponent({
     const hasMembers = computed(
       () => set.value.memberCount !== undefined && set.value.memberCount > 0,
     );
-    const isWorkset = computed(
-      () => set.value.setType && set.value.setType.name === "Workset",
-    );
+    const isWorkset = computed(() => set.value.setType && set.value.setType.name === "Workset");
 
     useMeta(() => ({
       title: set.value ? set.value.name : `Set ${id.value}`,
@@ -175,14 +146,12 @@ export default defineComponent({
     const fetchData = async () => {
       await fetchAPI(requests.sets.getSet(id.value));
       if (success.value)
-        await setDetailSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            resource.value = value.setType.name.toLowerCase();
-            set.value = value;
-            $navStore.currentSubsection = value.setType.name + "s";
-            loading.value = false;
-          });
+        await setDetailSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          resource.value = value.setType.name.toLowerCase();
+          set.value = value;
+          $navStore.currentSubsection = value.setType.name + "s";
+          loading.value = false;
+        });
     };
 
     provide("id", id);

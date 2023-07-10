@@ -8,7 +8,7 @@ import {
   CreditsField,
   FoliosField,
   InputField,
-  MultipleSelectField,
+  // MultipleSelectField,
   SelectField,
 } from "@/components/forms";
 import {
@@ -18,7 +18,6 @@ import {
   folioValidators,
   recordEditSchema,
   recordFieldValidation,
-  setOptionsSchema,
   sourceOptionsSchema,
   sourceSubmitSchemas,
 } from "@/schemas";
@@ -45,16 +44,14 @@ const recordFormSchema = {
     field: "name",
     component: markRaw(InputField),
     label: "Name *",
-    description:
-      "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
+    description: "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
     validation: recordFieldValidation.name,
   },
   shortName: {
     field: "shortName",
     component: markRaw(InputField),
     label: "Short name *",
-    description:
-      "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
+    description: "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
     validation: recordFieldValidation.shortName,
   },
   hasInventory: {
@@ -69,24 +66,25 @@ const recordFormSchema = {
     component: markRaw(SelectField),
     label: "Parent",
     description:
+      // eslint-disable-next-line max-len
       "Parent record, if applicable, eg: a book for a book chapter, an archival unit for a record, etc.",
     getOptions: () =>
-      fetcher(requests.sources.getSourceOptionsByType("record")).then(
-        (response) => response.json(),
+      fetcher(requests.sources.getSourceOptionsByType("record")).then((response) =>
+        response.json(),
       ),
     optionsSchema: sourceOptionsSchema,
     validation: recordFieldValidation.parent,
   },
-  sets: {
-    field: "sets",
-    component: markRaw(MultipleSelectField),
-    label: "Sets",
-    description: "The sets of which the source a member.",
-    getOptions: () =>
-      fetcher(requests.sets.getSets()).then((response) => response.json()),
-    optionsSchema: setOptionsSchema,
-    validation: recordFieldValidation.sets,
-  },
+  // sets: {
+  //   field: "sets",
+  //   component: markRaw(MultipleSelectField),
+  //   label: "Sets",
+  //   description: "The sets of which the source a member.",
+  //   getOptions: () =>
+  //     fetcher(requests.sets.getSets()).then((response) => response.json()),
+  //   optionsSchema: setOptionsSchema,
+  //   validation: recordFieldValidation.sets,
+  // },
   attributes: {
     field: "attributes",
     component: markRaw(AttributesField),
@@ -122,10 +120,8 @@ const recordFormSchema = {
 const sourceType = { id: 13 }; // TODO: Magic number.
 const recordRequests = {
   get: (id) => requests.sources.getSource(id),
-  create: (data) =>
-    requests.sources.createSource({ type: sourceType, ...data }),
-  update: ({ id, ...data }) =>
-    requests.sources.editSource(id, { type: sourceType, ...data }),
+  create: (data) => requests.sources.createSource({ type: sourceType, ...data }),
+  update: ({ id, ...data }) => requests.sources.editSource(id, { type: sourceType, ...data }),
 };
 
 export default {

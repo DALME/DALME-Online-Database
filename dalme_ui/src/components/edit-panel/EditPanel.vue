@@ -7,12 +7,7 @@
     @mouseover="showStrip = true"
     @mouseleave="showStrip = false"
   >
-    <TooltipWidget
-      anchor="center left"
-      self="center right"
-      text="Editing tools"
-      :offset="[5, 0]"
-    />
+    <TooltipWidget anchor="center left" self="center right" text="Editing tools" :offset="[5, 0]" />
     <q-icon name="more_vert" />
     <q-btn
       :icon="stripKeepOpen ? 'lock' : 'lock_open'"
@@ -42,11 +37,7 @@
     />
   </div>
   <transition name="collapse">
-    <div
-      v-show="drawerExpanded"
-      class="edit-content-holder"
-      :style="holderStyle"
-    >
+    <div v-show="drawerExpanded" class="edit-content-holder" :style="holderStyle">
       <WindowIndex />
       <FolioIndex />
       <InlineIndex />
@@ -88,7 +79,6 @@ export default defineComponent({
       folioIndexShow,
       inlineIndexShow,
       windowIndexShow,
-      compactMode,
     } = useStores();
     const { eventBus } = useEventHandling();
     const { hideEditing, showEditing } = useEditing();
@@ -100,21 +90,15 @@ export default defineComponent({
       },
     });
 
-    const top = computed(() => (compactMode.value ? 57 : 102));
-    const right = computed(() =>
-      showStrip.value ? 0 : stripApproachHover.value ? -223 : -250,
-    );
-    const stripStyle = computed(
-      () => `top: ${top.value}px; right: ${right.value}px`,
-    );
+    const right = computed(() => (showStrip.value ? 0 : stripApproachHover.value ? -223 : -250));
+    const stripStyle = computed(() => `top: 60px; right: ${right.value}px`);
     const holderStyle = computed(() => {
       let r = showStrip.value ? 0 : -250;
-      return `top: ${top.value}px; right: ${r}px`;
+      return `top: 60px; right: ${r}px`;
     });
 
     const ongoingEdit = computed(
-      () =>
-        folioIndexShow.value || inlineIndexShow.value || windowIndexShow.value,
+      () => folioIndexShow.value || inlineIndexShow.value || windowIndexShow.value,
     );
 
     const openEditing = () => (showStrip.value = true);
@@ -148,19 +132,18 @@ export default defineComponent({
   flex-wrap: nowrap;
   align-content: center;
   align-items: center;
-  height: 37px;
+  height: 41px;
   width: 263px;
   background-color: #ffca82;
   color: #a85e00;
   font-size: 18px;
-  border-radius: 12px 0 0 12px;
-  border-top: 1px solid #c87001;
-  border-left: 1px solid #c87001;
-  border-bottom: 1px solid #c87001;
-  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset,
-    rgb(79 79 79 / 17%) 0px 0px 20px 6px;
+  // border-radius: 3px 0 0 3px;
+  border-left: 1px solid #b88f5c;
+  border-bottom: 1px solid #b88f5c;
+  // box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset,
+  //   rgb(79 79 79 / 17%) 0px 0px 20px 6px;
   position: absolute;
-  z-index: 9998;
+  z-index: 5000;
   transition: all 0.5s ease-in-out;
 }
 .edit-panel-strip > i:first-of-type {

@@ -13,20 +13,10 @@
       <q-card-section v-if="title || icon" class="hero-bg">
         <q-icon v-if="icon" :name="icon" class="hero-icon" />
         <div v-if="title" class="hero-text">{{ title }}</div>
-        <q-btn
-          v-if="closeIcon"
-          icon="close"
-          flat
-          round
-          dense
-          v-close-popup
-          class="hero-button"
-        />
+        <q-btn v-if="closeIcon" icon="close" flat round dense v-close-popup class="hero-button" />
       </q-card-section>
 
-      <q-card-section
-        :class="message ? 'row items-center dialogue-body' : null"
-      >
+      <q-card-section :class="message ? 'row items-center dialogue-body' : null">
         <div v-if="message" :class="prompt ? '' : 'text-center full-width'">
           <span v-html="message" />
         </div>
@@ -115,8 +105,7 @@ export default {
   },
   emits: [...useDialogPluginComponent.emits],
   setup() {
-    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialogPluginComponent();
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
     const promptValue = ref("");
 

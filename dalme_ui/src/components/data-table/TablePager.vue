@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="scope.pagesNumber"
-    class="row full-width flex-center q-py-xs q-px-sm table-pager"
-  >
+  <div v-if="scope.pagesNumber" class="row full-width flex-center q-py-xs q-px-sm table-pager">
     <q-btn-group unelevated class="list-footer-button-group">
       <q-btn
         v-if="scope.pagesNumber > 2"

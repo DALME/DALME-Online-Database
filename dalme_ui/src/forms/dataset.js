@@ -1,12 +1,7 @@
 import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
-import {
-  AttributesField,
-  InputField,
-  SelectField,
-  TextField,
-} from "@/components/forms";
+import { AttributesField, InputField, SelectField, TextField } from "@/components/forms";
 import { permissionOptions } from "@/forms/constants";
 import {
   attributeValidators,
@@ -50,9 +45,7 @@ const datasetFormSchema = {
     label: "Dataset group *",
     description: "User group to be linked with this set.",
     getOptions: () =>
-      fetcher(requests.groups.getDatasetGroups()).then((response) =>
-        response.json(),
-      ),
+      fetcher(requests.groups.getDatasetGroups()).then((response) => response.json()),
     optionsSchema: groupOptionsSchema,
     validation: datasetFieldValidation.datasetUsergroup,
   },

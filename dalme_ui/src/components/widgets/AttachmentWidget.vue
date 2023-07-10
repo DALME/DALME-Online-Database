@@ -23,11 +23,7 @@
         </template>
 
         <div class="absolute-bottom-right text-subtitle1 text-center">
-          <a
-            :href="attachment.source"
-            target="_blank"
-            class="q-pa-sm text-white"
-          >
+          <a :href="attachment.source" target="_blank" class="q-pa-sm text-white">
             {{ attachment.filename }}
           </a>
         </div>

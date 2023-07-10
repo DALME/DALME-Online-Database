@@ -34,9 +34,7 @@ export const foliosNormalizeInputSchema = yup
       })),
   )
   .transform((arr) =>
-    arr
-      .map((item, idx) => ({ ...item, order: idx }))
-      .sort((x, y) => x.order - y.order),
+    arr.map((item, idx) => ({ ...item, order: idx })).sort((x, y) => x.order - y.order),
   );
 
 // const foliosNormalizeOutputSchema

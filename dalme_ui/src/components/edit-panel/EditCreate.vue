@@ -18,11 +18,7 @@
         icon="villa"
         push
       >
-        <TooltipWidget
-          anchor="bottom middle"
-          self="bottom middle"
-          :offset="[0, 35]"
-        >
+        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Archive
         </TooltipWidget>
       </q-fab-action>
@@ -34,11 +30,7 @@
         icon="inventory"
         push
       >
-        <TooltipWidget
-          anchor="bottom middle"
-          self="bottom middle"
-          :offset="[0, 35]"
-        >
+        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Archival File
         </TooltipWidget>
       </q-fab-action>
@@ -50,11 +42,7 @@
         icon="library_books"
         push
       >
-        <TooltipWidget
-          anchor="bottom middle"
-          self="bottom middle"
-          :offset="[0, 35]"
-        >
+        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Bibliography
         </TooltipWidget>
       </q-fab-action>
@@ -66,11 +54,7 @@
         icon="format_list_numbered"
         push
       >
-        <TooltipWidget
-          anchor="bottom middle"
-          self="bottom middle"
-          :offset="[0, 35]"
-        >
+        <TooltipWidget anchor="bottom middle" self="bottom middle" :offset="[0, 35]">
           Create Record
         </TooltipWidget>
       </q-fab-action>
@@ -139,11 +123,7 @@
       icon="assignment"
       push
     >
-      <TooltipWidget
-        anchor="center left"
-        self="center right"
-        :offset="[10, 10]"
-      >
+      <TooltipWidget anchor="center left" self="center right" :offset="[10, 10]">
         Create Task
       </TooltipWidget>
     </q-fab-action>
@@ -155,11 +135,7 @@
       icon="task"
       push
     >
-      <TooltipWidget
-        anchor="center left"
-        self="center right"
-        :offset="[10, 10]"
-      >
+      <TooltipWidget anchor="center left" self="center right" :offset="[10, 10]">
         Create Ticket
       </TooltipWidget>
     </q-fab-action>

@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="viewer-container"
-    :style="`height: ${viewerHeight}px; width: ${viewerWidth}px`"
-  >
+  <div id="viewer-container" :style="`height: ${viewerHeight}px; width: ${viewerWidth}px`">
     <div
       v-if="folioCount > 1"
       :class="`viewer-toolbar ${tbVertAlt ? 'toolbar-v' : 'toolbar-h'}`"
@@ -54,9 +51,7 @@
     </div>
     <div class="viewer-toolbar toolbar-h" :style="toolPosition">
       <q-btn
-        :icon="
-          view.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'
-        "
+        :icon="view.splitterHorizontal ? 'o_border_vertical' : 'o_border_horizontal'"
         @click="changeSplitView"
       />
       <q-btn
@@ -93,12 +88,8 @@ export default defineComponent({
     const { viewerHeight, viewerWidth } = inject("viewerDimensions");
     const { currentFolioData, folioCount, view } = useStores();
 
-    const tbHorAlt = computed(
-      () => view.value.splitterHorizontal && viewerHeight.value < 198,
-    );
-    const tbVertAlt = computed(
-      () => !view.value.splitterHorizontal && viewerWidth.value < 240,
-    );
+    const tbHorAlt = computed(() => view.value.splitterHorizontal && viewerHeight.value < 198);
+    const tbVertAlt = computed(() => !view.value.splitterHorizontal && viewerWidth.value < 240);
     const navPosition = computed(() => {
       let top = tbVertAlt.value ? 199 : 5;
       let posHor = tbVertAlt.value ? "left" : "right";

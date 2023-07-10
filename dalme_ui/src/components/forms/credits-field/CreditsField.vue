@@ -2,11 +2,7 @@
   <div class="credits-field column q-my-sm" :class="{ separator: !showing }">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
-        {{
-          !showing && modelValue !== [empty()]
-            ? `Credits (${modelValue.length})`
-            : "Credits"
-        }}
+        {{ !showing && modelValue !== [empty()] ? `Credits (${modelValue.length})` : "Credits" }}
       </div>
 
       <q-spinner v-if="loading" color="primary" size="xs" />
@@ -42,10 +38,7 @@
 
     <template v-if="showing">
       <template v-if="modelValue.length > 0">
-        <template
-          v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
-          :key="field.key"
-        >
+        <template v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)" :key="field.key">
           <div class="row q-mb-sm" v-show="showing">
             <div class="col-6 q-pr-sm">
               <SelectField
@@ -92,10 +85,7 @@
                     <template v-slot="scope">
                       <div class="column">
                         <div class="column">
-                          <code
-                            class="text-caption text-grey"
-                            style="font-size: 0.75rem"
-                          >
+                          <code class="text-caption text-grey" style="font-size: 0.75rem">
                             {{ cuid }}
                           </code>
                           <span class="text-caption text-grey-8">
@@ -150,24 +140,9 @@
 </template>
 
 <script>
-import {
-  filter as rFilter,
-  isEmpty,
-  isNil,
-  map as rMap,
-  keys,
-  reduce,
-  zip,
-} from "ramda";
+import { filter as rFilter, isEmpty, isNil, map as rMap, keys, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import {
-  computed,
-  defineComponent,
-  defineAsyncComponent,
-  inject,
-  ref,
-  unref,
-} from "vue";
+import { computed, defineComponent, defineAsyncComponent, inject, ref, unref } from "vue";
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
 import { agentOptionsSchema, creditRoleOptionsSchema } from "@/schemas";
@@ -192,9 +167,7 @@ export default defineComponent({
   },
   components: {
     SelectField,
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   setup(props, context) {
     const { fields, replace } = useFieldArray("credits");
@@ -240,9 +213,7 @@ export default defineComponent({
         if (row.agent) {
           const agentId = row.agent.value;
           const roleId = isNil(row.role) ? row.role : row.role.value;
-          keys(acc).includes(agentId)
-            ? acc[agentId].push(roleId)
-            : (acc[agentId] = [roleId]);
+          keys(acc).includes(agentId) ? acc[agentId].push(roleId) : (acc[agentId] = [roleId]);
         }
         return acc;
       };

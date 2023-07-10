@@ -15,12 +15,8 @@ export const getColumns = (columnMap) => {
 };
 
 export const getDefaults = (columnMap) => {
-  let vCols = Object.keys(
-    filter((column) => column.isDefaultVisible, columnMap),
-  );
-  let sortCol = Object.keys(
-    filter((column) => column.isSortDefault, columnMap),
-  )[0];
+  let vCols = Object.keys(filter((column) => column.isDefaultVisible, columnMap));
+  let sortCol = Object.keys(filter((column) => column.isSortDefault, columnMap))[0];
   let isSortDesc = columnMap[sortCol]["sortOrder"] === "da";
 
   return {

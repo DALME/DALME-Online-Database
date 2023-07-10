@@ -2,11 +2,7 @@
   <div class="folios-field column q-my-sm" :class="{ separator: !showing }">
     <div class="row items-center q-my-sm">
       <div class="q-field__label no-pointer-events q-mr-auto">
-        {{
-          !showing && modelValue !== [empty()]
-            ? `Folios (${modelValue.length})`
-            : "Folios"
-        }}
+        {{ !showing && modelValue !== [empty()] ? `Folios (${modelValue.length})` : "Folios" }}
       </div>
 
       <q-spinner v-if="loading" color="primary" size="xs" />
@@ -42,14 +38,9 @@
 
     <template v-if="showing">
       <template v-if="modelValue.length > 0">
-        <template
-          v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
-          :key="field.key"
-        >
+        <template v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)" :key="field.key">
           <div class="row q-mb-sm" v-show="showing">
-            <div
-              class="justify-center q-py-md q-pr-md text-grey text-subtitle2"
-            >
+            <div class="justify-center q-py-md q-pr-md text-grey text-subtitle2">
               #{{ idx + 1 }}
             </div>
             <div class="col-5 q-pr-sm">
@@ -111,24 +102,12 @@
                 <q-dialog v-model="confirm" persistent class="z-max">
                   <q-card>
                     <q-card-section class="row items-center">
-                      <q-avatar
-                        icon="warning"
-                        color="red"
-                        text-color="white"
-                        size="sm"
-                      />
-                      <span class="q-ml-sm">
-                        Are you sure you want to remove this folio?
-                      </span>
+                      <q-avatar icon="warning" color="red" text-color="white" size="sm" />
+                      <span class="q-ml-sm"> Are you sure you want to remove this folio? </span>
                     </q-card-section>
 
                     <q-card-actions align="right">
-                      <q-btn
-                        flat
-                        label="Cancel"
-                        color="primary"
-                        v-close-popup
-                      />
+                      <q-btn flat label="Cancel" color="primary" v-close-popup />
                       <q-btn
                         flat
                         label="Remove"
@@ -157,14 +136,7 @@
 import cuid from "cuid";
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import {
-  computed,
-  defineComponent,
-  defineAsyncComponent,
-  onMounted,
-  ref,
-  unref,
-} from "vue";
+import { computed, defineComponent, defineAsyncComponent, onMounted, ref, unref } from "vue";
 import { useActor } from "@xstate/vue";
 import { fetcher, requests } from "@/api";
 import { InputField, SelectField } from "@/components/forms";
@@ -191,9 +163,7 @@ export default defineComponent({
   components: {
     InputField,
     SelectField,
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   setup(props, context) {
     const {

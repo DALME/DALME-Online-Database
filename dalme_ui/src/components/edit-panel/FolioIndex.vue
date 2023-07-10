@@ -29,7 +29,6 @@
 
 <script>
 import { filter as rFilter } from "ramda";
-import moment from "moment";
 import { computed, defineComponent, watch } from "vue";
 import { useEditing, useEventHandling, useStores, useTransport } from "@/use";
 import { notNully } from "@/utils";
@@ -44,14 +43,10 @@ export default defineComponent({
       machine: { send },
     } = useEditing();
 
-    const disableRedo = computed(() =>
-      transport.canRedo.value ? false : true,
-    );
+    const disableRedo = computed(() => (transport.canRedo.value ? false : true));
     const isFocus = computed(() => focus.value === "inline");
     const { folioIndexShow, folioCount, view } = useStores();
     const { eventBus } = useEventHandling();
-    const fromUnixTs = (unixTs) =>
-      moment.unix(unixTs / 1000).format("YYYY-MM-DD HH:mm:ss");
 
     const folioList = computed(() => {
       if (folioCount.value) {
@@ -71,7 +66,6 @@ export default defineComponent({
       disableRedo,
       eventBus,
       focus,
-      fromUnixTs,
       handleFocus,
       notNully,
       isFocus,

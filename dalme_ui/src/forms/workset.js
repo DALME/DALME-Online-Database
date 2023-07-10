@@ -1,17 +1,11 @@
 import { markRaw } from "vue";
 
 import { requests } from "@/api";
-import {
-  AttributesField,
-  InputField,
-  SelectField,
-  TextField,
-} from "@/components/forms";
+import { AttributesField, InputField, SelectField, TextField } from "@/components/forms";
 import { permissionOptions } from "@/forms/constants";
 import {
   attributeValidators,
   optionsSchema,
-  setSubmitSchemas,
   worksetEditSchema,
   worksetFieldValidation,
 } from "@/schemas";
@@ -65,5 +59,4 @@ export default {
   edit: worksetEditSchema,
   form: worksetFormSchema,
   requests: worksetRequests,
-  submit: setSubmitSchemas,
 };

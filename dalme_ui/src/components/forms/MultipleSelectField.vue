@@ -24,11 +24,7 @@
           <q-item-label class="text-weight-medium">
             {{ scope.opt.label }}
           </q-item-label>
-          <div
-            v-if="scope.opt.caption"
-            v-html="scope.opt.caption"
-            caption
-          ></div>
+          <div v-if="scope.opt.caption" v-html="scope.opt.caption" caption></div>
         </q-item-section>
       </q-item>
     </template>
@@ -79,17 +75,12 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   setup(props) {
     const options = ref(null);
 
-    const { errorMessage, meta, handleBlur, value } = useField(
-      props.field,
-      props.validation,
-    );
+    const { errorMessage, meta, handleBlur, value } = useField(props.field, props.validation);
 
     const handleOptions = async (val, update) => {
       // TODO: Depending on whether or not FormVueLate is controlling the field,
@@ -113,10 +104,8 @@ export default defineComponent({
         const search = val.toLowerCase();
         options.value = options.value.filter((option) => {
           return (
-            (!isNil(option.label) &&
-              option.label.toString().toLowerCase().indexOf(search) > -1) ||
-            (!isNil(option.caption) &&
-              option.caption.toString().toLowerCase().indexOf(search) > -1)
+            (!isNil(option.label) && option.label.toString().toLowerCase().indexOf(search) > -1) ||
+            (!isNil(option.caption) && option.caption.toString().toLowerCase().indexOf(search) > -1)
           );
         });
       });

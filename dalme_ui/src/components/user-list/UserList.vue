@@ -106,19 +106,11 @@
     </template>
 
     <template v-slot:render-cell-isActive="props">
-      <BooleanWidget
-        :value="props.row.isActive"
-        :onlyTrue="true"
-        trueIcon="check_circle"
-      />
+      <BooleanWidget :value="props.row.isActive" :onlyTrue="true" trueIcon="check_circle" />
     </template>
 
     <template v-slot:render-cell-isStaff="props">
-      <BooleanWidget
-        :value="props.row.isStaff"
-        :onlyTrue="true"
-        trueIcon="check_circle"
-      />
+      <BooleanWidget :value="props.row.isStaff" :onlyTrue="true" trueIcon="check_circle" />
     </template>
   </DataTable>
 </template>
@@ -129,12 +121,7 @@ import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { formatDate, getColumns, getDefaults, notNully } from "@/utils";
-import {
-  BooleanWidget,
-  DataTable,
-  DetailPopover,
-  TagWidget,
-} from "@/components";
+import { BooleanWidget, DataTable, DetailPopover, TagWidget } from "@/components";
 import { userListSchema } from "@/schemas";
 import { useAPI, usePagination } from "@/use";
 import { columnMap } from "./columns";
@@ -162,15 +149,13 @@ export default defineComponent({
       const request = requests.users.getUsers(query);
       await fetchAPI(request);
       if (success.value)
-        await userListSchema
-          .validate(data.value.data, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns(columnMap);
-            pagination.value.rowsNumber = data.value.recordsFiltered;
-            pagination.value.rowsTotal = data.value.recordsTotal;
-            rows.value = value;
-            loading.value = false;
-          });
+        await userListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns(columnMap);
+          pagination.value.rowsNumber = data.value.filtered;
+          pagination.value.rowsTotal = data.value.count;
+          rows.value = value;
+          loading.value = false;
+        });
     };
 
     const {

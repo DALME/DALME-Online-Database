@@ -48,17 +48,10 @@
   >
     <q-tab-panel name="write" class="row q-pa-none">
       <div class="col-grow">
-        <div
-          id="ace-editor"
-          :style="`height: ${editorHeight}px; width: ${editorWidth}px`"
-        />
+        <div id="ace-editor" :style="`height: ${editorHeight}px; width: ${editorWidth}px`" />
       </div>
       <transition name="collapse">
-        <div
-          v-if="view.showTagMenu"
-          class="col tag-menu"
-          :style="`height: ${editorHeight + 20}px`"
-        >
+        <div v-if="view.showTagMenu" class="col tag-menu" :style="`height: ${editorHeight + 20}px`">
           <q-input
             dense
             borderless
@@ -98,28 +91,19 @@
                   <q-item>
                     <q-item-section>
                       <q-item-label class="text-detail text-grey-7 q-py-sm">
-                        <q-icon
-                          name="o_info"
-                          size="14px"
-                          color="grey-6"
-                          class="q-mr-xs"
-                        />
+                        <q-icon name="o_info" size="14px" color="grey-6" class="q-mr-xs" />
                         <span v-html="tag.help" />
                       </q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item clickable>
                     <q-item-section>
-                      <q-item-label class="text-grey-9">
-                        Include in shortcuts
-                      </q-item-label>
+                      <q-item-label class="text-grey-9"> Include in shortcuts </q-item-label>
                     </q-item-section>
                   </q-item>
                   <q-item clickable>
                     <q-item-section>
-                      <q-item-label class="text-grey-9">
-                        Include in context menu
-                      </q-item-label>
+                      <q-item-label class="text-grey-9"> Include in context menu </q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -128,12 +112,7 @@
           </q-list>
         </div>
       </transition>
-      <q-menu
-        touch-position
-        context-menu
-        transition-show="scale"
-        transition-hide="scale"
-      >
+      <q-menu touch-position context-menu transition-show="scale" transition-hide="scale">
         <q-list dense separator>
           <template v-for="(tag, idx) in teiTags" :key="idx">
             <q-item clickable>
@@ -145,11 +124,7 @@
         </q-list>
       </q-menu>
     </q-tab-panel>
-    <q-tab-panel
-      name="preview"
-      class="render-panel"
-      :style="`height: ${editorHeight}px`"
-    >
+    <q-tab-panel name="preview" class="render-panel" :style="`height: ${editorHeight}px`">
       <TeiRenderer :text="currentFolioData.editorSession.getValue()" />
     </q-tab-panel>
   </q-tab-panels>
@@ -198,8 +173,7 @@ export default defineComponent({
       isEmpty(tagFilter.value)
         ? sortBy(prop("name"), teiTags)
         : rFilter(
-            (tag) =>
-              tag.name.toLowerCase().includes(tagFilter.value.toLowerCase()),
+            (tag) => tag.name.toLowerCase().includes(tagFilter.value.toLowerCase()),
             // tag.help.toLowerCase().includes(tagFilter.value.toLowerCase())
             // tag.tagName.toLowerCase().includes(tagFilter.value.toLowerCase())
             sortBy(prop("name"), teiTags),
@@ -217,12 +191,9 @@ export default defineComponent({
       if (status.value !== 200) {
         if (status.value === 205) {
           console.log(data.value);
-          currentFolioData.value.transcriptionVersion =
-            data.value.transcriptionVersion;
-          currentFolioData.value.transcriptionAuthor =
-            data.value.transcriptionAuthor;
-          currentFolioData.value.transcriptionText =
-            data.value.transcriptionText;
+          currentFolioData.value.transcriptionVersion = data.value.transcriptionVersion;
+          currentFolioData.value.transcriptionAuthor = data.value.transcriptionAuthor;
+          currentFolioData.value.transcriptionText = data.value.transcriptionText;
           return true;
         } else {
           notifier.transcriptions.versionCheckFailed(data.value.error);
@@ -259,14 +230,9 @@ export default defineComponent({
 
     const createSession = () => {
       return new Promise((resolve) => {
-        currentFolioData.value.editorSession = ace.createEditSession(
-          currentFolioData.value.tei,
-        );
+        currentFolioData.value.editorSession = ace.createEditSession(currentFolioData.value.tei);
         loadSession().then(() => {
-          editor.session.once(
-            "change",
-            () => (currentFolioData.value.hasChanges = true),
-          );
+          editor.session.once("change", () => (currentFolioData.value.hasChanges = true));
           editor.session.setOptions({
             mode: "ace/mode/xml",
             useWorker: false,
@@ -282,9 +248,7 @@ export default defineComponent({
       let spAtt = {};
 
       if (attributes) {
-        attributes = attributes.includes("-")
-          ? attributes.split("-")
-          : [attributes];
+        attributes = attributes.includes("-") ? attributes.split("-") : [attributes];
 
         attributes.forEach((attribute) => {
           let att = attribute.split("|");

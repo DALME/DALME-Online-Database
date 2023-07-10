@@ -81,22 +81,15 @@ export default defineComponent({
         ? `New ${ctx.kind}`
         : `${capitalize(ctx.mode)} ${ctx.initialData.shortName}`,
     );
-    const zClass = computed(() =>
-      props.cuid === focus.value ? "z-max" : "z-top",
-    );
+    const zClass = computed(() => (props.cuid === focus.value ? "z-max" : "z-top"));
     const containerClasses = computed(() => {
       let classes = ["modal-container"];
       if (props.cuid === focus.value) classes.push("focussed");
-      if (valid.value && mouseoverSubmit.value && props.cuid === focus.value)
-        classes.push("pulse");
+      if (valid.value && mouseoverSubmit.value && props.cuid === focus.value) classes.push("pulse");
       return classes.join(" ");
     });
     const positionKey = `form-position:${props.cuid}`;
-    const positionValue = useStorage(
-      positionKey,
-      { x: props.xPos, y: props.yPos },
-      localStorage,
-    );
+    const positionValue = useStorage(positionKey, { x: props.xPos, y: props.yPos }, localStorage);
     const {
       x,
       y,

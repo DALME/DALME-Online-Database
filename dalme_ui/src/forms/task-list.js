@@ -23,8 +23,7 @@ const taskListFormSchema = {
     component: markRaw(SelectField),
     label: "Group *",
     description: "Which group is the task list filed under.",
-    getOptions: () =>
-      fetcher(requests.groups.getGroups()).then((response) => response.json()),
+    getOptions: () => fetcher(requests.groups.getGroups()).then((response) => response.json()),
     optionsSchema: groupOptionsSchema,
     validation: taskListFieldValidation.group,
   },

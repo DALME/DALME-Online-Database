@@ -3,16 +3,8 @@
     <div class="index-header">
       <div class="index-title">WINDOWS</div>
       <div class="index-btn-group">
-        <q-btn
-          icon="visibility_off"
-          :disable="disableHideAll"
-          @click.stop="hideAll"
-        />
-        <q-btn
-          icon="visibility"
-          :disable="disableShowAll"
-          @click.stop="showAll"
-        />
+        <q-btn icon="visibility_off" :disable="disableHideAll" @click.stop="hideAll" />
+        <q-btn icon="visibility" :disable="disableShowAll" @click.stop="showAll" />
       </div>
     </div>
 
@@ -29,28 +21,14 @@
         @click.stop="() => handleFocus(cuid)"
       >
         <q-item-section side>
-          <q-icon
-            class="mode-icon"
-            :name="editorModeIcons[actor.context.mode]"
-          />
+          <q-icon class="mode-icon" :name="editorModeIcons[actor.context.mode]" />
         </q-item-section>
         <q-item-section class="column">
-          <div
-            :class="
-              actor.context.mode === 'create'
-                ? 'row name text-capitalize'
-                : 'row kind'
-            "
-          >
-            <span v-if="actor.context.mode === 'create'" class="q-mr-xs">
-              New
-            </span>
+          <div :class="actor.context.mode === 'create' ? 'row name text-capitalize' : 'row kind'">
+            <span v-if="actor.context.mode === 'create'" class="q-mr-xs"> New </span>
             {{ actor.context.kind }}
           </div>
-          <div
-            v-if="actor.context.mode !== 'create'"
-            class="row name text-grey-8"
-          >
+          <div v-if="actor.context.mode !== 'create'" class="row name text-grey-8">
             {{ actor.context.initialData.shortName }}
           </div>
         </q-item-section>
@@ -124,9 +102,7 @@ export default defineComponent({
       windowIndexShow.value = keys(modals).length > 0;
       // TODO: I'm sure all this can be optimized to only traverse once.
       actors.value = rMap(({ actor }) => useActor(actor).state, modals);
-      const visibility = values(
-        rMap((actor) => actor.context.visible, actors.value),
-      );
+      const visibility = values(rMap((actor) => actor.context.visible, actors.value));
       disableHideAll.value = none(Boolean)(visibility);
       disableShowAll.value = all(Boolean)(visibility);
     });

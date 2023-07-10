@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="!loading && !isEmpty(task)"
-    class="full-width full-height q-px-content-visual"
-  >
+  <div v-if="!loading && !isEmpty(task)" class="full-width full-height q-px-content-visual">
     <div class="info-area row">
       <div class="col-grow">
         <div class="row items-center text-h5">
@@ -62,18 +59,12 @@
                 <q-item-section>
                   <q-card flat bordered class="box-left-arrow">
                     <q-card-section class="bg-grey-2 comment-head">
-                      <DetailPopover
-                        :userData="task.creationUser"
-                        :showAvatar="false"
-                      />
+                      <DetailPopover :userData="task.creationUser" :showAvatar="false" />
                       commented {{ formatDate(task.creationTimestamp) }}
                     </q-card-section>
                     <q-separator />
                     <q-card-section class="text-body2">
-                      <MarkdownEditor
-                        v-if="task.description"
-                        :text="task.description"
-                      />
+                      <MarkdownEditor v-if="task.description" :text="task.description" />
                       <span v-else>No description provided.</span>
                     </q-card-section>
                   </q-card>
@@ -96,26 +87,20 @@
         </q-card>
       </div>
       <div class="col-3 q-pl-md">
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-          Assignees
-        </div>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Assignees</div>
         <div class="q-mb-sm text-13">
           <span>No one assigned</span>
         </div>
         <q-separator class="q-my-md" />
 
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-          Attachments
-        </div>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Attachments</div>
         <div class="q-mb-sm text-13">
           <AttachmentWidget v-if="attachment" />
           <span v-else>None yet</span>
         </div>
         <q-separator class="q-my-md" />
 
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-          Links
-        </div>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Links</div>
         <div class="q-mb-sm text-13">
           <span>None yet</span>
         </div>
@@ -126,16 +111,9 @@
 </template>
 
 <script>
-import { isEmpty, isNil } from "ramda";
+import { isEmpty } from "ramda";
 import { useMeta, format } from "quasar";
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  provide,
-  readonly,
-  ref,
-} from "vue";
+import { computed, defineComponent, onMounted, provide, readonly, ref } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import {
@@ -161,7 +139,7 @@ export default defineComponent({
   setup() {
     const { notifier } = useEventHandling();
     const $route = useRoute();
-    const { isAdmin, nav } = useStores();
+    const { isAdmin, ui } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
@@ -178,7 +156,7 @@ export default defineComponent({
     );
 
     useMeta(() => ({ title: `Task #${id.value}` }));
-    nav.breadcrumbTail.push(`#${id.value}`);
+    ui.breadcrumbTail.push(`#${id.value}`);
 
     provide("attachment", attachment);
     provide("model", model);
@@ -199,20 +177,18 @@ export default defineComponent({
     const fetchData = async () => {
       await fetchAPI(requests.tasks.getTask(id.value));
       if (success.value)
-        await taskSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            action.value = value.completed ? "reopen task" : "complete task";
-            task.value = value;
-            attachment.value = value.file;
-            loading.value = false;
-          });
+        await taskSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          action.value = value.completed ? "reopen task" : "complete task";
+          task.value = value;
+          attachment.value = value.file;
+          loading.value = false;
+        });
     };
 
     editingDetailRouteGuard();
     onMounted(async () => await fetchData());
     onBeforeRouteLeave(() => {
-      nav.resetBreadcrumbTail();
+      ui.resetBreadcrumbTail();
     });
 
     return {
@@ -223,7 +199,6 @@ export default defineComponent({
       formatDate,
       isAdmin,
       isEmpty,
-      isNil,
       loading,
       onAction,
       task,

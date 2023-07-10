@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="!loading && !isEmpty(ticket)"
-    class="full-width full-height q-px-content-visual"
-  >
+  <div v-if="!loading && !isEmpty(ticket)" class="full-width full-height q-px-content-visual">
     <div class="info-area row">
       <div class="col-grow">
         <div class="row items-center text-h5">
@@ -63,18 +60,12 @@
                 <q-item-section>
                   <q-card flat bordered class="box-left-arrow">
                     <q-card-section class="bg-grey-2 comment-head">
-                      <DetailPopover
-                        :userData="ticket.creationUser"
-                        :showAvatar="false"
-                      />
+                      <DetailPopover :userData="ticket.creationUser" :showAvatar="false" />
                       commented {{ formatDate(ticket.creationTimestamp) }}
                     </q-card-section>
                     <q-separator />
                     <q-card-section class="text-body2">
-                      <MarkdownEditor
-                        v-if="ticket.description"
-                        :text="ticket.description"
-                      />
+                      <MarkdownEditor v-if="ticket.description" :text="ticket.description" />
                       <span v-else>No description provided.</span>
                     </q-card-section>
                   </q-card>
@@ -98,9 +89,7 @@
         </q-card>
       </div>
       <div class="col-3 q-pl-md">
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-          Assignees
-        </div>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Assignees</div>
         <div class="q-mb-sm text-13">
           <span>No one assigned</span>
         </div>
@@ -123,18 +112,14 @@
         </div>
         <q-separator class="q-my-md" />
 
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-          Attachments
-        </div>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Attachments</div>
         <div class="q-mb-sm text-13">
           <AttachmentWidget v-if="attachment" />
           <span v-else>None yet</span>
         </div>
         <q-separator class="q-my-md" />
 
-        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-          Links
-        </div>
+        <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Links</div>
         <div class="q-mb-sm text-13">
           <span>None yet</span>
         </div>
@@ -147,14 +132,7 @@
 <script>
 import { filter as rFilter, isEmpty, isNil } from "ramda";
 import { useMeta, format } from "quasar";
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  readonly,
-  ref,
-  provide,
-} from "vue";
+import { computed, defineComponent, onMounted, readonly, ref, provide } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import {
@@ -182,7 +160,7 @@ export default defineComponent({
   setup() {
     const { notifier } = useEventHandling();
     const $route = useRoute();
-    const { isAdmin, nav } = useStores();
+    const { isAdmin, ui } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { capitalize } = format;
@@ -198,7 +176,7 @@ export default defineComponent({
     );
 
     useMeta({ title: `Ticket #${id.value}` });
-    nav.breadcrumbTail.push(`#${id.value}`);
+    ui.breadcrumbTail.push(`#${id.value}`);
 
     provide("attachment", attachment);
     provide("model", model);
@@ -223,20 +201,18 @@ export default defineComponent({
     const fetchData = async () => {
       await fetchAPI(requests.tickets.getTicket(id.value));
       if (success.value)
-        await ticketDetailSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            action.value = value.status ? "reopen ticket" : "close ticket";
-            ticket.value = value;
-            attachment.value = value.file;
-            loading.value = false;
-          });
+        await ticketDetailSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          action.value = value.status ? "reopen ticket" : "close ticket";
+          ticket.value = value;
+          attachment.value = value.file;
+          loading.value = false;
+        });
     };
 
     onMounted(async () => await fetchData());
 
     onBeforeRouteLeave(() => {
-      nav.resetBreadcrumbTail();
+      ui.resetBreadcrumbTail();
     });
 
     return {
@@ -259,21 +235,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.closing-dot {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  justify-content: center;
-  flex-shrink: 0;
-  align-items: center;
-  display: inline-flex;
-  position: relative;
-  left: 55px;
-}
-.closing-dot-label {
-  padding-left: 65px;
-  padding-bottom: 2px;
-}
 .action-button {
   padding: 0px 10px 0px 10px;
   font-weight: 600;

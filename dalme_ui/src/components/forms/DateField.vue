@@ -24,11 +24,7 @@
           transition-hide="scale"
           class="z-max"
         >
-          <q-date
-            mask="YYYY-MM-DD"
-            :model-value="modelValue"
-            @update:modelValue="onUpdate"
-          >
+          <q-date mask="YYYY-MM-DD" :model-value="modelValue" @update:modelValue="onUpdate">
             <div class="row items-center justify-end">
               <q-btn v-close-popup label="Close" color="primary" flat />
             </div>
@@ -46,9 +42,7 @@ import { defineComponent, defineAsyncComponent } from "vue";
 export default defineComponent({
   name: "DateField",
   components: {
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   props: {
     field: {
@@ -69,10 +63,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { errorMessage, meta, handleBlur } = useField(
-      props.field,
-      props.validation,
-    );
+    const { errorMessage, meta, handleBlur } = useField(props.field, props.validation);
 
     const onUpdate = (value) => {
       context.emit("update:modelValue", value);

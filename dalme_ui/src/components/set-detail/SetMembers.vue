@@ -20,13 +20,7 @@
         Set Members ({{ memberCount }}, {{ publicMemberCount }} public)
       </q-item-label>
       <q-space />
-      <q-input
-        borderless
-        dense
-        debounce="300"
-        v-model="filter"
-        placeholder="Search"
-      >
+      <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
         <template v-slot:append>
           <q-icon name="search" />
         </template>
@@ -115,17 +109,13 @@ export default defineComponent({
       const request = requests.sets.getSetMembers(id.value, query);
       await fetchAPI(request);
       if (success.value)
-        await setMembersSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns();
-            fieldMap.value = data.value.data.length
-              ? keys(data.value.data[0])
-              : null;
-            pagination.value.rowsNumber = value.count;
-            rows.value.splice(0, rows.value.length, ...value.data);
-            loading.value = false;
-          });
+        await setMembersSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns();
+          fieldMap.value = data.value.data.length ? keys(data.value.data[0]) : null;
+          pagination.value.rowsNumber = value.count;
+          rows.value.splice(0, rows.value.length, ...value.data);
+          loading.value = false;
+        });
     };
 
     const { filter, pagination, onRequest } = usePagination(fetchData);

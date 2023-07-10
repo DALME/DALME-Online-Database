@@ -1,12 +1,7 @@
 import { markRaw } from "vue";
 
 import { fetcher, requests } from "@/api";
-import {
-  AttributesField,
-  InputField,
-  MultipleSelectField,
-  SelectField,
-} from "@/components/forms";
+import { AttributesField, InputField, MultipleSelectField, SelectField } from "@/components/forms";
 import {
   attributeValidators,
   bibliographyEditSchema,
@@ -16,13 +11,7 @@ import {
   sourceSubmitSchemas,
 } from "@/schemas";
 
-const resourceAttributes = [
-  "defaultRights",
-  "isPrivate",
-  "owner",
-  "parent",
-  "zoteroKey",
-];
+const resourceAttributes = ["defaultRights", "isPrivate", "owner", "parent", "zoteroKey"];
 
 const requiredAttributes = ["defaultRights", "zoteroKey"];
 
@@ -31,16 +20,14 @@ const bibliographyFormSchema = {
     field: "name",
     component: markRaw(InputField),
     label: "Name *",
-    description:
-      "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
+    description: "Name of the source, eg: Inventory of Poncius Gassini (ADBR 3B 57)",
     validation: bibliographyFieldValidation.name,
   },
   shortName: {
     field: "shortName",
     component: markRaw(InputField),
     label: "Short name *",
-    description:
-      "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
+    description: "A short name for the source to use in lists, eg: ADBR 3B 57 (Gassini)",
     validation: bibliographyFieldValidation.shortName,
   },
   type: {
@@ -49,9 +36,7 @@ const bibliographyFormSchema = {
     label: "Bilbliography type *",
     description: "The category of bibliography for this source.",
     getOptions: () =>
-      fetcher(requests.sources.getBibliographyTypes()).then((response) =>
-        response.json(),
-      ),
+      fetcher(requests.sources.getBibliographyTypes()).then((response) => response.json()),
     optionsSchema: bibliographyTypeOptionsSchema,
     validation: bibliographyFieldValidation.type,
   },
@@ -60,10 +45,7 @@ const bibliographyFormSchema = {
     component: markRaw(SelectField),
     label: "Primary dataset",
     description: "Dataset used to assign permissions.",
-    getOptions: () =>
-      fetcher(requests.sets.getSetsByType(3)).then((response) =>
-        response.json(),
-      ),
+    getOptions: () => fetcher(requests.sets.getSetsByType(3)).then((response) => response.json()),
     optionsSchema: setOptionsSchema,
     validation: bibliographyFieldValidation.primaryDataset,
   },
@@ -72,8 +54,7 @@ const bibliographyFormSchema = {
     component: markRaw(MultipleSelectField),
     label: "Sets",
     description: "The sets of which the source a member.",
-    getOptions: () =>
-      fetcher(requests.sets.getSets()).then((response) => response.json()),
+    getOptions: () => fetcher(requests.sets.getSets()).then((response) => response.json()),
     optionsSchema: setOptionsSchema,
     validation: bibliographyFieldValidation.sets,
   },

@@ -84,10 +84,7 @@
         v-if="props.row.commentCount"
         class="text-weight-bold q-mr-xs"
       />
-      <div
-        v-if="props.row.commentCount"
-        class="text-grey-8 text-weight-bold text-detail"
-      >
+      <div v-if="props.row.commentCount" class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.commentCount }}
       </div>
     </template>
@@ -107,10 +104,7 @@
     </template>
 
     <template v-slot:render-cell-name="props">
-      <router-link
-        class="text-link"
-        :to="{ name: 'Rights', params: { id: props.row.id } }"
-      >
+      <router-link class="text-link" :to="{ name: 'Rights', params: { id: props.row.id } }">
         {{ props.row.name }}
       </router-link>
     </template>
@@ -129,11 +123,7 @@
     </template>
 
     <template v-slot:render-cell-noticeDisplay="props">
-      <BooleanWidget
-        :value="props.row.noticeDisplay"
-        :onlyTrue="true"
-        trueIcon="verified"
-      />
+      <BooleanWidget :value="props.row.noticeDisplay" :onlyTrue="true" trueIcon="verified" />
     </template>
 
     <template v-slot:render-cell-attachments="props">
@@ -156,12 +146,7 @@ import { openURL } from "quasar";
 import { defineComponent, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import {
-  BooleanWidget,
-  DetailPopover,
-  TagWidget,
-  DataTable,
-} from "@/components";
+import { BooleanWidget, DetailPopover, TagWidget, DataTable } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { rightsListSchema } from "@/schemas";
 import { useAPI, useConstants, usePagination } from "@/use";
@@ -193,15 +178,13 @@ export default defineComponent({
       const request = requests.rights.getRights(query);
       await fetchAPI(request);
       if (success.value)
-        await rightsListSchema
-          .validate(data.value.data, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns(columnMap);
-            pagination.value.rowsNumber = data.value.recordsFiltered;
-            pagination.value.rowsTotal = data.value.recordsTotal;
-            rows.value = value;
-            loading.value = false;
-          });
+        await rightsListSchema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns(columnMap);
+          pagination.value.rowsNumber = data.value.filtered;
+          pagination.value.rowsTotal = data.value.count;
+          rows.value = value;
+          loading.value = false;
+        });
     };
 
     const {

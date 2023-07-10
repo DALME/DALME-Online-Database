@@ -4,9 +4,7 @@ const endpoint = `${apiUrl}/rights`;
 
 const rights = {
   getRights(query = false) {
-    const url = query
-      ? `${endpoint}/?${query}`
-      : `${endpoint}/?limit=0&offset=0`;
+    const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=0&offset=0`;
     return {
       url: url,
       method: "GET",

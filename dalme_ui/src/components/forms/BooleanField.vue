@@ -41,17 +41,12 @@ export default defineComponent({
     },
   },
   components: {
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   setup(props) {
     const options = booleanOptions;
 
-    const { errorMessage, meta, handleBlur, value } = useField(
-      props.field,
-      props.validation,
-    );
+    const { errorMessage, meta, handleBlur, value } = useField(props.field, props.validation);
 
     return {
       errorMessage,

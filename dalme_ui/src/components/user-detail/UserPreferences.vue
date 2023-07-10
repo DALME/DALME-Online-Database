@@ -57,8 +57,7 @@
               <q-item-section>
                 <q-item-label>Use Compact Sidebar</q-item-label>
                 <q-item-label caption>
-                  Sidebar collapses to occupy minimal space and expands as an
-                  overlay when hovering.
+                  Sidebar collapses to occupy minimal space and expands as an overlay when hovering.
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -83,9 +82,7 @@
               </q-item-section>
               <q-item-section>
                 <q-item-label>Theme</q-item-label>
-                <q-item-label caption>
-                  Change text and syntax highlighting colours.
-                </q-item-label>
+                <q-item-label caption> Change text and syntax highlighting colours. </q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
@@ -118,8 +115,8 @@
               <q-item-section>
                 <q-item-label>Highlight Word</q-item-label>
                 <q-item-label caption>
-                  When a word is selected the editor highlights all other
-                  occurrences of the same word in the text.
+                  When a word is selected the editor highlights all other occurrences of the same
+                  word in the text.
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -168,8 +165,7 @@
               <q-item-section>
                 <q-item-label>Show Invisibles</q-item-label>
                 <q-item-label caption>
-                  Show invisible characters such as spaces, tabs, and line
-                  breaks.
+                  Show invisible characters such as spaces, tabs, and line breaks.
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -186,8 +182,8 @@
               <q-item-section>
                 <q-item-label>Show Line Numbers</q-item-label>
                 <q-item-label caption>
-                  Show line numbers in the gutter (Show Gutter must also be on).
-                  When Soft Wrap is active, wrapped lines show without numbers.
+                  Show line numbers in the gutter (Show Gutter must also be on). When Soft Wrap is
+                  active, wrapped lines show without numbers.
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -204,8 +200,7 @@
               <q-item-section>
                 <q-item-label>Soft Wrap Text</q-item-label>
                 <q-item-label caption>
-                  Visually wrap long lines of text if they exceed the width of
-                  the editor's window.
+                  Visually wrap long lines of text if they exceed the width of the editor's window.
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -250,10 +245,10 @@ export default defineComponent({
   setup() {
     // const { apiInterface } = useAPI();
     // const { loading, success, data, fetchAPI } = apiInterface();
-    const { ui, sourceEditor } = useStores();
+    const { general, sourceEditor } = useStores();
     const tab = ref("ui");
-    const tooltipsOn = ref(ui.general.tooltipsOn);
-    const sidebarCollapsed = ref(ui.general.sidebarCollapsed);
+    const tooltipsOn = ref(general.tooltipsOn);
+    const sidebarCollapsed = ref(general.sidebarCollapsed);
     const theme = ref(sourceEditor.value.theme);
     const fontSize = ref(sourceEditor.value.fontSize);
     const highlightWord = ref(sourceEditor.value.highlightWord);

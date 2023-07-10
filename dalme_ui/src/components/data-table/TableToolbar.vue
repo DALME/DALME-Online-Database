@@ -41,8 +41,7 @@
                 })
               "
               :class="
-                activeFilters[filter.field] &&
-                activeFilters[filter.field] === filter.value
+                activeFilters[filter.field] && activeFilters[filter.field] === filter.value
                   ? 'text-weight-bold bg-indigo-1 text-indigo-5'
                   : 'text-grey-8'
               "
@@ -104,8 +103,8 @@
         @click="isEditModeOn = !isEditModeOn"
       >
         <TooltipWidget v-if="editable">
-          Click on this button to enable editing data in place for supported
-          columns (marked with this same icon).
+          Click on this button to enable editing data in place for supported columns (marked with
+          this same icon).
         </TooltipWidget>
       </q-btn>
       <q-btn-dropdown
@@ -132,9 +131,7 @@
             <q-item-section side class="q-pr-sm">
               <q-icon
                 :name="
-                  visibleColumns.includes(value.name)
-                    ? 'check_box'
-                    : 'check_box_outline_blank'
+                  visibleColumns.includes(value.name) ? 'check_box' : 'check_box_outline_blank'
                 "
                 color="indigo-5"
                 size="xs"
@@ -179,9 +176,7 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <TooltipWidget
-          >Select how many records to display per page.</TooltipWidget
-        >
+        <TooltipWidget>Select how many records to display per page.</TooltipWidget>
       </q-btn-dropdown>
       <q-btn
         v-if="grid"
@@ -263,8 +258,7 @@
             v-close-popup
             dense
             :class="
-              item.value.column === pagination.sortBy &&
-              item.value.desc === pagination.descending
+              item.value.column === pagination.sortBy && item.value.desc === pagination.descending
                 ? 'text-no-wrap text-weight-bold bg-indigo-1 text-indigo-5'
                 : 'text-no-wrap text-grey-8'
             "
@@ -356,10 +350,9 @@ export default defineComponent({
     const isEditModeOn = ref(false);
 
     const currentRpP = computed(() => {
-      return rFilter(
-        (item) => item.value == rowsPerPageValue.value,
-        rowsPerPageOptions,
-      )[0]["label"];
+      return rFilter((item) => item.value == rowsPerPageValue.value, rowsPerPageOptions)[0][
+        "label"
+      ];
     });
 
     const onChangeColumnVisibility = (value) => {
@@ -381,19 +374,13 @@ export default defineComponent({
     };
 
     const paginationStatus = computed(() => {
-      let rangeStart =
-        (pagination.value.page - 1) * pagination.value.rowsPerPage + 1;
+      let rangeStart = (pagination.value.page - 1) * pagination.value.rowsPerPage + 1;
       let rangeEnd = rangeStart + pagination.value.rowsPerPage - 1;
-      if (rangeEnd > pagination.value.rowsNumber)
-        rangeEnd = pagination.value.rowsNumber;
+      if (rangeEnd > pagination.value.rowsNumber) rangeEnd = pagination.value.rowsNumber;
 
-      return `Showing ${rangeStart.toLocaleString(
+      return `Showing ${rangeStart.toLocaleString("en-US")}-${rangeEnd.toLocaleString(
         "en-US",
-      )}-${rangeEnd.toLocaleString(
-        "en-US",
-      )} out of a total of ${pagination.value.rowsNumber.toLocaleString(
-        "en-US",
-      )} ${resource}.`;
+      )} out of a total of ${pagination.value.rowsNumber.toLocaleString("en-US")} ${resource}.`;
     });
 
     watch(isEditModeOn, (newValue) => {

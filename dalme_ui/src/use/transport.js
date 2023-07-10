@@ -1,14 +1,4 @@
-import {
-  findIndex,
-  groupBy,
-  head,
-  includes,
-  lensProp,
-  map,
-  prop,
-  propEq,
-  set,
-} from "ramda";
+import { findIndex, groupBy, head, includes, lensProp, map, prop, propEq, set } from "ramda";
 import { computed, inject, provide, ref, watch } from "vue";
 import { useManualRefHistory } from "@vueuse/core";
 
@@ -33,15 +23,10 @@ export const provideTransport = () => {
   };
 
   const objDiffs = computed(() => {
-    const snapshots = transport.history.value
-      .map((diff) => diff.snapshot)
-      .slice(0, -1);
+    const snapshots = transport.history.value.map((diff) => diff.snapshot).slice(0, -1);
     const byId = groupBy(prop("id"))(snapshots);
     const byField = map((diffs) => groupBy(prop("field"))(diffs), byId);
-    const values = map(
-      (diffs) => map((history) => head(history).new, diffs),
-      byField,
-    );
+    const values = map((diffs) => map((history) => head(history).new, diffs), byField);
     return values;
   });
 

@@ -42,10 +42,7 @@
 
     <template v-if="showing">
       <template v-if="modelValue.length > 0">
-        <template
-          v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)"
-          :key="field.key"
-        >
+        <template v-for="({ 0: data, 1: field }, idx) in zip(modelValue, fields)" :key="field.key">
           <div class="row q-mb-sm" v-show="showing">
             <div class="col-6 q-pr-sm">
               <SelectField
@@ -99,13 +96,7 @@
 <script>
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
-import {
-  computed,
-  defineComponent,
-  defineAsyncComponent,
-  ref,
-  unref,
-} from "vue";
+import { computed, defineComponent, defineAsyncComponent, ref, unref } from "vue";
 import { fetcher, requests } from "@/api";
 import { SelectField } from "@/components/forms";
 import { agentOptionsSchema, legalPersonaOptionsSchema } from "@/schemas";
@@ -130,9 +121,7 @@ export default defineComponent({
   },
   components: {
     SelectField,
-    TooltipWidget: defineAsyncComponent(() =>
-      import("@/components/widgets/TooltipWidget.vue"),
-    ),
+    TooltipWidget: defineAsyncComponent(() => import("@/components/widgets/TooltipWidget.vue")),
   },
   setup(props, context) {
     const { fields, replace } = useFieldArray("agents");
@@ -176,8 +165,8 @@ export default defineComponent({
         .then((response) => response.json())
         .then((options) => filterAgentOptions(options));
     const getLegalPersonaOptions = () =>
-      fetcher(requests.attributes.getAttributeOptions("legalPersona")).then(
-        (response) => response.json(),
+      fetcher(requests.attributes.getAttributeOptions("legalPersona")).then((response) =>
+        response.json(),
       );
 
     return {

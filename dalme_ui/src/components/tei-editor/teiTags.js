@@ -125,8 +125,7 @@ export const teiTags = [
         name: "place",
         label: "Place",
         type: "text",
-        message:
-          "<b>Place</b> where the addition is located with reference to the main text",
+        message: "<b>Place</b> where the addition is located with reference to the main text",
         options: ["above", "below"],
       },
     ],
@@ -161,16 +160,14 @@ export const teiTags = [
       {
         name: "lemma",
         label: "Lemma",
-        message:
-          "The <b>lemma</b> (<i>i.e.</i> non-elided version of the word)",
+        message: "The <b>lemma</b> (<i>i.e.</i> non-elided version of the word)",
         type: "text",
       },
       {
         name: "join",
         label: "Join",
         type: "choice",
-        message:
-          ", or the side on which the word should be <b>join</b> another",
+        message: ", or the side on which the word should be <b>join</b> another",
         options: ["left", "right"],
       },
     ],
@@ -196,6 +193,7 @@ export const teiTags = [
         label: "Force",
         type: "choice",
         message:
+          // eslint-disable-next-line max-len
           "<b>Force</b> of the association: <b>strong</b> for hyphen that should be preserved during tokenisation, <b>weak</b> for hyphen that should not be kept, <i>e.g.</i> split words at the end of lines",
         options: ["weak", "strong"],
       },
@@ -213,8 +211,7 @@ export const teiTags = [
         name: "reason",
         label: "Reason",
         type: "text",
-        message:
-          "<b>Reason</b> for the omission/gap, including type of content omitted",
+        message: "<b>Reason</b> for the omission/gap, including type of content omitted",
         options: ["damage", "script", "ink", "image"],
       },
       {
@@ -270,8 +267,7 @@ export const teiTags = [
       {
         name: "extent",
         label: "Extent",
-        message:
-          "Description of the <b>extent</b> of the blank, <i>e.g.</i> 7 words",
+        message: "Description of the <b>extent</b> of the blank, <i>e.g.</i> 7 words",
         type: "text",
       },
     ],
@@ -280,6 +276,7 @@ export const teiTags = [
     name: "Columns Layout",
     type: "w",
     section: "other",
+    // eslint-disable-next-line max-len
     help: "Wraps a section of text that is laid out as columns. The columns themselves must be tagged individually.",
     link: "#Columns",
     tagName: "layout",
@@ -287,8 +284,7 @@ export const teiTags = [
       {
         name: "columns",
         label: "Columns",
-        message:
-          "<b>Number of columns</b> in which the selected section is divided.",
+        message: "<b>Number of columns</b> in which the selected section is divided.",
         type: "text",
       },
     ],
@@ -306,8 +302,7 @@ export const teiTags = [
       {
         name: "n",
         label: "Number",
-        message:
-          "<b>Number of the column</b> on the page, <i>e.g.</i> 1, 2, etc",
+        message: "<b>Number of the column</b> on the page, <i>e.g.</i> 1, 2, etc",
         type: "text",
       },
     ],
@@ -331,6 +326,7 @@ export const teiTags = [
         name: "key",
         label: "Key",
         message:
+          // eslint-disable-next-line max-len
           ", and <b>key</b> to an externally-defined means of identifying the entity, <i>e.g.</i> a database UUID",
         type: "text",
       },
@@ -340,6 +336,7 @@ export const teiTags = [
     name: "Leader",
     type: "sc",
     section: "other",
+    // eslint-disable-next-line max-len
     help: "Typographical mark used to connect items on the page that might be separated by considerable horizontal distance.",
     link: "#Leaders",
     tagName: "metamark",

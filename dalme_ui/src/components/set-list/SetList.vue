@@ -41,12 +41,7 @@
     </template>
 
     <template v-slot:grid-avatar="props">
-      <q-icon
-        name="check_circle_outline"
-        color="purple-8"
-        size="22px"
-        :test="props.row.setType"
-      />
+      <q-icon name="check_circle_outline" color="purple-8" size="22px" :test="props.row.setType" />
     </template>
 
     <template v-slot:grid-main="props">
@@ -75,22 +70,14 @@
     </template>
 
     <template v-slot:grid-counter="props">
-      <q-icon
-        name="chat_bubble_outline"
-        size="17px"
-        class="text-weight-bold q-mr-xs"
-      />
+      <q-icon name="chat_bubble_outline" size="17px" class="text-weight-bold q-mr-xs" />
       <div class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.memberCount }}
       </div>
     </template>
 
     <template v-slot:grid-counter-extra="props">
-      <q-icon
-        name="chat_bubble_outline"
-        size="17px"
-        class="text-weight-bold q-mr-xs"
-      />
+      <q-icon name="chat_bubble_outline" size="17px" class="text-weight-bold q-mr-xs" />
       <div class="text-grey-8 text-weight-bold text-detail">
         {{ props.row.publicMemberCount }}
       </div>
@@ -115,19 +102,11 @@
     </template>
 
     <template v-slot:render-cell-isPublic="props">
-      <BooleanWidget
-        :value="props.row.isPublic"
-        :onlyTrue="true"
-        trueIcon="public"
-      />
+      <BooleanWidget :value="props.row.isPublic" :onlyTrue="true" trueIcon="public" />
     </template>
 
     <template v-slot:render-cell-hasLanding="props">
-      <BooleanWidget
-        :value="props.row.hasLanding"
-        :onlyTrue="true"
-        trueIcon="check_circle"
-      />
+      <BooleanWidget :value="props.row.hasLanding" :onlyTrue="true" trueIcon="check_circle" />
     </template>
 
     <template v-slot:render-cell-endpoint="props">
@@ -151,12 +130,7 @@ import { useMeta } from "quasar";
 import { computed, defineComponent, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
-import {
-  BooleanWidget,
-  ChooserWidget,
-  DataTable,
-  DetailPopover,
-} from "@/components";
+import { BooleanWidget, ChooserWidget, DataTable, DetailPopover } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { setListSchema } from "@/schemas";
 import { useAPI, usePagination, useStores } from "@/use";
@@ -205,16 +179,14 @@ export default defineComponent({
       const schema = setListSchema(setType.value);
       await fetchAPI(request);
       if (success.value)
-        await schema
-          .validate(data.value.data, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns(columnMap.value);
-            pagination.value.rowsNumber = data.value.recordsFiltered;
-            pagination.value.rowsTotal = data.value.recordsTotal;
-            rows.value = value;
-            //rows.value.splice(0, rows.value.length, ...value);
-            loading.value = false;
-          });
+        await schema.validate(data.value.data, { stripUnknown: true }).then((value) => {
+          columns.value = getColumns(columnMap.value);
+          pagination.value.rowsNumber = data.value.filtered;
+          pagination.value.rowsTotal = data.value.count;
+          rows.value = value;
+          //rows.value.splice(0, rows.value.length, ...value);
+          loading.value = false;
+        });
     };
 
     const {
@@ -230,12 +202,7 @@ export default defineComponent({
       search,
       resetPagination,
       visibleColumns,
-    } = usePagination(
-      fetchData,
-      $route.name,
-      getDefaults(columnMap.value),
-      props.embedded,
-    );
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap.value), props.embedded);
 
     provide("pagination", { pagination, fetchDataPaginated });
     provide("columns", columns);

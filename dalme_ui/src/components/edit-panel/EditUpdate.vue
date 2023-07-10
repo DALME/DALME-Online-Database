@@ -69,37 +69,29 @@ export default defineComponent({
         } = forms[resource.value];
         await fetchAPI(get(id.value));
         if (success.value) {
-          await editSchema
-            .validate(data.value, { stripUnknown: true })
-            .then(async (value) => {
-              // We only need to transform the attributes if they are there,
-              // otherwise the schema has taken care of everything already.
-              if (!value.attributes) {
-                spawnForm(value);
-              } else {
-                const { success, data, fetchAPI } = apiInterface();
-                const { attributes } = value;
-                const shortNames = keys(attributes).join(",");
-                const request =
-                  requests.attributeTypes.getAttributeTypesByShortName(
-                    shortNames,
-                  );
-                await fetchAPI(request);
-                if (success.value)
-                  await attributeTypesSchema
-                    .validate(data.value.data, { stripUnknown: true })
-                    .then((attributeTypes) => {
-                      const normalized = {
-                        ...value,
-                        attributes: normalizeAttributesInput(
-                          attributeTypes,
-                          attributes,
-                        ),
-                      };
-                      spawnForm(normalized);
-                    });
-              }
-            });
+          await editSchema.validate(data.value, { stripUnknown: true }).then(async (value) => {
+            // We only need to transform the attributes if they are there,
+            // otherwise the schema has taken care of everything already.
+            if (!value.attributes) {
+              spawnForm(value);
+            } else {
+              const { success, data, fetchAPI } = apiInterface();
+              const { attributes } = value;
+              const shortNames = keys(attributes).join(",");
+              const request = requests.attributeTypes.getAttributeTypesByShortName(shortNames);
+              await fetchAPI(request);
+              if (success.value)
+                await attributeTypesSchema
+                  .validate(data.value.data, { stripUnknown: true })
+                  .then((attributeTypes) => {
+                    const normalized = {
+                      ...value,
+                      attributes: normalizeAttributesInput(attributeTypes, attributes),
+                    };
+                    spawnForm(normalized);
+                  });
+            }
+          });
         }
         loading.value = false;
       }

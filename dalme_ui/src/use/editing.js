@@ -58,10 +58,8 @@ export const provideEditing = () => {
         actions: {
           hide: assign({ visible: false }),
           show: assign({ visible: true }),
-          notifyFailure: (context) =>
-            notifier.CRUD.failure(`Could not save ${context.kind}`),
-          notifySuccess: (context) =>
-            notifier.CRUD.success(`${context.kind} saved`),
+          notifyFailure: (context) => notifier.CRUD.failure(`Could not save ${context.kind}`),
+          notifySuccess: (context) => notifier.CRUD.success(`${context.kind} saved`),
           validate: assign({
             validated: (_, event) => (event.validated ? true : false),
           }),
@@ -117,8 +115,7 @@ export const provideEditing = () => {
       {
         actions: {
           debug: () => {},
-          notifyFailure: () =>
-            notifier.CRUD.failure("Couldn't save inline edits"),
+          notifyFailure: () => notifier.CRUD.failure("Couldn't save inline edits"),
           notifySuccess: () => notifier.CRUD.success("Inline edits saved"),
         },
       },
@@ -164,17 +161,11 @@ export const provideEditing = () => {
         editing: {},
         destroyModal: {
           entry: ["gcModal"],
-          always: [
-            { target: "editing", cond: "hasModals" },
-            { target: "normal" },
-          ],
+          always: [{ target: "editing", cond: "hasModals" }, { target: "normal" }],
         },
         destroyInline: {
           entry: ["gcInline"],
-          always: [
-            { target: "editing", cond: "hasModals" },
-            { target: "normal" },
-          ],
+          always: [{ target: "editing", cond: "hasModals" }, { target: "normal" }],
         },
         reset: {
           entry: ["gcModals"],
@@ -185,13 +176,11 @@ export const provideEditing = () => {
     {
       actions: {
         gcInline: assign({
-          focus: (context) =>
-            context.focus === "inline" ? null : context.focus,
+          focus: (context) => (context.focus === "inline" ? null : context.focus),
           inline: null,
         }),
         gcModal: assign({
-          focus: (context, event) =>
-            context.focus === event.cuid ? null : context.focus,
+          focus: (context, event) => (context.focus === event.cuid ? null : context.focus),
           modals: (context, event) => {
             const { actor } = context.modals[event.cuid];
             actor.stop();
@@ -214,9 +203,7 @@ export const provideEditing = () => {
           { type: "SAVE" },
           {
             to: (context) =>
-              context.focus === "inline"
-                ? context.inline
-                : context.modals[context.focus].actor,
+              context.focus === "inline" ? context.inline : context.modals[context.focus].actor,
           },
         ),
         spawnFolio: assign({
@@ -225,10 +212,9 @@ export const provideEditing = () => {
             return {
               [event.cuid]: {
                 kind: "folio",
-                actor: spawn(
-                  createFolioMachine(event.cuid, event.key, event.metadata),
-                  { sync: true },
-                ),
+                actor: spawn(createFolioMachine(event.cuid, event.key, event.metadata), {
+                  sync: true,
+                }),
               },
               ...context.modals,
             };
@@ -333,8 +319,7 @@ export const provideEditing = () => {
       values(forms.value),
     );
 
-    const inlineSaving =
-      !isNil(inline.value) && inline.value.getSnapshot().matches("saving");
+    const inlineSaving = !isNil(inline.value) && inline.value.getSnapshot().matches("saving");
 
     const isSaving = [...formsSaving, inlineSaving];
 
@@ -343,9 +328,7 @@ export const provideEditing = () => {
 
   // Close the editor when there's no CRUD happening.
   const hideEditing = ref(null); // Receives a method from the edit panel on render.
-  const noEditing = computed(
-    () => isNil(inline.value) && isEmpty(modals.value),
-  );
+  const noEditing = computed(() => isNil(inline.value) && isEmpty(modals.value));
   watch(
     () => noEditing.value,
     (newValue) => {
