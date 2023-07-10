@@ -2,7 +2,7 @@
   <q-icon v-if="mini" :name="miniIcon" :color="tagColours.text" :size="size" />
   <q-badge
     v-else
-    :color="tagColours.colour"
+    :color="outline ? 'transparent' : tagColours.colour"
     :text-color="tagColours.text"
     :class="`tag-${size}`"
     :label="name"
@@ -21,7 +21,7 @@ export default defineComponent({
       required: false,
     },
     name: {
-      type: String,
+      type: [String, Number],
       required: false,
     },
     mini: {
@@ -54,6 +54,10 @@ export default defineComponent({
       type: Number,
       required: false,
     },
+    outline: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const {
@@ -63,14 +67,31 @@ export default defineComponent({
       workflowIconbyStage,
       workflowIconbyStatus,
     } = useConstants();
-    const converter =
-      props.module === "workflow" ? workflowTagColours : ticketTagColours;
 
-    const tagColours = computed(() =>
-      props.module === "standalone"
-        ? { colour: props.colour, text: props.textColour }
-        : converter[props.type],
-    );
+    const converter = props.module === "workflow" ? workflowTagColours : ticketTagColours;
+
+    // const tagColours = computed(() =>
+    //   props.module === "standalone"
+    //     ? { colour: props.colour, text: props.textColour }
+    //     : converter[props.type],
+    // );
+
+    // TODO: fix this horrible hack (this was a quick solution after changing models)
+    const tagColours = computed(() => {
+      if (props.module === "workflow") {
+        let type = props.type;
+        type = ["ingestion", "transcription", "markup", "review", "parsing"].reduce(
+          (result, word) => result.replace(word, ""),
+          type,
+        );
+        type = type.trim().replace(" ", "_");
+        return converter[type];
+      } else if (props.module === "standalone") {
+        return { colour: props.colour, text: props.textColour };
+      } else {
+        return converter[props.type];
+      }
+    });
 
     const miniIcon = computed(() => {
       if (props.module === "workflow") {
@@ -103,5 +124,8 @@ export default defineComponent({
   font-weight: 600;
   height: 14px;
   padding: 0px 4px;
+}
+.transparent {
+  background: none;
 }
 </style>

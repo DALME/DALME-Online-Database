@@ -11,30 +11,27 @@
       no-parent-event
       anchor="top left"
       self="bottom left"
-      class="q-pb-sm no-shadow"
+      class="popover-container"
+      :class="dark ? 'dark' : ''"
       max-width="50%"
     >
-      <q-card flat bordered class="box-down-arrow q-pa-md">
+      <q-card flat bordered class="box-small-arrow" :class="dark ? 'dark' : ''">
         <slot>
-          <q-item v-if="userData" class="q-pa-none column flex-center">
-            <q-item-label v-if="showAvatar">
-              <q-avatar v-if="userData.avatar" size="50px">
-                <img :src="userData.avatar" />
+          <q-item v-if="userData">
+            <q-item-section v-if="showAvatar" avatar>
+              <q-avatar size="32px">
+                <img v-if="notNully(userData.avatar)" :src="userData.avatar" />
+                <q-icon v-else size="32px" name="mdi-account-circle" />
               </q-avatar>
-              <q-avatar
-                v-else
-                size="50px"
-                icon="account_circle"
-                color="light-blue-3"
-                text-color="blue-9"
-              />
-            </q-item-label>
-            <q-item-label class="text-h8 text-condensed text-grey-9">
-              {{ userData.fullName }}
-            </q-item-label>
-            <q-item-label class="text-detail text-weight-medium text-grey-8">
-              {{ userData.username }}
-            </q-item-label>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>
+                {{ userData.fullName }}
+              </q-item-label>
+              <q-item-label caption>
+                {{ userData.email }}
+              </q-item-label>
+            </q-item-section>
           </q-item>
         </slot>
       </q-card>
@@ -44,10 +41,15 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+import { notNully } from "@/utils";
 
 export default defineComponent({
   name: "DetailPopover",
   props: {
+    dark: {
+      type: Boolean,
+      default: false,
+    },
     linkClass: {
       type: String,
       required: false,
@@ -62,16 +64,6 @@ export default defineComponent({
       required: false,
     },
     showAvatar: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    spaceBefore: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    spaceAfter: {
       type: Boolean,
       required: false,
       default: false,
@@ -96,26 +88,44 @@ export default defineComponent({
       showPopover,
       target,
       text,
+      notNully,
     };
   },
 });
 </script>
 
-<style lang="scss" scoped>
-.popover-link {
-  font-weight: 500;
-  color: inherit;
-  white-space: normal;
+<style lang="scss">
+.popover-container {
+  --bg-colour: var(--light-bg-base-colour);
+  --border-colour: var(--ligth-border-base-colour);
+  --main-colour: var(--light-default-text-colour);
+  --secondary-colour: var(--light-secondary-text-colour);
 }
-.popover-link:hover {
-  color: #5c6bc0;
+.popover-container.dark {
+  --bg-colour: var(--dark-bg-base-colour);
+  --border-colour: var(--dark-border-base-colour);
+  --main-colour: var(--dark-default-text-colour);
+  --secondary-colour: var(--dark-secondary-text-colour);
 }
+.popover-container {
+  padding-bottom: 8px;
+  box-shadow: none !important;
+  background: none !important;
+}
+.popover-container .q-card {
+  background: var(--bg-colour);
+  border-color: var(--border-colour);
+}
+.popover-container .q-item {
+  color: var(--main-colour);
+}
+.popover-container .q-item .q-item__label--caption {
+  color: var(--secondary-colour);
+}
+.popover-link,
 .user-link {
-  font-weight: 500;
+  font-weight: 700;
   color: inherit;
   white-space: normal;
-}
-.user-link:hover {
-  color: #5c6bc0;
 }
 </style>

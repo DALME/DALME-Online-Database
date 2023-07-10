@@ -9,3 +9,4 @@ export { default as SimpleSpinner } from "./SimpleSpinner.vue";
 export { default as SuspenseWithError } from "./SuspenseWithError.vue";
 export { default as CommentWidget } from "./CommentWidget.vue";
 export { default as AttachmentWidget } from "./AttachmentWidget.vue";
+export { default as AttachmentIconWidget } from "./AttachmentIconWidget.vue";
