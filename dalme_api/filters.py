@@ -1,8 +1,9 @@
 from django_filters import rest_framework as filters
 
 from django.contrib.auth.models import User
+from django.db.models import Q
 
-from dalme_app.models import Collection, ContentTypeExtended, Record, RightsPolicy, Task, Ticket
+from dalme_app.models import Collection, ContentTypeExtended, Record, RightsPolicy, Task, TaskList, Ticket
 
 
 class ContentTypeFilter(filters.FilterSet):
@@ -69,6 +70,8 @@ class CollectionFilter(filters.FilterSet):
 class TaskFilter(filters.FilterSet):
     """Filter for Tasks endpoint."""
 
+    user = filters.CharFilter(label='user', method='for_user')
+
     class Meta:  # noqa: D106
         model = Task
         fields = [
@@ -76,10 +79,46 @@ class TaskFilter(filters.FilterSet):
             'title',
             'description',
             'completed',
+            'completed_by',
             'url',
+            'assignees',
             'creation_user',
             'creation_timestamp',
+            'user',
         ]
+
+    def for_user(self, queryset, name, value):  # noqa: ARG002
+        """Return tasks the user in the request created, was assigned to, or completed."""
+        return queryset.filter(
+            Q(creation_user=value) | Q(completed_by=value) | Q(assignees=value),
+        ).distinct()
+
+
+class TasklistFilter(filters.FilterSet):
+    """Filter for Tasklists endpoint."""
+
+    user = filters.CharFilter(label='user', method='for_user')
+
+    class Meta:  # noqa: D106
+        model = TaskList
+        fields = [
+            'id',
+            'name',
+            'description',
+            'slug',
+            'creation_user',
+            'creation_timestamp',
+            'user',
+        ]
+
+    def for_user(self, queryset, name, value):  # noqa: ARG002
+        """Return lists the user in the request owns, can see, or are linked to their teams/groups."""
+        groups = [g.id for g in User.objects.get(pk=value).groups.all()]
+        return queryset.filter(
+            Q(owner=value)
+            | Q(team_link__in=groups)
+            | (Q(permissions__principal_id=value) & Q(permissions__can_view=True)),
+        ).distinct()
 
 
 class TicketFilter(filters.FilterSet):
