@@ -1,6 +1,8 @@
 <template>
   <PageContainer>
-    <router-view />
+    <div class="data-view">
+      <router-view />
+    </div>
   </PageContainer>
 </template>
 
