@@ -27,7 +27,7 @@
     "core-js": "^3.30.2",
     "cuid": "^3.0.0",
     "formvuelate": "^3.9.1",
-    "moment": "^2.29.4",
+    "luxon": "3.3.0",
     "openseadragon": "^4.0.0",
     "pinia": "^2.1.1",
     "pinia-plugin-persistedstate": "^3.1.0",
