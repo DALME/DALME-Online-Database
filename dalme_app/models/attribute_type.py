@@ -18,8 +18,8 @@ class AttributeType(dalmeIntid):
         ('TXT', 'TXT (text)'),
     )
 
-    name = models.CharField(max_length=255)
-    short_name = models.CharField(max_length=55, unique=True)
+    name = models.CharField(max_length=55, unique=True)
+    label = models.CharField(max_length=255)
     description = models.TextField()
     data_type = models.CharField(max_length=15, choices=DATA_TYPES)
     is_local = models.BooleanField(default=False)

@@ -309,6 +309,12 @@ class Migration(migrations.Migration):  # noqa: D101
             preserve_default=False,
         ),
         # TaskList
+        migrations.AddField(
+            model_name='tasklist',
+            name='description',
+            field=models.TextField(blank=True, default=''),
+            preserve_default=False,
+        ),
         migrations.AlterField(
             model_name='tasklist',
             name='team_link',
@@ -322,7 +328,7 @@ class Migration(migrations.Migration):  # noqa: D101
         ),
         migrations.AlterUniqueTogether(
             name='tasklist',
-            unique_together={('team_link', 'slug')},
+            unique_together={('name', 'team_link', 'owner')},
         ),
         # Ticket
         migrations.AddField(

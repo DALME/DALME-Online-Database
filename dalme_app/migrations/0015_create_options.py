@@ -20,7 +20,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
             {'label': 'Notary', 'value': 'Notary'},
         ],
     )
-    authority = AttributeType.objects.get(short_name='authority')
+    authority = AttributeType.objects.get(name='authority')
     authority.options = auth_list
     authority.save(update_fields=['options'])
 
@@ -34,7 +34,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
             {'label': 'Register - quarto', 'value': 'Register - quarto'},
         ],
     )
-    att_format = AttributeType.objects.get(short_name='format')
+    att_format = AttributeType.objects.get(name='format')
     att_format.options = format_list
     att_format.save(update_fields=['options'])
 
@@ -115,7 +115,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
             {'label': 'unclear', 'value': 'unclear', 'group': 'Other'},
         ],
     )
-    record_type = AttributeType.objects.get(short_name='record_type')
+    record_type = AttributeType.objects.get(name='record_type')
     record_type.options = record_type_list
     record_type.save(update_fields=['options'])
 
@@ -130,7 +130,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
             {'label': 'Vellum', 'value': 'Vellum'},
         ],
     )
-    support = AttributeType.objects.get(short_name='support')
+    support = AttributeType.objects.get(name='support')
     support.options = support_list
     support.save(update_fields=['options'])
 
@@ -145,7 +145,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
             {'label': 'Public Domain', 'value': 'Public Domain'},
         ],
     )
-    rights_status = AttributeType.objects.get(short_name='rights_status')
+    rights_status = AttributeType.objects.get(name='rights_status')
     rights_status.options = rights_status_list
     rights_status.save(update_fields=['options'])
 
@@ -164,7 +164,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
             },
         },
     )
-    owner = AttributeType.objects.get(short_name='owner')
+    owner = AttributeType.objects.get(name='owner')
     owner.options = user_list
     owner.save(update_fields=['options'])
 
@@ -178,7 +178,7 @@ def create_attribute_options(apps, schema_editor):  # noqa: ARG001
             'choices': 'RIGHTS_STATUS',
         },
     )
-    rights_status = AttributeType.objects.get(short_name='rights_status')
+    rights_status = AttributeType.objects.get(name='rights_status')
     rights_status.options = rights_status_list
     rights_status.save(update_fields=['options'])
 
@@ -198,7 +198,7 @@ class Migration(migrations.Migration):  # noqa: D101
         ('auth', '0012_alter_user_first_name_max_length'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dalme_app', '0014_remove_unused'),
+        ('dalme_app', '0014_adj_and_remove_unused'),
     ]
 
     operations = [

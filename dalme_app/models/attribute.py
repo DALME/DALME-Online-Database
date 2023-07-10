@@ -33,13 +33,13 @@ class Attribute(dalmeUuid):
 
     @property
     def name(self):
-        """Return attribute name (short_name)."""
-        return self.attribute_type.short_name
+        """Return attribute name."""
+        return self.attribute_type.name
 
     @property
     def label(self):
-        """Return attribute label (name)."""
-        return self.attribute_type.name
+        """Return attribute label."""
+        return self.attribute_type.label
 
     @property
     def description(self):

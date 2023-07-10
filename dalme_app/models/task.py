@@ -37,7 +37,7 @@ class Task(dalmeIntid):
     assignees = models.ManyToManyField(User, blank=True, related_name='task_assignations')
 
     class Meta:  # noqa: D106
-        ordering = ['priority', 'creation_timestamp']
+        ordering = ['creation_timestamp']
 
     def __str__(self):  # noqa: D105
         return self.title
@@ -72,6 +72,7 @@ class TaskList(dalmeIntid, dalmeOwned):
 
     name = models.CharField(max_length=60)
     slug = models.SlugField(default='')
+    description = models.TextField(blank=True)
     team_link = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
@@ -84,8 +85,7 @@ class TaskList(dalmeIntid, dalmeOwned):
     class Meta:  # noqa: D106
         ordering = ['name']
         verbose_name_plural = 'Task Lists'
-        # Prevents (at the database level) creation of two lists with the same slug in the same group
-        unique_together = ('team_link', 'slug')
+        unique_together = ('name', 'team_link', 'owner')
 
     @property
     def task_count(self):

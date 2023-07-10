@@ -35,7 +35,7 @@ class RecordGroup(dalmeUuid, dalmeOwned):
     def is_private(self):
         """Return boolean indicating whether the record is private."""
         if self.permissions.filter(is_default=True).exists():
-            return not self.permissions.filter(is_default=True).first().get('can_view', True)
+            return not getattr(self.permissions.filter(is_default=True).first(), 'can_view', True)
         return False
 
     @property
@@ -95,7 +95,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     def is_private(self):
         """Return boolean indicating whether the record is private."""
         if self.permissions.filter(is_default=True).exists():
-            return not self.permissions.filter(is_default=True).first().get('can_view', True)
+            return not getattr(self.permissions.filter(is_default=True).first(), 'can_view', True)
         return False
 
     def get_related_resources(self, content_type):

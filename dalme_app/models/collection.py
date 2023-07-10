@@ -36,6 +36,13 @@ class Collection(dalmeUuid, dalmeOwned):
         """Return count of comments."""
         return self.comments.count()
 
+    @property
+    def is_private(self):
+        """Return boolean indicating whether the collection is private."""
+        if self.permissions.filter(is_default=True).exists():
+            return not getattr(self.permissions.filter(is_default=True).first(), 'can_view', True)
+        return False
+
     def membership_type(self):
         """Return the type of members of the collection."""
         types = list({m.content_type.model for m in self.members.all()})
