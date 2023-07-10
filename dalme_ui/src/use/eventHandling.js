@@ -1,11 +1,12 @@
-import { EventBus, Notify } from "quasar";
+import { Notify } from "quasar";
 import { inject, provide } from "vue";
 import notifier from "@/notifier";
+import { useUiStore } from "@/stores/ui";
 
 const EventHandlingSymbol = Symbol();
 
 export const provideEventHandling = () => {
-  const eventBus = new EventBus();
+  const ui = useUiStore();
 
   const onError = (evt) => {
     evt.preventDefault().stopImmediatePropagation();
@@ -36,7 +37,7 @@ export const provideEventHandling = () => {
 
   provide(EventHandlingSymbol, {
     notifier,
-    eventBus,
+    eventBus: ui.eventBus,
     onError,
     displayErrorAlert,
   });
