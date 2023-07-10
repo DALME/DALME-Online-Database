@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
+import { computed, ref } from "vue";
 import { isEmpty, mergeDeepLeft } from "ramda";
 import { notNully } from "@/utils";
-import { useNavStore } from "@/stores/navigation";
+import { useUiStore } from "@/stores/ui";
 
 class ViewState {
   constructor(state) {
@@ -14,82 +15,97 @@ class ViewState {
   }
 }
 
-export const useViewStore = defineStore("views", {
-  state: () => {
-    return {
-      view: {},
-      stored: {},
-    };
-  },
-  getters: {
-    /** @returns {boolean} */
-    showEditFolioBtn(state) {
+export const useViewStore = defineStore(
+  "views",
+  () => {
+    // stores
+    const ui = useUiStore();
+
+    // state
+    const view = ref({});
+    const stored = ref({});
+
+    // getters
+    const showEditFolioBtn = computed(() => {
       return (
-        "tab" in state.view &&
-        state.view.tab === "folios" &&
-        "folios" in state.view &&
-        state.view.folios.length > 0
+        "tab" in view.value &&
+        view.value.tab === "folios" &&
+        "folios" in view.value &&
+        view.value.folios.length > 0
       );
-    },
+    });
 
-    /** @returns {number} */
-    folioCount(state) {
-      return "folios" in state.view ? state.view.folios.length : false;
-    },
+    const folioCount = computed(() => ("folios" in view.value ? view.value.folios.length : false));
 
-    /** @returns {object} */
-    currentFolioData(state) {
-      if (notNully(state.view.folios) && notNully(state.view.currentFolioRef)) {
-        return state.view.folios[state.view.currentFolioRef];
+    const currentFolioData = computed(() => {
+      if (notNully(view.value.folios) && notNully(view.value.currentFolioRef)) {
+        return view.value.folios[view.value.currentFolioRef];
       } else {
         return {};
       }
-    },
+    });
 
-    /** @returns {boolean} */
-    currentFolioEditOn() {
-      return this.showEditFolioBtn && this.currentFolioData.editOn;
-    },
-  },
-  actions: {
-    saveViewState(path) {
-      this.stored[path] = new ViewState(this.view);
-    },
+    const currentFolioEditOn = computed(
+      () => showEditFolioBtn.value && currentFolioData.value.editOn,
+    );
 
-    deleteViewState(path) {
-      delete this.stored[path];
-    },
+    // actions
+    const $reset = () => {
+      view.value = {};
+      stored.value = {};
+    };
 
-    retrieveViewState(path) {
-      console.log("retrieving view state");
-      if (path in this.stored) {
-        const viewState = this.stored[path];
+    const saveViewState = (path) => {
+      stored.value[path] = new ViewState(view.value);
+    };
+
+    const deleteViewState = (path) => {
+      delete stored.value[path];
+    };
+
+    const retrieveViewState = (path) => {
+      if (path in stored.value) {
+        const viewState = stored.value[path];
         if (!viewState.isStale) {
           return viewState;
         } else {
-          delete this.deleteViewState(path);
+          deleteViewState(path);
         }
       }
       return null;
-    },
+    };
 
-    setViewState(target) {
-      const nav = useNavStore();
-      if (!nav.isSameRoute) {
-        this.view = {};
+    const setViewState = (target) => {
+      if (!ui.isSameRoute) {
+        view.value = {};
         if (!(isEmpty(target.meta) || target.meta.resetStateOnLoad)) {
-          const viewState = this.retrieveViewState(target.fullPath);
-          if ("viewDefaults" in target.meta)
-            this.view = target.meta.viewDefaults;
-          if (viewState) this.mergeValues(viewState.state);
+          const viewState = retrieveViewState(target.fullPath);
+          if ("viewDefaults" in target.meta) view.value = target.meta.viewDefaults;
+          if (viewState) mergeValues(viewState.state);
         }
       }
-    },
+    };
 
-    mergeValues(values) {
+    const mergeValues = (values) => {
       let partial = mergeDeepLeft(this.$state, { view: values });
       this.$patch(partial);
-    },
+    };
+
+    return {
+      view,
+      stored,
+      showEditFolioBtn,
+      folioCount,
+      currentFolioData,
+      currentFolioEditOn,
+      saveViewState,
+      deleteViewState,
+      retrieveViewState,
+      setViewState,
+      $reset,
+    };
   },
-  persist: true,
-});
+  {
+    persist: true,
+  },
+);
