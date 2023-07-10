@@ -30,11 +30,12 @@ module.exports = {
   },
 
   rules: {
-    indent: ["error", 2],
+    indent: "off", // eslint and prettier clash over indentation, e.g. switch statements
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     "prefer-promise-reject-errors": "off",
     "linebreak-style": ["error", "unix"],
     "no-unused-vars": "off",
+    "max-len": ["error", {"code": 100, "ignoreUrls": true}],
     "prettier/prettier": [
       "error",
       {
@@ -42,6 +43,7 @@ module.exports = {
         doubleQuote: true,
         tabWidth: 2,
         trailingComma: "all",
+        printWidth: 100,
       },
     ],
     quotes: ["error", "double"],
