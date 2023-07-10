@@ -1,307 +1,175 @@
 <template>
   <q-header class="no-shadow">
     <div class="main-toolbar row flex-center q-px-lg q-py-xs">
-      <q-btn flat dense class="q-pl-xs">
-        <q-avatar square color="white" size="34px">
-          <img src="~assets/dalme_logo.svg" alt="DALME" />
-        </q-avatar>
+      <q-btn icon="mdi-menu" class="tb-button q-mr-md" @click="appDrawerOpen = !appDrawerOpen">
+        <TooltipWidget>Open App menu.</TooltipWidget>
       </q-btn>
-      <q-form class="q-mx-md">
-        <q-input
-          dark
-          dense
-          standout
-          hide-bottom-space
-          v-model="searchQuery"
-          debounce="300"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          placeholder="Search..."
-          class="menu-search"
-        >
-          <template v-slot:append>
-            <q-icon
-              v-if="searchQuery === ''"
-              name="search"
-              size="18px"
-              color="blue-grey-5"
-            />
-            <q-icon
-              v-else
-              name="highlight_off"
-              class="cursor-pointer"
-              size="18px"
-              color="blue-grey-5"
-              @click="searchQuery = ''"
-            />
-          </template>
-        </q-input>
-      </q-form>
+
+      <q-icon :name="pageIcon" color="grey-4" size="26px" />
+
+      <q-breadcrumbs
+        separator-color="bc-colour"
+        gutter="xs"
+        class="menu-breadcrumb q-ml-md q-mr-auto"
+      >
+        <template v-for="(route, idx) in breadcrumbs" :key="idx">
+          <q-breadcrumbs-el
+            v-if="idx == breadcrumbs.length - 1"
+            :label="route"
+            class="text-grey-5 text-weight-bold"
+          />
+          <q-breadcrumbs-el v-else :label="route" :to="{ name: route }" class="text-grey-5" />
+        </template>
+      </q-breadcrumbs>
+
       <q-space />
-      <div style="font-size: 21px" class="q-mr-md text-blue-grey-3">
-        <strong>DALME</strong> DB
+
+      <div class="q-mr-xs dalme-logotype">
+        <strong>DALME</strong><span class="dalme-logotype-db">DB</span>
       </div>
-      <q-btn flat dense color="blue-grey-2" class="q-mr-sm q-pr-none">
-        <q-icon name="help_outline" size="sm" />
-        <q-icon name="arrow_drop_down" size="xs" style="margin-left: -3px" />
-        <q-menu anchor="bottom right" self="top right">
-          <q-list padding class="text-grey-9">
-            <q-item
-              dense
-              clickable
-              v-close-popup
-              @click="openKB"
-              class="q-pr-lg"
-            >
-              <q-item-section class="col-auto q-mr-xs">
-                <q-icon name="article" size="sm" />
-              </q-item-section>
-              <q-item-section>Knowledge Base</q-item-section>
-            </q-item>
 
-            <q-item dense clickable v-close-popup @click="search_help">
-              <q-item-section class="col-auto q-mr-xs">
-                <q-icon name="quiz" size="sm"></q-icon>
-              </q-item-section>
-              <q-item-section>Search Help</q-item-section>
-            </q-item>
-
-            <q-separator spaced></q-separator>
-
-            <q-item dense clickable v-close-popup @click="report_issue">
-              <q-item-section class="col-auto q-mr-xs">
-                <q-icon name="bug_report" size="sm"></q-icon>
-              </q-item-section>
-              <q-item-section>Report Issue</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
+      <q-btn
+        icon="mdi-magnify"
+        icon-right="mdi-tab-search"
+        label="Search..."
+        no-caps
+        class="tb-button q-mx-md tb-search-button"
+      >
+        <TooltipWidget>Search DALME.</TooltipWidget>
       </q-btn>
 
-      <q-btn flat dense color="blue-grey-2" size="12px" class="q-pr-none">
-        <q-avatar
-          v-if="!isEmpty(auth.avatar) && !isNil(auth.avatar)"
-          size="24px"
+      <q-separator vertical dark class="q-mr-md" />
+
+      <template v-for="(route, idx) in topRoutes" :key="idx">
+        <q-btn-group
+          v-if="route.path == 'tickets'"
+          class="tb-button q-mr-sm"
+          :class="ui.currentSection === route.children[0].name ? 'disabled' : ''"
         >
+          <q-btn
+            :to="{ name: route.children[0].name }"
+            :icon="route.meta.icon"
+            :disable="ui.currentSection === route.children[0].name"
+          >
+            <TooltipWidget>{{ route.label }}</TooltipWidget>
+          </q-btn>
+          <q-btn
+            icon="mdi-plus"
+            class="btn-dropdown-like"
+            :disable="ui.currentSection === route.children[0].name"
+          >
+            <TooltipWidget>Create new issue ticket.</TooltipWidget>
+          </q-btn>
+        </q-btn-group>
+
+        <q-btn-dropdown
+          v-else-if="route.dropdown == true"
+          :icon="route.meta.icon"
+          class="tb-button q-mr-sm"
+          menu-anchor="bottom right"
+          menu-self="top right"
+          :menu-offset="[0, 5]"
+          content-class="popup-menu dark"
+        >
+          <q-list>
+            <template v-for="(child, i) in route.children" :key="i">
+              <q-item
+                :to="{ name: child.name ? child.name : child.children[0].name }"
+                dense
+                clickable
+                v-close-popup
+                :disable="ui.currentSubsection === child.meta.navPath[1]"
+              >
+                <q-item-section class="col-auto q-mr-xs">
+                  <q-icon :name="child.meta.icon" size="xs" />
+                </q-item-section>
+                <q-item-section>
+                  {{ child.label ? child.label : child.children[0].label }}
+                </q-item-section>
+              </q-item>
+              <q-separator v-if="child.separator" spaced />
+            </template>
+          </q-list>
+        </q-btn-dropdown>
+
+        <q-btn
+          v-else
+          :to="{ name: route.name ? route.name : route.children[0].name }"
+          :icon="route.meta.icon"
+          class="tb-button q-mr-sm"
+          :disable="
+            route.name
+              ? ui.currentSection === route.name
+              : ui.currentSection === route.children[0].name
+          "
+        >
+          <TooltipWidget>{{ route.label }}</TooltipWidget>
+        </q-btn>
+      </template>
+
+      <q-btn dense round class="q-pr-none" @click="userDrawerOpen = !userDrawerOpen">
+        <q-avatar v-if="notNully(auth.avatar)" size="34px">
           <img :src="auth.avatar" />
         </q-avatar>
-        <q-icon v-else name="account_circle" size="sm" />
-        <q-icon name="arrow_drop_down" size="xs" style="margin-left: -3px" />
-        <q-menu fit anchor="bottom right" self="top right">
-          <div class="col q-px-md q-mt-md q-mb-sm user-menu">
-            <div class="row q-mb-sm justify-center">
-              <q-avatar
-                v-if="!isEmpty(auth.avatar) && !isNil(auth.avatar)"
-                size="50px"
-              >
-                <img :src="auth.avatar" />
-              </q-avatar>
-              <q-avatar v-else size="50px" icon="account_circle" />
-            </div>
-            <div class="row justify-center">
-              <q-item-label class="text-subtitle2 text-weight-bold">
-                {{ auth.fullName }}
-              </q-item-label>
-            </div>
-            <div class="row justify-center">
-              <q-item-label caption>{{ auth.username }}</q-item-label>
-            </div>
-          </div>
-          <q-list padding class="text-grey-9 q-pt-none">
-            <q-separator spaced />
-            <q-item
-              :to="{ name: 'User', params: { username: auth.username } }"
-              dense
-              clickable
-              v-close-popup
-            >
-              <q-item-section class="col-auto q-mr-xs">
-                <q-icon name="portrait" size="sm" />
-              </q-item-section>
-              <q-item-section>Profile</q-item-section>
-            </q-item>
-            <q-item
-              :to="{
-                name: 'User',
-                params: { username: auth.username, prefs: true },
-              }"
-              dense
-              clickable
-              v-close-popup
-            >
-              <q-item-section class="col-auto q-mr-xs">
-                <q-icon name="manage_accounts" size="sm" />
-              </q-item-section>
-              <q-item-section>Preferences</q-item-section>
-            </q-item>
-            <q-separator class="q-mb-sm" />
-            <q-item
-              dense
-              clickable
-              v-close-popup
-              @click="logout"
-              :loading="submitting"
-            >
-              <q-item-section class="col-auto q-mr-xs">
-                <q-icon name="logout" size="sm" />
-                <template v-slot:loading>
-                  <q-spinner-oval size="sm" />
-                </template>
-              </q-item-section>
-              <q-item-section>Log out</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
+        <q-icon v-else name="mdi-account-circle" size="lg" color="blue-grey-5" />
       </q-btn>
     </div>
-    <div class="menu-container row bg-grey-2 q-mb-md">
-      <div class="q-pl-content col-grow">
-        <transition name="collapse">
-          <div v-if="!compactMode" class="title-bar row q-pt-none text-grey-9">
-            <q-icon :name="pageIcon" color="grey-7" size="sm" class="pg-icn" />
-            <q-breadcrumbs
-              separator-color="grey-9"
-              gutter="xs"
-              class="menu-breadcrumb q-ml-xs q-mr-auto"
-            >
-              <template v-for="(route, idx) in breadcrumbs" :key="idx">
-                <q-breadcrumbs-el
-                  v-if="idx === 0"
-                  :label="route"
-                  class="text-indigo-6"
-                />
-                <q-breadcrumbs-el
-                  v-else-if="idx < breadcrumbs.length - 1"
-                  :label="route"
-                  :to="{ name: route }"
-                  class="text-indigo-6"
-                />
-                <q-breadcrumbs-el
-                  v-else
-                  class="text-indigo-6 text-weight-bold"
-                  :label="route"
-                />
-              </template>
-              <q-spinner-oval v-if="globalLoading" size="xs" />
-            </q-breadcrumbs>
-          </div>
-        </transition>
-        <q-toolbar class="row text-grey-9 bg-grey-2 menu-bar">
-          <template v-for="(route, idx) in navRoutes" :key="idx">
-            <q-btn
-              v-if="!route.children"
-              dense
-              flat
-              no-caps
-              no-wrap
-              :class="
-                nav.currentSection === route.name
-                  ? 'text-grey-9 menu-button active'
-                  : 'text-grey-9 menu-button'
-              "
-              size="sm"
-              :to="{ name: route.name }"
-              :active="nav.currentSection === route.name"
-            >
-              <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
-              <span :data-content="route.name" class="q-pl-sm text-menu">
-                {{ route.name }}
-              </span>
-            </q-btn>
 
-            <q-btn
-              v-else
-              dense
-              flat
-              no-caps
-              no-wrap
-              :class="
-                nav.currentSection === route.name
-                  ? 'text-grey-9 menu-button active'
-                  : 'text-grey-9 menu-button'
-              "
-              size="sm"
-              :active="nav.currentSection === route.name"
-            >
-              <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
-              <span :data-content="route.name" class="q-pl-sm text-menu">
-                {{ route.name }}
-              </span>
-              <q-menu
-                class="menu-shadow"
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-list dense bordered style="min-width: 100px">
-                  <template v-for="(child, idx) in route.children" :key="idx">
-                    <NavLink
-                      v-if="child.nav && !child.children"
-                      v-bind="{ to: child.name, icon: child.meta.icon }"
-                    />
-                    <NavLink
-                      v-else-if="child.nav"
-                      v-bind="{
-                        to: child.children[0].name,
-                        icon: child.children[0].meta.icon,
-                      }"
-                    />
-                  </template>
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </template>
-        </q-toolbar>
-      </div>
-      <div class="q-pr-content col-auto">
-        <div class="row flex-center title-bar-end">
-          <q-btn
-            v-show="allowCompactMode"
-            flat
-            dense
-            size="12px"
-            :color="compactMode ? 'indigo-7' : 'grey-7'"
-            :icon="compactMode ? 'present_to_all' : 'present_to_all'"
-            class="page-header-button q-mr-sm"
-            :class="{ 'rotate-180': compactMode, 'bg-indigo-1': compactMode }"
-            @click="compactMode = !compactMode"
-          >
-            <TooltipWidget>Compact mode</TooltipWidget>
-          </q-btn>
-          <q-btn
-            flat
-            dense
-            size="12px"
-            :color="showTips ? 'green-7' : 'grey-7'"
-            class="page-header-button q-mr-sm"
-            :class="{ 'bg-green-1': showTips }"
-            @click="showTips = !showTips"
-          >
-            <q-icon
-              :name="showTips ? 'o_speaker_notes_off' : 'o_speaker_notes'"
-              size="16px"
-            />
-            <TooltipWidget>Tooltips</TooltipWidget>
-          </q-btn>
-          <q-btn
-            flat
-            dense
-            size="12px"
-            :color="isFullscreen ? 'indigo-7' : 'grey-7'"
-            :icon="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-            class="page-header-button"
-            :class="{ 'bg-indigo-1': isFullscreen }"
-            @click="toggleFullscreen"
-          >
-            <TooltipWidget>Full screen</TooltipWidget>
-          </q-btn>
-        </div>
-      </div>
+    <div class="menu-container row bg-grey-2 q-mb-md">
+      <q-toolbar class="row text-grey-9 bg-grey-2 menu-bar">
+        <q-btn
+          v-for="(route, idx) in menuRoutes"
+          :key="idx"
+          no-wrap
+          class="text-grey-9 menu-button"
+          :class="
+            route.name
+              ? ui.currentSection === route.name
+                ? 'active'
+                : ''
+              : ui.currentSection === route.children[0].name
+              ? 'active'
+              : ''
+          "
+          :to="{ name: route.name ? route.name : route.children[0].name }"
+          :active="
+            route.name
+              ? ui.currentSection === route.name
+              : ui.currentSection === route.children[0].name
+          "
+        >
+          <q-icon :name="route.meta.icon" color="grey-7" size="19px" />
+          <span :data-content="route.name" class="q-pl-sm text-menu">
+            {{ route.name ? route.name : route.children[0].name }}
+          </span>
+        </q-btn>
+
+        <q-space />
+
+        <q-btn
+          size="12px"
+          :text-color="showTips ? 'green-7' : 'grey-7'"
+          :icon="showTips ? 'mdi-tooltip-remove-outline' : 'mdi-tooltip-check-outline'"
+          class="mc-button"
+          :class="{ 'bg-green-1': showTips }"
+          @click="showTips = !showTips"
+        >
+          <TooltipWidget>Tooltips</TooltipWidget>
+        </q-btn>
+        <q-btn
+          size="13px"
+          :text-color="isFullscreen ? 'indigo-7' : 'grey-7'"
+          :icon="isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+          class="mc-button"
+          :class="{ 'bg-indigo-1': isFullscreen }"
+          @click="toggleFullscreen"
+        >
+          <TooltipWidget>Full screen</TooltipWidget>
+        </q-btn>
+      </q-toolbar>
     </div>
     <div
       class="strip-approach"
-      :style="stripApproachStyle"
       @mouseenter="stripApproachHover = true"
       @mouseleave="stripApproachHover = false"
     />
@@ -311,59 +179,36 @@
 <script>
 import { openURL, useQuasar } from "quasar";
 import { isEmpty, isNil } from "ramda";
-import { computed, defineComponent, inject, provide, ref, watch } from "vue";
+import { computed, defineComponent, provide, ref, watch } from "vue";
 import { navRoutes } from "@/router";
-import { CustomDialog, TooltipWidget } from "@/components";
-import NavLink from "./NavLink.vue";
-import { useStores, useTooltips } from "@/use";
+import { TooltipWidget } from "@/components";
+import { useStores } from "@/use";
+import { notNully } from "@/utils";
 
 export default defineComponent({
   name: "NavBar",
   components: {
-    NavLink,
     TooltipWidget,
   },
   setup() {
     const $q = useQuasar();
     const {
       auth,
-      allowCompactMode,
-      compactMode,
       globalLoading,
       isFullscreen,
-      nav,
+      ui,
       stripApproachHover,
+      userDrawerOpen,
+      appDrawerOpen,
+      showTips,
     } = useStores();
 
-    const { showTips } = useTooltips();
     const submitting = ref(false);
     const searchQuery = ref("");
-    const currentSubsection = ref(nav.currentSubsection);
-    const prefSubscription = inject("prefSubscription");
-
-    const stripApproachStyle = computed(() =>
-      compactMode.value ? "top: 55px" : "top: 95px",
-    );
+    const currentSubsection = ref(ui.currentSubsection);
 
     const openKB = () => {
       openURL("https://kb.dalme.org/", null, { target: "_blank" });
-    };
-
-    const logout = () => {
-      $q.dialog({
-        component: CustomDialog,
-        componentProps: {
-          isPersistent: true,
-          title: "Log out",
-          closeIcon: false,
-          message: "Do you want to end your current session?",
-          icon: "exit_to_app",
-          okayButtonLabel: "Log out",
-        },
-      }).onOk(() => {
-        prefSubscription();
-        auth.logout();
-      });
     };
 
     const toggleFullscreen = () => {
@@ -378,27 +223,25 @@ export default defineComponent({
       }
     };
 
-    const breadcrumbs = computed(() => nav.breadcrumb);
-    const pageIcon = computed(() => nav.currentPageIcon);
+    const breadcrumbs = computed(() => ui.breadcrumb);
+    const pageIcon = computed(() => ui.currentPageIcon);
 
     provide("currentSubsection", currentSubsection);
 
     watch(
-      () => nav.currentSubsection,
-      () => (currentSubsection.value = nav.currentSubsection),
+      () => ui.currentSubsection,
+      () => (currentSubsection.value = ui.currentSubsection),
     );
 
     return {
       auth,
-      allowCompactMode,
       breadcrumbs,
-      compactMode,
       stripApproachHover,
       darkMode: $q.dark,
-      logout,
       globalLoading,
-      navRoutes,
-      nav,
+      menuRoutes: navRoutes("menu"),
+      topRoutes: navRoutes("top"),
+      ui,
       showTips,
       submitting,
       isFullscreen,
@@ -406,35 +249,141 @@ export default defineComponent({
       isEmpty,
       toggleFullscreen,
       searchQuery,
-      stripApproachStyle,
       pageIcon,
       openKB,
+      userDrawerOpen,
+      appDrawerOpen,
+      notNully,
     };
   },
 });
 </script>
 
 <style lang="scss">
-.q-header {
-  background-color: white;
-}
 .main-toolbar {
   background-color: #2f333c;
   background-image: linear-gradient(180deg, #072034 10%, #1b1b1b);
   background-size: cover;
+  height: 60px;
 }
-.user-menu {
-  min-width: 200px;
+.main-toolbar .tb-button {
+  border: 1px solid rgb(51, 67, 84);
+  color: rgb(97, 115, 139);
+  height: 32px;
+  width: 32px;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 11px;
 }
-.menu-container {
-  border-bottom: 1px solid rgb(209, 209, 209);
+.main-toolbar .tb-button:before {
+  box-shadow: none;
+}
+.main-toolbar .tb-button .q-icon {
+  font-size: 20px;
+}
+.main-toolbar .tb-button.q-btn-group {
+  padding: 0;
+}
+.main-toolbar .tb-button:hover:not(.q-btn-group, .disabled),
+.main-toolbar .tb-button.q-btn-group:not(.disabled) .q-btn:hover {
+  border-color: rgb(87, 115, 144);
+  color: rgb(132, 159, 195);
+  background-color: #1d3446;
+}
+.main-toolbar .tb-button.q-btn-group:hover:not(.disabled) {
+  border-color: rgb(87, 115, 144);
+}
+.main-toolbar .tb-button.q-btn-group.disabled,
+.main-toolbar .tb-button.disabled:not(.q-btn-group) {
+  box-shadow: inset -1px -1px 0px 1px rgb(87 111 128 / 15%), inset 1px 1px 0px 1px black;
+  opacity: 1 !important;
+  background: #13293a;
+}
+.main-toolbar .tb-button .q-focus-helper {
+  opacity: 0 !important;
+}
+.main-toolbar .tb-button.q-btn-group,
+.main-toolbar .tb-button.q-btn-dropdown {
+  width: auto;
+}
+.main-toolbar .tb-button.q-btn-group .q-btn-dropdown__arrow,
+.main-toolbar .tb-button.q-btn-dropdown .q-btn-dropdown__arrow {
+  margin-left: 2px;
+  width: 12px;
+}
+.main-toolbar .tb-button.q-btn-group .q-btn {
+  padding: 0 6px;
+  height: 30px;
+  font-size: 11px;
+}
+.main-toolbar
+  .tb-button.q-btn-dropdown--split
+  .q-btn-dropdown__arrow-container:not(.q-btn--outline) {
+  border-left: none;
+  padding-left: 4px;
+}
+.main-toolbar
+  .tb-button.q-btn-dropdown--split
+  .q-btn-dropdown__arrow-container:not(.q-btn--outline):before {
+  height: 20px;
+  border-left: 1px solid #334354;
+  margin-top: 5px;
+}
+.main-toolbar .tb-button.q-btn-group .q-btn.btn-dropdown-like {
+  padding: 0 2px;
+}
+.main-toolbar .tb-button .btn-dropdown-like:before {
+  height: 20px;
+  border-left: 1px solid #334354;
+  margin-top: 5px;
+  z-index: 1;
+}
+.tb-search-button {
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 20% !important;
+  align-items: baseline;
+}
+.tb-search-button span.block {
+  font-size: 14px;
+}
+.tb-search-button .q-btn__content {
+  width: 100%;
+}
+.tb-search-button .q-btn__content .q-icon.on-right {
+  margin-left: auto;
+  padding-left: 10px;
+  border-left: 1px solid rgb(51, 67, 84);
+}
+.main-toolbar .q-separator {
+  height: 26px;
+  align-self: center;
+  background: rgb(51, 67, 84);
+}
+.dalme-logotype {
+  color: rgb(119, 142, 172);
+  font-size: 16px;
+}
+.dalme-logotype-db {
+  color: rgb(97, 115, 139);
+  margin-left: 5px;
+}
+.text-bc-colour {
+  color: rgb(87, 115, 144);
+  margin-left: 8px;
+  margin-right: 4px;
+}
+.breadcrumb-container {
+  align-items: center;
 }
 .menu-breadcrumb {
-  font-size: 20px;
+  font-size: 16px;
+  margin-left: 10px;
 }
 .menu-bar {
   padding: 0;
   gap: 8px;
+  min-height: 40px;
 }
 .menu-button {
   position: relative;
@@ -451,23 +400,18 @@ export default defineComponent({
   border-radius: 6px;
   align-items: center;
   list-style: none !important;
+  text-transform: none;
+  min-height: 2em;
 }
 .menu-button::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  min-height: 48px;
-  content: "";
-  transform: translateX(-50%) translateY(-50%);
+  box-shadow: none;
 }
 .menu-button.active::after {
   position: absolute;
   right: 50%;
-  bottom: calc(50% - 27px);
+  bottom: calc(50% - 24px);
   width: 100%;
-  height: 2px;
+  height: 4px;
   content: "";
   background: #3f51b5;
   border-radius: 6px;
@@ -483,47 +427,29 @@ export default defineComponent({
   visibility: hidden;
   content: attr(data-content);
 }
-.menu-search .q-field__control {
-  height: 30px;
-  border: 1px solid rgb(87, 96, 106);
+.menu-container {
+  border-bottom: 1px solid rgb(209, 209, 209);
+  padding-right: 24px;
+  padding-left: 24px;
 }
-.menu-search .q-field__native,
-.menu-search .q-field__marginal {
-  height: 28px;
+.q-header {
+  background-color: white;
 }
-.menu-search .q-field__native::placeholder {
-  color: rgb(226, 226, 226);
+.user-menu {
+  min-width: 200px;
 }
-.menu-search.q-field--standout.q-field--dark.q-field--highlighted
-  .q-field__native::placeholder {
-  color: rgb(20, 20, 20);
-}
-.menu-search.q-field--standout.q-field--dark .q-field__control {
-  background: rgba(255, 255, 255, 0.01);
-}
-.menu-search.q-field--standout.q-field--dark.q-field--highlighted
-  .q-field__control {
-  background: rgb(255, 255, 255);
-}
-.page-header-button {
+.mc-button {
   border: 1px solid rgb(209, 209, 209);
   border-radius: 4px;
   height: 32px;
   width: 32px;
   z-index: 1;
+  text-transform: none;
+  min-height: 2em;
+  padding: 0.285em;
 }
-.title-bar {
-  height: 45px;
-  min-height: 0px;
-  align-items: flex-end;
-}
-.title-bar-end {
-  height: 45px;
-  align-items: flex-end;
-  padding-bottom: 3px;
-}
-.pg-icn {
-  padding-bottom: 2px;
+.mc-button::before {
+  box-shadow: none;
 }
 .strip-approach {
   position: absolute;
@@ -531,5 +457,8 @@ export default defineComponent({
   top: 95px;
   width: 80px;
   height: 65px;
+}
+.strip-approach {
+  top: 49px;
 }
 </style>
