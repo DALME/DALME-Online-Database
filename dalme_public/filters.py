@@ -38,7 +38,7 @@ def _map_record_types():
         str(idx): attr['attributevaluestr__value']
         for idx, attr in enumerate(
             Attribute.objects.filter(
-                attribute_type__short_name='record_type',
+                attribute_type__name='record_type',
                 object_id__in=Record.objects.filter(workflow__is_public=True).values('id'),
             )
             .values('attributevaluestr__value')
@@ -98,9 +98,9 @@ class RecordOrderingFilter(django_filters.OrderingFilter):
     @staticmethod
     def annotate_dates(qs):
         dates = Attribute.objects.filter(
-            Q(records=OuterRef('pk'), attribute_type__short_name='date')
-            | Q(records=OuterRef('pk'), attribute_type__short_name='start_date')
-            | Q(records=OuterRef('pk'), attribute_type__short_name='end_date'),
+            Q(records=OuterRef('pk'), attribute_type__name='date')
+            | Q(records=OuterRef('pk'), attribute_type__name='start_date')
+            | Q(records=OuterRef('pk'), attribute_type__name='end_date'),
         )
         qs = qs.annotate(record_date=Subquery(dates.values('attributevaluedate__year')[:1]))
         return qs.distinct()
@@ -109,7 +109,7 @@ class RecordOrderingFilter(django_filters.OrderingFilter):
     def annotate_record_type(qs):
         record_types = Attribute.objects.filter(
             records=OuterRef('pk'),
-            attribute_type__short_name='record_type',
+            attribute_type__name='record_type',
         )
         return qs.annotate(
             record_type=Subquery(record_types.values('attributevaluestr__value')[:1]),

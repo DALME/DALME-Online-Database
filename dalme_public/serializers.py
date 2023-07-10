@@ -130,10 +130,10 @@ class PublicRecordSerializer(serializers.ModelSerializer):
         if hasattr(_parent, 'parent'):  # register
             try:
                 format_values = {
-                    i['attribute_type__short_name']: i['value'].lower()
+                    i['attribute_type__name']: i['value'].lower()
                     for i in _parent.attributes.filter(
-                        attribute_type__short_name__in=['support', 'format'],
-                    ).values('attribute_type__short_name', 'value')
+                        attribute_type__name__in=['support', 'format'],
+                    ).values('attribute_type__name', 'value')
                 }
                 fmt = format_values.get('support')
                 if format_values.get('format'):
@@ -149,7 +149,7 @@ class PublicRecordSerializer(serializers.ModelSerializer):
             if archive_name and archive_url and marks:
                 return (f'<a href="{archive_url}" target="_blank">{archive_name}</a>, {marks}', fmt, 'register')
             return (loc, fmt, 'register')
-        zotero_key = _parent.attributes.filter(attribute_type__short_name='zotero_key')
+        zotero_key = _parent.attributes.filter(attribute_type__name='zotero_key')
         zotero_key = zotero_key.first().value if zotero_key.exists() else None
         return (
             (

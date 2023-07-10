@@ -992,7 +992,7 @@ class Collection(SearchEnabled):
             'languages': self.source_set.get_languages(published=True),
             'coverage': self.source_set.get_time_coverage(published=True),
         }
-        stats = self.source_set.attributes.filter(attribute_type__short_name='collection_metadata')
+        stats = self.source_set.attributes.filter(attribute_type__name='collection_metadata')
         if len(stats) > 0:
             ((key, value),) = stats[0].value.items()
             stats_dict['other'] = {
