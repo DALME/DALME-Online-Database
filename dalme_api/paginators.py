@@ -8,44 +8,62 @@ from rest_framework.response import Response
 class DALMELimitOffsetPagination(LimitOffsetPagination):
     """Subclasses LimitOffsetPagination to add metadata to response if requested."""
 
-    total_count = None
+    filtered_count = None
+    context = None
 
-    def paginate_queryset(self, queryset, request, view=None):  # noqa: ARG002
+    def paginate_queryset(self, queryset, request, view=None):
         """Paginate the passed queryset."""
         self.limit = self.get_limit(request)
-        self.total_count = self.get_count(queryset)
         self.count = self.get_count(queryset)
+        self.filtered_count = self.count
         self.offset = self.get_offset(request)
         self.request = request
-        if self.limit in [None, 0]:
-            return list(queryset)
 
-        if self.count > self.limit and self.template is not None:
-            self.display_page_controls = True
+        if view and hasattr(view, 'context'):
+            self.context = view.context
+
+        if self.limit in [None, 0] or self.limit > self.count:
+            return list(queryset)
 
         if self.count == 0 or self.offset > self.count:
             return []
 
-        return list(queryset[self.offset : self.offset + self.limit])
+        if self.count > self.limit and self.template is not None:
+            self.display_page_controls = True
+
+        queryset = queryset[self.offset : self.offset + self.limit]
+        self.filtered_count = self.get_count(queryset)
+
+        return list(queryset)
 
     def get_paginated_response(self, data_object):
         """Return paginated response object."""
-        try:
-            data, queryset, instance = data_object
-        except ValueError:
-            data, queryset, instance = data_object, None, None
+        # try:
+        #     data, queryset, instance = data_object
+        # except ValueError:
+        #     data, queryset, instance = data_object, None, None
 
-        if not isinstance(data, list):
-            data = [data]
+        # if not isinstance(data, list):
+        #     data = [data]
+
+        # response_obj = [
+        #     ('count', self.count),
+        #     ('filtered', self.filtered_count),
+        #     ('data', data),
+        # ]
 
         response_obj = [
-            ('recordsFiltered', self.count),
-            ('recordsTotal', self.total_count),
-            ('data', data),
+            ('count', self.count),
+            ('filtered', self.filtered_count),
+            ('data', data_object),
         ]
 
-        if self.request.GET.get('meta') is not None and instance is not None:
-            response_obj.append(('meta', instance.get_metadata(queryset)))
+        if self.context:
+            for key, value in self.context.items():
+                response_obj.append((key, value))
+
+        # if self.request.GET.get('meta') is not None and instance is not None:
+        #     response_obj.append(('meta', instance.get_metadata(queryset)))
 
         return Response(OrderedDict(response_obj))
 
