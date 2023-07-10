@@ -8,7 +8,7 @@ export { default as Places } from "./Places";
 export { default as Project } from "./Project";
 export { default as Rights } from "./Rights";
 export { default as Sets } from "./Sets";
-export { default as Sources } from "./Sources";
+export { default as Records } from "./Records";
 export { default as System } from "./System";
 export { default as Tasks } from "./Tasks";
 export { default as Tickets } from "./Tickets";

@@ -9,7 +9,7 @@ import { defineComponent } from "vue";
 import { PageContainer } from "@/components";
 
 export default defineComponent({
-  name: "SourcesPageContainer",
+  name: "RecordsPageContainer",
   components: { PageContainer },
 });
 </script>
