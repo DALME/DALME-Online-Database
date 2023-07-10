@@ -3,13 +3,13 @@
     <div class="row">
       <div class="col-grow">
         <transition name="collapse">
-          <div v-if="!ui.compactMode" class="info-area row">
+          <div class="info-area row">
             <div class="column">
               <div class="row items-center text-h5">
                 <template v-if="!ui.globalLoading">
-                  {{ source.name }}
+                  {{ record.name }}
                   <TagWidget
-                    v-if="source.hasInventory"
+                    v-if="record.hasInventory"
                     name="list"
                     colour="green-1"
                     textColour="green-8"
@@ -23,20 +23,20 @@
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!ui.globalLoading">
                   <span>Created</span>
-                  {{ formatDate(source.created.timestamp) }} by
+                  {{ formatDate(record.created.timestamp) }} by
                   <DetailPopover
                     :userData="{
-                      username: source.created.username,
-                      fullName: source.created.user,
+                      username: record.created.username,
+                      fullName: record.created.user,
                     }"
                     :showAvatar="false"
                   />
                   <span>, last modified</span>
-                  {{ formatDate(source.modified.timestamp) }} by
+                  {{ formatDate(record.modified.timestamp) }} by
                   <DetailPopover
                     :userData="{
-                      username: source.modified.username,
-                      fullName: source.modified.user,
+                      username: record.modified.username,
+                      fullName: record.modified.user,
                     }"
                     :showAvatar="false"
                   />
@@ -59,17 +59,12 @@
           >
             <q-tab name="info" icon="o_info" label="Info" />
             <template v-if="!ui.globalLoading">
-              <q-tab
-                v-if="hasChildren"
-                name="children"
-                label="Children"
-                icon="o_account_tree"
-              >
+              <q-tab v-if="hasChildren" name="children" label="Children" icon="o_account_tree">
                 <q-badge
                   color="indigo-1"
                   rounded
                   class="text-grey-8 q-mx-xs"
-                  :label="source.children.length"
+                  :label="record.children.length"
                 />
               </q-tab>
               <q-tab
@@ -83,7 +78,7 @@
                   color="indigo-1"
                   rounded
                   class="text-grey-8 q-mx-xs"
-                  :label="source.pages.length"
+                  :label="record.pages.length"
                 />
               </q-tab>
               <q-tab
@@ -121,21 +116,21 @@
             <div class="row q-mr-sm">
               <BooleanWidget
                 v-if="resource === 'record'"
-                :value="!source.workflow.isPublic"
+                :value="!record.workflow.isPublic"
                 :onlyTrue="true"
                 trueIcon="public"
                 trueColour="light-green-7"
               />
               <BooleanWidget
                 v-if="resource === 'record'"
-                :value="!source.workflow.helpFlag"
+                :value="!record.workflow.helpFlag"
                 :onlyTrue="true"
                 trueIcon="flag"
                 trueColour="red-4"
                 class="q-ml-xs"
               />
             </div>
-            <WorkflowManager :data="source.workflow" />
+            <WorkflowManager :data="record.workflow" />
           </div>
         </div>
       </template>
@@ -151,27 +146,27 @@
             keep-alive
           >
             <q-tab-panel name="info" class="q-pt-none q-px-none">
-              <SourceAttributes />
+              <RecordAttributes />
             </q-tab-panel>
             <q-tab-panel name="children" class="q-pt-none q-px-none">
-              <SourceChildren :children="source.children" />
+              <RecordChildren :children="record.children" />
             </q-tab-panel>
             <q-tab-panel name="folios" class="q-pt-sm q-px-none">
-              <SourcePages :pages="source.pages" />
+              <RecordPages :pages="record.pages" />
             </q-tab-panel>
             <q-tab-panel name="entities" class="q-pt-none q-px-none">
               <div v-if="hasAgents">
-                <SourceAgents :agents="source.agents" />
+                <RecordAgents :agents="record.agents" />
               </div>
               <div v-if="hasPlaces" class="q-mt-md">
-                <SourcePlaces :places="source.places" />
+                <RecordPlaces :places="record.places" />
               </div>
             </q-tab-panel>
             <q-tab-panel name="comments" class="q-pt-md q-px-lg">
               <CommentWidget @on-count-changed="updateCommentCount" />
             </q-tab-panel>
             <q-tab-panel name="log" class="q-pt-md q-px-lg">
-              <LogViewer :data="source.workflow" />
+              <LogViewer :data="record.workflow" />
             </q-tab-panel>
           </q-tab-panels>
         </template>
@@ -183,18 +178,9 @@
 
 <script>
 import { useMeta } from "quasar";
-import {
-  computed,
-  defineComponent,
-  provide,
-  ref,
-  watch,
-  onBeforeUnmount,
-  onUnmounted,
-} from "vue";
+import { computed, defineComponent, provide, ref, watch, onBeforeUnmount, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
-import { sourceDetailSchema } from "@/schemas";
 import { useAPI, useEditing, useStores } from "@/use";
 import {
   AdaptiveSpinner,
@@ -206,25 +192,25 @@ import {
   WorkflowManager,
 } from "@/components";
 import { formatDate, notNully } from "@/utils";
-import SourceAttributes from "./SourceAttributes.vue";
-import SourceAgents from "./SourceAgents.vue";
-import SourceChildren from "./SourceChildren.vue";
-import SourcePages from "./SourcePages.vue";
-import SourcePlaces from "./SourcePlaces.vue";
+import RecordAttributes from "./RecordAttributes.vue";
+import RecordAgents from "./RecordAgents.vue";
+import RecordChildren from "./RecordChildren.vue";
+import RecordPages from "./RecordPages.vue";
+import RecordPlaces from "./RecordPlaces.vue";
 
 export default defineComponent({
-  name: "SourceDetail",
+  name: "RecordDetail",
   components: {
     AdaptiveSpinner,
     BooleanWidget,
     DetailPopover,
     CommentWidget,
     LogViewer,
-    SourceAttributes,
-    SourceAgents,
-    SourceChildren,
-    SourcePages,
-    SourcePlaces,
+    RecordAttributes,
+    RecordAgents,
+    RecordChildren,
+    RecordPages,
+    RecordPlaces,
     TagWidget,
     WorkflowManager,
   },
@@ -232,25 +218,25 @@ export default defineComponent({
     const $route = useRoute();
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard, resource } = useEditing();
-    const { nav, ui, view } = useStores();
+    const { ui, view } = useStores();
     const { success, data, fetchAPI } = apiInterface();
-    const source = ref({});
+    const record = ref({});
     const id = ref($route.params.id);
-    const hasAttributes = computed(() => notNully(source.value.attributes));
-    const hasAgents = computed(() => notNully(source.value.agents));
-    const hasChildren = computed(() => notNully(source.value.children));
-    const hasPlaces = computed(() => notNully(source.value.places));
-    const hasPages = computed(() => notNully(source.value.pages));
+    const hasAttributes = computed(() => notNully(record.value.attributes));
+    const hasAgents = computed(() => notNully(record.value.agents));
+    const hasChildren = computed(() => notNully(record.value.children));
+    const hasPlaces = computed(() => notNully(record.value.places));
+    const hasPages = computed(() => notNully(record.value.pages));
     const entityCount = computed(() => {
-      let agentsCount = hasAgents.value ? source.value.agents.length : 0;
-      let placesCount = hasPlaces.value ? source.value.places.length : 0;
+      let agentsCount = hasAgents.value ? record.value.agents.length : 0;
+      let placesCount = hasPlaces.value ? record.value.places.length : 0;
       return agentsCount + placesCount;
     });
     const commentCount = ref(0);
 
-    provide("model", "Source");
+    provide("model", "Record");
     provide("id", id);
-    provide("source", source);
+    provide("record", record);
     provide("hasAttributes", hasAttributes);
     provide("hasPages", hasPages);
     provide("hasChildren", hasChildren);
@@ -258,29 +244,40 @@ export default defineComponent({
     provide("hasPlaces", hasPlaces);
 
     useMeta(() => ({
-      title: source.value ? source.value.name : `Source ${id.value}`,
+      title: record.value ? record.value.name : `Record ${id.value}`,
     }));
+
+    // const fetchData = async () => {
+    //   ui.globalLoading = true;
+    //   await fetchAPI(requests.records.getRecord(id.value));
+    //   if (success.value)
+    //     await recordDetailSchema
+    //       .validate(data.value, { stripUnknown: true })
+    //       .then((value) => {
+    //         resource.value =
+    //           {
+    //             archive: "archive",
+    //             "file unit": "archivalFile",
+    //             record: "record",
+    //           }[value.type.name.toLowerCase()] || "bibliography";
+    //         record.value = value;
+    //         commentCount.value = value.commentCount;
+    //         nav.currentSubsection = value.type.name + "s";
+    //         nav.breadcrumbTail.push(value.shortName);
+    //         ui.globalLoading = false;
+    //       });
+    // };
 
     const fetchData = async () => {
       ui.globalLoading = true;
-      await fetchAPI(requests.sources.getSource(id.value));
-      if (success.value)
-        await sourceDetailSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            resource.value =
-              {
-                archive: "archive",
-                "file unit": "archivalFile",
-                record: "record",
-              }[value.type.name.toLowerCase()] || "bibliography";
-            if (resource.value === "record") ui.compactModeDisable = false;
-            source.value = value;
-            commentCount.value = value.commentCount;
-            nav.currentSubsection = value.type.name + "s";
-            nav.breadcrumbTail.push(value.shortName);
-            ui.globalLoading = false;
-          });
+      await fetchAPI(requests.records.getRecord(id.value));
+      if (success.value) {
+        resource.value = "record";
+        record.value = data.value;
+        commentCount.value = data.value.commentCount;
+        ui.breadcrumbTail.push(data.value.shortName);
+        ui.globalLoading = false;
+      }
     };
 
     const updateCommentCount = (cnt) => {
@@ -292,7 +289,7 @@ export default defineComponent({
       async (to) => {
         if (to) {
           id.value = to;
-          nav.resetBreadcrumbTail();
+          ui.resetBreadcrumbTail();
           await fetchData();
         }
       },
@@ -302,10 +299,10 @@ export default defineComponent({
     editingDetailRouteGuard();
 
     onBeforeUnmount(() => {
-      console.log("sourceDetail beforeUnmount");
+      console.log("recordDetail beforeUnmount");
     });
     onUnmounted(() => {
-      console.log("sourceDetail unmounted");
+      console.log("recordDetail unmounted");
     });
 
     return {
@@ -320,7 +317,7 @@ export default defineComponent({
       hasPages,
       hasPlaces,
       resource,
-      source,
+      record,
       ui,
     };
   },

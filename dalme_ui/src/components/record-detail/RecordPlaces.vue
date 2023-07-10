@@ -25,7 +25,7 @@ const columnMap = {
 };
 
 export default defineComponent({
-  name: "SourcePlaces",
+  name: "RecordPlaces",
   props: {
     places: {
       type: Object,

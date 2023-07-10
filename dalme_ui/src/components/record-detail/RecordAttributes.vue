@@ -1,25 +1,22 @@
 <template>
-  <div class="row q-pt-md">
+  <div v-if="record" class="row q-pt-md">
     <div class="col-9 q-pr-md">
-      <DetailCard icon="bookmark" title="Source" padContainer>
+      <DetailCard icon="bookmark" title="Record" padContainer>
         <div class="row q-mt-xs">
           <div class="col-3 text-weight-medium text-right q-mr-lg">Name</div>
-          <div class="col-8">{{ source.name }}</div>
+          <div class="col-8">{{ record.name }}</div>
         </div>
 
         <div class="row q-mt-xs">
-          <div class="col-3 text-weight-medium text-right q-mr-lg">
-            Short name
-          </div>
-          <div class="col-8">{{ source.shortName }}</div>
+          <div class="col-3 text-weight-medium text-right q-mr-lg">Short name</div>
+          <div class="col-8">{{ record.shortName }}</div>
         </div>
 
         <div class="row q-mt-xs">
           <div class="col-3 text-weight-medium text-right q-mr-lg">Type</div>
           <div class="col-8">
-            {{ source.type.name }}
             <q-chip
-              v-if="source.hasInventory"
+              v-if="record.hasInventory"
               dense
               size="10px"
               outline
@@ -38,13 +35,13 @@
               class="text-link"
               :to="{
                 name: 'User',
-                params: { username: source.owner.username },
+                params: { username: record.owner.username },
               }"
             >
-              {{ source.owner.fullName }}
+              {{ record.owner.fullName }}
             </router-link>
             <q-chip
-              v-if="source.isPrivate"
+              v-if="record.isPrivate"
               dense
               size="10px"
               outline
@@ -56,38 +53,36 @@
           </div>
         </div>
 
-        <div class="row q-mt-xs" v-if="source.parent">
+        <div class="row q-mt-xs" v-if="record.parent">
           <div class="col-3 text-weight-medium text-right q-mr-lg">Parent</div>
           <div class="col-8">
             <router-link
               class="text-link"
               :to="{
-                name: 'Source',
-                params: { id: source.parent.id },
+                name: 'Record',
+                params: { id: record.parent.id },
               }"
             >
-              {{ source.parent.name }}
+              {{ record.parent.name }}
             </router-link>
           </div>
         </div>
 
-        <div class="row q-mt-xs" v-if="source.primaryDataset">
-          <div class="col-3 text-weight-medium text-right q-mr-lg">
-            Primary Dataset
-          </div>
+        <div class="row q-mt-xs" v-if="record.primaryDataset">
+          <div class="col-3 text-weight-medium text-right q-mr-lg">Primary Dataset</div>
           <div class="col-8">
             <router-link
               class="text-link"
               :to="{
                 name: 'Set',
-                params: { id: source.primaryDataset.id },
+                params: { id: record.primaryDataset.id },
               }"
             >
-              {{ source.primaryDataset.name }}
+              {{ record.primaryDataset.name }}
             </router-link>
             <br />
             <span class="text-caption text-grey-8">
-              {{ source.primaryDataset.detailString }}
+              {{ record.primaryDataset.detailString }}
             </span>
           </div>
         </div>
@@ -100,20 +95,11 @@
         padContainer
         class="q-mt-md"
       >
-        <MarkdownEditor
-          v-if="hasDescription"
-          :text="source.attributes.description"
-        />
+        <MarkdownEditor v-if="hasDescription" :text="record.attributes.description" />
       </DetailCard>
 
-      <DetailCard
-        v-if="hasPages"
-        icon="auto_stories"
-        title="Folios"
-        showFilter
-        class="q-mt-md"
-      >
-        <SourcePages overview :pages="source.pages" />
+      <DetailCard v-if="hasPages" icon="auto_stories" title="Folios" showFilter class="q-mt-md">
+        <RecordPages overview :pages="record.pages" />
       </DetailCard>
 
       <DetailCard
@@ -123,32 +109,20 @@
         showFilter
         class="q-mt-md"
       >
-        <SourceChildren overview :children="source.children" />
+        <RecordChildren overview :children="record.children" />
       </DetailCard>
 
-      <DetailCard
-        v-if="hasAgents"
-        icon="people"
-        title="Agents"
-        showFilter
-        class="q-mt-md"
-      >
-        <SourceAgents overview :agents="source.agents" />
+      <DetailCard v-if="hasAgents" icon="people" title="Agents" showFilter class="q-mt-md">
+        <RecordAgents overview :agents="record.agents" />
       </DetailCard>
 
-      <DetailCard
-        v-if="hasPlaces"
-        icon="place"
-        title="Places"
-        showFilter
-        class="q-mt-md"
-      >
-        <SourcePlaces overview :places="source.places" />
+      <DetailCard v-if="hasPlaces" icon="place" title="Places" showFilter class="q-mt-md">
+        <RecordPlaces overview :places="record.places" />
       </DetailCard>
     </div>
 
     <div class="col-3 q-pl-md">
-      <template v-for="(value, name) in source.attributes" :key="name">
+      <template v-for="(value, name) in record.attributes" :key="name">
         <template v-if="!isNil(value) && name !== 'description'">
           <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
             {{ getAttributeLabel(name) }}
@@ -168,10 +142,8 @@
           <q-separator class="q-my-md" />
         </template>
       </template>
-      <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">
-        Unique Id
-      </div>
-      <div class="q-mb-sm text-13">{{ source.id }}</div>
+      <div class="text-detail text-grey-8 text-weight-bold q-mb-sm">Unique Id</div>
+      <div class="q-mb-sm text-13">{{ record.id }}</div>
     </div>
   </div>
 </template>
@@ -180,10 +152,10 @@
 import { computed, defineComponent, inject } from "vue";
 import { filter as rFilter, isNil, map } from "ramda";
 import { DetailCard, MarkdownEditor } from "@/components";
-import SourceAgents from "./SourceAgents.vue";
-import SourceChildren from "./SourceChildren.vue";
-import SourcePages from "./SourcePages.vue";
-import SourcePlaces from "./SourcePlaces.vue";
+import RecordAgents from "./RecordAgents.vue";
+import RecordChildren from "./RecordChildren.vue";
+import RecordPages from "./RecordPages.vue";
+import RecordPlaces from "./RecordPlaces.vue";
 
 const getAttributeLabel = (attribute) => {
   return {
@@ -220,37 +192,37 @@ const isObj = (obj) => {
 };
 
 export default defineComponent({
-  name: "SourceAttributes",
+  name: "RecordAttributes",
   components: {
     DetailCard,
     MarkdownEditor,
-    SourceAgents,
-    SourceChildren,
-    SourcePages,
-    SourcePlaces,
+    RecordAgents,
+    RecordChildren,
+    RecordPages,
+    RecordPlaces,
   },
   setup() {
-    const source = inject("source");
+    const record = inject("record");
     const hasAttributes = inject("hasAttributes");
     const hasPages = inject("hasPages");
     const hasChildren = inject("hasChildren");
     const hasAgents = inject("hasAgents");
     const hasPlaces = inject("hasPlaces");
 
-    const hasDescription = computed(
-      () => !isNil(source.value.attributes.description),
-    );
+    const hasDescription = computed(() => !isNil(record.value.attributes.description));
 
     // TODO: Could use a transducer at some point.
     const attributes = computed(() =>
       rFilter(
         (attribute) => !["description"].includes(attribute.key),
         map(
-          (key) => ({ key, value: source.value.attributes[key] }),
-          Object.keys(source.value.attributes).reverse(),
+          (key) => ({ key, value: record.value.attributes[key] }),
+          Object.keys(record.value.attributes).reverse(),
         ),
       ),
     );
+
+    console.log(record.value);
 
     return {
       attributes,
@@ -263,7 +235,7 @@ export default defineComponent({
       hasPlaces,
       isObj,
       isNil,
-      source,
+      record,
     };
   },
 });

@@ -24,18 +24,18 @@
     </q-table>
   </template>
   <template v-else>
-    <SourceEditor />
+    <RecordEditor />
   </template>
 </template>
 
 <script>
 import { defineComponent, inject, provide, ref } from "vue";
 import { getColumns } from "@/utils";
-import { BooleanWidget, SourceEditor } from "@/components";
+import { BooleanWidget, RecordEditor } from "@/components";
 import { columnMap } from "./pageColumns";
 
 export default defineComponent({
-  name: "SourcePages",
+  name: "RecordPages",
   props: {
     pages: {
       type: Array,
@@ -49,7 +49,7 @@ export default defineComponent({
   },
   components: {
     BooleanWidget,
-    SourceEditor,
+    RecordEditor,
   },
   setup(props) {
     const columns = ref(getColumns(columnMap));

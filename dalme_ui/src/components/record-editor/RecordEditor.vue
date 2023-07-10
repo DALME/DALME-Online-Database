@@ -1,9 +1,5 @@
 <template>
-  <q-layout
-    view="lhh lpr lff"
-    container
-    :style="`height: ${containerHeight}px`"
-  >
+  <q-layout view="lhh lpr lff" container :style="`height: ${containerHeight}px`">
     <q-drawer
       v-model="drawer"
       side="left"
@@ -12,11 +8,7 @@
       :width="parseInt(141)"
       :mini-width="parseInt(0)"
     >
-      <div
-        v-if="folioChooser"
-        class="folio-container"
-        :style="`height: ${containerHeight}px`"
-      >
+      <div v-if="folioChooser" class="folio-container" :style="`height: ${containerHeight}px`">
         <q-table
           grid
           hide-bottom
@@ -118,7 +110,7 @@ import { IiifViewer, TeiEditor, TeiRenderer } from "@/components";
 import { notNully } from "@/utils";
 
 export default defineComponent({
-  name: "SourceEditor",
+  name: "RecordEditor",
   components: {
     IiifViewer,
     TeiEditor,
@@ -195,24 +187,18 @@ export default defineComponent({
     );
 
     const viewerHeight = computed(() =>
-      view.value.splitterHorizontal
-        ? view.value.editorSplitter
-        : containerHeight.value,
+      view.value.splitterHorizontal ? view.value.editorSplitter : containerHeight.value,
     );
 
     const viewerWidth = computed(() =>
-      view.value.splitterHorizontal
-        ? containerWidth.value
-        : view.value.editorSplitter,
+      view.value.splitterHorizontal ? containerWidth.value : view.value.editorSplitter,
     );
 
     const separatorHeight = computed(() =>
       view.value.splitterHorizontal ? 4 : viewerHeight.value,
     );
 
-    const separatorWidth = computed(() =>
-      view.value.splitterHorizontal ? viewerWidth.value : 4,
-    );
+    const separatorWidth = computed(() => (view.value.splitterHorizontal ? viewerWidth.value : 4));
 
     const splitterLimits = computed(() =>
       view.value.splitterHorizontal
@@ -221,19 +207,13 @@ export default defineComponent({
     );
 
     const currentSplitterPercentage = computed(() => {
-      let total = view.value.splitterHorizontal
-        ? containerHeight.value
-        : containerWidth.value;
+      let total = view.value.splitterHorizontal ? containerHeight.value : containerWidth.value;
       return Math.round((view.value.editorSplitter * 100) / total);
     });
 
     const nextSplitterPixels = computed(() => {
-      let total = view.value.splitterHorizontal
-        ? containerWidth.value
-        : containerHeight.value;
-      return view.value.lastSplitter
-        ? Math.round((view.value.lastSplitter * total) / 100)
-        : 0;
+      let total = view.value.splitterHorizontal ? containerWidth.value : containerHeight.value;
+      return view.value.lastSplitter ? Math.round((view.value.lastSplitter * total) / 100) : 0;
     });
 
     const toggleSplitter = () => {

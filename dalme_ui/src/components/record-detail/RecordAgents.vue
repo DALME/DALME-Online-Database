@@ -2,9 +2,8 @@
   <q-table
     flat
     :dense="overview"
-    :rows="children"
+    :rows="agents"
     :columns="columns"
-    :visible-columns="visibleColumns"
     :no-data-label="noData"
     :filter="filter"
     :pagination="pagination"
@@ -16,31 +15,7 @@
   >
     <template v-slot:body-cell-name="props">
       <q-td :props="props">
-        <router-link
-          class="text-link"
-          :to="{
-            name: 'Source',
-            params: { id: props.row.id },
-          }"
-        >
-          {{ props.value }}
-        </router-link>
-      </q-td>
-    </template>
-
-    <template v-slot:body-cell-type="props">
-      <q-td :props="props" class="text-no-wrap">
-        {{ props.value }}
-        <q-chip
-          v-if="props.row.hasInventory"
-          dense
-          size="10px"
-          outline
-          color="green-9"
-          class="text-bold"
-        >
-          LIST
-        </q-chip>
+        <span v-html="props.value" />
       </q-td>
     </template>
   </q-table>
@@ -51,16 +26,15 @@ import { keys, map } from "ramda";
 import { defineComponent, inject, ref } from "vue";
 
 const columnMap = {
-  name: "Name",
-  shortName: "Short Name",
+  name: "Standard Name",
   type: "Type",
-  hasInventory: "Inventory",
+  legalPersona: "Legal Persona",
 };
 
 export default defineComponent({
-  name: "SourceChildren",
+  name: "RecordAgents",
   props: {
-    children: {
+    agents: {
       type: Object,
       required: true,
     },
@@ -72,13 +46,11 @@ export default defineComponent({
   },
   setup(props) {
     const columns = ref([]);
-    const visibleColumns = ref(
-      props.overview ? ["name", "type"] : ["name", "shortName", "type"],
-    );
+    const visibleColumns = ref([]);
     const filter = inject("cardFilter");
 
-    const noData = "No children found.";
-    const pagination = { rowsPerPage: props.overview ? 10 : 0 }; // 0 = all rows
+    const noData = "No agents found.";
+    const pagination = { rowsPerPage: props.overview ? 5 : 0 }; // 0 = all rows
 
     const getColumns = () => {
       const toColumn = (key) => ({
@@ -95,11 +67,21 @@ export default defineComponent({
 
     return {
       columns,
+      visibleColumns,
       filter,
       noData,
       pagination,
-      visibleColumns,
     };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.q-table__top {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0;
+}
+.q-table__bottom--nodata {
+  border: 0;
+}
+</style>

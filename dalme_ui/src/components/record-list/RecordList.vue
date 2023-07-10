@@ -21,28 +21,26 @@
   >
     <template v-slot:grid-avatar="props">
       <TagWidget
-        v-if="sourceType === 'records'"
         mini
         module="workflow"
         size="22px"
-        :type="props.row.workflow.status.tag"
+        :type="props.row.workflow.status"
         :wfStage="props.row.workflow.stage"
         :wfStatus="props.row.workflow.wfStatus"
       />
-      <q-icon v-else :name="currentPageIcon" size="sm" />
     </template>
 
     <template v-slot:grid-main="props">
       <DetailPopover
         linkClass="text-h7 title-link"
-        :linkTarget="{ name: 'Source', params: { id: props.row.id } }"
+        :linkTarget="{ name: 'Record', params: { id: props.row.id } }"
         :linkText="props.row.name"
       >
         <div class="text-h8 q-mb-xs">
           {{ props.row.name }}
         </div>
       </DetailPopover>
-      <template v-if="sourceType === 'records'">
+      <template>
         <TagWidget
           v-if="props.row.workflow.isPublic"
           name="public"
@@ -66,11 +64,8 @@
 
     <template v-slot:grid-detail="props">
       <span class="text-detail text-weight-medium text-grey-8">
-        {{ props.row.attributes.recordType }} |
-        <span
-          v-if="sourceType === 'records'"
-          v-html="renderDate(props.row.attributes)"
-        />
+        {{ props.row.attributes.recordType.value }} |
+        <span v-html="renderDate(props.row.attributes)" />
       </span>
     </template>
 
@@ -90,7 +85,7 @@
       <q-icon
         name="flag"
         size="17px"
-        v-if="sourceType === 'records' && props.row.workflow.helpFlag"
+        v-if="props.row.workflow.helpFlag"
         color="red-4"
         class="text-weight-bold q-mr-xs"
       />
@@ -99,26 +94,13 @@
     <template v-slot:render-cell-name="props">
       <router-link
         class="text-subtitle2 text-link"
-        :to="{ name: 'Source', params: { id: props.row.id } }"
+        :to="{ name: 'Record', params: { id: props.row.id } }"
       >
         {{ props.row.name }}
       </router-link>
     </template>
 
-    <template v-slot:render-cell-primaryDataset="props">
-      <router-link
-        class="text-link"
-        :to="{ name: 'Set', params: { id: props.row.primaryDataset.id } }"
-      >
-        {{ props.row.primaryDataset.name }}
-      </router-link>
-    </template>
-
-    <template v-slot:render-cell-noRecords="props">
-      {{ props.row.noRecords }}
-    </template>
-
-    <template v-slot:render-cell-defaultRights="props">
+    <!-- <template v-slot:render-cell-defaultRights="props">
       <router-link
         v-if="props.row.attributes.defaultRights"
         class="text-link"
@@ -131,9 +113,9 @@
       >
         {{ props.row.attributes.defaultRights.name }}
       </router-link>
-    </template>
+    </template> -->
 
-    <template v-slot:render-cell-url="props">
+    <!-- <template v-slot:render-cell-url="props">
       <a
         v-if="props.row.attributes.url"
         :href="props.row.attributes.url"
@@ -142,7 +124,7 @@
       >
         Visit Website
       </a>
-    </template>
+    </template> -->
 
     <template v-slot:render-cell-owner="props">
       <router-link
@@ -156,37 +138,32 @@
       </router-link>
     </template>
 
-    <template v-slot:render-cell-locale="props">
+    <!-- <template v-slot:render-cell-locale="props">
       {{ getLocale(props.row.attributes.locale) }}
-    </template>
+    </template> -->
 
-    <template v-slot:render-cell-recordType="props">
+    <!-- <template v-slot:render-cell-recordType="props">
       {{ props.row.attributes.recordType }}
-    </template>
+    </template> -->
 
-    <template v-slot:render-cell-date="props">
+    <!-- <template v-slot:render-cell-date="props">
       <span v-html="renderDate(props.row.attributes)"></span>
-    </template>
+    </template> -->
 
-    <template v-slot:render-cell-language="props">
+    <!-- <template v-slot:render-cell-language="props">
       {{ props.row.attributes.language[0].name }}
-    </template>
+    </template> -->
 
     <template v-slot:render-cell-status="props">
       <TagWidget
-        :name="props.row.workflow.status.text"
-        :type="props.row.workflow.status.tag"
+        :name="props.row.workflow.status"
+        :type="props.row.workflow.status"
         module="workflow"
       />
     </template>
 
     <template v-slot:render-cell-helpFlag="props">
-      <q-icon
-        v-if="props.row.workflow.helpFlag"
-        name="flag"
-        class="text-red"
-        size="xs"
-      />
+      <q-icon v-if="props.row.workflow.helpFlag" name="flag" class="text-red" size="xs" />
     </template>
 
     <template v-slot:render-cell-activity="props">
@@ -215,14 +192,10 @@
     </template>
 
     <template v-slot:render-cell-isPublic="props">
-      <BooleanWidget
-        :value="props.row.workflow.isPublic"
-        :onlyTrue="true"
-        trueIcon="public"
-      />
+      <BooleanWidget :value="props.row.workflow.isPublic" :onlyTrue="true" trueIcon="public" />
     </template>
 
-    <template v-slot:render-cell-authority="props">
+    <!-- <template v-slot:render-cell-authority="props">
       {{ props.row.attributes.authority }}
     </template>
 
@@ -236,29 +209,25 @@
 
     <template v-slot:render-cell-zoteroKey="props">
       {{ props.row.attributes.zoteroKey }}
-    </template>
+    </template> -->
   </DataTable>
 </template>
 
 <script>
+import camelcaseKeys from "camelcase-keys";
 import { useMeta } from "quasar";
-import { computed, defineComponent, provide, ref, watch } from "vue";
+import { defineComponent, provide, ref } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { requests } from "@/api";
 import { getColumns, getDefaults } from "@/utils";
-import {
-  BooleanWidget,
-  DataTable,
-  DetailPopover,
-  TagWidget,
-} from "@/components";
-import { sourceListSchema } from "@/schemas";
+import { BooleanWidget, DataTable, DetailPopover, TagWidget } from "@/components";
 import { useAPI, usePagination, useStores } from "@/use";
-import { columnsByType } from "./columns";
-import { filtersByType, sortByType } from "./filters";
+import { columnMap } from "./columns";
+import { filterList, sortList } from "./filters";
+import { recordListSchema } from "@/schemas";
 
 export default defineComponent({
-  name: "SourceList",
+  name: "RecordList",
   components: {
     BooleanWidget,
     DetailPopover,
@@ -272,34 +241,19 @@ export default defineComponent({
     const { loading, success, data, fetchAPI } = apiInterface();
     const columns = ref([]);
     const rows = ref([]);
-    const sourceType = ref("");
-    const sourceTypeAPI = ref("");
     const title = ref("");
 
     useMeta(() => ({ title: title.value }));
 
-    const columnMap = computed(() => {
-      return columnsByType($route.meta.sourceType);
-    });
-
-    const filterList = computed(() => {
-      console.log($route.meta.sourceType);
-      return filtersByType($route.meta.sourceType);
-    });
-
-    const sortList = computed(() => {
-      return sortByType($route.meta.sourceType);
-    });
-
-    const noData = "No sources found.";
+    const noData = "No records found.";
     const renderDate = (attributes) => {
       if (attributes.startDate && attributes.endDate) {
-        return `${attributes.startDate.name} – ${attributes.endDate.name}`;
+        return `${attributes.startDate.value.text} – ${attributes.endDate.value.text}`;
       }
       if (attributes.startDate) {
-        return attributes.startDate.name;
+        return attributes.startDate.value.text;
       }
-      return attributes.date.name;
+      return attributes.date.value.text;
     };
 
     const getLocale = (data) => {
@@ -307,19 +261,22 @@ export default defineComponent({
     };
 
     const fetchData = async (query) => {
-      const request = requests.sources.getSources(sourceTypeAPI.value, query);
-      const schema = sourceListSchema(sourceType.value);
+      const request = requests.records.getRecords(query);
       await fetchAPI(request);
       if (success.value)
-        await schema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            columns.value = getColumns(columnMap.value);
-            pagination.value.rowsNumber = value.recordsFiltered;
-            pagination.value.rowsTotal = value.recordsTotal;
-            rows.value.splice(0, rows.value.length, ...value.data);
-            loading.value = false;
-          });
+        await recordListSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
+          columns.value = getColumns(columnMap);
+          pagination.value.rowsNumber = data.value.filtered;
+          pagination.value.rowsTotal = data.value.count;
+          value.forEach(
+            (a) =>
+              (a.attributes = camelcaseKeys(
+                Object.fromEntries(Array.from(a.attributes, (val) => [val.name, val])),
+              )),
+          );
+          rows.value.splice(0, rows.value.length, ...value);
+          loading.value = false;
+        });
     };
 
     const {
@@ -333,9 +290,8 @@ export default defineComponent({
       onRequest,
       pagination,
       search,
-      resetPagination,
       visibleColumns,
-    } = usePagination(fetchData, $route.name, getDefaults(columnMap.value));
+    } = usePagination(fetchData, $route.name, getDefaults(columnMap));
 
     provide("pagination", { pagination, fetchDataPaginated });
     provide("columns", columns);
@@ -345,36 +301,6 @@ export default defineComponent({
     onBeforeRouteLeave(() => {
       if (loading.value) return false;
     });
-
-    watch(
-      () => $route.name,
-      async (to) => {
-        const reload = [
-          "Archives",
-          "Archival Files",
-          "Records",
-          "Bibliography",
-        ];
-        const reloadPage = async () => {
-          loading.value = true;
-          sourceTypeAPI.value = $route.meta.sourceTypeAPI;
-          sourceType.value = $route.meta.sourceType;
-          const setTitle = () => (title.value = to);
-          let updateTitle = true;
-          if (!title.value) {
-            setTitle();
-            updateTitle = false;
-          }
-          resetPagination();
-          await fetchDataPaginated();
-          if (updateTitle) setTitle();
-        };
-        if (reload.includes(to)) {
-          await reloadPage();
-        }
-      },
-      { immediate: true },
-    );
 
     return {
       columns,
@@ -394,7 +320,6 @@ export default defineComponent({
       rows,
       search,
       sortList,
-      sourceType,
       title,
       visibleColumns,
     };
