@@ -1,232 +1,97 @@
 <template>
-  <q-card v-if="editable" flat bordered class="box-left-arrow">
-    <div class="bg-grey-2 q-px-sm row justify-between items-center">
-      <div class="column q-pt-xs">
-        <q-tabs
-          v-model="mdTab"
-          dense
-          shrink
-          class="text-grey md-editor-tabs"
-          active-color="light-blue-10"
-          active-bg-color="white"
-          indicator-color="transparent"
-          align="left"
-          narrow-indicator
-          no-caps
-          content-class="q-px-sm"
-        >
+  <template v-if="editable">
+    <q-card flat bordered :class="containerClasses">
+      <div>
+        <q-tabs v-model="mdTab" dense indicator-color="transparent" no-caps>
           <q-tab name="write" label="Write" />
           <q-tab name="preview" label="Preview" :disable="disabled" />
         </q-tabs>
-      </div>
-      <div class="column">
-        <div class="row">
-          <q-btn
-            color="grey-7"
-            flat
-            icon="text_format"
-            class="md-editor-button"
-            @click="insertEnclosure(['### ', ''])"
-          >
-            <TooltipWidget>Add heading</TooltipWidget>
-          </q-btn>
-          <q-btn
-            color="grey-7"
-            flat
-            icon="format_bold"
-            class="md-editor-button"
-            @click="insertEnclosure(['**', '**'])"
-          >
-            <TooltipWidget>Add bold text</TooltipWidget>
-          </q-btn>
-          <q-btn
-            color="grey-7"
-            flat
-            icon="format_italic"
-            class="md-editor-button"
-            @click="insertEnclosure(['*', '*'])"
-          >
-            <TooltipWidget>Add italic text</TooltipWidget>
-          </q-btn>
-          <q-btn
-            color="grey-7"
-            flat
-            icon="format_strikethrough"
-            class="md-editor-button"
-            @click="insertEnclosure(['~~', '~~'])"
-          >
-            <TooltipWidget>Add strike-through text</TooltipWidget>
-          </q-btn>
-          <q-separator vertical class="q-mr-sm" />
-          <q-btn
-            color="grey-7"
-            flat
-            icon="format_quote"
-            class="md-editor-button"
-            @click="insertPrefix('> ')"
-          >
-            <TooltipWidget>Insert a quote</TooltipWidget>
-          </q-btn>
-          <q-btn color="grey-7" flat icon="code" class="md-editor-button">
-            <TooltipWidget>Insert code</TooltipWidget>
-            <q-menu cover>
-              <q-list dense>
-                <q-item
-                  dense
-                  v-for="(option, idx) in codeOptions"
-                  :key="idx"
-                  clickable
-                  v-close-popup
-                  @click="
-                    insertEnclosure([
-                      '\`\`\`' + option.value + '\\n',
-                      '\\n\`\`\`',
-                    ])
-                  "
-                >
-                  <q-item-section>
-                    <span v-text="option.label" />
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-          <q-btn
-            color="grey-7"
-            flat
-            icon="insert_link"
-            class="md-editor-button"
-            @click="insertEnclosure(['[', '](url)'])"
-          >
-            <TooltipWidget>Insert a link</TooltipWidget>
-          </q-btn>
-          <q-btn
-            color="grey-7"
-            flat
-            icon="sticky_note_2"
-            class="md-editor-button"
-            @click="insertEnclosure([':::\n', '\n:::'])"
-          >
-            <TooltipWidget>Insert a note</TooltipWidget>
-          </q-btn>
-          <q-separator vertical class="q-mr-sm" />
-          <q-btn
-            color="grey-7"
-            flat
-            icon="format_list_bulleted"
-            class="md-editor-button"
-            @click="insertPrefix('- ')"
-          >
-            <TooltipWidget>Add a bulleted list</TooltipWidget>
-          </q-btn>
-          <q-btn
-            color="grey-7"
-            flat
-            icon="format_list_numbered"
-            class="md-editor-button"
-            @click="insertPrefix('numbered')"
-          >
-            <TooltipWidget>Add a numbered list</TooltipWidget>
-          </q-btn>
-          <q-btn
-            color="grey-7"
-            flat
-            icon="checklist"
-            class="md-editor-button"
-            @click="insertPrefix('- [ ] ')"
-          >
-            <TooltipWidget>Add a task list</TooltipWidget>
-          </q-btn>
-          <q-separator vertical class="q-mr-sm" />
-          <ChooserWidget
-            icon="people"
-            color="grey-7"
-            returnField="username"
-            class="q-mr-sm"
-            toolTip="Directly mention a user or team"
-            target="users"
-            classes="md-editor-button"
-            @itemChosen="onUserSelected"
-          />
-          <ChooserWidget
-            icon="bug_report"
-            color="grey-7"
-            toolTip="Reference another issue ticket"
-            target="tickets"
-            classes="md-editor-button"
-            @itemChosen="onTicketSelected"
-          />
-        </div>
-      </div>
-    </div>
-    <q-separator />
-    <q-tab-panels
-      v-model="mdTab"
-      keep-alive
-      animated
-      transition-prev="jump-up"
-      transition-next="jump-up"
-      class="text-body2 md-panels"
-    >
-      <q-tab-panel name="write" class="q-pa-sm">
-        <q-input
-          type="textarea"
-          ref="input"
-          v-model="mdText"
-          outlined
-          dense
-          bg-color="grey-1"
-          :placeholder="pHolder"
-          autocapitalize="off"
-          autocomplete="off"
-          autocorrect="off"
-          class="md-editor-textbox"
+
+        <MDEToolbar
+          :dark="dark"
+          @insert-enclosure="insertEnclosure"
+          @insert-prefix="insertPrefix"
         />
-        <div class="bg-grey-1 md-editor-footer q-px-sm q-py-xs items-center">
-          <span v-if="help" class="text-caption text-grey-6">{{ help }}</span>
-          <q-space />
-          <q-icon
-            name="integration_instructions"
-            @click="openMarkdown"
-            class="no-undeline cursor-pointer"
-          >
-            <TooltipWidget>Styling with Markdown is supported</TooltipWidget>
-          </q-icon>
-        </div>
-      </q-tab-panel>
-      <q-tab-panel name="preview">
-        <q-markdown
-          :src="mdText"
-          :extend="extendMarkdown"
-          style="min-height: 144px"
-          task-lists-enable
+      </div>
+
+      <q-separator />
+      <q-tab-panels
+        v-model="mdTab"
+        keep-alive
+        animated
+        transition-prev="jump-up"
+        transition-next="jump-up"
+      >
+        <q-tab-panel name="write" class="q-pa-sm">
+          <q-input
+            type="textarea"
+            ref="input"
+            v-model="mdText"
+            outlined
+            dense
+            :placeholder="pHolder"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+          />
+        </q-tab-panel>
+        <q-tab-panel name="preview" class="q-py-sm q-px-md">
+          <q-markdown
+            :class="dark ? 'dark' : ''"
+            :src="mdText"
+            :extend="extendMarkdown"
+            style="min-height: 132px"
+            task-lists-enable
+          />
+        </q-tab-panel>
+      </q-tab-panels>
+
+      <div class="md-editor-footer">
+        <q-icon
+          size="sm"
+          name="mdi-language-markdown"
+          @click="openMarkdown"
+          class="cursor-pointer q-mr-sm"
         />
-        <q-separator />
-      </q-tab-panel>
-    </q-tab-panels>
-    <q-card-actions align="right" class="q-px-sm q-pt-xs md-editor-actions">
-      <q-btn
-        unelevated
-        no-caps
-        color="light-green-9"
-        :disable="disabled"
-        :label="buttonLabel"
-        @click="onSubmit"
-      />
-    </q-card-actions>
-  </q-card>
-  <q-markdown v-else :src="mdText" :extend="extendMarkdown" task-lists-enable />
+        <div v-if="help" class="text-caption">{{ help }}</div>
+        <q-space />
+        <q-btn
+          class="submit-button text-roboto"
+          :disable="disabled"
+          :label="buttonLabel"
+          @click="onSubmit"
+        />
+      </div>
+    </q-card>
+  </template>
+  <q-markdown
+    v-else
+    :class="dark ? 'dark' : ''"
+    :src="mdText"
+    :extend="extendMarkdown"
+    task-lists-enable
+  />
 </template>
 
 <script>
 import { openURL } from "quasar";
-import { isEmpty, isNil } from "ramda";
-import { computed, defineComponent, onMounted, ref } from "vue";
-import { ChooserWidget, TooltipWidget } from "@/components/widgets";
+import { notNully } from "@/utils";
+import { computed, defineComponent, onMounted, provide, ref } from "vue";
+import MDEToolbar from "./MDEToolbar.vue";
 
 export default defineComponent({
   name: "MarkdownEditor",
   props: {
+    dark: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    right: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     editable: {
       type: Boolean,
       required: false,
@@ -250,28 +115,24 @@ export default defineComponent({
     },
   },
   components: {
-    ChooserWidget,
-    TooltipWidget,
+    MDEToolbar,
   },
   emits: ["onSaveText"],
   setup(props, context) {
-    const buttonLabel = props.submitLabel || "Save";
-    const mdText = ref(
-      !isEmpty(props.text) && !isNil(props.text) ? props.text : "",
-    );
-    const pHolder = props.placeholder || "Enter text here...";
-    const input = ref(null);
-    const mdTab = ref("write");
-    const disabled = computed(() => isEmpty(mdText.value));
     const textareaEl = ref(null);
-    const codeOptions = [
-      { label: "CSS", value: "css" },
-      { label: "HTML", value: "html" },
-      { label: "JavaScript", value: "js" },
-      { label: "JSON", value: "json" },
-      { label: "Python", value: "py" },
-      { label: "XML/TEI", value: "xml" },
-    ];
+    const input = ref(null);
+    const buttonLabel = props.submitLabel || "Save";
+    const mdText = ref(notNully(props.text) ? props.text : "");
+    const pHolder = props.placeholder || "Enter text here...";
+    const mdTab = ref("write");
+    const disabled = computed(() => !notNully(mdText.value));
+
+    const containerClasses = computed(() => {
+      let clss = props.dark
+        ? "md-editor-container box-arrow dark"
+        : "md-editor-container box-arrow";
+      return props.right ? (clss += " right") : clss;
+    });
 
     const onUserSelected = (value) => insertText("@" + value);
     const onTicketSelected = (value) => insertText("#" + value);
@@ -304,16 +165,12 @@ export default defineComponent({
     };
 
     const getSelection = () => {
-      return [
-        textareaEl.value.selectionStart || 0,
-        textareaEl.value.selectionEnd,
-      ];
+      return [textareaEl.value.selectionStart || 0, textareaEl.value.selectionEnd];
     };
 
     const insertText = (text) => {
       const [start, end] = getSelection();
-      mdText.value =
-        mdText.value.slice(0, start) + `${text} ` + mdText.value.slice(end);
+      mdText.value = mdText.value.slice(0, start) + `${text} ` + mdText.value.slice(end);
       input.value.focus();
     };
 
@@ -346,10 +203,7 @@ export default defineComponent({
           let lead = mark === "numbered" ? `${i + 1}. ` : mark;
           lines[i] = `${lead}${line}`;
         });
-        mdText.value =
-          mdText.value.slice(0, start) +
-          lines.join("\n") +
-          mdText.value.slice(end);
+        mdText.value = mdText.value.slice(0, start) + lines.join("\n") + mdText.value.slice(end);
         textareaEl.value.focus();
       }
     };
@@ -368,9 +222,11 @@ export default defineComponent({
       });
     }
 
+    provide("onUserSelected", onUserSelected);
+    provide("onTicketSelected", onTicketSelected);
+
     return {
       buttonLabel,
-      codeOptions,
       disabled,
       extendMarkdown,
       insertEnclosure,
@@ -386,61 +242,122 @@ export default defineComponent({
       pHolder,
       resetEditor,
       textareaEl,
+      containerClasses,
     };
   },
 });
 </script>
 
 <style lang="scss">
-.md-editor-tabs {
-  height: 29px !important;
-  margin-bottom: -1px;
+.md-editor-container {
+  --base-colour: var(--light-bg-base-colour);
+  --bg-colour: var(--light-bg-raised-colour);
+  --border-colour: var(--ligth-border-base-colour);
+  --text-accent: var(--light-text-accent);
+  --text-detail: var(--light-secondary-text-colour);
+  --toolbar-highlight: var(--light-toolbar-button-highlight);
+  --textbox-bg: var(--light-textbox-bg-colour);
+  --textbox-text: var(--light-textbox-colour);
+  --green-button: var(--light-green-button-bg);
+  --green-button-text: var(--light-green-button-text);
 }
-.md-editor-tabs.q-tabs--dense .q-tab {
+.md-editor-container.dark {
+  --base-colour: var(--dark-bg-base-colour);
+  --bg-colour: var(--dark-bg-raised-colour);
+  --border-colour: var(--dark-border-base-colour);
+  --text-accent: var(--dark-text-accent);
+  --text-detail: var(--dark-secondary-text-colour);
+  --toolbar-highlight: var(--dark-toolbar-button-highlight);
+  --textbox-bg: var(--dark-textbox-bg-colour);
+  --textbox-text: var(--dark-textbox-colour);
+  --green-button: var(--dark-green-button-bg);
+  --green-button-text: var(--dark-green-button-text);
+}
+.md-editor-container {
+  min-width: 350px;
+  width: 100%;
+}
+.md-editor-container > div:first-child {
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 4px 8px;
+  background: var(--bg-colour);
+}
+.md-editor-container .q-tabs {
+  position: relative;
+  bottom: -5px;
+}
+.md-editor-container .q-tabs.q-tabs--dense .q-tab {
   min-height: 30px;
 }
-.md-editor-tabs .q-tab__label {
+.md-editor-container .q-tabs .q-tab__label {
   font-size: 12px;
   line-height: 1.715em;
   font-weight: 500;
 }
-.md-editor-tabs .q-tab.q-tab--active {
+.md-editor-container .q-tabs .q-tab.q-tab--active {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  border-left: 1px solid rgb(209, 209, 209);
-  border-top: 1px solid rgb(209, 209, 209);
-  border-right: 1px solid rgb(209, 209, 209);
-  border-bottom: 1px solid white;
+  border-left: 1px solid var(--border-colour);
+  border-top: 1px solid var(--border-colour);
+  border-right: 1px solid var(--border-colour);
+  border-bottom: 1px solid var(--base-colour);
+  color: var(--text-accent);
+  background: var(--base-colour);
+  cursor: default !important;
 }
-.md-panels .q-field--outlined .q-field__control:before {
-  border-color: rgb(209, 209, 209);
-  border-bottom-style: dashed;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+.md-editor-container .q-tabs .q-tab.q-tab--active .q-focus-helper {
+  opacity: 0;
 }
-.md-editor-footer {
+.md-editor-container .q-tab-panels {
+  background: var(--base-colour);
+}
+.md-editor-container .q-tab-panels .q-field--outlined .q-field__control:before {
+  border-color: var(--border-colour);
+}
+.md-editor-container .q-field.q-textarea .q-field__control {
+  border-radius: 6px;
+  padding: 0;
+  background: var(--textbox-bg);
+}
+.md-editor-container .q-field.q-textarea .q-field__native {
+  color: var(--textbox-text);
+  padding: 10px;
+}
+.md-editor-container .md-editor-footer {
   display: flex;
-  border-top: none;
-  border-left: 1px solid rgb(209, 209, 209);
-  border-right: 1px solid rgb(209, 209, 209);
-  border-bottom: 1px solid rgb(209, 209, 209);
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
+  background: var(--bg-colour);
+  color: var(--text-detail);
+  padding: 0 8px;
+  align-items: center;
+  border-top: 1px solid var(--border-colour);
+  height: 31px;
 }
-.md-editor-textbox .q-field__control {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
+.md-editor-container .md-editor-footer .text-caption {
+  height: 31px;
+  overflow: hidden;
+  line-height: 31px;
 }
-.md-editor-button {
-  font-size: 11px;
-  padding: 4px;
-  margin-right: 2px;
+.md-editor-container .submit-button {
+  background: var(--green-button);
+  color: var(--green-button-text);
+  font-weight: 500;
+  font-size: 12px;
+  padding: 0 22px;
+  border-radius: 0;
+  min-height: 30px;
+  border-right: 1px solid var(--border-colour);
+  border-left: 1px solid var(--border-colour);
 }
-.md-editor-button:last-of-type {
-  margin-right: 0;
+.md-editor-container .submit-button.disabled {
+  opacity: 0.2 !important;
+  background: none;
+  color: grey;
+}
+.md-editor-container .submit-button::before {
+  box-shadow: none;
+}
+.q-markdown.dark a {
+  color: var(--dark-link-colour);
 }
 </style>
