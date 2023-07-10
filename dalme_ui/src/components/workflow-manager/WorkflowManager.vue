@@ -52,7 +52,16 @@ export default defineComponent({
   },
   setup(props) {
     const { workflowTagColours, workflowIconbyStage } = useConstants();
-    const colours = computed(() => workflowTagColours[props.data.status.tag]);
+    // const colours = computed(() => workflowTagColours[props.data.status.tag]);
+    const colours = computed(() => {
+      let type = props.data.status;
+      type = ["ingestion", "transcription", "markup", "review", "parsing"].reduce(
+        (result, word) => result.replace(word, ""),
+        type,
+      );
+      type = type.trim().replace(" ", "_");
+      return workflowTagColours[type];
+    });
     const icon = computed(() => workflowIconbyStage[props.data.stage]);
 
     return {

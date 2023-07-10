@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pb-lg q-pt-xs q-px-content full-width full-height">
+  <div class="q-pb-lg q-pt-xs full-width full-height">
     <TableToolbar
       :title="title"
       :embedded="embedded"
@@ -61,21 +61,10 @@
               <q-item-section class="text-left">
                 {{ props.col.label }}
               </q-item-section>
-              <q-item-section
-                v-if="isAdmin && editable.includes(props.col.name)"
-                side
-              >
-                <q-icon
-                  name="edit"
-                  size="xs"
-                  :color="editMode ? 'red-4' : 'grey-5'"
-                />
+              <q-item-section v-if="isAdmin && editable.includes(props.col.name)" side>
+                <q-icon name="edit" size="xs" :color="editMode ? 'red-4' : 'grey-5'" />
               </q-item-section>
-              <q-item-section
-                v-if="props.col.sortable"
-                side
-                style="padding-left: 2px"
-              >
+              <q-item-section v-if="props.col.sortable" side style="padding-left: 2px">
                 <q-btn
                   flat
                   dense
@@ -89,8 +78,7 @@
                     size="sm"
                     style="height: 9px; width: 16px"
                     :color="
-                      pagination.sortBy === props.col.name &&
-                      !pagination.sortDesc
+                      pagination.sortBy === props.col.name && !pagination.sortDesc
                         ? 'indigo-5'
                         : 'grey-5'
                     "
@@ -101,8 +89,7 @@
                     size="sm"
                     style="height: 9px; width: 16px"
                     :color="
-                      pagination.sortBy === props.col.name &&
-                      pagination.sortDesc
+                      pagination.sortBy === props.col.name && pagination.sortDesc
                         ? 'indigo-5'
                         : 'grey-5'
                     "
@@ -120,10 +107,8 @@
               v-bind:class="
                 isAdmin
                   ? {
-                      'text-red-6':
-                        isDirty && cellIsDirty(props.row.id, column.field),
-                      'bg-green-1':
-                        submitting && cellIsDirty(props.row.id, column.field),
+                      'text-red-6': isDirty && cellIsDirty(props.row.id, column.field),
+                      'bg-green-1': submitting && cellIsDirty(props.row.id, column.field),
                     }
                   : null
               "
@@ -147,17 +132,12 @@
                   v-slot="scope"
                   :validate="getValidation(column.field)"
                   @before-show="clearError"
-                  @save="
-                    (value, prev) =>
-                      onDiff(props.row.id, column.field, value, prev)
-                  "
+                  @save="(value, prev) => onDiff(props.row.id, column.field, value, prev)"
                   buttons
                 >
                   <q-input
                     :type="
-                      schemaTypes[column.field] === 'string'
-                        ? 'text'
-                        : schemaTypes[column.field]
+                      schemaTypes[column.field] === 'string' ? 'text' : schemaTypes[column.field]
                     "
                     :error="editError"
                     :error-message="editErrorMessage"
@@ -353,15 +333,8 @@ export default defineComponent({
 
     const { isAdmin } = useStores();
 
-    const {
-      diffCount,
-      isDirty,
-      cellIsDirty,
-      objDiffs,
-      onDiff,
-      resetTransport,
-      transportWatcher,
-    } = useTransport();
+    const { diffCount, isDirty, cellIsDirty, objDiffs, onDiff, resetTransport, transportWatcher } =
+      useTransport();
 
     // We can only open one inline popup at a time when doing editing, so we
     // can share these, no need for any scoping/duplication etc.
@@ -394,9 +367,7 @@ export default defineComponent({
     //     ],
     //   };
     const genericValidation = {
-      number: [
-        { check: (val) => !isNumber(val), error: "Input must be a number." },
-      ],
+      number: [{ check: (val) => !isNumber(val), error: "Input must be a number." }],
       // TODO: Disabled this check so the place.notes field can be nulled
       // (which is the only inline editable field currently in use). We need to
       // develop a better, nullable solution for this system, but it's not in

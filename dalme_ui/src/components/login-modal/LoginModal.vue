@@ -79,13 +79,7 @@
           <div class="row justify-center text-indigo-6 login-modal-link">
             <a href="" class="text-link">Recover password</a>
             <span v-if="reAuthenticate" class="text-grey-7 q-mx-sm">|</span>
-            <a
-              v-if="reAuthenticate"
-              @click="logout"
-              class="text-link cursor-pointer"
-            >
-              Log out
-            </a>
+            <a v-if="reAuthenticate" @click="logout" class="text-link cursor-pointer"> Log out </a>
           </div>
         </q-form>
       </q-card-section>
@@ -96,7 +90,7 @@
 <script>
 import { any, isEmpty } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
-import { authSchema, preferenceSchema } from "@/schemas";
+import { authSchema } from "@/schemas";
 import { requests, publicUrl } from "@/api";
 import { useAPI, useEventHandling, useStores } from "@/use";
 import { useRoute } from "vue-router";
@@ -104,7 +98,7 @@ import { useRoute } from "vue-router";
 export default defineComponent({
   name: "LoginModal",
   setup() {
-    const { auth, prefs, reAuthenticate } = useStores();
+    const { auth, reAuthenticate } = useStores();
     const { notifier } = useEventHandling();
     const $route = useRoute();
     const { apiInterface } = useAPI();
@@ -115,16 +109,10 @@ export default defineComponent({
     const password = ref("");
     const isPassword = ref(true);
     const submitting = ref(false);
-    const disabled = computed(() =>
-      any(isEmpty)([username.value, password.value]),
-    );
+    const disabled = computed(() => any(isEmpty)([username.value, password.value]));
 
-    const usernameRules = [
-      (val) => (val && !isEmpty(val)) || "Username is required",
-    ];
-    const passwordRules = [
-      (val) => (val && !isEmpty(val)) || "Password is required",
-    ];
+    const usernameRules = [(val) => (val && !isEmpty(val)) || "Username is required"];
+    const passwordRules = [(val) => (val && !isEmpty(val)) || "Password is required"];
 
     const logout = () => {
       prefSubscription();
@@ -140,27 +128,15 @@ export default defineComponent({
         }),
       );
       if (success.value) {
-        await authSchema
-          .validate(data.value, { stripUnknown: true })
-          .then((value) => {
-            auth.login(value.user).then(async () => {
-              await fetchAPI(requests.users.getUserPreferences(auth.userId));
-              if (success.value) {
-                await preferenceSchema
-                  .validate(data.value, { stripUnknown: false })
-                  .then(async (value) => {
-                    await prefs.loadPreferences(value);
-                    prefSubscription("subscribe");
-                  });
-              } else {
-                notifier.users.prefRetrievalFailed();
-              }
-              updateShowLogin(false);
-              if ($route.query.next) {
-                window.location.href = `${publicUrl}${$route.query.next}`;
-              }
-            });
+        await authSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          auth.login(value.user).then(() => {
+            prefSubscription("subscribe");
+            updateShowLogin(false);
+            if ($route.query.next) {
+              window.location.href = `${publicUrl}${$route.query.next}`;
+            }
           });
+        });
       } else {
         notifier.auth.authFailed();
         submitting.value = false;
@@ -245,8 +221,5 @@ export default defineComponent({
 .login-modal-button {
   font-weight: 400;
   padding: 4px 4rem !important;
-}
-.frosted-background > .q-dialog__backdrop {
-  backdrop-filter: blur(5px) grayscale(70%);
 }
 </style>

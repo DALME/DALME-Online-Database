@@ -1,11 +1,5 @@
 <template>
-  <q-tooltip
-    class="bg-blue z-max"
-    :anchor="anchor"
-    :self="self"
-    :offset="offset"
-    v-if="showTips"
-  >
+  <q-tooltip class="bg-blue z-max" :anchor="anchor" :self="self" :offset="offset" v-if="showTips">
     <slot />
     {{ text }}
   </q-tooltip>
@@ -13,7 +7,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { useTooltips } from "@/use";
+import { useUiStore } from "@/stores/ui";
 
 export default defineComponent({
   name: "TooltipWidget",
@@ -35,9 +29,8 @@ export default defineComponent({
     },
   },
   setup() {
-    const { showTips } = useTooltips();
-
-    return { showTips };
+    const ui = useUiStore();
+    return { showTips: ui.showTips };
   },
 });
 </script>
