@@ -6,6 +6,7 @@ import auth from "./auth";
 import choices from "./choices";
 import comments from "./comments";
 import countries from "./countries";
+import collections from "./collections";
 import groups from "./groups";
 import images from "./images";
 import languages from "./languages";
@@ -13,8 +14,9 @@ import library from "./library";
 import locales from "./locales";
 import pages from "./pages";
 import places from "./places";
-import sets from "./sets";
-import sources from "./sources";
+import publications from "./publications";
+import recordGroups from "./record-groups";
+import records from "./records";
 import transcriptions from "./transcriptions";
 import rights from "./rights";
 import tasks from "./tasks";
@@ -30,6 +32,7 @@ const requests = {
   choices,
   comments,
   countries,
+  collections,
   groups,
   images,
   languages,
@@ -37,9 +40,10 @@ const requests = {
   locales,
   pages,
   places,
+  publications,
   rights,
-  sets,
-  sources,
+  recordGroups,
+  records,
   transcriptions,
   tasks,
   tickets,

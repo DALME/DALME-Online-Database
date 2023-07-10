@@ -1,12 +1,11 @@
-import { snakeCase } from "change-case";
 import { apiUrl } from "./config";
 
 const endpoint = `${apiUrl}/attributes`;
 
 const attributes = {
-  getAttributeOptions(shortName) {
+  getAttributeOptions(id) {
     return {
-      url: `${endpoint}/?options=${snakeCase(shortName)}`,
+      url: `${endpoint}/${id}/options/`,
       method: "GET",
     };
   },

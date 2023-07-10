@@ -5,9 +5,7 @@ const endpoint = `${apiUrl}/tasks`;
 
 const tasks = {
   getTasks(query = false) {
-    const url = query
-      ? `${endpoint}/?${query}`
-      : `${endpoint}/?limit=0&offset=0`;
+    const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=0&offset=0`;
     return {
       url: url,
       method: "GET",
@@ -19,9 +17,27 @@ const tasks = {
       method: "GET",
     };
   },
-  getUserTasks(userId) {
+  getUserTasks(userId, limit) {
     return {
-      url: `${endpoint}/?assigned_to=${userId}`,
+      url: `${endpoint}/?user=${userId}&limit=${limit}`,
+      method: "GET",
+    };
+  },
+  getCreatedTasks(userId, limit, offset = 0) {
+    return {
+      url: `${endpoint}/?creation_user=${userId}&completed=false&limit=${limit}&offset=${offset}`,
+      method: "GET",
+    };
+  },
+  getAssignedTasks(userId, limit) {
+    return {
+      url: `${endpoint}/?assignees=${userId}&completed=false&limit=${limit}`,
+      method: "GET",
+    };
+  },
+  getCompletedTasks(userId, limit) {
+    return {
+      url: `${endpoint}/?completed=true&completed_by=${userId}&limit=${limit}`,
       method: "GET",
     };
   },
@@ -46,32 +62,38 @@ const tasks = {
       data: { action: S(action).underscore().s },
     };
   },
-  getTaskLists() {
+  getUserTasklists(userId) {
+    return {
+      url: `${apiUrl}/tasklists/?user=${userId}`,
+      method: "GET",
+    };
+  },
+  getTasklists() {
     return {
       url: `${apiUrl}/tasklists/`,
       method: "GET",
     };
   },
-  getTaskList(id) {
+  getTasklist(id) {
     return {
       url: `${apiUrl}/tasklists/${id}`,
       method: "GET",
     };
   },
-  createTaskList(data) {
+  createTasklist(data) {
     return {
       url: `${apiUrl}/tasklists/`,
       method: "POST",
       data: data,
     };
   },
-  deleteTaskList(id) {
+  deleteTasklist(id) {
     return {
       url: `${apiUrl}/tasklists/${id}`,
       method: "DELETE",
     };
   },
-  editTaskList(id, data) {
+  editTasklist(id, data) {
     return {
       url: `${apiUrl}/tasklists/${id}/`,
       method: "PUT",

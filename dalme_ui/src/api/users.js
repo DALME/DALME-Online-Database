@@ -4,29 +4,27 @@ const endpoint = `${apiUrl}/users`;
 
 const users = {
   getUsers(query = false) {
-    const url = query
-      ? `${endpoint}/?${query}`
-      : `${endpoint}/?limit=0&offset=0`;
+    const url = query ? `${endpoint}/?${query}` : `${endpoint}/?limit=0&offset=0`;
     return {
       url: url,
       method: "GET",
     };
   },
-  getUser(username) {
+  getUser(userId_or_username) {
     return {
-      url: `${endpoint}/?username=${username}`,
+      url: `${endpoint}/${userId_or_username}/`,
       method: "GET",
     };
   },
-  getUserPreferences(userId) {
+  getUserPreferences(userId_or_username) {
     return {
-      url: `${endpoint}/${userId}/get_preferences/`,
+      url: `${endpoint}/${userId_or_username}/get_preferences/`,
       method: "GET",
     };
   },
-  updateUserPreferences(userId, section, key, value) {
+  updateUserPreferences(userId_or_username, section, key, value) {
     return {
-      url: `${endpoint}/${userId}/update_preferences/`,
+      url: `${endpoint}/${userId_or_username}/update_preferences/`,
       method: "POST",
       data: { section, key, value },
     };
