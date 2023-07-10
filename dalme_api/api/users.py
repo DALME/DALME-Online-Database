@@ -22,6 +22,7 @@ with pathlib.Path('static/snippets/default_user_preferences.json').open() as fp:
 class Users(DALMEBaseViewSet):
     """API endpoint for managing users."""
 
+    lookup_url_kwarg = 'pk'
     permission_classes = (UserAccessPolicy,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -39,7 +40,14 @@ class Users(DALMEBaseViewSet):
         'is_superuser',
         'first_name',
     ]
-    ordering = ['-is_active', 'id']
+    ordering = ['-is_active', 'username']
+
+    def get_object(self):
+        """Return the object the view is displaying by id or username."""
+        lookup = self.kwargs.get(self.lookup_url_kwarg)
+        if lookup is not None and not lookup.isdigit():
+            self.lookup_field = 'username'
+        return super().get_object()
 
     @action(detail=True, methods=['post'])
     def reset_password(self, request, *args, **kwargs):  # noqa: ARG002
