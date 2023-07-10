@@ -2,7 +2,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from dalme_api.access_policies import TaskAccessPolicy, TaskListAccessPolicy
-from dalme_api.filters import TaskFilter
+from dalme_api.filters import TaskFilter, TasklistFilter
 from dalme_api.serializers import TaskListSerializer, TaskSerializer
 from dalme_app.models import Task, TaskList
 
@@ -18,7 +18,19 @@ class Tasks(DALMEBaseViewSet):
     filterset_class = TaskFilter
     search_fields = ['title', 'description']
     ordering_fields = ['id', 'title', 'description', 'completed', 'creation_user', 'creation_timestamp']
-    ordering = ['id']
+    ordering = ['-creation_timestamp']
+
+    def list(self, request, *args, **kwargs):  # noqa: A003
+        """Override method to include context data."""
+        if self.request.query_params.get('user'):
+            user = self.request.query_params['user']
+            self.context = {
+                'total_tasks': Task.objects.all().count(),
+                'total_created': Task.objects.filter(creation_user=user, completed=False).count(),
+                'total_assigned': Task.objects.filter(assignees=user, completed=False).count(),
+                'total_completed': Task.objects.filter(completed_by=user).count(),
+            }
+        return super().list(request, *args, **kwargs)
 
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):  # noqa: ARG002
@@ -45,3 +57,4 @@ class TaskLists(DALMEBaseViewSet):
     permission_classes = (TaskListAccessPolicy,)
     queryset = TaskList.objects.all()
     serializer_class = TaskListSerializer
+    filterset_class = TasklistFilter
