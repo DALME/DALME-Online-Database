@@ -15,21 +15,24 @@ from dalme_public.serializers import PublicRecordSerializer
 
 
 class DALMEPagination(pagination.PageNumberPagination):
+    """Pagination class for front-end."""
+
     page_size = 25
 
     def get_next_link(self):
+        """Return next link."""
         if not self.page.has_next():
             return None
-        page_number = self.page.next_page_number()
-        return page_number
+        return self.page.next_page_number()
 
     def get_previous_link(self):
+        """Return previous link."""
         if not self.page.has_previous():
             return None
-        page_number = self.page.previous_page_number()
-        return page_number
+        return self.page.previous_page_number()
 
-    def paginate_queryset(self, queryset, request, view=None):
+    def paginate_queryset(self, queryset, request, view=None):  # noqa: ARG002
+        """Paginate the queryset."""
         page_size = self.get_page_size(request)
         if not page_size:
             return None
@@ -51,6 +54,7 @@ class DALMEPagination(pagination.PageNumberPagination):
         return list(self.page)
 
     def get_paginated_response(self, data):
+        """Return paginated `Response` object."""
         page_size = self.page_size
         current_page = self.page.number
         total_count = self.page.paginator.count
@@ -60,7 +64,9 @@ class DALMEPagination(pagination.PageNumberPagination):
         result_end = start_offset + page_size + 1
         if result_end > total_count:
             result_end = total_count
-        start_page = max(current_page - adjacent_pages, 1) if max(current_page - adjacent_pages, 1) >= 3 else 1
+        start_page = (
+            max(current_page - adjacent_pages, 1) if max(current_page - adjacent_pages, 1) >= 3 else 1  # noqa: PLR2004
+        )
         end_page = current_page + adjacent_pages if current_page + adjacent_pages <= num_pages else num_pages
         page_numbers = list(range(start_page, end_page + 1))
 
@@ -80,7 +86,10 @@ class DALMEPagination(pagination.PageNumberPagination):
 
 
 class Thumbnail(View):
+    """API endpoint for returning thumbnails."""
+
     def get_data(self):
+        """Get the thumbnail's URL."""
         try:
             thumbnail = rs_resource.objects.get(
                 ref=self.request.GET['image_ref'],
@@ -89,11 +98,14 @@ class Thumbnail(View):
             thumbnail = None
         return {'image_url': thumbnail}
 
-    def get(self, request):
+    def get(self, request):  # noqa: ARG002
+        """Return thumbnail URL."""
         return JsonResponse(self.get_data())
 
 
 class RecordList(ListAPIView):
+    """API endpoint for record lists."""
+
     model = Record
     queryset = Record.objects.filter(workflow__is_public=True)
     serializer_class = PublicRecordSerializer
@@ -101,7 +113,8 @@ class RecordList(ListAPIView):
     filterset_class = RecordFilter
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):  # noqa: A003, ARG002
+        """Return list of records."""
         queryset = self.get_queryset()
 
         page = self.paginate_queryset(queryset)
@@ -113,6 +126,7 @@ class RecordList(ListAPIView):
         return Response(serializer.data)
 
     def get_queryset(self, *args, **kwargs):
+        """Return the filtered queryset."""
         qs = []
         if self.request.GET.get('search'):
             search_context = SearchContext(public=True)
@@ -167,6 +181,8 @@ class RecordList(ListAPIView):
 
 
 class RecordDetail(RetrieveAPIView):
+    """API endpoint for single record instances."""
+
     model = Record
     queryset = Record.objects.all()
     serializer_class = PublicRecordSerializer
@@ -175,11 +191,15 @@ class RecordDetail(RetrieveAPIView):
 
 
 class FilterChoices(View):
+    """API endpoint for returning filter options."""
+
     def corpus_choices(self):
+        """Return options for `corpus`."""
         choices = [{'value': corpus.pk, 'text': corpus.title} for corpus in Corpus.objects.all().order_by('title')]
         return [{'value': '', 'text': 'Filter by corpus', 'disabled': True}, *choices]
 
     def collection_choices(self):
+        """Return options for `collection`."""
         choices = [
             {'value': collection.pk, 'text': collection.title}
             for collection in Collection.objects.all().order_by('title')
@@ -187,6 +207,7 @@ class FilterChoices(View):
         return [{'value': '', 'text': 'Filter by collection', 'disabled': True}, *choices]
 
     def record_type_choices(self):
+        """Return options for `record_type`."""
         types = _map_record_types()
         choices = sorted(
             [{'value': str(idx), 'text': value} for idx, value in types.items()],
@@ -195,11 +216,13 @@ class FilterChoices(View):
         return [{'value': '', 'text': 'Filter by record type', 'disabled': True}, *choices]
 
     def locale_choices_as_dict(self):
+        """Return options for `locale`."""
         choices = [{'value': i[0], 'text': i[1]} for i in locale_choices()]
         return [{'value': '', 'text': 'Filter by locale', 'disabled': True}, *choices]
 
     @property
     def methods(self):
+        """Redirect request to the appropriate method."""
         return {
             'corpusChoices': self.corpus_choices,
             'collectionChoices': self.collection_choices,
@@ -208,7 +231,9 @@ class FilterChoices(View):
         }
 
     def get_data(self):
+        """Return the options data."""
         return {key: func() for key, func in self.methods.items()}
 
-    def get(self, request):
+    def get(self, request):  # noqa: ARG002
+        """Return the requested data."""
         return JsonResponse(self.get_data())
