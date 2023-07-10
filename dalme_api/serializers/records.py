@@ -25,6 +25,7 @@ class RecordSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True, required=False)
     workflow = WorkflowSerializer(required=False)
     pages = PageSerializer(many=True, required=False)
+    owner = UserSerializer(field_set='attribute', required=False)
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
     folios = RecordFolioSerializer(many=True, fields=['page_data'], required=False)
@@ -36,6 +37,7 @@ class RecordSerializer(DynamicSerializer):
             'name',
             'short_name',
             # 'parent',
+            'owner',
             'attributes',
             'no_folios',
             'no_images',

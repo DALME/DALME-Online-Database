@@ -117,6 +117,7 @@ class BaseAccessPolicy(AccessPolicy):
                 )
                 perm_obj = Permission.objects.filter(default_perms | user_perms | group_perms).values(*self.perm_types)
 
+                permissions[target.id] = {}
                 for pt in self.perm_types:
                     permissions[target.id][pt] = len([i[pt] for i in perm_obj if i[pt] is True]) > 0
 

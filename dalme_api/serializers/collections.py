@@ -55,7 +55,10 @@ class CollectionSerializer(DynamicSerializer):
     attributes = AttributeSerializer(many=True, required=False)
     owner = UserSerializer(field_set='attribute', required=False)
     team_link = GroupSerializer(field_set='attribute', required=False)
-    members = CollectionMemberSerializer(many=True)
+    # members = CollectionMemberSerializer(many=True)
+    creation_user = UserSerializer(field_set='attribute', required=False)
+    modification_user = UserSerializer(field_set='attribute', required=False)
+    is_private = serializers.BooleanField()
 
     class Meta:  # noqa: D106
         model = Collection
@@ -65,17 +68,27 @@ class CollectionSerializer(DynamicSerializer):
             'attributes',
             'use_as_workset',
             'is_published',
+            'is_private',
             'owner',
             'team_link',
             'creation_timestamp',
             'modification_timestamp',
             'creation_user',
             'modification_user',
-            'members',
+            # 'members',
             'member_count',
             'comment_count',
         )
         field_sets = {
-            'option': ['id', 'name', 'is_published'],
-            'attribute': ['id', 'name', 'is_published', 'use_as_workset', 'owner', 'team_link', 'member_count'],
+            'option': ['id', 'name', 'is_published', 'is_private'],
+            'attribute': [
+                'id',
+                'name',
+                'is_published',
+                'is_private',
+                'use_as_workset',
+                'owner',
+                'team_link',
+                'member_count',
+            ],
         }

@@ -7,7 +7,7 @@ from dalme_app.models import Workflow, WorkLog
 class WorklogSerializer(serializers.ModelSerializer):
     """Basic serializer for work logs."""
 
-    user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'])
+    user = UserSerializer(field_set='attribute', required=False)
 
     class Meta:  # noqa: D106
         model = WorkLog
@@ -17,7 +17,7 @@ class WorklogSerializer(serializers.ModelSerializer):
 class WorkflowSerializer(serializers.ModelSerializer):
     """Basic serializer for workflow control."""
 
-    last_user = UserSerializer(fields=['username', 'profile'], required=False)
+    last_user = UserSerializer(field_set='attribute', required=False)
     work_log = WorklogSerializer(many=True, read_only=True, required=False)
 
     class Meta:  # noqa: D106

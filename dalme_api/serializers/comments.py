@@ -7,7 +7,7 @@ from dalme_app.models import Comment
 class CommentSerializer(serializers.ModelSerializer):
     """Serializer for comments."""
 
-    creation_user = UserSerializer(field_set='attribute')
+    creation_user = UserSerializer(field_set='attribute', required=False)
 
     class Meta:  # noqa: D106
         model = Comment

@@ -20,7 +20,7 @@ class Tickets(DALMEBaseViewSet):
     filterset_class = TicketFilter
     search_fields = ['subject', 'description']
     ordering_fields = ['id', 'subject', 'description', 'status', 'creation_user', 'creation_timestamp', 'assigned_to']
-    ordering = ['id']
+    ordering = ['status', 'id']
 
     @action(detail=True, methods=['patch'])
     def set_state(self, request, *args, **kwargs):  # noqa: ARG002

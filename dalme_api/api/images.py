@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from dalme_api.access_policies import ImageAccessPolicy
-from dalme_api.serializers import ImageOptionsSerializer, ImageUrlSerializer, RSImageSerializer
+from dalme_api.serializers import RSImageSerializer
 from dalme_app.models import rs_api_query, rs_resource
 
 from .base_viewset import DALMEBaseViewSet
@@ -23,8 +23,6 @@ class Images(DALMEBaseViewSet):
     permission_classes = (ImageAccessPolicy,)
     queryset = rs_resource.objects.filter(resource_type=1, archive=0, ref__gte=0)
     serializer_class = RSImageSerializer
-    options_serializer_class = ImageOptionsSerializer
-    url_serializer_class = ImageUrlSerializer
     search_fields = ['ref', 'title', 'country', 'field12', 'field8', 'field3', 'field51', 'field79']
     ordering_fields = ['ref', 'title', 'country', 'field12', 'field8', 'field3', 'field51', 'field79']
     ordering = ['ref']

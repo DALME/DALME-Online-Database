@@ -17,10 +17,10 @@ class TicketSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(many=True, required=False)
     file = AttachmentSerializer(required=False)
-    creation_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
-    modification_user = UserSerializer(fields=['full_name', 'username', 'id'], required=False)
-    closing_user = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
-    assigned_to = UserSerializer(fields=['full_name', 'username', 'id', 'avatar'], required=False)
+    creation_user = UserSerializer(field_set='attribute', required=False)
+    modification_user = UserSerializer(field_set='attribute', required=False)
+    closing_user = UserSerializer(field_set='attribute', required=False)
+    assigned_to = UserSerializer(field_set='attribute', required=False)
 
     class Meta:  # noqa: D106
         model = Ticket

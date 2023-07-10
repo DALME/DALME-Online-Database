@@ -35,7 +35,8 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
             'preferences',
         )
         field_sets = {
-            'attribute': ['id', 'username', 'full_name'],
+            'attribute': ['id', 'username', 'full_name', 'avatar', 'email'],
+            'option': ['id', 'username', 'full_name'],
         }
         extra_kwargs = {
             'username': {'validators': []},

@@ -21,7 +21,7 @@ class AttributeTypes(DALMEBaseViewSet):
         if self.request.GET.get('short_names') is not None:
             q_short_names = self.request.GET.get('short_names')
             q_short_names = [snakecase(short_name) for short_name in q_short_names.split(',')]
-            return AttributeType.objects.filter(short_name__in=q_short_names)
+            return AttributeType.objects.filter(name__in=q_short_names)
 
         if self.request.GET.get('filter') is not None:
             filter_v = self.request.GET['filter'].split(',')

@@ -18,7 +18,7 @@ class DalmeOrderingFilter(OrderingFilter):
             for flt in ordering:
                 cf = self.clean_field(flt)
                 if cf.startswith('attributes.'):
-                    att_type = AttributeType.objects.get(short_name=cf[11:])
+                    att_type = AttributeType.objects.get(name=cf[11:])
                     attributes = Attribute.objects.filter(object_id=OuterRef('pk'), attribute_type=att_type)
                     if att_type.data_type == 'DATE':
                         queryset = (

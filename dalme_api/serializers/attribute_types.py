@@ -8,4 +8,4 @@ class AttributeTypeSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D106
         model = AttributeType
-        fields = ('id', 'name', 'short_name', 'description', 'data_type', 'source', 'options', 'same_as')
+        fields = ('id', 'name', 'label', 'description', 'data_type', 'source', 'options', 'same_as')

@@ -9,8 +9,7 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
     permission_classes = ()
     queryset = None
     serializer_class = None
-    options_serializer_class = None
-    url_serializer_class = None
+    context = None
 
     @property
     def options_view(self):

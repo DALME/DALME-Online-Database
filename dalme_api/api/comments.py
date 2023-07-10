@@ -40,7 +40,7 @@ class Comments(viewsets.ModelViewSet):
         try:
             model = apps.get_model(app_label='dalme_app', model_name=request.data['model'])
             obj_pk = request.data['object']
-            body = request.data.get['body']
+            body = request.data['body']
 
             if isinstance(obj_pk, str):
                 with contextlib.suppress(ValueError):

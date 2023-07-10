@@ -35,8 +35,8 @@ class Library(viewsets.ViewSet):
             result = {
                 # cast return "draw" value as INT to prevent Cross Site Scripting (XSS) attacks
                 'draw': int(dt_request.get('draw')),
-                'recordsTotal': record_total,
-                'recordsFiltered': page.count_items(),
+                'count': record_total,
+                'filtered': page.count_items(),
                 'data': [i['data'] for i in page],
             }
         else:
