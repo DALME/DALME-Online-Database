@@ -14,15 +14,20 @@ class JWTUserDetailsSerializer(serializers.ModelSerializer):
     avatar = serializers.CharField(max_length=255, source='profile.profile_image', required=False)
     is_admin = serializers.SerializerMethodField()
     preferences = serializers.JSONField(source='profile.preferences', required=False)
+    groups = serializers.SerializerMethodField()
 
     class Meta:  # noqa: D106
         model = auth.models.User
-        fields = ('id', 'username', 'full_name', 'email', 'avatar', 'is_admin', 'preferences')
-        read_only_fields = ('email', 'is_admin')
+        fields = ['id', 'username', 'full_name', 'email', 'avatar', 'is_admin', 'preferences', 'groups']
+        read_only_fields = ('email', 'is_admin', 'groups')
 
     def get_is_admin(self, obj):
         """Return boolean indicating whether user is admin."""
         return any(group.name == "Administrators" for group in obj.groups.all())
+
+    def get_groups(self, obj):
+        """Return list of user groups."""
+        return [group.name for group in obj.groups.all()]
 
     @staticmethod
     def validate_username(username):
