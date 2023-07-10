@@ -9,85 +9,32 @@ const routes = [
         path: "",
         meta: {
           navPath: ["Dashboard", null],
-          icon: "o_space_dashboard",
+          icon: "mdi-view-dashboard-outline",
+          pageIcon: "mdi-view-dashboard",
         },
-        nav: true,
+        menu: "menu",
       },
-
-      /* Sections */
       {
-        // Sources
-        component: () => import("pages/Sources.vue"),
-        name: "Sources",
-        path: "sources",
+        // Records
+        component: () => import("pages/Records.vue"),
+        path: "records",
+        menu: "menu",
         meta: {
-          navPath: ["Sources", null],
-          icon: "o_bookmarks",
+          navPath: ["Records", null],
+          icon: "mdi-text-box-outline",
+          pageIcon: "mdi-text-box",
         },
-        nav: true,
         children: [
           {
-            component: () =>
-              import("src/components/source-list/SourceList.vue"),
-            name: "Archives",
-            path: "archives",
-            nav: true,
-            meta: {
-              navPath: ["Sources", "Archives"],
-              icon: "o_home_work",
-              sourceType: "archives",
-              sourceTypeAPI: "archives",
-            },
-          },
-          {
-            component: () =>
-              import("src/components/source-list/SourceList.vue"),
-            name: "Archival Files",
-            path: "archival-files",
-            nav: true,
-            meta: {
-              navPath: ["Sources", "Archival Files"],
-              icon: "o_inventory_2",
-              sourceType: "archivalFiles",
-              sourceTypeAPI: "archival_files",
-            },
-          },
-          {
-            component: () =>
-              import("src/components/source-list/SourceList.vue"),
+            component: () => import("components/record-list/RecordList.vue"),
             name: "Records",
-            path: "records",
-            nav: true,
-            meta: {
-              navPath: ["Sources", "Records"],
-              icon: "o_text_snippet",
-              sourceType: "records",
-              sourceTypeAPI: "records",
-            },
+            path: "",
           },
           {
-            component: () =>
-              import("src/components/source-list/SourceList.vue"),
-            name: "Bibliography",
-            path: "bibilographies",
-            nav: true,
-            meta: {
-              navPath: ["Sources", "Bibliography"],
-              icon: "o_local_library",
-              sourceType: "bibliography",
-              sourceTypeAPI: "bibliography",
-            },
-          },
-          {
-            component: () =>
-              import("components/source-detail/SourceDetail.vue"),
-            name: "Source",
+            component: () => import("components/record-detail/RecordDetail.vue"),
+            name: "Record",
             path: ":id",
-            nav: false,
             meta: {
-              navPath: ["Sources", null],
-              icon: "bookmark_border",
-              allowCompactMode: true,
               viewDefaults: { tab: "info" },
             },
           },
@@ -95,311 +42,274 @@ const routes = [
       },
 
       {
-        // Sets
-        component: () => import("pages/Sets.vue"),
-        name: "Sets",
-        path: "sets",
+        // Collections
+        component: () => import("pages/Collections.vue"),
+        name: "Record Groups",
+        path: "collections",
         meta: {
-          navPath: ["Sets", null],
-          icon: "o_folder_copy",
+          navPath: ["Collections", null],
+          icon: "mdi-archive-outline",
+          pageIcon: "mdi-archive",
         },
-        nav: true,
-        children: [
-          {
-            component: () => import("src/components/set-list/SetList.vue"),
-            name: "Corpora",
-            path: "corpora",
-            nav: true,
-            meta: {
-              navPath: ["Sets", "Corpora"],
-              icon: "o_drive_folder_upload",
-              setType: "corpora",
-              setTypeAPI: "corpora",
-            },
-          },
-          {
-            component: () => import("src/components/set-list/SetList.vue"),
-            name: "Collections",
-            path: "collections",
-            nav: true,
-            meta: {
-              navPath: ["Sets", "Collections"],
-              icon: "o_folder_special",
-              setType: "collections",
-              setTypeAPI: "collections",
-            },
-          },
-          {
-            component: () => import("src/components/set-list/SetList.vue"),
-            name: "Datasets",
-            path: "datasets",
-            nav: true,
-            meta: {
-              navPath: ["Sets", "Datasets"],
-              icon: "o_topic",
-              setType: "datasets",
-              setTypeAPI: "datasets",
-            },
-          },
-          {
-            component: () => import("src/components/set-list/SetList.vue"),
-            name: "Worksets",
-            path: "worksets",
-            nav: true,
-            meta: {
-              navPath: ["Sets", "Worksets"],
-              icon: "o_rule_folder",
-              setType: "worksets",
-              setTypeAPI: "worksets",
-            },
-          },
-          {
-            component: () => import("components/set-detail/SetDetail.vue"),
-            name: "Set",
-            path: ":id",
-            nav: false,
-            meta: {
-              navPath: ["Sets", null],
-              icon: "o_folder",
-              allowCompactMode: true,
-              preserveCompactMode: true,
-            },
-          },
-        ],
+        menu: "menu",
       },
 
+      {
+        // Images
+        component: () => import("pages/Entities.vue"),
+        name: "Images",
+        path: "images",
+        meta: {
+          navPath: ["Images", null],
+          icon: "mdi-image-multiple-outline",
+          pageIcon: "mdi-image-multiple",
+        },
+        menu: "menu",
+      },
       {
         // Entities
         component: () => import("pages/Entities.vue"),
         name: "Entities",
         path: "entities",
-        meta: {
-          navPath: ["Entities", null],
-          icon: "o_hive",
-        },
-        nav: true,
+        menu: "app",
         children: [
           {
             component: () => import("pages/Agents.vue"),
             name: "Agents",
             path: "agents",
-            nav: true,
             meta: {
               navPath: ["Entities", "Agents"],
-              icon: "o_groups",
+              icon: "mdi-account-child-outline",
+              pageIcon: "mdi-account-child",
             },
           },
           {
             component: () => import("pages/Places.vue"),
             name: "Places",
             path: "places",
-            nav: true,
             meta: {
               navPath: ["Entities", "Places"],
-              icon: "o_place",
+              icon: "mdi-map-marker-multiple-outline",
+              pageIcon: "mdi-map-marker-multiple",
             },
           },
-        ],
-      },
-
-      {
-        // Project
-        component: () => import("pages/Project.vue"),
-        name: "Project",
-        path: "project",
-        meta: {
-          navPath: ["Project", null],
-          icon: "o_business_center",
-        },
-        nav: true,
-        children: [
           {
-            component: () => import("pages/Tasks.vue"),
-            path: "tasks",
-            nav: true,
-            children: [
-              {
-                component: () =>
-                  import("src/components/task-list/TaskList.vue"),
-                name: "Tasks",
-                path: "",
-                nav: true,
-                meta: {
-                  navPath: ["Project", "Tasks"],
-                  icon: "checklist",
-                },
-              },
-              {
-                component: () =>
-                  import("components/task-detail/TaskDetail.vue"),
-                name: "Task",
-                path: ":id",
-                nav: false,
-                meta: {
-                  navPath: ["Project", "Tasks"],
-                  icon: "add_task",
-                  allowCompactMode: false,
-                  preserveCompactMode: false,
-                },
-              },
-            ],
-          },
-          {
-            component: () => import("pages/Tickets.vue"),
-            path: "tickets",
-            nav: true,
-            children: [
-              {
-                component: () =>
-                  import("src/components/ticket-list/TicketList.vue"),
-                name: "Tickets",
-                path: "",
-                nav: true,
-                meta: {
-                  navPath: ["Project", "Tickets"],
-                  icon: "o_bug_report",
-                },
-              },
-              {
-                component: () =>
-                  import("components/ticket-detail/TicketDetail.vue"),
-                name: "Ticket",
-                path: ":id",
-                nav: false,
-                meta: {
-                  navPath: ["Project", "Tickets"],
-                  icon: "o_pest_control",
-                  allowCompactMode: false,
-                  preserveCompactMode: false,
-                },
-              },
-            ],
-          },
-          {
-            component: () => import("pages/Library.vue"),
-            name: "Library",
-            path: "library",
-            nav: true,
+            component: () => import("pages/Places.vue"),
+            name: "Objects",
+            path: "objects",
             meta: {
-              navPath: ["Project", "Library"],
-              icon: "menu_book",
+              navPath: ["Entities", "Objects"],
+              icon: "mdi-atom",
             },
-          },
-          {
-            component: () => import("pages/Rights.vue"),
-            path: "rights",
-            nav: true,
-            children: [
-              {
-                component: () =>
-                  import("src/components/rights-list/RightsList.vue"),
-                name: "Rights Policies",
-                path: "",
-                nav: true,
-                meta: {
-                  navPath: ["Project", "Rights Policies"],
-                  icon: "copyright",
-                },
-              },
-              {
-                component: () =>
-                  import("components/rights-detail/RightsDetail.vue"),
-                name: "Rights",
-                path: ":id",
-                props: true,
-                nav: false,
-                meta: {
-                  navPath: ["Project", "Rights Policies"],
-                  icon: "attribution",
-                  allowCompactMode: false,
-                  preserveCompactMode: false,
-                },
-              },
-            ],
           },
         ],
       },
 
       {
-        // System
+        // Reference
         component: () => import("pages/System.vue"),
-        name: "System",
-        path: "system",
-        meta: {
-          navPath: ["System", null],
-          icon: "o_settings_applications",
-        },
-        nav: true,
+        name: "Reference",
+        path: "Reference",
+        menu: "app",
         children: [
-          {
-            component: () => import("pages/Locales.vue"),
-            name: "Locales",
-            path: "locales",
-            nav: true,
-            meta: {
-              navPath: ["System", "Locales"],
-              icon: "location_city",
-            },
-          },
           {
             component: () => import("pages/Countries.vue"),
             name: "Countries",
             path: "countries",
-            nav: true,
             meta: {
-              navPath: ["System", "Countries"],
-              icon: "o_flag",
+              navPath: ["Reference", "Countries"],
+              icon: "mdi-earth",
             },
           },
           {
             component: () => import("pages/Languages.vue"),
             name: "Languages",
             path: "languages",
-            nav: true,
             meta: {
-              navPath: ["System", "Languages"],
-              icon: "o_g_translate",
+              navPath: ["Reference", "Languages"],
+              icon: "mdi-translate",
             },
           },
           {
+            component: () => import("pages/Library.vue"),
+            name: "Library",
+            path: "library",
+            meta: {
+              navPath: ["Reference", "Library"],
+              icon: "mdi-bookshelf",
+            },
+          },
+          {
+            component: () => import("pages/Locales.vue"),
+            name: "Locales",
+            path: "locales",
+            meta: {
+              navPath: ["Reference", "Locales"],
+              icon: "mdi-office-building-marker-outline",
+              pageIcon: "mdi-office-building-marker",
+            },
+          },
+        ],
+      },
+      {
+        // Project
+        component: () => import("pages/Project.vue"),
+        name: "Project",
+        path: "project",
+        menu: "app",
+        children: [
+          {
+            component: () => import("src/components/rights-list/RightsList.vue"),
+            name: "Rights",
+            label: "Manage content rights",
+            path: "rights",
+            meta: {
+              navPath: ["Project", "Rights"],
+              icon: "mdi-copyright",
+            },
+          },
+          {
+            component: () => import("src/components/rights-list/RightsList.vue"),
+            name: "Ontology",
+            label: "Edit ontology",
+            path: "ontology",
+            meta: {
+              navPath: ["Project", "Ontology"],
+              icon: "mdi-graph-outline",
+              pageIcon: "mdi-graph",
+            },
+          },
+        ],
+      },
+      {
+        // Tasks
+        component: () => import("pages/Tasks.vue"),
+        path: "tasks",
+        menu: "top",
+        dropdown: false,
+        label: "Manage tasks",
+        meta: {
+          navPath: ["Tasks", null],
+          icon: "mdi-format-list-checkbox",
+        },
+        children: [
+          {
+            component: () => import("src/components/task-list/TaskList.vue"),
+            name: "Tasks",
+            path: "",
+          },
+          {
+            component: () => import("components/task-detail/TaskDetail.vue"),
+            name: "Task",
+            path: ":id",
+          },
+        ],
+      },
+      {
+        component: () => import("pages/Tickets.vue"),
+        path: "tickets",
+        menu: "top",
+        dropdown: false,
+        label: "Manage issue tickets",
+        meta: {
+          navPath: ["Tickets", null],
+          icon: "mdi-bug",
+        },
+        children: [
+          {
+            component: () => import("src/components/ticket-list/TicketList.vue"),
+            name: "Tickets",
+            path: "",
+          },
+          {
+            component: () => import("components/ticket-detail/TicketDetail.vue"),
+            name: "Ticket",
+            path: ":id",
+          },
+        ],
+      },
+      {
+        component: {},
+        name: "DALME Knowledge Base",
+        path: "kb",
+        menu: "top",
+        dropdown: false,
+        label: "Open DALME Knowledge Base.",
+        meta: {
+          navPath: ["System", "KB"],
+          icon: "mdi-book-open-page-variant-outline",
+        },
+        beforeEnter(_) {
+          window.location.replace("https://kb.dalme.org/");
+        },
+      },
+      {
+        // System
+        component: () => import("pages/System.vue"),
+        path: "system",
+        menu: "top",
+        dropdown: true,
+        meta: {
+          navPath: ["System", null],
+          icon: "mdi-cog",
+        },
+        children: [
+          {
             component: () => import("pages/Users.vue"),
             path: "users",
-            nav: true,
+            separator: false,
+            meta: {
+              navPath: ["System", "Users"],
+              icon: "mdi-account-multiple-outline",
+              pageIcon: "mdi-account-multiple",
+            },
             children: [
               {
-                component: () =>
-                  import("src/components/user-list/UserList.vue"),
+                component: () => import("src/components/user-list/UserList.vue"),
                 name: "Users",
+                label: "Manage users",
                 path: "",
-                nav: true,
-                meta: {
-                  navPath: ["System", "Users"],
-                  icon: "o_supervisor_account",
-                },
               },
               {
-                component: () =>
-                  import("components/user-detail/UserDetail.vue"),
+                component: () => import("components/user-detail/UserDetail.vue"),
                 name: "User",
                 path: ":username",
-                nav: false,
-                meta: {
-                  navPath: ["System", "Users"],
-                  icon: "person_outline",
-                  allowCompactMode: false,
-                  preserveCompactMode: false,
-                },
               },
             ],
           },
           {
+            component: () => import("src/components/ticket-list/TicketList.vue"),
+            name: "Groups",
+            label: "Manage groups and teams",
+            path: "groups",
+            separator: true,
+            meta: {
+              navPath: ["System", "Groups"],
+              icon: "mdi-account-group-outline",
+              pageIcon: "mdi-account-group",
+            },
+          },
+          {
+            component: () => import("src/components/ticket-list/TicketList.vue"),
+            name: "Permissions",
+            label: "Manage permissions",
+            path: "permissions",
+            separator: true,
+            meta: {
+              navPath: ["System", "Permissions"],
+              icon: "mdi-lock-check-outline",
+              pageIcon: "mdi-lock-check",
+            },
+          },
+          {
             component: {},
             name: "Admin",
+            label: "Open Django Admin",
             path: "admin",
-            nav: true,
             meta: {
               navPath: ["System", "Admin"],
-              icon: "o_admin_panel_settings",
+              icon: "mdi-application-cog-outline",
+              pageIcon: "mdi-application-cog",
             },
             beforeEnter(_) {
               window.location.replace("/admin");
