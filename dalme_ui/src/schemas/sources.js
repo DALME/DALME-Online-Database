@@ -3,7 +3,7 @@ import * as yup from "yup";
 
 import { normalizeAttributesOutput } from "@/components/forms/attributes-field/normalize";
 
-import { ownerSchema, userRefSchema } from "./common";
+import { userAttributeSchema, workflowSchema } from "@/schemas";
 
 export const sourceOptionsSchema = yup.array().of(
   yup
@@ -53,61 +53,6 @@ const languageSchema = yup.object().shape({
   url: yup.string().required(),
   id: yup.object().shape({ id: yup.number().required() }).required(),
 });
-
-const logEventSchema = yup.object().shape({
-  event: yup.string().required(),
-  id: yup.number().required(),
-  timestamp: yup.string().required(),
-  user: userRefSchema.required(),
-});
-
-const workflowSchema = yup
-  .object()
-  .shape({
-    helpFlag: yup.boolean().required(),
-    isPublic: yup.boolean().required(),
-    wfStatus: yup.number().required(),
-    stage: yup.number().default(null).nullable(),
-    ingestionDone: yup.boolean().required(),
-    transcriptionDone: yup.boolean().required(),
-    markupDone: yup.boolean().required(),
-    reviewDone: yup.boolean().required(),
-    parsingDone: yup.boolean().default(null).nullable(),
-    lastModified: yup.string().required(),
-    lastUser: yup
-      .object()
-      .shape({
-        profile: yup
-          .object()
-          .shape({
-            fullName: yup.string().required(),
-            primaryGroup: yup
-              .object()
-              .shape({
-                description: yup.string().required(),
-                id: yup.number().required(),
-                name: yup.string().required(),
-              })
-              .required()
-              .camelCase(),
-          })
-          .required()
-          .camelCase(),
-        username: yup.string().required(),
-      })
-      .required()
-      .camelCase(),
-    status: yup
-      .object()
-      .shape({
-        text: yup.string().required(),
-        tag: yup.string().required(),
-      })
-      .required()
-      .camelCase(),
-    workLog: yup.array().of(logEventSchema).default(null).nullable(),
-  })
-  .camelCase();
 
 const creditSchema = yup
   .object()
@@ -195,9 +140,7 @@ export const archiveSourceSchema = yup
           .url()
           .default(null)
           .nullable()
-          .transform((value) =>
-            value.includes(" ") ? `http://${last(value.split(" "))}` : value,
-          ),
+          .transform((value) => (value.includes(" ") ? `http://${last(value.split(" "))}` : value)),
         locale: localeSchema.default(null).nullable(),
         defaultRights: defaultRightsSchema.default(null).nullable(),
       })
@@ -212,7 +155,7 @@ export const archivalFileSourceSchema = yup
     id: yup.string().uuid().required(),
     name: yup.string().required(),
     primaryDataset: primaryDatasetSchema.required(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     isPrivate: yup.boolean().required(),
     noRecords: yup.number().required(),
     attributes: yup
@@ -233,7 +176,7 @@ export const recordSourceSchema = yup
     id: yup.string().uuid().required(),
     name: yup.string().required(),
     noFolios: yup.number().required(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     isPrivate: yup.boolean().required(),
     workflow: workflowSchema.default(null).nullable(),
     attributes: yup
@@ -242,21 +185,9 @@ export const recordSourceSchema = yup
         locale: yup.array().of(localeSchema).default(null).nullable(),
         language: yup.array().of(languageSchema).default(null).nullable(),
         recordType: yup.string().required(),
-        date: yup
-          .object()
-          .shape({ name: yup.string().required() })
-          .default(null)
-          .nullable(),
-        startDate: yup
-          .object()
-          .shape({ name: yup.string().required() })
-          .default(null)
-          .nullable(),
-        endDate: yup
-          .object()
-          .shape({ name: yup.string().required() })
-          .default(null)
-          .nullable(),
+        date: yup.object().shape({ name: yup.string().required() }).default(null).nullable(),
+        startDate: yup.object().shape({ name: yup.string().required() }).default(null).nullable(),
+        endDate: yup.object().shape({ name: yup.string().required() }).default(null).nullable(),
       })
       .required()
       .camelCase(),
@@ -272,7 +203,7 @@ export const bibliographySourceSchema = yup
       id: yup.string().uuid().required(),
       name: yup.string().required(),
     }),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     isPrivate: yup.boolean().required(),
     noRecords: yup.number().required(),
     attributes: yup
@@ -312,7 +243,7 @@ export const sourceDetailSchema = yup
     noImages: yup.number().required(),
     noRecords: yup.number().required(),
     isPrivate: yup.boolean().required(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     primaryDataset: primaryDatasetSchema.default(null).nullable(),
     workflow: workflowSchema.default(null).nullable(),
     created: yup
@@ -347,9 +278,7 @@ export const sourceDetailSchema = yup
           .url()
           .default(null)
           .nullable()
-          .transform((value) =>
-            value.includes(" ") ? `http://${last(value.split(" "))}` : value,
-          ),
+          .transform((value) => (value.includes(" ") ? `http://${last(value.split(" "))}` : value)),
         mk1Identifier: yup.number().default(null).nullable(),
         mk2Identifier: yup.string().default(null).nullable(),
         altIdentifier: yup.string().default(null).nullable(),
@@ -364,21 +293,9 @@ export const sourceDetailSchema = yup
         debtAmount: yup.string().default(null).nullable(),
         debtUnit: yup.string().default(null).nullable(),
         debtSource: yup.string().default(null).nullable(),
-        date: yup
-          .object()
-          .shape({ name: yup.string().required() })
-          .default(null)
-          .nullable(),
-        startDate: yup
-          .object()
-          .shape({ name: yup.string().required() })
-          .default(null)
-          .nullable(),
-        endDate: yup
-          .object()
-          .shape({ name: yup.string().required() })
-          .default(null)
-          .nullable(),
+        date: yup.object().shape({ name: yup.string().required() }).default(null).nullable(),
+        startDate: yup.object().shape({ name: yup.string().required() }).default(null).nullable(),
+        endDate: yup.object().shape({ name: yup.string().required() }).default(null).nullable(),
         language: yup
           .array()
           .of(
@@ -387,10 +304,7 @@ export const sourceDetailSchema = yup
               .shape({
                 name: yup.string().required(),
                 url: yup.string().required(),
-                id: yup
-                  .object()
-                  .shape({ id: yup.number().required() })
-                  .required(),
+                id: yup.object().shape({ id: yup.number().required() }).required(),
               })
               .required(),
           )
@@ -416,8 +330,8 @@ export const sourceListSchema = (sourceType) => {
     bibliography: bibliographySourceSchema,
   };
   return yup.object().shape({
-    recordsTotal: yup.number().required(),
-    recordsFiltered: yup.number().required(),
+    count: yup.number().required(),
+    filtered: yup.number().nullable(),
     data: yup.array().of(sourceMap[sourceType]),
   });
 };
@@ -432,11 +346,7 @@ const sourcePostSchema = yup
     type: yup.object().shape({
       id: yup.number().nullable().required(),
     }),
-    parent: yup
-      .object()
-      .shape({ id: yup.string().uuid().required() })
-      .default(null)
-      .nullable(),
+    parent: yup.object().shape({ id: yup.string().uuid().required() }).default(null).nullable(),
     primaryDataset: yup
       .object()
       .shape({ id: yup.string().uuid().required() })
@@ -455,9 +365,7 @@ const sourcePostSchema = yup
       ...data,
       type: { id: data.type.value },
       parent: data.parent ? { id: data.parent.value } : null,
-      primaryDataset: data.primaryDataset
-        ? { id: data.primaryDataset.value }
-        : null,
+      primaryDataset: data.primaryDataset ? { id: data.primaryDataset.value } : null,
       hasInventory: Boolean(data.hasInventory),
       isPrivate: Boolean(data.isPrivate),
       attributes: normalizeAttributesOutput(data),

@@ -1,5 +1,18 @@
 import * as yup from "yup";
 
+export const groupSchema = yup.object().shape({
+  id: yup.number().required(),
+  name: yup.string().required(),
+  description: yup.string().required(),
+});
+
+export const groupAttributeSchema = yup.object().shape({
+  id: yup.number().required(),
+  name: yup.string().required(),
+  groupType: yup.string().required(),
+  description: yup.string().required(),
+});
+
 export const groupOptionsSchema = yup.array().of(
   yup
     .object()

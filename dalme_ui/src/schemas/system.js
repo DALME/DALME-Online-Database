@@ -1,5 +1,5 @@
 /* Schemas for system list pages. */
-import moment from "moment";
+import { DateTime } from "luxon";
 import * as yup from "yup";
 
 export const usersSchema = yup
@@ -12,9 +12,7 @@ export const usersSchema = yup
     lastLogin: yup
       .string()
       .required()
-      .transform((value) =>
-        moment(new Date(value)).format("DD-MMM-YYYY HH:mm"),
-      ),
+      .transform((value) => DateTime.fromISO(value).toISO()),
     active: yup.boolean().required(),
     staff: yup.boolean().required(),
   })

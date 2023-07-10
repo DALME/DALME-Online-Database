@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { attachmentSchema, userRefSchema } from "@/schemas";
+import { attachmentSchema, userAttributeSchema } from "@/schemas";
 
 export const ticketDetailSchema = yup
   .object()
@@ -29,11 +29,11 @@ export const ticketDetailSchema = yup
     ),
     file: attachmentSchema.default(null).nullable(),
     commentCount: yup.number().default(0).nullable(),
-    creationUser: userRefSchema.required(),
+    creationUser: userAttributeSchema.required(),
     creationTimestamp: yup.string(),
-    modificationUser: userRefSchema.required(),
+    modificationUser: userAttributeSchema.required(),
     modificationTimestamp: yup.string(),
-    closingUser: userRefSchema.default(null).nullable(),
+    closingUser: userAttributeSchema.default(null).nullable(),
     closingDate: yup.string().default(null).nullable(),
   })
   .camelCase();
@@ -65,11 +65,11 @@ export const ticketSchema = yup
     ),
     file: attachmentSchema.default(null).nullable(),
     commentCount: yup.number().default(0).nullable(),
-    creationUser: userRefSchema.required(),
+    creationUser: userAttributeSchema.required(),
     creationTimestamp: yup.string(),
-    modificationUser: userRefSchema.required(),
+    modificationUser: userAttributeSchema.required(),
     modificationTimestamp: yup.string(),
-    closingUser: userRefSchema.default(null).nullable(),
+    closingUser: userAttributeSchema.default(null).nullable(),
     closingDate: yup.string().default(null).nullable(),
     url: yup.string().url().default(null).nullable(),
   })

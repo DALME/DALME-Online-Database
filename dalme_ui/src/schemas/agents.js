@@ -54,35 +54,20 @@ const legalPersonaOptionSchema = yup.object().shape({
     .transform((value) => value.charAt(0).toUpperCase() + value.slice(1)),
 });
 
-export const legalPersonaOptionsSchema = yup
-  .array()
-  .of(legalPersonaOptionSchema);
+export const legalPersonaOptionsSchema = yup.array().of(legalPersonaOptionSchema);
 
 export const creditsFieldSchema = yup.object().shape({
-  agent: yup
-    .object()
-    .shape({ value: yup.string().uuid().required() })
-    .nullable(),
+  agent: yup.object().shape({ value: yup.string().uuid().required() }).nullable(),
   role: yup.object().shape({ value: yup.number().required() }).nullable(),
   note: yup
     .string()
     .nullable()
-    .test(
-      "length",
-      "Note cannot be longer than 255 characters",
-      (val) => val.length < 256,
-    ),
+    .test("length", "Note cannot be longer than 255 characters", (val) => val.length < 256),
 });
 
 export const agentsFieldSchema = yup.object().shape({
-  agent: yup
-    .object()
-    .shape({ value: yup.string().uuid().required() })
-    .nullable(),
-  legalPersona: yup
-    .object()
-    .shape({ value: yup.string().required() })
-    .nullable(),
+  agent: yup.object().shape({ value: yup.string().uuid().required() }).nullable(),
+  legalPersona: yup.object().shape({ value: yup.string().required() }).nullable(),
 });
 
 export const agentValidators = {

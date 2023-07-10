@@ -1,6 +1,27 @@
 import { isNil } from "ramda";
 import * as yup from "yup";
-import { groupSchema } from "@/schemas";
+import { groupSchema, userAttributeSchema } from "@/schemas";
+
+// Full object schema.
+export const taskListSchema = yup
+  .object()
+  .shape({
+    id: yup.number().required(),
+    name: yup.string().required(),
+    description: yup.string().nullable(),
+    slug: yup.string().required(),
+    teamLink: groupSchema.required(),
+    owner: userAttributeSchema.required(),
+    taskCount: yup.number().required(),
+    creationTimestamp: yup.string().required(),
+    creationUser: userAttributeSchema.required(),
+    modificationTimestamp: yup.string().required(),
+    modificationUser: userAttributeSchema.required(),
+    // taskIndex: yup.array().of(yup.number().required()).required(),
+  })
+  .camelCase();
+
+export const taskListsSchema = yup.array().of(taskListSchema);
 
 // Field-level validation rules/schemas.
 export const taskListFieldValidation = {
@@ -28,26 +49,12 @@ export const taskListEditSchema = yup.object().shape({
     .required(),
 });
 
-// Full object schema.
-export const taskListSchema = yup
-  .object()
-  .shape({
-    id: yup.number().required(),
-    group: groupSchema.required(),
-    name: yup.string().required(),
-    taskCount: yup.number().required(),
-    taskIndex: yup.array().of(yup.number().required()).required(),
-  })
-  .camelCase();
-
-export const taskListsSchema = yup.array().of(taskListSchema);
-
 // API submit schemas.
 export const taskListPostSchema = yup
   .object()
   .shape({
     name: yup.string().required(),
-    group: yup.number().required(),
+    teamLink: yup.number().required(),
   })
   .transform((obj) => ({ ...obj, group: obj.group.value }));
 

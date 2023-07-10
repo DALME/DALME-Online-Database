@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { attachmentSchema, userRefSchema } from "@/schemas";
+import { attachmentSchema, userAttributeSchema } from "@/schemas";
 
 export const rightsListSchema = yup.array().of(
   yup
@@ -22,9 +22,9 @@ export const rightsListSchema = yup.array().of(
       commentCount: yup.number().default(null).nullable(),
       licence: yup.string().default(null).nullable(),
       creationTimestamp: yup.string().required(),
-      creationUser: userRefSchema.required(),
+      creationUser: userAttributeSchema.required(),
       modificationTimestamp: yup.string().required(),
-      modificationUser: userRefSchema.required(),
+      modificationUser: userAttributeSchema.required(),
       attachments: attachmentSchema.default(null).nullable(),
     })
     .camelCase(),

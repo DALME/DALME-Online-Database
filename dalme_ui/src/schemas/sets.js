@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 import { unpackPseudoAttributes } from "@/components/forms/attributes-field/normalize";
-import { apiOptionSchema, ownerSchema } from "./common";
+import { userAttributeSchema } from "./common";
 
 export const setOptionsSchema = yup.array().of(
   yup
@@ -37,7 +37,7 @@ const collectionSetSchema = yup
     description: yup.string().required(),
     isPublic: yup.boolean().required(),
     hasLanding: yup.boolean().required(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     permissions: permissionSchema.required(),
   })
   .camelCase();
@@ -49,7 +49,7 @@ const corporaSetSchema = yup
     name: yup.string().required(),
     memberCount: yup.number().required(),
     description: yup.string().required(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     permissions: permissionSchema.required(),
   })
   .camelCase();
@@ -61,7 +61,7 @@ const datasetSchema = yup
     name: yup.string().required(),
     memberCount: yup.number().required(),
     description: yup.string().required(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     datasetUsergroup: yup.object().shape({
       id: yup.number().required(),
       name: yup.string().required(),
@@ -82,7 +82,7 @@ const worksetSchema = yup
     isPublic: yup.boolean().default(null).nullable(),
     memberCount: yup.number().required(),
     name: yup.string().required(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     permissions: permissionSchema.required(),
     worksetProgress: yup.number().required(),
     publicMemberCount: yup.number().required(),
@@ -114,7 +114,7 @@ export const setDetailSchema = yup
     isPublic: yup.boolean().default(null).nullable(),
     hasLanding: yup.boolean().default(null).nullable(),
     endpoint: yup.string().default(null).nullable(),
-    owner: ownerSchema.required(),
+    owner: userAttributeSchema.required(),
     permissions: permissionSchema.required(),
     description: yup.string().required(),
     worksetProgress: yup.number().default(null).nullable(),
@@ -142,10 +142,6 @@ const setPostSchema = yup
   .shape({
     name: yup.string().required(),
     description: yup.string().required(),
-    permissions: apiOptionSchema.required(),
-    owner: apiOptionSchema.default(null).nullable(),
-    endpoint: apiOptionSchema.default(null).nullable(),
-    datasetUsergroup: apiOptionSchema.default(null).nullable(),
     isPublic: yup.boolean().default(null).nullable(),
     hasLanding: yup.boolean().default(null).nullable(),
     statTitle: yup.string().default(null).nullable(),

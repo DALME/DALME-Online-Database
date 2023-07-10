@@ -1,6 +1,41 @@
 import * as yup from "yup";
 
-import { attributesFieldSchema } from "@/schemas";
+import {
+  attributeSchema,
+  attributesFieldSchema,
+  userAttributeSchema,
+  groupAttributeSchema,
+} from "@/schemas";
+
+export const collectionAttributeSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  name: yup.string().required(),
+  isPublished: yup.boolean().required(),
+  isPrivate: yup.boolean().required(),
+  useAsWorkset: yup.boolean().required(),
+  owner: userAttributeSchema.default(null).nullable(),
+  teamLink: groupAttributeSchema.default(null).nullable(),
+  memberCount: yup.number().default(null).nullable(),
+});
+
+export const collectionSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  name: yup.string().required(),
+  attributes: yup.array().of(attributeSchema).default(null).nullable(),
+  useAsWorkset: yup.boolean().required(),
+  isPublished: yup.boolean().required(),
+  isPrivate: yup.boolean().required(),
+  owner: userAttributeSchema.default(null).nullable(),
+  teamLink: groupAttributeSchema.default(null).nullable(),
+  creationTimestamp: yup.string().required(),
+  modificationTimestamp: yup.string().required(),
+  creationUser: userAttributeSchema.required(),
+  modificationUser: userAttributeSchema.required(),
+  memberCount: yup.number().default(null).nullable(),
+  commentCount: yup.number().default(null).nullable(),
+});
+
+export const collectionsSchema = yup.array().of(collectionSchema);
 
 // Field-level validation rules/schemas.
 export const collectionFieldValidation = {
@@ -17,12 +52,7 @@ export const collectionFieldValidation = {
     .label("Permissions"),
   statTitle: yup.string().default(null).nullable().label("Status title"),
   statText: yup.string().default(null).nullable().label("Status text"),
-  attributes: yup
-    .array()
-    .of(attributesFieldSchema)
-    .default(null)
-    .nullable()
-    .label("Attributes"),
+  attributes: yup.array().of(attributesFieldSchema).default(null).nullable().label("Attributes"),
 };
 
 // Edit existing object schema.

@@ -33,11 +33,7 @@ export const bibliographyFieldValidation = {
     .of(yup.object().shape({ value: yup.string().uuid().nullable() }))
     .nullable()
     .label("Sets"),
-  attributes: yup
-    .array()
-    .of(attributesFieldSchema)
-    .required()
-    .label("Attributes"),
+  attributes: yup.array().of(attributesFieldSchema).required().label("Attributes"),
 };
 
 // Edit existing object schema.

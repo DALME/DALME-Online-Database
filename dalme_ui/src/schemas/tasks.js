@@ -1,8 +1,13 @@
-import moment from "moment";
+import { DateTime } from "luxon";
 import { isNil } from "ramda";
 import * as yup from "yup";
 
-import { attachmentSchema, taskListSchema, userRefSchema } from "@/schemas";
+import {
+  attachmentSchema,
+  taskListSchema,
+  userAttributeSchema,
+  collectionAttributeSchema,
+} from "@/schemas";
 
 // Field-level validation rules/schemas.
 export const taskFieldValidation = {
@@ -19,9 +24,7 @@ export const taskFieldValidation = {
   dueDate: yup
     .string()
     .nullable()
-    .transform((value) =>
-      value ? moment(new Date(value)).format("YYYY-MM-DD") : null,
-    )
+    .transform((value) => (value ? DateTime.fromISO(value).toISODate() : null))
     .label("Date due"),
   assignedTo: yup
     .object()
@@ -38,9 +41,7 @@ export const taskEditSchema = yup.object().shape({
   dueDate: yup
     .string()
     .nullable()
-    .transform((value) =>
-      value ? moment(new Date(value)).format("YYYY-MM-DD") : null,
-    ),
+    .transform((value) => (value ? DateTime.fromISO(value).toISODate() : null)),
   assignedTo: yup.string().nullable(),
 });
 
@@ -49,25 +50,26 @@ export const taskSchema = yup
   .object()
   .shape({
     id: yup.number().required(),
-    assignedTo: userRefSchema.default(null).nullable(),
-    completed: yup.boolean().required(),
     title: yup.string().required(),
-    description: yup.string().required(),
-    completedDate: yup.string().default(null).nullable(),
-    creationTimestamp: yup.string().required(),
-    creationUser: userRefSchema.required(),
-    modificationTimestamp: yup.string().required(),
-    modificationUser: userRefSchema.required(),
-    dueDate: yup.string().default(null).nullable(),
-    overdueStatus: yup.boolean().default(null).nullable(),
-    url: yup.string().url().default(null).nullable(),
-    workset: yup.number().default(null).nullable(),
-    file: attachmentSchema.default(null).nullable(),
-    commentCount: yup.number().default(null).nullable(),
     taskList: taskListSchema.shape({
       taskCount: yup.number().default(null).nullable(),
       taskIndex: yup.array().of(yup.number()).default(null).nullable(),
     }),
+    description: yup.string().required(),
+    dueDate: yup.string().default(null).nullable(),
+    completed: yup.boolean().required(),
+    completedDate: yup.string().default(null).nullable(),
+    completedBy: userAttributeSchema.default(null).nullable(),
+    overdue: yup.boolean().default(null).nullable(),
+    files: yup.array().of(attachmentSchema).default(null).nullable(),
+    resources: yup.array().of(collectionAttributeSchema).default(null).nullable(),
+    assignees: yup.array().of(userAttributeSchema).default(null).nullable(),
+    url: yup.string().url().default(null).nullable(),
+    commentCount: yup.number().default(null).nullable(),
+    creationTimestamp: yup.string().required(),
+    creationUser: userAttributeSchema.required(),
+    modificationTimestamp: yup.string().required(),
+    modificationUser: userAttributeSchema.required(),
   })
   .camelCase();
 

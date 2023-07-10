@@ -1,7 +1,45 @@
 import { camelCase } from "camel-case";
-import moment from "moment";
+import { DateTime } from "luxon";
 import { isNil } from "ramda";
 import * as yup from "yup";
+
+export const attributeDateSchema = yup.object().shape({
+  day: yup.number().nullable(),
+  month: yup.number().nullable(),
+  year: yup.number().nullable(),
+  date: yup.date().transform((value) => (value == null ? null : new Date(value))),
+  text: yup.string().required(),
+});
+
+export const attributeSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  name: yup.string().required(),
+  label: yup.string().required(),
+  description: yup.string().nullable(),
+  value: yup
+    .mixed()
+    .when("dataType", ([dataType], _schema) => {
+      switch (dataType) {
+        case "BOOL":
+          return yup.boolean();
+        case "DATE":
+          return attributeDateSchema;
+        case "DEC":
+          return yup.number();
+        case "FKEY":
+          return yup.object();
+        case "INT":
+          return yup.number();
+        case "JSON":
+          return yup.mixed();
+        default:
+          return yup.string();
+      }
+    })
+    .required(),
+  attributeType: yup.number().required(),
+  dataType: yup.string().required(),
+});
 
 export const attributesFieldSchema = yup.object().shape({
   attribute: yup
@@ -25,7 +63,7 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Date"),
   defaultRights: yup
     .object()
@@ -40,38 +78,30 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("End date"),
   format: yup.string().nullable().required().label("Format"),
   hasLanding: yup
     .boolean()
     .nullable()
     .required()
-    .transform((option) =>
-      isNil(option) ? null : Boolean(parseInt(option.value)),
-    )
+    .transform((option) => (isNil(option) ? null : Boolean(parseInt(option.value))))
     .label("Has landing"),
   helpFlag: yup
     .boolean()
     .nullable()
     .required()
-    .transform((option) =>
-      isNil(option) ? null : Boolean(parseInt(option.value)),
-    )
+    .transform((option) => (isNil(option) ? null : Boolean(parseInt(option.value))))
     .label("Help flag"),
   isPublic: yup
     .boolean()
     .nullable()
     .required()
-    .transform((option) =>
-      isNil(option) ? null : Boolean(parseInt(option.value)),
-    )
+    .transform((option) => (isNil(option) ? null : Boolean(parseInt(option.value))))
     .label("Is public"),
   language: yup
     .array()
-    .of(
-      yup.object().shape({ value: yup.string().required().label("Language") }),
-    )
+    .of(yup.object().shape({ value: yup.string().required().label("Language") }))
     .nullable()
     .required()
     .transform((value) => (value && value.length > 0 ? value : null))
@@ -89,9 +119,7 @@ export const attributeValidators = {
     .shape({ value: yup.number().nullable().required().label("Owner") })
     .nullable()
     .required()
-    .transform((option) =>
-      isNil(option) ? null : { ...option, value: parseInt(option.value) },
-    )
+    .transform((option) => (isNil(option) ? null : { ...option, value: parseInt(option.value) }))
     .label("Owner"),
   parent: yup
     .object()
@@ -109,7 +137,7 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Start date"),
   statText: yup.string().nullable().required().label("Stat text"),
   statTitle: yup.string().nullable().required().label("Stat title"),
@@ -130,11 +158,7 @@ export const attributeValidators = {
 
   // Unverified/unused.
   activity: yup.string().nullable().required().label("Activity"),
-  administrativeRegion: yup
-    .string()
-    .nullable()
-    .required()
-    .label("Administrative region"),
+  administrativeRegion: yup.string().nullable().required().label("Administrative region"),
   alpha_2Code: yup.string().nullable().required().label("Alpha-2 Code"),
   alpha_3Code: yup.string().nullable().required().label("Alpha-3 Code"),
   altIdentifier: yup.string().nullable().required().label("Alt. ID"),
@@ -150,13 +174,13 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Creation date"),
   creationTimestamp: yup
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Created on"),
   creationUsername: yup.string().nullable().required().label("Created by"),
   damId: yup.number().nullable().required().label("DAM id"),
@@ -167,13 +191,13 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Date done"),
   dateJoined: yup
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Date joined"),
   debtAmount: yup.number().nullable().required().label("Debt amount"),
   debtPhrase: yup.string().nullable().required().label("Debt phrase"),
@@ -193,7 +217,7 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Resource date"),
   field3: yup.string().nullable().required().label("Country (RS-DALME)"),
   field51: yup.string().nullable().required().label("Original filename"),
@@ -220,11 +244,7 @@ export const attributeValidators = {
   iso6393: yup.string().nullable().required().label("ISO-693-3"),
   languageGc: yup
     .array()
-    .of(
-      yup
-        .object()
-        .shape({ value: yup.number().required().label("Language (GC)") }),
-    )
+    .of(yup.object().shape({ value: yup.number().required().label("Language (GC)") }))
     .nullable()
     .required()
     .transform((value) => (value && value.length > 0 ? value : null))
@@ -233,13 +253,13 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
+    .transform((value) => DateTime.fromISO(value).toISO())
     .label("Last login"),
   lastModified: yup
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
+    .transform((value) => DateTime.fromISO(value).toISO())
     .label("Last modified"),
   lastName: yup.string().nullable().required().label("Last name"),
   lastUser: yup.string().nullable().required().label("Last user"),
@@ -255,22 +275,18 @@ export const attributeValidators = {
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD HH:mm"))
+    .transform((value) => DateTime.fromISO(value).toISO())
     .label("Modified on"),
   modificationUsername: yup.string().nullable().required().label("Modified by"),
   modified: yup
     .string()
     .nullable()
     .required()
-    .transform((value) => moment(new Date(value)).format("YYYY-MM-DD"))
+    .transform((value) => DateTime.fromISO(value).toISODate())
     .label("Date modified"),
   name: yup.string().nullable().required().label("Name"),
   noFolios: yup.number().nullable().required().label("No. folios"),
-  noticeDisplay: yup
-    .boolean()
-    .nullable()
-    .required()
-    .label("Rights notice display"),
+  noticeDisplay: yup.boolean().nullable().required().label("Rights notice display"),
   numCode: yup.number().nullable().required().label("Numeric code"),
   optionsList: yup.string().nullable().required().label("Options list"),
   order: yup.number().nullable().required().label("Order"),
@@ -280,29 +296,15 @@ export const attributeValidators = {
   permissions: yup
     .object()
     .shape({
-      value: yup
-        .number()
-        .min(1)
-        .max(4)
-        .nullable()
-        .required()
-        .label("Permissions"),
+      value: yup.number().min(1).max(4).nullable().required().label("Permissions"),
     })
     .label("Permissions"),
   poboxNumber: yup.string().nullable().required().label("PO box"),
   postalCode: yup.string().nullable().required().label("Postal code"),
   progress: yup.string().nullable().required().label("Progress"),
   r1Inheritance: yup.string().nullable().required().label("Direct inheritance"),
-  r2Inheritance: yup
-    .string()
-    .nullable()
-    .required()
-    .label("Indirect inheritance"),
-  recordTypePhrase: yup
-    .string()
-    .nullable()
-    .required()
-    .label("Record type phrase"),
+  r2Inheritance: yup.string().nullable().required().label("Indirect inheritance"),
+  recordTypePhrase: yup.string().nullable().required().label("Record type phrase"),
   ref: yup.number().nullable().required().label("DAM ID"),
   religion: yup.string().nullable().required().label("Religion"),
   renderExp: yup.string().nullable().required().label("Render expression"),
@@ -346,42 +348,31 @@ export const attributeTypeSchema = yup
     dataType: yup
       .string()
       .required()
-      .when(
-        ["shortName", "optionsList", "description"],
-        (shortName, optionsList, description, schema) => {
-          // Make sure certain fields come through as select fields.
-          const forceOptions = [
-            "createdBy",
-            "endpoint",
-            "lastUser",
-            "owner",
-            "recordType",
-            "sameAs",
-          ];
-          const optionsType =
-            optionsList || forceOptions.includes(shortName) ? "Options" : false;
+      .when(["shortName", "optionsList", "description"], (shortName, schema) => {
+        // Make sure certain fields come through as select fields.
+        const forceOptions = ["createdBy", "endpoint", "lastUser", "owner", "recordType", "sameAs"];
+        const optionsType = shortName[1] || forceOptions.includes(shortName[0]) ? "Options" : false;
 
-          // Booleans are a subset of INT so let's sort those out for clarity.
-          const booleanType = description.toLowerCase().includes("boolean")
-            ? "Boolean"
-            : false;
+        // Booleans are a subset of INT so let's sort those out for clarity.
+        console.log(shortName, schema);
+        const booleanType = shortName[2].toLowerCase().includes("boolean") ? "Boolean" : false;
 
-          return schema.transform(
-            (value) =>
-              optionsType ||
-              booleanType ||
-              {
-                DATE: "Date",
-                DEC: "Decimal",
-                INT: "Number",
-                STR: "String",
-                TXT: "Text",
-                "FK-INT": "Options",
-                "FK-UUID": "Options",
-              }[value],
-          );
-        },
-      ),
+        return schema.transform(
+          (value) =>
+            optionsType ||
+            booleanType ||
+            {
+              DATE: "Date",
+              DEC: "Decimal",
+              INT: "Number",
+              STR: "String",
+              TXT: "Text",
+              JSON: "Data",
+              "FK-INT": "Options",
+              "FK-UUID": "Options",
+            }[value],
+        );
+      }),
   })
   .camelCase();
 

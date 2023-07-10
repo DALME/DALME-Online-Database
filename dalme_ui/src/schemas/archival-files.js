@@ -19,11 +19,7 @@ export const archivalFileFieldValidation = {
     .default(null)
     .nullable()
     .label("Primary dataset"),
-  attributes: yup
-    .array()
-    .of(attributesFieldSchema)
-    .required()
-    .label("Attributes"),
+  attributes: yup.array().of(attributesFieldSchema).required().label("Attributes"),
 };
 
 // Edit existing object schema.

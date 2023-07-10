@@ -6,11 +6,38 @@ import { agentsNormalizeInputSchema } from "@/components/forms/agents-field/norm
 import { creditsNormalizeInputSchema } from "@/components/forms/credits-field/normalize";
 import { foliosNormalizeInputSchema } from "@/components/forms/folios-field/normalize";
 import {
+  attributeSchema,
   agentsFieldSchema,
   attributesFieldSchema,
   creditsFieldSchema,
   foliosFieldSchema,
+  folioSchema,
+  pageSchema,
+  timeStampSchema,
+  userAttributeSchema,
+  workflowSchema,
 } from "@/schemas";
+
+export const recordSchema = yup.object().shape({
+  id: yup.string().uuid().required(),
+  name: yup.string().required(),
+  shortName: yup.string().required(),
+  owner: userAttributeSchema.required(),
+  attributes: yup.array().of(attributeSchema).required(),
+  noFolios: yup.number().required(),
+  noImages: yup.number().required(),
+  workflow: workflowSchema.nullable(),
+  pages: yup.array().of(pageSchema).nullable(),
+  isPrivate: yup.boolean().required(),
+  commentCount: yup.number().required(),
+  folios: yup.array().of(folioSchema).nullable(),
+  creationTimestamp: timeStampSchema.required(),
+  creationUser: userAttributeSchema.required(),
+  modificationTimestamp: timeStampSchema.required(),
+  modificationUser: userAttributeSchema.required(),
+});
+
+export const recordListSchema = yup.array().of(recordSchema);
 
 // Field-level validation rules/schemas.
 export const recordFieldValidation = {
@@ -28,40 +55,17 @@ export const recordFieldValidation = {
     .nullable()
     .required()
     .label("List"),
-  parent: yup
-    .object()
-    .shape({ value: yup.string().uuid().nullable() })
-    .nullable()
-    .label("Parent"),
+  parent: yup.object().shape({ value: yup.string().uuid().nullable() }).nullable().label("Parent"),
   sets: yup
     .array()
     .of(yup.object().shape({ value: yup.string().uuid().nullable() }))
     .default(null)
     .nullable()
     .label("Sets"),
-  attributes: yup
-    .array()
-    .of(attributesFieldSchema)
-    .required()
-    .label("Attributes"),
-  agents: yup
-    .array()
-    .of(agentsFieldSchema)
-    .default(null)
-    .nullable()
-    .label("Agents"),
-  pages: yup
-    .array()
-    .of(foliosFieldSchema)
-    .default(null)
-    .nullable()
-    .label("Folios"),
-  credits: yup
-    .array()
-    .of(creditsFieldSchema)
-    .default(null)
-    .nullable()
-    .label("Credits"),
+  attributes: yup.array().of(attributesFieldSchema).required().label("Attributes"),
+  agents: yup.array().of(agentsFieldSchema).default(null).nullable().label("Agents"),
+  pages: yup.array().of(foliosFieldSchema).default(null).nullable().label("Folios"),
+  credits: yup.array().of(creditsFieldSchema).default(null).nullable().label("Credits"),
 };
 
 // Edit object schema
@@ -83,12 +87,12 @@ export const recordEditSchema = yup
         label: yup.string().required(),
       })
       .nullable(),
-    sets: yup.array().of(
-      yup.object().shape({
-        value: yup.string().uuid().required(),
-        label: yup.string().required(),
-      }),
-    ),
+    // sets: yup.array().of(
+    //   yup.object().shape({
+    //     value: yup.string().uuid().required(),
+    //     label: yup.string().required(),
+    //   }),
+    // ),
     agents: agentsNormalizeInputSchema,
     // NOTE: Just minimal validation here for the attributes. We apply the full
     // transform elsewhere, as it's very complex and better suits a function.
@@ -107,7 +111,7 @@ export const recordEditSchema = yup
       value: data.parent.id,
       label: data.parent.name,
     },
-    sets: data.sets.map((item) => ({ value: item.id, label: item.name })),
+    // sets: data.sets.map((item) => ({ value: item.id, label: item.name })),
     // TODO: Remove ALL camelcase hackage when we sort out the API renderer.
     // Until then, we camelize here because we run a function not a schema to
     // normalize the attributes so we can't call on yup to camelCase the data.

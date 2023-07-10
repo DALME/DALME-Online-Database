@@ -15,12 +15,7 @@ export const corpusFieldValidation = {
     .nullable()
     .required()
     .label("Permissions"),
-  attributes: yup
-    .array()
-    .of(attributesFieldSchema)
-    .default(null)
-    .nullable()
-    .label("Attributes"),
+  attributes: yup.array().of(attributesFieldSchema).default(null).nullable().label("Attributes"),
 };
 
 // Edit existing object schema.

@@ -7,11 +7,7 @@ import { attributesFieldSchema } from "@/schemas";
 export const archiveFieldValidation = {
   name: yup.string().nullable().required().label("Name"),
   shortName: yup.string().nullable().required().label("Short name"),
-  attributes: yup
-    .array()
-    .of(attributesFieldSchema)
-    .required()
-    .label("Attributes"),
+  attributes: yup.array().of(attributesFieldSchema).required().label("Attributes"),
 };
 
 // Edit existing object schema.

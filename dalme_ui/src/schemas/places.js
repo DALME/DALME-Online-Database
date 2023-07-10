@@ -24,9 +24,7 @@ export const placeListSchema = yup.array().of(
     .transform((data) => {
       return {
         ...data,
-        administrativeRegion: data.locale
-          ? data.locale.administrativeRegion
-          : null,
+        administrativeRegion: data.locale ? data.locale.administrativeRegion : null,
         country: data.locale ? data.locale.country : null,
       };
     })
