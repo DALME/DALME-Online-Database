@@ -1,23 +1,23 @@
 <template>
   <PageContainer>
-    <TaskList :embedded="true" />
+    <!-- <TaskList :embedded="true" />
     <SetList :embedded="true" />
-    <TicketList :embedded="true" />
+    <TicketList :embedded="true" /> -->
   </PageContainer>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-import { PageContainer, TaskList, TicketList, SetList } from "@/components";
+import { PageContainer } from "@/components";
 
 export default defineComponent({
   name: "DashBoard",
   components: {
     PageContainer,
-    TaskList,
-    TicketList,
-    SetList,
+    // TaskList,
+    // TicketList,
+    // SetList,
   },
   setup() {
     useMeta({ title: "Dashboard" });
