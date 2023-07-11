@@ -92,8 +92,6 @@ export const useUiStore = defineStore(
     };
 
     const onWindowResize = () => {
-      eventBus.emit("windowSizeChanged");
-      console.log("emitted");
       windowHeight.value = window.innerHeight;
       windowWidth.value = window.innerWidth;
     };

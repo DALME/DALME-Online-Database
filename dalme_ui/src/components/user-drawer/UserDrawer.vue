@@ -222,7 +222,8 @@ export default defineComponent({
 }
 .task-list-actions .q-btn:last-of-type {
   margin-left: auto;
-  border-left: 1px solid var(--dark-border-base-colour);
+  margin-right: auto;
+  // border-left: 1px solid var(--dark-border-base-colour);
 }
 .task-list-actions .q-btn:last-of-type .q-icon {
   font-size: 14px;

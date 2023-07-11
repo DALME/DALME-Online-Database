@@ -7,92 +7,102 @@
     class="frosted-background dialogue-top"
     @hide="onDialogHide"
   >
-    <div
-      class="action-modal-card"
-      :class="openDrawer || tm.viewing.commentCount > 0 ? 'full-height' : ''"
-    >
+    <div :class="fullHeight ? 'action-modal-card full-height' : 'action-modal-card'">
       <div class="card-drawer" :class="openDrawer ? 'show' : ''">
         <template v-if="openDrawer && tm.listsReady">
           <div class="q-mb-md">
-            <div class="tasklist-toolbar">
-              <TasklistManager :lists="tm.listGroups" />
-              <q-btn-dropdown
-                label="Filter"
-                size="12px"
-                menu-anchor="bottom left"
-                menu-self="top left"
-                content-class="popup-menu filtered dark info-list menu-only"
-              >
-                <q-list separator>
-                  <q-item dense class="header">
-                    <q-item-section>Status</q-item-section>
-                    <q-item-section side>
-                      <q-btn flat dense size="xs" icon="close" @click.stop="tm.clearFilters" />
-                    </q-item-section>
-                  </q-item>
-                  <q-item dense clickable v-close-popup class="inset-item">
-                    <q-item-section>Completed</q-item-section>
-                  </q-item>
-                  <q-item dense clickable v-close-popup class="inset-item">
-                    <q-item-section>Overdue</q-item-section>
-                  </q-item>
-                  <q-item dense clickable v-close-popup class="inset-item">
-                    <q-item-section>Pending</q-item-section>
-                  </q-item>
-                  <q-item dense class="header">
-                    <q-item-section>Users</q-item-section>
-                  </q-item>
-                  <q-item dense clickable v-close-popup class="inset-item">
-                    <q-item-section>Created by</q-item-section>
-                  </q-item>
-                  <q-item dense clickable v-close-popup class="inset-item">
-                    <q-item-section>Completed by</q-item-section>
-                  </q-item>
-                  <ChooserWidget
-                    item
-                    dark
-                    return-field="username"
-                    label="Author"
-                    target="users"
-                    @item-chosen="$emit('userSelected')"
-                  />
-                </q-list>
-              </q-btn-dropdown>
-              <q-btn-dropdown
-                label="Sort"
-                size="12px"
-                menu-anchor="bottom left"
-                menu-self="top left"
-                content-class="popup-menu filtered dark info-list menu-only"
-              >
-                <q-list separator>
-                  <q-item dense class="header">
-                    <q-item-section>Sort by</q-item-section>
-                    <q-item-section side>
-                      <q-btn flat dense size="xs" icon="close" @click.stop="tm.activeSort == ''" />
-                    </q-item-section>
-                  </q-item>
-                  <q-item
-                    v-for="(item, idx) in sortMenu"
-                    :key="idx"
-                    dense
-                    clickable
-                    v-close-popup
-                    class="inset-item"
-                    :active="item.value == tm.activeSort"
-                    @click.stop="tm.activeSort == item.value"
-                  >
-                    <q-item-section>{{ item.label }}</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-              <q-btn icon="mdi-magnify" />
+            <div
+              v-if="notNully(tm.listGroups) || tm.tasks.length > 0 || tm.tasksMeta.user > 0"
+              class="tasklist-toolbar"
+            >
+              <TasklistManager v-if="notNully(tm.listGroups)" :lists="tm.listGroups" />
+              <template v-if="tm.tasks.length > 0 || tm.tasksMeta.user > 0">
+                <q-btn-dropdown
+                  label="Filter"
+                  size="12px"
+                  menu-anchor="bottom left"
+                  menu-self="top left"
+                  content-class="popup-menu filtered dark info-list menu-only"
+                >
+                  <q-list separator>
+                    <q-item dense class="header">
+                      <q-item-section>Status</q-item-section>
+                      <q-item-section side>
+                        <q-btn flat dense size="xs" icon="close" @click.stop="tm.clearFilters" />
+                      </q-item-section>
+                    </q-item>
+                    <q-item dense clickable v-close-popup class="inset-item">
+                      <q-item-section>Completed</q-item-section>
+                    </q-item>
+                    <q-item dense clickable v-close-popup class="inset-item">
+                      <q-item-section>Overdue</q-item-section>
+                    </q-item>
+                    <q-item dense clickable v-close-popup class="inset-item">
+                      <q-item-section>Pending</q-item-section>
+                    </q-item>
+                    <q-item dense class="header">
+                      <q-item-section>Users</q-item-section>
+                    </q-item>
+                    <q-item dense clickable v-close-popup class="inset-item">
+                      <q-item-section>Created by</q-item-section>
+                    </q-item>
+                    <q-item dense clickable v-close-popup class="inset-item">
+                      <q-item-section>Completed by</q-item-section>
+                    </q-item>
+                    <ChooserWidget
+                      item
+                      dark
+                      return-field="username"
+                      label="Author"
+                      target="users"
+                      @item-chosen="$emit('userSelected')"
+                    />
+                  </q-list>
+                </q-btn-dropdown>
+                <q-btn-dropdown
+                  label="Sort"
+                  size="12px"
+                  menu-anchor="bottom left"
+                  menu-self="top left"
+                  content-class="popup-menu filtered dark info-list menu-only"
+                >
+                  <q-list separator>
+                    <q-item dense class="header">
+                      <q-item-section>Sort by</q-item-section>
+                      <q-item-section side>
+                        <q-btn
+                          flat
+                          dense
+                          size="xs"
+                          icon="close"
+                          @click.stop="tm.activeSort == ''"
+                        />
+                      </q-item-section>
+                    </q-item>
+                    <q-item
+                      v-for="(item, idx) in sortMenu"
+                      :key="idx"
+                      dense
+                      clickable
+                      v-close-popup
+                      class="inset-item"
+                      :active="item.value == tm.activeSort"
+                      @click.stop="tm.activeSort == item.value"
+                    >
+                      <q-item-section>{{ item.label }}</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+                <q-btn icon="mdi-magnify" />
+              </template>
             </div>
           </div>
           <q-scroll-area dark class="scroll-area">
             <TaskList
               :data="tm.tasks"
               :more-button="tm.moreTasks"
+              :no-data-message="noTasksData"
+              :scroll-off="tm.viewing == null"
               @show-more="tm.onShowMore('all')"
               @change-status="tm.onChangeStatus"
               @view-detail="tm.setViewing"
@@ -102,11 +112,10 @@
       </div>
       <div class="separator" />
       <div class="card-main">
-        <div class="task-wrapper">
+        <div :class="tm.viewing ? 'task-wrapper border' : 'task-wrapper'">
           <q-item class="task-title">
             <q-item-section avatar>
               <q-btn
-                v-if="showLists"
                 flat
                 dense
                 class="q-pa-none"
@@ -116,7 +125,7 @@
                 @click="openDrawer = !openDrawer"
               />
             </q-item-section>
-            <q-item-section>
+            <q-item-section v-if="tm.viewing">
               <q-item-label>
                 {{ tm.viewing.title }}
                 <q-chip
@@ -137,63 +146,70 @@
                 </template>
               </q-item-label>
             </q-item-section>
-            <q-item-section top side>
-              <q-btn icon="mdi-close" flat round dense v-close-popup class="q-ml-auto" />
+            <q-item-section top side class="q-ml-auto">
+              <q-btn icon="mdi-close" flat round dense v-close-popup />
             </q-item-section>
           </q-item>
-
-          <q-item class="task-container">
-            <q-item-section top avatar>
-              <q-icon name="mdi-note-outline" />
-            </q-item-section>
-            <q-item-section>
-              <MarkdownEditor v-if="tm.viewing.description" :text="tm.viewing.description" dark />
-              <span v-else>No description provided.</span>
-            </q-item-section>
-            <q-item-section top side>
-              <div class="task-meta">
-                <div v-if="tm.viewing.assignees.length">
-                  <div class="meta-label">Assignees</div>
-                  <div class="meta-content">
-                    <q-avatar v-for="(user, i) in tm.viewing.assignees" :key="i" size="30px">
-                      <img v-if="notNully(user.avatar)" :src="user.avatar" />
-                      <q-icon v-else size="38px" name="mdi-account-circle" />
-                    </q-avatar>
+          <template v-if="tm.viewing">
+            <q-item class="task-container">
+              <q-item-section top avatar>
+                <q-icon name="mdi-note-outline" />
+              </q-item-section>
+              <q-item-section>
+                <MarkdownEditor v-if="tm.viewing.description" :text="tm.viewing.description" dark />
+                <span v-else>No description provided.</span>
+              </q-item-section>
+              <q-item-section top side>
+                <div class="task-meta">
+                  <div v-if="tm.viewing.assignees.length">
+                    <div class="meta-label">Assignees</div>
+                    <div class="meta-content">
+                      <q-avatar v-for="(user, i) in tm.viewing.assignees" :key="i" size="30px">
+                        <img v-if="notNully(user.avatar)" :src="user.avatar" />
+                        <q-icon v-else size="38px" name="mdi-account-circle" />
+                      </q-avatar>
+                    </div>
+                  </div>
+                  <div v-if="tm.viewing.files.length">
+                    <div class="meta-label">Attachments</div>
+                    <div class="meta-content">
+                      <AttachmentIconWidget
+                        v-for="(file, i) in tm.viewing.files"
+                        :key="i"
+                        :attachment="file"
+                      />
+                    </div>
+                  </div>
+                  <div v-if="tm.viewing.resources.length">
+                    <div class="meta-label">Resources</div>
                   </div>
                 </div>
-                <div v-if="tm.viewing.files.length">
-                  <div class="meta-label">Attachments</div>
-                  <div class="meta-content">
-                    <AttachmentIconWidget
-                      v-for="(file, i) in tm.viewing.files"
-                      :key="i"
-                      :attachment="file"
-                    />
-                  </div>
-                </div>
-                <div v-if="tm.viewing.resources.length">
-                  <div class="meta-label">Resources</div>
-                </div>
+              </q-item-section>
+            </q-item>
+            <div class="task-footer">
+              <div v-if="tm.viewing.dueDate" class="text-caption">
+                <q-btn flat dense icon="mdi-calendar-edit-outline" @click="changeDueDate" />
+                <span v-text="`Due ${fDate(tm.viewing.dueDate, 0, 'h')} `" />
+                <span v-text="`(${fDate(tm.viewing.dueDate, 0, 'd', null)})`" />
               </div>
-            </q-item-section>
-          </q-item>
-          <div class="task-footer">
-            <div v-if="tm.viewing.dueDate" class="text-caption">
-              <q-btn flat dense icon="mdi-calendar-edit-outline" @click="changeDueDate" />
-              <span v-text="`Due ${fDate(tm.viewing.dueDate, 0, 'h')} `" />
-              <span v-text="`(${fDate(tm.viewing.dueDate, 0, 'd', null)})`" />
+              <q-btn v-if="tm.viewing.url" flat icon="mdi-link" @click="openURL(tm.viewing.url)" />
+              <q-btn
+                v-if="tm.viewing.canChange"
+                flat
+                :class="`action-button ${action[1]}`"
+                :label="capitalize(action[0])"
+                @click.stop="onAction"
+              />
             </div>
-            <q-btn v-if="tm.viewing.url" flat icon="mdi-link" @click="openURL(tm.viewing.url)" />
-            <q-btn
-              v-if="tm.viewing.canChange"
-              flat
-              :class="`action-button ${action[1]}`"
-              :label="capitalize(action[0])"
-              @click.stop="onAction"
-            />
+          </template>
+          <div v-else class="no-task-data">
+            <q-spinner-bars color="blue-grey-9" size="xl" class="q-mb-lg" />
+            <div class="text-weight-medium text-blue-grey-6">
+              Select a task to display its information here.
+            </div>
           </div>
         </div>
-        <q-scroll-area dark class="scroll-area q-px-lg">
+        <q-scroll-area dark class="scroll-area q-px-lg" v-if="tm.viewing">
           <CommentWidget dark :author="tm.viewing.creationUser.id">
             <template v-if="tm.viewing.completed" v-slot:comment-stream-end>
               <q-item class="comment-box" :class="tm.viewing.completedByAuthor ? 'op-post' : ''">
@@ -222,7 +238,7 @@
 
 <script>
 import { useDialogPluginComponent, format, openURL } from "quasar";
-import { computed, provide, ref, watch } from "vue";
+import { computed, provide, onMounted, ref, watch } from "vue";
 import { formatDate as fDate, notNully } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTasks } from "@/stores/tasks";
@@ -253,21 +269,36 @@ export default {
     const { capitalize } = format;
     const tm = useTasks();
     const openDrawer = ref(false);
-    const showLists = ref(true);
     const attachment = ref(null);
     const id = computed(() => (tm.viewing ? tm.viewing.id : null));
 
     const action = computed(() =>
-      tm.viewing.completed ? ["mark pending", "open"] : ["mark done", "close"],
+      tm.viewing
+        ? tm.viewing.completed
+          ? ["mark pending", "open"]
+          : ["mark done", "close"]
+        : null,
     );
 
     const taskStatus = computed(() => {
-      let label = tm.viewing.completed ? "DONE" : "PENDING";
-      let colour = tm.viewing.completed ? "light-green-9" : "deep-purple-6";
-      let icon = tm.viewing.completed ? "mdi-check-circle" : "mdi-dots-horizontal-circle-outline";
-      return tm.viewing.overdue == true
-        ? ["mdi-clock-alert-outline", "OVERDUE", "red-5"]
-        : [icon, label, colour];
+      if (tm.viewing) {
+        let label = tm.viewing.completed ? "DONE" : "PENDING";
+        let colour = tm.viewing.completed ? "light-green-9" : "deep-purple-6";
+        let icon = tm.viewing.completed ? "mdi-check-circle" : "mdi-dots-horizontal-circle-outline";
+        return tm.viewing.overdue == true
+          ? ["mdi-clock-alert-outline", "OVERDUE", "red-5"]
+          : [icon, label, colour];
+      } else {
+        return null;
+      }
+    });
+
+    const fullHeight = computed(() => {
+      if (tm.viewing) {
+        return (openDrawer.value && tm.tasks.length > 5) || tm.viewing.commentCount > 0;
+      } else {
+        return tm.tasks.length > 5;
+      }
     });
 
     const sortMenu = [
@@ -278,6 +309,15 @@ export default {
       { label: "Most commented", value: "" },
       { label: "Least commented", value: "" },
     ];
+
+    const noTasksData = computed(() => {
+      if (tm.tasksMeta.user > 0) {
+        return "No tasks match the current filter or search criteria.";
+      } else {
+        // eslint-disable-next-line max-len
+        return "Neither you nor your team have created any tasks yet, and no tasks have yet been assigned to you.";
+      }
+    });
 
     const onAction = () => {
       console.log("action");
@@ -300,6 +340,12 @@ export default {
       },
     );
 
+    onMounted(() => {
+      if (!tm.viewing) {
+        openDrawer.value = true;
+      }
+    });
+
     return {
       action,
       attachment,
@@ -310,13 +356,14 @@ export default {
       onAction,
       auth,
       openDrawer,
-      showLists,
       tm,
       taskStatus,
       notNully,
       openURL,
       changeDueDate,
       sortMenu,
+      fullHeight,
+      noTasksData,
     };
   },
 };
@@ -376,6 +423,7 @@ export default {
   border-radius: 0 !important;
   box-shadow: 1px 0px 0px 0px #1e2a31, inset -1px 0px 0px 0px #000000;
   height: auto;
+  min-height: 350px;
   flex-shrink: 0;
 }
 .card-drawer.show {
@@ -389,9 +437,18 @@ export default {
   height: 100%;
 }
 .card-main .task-wrapper {
-  border-bottom: 1px solid var(--dark-border-base-colour);
   margin-bottom: 24px;
   min-width: 800px;
+}
+.card-main .task-wrapper.border {
+  border-bottom: 1px solid var(--dark-border-base-colour);
+}
+.card-main .task-wrapper .no-task-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
 }
 .card-main .scroll-area {
   min-height: 250px;

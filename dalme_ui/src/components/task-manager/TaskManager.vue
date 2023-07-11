@@ -5,6 +5,7 @@
       :data="tm.created"
       label="Your tasks"
       in-user-drawer
+      :no-data-message="createdNoData"
       :more-button="tm.moreCreated"
       @show-more="tm.onShowMore('created')"
       @change-status="tm.onChangeStatus"
@@ -14,6 +15,7 @@
       :data="tm.assigned"
       label="Tasks assigned to you"
       in-user-drawer
+      :no-data-message="assignedNoData"
       :more-button="tm.moreAssigned"
       @show-more="tm.onShowMore('assigned')"
       @change-status="tm.onChangeStatus"
@@ -23,6 +25,7 @@
       :data="tm.completed"
       label="Tasks you completed"
       in-user-drawer
+      no-data-message="You have not completed any tasks yet."
       :more-button="tm.moreCompleted"
       @show-more="tm.onShowMore('completed')"
       @change-status="tm.onChangeStatus"
@@ -32,11 +35,9 @@
 </template>
 
 <script>
-import { useQuasar } from "quasar";
-import { defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import { useTasks } from "@/stores/tasks";
 import TaskList from "./TaskList.vue";
-import TaskViewer from "./TaskViewer.vue";
 
 export default defineComponent({
   name: "TaskManager",
@@ -44,19 +45,36 @@ export default defineComponent({
     TaskList,
   },
   setup() {
-    const $q = useQuasar();
     const tm = useTasks();
 
     const onViewDetail = (task) => {
       tm.setViewing(task);
-      $q.dialog({ component: TaskViewer });
+      tm.showTaskModal();
     };
+
+    const createdNoData = computed(() => {
+      if (tm.tasksMeta.user > 0) {
+        return "There are no pending tasks.";
+      } else {
+        return "You have not created any tasks yet.";
+      }
+    });
+
+    const assignedNoData = computed(() => {
+      if (tm.tasksMeta.assigned > 0) {
+        return "There are no pending tasks assigned to you.";
+      } else {
+        return "You have not been assigned any tasks yet.";
+      }
+    });
 
     onMounted(async () => await tm.init("tasks"));
 
     return {
       tm,
       onViewDetail,
+      createdNoData,
+      assignedNoData,
     };
   },
 });

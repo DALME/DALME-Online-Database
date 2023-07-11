@@ -16,27 +16,31 @@
         @change-status="$emit('changeStatus', task)"
         @view-detail="$emit('viewDetail', task)"
       />
-      <div class="task-list-actions" v-if="addNewButton || showMoreButton">
-        <q-btn
-          v-if="showMoreButton"
-          flat
-          no-caps
-          label="Show more..."
-          class="task-action"
-          @click="$emit('showMore')"
-        />
-        <q-btn
-          v-if="addNewButton"
-          flat
-          no-caps
-          label="Add new"
-          icon="mdi-checkbox-marked-circle-plus-outline"
-          class="task-action"
-          @click="$emit('showMore')"
-        />
-      </div>
     </template>
-    <div v-else>No tasks available</div>
+    <q-item v-else class="q-px-sm q-py-md">
+      <q-item-section>
+        <q-item-label class="text-caption">{{ noDataMessage }}</q-item-label>
+      </q-item-section>
+    </q-item>
+    <div class="task-list-actions" v-if="addNewButton || showMoreButton">
+      <q-btn
+        v-if="showMoreButton"
+        flat
+        no-caps
+        label="Show more..."
+        class="task-action"
+        @click="$emit('showMore')"
+      />
+      <q-btn
+        v-if="addNewButton"
+        flat
+        no-caps
+        label="Add new"
+        icon="mdi-checkbox-marked-circle-plus-outline"
+        class="task-action"
+        @click="$emit('showMore')"
+      />
+    </div>
   </q-expansion-item>
   <q-list v-else class="drawer-menu-list scroll-area">
     <template v-if="taskData.length > 0">
@@ -57,7 +61,13 @@
         @click="$emit('showMore')"
       />
     </template>
-    <div v-else>No tasks available</div>
+    <q-item v-else class="q-px-sm q-py-md">
+      <q-item-section>
+        <q-item-label class="text-center text-blue-grey-6" style="line-height: 1.4 !important">
+          {{ noDataMessage }}
+        </q-item-label>
+      </q-item-section>
+    </q-item>
   </q-list>
 </template>
 
@@ -89,6 +99,14 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    noDataMessage: {
+      type: String,
+      default: "No tasks available.",
+    },
+    scrollOff: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     TaskTile,
@@ -101,7 +119,7 @@ export default defineComponent({
     const selectedId = inject("id", 0);
 
     onMounted(async () => {
-      if (!props.inUserDrawer && selectedId.value != 0) {
+      if (!props.inUserDrawer && !props.scrollOff && selectedId.value != 0) {
         const target = rFilter((x) => x.task.id == selectedId.value, tileRefs.value);
         target[0].$el.scrollIntoView();
       }

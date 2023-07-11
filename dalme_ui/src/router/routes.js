@@ -1,3 +1,5 @@
+import { useTasks } from "@/stores/tasks";
+
 const routes = [
   {
     path: "/",
@@ -40,7 +42,6 @@ const routes = [
           },
         ],
       },
-
       {
         // Collections
         component: () => import("pages/Collections.vue"),
@@ -53,7 +54,6 @@ const routes = [
         },
         menu: "menu",
       },
-
       {
         // Images
         component: () => import("pages/Entities.vue"),
@@ -104,7 +104,6 @@ const routes = [
           },
         ],
       },
-
       {
         // Reference
         component: () => import("pages/System.vue"),
@@ -183,8 +182,9 @@ const routes = [
       },
       {
         // Tasks
-        component: () => import("pages/Tasks.vue"),
-        path: "tasks",
+        component: {},
+        name: "Tasks",
+        path: "tasks/:id?",
         menu: "top",
         dropdown: false,
         label: "Manage tasks",
@@ -192,20 +192,21 @@ const routes = [
           navPath: ["Tasks", null],
           icon: "mdi-format-list-checkbox",
         },
-        children: [
-          {
-            component: () => import("src/components/task-list/TaskList.vue"),
-            name: "Tasks",
-            path: "",
-          },
-          {
-            component: () => import("components/task-detail/TaskDetail.vue"),
-            name: "Task",
-            path: ":id",
-          },
-        ],
+        beforeEnter(to, from) {
+          if (from.name == undefined) {
+            const state = { showTasks: true };
+            if ("id" in to.params) state["taskId"] = to.params.id;
+            return { name: "Dashboard", state: state };
+          } else {
+            const tm = useTasks();
+            if ("id" in to.params) tm.setViewing(to.params.id, true);
+            tm.showTaskModal();
+            return false;
+          }
+        },
       },
       {
+        // Tickets
         component: () => import("pages/Tickets.vue"),
         path: "tickets",
         menu: "top",

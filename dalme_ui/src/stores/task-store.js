@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { API as apiInterface, requests } from "@/api";
 import { useAuthStore } from "@/stores/auth";
 import { tasksSchema } from "@/schemas";
+import { filter as rFilter } from "ramda";
 
 class Task {
   constructor(data, user, groups) {
@@ -56,13 +57,6 @@ class Task {
       return `${groupLabel}-${this.taskList.name}`;
     }
   }
-  // methods
-  // isAuthor = (id) => id == this.creationUser.id;
-  // isAssignee = (id) => this.assigneeIds.includes(id);
-  // isTeamMember = (groups) => this.taskList.teamLink
-  //&& groups.includes(this.taskList.teamLink.name);
-  // canChange = (id, groups) => this.isAuthor(id) || this.isAssignee(id)
-  //|| this.isTeamMember(groups);
 }
 
 export const useTaskStore = defineStore("taskStore", () => {
@@ -83,7 +77,7 @@ export const useTaskStore = defineStore("taskStore", () => {
 
   // getters
   const _isStale = computed(() => Date.now() - timestamp.value > 86400000);
-  const isLoaded = computed(() => tasks.value.length && auth.userId);
+  const isLoaded = computed(() => timestamp.value != null && auth.userId);
 
   // actions
   const $reset = () => {
@@ -100,8 +94,16 @@ export const useTaskStore = defineStore("taskStore", () => {
   };
 
   const init = () => {
-    $reset();
-    fetchData("user", 15);
+    return new Promise((resolve) => {
+      if (_isStale.value || !isLoaded.value) {
+        $reset();
+        fetchData("user", 15).then(() => {
+          return resolve();
+        });
+      } else {
+        return resolve();
+      }
+    });
   };
 
   const getRequest = (type, limit, offset, query) => {
@@ -131,11 +133,17 @@ export const useTaskStore = defineStore("taskStore", () => {
             }
             validatedData.forEach((x) => tasks.value.push(new Task(x, auth.userId, auth.groups)));
             loading.value = false;
-            return resolve;
+            return resolve();
           });
         }
       });
     });
+  };
+
+  const getTaskbyId = (id) => {
+    const result = rFilter((x) => x.id == id, tasks.value);
+    //TODO: should check the server too
+    return result.length ? result[0] : null;
   };
 
   return {
@@ -146,5 +154,6 @@ export const useTaskStore = defineStore("taskStore", () => {
     tasks,
     meta,
     fetchData,
+    getTaskbyId,
   };
 });

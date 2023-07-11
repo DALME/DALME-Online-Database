@@ -10,14 +10,15 @@ export const useTasklistStore = defineStore("tasklistStore", () => {
   const auth = useAuthStore();
 
   // state
-  const value = ref([]);
+  const lists = ref([]);
   const timestamp = ref(null);
   const loading = ref(false);
 
   // getters
   const _isStale = computed(() => Date.now() - timestamp.value > 86400000);
-  const isLoaded = computed(() => value.value.length);
-  const grouped = computed(() => groupBy((list) => list.teamLink.name, value.value));
+  const isLoaded = computed(() => timestamp.value != null);
+  const grouped = computed(() => groupBy((list) => list.teamLink.name, lists.value));
+
   const index = computed(() =>
     forEachObjIndexed((value, key, obj) => {
       obj[key] = Array.from(value, (val) => val.name);
@@ -26,7 +27,7 @@ export const useTasklistStore = defineStore("tasklistStore", () => {
 
   // actions
   const $reset = () => {
-    value.value = [];
+    lists.value = [];
     timestamp.value = null;
     loading.value = false;
   };
@@ -34,7 +35,7 @@ export const useTasklistStore = defineStore("tasklistStore", () => {
   const init = () => {
     $reset();
     fetchData(getRequest("user", 50)).then((response) => {
-      value.value = response;
+      lists.value = response;
       loading.value = false;
     });
   };
@@ -60,11 +61,11 @@ export const useTasklistStore = defineStore("tasklistStore", () => {
   };
 
   const getList = (id) => {
-    return rFilter((x) => x.id == id, value.value)[0];
+    return rFilter((x) => x.id == id, lists.value)[0];
   };
 
   return {
-    value,
+    lists,
     timestamp,
     loading,
     isLoaded,

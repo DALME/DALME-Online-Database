@@ -1,15 +1,16 @@
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-// import { useAuthStore } from "@/stores/auth";
+import { computed, defineAsyncComponent, ref } from "vue";
+import { Dialog } from "quasar";
+import { useRouter } from "vue-router";
 import { useTasklistStore } from "@/stores/tasklist-store";
 import { useTaskStore } from "@/stores/task-store";
 import { filter as rFilter, groupBy, sortBy, prop, descend } from "ramda";
 
 export const useTasks = defineStore("tasks", () => {
   // stores
-  // const auth = useAuthStore();
   const _tasks = useTaskStore();
   const _lists = useTasklistStore();
+  const $router = useRouter();
 
   // state
   const viewing = ref(null);
@@ -47,7 +48,7 @@ export const useTasks = defineStore("tasks", () => {
   const moreAssigned = computed(() => show.value.assigned < _tasks.meta.assigned);
   const moreCompleted = computed(() => show.value.completed < _tasks.meta.completed);
   const moreCreated = computed(() => show.value.created < _tasks.meta.created);
-  const listGroups = computed(() => groupBy((x) => x.teamLink.name, _lists.value));
+  const listGroups = computed(() => groupBy((x) => x.teamLink.name, _lists.lists));
   const loads = computed(() => {
     return {
       all: tasks.value.length,
@@ -64,11 +65,15 @@ export const useTasks = defineStore("tasks", () => {
   };
 
   const init = (target = null) => {
-    if (target) {
-      target == "tasks" ? _tasks.init() : _lists.init();
-    } else {
-      _tasks.init();
+    const state = $router.options.history.state;
+    if (target == "lists") {
       _lists.init();
+    } else {
+      _tasks.init().then(() => {
+        if (target == null) _lists.init();
+        if ("taskId" in state) setViewing(state.taskId, true);
+        if ("showTasks" in state) showTaskModal();
+      });
     }
   };
 
@@ -126,8 +131,15 @@ export const useTasks = defineStore("tasks", () => {
     activeLists.value.clear();
   };
 
-  const setViewing = (task) => {
-    viewing.value = task;
+  const setViewing = (task, byId = false) => {
+    const target = byId ? _tasks.getTaskbyId(task) : task;
+    viewing.value = target;
+  };
+
+  const showTaskModal = () => {
+    Dialog.create({
+      component: defineAsyncComponent(() => import("components/task-manager/TaskViewer.vue")),
+    });
   };
 
   const onShowMore = (list) => {
@@ -170,5 +182,7 @@ export const useTasks = defineStore("tasks", () => {
     clearListFilters,
     setFilterList,
     activeSort,
+    showTaskModal,
+    tasksMeta: _tasks.meta,
   };
 });
