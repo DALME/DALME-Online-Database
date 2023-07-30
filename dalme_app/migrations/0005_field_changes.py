@@ -132,12 +132,6 @@ class Migration(migrations.Migration):  # noqa: D101
             new_name='group_type',
         ),
         # LanguageReference
-        migrations.AlterField(
-            model_name='languagereference',
-            name='iso6393',
-            field=models.CharField(blank=True, default='', max_length=25, unique=True),
-            preserve_default=False,
-        ),
         migrations.AddField(
             model_name='languagereference',
             name='is_dialect',

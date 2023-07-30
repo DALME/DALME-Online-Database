@@ -65,7 +65,7 @@ class Migration(migrations.Migration):  # noqa: D101
         migrations.RunSQL("CREATE CAST (character varying AS integer) WITH INOUT AS IMPLICIT;"),
         migrations.RunSQL("CREATE CAST (integer AS character varying) WITH INOUT AS IMPLICIT;"),
         # the next commands are necessary because when migrating from MySQL to Postgres
-        # certain constrints were created as indices and Postgres doesn't look for indices
+        # certain constraints were created as indices and Postgres doesn't look for indices
         # when altering constraints, so we drop the index and recreate it as a constraint proper
         migrations.RunSQL("DROP INDEX idx_16430_dalme_app_attribute_object_id_attribute_type_c83849ec;"),
         migrations.RunSQL(
@@ -82,5 +82,9 @@ class Migration(migrations.Migration):  # noqa: D101
         migrations.RunSQL("DROP INDEX idx_16561_dalme_app_source_credit_source_id_agent_id_type_2bd09;"),
         migrations.RunSQL(
             'ALTER TABLE public.dalme_app_source_credit ADD CONSTRAINT idx_16561_dalme_app_source_credit_source_id_agent_id_type_2bd09 UNIQUE(source_id, agent_id, type);',
+        ),
+        migrations.RunSQL("DROP INDEX idx_16580_dalme_app_tasklist_group_id_slug_82602101_uniq;"),
+        migrations.RunSQL(
+            'ALTER TABLE public.dalme_app_tasklist ADD CONSTRAINT idx_16580_dalme_app_tasklist_group_id_slug_82602101_uniq UNIQUE(group, slug);',
         ),
     ]
