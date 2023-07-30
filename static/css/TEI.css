@@ -1,6 +1,6 @@
 tei-TEI {
-  font-family: 'PT Serif';
-  font-size: 17px;
+  font-family: 'Times New Roman';
+  font-size: 19px;
   margin-right: 30px;
   margin-left: 30px;
   margin-top: 10px;
@@ -2173,6 +2173,7 @@ tei-note[type="marginal"] > div > i:not(first-child) {
   opacity: .95;
 }
 .tooltip.note .tooltip-inner {
+  font-family: 'Times New Roman';
   max-width: 400px;
   padding: .75rem .75rem;
   color: #000;
@@ -2192,16 +2193,25 @@ tei-note[type="marginal"] > div > i:not(first-child) {
 .tooltip.note .arrow::before .bs-tooltip-bottom {
   border-bottom-color: #aaa;
 }
-
-tei-ref {
-  font-size: 20px;
-  font-weight: 400;
-  margin-left: 2px;
-  font-family: "Open Sans";
+.tooltip.gloss .tooltip-inner {
+  background-color: #dfebee;
+}
+.tooltip.gloss .tooltip-inner .fa-link {
+  color: #0e62b7;
+}
+tei-ref:not([rend=gloss]) {
+  font-size: 14px;
+  font-weight: bold;
+  font-family: 'Helvetica', 'Arial';
   position: relative;
-  top: -5px;
+  top: -10px;
   text-decoration: none !important;
   display: inline-block;
+  color: #5c8ea5;
+}
+
+tei-ref[rend=gloss] {
+  color: #3c71a7;
 }
 
 tei-hi[rend=indent] {

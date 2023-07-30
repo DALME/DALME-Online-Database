@@ -118,10 +118,10 @@ const dalmeTeiBehaviours = {
         if (e.innerText.length > 3) {
           e.setAttribute('rend-basic', 1);
         }
-      }],
+      }]
     ],
     'ref': [
-      ['[target]', function(e) {
+      [':not([rend])', function(e) {
         let ref_id = e.getAttribute('target');
         if (ref_id.length > 1) {
           if (ref_id.startsWith('#')) {

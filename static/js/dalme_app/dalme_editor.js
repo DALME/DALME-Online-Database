@@ -554,6 +554,7 @@ function setupTeiRendering() {
   if ($('tei-seg[type=brace]').length) { formatBraces(); }
   if ($('tei-note[type=marginal]').length) { formatMarginalNotes(); }
   if ($('tei-ref[target]').length) { formatRenvois(); }
+  if ($('tei-ref[rend=gloss]').length) { formatGlosses(); }
   if ($('tei-ab[type=column]').length) { formatColumns(); }
   if ($('tei-metamark[function=leader]').length) { formatLeaders(); }
   $('[data-toggle="tooltip"]').tooltip();
@@ -707,7 +708,7 @@ function formatLeaders() {
 }
 
 function formatRenvois() {
-  $('tei-ref[target]').each( function(index, el) {
+  $('tei-ref:not([rend])').each( function(index, el) {
     let note_id = $(this).attr('target');
     if (note_id.length > 1 && note_id.startsWith('#')) note_id = note_id.substring(1);
     note = $(`tei-note[id='${note_id}']`)
@@ -720,6 +721,30 @@ function formatRenvois() {
       })
     }
   })
+}
+
+function formatGlosses() {
+  $('tei-ref[rend=gloss]').each( function(index, el) {
+    let note_id = $(this).attr('target');
+    note = $(`tei-note[id='${note_id}']`).html();
+    note = note.replaceAll('tei-a', 'a');
+    note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
+    
+    if (note.length) {
+      $(this).attr({
+        title: note,
+        'data-toggle': 'tooltip',
+        'data-html': true,
+        'data-template': '<div class="tooltip note gloss" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
+      })
+    }
+  });
+  $('tei-ref[rend=gloss]').tooltip({
+    delay: {
+      "show": 0,
+      "hide": 1000
+    }
+  });
 }
 
 // function create_named_entity() {
