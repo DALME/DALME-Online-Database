@@ -553,7 +553,7 @@ function addTag(type, tag, att_array) {
 function setupTeiRendering() {
   if ($('tei-seg[type=brace]').length) { formatBraces(); }
   if ($('tei-note[type=marginal]').length) { formatMarginalNotes(); }
-  if ($('tei-ref[target]').length) { formatRenvois(); }
+  if ($('tei-ref:not([rend])').length) { formatRenvois(); }
   if ($('tei-ref[rend=gloss]').length) { formatGlosses(); }
   if ($('tei-ab[type=column]').length) { formatColumns(); }
   if ($('tei-metamark[function=leader]').length) { formatLeaders(); }

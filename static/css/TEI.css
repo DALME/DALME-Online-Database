@@ -2211,7 +2211,7 @@ tei-ref:not([rend=gloss]) {
 }
 
 tei-ref[rend=gloss] {
-  color: #3c71a7;
+  color: #632d91;
 }
 
 tei-hi[rend=indent] {
