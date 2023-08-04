@@ -807,7 +807,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             'header_image': browser_snippet.header_image,
             'header_position': browser_snippet.header_position,
             'records': True,
-            'browse_mode': request.session.get('public-browse-mode', 'wide')
+            'browse_mode': request.session.get('public-browse-mode', 'wide'),
         })
 
         try:
@@ -827,8 +827,10 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             raise Http404()
 
         source = qs.first()
+        preview_mode = self.preview if hasattr(self, 'preview') else False
 
-        if not source.workflow.is_public:
+
+        if not source.workflow.is_public and not preview_mode:
             raise Http404()
 
         pages = source.source_pages.all().values(
@@ -849,6 +851,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             from_search = True
 
         data = PublicSourceSerializer(source).data
+        purl = f'https://purl.dalme.org/{source.id}/' if preview_mode else source.get_purl()
+
+
         context.update({
             'header_image': viewer_snippet.header_image,
             'header_position': viewer_snippet.header_position,
@@ -856,7 +861,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             'from_search': from_search,
             'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
             'render_mode': request.session.get('public-render-mode', 'scholarly'),
-            'purl': source.get_purl(),
+            'purl': purl,
             'title': self.smart_truncate(data['name'], length=35),
             'data': {
                 'folios': list(pages),
@@ -934,6 +939,10 @@ class Collection(SearchEnabled):
         default=True,
         help_text='Check this box to show the "Cite" menu for this page.'
     )
+    preview = models.BooleanField(
+        default=True,
+        help_text="Check this box to set this collection to Preview mode only. It will be made public but not added to the search or map. Only people with the link will be able to access it."
+    )
 
     parent_page_types = ['dalme_public.Collections']
     subpage_types = ['dalme_public.Flat']
@@ -943,6 +952,7 @@ class Collection(SearchEnabled):
         ImageChooserPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('citable'),
+        FieldPanel('preview'),
         StreamFieldPanel('body'),
     ]
 
@@ -956,11 +966,18 @@ class Collection(SearchEnabled):
 
     @property
     def stats(self):
-        stats_dict = {
-            'records': self.source_set.get_public_member_count(),
-            'languages': self.source_set.get_public_languages(),
-            'coverage': self.source_set.get_public_time_coverage(),
-        }
+        if self.preview:
+            stats_dict = {
+                'records': self.source_set.member_count,
+                'languages': self.source_set.get_languages(),
+                'coverage': self.source_set.get_time_coverage(),
+            }
+        else:
+            stats_dict = {
+                'records': self.source_set.get_public_member_count(),
+                'languages': self.source_set.get_public_languages(),
+                'coverage': self.source_set.get_public_time_coverage(),
+            }
         if self.source_set.stat_title is not None:
             stats_dict['other'] = {
                     'label': self.source_set.stat_title,

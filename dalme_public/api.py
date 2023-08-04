@@ -144,7 +144,11 @@ class SourceList(ListAPIView):
             qs = search_obj.results
 
         else:
-            qs = super().get_queryset(*args, **kwargs).order_by('name')
+            if self.request.GET.get('collection') and Collection.objects.get(pk=self.request.GET.get('collection')).preview:
+                qs = Source.objects.filter(type=13).order_by('name')
+            else:
+                qs = super().get_queryset(*args, **kwargs).order_by('name')
+            
             qs = qs.prefetch_related(
                 'attributes', 'attributes__attribute_type'
             )
