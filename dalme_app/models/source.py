@@ -108,13 +108,10 @@ class Source(index.Indexed, dalmeUuidOwned):
             return True
         else:
             return False
-
+        
     @property
     def no_transcriptions(self):
-        if self.source_pages.exclude(transcription__count_ignore=True).exists():
-            return self.source_pages.exclude(transcription__count_ignore=True).count()
-        else:
-            return 0
+        return len([t for t in self.source_pages.all() if t.transcription is not None and t.transcription.count_transcription])
 
     @property
     def no_folios(self):

@@ -15,17 +15,6 @@ class Transcription(dalmeUuid):
     def __str__(self):
         return str(self.id)
 
-    def save(self, **kwargs):
-        # set count_ignore flag
-        xml_parser = et.XMLParser(recover=True)
-        tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
-        tags = len(tree)
-
-        if tags == 1 and tree[0].tag in ['quote', 'gap', 'mute'] or tags == 0:
-            self.count_ignore = len(' '.join(t for t in tree.xpath('text()'))) == 0
-
-        super(Transcription, self).save()
-
     @property
     def text_blob(self):
         xml_parser = et.XMLParser(recover=True)
@@ -35,3 +24,14 @@ class Transcription(dalmeUuid):
     @property
     def tei(self):
         return f'<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>{self.transcription}</body></text></TEI>'
+    
+    @property
+    def count_transcription(self):
+        xml_parser = et.XMLParser(recover=True)
+        tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
+        tags = len(tree)
+
+        if tags == 1 and tree[0].tag in ['quote', 'gap', 'mute'] or tags == 0:
+            return not len(' '.join(t for t in tree.xpath('text()'))) == 0
+        else:
+            return True
