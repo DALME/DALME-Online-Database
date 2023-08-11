@@ -1,4 +1,4 @@
-<div id="handle" class="u-subsection u-flex" data-collapsed="{{ value.collapsed|yesno:" true,false" }}">
+<div id="handle" class="u-subsection {% if value.minor_heading %}u-subsection-minor{% endif %} u-flex" data-collapsed="{{ value.collapsed|yesno:" true,false" }}">
   <a href="#{{ value.subsection|slugify }}" class="anchor">
     {% if value.minor_heading %}
     <h4>{{ value.subsection }}</h4>

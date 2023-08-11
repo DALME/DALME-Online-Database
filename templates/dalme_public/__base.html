@@ -140,15 +140,24 @@
         const footnote_section = $('<div>', { class: 'footnote_list' });
         footnote_section.append('<hr>');
         footnote_section.append(footnotes);
-        $('.content').append(footnote_section);
+        const fnContainer = $('#footnote-container');
+        if (fnContainer.length) {
+          fnContainer.append(footnote_section);
+        } else {
+          $('.content').append(footnote_section);
+        }
       }
 
       // Subsections initialize.
-      const subsections = $('.block-subsection');
-      $.each(subsections, function (index, value) {
-        const subsection = $(value);
+      function initSubsection(subsection, isMinor) {
         const subContainer = $('<div/>').attr({ class: 'subsection-container' });
-        const subsectionBlock = subsection.nextUntil('.block-subsection, .block-subsection_end_marker');
+        const subsectionBlock = isMinor
+          ? subsection.nextUntil('.block-subsection, .block-subsection_end_marker')
+          : subsection.nextUntil('.block-subsection:not(.minor), .block-subsection_end_marker');
+        
+        if (subsectionBlock.last().next().hasClass('block-subsection_end_marker')) {
+          subsectionBlock.last().next().detach();
+        }
         if (subsectionBlock.length) {
           subContainer.append(subsectionBlock.detach());
         } else {
@@ -158,6 +167,20 @@
         if (subsection.find('i').hasClass('fa-caret-left')) {
           subContainer.hide();
         }
+      }
+
+      $.each($('.block-subsection'), function (index, value) {
+        if ($(value).find('.u-subsection-minor').length) {
+          $(value).addClass('minor');
+        }
+      });
+
+      $.each($('.block-subsection.minor'), function (index, value) {
+        initSubsection($(value), true);
+      });
+
+      $.each($('.block-subsection:not(.minor)'), function (index, value) {
+        initSubsection($(value), false);
       });
 
       // Collections initialize.
