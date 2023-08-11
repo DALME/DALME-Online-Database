@@ -9,14 +9,14 @@ services:
     env_file:
       - "./config/eb/env.web.eb"
     volumes:
-      - ./dalme_api:/opt/app/dalme_api
-      - ./dalme_app:/opt/app/dalme_app
-      - ./dalme_public:/opt/app/dalme_public
-      - ./templates:/opt/app/templates
+      - "./dalme_api:/opt/app/dalme_api"
+      - "./dalme_app:/opt/app/dalme_app"
+      - "./dalme_purl:/opt/app/dalme_purl"
+      - "./dalme_public:/opt/app/dalme_public"
+      - "./templates:/opt/app/templates"
+      - "./static:/opt/app/static"
     command: >
-      bash -c "python manage.py collectstatic --noinput && \
-      python manage.py compress --verbosity=0 && \
-      ./wait-for-it.sh db:3306 -- gunicorn -c gunicorn.conf.py dalme.wsgi"
+      bash -c "python manage.py collectstatic --noinput && \ python manage.py compress --verbosity=0 && \ ./wait-for-it.sh db:3306 -- gunicorn -c gunicorn.conf.py dalme.wsgi"
     depends_on:
       - dalme.db
     networks:
@@ -55,8 +55,7 @@ services:
       - "./config/eb/env.web.eb"
     volumes:
       - "./config/eb/nginx:/etc/nginx/conf.d"
-      - ./ssl-certs:/var/certs
-      - assets:/static
+      - "./ssl-certs:/var/certs"
     networks:
       - app-network
     depends_on:
@@ -65,8 +64,8 @@ services:
       - "8000:443"
 
 volumes:
-  assets:
   db-data:
+
 
 networks:
   app-network:

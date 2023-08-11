@@ -33,12 +33,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r ./requirements-dev.txt
 
 COPY dalme ./dalme
-COPY dalme_api ./dalme_api
-COPY dalme_app ./dalme_app
-COPY dalme_public ./dalme_public
-COPY dalme_purl ./dalme_purl
-COPY templates ./templates
-COPY static ./static
 COPY ssl-certs ./ssl-certs
 
 COPY ./config/eb/gunicorn.conf.py .
