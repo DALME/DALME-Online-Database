@@ -3548,7 +3548,7 @@ parsererror div {
   list-style-type: disc;
 }
 .block-text ol li {
-  list-style-type: auto;
+  list-style-type: unset;
 }
 
 .block-text ul li:not(:last-of-type),
@@ -3874,4 +3874,16 @@ a.anchor:hover {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px dashed #e0e087;
+}
+.caption {
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+  color: #6c757d;
+  font-size: 14px;
+  text-align: center;
+}
+
+.transcription-excerpt + .caption {
+  margin-top: -1.5rem;
+  margin-bottom: 0.5rem;
 }
