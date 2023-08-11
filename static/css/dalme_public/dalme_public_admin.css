@@ -1,3 +1,6 @@
+.Draftail-Editor .DraftEditor-root {
+  font-family: "PT Serif", "Times New Roman", serif !important;
+}
 .p_date_scheduled {
   color: #ab803f;
   font-weight: 700;
@@ -262,7 +265,7 @@ input[type=checkbox] {
   box-sizing: border-box;
   border-radius: 6px;
   width: 100%;
-  font-family: Open Sans,Arial,sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   border: 1px solid #e6e6e6;
   padding: .9em 1.2em;
   border-top-left-radius: 0;
@@ -333,7 +336,7 @@ input[type=checkbox] {
   font-size: .95em;
   height: 3em;
   border-radius: 3px;
-  font-family: Open Sans,Arial,sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   width: auto;
   font-weight: 400;
   vertical-align: middle;

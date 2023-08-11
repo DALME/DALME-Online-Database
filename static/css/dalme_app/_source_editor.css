@@ -92,7 +92,7 @@
   overflow: scroll;
   white-space: pre-line;
   line-height: 1.3;
-  font-family: 'Menlo', 'Consolas', monospace;
+  font-family: 'Menlo', 'Consolas', 'Monaco', monospace;
   height: calc(100vh - 572px); /* panel-bottom-editor_bar-xml_margin = 509-29-10*/
 }
 

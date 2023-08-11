@@ -57,17 +57,17 @@ input[type=search]{
 }
 
 .u-type-sans {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
 }
 
 .u-type-serif {
-  font-family: "Asul", serif;
+  font-family: "Asul", "Times New Roman", serif;
 }
 
 .u-lozenge {
   background: #02a1ff;
   border-radius: 2rem;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   padding: 0.5rem 1.5rem;
   text-transform: uppercase;
   box-shadow: 0 1px 12px rgba(0, 0, 0, 0.34);
@@ -132,17 +132,14 @@ a.u-lozenge:hover {
 }
 
 .u-subsection h4 {
-  text-transform: uppercase;
-  font-size: 1rem;
-  font-weight: 650;
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  font-weight: 700;
   letter-spacing: 0.05rem;
-  margin: 0.8rem 0 0.5rem 0.5rem;
+  margin: 0.8rem 0 0.5rem 0.3rem;
   color: #3a5d82;
-  list-style: circle;
-  display: list-item;
-  list-style-position: inside;
+  padding-top: 0 !important;
 }
-
 
 .u-subsection-end {
   margin-bottom: 30px;;
@@ -151,6 +148,13 @@ a.u-lozenge:hover {
 .u-subsection i {
   margin-left: auto;
   align-self: center;
+}
+
+.u-subsection i.fa-caret-left {
+  margin-right: 5px;
+}
+.u-subsection i.fa-caret-down {
+  margin-right: 2px;
 }
 
 .u-bottom-to-top {
@@ -218,6 +222,9 @@ main section p {
   font-size: 1.2rem;
   margin: 1rem 0;
 }
+main section p:first-child {
+  margin-top: 0;
+}
 main section h4 {
   color: #666;
   text-transform: uppercase;
@@ -274,14 +281,16 @@ body.home section.featured img {
 }
 main.collections section p,
 main.collection section p {
-  font-family: "PT Serif", serif;
-  padding: 0 .5rem;
+  font-family: "PT Serif", "Times New Roman", serif;
+  padding: 0;
 }
 main.collections section h4,
 main.collection section h4 {
   padding-top: 1rem;
 }
-
+main section .subsection-container > .block-text > p {
+  padding: 0 .5rem;
+}
 nav.primary {
   background-color: unset;
   background-image: unset;
@@ -417,7 +426,7 @@ header .title > h1 {
   text-align: center;
 }
 header .title > h2 {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   margin-top: 0.5rem;
   font-size: 1.3rem;
   font-style: italic;
@@ -436,7 +445,7 @@ header.home h1.small,
 header.home span.small {
   font-size: 1.8rem;
   font-style: italic;
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   font-weight: 500;
 }
 header.home span.small {
@@ -639,7 +648,7 @@ nav.browse a {
   font-weight: 500;
   font-size: 1.4rem;
   margin-top: 1rem;
-  font-family: "Lora", serif;
+  font-family: "Lora", "Times New Roman", serif;
   font-style: italic;
 }
 .monthly h4 {
@@ -677,7 +686,7 @@ nav.browse a {
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  font-family: "Lora", serif;
+  font-family: "Lora", "Times New Roman", serif;
   color: black;
   font-style: italic;
   font-weight: 500;
@@ -775,7 +784,7 @@ nav.browse a {
   border-bottom: 1px dotted #354d87;
 }
 .statement .block-text {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   padding: 3rem 3rem 2rem 4.5rem;
 }
 .statement .block-text p:first-of-type {
@@ -843,7 +852,7 @@ body.home main .statement p {
 .main-image .caption {
   color: #aaa;
   margin: 3px auto 0 auto;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   font-size: 12px;
   line-height: 1.5;
   text-align: center;
@@ -955,7 +964,6 @@ main.browser > article {
 
 .corpora-container {
   flex-direction: column;
-  padding-top: 1rem;
 }
 .corpora-container h4 {
   color: unset;
@@ -967,7 +975,7 @@ main.browser > article {
   width: 100%;
 }
 .corpora-container > .corpus .rich-text {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
 }
 .corpora-container .collections-container {
   margin-bottom: 2rem;
@@ -1299,7 +1307,7 @@ i.inactive {
   text-shadow: 0px 0px 10pt rgba(0, 0, 0, 1);
   line-height: 1.5;
   font-size: 18px;
-  font-family: "Lora", serif;
+  font-family: "Lora", "Times New Roman", serif;
 }
 .app.inventory-list .inventory-detail:hover .top p {
   color: #2c4171;
@@ -1384,7 +1392,7 @@ i.inactive {
 .folios .folio-rights div {
   font-size: 0.9rem;
   margin: auto;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   font-weight: 400;
   white-space: nowrap;
   overflow: hidden;
@@ -1578,7 +1586,7 @@ h4.featured-group-key {
 .block-heading {
   font-weight: 650;
   letter-spacing: 0.1rem;
-  margin: 2rem 0;
+  margin: 3rem 0 1rem 0;
   text-transform: uppercase;
   font-size: 1.2rem;
   color: #3a5d82;
@@ -1586,19 +1594,32 @@ h4.featured-group-key {
   padding-bottom: 0.25rem;
 }
 
+.block-text + .block-heading {
+  margin-top: 1rem;
+}
+
 .block-html {
   text-align: center;
 }
 
 .block-text {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1.2rem;
+}
+.subsection-container + .block-text {
+  padding-top: 1rem;
+}
+.content + .block-text {
+  background: green;
+}
+.content > .block-text:first-child > p:first-child {
+  margin-block-end: 0;
 }
 .block-pullquote {
   color: #636363;
   padding: .5rem 0 2rem 0;
   text-align: center;
-  font-family: "Lora", serif;
+  font-family: "Lora", "Times New Roman", serif;
   font-size: 18px;
   width: 96%;
 }
@@ -1609,7 +1630,7 @@ h4.featured-group-key {
 }
 .block-pullquote p:first-of-type:before {
   content: "\f10d";
-  font-family: 'FontAwesome';
+  font-family: "Font Awesome 5 Free";
   font-size: 11px;
   margin-right: .5rem;
   color: #bbbbbb;
@@ -1618,7 +1639,7 @@ h4.featured-group-key {
 }
 .block-pullquote p:last-of-type:after {
   content: "\f10e";
-  font-family: 'FontAwesome';
+  font-family: "Font Awesome 5 Free";
   font-size: 11px;
   margin-left: .3rem;
   color: #bbbbbb;
@@ -1670,7 +1691,7 @@ h4.featured-group-key {
   border: 1px solid #000;
 }
 .block-person h4 {
-  font-family: "Lora", serif;
+  font-family: "Lora", "Times New Roman", serif;
   font-style: italic;
   font-size: 1.4rem;
   font-weight: 400;
@@ -2517,7 +2538,7 @@ ul.pagination > li.page-item:last-child button {
 
 #search-help-content .block-text {
   color: #444;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   font-size: 1rem;
   line-height: 1.7;
   margin-top: 40px;
@@ -2536,7 +2557,7 @@ ul.pagination > li.page-item:last-child button {
 }
 
 #search-help-content .block-text b {
-    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    font-family: "SFMono-Regular","Menlo","Monaco","Consolas","Liberation Mono","Courier New",monospace;
     font-size: 87.5%;
     color: #212529;
     display: inline-block;
@@ -2545,7 +2566,7 @@ ul.pagination > li.page-item:last-child button {
 }
 
 #search-help-content .block-text b::after {
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Free";
   font-weight: normal;
   font-style: normal;
   display: inline-block;
@@ -2555,7 +2576,7 @@ ul.pagination > li.page-item:last-child button {
 }
 
 #search-help-content .block-text i {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
 }
 
 .hidden-search-submit {
@@ -2616,12 +2637,12 @@ ul.pagination > li.page-item:last-child button {
 }
 .block-document .doc-title h4,
 .block-document .doc-title a {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1.3rem;
   font-weight: 500;
   line-height: 1.4;
   color: #333;
-  decoration: none;
+  text-decoration: none;
   margin-bottom: 0;
   display: inline;
   border-bottom: 1px dotted transparent;
@@ -2664,7 +2685,7 @@ ul.pagination > li.page-item:last-child button {
   font-size: 1.1rem;
   color: #686868;
   white-space: pre-line;
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   line-height: 1.5;
 }
 
@@ -2690,7 +2711,7 @@ main.features .block-text p {
 }
 
 .show-more {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   margin-top: 2px;
   border-radius: 3px;
   cursor: pointer;
@@ -2885,10 +2906,10 @@ main.features .block-text p {
 }
 
 .map-popup {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
 }
 .map-pop-title {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 18px;
   font-weight: 600;
 }
@@ -3216,7 +3237,7 @@ section.transcription {
 }
 .record-info .description {
   color: white;
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 16px;
   overflow: scroll;
   max-height: calc(100vh - 500px);
@@ -3430,7 +3451,6 @@ section.transcription {
   margin-top: 1rem;
   margin-bottom: 1.5rem;
 }
-
 .popover-body .dropdown-menu {
   padding: .75rem 0;
 }
@@ -3469,7 +3489,7 @@ parsererror {
   padding-right: 1rem !important;
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
 }
 
 parsererror h3 {
@@ -3515,14 +3535,25 @@ parsererror div {
   color: #354d87 !important;
   border-color: #354d87 !important;
 }
-.block-text ul {
-  margin: 1rem 1rem 2rem 3rem;
+.block-text ul,
+.block-text ol  {
+  margin: 1rem 3rem;
+}
+.block-text ul li,
+.block-text ol li {
+  list-style-position: outside;
+  line-height: 2;
 }
 .block-text ul li {
   list-style-type: disc;
-  list-style-position: outside;
-  font-size: 1.1rem;
-  line-height: 2;
+}
+.block-text ol li {
+  list-style-type: auto;
+}
+
+.block-text ul li:not(:last-of-type),
+.block-text ol li:not(:last-of-type) {
+  margin-bottom: 1rem;
 }
 
 .line-clamp {
@@ -3537,7 +3568,7 @@ parsererror div {
 }
 
 .bibliography-container {
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1.2rem;
 }
 .bibliography-container .csl-bib-body {
@@ -3563,7 +3594,7 @@ parsererror div {
   background-color: #ffffff99;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(15px);
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   color: #193a5d;
   font-size: 14px;
   font-weight: 600;
@@ -3602,7 +3633,7 @@ parsererror div {
 }
 .inline-image .caption {
   text-align: center;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   border: 0;
   line-height: 1.4em;
   padding: 6px 3px 3px 3px;
@@ -3673,7 +3704,7 @@ parsererror div {
 .dataverse-badge {
   display: flex;
   flex-direction: column;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   font-size: 11px;
   color: #084094;
   border: 1px solid #aaa;
@@ -3715,7 +3746,9 @@ a.anchor:hover {
 }
 
 /* footnotes */
-
+#footnote-container {
+  text-align: left;
+}
 .footnote_list {
   font-size: .85em;
 }
@@ -3745,7 +3778,8 @@ a.anchor:hover {
 }
 .footnote_list p {
   margin: 0 0 1.6em 0;
-  padding: 0;
+  padding: 0 !important;
+  font-size: inherit;
 }
 .content p > a.footnote_callout {
   font-weight: 700;
@@ -3767,5 +3801,77 @@ a.anchor:hover {
 }
 .footnote_list blockquote {
   margin: 1rem 1rem 1rem 1rem;
-  font-family: "PT Serif", serif;
+  font-family: "PT Serif", "Times New Roman", serif;
+}
+.table-container {
+  padding: 1rem;
+}
+.u-table {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+}
+.u-table:not(.no-border), 
+.u-table:not(.no-border) th, 
+.u-table:not(.no-border) td {
+  border: 1px solid #aaa;
+}
+.u-table th {
+  font-size: 13px;
+}
+.u-table th, 
+.u-table td {
+  text-align: left;
+  padding: 5px 20px;
+}
+.u-table th.right, 
+.u-table td.right {
+  text-align: right;
+}
+.u-table th.center, 
+.u-table td.center {
+  text-align: center;
+}
+.u-table caption {
+  font-size: 14px;
+  text-align: center;
+}
+.u-table + p {
+  margin-top: 1.5rem;
+}
+.u-table tr.divider {
+  border-bottom: 1px solid black;
+}
+.u-table tr.divider + tr td {
+  padding-top: 15px;
+}
+.u-table td.indented {
+  padding-left: 40px;
+}
+.transcription-excerpt {
+  background: #fffffa;
+  border: 1px dotted #e0e087;
+  padding: 15px;
+  margin: 1.5rem 2rem;
+  text-align: left;
+}
+.transcription-excerpt.center {
+  text-align: center;
+}
+.transcription-excerpt.right {
+  text-align: right;
+}
+.transcription-excerpt .transcription {
+  font-family: "PT Serif","Times New Roman",serif;
+  font-size: 16px;
+  color: #553010;
+}
+.transcription-excerpt .translation {
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  font-size: 14px;
+  color: #2c7b9d;
+  font-weight: 500;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e0e087;
 }
