@@ -54,6 +54,7 @@ from dalme_public.blocks import (
     SponsorBlock,
     SubsectionBlock,
     SubsectionEndMarkerBlock,
+    FootnotesPlaceMarker,
 )
 
 from dalme_app.utils import Search, formset_factory, SearchContext
@@ -312,6 +313,7 @@ class DALMEPage(Page):
         ('html', blocks.RawHTMLBlock()),
         ('subsection', SubsectionBlock()),
         ('subsection_end_marker', SubsectionEndMarkerBlock()),
+        ('footnotes_placemarker', FootnotesPlaceMarker()),
     ], null=True)
 
     class Meta:

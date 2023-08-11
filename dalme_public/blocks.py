@@ -164,3 +164,10 @@ class SubsectionEndMarkerBlock(blocks.StructBlock):
     class Meta:
         icon = 'collapse-up'
         template = 'dalme_public/blocks/_subsection_end.html'
+
+
+class FootnotesPlaceMarker(blocks.StructBlock):
+    
+    class Meta:
+        icon = 'list-ol'
+        template = 'dalme_public/blocks/_footnote_placemarker.html'
