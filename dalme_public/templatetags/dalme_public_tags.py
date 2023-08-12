@@ -552,3 +552,18 @@ def js_trans(value, mode=None):
         return value
     else:
         return value if value.startswith('"') and value.endswith('"') else f'"{value}"'
+
+
+@register.simple_tag()
+def image_rendition(image, resize_rule, dimensions, parameters):
+    try:
+        if resize_rule != 'background':
+            return image.get_rendition(f'{resize_rule}-{dimensions}')
+        else:
+            img = image.get_rendition('original')
+            dims = dimensions.split('x')
+            height = dims[1]
+            width = dims[0] if int(dims[0]) < 308 else 308
+            return f'<div class="image-as-background" style="background: url({img.url}) {parameters}; width: {width}px; height: {height}px;"></div>'
+    except:
+        return image.get_rendition('original')
