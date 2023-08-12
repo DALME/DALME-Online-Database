@@ -732,18 +732,17 @@ function formatGlosses() {
     
     if (note.length) {
       $(this).attr({
-        title: note,
-        'data-toggle': 'tooltip',
-        'data-html': true,
-        'data-template': '<div class="tooltip note gloss" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
+        'title': 'Note',
+        'data-content': note,
+        'data-toggle': 'popover',
+        'tabindex': '0',
       })
     }
   });
-  $('tei-ref[rend=gloss]').tooltip({
-    delay: {
-      "show": 0,
-      "hide": 1000
-    }
+  $('tei-ref[rend=gloss]').popover({
+    container: 'body',
+    trigger: 'focus',
+    html: true,
   });
 }
 

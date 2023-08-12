@@ -2214,7 +2214,24 @@ tei-ref:not([rend=gloss]) {
 }
 
 tei-ref[rend=gloss] {
-  color: #632d91;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+tei-ref[rend=gloss]:after {
+  content: "\f249";
+  font-family: "Font Awesome 5 Free";
+  font-size: 8px;
+  color: #909090;
+  position: relative;
+  height: 1px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(#909090, #909090) no-repeat left/40% 2px, linear-gradient(#909090, #909090) no-repeat right/40% 2px;
+  margin-top: -2px;
+  width: 95%;
+  align-self: end;
 }
 
 tei-hi[rend=indent] {
