@@ -164,7 +164,7 @@
           subContainer.append(subsection.nextAll().detach());
         }
         subContainer.insertAfter(subsection);
-        if (subsection.find('i').hasClass('fa-caret-left')) {
+        if (subsection.find('i').hasClass('fa-plus')) {
           subContainer.hide();
         }
       }
@@ -187,7 +187,7 @@
       const collections = $('section.collection');
       $.each(collections, function (index, value) {
         const collection = $(value);
-        if (collection.find('i').hasClass('fa-caret-left')) {
+        if (collection.find('i').hasClass('fa-plus')) {
           collection.children().not('.u-subsection').hide();
         }
       });
@@ -205,18 +205,20 @@
           icon = target;
         }
 
-        // Collections.
-        icon.hasClass('fa-caret-left')
-          ? icon.removeClass('fa-caret-left').addClass('fa-caret-down')
-          : icon.removeClass('fa-caret-down').addClass('fa-caret-left');
-        icon.closest('section')
+        icon.hasClass('fa-plus')
+          ? icon.removeClass('fa-plus').addClass('fa-minus')
+          : icon.removeClass('fa-minus').addClass('fa-plus');
+        
+        icon.closest('.u-subsection')
           .attr('data-collapsed', function (index, attr) {
             return attr === 'true' ? 'false' : 'true';
           });
+
+        // Collections collapsing logic.
         if (icon.hasClass('corpus')) {
           const collection = $(icon).closest('section.corpus');
           const nodes = collection.children().not('.u-subsection');
-          icon.hasClass('fa-caret-left')
+          icon.hasClass('fa-plus')
             ? nodes.hide()
             : nodes.show();
         }
@@ -224,7 +226,7 @@
         // Subsections collapsing logic.
         if (icon.hasClass('subsection')) {
           const subsection = $(icon).closest('.block-subsection');
-          if (icon.hasClass('fa-caret-left')) {
+          if (icon.hasClass('fa-plus')) {
             subsection.next().hide();
           } else {
             subsection.next().show();
