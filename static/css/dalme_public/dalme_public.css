@@ -124,8 +124,8 @@ a.u-lozenge:hover {
   background: #3a5d82;
   color: white;
 }
-.u-subsection[data-collapsed='true'] a.anchor h3::after,
-.u-subsection[data-collapsed='true'] a.anchor h4::after {
+.u-subsection[data-collapsed='true'] h3::after,
+.u-subsection[data-collapsed='true'] h4::after {
   content: '...';
 }
 .u-subsection h3 {
@@ -135,6 +135,7 @@ a.u-lozenge:hover {
   letter-spacing: 0.1rem;
   margin: 0.8rem 0 0.5rem 0;
   color: #3a5d82;
+  z-index: -1;
 }
 .u-subsection h4 {
   text-transform: capitalize;
@@ -144,6 +145,7 @@ a.u-lozenge:hover {
   margin: 0.8rem 0 0.5rem 0.3rem;
   color: #3a5d82;
   padding-top: 0 !important;
+  z-index: -1;
 }
 .u-subsection-end {
   margin-bottom: 30px;;
@@ -164,7 +166,6 @@ a.u-lozenge:hover {
   writing-mode: tb-rl;
   transform: rotate(180deg);
 }
-
 .u-ellipsis {
   color: #aaa;
 }
@@ -3635,7 +3636,6 @@ parsererror div {
 }
 .inline-image .caption {
   text-align: center;
-  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   border: 0;
   line-height: 1.4em;
   padding: 6px 3px 3px 3px;
@@ -3643,8 +3643,10 @@ parsererror div {
   color: #6b6b6b;
 }
 .inline-image .caption p {
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
   margin: 0;
   line-height: 1.5;
+  font-size: 14px;
 }
 .inline-image.right,
 .chart-embed.right {
@@ -3894,4 +3896,18 @@ a.anchor:hover {
 
 .display-none {
   display: none;
+}
+
+code {
+  padding: 2px 3px;
+  font-size: 87%;
+  margin: 0 2px;
+  background-color: rgba(27,31,35,0.05);
+  font-family: Consolas,Menlo,Monaco,"Lucida Console","Liberation Mono","DejaVu Sans Mono","Bitstream Vera Sans Mono","Courier New",monospace,sans-serif;
+  border-radius: 3px;
+  color: #747474;
+  border: 1px solid #8080801a;
+  height: 22px;
+  line-height: 18px;
+  display: inline-flex;
 }

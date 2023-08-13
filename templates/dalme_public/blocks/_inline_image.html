@@ -1,17 +1,8 @@
 {% load dalme_public_tags wagtailimages_tags %}
 
 <div class="inline-image u-flex {{ value.alignment }}">
-  {% if value.resize_rule %}
-    {% if value.resize_rule == 'background' %}
-      {% image_rendition value.image value.resize_rule value.dimensions value.parameters as img %}
-      {% image value.image original class="display-none" %}
-      {{ img | safe }}
-    {% else %}
-      {% image_rendition value.image value.resize_rule value.dimensions value.parameters %}
-    {% endif %}
-  {% else %}
-    {% image value.image original %}
-  {% endif %}
+  {% render_image value as img %}
+  {{ img | safe }}
   {% if value.show_caption and value.caption %}
     <div class="caption">{{ value.caption }}</div>
   {% endif %}

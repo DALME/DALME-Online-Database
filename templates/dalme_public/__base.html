@@ -192,15 +192,13 @@
         }
       });
 
-      $('body').on('click', '#handle', function (e) {
+      $('body').on('click', '.handle', function (e) {
         const target = $(e.target);
         let icon = null;
         if (e.target.localName === 'div') {
           icon = target.find('i');
         } else if (e.target.localName === 'h3' || e.target.localName === 'h4') {
           icon = target.parent().next();
-        } else if (e.target.localName === 'a') {
-          icon = target.next();
         } else {
           icon = target;
         }
