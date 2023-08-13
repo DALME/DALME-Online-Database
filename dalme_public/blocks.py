@@ -6,11 +6,15 @@ from django.core.exceptions import ValidationError
 
 def validate_dimensions(value):
     try:
-        dims = value.split('x')
-        if len(dims) != 2 or not dims[0].isdigit() or not dims[1].isdigit():
-            raise ValidationError(f'Dimensions must be expressed as two integers separated by a letter "x".')
+        if 'x' in value:
+            dims = value.split('x')
+            if len(dims) != 2 or not dims[0].isdigit() or not dims[1].isdigit():
+                raise ValidationError(f'Must be either a single integer or two integers separated by the letter "x".')
+        else:
+            if not value.isdigit():
+                raise ValidationError(f'Must be either a single integer or two integers separated by the letter "x".')
     except:
-        raise ValidationError(f'Dimensions must be expressed as two integers separated by a letter "x".')
+        raise ValidationError(f'Must be either a single integer or two integers separated by the letter "x".')
 
 
 class AnnouncementBannerBlock(blocks.StructBlock):
@@ -114,6 +118,7 @@ class MainImageBlock(ImageChooserBlock):
 
 class InlineImageBlock(blocks.StructBlock):
     image = ImageChooserBlock()
+    image_id = blocks.CharBlock(required=False, help_text='Can be used as an anchor to link to the image.')
     caption = blocks.RichTextBlock(required=False)
     alignment = blocks.ChoiceBlock(
         choices=[
