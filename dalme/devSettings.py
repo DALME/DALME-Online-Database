@@ -49,7 +49,9 @@ ALLOWED_HOSTS = [
     'data.127.0.0.1.sslip.io',
     'purl.127.0.0.1.sslip.io:8443',
     'purl.127.0.0.1.sslip.io:8000',
-    'purl.127.0.0.1.sslip.io'
+    'purl.127.0.0.1.sslip.io',
+    '.dalme.org',
+    'dalme.org'
 ]
 
 SECURE_SSL_REDIRECT = False
