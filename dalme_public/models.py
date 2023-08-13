@@ -829,10 +829,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             raise Http404()
 
         source = qs.first()
-        preview_mode = self.preview if hasattr(self, 'preview') else False
+        as_preview = self.preview if hasattr(self, 'preview') else False
 
-
-        if not source.workflow.is_public and not preview_mode:
+        if not source.workflow.is_public and not as_preview:
             raise Http404()
 
         pages = source.source_pages.all().values(
@@ -853,7 +852,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             from_search = True
 
         data = PublicSourceSerializer(source).data
-        purl = f'https://purl.dalme.org/{source.id}/' if preview_mode else source.get_purl()
+        purl = f'https://purl.dalme.org/{source.id}/' if as_preview else source.get_purl()
 
 
         context.update({
@@ -880,6 +879,12 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         return TemplateResponse(
           request, 'dalme_public/record.html', context
         )
+    
+    def relative_url(self, current_site, request=None):
+        if hasattr(request, 'is_dummy') and request.is_dummy:
+            return '/'
+        else:
+            return self.get_url(request=request, current_site=current_site)
 
 
 class Collections(SearchEnabled):
@@ -913,7 +918,7 @@ class Collections(SearchEnabled):
             for corpus in self.corpora.all()
         ]
         return context
-
+    
     @route(r'^explore/$', name='explore')
     def explore(self, request):
         context = self.get_context(request)
@@ -942,7 +947,7 @@ class Collection(SearchEnabled):
         help_text='Check this box to show the "Cite" menu for this page.'
     )
     preview = models.BooleanField(
-        default=True,
+        default=False,
         help_text="Check this box to set this collection to Preview mode only. It will be made public but not added to the search or map. Only people with the link will be able to access it."
     )
 
