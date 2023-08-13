@@ -139,3 +139,12 @@ def register_footnote(features):
         'from_database_format': {'span[data-footnote]': FootnoteElementHandler(type_)},
         'to_database_format': {'entity_decorators': {type_: footnote_decorator}},
     })
+
+
+@hooks.register('register_rich_text_features')
+def enable_features(features):
+    features.default_features.append('superscript')
+    features.default_features.append('subscript')
+    features.default_features.append('strikethrough')
+    features.default_features.append('code')
+    features.default_features.append('blockquote')
