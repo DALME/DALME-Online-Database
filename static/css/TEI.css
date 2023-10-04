@@ -8,6 +8,13 @@ tei-TEI {
   color: #111;
 }
 
+@-moz-document url-prefix() {
+  tei-TEI {
+    font-family: "Times New Roman", serif;
+    font-size: 19px;
+  }
+}
+
 tei-TEI > tei-text {
   display: block;
   line-height: 1.5;
