@@ -9,10 +9,12 @@ services:
     env_file:
       - "./config/eb/env.web.eb"
     volumes:
+      - "./dalme:/opt/app/dalme"
       - "./dalme_api:/opt/app/dalme_api"
       - "./dalme_app:/opt/app/dalme_app"
       - "./dalme_purl:/opt/app/dalme_purl"
       - "./dalme_public:/opt/app/dalme_public"
+      - "./ssl-certs:/opt/app/ssl-certs"
       - "./templates:/opt/app/templates"
       - "./static:/opt/app/static"
     command: >

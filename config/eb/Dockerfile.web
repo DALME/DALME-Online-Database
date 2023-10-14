@@ -32,8 +32,8 @@ COPY ./requirements.txt ./requirements-dev.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r ./requirements-dev.txt
 
-COPY dalme ./dalme
-COPY ssl-certs ./ssl-certs
+# COPY dalme ./dalme
+# COPY ssl-certs ./ssl-certs
 
 COPY ./config/eb/gunicorn.conf.py .
 COPY ./config/eb/wait-for-it.sh .
