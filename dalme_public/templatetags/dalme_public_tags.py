@@ -14,9 +14,9 @@ from dalme_public.models import (
     FeaturedObject,
     FeaturedInventory,
     Features,
-    Footer,
     Home,
-    SearchPage
+    SearchPage,
+    SiteSettings
 )
 
 from datetime import date
@@ -24,25 +24,16 @@ from datetime import date
 register = template.Library()
 
 
-@register.inclusion_tag(
-    'dalme_public/includes/_footer.html', takes_context=True
-)
-def footer(context):
-    return {
-        'footer': Footer.objects.first(),
-        'year': context['year'],
-        'project': context['project'],
-    }
-
-
 @register.filter
 def classname(obj):
     return obj.specific.__class__.__name__
 
 
-@register.simple_tag
-def get_nav():
-    home = Home.objects.first()
+@register.simple_tag(takes_context=True)
+def get_nav(context):
+    page = context.get('page')
+    home = page.get_site().root_page
+
     return [
         page.specific for page in
         (home, *home.get_children().live().filter(show_in_menus=True))
@@ -146,21 +137,19 @@ def get_flat_nav(context):
 
 @register.simple_tag(takes_context=True)
 def get_header_image_styles(context, header_image, header_position):
-    gradients = {
-        'DALME': '125deg, rgba(6, 78, 140, 0.5) 0%, rgba(17, 74, 40, 0.5) 100%',  # noqa
-        'project': '125deg, rgba(83, 134, 160, 0.7) 0%, rgba(63, 101, 68, 0.9) 100%',  # noqa
-        'features': '125deg, rgba(99, 98, 58, 0.7) 0%, rgba(138, 71, 71, 0.9) 100%',  # noqa
-        'collections': '125deg, rgba(95, 81, 111, 0.7) 0%, rgba(23, 62, 101, 0.9) 100%',  # noqa
-        'about': '125deg, rgba(105, 102, 63, 0.6) 0%, rgba(146, 106, 16, 0.9) 100%',  # noqa
-        'generic': '59deg, #11587c 54.62%, #1b1b1b',
-    }
-    page = context['page']
+    page = context.get('page')
+    settings = SiteSettings.for_site(page.get_site())
+    gradients = {i.label: i.css_value for i in settings.gradients.all()}
     value = False
     count = 0
 
     while not value and count < 4:
-        value = gradients.get(page.slug, False)
-        page = page.get_parent()
+        try:
+            value = gradients.get(page.slug, False)
+            page = page.get_parent()
+        except AttributeError:
+            value = False
+            break
 
     if not value:
         value = gradients['generic']
@@ -311,6 +300,7 @@ def get_snippet(obj, width):
 def get_citation_data(context):
     accessed = date.today()
     page = context['page']
+    settings = SiteSettings.for_site(page.get_site())
     published = page.first_published_at or date.today()
     page_class = page.get_verbose_name()
     formats = None
@@ -323,20 +313,19 @@ def get_citation_data(context):
         ('url_ver', 'Z39.88-2004'),
         ('ctx_ver', 'Z39.88-2004'),
         ('rft_val_fmt', 'info:ofi/fmt:kev:mtx:book'),
-        ('rft.au', 'Daniel Lord Smail'),
-        ('rft.au', 'Gabriel H. Pizzorno'),
-        ('rft.au', 'Laura Morreale'),
-        ('rft.btitle', 'The Documentary Archaeology of Late Medieval Europe'),
+        ('rft.btitle', settings.citation_title),
         ('rft.date', f'{published.year}/{published.month}/{published.day}'),
         # ('rft.identifier', 'info:doi/10.1000/xyz123')
     ]
+    editors = []
+    
+    for editor in settings.citation_authors.all():
+        coins_list.append(('rft.au', f'{editor.name} {editor.surname}'))
+        editors.append({'family': editor.surname, 'given': editor.name})
+
     citation = {
-        'editor': [
-            {'family': 'Smail', 'given': 'Daniel Lord'},
-            {'family': 'Pizzorno', 'given': 'Gabriel H.'},
-            {'family': 'Morreale', 'given': 'Laura'}
-        ],
-        "accessed": {"date-parts": [[accessed.year, accessed.month, accessed.day]]},
+        'editor': editors,
+        'accessed': {'date-parts': [[accessed.year, accessed.month, accessed.day]]},
     }
 
     if page_class == 'Collections' and not record:
@@ -354,7 +343,7 @@ def get_citation_data(context):
         coins_list.append(('rft.genre', 'bookitem'))
         citation.update({
             'type': 'chapter',
-            'container-title': 'The Documentary Archaeology of Late Medieval Europe',
+            'container-title': settings.citation_title,
         })
 
         if record:

@@ -464,6 +464,9 @@ header.home .title {
 header.home > div > a {
   margin: 3rem 0 8rem 0;
 }
+header.home .home-heading-spacer {
+  margin-bottom: 3rem;
+}
 
 aside.side-column {
   flex-direction: column;
@@ -789,12 +792,15 @@ nav.browse a {
 }
 .statement .block-text {
   font-family: "PT Serif", "Times New Roman", serif;
-  padding: 3rem 3rem 2rem 4.5rem;
+  padding: 3rem 3rem 2rem 3rem;
 }
-.statement .block-text p:first-of-type {
+.statement.home-parchment .block-text {
+  padding-left: 4.5rem;
+}
+.statement.home-parchment .block-text p:first-of-type {
   text-indent: 35px;
 }
-.statement .block-text p:first-of-type b:first-of-type {
+.statement.home-parchment .block-text p:first-of-type b:first-of-type {
   font-size: 110%;
 }
 .statement .block-text .rich-text p {
@@ -816,10 +822,16 @@ nav.browse a {
   top: 39px;
   left: 4.4rem;
 }
-.home-register {
+.statement.home-parchment + .block-html {
   background: url(/static/images/home_reg.jpg);
   background-size: cover;
   width: 25%;
+}
+.home-register {
+  display: none;
+  /* background: url(/static/images/home_reg.jpg);
+  background-size: cover;
+  width: 25%; */
 }
 body.home main .statement p {
   margin: 0 0 1rem 0;
@@ -2165,7 +2177,7 @@ div.description[data-collapsed='true'] {
   .home-parchment {
     width: 65%;
   }
-  .home-register {
+  .statement.home-parchment + .block-html {
     width: 35%;
   }
   main {

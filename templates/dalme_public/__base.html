@@ -22,7 +22,7 @@
   <meta name="theme-color" content="#ffffff">
   {% endblock %}
   <title>
-    {% block title %}DALME{% endblock %}
+    {% block title %}{{ page.title }}{% endblock %}
   </title>
   {% block styles %}
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -64,7 +64,27 @@
   </main>
 
   <footer class="u-flex" id="footer-app">
-    {% footer %}
+    {% if settings.dalme_public.SiteSettings.footer_links %}
+      <nav class="footer">
+        <ul>
+          {% for block in settings.dalme_public.SiteSettings.footer_links %}
+            {{ block }}
+          {% endfor %}
+        </ul>
+      </nav>
+    {% endif %}
+    
+    <div class="copyright">
+      Copyright &copy; {{ year }} {{ settings.dalme_public.SiteSettings.copyright_owner }}
+    </div>
+    
+    {% if settings.dalme_public.SiteSettings.social_media %}
+      <div class="social">
+        {% for block in settings.dalme_public.SiteSettings.social_media %}
+          {{ block }}
+        {% endfor %}
+      </div>
+    {% endif %}
   </footer>
 
   <!-- LIGHTBOX MODAL -->

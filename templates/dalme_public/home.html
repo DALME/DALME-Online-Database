@@ -3,11 +3,15 @@
 
 {% block header_extra %}
   <div class="title u-flex u-type-serif">
-    <h1 class="small">The</h1>
-    <h1>Documentary Archaeology</h1>
-    <h1 class="last"><span class="small">of</span> Late Medieval Europe</h1>
+    {% if page.heading_text %}
+      {{ page.heading_text|safe }}
+    {% else %}
+      <h1>{{ page.title }}</h1>
+    {% endif %}
     {% if page.learn_more_page %}
       <a class="u-lozenge" href="{% pageurl page.learn_more_page %}">LEARN MORE</a>
+    {% else %}
+      <div class="home-heading-spacer"></div>
     {% endif %}
   </div>
   {% if page.banners %}
@@ -18,16 +22,22 @@
 {% endblock %}
 
 {% block main_column %}
-  {% include "dalme_public/includes/_featured.html" %}
+  {% if page.show_featured %}
+    {% include "dalme_public/includes/_featured.html" %}
+  {% endif %}
 
   <section class="mission u-flex">
-    <h2 class="u-lozenge">DALME</h2>
+    <h2 class="u-lozenge">{{ settings.dalme_public.SiteSettings.site_slug }}</h2>
     <div class="u-flex">
-      <div class="statement home-parchment">
-        <img src="{% static "images/dalme_logo.svg" %}" alt="DALME logo">
+      <div class="statement {% if page.body_wrapper %}{{ page.body_wrapper }}{% endif %}">
+        {% if page.body_prepend %}
+          {{ page.body_prepend|safe }}
+        {% endif %}
         {{ page.body }}
       </div>
-      <div class="home-register"></div>
+      {% if page.body_append %}
+        {{ page.body_append|safe }}
+      {% endif %}
     </div>
   </section>
 
