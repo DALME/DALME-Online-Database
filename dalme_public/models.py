@@ -26,7 +26,7 @@ from wagtail.admin.edit_handlers import (
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.core import blocks
 
-from wagtail.core.models import Orderable, Page
+from wagtail.core.models import Orderable, Page, Site
 from wagtail.core.fields import RichTextField, StreamField
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
@@ -60,6 +60,7 @@ from dalme_public.blocks import (
 from dalme_app.utils import Search, formset_factory, SearchContext
 from dalme_app.forms import SearchForm
 from urllib import parse
+from wagtail.contrib.settings.models import BaseSetting, register_setting
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -70,6 +71,75 @@ HEADER_POSITION = (
     ('center', 'Center'),
     ('bottom', 'Bottom'),
 )
+
+# SITE SETTINGS
+@register_setting
+class SiteSettings(BaseSetting, ClusterableModel):
+    site_slug = models.CharField(
+        max_length=255, 
+        help_text='A short version of the website\'s name, e.g. "DALME".'
+    )
+    copyright_owner = models.CharField(
+        max_length=255,
+        null=True,
+        help_text='Copyright owner as it should appear on the website\'s footer.'
+    )
+    footer_links = StreamField(
+        [('page', FooterPageChooserBlock())], 
+        null=True,
+        blank=True,
+        help_text='Copyright owner as it should appear on the website\'s footer.'
+    )
+    social_media = StreamField([('social', SocialBlock())], null=True, blank=True)
+    citation_title = models.CharField(max_length=255, null=True)
+    citation_url = models.CharField(max_length=255, null=True)
+
+    panels = [
+        FieldPanel('site_slug'),
+        FieldPanel('copyright_owner'),
+        InlinePanel('gradients', min_num=1, label="Preset Gradients"),
+        MultiFieldPanel([
+                FieldPanel('citation_title'),
+                FieldPanel('citation_url'),
+                InlinePanel('citation_authors', min_num=1, label="Editors")
+            ],
+            heading='Citation',
+        ),
+        MultiFieldPanel([
+                StreamFieldPanel('footer_links'),
+                StreamFieldPanel('social_media'),
+            ],
+            heading='Footer',
+        ),
+    ]
+
+    class Meta:
+        verbose_name = 'Site Settings'
+
+
+class CitationAuthors(Orderable):
+    site = ParentalKey(SiteSettings, on_delete=models.CASCADE, related_name='citation_authors')
+    name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
+
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('surname'),
+    ]
+
+
+class SiteGradients(Orderable):
+    site = ParentalKey(SiteSettings, on_delete=models.CASCADE, related_name='gradients')
+    label = models.CharField(max_length=255)
+    css_value = models.CharField(
+        max_length=255, 
+        help_text='e.g. "59deg, #11587c 54.62%, #1b1b1b".'
+    )
+
+    panels = [
+        FieldPanel('label'),
+        FieldPanel('css_value'),
+    ]
 
 
 @register_model_chooser
@@ -106,26 +176,6 @@ class CustomRendition(AbstractRendition):
         unique_together = (
             ('image', 'filter_spec', 'focal_point_key'),
         )
-
-
-@register_snippet
-class Footer(models.Model):
-    pages = StreamField([('page', FooterPageChooserBlock())], null=True)
-    copyright = models.CharField(max_length=255, blank=True, null=True)
-    social = StreamField([('social', SocialBlock())], null=True)
-
-    panels = [
-        StreamFieldPanel('pages'),
-        FieldPanel('copyright'),
-        StreamFieldPanel('social'),
-    ]
-
-    def __str__(self):
-        return "Site Footer"
-
-    def clean(self):
-        if self.id is None and self._meta.model.objects.exists():
-            raise ValidationError('The site can only have one footer.')
 
 
 @register_snippet
@@ -463,8 +513,21 @@ class Home(DALMEPage):
         on_delete=models.SET_NULL,
         related_name='+',
     )
-    sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
-    banners = StreamField([('banners', AnnouncementBannerBlock())], null=True)
+    sponsors = StreamField([('sponsors', SponsorBlock())], null=True, blank=True)
+    banners = StreamField([('banners', AnnouncementBannerBlock())], null=True, blank=True)
+    heading_text = models.TextField(null=True, blank=True, help_text='Heading text to be displayed on top of the heading image (the field accepts HTML).')
+    body_wrapper = models.CharField(max_length=255, null=True, blank=True, help_text='CSS classes for main text body wrapper.')
+    body_prepend = StreamField([
+        ('image', ImageChooserBlock()),
+        ('text', blocks.RichTextBlock()),
+        ('html', blocks.RawHTMLBlock()),
+    ], null=True, blank=True, help_text='Content to add before main text body.')
+    body_append = StreamField([
+        ('image', ImageChooserBlock()),
+        ('text', blocks.RichTextBlock()),
+        ('html', blocks.RawHTMLBlock()),
+    ], null=True, blank=True, help_text='Content to add after main text body.')    
+    show_featured = models.BooleanField(default=True)
 
     subpage_types = [
         'dalme_public.Section',
@@ -474,22 +537,32 @@ class Home(DALMEPage):
 
     content_panels = DALMEPage.content_panels + [
         ImageChooserPanel('header_image'),
+        FieldPanel('heading_text'),
         PageChooserPanel('learn_more_page'),
+        FieldPanel('show_featured'),
         StreamFieldPanel('banners'),
-        StreamFieldPanel('body'),
+        MultiFieldPanel([
+                FieldPanel('body_wrapper'),
+                StreamFieldPanel('body_prepend'),
+                StreamFieldPanel('body'),
+                StreamFieldPanel('body_append'),
+            ],
+            heading='Main Text',
+        ),
         StreamFieldPanel('sponsors'),
     ]
 
     def get_context(self, request):
         context = super().get_context(request)
 
-        objects = FeaturedObject.objects.live().specific().order_by('go_live_at')
-        inventories = FeaturedInventory.objects.live().specific().order_by('go_live_at')
-        essays = Essay.objects.live().specific().order_by('go_live_at')
+        if self.show_featured:
+            objects = FeaturedObject.objects.live().specific().order_by('go_live_at')
+            inventories = FeaturedInventory.objects.live().specific().order_by('go_live_at')
+            essays = Essay.objects.live().specific().order_by('go_live_at')
 
-        context['featured_object'] = objects.last()
-        context['featured_inventory'] = inventories.last()
-        context['essay'] = essays.last()
+            context['featured_object'] = objects.last()
+            context['featured_inventory'] = inventories.last()
+            context['essay'] = essays.last()
 
         return context
 
