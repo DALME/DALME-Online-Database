@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import cuid from "cuid";
+import { createId as cuid } from "@paralleldrive/cuid2";
 import { isNil } from "ramda";
 import { computed, defineComponent, inject, ref } from "vue";
 import { useRouter } from "vue-router";

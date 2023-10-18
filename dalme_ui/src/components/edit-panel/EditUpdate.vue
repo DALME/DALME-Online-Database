@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import cuid from "cuid";
+import { createId as cuid } from "@paralleldrive/cuid2";
 import { isNil, keys } from "ramda";
 import { computed, defineComponent } from "vue";
 import { useRoute } from "vue-router";

@@ -1,1 +1,1 @@
-export { default } from "./FolioModal";
+export { default } from "./FolioModal.vue";

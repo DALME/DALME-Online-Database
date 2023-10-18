@@ -117,3 +117,45 @@ export const recordEditSchema = yup
     // normalize the attributes so we can't call on yup to camelCase the data.
     attributes: camelcaseKeys(data.attributes),
   }));
+
+// TODO: Ported back.
+export const recordOptionsSchema = yup.array().of(
+  yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().uuid().required(),
+      caption: yup.string().uuid().required(),
+    })
+    .transform((value) => ({
+      label: value.name,
+      value: value.id,
+      caption: value.id,
+    })),
+);
+
+// POST/PUT data schemas.
+// Normalizes source form data for output to the API.
+const recordPostSchema = yup.object().shape({
+  name: yup.string().required(),
+  shortName: yup.string().required(),
+  parent: yup.string().uuid().default(null).nullable(),
+  hasInventory: yup.boolean().default(false).required(),
+  isPrivate: yup.boolean().default(false).required(),
+  primaryDataset: yup.string().uuid().default(null).nullable(),
+  // TODO: Make a payload with all these and use that as yer guide.
+  // sets,
+  // agents,
+  // attributes,
+  // credits,
+  // pages,
+});
+
+const recordPutSchema = recordPostSchema.shape({
+  id: yup.string().uuid().required(),
+});
+
+export const recordSubmitSchemas = {
+  create: recordPostSchema,
+  update: recordPutSchema,
+};

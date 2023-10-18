@@ -1,1 +1,1 @@
-export { default } from "./FormModal";
+export { default } from "./FormModal.vue";

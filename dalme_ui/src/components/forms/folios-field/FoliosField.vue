@@ -133,7 +133,7 @@
 </template>
 
 <script>
-import cuid from "cuid";
+import { createId as cuid } from "@paralleldrive/cuid2";
 import { filter as rFilter, isNil, reduce, zip } from "ramda";
 import { useFieldArray } from "vee-validate";
 import { computed, defineComponent, defineAsyncComponent, onMounted, ref, unref } from "vue";

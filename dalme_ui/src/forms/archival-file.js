@@ -7,8 +7,8 @@ import {
   archivalFileEditSchema,
   archivalFileFieldValidation,
   setOptionsSchema,
-  sourceOptionsSchema,
-  sourceSubmitSchemas,
+  recordOptionsSchema,
+  recordSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = [
@@ -52,7 +52,7 @@ const archivalFileFormSchema = {
       fetcher(requests.sources.getSourceOptionsByType("archivalFile")).then((response) =>
         response.json(),
       ),
-    optionsSchema: sourceOptionsSchema,
+    optionsSchema: recordOptionsSchema,
     validation: archivalFileFieldValidation.parent,
   },
   primaryDataset: {
@@ -86,5 +86,5 @@ export default {
   edit: archivalFileEditSchema,
   form: archivalFileFormSchema,
   requests: archivalFileRequests,
-  submit: sourceSubmitSchemas,
+  submit: recordSubmitSchemas,
 };

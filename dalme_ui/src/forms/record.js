@@ -18,8 +18,8 @@ import {
   folioValidators,
   recordEditSchema,
   recordFieldValidation,
-  sourceOptionsSchema,
-  sourceSubmitSchemas,
+  recordOptionsSchema,
+  recordSubmitSchemas,
 } from "@/schemas";
 
 const resourceAttributes = [
@@ -72,7 +72,7 @@ const recordFormSchema = {
       fetcher(requests.sources.getSourceOptionsByType("record")).then((response) =>
         response.json(),
       ),
-    optionsSchema: sourceOptionsSchema,
+    optionsSchema: recordOptionsSchema,
     validation: recordFieldValidation.parent,
   },
   // sets: {
@@ -128,5 +128,5 @@ export default {
   edit: recordEditSchema,
   form: recordFormSchema,
   requests: recordRequests,
-  submit: sourceSubmitSchemas,
+  submit: recordSubmitSchemas,
 };

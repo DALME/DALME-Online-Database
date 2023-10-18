@@ -2,17 +2,20 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    parser: "@babel/eslint-parser",
-    ecmaVersion: 2018,
-    sourceType: "module",
-    requireConfigFile: false,
+    ecmaVersion: 2021, // Allows for the parsing of modern ECMAScript features
   },
 
   env: {
+    node: true,
     browser: true,
+    "vue/setup-compiler-macros": true,
   },
 
-  extends: ["eslint:recommended", "plugin:vue/vue3-essential", "prettier"],
+  extends: [
+    "eslint:recommended",
+    "plugin:vue/vue3-essential", // Priority A: Essential (Error Prevention)
+    "prettier",
+  ],
 
   plugins: ["vue", "prettier", "unused-imports"],
 
@@ -30,12 +33,11 @@ module.exports = {
   },
 
   rules: {
-    indent: "off", // eslint and prettier clash over indentation, e.g. switch statements
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
     "prefer-promise-reject-errors": "off",
     "linebreak-style": ["error", "unix"],
     "no-unused-vars": "off",
-    "max-len": ["error", {"code": 100, "ignoreUrls": true}],
+    "max-len": ["error", { code: 100, ignoreUrls: true }],
     "prettier/prettier": [
       "error",
       {

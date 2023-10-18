@@ -222,9 +222,10 @@ jobs:
         env:
           SKIP: ${{ env.SKIP_UI }}
 
-      # TODO: Setup UI tests with coverage.
-      # - name: Test
-      #   run: docker run --rm ${{ env.APP }}.ui:${{ env.CI_TAG }} yarn coverage
+      - name: Test
+        run: >
+          docker run --rm ${{ env.APP }}.ui:${{ env.CI_TAG }}
+          yarn --cwd test:unit:ci
 
   integrate_docs:
     name: 'Integrate Docs'

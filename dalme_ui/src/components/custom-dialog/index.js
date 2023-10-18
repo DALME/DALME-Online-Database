@@ -1,1 +1,1 @@
-export { default } from "./CustomDialog";
+export { default } from "./CustomDialog.vue";

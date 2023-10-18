@@ -14,7 +14,6 @@ ui.install:
 .PHONY: ui.install
 
 ui.lint:
-	# NOTE: Using compose run causes an error in CI so just use run here.
 	docker run --rm \
 		$(PROJECT).ui:dev \
 		yarn lint
@@ -34,12 +33,12 @@ ui.sync: ui.install ui.build
 .PHONY: ui.sync
 
 ui.test:
-	yarn --cwd $(UI) coverage
+	yarn --cwd $(UI) test:unit
 .PHONY: ui.test
 
-# ui.test.watch:
-#   yarn --cwd $(UI) watch
-# .PHONY ui.test.watch
+ui.test.watch:
+	yarn --cwd $(UI) test:unit:ui
+.PHONY: ui.test.watch
 
 ui.help:
 	@echo "  ui.build               rebuild the ui service"

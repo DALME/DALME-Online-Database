@@ -20,7 +20,7 @@ const createHistory = process.env.SERVER
 
 export const router = createRouter({
   routes,
-  history: createHistory(process.env.MODE === "ssr" ? void 0 : process.env.VUE_ROUTER_BASE),
+  history: createHistory(process.env.VUE_ROUTER_BASE),
   scrollBehavior: () => ({ left: 0, top: 0 }),
 });
 

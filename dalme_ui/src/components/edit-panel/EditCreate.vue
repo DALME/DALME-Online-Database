@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import cuid from "cuid";
+import { createId as cuid } from "@paralleldrive/cuid2";
 import { defineComponent, ref } from "vue";
 import { useEditing } from "@/use";
 import { TooltipWidget } from "@/components";
