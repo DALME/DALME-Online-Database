@@ -135,7 +135,9 @@ export default defineComponent({
   border-bottom: 1px solid #c87001;
   background: #ffca82;
   padding-left: 8px;
-  box-shadow: 1px 1px 0px 0px #ffffff4d inset, -1px -1px 0px 0px #5757573d inset;
+  box-shadow:
+    1px 1px 0px 0px #ffffff4d inset,
+    -1px -1px 0px 0px #5757573d inset;
 }
 .index-title {
   font-size: 12px;

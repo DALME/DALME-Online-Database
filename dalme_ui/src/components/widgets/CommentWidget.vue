@@ -205,12 +205,8 @@ export default defineComponent({
 }
 .comment_thread {
   padding: 0;
-  background: linear-gradient(
-        to right,
-        #00000000 0 48%,
-        var(--blue-box) 49% 52%,
-        #00000000 53% 100%
-      )
+  background:
+    linear-gradient(to right, #00000000 0 48%, var(--blue-box) 49% 52%, #00000000 53% 100%)
       no-repeat left/40px 100%,
     linear-gradient(to left, #00000000 0 48%, var(--green-box) 49% 52%, #00000000 53% 100%)
       no-repeat right/40px 100%;

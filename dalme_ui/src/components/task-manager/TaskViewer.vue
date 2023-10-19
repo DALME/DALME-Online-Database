@@ -421,7 +421,9 @@ export default {
   opacity: 0;
   transition: all 0.3s linear;
   border-radius: 0 !important;
-  box-shadow: 1px 0px 0px 0px #1e2a31, inset -1px 0px 0px 0px #000000;
+  box-shadow:
+    1px 0px 0px 0px #1e2a31,
+    inset -1px 0px 0px 0px #000000;
   height: auto;
   min-height: 350px;
   flex-shrink: 0;

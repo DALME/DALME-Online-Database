@@ -140,7 +140,9 @@ export default defineComponent({
   left: auto;
 }
 .custom-drawer .q-drawer {
-  box-shadow: rgb(48, 54, 61) 0px 0px 0px 1px, rgba(1, 4, 9, 0.85) 0px 16px 32px 0px;
+  box-shadow:
+    rgb(48, 54, 61) 0px 0px 0px 1px,
+    rgba(1, 4, 9, 0.85) 0px 16px 32px 0px;
   background: var(--dark-bg-base-colour);
   border-left: 1px solid var(--dark-border-base-colour);
   overflow: hidden;

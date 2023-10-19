@@ -167,7 +167,9 @@ export default defineComponent({
   border-radius: 8px 0 0 8px;
   border-width: 1px 0 1px 1px;
   margin-right: -1px;
-  box-shadow: 1px 1px 0px 0px #5757573d inset, 0px -1px 0px 0px #ffffff7d inset;
+  box-shadow:
+    1px 1px 0px 0px #5757573d inset,
+    0px -1px 0px 0px #ffffff7d inset;
 }
 .edit-panel-strip > button.drawer-control {
   align-self: end;
@@ -176,19 +178,27 @@ export default defineComponent({
   position: absolute;
   right: 98px;
   margin-bottom: -1px;
-  box-shadow: 1px 1px 0px 0px #5757573d inset, -1px -1px 0px 0px #ffffff7d inset,
-    1px 0px 0px 0px #5757573d, -1px 0 0px 0px #ffffff7d;
+  box-shadow:
+    1px 1px 0px 0px #5757573d inset,
+    -1px -1px 0px 0px #ffffff7d inset,
+    1px 0px 0px 0px #5757573d,
+    -1px 0 0px 0px #ffffff7d;
 }
 .edit-panel-strip > button.on {
   background-color: #ffca82;
   color: #a85e00;
-  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset;
+  box-shadow:
+    1px 1px 0px 0px #ffffff7d inset,
+    0px -1px 0px 0px #5757573d inset;
 }
 .edit-panel-strip > button.drawer-control.on {
   border-bottom: none;
   border-top: 1px solid #a55e002b;
-  box-shadow: 1px 1px 0px 0px #ffffff7d inset, -1px 0 0px 0px #5757573d inset,
-    -1px 0 0px 0px #5757573d, 1px 0px 0px 0px #ffffff7d;
+  box-shadow:
+    1px 1px 0px 0px #ffffff7d inset,
+    -1px 0 0px 0px #5757573d inset,
+    -1px 0 0px 0px #5757573d,
+    1px 0px 0px 0px #ffffff7d;
 }
 .edit-panel-strip button::before,
 .strip-button-container a.q-btn::before {
@@ -217,7 +227,9 @@ export default defineComponent({
   color: #a85e00;
   background-color: #ffca82;
   width: 55px;
-  box-shadow: 1px 1px 0px 0px #ffffff4d inset, -1px -1px 0px 0px #5757573d inset;
+  box-shadow:
+    1px 1px 0px 0px #ffffff4d inset,
+    -1px -1px 0px 0px #5757573d inset;
 }
 .strip-button-container button:nth-of-type(1) {
   padding-right: 8px;
@@ -236,7 +248,9 @@ export default defineComponent({
 .strip-button-container button.disabled {
   background-color: #ffe1b8 !important;
   color: #bb894a !important;
-  box-shadow: 1px 1px 0px 0px #5757571f inset, -1px -1px 0px 0px #ffffffe8 inset;
+  box-shadow:
+    1px 1px 0px 0px #5757571f inset,
+    -1px -1px 0px 0px #ffffffe8 inset;
 }
 .edit-content-holder {
   margin-top: 37px;
@@ -271,17 +285,23 @@ export default defineComponent({
 .edit-panel-strip button.orange-on {
   background-color: #ffca82;
   color: #a85e00;
-  box-shadow: 1px 1px 0px 0px #ffffff7d inset, 0px -1px 0px 0px #5757573d inset;
+  box-shadow:
+    1px 1px 0px 0px #ffffff7d inset,
+    0px -1px 0px 0px #5757573d inset;
 }
 .edit-panel-strip button.orange-off {
   background-color: #ffe1b8;
   color: #bb894a;
-  box-shadow: 1px 1px 0px 0px #5757573d inset, 0px -1px 0px 0px #ffffff7d inset;
+  box-shadow:
+    1px 1px 0px 0px #5757573d inset,
+    0px -1px 0px 0px #ffffff7d inset;
 }
 .strip-button-container button.disabled.editing {
   background-color: #fdd3c7;
   color: #a74646;
-  box-shadow: 1px 1px 0px 0px #5757572b inset, 0px -1px 0px 0px #fffefe9c inset;
+  box-shadow:
+    1px 1px 0px 0px #5757572b inset,
+    0px -1px 0px 0px #fffefe9c inset;
 }
 .edit-on {
   background-color: #ffbfac;

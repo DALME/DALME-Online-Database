@@ -295,7 +295,9 @@ export default defineComponent({
 }
 .main-toolbar .tb-button.q-btn-group.disabled,
 .main-toolbar .tb-button.disabled:not(.q-btn-group) {
-  box-shadow: inset -1px -1px 0px 1px rgb(87 111 128 / 15%), inset 1px 1px 0px 1px black;
+  box-shadow:
+    inset -1px -1px 0px 1px rgb(87 111 128 / 15%),
+    inset 1px 1px 0px 1px black;
   opacity: 1 !important;
   background: #13293a;
 }

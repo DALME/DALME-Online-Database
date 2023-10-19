@@ -309,11 +309,15 @@ export default defineComponent({
 }
 .q-splitter--horizontal > .splitter-separator.q-splitter__separator {
   height: 7px;
-  box-shadow: 0px 1px 0px 0px #dee2fc inset, 0px -1px 0px 0px #aeb7e7 inset;
+  box-shadow:
+    0px 1px 0px 0px #dee2fc inset,
+    0px -1px 0px 0px #aeb7e7 inset;
 }
 .q-splitter--vertical > .splitter-separator.q-splitter__separator {
   width: 7px;
-  box-shadow: 1px 0px 0px 0px #dee2fc inset, -1px 0px 0px 0px #aeb7e7 inset;
+  box-shadow:
+    1px 0px 0px 0px #dee2fc inset,
+    -1px 0px 0px 0px #aeb7e7 inset;
 }
 .splitter-separator-button {
   height: 60px;
@@ -323,10 +327,14 @@ export default defineComponent({
   border: 1px solid #5c6bc0;
 }
 .q-splitter--horizontal .splitter-separator-button {
-  box-shadow: 1px 0px 0px 0px #dee2fc inset, -1px 0px 0px 0px #aeb7e7 inset;
+  box-shadow:
+    1px 0px 0px 0px #dee2fc inset,
+    -1px 0px 0px 0px #aeb7e7 inset;
 }
 .q-splitter--vertical .splitter-separator-button {
-  box-shadow: 0px 1px 0px 0px #dee2fc inset, 0px -1px 0px 0px #aeb7e7 inset;
+  box-shadow:
+    0px 1px 0px 0px #dee2fc inset,
+    0px -1px 0px 0px #aeb7e7 inset;
 }
 .splitter-separator-button i {
   font-size: 1.3em !important;
