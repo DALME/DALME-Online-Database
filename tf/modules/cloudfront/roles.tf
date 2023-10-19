@@ -52,9 +52,9 @@ data "aws_iam_policy_document" "public_staticfiles" {
   statement {
     actions = [
       "s3:GetObject",
+      "s3:GetObjectVersion",
     ]
     resources = [
-      module.staticfiles.s3_bucket_arn,
       "${module.staticfiles.s3_bucket_arn}/*",
     ]
 
