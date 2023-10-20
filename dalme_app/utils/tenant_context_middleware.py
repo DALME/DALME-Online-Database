@@ -1,8 +1,6 @@
 """Define the tenant context middleware."""
 import contextvars
-import uuid
 
-import structlog
 from werkzeug.local import LocalProxy
 
 from django.conf import settings
@@ -38,11 +36,6 @@ class TenantContextMiddleware:
         settings.CSRF_COOKIE_DOMAIN = f'.{domain}'
         settings.SESSION_COOKIE_DOMAIN = f'.{domain}'
         settings.WAGTAIL_SITE_NAME = request.tenant.name
-
-        structlog.contextvars.bind_contextvars(
-            request_id=str(uuid.uuid4()),
-            tenant=request.tenant,
-        )
 
         token = _tenant.set(request.tenant)
 

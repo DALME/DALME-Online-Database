@@ -35,7 +35,6 @@ class Base(Configuration):
     def setup(cls):
         """Override settings setup hook."""
         super().setup()
-
         cls.INSTALLED_APPS = [
             *cls.SHARED_APPS,
             *[app for app in cls.TENANT_APPS if app not in cls.SHARED_APPS],
@@ -129,10 +128,10 @@ class Base(Configuration):
 
     MIDDLEWARE = [
         'dalme_app.utils.HealthCheckMiddleware',
-        # 'dalme_app.utils.MultipleProxyMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'dalme_app.utils.TenantMiddleware',
         'dalme_app.utils.TenantContextMiddleware',
+        'django_structlog.middlewares.RequestMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -196,103 +195,75 @@ class Base(Configuration):
         'version': 1,
         'disable_existing_loggers': False,
         'formatters': {
-            'console': {
+            'colored_console': {
                 '()': structlog.stdlib.ProcessorFormatter,
                 'processor': structlog.dev.ConsoleRenderer(colors=True),
+            },
+            'json_formatter': {
+                '()': structlog.stdlib.ProcessorFormatter,
+                'processor': structlog.processors.JSONRenderer(),
+            },
+            'key_value': {
+                '()': structlog.stdlib.ProcessorFormatter,
+                'processor': structlog.processors.KeyValueRenderer(
+                    key_order=['timestamp', 'level', 'event', 'logger'],
+                ),
             },
         },
         'handlers': {
             'console': {
                 'class': 'logging.StreamHandler',
-                'formatter': 'console',
+                'formatter': 'colored_console',
+            },
+            'flat_line': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'key_value',
+            },
+            'json': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'json_formatter',
+            },
+            'null': {
+                'class': 'logging.NullHandler',
             },
         },
+        'root': {
+            'handlers': ['console'],
+            'level': LOG_LEVEL,
+        },
         'loggers': {
-            'root': {
-                'handlers': ['console'],
-                'level': os.environ['LOG_LEVEL'],
+            'django_structlog': {
+                'level': LOG_LEVEL,
+            },
+            'dalme': {
+                'level': LOG_LEVEL,
+            },
+            'dalme_api': {
+                'level': LOG_LEVEL,
+            },
+            'dalme_app': {
+                'level': LOG_LEVEL,
+            },
+            'dalme_public': {
+                'level': LOG_LEVEL,
+            },
+            'gunicorn.access': {
+                'level': LOG_LEVEL,
+            },
+            'gunicorn.error': {
+                "level": LOG_LEVEL,
+            },
+            # Nulled to use structlog middleware.
+            'django.server': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+            'django.request': {
+                'handlers': ['null'],
+                'propagate': False,
             },
         },
     }
-
-    # LOGGING = {
-    #     'version': 1,
-    #     'disable_existing_loggers': False,
-    #     'formatters': {
-    #         'colored_console': {
-    #             '()': structlog.stdlib.ProcessorFormatter,
-    #             'processor': structlog.dev.ConsoleRenderer(colors=True),
-    #         },
-    #         'json_formatter': {
-    #             '()': structlog.stdlib.ProcessorFormatter,
-    #             'processor': structlog.processors.JSONRenderer(),
-    #         },
-    #         'key_value': {
-    #             '()': structlog.stdlib.ProcessorFormatter,
-    #             'processor': structlog.processors.KeyValueRenderer(
-    #                 key_order=[
-    #                     'timestamp',
-    #                     'level',
-    #                     'event',
-    #                     'logger',
-    #                 ],
-    #             ),
-    #         },
-    #     },
-    #     'handlers': {
-    #         'console': {
-    #             'class': 'logging.StreamHandler',
-    #             'formatter': 'colored_console',
-    #         },
-    #         'json': {
-    #             'class': 'logging.StreamHandler',
-    #             'formatter': 'json_formatter',
-    #         },
-    #         'key_value': {
-    #             'class': 'logging.StreamHandler',
-    #             'formatter': 'key_value',
-    #         },
-    #         'null': {
-    #             'class': 'logging.NullHandler',
-    #         },
-    #     },
-    #     'root': {
-    #         'handlers': ['console'],
-    #         'level': LOG_LEVEL,
-    #     },
-    #     'loggers': {
-    #         'django_structlog': {
-    #             'level': LOG_LEVEL,
-    #         },
-    #         'django_structlog.middlewares': {
-    #             'level': LOG_LEVEL,
-    #         },
-    #         'django.db.backends': {
-    #             'level': LOG_LEVEL,
-    #         },
-    #         'dalme': {
-    #             'level': LOG_LEVEL,
-    #         },
-    #         'dalme_api': {
-    #             'level': LOG_LEVEL,
-    #         },
-    #         'dalme_app': {
-    #             'level': LOG_LEVEL,
-    #         },
-    #         'dalme_public': {
-    #             'level': LOG_LEVEL,
-    #         },
-    #         # Nulled to use structlog middleware.
-    #         'django.server': {
-    #             'handlers': ['null'],
-    #             'propagate': False,
-    #         },
-    #         'django.request': {
-    #             'handlers': ['null'],
-    #             'propagate': False,
-    #         },
-    #     },
-    # }
 
     AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
     AUTH_PASSWORD_VALIDATORS = [
@@ -414,8 +385,7 @@ class Development(Base, Configuration):
     @classmethod
     def setup(cls):
         super().setup()
-        if os.environ['ENV'] == 'development':
-            cls.INSTALLED_APPS += ['django_extensions']
+        cls.INSTALLED_APPS += ['django_extensions']
 
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
@@ -438,6 +408,7 @@ class Development(Base, Configuration):
         'http://globalpharmacopeias.localhost:8000',
     ]
     SESSION_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SECRET_KEY = 'django-insecure-development-environment-secret-key'
@@ -515,7 +486,7 @@ class Production(Base, Configuration):
     def setup(cls):
         super().setup()
         cls.INSTALLED_APPS += ['storages']
-        # cls.LOGGING['root']['handlers'] = ['key_value']
+        cls.LOGGING['root']['handlers'] = ['flat_line']
 
     DEBUG = False
 

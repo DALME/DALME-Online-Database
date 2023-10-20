@@ -111,7 +111,7 @@ resource "aws_ecs_task_definition" "main" {
         "--workers=${var.workers}",
         "--worker-class=${var.worker}",
         "--worker-tmp-dir=${var.worker_tmp}",
-        "--logger-class=${var.logger}",
+        "--config=python:${var.gunicorn_config}",
         var.wsgi,
       ]
       logConfiguration = {

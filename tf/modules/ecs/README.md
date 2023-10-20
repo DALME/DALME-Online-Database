@@ -79,12 +79,12 @@ No modules.
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
 | <a name="input_fargate_cpu"></a> [fargate\_cpu](#input\_fargate\_cpu) | Fargate instance CPU units to provision (1 vCPU = 1024 CPU units). | `number` | n/a | yes |
 | <a name="input_fargate_memory"></a> [fargate\_memory](#input\_fargate\_memory) | Fargate instance memory to provision (in MiB). | `number` | n/a | yes |
+| <a name="input_gunicorn_config"></a> [gunicorn\_config](#input\_gunicorn\_config) | Path to the gunicorn config file. | `string` | n/a | yes |
 | <a name="input_health_check_grace_period"></a> [health\_check\_grace\_period](#input\_health\_check\_grace\_period) | How long to wait before terminating tasks that fail health checks. | `number` | n/a | yes |
 | <a name="input_image"></a> [image](#input\_image) | Common container name. | `string` | n/a | yes |
 | <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The project encryption key ARN. | `string` | n/a | yes |
 | <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Set the severity of the web logger. | `string` | n/a | yes |
 | <a name="input_log_retention_in_days"></a> [log\_retention\_in\_days](#input\_log\_retention\_in\_days) | How long to keep cloudwatch records. | `number` | n/a | yes |
-| <a name="input_logger"></a> [logger](#input\_logger) | Path to the application logger class. | `string` | n/a | yes |
 | <a name="input_max_capacity"></a> [max\_capacity](#input\_max\_capacity) | Maximum number for scaling targets. | `number` | n/a | yes |
 | <a name="input_max_percent"></a> [max\_percent](#input\_max\_percent) | The upper limit of running tasks in a service during a deployment. | `number` | n/a | yes |
 | <a name="input_memory_scale_in_cooldown"></a> [memory\_scale\_in\_cooldown](#input\_memory\_scale\_in\_cooldown) | How long (secs) after a memory scale-in completes before another can start. | `number` | n/a | yes |

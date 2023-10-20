@@ -1,4 +1,5 @@
 """Parse the tenant from the request and set the schema path."""
+
 import structlog
 from django_tenants.utils import remove_www
 
@@ -16,9 +17,6 @@ class TenantMiddleware:
 
     def __call__(self, request):
         """Invoke the middleware layer."""
-        logger = structlog.get_logger(__name__)
-        logger.info('Request META', meta=str(request.META))
-
         origin = remove_www(request.META['HTTP_HOST'])
         connection.set_schema_to_public()
 
@@ -29,5 +27,7 @@ class TenantMiddleware:
 
         request.tenant = domain.tenant
         connection.set_tenant(request.tenant)
+
+        structlog.contextvars.bind_contextvars(tenant=request.tenant)
 
         return self.get_response(request)

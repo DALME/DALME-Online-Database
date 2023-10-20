@@ -85,6 +85,11 @@ variable "fargate_memory" {
   type        = number
 }
 
+variable "gunicorn_config" {
+  description = "Path to the gunicorn config file."
+  type        = string
+}
+
 variable "health_check_grace_period" {
   description = "How long to wait before terminating tasks that fail health checks."
   type        = number
@@ -108,11 +113,6 @@ variable "log_level" {
 variable "log_retention_in_days" {
   description = "How long to keep cloudwatch records."
   type        = number
-}
-
-variable "logger" {
-  description = "Path to the application logger class."
-  type        = string
 }
 
 variable "max_capacity" {
