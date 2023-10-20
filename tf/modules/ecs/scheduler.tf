@@ -108,6 +108,7 @@ resource "aws_sfn_state_machine" "publish" {
     assign_public_ip       = local.assign_public_ip
     backoff_rate           = var.sfn_backoff_rate
     cluster                = aws_ecs_cluster.main.arn
+    container              = "publish"
     failure_sns_topic      = aws_sns_topic.ecs_scheduled_task_failure.arn
     heartbeat              = var.sfn_heartbeat
     max_attempts           = var.sfn_max_attempts

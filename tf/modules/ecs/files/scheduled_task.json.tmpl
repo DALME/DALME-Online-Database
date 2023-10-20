@@ -18,6 +18,7 @@
         },
         "Overrides": {
           "ContainerOverrides": [{
+            "Name": "${container}",
             "Environment": [{
               "Name": "AWS_SFN_TASK_TOKEN",
               "Value.$": "$$.Task.Token"
