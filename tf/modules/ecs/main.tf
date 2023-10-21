@@ -192,7 +192,7 @@ resource "aws_ecs_task_definition" "main" {
       }
     },
     {
-      name        = "collectstatic_dalme"
+      name        = "collectstatic_schemas"
       image       = local.web_image
       environment = local.web_env
       secrets     = local.secrets
@@ -200,35 +200,9 @@ resource "aws_ecs_task_definition" "main" {
       command = [
         "python3",
         "manage.py",
-        "collectstatic_schemas",
+        "all_tenants_command",
+        "collectstatic",
         "--noinput",
-        "--schema=dalme",
-      ]
-      dependsOn = [
-        { containerName = var.service, condition = "HEALTHY" },
-        { containerName = "ensure_tenants", condition = "SUCCESS" },
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "ecs"
-        }
-      }
-    },
-    {
-      name        = "collectstatic_globalpharmacopeias"
-      image       = local.web_image
-      environment = local.web_env
-      secrets     = local.secrets
-      essential   = false
-      command = [
-        "python3",
-        "manage.py",
-        "collectstatic_schemas",
-        "--noinput",
-        "--schema=globalpharmacopeias",
       ]
       dependsOn = [
         { containerName = var.service, condition = "HEALTHY" },
@@ -252,8 +226,7 @@ resource "aws_ecs_task_definition" "main" {
       command     = ["python3", "manage.py", "collectstatic", "--noinput"]
       dependsOn = [
         { containerName = var.service, condition = "HEALTHY" },
-        { containerName = "collectstatic_dalme", condition = "SUCCESS" },
-        { containerName = "collectstatic_globalpharmacopeias", condition = "SUCCESS" },
+        { containerName = "collectstatic_schemas", condition = "SUCCESS" },
       ]
       logConfiguration = {
         logDriver = "awslogs"
