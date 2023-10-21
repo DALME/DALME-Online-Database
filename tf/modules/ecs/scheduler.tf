@@ -55,7 +55,12 @@ resource "aws_ecs_task_definition" "publish" {
       environment = local.web_env
       secrets     = local.secrets
       essential   = true
-      command     = ["python3", "manage.py", "publish_scheduled"]
+      command = [
+        "python3",
+        "manage.py",
+        "all_tenants_command",
+        "publish_scheduled",
+      ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {

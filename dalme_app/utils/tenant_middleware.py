@@ -28,6 +28,9 @@ class TenantMiddleware:
         request.tenant = domain.tenant
         connection.set_tenant(request.tenant)
 
-        structlog.contextvars.bind_contextvars(tenant=request.tenant)
+        structlog.contextvars.bind_contextvars(
+            tenant=request.tenant.name,
+            domain=origin,
+        )
 
         return self.get_response(request)
