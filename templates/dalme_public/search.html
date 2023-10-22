@@ -282,7 +282,7 @@
 {% block js_foot %}
   {{ block.super }}
   {% compress js %}
-    <script type="text/javascript" src="{% static '/js/dalme_app/dalme_util.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
   {% endcompress %}
   {{ search_context|json_script:"search_context" }}
   <script id="clauses" type="application/json">

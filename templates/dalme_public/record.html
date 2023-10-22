@@ -6,8 +6,8 @@
 {% block styles %}
   {{ block.super }}
   {% compress css %}
-    <link rel="stylesheet" href="{% static '/js/Diva-6.0.2/diva.css' %}" />
-    <link rel="stylesheet" href="{% static '/css/common/TEI.css' %}" />
+    <link rel="stylesheet" href="{% static 'js/Diva-6.0.2/diva.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/TEI.css' %}" />
   {% endcompress %}
 {% endblock %}
 
@@ -288,10 +288,10 @@
 {% block js_foot %}
   {{ block.super }}
   {% compress js %}
-    <script type="text/javascript" src="{% static '/js/CETEI.js' %}"></script>
-    <script type="text/javascript" src="{% static '/js/dalme_app/dalme_util.js' %}"></script>
-    <script type="text/javascript" src="{% static '/js/ResizeSensor.js' %}"></script>
-    <script type="text/javascript" src="{% static '/js/dalme_common/cetei_functions.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ResizeSensor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dalme_common/cetei_functions.js' %}"></script>
   {% endcompress %}
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
