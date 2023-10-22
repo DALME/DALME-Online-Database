@@ -11,7 +11,7 @@ from .object import Object, Object_attribute # NOQA
 from .page import Page # NOQA
 from .place import Place # NOQA
 from .public_register import PublicRegister # NOQA
-from .reference import AttributeReference, CountryReference, LanguageReference, LocaleReference # NOQA
+from .reference import AttributeReference, CountryReference, LanguageReference, LibraryReference, LocaleReference # NOQA
 from .relationship import Relationship # NOQA
 from .resourcespace import rs_api_query, rs_resource, rs_resource_data, rs_collection, rs_collection_resource, rs_user, rs_resource_type_field # NOQA
 from .rights_policy import RightsPolicy # NOQA

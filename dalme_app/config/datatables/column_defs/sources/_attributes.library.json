@@ -1,0 +1,12 @@
+{
+    "title": "Library",
+    "data": "attributes.library",
+    "name": "library",
+    "editField": "attributes.library.id",
+    "defaultContent": "",
+    "visible": true,
+    "orderable": true,
+    "searchable": true,
+    "className": "nowrap",
+    "render": "function (data, type, row, meta) {return (typeof data == \"undefined\") ? \"\" : '<a href=\"'+data.url+'\">'+data.name+'</a>'; }"
+}

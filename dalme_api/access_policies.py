@@ -100,6 +100,10 @@ class ImageAccessPolicy(BaseAccessPolicy):
     id = 'images-policy'
 
 
+class LibraryReferenceAccessPolicy(BaseAccessPolicy):
+    id = 'libraries-policy'
+
+
 class LocaleAccessPolicy(BaseAccessPolicy):
     id = 'locales-policy'
 

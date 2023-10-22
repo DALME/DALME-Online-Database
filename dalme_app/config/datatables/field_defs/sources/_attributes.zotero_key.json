@@ -1,17 +1,19 @@
 {
     "name": "attributes.zotero_key",
-    "label": "Zotero Reference",
+    "label": "Reference",
     "type": "selectize",
     "opts": {
         "placeholder": "Select library entry",
         "labelField": "title",
         "valueField": "key",
-        "searchField": ["title"],
+        "searchField": [
+            "title"
+        ],
         "preload": "focus"
     },
     "options": {
         "type": "api_call",
-        "url": "library/?collection=A4QHN348&format=select&search="
+        "url": "library/?library=\" + url_var + \"&editions&format=select&search="
     },
-    "fieldInfo": "Reference in the DALME Zotero Library"
+    "fieldInfo": "Reference in the selected Zotero library"
 }

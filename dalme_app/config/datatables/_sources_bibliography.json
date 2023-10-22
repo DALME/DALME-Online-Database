@@ -15,6 +15,7 @@
         "remove_success": "The source was deleted succesfully."
       },
       "attribute_concordance": {
+        "library": "attributes.library.id",
         "zotero_key": "attributes.zotero_key",
         "name": "name",
         "short_name": "short_name",
@@ -31,6 +32,7 @@
         "type.id",
         "primary_dataset.id",
         "attributes.default_rights.id",
+        "attributes.library.id",
         "attributes.zotero_key"
       ]
     }
@@ -43,6 +45,7 @@
       "parent",
       "primary_dataset",
       "attributes.default_rights",
+      "attributes.library",
       "attributes.zotero_key",
       "owner",
       "is_private",
@@ -63,6 +66,7 @@
       "parent",
       "primary_dataset",
       "attributes.default_rights",
+      "attributes.library",
       "attributes.zotero_key",
       "owner",
       "is_private"
@@ -101,8 +105,8 @@
       },
       "parent.id": {
         "options": {
-            "type": "api_call",
-            "url": "sources/?format=select&type__lt=11&search="
+          "type": "api_call",
+          "url": "sources/?format=select&type__lt=11&search="
         }
       }
     }

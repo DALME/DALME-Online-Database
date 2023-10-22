@@ -36,9 +36,9 @@ var select_entry = $("#id_bibliography-chooser-id").selectize({
   load: function (query, callback) {
     let base_url = '{{ api_url }}/library/';
     if (window.dalmeLastEntityID && !query.length) {
-      url = base_url + window.dalmeLastEntityID + '/?';
+      url = base_url + window.dalmeLastEntityID + '/?library=1&';
     } else {
-      url = base_url + '?';
+      url = base_url + '?library=1&';
       if (query.length) url = url + `search=${query}&`;
       url = url + 'limit=10&';
     }

@@ -5,25 +5,26 @@ from dalme_api.access_policies import GeneralAccessPolicy
 from dalme_app.utils import zotero
 from django.conf import settings
 from rest_framework.decorators import action
+from dalme_app.models import LibraryReference
 
 
 class Library(viewsets.ViewSet):
-    """ API endpoint for accessing DALME Zotero Library """
+    """ API endpoint for accessing Zotero libraries """
     permission_classes = (GeneralAccessPolicy,)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):        
+        if not request.GET.get('library'):
+            return Response({'error': 'The request did not include a library id.'}, 400)
+
+        library_record = LibraryReference.objects.get(pk=int(request.GET.get('library')))
+        library_id = library_record.zotero_id
+        collection = library_record.editions_id if request.GET.get('editions') is not None else request.GET.get('collection')
         data = request.GET.get('data')
-        collection = request.GET.get('collection')
         id = request.GET.get('id')
         search = request.GET.get('search')
         content = request.GET.get('content')
         limit = request.GET.get('limit')
-
-        queryset_generator = zotero.Zotero(
-            settings.ZOTERO_LIBRARY_ID,
-            'group',
-            settings.ZOTERO_API_KEY
-        )
+        queryset_generator = zotero.Zotero(library_id, 'group', settings.ZOTERO_API_KEY)
 
         if data:
             record_total = queryset_generator.count_items()
@@ -93,18 +94,17 @@ class Library(viewsets.ViewSet):
         return context
 
     def retrieve(self, request, pk=None):
+        if not request.GET.get('library'):
+            return Response({'error': 'The request did not include a library id.'}, 400)
+
+        library_id = LibraryReference.objects.get(pk=int(request.GET.get('library'))).zotero_id
         content = request.GET.get('content')
 
         paras = {}
         if content:
             paras['content'] = content
 
-        queryset_generator = zotero.Zotero(
-            settings.ZOTERO_LIBRARY_ID,
-            'group',
-            settings.ZOTERO_API_KEY
-        )
-
+        queryset_generator = zotero.Zotero(library_id, 'group', settings.ZOTERO_API_KEY)
         result = queryset_generator.item(pk, **paras)
 
         return Response(result)

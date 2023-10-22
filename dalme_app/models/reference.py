@@ -54,6 +54,22 @@ class LanguageReference(dalmeIntid):
         return '/languages/' + str(self.id)
 
 
+class LibraryReference(dalmeIntid):
+    zotero_id = models.IntegerField()
+    name = models.CharField(max_length=55)
+    description = models.CharField(max_length=255)
+    editions_id = models.CharField(max_length=55)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    def get_url(self):
+        return 'https://www.zotero.org/groups/' + str(self.zotero_id)
+
+
 class LocaleReference(dalmeIntid):
     name = models.CharField(max_length=255)
     administrative_region = models.CharField(max_length=255)

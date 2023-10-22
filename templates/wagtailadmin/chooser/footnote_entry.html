@@ -91,7 +91,7 @@
       },
     },
     load: function (query, callback) {
-      let url = '{{ api_url }}/library/?';
+      let url = '{{ api_url }}/library/?library=1&';
       if (query.length) url = url + `search=${query}&`;
       url = url + 'limit=10&content=csljson&format=json';
       fetch(url)

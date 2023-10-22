@@ -84,7 +84,7 @@
         createBibliography(key) {
           const that = this;
           return new Promise(async function (resolve, reject) {
-            await fetch(`${that.api_endpoint}/library/?collection=${key}&content=csljson&format=json`)
+            await fetch(`${that.api_endpoint}/library/?library=1&collection=${key}&content=csljson&format=json`)
               .then(response => response.json())
               .then(data => {
                 let citation = new that.cite();

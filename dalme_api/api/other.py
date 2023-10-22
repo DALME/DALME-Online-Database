@@ -1,13 +1,13 @@
 from django.contrib.auth.models import Group
 
 from dalme_api.serializers import (AgentSerializer, ContentClassSerializer, ContentTypeSerializer,
-                                   CountryReferenceSerializer, GroupSerializer, LanguageReferenceSerializer,
+                                   CountryReferenceSerializer, GroupSerializer, LanguageReferenceSerializer, LibraryReferenceSerializer,
                                    LocaleReferenceSerializer, PlaceSerializer, RightsPolicySerializer, SimpleAttributeSerializer)
 
 from dalme_app.models import (Agent, Attribute, Content_class, Content_type, CountryReference,
-                              LanguageReference, LocaleReference, Place, RightsPolicy)
+                              LanguageReference, LibraryReference, LocaleReference, Place, RightsPolicy)
 
-from dalme_api.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy, LocaleAccessPolicy, PlaceAccessPolicy
+from dalme_api.access_policies import AgentAccessPolicy, GeneralAccessPolicy, RightsAccessPolicy, LibraryReferenceAccessPolicy, LocaleAccessPolicy, PlaceAccessPolicy
 from ._common import DALMEBaseViewSet
 from dalme_api.filters import ContenTypeFilter
 
@@ -75,6 +75,17 @@ class Languages(DALMEBaseViewSet):
     filterset_fields = ['id', 'name', 'type', 'parent__name', 'iso6393', 'glottocode']
     search_fields = ['id', 'name', 'type', 'parent__name', 'iso6393', 'glottocode']
     ordering_fields = ['id', 'name', 'type', 'parent', 'iso6393', 'glottocode']
+    ordering = ['name']
+
+
+class LibraryReferences(DALMEBaseViewSet):
+    """ API endpoint for managing library references """
+    permission_classes = (LibraryReferenceAccessPolicy,)
+    queryset = LibraryReference.objects.all()
+    serializer_class = LibraryReferenceSerializer
+    filterset_fields = ['id', 'name', 'description', 'zotero_id']
+    search_fields = ['id', 'name', 'description', 'zotero_id']
+    ordering_fields = ['id', 'name', 'description', 'zotero_id']
     ordering = ['name']
 
 

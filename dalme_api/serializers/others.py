@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group
 
 from dalme_app.models import (Attribute_type, Attachment, Content_attributes, Content_class, CountryReference,
-                              GroupProperties, Profile, Tag, Transcription)
+                              GroupProperties, LibraryReference, Profile, Tag, Transcription)
 
 from rest_framework import serializers
 from ._common import DynamicSerializer
@@ -62,6 +62,15 @@ class GroupSerializer(DynamicSerializer):
         model = Group
         fields = ('id', 'name', 'properties', 'description')
         extra_kwargs = {'name': {'required': False}, }
+
+
+
+class LibraryReferenceSerializer(serializers.ModelSerializer):
+    """ Serialises references to Zotero libraries """
+
+    class Meta:
+        model = LibraryReference
+        fields = ('id', 'name', 'description', 'zotero_id', 'editions_id')
 
 
 class ProfileSerializer(DynamicSerializer):

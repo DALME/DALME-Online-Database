@@ -7,7 +7,7 @@ import django.db.models.options as options
 from django.utils.dateparse import parse_date
 import calendar
 # model imports for eval()
-from dalme_app.models.reference import CountryReference, LanguageReference, LocaleReference # noqa
+from dalme_app.models.reference import CountryReference, LanguageReference, LibraryReference, LocaleReference # noqa
 from dalme_app.models.rights_policy import RightsPolicy # noqa
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('in_db',)

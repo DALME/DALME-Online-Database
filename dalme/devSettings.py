@@ -24,7 +24,6 @@ RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY', '')
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY', '')
 
 ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
-ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

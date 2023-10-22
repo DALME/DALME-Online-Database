@@ -17,6 +17,11 @@ class SelectRenderer(renderers.JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if data is None:
             return b''
+        
+        if hasattr(data, 'get') and data.get('error') is not None:
+            ret = json.dumps(data)
+            ret = ret.replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+            return ret.encode()
 
         renderer_context = renderer_context or {}
         indent = self.get_indent(accepted_media_type, renderer_context)

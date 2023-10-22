@@ -3,6 +3,20 @@ function source_forms_load() {
 
 function source_forms_init() {
   one_time_setup = false;
+  url_var = null;
+  biblio_types = {
+    'book': 1,
+    'bookSection': 4,
+    'encyclopediaArticle': 9,
+    'journalArticle': 3,
+    'magazineArticle': 6,
+    'manuscript': 7,
+    'newspaperArticle': 6,
+    'thesis': 11,
+    'webpage': 2
+  };
+  selectize_key = dt_editor.field('attributes.zotero_key').inst();
+  selectize_lib = dt_editor.field('attributes.library.id').inst();
 }
 
 function source_form_setup(e, mode, action) {
@@ -19,17 +33,17 @@ function source_form_setup(e, mode, action) {
         dt_editor.field('credits[]').addNew();
       })
 
+      if (source_type == 'bibliography') {
+        selectize_key.on('change', populate_biblio_fields);
+        selectize_lib.on('change', activate_zotero_selection);
+        selectize_key.disable();
+      }
+      
       one_time_setup = true;
     }
 
     if (source_type == 'records') {
       $('#form-side-container').removeClass('d-none');
-    }
-
-    if (source_type == 'bibliography') {
-      let selectize = dt_editor.field('attributes.zotero_key').inst()
-      // console.log(selectize)
-      selectize.on('change', populate_biblio_fields);
     }
 
     if (action == 'create') {
@@ -62,25 +76,35 @@ function source_form_restore(e) {
   if (source_type == 'records') {
     $('#form-side-container').addClass('d-none');
   }
+  if (source_type == 'bibliography') {
+    selectize_key.clearOptions(true);
+    selectize_key.disable();
+    url_var = null;
+  }
 }
 
 function populate_biblio_fields() {
-  let selectize = dt_editor.field('attributes.zotero_key').inst()
-  let opt = selectize.options[selectize.getValue()]
-  let types = {
-    'book': 1,
-    'bookSection': 4,
-    'encyclopediaArticle': 9,
-    'journalArticle': 3,
-    'magazineArticle': 6,
-    'manuscript': 7,
-    'newspaperArticle': 6,
-    'thesis': 11,
-    'webpage': 2
+  let opt = selectize_key.options[selectize_key.getValue()];
+  if (opt) {
+    dt_editor.field('name').set(opt.title)
+    dt_editor.field('short_name').set(opt.shortTitle)
+    dt_editor.field('type.id').set(biblio_types[opt.itemType])
   }
-  dt_editor.field('name').set(opt.title)
-  dt_editor.field('short_name').set(opt.shortTitle)
-  dt_editor.field('type.id').set(types[opt.itemType])
+}
+
+function activate_zotero_selection() {
+  if (selectize_lib.options[selectize_lib.getValue()]) {
+    let new_val = JSON.parse(selectize_lib.options[selectize_lib.getValue()].id).id;
+    if (url_var != new_val) {
+      selectize_key.clearOptions(true);
+    }
+    url_var = new_val;
+    if (url_var != null) {
+      selectize_key.enable();
+    }
+  } else {
+    selectize_key.disable();
+  }
 }
 
 // function init_dt_editor(para_data) {

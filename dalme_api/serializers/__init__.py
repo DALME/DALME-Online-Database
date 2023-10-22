@@ -8,7 +8,7 @@ from .locale_references import LocaleReferenceSerializer # noqa
 
 from .others import (AttachmentSerializer, AttributeTypeSerializer, ContentClassSerializer,  # noqa
                      ContentXAttributeSerializer, CountryReferenceSerializer, GroupPropertiesSerializer, GroupSerializer,  # noqa
-                     ProfileSerializer, TagSerializer, TranscriptionSerializer) # noqa
+                     LibraryReferenceSerializer, ProfileSerializer, TagSerializer, TranscriptionSerializer) # noqa
 
 from .page import PageSerializer # noqa
 from .places import PlaceSerializer # noqa

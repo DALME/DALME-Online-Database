@@ -1,0 +1,14 @@
+{
+    "name": "attributes.library.id",
+    "label": "Library",
+    "type": "selectize",
+    "opts": {
+        "placeholder": "Select library",
+        "preload": true
+    },
+    "options": {
+        "type": "api_call",
+        "url": "library-references/?format=select&select_type=att&search="
+    },
+    "fieldInfo": "Which Zotero library or collection to use"
+}
