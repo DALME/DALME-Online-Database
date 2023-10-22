@@ -62,18 +62,21 @@ def add_to_existing(apps, schema_editor):  # noqa: ARG001
     Attribute = apps.get_model('dalme_app', 'Attribute')  # noqa: N806
     ContentType = apps.get_model('contenttypes', 'ContentType')  # noqa: N806
     LibraryReference = apps.get_model("dalme_app", "LibraryReference")  # noqa: N806
+    Set = apps.get_model("dalme_app", "Set")  # noqa: N806
     Source = apps.get_model("dalme_app", "Source")  # noqa: N806
     User = apps.get_model("auth", "User")  # noqa: N806
 
     user_obj = User.objects.get(pk=1)
     library_atype = AttributeType.objects.get(short_name='library')
-    dalme_record = LibraryReference.objects.get(name='DALME')
-    # dalme_lib = '{"id":{},"class":"LibraryReference"}'.format(dalme_record.id)
-    # dalme_lib = '{"id":1,"class":"LibraryReference"}'
     dalme_lib = {
-        'id': dalme_record.id,
+        'id': LibraryReference.objects.get(name='DALME').id,
         'class': 'LibraryReference'
         }
+    pharma_lib = {
+        'id': LibraryReference.objects.get(name='GP').id,
+        'class': 'LibraryReference'
+        }
+    pharma_dataset = Set.objects.get(name='Team Pharmacopeia Sources')
     source_ctype = ContentType.objects.get(app_label='dalme_app', model='Source')
     sources = Source.objects.filter(Q(type__in=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]))
     record_count = len(sources)
@@ -81,11 +84,12 @@ def add_to_existing(apps, schema_editor):  # noqa: ARG001
     print(f'\n\nStarting processing of {record_count} records')  # noqa: T201
 
     for i, source in enumerate(sources):
+        lib_value = pharma_lib if source.primary_dataset.id == pharma_dataset.id else dalme_lib
         new_val = Attribute(
             content_type=source_ctype,
             object_id=source.id,
             attribute_type=library_atype,
-            value_JSON=dalme_lib,
+            value_JSON=lib_value,
             creation_user=user_obj,
             modification_user=user_obj,
             )
