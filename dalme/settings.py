@@ -62,24 +62,21 @@ class Base(Configuration):
     SESSION_COOKIE_HTTPONLY = True
     USE_X_FORWARDED_HOST = True
 
-    MEDIA_ROOT = (BASE_DIR / 'media').as_posix()
-    MULTITENANT_RELATIVE_MEDIA_ROOT = ''
-
     STATICFILES_DIRS = [
         (BASE_DIR / 'static').as_posix(),
     ]
-    STATIC_URL = '/static/'
-    STATIC_ROOT = (BASE_DIR / 'www' / 'static').as_posix()
+    MULTITENANT_STATICFILES_DIRS = [
+        (BASE_DIR / 'tenants/%s/static').as_posix(),
+    ]
     STATICFILES_FINDERS = [
         'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'compressor.finders.CompressorFinder',
     ]
-    MULTITENANT_STATICFILES_DIRS = [
-        (BASE_DIR / 'tenants/%s/static').as_posix(),
-    ]
     MULTITENANT_RELATIVE_STATIC_ROOT = ''
+    MULTITENANT_RELATIVE_MEDIA_ROOT = ''
+    STATIC_URL = '/static/'
 
     SHARED_APPS = [
         'django_tenants',
@@ -412,6 +409,14 @@ class Development(Base, Configuration):
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SECRET_KEY = 'django-insecure-development-environment-secret-key'
+
+    @property
+    def MEDIA_ROOT(self):  # noqa: N802
+        return (self.BASE_DIR / 'www' / 'media').as_posix()
+
+    @property
+    def STATIC_ROOT(self):  # noqa: N802
+        return (self.BASE_DIR / 'www' / 'static').as_posix()
 
     DATABASES = {
         'default': {

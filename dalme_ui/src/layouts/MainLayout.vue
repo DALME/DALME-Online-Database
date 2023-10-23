@@ -97,7 +97,7 @@ export default defineComponent({
 
 <style lang="scss">
 .login-background {
-  background-image: url(/static/images/map_bg.png);
+  background-image: url(/static/dalme/images/map_bg.png);
   background-color: #ddd5c3;
   background-repeat: no-repeat;
   background-position: center;
