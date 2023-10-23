@@ -62,14 +62,14 @@ class Base(Configuration):
     SESSION_COOKIE_HTTPONLY = True
     USE_X_FORWARDED_HOST = True
 
-    MEDIA_ROOT = PROJECT_ROOT / 'media'
+    MEDIA_ROOT = (BASE_DIR / 'media').as_posix()
     MULTITENANT_RELATIVE_MEDIA_ROOT = ''
 
     STATICFILES_DIRS = [
         (BASE_DIR / 'static').as_posix(),
     ]
     STATIC_URL = '/static/'
-    STATIC_ROOT = BASE_DIR / 'www' / 'static'
+    STATIC_ROOT = (BASE_DIR / 'www' / 'static').as_posix()
     STATICFILES_FINDERS = [
         'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
         'django.contrib.staticfiles.finders.FileSystemFinder',

@@ -1,10 +1,26 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 RESOLVER := /etc/resolver/localhost
+TENANTS = dalme globalpharmacopeias
 
 web.build:
 	 docker compose up -d --no-deps --build $(PROJECT).web
 .PHONY: web.build
+
+web.collectstatic:
+	@# Doesn't succeed if we just use 'all_tenants_command collectstatic'. It
+	@# only collects the files for dalme even though the command reports that
+	@# it has collected the files for globalpharmacopeias. So we loop instead.
+	$(foreach tenant,$(TENANTS),\
+		docker compose exec \
+		$(PROJECT).web \
+		python manage.py \
+		collectstatic_schemas --schema=$(tenant);)
+	@# Lastly, collect all non-tenant partitioned staticfiles.
+	docker compose exec \
+		$(PROJECT).web \
+		python manage.py collectstatic
+.PHONY: web.collectstatic
 
 web.dns:
 	sudo mkdir -p /etc/resolver
@@ -24,7 +40,7 @@ ifndef args
 	$(error Call management commands with args. \
 		Usage: make web.manage args='collectstatic --no-input')
 else
-	docker compose run --rm \
+	docker compose exec \
 		$(PROJECT).web \
 		python manage.py $(args)
 endif
@@ -35,13 +51,13 @@ web.open:
 .PHONY: web.open
 
 web.python:
-	docker compose run --rm \
+	docker compose exec \
 		$(PROJECT).web \
 		python manage.py shell_plus --print-sql
 .PHONY: web.python
 
 web.shell:
-	docker compose run --rm \
+	docker compose exec \
 		$(PROJECT).web \
 		bash
 .PHONY: web.shell
@@ -104,6 +120,7 @@ web.test.watch:
 
 web.help:
 	@echo "  web.build              rebuild the web service"
+	@echo "  web.collectstatic       bundle static files for all apps and tenants"
 	@echo "  web.install            install the web requirements into the local venv"
 	@echo "  web.manage             call django management commands"
 	@echo "  web.open               view the site in your browser."
