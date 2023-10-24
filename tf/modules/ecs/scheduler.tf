@@ -59,7 +59,7 @@ resource "aws_ecs_task_definition" "publish" {
         "python3",
         "manage.py",
         "all_tenants_command",
-        "publish_scheduled",
+        "publish_pages",
       ]
       logConfiguration = {
         logDriver = "awslogs"

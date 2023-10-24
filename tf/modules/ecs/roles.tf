@@ -71,6 +71,17 @@ data "aws_iam_policy_document" "ecs_task_policy" {
       "${var.staticfiles_arn}/*",
     ]
   }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "states:SendTaskSuccess",
+    ]
+    resources = [
+      "arn:aws:states:${var.aws_region}:${var.aws_account}:stateMachine:*",
+    ]
+  }
+
 }
 
 # ECS task execution
