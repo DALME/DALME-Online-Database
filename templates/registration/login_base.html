@@ -1,5 +1,4 @@
 {% load static i18n %}
-{% load compress %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,11 +32,9 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 
   <!-- DALME CSS START -->
-  {% compress css %}
-    <link href="{% static 'css/common/sb-admin-2.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/common/general.css' %}" rel="stylesheet">
-    <link href="{% static 'css/commmon/login.css' %}" rel="stylesheet">
-  {% endcompress %}
+  <link href="{% static 'css/common/sb-admin-2.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/common/general.css' %}" rel="stylesheet">
+  <link href="{% static 'css/commmon/login.css' %}" rel="stylesheet">
   <!-- DALME CSS END -->
 
 </head>

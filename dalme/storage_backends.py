@@ -31,5 +31,5 @@ class MediaStorage(S3ManifestStaticStorage):
 
     def get_default_settings(self):
         settings = super().get_default_settings()
-        settings['location'] = parse_tenant_config_path('%s')
+        settings['location'] = f'media/{parse_tenant_config_path("%s")}'
         return settings

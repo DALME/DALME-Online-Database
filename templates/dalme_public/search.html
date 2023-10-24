@@ -1,5 +1,5 @@
 {% extends "dalme_public/layouts/__left_side_column.html" %}
-{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags compress %}
+{% load static dalme_public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}{{ block.super }} &ndash; Search{% endblock %}
 
@@ -281,9 +281,7 @@
 {% endblock %}
 {% block js_foot %}
   {{ block.super }}
-  {% compress js %}
-    <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
-  {% endcompress %}
+  <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
   {{ search_context|json_script:"search_context" }}
   <script id="clauses" type="application/json">
     [{% for set in form %}

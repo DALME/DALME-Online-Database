@@ -1,4 +1,4 @@
-{% load static dalme_public_tags wagtailimages_tags wagtailuserbar wagtailcore_tags compress %}
+{% load static dalme_public_tags wagtailimages_tags wagtailuserbar wagtailcore_tags %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 
@@ -31,9 +31,7 @@
     <script async defer data-domain="dalme.org" src="https://plausible.io/js/plausible.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/snarkdown@2.0.0/dist/snarkdown.umd.js"
       integrity="sha256-QqCCWG2y306e9DZ9VbcdrkacMAz1nubFmYCkac3I3AM=" crossorigin="anonymous"></script>
-    {% compress css %}
-      <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public.css' %}" />
-    {% endcompress %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dalme_public/dalme_public.css' %}" />
   {% endblock %}
 </head>
 
@@ -91,10 +89,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"
         integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw=="
         crossorigin="anonymous"></script>
-
-      {% compress js %}
-        <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
-      {% endcompress %}
+      <script type="text/javascript" src="{% static 'js/dalme_app/dalme_util.js' %}"></script>
 
       <script>
         $(document).ready(function () {

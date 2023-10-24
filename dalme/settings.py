@@ -72,7 +72,6 @@ class Base(Configuration):
         'django_tenants.staticfiles.finders.TenantFileSystemFinder',  # NOTE: Must come first.
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-        'compressor.finders.CompressorFinder',
     ]
     MULTITENANT_RELATIVE_STATIC_ROOT = ''
     MULTITENANT_RELATIVE_MEDIA_ROOT = ''
@@ -97,7 +96,6 @@ class Base(Configuration):
         'django_filters',
         'maintenance_mode',
         'captcha',
-        'compressor',
         'corsheaders',
         'dalme_api.application.DalmeAPIConfig',
         'dalme_purl.application.DalmePURLConfig',
@@ -598,8 +596,6 @@ class Production(Base, Configuration):
     AWS_IS_GZIPPED = True
     AWS_LOCATION = 'static'
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-
-    COMPRESS_ENABLED = True
 
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_USE_TLS = True
