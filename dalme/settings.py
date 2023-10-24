@@ -76,6 +76,7 @@ class Base(Configuration):
     MULTITENANT_RELATIVE_STATIC_ROOT = ''
     MULTITENANT_RELATIVE_MEDIA_ROOT = ''
     STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'
 
     SHARED_APPS = [
         'django_tenants',
@@ -577,8 +578,12 @@ class Production(Base, Configuration):
         return os.environ['DJANGO_SECRET_KEY']
 
     @property
+    def MEDIA_URL(self):  # noqa: N802
+        return f'https://{self.AWS_S3_CUSTOM_DOMAIN}/{self.MEDIA_LOCATION}/'
+
+    @property
     def STATIC_URL(self):  # noqa: N802
-        return f'https://{self.AWS_S3_CUSTOM_DOMAIN}/{self.AWS_LOCATION}/'
+        return f'https://{self.AWS_S3_CUSTOM_DOMAIN}/{self.STATIC_LOCATION}/'
 
     @property
     def TENANT_DOMAINS(self):  # noqa: N802
@@ -594,8 +599,9 @@ class Production(Base, Configuration):
 
     AWS_DEFAULT_ACL = None
     AWS_IS_GZIPPED = True
-    AWS_LOCATION = 'static'
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    STATIC_LOCATION = 'static'
+    MEDIA_LOCATION = 'media'
 
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_USE_TLS = True
