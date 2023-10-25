@@ -2248,7 +2248,7 @@ section.transcription.soft-wrap tei-lb::after {
 }
 section.transcription.show-newlines tei-lb::before {
   content: ' ';
-  background-image: url(@/assets/images/newline-icon.svg);
+  background-image: url(@/assets/newline-icon.svg);
   background-position: center 9px;
   background-repeat: no-repeat;
   width: 15px;
@@ -2268,7 +2268,7 @@ div.ab-content > tei-lb:first-child {
 }
 section.transcription.show-newlines tei-hi[rend=center]::after {
   content: ' ';
-  background-image: url(@/assets/images/newline-icon.svg);
+  background-image: url(@/assets/newline-icon.svg);
   background-position: center 9px;
   background-repeat: no-repeat;
   width: 15px;
