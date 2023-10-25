@@ -12,8 +12,9 @@ env.*
 !env.hcl
 
 # local dev database dumps
-sql/
-*.sql
+sql/**/*.sql
+sql/**/*.dump
+sql/dumps/pg_restore.log
 
 # local test and temporary files
 extracted_datasets

@@ -1,13 +1,40 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 DB_VOLUME := pgdata
+DUMPS := /opt/db/dumps
 
-db.drop:
+db.drop: confirm
 	@$(MAKE) infra.stop
 	docker rm -f $$(docker ps -a -q)
 	docker volume rm $(PROJECT)_$(DB_VOLUME)
 	@$(MAKE) infra.start
 .PHONY: db.drop
+
+db.dump:
+	docker compose exec \
+		$(PROJECT).db \
+		pg_dump \
+		-Fc \
+		--dbname $(PROJECT) \
+		--username $(PROJECT) \
+		-f $(DUMPS)/$(PROJECT)-$$(date -u +"%Y%m%d-T%s").dump
+.PHONY: db.dump
+
+db.load:
+ifndef dump
+	$(error No local dump specified to restore. \
+		Usage: make db.load dump='dalme-20231025-T1698276955.dump')
+else
+	docker exec -i \
+		$(PROJECT).db \
+		pg_restore \
+		--clean \
+		--verbose \
+		--dbname=$(PROJECT) \
+		--username=$(PROJECT) \
+		$(DUMPS)/$(dump)
+endif
+.PHONY: db.load
 
 db.migrate:
 	docker compose run --rm \
@@ -50,17 +77,26 @@ db.migrations.show:
 		python manage.py showmigrations
 .PHONY: db.migrations.show
 
-db.shell:
+db.psql:
 	PGPASSWORD=$(PROJECT) \
 		docker compose exec \
 		$(PROJECT).db \
 		psql -wx \
 		--username $(PROJECT) \
 		--dbname $(PROJECT)
+.PHONY: db.psql
+
+db.shell:
+	PGPASSWORD=$(PROJECT) \
+		docker compose exec \
+		$(PROJECT).db \
+		bash
 .PHONY: db.shell
 
 db.help:
 	@echo "  db.drop                drop the db volume"
+	@echo "  db.dump                dump the dev database to sql (data only, no schema)"
+	@echo "  db.load                restore a local sql dump"
 	@echo "  db.migrations.empty    generate an empty database revision"
 	@echo "  db.migrations.make     generate a database revision"
 	@echo "  db.migrations.merge    merge database revisions"
@@ -68,6 +104,7 @@ db.help:
 	@echo "  db.migrate             apply all upgrades to the database schema"
 	@echo "  db.migrate.fake        run faked migrations"
 	@echo "  db.migrate.revert      revert migrations for an app"
-	@echo "  db.shell               shell into to psql on the service"
+	@echo "  db.psql                shell into psql on the service"
+	@echo "  db.shell               shell into the db container"
 	@echo ""
 .PHONY: db.help
