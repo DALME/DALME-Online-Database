@@ -3122,7 +3122,9 @@ div.viewer {
   position: relative;
   width: 100%;
   padding: 2rem;
+  display: flex;
 }
+
 main.viewer {
   flex: 0;
   height: calc(100vh - 147px);
@@ -3911,3 +3913,35 @@ code {
   line-height: 18px;
   display: inline-flex;
 }
+
+.gloss-container {
+  font-family: Nunito,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Segoe UI Symbol";
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.inline-gloss {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.gloss-lang {
+  display: inline-flex;
+  margin-right: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 0 4px;
+  color: #1e5782;
+  background: #c0d7eb;
+  border: 1px solid #2770a4;
+  border-radius: 6px;
+}
+
+.gloss-text {
+  color: black;
+  font-size: 11px;
+  font-weight: 400;
+}
+

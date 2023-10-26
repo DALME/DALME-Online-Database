@@ -62,6 +62,8 @@ function setTitle(e) {
   const title_strings = {
     'ADD': 'addition',
     'ABBR': `expanded ${e.getAttribute('type', 'abbreviation')}`,
+    'NUM': e.getAttribute('value', 'number'),
+    'EXPAN': 'expansion',
   }
   if (reason) {
     e.setAttribute('title', `${tag_name.toLowerCase()} (${reason})`);
@@ -71,6 +73,10 @@ function setTitle(e) {
     e.setAttribute('title', `by ${resp}`);
   } else if (tag_name in title_strings) {
     e.setAttribute('title', title_strings[tag_name]);
+  } else if (tag_name == 'RS' && type) {
+    e.setAttribute('title', type);
+  } else if (tag_name == 'W' && type == 'elision') {
+    e.setAttribute('title', 'elision');
   } else {
     e.setAttribute('title', `${tag_name.toLowerCase()}`);
   }
@@ -94,14 +100,19 @@ const dalmeTeiBehaviours = {
          e.appendChild(div);
          e.appendChild(content);
      }],
-     // ['[type=context]', function(e) {
-     //   if (e.getAttribute('key')) {
-     //     const content = document.createElement('a');
-     //     content.setAttribute('href', `/`);
-     //   }
-     // }]
     ],
+    'expan': function(e) { e = setTitle(e); },
     'gap': function(e) { e = setExtent(e); },
+    'handShift': function(e) {
+      let content = 'hand shift';
+      e.getAttributeNames().forEach((att_name) => {
+        if (['scribe', 'medium', 'script'].includes(att_name)) {
+          content += ` | ${att_name}: ${e.getAttribute(att_name)}`;
+        }
+      });
+      e.setAttribute('title', content);
+      e.setAttribute('data-toggle', 'tooltip');
+     },
     'space': function(e) { e = setExtent(e); },
     'unclear': function(e) { e = setTitle(e); },
     'supplied': function(e) { e = setTitle(e); },
@@ -109,19 +120,28 @@ const dalmeTeiBehaviours = {
     'abbr': function(e) { e = setTitle(e); },
     'w': function(e) { e = setTitle(e); },
     'quote': function(e) { e = setTitle(e); },
+    'num': function(e) { e = setTitle(e); },
     'g': function(e) {
       let ref = e.getAttribute('ref', false);
       if (ref) e.innerText = String.fromCharCode(parseInt(ref, 16));
     },
+    'gloss': function(e) { e.setAttribute('class', 'd-none'); },
     'hi': [
       ['[rend=superscript]', function(e) {
         if (e.innerText.length > 3) {
           e.setAttribute('rend-basic', 1);
         }
+      }],
+      ['[rend=center], [rend=right]', function(e) {
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'inline-block';
+        wrapper.innerHTML = e.innerHTML;
+        e.innerHTML = '';
+        e.appendChild(wrapper);
       }]
     ],
     'ref': [
-      [':not([rend])', function(e) {
+      [':not([rend]), [rend=footnote]', function(e) {
         let ref_id = e.getAttribute('target');
         if (ref_id.length > 1) {
           if (ref_id.startsWith('#')) {
@@ -132,22 +152,23 @@ const dalmeTeiBehaviours = {
           }
         }
         e.innerText = ref_id;
-        // e.innerHTML = `<a href="#${ref_id}">${e.getAttribute('target')}</a>`;
       }]
+    ],
+    'rs': [
+      ['[type]', function(e) { e = setTitle(e); }]
     ],
     'note': [
       ['[type=marginal]', function(e) {
-        e.innerHTML = `<div><i class="fas fa-caret-left"></i><i class="fas fa-sticky-note">\
-                      </i></div><div class="note_content">${e.innerHTML}</div>`;
+        e.innerHTML = `<div><i class="fas fa-sticky-note"></i></div><div class="note_content">${e.innerHTML}</div>`;
       }],
       ['[type=brace]', function(e) {
-        e.setAttribute('title', e.innerHTML);
-        e.setAttribute('data-toggle', 'tooltip');
-        e.setAttribute('data-html', 'true');
-        e.setAttribute('data-template', '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>');
+        e.setAttribute('title', 'Note');
+        e.setAttribute('data-content', e.innerHTML);
+        e.setAttribute('data-toggle', 'popover');
+        e.setAttribute('data-template', '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header-wrapper"><h3 class="popover-header"></h3><div class="popover-header-closer"></div></div><div class="popover-body"></div></div>');
         e.innerHTML = '<i class="fas fa-sticky-note"></i>';
       }],
-      [':not([type]), [type=renvoi]', function(e) {
+      [':not([type]), [type=renvoi], [type=gloss], [type=footnote]', function(e) {
         e.setAttribute('class', 'd-none');
       }]
     ],

@@ -1,11 +1,10 @@
 tei-TEI {
   font-family: "PT Serif", "Times New Roman", serif;
   font-size: 17px;
-  margin-right: 30px;
-  margin-left: 30px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-right: auto;
+  margin-left: auto;
   color: #111;
+  display: flex; /* width of page adapts to text */
 }
 
 @-moz-document url-prefix() {
@@ -18,6 +17,8 @@ tei-TEI {
 tei-TEI > tei-text {
   display: block;
   line-height: 1.5;
+  margin-left: 35px;
+  margin-right: 35px;
 }
 
 tei-body {
@@ -51,9 +52,12 @@ unclear {
   border-bottom: 1px dashed #6d6d6d;
 }
 
-tei-del,
+tei-del[rend=overstrike],
 del {
   text-decoration: line-through;
+}
+tei-del[rend=rubout] {
+  filter: blur(2px);
 }
 
 tei-supplied:before,
@@ -66,9 +70,60 @@ supplied:after {
   content: "]"
 }
 
-tei-rs {
-  font-style: italic;
-  font-weight: 500;
+tei-rs[type=person]::before {
+  content: "\f007";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=organization]::before {
+  content: "\f1ad";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=object]::before {
+  content: "\f5a7";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=place]::before {
+  content: "\f3c5";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
+}
+tei-rs[type=locus]::before {
+  content: "\f015";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  color: #a0a0a0;
+  margin-right: 2px;
+  font-size: 10px;
+  position: relative;
+  top: -10px;
+  font-style: normal;
 }
 
 tei-num[type="cardinal"] {
@@ -98,8 +153,8 @@ tei-cb:before {
 tei-seg[type="brace"] {
   border-left: 2px solid #aaa;
   display: inline-block;
-  padding-left: 10px;
-  margin-left: -10px;
+  padding-left: 15px;
+  margin-left: -15px;
   position: relative;
   border-radius: 5px;
 }
@@ -158,18 +213,25 @@ tei-item > tei-list {
   margin-top: 0;
 }
 tei-abbr {
-
+  color: #6c6b6b;
 }
 tei-add {
   font-style: italic;
 }
 tei-add[place="above"] {
   vertical-align: super;
+  font-size: medium;
   line-height: 90%;
 }
 tei-add[place="below"] {
   vertical-align: sub;
+  font-size: medium;
   line-height: 90%;
+}
+tei-add[place="inline"] {
+  border-right: 2px dotted #aaa;
+  border-left: 2px dotted #aaa;
+  padding: 0px 3px;
 }
 tei-add[place="below"]:before,
 tei-add[place="below"]:after {
@@ -758,7 +820,21 @@ tei-handNotes {
   /* Empty Rule Set */
 }
 tei-handShift {
-  /* Empty Rule Set */
+  padding: 0px 5px;
+  font-family: "Font Awesome 5 Free";
+  font-size: 14px;
+  font-weight: 400;
+  color: #a0a0a0;
+  position: relative;
+  left: -25px;
+  display: inline-block;
+  margin-right: -22px;
+}
+tei-handShift::before {
+  content: "\f256";
+}
+tei-handShift + tei-lb {
+  display: none;
 }
 /* Need head with TEI parent to distinguish from HTML head */
 tei-TEI tei-head {
@@ -1477,9 +1553,6 @@ tei-root {
 tei-row {
   display: table-row;
 }
-tei-rs {
-  /* Empty Rule Set */
-}
 /*label*/
 /* s */
 /* When TEI document is embedded in HTML page,
@@ -1750,16 +1823,28 @@ tei-table {
   border-collapse: separate;
   border-spacing: 2px;
 }
-/* Why is this selector "TEI table" instead of just "table"? */
-tei-TEI tei-table {
-  display: block;
-  margin-top: 2em;
-  margin-bottom: 2em;
-  font-size: 12pt;
+tei-table tei-lb {
+  display: none;
 }
 tei-table > head {
   text-align: center;
 }
+tei-table table {
+  border-collapse: collapse;
+}
+tei-table table td {
+  padding: 0px 10px;
+}
+tei-table[rend~=boxed] table {
+  border: 1px solid #d7d7d7;
+}
+tei-table[rend~=vdiv] table td:not(:last-of-type) {
+  border-right: 1px solid #d7d7d7;
+}
+tei-table[rend~=hdiv] table tr:not(:last-of-type) {
+  border-bottom: 1px solid #d7d7d7;
+}
+
 tei-teiHeader {
   display: block;
   /*
@@ -1904,9 +1989,6 @@ tei-zone {
 
 /* TEI Common */
 
-.transcription tei-TEI {
-  margin: 0;
-}
 .ab-content {
   padding: 1.5rem;
 }
@@ -1975,8 +2057,28 @@ tei-hi[rend*=indent] tei-lb + tei-hi[rend="underscore"] {
 /* tei-hi[rend*=indent] tei-w[type=elision] + span {
     padding: inherit;
 } */
+/* LEADERS */
 tei-w[type=elision] + span {
   padding: 0;
+}
+tei-metamark[function="ditto"]::before {
+  content: "\3003";
+}
+tei-metamark[function="ellipsis"]::before {
+  content: "\2026";
+}
+tei-metamark[function="leader"] {
+  height: 1px;
+  display: inline-flex;
+  margin-left: 5px;
+  margin-right: 5px;
+  flex-grow: 1;
+  margin-top: auto;
+  margin-bottom: 9px;
+}
+tei-metamark[function="leader"]::before {
+  background-size: 50px 1px;
+  border-bottom: 1px solid #aaa;
 }
 tei-metamark[rend="line"] {
   background-size: 50px 1px;
@@ -1990,21 +2092,17 @@ tei-metamark[rend="dots"] {
   background-size: 6px 1px;
   background-image: radial-gradient(1px 1px at center, #aaa 1px, transparent 2px);
 }
-tei-metamark[function="leader"] {
-  height: 1px;
-  display: inline-flex;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-tei-metamark[function="leader"]::before {
-  background-size: 50px 1px;
-  border-bottom: 1px solid #aaa;
-}
 tei-metamark[function="hr"] {
   background-size: 50px 1px;
   border-bottom: 1px solid #aaa;
   display: block;
   margin: 1rem 0;
+}
+.tei-leader-line {
+  display: flex;
+}
+.tei-leader-line + tei-lb {
+  display: none;
 }
 
 tei-ab {
@@ -2045,12 +2143,13 @@ tei-quote {
   color: #6b6b6b;
   border-top: 1px dotted #d4d4d4;
   border-bottom: 1px dotted #d4d4d4;
-  padding: 1rem;
+  padding: 1rem 1rem 1.3rem 1rem;
   display: block;
   width: 100%;
   font-family: 'Lora';
   white-space: normal;
   text-align: center;
+  line-height: 0.8;
 }
 tei-quote:not(:first-child) {
   margin-top: 1rem;
@@ -2059,22 +2158,21 @@ tei-quote:not(:last-child) {
   margin-bottom: 1rem;
 }
 tei-quote:before {
-  content: "\f10d";
-  font-family: "Font Awesome 5 Free";
-  font-size: 11px;
-  margin-right: .5rem;
+  content: "\201c";
+  font-family: 'Lora', 'PT Serif', serif;
+  font-size: 35px;
+  margin-right: .3rem;
   color: #bbbbbb;
   position: relative;
   top: 5px;
 }
 tei-quote:after {
-  content: "\f10e";
-  font-family: "Font Awesome 5 Free";
-  font-size: 11px;
-  margin-left: .3rem;
+  content: "\201e";
+  font-family: 'Lora', 'PT Serif', serif;
+  font-size: 35px;
+  margin-left: .5rem;
   color: #bbbbbb;
   position: relative;
-  bottom: 5px;
 }
 tei-quote[next]:after {
   content: "" !important;
@@ -2085,7 +2183,16 @@ tei-quote[prev]:before {
 tei-quote span {
   display: contents;
 }
-
+tei-quote tei-lb:first-of-type {
+  display: none;
+}
+tei-quote span ~ tei-lb:last-of-type {
+  display: none;
+}
+tei-expan {
+  color: #888888;
+  font-style: italic;
+}
 tei-note:not([type]) {
   border-top: 1px dotted #6b6b6b;
   padding: 5px 10px;
@@ -2112,69 +2219,70 @@ tei-note[type="brace"] {
   border-right: none;
   border-left: none;
   line-height: 17px;
+  cursor: pointer;
 }
+
 #notebar {
   position: absolute;
   right: 4rem;
   display: block;
   z-index: 2;
-  overflow: scroll;
-  padding-left: 8px;
+  overflow: hidden;
+  width: 31px;
+  border-left: 1px dotted #c9c9c9;
+  padding-left: 31px;
+  transition: width 2s;
 }
 .notes_container {
   position: relative;
   display: block;
-  width: auto;
-  border-left: 1px dashed #bfbfbf41;
+  width: fit-content;
+  border-left: 1px dotted #c9c9c9;
+  transition: backdrop-filter 0.5s, background 0.5s;
 }
 tei-note[type="marginal"] {
   font-size: 14px;
   position: relative;
-  background-color: #ffffffd4;
-  border: 1px solid #d4d4d4;
-  border-right: none;
-  margin-left: -1px;
   color: #d4d4d4;
-  min-width: 28px;
   display: flex;
   flex-direction: row;
-  border-top-left-radius: .2rem;
-  border-bottom-left-radius: .2rem;
-
 }
-tei-note[type="marginal"] > div > i:first-child {
+tei-note[type="marginal"] > div:first-of-type {
+  color: #e1e1e1;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  left: -7px;
-  top: 1px;
-  font-size: 18px;
-}
-tei-note[type="marginal"] > div > i:not(first-child) {
-  margin-top: .3rem;
-  margin-bottom: .5rem;
+  left: -32px;
+  margin-right: -31px;
+  transition: opacity 0.5s;
 }
 .notes_container tei-note[type="marginal"] .note_content {
-  display: none;
   color: #6b6b6b;
-  max-width: 200px;
   line-height: 1.3;
-  padding: .5rem;
+  padding: 6px 10px;
   font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1rem;
-  background-color: #fbfbfb5c;
-  backdrop-filter: blur(2px);
+  width: 100%;
+  border-top: 1px dotted #c9c9c9;
+  border-bottom: 1px dotted #c9c9c9;
+  white-space: pre;
+}
+#notebar:hover {
+  border-color: transparent;
+  width: auto;
+}
+#notebar:hover .notes_container{
+  background-color: #fbfbfbb5;
+  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(2px);
 }
-.notes_container:hover tei-note[type="marginal"] {
-  color: #354d87;
-  border-color: #354d87;
-  background-color: #fbfbfb;
+#notebar:hover tei-note[type="marginal"] > div:first-of-type {
+  opacity: 0;
 }
-.notes_container:hover {
-  border-color: transparent;
-}
-.notes_container:hover tei-note[type="marginal"] .note_content {
-  display: block;
-}
+
 .tooltip.note {
   font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1rem;
@@ -2209,26 +2317,40 @@ tei-note[type="marginal"] > div > i:not(first-child) {
 .tooltip.gloss .tooltip-inner .fa-link {
   color: #0e62b7;
 }
-tei-ref:not([rend=gloss]) {
-  font-size: 14px;
-  font-weight: bold;
-  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
-  position: relative;
-  top: -10px;
+
+tei-ref {
   text-decoration: none !important;
-  display: inline-block;
-  color: #5c8ea5;
+  color: #8a8a8a;
+  cursor: pointer;
+  margin-left: 2px;
+}
+tei-ref[rend~=superscript] {
+  position: relative;
+  top: -5px;
+}
+tei-ref[rend~=subscript] {
+  position: relative;
+  bottom: -10px;
+}
+tei-ref[rend~=bold] {
+  font-weight: 900;
+}
+tei-ref[rend~=oversized] {
+  font-size: 32px;
+  line-height: 18px;
+  vertical-align: bottom;
 }
 
-tei-ref[rend=gloss] {
+/* tei-ref[rend=gloss] {
   display: inline-flex;
   flex-direction: column;
+  white-space: pre;
 }
 
 tei-ref[rend=gloss]:after {
-  content: "\f249";
-  font-family: "Font Awesome 5 Free";
-  font-size: 8px;
+  content: "?";
+  font-size: 10px;
+  font-weight: bold;
   color: #909090;
   position: relative;
   height: 1px;
@@ -2239,7 +2361,7 @@ tei-ref[rend=gloss]:after {
   margin-top: -2px;
   width: 95%;
   align-self: end;
-}
+} */
 
 tei-hi[rend=indent] {
   padding-left: 1em;
@@ -2250,14 +2372,31 @@ tei-hi[rend=indent1] {
 tei-hi[rend=indent2] {
   padding-left: 3em;
 }
+tei-hi[rend=indent3] {
+  padding-left: 4em;
+}
+tei-hi[rend=indent4] {
+  padding-left: 5em;
+}
 tei-hi[rend=underline] {
   text-decoration: underline;
 }
-tei-hi[rend=center] {
-  display: inline-block;
-  text-align: center;
+tei-hi[rend=overline] {
+  text-decoration: overline;
+}
+
+tei-hi[rend=center],
+tei-hi[rend=right] {
+  display: inline-flex;
   width: 100%;
 }
+tei-hi[rend=center] {
+  justify-content: center;
+}
+tei-hi[rend=right] {
+  justify-content: end;
+}
+
 tei-w[type=elision]:empty {
   margin-right: .25rem;
 }
@@ -2275,7 +2414,26 @@ tei-lb:after {
   content: '\a';
   white-space: pre;
 }
-
+tei-term {
+  display: inline-flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+tei-term::after {
+  content: "\f06e";
+  font-family: "Font Awesome 5 Free";
+  font-size: 8px;
+  color: #a2a2a2;
+  position: relative;
+  height: 1px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(90deg, #dddddd,#a2a2a2) no-repeat left/40% 2px,linear-gradient(90deg, #a2a2a2,#dddddd) no-repeat right/40% 2px;
+  margin-top: -4px;
+  width: 100%;
+  align-self: end;
+}
 /* independent soft-wrap */
 section.transcription.soft-wrap tei-text > tei-body {
   white-space: pre-wrap !important;
@@ -2319,11 +2477,11 @@ section.transcription.scholarly {
   overflow: auto;
 }
 section.transcription.scholarly tei-text > tei-body {
-  white-space: pre;
+  white-space: pre-line;
 }
 
 /* TEI Basic */
-section.transcription.basic {
+/* section.transcription.basic {
   overflow: scroll;
 }
 section.transcription.basic tei-text > tei-body {
@@ -2335,9 +2493,69 @@ section.transcription.basic tei-pc {
 }
 section.transcription.basic tei-pc + tei-lb {
   display: none;
-}
+} */
 section.transcription.basic tei-hi[rend-basic="1"],
 section.transcription.basic tei-hi[rend="subscript"] {
   vertical-align: unset;
   font-size: 100%;
+}
+
+.popover-header-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+.popover-header-wrapper .popover-header {
+  display: inline-flex;
+  flex-grow: 1;
+}
+.popover-header-wrapper .popover-header-closer {
+  display: inline-flex;
+  background: #f7f7f7;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  border-top-right-radius: calc(0.3rem - 1px);
+  border-left: 1px solid #ebebeb;
+}
+.popover-header-wrapper .popover-header-closer:hover {
+  background: #e2e2e2;
+  color: black;
+}
+.popover-header-wrapper .popover-header-closer::before {
+  content: 'x';
+}
+
+.gloss-container {
+  font-family: Nunito,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Segoe UI Symbol";
+  display: flex;
+  flex-direction: column;
+}
+.inline-gloss {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.gloss-lang {
+  display: inline-flex;
+  margin-right: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 0 4px;
+  color: #1e5782;
+  background: #c0d7eb;
+  border: 1px solid #2770a4;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  border-right-width: 2px;
+}
+.gloss-text {
+  color: #313131;
+  font-size: 14px;
+  font-weight: 400;
+}
+.inline-gloss-note {
+  font-family: 'PT Serif', 'Times New Roman', serif;
+  border-top: 1px dashed #c4c4c4;
+  margin-top: 8px;
+  padding-top: 5px;
 }

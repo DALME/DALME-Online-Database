@@ -95,10 +95,6 @@ parsererror div {
   font-size: 14px !important;
 }
 
-tei-TEI {
-    width: 100%
-}
-
 .img-placeholder {
   height: 80vh;
   /* background-color: #8a8a8a; */
