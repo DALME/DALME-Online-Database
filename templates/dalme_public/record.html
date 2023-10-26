@@ -271,7 +271,7 @@
       class="transcription"
       :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showLinebreaks }, { 'no-scroll-bar': hasMarginalNotes && showMarginalNotes}]"
       :style="{ height: transcriptionHeight + 'px' }">
-      <beat-loader v-show="loading" color="#aaa"></beat-loader>
+      <beat-loader v-show="loading && transcriptionId" color="#aaa"></beat-loader>
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
       <div v-if="transcriptionId" v-html="renderedTranscription" id="tei-container"></div>
     </section>

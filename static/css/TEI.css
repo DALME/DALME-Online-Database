@@ -2144,12 +2144,12 @@ tei-quote {
   border-top: 1px dotted #d4d4d4;
   border-bottom: 1px dotted #d4d4d4;
   padding: 1rem 1rem 1.3rem 1rem;
-  display: block;
+  display: flex;
   width: 100%;
   font-family: 'Lora';
   white-space: normal;
   text-align: center;
-  line-height: 0.8;
+  line-height: 1.5;
 }
 tei-quote:not(:first-child) {
   margin-top: 1rem;
@@ -2157,22 +2157,23 @@ tei-quote:not(:first-child) {
 tei-quote:not(:last-child) {
   margin-bottom: 1rem;
 }
-tei-quote:before {
-  content: "\201c";
+tei-quote span:before {
+  content: "\201c\00a0";
   font-family: 'Lora', 'PT Serif', serif;
   font-size: 35px;
-  margin-right: .3rem;
   color: #bbbbbb;
   position: relative;
-  top: 5px;
+  display: contents;
+  line-height: 0.8;
 }
-tei-quote:after {
-  content: "\201e";
+tei-quote span:after {
+  content: "\00a0\201e";
   font-family: 'Lora', 'PT Serif', serif;
   font-size: 35px;
-  margin-left: .5rem;
   color: #bbbbbb;
   position: relative;
+  display: contents;
+  line-height: 0.3;
 }
 tei-quote[next]:after {
   content: "" !important;
@@ -2193,7 +2194,7 @@ tei-expan {
   color: #888888;
   font-style: italic;
 }
-tei-note:not([type]) {
+/* tei-note:not([type]) {
   border-top: 1px dotted #6b6b6b;
   padding: 5px 10px;
   display: inline-block;
@@ -2205,7 +2206,7 @@ tei-note:not([type]):before {
   font-weight: 600;
   color: #757876;
   margin-right: 5px;
-}
+} */
 
 tei-note[type="brace"] {
   font-size: 12px;
@@ -2224,7 +2225,6 @@ tei-note[type="brace"] {
 
 #notebar {
   position: absolute;
-  right: 4rem;
   display: block;
   z-index: 2;
   overflow: hidden;
@@ -2268,7 +2268,7 @@ tei-note[type="marginal"] > div:first-of-type {
   width: 100%;
   border-top: 1px dotted #c9c9c9;
   border-bottom: 1px dotted #c9c9c9;
-  white-space: pre;
+  white-space: pre-wrap;
 }
 #notebar:hover {
   border-color: transparent;
@@ -2558,4 +2558,21 @@ section.transcription.basic tei-hi[rend="subscript"] {
   border-top: 1px dashed #c4c4c4;
   margin-top: 8px;
   padding-top: 5px;
+}
+
+/* Media Queries */
+@media only screen and (min-width: 600px) {
+  #notebar {
+    right: 0;
+  }  
+}
+@media only screen and (min-width: 1200px) {
+  #notebar {
+    right: 4rem;
+  }    
+}
+@media only screen and (min-width: 1600px) {
+  #notebar {
+    right: 12rem;
+  }
 }
