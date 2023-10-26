@@ -1,401 +1,1033 @@
 [
   {
     "section": "Annotation",
-    "id": "annotation_tags"
-  },
-  {
-    "name": "Note",
-    "type": "sc",
-    "help": "Add additional comment out of the main textual stream.",
-    "link": "#Marginal_Notes_and_Insertions_via_renvoi",
-    "tag_name": "note",
-    "attributes": [
+    "id": "annotation_tags",
+    "items": [
       {
-        "name": "type",
-        "label": "Type",
-        "type": "choice",
-        "message": "<b>Type</b> of note",
-        "options": [
-          "marginal",
-          "renvoi",
-          "brace"
+        "label": "Gloss",
+        "type": "w",
+        "default_content": "WORD",
+        "help": "Add a gloss or translation for a term.",
+        "documentation": "#Glosses",
+        "tag": "note",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "type",
+            "label": "Type",
+            "editable": false,
+            "required": true,
+            "default": "gloss"
+          },
+          {
+            "name": "text",
+            "label": "Note",
+            "editable": true,
+            "required": false,
+            "type": "textarea"
+          },
+          {
+            "name": "lang",
+            "label": "Language",
+            "editable": true,
+            "required": true,
+            "type": "choice",
+            "options": [
+              {
+                "label": "English",
+                "value": "ENG"
+              },
+              {
+                "label": "French",
+                "value": "FRA"
+              },
+              {
+                "label": "German",
+                "value": "DEU"
+              },
+              {
+                "label": "Italian",
+                "value": "ITA"
+              },
+              {
+                "label": "Spanish",
+                "value": "SPA"
+              }
+            ]
+          },
+          {
+            "name": "gloss",
+            "label": "Gloss",
+            "editable": true,
+            "required": true,
+            "type": "string"
+          }
         ]
       },
       {
-        "name": "target",
-        "label": "Target",
-        "message": ", <b>target</b> id to be used if renvoi",
-        "type": "text"
-      },
-      {
-        "name": "text",
-        "label": "Text",
-        "message": ", and the actual <b>text</b> of the note",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Brace",
-    "type": "w",
-    "help": "Vertical element used to show groupings of lines that function as a unit.",
-    "link": "#Braces",
-    "tag_name": "seg",
-    "attribute_name": "type",
-    "attribute_value": "brace",
-    "attributes": [
-      {
-        "name": "text",
-        "label": "Text",
-        "message": "<b>Text</b> to be associated with the lines",
-        "type": "text"
-      },
-      {
-        "name": "rend",
-        "label": "Rend",
-        "message": ", indication of how the brace is <b>rend</b>ered on the page",
-        "type": "text",
-        "options": [
-          "curly bracket",
-          "C-shaped",
-          "line",
-          "L-shaped"
+        "label": "Marginal note",
+        "type": "sc",
+        "help": "Adds a note to the margin aligned with the point of insertion.",
+        "documentation": "#Marginal_Notes_and_Insertions_via_renvoi",
+        "tag": "note",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "type",
+            "label": "Type",
+            "editable": false,
+            "required": true,
+            "default": "marginal"
+          },
+          {
+            "name": "text",
+            "label": "Note",
+            "editable": true,
+            "required": true,
+            "type": "textarea"
+          }
         ]
       },
       {
-        "name": "target",
-        "label": "Target",
-        "message": ", and <b>target</b> id to be used to link the brace and the note (<i>e.g.</i> note_01)",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Paraphrase",
-    "type": "w",
-    "help": "Wrap text that has been paraphrased",
-    "link": "#Paraphrasing",
-    "tag_name": "quote",
-    "attributes": [
+        "label": "Mute",
+        "type": "w",
+        "default_content": "CONTENT TO MUTE",
+        "help": "Indicates that the enclosed section of the text should be hidden and ignored for all processing purposes.",
+        "documentation": "#Marginal_Notes_and_Insertions_via_renvoi",
+        "tag": "mute",
+        "multi_tag": false
+      },
       {
-        "name": "resp",
-        "label": "Author",
-        "message": "<b>Person responsible</b> for the paraphrased text",
-        "type": "text"
+        "label": "Named entity",
+        "type": "w",
+        "default_content": "NAMED ENTITY",
+        "help": "Wrap text that refers to a person, place, room, etc.",
+        "documentation": "#Named_Entities_.28Persons.2FLocations.2FOrganizations.29",
+        "tag": "rs",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "type",
+            "label": "Type",
+            "editable": true,
+            "required": true,
+            "type": "choice",
+            "options": [
+              {
+                "label": "Object",
+                "value": "object"
+              },
+              {
+                "label": "Organization",
+                "value": "organization"
+              },
+              {
+                "label": "Person",
+                "value": "person"
+              },
+              {
+                "label": "Place",
+                "value": "place"
+              },
+              {
+                "label": "Locus",
+                "value": "locus"
+              }
+            ]
+          },
+          {
+            "name": "key",
+            "label": "Key",
+            "editable": true,
+            "required": false,
+            "type": "string",
+            "description": "An externally-defined means of identifying the entity, <i>e.g.</i> a database UUID."
+          }
+        ]
+      },
+      {
+        "label": "Note with brace",
+        "type": "w",
+        "default_content": "CONTENT\nTO ENCLOSE\nWITH BRACE",
+        "help": "Note with a vertical element that indicates the lines it refers to.",
+        "documentation": "#Braces",
+        "tag": "note",
+        "multi_tag": true,
+        "attributes": [
+          {
+            "name": "type",
+            "label": "Type",
+            "editable": false,
+            "required": true,
+            "default": "brace"
+          },
+          {
+            "name": "text",
+            "label": "Note",
+            "editable": true,
+            "required": true,
+            "type": "textarea"
+          },
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "default": "curly bracket",
+            "type": "choice",
+            "options": [
+              {
+                "label": "Curly bracket",
+                "value": "curly bracket"
+              },
+              {
+                "label": "\"C\"-shaped",
+                "value": "c_shaped"
+              },
+              {
+                "label": "Vertical line",
+                "value": "line"
+              },
+              {
+                "label": "\"L\"-shaped",
+                "value": "l_shaped"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Note with renvoi",
+        "type": "w",
+        "default_content": "*",
+        "help": "Adds comments outside of the main textual stream, using a mark to indicate a specific point in the text.",
+        "documentation": "#Marginal_Notes_and_Insertions_via_renvoi",
+        "tag": "note",
+        "multi_tag": true,
+        "attributes": [
+          {
+            "name": "type",
+            "label": "Type",
+            "editable": false,
+            "required": true,
+            "default": "renvoi"
+          },
+          {
+            "name": "text",
+            "label": "Note",
+            "editable": true,
+            "required": true,
+            "type": "textarea"
+          },
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "default": "superscript",
+            "type": "multichoice",
+            "options": [
+              {
+                "label": "Superscript",
+                "value": "superscript"
+              },
+              {
+                "label": "Subscript",
+                "value": "subscript"
+              },
+              {
+                "label": "Bold",
+                "value": "bold"
+              },
+              {
+                "label": "Oversized",
+                "value": "oversized"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Paraphrase",
+        "type": "w",
+        "default_content": "PARAPHRASED CONTENT",
+        "help": "Wrap text that has been paraphrased",
+        "documentation": "#Paraphrasing",
+        "tag": "quote",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "resp",
+            "label": "Author",
+            "editable": true,
+            "required": false,
+            "type": "string",
+            "description": "Person responsible for the paraphrased text."
+          }
+        ]
       }
     ]
-  },
-  {
-    "name": "Highlight",
-    "type": "w",
-    "help": "Wrap a word or phrase to mark it as graphically distinct from the surrounding text.",
-    "link": "#Indentations.2C_Superscripts.2C_and_Subscripts",
-    "tag_name": "hi",
-    "attribute": "rend",
-    "menu": [
-      "subscript",
-      "superscript",
-      "underscore",
-      "center",
-      "indent",
-      "indent1",
-      "indent2",
-      "indent3",
-      "indent4"
-    ]
-  },
-  {
-    "section": "close"
   },
   {
     "section": "Editorial",
-    "id": "editorial_tags"
-  },
-  {
-    "name": "Abbreviation",
-    "type": "w",
-    "help": "Wrap abbreviation",
-    "link": "#Abbreviations_and_Expansions",
-    "tag_name": "abbr",
-    "attributes": [
+    "id": "editorial_tags",
+    "items": [
       {
-        "name": "type",
-        "label": "Type",
-        "type": "text",
-        "message": "<b>Type</b> of abbreviation",
-        "options": [
-          "title",
-          "initial",
-          "acronym"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Addition",
-    "type": "w",
-    "help": "Wrap text inserted in the source text",
-    "link": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
-    "tag_name": "add",
-    "attributes": [
-      {
-        "name": "place",
-        "label": "Place",
-        "type": "text",
-        "message": "<b>Place</b> where the addition is located with reference to the main text",
-        "options": [
-          "above",
-          "below"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Deletion",
-    "type": "w",
-    "help": "Wrap text deleted, marked as deleted, or otherwise indicated as superfluous.",
-    "link": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
-    "tag_name": "del",
-    "attributes": [
-      {
-        "name": "rend",
-        "label": "Rend",
-        "type": "text",
-        "message": "How the deletion is <b>rend</b>ered on the page",
-        "options": [
-          "overstrike"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Elision",
-    "type": "w",
-    "help": "Wrap elided word.",
-    "link": "#Elisions",
-    "tag_name": "w",
-    "attribute_name": "type",
-    "attribute_value": "elision",
-    "attributes": [
-      {
-        "name": "lemma",
-        "label": "Lemma",
-        "message": "The <b>lemma</b> (<i>i.e.</i> non-elided version of the word)",
-        "type": "text"
-      },
-      {
-        "name": "join",
-        "label": "Join",
-        "type": "choice",
-        "message": ", or the side on which the word should be <b>join</b> another",
-        "options": [
-          "left",
-          "right"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Expansion",
-    "type": "w",
-    "help": "Wrap text that has been expanded from an abbreviation.",
-    "link": "#Abbreviations_and_Expansions",
-    "tag_name": "expan"
-  },
-  {
-    "name": "Hyphenation",
-    "type": "w",
-    "help": "Wrap a hyphen and indicate its type/function.",
-    "link": "#Hyphenation",
-    "tag_name": "pc",
-    "attributes": [
-      {
-        "name": "force",
-        "label": "Force",
-        "type": "choice",
-        "message": "<b>Force</b> of the association: <b>strong</b> for hyphen that should be preserved during tokenisation, <b>weak</b> for hyphen that should not be kept, <i>e.g.</i> split words at the end of lines",
-        "options": [
-          "weak",
-          "strong"
-        ]
-      }
-    ]
-  },
-  {
-    "name": "Omission/Gap",
-    "type": "sc",
-    "help": "Mark a gap or omission in the transcription.",
-    "link": "#Omissions",
-    "tag_name": "gap",
-    "attributes": [
-      {
-        "name": "reason",
-        "label": "Reason",
-        "type": "text",
-        "message": "<b>Reason</b> for the omission/gap, including type of content omitted",
-        "options": [
-          "damage",
-          "script",
-          "ink",
-          "image"
+        "label": "Abbreviation",
+        "type": "w",
+        "default_content": "ABBREVIATION",
+        "help": "Wrap abbreviation",
+        "documentation": "#Abbreviations_and_Expansions",
+        "tag": "abbr",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "type",
+            "label": "Type",
+            "editable": true,
+            "required": false,
+            "type": "choice",
+            "options": [
+              {
+                "label": "Acronym",
+                "value": "acronym"
+              },
+              {
+                "label": "Initial",
+                "value": "initial"
+              },
+              {
+                "label": "Title",
+                "value": "title"
+              }
+            ]
+          }
         ]
       },
       {
-        "name": "extent",
-        "label": "Extent",
-        "message": ", <b>extent</b> of the gap, <i>e.g.</i> 1 word, 3 paragraphs",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Supplied",
-    "type": "w",
-    "help": "Wrap text supplied by the transcriber",
-    "link": "#Supplied_Text",
-    "tag_name": "supplied",
-    "attributes": [
+        "label": "Addition",
+        "type": "w",
+        "default_content": "INSERTED CONTENT",
+        "help": "Wrap text inserted in the source text",
+        "documentation": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
+        "tag": "add",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "place",
+            "label": "Place",
+            "editable": true,
+            "required": false,
+            "type": "choice",
+            "message": "Location of the addition with reference to the main text.",
+            "options": [
+              {
+                "label": "Above the line",
+                "value": "above"
+              },
+              {
+                "label": "Below the line",
+                "value": "below"
+              },
+              {
+                "label": "Inline",
+                "value": "inline"
+              }
+            ]
+          }
+        ]
+      },
       {
-        "name": "reason",
-        "label": "Reason",
-        "message": "<b>Reason</b> why the text had to be supplied",
-        "type": "text",
-        "options": [
-          "damage",
-          "script",
-          "ink",
-          "image"
+        "label": "Deletion",
+        "type": "w",
+        "default_content": "DELETED CONTENT",
+        "help": "Wrap text deleted, marked as deleted, or otherwise indicated as superfluous.",
+        "documentation": "#Additions.2C_Deletions.2C_Substitutions.2C_and_Restorations",
+        "tag": "del",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "default": "overstrike",
+            "type": "choice",
+            "options": [
+              {
+                "label": "Overstrike",
+                "value": "overstrike"
+              },
+              {
+                "label": "Rubout",
+                "value": "rubout"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Elision",
+        "type": "w",
+        "default_content": "ELIDED WORD",
+        "help": "Wrap elided word.",
+        "documentation": "#Elisions",
+        "tag": "w",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "type",
+            "label": "Type",
+            "editable": false,
+            "required": true,
+            "default": "elision"
+          },
+          {
+            "name": "lemma",
+            "label": "Lemma",
+            "editable": true,
+            "required": true,
+            "type": "string",
+            "description": "The non-elided version of the word."
+          },
+          {
+            "name": "join",
+            "label": "Join",
+            "editable": true,
+            "required": true,
+            "type": "choice",
+            "description": "Side on which the word should be joined.",
+            "options": [
+              {
+                "label": "Join left",
+                "value": "left"
+              },
+              {
+                "label": "Join right",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Expansion",
+        "type": "w",
+        "default_content": "EXPANDED WORD",
+        "help": "Wrap text that has been expanded from an abbreviation.",
+        "documentation": "#Abbreviations_and_Expansions",
+        "tag": "expan",
+        "multi_tag": false
+      },
+      {
+        "label": "Hand shift",
+        "type": "sc",
+        "help": "Mark the beginning of a sequence of text written in a new hand, a change of writing style, character, or ink.",
+        "documentation": "#Hyphenation",
+        "tag": "handShift",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "scribe",
+            "label": "Scribe",
+            "editable": true,
+            "required": false,
+            "type": "string",
+            "description": "Scribe name or ID (can be relative to document) if hand is attributable."
+          },
+          {
+            "name": "script",
+            "label": "Script",
+            "editable": true,
+            "required": false,
+            "type": "string",
+            "description": "Writing style, <i>e.g. secretary, copperplate, smaller, lighter, rough</i>."
+          },
+          {
+            "name": "medium",
+            "label": "Medium",
+            "editable": true,
+            "required": false,
+            "type": "string",
+            "description": "Tint or type of ink or writing medium, <i>e.g. black ink, greenish ink, pencil</i>."
+          }
+        ]
+      },
+      {
+        "label": "Hyphenation",
+        "type": "w",
+        "default_content": "-",
+        "help": "Wrap a hyphen and indicate its type/function.",
+        "documentation": "#Hyphenation",
+        "tag": "pc",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "force",
+            "label": "Force",
+            "editable": true,
+            "required": true,
+            "default": "weak",
+            "type": "choice",
+            "options": [
+              {
+                "label": "Strong",
+                "value": "strong",
+                "description": "Preserved during tokeneization."
+              },
+              {
+                "label": "Weak",
+                "value": "weak",
+                "description": "Ignored during tokeneization."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Omission/Gap",
+        "type": "sc",
+        "help": "Mark a gap or omission in the transcription.",
+        "documentation": "#Omissions",
+        "tag": "gap",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "reason",
+            "label": "Reason",
+            "editable": true,
+            "required": true,
+            "type": "choice",
+            "options": [
+              {
+                "label": "Contains context",
+                "value": "context"
+              },
+              {
+                "label": "Damaged medium",
+                "value": "damage"
+              },
+              {
+                "label": "Image unreadable",
+                "value": "image"
+              },
+              {
+                "label": "Ink blot",
+                "value": "ink"
+              },
+              {
+                "label": "Script undecipherable",
+                "value": "script"
+              }
+            ]
+          },
+          {
+            "name": "extent",
+            "label": "Extent",
+            "editable": true,
+            "required": false,
+            "description": "Extent of the gap, <i>e.g.</i> 1 word, 3 paragraphs",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "label": "Supplied",
+        "type": "w",
+        "default_content": "SUPPLIED WORD",
+        "help": "Wrap text supplied by the transcriber",
+        "documentation": "#Supplied_Text",
+        "tag": "supplied",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "reason",
+            "label": "Reason",
+            "editable": true,
+            "required": false,
+            "description": "Reason why the text had to be supplied",
+            "type": "choice",
+            "options": [
+              {
+                "label": "Contains antecedent",
+                "value": "antecedent"
+              },
+              {
+                "label": "Damaged medium",
+                "value": "damage"
+              },
+              {
+                "label": "Image unreadable",
+                "value": "image"
+              },
+              {
+                "label": "Ink blot",
+                "value": "ink"
+              },
+              {
+                "label": "Script undecipherable",
+                "value": "script"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Unclear",
+        "type": "w",
+        "default_content": "UNCLEAR WORD",
+        "help": "Wrap text that cannot be transcribed with certainty.",
+        "documentation": "#Unclear_Text",
+        "tag": "unclear",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "reason",
+            "label": "Reason",
+            "editable": true,
+            "required": false,
+            "description": "Reason why the material is hard to transcribe",
+            "type": "choice",
+            "options": [
+              {
+                "label": "Damaged medium",
+                "value": "damage"
+              },
+              {
+                "label": "Image unreadable",
+                "value": "image"
+              },
+              {
+                "label": "Ink blot",
+                "value": "ink"
+              },
+              {
+                "label": "Script undecipherable",
+                "value": "script"
+              }
+            ]
+          }
         ]
       }
     ]
   },
   {
-    "name": "Unclear",
-    "type": "w",
-    "help": "Wrap text that cannot be transcribed with certainty.",
-    "link": "#Unclear_Text",
-    "tag_name": "unclear",
-    "attributes": [
+    "section": "Format",
+    "id": "format_tags",
+    "items": [
       {
-        "name": "reason",
-        "label": "Reason",
-        "message": "<b>Reason</b> why the material is hard to transcribe",
-        "type": "text",
-        "options": [
-          "damage",
-          "script",
-          "ink",
-          "image"
+        "label": "Alignment",
+        "type": "w",
+        "default_content": "CONTENT TO ALIGN",
+        "help": "Wrap a word or phrase to indicate a change in alignment.",
+        "documentation": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+        "tag": "hi",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "type": "menu",
+            "options": [
+              {
+                "label": "Center",
+                "value": "center"
+              },
+              {
+                "label": "Right",
+                "value": "right"
+              },
+              {
+                "label": "Justify",
+                "value": "justify"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Baseline",
+        "type": "w",
+        "default_content": "TARGET CONTENT",
+        "help": "Wrap a word or phrase to alter its baseline.",
+        "documentation": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+        "tag": "hi",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "type": "menu",
+            "options": [
+              {
+                "label": "Subscript",
+                "value": "subscript"
+              },
+              {
+                "label": "Superscript",
+                "value": "superscript"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Decoration",
+        "type": "w",
+        "default_content": "CONTENT TO DECORATE",
+        "help": "Wrap a word or phrase and indicate a type of decoration.",
+        "documentation": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+        "tag": "hi",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "type": "menu",
+            "options": [
+              {
+                "label": "Underscore/Underline",
+                "value": "underscore"
+              },
+              {
+                "label": "Overline",
+                "value": "overline"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Indentation",
+        "type": "w",
+        "default_content": "CONTENT TO INDENT",
+        "help": "Wrap a word or phrase to assign a level of indentation to it.",
+        "documentation": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+        "tag": "hi",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "type": "menu",
+            "options": [
+              {
+                "label": "Level 1",
+                "value": "indent"
+              },
+              {
+                "label": "Level 2",
+                "value": "indent1"
+              },
+              {
+                "label": "Level 3",
+                "value": "indent2"
+              },
+              {
+                "label": "Level 4",
+                "value": "indent3"
+              },
+              {
+                "label": "Level 5",
+                "value": "indent4"
+              }
+            ]
+          }
         ]
       }
     ]
   },
   {
-    "section": "close"
-  },
-  {
-    "section": "Other",
-    "id": "other_tags"
-  },
-  {
-    "name": "Blank space",
-    "type": "sc",
-    "help": "Mark <b>unusual space</b> in the source text.",
-    "link": "#Blank_Space",
-    "tag_name": "space",
-    "attributes": [
+    "section": "Layout",
+    "id": "layout_tags",
+    "items": [
       {
-        "name": "extent",
-        "label": "Extent",
-        "message": "Description of the <b>extent</b> of the blank, <i>e.g.</i> 7 words",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Layout > Columns",
-    "type": "w",
-    "help": "Wraps a section of text that is laid out as columns. The columns themselves must be tagged individually.",
-    "link": "#Columns",
-    "tag_name": "layout",
-    "attributes": [
+        "label": "Blank space",
+        "type": "sc",
+        "help": "Mark <b>unusual space</b> in the source text.",
+        "documentation": "#Blank_Space",
+        "tag": "space",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "extent",
+            "label": "Extent",
+            "editable": true,
+            "required": true,
+            "description": "Description of the <b>extent</b> of the blank, <i>e.g.</i> 7 words",
+            "type": "string"
+          }
+        ]
+      },
       {
-        "name": "columns",
         "label": "Columns",
-        "message": "<b>Number of columns</b> in which the selected section is divided.",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Column",
-    "type": "w",
-    "help": "Wraps a column of text. Must be inside a <layout> tag.",
-    "link": "#Columns",
-    "tag_name": "ab",
-    "attribute_name": "type",
-    "attribute_value": "column",
-    "attributes": [
-      {
-        "name": "n",
-        "label": "Number",
-        "message": "<b>Number of the column</b> on the page, <i>e.g.</i> 1, 2, etc",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Named entity",
-    "type": "w",
-    "help": "Wrap text that refers to a person, place, room, etc.",
-    "link": "#Named_Entities_.28Persons.2FLocations.2FOrganizations.29",
-    "tag_name": "rs",
-    "attributes": [
-      {
-        "name": "type",
-        "label": "Type",
-        "type": "text",
-        "message": "<b>Type</b> of entity",
-        "options": [
-          "object",
-          "organization",
-          "person",
-          "place",
-          "locus"
+        "type": "w",
+        "help": "Adds a set of columns to the page.",
+        "documentation": "#Columns",
+        "tag": "layout",
+        "multi_tag": true,
+        "attributes": [
+          {
+            "name": "columns",
+            "label": "Number of columns",
+            "editable": true,
+            "required": true,
+            "type": "string"
+          }
         ]
       },
       {
-        "name": "key",
-        "label": "Key",
-        "message": ", and <b>key</b> to an externally-defined means of identifying the entity, <i>e.g.</i> a database UUID",
-        "type": "text"
-      }
-    ]
-  },
-  {
-    "name": "Leader",
-    "type": "sc",
-    "help": "Typographical mark used to connect items on the page that might be separated by considerable horizontal distance.",
-    "link": "#Leaders",
-    "tag_name": "metamark",
-    "attribute_name": "function",
-    "attribute_value": "leader",
-    "attributes": [
+        "label": "Horizontal rule",
+        "type": "sc",
+        "help": "Adds a horizontal line accross the page.",
+        "documentation": "#Leaders",
+        "tag": "metamark",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "function",
+            "label": "Function",
+            "editable": false,
+            "required": true,
+            "default": "hr"
+          }
+        ]
+      },
       {
-        "name": "rend",
-        "label": "Rend",
-        "type": "text",
-        "message": "How the leader is <b>rend</b>ered on the page",
-        "options": [
-          "dots",
-          "line",
-          "dashes",
-          "none"
+        "label": "Leader",
+        "type": "sc",
+        "help": "Typographical mark used to connect items on the page that might be separated by considerable horizontal distance.",
+        "documentation": "#Leaders",
+        "tag": "metamark",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "function",
+            "label": "Function",
+            "editable": false,
+            "required": true,
+            "default": "leader"
+          },
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": true,
+            "type": "choice",
+            "description": "How the leader is <b>rend</b>ered on the page",
+            "options": [
+              {
+                "label": "Dashed line",
+                "value": "dashes"
+              },
+              {
+                "label": "Dotted line",
+                "value": "dots"
+              },
+              {
+                "label": "Ellipsis (three dots)",
+                "value": "ellipsis"
+              },
+              {
+                "label": "Solid line",
+                "value": "line"
+              },
+              {
+                "label": "Spacing only",
+                "value": "none"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "Table",
+        "type": "w",
+        "help": "Adds a tabular structure to the page. If applied to a comma/tab-separated block of content, the structure is parsed automatically, otherwise a skeleton table is added.",
+        "documentation": "#Leaders",
+        "tag": "table",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "rend",
+            "label": "Rendering",
+            "editable": true,
+            "required": false,
+            "type": "multichoice",
+            "options": [
+              {
+                "label": "Horizontal header",
+                "value": "hor_header",
+                "description": "Use the contents of the first row as headers."
+              },
+              {
+                "label": "Vertical header",
+                "value": "vert_header",
+                "description": "Use the contents of the first column as headers."
+              },
+              {
+                "label": "Table border",
+                "value": "boxed",
+                "description": "Adds a border around the table."
+              },
+              {
+                "label": "Row dividers",
+                "value": "hdiv",
+                "description": "Adds dividers between rows."
+              },
+              {
+                "label": "Column dividers",
+                "value": "vdiv",
+                "description": "Adds dividers between columns."
+              }
+            ]
+          },
+          {
+            "name": "rows",
+            "label": "Rows",
+            "editable": true,
+            "required": false,
+            "type": "string",
+            "description": "Number of rows if creating an empty table."
+          },
+          {
+            "name": "cols",
+            "label": "Columns",
+            "editable": true,
+            "required": false,
+            "type": "string",
+            "description": "Number of columns if creating an empty table."
+          }
         ]
       }
     ]
   },
   {
-    "section": "close"
+    "section": "Marks",
+    "id": "mark_tags",
+    "items": [
+      {
+        "label": "Ditto",
+        "type": "sc",
+        "help": "Mark to indicate that the words or figures above it are to be repeated",
+        "documentation": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+        "tag": "metamark",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "function",
+            "label": "Function",
+            "editable": false,
+            "required": true,
+            "default": "ditto"
+          }
+        ]
+      },
+      {
+        "label": "Ellipsis",
+        "type": "sc",
+        "help": "Mark to indicates the intentional omission of text without altering its original meaning",
+        "documentation": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+        "tag": "metamark",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "function",
+            "label": "Function",
+            "editable": false,
+            "required": true,
+            "default": "ellipsis"
+          }
+        ]
+      },
+      {
+        "label": "Glyph",
+        "type": "sc",
+        "help": "Add a non-standard character (e.g. manicule, cross, fraction, etc.)",
+        "documentation": "#Indentations.2C_Superscripts.2C_and_Subscripts",
+        "tag": "g",
+        "multi_tag": true,
+        "attributes": [
+          {
+            "name": "ref",
+            "label": "Value",
+            "editable": true,
+            "required": true,
+            "type": "special",
+            "options": [
+              {
+                "value": "22B6",
+                "description": "Barbell right"
+              },
+              {
+                "value": "22B7",
+                "description": "Barbell left"
+              },
+              {
+                "value": "25CB",
+                "description": "Circle"
+              },
+              {
+                "value": "2655",
+                "description": "Crown"
+              },
+              {
+                "value": "2720",
+                "description": "Maltese cross"
+              },
+              {
+                "value": "261A",
+                "description": "Manicule pointing left"
+              },
+              {
+                "value": "261B",
+                "description": "Manicule pointing right"
+              },
+              {
+                "value": "00BD",
+                "description": "fraction - half",
+                "wrapper": {
+                  "tag": "num",
+                  "attributes": {
+                    "type": "fraction",
+                    "value": 0.5
+                  }
+                }
+              },
+              {
+                "value": "2153",
+                "description": "fraction - third",
+                "wrapper": {
+                  "tag": "num",
+                  "attributes": {
+                    "type": "fraction",
+                    "value": 0.33
+                  }
+                }
+              },
+              {
+                "value": "00BC",
+                "description": "fraction - quarter",
+                "wrapper": {
+                  "tag": "num",
+                  "attributes": {
+                    "type": "fraction",
+                    "value": 0.25
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
