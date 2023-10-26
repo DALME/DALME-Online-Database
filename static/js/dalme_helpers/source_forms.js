@@ -3,20 +3,23 @@ function source_forms_load() {
 
 function source_forms_init() {
   one_time_setup = false;
-  url_var = null;
-  biblio_types = {
-    'book': 1,
-    'bookSection': 4,
-    'encyclopediaArticle': 9,
-    'journalArticle': 3,
-    'magazineArticle': 6,
-    'manuscript': 7,
-    'newspaperArticle': 6,
-    'thesis': 11,
-    'webpage': 2
-  };
-  selectize_key = dt_editor.field('attributes.zotero_key').inst();
-  selectize_lib = dt_editor.field('attributes.library.id').inst();
+
+  if (source_type == 'bibliography') {
+    url_var = null;
+    biblio_types = {
+      'book': 1,
+      'bookSection': 4,
+      'encyclopediaArticle': 9,
+      'journalArticle': 3,
+      'magazineArticle': 6,
+      'manuscript': 7,
+      'newspaperArticle': 6,
+      'thesis': 11,
+      'webpage': 2
+    };
+    selectize_key = dt_editor.field('attributes.zotero_key').inst();
+    selectize_lib = dt_editor.field('attributes.library.id').inst();
+  }
 }
 
 function source_form_setup(e, mode, action) {
