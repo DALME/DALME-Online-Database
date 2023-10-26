@@ -17,6 +17,7 @@ function switch_tab(tab) {
 function startEditor() {
   if (typeof transcriber_state == 'undefined') {
       transcriber_state = 'on';
+      tag_reference = {};
       footer_content = '...';
       maxHeight = $(window).height() - 340;
       editor_mode = 'render';
@@ -46,7 +47,8 @@ function startEditor() {
           });
       };
       if (folio_array[0].tr_id == 'None') {
-          $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
+          $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. \
+          Click <b>Edit</b> to start...</div>');
           $('#author').html('No transcription available');
           tr_text = '';
       } else {
@@ -65,7 +67,7 @@ function startEditor() {
             tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
                 $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
             });
-            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+            // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
             $('#author').html('Transcribed by '+data.author);
             setupTeiRendering()
           });
@@ -102,8 +104,12 @@ function resizeEditor(top_height) {
     const remainingSpace = $('#tr_editor').height() - top_height - $('#viewer-toolbar').outerHeight();
     $('.panel-bottom').height(remainingSpace);
     $('#diva_viewer').height(diva_height);
-    $('#editor').height(remainingSpace - $('#editor-toolbar').outerHeight());
-    $('#tag-menu').height(remainingSpace - $('#editor-toolbar').outerHeight());
+    let new_h = remainingSpace - $('#editor-toolbar').outerHeight();
+    $('#editor').height(new_h);
+    $('#notebar').height(new_h);
+    $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`})
+    $('.notes_container').height($('tei-body').height() + 20);
+    $('#tag-menu').height(new_h);
     if (editor_mode == 'xml') { xmleditor.resize() };
     resetPanelMetrics();
 }
@@ -134,6 +140,8 @@ function changeEditorMode() {
       xmleditor.session.on("change", updateEditorToolbar);
       setEditorToolbar();
       setTagMenu('on');
+      resetTeiRendering();
+      $('#notebar').hide();
   } else if (editor_mode == 'xml') {
       editor_mode = 'render';
       saveEditor();
@@ -149,12 +157,13 @@ function changeEditorMode() {
         tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
             $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
         });
-        setupTeiRendering()
       } else {
         $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
         $('#editor').html('No transcription available');
       };
-      $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+      // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+      $('#notebar').show();
+      setupTeiRendering();
   }
 }
 
@@ -256,7 +265,9 @@ function setEditorOptions(dict) {
         mode: "ace/mode/xml",
         indentedSoftWrap: true,
         fixedWidthGutter: true,
-        scrollPastEnd: 0.1
+        scrollPastEnd: 0.1,
+        useSoftTabs: false,
+        navigateWithinSoftTabs: true,
     });
   }
 }
@@ -264,7 +275,7 @@ function setEditorOptions(dict) {
 function setEditorToolbar() {
   let editor_options = $('#hidden-content').html();
   $('#editor-right-toolbar')
-    .prepend('<button class="editor-btn button-border-left" id="btn_cancel" onclick="cancelEditor()"><i class="fa fa-times-circle fa-fw"></i> Cancel</button>')
+    .prepend('<button class="editor-btn button-border-left" id="btn_cancel" onclick="cancelEditor()"><i class="fa fa-times-circle fa-fw">\</i> Cancel</button>')
     .prepend('<button class="editor-btn button-border-left" id="btn_save" onclick="saveButton()" disabled><i class="fa fa-save fa-fw"></i> Save</button>');
   $('#editor-left-toolbar')
     .prepend('<button class="editor-btn button-border-right" id="btn_options" onclick="editorOptionsMenu()" title="Editor options" data-toggle="tooltip"><i class="fas fa-cog fa-fw" ></i></button>')
@@ -393,171 +404,409 @@ function setTagMenu(action) {
               'target': 'editor_tei_tags'
             })
           }).done(function(data, textStatus, jqXHR) {
-              tei_tags = data[0];
-              tag_menu_html = '';
-              for (let i = 0, len = tei_tags.length; i < len; ++i) {
-                  let item = tei_tags[i];
-                  let att_array = [];
-                  if ('section' in item) {
-                      if (item.section == 'close') {
-                        tag_menu_html += '</div></div>';
-                      } else {
-                        tag_menu_html += `<div class="tag-menu-container"><div class="tag-menu-section-head collapsed" id="heading_${item.id}" data-toggle="collapse" \
-                        data-target="#${item.id}" aria-expanded="false" aria-controls="${item.id}">${item.section}</div>\
-                        <div id="${item.id}" class="collapse" aria-labelledby="heading_${item.id}" data-parent="#tag-menu">`;
-                      }
-                  } else {
-                      if ('attribute_name' in item) {
-                        att_array.push(item.attribute_name+'|'+item.attribute_value);
-                      };
-                      if ('attributes' in item) {
-                          tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button tag-keep-open" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
-                          </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} \
-                          <a href='https://wiki.dalme.org/DALME_TEI_Schema${item.link}' target='_blank'>See DALME Wiki</a>"></i>\
-                          </div><div id="${item.tag_name}_dd" class="dropdown-menu tag-menu-dropdown p-2"><div class="tag-menu-form">`;
-                          let message = '';
-                          for (let j = 0, lenj = item.attributes.length; j < lenj; ++j) {
-                            let att = item.attributes[j];
-                            message += att.message;
-                            att_array.push(att.name+'|'+att.type+'|'+item.tag_name+'_'+att.name);
-                            if (att.type == 'text') {
-                                tag_menu_html += `<input class="form-control form-control-sm" type="text" id="${item.tag_name+'_'+att.name}" placeholder="${att.label}">`;
-                                if ('options' in att) {
-                                  message += ' (<i>e.g.:</i> ';
-                                  let opt_list = [];
-                                  for (let k = 0, lenk = att.options.length; k < lenk; ++k) {
-                                    opt_list.push(`<a href="#" onclick="$(\'#${item.tag_name+'_'+att.name}\').val(\'${att.options[k]}\')">${att.options[k]}</a>`);
+              tei_data = data[0];
+              tag_menu_html = '<div class="tag-menu-container">';
+
+              for (const section of tei_data) { // open 1
+                tag_menu_html += `<div class="tag-menu-section-head collapsed" id="heading_${section.id}" \ 
+                data-toggle="collapse" data-target="#${section.id}" aria-expanded="false" aria-controls="${section.id}">${section.section}</div> \
+                <div id="${section.id}" class="collapse" aria-labelledby="heading_${section.id}" data-parent="#tag-menu">`;
+                
+                for (const item of section.items) {
+                  const item_id = item.label.replaceAll(' ', '').toLowerCase();
+                  const defaultCt = item.default_content || null;
+                  tag_reference[item_id] = item;
+                  
+                  if ('attributes' in item) {
+                    const att_array = [];
+                    var isButton = false;
+                    var isMenu = false;
+
+                    if (item.attributes.length == 1 && item.attributes[0].type == 'menu') { // open 2
+                      tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button" data-toggle="dropdown" \
+                      aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
+                      </i>${item.label}<i class="fas fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" \
+                      data-toggle="tooltip" data-placement="left" title="${item.help} <a href='${item.documentation}' target='_blank'>See documentation</a>">\
+                      </i></div><div id="${item_id}_dd" class="dropdown-menu">`;
+                      isMenu = true;
+
+                    } else if (item.attributes.length == 1 && !item.attributes[0].editable) {
+                      tag_menu_html += `<div class="tag-menu-button-safe" onclick="addTag('${item_id}')"><i class="fas \
+                      fa-ellipsis-v fa-fw mr-1"></i>${item.label}<i class="fas fa-info-circle fa-fw ml-auto pl-2 \
+                      tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} \
+                      <a href='${item.documentation}' target='_blank'>See documentation</a>"></i></div>`;
+                      isButton = true;
+
+                    } else { // open 4
+                      tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button tag-keep-open" data-toggle="dropdown" \
+                      aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1"> \
+                      </i>${item.label}<i class="fas fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" \
+                      data-placement="left" title="${item.help} <a href='${item.documentation}' target='_blank'>See documentation</a>"></i> \
+                      </div><div id="${item_id}_dd" class="dropdown-menu tag-menu-dropdown p-2"><div class="tag-menu-form">\
+                      <div class="input-container">`;
+                    }
+
+                    for (const attribute of item.attributes) {
+                        if (attribute.editable) {
+                          if (isMenu) {
+                            for (const opt of attribute.options) {
+                              tag_menu_html += `<a class="dropdown-item" href="#" onclick="addTag('${item_id}', '${opt.value}')">${opt.label}</a>`;
+                            }
+                            tag_menu_html += '</div></div>'; // close 2
+
+                          } else {
+                            if (attribute.type == 'special') {
+                              if (item.label == 'Glyph') {
+                                tag_menu_html += '</div><div class="glyph-container">';
+                                for (const opt of attribute.options) {
+                                  tag_menu_html += `<button class="glyph" data-toggle="tooltip" title="${opt.description}" \
+                                  onclick="$(\'#${item_id+'_'+attribute.name}\').val(\'${opt.value}\')">&#x${opt.value};</button>`;
+                                }
+                                tag_menu_html += '</div><div class="input-container">'
+                                tag_menu_html += `<div class="input-grp"><input class="form-control form-control-sm" type="text" \
+                                id="${item_id+'_'+attribute.name}" placeholder="Unicode value" aria-describedby="${item_id+'_'+attribute.name+'_help'}">\
+                                <small id="${item_id+'_'+attribute.name+'_help'}" class="form-text-flex text-muted"><span>\
+                                You can find new glyphs by consulting <a href="https://symbl.cc/en/unicode/" target="_blank">character tables</a> \
+                                or by <a href="https://shapecatcher.com" target="_blank">drawing the desired symbol</a>.</span></small></div>`; 
+                              }
+                            } else {
+                              if (attribute.type == 'string') {
+                                  let att_html = attribute.description ? '<div class="input-grp">' : '';
+                                  att_html += `<input class="form-control form-control-sm" type="text" id="${item_id+'_'+attribute.name}" \
+                                  placeholder="${attribute.label}"`;
+  
+                                  if (attribute.description) {
+                                    att_html += ` aria-describedby="${item_id+'_'+attribute.name+'_help'}">\
+                                    <small id="${item_id+'_'+attribute.name+'_help'}" class="form-text-flex text-muted"><span>${attribute.description}</span></small></div>`
+                                  } else {
+                                    att_html += '>';
+                                  }
+                                  
+                                  tag_menu_html += att_html;
+  
+                              } else if (attribute.type == 'textarea') {
+                                  let att_html = attribute.description ? '<div class="input-grp">' : '';
+                                  att_html += `</div><textarea class="form-control form-control-sm" id="${item_id+'_'+attribute.name}" \
+                                  placeholder="${attribute.label}"`;
+                                  
+                                  if (attribute.description) {
+                                    att_html += ` aria-describedby="${item_id+'_'+attribute.name+'_help'}"></textarea>\
+                                    <small id="${item_id+'_'+attribute.name+'_help'}" class="form-text-flex text-muted">${attribute.description}</small>\
+                                    </div><div class="input-container">`
+                                  } else {
+                                    att_html += '></textarea><div class="input-container">';
+                                  }
+  
+                                  tag_menu_html += att_html;
+                              
+                              } else if (attribute.type == 'choice') {
+                                  tag_menu_html += `<select class="form-control form-control-sm" id="${item_id+'_'+attribute.name}">`
+                                  tag_menu_html += `<option disabled selected>${attribute.label}</option>`;
+                                  
+                                  for (const opt of attribute.options) {
+                                    tag_menu_html += `<option value="${opt.value}"`;
+                                    if (opt.value == attribute.default) {
+                                      tag_menu_html += ' selected';
+                                    }
+                                    tag_menu_html += `>${opt.label}</option>`;
                                   };
-                                  message += opt_list.join(', ')
-                                  message += ')';
-                                };
-                            } else if (att.type == 'choice') {
-                                tag_menu_html += `<select class="form-control form-control-sm" id="${item.tag_name+'_'+att.name}">`
-                                tag_menu_html += `<option disabled selected>${att.label}</option>`;
-                                for (let k = 0, lenk = att.options.length; k < lenk; ++k) { tag_menu_html += `<option>${att.options[k]}</option>`; };
-                                tag_menu_html += `</select>`;
-                            };
-                          };
-                          message += '.';
-                          tag_menu_html += `<button type="button" class="btn btn-primary dd-button" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')">Add</button>`;
-                          tag_menu_html += `</div><small class="form-text text-muted">${message}</small></div></div>`;
-                      } else if ('menu' in item) {
-                          tag_menu_html += `<div class="list-group dropleft"><div class="tag-menu-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-caret-left fa-fw mr-1">\
-                          </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} \
-                          <a href='https://wiki.dalme.org/DALME_TEI_Schema${item.link}' target='_blank'>See DALME Wiki</a>"></i>\
-                          </div><div id="${item.tag_name}_dd" class="dropdown-menu">`;
-                          for (let j = 0, lenj = item.menu.length; j < lenj; ++j) {
-                            tag_menu_html += `<a class="dropdown-item" href="#" onclick="addTag('${item.type}', '${item.tag_name}', '${item.attribute}|${item.menu[j]}')">${item.menu[j]}</a>`;
-                          };
-                          tag_menu_html += '</div>';
-                      } else {
-                          tag_menu_html += `<div class="tag-menu-button" onclick="addTag('${item.type}', '${item.tag_name}', '${att_array.join('-')}')"><i class="fas fa-caret-left fa-fw mr-1">\
-                          </i>${item.name}<i class="far fa-info-circle fa-fw ml-auto pl-2 tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help}"></i></div>`;
-                      };
-                  }
-              };
-              tag_menu_html += '</div></div>';
+                                  
+                                  tag_menu_html += `</select>`;
+
+                              } else if (attribute.type == 'multichoice') {
+                                  tag_menu_html += `</div><div class="multi-container" id="${item_id+'_'+attribute.name}"><div class="multi-title">${attribute.label}</div>`;
+                                  for (const opt of attribute.options) {
+                                    tag_menu_html += `<div class="form-check"><input class="form-check-input" \
+                                    type="checkbox" value="${opt.value}" id="${item_id+'_'+opt.value}">\
+                                    <label class="form-check-label" for="${item_id+'_'+opt.value}">${opt.label}</label></div>`;
+                                    if (opt.description) {
+                                      tag_menu_html += `<div class="multi-help">${opt.description}</div>`;
+                                    }
+                                  };
+                                  tag_menu_html += '</div><div class="input-container">';
+                              }
+                            }
+                          }
+                        }
+                    }
+                    
+                    if (!isButton && !isMenu) {
+                      tag_menu_html += `<button type="button" class="btn btn-primary dd-button" onclick="addTag('${item_id}')">Add</button>\
+                      </div></div></div></div>`;
+                    }
+                  
+                  } else {
+                      tag_menu_html += `<div class="tag-menu-button-safe" onclick="addTag('${item_id}')"><i class="fas \
+                      fa-ellipsis-v fa-fw mr-1"></i>${item.label}<i class="fas fa-info-circle fa-fw ml-auto pl-2 \
+                      tag-tooltip" data-html="true" data-toggle="tooltip" data-placement="left" title="${item.help} \
+                      <a href='${item.documentation}' target='_blank'>See documentation</a>"></i></div>`;
+                  };
+                }
+                tag_menu_html += '</div>';
+              }
+
+              tag_menu_html += '</div>';
               $('#tag-menu').show();
               $('#tag-menu').html(tag_menu_html);
               $('.tag-tooltip').tooltip({container: 'body', delay: { "show": 100, "hide": 1000 }});
               $('.tag-menu-dropdown').on('click', function(e) { e.stopPropagation(); });
               $('.tag-keep-open').on('click', function(e) { $(this).next().toggle(); });
-              $('.dd-button').on('click', function(e) { $(this).parent().parent().toggle(); });
+              $('.dd-button').on('click', function(e) { $(this).parent().parent().parent().toggle(); });
+          
           }).fail(function(jqXHR, textStatus, errorThrown) {
               toastr.error('The following error occured while attempting to retrieve the data for the tags menu: '+errorThrown);
           });
+      
       } else {
           $('#tag-menu').show();
           $('#tag-menu').html(tag_menu_html);
           $('.tag-tooltip').tooltip({container: 'body', delay: { "show": 100, "hide": 1000 }});
           $('.tag-menu-dropdown').on('click', function(e) { e.stopPropagation(); });
           $('.tag-menu-button').on('click', function(e) { $(this).next().toggle(); });
-          $('.dd-button').on('click', function(e) { $(this).parent().parent().toggle(); });
+          $('.dd-button').on('click', function(e) { $(this).parent().parent().parent().toggle(); });
       }
+
   } else {
       $('#tag-menu').html('');
       $('#tag-menu').hide();
   }
 }
 
-function addTag(type, tag, att_array) {
-    let tag_attributes = [];
-    if (tag == 'note' || tag == 'seg') { var special_att = {} };
-    if (att_array) {
-      if (att_array.includes('-')) {
-        att_array = att_array.split('-');
-      } else {
-        att_array = [att_array];
-      };
-      for (let i = 0, len = att_array.length; i < len; ++i) {
-          let att = att_array[i].split('|');
-          if (att.length == 2) {
-              tag_attributes.push([att[0], att[1]]);
-          } else {
-              let att_value = '';
-              switch (att[1]) {
-                case 'text':
-                    att_value = $('#'+att[2]).val();
-                    $('#'+att[2]).val('');
-                    break;
-                case 'choice':
-                    att_value = $('#'+att[2]).find('option:selected').text();
-                    $('#'+att[2])[0].selectedIndex = 0;
-              };
-              if (tag == 'note' || tag == 'seg') {
-                special_att[att[0]] = att_value;
-              } else {
-                tag_attributes.push([att[0], att_value]);
+function addTag(item_id, value=null) {
+    const item_data = tag_reference[item_id];
+    const attributes = {};
+    let type = item_data.type;
+    let tag_attributes = null;
+    let tag_content = null;
+    let prefix = null;
+    let suffix = null;
+    let tag_output = '<' + item_data.tag;
+    let insert_range = xmleditor.selection.getRange();
+    let insert_point = insert_range.end;
+
+    if (item_data.attributes) {
+      item_data.attributes.forEach((attr) => {
+        if (!attr.editable) {
+          attributes[attr.name] = attr.default;
+        } else if (attr.type == 'menu') {
+          attributes[attr.name] = value;
+        } else {
+          if (['string', 'textarea', 'special'].includes(attr.type)) {
+            attributes[attr.name] = $(`#${item_id}_${attr.name}`).val();
+            $(`#${item_id}_${attr.name}`).val('');
+          
+          } else if (attr.type == 'multichoice') {
+            let att_list = [];
+            $(`#${item_id}_${attr.name}`).find('input[type=checkbox]').each(function(index, el) {
+              if (this.checked) {
+                att_list.push($(this).val());
+                $(this).prop("checked", false);
               }
-          }
-      }
-    };
-    if (tag == 'seg') {
-      tag_attributes.push(['target', special_att['target']]);
-      tag_attributes.push(['rend', special_att['rend']]);
-    };
-    if (tag == 'note') {
-      if (special_att['type'] == 'renvoi') {
-        const note_ref = `<ref target="${special_att['target']}"/>`;
-        const note_output = `\n\n<note xml:id="${special_att['target']}">${special_att['text']}</note>`;
-        xmleditor.session.insert(xmleditor.getCursorPosition(), note_ref);
-        xmleditor.session.insert({row: xmleditor.session.getLength(), column: 0}, note_output)
-      } else {
-        const tag_output = `<note type="${special_att['type']}">${special_att['text']}</note>`;
-        xmleditor.session.insert(xmleditor.getCursorPosition(), tag_output)
-      }
-    } else {
-      var tag_output = '<' + tag;
-      if (tag_attributes.length != 0) {
-        for (let i = 0, len = tag_attributes.length; i < len; ++i) {
-          if (tag_attributes[i][1] != '' && tag_attributes[i][1] != 'Join') {
-            tag_output += ' ' + tag_attributes[i][0] + '="' + tag_attributes[i][1] + '"';
+            });
+            if (att_list.length) {
+              attributes[attr.name] = att_list;
+            }
+
+          } else {
+            attributes[attr.name] = $(`#${item_id}_${attr.name}`).find('option:selected').val();
+            $(`#${item_id}_${attr.name}`)[0].selectedIndex = 0;
           }
         }
-      };
-      if (type == 'w') {
-        const range = xmleditor.selection.getRange();
-        tag_output += '>' + xmleditor.getSelectedText() + '</' + tag + '>';
-        xmleditor.session.replace(range, tag_output);
+      })
+    }
+
+    if (type == 'w') {
+      let selection = xmleditor.getSelectedText();
+      if (selection) {
+        tag_content = selection;
+      } else if (item_data.default_content) {
+        tag_content = item_data.default_content;
+      }
+    }
+
+    if (item_id == 'columns') {
+      let col_count = attributes.columns;
+      let content = '';
+      for (let i = 0; i < col_count; i++) {
+        content += `\n\t<ab type="column" n="${i+1}">`;
+        if (i == 0 && tag_content) {
+          let lines = tag_content.split('\n');
+          lines.forEach((line) => {
+            content += `\n\t\t${line}`;
+          })
+        } else {
+          content += `\n\t\tCOLUMN ${i+1} CONTENT`;
+        }
+        content += '\n\t</ab>';
+      }
+      tag_content = `${content}\n`;
+    }
+
+    if (item_id == 'glyph') {
+      let opt = item_data.attributes[0].options.filter((i) => i.value == attributes.ref)[0];
+      if (opt.wrapper) {
+        prefix = `<${opt.wrapper.tag}`;
+        if (opt.wrapper.attributes) {
+          for (const key in opt.wrapper.attributes) {
+            prefix += ` ${key}="${opt.wrapper.attributes[key]}"`
+          }
+          prefix += '>'
+        } else {
+          prefix += '>'
+        }
+        suffix = `</${opt.wrapper.tag}>`;
+      }
+    }
+
+    if (item_data.tag == 'note') {
+      let { text, rend, gloss, lang, ...x_attributes } = attributes;
+      tag_attributes = x_attributes;
+      rend = Array.isArray(rend) ? rend.join(' ') : rend;
+    
+      if (['renvoi', 'brace', 'gloss'].includes(tag_attributes.type)) {
+        const note_id = Math.ceil(Math.random()*10000);
+        prefix = '\n';
+        suffix = '\n';
+        tag_attributes['xml:id'] = note_id;
+        
+        if (tag_attributes.type == 'renvoi') {
+          xmleditor.session.replace(insert_range, `<ref target="${note_id}" rend="${rend}">${tag_content}</ref>`);
+        } else if (tag_attributes.type == 'gloss') {
+          xmleditor.session.replace(insert_range, `<term xml:id="${note_id}">${tag_content}</term>`);
+          var gloss_tag = `\n<noteGrp>\n\t<gloss target="${note_id}" lang="${lang}">${gloss}</gloss>\n</noteGrp>\n`;
+        } else {
+          let content = `<seg type="brace" target="${note_id}" rend="${rend}">`;
+          let lines = tag_content.split('\n');
+          lines.forEach((line) => {
+            content += `\n\t${line}`;
+          })
+          content += '\n</seg>';
+          xmleditor.session.replace(insert_range, content);
+        }
+
+        insert_point = { row: xmleditor.session.getLength(), column: 0 };
+        tag_content = text;
+        type = 'sc';
+
+        if (typeof gloss_tag != 'undefined') {
+          xmleditor.session.insert(insert_point, gloss_tag);
+          insert_point = { row: insert_point.row + 1, column: 0 };
+          prefix = '\t';
+        }
+  
+      } else if (tag_attributes.type == 'marginal') {
+        prefix = ' ';
+        tag_content = text;
+      }
+    }
+
+    if (item_data.tag == 'table') {
+      let rend_attr = attributes.rend ? attributes.rend.filter((attr) => !['hor_header', 'vert_header'].includes(attr)) : null;
+      let row_count = attributes.rows ? attributes.rows : 3;
+      let col_count = attributes.cols ? attributes.cols : 3;
+      let body = '';
+
+      if (tag_content) {
+        tag_content = tag_content.trim();
+        let lines = tag_content.split('\n');
+        let splitter = ',';
+        row_count = lines.length;
+
+        lines.forEach((line, i) => {
+          if (i == 0) { splitter = line.includes('\t') ? '\t' : ','; }
+          let row = i == 0 && attributes.rend.includes('hor_header') ? '\t<row role="label">\n' : '\t<row role="data">\n';
+          let cols = line.split(splitter);
+          if (i == 0) { col_count = cols.length; }
+
+          cols.forEach((col, j) => {
+            if (j == 0 && attributes.rend.includes('vert_header')) {
+              row += `\t\t<cell role="label">${col.trim()}</cell>\n`;
+            } else {
+              row += `\t\t<cell>${col.trim()}</cell>\n`;
+            }
+          })
+
+          row += '\t</row>\n';
+          body += row;
+        })
+        
       } else {
-        tag_output += '/>';
-        xmleditor.session.insert(xmleditor.getCursorPosition(), tag_output)
-      };
-      if (tag == 'seg') {
-        const note_output = `\n\n<note type="brace" xml:id="${special_att['target']}">${special_att['text']}</note>`;
-        xmleditor.session.insert({row: xmleditor.session.getLength(), column: 0}, note_output)
-      };
+        for (let i = 0; i < row_count; i++) {
+          let row = i == 0 ? '\t<row role="label">\n' : '\t<row role="data">\n';
+          let cell_str = i == 0 ? 'HEADER' : 'VALUE';
+          for (let j = 0; j < col_count; j++) { 
+            row += `\t\t<cell>${cell_str} ${j + 1}</cell>\n`;
+          }
+          row += '\t</row>\n';
+          body += row;
+        }
+      }
+
+      tag_content = `\n${body}`;
+      tag_attributes = { rows: row_count, cols: col_count };
+
+      if (rend_attr.length) {
+        tag_attributes['rend'] = rend_attr.join(' ');
+      }
+    }
+
+    if (tag_attributes == null && Object.keys(attributes).length) { 
+      tag_attributes = attributes; 
+    }
+
+    if (tag_attributes && Object.keys(tag_attributes).length) {
+      for (const prop in tag_attributes) {
+        if (tag_attributes[prop] != '' && tag_attributes[prop] != 'Join') {
+          let vals = Array.isArray(tag_attributes[prop]) ? tag_attributes[prop].join(' ') : tag_attributes[prop];
+          tag_output += ` ${prop}="${vals}"`;
+        }
+        if (tag_attributes[prop] == 'hr') { prefix = '\n'; }
+      }
+    }
+
+    tag_output = tag_content != null ? `${tag_output}>${tag_content}</${item_data.tag}>` : `${tag_output} />`;
+    if (prefix) { tag_output = `${prefix}${tag_output}`; }
+    if (suffix) { tag_output = `${tag_output}${suffix}`; }
+
+    if (type == 'w') {
+      xmleditor.session.replace(insert_range, tag_output);
+    } else {
+      xmleditor.session.insert(insert_point, tag_output);
     }
 }
 
 function setupTeiRendering() {
+  $('#notebar').height(Math.round($('.panel-bottom').height() - 62));
+  $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
+  $('.notes_container').height($('tei-body').height() + 20);
+
   if ($('tei-seg[type=brace]').length) { formatBraces(); }
-  if ($('tei-note[type=marginal]').length) { formatMarginalNotes(); }
-  if ($('tei-ref:not([rend])').length) { formatRenvois(); }
-  if ($('tei-ref[rend=gloss]').length) { formatGlosses(); }
+  if ($('tei-ref').length) { formatRenvois(); }
+  if ($('tei-gloss').length) { formatGlosses(); }
   if ($('tei-ab[type=column]').length) { formatColumns(); }
   if ($('tei-metamark[function=leader]').length) { formatLeaders(); }
+  if ($('tei-note[type=marginal]').length) { formatMarginalNotes(); }
+  
   $('[data-toggle="tooltip"]').tooltip();
+  
+  $(document).on('click', '.popover-header-closer', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(e.target).parent().parent().popover('hide');
+  });
+}
+
+function resetTeiRendering() {
+  $('[data-toggle="tooltip"]').tooltip('dispose');
+  if ($('tei-note[type=marginal]').length) {
+    $('.notes_container').empty();
+    $('#editor').off('scroll');
+    $('#notebar').off('scroll');
+  }
+  if ($('tei-ab[type=column]').length) { 
+    $(document).off('click', '.ab-column-toggler');
+  }
+  $('.notes_container').height($('tei-body').height() + 20);
 }
 
 /***** Utility functions *********/
@@ -634,34 +883,6 @@ function saveDescription() {
   }
 }
 
-function formatBraces() {
-  $('tei-seg[type=brace]').each(function(index, el) {
-    let target = $(this).attr('target');
-    if (target) {
-      if (target.length > 1 && target.startsWith('#')) target = target.substring(1);
-      $(this).append($(`tei-note#${target}`).remove());
-    }
-  });
-}
-
-function formatMarginalNotes() {
-  $('tei-note[type=marginal]').each(function(index, el) {
-    let margin_top = Math.round($(this).position().top);
-    let note = $(this).remove();
-    $(note).css({ top: `${margin_top}px`});
-    $('.notes_container').append(note);
-  });
-  $('.notes_container').height($('tei-text').height());
-  $('#transcription').on('scroll', function (e) {
-    $('#notebar').scrollTop($(this).scrollTop());
-  });
-  $('#notebar').on('scroll wheel', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  });
-}
-
 function formatColumns() {
   $(document).on('click', '.ab-column-toggler', (e) => {
       const parent = e.target.closest('tei-ab');
@@ -670,79 +891,146 @@ function formatColumns() {
 }
 
 function formatLeaders() {
-  let container_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
-  $('tei-metamark[function=leader]').each(function(index, el) {
-    let sum = 0;
+  $('tei-metamark[function=leader]:not([rend=ellipsis])').each(function(index, el) {
     let prev_array = [];
     let next_array = [];
     let prevSibs = $(this).prevUntil('tei-lb');
     let prevChild = $(this).prevUntil('*:has(tei-lb)');
     let nextSibs = $(this).nextUntil('tei-lb');
     let nextChild = $(this).nextUntil('*:has(tei-lb)');
+    
     if (prevChild.length < prevSibs.length) {
       let prev_el = prevChild.length ? prevChild : this;
       prev_array = $.merge(prevChild, $(prev_el).prev().children().nextUntil('tei-lb'));
     } else {
       prev_array = prevSibs;
     }
+
     if (nextChild.length < nextSibs.length) {
       let next_el = nextChild.length ? nextChild : this;
       next_array = $.merge(nextChild, $(next_el).next().children().nextUntil('tei-lb'));
     } else {
       next_array = nextSibs;
     }
-    const line_el = $.merge(prev_array, next_array)
-    line_el.each(function(i, elt) { sum += $(this).innerWidth(); });
-    const container_column = $(this).parents('.ab-content');
-    if (container_column.length) {
-      let column_width = container_column.attr('width');
-      if (typeof column_width === typeof undefined || column_width === false) {
-        container_column.attr('width', container_column.innerWidth());
-      }
-      container_width = container_column.attr('width');
+
+    const wrapper = $('<div class="tei-leader-line"></div>');
+    const post = $('<div></div>');
+    const anchor = $(next_array[next_array.length - 1]).next();
+    post.append(next_array);
+    wrapper.append(prev_array);
+    wrapper.append($(this));
+    wrapper.append(post);
+    wrapper.insertBefore(anchor);
+  });
+}
+
+function formatMarginalNotes() {
+  const rest = $('#notebar').offset().top;
+  let sum_height = 0;
+  $('tei-note[type=marginal]').each(function(index, el) {
+    $(el).css({ top: `${Math.round($(el).prev().offset().top - sum_height - rest)}px`});
+    sum_height += Math.round($(el).outerHeight(true));
+    $('.notes_container').append($(el).remove());
+  });
+
+  $('.notes_container').height($('tei-body').outerHeight() + 20);
+  $('#editor').on('scroll', function (e) {
+    $('#notebar').scrollTop($(this).scrollTop());
+  });
+
+  $('#notebar').on('scroll', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  });
+}
+
+function formatBraces() {
+  $('tei-seg[type=brace]').each(function(index, el) {
+    let target = $(this).attr('target');
+    if (target) {
+      if (target.length > 1 && target.startsWith('#')) target = target.substring(1);
+      $(this).append($(`tei-note#${target}`).remove());
     }
-    let target_width = container_width - sum - 15;
-    target_width = target_width > 10 ? target_width : 10;
-    $(this).width(target_width);
+  });
+  $('tei-note[type=brace]').popover({
+    container: 'body',
+    trigger: 'click',
+    html: true,
+    sanitize: false,
   });
 }
 
 function formatRenvois() {
-  $('tei-ref:not([rend])').each( function(index, el) {
+  $('tei-ref').each( function(index, el) {
     let note_id = $(this).attr('target');
     if (note_id.length > 1 && note_id.startsWith('#')) note_id = note_id.substring(1);
-    note = $(`tei-note[id='${note_id}']`)
+    let note = $(`tei-note[id='${note_id}']`).html();
+    note = note.replaceAll('tei-a', 'a');
+    note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
+
     if (note.length) {
-      $(this).attr({
-        title: note.html(),
-        'data-toggle': 'tooltip',
-        'data-html': true,
-        'data-template': '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
-      })
-    }
-  })
+        $(this).attr({
+          'title': 'Note',
+          'data-content': note,
+          'data-toggle': 'popover',
+          'data-template': '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header-wrapper"><h3 class="popover-header"></h3><div class="popover-header-closer"></div></div><div class="popover-body"></div></div>',
+          'tabindex': '0',
+        })
+      }
+    });
+    $('tei-ref').popover({
+      container: 'body',
+      trigger: 'click',
+      html: true,
+      sanitize: false,
+    });
 }
 
 function formatGlosses() {
-  $('tei-ref[rend=gloss]').each( function(index, el) {
-    let note_id = $(this).attr('target');
-    note = $(`tei-note[id='${note_id}']`).html();
+  const termList = {};
+  $('tei-gloss').each(function(index, el) {
+    const term_id = $(this).attr('target');
+    if (!(term_id in termList)) {
+      termList[term_id] = { glosses: [] }; 
+    }
+    termList[term_id].glosses.push({
+      lang: $(this).attr('lang'),
+      gloss: $(this).html()
+    });
+  });
+
+  for (const termId in termList) {
+    const glossList = termList[termId].glosses;
+    let note = $(`tei-note[id='${termId}']`).html();
     note = note.replaceAll('tei-a', 'a');
     note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
-    
-    if (note.length) {
-      $(this).attr({
-        'title': 'Note',
-        'data-content': note,
-        'data-toggle': 'popover',
-        'tabindex': '0',
-      })
+
+    let body = '<div class="gloss-container">';
+    for (const gloss of glossList) {
+      body = body + `<div class="inline-gloss"><div class="gloss-lang">${gloss.lang}</div>\
+      <div class="gloss-text">${gloss.gloss}</div></div>`;
     }
-  });
-  $('tei-ref[rend=gloss]').popover({
+
+    if (note.length) {
+      body = body + `<div class="inline-gloss-note">${note}</div>`;
+    }
+
+    body = body + '</div>';
+
+    $(`tei-term[id='${termId}']`).attr({
+      'title': 'Gloss',
+      'data-content': body,
+      'data-toggle': 'popover',
+      'data-template': '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header-wrapper"><h3 class="popover-header"></h3><div class="popover-header-closer"></div></div><div class="popover-body"></div></div>',
+      'tabindex': '0',
+    });
+  }
+  $('tei-term').popover({
     container: 'body',
-    trigger: 'focus',
+    trigger: 'click',
     html: true,
+    sanitize: false,
   });
 }
 
