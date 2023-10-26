@@ -83,32 +83,32 @@ resource "aws_iam_service_linked_role" "opensearch" {
 
 # Logs - https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticsearch/model/LogType.html
 resource "aws_cloudwatch_log_group" "opensearch_log_group_index_slow_logs" {
-  name              = "${var.service}-logs-opensearch-${local.opensearch_domain}-index-slow-${var.environment}"
+  name              = "${var.service}/opensearch/index-slow/${var.environment}"
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
   tags = {
-    Name = "${var.service}-logs-opensearch-${local.opensearch_domain}-index-slow-${var.environment}"
+    Name = "${var.service}/opensearch/index-slow/${var.environment}"
   }
 }
 
 resource "aws_cloudwatch_log_group" "opensearch_log_group_search_slow_logs" {
-  name              = "${var.service}-logs-opensearch-${local.opensearch_domain}-search-slow-${var.environment}"
+  name              = "${var.service}/opensearch/search-slow/${var.environment}"
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
   tags = {
-    Name = "${var.service}-logs-opensearch-${local.opensearch_domain}-search-slow-${var.environment}"
+    Name = "${var.service}/opensearch/search-slow/${var.environment}"
   }
 }
 
 resource "aws_cloudwatch_log_group" "opensearch_log_group_es_application_logs" {
-  name              = "${var.service}-logs-opensearch-${local.opensearch_domain}-es-application-${var.environment}"
+  name              = "${var.service}/opensearch/es-application/${var.environment}"
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
   tags = {
-    Name = "${var.service}-logs-opensearch-${local.opensearch_domain}-es-application-${var.environment}"
+    Name = "${var.service}/opensearch/es-application/${var.environment}"
   }
 }
 

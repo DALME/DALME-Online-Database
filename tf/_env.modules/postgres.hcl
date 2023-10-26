@@ -56,12 +56,13 @@ dependency "vpc" {
 inputs = {
   allocated_storage                     = 20
   backup_retention_period               = 7
-  db_name                               = "dalme"
+  db_name                               = local.service
   db_subnet_group_name                  = dependency.vpc.outputs.subnets.postgres
-  deletion_protection                   = false
+  deletion_protection                   = local.environment == "production"
   engine                                = "postgres"
   engine_version                        = 15
   environment                           = local.environment
+  iam_database_authentication_enabled   = false
   identifier                            = "${local.service}-rds-postgres-${local.environment}"
   instance_class                        = "db.t3.micro"
   kms_key_arn                           = dependency.secrets.outputs.kms_key_arn
@@ -74,8 +75,8 @@ inputs = {
   publicly_accessible                   = false
   vpc_security_group_ids                = [dependency.vpc.outputs.security_groups.postgres]
   service                               = local.service
-  skip_final_snapshot                   = true
+  skip_final_snapshot                   = local.environment == "staging"
   storage_encrypted                     = false
   storage_type                          = "gp2"
-  username                              = "dalme"
+  username                              = local.service
 }

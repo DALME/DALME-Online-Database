@@ -5,9 +5,10 @@ output "address" {
   value       = aws_db_instance.main.address
 }
 
-output "rds_instance_arn" {
-  description = "The ARN of the RDS instance."
-  value       = aws_db_instance.main.arn
+output "db_user" {
+  description = "IAM user with permissions to access the database."
+  value       = aws_iam_user.db_user.name
+  sensitive   = true
 }
 
 output "master_user_secret_arn" {
@@ -23,4 +24,9 @@ output "name" {
 output "username" {
   description = "The main username of the RDS instance."
   value       = aws_db_instance.main.username
+}
+
+output "rds_instance_arn" {
+  description = "The ARN of the RDS instance."
+  value       = aws_db_instance.main.arn
 }

@@ -302,31 +302,31 @@ resource "aws_ecs_service" "main" {
 }
 
 resource "aws_cloudwatch_log_group" "web_log_group" {
-  name              = "${var.service}-logs-web-log-group-${var.environment}"
+  name              = "${var.service}/ecs/web/${var.environment}/logs"
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
   tags = {
-    Name = "${var.service}-logs-web-log-group-${var.environment}"
+    Name = "${var.service}/ecs/web/${var.environment}/logs"
   }
 }
 
 resource "aws_cloudwatch_log_stream" "web_log_stream" {
-  name           = "${var.service}-logs-web-log-stream-${var.environment}"
+  name           = "${var.service}-ecs-web-log-stream-${var.environment}"
   log_group_name = aws_cloudwatch_log_group.web_log_group.name
 }
 
 resource "aws_cloudwatch_log_group" "proxy_log_group" {
-  name              = "${var.service}-logs-proxy-log-group-${var.environment}"
+  name              = "${var.service}/ecs/proxy/${var.environment}/logs"
   kms_key_id        = var.kms_key_arn
   retention_in_days = var.log_retention_in_days
 
   tags = {
-    Name = "${var.service}-logs-proxy-log-group-${var.environment}"
+    Name = "${var.service}/ecs/proxy/${var.environment}/logs"
   }
 }
 
 resource "aws_cloudwatch_log_stream" "proxy_log_stream" {
-  name           = "${var.service}-logs-proxy-log-stream-${var.environment}"
+  name           = "${var.service}-ecs-proxy-log-stream-${var.environment}"
   log_group_name = aws_cloudwatch_log_group.proxy_log_group.name
 }

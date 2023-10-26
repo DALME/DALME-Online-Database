@@ -40,6 +40,11 @@ variable "environment" {
   type        = string
 }
 
+variable "iam_database_authentication_enabled" {
+  description = "Allow db connections via IAM."
+  type        = bool
+}
+
 variable "identifier" {
   description = "Names the rds resource itself."
   type        = string

@@ -20,6 +20,7 @@ resource "aws_db_instance" "main" {
   deletion_protection                   = var.deletion_protection # tfsec:ignore:AVD-AWS-0177
   engine                                = var.engine
   engine_version                        = var.engine_version
+  iam_database_authentication_enabled   = var.iam_database_authentication_enabled
   identifier                            = var.identifier
   instance_class                        = var.instance_class
   manage_master_user_password           = var.manage_master_user_password

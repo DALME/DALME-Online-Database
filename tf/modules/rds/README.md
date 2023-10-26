@@ -35,6 +35,7 @@ No modules.
 | <a name="input_engine"></a> [engine](#input\_engine) | What type of database is the db instance. | `string` | n/a | yes |
 | <a name="input_engine_version"></a> [engine\_version](#input\_engine\_version) | The release version of the db instance. | `number` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Identify the deployment environment. | `string` | n/a | yes |
+| <a name="input_iam_database_authentication_enabled"></a> [iam\_database\_authentication\_enabled](#input\_iam\_database\_authentication\_enabled) | Allow db connections via IAM. | `bool` | n/a | yes |
 | <a name="input_identifier"></a> [identifier](#input\_identifier) | Names the rds resource itself. | `string` | n/a | yes |
 | <a name="input_instance_class"></a> [instance\_class](#input\_instance\_class) | The RDS db instance type. | `string` | n/a | yes |
 | <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The project encryption key ARN. | `string` | n/a | yes |
@@ -57,6 +58,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_address"></a> [address](#output\_address) | The address of the RDS instance. |
+| <a name="output_db_user"></a> [db\_user](#output\_db\_user) | IAM user with permissions to access the database. |
 | <a name="output_master_user_secret_arn"></a> [master\_user\_secret\_arn](#output\_master\_user\_secret\_arn) | The ARN of the db instance password secret. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the RDS instance. |
 | <a name="output_rds_instance_arn"></a> [rds\_instance\_arn](#output\_rds\_instance\_arn) | The ARN of the RDS instance. |

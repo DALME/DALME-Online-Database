@@ -22,6 +22,8 @@
 
 | Name | Type |
 |------|------|
+| [aws_acm_certificate.vpn](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/acm_certificate) | resource |
+| [aws_acm_certificate_validation.vpn](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/acm_certificate_validation) | resource |
 | [aws_db_subnet_group.postgres](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/db_subnet_group) | resource |
 | [aws_eip.nat](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/eip) | resource |
 | [aws_flow_log.vpc](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/flow_log) | resource |
@@ -29,6 +31,7 @@
 | [aws_nat_gateway.main](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/nat_gateway) | resource |
 | [aws_route.private](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route) | resource |
 | [aws_route.public](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route) | resource |
+| [aws_route53_record.vpn](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route53_record) | resource |
 | [aws_route_table.private](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route_table) | resource |
 | [aws_route_table.public](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route_table) | resource |
 | [aws_route_table_association.private](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route_table_association) | resource |
@@ -41,6 +44,7 @@
 | [aws_subnet.public](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/subnet) | resource |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/vpc) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/availability_zones) | data source |
+| [aws_route53_zone.main](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
 
