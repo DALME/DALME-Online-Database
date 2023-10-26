@@ -277,7 +277,7 @@
     </section>
     <div
       id="notebar"
-      :style= "[viewerMode == 'horizontal-split' ? { height: transcriptionHeight + 'px', top: divaHeight + headerHeight + 47 + 'px' } : { height: transcriptionHeight + 'px' }]"
+      :style="[viewerMode == 'horizontal-split' ? { height: transcriptionHeight + 'px', top: divaHeight + headerHeight + 47 + 'px', 'max-width': transcriptionWidth - transcriptionWidth * 0.25 + 'px' } : { height: transcriptionHeight + 'px', 'max-width': transcriptionWidth - transcriptionWidth * 0.25 + 'px' }]"
       v-show="hasMarginalNotes && showMarginalNotes">
       <div class="notes_container"></div>
     </div>
@@ -381,6 +381,7 @@
           windowHeight: null,
           headerHeight: 93,
           windowWidth: window.innerWidth,
+          transcriptionWidth: 0,
         },
         watch: {
           folioIndex: "switchFolio",
@@ -503,7 +504,7 @@
           renderImage() {
             if (!window.folio) {
               window.folio = new Diva('diva_viewer', {
-                objectData: `${this.db_endpoint}/pages/${this.folioId}/manifest/`,
+                objectData: `${this.db_endpoint}pages/${this.folioId}/manifest/`,
                 enableAutoTitle: false,
                 enableFullscreen: false,
                 enableKeyScroll: false,
@@ -528,7 +529,7 @@
               });
             } else {
               this.zoomLevel = 2;
-              window.folio.changeObject(`${this.db_endpoint}/pages/${this.folioId}/manifest/`);
+              window.folio.changeObject(`${this.db_endpoint}pages/${this.folioId}/manifest/`);
             }
           },
           setResizable(flipView=false) {
@@ -610,14 +611,10 @@
               this.hasBraces = true;
               this.formatBraces();
             }
-            if ($('tei-note[type=marginal]').length) {
-              this.hasMarginalNotes = true;
-              this.formatMarginalNotes();
-            }
-            if ($('tei-ref:not([rend])').length) {
+            if ($('tei-ref').length) {
               this.formatRenvois();
             }
-            if ($('tei-ref[rend=gloss]').length) {
+            if ($('tei-gloss').length) {
               this.formatGlosses();
             }
             if ($('tei-ab[type=column]').length) {
@@ -628,9 +625,23 @@
               this.hasLeaders = true;
               this.formatLeaders();
             }
+            if ($('tei-note[type=marginal]').length) {
+              this.hasMarginalNotes = true;
+              this.formatMarginalNotes();
+            }
+
             $('[data-toggle="tooltip"]').tooltip();
+
+            $(document).on('click', '.popover-header-closer', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              $(e.target).parent().parent().popover('hide');
+            });
+
+            this.transcriptionWidth = $('#tei-container').width();
+
             setTimeout(() => {
-              new ResizeSensor($('tei-text'), function(e) { app.updateTeiRendering(e) });
+              new ResizeSensor($('tei-text'), function(e) { app.updateTeiRendering() });
               $('section.transcription').scrollTop(0);
             }, 10);
           },
@@ -640,12 +651,14 @@
             }
             if (this.hasMarginalNotes) {
               let prev_height = $('.notes_container').height();
-              $('.notes_container').height(e.height);
+              let new_height = $('#tei-container').outerHeight();
+              $('.notes_container').height(new_height);
               $('tei-note[type=marginal]').each(function() {
-                let new_top = (parseInt($(this).css('top'), 10) / prev_height) * e.height;
+                let new_top = (parseInt($(this).css('top'), 10) / prev_height) * new_height;
                 $(this).css({ top: `${Math.round(new_top)}px`});
               });
             }
+            this.transcriptionWidth = $('#tei-container').width();
           },
           resetTeiRendering() {
             $('[data-toggle="tooltip"]').tooltip('dispose');
@@ -653,7 +666,7 @@
               this.hasMarginalNotes = false;
               $('.notes_container').empty();
               $('#transcription').off('scroll');
-              $('#notebar').off('scroll wheel');
+              $('#notebar').off('scroll');
             }
             if (this.hasColumns) {
               this.hasColumns = false;
@@ -735,19 +748,26 @@
                 $(this).append($(`tei-note#${target}`).remove());
               }
             });
+            $('tei-note[type=brace]').popover({
+              container: 'body',
+              trigger: 'click',
+              html: true,
+              sanitize: false,
+            });
           },
           formatMarginalNotes() {
+            $('.notes_container').height($('#tei-container').outerHeight());
+            let sum_height = 0;
             $('tei-note[type=marginal]').each(function(index, el) {
-              let margin_top = Math.round($(this).position().top);
-              let note = $(this).remove();
-              $(note).css({ top: `${margin_top}px`});
-              $('.notes_container').append(note);
+              $(el).css({ top: `${Math.round($(el).prev().position().top - sum_height)}px`});
+              sum_height += Math.round($(el).outerHeight(true));
+              $('.notes_container').append($(el).remove());
             });
-            $('.notes_container').height($('tei-text').height());
+            $('.notes_container').height($('#tei-container').outerHeight());
             $('#transcription').on('scroll', function (e) {
               $('#notebar').scrollTop($(this).scrollTop());
             });
-            $('#notebar').on('scroll wheel', function(e) {
+            $('#notebar').on('scroll', function(e) {
               e.preventDefault();
               e.stopPropagation();
               return false;
@@ -760,9 +780,7 @@
             });
           },
           formatLeaders() {
-            let container_width = Math.round(Math.max($('tei-text').innerWidth(), $('tei-body').innerWidth()));
-            $('tei-metamark[function=leader]').each(function(index, el) {
-              let sum = 0;
+            $('tei-metamark[function=leader]:not([rend=ellipsis])').each(function(index, el) {
               let prev_array = [];
               let next_array = [];
               let prevSibs = $(this).prevUntil('tei-lb');
@@ -781,56 +799,86 @@
               } else {
                 next_array = nextSibs;
               }
-              const line_el = $.merge(prev_array, next_array)
-              line_el.each(function(i, elt) { sum += $(this).innerWidth(); });
-              const container_column = $(this).parents('.ab-content');
-              if (container_column.length) {
-                let column_width = container_column.attr('width');
-                if (typeof column_width === typeof undefined || column_width === false) {
-                  container_column.attr('width', container_column.innerWidth());
-                }
-                container_width = container_column.attr('width');
-              }
-              let target_width = container_width - sum - 15;
-              target_width = target_width > 10 ? target_width : 10;
-              $(this).width(target_width);
+              const wrapper = $('<div class="tei-leader-line"></div>');
+              const post = $('<div></div>');
+              const anchor = $(next_array[next_array.length - 1]).next();
+              post.append(next_array);
+              wrapper.append(prev_array);
+              wrapper.append($(this));
+              wrapper.append(post);
+              wrapper.insertBefore(anchor);
             });
           },
           formatRenvois() {
-            $('tei-ref:not([rend])').each( function(index, el) {
+            $('tei-ref').each( function(index, el) {
               let note_id = $(this).attr('target');
               if (note_id.length > 1 && note_id.startsWith('#')) note_id = note_id.substring(1);
-              note = $(`tei-note[id='${note_id}']`)
-              if (note.length) {
-                $(this).attr({
-                  title: note.html(),
-                  'data-toggle': 'tooltip',
-                  'data-html': true,
-                  'data-template': '<div class="tooltip note" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
-                });
-              }
-            })
-          },
-          formatGlosses() {
-            $('tei-ref[rend=gloss]').each( function(index, el) {
-              let note_id = $(this).attr('target');
-              note = $(`tei-note[id='${note_id}']`).html();
+              let note_el = $(`tei-note[id='${note_id}']`);
+              let note = note_el.html();
               note = note.replaceAll('tei-a', 'a');
               note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
-
               if (note.length) {
                 $(this).attr({
                   'title': 'Note',
                   'data-content': note,
                   'data-toggle': 'popover',
+                  'data-template': '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header-wrapper"><h3 class="popover-header"></h3><div class="popover-header-closer"></div></div><div class="popover-body"></div></div>',
                   'tabindex': '0',
                 });
+                note_el.remove();
               }
             });
-            $('tei-ref[rend=gloss]').popover({
+            $('tei-ref').popover({
               container: 'body',
-              trigger: 'focus',
+              trigger: 'click',
               html: true,
+              sanitize: false,
+            });
+          },
+          formatGlosses() {
+            const termList = {};
+            $('tei-gloss').each(function(index, el) {
+              const term_id = $(this).attr('target');
+              if (!(term_id in termList)) { 
+                termList[term_id] = { 
+                  glosses: [],
+                  noteGrp: $(this).parent(),
+                };
+              }
+              termList[term_id].glosses.push({
+                lang: $(this).attr('lang'),
+                gloss: $(this).html()
+              });
+            });
+
+            for (const termId in termList) {
+              let note = $(`tei-note[id='${termId}']`).html();
+              note = note.replaceAll('tei-a', 'a');
+              note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
+              let body = '<div class="gloss-container">';
+              for (const gloss of termList[termId].glosses) {
+                note_group = 
+                body = body + `<div class="inline-gloss"><div class="gloss-lang">${gloss.lang}</div>\
+                <div class="gloss-text">${gloss.gloss}</div></div>`;
+              }
+              if (note.length) {
+                body = body + `<div class="inline-gloss-note">${note}</div>`;
+              }
+              body = body + '</div>';
+              $(`tei-term[id='${termId}']`).attr({
+                'title': 'Gloss',
+                'data-content': body,
+                'data-toggle': 'popover',
+                'data-template': '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header-wrapper"><h3 class="popover-header"></h3><div class="popover-header-closer"></div></div><div class="popover-body"></div></div>',
+                'tabindex': '0',
+              });
+              termList[termId].noteGrp.remove();
+            }
+            $('tei-term').popover({
+              container: 'body',
+              trigger: 'click',
+              html: true,
+              sanitize: false,
             });
           }
         }
