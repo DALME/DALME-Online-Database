@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "gha_oidc_role" {
   }
 }
 
-data "aws_iam_policy_document" "gha_oidc_policy" {
+data "aws_iam_policy_document" "gha_oidc_policy_one" {
   statement {
     effect = "Allow"
     actions = [
@@ -171,8 +171,8 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
       "ec2:CreateSubnet",
       "ec2:CreateTags",
       "ec2:CreateVpcEndpoint",
-      "ec2:ModifyVpcEndpoint",
       "ec2:DeleteVpcEndpoints",
+      "ec2:ModifyVpcEndpoint",
       "ec2:RevokeSecurityGroupEgress",
     ]
     resources = [
@@ -213,26 +213,6 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
     ]
   }
 
-  # statement {
-  #   effect = "Allow"
-  #   # tfsec:ignore:aws-iam-no-policy-wildcards
-  #   actions = [
-  #     "ecs:CreateCluster",
-  #     "ecs:CreateService",
-  #     "ecs:CreateTaskSet",
-  #     "ecs:DeleteTaskSet",
-  #     "ecs:DeregisterTaskDefinition",
-  #     "ecs:Describe*",
-  #     "ecs:List*",
-  #     "ecs:PutClusterCapacityProviders",
-  #     "ecs:RegisterTaskDefinition",
-  #     "ecs:UpdateService",
-  #     "ecs:UpdateServicePrimaryTaskSet",
-  #   ]
-  #   # tfsec:ignore:aws-iam-no-policy-wildcards
-  #   resources = ["*"]
-  # }
-
   statement {
     effect = "Allow"
     # tfsec:ignore:aws-iam-no-policy-wildcards
@@ -251,7 +231,6 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
       "elasticloadbalancing:CreateListener",
       "elasticloadbalancing:CreateLoadBalancer",
       "elasticloadbalancing:CreateTargetGroup",
-      "elasticloadbalancing:Describe*",
       "elasticloadbalancing:ModifyLoadBalancerAttributes",
       "elasticloadbalancing:ModifyTargetGroupAttributes",
       "elasticloadbalancing:SetSecurityGroups",
@@ -321,14 +300,15 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
       "iam:Describe*",
       "iam:Get*",
       "iam:List*",
-      "iam:GetOpenIDConnectProvider",
       "iam:PassRole",
       "iam:TagRole",
     ]
     # tfsec:ignore:aws-iam-no-policy-wildcards
     resources = ["*"]
   }
+}
 
+data "aws_iam_policy_document" "gha_oidc_policy_two" {
   statement {
     effect = "Allow"
     # tfsec:ignore:aws-iam-no-policy-wildcards
@@ -363,9 +343,9 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
     # tfsec:ignore:aws-iam-no-policy-wildcards
     actions = [
       "logs:CreateLogDelivery",
-      "logs:DeleteLogDelivery",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
+      "logs:DeleteLogDelivery",
       "logs:Describe*",
       "logs:ListTags*",
       "logs:PutResourcePolicy",
@@ -394,8 +374,8 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
       "rds:AddTagsToResource",
       "rds:CreateDBInstance",
       "rds:CreateDBParameterGroup",
-      "rds:ModifyDBParameterGroup",
       "rds:CreateDBSubnetGroup",
+      "rds:ModifyDBParameterGroup",
       "rds:ListTags*",
     ]
     resources = [
@@ -433,14 +413,7 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
       "s3:CreateBucket",
       "s3:DeleteObject",
       "s3:Get*",
-      "s3:PutBucketAcl",
-      "s3:PutBucketCORS",
-      "s3:PutBucketLogging",
-      "s3:PutBucketOwnershipControls",
-      "s3:PutBucketPolicy",
-      "s3:PutBucketPublicAccessBlock",
-      "s3:PutBucketTagging",
-      "s3:PutBucketVersioning",
+      "s3:PutBucket*",
       "s3:PutObject",
     ]
     resources = [
@@ -548,8 +521,9 @@ data "aws_iam_policy_document" "gha_oidc_policy" {
 }
 
 locals {
-  role_name   = "${var.service}-${var.gha_oidc_role_name}-${var.environment}"
-  policy_name = "${var.service}-gha-oidc-policy-${var.environment}"
+  role_name       = "${var.service}-${var.gha_oidc_role_name}-${var.environment}"
+  policy_one_name = "${var.service}-gha-oidc-policy-one-${var.environment}"
+  policy_two_name = "${var.service}-gha-oidc-policy-two-${var.environment}"
 }
 
 resource "aws_iam_role" "gha_oidc_role" {
@@ -561,18 +535,32 @@ resource "aws_iam_role" "gha_oidc_role" {
   }
 }
 
-resource "aws_iam_policy" "gha_oidc_policy" {
-  name   = local.policy_name
-  policy = data.aws_iam_policy_document.gha_oidc_policy.json
+resource "aws_iam_policy" "gha_oidc_policy_one" {
+  name   = local.policy_one_name
+  policy = data.aws_iam_policy_document.gha_oidc_policy_one.json
 
   tags = {
-    Name = local.policy_name
+    Name = local.policy_one_name
   }
 }
 
-resource "aws_iam_role_policy_attachment" "gha_oidc_role" {
+resource "aws_iam_policy" "gha_oidc_policy_two" {
+  name   = local.policy_two_name
+  policy = data.aws_iam_policy_document.gha_oidc_policy_two.json
+
+  tags = {
+    Name = local.policy_two_name
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "gha_oidc_role_one" {
   role       = aws_iam_role.gha_oidc_role.name
-  policy_arn = aws_iam_policy.gha_oidc_policy.arn
+  policy_arn = aws_iam_policy.gha_oidc_policy_one.arn
+}
+
+resource "aws_iam_role_policy_attachment" "gha_oidc_role_two" {
+  role       = aws_iam_role.gha_oidc_role.name
+  policy_arn = aws_iam_policy.gha_oidc_policy_two.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_full_access_policy_attachment" {

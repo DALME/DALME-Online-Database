@@ -23,11 +23,14 @@ No modules.
 | Name | Type |
 |------|------|
 | [aws_iam_openid_connect_provider.github](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_openid_connect_provider) | resource |
-| [aws_iam_policy.gha_oidc_policy](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.gha_oidc_policy_one](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.gha_oidc_policy_two](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_policy) | resource |
 | [aws_iam_role.gha_oidc_role](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.ecs_full_access_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.gha_oidc_role](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_policy_document.gha_oidc_policy](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_role_policy_attachment.gha_oidc_role_one](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.gha_oidc_role_two](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_policy_document.gha_oidc_policy_one](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.gha_oidc_policy_two](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.gha_oidc_role](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/iam_policy_document) | data source |
 | [tls_certificate.github](https://registry.terraform.io/providers/hashicorp/tls/4.0.4/docs/data-sources/certificate) | data source |
 

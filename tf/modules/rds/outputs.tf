@@ -5,12 +5,6 @@ output "address" {
   value       = aws_db_instance.main.address
 }
 
-output "db_user" {
-  description = "IAM user with permissions to access the database."
-  value       = aws_iam_user.db_user.name
-  sensitive   = true
-}
-
 output "master_user_secret_arn" {
   description = "The ARN of the db instance password secret."
   value       = aws_db_instance.main.master_user_secret[0].secret_arn

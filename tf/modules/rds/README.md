@@ -58,7 +58,6 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_address"></a> [address](#output\_address) | The address of the RDS instance. |
-| <a name="output_db_user"></a> [db\_user](#output\_db\_user) | IAM user with permissions to access the database. |
 | <a name="output_master_user_secret_arn"></a> [master\_user\_secret\_arn](#output\_master\_user\_secret\_arn) | The ARN of the db instance password secret. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the RDS instance. |
 | <a name="output_rds_instance_arn"></a> [rds\_instance\_arn](#output\_rds\_instance\_arn) | The ARN of the RDS instance. |
