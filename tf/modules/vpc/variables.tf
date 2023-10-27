@@ -1,5 +1,10 @@
 # Terraform variables for the vpc module.
 
+variable "account_ids" {
+  description = "AWS accounts granted jump server permissions."
+  type        = list(string)
+}
+
 variable "aws_account" {
   description = "The AWS account where resources are created."
   type        = number

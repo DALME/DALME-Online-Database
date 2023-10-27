@@ -55,7 +55,7 @@ inputs = {
   aws_account     = local.aws_account
   dns_ttl         = 60
   environment     = local.environment
-  force_destroy   = true
+  force_destroy   = local.environment == "staging"
   service         = local.service
   tenant_domains  = local.tenant_domains
   web_acl_id      = dependency.waf.outputs.waf_arn

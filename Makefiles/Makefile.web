@@ -120,7 +120,7 @@ web.test.watch:
 
 web.help:
 	@echo "  web.build              rebuild the web service"
-	@echo "  web.collectstatic       bundle static files for all apps and tenants"
+	@echo "  web.collectstatic      bundle static files for all apps and tenants"
 	@echo "  web.install            install the web requirements into the local venv"
 	@echo "  web.manage             call django management commands"
 	@echo "  web.open               view the site in your browser."

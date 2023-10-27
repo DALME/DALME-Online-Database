@@ -1,7 +1,7 @@
 # Terraform variables for the secrets module.
 
 variable "account_ids" {
-  description = "AWS accounts granted KMS key permissions."
+  description = "AWS accounts to be granted KMS key permissions."
   type        = list(string)
 }
 

@@ -33,7 +33,7 @@ resource "aws_acm_certificate" "opensearch" {
   }
 
   tags = {
-    Name = "${var.service}-opensearch-certificate-${var.environment}"
+    Name = "${var.service}-ssl-certificate-opensearch-${var.environment}"
   }
 }
 
@@ -194,10 +194,6 @@ resource "aws_opensearch_domain" "main" {
     }
   }
 
-  encrypt_at_rest {
-    enabled = var.encrypt_at_rest
-  }
-
   domain_endpoint_options {
     enforce_https       = true
     tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
@@ -212,6 +208,10 @@ resource "aws_opensearch_domain" "main" {
     volume_size = var.ebs_volume_size
     volume_type = var.ebs_volume_type
     throughput  = var.ebs_throughput
+  }
+
+  encrypt_at_rest {
+    enabled = var.encrypt_at_rest
   }
 
   log_publishing_options {

@@ -10,6 +10,7 @@ output "security_groups" {
   value = {
     alb        = aws_security_group.alb.id
     ecs        = aws_security_group.ecs.id
+    jump_host  = aws_security_group.jump_host.id
     opensearch = aws_security_group.opensearch.id
     postgres   = aws_security_group.postgres.id
   }

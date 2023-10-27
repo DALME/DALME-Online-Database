@@ -29,7 +29,7 @@ resource "aws_acm_certificate" "alb" {
   }
 
   tags = {
-    Name = "${var.service}-alb-certificate-${var.environment}"
+    Name = "${var.service}-ssl-certificate-alb-${var.environment}"
   }
 }
 

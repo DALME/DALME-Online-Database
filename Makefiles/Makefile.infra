@@ -26,11 +26,11 @@ infra.log:
 .PHONY: infra.log
 
 infra.pg.check:
-	@postgres --version
+	@command -v 'postgres' >/dev/null 2>&1
 .PHONY: infra.pg.check
 
 infra.pg.warn:
-	$(error 'ERROR: Install postgres so psycopg can be compiled locally))
+	$(error 'ERROR: Install postgres so psycopg can be compiled locally)
 .PHONY: infra.pg.warn
 
 infra.pyenv.check:

@@ -322,6 +322,7 @@ data "aws_iam_policy_document" "gha_oidc_policy_two" {
       "kms:List*",
       "kms:PutKeyPolicy",
       "kms:TagResource",
+      "kms:UpdateKeyDescription",
     ]
     resources = [
       "arn:aws:kms:${var.aws_region}:${var.aws_account}:key/*",
@@ -494,6 +495,19 @@ data "aws_iam_policy_document" "gha_oidc_policy_two" {
     ]
     resources = [
       "arn:aws:sns:${var.aws_region}:${var.aws_account}:*",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    # tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "ssm:Get*",
+      "ssm:Describe*",
+    ]
+    # tfsec:ignore:aws-iam-no-policy-wildcards
+    resources = [
+      "arn:aws:ssm:${var.aws_region}:${var.aws_account}:document/*",
     ]
   }
 

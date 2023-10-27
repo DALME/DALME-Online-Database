@@ -1,7 +1,8 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
-ENVIRONMENT := staging
 IAMLIVE := true
+JUMP_HOST := $(PROJECT)-asg-jump-host-$(ENVIRONMENT)
+REGION := eu-west-2
 TF_LOG := WARN
 TF_PROVIDER := "~> 5.0"
 
@@ -23,12 +24,17 @@ deploy.apply:
 .PHONY: deploy.apply
 
 deploy.apply.module:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.apply.module module=ecs)
+else
 	docker compose run --rm \
 		-e IAMLIVE=$(IAMLIVE) \
 		$(PROJECT).deploy \
 		terragrunt apply \
-		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.apply.module
 
 deploy.destroy: deploy.confirm.destroy
@@ -42,13 +48,18 @@ deploy.destroy: deploy.confirm.destroy
 .PHONY: deploy.destroy
 
 deploy.destroy.module: deploy.confirm.destroy
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.destroy.module module=ecs)
+else
 	docker compose run --rm \
 		$(PROJECT).deploy \
 		terragrunt destroy \
-		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-ignore-external-dependencies \
 		--terragrunt-log-level $(TF_LOG) \
 		--terragrunt-non-interactive
+endif
 .PHONY: deploy.destroy.module
 
 deploy.ecs:
@@ -71,11 +82,16 @@ deploy.init: deploy.ensure.cache
 .PHONT: deploy.init
 
 deploy.init.module: deploy.ensure.cache
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.init.module module=ecs)
+else
 	docker compose run --rm \
 		$(PROJECT).deploy \
 		terragrunt init \
-		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.init.module
 
 deploy.init.upgrade: deploy.ensure.cache
@@ -108,12 +124,17 @@ deploy.plan:
 .PHONY: deploy.plan
 
 deploy.plan.module:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.plan.module module=ecs)
+else
 	docker compose run --rm \
 		-e IAMLIVE=$(IAMLIVE) \
 		$(PROJECT).deploy \
 		terragrunt plan \
-		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.plan.module
 
 deploy.shell:
@@ -123,26 +144,30 @@ deploy.shell:
 .PHONY: deploy.shell
 
 deploy.state.list:
+ifndef module
+	$(error Supply module for operation. \
+		Usage: make deploy.state.list module=ecs)
+else
 	docker compose run --rm \
 		$(PROJECT).deploy \
 		terragrunt state list \
-		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
+endif
 .PHONY: deploy.state.list
 
 deploy.state.rm:
 ifndef resource
-	$(error Supply state resources to delete. \
+	$(error Supply exact state resources to delete. \
 		Usage: make deploy.state.rm \
 		resource='aws_ecs_task_definition.example' \
-		region=us-east-1 \
 		module=ecs)
 else
 	docker compose run --rm \
 		$(PROJECT).deploy \
 		terragrunt state rm \
 		$(resource) \
-		--terragrunt-working-dir $(ENVIRONMENT)/$(region)/$(module) \
+		--terragrunt-working-dir $(ENVIRONMENT)/$(REGION)/$(module) \
 		--terragrunt-log-level $(TF_LOG)
 endif
 .PHONY: deploy.state.rm
@@ -231,6 +256,15 @@ deploy.tf.validate:
 		--terragrunt-log-level $(TF_LOG)
 .PHONY: deploy.tf.validate
 
+deploy.tunnel:
+	$(CONFIG)/scripts/aws.ec2.jumphost.sh \
+		--jump_host "$(JUMP_HOST)" \
+		--region "$(REGION)" \
+		--host "$(host)" \
+		--host_bind "$(host_bind)" \
+		--local_bind "$(local_bind)"
+.PHONY: deploy.tunnel
+
 deploy.help:
 	@echo "  deploy.apply           provision the infrastructure"
 	@echo "  deploy.apply.module    provision a single resource module"
@@ -247,5 +281,6 @@ deploy.help:
 	@echo "  deploy.state.list      detail the resources in the state for a module"
 	@echo "  deploy.state.rm        do some surgery on the state for a module"
 	@echo "  deploy.shell           shell into the deploy container"
+	@echo "  deploy.tunnel          open a secure tunnel into the deploy environment"
 	@echo ""
 .PHONY: deploy.help

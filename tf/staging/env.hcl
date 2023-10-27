@@ -14,8 +14,8 @@ locals {
   lock_table         = "terraform-locks"
   ports = {
     alb        = 80
-    opensearch = 443
     mysql      = 3306
+    opensearch = 443
     postgres   = 5432
     proxy      = 80
     ssl        = 443

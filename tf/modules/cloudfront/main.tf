@@ -34,7 +34,7 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 
   tags = {
-    Name = "${var.service}-cloudfront-certificate-${var.environment}"
+    Name = "${var.service}-ssl-certificate-cloudfront-${var.environment}"
   }
 }
 
@@ -304,7 +304,7 @@ resource "aws_cloudfront_function" "viewer_request" {
   name    = "${var.service}-cloudfront-function-viewer-request-${var.environment}"
   runtime = "cloudfront-js-1.0"
   publish = true
-  code    = file("${path.module}/scripts/viewer-request.js")
+  code    = file("${path.module}/files/viewer-request.js")
 }
 
 // DNS

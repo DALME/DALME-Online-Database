@@ -8,7 +8,7 @@ export DOCS := $(ROOT)/dalme_docs
 export TF := $(ROOT)/tf
 export UI := $(ROOT)/dalme_ui
 
-export PROXY_PORT := 8000
+export ENVIRONMENT := staging
 
 export PY := $(shell cat "$(ROOT)/.python-version")
 export VENV := $(ROOT)/.venv

@@ -22,20 +22,25 @@ terraform {
 }
 
 locals {
-  env         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  aws_account = local.env.locals.aws_account
-  environment = local.env.locals.environment
-  ports       = local.env.locals.ports
-  service     = local.env.locals.service
+  env            = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  region_env     = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  account_ids    = local.env.locals.account_ids
+  aws_account    = local.env.locals.aws_account
+  aws_region     = local.region_env.locals.aws_region
+  environment    = local.env.locals.environment
+  ports          = local.env.locals.ports
+  service        = local.env.locals.service
+  tenant_domains = local.env.locals.tenant_domains
 }
 
 inputs = {
+  account_ids            = local.account_ids
   aws_account            = local.aws_account
   az_count               = 2
   cidr                   = "10.0.0.0/16"
   destination_cidr_block = "0.0.0.0/0"
   environment            = local.environment
-  force_destroy          = true
+  force_destroy          = local.environment == "staging"
   service                = local.service
   security_groups = {
     cidr_blocks      = "0.0.0.0/0",

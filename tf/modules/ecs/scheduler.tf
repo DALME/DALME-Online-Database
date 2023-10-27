@@ -109,7 +109,7 @@ resource "aws_sfn_state_machine" "publish" {
   name     = "${var.service}-sfn-state-machine-publish-${var.environment}"
   role_arn = aws_iam_role.sfn_execution_role.arn
 
-  definition = templatefile("${path.module}/files/scheduled_task.json.tmpl", {
+  definition = templatefile("${path.module}/files/scheduled-task.json.tmpl", {
     assign_public_ip       = local.assign_public_ip
     backoff_rate           = var.sfn_backoff_rate
     cluster                = aws_ecs_cluster.main.arn

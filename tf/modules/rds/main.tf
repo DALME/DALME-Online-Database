@@ -44,8 +44,9 @@ resource "aws_db_instance" "main" {
 }
 
 locals {
-  family = "${var.engine}${var.engine_version}"
-  name   = "${var.service}-rds-parameter-group-${var.environment}"
+  apply_method = var.environment == "staging" ? "immediate" : "pending-reboot"
+  family       = "${var.engine}${var.engine_version}"
+  name         = "${var.service}-rds-parameter-group-${var.environment}"
 }
 
 resource "aws_db_parameter_group" "main" {
@@ -60,7 +61,7 @@ resource "aws_db_parameter_group" "main" {
     # Enforce SSL connections.
     name         = "rds.force_ssl"
     value        = var.parameter_rds_force_ssl
-    apply_method = var.environment == "staging" ? "immediate" : "pending-reboot"
+    apply_method = local.apply_method
   }
 
   tags = {

@@ -16,11 +16,12 @@ terraform {
 }
 
 resource "aws_kms_key" "main" {
+  description         = "Global KMS key per deploy environment."
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.kms.json
 
   tags = {
-    Name = "${var.service}-kms-key-${var.environment}"
+    Name = "${var.service}-kms-key-main-${var.environment}"
   }
 }
 

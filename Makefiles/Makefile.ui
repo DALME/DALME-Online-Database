@@ -1,6 +1,7 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 NODE_MODULES := $(UI)/node_modules
+PROXY_PORT := 8000
 
 ui.build:
 	docker compose up -d --no-deps --build $(PROJECT).ui
