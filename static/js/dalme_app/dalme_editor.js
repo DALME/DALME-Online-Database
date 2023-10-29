@@ -590,6 +590,7 @@ function addTag(item_id, value=null) {
     let tag_output = '<' + item_data.tag;
     let insert_range = xmleditor.selection.getRange();
     let insert_point = insert_range.end;
+    let skip_tag = false;
 
     if (item_data.attributes) {
       item_data.attributes.forEach((attr) => {
@@ -681,6 +682,9 @@ function addTag(item_id, value=null) {
         } else if (tag_attributes.type == 'gloss') {
           xmleditor.session.replace(insert_range, `<term xml:id="${note_id}">${tag_content}</term>`);
           var gloss_tag = `\n<noteGrp>\n\t<gloss target="${note_id}" lang="${lang}">${gloss}</gloss>\n</noteGrp>\n`;
+          if (!text || text == '') {
+            skip_tag = true;
+          }
         } else {
           let content = `<seg type="brace" target="${note_id}" rend="${rend}">`;
           let lines = tag_content.split('\n');
@@ -775,10 +779,12 @@ function addTag(item_id, value=null) {
     if (prefix) { tag_output = `${prefix}${tag_output}`; }
     if (suffix) { tag_output = `${tag_output}${suffix}`; }
 
-    if (type == 'w') {
-      xmleditor.session.replace(insert_range, tag_output);
-    } else {
-      xmleditor.session.insert(insert_point, tag_output);
+    if (!skip_tag) {
+      if (type == 'w') {
+        xmleditor.session.replace(insert_range, tag_output);
+      } else {
+        xmleditor.session.insert(insert_point, tag_output);
+      }
     }
 }
 
@@ -1001,7 +1007,10 @@ function formatGlosses() {
   $('tei-gloss').each(function(index, el) {
     const term_id = $(this).attr('target');
     if (!(term_id in termList)) {
-      termList[term_id] = { glosses: [] }; 
+      termList[term_id] = { 
+        glosses: [],
+        noteGrp: $(this).parent(), 
+      }; 
     }
     termList[term_id].glosses.push({
       lang: $(this).attr('lang'),
@@ -1010,9 +1019,8 @@ function formatGlosses() {
   });
 
   for (const termId in termList) {
-    let note = $(`tei-note[id='${termId}']`).html();
-    note = note.replaceAll('tei-a', 'a');
-    note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
+    let note_el = $(`tei-note[id='${termId}']`);
+    let note = note_el.length ? note_el.html() : '';
     let body = '<div class="gloss-container">';
     for (const gloss of termList[termId].glosses) {
       body = body + `<div class="inline-gloss"><div class="gloss-lang">${gloss.lang}</div>\
@@ -1020,6 +1028,8 @@ function formatGlosses() {
     }
 
     if (note.length) {
+      note = note.replaceAll('tei-a', 'a');
+      note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
       body = body + `<div class="inline-gloss-note">${note}</div>`;
     }
 

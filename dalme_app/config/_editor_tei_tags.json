@@ -32,6 +32,7 @@
             "editable": true,
             "required": true,
             "type": "choice",
+            "default": "ENG",
             "options": [
               {
                 "label": "English",

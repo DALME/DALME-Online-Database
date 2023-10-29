@@ -852,15 +852,16 @@
             });
 
             for (const termId in termList) {
-              let note = $(`tei-note[id='${termId}']`).html();
-              note = note.replaceAll('tei-a', 'a');
-              note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
+              let note_el = $(`tei-note[id='${termId}']`);
+              let note = note_el.length ? note_el.html() : '';
               let body = '<div class="gloss-container">';
               for (const gloss of termList[termId].glosses) {
                 body = body + `<div class="inline-gloss"><div class="gloss-lang">${gloss.lang}</div>\
                 <div class="gloss-text">${gloss.gloss}</div></div>`;
               }
               if (note.length) {
+                note = note.replaceAll('tei-a', 'a');
+                note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
                 body = body + `<div class="inline-gloss-note">${note}</div>`;
               }
               body = body + '</div>';
