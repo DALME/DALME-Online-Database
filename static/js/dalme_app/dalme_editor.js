@@ -220,7 +220,6 @@ function changeEditorFolio(target) {
                 tei_cont.html(text);
                 $('#editor').empty();
                 $('#editor').append(tei_cont);
-                $('#editor').html(`<div id="tei-container">${text}</div>`);
             });
             // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
             setupTeiRendering()
