@@ -799,6 +799,9 @@ function setupTeiRendering() {
   if ($('tei-ab[type=column]').length) { formatColumns(); }
   if ($('tei-metamark[function=leader]').length) { formatLeaders(); }
   if ($('tei-note[type=marginal]').length) { formatMarginalNotes(); }
+
+  // eliminate residual tei-lbs at end of document
+  $('tei-lb').last().prevUntil(':not(tei-lb)', 'tei-lb').remove();
   
   $('[data-toggle="tooltip"]').tooltip();
   
