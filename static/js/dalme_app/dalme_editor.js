@@ -521,11 +521,14 @@ function setTagMenu(action) {
                                   tag_menu_html += `</select>`;
 
                               } else if (attribute.type == 'multichoice') {
-                                  tag_menu_html += `</div><div class="multi-container" id="${item_id+'_'+attribute.name}"><div class="multi-title">${attribute.label}</div>`;
+                                  tag_menu_html += `</div><div class="multi-container" id="${item_id+'_'+attribute.name}">`;
                                   for (const opt of attribute.options) {
                                     tag_menu_html += `<div class="form-check"><input class="form-check-input" \
-                                    type="checkbox" value="${opt.value}" id="${item_id+'_'+opt.value}">\
-                                    <label class="form-check-label" for="${item_id+'_'+opt.value}">${opt.label}</label></div>`;
+                                    type="checkbox" value="${opt.value}" id="${item_id+'_'+opt.value}"`
+                                    if (opt.value == attribute.default) {
+                                      tag_menu_html += ' checked="true"';
+                                    }
+                                    tag_menu_html += `><label class="form-check-label" for="${item_id+'_'+opt.value}">${opt.label}</label></div>`;
                                     if (opt.description) {
                                       tag_menu_html += `<div class="multi-help">${opt.description}</div>`;
                                     }
@@ -599,16 +602,19 @@ function addTag(item_id, value=null) {
         } else if (attr.type == 'menu') {
           attributes[attr.name] = value;
         } else {
+          let reset_val = attr.default ? attr.default : '';
           if (['string', 'textarea', 'special'].includes(attr.type)) {
             attributes[attr.name] = $(`#${item_id}_${attr.name}`).val();
-            $(`#${item_id}_${attr.name}`).val('');
+            $(`#${item_id}_${attr.name}`).val(reset_val);
           
           } else if (attr.type == 'multichoice') {
             let att_list = [];
             $(`#${item_id}_${attr.name}`).find('input[type=checkbox]').each(function(index, el) {
               if (this.checked) {
                 att_list.push($(this).val());
-                $(this).prop("checked", false);
+                if ($(this).val() != reset_val) {
+                  $(this).prop("checked", false);
+                }
               }
             });
             if (att_list.length) {
@@ -616,8 +622,15 @@ function addTag(item_id, value=null) {
             }
 
           } else {
-            attributes[attr.name] = $(`#${item_id}_${attr.name}`).find('option:selected').val();
-            $(`#${item_id}_${attr.name}`)[0].selectedIndex = 0;
+            let sel_val = $(`#${item_id}_${attr.name}`).find('option:selected').val();
+            if (sel_val && sel_val != attr.label) {
+              attributes[attr.name] = sel_val;
+            }
+            if (reset_val != '') {
+              $(`#${item_id}_${attr.name}`).val(reset_val);
+            } else {
+              $(`#${item_id}_${attr.name}`)[0].selectedIndex = 0;
+            }
           }
         }
       })
@@ -648,6 +661,7 @@ function addTag(item_id, value=null) {
         content += '\n\t</ab>';
       }
       tag_content = `${content}\n`;
+      prefix = '\n';
     }
 
     if (item_id == 'glyph') {
@@ -755,8 +769,9 @@ function addTag(item_id, value=null) {
 
       tag_content = `\n${body}`;
       tag_attributes = { rows: row_count, cols: col_count };
+      prefix = '\n';
 
-      if (rend_attr.length) {
+      if (rend_attr) {
         tag_attributes['rend'] = rend_attr.join(' ');
       }
     }

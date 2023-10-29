@@ -2419,6 +2419,9 @@ tei-term {
   flex-direction: column;
   cursor: pointer;
 }
+tei-term + tei-term {
+  margin-left: 5px;
+}
 tei-term::after {
   content: "\f06e";
   font-family: "Font Awesome 5 Free";
@@ -2533,7 +2536,7 @@ section.transcription.basic tei-hi[rend="subscript"] {
 .inline-gloss {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: baseline;
 }
 .gloss-lang {
   display: inline-flex;
