@@ -1,15 +1,16 @@
-[ {
-  "text": "Dashboard",
-  "link": "/",
-  "iconClass": "fa-tachometer-alt",
-  "itemClass": "dash-menu"
+[
+  {
+    "text": "Dashboard",
+    "link": "/",
+    "iconClass": "fa-tachometer-alt",
+    "itemClass": "dash-menu"
   },
   {
     "text": "Search",
     "link": "/search/",
     "iconClass": "fa-search",
     "itemClass": "search-menu"
-    },
+  },
   {
     "text": "Content",
     "section": true
@@ -69,28 +70,44 @@
     "link": "/sets/?type=corpora",
     "iconClass": "fa-clone, fa-archive",
     "child": true,
-    "permissions": ["Administrators", "Developers"]
+    "permissions": [
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Collections",
     "link": "/sets/?type=collections",
     "iconClass": "fa-clone, fa-globe",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Datasets",
     "link": "/sets/?type=datasets",
     "iconClass": "fa-clone, fa-database",
     "child": true,
-    "permissions": ["Administrators", "Developers"]
+    "permissions": [
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Worksets",
     "link": "/sets/?type=worksets",
     "iconClass": "fa-clone, fa-cog",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "close_dropdown": true
@@ -107,61 +124,36 @@
     "link": "/agents/",
     "iconClass": "fa-hospital-user",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Objects",
     "link": "#",
     "iconClass": "fa-mortar-pestle",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Places",
     "link": "/places/",
     "iconClass": "fa-sign",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
-  },
-  {
-    "close_dropdown": true
-  },
-  {
-    "text": "Lexicon",
-    "link": "#",
-    "iconClass": "fa-book",
-    "itemClass": "lexicon",
-    "dropdown": true
-  },
-  {
-    "text": "Dictionary",
-    "link": "#",
-    "iconClass": "fa-language",
-    "child": true
-  },
-  {
-    "text": "Corpus",
-    "link": "#",
-    "iconClass": "fa-stream",
-    "child": true
-  },
-  {
-    "text": "Wordforms",
-    "link": "#",
-    "iconClass": "fa-bars",
-    "child": true
-  },
-  {
-    "text": "Headwords",
-    "link": "#",
-    "iconClass": "fa-list",
-    "child": true
-  },
-  {
-    "text": "Concepts",
-    "link": "#",
-    "iconClass": "fa-lightbulb",
-    "child": true
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "close_dropdown": true
@@ -169,7 +161,12 @@
   {
     "text": "Admin",
     "section": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Project",
@@ -177,35 +174,59 @@
     "iconClass": "fa-briefcase",
     "itemClass": "project",
     "dropdown": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Issue Tickets",
     "link": "/tickets",
     "iconClass": "fa-ticket-alt",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Library",
     "link": "/library",
     "iconClass": "fa-book-reader",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Rights Policies",
     "link": "/rights",
     "iconClass": "fa-copyright",
     "child": true,
-    "permissions": ["Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Tasks",
     "link": "/tasks",
     "iconClass": "fa-tasks",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "close_dropdown": true
@@ -216,42 +237,68 @@
     "iconClass": "fa-cog",
     "itemClass": "system",
     "dropdown": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Locales",
     "link": "/locales",
     "iconClass": "fa-city",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Countries",
     "link": "/countries",
     "iconClass": "fa-globe",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Languages",
     "link": "/languages",
     "iconClass": "fa-language",
     "child": true,
-    "permissions": ["Users", "Staff", "Administrators", "Developers"]
+    "permissions": [
+      "Users",
+      "Staff",
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Users",
     "link": "/users",
     "iconClass": "fa-users",
     "child": true,
-    "permissions": ["Administrators", "Developers"]
+    "permissions": [
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "text": "Admin",
     "link": "/admin",
     "iconClass": "fa-user-cog",
     "child": true,
-    "permissions": ["Administrators", "Developers"]
+    "permissions": [
+      "Administrators",
+      "Developers"
+    ]
   },
   {
     "close_dropdown": true
@@ -259,7 +306,9 @@
   {
     "text": "Dev",
     "section": true,
-    "permissions": ["Developers"]
+    "permissions": [
+      "Developers"
+    ]
   },
   {
     "text": "Tools",
@@ -267,28 +316,36 @@
     "iconClass": "fa-toolbox",
     "itemClass": "dev-tools",
     "dropdown": true,
-    "permissions": ["Developers"]
+    "permissions": [
+      "Developers"
+    ]
   },
   {
     "text": "Config Editor",
     "link": "/tools/config-editor",
     "iconClass": "fa-laptop-code",
     "child": true,
-    "permissions": ["Developers"]
+    "permissions": [
+      "Developers"
+    ]
   },
   {
     "text": "Scripts",
     "link": "/tools/scripts",
     "iconClass": "fa-code",
     "child": true,
-    "permissions": ["Developers"]
+    "permissions": [
+      "Developers"
+    ]
   },
   {
     "text": "Settings",
     "link": "/tools/settings",
     "iconClass": "fa-clipboard-list",
     "child": true,
-    "permissions": ["Developers"]
+    "permissions": [
+      "Developers"
+    ]
   },
   {
     "close_dropdown": true
