@@ -65,7 +65,9 @@ function startEditor() {
             tr_text = data.transcription;
             let text_to_render = tr_text.replace(/\n/g, '<lb/>');
             tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
-                $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
+                let tei_cont = $('<div id="tei-container"></div>');
+                tei_cont.html(text);
+                $('#editor').removeClass("justify-content-center").addClass("justify-content-left").append(tei_cont);
             });
             // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
             $('#author').html('Transcribed by '+data.author);
@@ -155,7 +157,9 @@ function changeEditorMode() {
       if (tr_text != '') {
         let text_to_render = tr_text.replace(/\n/g, '<lb/>');
         tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
-            $('#editor').removeClass("justify-content-center").addClass("justify-content-left").html(text);
+            let tei_cont = $('<div id="tei-container"></div>');
+            tei_cont.html(text);
+            $('#editor').removeClass("justify-content-center").addClass("justify-content-left").append(tei_cont);
         });
       } else {
         $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
@@ -212,9 +216,13 @@ function changeEditorFolio(target) {
         if (editor_mode == 'render') {
             let text_to_render = tr_text.replace(/\n/g, '<lb/>');
             tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
-                $('#editor').html(text);
+                let tei_cont = $('<div id="tei-container"></div>');
+                tei_cont.html(text);
+                $('#editor').empty();
+                $('#editor').append(tei_cont);
+                $('#editor').html(`<div id="tei-container">${text}</div>`);
             });
-            $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
+            // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
             setupTeiRendering()
         } else if (editor_mode == 'xml') {
             saveEditor();
@@ -965,7 +973,8 @@ function formatRenvois() {
   $('tei-ref').each( function(index, el) {
     let note_id = $(this).attr('target');
     if (note_id.length > 1 && note_id.startsWith('#')) note_id = note_id.substring(1);
-    let note = $(`tei-note[id='${note_id}']`).html();
+    let note_el = $(`tei-note[id='${note_id}']`);
+    let note = note_el.html();
     note = note.replaceAll('tei-a', 'a');
     note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
 
@@ -976,7 +985,8 @@ function formatRenvois() {
           'data-toggle': 'popover',
           'data-template': '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header-wrapper"><h3 class="popover-header"></h3><div class="popover-header-closer"></div></div><div class="popover-body"></div></div>',
           'tabindex': '0',
-        })
+        });
+        note_el.remove();
       }
     });
     $('tei-ref').popover({
@@ -1001,13 +1011,11 @@ function formatGlosses() {
   });
 
   for (const termId in termList) {
-    const glossList = termList[termId].glosses;
     let note = $(`tei-note[id='${termId}']`).html();
     note = note.replaceAll('tei-a', 'a');
     note = note.replaceAll('⚭', '<i class="fas fa-link"></i>');
-
     let body = '<div class="gloss-container">';
-    for (const gloss of glossList) {
+    for (const gloss of termList[termId].glosses) {
       body = body + `<div class="inline-gloss"><div class="gloss-lang">${gloss.lang}</div>\
       <div class="gloss-text">${gloss.gloss}</div></div>`;
     }
@@ -1025,6 +1033,7 @@ function formatGlosses() {
       'data-template': '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header-wrapper"><h3 class="popover-header"></h3><div class="popover-header-closer"></div></div><div class="popover-body"></div></div>',
       'tabindex': '0',
     });
+    termList[termId].noteGrp.remove();
   }
   $('tei-term').popover({
     container: 'body',

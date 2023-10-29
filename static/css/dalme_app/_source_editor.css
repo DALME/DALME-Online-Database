@@ -7,10 +7,10 @@
   /* box-shadow: inset 50px 0px 0px #ebebeb; */
 }
 
-tei-TEI {
+/* tei-TEI {
   margin-top: 10px;
   margin-bottom: 10px;
-}
+} */
 
 .panel-container {
   display: flex;
@@ -31,7 +31,11 @@ tei-TEI {
 .panel-bottom {
   flex: 1 1 auto;
   height: calc(100vh - 543px); /*topbar+tb-margin+card-header+panel-top+card-margin = 24+24+45+400+16 all -9 adjustment*/
-  /* padding-top: 4px; */
+  overflow: hidden;
+}
+
+.editor-wrapper {
+  overflow: hidden;
 }
 
 .panel-left {
@@ -94,11 +98,18 @@ tei-TEI {
 }
 
 #editor {
-  overflow: scroll;
+  overflow: auto;
   white-space: pre-line;
   line-height: 1.3;
   font-family: 'Menlo', 'Consolas', 'Monaco', monospace;
   height: calc(100vh - 600px); /* panel-bottom-editor_bar-xml_margin = 509-29-10*/
+}
+
+#tei-container {
+  position: relative;
+  width: 100%;
+  padding: 2rem;
+  display: flex;
 }
 
 .ace_scroller {
@@ -227,7 +238,7 @@ tei-TEI {
   padding-left: 0;
   margin-bottom: 0;
   height: calc(100vh - 572px); /* panel-bottom-editor_bar-xml_margin = 509-29-10*/
-  /* overflow-y: scroll; */
+  overflow-y: scroll;
 }
 
 .tag-menu-container {
@@ -394,8 +405,14 @@ button.glyph {
 .multi-container .form-check {
   margin-top: 5px;
 }
+
 /* OVERRIDES TEI.CSS */
 #notebar {
   right: 0 !important;
 }
-
+tei-body {
+  position: relative;
+}
+tei-TEI > tei-text {
+  position: relative;
+}

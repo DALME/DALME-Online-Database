@@ -492,8 +492,7 @@
 
 .entry-clear-button:hover,
 .page-dam-search:hover,
-.page-grab-handle:hover,
- {
+.page-grab-handle:hover {
   border-color: #5d788c;
   color: #1a4367;
 }
@@ -944,7 +943,7 @@ div.DTE_Field div.multi-restore:hover {
   background-color: #fff;
 }
 
-.editor-btn:focus, .editor-btn:active {
+.editor-btn:not(#btn_edit):focus, .editor-btn:not(#btn_edit):active {
   background-color: #c4e1ef !important;
   color: #024e88 !important;
 }
