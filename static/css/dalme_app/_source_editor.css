@@ -238,7 +238,7 @@
   padding-left: 0;
   margin-bottom: 0;
   height: calc(100vh - 572px); /* panel-bottom-editor_bar-xml_margin = 509-29-10*/
-  overflow-y: scroll;
+  min-width: 180px;
 }
 
 .tag-menu-container {
