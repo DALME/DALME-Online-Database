@@ -607,6 +607,8 @@
             URL.revokeObjectURL(link.href)
           },
           setupTeiRendering() {
+            $('.notes_container').empty();
+
             if ($('tei-seg[type=brace]').length) {
               this.hasBraces = true;
               this.formatBraces();
@@ -666,10 +668,10 @@
           resetTeiRendering() {
             $('[data-toggle="tooltip"]').tooltip('dispose');
             if (this.hasMarginalNotes) {
-              this.hasMarginalNotes = false;
               $('.notes_container').empty();
               $('#transcription').off('scroll');
               $('#notebar').off('scroll');
+              this.hasMarginalNotes = false;
             }
             if (this.hasColumns) {
               this.hasColumns = false;

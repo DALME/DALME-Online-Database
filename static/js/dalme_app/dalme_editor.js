@@ -68,10 +68,10 @@ function startEditor() {
                 let tei_cont = $('<div id="tei-container"></div>');
                 tei_cont.html(text);
                 $('#editor').removeClass("justify-content-center").addClass("justify-content-left").append(tei_cont);
+                $('#author').html('Transcribed by '+data.author);
+                setupTeiRendering()
             });
             // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-            $('#author').html('Transcribed by '+data.author);
-            setupTeiRendering()
           });
       };
       $('.panel-top').resizable({
@@ -149,6 +149,7 @@ function changeEditorMode() {
       saveEditor();
       removeEditorToolbar();
       setTagMenu('off');
+      $('#notebar').show();
       tr_text = xmleditor.getValue();
       xmleditor.off("change");
       xmleditor.renderer.freeze();
@@ -160,14 +161,13 @@ function changeEditorMode() {
             let tei_cont = $('<div id="tei-container"></div>');
             tei_cont.html(text);
             $('#editor').removeClass("justify-content-center").addClass("justify-content-left").append(tei_cont);
+            setupTeiRendering();
         });
       } else {
         $('#editor').html('<div class="mt-auto mb-auto ml-auto mr-auto">This folio/page has not been transcribed. Click <b>Edit</b> to start...</div>');
         $('#editor').html('No transcription available');
       };
       // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-      $('#notebar').show();
-      setupTeiRendering();
   }
 }
 
@@ -214,15 +214,15 @@ function changeEditorFolio(target) {
       }).done(function(data, textStatus, jqXHR) {
         tr_text = data.transcription;
         if (editor_mode == 'render') {
+            $('#editor').empty();
             let text_to_render = tr_text.replace(/\n/g, '<lb/>');
             tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
                 let tei_cont = $('<div id="tei-container"></div>');
                 tei_cont.html(text);
-                $('#editor').empty();
                 $('#editor').append(tei_cont);
+                setupTeiRendering();
             });
             // $('[data-toggle="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
-            setupTeiRendering()
         } else if (editor_mode == 'xml') {
             saveEditor();
             xmleditor.session.setValue(tr_text);
@@ -804,6 +804,7 @@ function addTag(item_id, value=null) {
 }
 
 function setupTeiRendering() {
+  $('.notes_container').empty();
   $('#notebar').height(Math.round($('.panel-bottom').height() - 62));
   $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
   $('.notes_container').height($('tei-body').height() + 20);
