@@ -101,6 +101,16 @@ const dalmeTeiBehaviours = {
          e.appendChild(content);
      }],
     ],
+    'del': function(e) {
+      let rend_att = e.getAttribute('rend', false);
+      let content = '';
+      if (rend_att) {
+        content += `${rend_att}: `
+      }
+      content += e.innerText;
+      e.setAttribute('title', content);
+      e.setAttribute('data-toggle', 'tooltip');
+    },
     'expan': function(e) { e = setTitle(e); },
     'gap': function(e) { e = setExtent(e); },
     'handShift': function(e) {

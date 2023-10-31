@@ -617,7 +617,7 @@
             } else {
               // turn on
               this.noteBarOn = true;
-              $('.notes_container').height($('#tei-container').outerHeight());
+              $('.notes_container').height(Math.round($('tei-text').height()));
               $('#transcription').on('scroll', function (e) {
                 $('#notebar').scrollTop($(this).scrollTop());
               });
@@ -649,13 +649,13 @@
               this.hasLeaders = true;
               this.formatLeaders();
             }
+            // eliminate residual tei-lbs at end of document
+            $('tei-lb').last().prevUntil(':not(tei-lb)', 'tei-lb').remove();
+
             if ($('tei-note[type=marginal]').length) {
               this.hasMarginalNotes = true;
               this.formatMarginalNotes();
             }
-
-            // eliminate residual tei-lbs at end of document
-            $('tei-lb').last().prevUntil(':not(tei-lb)', 'tei-lb').remove();
 
             $('[data-toggle="tooltip"]').tooltip();
 
@@ -784,11 +784,11 @@
             this.toggleNotebar();
             let sum_height = 0;
             $('tei-note[type=marginal]').each(function(index, el) {
-              $(el).css({ top: `${Math.round($(el).prev().position().top - sum_height)}px`});
+              $(el).css({ top: `${Math.round($(el).prev().position().top - sum_height - 5)}px`});
               sum_height += Math.round($(el).outerHeight(true));
               $('.notes_container').append($(el).remove());
             });
-            $('.notes_container').height($('tei-text').outerHeight());
+            $('.notes_container').height(Math.round($('tei-text').height()));
           },
           formatColumns() {
             $(document).on('click', '.ab-column-toggler', (e) => {

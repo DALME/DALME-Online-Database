@@ -108,7 +108,7 @@
 #tei-container {
   position: relative;
   width: 100%;
-  padding: 2rem;
+  padding: 30px;
   display: flex;
 }
 
@@ -410,10 +410,4 @@ button.glyph {
 #notebar {
   display: none;
   right: 13px !important;
-}
-tei-body {
-  position: relative;
-}
-tei-TEI > tei-text {
-  position: relative;
 }
