@@ -2225,13 +2225,12 @@ tei-note[type="brace"] {
 
 #notebar {
   position: absolute;
-  display: block;
   z-index: 2;
   overflow: hidden;
   width: 31px;
-  border-left: 1px dotted #c9c9c9;
   padding-left: 31px;
   transition: width 2s;
+  background: linear-gradient(90deg, #ffffff, #e4e4e4, #ffffff) no-repeat top/1px 100%;
 }
 .notes_container {
   position: relative;
@@ -2239,6 +2238,7 @@ tei-note[type="brace"] {
   width: fit-content;
   border-left: 1px dotted #c9c9c9;
   transition: backdrop-filter 0.5s, background 0.5s;
+  padding: 27px 0;
 }
 tei-note[type="marginal"] {
   font-size: 14px;
@@ -2271,11 +2271,10 @@ tei-note[type="marginal"] > div:first-of-type {
   white-space: pre-wrap;
 }
 #notebar:hover {
-  border-color: transparent;
   width: auto;
 }
 #notebar:hover .notes_container{
-  background-color: #fbfbfbb5;
+  background: linear-gradient(90deg, #fbfbfbb5, transparent) no-repeat left/100%;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(2px);
 }
@@ -2340,28 +2339,6 @@ tei-ref[rend~=oversized] {
   line-height: 18px;
   vertical-align: bottom;
 }
-
-/* tei-ref[rend=gloss] {
-  display: inline-flex;
-  flex-direction: column;
-  white-space: pre;
-}
-
-tei-ref[rend=gloss]:after {
-  content: "?";
-  font-size: 10px;
-  font-weight: bold;
-  color: #909090;
-  position: relative;
-  height: 1px;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(#909090, #909090) no-repeat left/40% 2px, linear-gradient(#909090, #909090) no-repeat right/40% 2px;
-  margin-top: -2px;
-  width: 95%;
-  align-self: end;
-} */
 
 tei-hi[rend=indent] {
   padding-left: 1em;
@@ -2566,16 +2543,16 @@ section.transcription.basic tei-hi[rend="subscript"] {
 /* Media Queries */
 @media only screen and (min-width: 600px) {
   #notebar {
-    right: 0;
+    right: 13px;
   }  
 }
 @media only screen and (min-width: 1200px) {
   #notebar {
-    right: 4rem;
+    right: calc(4rem + 13px);
   }    
 }
 @media only screen and (min-width: 1600px) {
   #notebar {
-    right: 12rem;
+    right: calc(12rem + 13px);
   }
 }

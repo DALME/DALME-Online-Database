@@ -24,6 +24,11 @@ function startEditor() {
       edit_mode = 'off';
       folio_array = folio_list;
       folio_idx = 0;
+      hasBraces = false;
+      hasColumns = false;
+      hasLeaders = false;
+      hasMarginalNotes = false;
+      noteBarOn = false;
       resetPanelMetrics();
       tei = new CETEI();
       tei.addBehaviors(dalmeTeiBehaviours);
@@ -108,11 +113,15 @@ function resizeEditor(top_height) {
     $('#diva_viewer').height(diva_height);
     let new_h = remainingSpace - $('#editor-toolbar').outerHeight();
     $('#editor').height(new_h);
-    $('#notebar').height(new_h);
-    $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`})
-    $('.notes_container').height($('tei-body').height() + 20);
-    $('#tag-menu').height(new_h);
-    if (editor_mode == 'xml') { xmleditor.resize() };
+    if (noteBarOn) {
+      $('#notebar').height(new_h);
+      $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
+      $('.notes_container').height($('tei-body').height() + 20);
+    }
+    if (editor_mode == 'xml') {
+      $('#tag-menu').height(new_h);
+      xmleditor.resize(); 
+    };
     resetPanelMetrics();
 }
 
@@ -133,7 +142,7 @@ function cleanFooter() {
 function changeEditorMode() {
   if (editor_mode == 'render') {
       editor_mode = 'xml';
-      $('#editor').empty();
+      resetTeiRendering();
       $('#btn_edit').html('<i class="fa fa-eye fa-fw"></i> View');
       xmleditor = ace.edit("editor");
       setEditorOptions();
@@ -142,14 +151,11 @@ function changeEditorMode() {
       xmleditor.session.on("change", updateEditorToolbar);
       setEditorToolbar();
       setTagMenu('on');
-      resetTeiRendering();
-      $('#notebar').hide();
   } else if (editor_mode == 'xml') {
       editor_mode = 'render';
       saveEditor();
       removeEditorToolbar();
       setTagMenu('off');
-      $('#notebar').show();
       tr_text = xmleditor.getValue();
       xmleditor.off("change");
       xmleditor.renderer.freeze();
@@ -214,7 +220,7 @@ function changeEditorFolio(target) {
       }).done(function(data, textStatus, jqXHR) {
         tr_text = data.transcription;
         if (editor_mode == 'render') {
-            $('#editor').empty();
+            resetTeiRendering();
             let text_to_render = tr_text.replace(/\n/g, '<lb/>');
             tei.makeHTML5('<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>'+text_to_render+'</body></text></TEI>', function(text) {
                 let tei_cont = $('<div id="tei-container"></div>');
@@ -282,12 +288,12 @@ function setEditorOptions(dict) {
 function setEditorToolbar() {
   let editor_options = $('#hidden-content').html();
   $('#editor-right-toolbar')
-    .prepend('<button class="editor-btn button-border-left" id="btn_cancel" onclick="cancelEditor()"><i class="fa fa-times-circle fa-fw">\</i> Cancel</button>')
-    .prepend('<button class="editor-btn button-border-left" id="btn_save" onclick="saveButton()" disabled><i class="fa fa-save fa-fw"></i> Save</button>');
+    .prepend('<button class="editor-btn no-active button-border-left" id="btn_cancel" onclick="cancelEditor()"><i class="fa fa-times-circle fa-fw">\</i> Cancel</button>')
+    .prepend('<button class="editor-btn no-active button-border-left" id="btn_save" onclick="saveButton()" disabled><i class="fa fa-save fa-fw"></i> Save</button>');
   $('#editor-left-toolbar')
-    .prepend('<button class="editor-btn button-border-right" id="btn_options" onclick="editorOptionsMenu()" title="Editor options" data-toggle="tooltip"><i class="fas fa-cog fa-fw" ></i></button>')
-    .append('<button class="editor-btn button-border-right" id="btn_redo" onclick="redoEditor()" title="Redo" data-toggle="tooltip" disabled><i class="fa fa-redo-alt fa-fw"></i></button>')
-    .append('<button class="editor-btn button-border-right" id="btn_undo" onclick="undoEditor()" title="Undo" data-toggle="tooltip" disabled><i class="fa fa-undo-alt fa-fw"></i></button>');
+    .prepend('<button class="editor-btn no-active button-border-right" id="btn_options" onclick="editorOptionsMenu()" title="Editor options" data-toggle="tooltip"><i class="fas fa-cog fa-fw" ></i></button>')
+    .append('<button class="editor-btn no-active button-border-right" id="btn_redo" onclick="redoEditor()" title="Redo" data-toggle="tooltip" disabled><i class="fa fa-redo-alt fa-fw"></i></button>')
+    .append('<button class="editor-btn no-active button-border-right" id="btn_undo" onclick="undoEditor()" title="Undo" data-toggle="tooltip" disabled><i class="fa fa-undo-alt fa-fw"></i></button>');
   $('#xmleditor-options').html(editor_options);
   $('#xmleditor-options-form').find('input').on('change.dalme', function (e) { setEditorOptions(e) });
   $('#xmleditor-options-form').find('select').on('change.dalme', function (e) { setEditorOptions(e) });
@@ -558,6 +564,7 @@ function setTagMenu(action) {
               tag_menu_html += '</div>';
               $('#tag-menu').show();
               $('#tag-menu').html(tag_menu_html);
+              $('#tag-menu').height($('#editor').outerHeight());
               $('.tag-tooltip').tooltip({container: 'body', delay: { "show": 100, "hide": 1000 }});
               $('.tag-menu-dropdown').on('click', function(e) { e.stopPropagation(); });
               $('.tag-keep-open').on('click', function(e) { $(this).next().toggle(); });
@@ -570,6 +577,7 @@ function setTagMenu(action) {
       } else {
           $('#tag-menu').show();
           $('#tag-menu').html(tag_menu_html);
+          $('#tag-menu').height($('#editor').outerHeight());
           $('.tag-tooltip').tooltip({container: 'body', delay: { "show": 100, "hide": 1000 }});
           $('.tag-menu-dropdown').on('click', function(e) { e.stopPropagation(); });
           $('.tag-menu-button').on('click', function(e) { $(this).next().toggle(); });
@@ -804,17 +812,30 @@ function addTag(item_id, value=null) {
 }
 
 function setupTeiRendering() {
-  $('.notes_container').empty();
-  $('#notebar').height(Math.round($('.panel-bottom').height() - 62));
-  $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
-  $('.notes_container').height($('tei-body').height() + 20);
+  $('#editor').scrollTop(0);
 
-  if ($('tei-seg[type=brace]').length) { formatBraces(); }
-  if ($('tei-ref').length) { formatRenvois(); }
-  if ($('tei-gloss').length) { formatGlosses(); }
-  if ($('tei-ab[type=column]').length) { formatColumns(); }
-  if ($('tei-metamark[function=leader]').length) { formatLeaders(); }
-  if ($('tei-note[type=marginal]').length) { formatMarginalNotes(); }
+  if ($('tei-seg[type=brace]').length) {
+    hasBraces = true;
+    formatBraces(); 
+  }
+  if ($('tei-ref').length) { 
+    formatRenvois(); 
+  }
+  if ($('tei-gloss').length) { 
+    formatGlosses(); 
+  }
+  if ($('tei-ab[type=column]').length) { 
+    hasColumns = true;
+    formatColumns(); 
+  }
+  if ($('tei-metamark[function=leader]').length) { 
+    hasLeaders = true;
+    formatLeaders();
+  }
+  if ($('tei-note[type=marginal]').length) {
+    hasMarginalNotes = true;
+    formatMarginalNotes();
+  }
 
   // eliminate residual tei-lbs at end of document
   $('tei-lb').last().prevUntil(':not(tei-lb)', 'tei-lb').remove();
@@ -830,15 +851,47 @@ function setupTeiRendering() {
 
 function resetTeiRendering() {
   $('[data-toggle="tooltip"]').tooltip('dispose');
-  if ($('tei-note[type=marginal]').length) {
-    $('.notes_container').empty();
-    $('#editor').off('scroll');
-    $('#notebar').off('scroll');
+  if (hasMarginalNotes) {
+    toggleNotebar();
+    hasMarginalNotes = false;
   }
-  if ($('tei-ab[type=column]').length) { 
+  if (hasColumns) {
+    hasColumns = false;
     $(document).off('click', '.ab-column-toggler');
   }
-  $('.notes_container').height($('tei-body').height() + 20);
+  hasBraces = false;
+  hasLeaders = false;
+  $('#editor').empty();
+  // $('.notes_container').height($('tei-body').height() + 20);
+}
+
+function toggleNotebar() {
+  if (noteBarOn) {
+    // turn off
+    $('.notes_container').empty();
+    $('#editor').off('scroll');
+    $('#notebar').off('scroll wheel');
+    $('#notebar').hide();
+    noteBarOn = false;
+  } else {
+    // turn on
+    $('#notebar').show();
+    $('#notebar').height($('#editor').outerHeight());
+    $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
+    $('.notes_container').height($('tei-body').height() + 20);
+    
+    $('#editor').on('scroll', function (e) {
+      $('#notebar').scrollTop($(this).scrollTop());
+    });
+  
+    $('#notebar').on('scroll wheel', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    });
+
+    noteBarOn = true;
+  }
 }
 
 /***** Utility functions *********/
@@ -957,24 +1010,14 @@ function formatLeaders() {
 }
 
 function formatMarginalNotes() {
-  const rest = $('#notebar').offset().top;
+  toggleNotebar();
   let sum_height = 0;
   $('tei-note[type=marginal]').each(function(index, el) {
-    $(el).css({ top: `${Math.round($(el).prev().offset().top - sum_height - rest)}px`});
+    $(el).css({ top: `${Math.round($(el).prev().position().top - sum_height)}px`});
     sum_height += Math.round($(el).outerHeight(true));
     $('.notes_container').append($(el).remove());
   });
-
-  $('.notes_container').height($('tei-body').outerHeight() + 20);
-  $('#editor').on('scroll', function (e) {
-    $('#notebar').scrollTop($(this).scrollTop());
-  });
-
-  $('#notebar').on('scroll', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  });
+  $('.notes_container').height($('tei-text').outerHeight());
 }
 
 function formatBraces() {

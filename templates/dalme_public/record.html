@@ -269,7 +269,7 @@
     <section
       id="transcription"
       class="transcription"
-      :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showLinebreaks }, { 'no-scroll-bar': hasMarginalNotes && showMarginalNotes}]"
+      :class="[renderMode, { 'soft-wrap': softWrap }, { 'show-newlines': showLinebreaks }]"
       :style="{ height: transcriptionHeight + 'px' }">
       <beat-loader v-show="loading && transcriptionId" color="#aaa"></beat-loader>
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
@@ -278,7 +278,7 @@
     <div
       id="notebar"
       :style="[viewerMode == 'horizontal-split' ? { height: transcriptionHeight + 'px', top: divaHeight + headerHeight + 47 + 'px', 'max-width': transcriptionWidth - transcriptionWidth * 0.25 + 'px' } : { height: transcriptionHeight + 'px', 'max-width': transcriptionWidth - transcriptionWidth * 0.25 + 'px' }]"
-      v-show="hasMarginalNotes && showMarginalNotes">
+      v-show="noteBarOn && showMarginalNotes">
       <div class="notes_container"></div>
     </div>
   </div>
@@ -368,6 +368,7 @@
           hasColumns: false,
           hasLeaders: false,
           hasBraces: false,
+          noteBarOn: false,
           showMarginalNotes: true,
           showImage: false,
           showNotice: false,
@@ -606,8 +607,29 @@
             link.click()
             URL.revokeObjectURL(link.href)
           },
+          toggleNotebar() {
+            if (this.noteBarOn) {
+              // turn off
+              $('.notes_container').empty();
+              $('#transcription').off('scroll');
+              $('#notebar').off('scroll wheel');
+              this.noteBarOn = false;
+            } else {
+              // turn on
+              this.noteBarOn = true;
+              $('.notes_container').height($('#tei-container').outerHeight());
+              $('#transcription').on('scroll', function (e) {
+                $('#notebar').scrollTop($(this).scrollTop());
+              });
+              $('#notebar').on('scroll wheel', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              });
+            }
+          },
           setupTeiRendering() {
-            $('.notes_container').empty();
+            $('#editor').scrollTop(0);
 
             if ($('tei-seg[type=brace]').length) {
               this.hasBraces = true;
@@ -668,9 +690,7 @@
           resetTeiRendering() {
             $('[data-toggle="tooltip"]').tooltip('dispose');
             if (this.hasMarginalNotes) {
-              $('.notes_container').empty();
-              $('#transcription').off('scroll');
-              $('#notebar').off('scroll');
+              this.toggleNotebar();
               this.hasMarginalNotes = false;
             }
             if (this.hasColumns) {
@@ -761,22 +781,14 @@
             });
           },
           formatMarginalNotes() {
-            $('.notes_container').height($('#tei-container').outerHeight());
+            this.toggleNotebar();
             let sum_height = 0;
             $('tei-note[type=marginal]').each(function(index, el) {
               $(el).css({ top: `${Math.round($(el).prev().position().top - sum_height)}px`});
               sum_height += Math.round($(el).outerHeight(true));
               $('.notes_container').append($(el).remove());
             });
-            $('.notes_container').height($('#tei-container').outerHeight());
-            $('#transcription').on('scroll', function (e) {
-              $('#notebar').scrollTop($(this).scrollTop());
-            });
-            $('#notebar').on('scroll', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              return false;
-            });
+            $('.notes_container').height($('tei-text').outerHeight());
           },
           formatColumns() {
             $(document).on('click', '.ab-column-toggler', (e) => {

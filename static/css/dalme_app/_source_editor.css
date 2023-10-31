@@ -237,7 +237,7 @@
   flex-direction: column;
   padding-left: 0;
   margin-bottom: 0;
-  height: calc(100vh - 572px); /* panel-bottom-editor_bar-xml_margin = 509-29-10*/
+  /* height: calc(100vh - 572px); panel-bottom-editor_bar-xml_margin = 509-29-10 */
   min-width: 180px;
 }
 
@@ -408,7 +408,8 @@ button.glyph {
 
 /* OVERRIDES TEI.CSS */
 #notebar {
-  right: 0 !important;
+  display: none;
+  right: 13px !important;
 }
 tei-body {
   position: relative;

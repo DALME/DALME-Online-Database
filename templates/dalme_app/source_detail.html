@@ -293,8 +293,8 @@
       <div class="tab-pane card-body p-0 clearfix transcription-editor" id="tr_editor" role="tabpanel" aria-labelledby="editor-tab">
           <div id="viewer-toolbar" class="d-flex">
             <div class="btn-group align-self-start mr-auto" role="group" aria-label="zoom">
-              <button class="editor-btn button-border-right" onclick="diva.zoomOut()"><i class="fa fa-search-minus fa-fw"></i></button>
-              <button class="editor-btn button-border-right" onclick="diva.zoomIn()"><i class="fa fa-search-plus fa-fw"></i></button>
+              <button class="editor-btn no-active button-border-right" onclick="diva.zoomOut()"><i class="fa fa-search-minus fa-fw"></i></button>
+              <button class="editor-btn no-active button-border-right" onclick="diva.zoomIn()"><i class="fa fa-search-plus fa-fw"></i></button>
             </div>
             <div id="folio-menu" class="btn-group align-self-end" role="group" aria-label="foliation" >
               {{ folio_menu | safe }}
@@ -315,7 +315,7 @@
             </div>
               <div id="editor-right-toolbar" class="align-self-end btn-group">
                 {% if can_edit %}
-                <button class="editor-btn button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
+                <button class="editor-btn no-active button-border-left" id="btn_edit" onclick="changeEditorMode();"><i class="fa fa-edit fa-fw"></i> Edit</button>
                 {% endif %}
               </div>
           </div>
