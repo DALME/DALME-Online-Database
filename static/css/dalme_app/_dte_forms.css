@@ -943,7 +943,7 @@ div.DTE_Field div.multi-restore:hover {
   background-color: #fff;
 }
 
-.editor-btn:not(#btn_edit):focus, .editor-btn:not(#btn_edit):active {
+.editor-btn:not(.no-active):focus, .editor-btn:not(.no-active):active {
   background-color: #c4e1ef !important;
   color: #024e88 !important;
 }
