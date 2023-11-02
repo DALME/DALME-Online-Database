@@ -293,6 +293,7 @@
     <script type="text/javascript" src="{% static 'js/ResizeSensor.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dalme_common/cetei_functions.js' %}"></script>
   {% endcompress %}
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js" integrity="sha256-ur/YlHMU96MxHEsy3fHGszZHas7NzH4RQlD4tDVvFhw=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/diva.js@6.0.2/build/diva.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-clickaway@2.2.2/dist/vue-clickaway.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jquery-resizable-dom@0.35.0/dist/jquery-resizable.min.js"></script>
@@ -616,8 +617,8 @@
               this.noteBarOn = false;
             } else {
               // turn on
-              this.noteBarOn = true;
-              $('.notes_container').height(Math.round($('tei-text').height()));
+              $('.notes_container').height(Math.round($('#tei-container').outerHeight()));
+              this.positionMarginalNotes();
               $('#transcription').on('scroll', function (e) {
                 $('#notebar').scrollTop($(this).scrollTop());
               });
@@ -626,6 +627,7 @@
                 e.stopPropagation();
                 return false;
               });
+              this.noteBarOn = true;
             }
           },
           setupTeiRendering() {
@@ -668,22 +670,14 @@
             this.transcriptionWidth = $('#tei-container').width();
 
             setTimeout(() => {
-              new ResizeSensor($('tei-text'), function(e) { app.updateTeiRendering() });
+              new ResizeSensor($('tei-text'), _.debounce((e) => { app.updateTeiRendering() }, 150));
               $('section.transcription').scrollTop(0);
             }, 10);
           },
           updateTeiRendering(e) {
-            if (this.hasLeaders) {
-              this.formatLeaders();
-            }
             if (this.hasMarginalNotes) {
-              let prev_height = $('.notes_container').height();
-              let new_height = $('#tei-container').outerHeight();
-              $('.notes_container').height(new_height);
-              $('tei-note[type=marginal]').each(function() {
-                let new_top = (parseInt($(this).css('top'), 10) / prev_height) * new_height;
-                $(this).css({ top: `${Math.round(new_top)}px`});
-              });
+              $('.notes_container').height(Math.round($('#tei-container').outerHeight()));
+              this.positionMarginalNotes();
             }
             this.transcriptionWidth = $('#tei-container').width();
           },
@@ -704,7 +698,7 @@
             const containerList = [
               { selector: 'tei-ab[type=column] div.ab-content', parent: true },
               { selector: 'tei-layout[columns]', parent: false },
-              { selector: 'tei-note:not([type])', parent: false }
+              //{ selector: 'tei-note:not([type])', parent: false }
             ];
             const that = this;
             for (let i = 0, len = containerList.length; i < len; ++i) {
@@ -780,15 +774,27 @@
               sanitize: false,
             });
           },
-          formatMarginalNotes() {
-            this.toggleNotebar();
+          positionMarginalNotes() {
             let sum_height = 0;
+            const rest = $('#tei-container').offset().top;
             $('tei-note[type=marginal]').each(function(index, el) {
-              $(el).css({ top: `${Math.round($(el).prev().position().top - sum_height - 5)}px`});
-              sum_height += Math.round($(el).outerHeight(true));
+              let anchor_top = $(`#${$(el).attr("data-anchor")}`).offset().top;
+              let note_height = $(el).height();
+              $(el).css({ top: `${anchor_top - rest - sum_height}px`});
+              sum_height += note_height;
+            });
+          },
+          formatMarginalNotes() {
+            $('tei-note[type=marginal]').each(function(index, el) {
+              const note_id = Math.ceil(Math.random()*10000);
+              const anchor = $(`<div class="note-anchor" id="${note_id}"></div>`);
+              const anchor_target = $(el).prev().length ? $(el).prev() : $(el);
+              anchor.insertBefore(anchor_target);
+              $(el).attr("data-anchor", note_id);
+              $(el).attr("data-height", Math.round($(el).outerHeight(true)));
               $('.notes_container').append($(el).remove());
             });
-            $('.notes_container').height(Math.round($('tei-text').height()));
+            this.toggleNotebar();
           },
           formatColumns() {
             $(document).on('click', '.ab-column-toggler', (e) => {

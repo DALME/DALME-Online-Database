@@ -96,7 +96,6 @@ function startEditor() {
                 $('#diva_viewer').width(top_width + 1);
                 Diva.Events.publish("PanelSizeDidChange");
               };
-              if (editor_mode == 'xml') { xmleditor.resize() };
           }
       }, false);
       Diva.Events.subscribe('DocumentDidLoad', function () { window.dispatchEvent(new Event('resize')); });
@@ -113,16 +112,13 @@ function resizeEditor(top_height) {
     $('#diva_viewer').height(diva_height);
     let new_h = remainingSpace - $('#editor-toolbar').outerHeight();
     $('#editor').height(new_h);
-    if (noteBarOn) {
-      $('#notebar').height(new_h);
-      $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
-      $('.notes_container').height($('tei-body').height() + 20);
-    }
+    resetPanelMetrics();
     if (editor_mode == 'xml') {
       $('#tag-menu').height(new_h);
       xmleditor.resize(); 
+    } else {
+      updateTeiRendering();
     };
-    resetPanelMetrics();
 }
 
 function resetPanelMetrics() {
@@ -426,7 +422,7 @@ function setTagMenu(action) {
                 <div id="${section.id}" class="collapse" aria-labelledby="heading_${section.id}" data-parent="#tag-menu">`;
                 
                 for (const item of section.items) {
-                  const item_id = item.label.replaceAll(' ', '').toLowerCase();
+                  const item_id = item.label.replaceAll(' ', '').replaceAll('/', '').toLowerCase();
                   const defaultCt = item.default_content || null;
                   tag_reference[item_id] = item;
                   
@@ -849,6 +845,15 @@ function setupTeiRendering() {
   });
 }
 
+function updateTeiRendering() {
+  if (noteBarOn) {
+    $('#notebar').height($('#editor').outerHeight());
+    $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
+    $('.notes_container').height(Math.round($('#tei-container').outerHeight()));
+    positionMarginalNotes();
+  }
+}
+
 function resetTeiRendering() {
   $('[data-toggle="tooltip"]').tooltip('dispose');
   if (hasMarginalNotes) {
@@ -862,7 +867,6 @@ function resetTeiRendering() {
   hasBraces = false;
   hasLeaders = false;
   $('#editor').empty();
-  // $('.notes_container').height($('tei-body').height() + 20);
 }
 
 function toggleNotebar() {
@@ -878,18 +882,16 @@ function toggleNotebar() {
     $('#notebar').show();
     $('#notebar').height($('#editor').outerHeight());
     $('#notebar').css({ top: `${Math.round($('#editor-toolbar').position().top + 30)}px`});
-    $('.notes_container').height($('tei-body').height() + 20);
-    
+    $('.notes_container').height(Math.round($('#tei-container').outerHeight()));
+    positionMarginalNotes();
     $('#editor').on('scroll', function (e) {
       $('#notebar').scrollTop($(this).scrollTop());
     });
-  
     $('#notebar').on('scroll wheel', function(e) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     });
-
     noteBarOn = true;
   }
 }
@@ -1009,15 +1011,28 @@ function formatLeaders() {
   });
 }
 
-function formatMarginalNotes() {
-  toggleNotebar();
+function positionMarginalNotes() {
   let sum_height = 0;
+  const rest = $('#tei-container').offset().top;
   $('tei-note[type=marginal]').each(function(index, el) {
-    $(el).css({ top: `${Math.round($(el).prev().position().top - sum_height)}px`});
-    sum_height += Math.round($(el).outerHeight(true));
+    let anchor_top = $(`#${$(el).attr("data-anchor")}`).offset().top;
+    let note_height = $(el).height();
+    $(el).css({ top: `${anchor_top - rest - sum_height}px`});
+    sum_height += note_height;
+  });
+}
+
+function formatMarginalNotes() {
+  $('tei-note[type=marginal]').each(function(index, el) {
+    const note_id = Math.ceil(Math.random()*10000);
+    const anchor = $(`<div class="note-anchor" id="${note_id}"></div>`);
+    const anchor_target = $(el).prev().length ? $(el).prev() : $(el);
+    anchor.insertBefore(anchor_target);
+    $(el).attr("data-anchor", note_id);
+    $(el).attr("data-height", Math.round($(el).outerHeight(true)));
     $('.notes_container').append($(el).remove());
   });
-  $('.notes_container').height($('tei-text').outerHeight());
+  toggleNotebar();
 }
 
 function formatBraces() {
