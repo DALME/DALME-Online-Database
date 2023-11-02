@@ -55,5 +55,5 @@ __pycache__/
 *.sln
 
 # Miscellaneous
-apply-perms.temp
 .infracost/
+apply-perms.temp

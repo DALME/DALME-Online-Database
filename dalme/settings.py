@@ -125,11 +125,11 @@ class Base(Configuration):
     MIDDLEWARE = [
         'dalme_app.utils.HealthCheckMiddleware',
         'corsheaders.middleware.CorsMiddleware',
+        'django.middleware.common.CommonMiddleware',
         'dalme_app.utils.TenantMiddleware',
         'dalme_app.utils.TenantContextMiddleware',
         'django_structlog.middlewares.RequestMiddleware',
         'django.middleware.security.SecurityMiddleware',
-        'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'dalme_app.utils.SubdomainRedirectMiddleware',
         'django_structlog.middlewares.RequestMiddleware',
