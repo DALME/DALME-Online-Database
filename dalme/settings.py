@@ -247,7 +247,7 @@ class Base(Configuration):
                 'level': LOG_LEVEL,
             },
             'gunicorn.error': {
-                "level": LOG_LEVEL,
+                'level': LOG_LEVEL,
             },
             # Nulled to use structlog middleware.
             'django.server': {
@@ -369,10 +369,7 @@ class Base(Configuration):
         if isinstance(tenants, str):
             tenants = json.loads(tenants)
 
-        return enum.Enum('TENANTS', {
-            key: TENANT(**tenant_data)
-            for key, tenant_data in tenants.items()
-        })
+        return enum.Enum('TENANTS', {key: TENANT(**tenant_data) for key, tenant_data in tenants.items()})
 
 
 class Development(Base, Configuration):
@@ -432,9 +429,9 @@ class Development(Base, Configuration):
         'dam': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': values.Value('DAM_DB_NAME', environ_prefix=None),
-            'USER':  values.Value('DAM_DB_USER', environ_prefix=None),
+            'USER': values.Value('DAM_DB_USER', environ_prefix=None),
             'PASSWORD': values.Value('DAM_DB_PASSWORD', environ_prefix=None),
-            'HOST':  values.Value('DAM_DB_HOST', environ_prefix=None),
+            'HOST': values.Value('DAM_DB_HOST', environ_prefix=None),
             'PORT': os.environ.get('DAM_DB_PORT', 3306),
         },
     }
@@ -506,7 +503,7 @@ class Production(Base, Configuration):
         return json.loads(os.environ['ALLOWED_HOSTS'])
 
     @property
-    def AWS_S3_CUSTOM_DOMAIN(self): # noqa: N802
+    def AWS_S3_CUSTOM_DOMAIN(self):  # noqa: N802
         return f'{self.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
     @property
@@ -515,17 +512,11 @@ class Production(Base, Configuration):
 
     @property
     def CORS_ALLOWED_ORIGINS(self):  # noqa: N802
-        return [
-            f'https://{domain}'
-            for domain in self.TENANT_DOMAINS
-        ]
+        return [f'https://{domain}' for domain in self.TENANT_DOMAINS]
 
     @property
     def CSRF_TRUSTED_ORIGINS(self):  # noqa: N802
-        return [
-            f'https://{domain}'
-            for domain in self.TENANT_DOMAINS
-        ]
+        return [f'https://{domain}' for domain in self.TENANT_DOMAINS]
 
     @property
     def DATABASES(self):  # noqa: N802
@@ -541,18 +532,18 @@ class Production(Base, Configuration):
             'dam': {
                 'ENGINE': 'django.db.backends.mysql',
                 'NAME': os.environ.get('DAM_DB_NAME'),
-                'USER':  os.environ.get('DAM_DB_USER'),
+                'USER': os.environ.get('DAM_DB_USER'),
                 'PASSWORD': os.environ.get('DAM_DB_PASSWORD'),
-                'HOST':  os.environ.get('DAM_DB_HOST'),
+                'HOST': os.environ.get('DAM_DB_HOST'),
                 'PORT': 3306,
             },
         }
 
     @property
     def ELASTICSEARCH_DSL(self):  # noqa: N802
-        return  {
+        return {
             'default': {
-                'host':  os.environ['ELASTICSEARCH_ENDPOINT'],
+                'host': os.environ['ELASTICSEARCH_ENDPOINT'],
                 'port': 443,
                 'http_auth': (
                     os.environ['ELASTICSEARCH_USER'],

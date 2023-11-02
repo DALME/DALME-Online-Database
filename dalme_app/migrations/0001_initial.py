@@ -16,7 +16,6 @@ import dalme_app.models.templates
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -204,7 +203,13 @@ class Migration(migrations.Migration):
                 ('password', models.CharField(blank=True, max_length=64)),
                 ('fullname', models.CharField(blank=True, max_length=100)),
                 ('email', models.CharField(blank=True, max_length=100)),
-                ('usergroup', models.IntegerField(choices=[(2, 'General User'), (4, 'Archivist'), (1, 'Administrator'), (3, 'Super Admin')], null=True)),
+                (
+                    'usergroup',
+                    models.IntegerField(
+                        choices=[(2, 'General User'), (4, 'Archivist'), (1, 'Administrator'), (3, 'Super Admin')],
+                        null=True,
+                    ),
+                ),
                 ('last_active', models.DateTimeField(blank=True, null=True)),
                 ('logged_in', models.IntegerField(null=True)),
                 ('last_browser', models.TextField()),
@@ -239,11 +244,34 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('agent_type', models.IntegerField(choices=[(1, 'Person'), (2, 'Organization')])),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -254,12 +282,43 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('filefield', models.FileField(upload_to='attachments/%Y/%m/')),
                 ('filetype', models.CharField(blank=True, max_length=255)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_related', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'owner',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_related',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -270,7 +329,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('object_id', models.CharField(db_index=True, max_length=36)),
             ],
             options={
@@ -286,11 +350,45 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=55, unique=True)),
                 ('label', models.CharField(max_length=255)),
                 ('description', models.TextField()),
-                ('data_type', models.CharField(choices=[('BOOL', 'BOOL (boolean)'), ('DATE', 'DATE (date)'), ('DEC', 'DEC (decimal)'), ('FKEY', 'FKEY (foreign key)'), ('INT', 'INT (integer)'), ('JSON', 'JSON (data)'), ('RREL', 'RREL (reverse relation)'), ('STR', 'STR (string)'), ('TXT', 'TXT (text)')], max_length=15)),
+                (
+                    'data_type',
+                    models.CharField(
+                        choices=[
+                            ('BOOL', 'BOOL (boolean)'),
+                            ('DATE', 'DATE (date)'),
+                            ('DEC', 'DEC (decimal)'),
+                            ('FKEY', 'FKEY (foreign key)'),
+                            ('INT', 'INT (integer)'),
+                            ('JSON', 'JSON (data)'),
+                            ('RREL', 'RREL (reverse relation)'),
+                            ('STR', 'STR (string)'),
+                            ('TXT', 'TXT (text)'),
+                        ],
+                        max_length=15,
+                    ),
+                ),
                 ('is_local', models.BooleanField(default=False)),
                 ('source', models.CharField(blank=True, max_length=255)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['id'],
@@ -301,14 +399,54 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('use_as_workset', models.BooleanField(default=False)),
                 ('is_published', models.BooleanField(default=False)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_related', to=settings.AUTH_USER_MODEL)),
-                ('team_link', models.ForeignKey(limit_choices_to={'properties__type': 3}, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='default_collection', to='auth.group')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'owner',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_related',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'team_link',
+                    models.ForeignKey(
+                        limit_choices_to={'properties__type': 3},
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='default_collection',
+                        to='auth.group',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -319,10 +457,33 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('getty_id', models.IntegerField(db_index=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -338,7 +499,14 @@ class Migration(migrations.Migration):
                 ('is_unique', models.BooleanField(default=True)),
                 ('override_label', models.CharField(blank=True, max_length=255)),
                 ('override_description', models.TextField(blank=True)),
-                ('attribute_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contenttypes', to='dalme_app.attributetype')),
+                (
+                    'attribute_type',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='contenttypes',
+                        to='dalme_app.attributetype',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -351,8 +519,26 @@ class Migration(migrations.Migration):
                 ('alpha_3_code', models.CharField(max_length=3)),
                 ('alpha_2_code', models.CharField(max_length=2)),
                 ('num_code', models.IntegerField()),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['name'],
@@ -363,11 +549,39 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('object_id', models.UUIDField(db_index=True, null=True)),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -379,8 +593,26 @@ class Migration(migrations.Migration):
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -391,12 +623,35 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('word', models.CharField(max_length=55)),
                 ('full_lemma', models.CharField(max_length=255)),
                 ('concept_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dalme_app.concept')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -407,10 +662,36 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('location_type', models.IntegerField(choices=[(1, 'Address'), (2, 'Country'), (3, 'Geometry'), (4, 'Locale')])),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
+                (
+                    'location_type',
+                    models.IntegerField(choices=[(1, 'Address'), (2, 'Country'), (3, 'Geometry'), (4, 'Locale')]),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -421,10 +702,33 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('concept', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.concept')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -435,13 +739,36 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=55)),
                 ('dam_id', models.IntegerField(db_index=True, null=True)),
                 ('order', models.IntegerField(db_index=True)),
                 ('canvas', models.TextField(blank=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['order'],
@@ -452,15 +779,51 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('short_name', models.CharField(max_length=55)),
                 ('parent_id', models.CharField(db_index=True, max_length=36, null=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_related', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'owner',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_related',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('pages', models.ManyToManyField(db_index=True, through='dalme_app.Folio', to='dalme_app.page')),
-                ('parent_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
+                (
+                    'parent_type',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -470,13 +833,39 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tenant',
             fields=[
-                ('schema_name', models.CharField(db_index=True, max_length=63, unique=True, validators=[django_tenants.postgresql_backend.base._check_schema_name])),  # noqa: SLF001
+                (
+                    'schema_name',
+                    models.CharField(
+                        db_index=True,
+                        max_length=63,
+                        unique=True,
+                        validators=[django_tenants.postgresql_backend.base._check_schema_name],  # noqa: SLF001
+                    ),
+                ),
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
                 ('name', models.CharField(max_length=255, unique=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -485,7 +874,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueBool',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
                 ('value', models.BooleanField()),
             ],
             options={
@@ -496,9 +895,37 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueDate',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
-                ('day', models.PositiveSmallIntegerField(null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(31)])),
-                ('month', models.PositiveSmallIntegerField(null=True, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(12)])),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
+                (
+                    'day',
+                    models.PositiveSmallIntegerField(
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(31),
+                        ],
+                    ),
+                ),
+                (
+                    'month',
+                    models.PositiveSmallIntegerField(
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(12),
+                        ],
+                    ),
+                ),
                 ('year', models.IntegerField(null=True)),
                 ('date', models.DateField(null=True)),
                 ('text', models.CharField(blank=True, max_length=255)),
@@ -511,7 +938,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueDec',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
                 ('value', models.DecimalField(decimal_places=2, max_digits=9)),
             ],
             options={
@@ -522,7 +959,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueFkey',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
                 ('target_id', models.CharField(db_index=True, max_length=36)),
             ],
             options={
@@ -533,7 +980,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueInt',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
                 ('value', models.IntegerField()),
             ],
             options={
@@ -544,7 +1001,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueJson',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
                 ('value', models.JSONField()),
             ],
             options={
@@ -555,7 +1022,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueStr',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
                 ('value', models.CharField(max_length=255)),
             ],
             options={
@@ -566,7 +1043,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AttributeValueTxt',
             fields=[
-                ('attribute_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.attribute')),
+                (
+                    'attribute_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.attribute',
+                    ),
+                ),
                 ('value', models.TextField()),
             ],
             options={
@@ -577,7 +1064,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Organization',
             fields=[
-                ('agent_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.agent')),
+                (
+                    'agent_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.agent',
+                    ),
+                ),
                 ('short_name', models.CharField(max_length=55)),
             ],
             options={
@@ -588,7 +1085,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Person',
             fields=[
-                ('agent_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dalme_app.agent')),
+                (
+                    'agent_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='dalme_app.agent',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -598,9 +1105,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Workflow',
             fields=[
-                ('record', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='workflow', serialize=False, to='dalme_app.record')),
-                ('wf_status', models.IntegerField(choices=[(1, 'assessing'), (2, 'processing'), (3, 'processed')], default=2)),
-                ('stage', models.IntegerField(choices=[(1, 'ingestion'), (2, 'transcription'), (3, 'markup'), (4, 'review'), (5, 'parsing')], default=1)),
+                (
+                    'record',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        related_name='workflow',
+                        serialize=False,
+                        to='dalme_app.record',
+                    ),
+                ),
+                (
+                    'wf_status',
+                    models.IntegerField(choices=[(1, 'assessing'), (2, 'processing'), (3, 'processed')], default=2),
+                ),
+                (
+                    'stage',
+                    models.IntegerField(
+                        choices=[(1, 'ingestion'), (2, 'transcription'), (3, 'markup'), (4, 'review'), (5, 'parsing')],
+                        default=1,
+                    ),
+                ),
                 ('last_modified', models.DateTimeField(blank=True, null=True)),
                 ('help_flag', models.BooleanField(default=False)),
                 ('ingestion_done', models.BooleanField(default=False)),
@@ -609,7 +1134,15 @@ class Migration(migrations.Migration):
                 ('parsing_done', models.BooleanField(default=False)),
                 ('review_done', models.BooleanField(default=False)),
                 ('is_public', models.BooleanField(default=False)),
-                ('last_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    'last_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -617,12 +1150,38 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('normalized_form', models.CharField(max_length=55)),
                 ('pos', models.CharField(max_length=255)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('headword_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dalme_app.headword')),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'headword_id',
+                    models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dalme_app.headword'),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -633,13 +1192,36 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('transcription', models.TextField(blank=True)),
                 ('author', models.CharField(default=dalme_app.models.templates.get_current_username, max_length=255)),
                 ('version', models.IntegerField(default=1)),
                 ('count_ignore', models.BooleanField(default=False)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -650,15 +1232,44 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('raw_token', models.CharField(max_length=255)),
                 ('clean_token', models.CharField(max_length=55)),
                 ('order', models.IntegerField(db_index=True)),
                 ('flags', models.CharField(max_length=10)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('object_phrase_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.entityphrase')),
-                ('wordform_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dalme_app.wordform')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'object_phrase_id',
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.entityphrase'),
+                ),
+                (
+                    'wordform_id',
+                    models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dalme_app.wordform'),
+                ),
             ],
             options={
                 'abstract': False,
@@ -675,11 +1286,43 @@ class Migration(migrations.Migration):
                 ('status', models.IntegerField(choices=[(0, 'Open'), (1, 'Closed')], default=0)),
                 ('url', models.CharField(blank=True, max_length=255)),
                 ('closing_date', models.DateTimeField(blank=True, null=True)),
-                ('assigned_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='ticket_assigned_to', to=settings.AUTH_USER_MODEL)),
-                ('closing_user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
+                (
+                    'assigned_to',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='ticket_assigned_to',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'closing_user',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('files', models.ManyToManyField(blank=True, related_name='tickets', to='dalme_app.attachment')),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['status', 'creation_timestamp'],
@@ -691,9 +1334,32 @@ class Migration(migrations.Migration):
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
-                ('level', models.CharField(choices=[('admin', 'Admin'), ('member', 'Member')], default='member', max_length=6)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'level',
+                    models.CharField(
+                        choices=[('admin', 'Admin'), ('member', 'Member')], default='member', max_length=6
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.tenant')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
@@ -707,10 +1373,45 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=60)),
                 ('slug', models.SlugField(default='')),
                 ('description', models.TextField(blank=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_related', to=settings.AUTH_USER_MODEL)),
-                ('team_link', models.ForeignKey(limit_choices_to={'properties__type': 3}, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='team_tasklist', to='auth.group')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'owner',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_related',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'team_link',
+                    models.ForeignKey(
+                        limit_choices_to={'properties__type': 3},
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='team_tasklist',
+                        to='auth.group',
+                    ),
+                ),
             ],
             options={
                 'verbose_name_plural': 'Task Lists',
@@ -730,13 +1431,47 @@ class Migration(migrations.Migration):
                 ('completed', models.BooleanField(default=False)),
                 ('completed_date', models.DateTimeField(blank=True, null=True)),
                 ('url', models.CharField(blank=True, max_length=255)),
-                ('assignees', models.ManyToManyField(blank=True, related_name='task_assignations', to=settings.AUTH_USER_MODEL)),
-                ('completed_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='completed_tasks', to=settings.AUTH_USER_MODEL)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
+                (
+                    'assignees',
+                    models.ManyToManyField(blank=True, related_name='task_assignations', to=settings.AUTH_USER_MODEL),
+                ),
+                (
+                    'completed_by',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='completed_tasks',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('files', models.ManyToManyField(blank=True, related_name='tasks', to='dalme_app.attachment')),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('resources', models.ManyToManyField(blank=True, related_name='tasks', to='dalme_app.collection')),
-                ('task_list', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='dalme_app.tasklist')),
+                (
+                    'task_list',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='dalme_app.tasklist'
+                    ),
+                ),
             ],
             options={
                 'ordering': ['creation_timestamp'],
@@ -747,14 +1482,45 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('tag_type', models.CharField(choices=[('WF', 'Workflow'), ('C', 'Control'), ('T', 'Ticket')], max_length=2)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
+                (
+                    'tag_type',
+                    models.CharField(choices=[('WF', 'Workflow'), ('C', 'Control'), ('T', 'Ticket')], max_length=2),
+                ),
                 ('tag', models.CharField(blank=True, max_length=55)),
                 ('tag_group', models.CharField(blank=True, max_length=255)),
                 ('object_id', models.CharField(blank=True, db_index=True, max_length=55)),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -767,8 +1533,26 @@ class Migration(migrations.Migration):
                 ('short_name', models.CharField(max_length=55, unique=True)),
                 ('description', models.TextField()),
                 ('source', models.CharField(blank=True, max_length=255)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['id'],
@@ -779,12 +1563,43 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('parameters', models.JSONField()),
                 ('notes', models.TextField(blank=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('scope_type', models.ForeignKey(db_column='scope_type', on_delete=django.db.models.deletion.CASCADE, related_name='scopes', to='dalme_app.scopetype')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'scope_type',
+                    models.ForeignKey(
+                        db_column='scope_type',
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='scopes',
+                        to='dalme_app.scopetype',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -795,12 +1610,43 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('search', models.JSONField()),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_related', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'owner',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_related',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -811,18 +1657,58 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=100)),
-                ('rights_status', models.IntegerField(choices=[(1, 'Copyrighted'), (2, 'Orphaned'), (3, 'Owned'), (4, 'Public Domain'), (5, 'Unknown')], default=5)),
+                (
+                    'rights_status',
+                    models.IntegerField(
+                        choices=[
+                            (1, 'Copyrighted'),
+                            (2, 'Orphaned'),
+                            (3, 'Owned'),
+                            (4, 'Public Domain'),
+                            (5, 'Unknown'),
+                        ],
+                        default=5,
+                    ),
+                ),
                 ('rights', models.TextField(blank=True)),
                 ('rights_notice', models.JSONField(null=True)),
                 ('licence', models.TextField(blank=True)),
                 ('rights_holder', models.CharField(blank=True, max_length=255)),
                 ('notice_display', models.BooleanField(default=False)),
                 ('public_display', models.BooleanField(default=True)),
-                ('attachments', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.attachment')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'attachments',
+                    models.ForeignKey(
+                        blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.attachment'
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['name'],
@@ -839,8 +1725,26 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('source', models.CharField(blank=True, max_length=255)),
                 ('is_directed', models.BooleanField(default=False)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['id'],
@@ -851,16 +1755,63 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('source_object_id', models.CharField(db_index=True, max_length=36)),
                 ('target_object_id', models.CharField(db_index=True, max_length=36)),
                 ('notes', models.TextField(blank=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('rel_type', models.ForeignKey(db_column='rel_type', on_delete=django.db.models.deletion.CASCADE, related_name='relationships', to='dalme_app.relationshiptype')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'rel_type',
+                    models.ForeignKey(
+                        db_column='rel_type',
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='relationships',
+                        to='dalme_app.relationshiptype',
+                    ),
+                ),
                 ('scopes', models.ManyToManyField(db_index=True, to='dalme_app.scope')),
-                ('source_content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='rel_sources', to='contenttypes.contenttype')),
-                ('target_content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='rel_targets', to='contenttypes.contenttype')),
+                (
+                    'source_content_type',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='rel_sources',
+                        to='contenttypes.contenttype',
+                    ),
+                ),
+                (
+                    'target_content_type',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='rel_targets',
+                        to='contenttypes.contenttype',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -871,14 +1822,50 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('short_name', models.CharField(max_length=55)),
                 ('parent_id', models.CharField(db_index=True, max_length=36, null=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_related', to=settings.AUTH_USER_MODEL)),
-                ('parent_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'owner',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_related',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'parent_type',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -889,8 +1876,22 @@ class Migration(migrations.Migration):
             fields=[
                 ('object_id', models.UUIDField(db_index=True, primary_key=True, serialize=False)),
                 ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('creator', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+                    ),
+                ),
+                (
+                    'creator',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['created'],
@@ -901,11 +1902,34 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('short_name', models.CharField(max_length=55)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -917,7 +1941,12 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('full_name', models.CharField(blank=True, max_length=50)),
                 ('preferences', models.JSONField(default=dalme_app.models.auth_extensions.default_preferences)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    'user',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -925,11 +1954,37 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('location', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.location')),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'location',
+                    models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.location'),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -940,7 +1995,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('principal_id', models.PositiveIntegerField(db_index=True, null=True)),
                 ('object_id', models.CharField(db_index=True, max_length=36)),
                 ('is_default', models.BooleanField(default=False)),
@@ -949,10 +2009,44 @@ class Migration(migrations.Migration):
                 ('can_delete', models.BooleanField(default=False)),
                 ('can_add', models.BooleanField(default=False)),
                 ('can_remove', models.BooleanField(default=False)),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cperm_objects', to='contenttypes.contenttype')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('principal_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cperm_principals', to='contenttypes.contenttype')),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='cperm_objects',
+                        to='contenttypes.contenttype',
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'principal_type',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='cperm_principals',
+                        to='contenttypes.contenttype',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -962,11 +2056,39 @@ class Migration(migrations.Migration):
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
                 ('name', models.CharField(max_length=255)),
-                ('payload_type', models.CharField(choices=[('db_records', 'DB Records'), ('field_choices', 'Field Choices'), ('static_list', 'Static List')], max_length=15)),
+                (
+                    'payload_type',
+                    models.CharField(
+                        choices=[
+                            ('db_records', 'DB Records'),
+                            ('field_choices', 'Field Choices'),
+                            ('static_list', 'Static List'),
+                        ],
+                        max_length=15,
+                    ),
+                ),
                 ('description', models.TextField()),
                 ('payload', models.JSONField()),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -977,10 +2099,36 @@ class Migration(migrations.Migration):
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('attribute_concept', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.concept')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
+                (
+                    'attribute_concept',
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.concept'),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('obj', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dalme_app.object')),
             ],
             options={
@@ -997,9 +2145,32 @@ class Migration(migrations.Migration):
                 ('administrative_region', models.CharField(max_length=255)),
                 ('latitude', models.DecimalField(decimal_places=6, max_digits=9, null=True)),
                 ('longitude', models.DecimalField(decimal_places=6, max_digits=9, null=True)),
-                ('country', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.countryreference')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'country',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.countryreference'
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['country', 'name'],
@@ -1015,9 +2186,32 @@ class Migration(migrations.Migration):
                 ('iso6393', models.CharField(blank=True, default=None, max_length=25, null=True, unique=True)),
                 ('name', models.CharField(max_length=255)),
                 ('is_dialect', models.BooleanField(default=False)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.languagereference')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'parent',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.languagereference'
+                    ),
+                ),
             ],
             options={
                 'ordering': ['name'],
@@ -1027,30 +2221,51 @@ class Migration(migrations.Migration):
             name='GroupProperties',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('group_type', models.IntegerField(choices=[(1, 'Admin'), (2, 'DAM'), (3, 'Team'), (4, 'Knowledge Base'), (5, 'Website')])),
+                (
+                    'group_type',
+                    models.IntegerField(
+                        choices=[(1, 'Admin'), (2, 'DAM'), (3, 'Team'), (4, 'Knowledge Base'), (5, 'Website')]
+                    ),
+                ),
                 ('description', models.CharField(max_length=255)),
-                ('group', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='properties', to='auth.group')),
+                (
+                    'group',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, related_name='properties', to='auth.group'
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
             model_name='folio',
             name='page',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='records', to='dalme_app.page'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name='records', to='dalme_app.page'
+            ),
         ),
         migrations.AddField(
             model_name='folio',
             name='record',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='folios', to='dalme_app.record'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name='folios', to='dalme_app.record'
+            ),
         ),
         migrations.AddField(
             model_name='folio',
             name='transcription',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='folios', to='dalme_app.transcription'),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='folios',
+                to='dalme_app.transcription',
+            ),
         ),
         migrations.AddField(
             model_name='entityphrase',
             name='transcription_id',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='entity_phrases', to='dalme_app.transcription'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name='entity_phrases', to='dalme_app.transcription'
+            ),
         ),
         migrations.CreateModel(
             name='Domain',
@@ -1060,9 +2275,32 @@ class Migration(migrations.Migration):
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='domains', to='dalme_app.tenant')),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'tenant',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name='domains', to='dalme_app.tenant'
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -1071,7 +2309,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ContentTypeExtended',
             fields=[
-                ('contenttype_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='contenttypes.contenttype')),
+                (
+                    'contenttype_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='contenttypes.contenttype',
+                    ),
+                ),
                 ('name', models.CharField(max_length=255, unique=True)),
                 ('description', models.TextField()),
                 ('is_abstract', models.BooleanField(default=True)),
@@ -1080,8 +2328,16 @@ class Migration(migrations.Migration):
                 ('can_delete', models.BooleanField(default=False)),
                 ('can_add', models.BooleanField(default=False)),
                 ('can_remove', models.BooleanField(default=False)),
-                ('attribute_types', models.ManyToManyField(through='dalme_app.ContentAttributes', to='dalme_app.attributetype')),
-                ('parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.contenttypeextended')),
+                (
+                    'attribute_types',
+                    models.ManyToManyField(through='dalme_app.ContentAttributes', to='dalme_app.attributetype'),
+                ),
+                (
+                    'parent',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.contenttypeextended'
+                    ),
+                ),
             ],
             options={
                 'ordering': ['id'],
@@ -1094,22 +2350,40 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contentattributes',
             name='content_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attributes_list', to='dalme_app.contenttypeextended'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='attributes_list',
+                to='dalme_app.contenttypeextended',
+            ),
         ),
         migrations.AddField(
             model_name='contentattributes',
             name='creation_user',
-            field=models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                default=django_currentuser.middleware.get_current_user,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='%(app_label)s_%(class)s_creation',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='contentattributes',
             name='modification_user',
-            field=models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                default=django_currentuser.middleware.get_current_user,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='%(app_label)s_%(class)s_modification',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='contentattributes',
             name='override_options',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.optionslist'),
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.optionslist'
+            ),
         ),
         migrations.CreateModel(
             name='Comment',
@@ -1119,9 +2393,32 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
                 ('object_id', models.CharField(db_index=True, max_length=55)),
                 ('body', models.TextField(blank=True)),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dalme_app.tenant')),
             ],
             options={
@@ -1135,10 +2432,38 @@ class Migration(migrations.Migration):
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('object_id', models.CharField(db_index=True, max_length=36)),
-                ('collection', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='members', to='dalme_app.collection')),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'collection',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name='members', to='dalme_app.collection'
+                    ),
+                ),
+                (
+                    'content_type',
+                    models.ForeignKey(
+                        null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+                    ),
+                ),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='dalme_app.tenant')),
             ],
             options={
@@ -1153,27 +2478,54 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attributetype',
             name='options',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.optionslist'),
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.optionslist'
+            ),
         ),
         migrations.AddField(
             model_name='attributetype',
             name='same_as',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.attributetype'),
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_app.attributetype'
+            ),
         ),
         migrations.CreateModel(
             name='AttributeReference',
             fields=[
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
-                ('id', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    'id',
+                    models.UUIDField(
+                        db_index=True, default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                    ),
+                ),
                 ('name', models.CharField(max_length=255)),
                 ('short_name', models.CharField(max_length=55)),
                 ('description', models.TextField()),
                 ('data_type', models.CharField(max_length=15)),
                 ('source', models.CharField(max_length=255)),
                 ('term_type', models.CharField(blank=True, max_length=55)),
-                ('creation_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL)),
-                ('modification_user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL)),
+                (
+                    'creation_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_creation',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'modification_user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='%(app_label)s_%(class)s_modification',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -1182,22 +2534,41 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attribute',
             name='attribute_type',
-            field=models.ForeignKey(db_column='attribute_type', on_delete=django.db.models.deletion.CASCADE, related_name='attributes', to='dalme_app.attributetype'),
+            field=models.ForeignKey(
+                db_column='attribute_type',
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='attributes',
+                to='dalme_app.attributetype',
+            ),
         ),
         migrations.AddField(
             model_name='attribute',
             name='content_type',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'),
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'
+            ),
         ),
         migrations.AddField(
             model_name='attribute',
             name='creation_user',
-            field=models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_creation', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                default=django_currentuser.middleware.get_current_user,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='%(app_label)s_%(class)s_creation',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='attribute',
             name='modification_user',
-            field=models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='%(app_label)s_%(class)s_modification', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                default=django_currentuser.middleware.get_current_user,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='%(app_label)s_%(class)s_modification',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='attachment',
@@ -1210,8 +2581,21 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(db_index=True, primary_key=True, serialize=False, unique=True)),
                 ('event', models.CharField(max_length=255)),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(default=django_currentuser.middleware.get_current_user, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('record', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='work_log', to='dalme_app.workflow')),
+                (
+                    'user',
+                    models.ForeignKey(
+                        default=django_currentuser.middleware.get_current_user,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    'record',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name='work_log', to='dalme_app.workflow'
+                    ),
+                ),
             ],
         ),
         migrations.AddConstraint(
@@ -1229,7 +2613,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='person',
             name='user',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='person_record', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='person_record',
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterUniqueTogether(
             name='permission',
@@ -1255,6 +2644,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attributevaluefkey',
             name='target_content_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='fk_attributes', to='contenttypes.contenttype'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name='fk_attributes', to='contenttypes.contenttype'
+            ),
         ),
     ]

@@ -18,36 +18,33 @@ from django.db import (
 
 
 class Command(BaseCommand):
-    help = "Creates the tables needed to use the SQL cache backend."  # noqa: A003
+    help = 'Creates the tables needed to use the SQL cache backend.'  # noqa: A003
 
     requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "args",
-            metavar="table_name",
-            nargs="*",
-            help=(
-                "Optional table names. Otherwise, settings.CACHES is used to find "
-                "cache tables."
-            ),
+            'args',
+            metavar='table_name',
+            nargs='*',
+            help=('Optional table names. Otherwise, settings.CACHES is used to find ' 'cache tables.'),
         )
         parser.add_argument(
-            "--database",
+            '--database',
             default=DEFAULT_DB_ALIAS,
-            help="Nominates a database onto which the cache tables will be "
+            help='Nominates a database onto which the cache tables will be '
             'installed. Defaults to the "default" database.',
         )
         parser.add_argument(
-            "--dry-run",
-            action="store_true",
-            help="Does not create the table, just prints the SQL that would be run.",
+            '--dry-run',
+            action='store_true',
+            help='Does not create the table, just prints the SQL that would be run.',
         )
 
     def handle(self, *tablenames, **options):
-        db = options["database"]
-        self.verbosity = options["verbosity"]
-        dry_run = options["dry_run"]
+        db = options['database']
+        self.verbosity = options['verbosity']
+        dry_run = options['dry_run']
         if tablenames:
             # Legacy behavior, tablename specified as argument
             for tablename in tablenames:
@@ -75,10 +72,13 @@ class Command(BaseCommand):
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
             models.CharField(
-                name="cache_key", max_length=255, unique=True, primary_key=True,
+                name='cache_key',
+                max_length=255,
+                unique=True,
+                primary_key=True,
             ),
-            models.TextField(name="value"),
-            models.DateTimeField(name="expires", db_index=True),
+            models.TextField(name='value'),
+            models.DateTimeField(name='expires', db_index=True),
         )
         table_output = []
         index_output = []
@@ -87,31 +87,31 @@ class Command(BaseCommand):
             field_output = [
                 qn(f.name),
                 f.db_type(connection=connection),
-                "%sNULL" % ("NOT " if not f.null else ""),
+                '%sNULL' % ('NOT ' if not f.null else ''),
             ]
             if f.primary_key:
-                field_output.append("PRIMARY KEY")
+                field_output.append('PRIMARY KEY')
             elif f.unique:
-                field_output.append("UNIQUE")
+                field_output.append('UNIQUE')
             if f.db_index:
-                unique = "UNIQUE " if f.unique else ""
+                unique = 'UNIQUE ' if f.unique else ''
                 index_output.append(
-                    "CREATE {}INDEX {} ON {} ({});".format(
+                    'CREATE {}INDEX {} ON {} ({});'.format(
                         unique,
-                        qn(f"{tablename}_{f.name}"),
+                        qn(f'{tablename}_{f.name}'),
                         qn(tablename),
                         qn(f.name),
                     ),
                 )
-            table_output.append(" ".join(field_output))
-        full_statement = ["CREATE TABLE %s (" % qn(tablename)]
+            table_output.append(' '.join(field_output))
+        full_statement = ['CREATE TABLE %s (' % qn(tablename)]
         for i, line in enumerate(table_output):
             full_statement.append(
-                "    {}{}".format(line, "," if i < len(table_output) - 1 else ""),
+                '    {}{}'.format(line, ',' if i < len(table_output) - 1 else ''),
             )
-        full_statement.append(");")
+        full_statement.append(');')
 
-        full_statement = "\n".join(full_statement)
+        full_statement = '\n'.join(full_statement)
 
         if dry_run:
             self.stdout.write(full_statement)
@@ -120,7 +120,8 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic(
-            using=database, savepoint=connection.features.can_rollback_ddl,
+            using=database,
+            savepoint=connection.features.can_rollback_ddl,
         ), connection.cursor() as curs:
             try:
                 curs.execute(full_statement)

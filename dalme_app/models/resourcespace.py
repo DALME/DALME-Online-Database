@@ -119,10 +119,10 @@ class rs_resource(models.Model):  # noqa: N801
 
 
 class rs_resource_data(models.Model):  # noqa: N801
-    django_id = models.IntegerField(primary_key=True, db_column="django_id")
+    django_id = models.IntegerField(primary_key=True, db_column='django_id')
     resource = models.ForeignKey(
         'rs_resource',
-        db_column="resource",
+        db_column='resource',
         to_field='ref',
         on_delete=models.CASCADE,
         related_name='resource_data',

@@ -27,7 +27,7 @@ class JWTUserDetailsSerializer(serializers.ModelSerializer):
 
     def get_is_admin(self, obj):
         """Return boolean indicating whether user is admin."""
-        return any(group.name == "Administrators" for group in obj.groups.all())
+        return any(group.name == 'Administrators' for group in obj.groups.all())
 
     def get_groups(self, obj):
         """Return list of user groups."""
@@ -48,7 +48,8 @@ class JWTSessionAuthentication(MiddlewareMixin):
     def is_tenant_user(self, user):
         """Verify the request user is registered with the request tenant."""
         return TenantRole.objects.filter(
-            user=user, tenant=get_current_tenant(),
+            user=user,
+            tenant=get_current_tenant(),
         ).exists()
 
     def process_request(self, request):

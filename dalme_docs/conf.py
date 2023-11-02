@@ -7,34 +7,34 @@ from __future__ import annotations
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "DALME"
-copyright = "2023, The Documentary Archaeology of Late Medieval Europe"  # noqa: A001
-author = "The Documentary Archaeology of Late Medieval Europe"
+project = 'DALME'
+copyright = '2023, The Documentary Archaeology of Late Medieval Europe'  # noqa: A001
+author = 'The Documentary Archaeology of Late Medieval Europe'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "myst_parser",
+    'myst_parser',
     # "sphinx_js",
-    "sphinxcontrib.mermaid",
+    'sphinxcontrib.mermaid',
 ]
 
 myst_enable_extensions = [
-    "attrs_block",
-    "colon_fence",
-    "deflist",
-    "smartquotes",
+    'attrs_block',
+    'colon_fence',
+    'deflist',
+    'smartquotes',
 ]
 
-templates_path = ["_templates"]
-exclude_patterns = [".DS_Store", "*.txt", "_build", "README.md", "Thumbs.db"]
+templates_path = ['_templates']
+exclude_patterns = ['.DS_Store', '*.txt', '_build', 'README.md', 'Thumbs.db']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "furo"
-html_static_path = ["_static"]
+html_theme = 'furo'
+html_static_path = ['_static']
 
 # -- Options for sphinx-js  https://github.com/mozilla/sphinx-js -------------
 

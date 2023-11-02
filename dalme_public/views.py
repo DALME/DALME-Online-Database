@@ -79,8 +79,11 @@ def biblio_entry(request):
                 'prefer_this_title_as_link_text': ('link_text' in form.changed_data),
             }
             return render_modal_workflow(
-                request, None, None,
-                None, json_data={'step': 'biblio_chosen', 'result': result},
+                request,
+                None,
+                None,
+                None,
+                json_data={'step': 'biblio_chosen', 'result': result},
             )
     else:
         form = BibliographyLinkChooserForm(
@@ -145,9 +148,12 @@ def enter_footnote(request):
         request,
         'wagtailadmin/chooser/footnote_entry.html',
         None,  # js template
-        chooser.shared_context(request, {
-            'form': form,
-            'title': title,
-        }),
+        chooser.shared_context(
+            request,
+            {
+                'form': form,
+                'title': title,
+            },
+        ),
         json_data={'step': 'enter_footnote'},
     )

@@ -35,6 +35,7 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
+
 @receiver(signals.update_failure_response)
 @receiver(signals.bind_extra_request_finished_metadata)
 def add_request_id_to_error_response(response, logger, **kwargs):  # noqa: ARG001
@@ -56,10 +57,13 @@ def bind_token_user_id(request, logger, **kwargs):  # noqa: ARG001
 
 
 if os.environ['ENV'] in {'staging', 'production'}:
+
     @receiver(signals.bind_extra_request_metadata)
     def bind_trace_id(request, logger, **kwargs):  # noqa: ARG001
         trace_id = get_request_header(
-             request, 'x-amzn-trace-id', 'HTTP_X_AMZN_TRACE_ID',
+            request,
+            'x-amzn-trace-id',
+            'HTTP_X_AMZN_TRACE_ID',
         )
         if trace_id:
             structlog.contextvars.bind_contextvars(trace_id=trace_id)

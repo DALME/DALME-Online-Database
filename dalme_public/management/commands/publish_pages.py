@@ -21,6 +21,6 @@ class Command(PublishScheduled):
     def handle(self, *args, **options):
         super().handle(*args, **options)
         logger.info('Scheduled pages have been published')
-        if (token := os.environ.get('AWS_SFN_TASK_TOKEN')):
+        if token := os.environ.get('AWS_SFN_TASK_TOKEN'):
             stfn = boto3.client('stepfunctions')
             stfn.send_task_success(taskToken=token, output='{"Status": "Success"}')

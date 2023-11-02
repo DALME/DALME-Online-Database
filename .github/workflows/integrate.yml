@@ -24,9 +24,9 @@ env:
   SKIP_APP: |
     eslint,prettier,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
   SKIP_TF: |
-    ruff,eslint,prettier,docs
+    ruff,ruff-format,eslint,prettier,docs
   SKIP_UI: |
-    ruff,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
+    ruff,ruff-format,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
   TF_ROOT: ./tf
   USE_INFRACOST_APP: true
 

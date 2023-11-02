@@ -39,12 +39,12 @@ class BaseAccessPolicy(AccessPolicy):
         return result
 
     def _get_invoked_action(self, view):
-        if hasattr(view, "action"):
+        if hasattr(view, 'action'):
             if view.action == 'has_permission':
                 return 'update'
             return view.action
 
-        if hasattr(view, "__class__"):
+        if hasattr(view, '__class__'):
             if view.__class__.__name__ in ['RecordDetail', 'dict']:
                 return 'update'
             return view.__class__.__name__

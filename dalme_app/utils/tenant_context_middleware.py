@@ -6,7 +6,7 @@ from werkzeug.local import LocalProxy
 from django.conf import settings
 from django.core.exceptions import DisallowedHost
 
-_tenant = contextvars.ContextVar("tenant")
+_tenant = contextvars.ContextVar('tenant')
 TENANT = LocalProxy(_tenant)
 
 

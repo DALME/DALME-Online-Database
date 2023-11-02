@@ -21,8 +21,8 @@ class Comment(ScopedBase, dalmeIntid):
 
     @property
     def snippet(self):
-        body_snippet = textwrap.shorten(self.body, width=35, placeholder="...")
-        return f"{self.creation_user.username} - {body_snippet}..."
+        body_snippet = textwrap.shorten(self.body, width=35, placeholder='...')
+        return f'{self.creation_user.username} - {body_snippet}...'
 
     def __str__(self):
         return self.snippet

@@ -108,7 +108,7 @@ class Footer(models.Model):
     ]
 
     def __str__(self):
-        return "Site Footer"
+        return 'Site Footer'
 
     def clean(self):
         if self.id is None and self._meta.model.objects.exists():
@@ -150,7 +150,7 @@ class SearchPage(models.Model):
     ]
 
     def __str__(self):
-        return "Search Page"
+        return 'Search Page'
 
     def clean(self):
         if self.id is None and self._meta.model.objects.exists():
@@ -206,7 +206,7 @@ class ExplorePage(models.Model):
     ]
 
     def __str__(self):
-        return "Explore Page Content"
+        return 'Explore Page Content'
 
     def clean(self):
         if self.id is None and self._meta.model.objects.exists():
@@ -238,7 +238,7 @@ class RecordBrowser(models.Model):
     ]
 
     def __str__(self):
-        return "Record Browser"
+        return 'Record Browser'
 
     def clean(self):
         if self.id is None and self._meta.model.objects.exists():
@@ -270,7 +270,7 @@ class RecordViewer(models.Model):
     ]
 
     def __str__(self):
-        return "Record Viewer"
+        return 'Record Viewer'
 
     def clean(self):
         if self.id is None and self._meta.model.objects.exists():
@@ -370,7 +370,6 @@ class DALMEPage(Page):
             return self.short_title or self.title
 
 
-
 class FeaturedPage(DALMEPage):
     alternate_author = models.CharField(
         max_length=127,
@@ -467,7 +466,7 @@ class FeaturedPage(DALMEPage):
 
 
 class Home(DALMEPage):
-    template = "home.html"
+    template = 'home.html'
 
     learn_more_page = models.ForeignKey(
         'wagtailcore.Page',
@@ -856,7 +855,6 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
         with contextlib.suppress(AttributeError):
             context.update({'set_id': self.source_set.id})
 
-
         return TemplateResponse(
             request,
             'dalme_public/records.html',
@@ -887,9 +885,14 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             .order_by('pageOrder')
         )
 
-        initial_folio_index = next(
-            (i for i, item in enumerate(pages) if item["pageName"] == folio), 0,
-        ) if folio else 0
+        initial_folio_index = (
+            next(
+                (i for i, item in enumerate(pages) if item['pageName'] == folio),
+                0,
+            )
+            if folio
+            else 0
+        )
 
         context = self.get_context(request)
         viewer_snippet = RecordViewer.objects.first()
@@ -919,7 +922,6 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
 
         with contextlib.suppress(AttributeError):
             context.update({'set_id': self.source_set.id})
-
 
         return TemplateResponse(
             request,

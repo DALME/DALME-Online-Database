@@ -11,13 +11,20 @@ from dalme_app.management.commands.ensure_tenants import Command as EnsureTenant
 from dalme_app.models import Domain, Tenant
 
 
-@mock.patch.dict(os.environ, {'TENANTS': json.dumps({
-    'DALME': {
-        'domain': 'dalme.localhost',
-        'name': 'DALME',
-        'schema_name': 'dalme',
+@mock.patch.dict(
+    os.environ,
+    {
+        'TENANTS': json.dumps(
+            {
+                'DALME': {
+                    'domain': 'dalme.localhost',
+                    'name': 'DALME',
+                    'schema_name': 'dalme',
+                },
+            }
+        )
     },
-})})
+)
 @mock.patch('dalme_app.management.commands.ensure_tenants.Domain')
 @mock.patch('dalme_app.management.commands.ensure_tenants.Tenant')
 @mock.patch('dalme_app.management.commands.ensure_tenants.logger')
@@ -43,25 +50,32 @@ def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
     ]
 
 
-@mock.patch.dict(os.environ, {'TENANTS': json.dumps({
-    'DALME': {
-        'domain': 'dalme.localhost',
-        'name': 'DALME',
-        'schema_name': 'dalme',
+@mock.patch.dict(
+    os.environ,
+    {
+        'TENANTS': json.dumps(
+            {
+                'DALME': {
+                    'domain': 'dalme.localhost',
+                    'name': 'DALME',
+                    'schema_name': 'dalme',
+                },
+                'GLOBALPHARMACOPEIAS': {
+                    'domain': 'globalpharmacopeias.localhost',
+                    'name': 'Global Pharmacopeias',
+                    'schema_name': 'globalpharmacopeias',
+                },
+            }
+        )
     },
-    'GLOBALPHARMACOPEIAS': {
-        'domain': 'globalpharmacopeias.localhost',
-        'name': 'Global Pharmacopeias',
-        'schema_name': 'globalpharmacopeias',
-    },
-})})
+)
 @mock.patch('dalme_app.management.commands.ensure_tenants.Domain')
 @mock.patch('dalme_app.management.commands.ensure_tenants.Tenant')
 @mock.patch('dalme_app.management.commands.ensure_tenants.logger')
 def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
     mock_tenant.objects.filter.return_value.exists.side_effect = [True, True, False]
     new_tenant = mock.MagicMock(spec=Tenant)
-    new_domain =  mock.MagicMock(spec=Domain)
+    new_domain = mock.MagicMock(spec=Domain)
     mock_tenant.objects.create.return_value = new_tenant
     mock_domain.objects.create.return_value = new_domain
 

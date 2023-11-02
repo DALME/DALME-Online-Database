@@ -46,23 +46,24 @@ class ScopedManager(models.Manager):
         RuntimeError. In those cases we just fallback to the unscoped manager.
 
         """
-        prod_envs = {"staging", "production"}
+        prod_envs = {'staging', 'production'}
         tenant = get_current_tenant()
 
         if self._queryset_class != models.QuerySet:
             try:
                 return super().get_queryset().filter(tenant__id=tenant.pk)
             except RuntimeError:
-                if settings.DEBUG or os.environ["ENV"] in prod_envs:
+                if settings.DEBUG or os.environ['ENV'] in prod_envs:
                     return super().get_queryset().filter()
                 raise
 
         try:
             return ScopedQueryset(
-                self.model, using=self._db,
+                self.model,
+                using=self._db,
             ).filter(tenant__id=tenant.pk)
         except RuntimeError:
-            if settings.DEBUG or os.environ.get("ENV") in prod_envs:
+            if settings.DEBUG or os.environ.get('ENV') in prod_envs:
                 return ScopedQueryset(self.model, using=self._db).filter()
             raise
 

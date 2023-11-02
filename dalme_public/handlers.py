@@ -102,7 +102,11 @@ class FootnoteElementHandler(InlineEntityElementHandler):
 
 
 def footnote_decorator(props):
-    return DOM.create_element('span', {
-        'data-note_id': props['note_id'],
-        'data-footnote': props['text'],
-    }, props['children'])
+    return DOM.create_element(
+        'span',
+        {
+            'data-note_id': props['note_id'],
+            'data-footnote': props['text'],
+        },
+        props['children'],
+    )

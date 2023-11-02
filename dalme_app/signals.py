@@ -87,4 +87,4 @@ def workflow_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
     if not created:
         models.signals.post_save.send(sender=Record, instance=instance.source, created=False)
     else:
-        WorkLog.objects.update_or_create(source=instance, event="Record created", timestamp=instance.last_modified)
+        WorkLog.objects.update_or_create(source=instance, event='Record created', timestamp=instance.last_modified)

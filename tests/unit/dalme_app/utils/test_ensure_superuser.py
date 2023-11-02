@@ -29,14 +29,16 @@ def test_ensure_superuser_no_creds(mock_logger, mock_user):
 @mock.patch('dalme_app.management.commands.ensure_superuser.logger')
 def test_ensure_superuser_create(mock_logger, mock_user):
     mock_user.DoesNotExist = User.DoesNotExist
-    mock_user.objects.get.side_effect = User.DoesNotExist("Some error")
+    mock_user.objects.get.side_effect = User.DoesNotExist('Some error')
 
     EnsureSuperuser().handle()
 
     assert mock_user.mock_calls == [
         mock.call.objects.get(username='foo'),
         mock.call.objects.create(
-            username='foo', password='bar', is_superuser=True,
+            username='foo',
+            password='bar',
+            is_superuser=True,
         ),
     ]
     assert mock_logger.mock_calls == [

@@ -27,44 +27,44 @@ from dalme_app.models import (
 def get_script_menu():
     script_register = [
         {
-            "name": "session_info",
-            "description": "Outputs the contents of the current session.",
-            "type": "info",
+            'name': 'session_info',
+            'description': 'Outputs the contents of the current session.',
+            'type': 'info',
         },
         {
-            "name": "update_folios_in_dam",
-            "description": "Updates the contents of the 'folio' field in the DAM to match the value in the corresponding DALME page.",
-            "type": "danger",
+            'name': 'update_folios_in_dam',
+            'description': "Updates the contents of the 'folio' field in the DAM to match the value in the corresponding DALME page.",
+            'type': 'danger',
         },
         {
-            "name": "rebuild_search_index",
-            "description": "Rebuilds the ElasticSearch indices.",
-            "type": "danger",
+            'name': 'rebuild_search_index',
+            'description': 'Rebuilds the ElasticSearch indices.',
+            'type': 'danger',
         },
         {
-            "name": "add_to_public_register",
-            "description": "Add sources marked as public to Public Register (purl endpoint).",
-            "type": "danger",
+            'name': 'add_to_public_register',
+            'description': 'Add sources marked as public to Public Register (purl endpoint).',
+            'type': 'danger',
         },
         {
-            "name": "geolocate_locales",
-            "description": "Add latitude and longitude to locales.",
-            "type": "warning",
+            'name': 'geolocate_locales',
+            'description': 'Add latitude and longitude to locales.',
+            'type': 'warning',
         },
         {
-            "name": "remove_11600",
-            "description": "Removes dam_id from pages for which the current value is 11600",
-            "type": "danger",
+            'name': 'remove_11600',
+            'description': 'Removes dam_id from pages for which the current value is 11600',
+            'type': 'danger',
         },
         {
-            "name": "test_expression",
-            "description": "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
-            "type": "info",
+            'name': 'test_expression',
+            'description': "Tests a simple expression that doesn't require complex data or context from the rest of the application.",
+            'type': 'info',
         },
         {
-            "name": "test_django_q",
-            "description": "Tests the tasks backend.",
-            "type": "info",
+            'name': 'test_django_q',
+            'description': 'Tests the tasks backend.',
+            'type': 'info',
         },
     ]
     _output = ''
@@ -104,7 +104,7 @@ def create_json_field_reps(request):  # noqa: ARG001
     with open(path) as f:
         data = json.load(f)
 
-    for field in data :
+    for field in data:
         path = os.path.join(
             'dalme_app',
             'config',
@@ -137,7 +137,7 @@ def add_attribute_types():
         AttributeReference.objects.bulk_create(entries)
         result = 'Cool!'
     except Exception as e:  # noqa: BLE001
-        result = 'Oops!'+str(e)
+        result = 'Oops!' + str(e)
 
     return result
 
@@ -231,8 +231,7 @@ def migrate_datasets(request):  # noqa: ARG001
     return result + 'Attributes deleted.'
 
 
-
-def add_to_public_register(request):   # noqa: ARG001
+def add_to_public_register(request):  # noqa: ARG001
     public_sources = Source.objects.filter(workflow__is_public=True)
     ct = ContentType.objects.get_for_model(public_sources.first())
     for source in public_sources:
@@ -243,7 +242,7 @@ def add_to_public_register(request):   # noqa: ARG001
     return 'done'
 
 
-def geolocate_locales(request):   # noqa: ARG001
+def geolocate_locales(request):  # noqa: ARG001
     locales = LocaleReference.objects.all()
     geolocator = AlgoliaPlaces(domain='places-dsn.algolia.net')
     errors = {}
@@ -293,44 +292,44 @@ def fix_users(records):
 #     return 'done'
 
 # def test_expression2(request):
-    # worksets = Workset.objects.all()
-    # set_names = [i.name for i in Set.objects.all()]
-    # for ws in worksets:
-    #     if ws.name not in set_names:
-    #         set_para = {
-    #             'name': ws.name,
-    #             'set_type': 4,
-    #             'endpoint': ws.endpoint,
-    #             'owner': ws.owner,
-    #             'set_permissions': 2,
-    #             'description': ws.description,
-    #         }
-    #         new_set = Set(**set_para)
-    #         new_set.save()
-    #         set_object = Set.objects.get(pk=new_set.id)
-    #         old_qset = json.loads(ws.qset)
-    #         new_members = []
-    #         for k, v in old_qset.items():
-    #             if Source.objects.filter(pk=v['pk']).exists():
-    #                 source_object = Source.objects.get(pk=v['pk'])
-    #                 new_entry = Set_x_content()
-    #                 new_entry.set_id = set_object
-    #                 new_entry.content_object = source_object
-    #                 new_entry.workset_done = v.get('done', False)
-    #                 new_members.append(new_entry)
-    #         Set_x_content.objects.bulk_create(new_members)
-    # result = record.source_pages.all().select_related('transcription')
-    # eps = [i.transcription.entity_phrases.filter(content_type=115) for i in result]
-    # eps = [i.transcription.entity_phrases.filter(content_type=104) for i in record.source_pages.all().select_related('transcription')]
-    # result2 = eps[0].union(*eps[1:])
-    # return record.agents[0].relations.all()[0].target_object.std_name
-    # record = Page.objects.get(pk='44c79e6a8a4b4b50aa7a1b9d6bb61134')
-    # pol = record.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR
-    # pol2 = json.loads(pol)['id']
-    # rights_obj = RightsPolicy.objects.get(pk=pol2)
-    # # return model_to_dict(rights_obj, fields=['rights_status', 'notice_display', 'rights_notice'])
-    # ret_dict = {'status': rights_obj.get_rights_status_display(), 'display_notice': rights_obj.notice_display, 'notice': json.loads(rights_obj.rights_notice)}
-    # return record.get_rights()['notice']['@ita']
+# worksets = Workset.objects.all()
+# set_names = [i.name for i in Set.objects.all()]
+# for ws in worksets:
+#     if ws.name not in set_names:
+#         set_para = {
+#             'name': ws.name,
+#             'set_type': 4,
+#             'endpoint': ws.endpoint,
+#             'owner': ws.owner,
+#             'set_permissions': 2,
+#             'description': ws.description,
+#         }
+#         new_set = Set(**set_para)
+#         new_set.save()
+#         set_object = Set.objects.get(pk=new_set.id)
+#         old_qset = json.loads(ws.qset)
+#         new_members = []
+#         for k, v in old_qset.items():
+#             if Source.objects.filter(pk=v['pk']).exists():
+#                 source_object = Source.objects.get(pk=v['pk'])
+#                 new_entry = Set_x_content()
+#                 new_entry.set_id = set_object
+#                 new_entry.content_object = source_object
+#                 new_entry.workset_done = v.get('done', False)
+#                 new_members.append(new_entry)
+#         Set_x_content.objects.bulk_create(new_members)
+# result = record.source_pages.all().select_related('transcription')
+# eps = [i.transcription.entity_phrases.filter(content_type=115) for i in result]
+# eps = [i.transcription.entity_phrases.filter(content_type=104) for i in record.source_pages.all().select_related('transcription')]
+# result2 = eps[0].union(*eps[1:])
+# return record.agents[0].relations.all()[0].target_object.std_name
+# record = Page.objects.get(pk='44c79e6a8a4b4b50aa7a1b9d6bb61134')
+# pol = record.sources.all()[0].source.parent.parent.attributes.get(attribute_type=144).value_STR
+# pol2 = json.loads(pol)['id']
+# rights_obj = RightsPolicy.objects.get(pk=pol2)
+# # return model_to_dict(rights_obj, fields=['rights_status', 'notice_display', 'rights_notice'])
+# ret_dict = {'status': rights_obj.get_rights_status_display(), 'display_notice': rights_obj.notice_display, 'notice': json.loads(rights_obj.rights_notice)}
+# return record.get_rights()['notice']['@ita']
 
 
 def replace_in_transcription(request):  # noqa: ARG001
@@ -346,12 +345,15 @@ def replace_in_transcription(request):  # noqa: ARG001
                 if fol.sources.first().transcription:
                     tr_id = fol.sources.first().transcription.id
                     text = fol.sources.first().transcription.transcription
-                    text = text.replace('<gap reason=\'not transcribed\' extent=\'unknown\'/>', '<metamark function="leader" rend="dashes"/>')
+                    text = text.replace(
+                        "<gap reason='not transcribed' extent='unknown'/>",
+                        '<metamark function="leader" rend="dashes"/>',
+                    )
                     Transcription.objects.filter(pk=tr_id).update(transcription=text)
     return 'cool'
 
 
-def import_transcriptions(request):   # noqa: ARG001
+def import_transcriptions(request):  # noqa: ARG001
     data = []
     count = 0
     current_id = 'bc3a2c32639e44d6b5a21829b42ae0b5'
@@ -406,7 +408,7 @@ def merge_attributes_csv():
                 month = int(row['value_month'])
                 year = int(row['value_year'])
                 the_date = date(year, month, day)
-                date_str = the_date.strftime("%d-%b-%Y").lstrip("0").replace(" 0", " ")
+                date_str = the_date.strftime('%d-%b-%Y').lstrip('0').replace(' 0', ' ')
                 att = Attribute.objects.get(pk=att_id)
                 att.value_DATE_d = day
                 att.value_DATE_m = month
@@ -420,7 +422,7 @@ def merge_attributes_csv():
                 month = int(row['value_month'])
                 year = int(row['value_year'])
                 the_date = date(year, month, 1)
-                date_str = the_date.strftime("%b-%Y")
+                date_str = the_date.strftime('%b-%Y')
                 att = Attribute.objects.get(pk=att_id)
                 att.value_DATE_m = month
                 att.value_DATE_y = year

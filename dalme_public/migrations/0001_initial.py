@@ -19,7 +19,6 @@ import dalme_public.blocks
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -33,11 +32,171 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Collection',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('citable', models.BooleanField(default=True, help_text='Check this box to show the "Cite" menu for this page.')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'citable',
+                    models.BooleanField(
+                        default=True, help_text='Check this box to show the "Cite" menu for this page.'
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -47,11 +206,171 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Collections',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('citable', models.BooleanField(default=True, help_text='Check this box to show the "Cite" menu for this page.')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'citable',
+                    models.BooleanField(
+                        default=True, help_text='Check this box to show the "Cite" menu for this page.'
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -63,7 +382,15 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=255, verbose_name='title')),
-                ('file', wagtail.images.models.WagtailImageField(height_field='height', upload_to=wagtail.images.models.get_upload_to, verbose_name='file', width_field='width')),
+                (
+                    'file',
+                    wagtail.images.models.WagtailImageField(
+                        height_field='height',
+                        upload_to=wagtail.images.models.get_upload_to,
+                        verbose_name='file',
+                        width_field='width',
+                    ),
+                ),
                 ('width', models.IntegerField(editable=False, verbose_name='width')),
                 ('height', models.IntegerField(editable=False, verbose_name='height')),
                 ('created_at', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='created at')),
@@ -74,9 +401,33 @@ class Migration(migrations.Migration):
                 ('file_size', models.PositiveIntegerField(editable=False, null=True)),
                 ('file_hash', models.CharField(blank=True, db_index=True, editable=False, max_length=40)),
                 ('caption', models.CharField(blank=True, max_length=255, null=True)),
-                ('collection', models.ForeignKey(default=wagtail.models.collections.get_root_collection_id, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='wagtailcore.collection', verbose_name='collection')),
-                ('tags', taggit.managers.TaggableManager(blank=True, help_text=None, through='taggit.TaggedItem', to='taggit.Tag', verbose_name='tags')),
-                ('uploaded_by_user', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='uploaded by user')),
+                (
+                    'collection',
+                    models.ForeignKey(
+                        default=wagtail.models.collections.get_root_collection_id,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='+',
+                        to='wagtailcore.collection',
+                        verbose_name='collection',
+                    ),
+                ),
+                (
+                    'tags',
+                    taggit.managers.TaggableManager(
+                        blank=True, help_text=None, through='taggit.TaggedItem', to='taggit.Tag', verbose_name='tags'
+                    ),
+                ),
+                (
+                    'uploaded_by_user',
+                    models.ForeignKey(
+                        blank=True,
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name='uploaded by user',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -87,19 +438,216 @@ class Migration(migrations.Migration):
             name='Footer',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('pages', wagtail.fields.StreamField([('page', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('page', wagtail.blocks.PageChooserBlock())]))], null=True, use_json_field=True)),
+                (
+                    'pages',
+                    wagtail.fields.StreamField(
+                        [
+                            (
+                                'page',
+                                wagtail.blocks.StructBlock(
+                                    [('title', wagtail.blocks.CharBlock()), ('page', wagtail.blocks.PageChooserBlock())]
+                                ),
+                            )
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
                 ('copyright', models.CharField(blank=True, max_length=255, null=True)),
-                ('social', wagtail.fields.StreamField([('social', wagtail.blocks.StructBlock([('fa_icon', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock(required=False)), ('css_class', wagtail.blocks.CharBlock(required=False))]))], null=True, use_json_field=True)),
+                (
+                    'social',
+                    wagtail.fields.StreamField(
+                        [
+                            (
+                                'social',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('fa_icon', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('css_class', wagtail.blocks.CharBlock(required=False)),
+                                    ]
+                                ),
+                            )
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='Section',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -110,38 +658,311 @@ class Migration(migrations.Migration):
             name='SearchPage',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('help_content', wagtail.fields.StreamField([('text', wagtail.blocks.RichTextBlock()), ('html', wagtail.blocks.RawHTMLBlock())], null=True, use_json_field=True)),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'help_content',
+                    wagtail.fields.StreamField(
+                        [('text', wagtail.blocks.RichTextBlock()), ('html', wagtail.blocks.RawHTMLBlock())],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='RecordViewer',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='RecordBrowser',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='Home',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('sponsors', wagtail.fields.StreamField([('sponsors', wagtail.blocks.StructBlock([('logo', wagtail.images.blocks.ImageChooserBlock()), ('url', wagtail.blocks.URLBlock())]))], null=True, use_json_field=True)),
-                ('banners', wagtail.fields.StreamField([('banners', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.TextBlock()), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('start_date', wagtail.blocks.DateBlock()), ('end_date', wagtail.blocks.DateBlock())]))], null=True, use_json_field=True)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
-                ('learn_more_page', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='wagtailcore.page')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'sponsors',
+                    wagtail.fields.StreamField(
+                        [
+                            (
+                                'sponsors',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('logo', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                    ]
+                                ),
+                            )
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'banners',
+                    wagtail.fields.StreamField(
+                        [
+                            (
+                                'banners',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.TextBlock()),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('start_date', wagtail.blocks.DateBlock()),
+                                        ('end_date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            )
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
+                (
+                    'learn_more_page',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='wagtailcore.page',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -151,13 +972,186 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Flat',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('show_contact_form', models.BooleanField(default=False, help_text='Check this box to show a contact form on the page.')),
-                ('citable', models.BooleanField(default=False, help_text='Check this box to show the "Cite" menu for this page.')),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'show_contact_form',
+                    models.BooleanField(default=False, help_text='Check this box to show a contact form on the page.'),
+                ),
+                (
+                    'citable',
+                    models.BooleanField(
+                        default=False, help_text='Check this box to show the "Cite" menu for this page.'
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -167,11 +1161,176 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Features',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -181,15 +1340,212 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FeaturedObject',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('alternate_author', models.CharField(blank=True, help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.', max_length=127, null=True)),
-                ('citable', models.BooleanField(default=True, help_text='Check this box to show the "Cite" menu for this page.')),
-                ('front_page_image', models.ForeignKey(blank=True, help_text='The image that will display on the front page.', null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_public.dalmeimage')),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
-                ('source', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='featured_objects', to='dalme_app.record')),
-                ('source_set', models.ForeignKey(blank=True, help_text='Optional, select a particular public set for the source associated with this object. The source must be a member of the set chosen or the page will not validate.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='featured_objects', to='dalme_app.collection')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'alternate_author',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.',
+                        max_length=127,
+                        null=True,
+                    ),
+                ),
+                (
+                    'citable',
+                    models.BooleanField(
+                        default=True, help_text='Check this box to show the "Cite" menu for this page.'
+                    ),
+                ),
+                (
+                    'front_page_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display on the front page.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
+                (
+                    'source',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='featured_objects',
+                        to='dalme_app.record',
+                    ),
+                ),
+                (
+                    'source_set',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='Optional, select a particular public set for the source associated with this object. The source must be a member of the set chosen or the page will not validate.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='featured_objects',
+                        to='dalme_app.collection',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Object',
@@ -200,15 +1556,212 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FeaturedInventory',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('alternate_author', models.CharField(blank=True, help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.', max_length=127, null=True)),
-                ('citable', models.BooleanField(default=True, help_text='Check this box to show the "Cite" menu for this page.')),
-                ('front_page_image', models.ForeignKey(blank=True, help_text='The image that will display on the front page.', null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_public.dalmeimage')),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
-                ('source', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='featured_inventories', to='dalme_app.record')),
-                ('source_set', models.ForeignKey(blank=True, help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='featured_inventories', to='dalme_app.collection')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'alternate_author',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.',
+                        max_length=127,
+                        null=True,
+                    ),
+                ),
+                (
+                    'citable',
+                    models.BooleanField(
+                        default=True, help_text='Check this box to show the "Cite" menu for this page.'
+                    ),
+                ),
+                (
+                    'front_page_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display on the front page.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
+                (
+                    'source',
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='featured_inventories',
+                        to='dalme_app.record',
+                    ),
+                ),
+                (
+                    'source_set',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='Optional, select a particular public set for the source associated with this inventory. The source must be a member of the set chosen or the page will not validate.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='featured_inventories',
+                        to='dalme_app.collection',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Inventory',
@@ -220,24 +1773,279 @@ class Migration(migrations.Migration):
             name='ExplorePage',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text_before', wagtail.fields.StreamField([('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('html', wagtail.blocks.RawHTMLBlock())], null=True, use_json_field=True)),
-                ('text_after', wagtail.fields.StreamField([('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('html', wagtail.blocks.RawHTMLBlock()), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media'))], null=True, use_json_field=True)),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'text_before',
+                    wagtail.fields.StreamField(
+                        [
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'text_after',
+                    wagtail.fields.StreamField(
+                        [
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name='Essay',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('alternate_author', models.CharField(blank=True, help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.', max_length=127, null=True)),
-                ('citable', models.BooleanField(default=True, help_text='Check this box to show the "Cite" menu for this page.')),
-                ('front_page_image', models.ForeignKey(blank=True, help_text='The image that will display on the front page.', null=True, on_delete=django.db.models.deletion.SET_NULL, to='dalme_public.dalmeimage')),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
-                ('source', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='essays', to='dalme_app.record')),
-                ('source_set', models.ForeignKey(blank=True, help_text='Optional, select a particular public set for the source associated with this essay. The source must be a member of the set chosen or the page will not validate.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='essays', to='dalme_app.collection')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'alternate_author',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional name field that will be displayed as the author of this page instead of the user who created it.',
+                        max_length=127,
+                        null=True,
+                    ),
+                ),
+                (
+                    'citable',
+                    models.BooleanField(
+                        default=True, help_text='Check this box to show the "Cite" menu for this page.'
+                    ),
+                ),
+                (
+                    'front_page_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display on the front page.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
+                (
+                    'source',
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='essays',
+                        to='dalme_app.record',
+                    ),
+                ),
+                (
+                    'source_set',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='Optional, select a particular public set for the source associated with this essay. The source must be a member of the set chosen or the page will not validate.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='essays',
+                        to='dalme_app.collection',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'Mini Essay',
@@ -252,8 +2060,18 @@ class Migration(migrations.Migration):
                 ('sort_order', models.IntegerField(blank=True, editable=False, null=True)),
                 ('title', models.CharField(max_length=255)),
                 ('description', wagtail.fields.RichTextField()),
-                ('collections', modelcluster.fields.ParentalManyToManyField(related_name='corpora', to='dalme_public.collection')),
-                ('page', modelcluster.fields.ParentalKey(on_delete=django.db.models.deletion.CASCADE, related_name='corpora', to='dalme_public.collections')),
+                (
+                    'collections',
+                    modelcluster.fields.ParentalManyToManyField(related_name='corpora', to='dalme_public.collection'),
+                ),
+                (
+                    'page',
+                    modelcluster.fields.ParentalKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='corpora',
+                        to='dalme_public.collections',
+                    ),
+                ),
             ],
             options={
                 'ordering': ['sort_order'],
@@ -263,26 +2081,209 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='collections',
             name='header_image',
-            field=models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage'),
+            field=models.ForeignKey(
+                blank=True,
+                help_text='The image that will display in the header.',
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='+',
+                to='dalme_public.dalmeimage',
+            ),
         ),
         migrations.AddField(
             model_name='collection',
             name='header_image',
-            field=models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage'),
+            field=models.ForeignKey(
+                blank=True,
+                help_text='The image that will display in the header.',
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='+',
+                to='dalme_public.dalmeimage',
+            ),
         ),
         migrations.AddField(
             model_name='collection',
             name='source_set',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='public_collections', to='dalme_app.collection'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name='public_collections',
+                to='dalme_app.collection',
+            ),
         ),
         migrations.CreateModel(
             name='Bibliography',
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('header_position', models.CharField(choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')], default='top', help_text='Position of the header image within its container.', max_length=6)),
-                ('short_title', models.CharField(blank=True, help_text='An optional short title that will be displayed in certain space constrained contexts.', max_length=63, null=True)),
-                ('body', wagtail.fields.StreamField([('main_image', dalme_public.blocks.MainImageBlock()), ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())), ('chart_embed', wagtail.blocks.StructBlock([('html', wagtail.blocks.RawHTMLBlock()), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned'), ('full', 'Full-width')]))])), ('inline_image', wagtail.blocks.StructBlock([('image', wagtail.images.blocks.ImageChooserBlock()), ('caption', wagtail.blocks.RichTextBlock(required=False)), ('alignment', wagtail.blocks.ChoiceBlock(choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')])), ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False))])), ('text', wagtail.blocks.RichTextBlock()), ('heading', wagtail.blocks.CharBlock()), ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')), ('page', wagtail.blocks.PageChooserBlock()), ('bibliography', wagtail.blocks.StructBlock([('collection', wagtail.blocks.ChoiceBlock(choices=[('A4QHN348', 'Editions'), ('BKW2PVCM', 'Glossaries and dictionaries'), ('QM9AZNT3', 'Methodology'), ('SLIT6LID', 'Studies'), ('FRLVXUWL', 'Other resources')]))])), ('document', wagtail.blocks.StructBlock([('type', wagtail.blocks.ChoiceBlock(choices=[('document', 'Document'), ('publication', 'Publication'), ('talk', 'Talk')])), ('title', wagtail.blocks.CharBlock()), ('abstract', wagtail.blocks.CharBlock(required=False)), ('author', wagtail.blocks.CharBlock()), ('detail', wagtail.blocks.CharBlock(required=False)), ('version', wagtail.blocks.FloatBlock(required=False)), ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('page', wagtail.blocks.PageChooserBlock(required=False)), ('date', wagtail.blocks.DateBlock())])), ('person', wagtail.blocks.StructBlock([('name', wagtail.blocks.CharBlock()), ('job', wagtail.blocks.CharBlock(required=False)), ('institution', wagtail.blocks.CharBlock(required=False)), ('url', wagtail.blocks.URLBlock(required=False)), ('photo', wagtail.images.blocks.ImageChooserBlock(required=False))])), ('external_resource', wagtail.blocks.StructBlock([('title', wagtail.blocks.CharBlock()), ('info', wagtail.blocks.CharBlock()), ('url', wagtail.blocks.URLBlock()), ('date', wagtail.blocks.DateBlock())])), ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')), ('html', wagtail.blocks.RawHTMLBlock()), ('subsection', wagtail.blocks.StructBlock([('subsection', wagtail.blocks.CharBlock()), ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)), ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False))])), ('subsection_end_marker', wagtail.blocks.StructBlock([]))], null=True, use_json_field=True)),
-                ('header_image', models.ForeignKey(blank=True, help_text='The image that will display in the header.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='dalme_public.dalmeimage')),
+                (
+                    'page_ptr',
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to='wagtailcore.page',
+                    ),
+                ),
+                (
+                    'header_position',
+                    models.CharField(
+                        choices=[('top', 'Top'), ('center', 'Center'), ('bottom', 'Bottom')],
+                        default='top',
+                        help_text='Position of the header image within its container.',
+                        max_length=6,
+                    ),
+                ),
+                (
+                    'short_title',
+                    models.CharField(
+                        blank=True,
+                        help_text='An optional short title that will be displayed in certain space constrained contexts.',
+                        max_length=63,
+                        null=True,
+                    ),
+                ),
+                (
+                    'body',
+                    wagtail.fields.StreamField(
+                        [
+                            ('main_image', dalme_public.blocks.MainImageBlock()),
+                            ('carousel', dalme_public.blocks.CarouselBlock(wagtail.images.blocks.ImageChooserBlock())),
+                            (
+                                'chart_embed',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('html', wagtail.blocks.RawHTMLBlock()),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('left', 'Left-aligned'),
+                                                    ('right', 'Right-aligned'),
+                                                    ('full', 'Full-width'),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'inline_image',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('image', wagtail.images.blocks.ImageChooserBlock()),
+                                        ('caption', wagtail.blocks.RichTextBlock(required=False)),
+                                        (
+                                            'alignment',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[('left', 'Left-aligned'), ('right', 'Right-aligned')]
+                                            ),
+                                        ),
+                                        ('show_caption', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('text', wagtail.blocks.RichTextBlock()),
+                            ('heading', wagtail.blocks.CharBlock()),
+                            ('pullquote', wagtail.blocks.RichTextBlock(icon='openquote')),
+                            ('page', wagtail.blocks.PageChooserBlock()),
+                            (
+                                'bibliography',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'collection',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('A4QHN348', 'Editions'),
+                                                    ('BKW2PVCM', 'Glossaries and dictionaries'),
+                                                    ('QM9AZNT3', 'Methodology'),
+                                                    ('SLIT6LID', 'Studies'),
+                                                    ('FRLVXUWL', 'Other resources'),
+                                                ]
+                                            ),
+                                        )
+                                    ]
+                                ),
+                            ),
+                            (
+                                'document',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        (
+                                            'type',
+                                            wagtail.blocks.ChoiceBlock(
+                                                choices=[
+                                                    ('document', 'Document'),
+                                                    ('publication', 'Publication'),
+                                                    ('talk', 'Talk'),
+                                                ]
+                                            ),
+                                        ),
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('abstract', wagtail.blocks.CharBlock(required=False)),
+                                        ('author', wagtail.blocks.CharBlock()),
+                                        ('detail', wagtail.blocks.CharBlock(required=False)),
+                                        ('version', wagtail.blocks.FloatBlock(required=False)),
+                                        ('document', wagtail.documents.blocks.DocumentChooserBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('page', wagtail.blocks.PageChooserBlock(required=False)),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'person',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('name', wagtail.blocks.CharBlock()),
+                                        ('job', wagtail.blocks.CharBlock(required=False)),
+                                        ('institution', wagtail.blocks.CharBlock(required=False)),
+                                        ('url', wagtail.blocks.URLBlock(required=False)),
+                                        ('photo', wagtail.images.blocks.ImageChooserBlock(required=False)),
+                                    ]
+                                ),
+                            ),
+                            (
+                                'external_resource',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('title', wagtail.blocks.CharBlock()),
+                                        ('info', wagtail.blocks.CharBlock()),
+                                        ('url', wagtail.blocks.URLBlock()),
+                                        ('date', wagtail.blocks.DateBlock()),
+                                    ]
+                                ),
+                            ),
+                            ('embed', wagtail.embeds.blocks.EmbedBlock(icon='media')),
+                            ('html', wagtail.blocks.RawHTMLBlock()),
+                            (
+                                'subsection',
+                                wagtail.blocks.StructBlock(
+                                    [
+                                        ('subsection', wagtail.blocks.CharBlock()),
+                                        ('collapsed', wagtail.blocks.BooleanBlock(default=True, required=False)),
+                                        ('minor_heading', wagtail.blocks.BooleanBlock(default=False, required=False)),
+                                    ]
+                                ),
+                            ),
+                            ('subsection_end_marker', wagtail.blocks.StructBlock([])),
+                        ],
+                        null=True,
+                        use_json_field=True,
+                    ),
+                ),
+                (
+                    'header_image',
+                    models.ForeignKey(
+                        blank=True,
+                        help_text='The image that will display in the header.',
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name='+',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
             options={
                 'abstract': False,
@@ -294,11 +2295,26 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('filter_spec', models.CharField(db_index=True, max_length=255)),
-                ('file', wagtail.images.models.WagtailImageField(height_field='height', storage=wagtail.images.models.get_rendition_storage, upload_to=wagtail.images.models.get_rendition_upload_to, width_field='width')),
+                (
+                    'file',
+                    wagtail.images.models.WagtailImageField(
+                        height_field='height',
+                        storage=wagtail.images.models.get_rendition_storage,
+                        upload_to=wagtail.images.models.get_rendition_upload_to,
+                        width_field='width',
+                    ),
+                ),
                 ('width', models.IntegerField(editable=False)),
                 ('height', models.IntegerField(editable=False)),
                 ('focal_point_key', models.CharField(blank=True, default='', editable=False, max_length=16)),
-                ('image', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='renditions', to='dalme_public.dalmeimage')),
+                (
+                    'image',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='renditions',
+                        to='dalme_public.dalmeimage',
+                    ),
+                ),
             ],
             options={
                 'unique_together': {('image', 'filter_spec', 'focal_point_key')},

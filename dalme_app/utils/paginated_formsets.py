@@ -83,7 +83,7 @@ def formset_factory(  # noqa: PLR0913
         'absolute_max': absolute_max,
         'validate_min': validate_min,
         'validate_max': validate_max,
-        "renderer": renderer or get_default_renderer(),
+        'renderer': renderer or get_default_renderer(),
     }
 
     return type(form.__name__ + 'FormSet', (formset,), attrs)

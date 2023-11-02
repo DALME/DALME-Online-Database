@@ -317,7 +317,7 @@ def get_citation_data(context):
             {'family': 'Pizzorno', 'given': 'Gabriel H.'},
             {'family': 'Morreale', 'given': 'Laura'},
         ],
-        "accessed": {"date-parts": [[accessed.year, accessed.month, accessed.day]]},
+        'accessed': {'date-parts': [[accessed.year, accessed.month, accessed.day]]},
     }
 
     if page_class == 'Collections' and not record:
@@ -524,8 +524,8 @@ def js_trans(value, mode=None):
         type(value) in [int, list, dict]
         or value.startswith('"')
         and value.endswith('"')
-        or value.startswith('\'')
-        and value.endswith('\'')
+        or value.startswith("'")
+        and value.endswith("'")
     ):
         return value
     return value if value.startswith('"') and value.endswith('"') else f'"{value}"'

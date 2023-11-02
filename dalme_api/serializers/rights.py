@@ -70,7 +70,10 @@ class RightsPolicySerializer(DynamicSerializer):
         """Transform incoming data."""
         if data.get('attachments') is not None:
             if data['attachments'].get('file') is not None:
-                if isinstance(data['attachments']['file'], dict) and data['attachments']['file'].get('file_id') is not None:
+                if (
+                    isinstance(data['attachments']['file'], dict)
+                    and data['attachments']['file'].get('file_id') is not None
+                ):
                     data['attachments'] = data['attachments']['file']['file_id']
                 else:
                     data['attachments'] = data['attachments']['file']
