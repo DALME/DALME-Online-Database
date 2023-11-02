@@ -2196,20 +2196,6 @@ tei-expan {
   color: #888888;
   font-style: italic;
 }
-/* tei-note:not([type]) {
-  border-top: 1px dotted #6b6b6b;
-  padding: 5px 10px;
-  display: inline-block;
-  min-width: 100%;
-  font-size: 14px;
-}
-tei-note:not([type]):before {
-  content: attr(id)":";
-  font-weight: 600;
-  color: #757876;
-  margin-right: 5px;
-} */
-
 tei-note[type="brace"] {
   font-size: 12px;
   text-align: end;
@@ -2240,7 +2226,10 @@ tei-note[type="brace"] {
   width: max-content;
   border-left: 1px dotted #c9c9c9;
   transition: backdrop-filter 0.5s, background 0.5s;
-  padding: 30px 0;
+}
+.note-anchor {
+  display: inline;
+  position: relative;
 }
 tei-note[type="marginal"] {
   font-size: 14px;
