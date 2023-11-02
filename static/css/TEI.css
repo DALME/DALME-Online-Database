@@ -2412,9 +2412,9 @@ tei-term::after {
 section.transcription.soft-wrap tei-text > tei-body {
   white-space: pre-line !important;
 }
-/* section.transcription.soft-wrap tei-lb::after {
-  white-space: pre-wrap;
-} */
+section.transcription.soft-wrap tei-lb::after {
+  white-space: pre-line;
+}
 section.transcription.show-newlines tei-lb::before {
   content: ' ';
   background-image: url(/static/images/newline-icon.svg);
