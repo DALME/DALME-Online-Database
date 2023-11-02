@@ -15,10 +15,9 @@ tei-TEI {
 }
 
 tei-TEI > tei-text {
-  display: block;
+  display: flex;
   line-height: 1.5;
-  margin-left: 35px;
-  margin-right: 35px;
+  margin-right: 30px;
   position: relative;
 }
 
@@ -2218,14 +2217,15 @@ tei-note[type="brace"] {
   width: 31px;
   padding-left: 31px;
   transition: width 2s;
-  background: linear-gradient(90deg, #ffffff, #e4e4e4, #ffffff) no-repeat top/1px 100%;
+  background: linear-gradient(90deg,#ffffff,#9b9b9b,#ffffff) no-repeat top/1px 100% #ffffff91;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 .notes_container {
   position: relative;
   display: block;
   width: max-content;
   border-left: 1px dotted #c9c9c9;
-  transition: backdrop-filter 0.5s, background 0.5s;
 }
 .note-anchor {
   display: inline;
@@ -2239,7 +2239,7 @@ tei-note[type="marginal"] {
   flex-direction: row;
 }
 tei-note[type="marginal"] > div:first-of-type {
-  color: #e1e1e1;
+  color: #9b9b9b;
   width: 30px;
   height: 30px;
   display: flex;
@@ -2263,11 +2263,14 @@ tei-note[type="marginal"] > div:first-of-type {
 }
 #notebar:hover {
   width: auto;
+  background: none;
+  backdrop-filter: unset;
+  -webkit-backdrop-filter: unset;
 }
 #notebar:hover .notes_container{
-  background: linear-gradient(90deg, #fbfbfbb5, transparent) no-repeat left/100%;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(2px);
+  background: linear-gradient(90deg, #fbfbfbe3, #ffffff8a) no-repeat left/100%;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 #notebar:hover tei-note[type="marginal"] > div:first-of-type {
   opacity: 0;
@@ -2407,18 +2410,18 @@ tei-term::after {
 }
 /* independent soft-wrap */
 section.transcription.soft-wrap tei-text > tei-body {
-  white-space: pre-wrap !important;
+  white-space: pre-line !important;
 }
-section.transcription.soft-wrap tei-lb::after {
+/* section.transcription.soft-wrap tei-lb::after {
   white-space: pre-wrap;
-}
+} */
 section.transcription.show-newlines tei-lb::before {
   content: ' ';
   background-image: url(/static/images/newline-icon.svg);
   background-position: center 9px;
   background-repeat: no-repeat;
   width: 15px;
-  height: 23px;
+  height: 20px;
   display: inline-block;
   background-size: contain;
 }
@@ -2448,15 +2451,15 @@ section.transcription.scholarly {
   overflow: auto;
 }
 section.transcription.scholarly tei-text > tei-body {
-  white-space: pre-line;
+  white-space: nowrap;
 }
 
 /* TEI Basic */
-/* section.transcription.basic {
-  overflow: scroll;
+section.transcription.basic {
+  overflow: auto;
 }
 section.transcription.basic tei-text > tei-body {
-  white-space: pre-wrap;
+  white-space: pre-line;
 }
 section.transcription.basic tei-del,
 section.transcription.basic tei-pc {
@@ -2464,7 +2467,7 @@ section.transcription.basic tei-pc {
 }
 section.transcription.basic tei-pc + tei-lb {
   display: none;
-} */
+}
 section.transcription.basic tei-hi[rend-basic="1"],
 section.transcription.basic tei-hi[rend="subscript"] {
   vertical-align: unset;
