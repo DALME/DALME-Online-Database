@@ -11,7 +11,7 @@ function handler(event) {
   request.uri = request.uri.replace(/^\/[^/]*\//, '/');
 
   if (!uri.includes('.')) {
-    request.uri += 'index.html';
+    request.uri = '/index.html';
   }
 
   return request;
