@@ -47,7 +47,6 @@ COPY ./tenants ./tenants
 COPY ./static ./static
 COPY ./manage.py ./
 CMD ["python", "manage.py", "runserver_plus", "0.0.0.0:8001"]
-STOPSIGNAL SIGINT
 
 ### TARGET: ci
 FROM install-dev as ci
@@ -124,4 +123,3 @@ COPY ./templates ./templates
 COPY ./tenants ./tenants
 COPY ./static ./static
 COPY ./manage.py ./
-STOPSIGNAL SIGTERM

@@ -23,7 +23,7 @@ locals {
   }
   service = "dalme"
   tenant_domains = [
-    # NOTE: DALME must come first.
+    # IMPORTANT: DALME must come first.
     "dalme.ocp.systems",
     "globalpharmacopeias.ocp.systems",
   ]
