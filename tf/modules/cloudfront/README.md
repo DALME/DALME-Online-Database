@@ -35,10 +35,8 @@
 | [aws_route53_record.www-a](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route53_record) | resource |
 | [aws_route53_record.www-aaaa](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/route53_record) | resource |
 | [aws_s3_bucket_policy.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/s3_bucket_policy) | resource |
-| [aws_s3_bucket_policy.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/s3_bucket_policy) | resource |
 | [aws_s3_bucket_policy.public_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/s3_bucket_policy) | resource |
 | [aws_iam_policy_document.oac_assets](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.oac_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.public_staticfiles](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/iam_policy_document) | data source |
 | [aws_route53_zone.tenant_zones](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/data-sources/route53_zone) | data source |
 
