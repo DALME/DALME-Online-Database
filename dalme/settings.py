@@ -439,7 +439,7 @@ class Development(Base, Configuration):
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
         'default': {
-            'BACKEND': 'dalme.storage_backends.LocalStorage',
+            'BACKEND': 'django_tenants.files.storage.TenantFileSystemStorage',
         },
         'staticfiles': {
             'BACKEND': 'django_tenants.staticfiles.storage.TenantStaticFilesStorage',

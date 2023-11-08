@@ -1,12 +1,6 @@
 """Customize staticfiles storage logic."""
 from django_tenants.utils import parse_tenant_config_path
-from storages.backends.s3boto3 import S3ManifestStaticStorage
-
-from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
-
-
-class LocalStorage(ManifestStaticFilesStorage):
-    """Local file system storage with S3 read fallbacks for development."""
+from storages.backends.s3boto3 import S3Boto3Storage, S3ManifestStaticStorage
 
 
 class StaticStorage(S3ManifestStaticStorage):
@@ -14,22 +8,19 @@ class StaticStorage(S3ManifestStaticStorage):
 
     default_acl = None
     file_overwrite = False
-    custom_domain = False
 
     def get_default_settings(self):
         settings = super().get_default_settings()
-        settings['location'] = f'static/{parse_tenant_config_path("%s")}'
+        settings['location'] = parse_tenant_config_path('static')
         return settings
 
 
-class MediaStorage(S3ManifestStaticStorage):
+class MediaStorage(S3Boto3Storage):
     """Multitenant aware media files storage class for S3."""
 
     default_acl = None
-    file_overwrite = False
-    custom_domain = False
 
     def get_default_settings(self):
         settings = super().get_default_settings()
-        settings['location'] = f'media/{parse_tenant_config_path("%s")}'
+        settings['location'] = parse_tenant_config_path('media')
         return settings
