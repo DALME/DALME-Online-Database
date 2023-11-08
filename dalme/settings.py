@@ -98,6 +98,7 @@ class Base(Configuration):
         'maintenance_mode',
         'captcha',
         'corsheaders',
+        's3manifestcollectstatic',
         'dalme_api.application.DalmeAPIConfig',
         'dalme_purl.application.DalmePURLConfig',
     ]

@@ -201,8 +201,7 @@ resource "aws_ecs_task_definition" "main" {
         "python3",
         "manage.py",
         "all_tenants_command",
-        "collectstatic",
-        "--noinput",
+        "s3manifestcollectstatic",
       ]
       dependsOn = [
         { containerName = var.service, condition = "HEALTHY" },
@@ -223,7 +222,7 @@ resource "aws_ecs_task_definition" "main" {
       environment = local.web_env
       secrets     = local.secrets
       essential   = false
-      command     = ["python3", "manage.py", "collectstatic", "--noinput"]
+      command     = ["python3", "manage.py", "s3manifestcollectstatic"]
       dependsOn = [
         { containerName = var.service, condition = "HEALTHY" },
         { containerName = "collectstatic_schemas", condition = "SUCCESS" },

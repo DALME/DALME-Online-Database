@@ -32,6 +32,7 @@ pycurl==7.45.2
 pyzotero==1.5.9
 requests==2.30.0
 requests-aws4auth==1.2.3
+s3manifestcollectstatic==0.3.2
 stringcase==1.2.0
 urllib3==1.26.15
 wagtail==5.0
