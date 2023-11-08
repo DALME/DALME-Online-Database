@@ -94,9 +94,11 @@ data "aws_iam_policy_document" "gha_oidc_policy_one" {
       "application-autoscaling:PutScalingPolicy",
       "application-autoscaling:RegisterScalableTarget",
       "application-autoscaling:TagResource",
+      "autoscaling:StartInstanceRefresh",
     ]
     resources = [
       "arn:aws:application-autoscaling:${var.aws_region}:${var.aws_account}:*",
+      "arn:aws:autoscaling:${var.aws_region}:${var.aws_account}:*",
     ]
   }
 
@@ -164,6 +166,7 @@ data "aws_iam_policy_document" "gha_oidc_policy_one" {
       "ec2:AuthorizeSecurityGroupIngress",
       "ec2:CreateFlowLogs",
       "ec2:CreateInternetGateway",
+      "ec2:CreateLaunchTemplateVersion",
       "ec2:CreateNatGateway",
       "ec2:CreateRoute",
       "ec2:CreateRouteTable",
@@ -172,6 +175,7 @@ data "aws_iam_policy_document" "gha_oidc_policy_one" {
       "ec2:CreateTags",
       "ec2:CreateVpcEndpoint",
       "ec2:DeleteVpcEndpoints",
+      "ec2:ModifyLaunchTemplate",
       "ec2:ModifyVpcEndpoint",
       "ec2:RevokeSecurityGroupEgress",
     ]
