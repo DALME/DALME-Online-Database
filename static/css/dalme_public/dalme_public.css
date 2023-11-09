@@ -792,7 +792,7 @@ nav.browse a {
   overflow: initial;
 }
 .home-parchment {
-  background: url(/static/images/home_bg.jpg);
+  background: url(/static/dalme/images/home_bg.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: right 0px top 0px;
@@ -807,7 +807,7 @@ nav.browse a {
   left: 4.4rem;
 }
 .home-register {
-  background: url(/static/images/home_reg.jpg);
+  background: url(/static/dalme/images/home_reg.jpg);
   background-size: cover;
   width: 25%;
 }
@@ -2871,7 +2871,7 @@ main.features .block-text p {
 }
 .leaflet-zoom-box-icon {
     background: transparent no-repeat center center;
-    background-image: url(/static/images/zoom-box-icon.svg);
+    background-image: url(/static/dalme/images/zoom-box-icon.svg);
     background-size: 60%;
 }
 .leaflet-zoom-box-icon.active {
@@ -3155,14 +3155,14 @@ main.viewer {
   flex: 0 0 auto;
 }
 .folios.vertical-split .resize-handle {
-  background: url(/static/images/solid_grip_v.svg) 0px center/15px 40px no-repeat;
+  background: url(/static/dalme/images/solid_grip_v.svg) 0px center/15px 40px no-repeat;
   cursor: col-resize;
   width: 15px;
   margin-right: -8px;
   z-index: 6;
 }
 .folios.horizontal-split .resize-handle {
-  background: url(/static/images/solid_grip_h.svg) center 0px/40px 15px no-repeat;
+  background: url(/static/dalme/images/solid_grip_h.svg) center 0px/40px 15px no-repeat;
   cursor: row-resize;
   height: 15px;
   margin-bottom: -8px;
@@ -3240,7 +3240,7 @@ section.transcription {
   margin-right: 15px;
   border: 1px solid #333333;
   background-color: #2d2d2d;
-  background-image: url(/static/images/eye-slash-solid.svg);
+  background-image: url(/static/dalme/images/eye-slash-solid.svg);
   background-size: 40%;
   background-position: center center;
   background-repeat: no-repeat;
@@ -3248,7 +3248,7 @@ section.transcription {
 
 .detail-thumb {
   background-color: #2d2d2d;
-  background-image: url(/static/images/eye-slash-solid.svg);
+  background-image: url(/static/dalme/images/eye-slash-solid.svg);
   background-size: 40%;
   background-position: center center;
   background-repeat: no-repeat;
@@ -3270,9 +3270,6 @@ section.transcription {
 .app.inventory-list .grid-row-wrapper.detail > .detail-thumb:last-child {
   margin-right: 1.5rem;
 }
-
-
-
 
 .filter-form {
   flex-direction: column;

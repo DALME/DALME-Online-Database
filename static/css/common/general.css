@@ -359,7 +359,7 @@ table.dataTable tbody tr.selected a, table.dataTable tbody td.selected a {
 
 .panel-preview {
   background-color: #fff;
-  background-image: url(/static/images/no_image.png);
+  background-image: url(/static/dalme/images/no_image.png);
   background-position: center center;
   background-repeat:no-repeat;
 }
