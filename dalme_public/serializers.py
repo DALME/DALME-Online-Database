@@ -143,7 +143,7 @@ class PublicRecordSerializer(serializers.ModelSerializer):
                 fmt = None
 
             archive_name = _parent.parent.name
-            archive_url = _parent.parent.attributes.filter(attribute_type__short_name='url')
+            archive_url = _parent.parent.attributes.filter(attribute_type__name='url')
             archive_url = archive_url.first().value if archive_url.exists() else None
             marks = loc.replace(archive_name, '').strip() if archive_name in loc else None
             marks = marks[1:] if marks and marks.startswith(',') else marks
