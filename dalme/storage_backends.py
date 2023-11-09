@@ -11,9 +11,6 @@ from dalme_app.tenant import get_current_tenant
 class StaticStorage(S3ManifestStaticStorage):
     """Multitenant aware staticfiles storage class for S3."""
 
-    default_acl = None
-    file_overwrite = False
-
     def _normalize_name(self, name):
         """Override to achieve the schema partitioning we need."""
         try:
@@ -34,8 +31,6 @@ class StaticStorage(S3ManifestStaticStorage):
 
 class MediaStorage(S3Boto3Storage):
     """Multitenant aware media files storage class for S3."""
-
-    default_acl = None
 
     def _normalize_name(self, name):
         """Override to achieve the schema partitioning we need."""
