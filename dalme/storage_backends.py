@@ -9,9 +9,13 @@ class StaticStorage(S3ManifestStaticStorage):
     default_acl = None
     file_overwrite = False
 
+    @property
+    def location(self):
+        return 'static/%s'
+
     def get_default_settings(self):
         settings = super().get_default_settings()
-        settings['location'] = parse_tenant_config_path('static')
+        settings['location'] = parse_tenant_config_path('static/%s')
         return settings
 
 
@@ -20,7 +24,11 @@ class MediaStorage(S3Boto3Storage):
 
     default_acl = None
 
+    @property
+    def location(self):
+        return 'media/%s'
+
     def get_default_settings(self):
         settings = super().get_default_settings()
-        settings['location'] = parse_tenant_config_path('media')
+        settings['location'] = parse_tenant_config_path('media/%s')
         return settings
