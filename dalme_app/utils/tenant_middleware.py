@@ -1,5 +1,4 @@
 """Parse the tenant from the request and set the schema path."""
-
 import structlog
 from django_tenants.utils import remove_www
 

@@ -8,18 +8,9 @@ web.build:
 .PHONY: web.build
 
 web.collectstatic:
-	@# Doesn't succeed if we just use 'all_tenants_command collectstatic'. It
-	@# only collects the files for dalme even though the command reports that
-	@# it has collected the files for globalpharmacopeias. So we loop instead.
-	$(foreach tenant,$(TENANTS),\
-		docker compose exec \
-		$(PROJECT).web \
-		python manage.py \
-		collectstatic_schemas --schema=$(tenant);)
-	@# Lastly, collect all non-tenant partitioned staticfiles.
 	docker compose exec \
 		$(PROJECT).web \
-		python manage.py collectstatic
+		python manage.py collectstatic_tenants
 .PHONY: web.collectstatic
 
 web.dns:

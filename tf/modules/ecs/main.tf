@@ -192,7 +192,7 @@ resource "aws_ecs_task_definition" "main" {
       }
     },
     {
-      name        = "collectstatic_schemas"
+      name        = "collectstatic"
       image       = local.web_image
       environment = local.web_env
       secrets     = local.secrets
@@ -200,32 +200,11 @@ resource "aws_ecs_task_definition" "main" {
       command = [
         "python3",
         "manage.py",
-        "all_tenants_command",
-        "s3manifestcollectstatic",
+        "collectstatic_tenants",
       ]
       dependsOn = [
         { containerName = var.service, condition = "HEALTHY" },
         { containerName = "ensure_tenants", condition = "SUCCESS" },
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.web_log_group.name
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "ecs"
-        }
-      }
-    },
-    {
-      name        = "collectstatic"
-      image       = local.web_image
-      environment = local.web_env
-      secrets     = local.secrets
-      essential   = false
-      command     = ["python3", "manage.py", "s3manifestcollectstatic"]
-      dependsOn = [
-        { containerName = var.service, condition = "HEALTHY" },
-        { containerName = "collectstatic_schemas", condition = "SUCCESS" },
       ]
       logConfiguration = {
         logDriver = "awslogs"

@@ -1,50 +1,47 @@
 """Customize staticfiles storage logic."""
-from django_tenants.utils import parse_tenant_config_path
+import structlog
 from storages.backends.s3boto3 import S3Boto3Storage, S3ManifestStaticStorage
-from storages.utils import safe_join
 
-from django.core.exceptions import SuspiciousOperation
+from django.db import connection
 
 from dalme_app.tenant import get_current_tenant
+
+logger = structlog.get_logger(__name__)
 
 
 class StaticStorage(S3ManifestStaticStorage):
     """Multitenant aware staticfiles storage class for S3."""
 
-    def _normalize_name(self, name):
-        """Override to achieve the schema partitioning we need."""
+    key = 'static'
+
+    @property
+    def schema(self):
+        """Get the tenant schema name."""
         try:
-            schema = get_current_tenant().schema_name
+            return get_current_tenant().schema_name
         except RuntimeError:
-            schema = 'public'
+            return connection.tenant.schema_name
 
-        try:
-            return safe_join(f'static/{schema}', name)
-        except ValueError as exc:
-            raise SuspiciousOperation('Attempted access to "%s" denied.' % name) from exc
-
-    def get_default_settings(self):
-        settings = super().get_default_settings()
-        settings['location'] = parse_tenant_config_path('static/%s')
-        return settings
+    @property
+    def location(self):
+        """Get the schema qualified filepath."""
+        return f'{self.key}/{self.schema}'
 
 
 class MediaStorage(S3Boto3Storage):
     """Multitenant aware media files storage class for S3."""
 
-    def _normalize_name(self, name):
-        """Override to achieve the schema partitioning we need."""
+    key = 'media'
+
+    @property
+    def schema(self):
+        """Get the tenant schema name."""
         try:
-            schema = get_current_tenant().schema_name
+            return get_current_tenant().schema_name
         except RuntimeError:
-            schema = 'public'
+            return connection.tenant.schema_name
 
-        try:
-            return safe_join(f'media/{schema}', name)
-        except ValueError as exc:
-            raise SuspiciousOperation('Attempted access to "%s" denied.' % name) from exc
-
-    def get_default_settings(self):
-        settings = super().get_default_settings()
-        settings['location'] = parse_tenant_config_path('media/%s')
-        return settings
+    @property
+    def location(self):
+        """Get the schema qualified filepath."""
+        return f'{self.key}/{self.schema}'

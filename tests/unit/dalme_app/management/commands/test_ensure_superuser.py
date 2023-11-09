@@ -1,4 +1,4 @@
-"""Test the dalme_app.utils.ensure_superuser module."""
+"""Test the dalme_app.management.commands.ensure_superuser module."""
 import os
 from unittest import mock
 

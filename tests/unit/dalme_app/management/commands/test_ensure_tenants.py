@@ -1,4 +1,4 @@
-"""Test the dalme_app.utils.ensure_tenants module."""
+"""Test the dalme_app.management.commands.ensure_tenants module."""
 import json
 import os
 from unittest import mock
