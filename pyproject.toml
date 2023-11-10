@@ -9,6 +9,10 @@ markers = [
 
 [tool.coverage.run]
 omit = [
+  "*manage.py*",
+  "*migrations*",
+  "*venv*",
+  "tests/*",
   "dalme_app/management/commands/custom_createcachetable.py",
 ]
 
