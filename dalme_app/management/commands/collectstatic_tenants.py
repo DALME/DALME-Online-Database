@@ -88,6 +88,9 @@ class Command(BaseCommand):
 
                 def _save_asset(path):
                     path_obj = Path(tmpdirname) / path
+                    # We have to set the tenant context here again for when we
+                    # are running inside the thread pool otherwise the tenant
+                    # will always be 'public'.
                     with path_obj.open('rb') as f, tenant_context(tenant):
                         staticfiles_storage.save(path, f)
                     return path

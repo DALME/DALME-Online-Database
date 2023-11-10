@@ -792,7 +792,6 @@ nav.browse a {
   overflow: initial;
 }
 .home-parchment {
-  background: url(/static/dalme/images/home_bg.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: right 0px top 0px;
@@ -807,7 +806,6 @@ nav.browse a {
   left: 4.4rem;
 }
 .home-register {
-  background: url(/static/dalme/images/home_reg.jpg);
   background-size: cover;
   width: 25%;
 }
