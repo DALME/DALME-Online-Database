@@ -2869,7 +2869,6 @@ main.features .block-text p {
 }
 .leaflet-zoom-box-icon {
     background: transparent no-repeat center center;
-    background-image: url(/static/dalme/images/zoom-box-icon.svg);
     background-size: 60%;
 }
 .leaflet-zoom-box-icon.active {
@@ -3153,14 +3152,12 @@ main.viewer {
   flex: 0 0 auto;
 }
 .folios.vertical-split .resize-handle {
-  background: url(/static/dalme/images/solid_grip_v.svg) 0px center/15px 40px no-repeat;
   cursor: col-resize;
   width: 15px;
   margin-right: -8px;
   z-index: 6;
 }
 .folios.horizontal-split .resize-handle {
-  background: url(/static/dalme/images/solid_grip_h.svg) center 0px/40px 15px no-repeat;
   cursor: row-resize;
   height: 15px;
   margin-bottom: -8px;
@@ -3238,15 +3235,12 @@ section.transcription {
   margin-right: 15px;
   border: 1px solid #333333;
   background-color: #2d2d2d;
-  background-image: url(/static/dalme/images/eye-slash-solid.svg);
   background-size: 40%;
   background-position: center center;
   background-repeat: no-repeat;
 }
-
 .detail-thumb {
   background-color: #2d2d2d;
-  background-image: url(/static/dalme/images/eye-slash-solid.svg);
   background-size: 40%;
   background-position: center center;
   background-repeat: no-repeat;
@@ -3709,7 +3703,6 @@ a.anchor:hover {
 }
 
 /* footnotes */
-
 .footnote_list {
   font-size: .85em;
 }

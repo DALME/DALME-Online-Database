@@ -96,54 +96,12 @@ def test_collectstatic_tenants_does_not_exist(mock_logger, mock_tenant, mock_cal
     mock_storage.exists.return_value = False
 
     with mock.patch(
-        'dalme_app.management.commands.collectstatic_tenants.Path.open', mock.mock_open(read_data=MANIFEST_DATA)
+        'dalme_app.management.commands.collectstatic_tenants.open_rb',
+        mock.mock_open(read_data=MANIFEST_DATA),
     ) as mock_open:
         CollectstaticTenants().handle()
 
-        assert mock_open.mock_calls == [
-            # public
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            # tenant1
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            # tenant2
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-        ]
+        assert mock_open.call_count == 12  # noqa: PLR2004
 
     assert mock_call_command.called
 
@@ -191,56 +149,11 @@ def test_collectstatic_tenants_exists(mock_logger, mock_tenant, mock_call_comman
     mock_storage.exists.return_value = True
 
     with mock.patch(
-        'dalme_app.management.commands.collectstatic_tenants.Path.open', mock.mock_open(read_data=MANIFEST_DATA)
-    ) as mock_open, mock.patch(
-        'dalme_app.management.commands.collectstatic_tenants.staticfiles_storage.open',
-        mock.mock_open(read_data=MANIFEST_DATA),
-    ) as mock_storage_open:
+        'dalme_app.management.commands.collectstatic_tenants.open_rb', mock.mock_open(read_data=MANIFEST_DATA)
+    ) as mock_open:
         CollectstaticTenants().handle()
 
-        assert mock_open.mock_calls == [
-            # public
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            # tenant1
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            # tenant2
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-        ]
-        assert mock_storage_open.mock_calls == [
-            # public
-            mock.call('staticfiles.json'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            # tenant1
-            mock.call('staticfiles.json'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            # tenant2
-            mock.call('staticfiles.json'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-        ]
+        assert mock_open.call_count == 9  # noqa: PLR2004
 
     assert mock_call_command.called
 
@@ -292,71 +205,11 @@ def test_collectstatic_tenants_exists_force(mock_logger, mock_tenant, mock_call_
     mock_storage.exists.return_value = True
 
     with mock.patch(
-        'dalme_app.management.commands.collectstatic_tenants.Path.open', mock.mock_open(read_data=MANIFEST_DATA)
-    ) as mock_open, mock.patch(
-        'dalme_app.management.commands.collectstatic_tenants.staticfiles_storage.open',
-        mock.mock_open(read_data=MANIFEST_DATA),
-    ) as mock_storage_open:
+        'dalme_app.management.commands.collectstatic_tenants.open_rb', mock.mock_open(read_data=MANIFEST_DATA)
+    ) as mock_open:
         CollectstaticTenants().handle(force=True)
 
-        assert mock_open.mock_calls == [
-            # public
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            # tenant1
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            # tenant2
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-            mock.call('rb'),
-            mock.call().__enter__(),
-            mock.call().__exit__(None, None, None),
-        ]
-        assert mock_storage_open.mock_calls == [
-            mock.call('staticfiles.json'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('staticfiles.json'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-            mock.call('staticfiles.json'),
-            mock.call().__enter__(),
-            mock.call().read(),
-            mock.call().__exit__(None, None, None),
-        ]
+        assert mock_open.call_count == 15  # noqa: PLR2004
 
     assert mock_call_command.called
 

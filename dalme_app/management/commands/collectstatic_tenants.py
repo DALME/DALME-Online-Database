@@ -3,6 +3,7 @@
 Adapted from: https://github.com/dduong42/s3manifestcollectstatic
 
 """
+import builtins
 import functools
 import json
 import os
@@ -27,6 +28,11 @@ logger = structlog.get_logger(__name__)
 MANIFEST_PATH = 'staticfiles.json'
 
 
+def open_rb(path):
+    """Wrap the builtin open method for convenience."""
+    return builtins.open(path, 'rb')
+
+
 class Command(BaseCommand):
     """Define the collectstatic_tenants command."""
 
@@ -47,14 +53,15 @@ class Command(BaseCommand):
 
         """
         path_obj = Path(tmpdir) / path
-        with tenant_context(tenant), path_obj.open('rb') as f:
+        with tenant_context(tenant), open_rb(path_obj) as f:
             staticfiles_storage.save(path, f)
         return path
 
     @staticmethod
-    def parse_manifest(handle):
+    def parse_manifest(manifest_path):
         """Read the contents of a static manifest file."""
-        return set(json.load(handle)['paths'].values())
+        with open_rb(manifest_path) as f:
+            return set(json.load(f)['paths'].values())
 
     @staticmethod
     def collect(tmpdir):
@@ -63,36 +70,35 @@ class Command(BaseCommand):
         command.storage = ManifestStaticFilesStorage(location=tmpdir)
         call_command(command)
 
-    def get_file_data(self, tenant):
-        """Process the files and collect the resulting file data for the run."""
-        with TemporaryDirectory() as tmpdir:
-            self.collect(tmpdir)
+    def get_file_data(self, tmpdir, tenant):
+        """Process the files and collect the resulting file data for the run.
 
-            manifest = Path(tmpdir) / MANIFEST_PATH
-            with manifest.open('rb') as f:
-                to_upload = self.parse_manifest(f)
+        Compare the newly generated manifest with the remote manifest (if it
+        exists) to determine what needs to be sent down the wire. If the remote
+        manifest doesn't exist just upload everything that was collected.
 
-            # Compare the newly generated manifest with the remote manifest (if
-            # it exists) to determine what needs to be sent down the wire.
-            if staticfiles_storage.exists(MANIFEST_PATH):
-                with staticfiles_storage.open(MANIFEST_PATH) as f:
-                    already_uploaded = self.parse_manifest(f)
-                    intersection = to_upload.intersection(already_uploaded)
+        """
+        self.collect(tmpdir)
+        to_upload = self.parse_manifest(Path(tmpdir) / MANIFEST_PATH)
 
-                    if self.force:
-                        logger.info(
-                            'Forcing the reupload of all staticfiles for tenant: %s',
-                            tenant=tenant.schema_name,
-                        )
-                    else:
-                        to_upload.difference_update(already_uploaded)
-                        logger.info(
-                            '%s files already exist, those uploads will be skipped for tenant: %s',
-                            count=len(intersection),
-                            tenant=tenant.schema_name,
-                        )
+        if staticfiles_storage.exists(MANIFEST_PATH):
+            already_uploaded = self.parse_manifest(MANIFEST_PATH)
+            intersection = to_upload.intersection(already_uploaded)
 
-            return tmpdir, to_upload
+            if self.force:
+                logger.info(
+                    'Forcing the reupload of all staticfiles for tenant: %s',
+                    tenant=tenant.schema_name,
+                )
+            else:
+                to_upload.difference_update(already_uploaded)
+                logger.info(
+                    '%s files already exist, those uploads will be skipped for tenant: %s',
+                    count=len(intersection),
+                    tenant=tenant.schema_name,
+                )
+
+        return to_upload
 
     def collectstatic_s3(self, tenant):
         """Efficiently upload staticfiles to s3."""
@@ -101,17 +107,19 @@ class Command(BaseCommand):
                 msg = 'The maximum number of workers must be greater than 0.'
                 raise CommandError(msg)
 
-            tmpdir, to_upload = self.get_file_data(tenant)
-            if (count := len(to_upload)) > 0:
-                logger.info('Uploading %s files for tenant: %s', count=count, tenant=tenant.schema_name)
+            with TemporaryDirectory() as tmpdir:
+                to_upload = self.get_file_data(tmpdir, tenant)
 
-            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-                func = functools.partial(self.save_asset, tenant=tenant, tmpdir=tmpdir)
-                for path in executor.map(func, to_upload):
-                    logger.info('File was uploaded to: %s/%s', tenant=tenant.schema_name, path=path)
+                if (count := len(to_upload)) > 0:
+                    logger.info('Uploading %s files for tenant: %s', count=count, tenant=tenant.schema_name)
 
-            logger.info('Uploading the manifest for tenant: %s', tenant=tenant.schema_name)
-            self.save_asset(MANIFEST_PATH, tmpdir, tenant)
+                    with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+                        func = functools.partial(self.save_asset, tmpdir=tmpdir, tenant=tenant)
+                        for path in executor.map(func, to_upload):
+                            logger.info('File was uploaded to: %s/%s', tenant=tenant.schema_name, path=path)
+
+                logger.info('Uploading the manifest for tenant: %s', tenant=tenant.schema_name)
+                self.save_asset(MANIFEST_PATH, tmpdir, tenant)
 
     def collectstatic(self, tenant):
         """Invoke the normal django collectstatic command."""

@@ -273,6 +273,7 @@
       <div class="empty-folio-warning" v-if="!transcriptionId || !renderedTranscription">This folio has not been transcribed.</div>
       <div v-if="transcriptionId" v-html="renderedTranscription" id="tei-container"></div>
     </section>
+
     <div
       id="notebar"
       :style= "[viewerMode == 'horizontal-split' ? { height: transcriptionHeight + 'px', top: divaHeight + headerHeight + 47 + 'px' } : { height: transcriptionHeight + 'px' }]"
@@ -281,6 +282,20 @@
     </div>
   </div>
 </div>
+<style>
+  .folios.vertical-split .resize-handle {
+    background: url('{% static "/images/solid_grip_v.svg" %}') 0px center/15px 40px no-repeat;
+  }
+  .folios.horizontal-split .resize-handle {
+    background: url('{% static "/images/solid_grip_v.svg" %}') center 0px/40px 15px no-repeat;
+  }
+  section.transcription.show-newlines tei-lb::before {
+    background-image: url('{% static "/icons/newline-icon.svg" %}')
+  };
+  section.transcription.show-newlines tei-hi[rend=center]::after {
+    background-image: url('{% static "/icons/newline-icon.svg" %}');
+  };
+</style>
 {% endblock %}
 
 {% block js_foot %}
