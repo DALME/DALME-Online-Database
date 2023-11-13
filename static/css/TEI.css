@@ -61,6 +61,10 @@ tei-del[rend=rubout] {
   filter: blur(2px);
 }
 
+tei-term + tei-del {
+  margin-left: 5px;
+}
+
 tei-supplied:before,
 supplied:before {
   content: "["
