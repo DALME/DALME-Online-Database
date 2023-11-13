@@ -1659,7 +1659,7 @@ tei-shift {
   /* seems a bit to complex to do anything with */
 }
 tei-sic {
-  /* rend as choice when contained within a choice tag, perhaps as label with parenthesis after when alone */
+  font-variant: small-caps;
 }
 tei-signatures {
   /* DON't KNOW, look again later */

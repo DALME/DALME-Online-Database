@@ -113,6 +113,10 @@ const dalmeTeiBehaviours = {
     },
     'expan': function(e) { e = setTitle(e); },
     'gap': function(e) { e = setExtent(e); },
+    'sic': function(e) { 
+      e.setAttribute('title', 'sic');
+      e.setAttribute('data-toggle', 'tooltip');
+     },
     'handShift': function(e) {
       let content = 'hand shift';
       e.getAttributeNames().forEach((att_name) => {
