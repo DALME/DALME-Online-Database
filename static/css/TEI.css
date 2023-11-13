@@ -238,6 +238,14 @@ tei-add[place="inline"] {
   border-left: 2px dotted #aaa;
   padding: 0px 3px;
 }
+tei-add[place="inline-block"] {
+  border-right: 2px dotted #aaa;
+  border-left: 2px dotted #aaa;
+  padding: 0px 3px;
+  font-size: smaller;
+  line-height: 1.2;
+  float: right;
+}
 tei-add[place="below"]:before,
 tei-add[place="below"]:after {
   content: "\21a7";

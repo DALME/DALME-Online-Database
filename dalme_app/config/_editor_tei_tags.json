@@ -333,6 +333,10 @@
               {
                 "label": "Inline",
                 "value": "inline"
+              },
+              {
+                "label": "Inline block",
+                "value": "inline-block"
               }
             ]
           }
