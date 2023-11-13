@@ -233,6 +233,10 @@ tei-add[place="below"] {
   font-size: medium;
   line-height: 90%;
 }
+tei-lb + tei-add[place="above"],
+tei-lb + tei-add[place="below"]  {
+  vertical-align: unset;
+}
 tei-add[place="inline"] {
   border-right: 2px dotted #aaa;
   border-left: 2px dotted #aaa;
@@ -260,7 +264,6 @@ tei-add[place="above"]:after {
   font-size: 18px;
   color: #aaa;
 }
-
 /* tei-add:before {
   content: "»";
 }
