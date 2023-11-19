@@ -747,6 +747,15 @@
             ]
           }
         ]
+      },
+      {
+        "label": "Format Quotation",
+        "type": "w",
+        "default_content": "QUOTED CONTENT",
+        "help": "Formats wrapped text as directly quoted, e.g. from a manuscript. Mainly for use in notes.",
+        "documentation": "#Paraphrasing",
+        "tag": "quotation",
+        "multi_tag": false
       }
     ]
   },
@@ -803,6 +812,23 @@
             "editable": false,
             "required": true,
             "default": "hr"
+          }
+        ]
+      },
+      {
+        "label": "Partial rule",
+        "type": "sc",
+        "help": "Adds a partial, unindented horizontal line.",
+        "documentation": "#Leaders",
+        "tag": "metamark",
+        "multi_tag": false,
+        "attributes": [
+          {
+            "name": "function",
+            "label": "Function",
+            "editable": false,
+            "required": true,
+            "default": "hhr"
           }
         ]
       },
