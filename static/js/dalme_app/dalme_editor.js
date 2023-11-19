@@ -834,7 +834,7 @@ function setupTeiRendering() {
   }
 
   // eliminate residual tei-lbs at end of document
-  $('tei-lb').last().prevUntil(':not(tei-lb)', 'tei-lb').remove();
+  $('#editor tei-lb').last().prevUntil(':not(tei-lb)', 'tei-lb').remove();
   
   $('[data-toggle="tooltip"]').tooltip();
   

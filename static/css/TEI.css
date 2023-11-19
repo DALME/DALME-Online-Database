@@ -31,7 +31,7 @@ tei-body {
 
 tei-hi[rend="superscript"],
 hi[rend="superscript"] {
-  font-size: 90%;
+  font-size: 70%;
   position: relative;
   top: -5px;
 }
@@ -39,7 +39,7 @@ hi[rend="superscript"] {
 tei-hi[rend="subscript"],
 hi[rend="subscript"] {
   vertical-align: sub;
-  font-size: 90%;
+  font-size: 70%;
 }
 
 tei-hi[rend="underscore"],
@@ -60,11 +60,6 @@ del {
 tei-del[rend=rubout] {
   filter: blur(2px);
 }
-
-tei-term + tei-del {
-  margin-left: 5px;
-}
-
 tei-supplied:before,
 supplied:before {
   content: "["
@@ -1479,9 +1474,18 @@ tei-q[data-tei-prev]:before {
   content: "" !important;
 }
 tei-quotation {
-  /* Empty Rule Set */
+  font-family: "Times New Roman", serif;
+  color: #4b4b4b;
+  white-space: pre-line;
+  margin: 5px 20px;
+  font-size: larger;
 }
-
+tei-quotation + tei-lb {
+  display: none;
+}
+tei-lb + tei-quotation {
+  margin-top: -15px;
+}
 tei-*/
 /* r */
 tei-app tei-rdg {
@@ -2117,10 +2121,19 @@ tei-metamark[function="hr"] {
 .tei-leader-line {
   display: flex;
 }
+tei-metamark[function="hhr"] + tei-lb,
+tei-metamark[function="hr"] + tei-lb,
 .tei-leader-line + tei-lb {
   display: none;
 }
-
+tei-metamark[function="hhr"] {
+  background-size: 50px 1px;
+  border-bottom: 1px solid #aaa;
+  display: block;
+  margin: 1rem 0;
+  width: 30%;
+  margin-left: -10%;
+}
 tei-ab {
   display: block;
 }
@@ -2164,14 +2177,14 @@ tei-quote {
   width: 100%;
   font-family: 'Lora';
   white-space: normal;
-  text-align: center;
+  justify-content: center;
   line-height: 1.5;
 }
 tei-quote:not(:first-child) {
   margin-top: 1rem;
 }
 tei-quote:not(:last-child) {
-  margin-bottom: 1rem;
+  margin-bottom: -1rem;
 }
 tei-quote span:before {
   content: "\201c\00a0";
@@ -2271,7 +2284,8 @@ tei-note[type="marginal"] > div:first-of-type {
   padding: 6px 10px;
   font-family: "PT Serif", "Times New Roman", serif;
   font-size: 1rem;
-  width: 100%;
+  /* width: 100%; */
+  width: max-content;
   border-top: 1px dotted #c9c9c9;
   border-bottom: 1px dotted #c9c9c9;
   white-space: pre-wrap;
@@ -2325,16 +2339,17 @@ tei-note[type="marginal"] > div:first-of-type {
 .tooltip.gloss .tooltip-inner .fa-link {
   color: #0e62b7;
 }
-
+tei-i {
+  font-style: italic;
+}
 tei-ref {
   text-decoration: none !important;
   color: #8a8a8a;
   cursor: pointer;
-  margin-left: 2px;
 }
 tei-ref[rend~=superscript] {
   position: relative;
-  top: -5px;
+  top: -3px;
 }
 tei-ref[rend~=subscript] {
   position: relative;
@@ -2405,9 +2420,17 @@ tei-term {
   flex-direction: column;
   cursor: pointer;
 }
-tei-term + tei-term {
+tei-term + tei-term,
+tei-term + tei-del,
+tei-term + tei-hi {
   margin-left: 5px;
 }
+
+tei-del + tei-term,
+tei-hi + tei-term {
+  margin-left: 5px;
+}
+
 tei-term::after {
   content: "\f06e";
   font-family: "Font Awesome 5 Free";
@@ -2419,7 +2442,7 @@ tei-term::after {
   justify-content: center;
   align-items: center;
   background: linear-gradient(90deg, #dddddd,#a2a2a2) no-repeat left/40% 2px,linear-gradient(90deg, #a2a2a2,#dddddd) no-repeat right/40% 2px;
-  margin-top: -4px;
+  margin-top: -2px;
   width: 100%;
   align-self: end;
 }
@@ -2489,13 +2512,48 @@ section.transcription.basic tei-hi[rend="subscript"] {
   font-size: 100%;
 }
 
+.popover {
+  display: flex;
+  flex-direction: column;
+  max-width: 47%;
+  max-height: 50%;
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-break: normal;
+  word-spacing: normal;
+  white-space: normal;
+  line-break: auto;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+.popover-body {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 0.5rem 0.75rem;
+  color: #858796;
+}
 .popover-header-wrapper {
   display: flex;
   flex-direction: row;
+  border-bottom: 1px solid #ebebeb;
 }
 .popover-header-wrapper .popover-header {
   display: inline-flex;
   flex-grow: 1;
+  border-bottom: none;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0;
+  font-size: 1rem;
+  background-color: #f7f7f7;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
 }
 .popover-header-wrapper .popover-header-closer {
   display: inline-flex;
