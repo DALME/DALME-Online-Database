@@ -1,5 +1,4 @@
 """Interface for the dalme_app.utils module."""
-from .dalme_saml_processor import SAMLProcessor
 from .database_router import ModelDatabaseRouter
 from .date_time_helpers import DalmeDate, round_timesince
 from .domain_middleware import SubdomainRedirectMiddleware
@@ -17,7 +16,6 @@ __all__ = [
     'JWTSessionAuthentication',
     'JWTUserDetailsSerializer',
     'ModelDatabaseRouter',
-    'SAMLProcessor',
     'Search',
     'SearchContext',
     'SubdomainRedirectMiddleware',

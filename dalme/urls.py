@@ -34,7 +34,6 @@ def to_dalme_logout(_request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('idp/', include('djangosaml2idp.urls', namespace='identity_provider')),
     path('maintenance-mode/', include(maintenance_mode_urls)),
     path('api/public/records/', api.RecordList.as_view(), name='record_list'),
     path('api/public/records/<uuid:pk>/', api.RecordDetail.as_view(), name='record_detail'),

@@ -90,7 +90,6 @@ class Base(Configuration):
         'django.contrib.staticfiles',
         'django.contrib.sites',
         'django_elasticsearch_dsl',
-        'djangosaml2idp',
         'dj_rest_auth',
         'rest_framework',
         'rest_framework.authtoken',
