@@ -1,4 +1,5 @@
-from django.contrib.auth.models import Group, User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
 from dalme_app.models import *
 
@@ -333,7 +334,7 @@ def run_commands():
 
         if entry.get('members') is not None:
             for member in entry['members']:
-                user = User.objects.get(pk=member)
+                user = get_user_model().objects.get(pk=member)
                 user.groups.add(group.id)
                 profile = user.profile
                 profile.primary_group = group

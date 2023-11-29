@@ -1,5 +1,5 @@
 """Model agent data."""
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -38,7 +38,7 @@ class Person(Agent):
     """Stores information about people."""
 
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name='person_record',
         null=True,

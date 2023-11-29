@@ -182,6 +182,7 @@ class Base(Configuration):
         'django_tenants.routers.TenantSyncRouter',
     ]
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+    AUTH_USER_MODEL = 'auth.User'
     TENANT_DOMAIN_MODEL = 'dalme_app.Domain'
     TENANT_MODEL = 'dalme_app.Tenant'
 

@@ -1,7 +1,7 @@
 """Model workform data."""
 from django_currentuser.middleware import get_current_user
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.db.models import options
 
@@ -36,7 +36,9 @@ class Workflow(models.Model):
     wf_status = models.IntegerField(choices=WORKFLOW_STATUS, default=2)
     stage = models.IntegerField(choices=PROCESSING_STAGES, default=1)
     last_modified = models.DateTimeField(null=True, blank=True)
-    last_user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
+    last_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE, default=get_current_user
+    )
     help_flag = models.BooleanField(default=False)
     ingestion_done = models.BooleanField(default=False)
     transcription_done = models.BooleanField(default=False)
@@ -73,7 +75,7 @@ class WorkLog(models.Model):
     record = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE, related_name='work_log')
     event = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, default=get_current_user)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE, default=get_current_user)
 
     def __str__(self):
         return f'{self.timestamp}: {self.record.id} ({self.user.username}) - {self.event}'

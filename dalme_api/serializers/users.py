@@ -2,7 +2,7 @@
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from .base_classes import DynamicSerializer
 from .groups import GroupSerializer
@@ -17,7 +17,7 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     preferences = serializers.JSONField(source='profile.preferences', required=False)
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = (
             'id',
             'last_login',
@@ -47,7 +47,7 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     # def to_internal_value(self, data):
     #     """Transform incoming data."""
     #     if type(data) is int:
-    #         user = User.objects.get(pk=data)
+    #         user = get_user_model().objects.get(pk=data)
     #         data = {'id': user.id, 'username': user.username}
 
     #     if data.get('groups') is not None:
@@ -84,7 +84,7 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
     #     if 'username' in validated_data:
     #         validated_data['username'] = validated_data['username'].lower()
 
-    #     user = User.objects.create_user(**validated_data)
+    #     user = get_user_model().objects.create_user(**validated_data)
 
     #     Profile.objects.create(user=user, **profile_data)
 

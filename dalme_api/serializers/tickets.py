@@ -3,7 +3,7 @@ from django_currentuser.middleware import get_current_user
 from rest_framework import serializers
 from rest_framework.utils import model_meta
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from dalme_api.serializers.attachments import AttachmentSerializer
@@ -128,7 +128,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
             )
 
         if assigned_to:
-            validated_data['assigned_to'] = User.objects.get(id=assigned_to)
+            validated_data['assigned_to'] = get_user_model().objects.get(id=assigned_to)
 
         if file:
             validated_data['file'] = Attachment.objects.get(id=file)

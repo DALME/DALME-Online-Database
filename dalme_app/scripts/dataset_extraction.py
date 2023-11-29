@@ -2,8 +2,6 @@ import csv
 import os
 import shutil
 
-from django.contrib.auth.models import User  # noqa
-
 from dalme_app.models import *  # noqa
 
 

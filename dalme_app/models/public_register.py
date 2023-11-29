@@ -1,7 +1,7 @@
 """Model public register data."""
 from django_currentuser.middleware import get_current_user
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -17,7 +17,7 @@ class PublicRegister(models.Model):
     object_id = models.UUIDField(db_index=True, primary_key=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     creator = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         default=get_current_user,
         related_name='%(app_label)s_%(class)s_creation',

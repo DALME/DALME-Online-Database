@@ -1,5 +1,5 @@
 """Model ticket data."""
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -28,13 +28,13 @@ class Ticket(dalmeIntid):
     files = models.ManyToManyField('Attachment', blank=True, related_name='tickets')
     comments = GenericRelation('Comment')
     assigned_to = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
         related_name='ticket_assigned_to',
     )
-    closing_user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    closing_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     closing_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:

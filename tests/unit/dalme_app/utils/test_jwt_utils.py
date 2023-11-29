@@ -1,7 +1,7 @@
 """Test the dalme_app.utils.jwt_utils module."""
 from unittest import mock
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from dalme_app.models import Tenant
 from dalme_app.utils.jwt_utils import JWTSessionAuthentication
@@ -19,6 +19,7 @@ def test_middleware(
     rf,
 ):
     """Assert the middleware handles authentication correctly."""
+    User = get_user_model()  # noqa: N806
     mock_user = mock.MagicMock(spec=User)
     mock_user.is_active = True
     mock_auth.authenticate.return_value = mock_user

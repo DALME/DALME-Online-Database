@@ -3,7 +3,7 @@ import json
 import pathlib
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import options
@@ -57,7 +57,7 @@ class Profile(models.Model):
 
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
     preferences = models.JSONField(default=default_preferences)
 

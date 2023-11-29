@@ -3,7 +3,8 @@ from datetime import datetime
 
 from django_currentuser.middleware import get_current_user
 
-from django.contrib.auth.models import Group, User
+from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -28,14 +29,14 @@ class Task(dalmeIntid):
     url = models.CharField(max_length=255, blank=True)
     comments = GenericRelation('Comment', related_query_name='tasks')
     completed_by = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         null=True,
         on_delete=models.CASCADE,
         related_name='completed_tasks',
     )
     files = models.ManyToManyField('Attachment', blank=True, related_name='tasks')
     resources = models.ManyToManyField('Collection', blank=True, related_name='tasks')
-    assignees = models.ManyToManyField(User, blank=True, related_name='task_assignations')
+    assignees = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='task_assignations')
 
     class Meta:
         ordering = ['creation_timestamp']

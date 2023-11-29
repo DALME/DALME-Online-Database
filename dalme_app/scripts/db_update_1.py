@@ -1,6 +1,6 @@
 import json
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from dalme_app.models import *
 
@@ -241,14 +241,14 @@ def step_10():
 
 # must be executed in normal RR-cycle
 def step_11():
-    users = User.objects.all()
+    users = get_user_model().objects.all()
     for user in users:
         try:
             pass
         except:
             user.delete()
     try:
-        users = User.objects.all()
+        users = get_user_model().objects.all()
         problems = []
         for user in users:
             new_agent = Agent()

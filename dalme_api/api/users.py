@@ -6,8 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.models import User
 from django.http import HttpRequest
 
 from dalme_api.access_policies import UserAccessPolicy
@@ -25,7 +25,7 @@ class Users(DALMEBaseViewSet):
 
     lookup_url_kwarg = 'pk'
     permission_classes = (UserAccessPolicy,)
-    queryset = User.objects.all()
+    queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
     search_fields = ['username', 'email', 'profile__full_name', 'first_name', 'last_name']

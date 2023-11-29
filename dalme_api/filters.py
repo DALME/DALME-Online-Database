@@ -1,7 +1,7 @@
 """Define API filtering logic and utilities."""
 from django_filters import rest_framework as filters
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from dalme_app.models import Collection, ContentTypeExtended, Record, RightsPolicy, Task, TaskList, Ticket
@@ -114,7 +114,7 @@ class TasklistFilter(filters.FilterSet):
 
     def for_user(self, queryset, name, value):  # noqa: ARG002
         """Return lists the user in the request owns, can see, or are linked to their teams/groups."""
-        groups = [g.id for g in User.objects.get(pk=value).groups.all()]
+        groups = [g.id for g in get_user_model().objects.get(pk=value).groups.all()]
         return queryset.filter(
             Q(owner=value)
             | Q(team_link__in=groups)
@@ -147,7 +147,7 @@ class UserFilter(filters.FilterSet):
     groups = filters.CharFilter(label='groups', method='check_groups')
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = [
             'id',
             'username',

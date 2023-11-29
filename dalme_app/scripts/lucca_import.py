@@ -4,7 +4,7 @@ import pandas as pd
 import regex as re
 from django_currentuser.middleware import _set_current_user
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from dalme_app.models import *  # noqa
 
@@ -37,8 +37,8 @@ re_subs_2 = [
 
 italy = CountryReference.objects.get(id=143) # noqa
 record_type = Content_type.objects.get(id=13) # noqa
-dls = User.objects.get(id=5)
-ghp = User.objects.get(id=1)
+dls = get_user_model().objects.get(id=5)
+ghp = get_user_model().objects.get(id=1)
 
 _set_current_user(ghp)
 
@@ -201,12 +201,12 @@ def run_commands():
                     entity_phrase = agent.instances.create(transcription_id=transcription)
 
                     attribute_lp = Attribute_type.objects.get(short_name='legal_persona') # noqa
-                    entity_phrase.attributes.create(**{'attribute_type': attribute_lp, 'value_STR': legal_persona})
+                    entity_phrase.attributes.create(attribute_type=attribute_lp, value_STR=legal_persona)
 
                     if person_attributes:
                         for short_name, value in person_attributes.items():
                             attribute_type = Attribute_type.objects.get(short_name=short_name) # noqa
-                            agent.attributes.update_or_create(**{'attribute_type': attribute_type, 'value_STR': value})
+                            agent.attributes.update_or_create(attribute_type=attribute_type, value_STR=value)
 
                     tr_block += f'{legal_persona}: <rs type="agent" subtype="person" key="{entity_phrase.id}">{name_phrase}</rs>'
 

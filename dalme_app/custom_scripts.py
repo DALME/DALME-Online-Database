@@ -7,7 +7,7 @@ from datetime import date
 import pandas as pd
 from geopy.geocoders import AlgoliaPlaces
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
 from dalme_app.models import (
@@ -194,7 +194,7 @@ def remove_11600(request):  # noqa: ARG001
 
 
 def migrate_datasets(request):  # noqa: ARG001
-    owner = User.objects.get(pk=5)
+    owner = get_user_model().objects.get(pk=5)
     datasets = list({i.value_STR for i in Attribute.objects.filter(attribute_type=27)})
     result = 'Unique dataset names = ' + str(len(datasets)) + ' | '
     new_sets = []
@@ -274,8 +274,8 @@ def test_expression(request):  # noqa: ARG001
 def fix_users(records):
     # records = Attribute.objects.all()
     for s in records:
-        c_user = User.objects.get(username=s.creation_username)
-        m_user = User.objects.get(username=s.modification_username)
+        c_user = get_user_model().objects.get(username=s.creation_username)
+        m_user = get_user_model().objects.get(username=s.modification_username)
         s.creation_user = c_user
         s.owner = c_user
         s.modification_user = m_user

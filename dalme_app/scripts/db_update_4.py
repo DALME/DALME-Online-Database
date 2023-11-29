@@ -1,5 +1,4 @@
-
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 
@@ -140,7 +139,7 @@ def step_8():
     #LOC-GLOB
     sxcs = Set.objects.get(pk='15ecfc2e-6043-4e85-bed1-5f6b2f26c62f').members.all()
     print(sxcs.count())
-    owner = User.objects.get(pk=57)
+    owner = get_user_model().objects.get(pk=57)
     for sxc in sxcs:
         obj = sxc.content_object
         obj.owner = owner

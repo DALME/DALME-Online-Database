@@ -8,7 +8,7 @@ import uuid
 
 from django_currentuser.middleware import get_current_user
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 
 
@@ -21,7 +21,7 @@ class dalmeBasic(models.Model):  # noqa: N801
     """Model template with timestamps, but no pre-defined ID or Owner."""
 
     creation_user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         default=get_current_user,
         related_name='%(app_label)s_%(class)s_creation',
@@ -29,7 +29,7 @@ class dalmeBasic(models.Model):  # noqa: N801
     )
 
     modification_user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         default=get_current_user,
         related_name='%(app_label)s_%(class)s_modification',
@@ -68,7 +68,7 @@ class dalmeOwned(dalmeBasic):  # noqa: N801
     """Model template with an owner field."""
 
     owner = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name='%(app_label)s_%(class)s_related',
         null=True,
