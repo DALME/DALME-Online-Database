@@ -28,11 +28,6 @@ logger = structlog.get_logger(__name__)
 MANIFEST_PATH = 'staticfiles.json'
 
 
-def open_rb(path):
-    """Wrap the builtin open method for convenience."""
-    return builtins.open(path, 'rb')
-
-
 class Command(BaseCommand):
     """Define the collectstatic_tenants command."""
 
@@ -53,15 +48,14 @@ class Command(BaseCommand):
 
         """
         path_obj = Path(tmpdir) / path
-        with tenant_context(tenant), open_rb(path_obj) as f:
+        with tenant_context(tenant), builtins.open(path_obj, 'rb') as f:
             staticfiles_storage.save(path, f)
         return path
 
     @staticmethod
-    def parse_manifest(manifest_path):
+    def parse_manifest(handle):
         """Read the contents of a static manifest file."""
-        with open_rb(manifest_path) as f:
-            return set(json.load(f)['paths'].values())
+        return set(json.load(handle)['paths'].values())
 
     @staticmethod
     def collect(tmpdir):
@@ -79,10 +73,12 @@ class Command(BaseCommand):
 
         """
         self.collect(tmpdir)
-        to_upload = self.parse_manifest(Path(tmpdir) / MANIFEST_PATH)
+        with builtins.open(Path(tmpdir) / MANIFEST_PATH, 'rb') as f:
+            to_upload = self.parse_manifest(f)
 
         if staticfiles_storage.exists(MANIFEST_PATH):
-            already_uploaded = self.parse_manifest(MANIFEST_PATH)
+            with staticfiles_storage.open(MANIFEST_PATH) as f:
+                already_uploaded = self.parse_manifest(f)
             intersection = to_upload.intersection(already_uploaded)
 
             if self.force:
