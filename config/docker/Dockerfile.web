@@ -75,6 +75,7 @@ ENV POSTGRES_DB=$POSTGRES_DB \
 ENV LOG_LEVEL ERROR
 WORKDIR /opt/web
 RUN mkdir /opt/web/www
+COPY ./ida ./ida
 COPY ./dalme ./dalme
 COPY ./dalme_api ./dalme_api
 COPY ./dalme_app ./dalme_app
@@ -82,8 +83,8 @@ COPY ./dalme_public ./dalme_public
 COPY ./dalme_purl ./dalme_purl
 COPY ./templates ./templates
 COPY ./tenants ./tenants
-COPY ./tests ./tests
 COPY ./static ./static
+COPY ./tests ./tests
 COPY ./manage.py ./
 COPY ./pyproject.toml ./
 
@@ -114,6 +115,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV LANG=en_US.UTF-8
 WORKDIR /opt/web
+COPY ./ida ./ida
 COPY ./dalme ./dalme
 COPY ./dalme_api ./dalme_api
 COPY ./dalme_app ./dalme_app

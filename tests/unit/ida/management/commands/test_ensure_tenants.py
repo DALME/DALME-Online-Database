@@ -1,4 +1,4 @@
-"""Test the dalme_app.management.commands.ensure_tenants module."""
+"""Test the ida.management.commands.ensure_tenants module."""
 import json
 import os
 from unittest import mock
@@ -7,8 +7,8 @@ import pytest
 
 from django.db import DataError
 
-from dalme_app.management.commands.ensure_tenants import Command as EnsureTenants
-from dalme_app.models import Domain, Tenant
+from ida.management.commands.ensure_tenants import Command as EnsureTenants
+from ida.models import Domain, Tenant
 
 
 @mock.patch.dict(
@@ -25,9 +25,9 @@ from dalme_app.models import Domain, Tenant
         )
     },
 )
-@mock.patch('dalme_app.management.commands.ensure_tenants.Domain')
-@mock.patch('dalme_app.management.commands.ensure_tenants.Tenant')
-@mock.patch('dalme_app.management.commands.ensure_tenants.logger')
+@mock.patch('ida.management.commands.ensure_tenants.Domain')
+@mock.patch('ida.management.commands.ensure_tenants.Tenant')
+@mock.patch('ida.management.commands.ensure_tenants.logger')
 def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
     mock_tenant.objects.filter.return_value.exists.side_effect = [True, False]
 
@@ -69,9 +69,9 @@ def test_ensure_tenants_exists_mismatch(mock_logger, mock_tenant, mock_domain):
         )
     },
 )
-@mock.patch('dalme_app.management.commands.ensure_tenants.Domain')
-@mock.patch('dalme_app.management.commands.ensure_tenants.Tenant')
-@mock.patch('dalme_app.management.commands.ensure_tenants.logger')
+@mock.patch('ida.management.commands.ensure_tenants.Domain')
+@mock.patch('ida.management.commands.ensure_tenants.Tenant')
+@mock.patch('ida.management.commands.ensure_tenants.logger')
 def test_ensure_tenants_exists(mock_logger, mock_tenant, mock_domain):
     mock_tenant.objects.filter.return_value.exists.side_effect = [True, True, False]
     new_tenant = mock.MagicMock(spec=Tenant)

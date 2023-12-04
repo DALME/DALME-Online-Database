@@ -1,4 +1,4 @@
-"""Configure fixtures for all tests in the module."""
+"""Configure fixtures for the tests module."""
 import pytest
 
 

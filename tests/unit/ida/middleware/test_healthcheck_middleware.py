@@ -1,10 +1,10 @@
-"""Test the dalme_app.utils.healthcheck_middleware module."""
+"""Test the ida.middleware.healthcheck_middleware module."""
 from http import HTTPStatus
 from unittest import mock
 
 from django.test import override_settings
 
-from dalme_app.utils.healthcheck_middleware import HealthCheckMiddleware
+from ida.middleware.healthcheck_middleware import HealthCheckMiddleware
 
 
 def test_ping_endpoint_pass_through(rf):
@@ -19,7 +19,7 @@ def test_ping_endpoint_pass_through(rf):
 
 
 @override_settings(DEBUG=True)
-@mock.patch('dalme_app.utils.healthcheck_middleware.MigrationExecutor')
+@mock.patch('ida.middleware.healthcheck_middleware.MigrationExecutor')
 def test_ping_endpoint_debug(mock_executor, rf):
     """Assert the health check passes in dev mode when there are no outstanding db migrations."""
     mock_executor.return_value.migration_plan.return_value = None
@@ -33,7 +33,7 @@ def test_ping_endpoint_debug(mock_executor, rf):
     assert response.status_code == HTTPStatus.OK
 
 
-@mock.patch('dalme_app.utils.healthcheck_middleware.MigrationExecutor')
+@mock.patch('ida.middleware.healthcheck_middleware.MigrationExecutor')
 def test_ping_endpoint_503s_when_db_not_ready(mock_executor, rf):
     """Assert the health check 503s when there are outstanding db migrations."""
     mock_executor.return_value.migration_plan.return_value = ['some plan data']
@@ -47,7 +47,7 @@ def test_ping_endpoint_503s_when_db_not_ready(mock_executor, rf):
     assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE
 
 
-@mock.patch('dalme_app.utils.healthcheck_middleware.MigrationExecutor')
+@mock.patch('ida.middleware.healthcheck_middleware.MigrationExecutor')
 def test_ping_endpoint(mock_executor, rf):
     """Assert the health check passses when the db is up and ready."""
     mock_executor.return_value.migration_plan.return_value = None

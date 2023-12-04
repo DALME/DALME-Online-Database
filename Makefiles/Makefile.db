@@ -61,7 +61,7 @@ ifndef app
 else
 	docker compose run --rm \
 		$(PROJECT).web \
-		python manage.py migrations.make --empty $(app)
+		python manage.py makemigrations --empty $(app)
 endif
 .PHONY: db.migrations.empty
 

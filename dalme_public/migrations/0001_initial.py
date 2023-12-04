@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         ('wagtailcore', '0069_log_entry_jsonfield'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('taggit', '0004_alter_taggeditem_content_type_alter_taggeditem_tag'),
-        ('dalme_app', '__latest__'),
+        ('dalme_app', '0016_attachment_tenant_collection_tenant_and_more'),
     ]
 
     operations = [

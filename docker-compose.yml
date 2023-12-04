@@ -35,6 +35,7 @@ services:
       - ./dalme:/opt/web/dalme
       - ./dalme_api:/opt/web/dalme_api
       - ./dalme_app:/opt/web/dalme_app
+      - ./ida:/opt/web/ida
       - ./dalme_purl:/opt/web/dalme_purl
       - ./dalme_public:/opt/web/dalme_public
       - ./templates:/opt/web/templates

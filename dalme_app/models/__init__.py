@@ -50,7 +50,6 @@ from .saved_search import SavedSearch
 from .scope import Scope, ScopeType
 from .tag import Tag
 from .task import Task, TaskList
-from .tenant import Domain, Tenant, TenantRole
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
@@ -78,7 +77,6 @@ __all__ = [
     'ContentAttributes',
     'ContentTypeExtended',
     'CountryReference',
-    'Domain',
     'EntityPhrase',
     'Folio',
     'GroupProperties',
@@ -107,8 +105,6 @@ __all__ = [
     'Tag',
     'Task',
     'TaskList',
-    'Tenant',
-    'TenantRole',
     'Ticket',
     'Token',
     'Transcription',

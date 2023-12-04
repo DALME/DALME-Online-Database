@@ -5,10 +5,12 @@ from django.conf import settings
 from django.db import models
 from django.db.models import options
 
+from ida.models import ScopedBase
+
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Workflow(models.Model):
+class Workflow(ScopedBase, models.Model):
     """Stores information about the processing workflow for records."""
 
     ASSESSING = 1
@@ -68,7 +70,7 @@ class Workflow(models.Model):
         return getattr(self, f'{self.get_stage_display()}_done') if self.wf_status == 2 else True  # noqa: PLR2004
 
 
-class WorkLog(models.Model):
+class WorkLog(ScopedBase, models.Model):
     """Model workflow log data."""
 
     id = models.AutoField(primary_key=True, unique=True, db_index=True)  # noqa: A003

@@ -4,7 +4,6 @@ Uses: https://github.com/jazzband/django-configurations
 
 """
 import dataclasses
-import datetime
 import enum
 import json
 import os
@@ -80,7 +79,7 @@ class Base(Configuration):
 
     SHARED_APPS = [
         'django_tenants',
-        'dalme_app.application.DalmeConfig',
+        'ida.apps.IDAConfig',  # App containing the Tenant model.
         'django.contrib.contenttypes',
         # NOTE: The above must be present for django-tenants to function.
         'django.contrib.admin',
@@ -90,13 +89,13 @@ class Base(Configuration):
         'django.contrib.staticfiles',
         'django.contrib.sites',
         'django_elasticsearch_dsl',
-        'dj_rest_auth',
         'rest_framework',
-        'rest_framework.authtoken',
         'django_filters',
         'maintenance_mode',
         'captcha',
         'corsheaders',
+        # 'oauth2_provider',
+        'dalme_app.application.DalmeConfig',
         'dalme_api.application.DalmeAPIConfig',
         'dalme_purl.application.DalmePURLConfig',
     ]
@@ -122,18 +121,17 @@ class Base(Configuration):
     ]
 
     MIDDLEWARE = [
-        'dalme_app.utils.HealthCheckMiddleware',
+        'ida.middleware.HealthCheckMiddleware',
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.common.CommonMiddleware',
-        'dalme_app.utils.TenantMiddleware',
-        'dalme_app.utils.TenantContextMiddleware',
+        'ida.middleware.TenantMiddleware',
+        'ida.middleware.TenantContextMiddleware',
         'django_structlog.middlewares.RequestMiddleware',
         'django.middleware.security.SecurityMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'dalme_app.utils.SubdomainRedirectMiddleware',
         'django_structlog.middlewares.RequestMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
-        'dalme_app.utils.JWTSessionAuthentication',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django_currentuser.middleware.ThreadLocalUserMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
@@ -183,8 +181,8 @@ class Base(Configuration):
     ]
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     AUTH_USER_MODEL = 'auth.User'
-    TENANT_DOMAIN_MODEL = 'dalme_app.Domain'
-    TENANT_MODEL = 'dalme_app.Tenant'
+    TENANT_DOMAIN_MODEL = 'ida.Domain'
+    TENANT_MODEL = 'ida.Tenant'
 
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOGGING = {
@@ -269,29 +267,11 @@ class Base(Configuration):
         {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
     ]
 
-    REST_AUTH = {
-        'USE_JWT': True,
-        'SESSION_LOGIN': True,
-        'JWT_AUTH_COOKIE': 'dalme-access-token',
-        'JWT_AUTH_REFRESH_COOKIE': 'dalme-refresh-token',
-        'JWT_AUTH_REFRESH_COOKIE_PATH': '/api/jwt/token/refresh/',
-        'JWT_AUTH_SECURE': True,
-        'JWT_AUTH_HTTPONLY': True,
-        'JWT_AUTH_SAMESITE': 'Strict',
-        'USER_DETAILS_SERIALIZER': 'dalme_app.utils.JWTUserDetailsSerializer',
-    }
-
-    SIMPLE_JWT = {
-        'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
-        'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
-    }
-
     REST_FRAMEWORK = {
         'DEFAULT_PAGINATION_CLASS': 'dalme_api.paginators.DALMELimitOffsetPagination',
         'PAGE_SIZE': 10,
         'DEFAULT_AUTHENTICATION_CLASSES': [
             'rest_framework.authentication.TokenAuthentication',
-            'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         ],
         'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
         'DEFAULT_PERMISSION_CLASSES': [

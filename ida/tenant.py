@@ -10,6 +10,6 @@ loaded. So just put this at the top-level so it's clean and ready for use.
 
 def get_current_tenant():
     """Defer importing the tenant context to minimize impact on import resolution."""
-    from dalme_app.utils import TENANT
+    from ida.middleware import TENANT
 
     return TENANT

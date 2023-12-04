@@ -12,6 +12,8 @@ DALME
    :caption: Contents:
 
    source/introduction
+   source/multitenancy
+   source/auth
 
 Indices
 *******

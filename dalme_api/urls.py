@@ -40,6 +40,6 @@ urlpatterns = [
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
     path('csrf/', api.csrf),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('jwt/', include('dj_rest_auth.urls')),
+    # path('jwt/', include('dj_rest_auth.urls')),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]

@@ -5,7 +5,7 @@ from django_tenants.utils import remove_www
 from django.core.exceptions import DisallowedHost
 from django.db import connection
 
-from dalme_app.models import Domain
+from ida.models import Domain
 
 
 class TenantMiddleware:

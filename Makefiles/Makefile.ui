@@ -15,8 +15,8 @@ ui.install:
 .PHONY: ui.install
 
 ui.lint:
-	docker run --rm \
-		$(PROJECT).ui:dev \
+	docker compose run -T --rm \
+		$(PROJECT).ui \
 		yarn lint
 .PHONY: ui.lint
 

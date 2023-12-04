@@ -14,7 +14,7 @@ import os
 from django.conf import settings
 from django.db import models
 
-from dalme_app.tenant import get_current_tenant
+from ida.tenant import get_current_tenant
 
 
 class ScopedQueryset(models.QuerySet):
@@ -72,7 +72,7 @@ class ScopedBase(models.Model):
     """Mixin to make a model multitenant aware."""
 
     tenant = models.ForeignKey(
-        'dalme_app.Tenant',
+        'ida.Tenant',
         on_delete=models.PROTECT,
         null=False,
     )

@@ -1,4 +1,4 @@
-"""Test the dalme_app.management.commands.collectstatic_tenants module."""
+"""Test the ida.management.commands.collectstatic_tenants module."""
 import argparse
 import json
 import os
@@ -8,8 +8,8 @@ import pytest
 
 from django.core.management.base import CommandError
 
-from dalme_app.management.commands.collectstatic_tenants import Command as CollectstaticTenants
-from dalme_app.models import Tenant
+from ida.management.commands.collectstatic_tenants import Command as CollectstaticTenants
+from ida.models import Tenant
 
 MANIFEST_DATA = json.dumps(
     {
@@ -32,10 +32,10 @@ def test_collectstatic_tenants_args():
 
 
 @mock.patch.dict(os.environ, {'ENV': 'development'})
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.connection')
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.call_command')
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.Tenant')
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.logger')
+@mock.patch('ida.management.commands.collectstatic_tenants.connection')
+@mock.patch('ida.management.commands.collectstatic_tenants.call_command')
+@mock.patch('ida.management.commands.collectstatic_tenants.Tenant')
+@mock.patch('ida.management.commands.collectstatic_tenants.logger')
 def test_collectstatic_tenants_development(mock_logger, mock_tenant, mock_call_command, mock_connection):
     tenant_1 = mock.MagicMock(spec=Tenant)
     tenant_1.schema_name = 'tenant1'
@@ -57,10 +57,10 @@ def test_collectstatic_tenants_development(mock_logger, mock_tenant, mock_call_c
 
 
 @mock.patch.dict(os.environ, {'ENV': 'production'})
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.connection')
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.call_command')
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.Tenant')
-@mock.patch('dalme_app.management.commands.collectstatic_tenants.logger')
+@mock.patch('ida.management.commands.collectstatic_tenants.connection')
+@mock.patch('ida.management.commands.collectstatic_tenants.call_command')
+@mock.patch('ida.management.commands.collectstatic_tenants.Tenant')
+@mock.patch('ida.management.commands.collectstatic_tenants.logger')
 def test_collectstatic_tenants_insufficient_workers(mock_logger, mock_tenant, mock_call_command, mock_connection):
     tenant_1 = mock.MagicMock(spec=Tenant)
     tenant_1.schema_name = 'tenant1'

@@ -20,7 +20,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
-from dalme_app.models import Tenant
+from ida.models import Tenant
 
 logger = structlog.get_logger(__name__)
 

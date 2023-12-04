@@ -12,11 +12,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from dalme_app.models.templates import dalmeIntid, dalmeOwned
+from ida.models import ScopedBase
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Task(dalmeIntid):
+class Task(ScopedBase, dalmeIntid):
     """Stores information about tasks."""
 
     title = models.CharField(max_length=140)
@@ -71,7 +72,7 @@ class Task(dalmeIntid):
         super().save(*args, **kwargs)
 
 
-class TaskList(dalmeIntid, dalmeOwned):
+class TaskList(ScopedBase, dalmeIntid, dalmeOwned):
     """Stores information about task lists."""
 
     name = models.CharField(max_length=60)

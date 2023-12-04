@@ -26,7 +26,7 @@ repos:
     hooks:
     - id: eslint
       name: eslint
-      entry: make ui.lint
+      entry: make -s ui.lint
       language: system
       types_or: [javascript, vue]
       require_serial: true
