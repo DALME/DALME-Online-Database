@@ -188,86 +188,10 @@ class BaseAccessPolicy(AccessPolicy):
         return True
 
 
-class AgentAccessPolicy(BaseAccessPolicy):
-    """Access policies for Agents endpoint."""
-
-    id = 'agents-policy'  # noqa: A003
-
-
-class AttachmentAccessPolicy(BaseAccessPolicy):
-    """Access policies for Attachments endpoint."""
-
-    id = 'attachments-policy'  # noqa: A003
-
-
-class AttributeAccessPolicy(BaseAccessPolicy):
-    """Access policies for record attributes."""
-
-    id = 'attributes-policy'  # noqa: A003
-
-
-class CollectionAccessPolicy(BaseAccessPolicy):
-    """Access policies for Collections endpoint."""
-
-    id = 'collections-policy'  # noqa: A003
-
-
-class CommentAccessPolicy(BaseAccessPolicy):
-    """Access policies for Comments endpoint."""
-
-    id = 'comments-policy'  # noqa: A003
-
-
 class GeneralAccessPolicy(BaseAccessPolicy):
     """General-purpose access policies."""
 
     id = 'general-policy'  # noqa: A003
-
-
-class ImageAccessPolicy(BaseAccessPolicy):
-    """Access policies for Images endpoint."""
-
-    id = 'images-policy'  # noqa: A003
-
-
-class LibraryAccessPolicy(BaseAccessPolicy):
-    """Access policies for Library endpoint."""
-
-    id = 'library-policy'  # noqa: A003
-
-
-class LocaleAccessPolicy(BaseAccessPolicy):
-    """Access policies for Locales endpoint."""
-
-    id = 'locales-policy'  # noqa: A003
-
-
-class PageAccessPolicy(BaseAccessPolicy):
-    """Access policies for Pages endpoint."""
-
-    id = 'pages-policy'  # noqa: A003
-
-    def get_parent(self, target):
-        """Return page parent object (record)."""
-        return (target.records.all()[0].record, RecordAccessPolicy())
-
-
-class PlaceAccessPolicy(BaseAccessPolicy):
-    """Access policies for Places endpoint."""
-
-    id = 'places-policy'  # noqa: A003
-
-
-class PublicAccessPolicy(BaseAccessPolicy):
-    """Access policies for public site."""
-
-    id = 'public-policy'  # noqa: A003
-
-
-class RightsAccessPolicy(BaseAccessPolicy):
-    """Access policies for Rights endpoint."""
-
-    id = 'rights-policy'  # noqa: A003
 
 
 class RecordAccessPolicy(BaseAccessPolicy):
@@ -288,47 +212,3 @@ class SessionAccessPolicy(BaseAccessPolicy):
     """Access policies for Session endpoint."""
 
     id = 'session-policy'  # noqa: A003
-
-
-class TaskAccessPolicy(BaseAccessPolicy):
-    """Access policies for Tasks endpoint."""
-
-    id = 'tasks-policy'  # noqa: A003
-
-
-class TaskListAccessPolicy(BaseAccessPolicy):
-    """Access policies for Tasks Lists endpoint."""
-
-    id = 'task_lists-policy'  # noqa: A003
-
-
-class TranscriptionAccessPolicy(BaseAccessPolicy):
-    """Access policies for Transcriptions endpoint."""
-
-    id = 'transcriptions-policy'  # noqa: A003
-
-    def get_parent(self, target):
-        """Return transcription parent object (record)."""
-        return (target.folios.all()[0].record, RecordAccessPolicy())
-
-
-class TicketAccessPolicy(BaseAccessPolicy):
-    """Access policies for Tickets endpoint."""
-
-    id = 'tickets-policy'  # noqa: A003
-
-
-class WorkflowAccessPolicy(BaseAccessPolicy):
-    """Access policies for Workflow endpoint."""
-
-    id = 'workflow-policy'  # noqa: A003
-
-    def get_parent(self, target):
-        """Return workflow parent object (record)."""
-        return (target.record, RecordAccessPolicy())
-
-
-class UserAccessPolicy(BaseAccessPolicy):
-    """Access policies for Users endpoint."""
-
-    id = 'users-policy'  # noqa: A003

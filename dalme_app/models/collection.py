@@ -1,7 +1,6 @@
 """Model collection data."""
 from collections import Counter
 
-from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -20,7 +19,7 @@ class Collection(ScopedBase, dalmeUuid, dalmeOwned):
     use_as_workset = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
     team_link = models.ForeignKey(
-        Group,
+        'auth.Group',
         on_delete=models.CASCADE,
         related_name='default_collection',
         limit_choices_to={'properties__type': 3},

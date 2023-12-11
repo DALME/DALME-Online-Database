@@ -27,6 +27,7 @@ pandas==2.0.1
 passlib==1.7.4
 psycopg==3.1.18
 pycurl==7.45.2
+pyhumps==3.8.0
 pyzotero==1.5.9
 requests==2.30.0
 requests-aws4auth==1.2.3

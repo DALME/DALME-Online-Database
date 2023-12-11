@@ -4,7 +4,6 @@ from datetime import datetime
 from django_currentuser.middleware import get_current_user
 
 from django.conf import settings
-from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -79,7 +78,7 @@ class TaskList(ScopedBase, dalmeIntid, dalmeOwned):
     slug = models.SlugField(default='')
     description = models.TextField(blank=True)
     team_link = models.ForeignKey(
-        Group,
+        'auth.Group',
         on_delete=models.CASCADE,
         related_name='team_tasklist',
         limit_choices_to={'properties__type': 3},
