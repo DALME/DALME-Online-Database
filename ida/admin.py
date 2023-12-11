@@ -8,4 +8,6 @@ from .models import Tenant
 
 @admin.register(Tenant)
 class TenantAdmin(TenantAdminMixin, admin.ModelAdmin):
+    """Tenant admin."""
+
     list_display = ('name',)
