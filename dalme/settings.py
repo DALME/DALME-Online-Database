@@ -180,7 +180,7 @@ class Base(Configuration):
         'django_tenants.routers.TenantSyncRouter',
     ]
     DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-    AUTH_USER_MODEL = 'auth.User'
+    AUTH_USER_MODEL = 'ida.User'
     TENANT_DOMAIN_MODEL = 'ida.Domain'
     TENANT_MODEL = 'ida.Tenant'
 
