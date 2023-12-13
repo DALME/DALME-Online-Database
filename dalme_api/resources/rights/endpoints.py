@@ -2,7 +2,7 @@
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from dalme_api.filters import RightsPolicyFilter
-from dalme_app.models import RightsPolicy
+from ida.models import RightsPolicy
 
 from .serializers import RightsPolicySerializer
 

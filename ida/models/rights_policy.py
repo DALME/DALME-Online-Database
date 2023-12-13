@@ -32,8 +32,8 @@ class RightsPolicy(dalmeUuid):
     rights_holder = models.CharField(max_length=255, blank=True)
     notice_display = models.BooleanField(default=False)
     public_display = models.BooleanField(default=True)
-    attachments = models.ForeignKey('Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-    comments = GenericRelation('Comment')
+    attachments = models.ForeignKey('dalme_app.Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = GenericRelation('dalme_app.Comment')
 
     class Meta:
         ordering = ['name']
