@@ -213,7 +213,7 @@ class Folio(dalmeIntid):
         related_name='records',
     )
     transcription = models.ForeignKey(
-        'Transcription',
+        'ida.Transcription',
         to_field='id',
         db_index=True,
         on_delete=models.SET_NULL,

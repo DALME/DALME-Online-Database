@@ -1,7 +1,7 @@
 """Serializers for transcription data."""
 from rest_framework import serializers
 
-from dalme_app.models import Transcription
+from ida.models import Transcription
 
 
 class TranscriptionSerializer(serializers.ModelSerializer):

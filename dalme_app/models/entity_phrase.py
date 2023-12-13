@@ -13,7 +13,7 @@ class EntityPhrase(dalmeUuid):
     """Stores entity-phrase information."""
 
     transcription_id = models.ForeignKey(
-        'Transcription',
+        'ida.Transcription',
         to_field='id',
         db_index=True,
         on_delete=models.CASCADE,
