@@ -35,4 +35,4 @@ class GroupProperties(models.Model):
     def __str__(self):
         if self.tenant:
             return f'{self.group.name} ({self.tenant.name})'
-        return f'{self.group.name} (global)'
+        return f'{self.group.name} (IDA)'
