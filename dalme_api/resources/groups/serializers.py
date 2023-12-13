@@ -5,7 +5,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import Group
 
 from dalme_api.dynamic_serializer import DynamicSerializer
-from dalme_app.models import GroupProperties
+from ida.models import GroupProperties
 
 
 class GroupSerializer(DynamicSerializer, WritableNestedModelSerializer):

@@ -13,7 +13,6 @@ from .attribute import (
     AttributeValueTxt,
 )
 from .attribute_type import AttributeType
-from .auth_extensions import GroupProperties
 from .collection import Collection, CollectionMembership
 from .comment import Comment
 from .concept import Concept
@@ -79,7 +78,6 @@ __all__ = [
     'CountryReference',
     'EntityPhrase',
     'Folio',
-    'GroupProperties',
     'Headword',
     'LanguageReference',
     'LocaleReference',
