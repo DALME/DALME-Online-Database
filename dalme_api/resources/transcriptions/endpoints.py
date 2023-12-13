@@ -4,7 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from dalme_api.access_policies import BaseAccessPolicy, RecordAccessPolicy
-from dalme_app.models import Folio, Transcription
+from dalme_app.models import Folio
+from ida.models import Transcription
 
 from .serializers import TranscriptionSerializer
 

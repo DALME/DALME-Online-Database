@@ -6,12 +6,10 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
 
-from dalme_app.models import (
-    Folio,
+from .models import (
     Page,
     PublicRegister,
     Record,
-    Transcription,
     Workflow,
     WorkLog,
     rs_resource,
@@ -66,24 +64,9 @@ def source_pre_delete(sender, instance, **kwargs):  # noqa: ARG001
         pr.first().delete()
 
 
-@receiver(models.signals.post_save, sender=Transcription)
-def transcription_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
-    """Run after save method on Transcription objects."""
-    folios = instance.folios.all()
-    if folios.exists():
-        for folio in folios:
-            source = folio.source
-            # update source tracking
-            source.modification_timestamp = timezone.now()
-            source.modification_user = get_current_user()
-            source.save()
-            # emit post_save signal on source_page for indexing
-            models.signals.post_save.send(sender=Folio, instance=folio, created=False)
-
-
 @receiver(models.signals.post_save, sender=Workflow)
 def workflow_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
-    """Run after save method on Transcription objects."""
+    """Run after save method on Workflow objects."""
     if not created:
         models.signals.post_save.send(sender=Record, instance=instance.source, created=False)
     else:
