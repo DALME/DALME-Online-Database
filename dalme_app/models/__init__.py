@@ -39,13 +39,12 @@ from .resourcespace import (
     rs_user,
 )
 from .rights_policy import RightsPolicy
-from .scope import Scope, ScopeType
-from .scoped import ScopedBase
 
 from .attachment import Attachment  # isort: skip
 from .comment import Comment  # isort: skip
 from .collection import Collection, CollectionMembership  # isort: skip
 from .saved_search import SavedSearch  # isort: skip
+from .scoped import ScopedBase  # isort: skip
 from .tag import Tag  # isort: skip
 from .task import Task, TaskList  # isort: skip
 from .workflow import Workflow, WorkLog  # isort: skip
@@ -87,8 +86,6 @@ __all__ = [
     'Relationship',
     'RightsPolicy',
     'SavedSearch',
-    'Scope',
-    'ScopeType',
     'ScopedBase',
     'Tag',
     'Task',
