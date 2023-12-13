@@ -1,5 +1,4 @@
 """Model user and profile data."""
-
 import humps
 
 from django.conf import settings
