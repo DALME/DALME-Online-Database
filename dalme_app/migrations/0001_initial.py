@@ -8,7 +8,7 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import dalme_app.models.templates
+import ida.models.templates
 from ida.models.user import get_default_preferences
 
 
@@ -994,7 +994,7 @@ class Migration(migrations.Migration):
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('transcription', models.TextField(blank=True, default=None)),
-                ('author', models.CharField(default=dalme_app.models.templates.get_current_username, max_length=255)),
+                ('author', models.CharField(default=ida.models.templates.get_current_username, max_length=255)),
                 ('version', models.IntegerField(default=1)),
                 ('count_ignore', models.BooleanField(default=False)),
                 (

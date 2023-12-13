@@ -36,7 +36,7 @@ class ScopedManager(models.Manager):
     def get_queryset(self):
         """Filter a tenant aware queryset.
 
-        If this throws an exeption because the tenant contextvar is unbound it
+        If this throws an exeption because the tenant contextvar is unbound, it
         means either 1) we're in dev mode and we're trying to use shell_plus
         but the tenant is not set because we're outside request/response. Or 2)
         we are in staging/prod and we're running a management command in a

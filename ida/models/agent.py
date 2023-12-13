@@ -21,17 +21,17 @@ class Agent(dalmeUuid):
 
     name = models.CharField(max_length=255)
     agent_type = models.IntegerField(choices=AGENT_TYPES)
-    attributes = GenericRelation('Attribute')
-    instances = GenericRelation('EntityPhrase')
-    comments = GenericRelation('Comment')
-    tags = GenericRelation('Tag')
+    attributes = GenericRelation('dalme_app.Attribute')
+    instances = GenericRelation('dalme_app.EntityPhrase')
+    comments = GenericRelation('dalme_app.Comment')
+    tags = GenericRelation('dalme_app.Tag')
 
 
 class Organization(Agent):
     """Stores information about organizations."""
 
     short_name = models.CharField(max_length=55)
-    location = models.ForeignKey('Location', on_delete=models.PROTECT, null=True)
+    location = models.ForeignKey('dalme_app.Location', on_delete=models.PROTECT, null=True)
 
 
 class Person(Agent):
