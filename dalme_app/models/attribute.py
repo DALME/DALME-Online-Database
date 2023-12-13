@@ -10,7 +10,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import options
 
-from dalme_app.models.templates import dalmeUuid
+from ida.models.templates import dalmeUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

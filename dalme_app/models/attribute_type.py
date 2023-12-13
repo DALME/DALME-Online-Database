@@ -1,7 +1,7 @@
 """Model attribute type data."""
 from django.db import models
 
-from dalme_app.models.templates import dalmeIntid
+from ida.models.templates import dalmeIntid
 
 
 class AttributeType(dalmeIntid):

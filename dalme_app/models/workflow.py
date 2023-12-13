@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import options
 
-from ida.models import ScopedBase
+from .scoped import ScopedBase
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

@@ -10,8 +10,9 @@ from django.db.models import options
 from django.urls import reverse
 from django.utils import timezone
 
-from dalme_app.models.templates import dalmeIntid, dalmeOwned
-from ida.models import ScopedBase
+from ida.models.templates import dalmeIntid, dalmeOwned
+
+from .scoped import ScopedBase
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
