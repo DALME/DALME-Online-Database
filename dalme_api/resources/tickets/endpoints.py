@@ -9,7 +9,7 @@ from django.utils import timezone
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from dalme_api.filters import TicketFilter
-from dalme_app.models import Ticket
+from ida.models import Ticket
 
 from .serializers import TicketSerializer
 

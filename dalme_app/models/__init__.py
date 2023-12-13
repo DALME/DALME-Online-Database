@@ -1,5 +1,4 @@
 """Interface for the dalme_app.models module."""
-from .attachment import Attachment
 from .attribute import (
     Attribute,
     AttributeValueBool,
@@ -12,8 +11,6 @@ from .attribute import (
     AttributeValueTxt,
 )
 from .attribute_type import AttributeType
-from .collection import Collection, CollectionMembership
-from .comment import Comment
 from .content import ContentAttributes, ContentTypeExtended
 from .entity_phrase import EntityPhrase
 from .location import Location
@@ -42,13 +39,16 @@ from .resourcespace import (
     rs_user,
 )
 from .rights_policy import RightsPolicy
-from .saved_search import SavedSearch
 from .scope import Scope, ScopeType
 from .scoped import ScopedBase
-from .tag import Tag
-from .task import Task, TaskList
-from .ticket import Ticket
-from .workflow import Workflow, WorkLog
+
+from .attachment import Attachment  # isort: skip
+from .comment import Comment  # isort: skip
+from .collection import Collection, CollectionMembership  # isort: skip
+from .saved_search import SavedSearch  # isort: skip
+from .tag import Tag  # isort: skip
+from .task import Task, TaskList  # isort: skip
+from .workflow import Workflow, WorkLog  # isort: skip
 
 __all__ = [
     'Attachment',
@@ -93,7 +93,6 @@ __all__ = [
     'Tag',
     'Task',
     'TaskList',
-    'Ticket',
     'WorkLog',
     'Workflow',
     'rs_api_query',

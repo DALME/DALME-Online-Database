@@ -10,7 +10,8 @@ from dalme_api.resources.attachments import AttachmentSerializer
 from dalme_api.resources.comments import CommentSerializer
 from dalme_api.resources.tags import TagSerializer
 from dalme_api.resources.users import UserSerializer
-from dalme_app.models import Attachment, Tag, Ticket
+from dalme_app.models import Attachment, Tag
+from ida.models import Ticket
 
 
 class TicketSerializer(serializers.ModelSerializer):

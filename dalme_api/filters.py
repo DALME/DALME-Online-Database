@@ -4,7 +4,8 @@ from django_filters import rest_framework as filters
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-from dalme_app.models import Collection, ContentTypeExtended, Record, RightsPolicy, Task, TaskList, Ticket
+from dalme_app.models import Collection, ContentTypeExtended, Record, RightsPolicy, Task, TaskList
+from ida.models import Ticket
 
 
 class ContentTypeFilter(filters.FilterSet):
