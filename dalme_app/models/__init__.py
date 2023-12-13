@@ -47,6 +47,7 @@ from .resourcespace import (
 from .rights_policy import RightsPolicy
 from .saved_search import SavedSearch
 from .scope import Scope, ScopeType
+from .scoped import ScopedBase
 from .tag import Tag
 from .task import Task, TaskList
 from .ticket import Ticket
@@ -99,6 +100,7 @@ __all__ = [
     'SavedSearch',
     'Scope',
     'ScopeType',
+    'ScopedBase',
     'Tag',
     'Task',
     'TaskList',

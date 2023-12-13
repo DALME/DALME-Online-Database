@@ -4,7 +4,7 @@ from django_tenants.models import DomainMixin, TenantMixin
 from django.conf import settings
 from django.db import models
 
-from dalme_app.models.templates import dalmeIntid
+from ida.models.templates import dalmeIntid
 
 
 class Tenant(dalmeIntid, TenantMixin):

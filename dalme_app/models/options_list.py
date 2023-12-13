@@ -2,7 +2,7 @@
 from django.db import models
 from django.db.models import options
 
-from dalme_app.models.templates import dalmeIntid
+from ida.models.templates import dalmeIntid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

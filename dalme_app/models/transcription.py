@@ -4,7 +4,7 @@ import lxml.etree as et
 from django.db import models
 from django.db.models import options
 
-from dalme_app.models.templates import dalmeUuid, get_current_username
+from ida.models.templates import dalmeUuid, get_current_username
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
