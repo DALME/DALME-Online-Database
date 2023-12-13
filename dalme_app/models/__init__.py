@@ -14,7 +14,6 @@ from .attribute import (
 from .attribute_type import AttributeType
 from .collection import Collection, CollectionMembership
 from .comment import Comment
-from .concept import Concept
 from .content import ContentAttributes, ContentTypeExtended
 from .entity_phrase import EntityPhrase
 from .headword import Headword
@@ -71,7 +70,6 @@ __all__ = [
     'Collection',
     'CollectionMembership',
     'Comment',
-    'Concept',
     'ContentAttributes',
     'ContentTypeExtended',
     'CountryReference',
