@@ -10,4 +10,4 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 class Concept(dalmeUuid):
     getty_id = models.IntegerField(db_index=True)
-    tags = GenericRelation('Tag')
+    tags = GenericRelation('dalme_app.Tag')

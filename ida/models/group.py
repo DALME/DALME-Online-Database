@@ -7,10 +7,11 @@ class GroupProperties(models.Model):
 
     Accomodates additional group related data, including group types.
 
-    We optionally scope this table to the Tenant because in some cases that
-    certainly makes sense, but in other it doesn't (eg. developers). So any
-    filtering must take care to correctly scope group querysets depending on
-    whatever context they are in.
+    We allow the optional scoping of rows on this table to some Tenant because
+    in some cases, for certain groups, that certainly makes sense. But in
+    others it doesn't (for example a 'developers' group). So, any filtering
+    that happens must take care to correctly scope group querysets depending on
+    whatever context it's in.
 
     """
 
