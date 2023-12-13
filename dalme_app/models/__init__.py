@@ -48,7 +48,6 @@ from .scoped import ScopedBase
 from .tag import Tag
 from .task import Task, TaskList
 from .ticket import Ticket
-from .token import Token
 from .workflow import Workflow, WorkLog
 
 __all__ = [
@@ -95,7 +94,6 @@ __all__ = [
     'Task',
     'TaskList',
     'Ticket',
-    'Token',
     'WorkLog',
     'Workflow',
     'rs_api_query',
