@@ -47,7 +47,7 @@ class Relationship(dalmeUuid):
     )
     target_object_id = models.CharField(max_length=36, db_index=True)
     rel_type = models.ForeignKey(
-        'RelationshipType',
+        'ida.RelationshipType',
         db_index=True,
         on_delete=models.CASCADE,
         db_column='rel_type',
