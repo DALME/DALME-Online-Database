@@ -28,7 +28,7 @@ class Collection(ScopedBase, dalmeUuid, dalmeOwned):
     )
     attributes = GenericRelation('Attribute', related_query_name='collection')
     permissions = GenericRelation('Permission', related_query_name='collection')
-    comments = GenericRelation('Comment')
+    comments = GenericRelation('dalme_app.Comment')
 
     def __str__(self):
         return self.name
@@ -97,7 +97,7 @@ class Collection(ScopedBase, dalmeUuid, dalmeOwned):
 class CollectionMembership(ScopedBase, dalmeBasic):
     """Links collections and members."""
 
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='members')
+    collection = models.ForeignKey('dalme_app.Collection', on_delete=models.CASCADE, related_name='members')
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=36, db_index=True)

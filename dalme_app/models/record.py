@@ -23,8 +23,8 @@ class RecordGroup(dalmeUuid, dalmeOwned):
     attributes = GenericRelation('Attribute', related_query_name='record_group')
     children = GenericRelation('Record', related_query_name='record_group')
     permissions = GenericRelation('Permission', related_query_name='record_group')
-    tags = GenericRelation('Tag')
-    comments = GenericRelation('Comment')
+    tags = GenericRelation('dalme_app.Tag')
+    comments = GenericRelation('dalme_app.Comment')
 
     @property
     def comment_count(self):
@@ -54,17 +54,17 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     parent_id = models.CharField(max_length=36, db_index=True, null=True)
     attributes = GenericRelation('Attribute', related_query_name='record')
     pages = models.ManyToManyField('Page', db_index=True, through='Folio')
-    tags = GenericRelation('Tag')
-    comments = GenericRelation('Comment')
-    collections = GenericRelation('CollectionMembership', related_query_name='record')
+    tags = GenericRelation('dalme_app.Tag')
+    comments = GenericRelation('dalme_app.Comment')
+    collections = GenericRelation('dalme_app.CollectionMembership', related_query_name='record')
     permissions = GenericRelation('Permission', related_query_name='record')
     relationships_as_source = GenericRelation(
-        'Relationship',
+        'ida.Relationship',
         content_type_field='source_content_type',
         object_id_field='source_object_id',
     )
     relationships_as_target = GenericRelation(
-        'Relationship',
+        'ida.Relationship',
         content_type_field='target_content_type',
         object_id_field='target_object_id',
     )

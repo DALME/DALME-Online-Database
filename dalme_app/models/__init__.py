@@ -28,7 +28,6 @@ from .reference import (
     LanguageReference,
     LocaleReference,
 )
-from .relationship import Relationship
 from .resourcespace import (
     rs_api_query,
     rs_collection,
