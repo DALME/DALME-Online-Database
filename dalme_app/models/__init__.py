@@ -16,7 +16,6 @@ from .collection import Collection, CollectionMembership
 from .comment import Comment
 from .content import ContentAttributes, ContentTypeExtended
 from .entity_phrase import EntityPhrase
-from .headword import Headword
 from .location import Location
 from .object import Object, ObjectAttribute
 from .options_list import OptionsList
@@ -75,7 +74,6 @@ __all__ = [
     'CountryReference',
     'EntityPhrase',
     'Folio',
-    'Headword',
     'LanguageReference',
     'LocaleReference',
     'Location',

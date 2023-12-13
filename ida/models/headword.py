@@ -14,7 +14,7 @@ class Headword(dalmeUuid):
     word = models.CharField(max_length=55)
     full_lemma = models.CharField(max_length=255)
     concept_id = models.ForeignKey('ida.Concept', to_field='id', db_index=True, on_delete=models.PROTECT)
-    tags = GenericRelation('Tag')
+    tags = GenericRelation('dalme_app.Tag')
 
     def __str__(self):
         return self.word

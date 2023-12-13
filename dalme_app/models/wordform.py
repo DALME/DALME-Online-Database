@@ -13,7 +13,7 @@ class Wordform(dalmeUuid):
 
     normalized_form = models.CharField(max_length=55)
     pos = models.CharField(max_length=255)
-    headword_id = models.ForeignKey('Headword', to_field='id', db_index=True, on_delete=models.PROTECT)
+    headword_id = models.ForeignKey('ida.Headword', to_field='id', db_index=True, on_delete=models.PROTECT)
     tags = GenericRelation('Tag')
 
     def __str__(self):
