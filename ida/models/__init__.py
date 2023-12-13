@@ -4,6 +4,7 @@ from .concept import Concept
 from .group import GroupProperties
 from .headword import Headword
 from .tenant import Domain, Tenant
+from .token import Token
 from .transcription import Transcription
 from .user import User
 from .wordform import Wordform
@@ -17,6 +18,7 @@ __all__ = [
     'Organization',
     'Person',
     'Tenant',
+    'Token',
     'Transcription',
     'User',
     'Wordform',
