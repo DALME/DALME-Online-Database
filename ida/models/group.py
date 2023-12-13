@@ -27,7 +27,7 @@ class GroupProperties(models.Model):
         (WEBSITE, 'Website'),
     )
 
-    # tenant = models.ForeignKey('ida.Tenant', on_delete=models.PROTECT, null=True)
+    tenant = models.ForeignKey('ida.Tenant', on_delete=models.PROTECT, null=True)
     group = models.OneToOneField('auth.Group', on_delete=models.CASCADE, related_name='properties')
     group_type = models.IntegerField(choices=GROUP_TYPES)
     description = models.CharField(max_length=255)
