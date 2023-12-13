@@ -53,5 +53,5 @@ class Relationship(dalmeUuid):
         db_column='rel_type',
         related_name='relationships',
     )
-    scopes = models.ManyToManyField('Scope', db_index=True)
+    scopes = models.ManyToManyField('ida.Scope', db_index=True)
     notes = models.TextField(blank=True)
