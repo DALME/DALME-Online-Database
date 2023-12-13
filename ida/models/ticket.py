@@ -23,10 +23,10 @@ class Ticket(dalmeIntid):
     subject = models.CharField(max_length=140)
     description = models.TextField(blank=True)
     status = models.IntegerField(choices=STATUS, default=0)
-    tags = GenericRelation('Tag')
+    tags = GenericRelation('dalme_app.Tag')
     url = models.CharField(max_length=255, blank=True)
-    files = models.ManyToManyField('Attachment', blank=True, related_name='tickets')
-    comments = GenericRelation('Comment')
+    files = models.ManyToManyField('dalme_app.Attachment', blank=True, related_name='tickets')
+    comments = GenericRelation('dalme_app.Comment')
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         blank=True,
