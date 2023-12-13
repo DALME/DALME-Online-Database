@@ -37,15 +37,6 @@ def get_default_preferences(camelize=True):
 class User(AbstractUser):
     """Override the default User model."""
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name='groups',
-        blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-        related_name='user_set',
-        related_query_name='user',
-    )
-
     def save(self, *args, **kwargs):
         """Override the save method to populate additional user data.
 
