@@ -1,5 +1,4 @@
 """Interface for the dalme_app.models module."""
-from .agent import Agent, Organization, Person
 from .attachment import Attachment
 from .attribute import (
     Attribute,
@@ -57,7 +56,6 @@ from .wordform import Wordform
 from .workflow import Workflow, WorkLog
 
 __all__ = [
-    'Agent',
     'Attachment',
     'Attribute',
     'AttributeReference',
@@ -86,10 +84,8 @@ __all__ = [
     'Object',
     'ObjectAttribute',
     'OptionsList',
-    'Organization',
     'Page',
     'Permission',
-    'Person',
     'Place',
     'PublicRegister',
     'Publication',

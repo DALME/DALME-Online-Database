@@ -3,7 +3,7 @@ from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 from dalme_api.dynamic_serializer import DynamicSerializer
 from dalme_api.resources.users import UserSerializer
-from dalme_app.models import Agent
+from ida.models import Agent
 
 
 class AgentSerializer(DynamicSerializer, WritableNestedModelSerializer):

@@ -1,7 +1,7 @@
 """API endpoint for managing agents."""
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_app.models import Agent
+from ida.models import Agent
 
 from .serializers import AgentSerializer
 
