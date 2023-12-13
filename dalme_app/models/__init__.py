@@ -50,7 +50,6 @@ from .task import Task, TaskList
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
-from .wordform import Wordform
 from .workflow import Workflow, WorkLog
 
 __all__ = [
@@ -99,7 +98,6 @@ __all__ = [
     'Ticket',
     'Token',
     'Transcription',
-    'Wordform',
     'WorkLog',
     'Workflow',
     'rs_api_query',

@@ -5,6 +5,7 @@ from .group import GroupProperties
 from .headword import Headword
 from .tenant import Domain, Tenant
 from .user import User
+from .wordform import Wordform
 
 __all__ = [
     'Agent',
@@ -16,4 +17,5 @@ __all__ = [
     'Person',
     'Tenant',
     'User',
+    'Wordform',
 ]
