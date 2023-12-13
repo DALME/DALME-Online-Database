@@ -38,7 +38,6 @@ from .resourcespace import (
     rs_resource_type_field,
     rs_user,
 )
-from .rights_policy import RightsPolicy
 
 from .attachment import Attachment  # isort: skip
 from .comment import Comment  # isort: skip

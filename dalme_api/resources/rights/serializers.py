@@ -4,7 +4,7 @@ from rest_framework import serializers
 from dalme_api.dynamic_serializer import DynamicSerializer
 from dalme_api.resources.attachments import AttachmentSerializer
 from dalme_api.resources.users import UserSerializer
-from dalme_app.models import RightsPolicy
+from ida.models import RightsPolicy
 
 
 class RightsPolicySerializer(DynamicSerializer):
