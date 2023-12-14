@@ -4,6 +4,7 @@ from .concept import Concept
 from .group import GroupProperties
 from .headword import Headword
 from .place import Place
+from .public_register import PublicRegister
 from .publication import Publication
 from .relationship import Relationship
 from .rights_policy import RightsPolicy
@@ -24,6 +25,7 @@ __all__ = [
     'Organization',
     'Person',
     'Place',
+    'PublicRegister',
     'Publication',
     'Relationship',
     'RightsPolicy',

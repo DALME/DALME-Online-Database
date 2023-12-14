@@ -6,9 +6,10 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
 
+from ida.models import PublicRegister
+
 from .models import (
     Page,
-    PublicRegister,
     Record,
     Workflow,
     WorkLog,
@@ -28,7 +29,7 @@ def page_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
 @receiver(models.signals.post_save, sender=Record)
 def source_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
     """Run after save method on Record objects."""
-    # create workflow record if this is a new source
+    # Create workflow record if this is a new source.
     if created:
         wf = Workflow(
             source=instance,
@@ -36,14 +37,17 @@ def source_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
             last_user=get_current_user(),
         )
         wf.save()
-    # create or delete public registration
+
+    # Create or delete public registration.
     public = instance.workflow.is_public
     registration = PublicRegister.objects.filter(object_id=instance.id)
+
     if public and not registration.exists():
         PublicRegister.objects.create(
             object_id=instance.id,
             content_type=ContentType.objects.get_for_model(instance),
         )
+
     if not public and registration.exists():
         registration.first().delete()
 
