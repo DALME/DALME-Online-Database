@@ -12,11 +12,11 @@ class Place(dalmeUuid):
     """Stores place information."""
 
     name = models.CharField(max_length=255)
-    attributes = GenericRelation('Attribute')
-    instances = GenericRelation('EntityPhrase')
-    location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
-    comments = GenericRelation('Comment')
-    tags = GenericRelation('Tag')
+    attributes = GenericRelation('dalme_app.Attribute')
+    instances = GenericRelation('dalme_app.EntityPhrase')
+    location = models.ForeignKey('dalme_app.Location', on_delete=models.SET_NULL, null=True)
+    comments = GenericRelation('dalme_app.Comment')
+    tags = GenericRelation('dalme_app.Tag')
 
     @property
     def comment_count(self):

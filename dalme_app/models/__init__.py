@@ -18,7 +18,6 @@ from .object import Object, ObjectAttribute
 from .options_list import OptionsList
 from .page import Page
 from .permission import Permission
-from .place import Place
 from .public_register import PublicRegister
 from .record import Folio, Record, RecordGroup
 from .reference import (
@@ -75,7 +74,6 @@ __all__ = [
     'OptionsList',
     'Page',
     'Permission',
-    'Place',
     'PublicRegister',
     'Record',
     'RecordGroup',
