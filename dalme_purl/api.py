@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
-from dalme_app.models import PublicRegister
+from ida.models import PublicRegister
 
 
 class Endpoint(viewsets.GenericViewSet):
