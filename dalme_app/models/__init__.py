@@ -20,7 +20,6 @@ from .page import Page
 from .permission import Permission
 from .place import Place
 from .public_register import PublicRegister
-from .publication import Publication
 from .record import Folio, Record, RecordGroup
 from .reference import (
     AttributeReference,
@@ -78,10 +77,8 @@ __all__ = [
     'Permission',
     'Place',
     'PublicRegister',
-    'Publication',
     'Record',
     'RecordGroup',
-    'Relationship',
     'RightsPolicy',
     'SavedSearch',
     'ScopedBase',
