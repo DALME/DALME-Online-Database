@@ -3,6 +3,7 @@ from .agent import Agent, Organization, Person
 from .concept import Concept
 from .group import GroupProperties
 from .headword import Headword
+from .publication import Publication
 from .relationship import Relationship
 from .rights_policy import RightsPolicy
 from .scope import Scope, ScopeType
@@ -21,6 +22,7 @@ __all__ = [
     'Headword',
     'Organization',
     'Person',
+    'Publication',
     'Relationship',
     'RightsPolicy',
     'Scope',

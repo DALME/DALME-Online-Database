@@ -13,7 +13,7 @@ class Publication(dalmeUuid):
 
     name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=55)
-    attributes = GenericRelation('Attribute', related_query_name='publications')
-    permissions = GenericRelation('Permission', related_query_name='publication')
-    tags = GenericRelation('Tag')
-    comments = GenericRelation('Comment')
+    attributes = GenericRelation('dalme_app.Attribute', related_query_name='publications')
+    permissions = GenericRelation('dalme_app.Permission', related_query_name='publication')
+    tags = GenericRelation('dalme_app.Tag')
+    comments = GenericRelation('dalme_app.Comment')
