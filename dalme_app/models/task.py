@@ -85,7 +85,7 @@ class TaskList(ScopedBase, dalmeIntid, dalmeOwned):
         limit_choices_to={'properties__type': 3},
         null=True,
     )
-    permissions = GenericRelation('Permission', related_query_name='tasklist')
+    permissions = GenericRelation('ida.Permission', related_query_name='tasklist')
 
     class Meta:
         ordering = ['name']

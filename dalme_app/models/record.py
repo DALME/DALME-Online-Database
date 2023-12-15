@@ -22,7 +22,7 @@ class RecordGroup(dalmeUuid, dalmeOwned):
     parent_id = models.CharField(max_length=36, db_index=True, null=True)
     attributes = GenericRelation('Attribute', related_query_name='record_group')
     children = GenericRelation('Record', related_query_name='record_group')
-    permissions = GenericRelation('Permission', related_query_name='record_group')
+    permissions = GenericRelation('ida.Permission', related_query_name='record_group')
     tags = GenericRelation('dalme_app.Tag')
     comments = GenericRelation('dalme_app.Comment')
 
@@ -57,7 +57,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     tags = GenericRelation('dalme_app.Tag')
     comments = GenericRelation('dalme_app.Comment')
     collections = GenericRelation('dalme_app.CollectionMembership', related_query_name='record')
-    permissions = GenericRelation('Permission', related_query_name='record')
+    permissions = GenericRelation('ida.Permission', related_query_name='record')
     relationships_as_source = GenericRelation(
         'ida.Relationship',
         content_type_field='source_content_type',

@@ -7,7 +7,7 @@ from rest_access_policy import AccessPolicy, AccessPolicyException
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 
-from dalme_app.models import Permission
+from ida.models import Permission
 
 
 class BaseAccessPolicy(AccessPolicy):
