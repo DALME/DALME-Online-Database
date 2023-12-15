@@ -21,7 +21,7 @@ class Page(dalmeUuid):
     dam_id = models.IntegerField(db_index=True, null=True)
     order = models.IntegerField(db_index=True)
     canvas = models.TextField(blank=True)
-    tags = GenericRelation('Tag')
+    tags = GenericRelation('dalme_app.Tag')
 
     class Meta:
         ordering = ['order']

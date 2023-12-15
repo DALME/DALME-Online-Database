@@ -53,7 +53,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     parent_id = models.CharField(max_length=36, db_index=True, null=True)
     attributes = GenericRelation('Attribute', related_query_name='record')
-    pages = models.ManyToManyField('Page', db_index=True, through='Folio')
+    pages = models.ManyToManyField('ida.Page', db_index=True, through='Folio')
     tags = GenericRelation('dalme_app.Tag')
     comments = GenericRelation('dalme_app.Comment')
     collections = GenericRelation('dalme_app.CollectionMembership', related_query_name='record')
@@ -206,7 +206,7 @@ class Folio(dalmeIntid):
         related_name='folios',
     )
     page = models.ForeignKey(
-        'Page',
+        'ida.Page',
         to_field='id',
         db_index=True,
         on_delete=models.CASCADE,

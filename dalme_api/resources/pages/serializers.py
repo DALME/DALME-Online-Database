@@ -1,6 +1,6 @@
 """Serializers for page data."""
 from dalme_api.dynamic_serializer import DynamicSerializer
-from dalme_app.models import Page
+from ida.models import Page
 
 
 class PageSerializer(DynamicSerializer):

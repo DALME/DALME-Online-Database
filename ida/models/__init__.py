@@ -3,6 +3,7 @@ from .agent import Agent, Organization, Person
 from .concept import Concept
 from .group import GroupProperties
 from .headword import Headword
+from .page import Page
 from .permission import Permission
 from .place import Place
 from .public_register import PublicRegister
@@ -24,6 +25,7 @@ __all__ = [
     'GroupProperties',
     'Headword',
     'Organization',
+    'Page',
     'Permission',
     'Person',
     'Place',
