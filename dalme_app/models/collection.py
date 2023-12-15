@@ -27,7 +27,7 @@ class Collection(ScopedBase, dalmeUuid, dalmeOwned):
         null=True,
     )
     attributes = GenericRelation('Attribute', related_query_name='collection')
-    permissions = GenericRelation('Permission', related_query_name='collection')
+    permissions = GenericRelation('ida.Permission', related_query_name='collection')
     comments = GenericRelation('dalme_app.Comment')
 
     def __str__(self):

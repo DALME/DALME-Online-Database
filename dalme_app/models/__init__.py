@@ -17,7 +17,6 @@ from .location import Location
 from .object import Object, ObjectAttribute
 from .options_list import OptionsList
 from .page import Page
-from .permission import Permission
 from .record import Folio, Record, RecordGroup
 from .reference import (
     AttributeReference,
