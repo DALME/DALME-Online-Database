@@ -5,7 +5,16 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
 
-from .models import Folio, Transcription
+from .models import Folio, Page, Transcription, rs_resource
+
+
+@receiver(models.signals.post_save, sender=Page)
+def page_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
+    """Run after save method on Page objects."""
+    if instance.dam_id is not None:
+        rs_image = rs_resource.objects.get(ref=instance.dam_id)
+        rs_image.field79 = instance.name
+        rs_image.save()
 
 
 @receiver(models.signals.post_save, sender=Transcription)

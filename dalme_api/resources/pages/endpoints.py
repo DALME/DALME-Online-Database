@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from dalme_api.access_policies import BaseAccessPolicy, RecordAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_app.models import Page
+from ida.models import Page
 
 from .serializers import PageSerializer
 
