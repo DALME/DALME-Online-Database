@@ -1,6 +1,6 @@
 """Serializers for language data."""
 from dalme_api.dynamic_serializer import DynamicSerializer
-from dalme_app.models import LanguageReference
+from ida.models import LanguageReference
 
 
 class LanguageReferenceSerializer(DynamicSerializer):

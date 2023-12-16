@@ -12,12 +12,6 @@ from .attribute import (
 )
 from .attribute_type import AttributeType
 from .record import Folio, Record, RecordGroup
-from .reference import (
-    AttributeReference,
-    CountryReference,
-    LanguageReference,
-    LocaleReference,
-)
 from .resourcespace import (
     rs_api_query,
     rs_collection,
@@ -40,7 +34,6 @@ from .workflow import Workflow, WorkLog  # isort: skip
 __all__ = [
     'Attachment',
     'Attribute',
-    'AttributeReference',
     'AttributeType',
     'AttributeValueBool',
     'AttributeValueDate',
@@ -53,10 +46,7 @@ __all__ = [
     'Collection',
     'CollectionMembership',
     'Comment',
-    'CountryReference',
     'Folio',
-    'LanguageReference',
-    'LocaleReference',
     'Location',
     'Object',
     'ObjectAttribute',

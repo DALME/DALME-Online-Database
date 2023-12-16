@@ -1,7 +1,7 @@
 """API endpoint for managing locales."""
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_app.models import LocaleReference
+from ida.models import LocaleReference
 
 from .serializers import LocaleReferenceSerializer
 
