@@ -15,7 +15,6 @@ from .content import ContentAttributes, ContentTypeExtended
 from .entity_phrase import EntityPhrase
 from .location import Location
 from .object import Object, ObjectAttribute
-from .options_list import OptionsList
 from .record import Folio, Record, RecordGroup
 from .reference import (
     AttributeReference,
@@ -68,7 +67,6 @@ __all__ = [
     'Location',
     'Object',
     'ObjectAttribute',
-    'OptionsList',
     'Permission',
     'Record',
     'RecordGroup',
