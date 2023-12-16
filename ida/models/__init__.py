@@ -13,6 +13,12 @@ from .permission import Permission
 from .place import Place
 from .public_register import PublicRegister
 from .publication import Publication
+from .reference import (
+    AttributeReference,
+    CountryReference,
+    LanguageReference,
+    LocaleReference,
+)
 from .relationship import Relationship
 from .rights_policy import RightsPolicy
 from .scope import Scope, ScopeType
@@ -25,13 +31,17 @@ from .wordform import Wordform
 
 __all__ = [
     'Agent',
+    'AttributeReference',
     'Concept',
     'ContentAttributes',
     'ContentTypeExtended',
+    'CountryReference',
     'Domain',
     'EntityPhrase',
     'GroupProperties',
     'Headword',
+    'LanguageReference',
+    'LocaleReference',
     'Location',
     'Object',
     'ObjectAttribute',

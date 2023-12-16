@@ -6,7 +6,7 @@ import django_filters
 
 from django.db.models import OuterRef, Q, Subquery
 
-from dalme_app.models import Attribute, LocaleReference, Record
+from dalme_app.models import Attribute, Record
 from dalme_public import forms
 from dalme_public.models import (
     Collection,
@@ -15,6 +15,7 @@ from dalme_public.models import (
     FeaturedInventory,
     FeaturedObject,
 )
+from ida.models import LocaleReference
 
 BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 

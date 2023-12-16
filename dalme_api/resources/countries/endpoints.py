@@ -1,7 +1,7 @@
 """API endpoint for managing countries."""
 from dalme_api.access_policies import GeneralAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_app.models import CountryReference
+from ida.models import CountryReference
 
 from .serializers import CountryReferenceSerializer
 

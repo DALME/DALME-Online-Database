@@ -1,6 +1,6 @@
 """Serializers for country data."""
 from dalme_api.dynamic_serializer import DynamicSerializer
-from dalme_app.models import CountryReference
+from ida.models import CountryReference
 
 
 class CountryReferenceSerializer(DynamicSerializer):

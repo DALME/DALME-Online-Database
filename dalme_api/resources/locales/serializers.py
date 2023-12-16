@@ -1,7 +1,7 @@
 """Serializers for locale data."""
 from dalme_api.dynamic_serializer import DynamicSerializer
 from dalme_api.resources.countries import CountryReferenceSerializer
-from dalme_app.models import LocaleReference
+from ida.models import LocaleReference
 
 
 class LocaleReferenceSerializer(DynamicSerializer):
