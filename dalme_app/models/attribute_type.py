@@ -26,7 +26,7 @@ class AttributeType(dalmeIntid):
     is_local = models.BooleanField(default=False)
     source = models.CharField(max_length=255, blank=True)
     same_as = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    options = models.ForeignKey('OptionsList', on_delete=models.SET_NULL, null=True)
+    options = models.ForeignKey('ida.OptionsList', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         ordering = ['id']

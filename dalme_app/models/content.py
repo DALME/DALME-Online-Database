@@ -48,7 +48,7 @@ class ContentAttributes(dalmeIntid):
     is_unique = models.BooleanField(default=True)
     override_label = models.CharField(max_length=255, blank=True)
     override_description = models.TextField(blank=True)
-    override_options = models.ForeignKey('OptionsList', on_delete=models.SET_NULL, null=True)
+    override_options = models.ForeignKey('ida.OptionsList', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         unique_together = ('content_type', 'attribute_type')
