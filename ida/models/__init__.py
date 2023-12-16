@@ -5,6 +5,7 @@ from .entity_phrase import EntityPhrase
 from .group import GroupProperties
 from .headword import Headword
 from .location import Location
+from .object import Object, ObjectAttribute
 from .options_list import OptionsList
 from .page import Page
 from .permission import Permission
@@ -29,6 +30,8 @@ __all__ = [
     'GroupProperties',
     'Headword',
     'Location',
+    'Object',
+    'ObjectAttribute',
     'OptionsList',
     'Organization',
     'Page',

@@ -19,5 +19,5 @@ class Object(dalmeUuid):
 class ObjectAttribute(dalmeUuid):
     """Stores attribute concepts for objects."""
 
-    obj = models.ForeignKey('Object', db_index=True, on_delete=models.CASCADE)
+    obj = models.ForeignKey('ida.Object', db_index=True, on_delete=models.CASCADE)
     attribute_concept = models.ForeignKey('ida.Concept', db_index=True, on_delete=models.CASCADE)
