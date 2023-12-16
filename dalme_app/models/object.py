@@ -12,8 +12,8 @@ class Object(dalmeUuid):
     """Stores object information."""
 
     concept = models.ForeignKey('ida.Concept', db_index=True, on_delete=models.CASCADE)
-    instances = GenericRelation('EntityPhrase')
-    tags = GenericRelation('Tag')
+    instances = GenericRelation('ida.EntityPhrase')
+    tags = GenericRelation('dalme_app.Tag')
 
 
 class ObjectAttribute(dalmeUuid):

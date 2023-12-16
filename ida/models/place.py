@@ -13,7 +13,7 @@ class Place(dalmeUuid):
 
     name = models.CharField(max_length=255)
     attributes = GenericRelation('dalme_app.Attribute')
-    instances = GenericRelation('dalme_app.EntityPhrase')
+    instances = GenericRelation('ida.EntityPhrase')
     location = models.ForeignKey('ida.Location', on_delete=models.SET_NULL, null=True)
     comments = GenericRelation('dalme_app.Comment')
     tags = GenericRelation('dalme_app.Tag')
