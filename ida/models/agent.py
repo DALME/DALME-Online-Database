@@ -31,7 +31,7 @@ class Organization(Agent):
     """Stores information about organizations."""
 
     short_name = models.CharField(max_length=55)
-    location = models.ForeignKey('dalme_app.Location', on_delete=models.PROTECT, null=True)
+    location = models.ForeignKey('ida.Location', on_delete=models.PROTECT, null=True)
 
 
 class Person(Agent):

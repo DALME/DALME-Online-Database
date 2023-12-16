@@ -13,7 +13,6 @@ from .attribute import (
 from .attribute_type import AttributeType
 from .content import ContentAttributes, ContentTypeExtended
 from .entity_phrase import EntityPhrase
-from .location import Location
 from .object import Object, ObjectAttribute
 from .record import Folio, Record, RecordGroup
 from .reference import (

@@ -23,9 +23,9 @@ class Location(dalmeUuid):
     )
 
     location_type = models.IntegerField(choices=LOCATION_TYPES)
-    attributes = GenericRelation('Attribute')
-    comments = GenericRelation('Comment')
-    tags = GenericRelation('Tag')
+    attributes = GenericRelation('dalme_app.Attribute')
+    comments = GenericRelation('dalme_app.Comment')
+    tags = GenericRelation('dalme_app.Tag')
 
     @property
     def comment_count(self):
