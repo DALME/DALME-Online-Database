@@ -11,7 +11,6 @@ from .attribute import (
     AttributeValueTxt,
 )
 from .attribute_type import AttributeType
-from .content import ContentAttributes, ContentTypeExtended
 from .record import Folio, Record, RecordGroup
 from .reference import (
     AttributeReference,
@@ -54,8 +53,6 @@ __all__ = [
     'Collection',
     'CollectionMembership',
     'Comment',
-    'ContentAttributes',
-    'ContentTypeExtended',
     'CountryReference',
     'Folio',
     'LanguageReference',
