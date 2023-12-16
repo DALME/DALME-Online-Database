@@ -1,7 +1,7 @@
 """API endpoint for managing locations."""
 from dalme_api.access_policies import GeneralAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_app.models import Location
+from ida.models import Location
 
 from .serializers import LocationSerializer
 

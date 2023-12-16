@@ -3,7 +3,7 @@ from dalme_api.dynamic_serializer import DynamicSerializer
 from dalme_api.resources.attributes import AttributeSerializer
 from dalme_api.resources.tags import TagSerializer
 from dalme_api.resources.users import UserSerializer
-from dalme_app.models import Location
+from ida.models import Location
 
 
 class LocationSerializer(DynamicSerializer):
