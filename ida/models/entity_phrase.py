@@ -22,4 +22,4 @@ class EntityPhrase(dalmeUuid):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.UUIDField(null=True, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
-    attributes = GenericRelation('Attribute')
+    attributes = GenericRelation('dalme_app.Attribute')

@@ -9,9 +9,7 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
 class Token(dalmeUuid):
-    object_phrase_id = models.ForeignKey(
-        'dalme_app.EntityPhrase', to_field='id', db_index=True, on_delete=models.CASCADE
-    )
+    object_phrase_id = models.ForeignKey('ida.EntityPhrase', to_field='id', db_index=True, on_delete=models.CASCADE)
     wordform_id = models.ForeignKey('ida.Wordform', to_field='id', db_index=True, on_delete=models.PROTECT)
     raw_token = models.CharField(max_length=255)
     clean_token = models.CharField(max_length=55)

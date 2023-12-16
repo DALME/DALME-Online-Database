@@ -22,7 +22,7 @@ class Agent(dalmeUuid):
     name = models.CharField(max_length=255)
     agent_type = models.IntegerField(choices=AGENT_TYPES)
     attributes = GenericRelation('dalme_app.Attribute')
-    instances = GenericRelation('dalme_app.EntityPhrase')
+    instances = GenericRelation('ida.EntityPhrase')
     comments = GenericRelation('dalme_app.Comment')
     tags = GenericRelation('dalme_app.Tag')
 
