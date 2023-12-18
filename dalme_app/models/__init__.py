@@ -10,7 +10,6 @@ from .attribute import (
     AttributeValueStr,
     AttributeValueTxt,
 )
-from .attribute_type import AttributeType
 from .record import Folio, Record, RecordGroup
 from .resourcespace import (
     rs_api_query,
@@ -34,7 +33,6 @@ from .workflow import Workflow, WorkLog  # isort: skip
 __all__ = [
     'Attachment',
     'Attribute',
-    'AttributeType',
     'AttributeValueBool',
     'AttributeValueDate',
     'AttributeValueDec',
