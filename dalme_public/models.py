@@ -31,7 +31,7 @@ from django.utils import timezone
 
 from dalme_app.forms import SearchForm
 from dalme_app.models import Collection as DalmeCollection
-from dalme_app.models import Record, SavedSearch
+from dalme_app.models import SavedSearch
 from dalme_app.utils import Search, SearchContext, formset_factory
 from dalme_public import forms
 from dalme_public.blocks import (
@@ -52,6 +52,7 @@ from dalme_public.blocks import (
     SubsectionEndMarkerBlock,
 )
 from dalme_public.serializers import PublicRecordSerializer
+from ida.models import Record
 
 # https://github.com/django/django/blob/3bc4240d979812bd11365ede04c028ea13fdc8c6/django/urls/converters.py#L26
 UUID_RE = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -624,7 +625,7 @@ class Bibliography(DALMEPage):
 class FeaturedObject(FeaturedPage):
     short_title = 'Object'
     source = models.ForeignKey(
-        'dalme_app.Record',
+        'ida.Record',
         related_name='featured_objects',
         on_delete=models.SET_NULL,
         null=True,
@@ -662,7 +663,7 @@ class FeaturedObject(FeaturedPage):
 class FeaturedInventory(FeaturedPage):
     short_title = 'Inventory'
     source = models.ForeignKey(
-        'dalme_app.Record',
+        'ida.Record',
         related_name='featured_inventories',
         on_delete=models.SET_NULL,
         null=True,
@@ -700,7 +701,7 @@ class FeaturedInventory(FeaturedPage):
 class Essay(FeaturedPage):
     short_title = 'Essay'
     source = models.ForeignKey(
-        'dalme_app.Record',
+        'ida.Record',
         related_name='essays',
         null=True,
         blank=True,

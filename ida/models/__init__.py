@@ -14,6 +14,7 @@ from .permission import Permission
 from .place import Place
 from .public_register import PublicRegister
 from .publication import Publication
+from .record import Folio, Record, RecordGroup
 from .reference import (
     AttributeReference,
     CountryReference,
@@ -40,6 +41,7 @@ __all__ = [
     'CountryReference',
     'Domain',
     'EntityPhrase',
+    'Folio',
     'GroupProperties',
     'Headword',
     'LanguageReference',
@@ -55,6 +57,8 @@ __all__ = [
     'Place',
     'PublicRegister',
     'Publication',
+    'Record',
+    'RecordGroup',
     'Relationship',
     'RightsPolicy',
     'Scope',

@@ -11,7 +11,6 @@ from elasticsearch_dsl.query import Q
 from django.conf import settings
 from django.utils.functional import cached_property
 
-from dalme_app.documents import *  # noqa: F403
 from dalme_app.documents import FullRecord, PublicRecord
 from dalme_app.forms import SearchForm
 from dalme_app.models import Attribute, Collection

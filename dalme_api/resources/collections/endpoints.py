@@ -8,7 +8,8 @@ from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from dalme_api.filters import CollectionFilter, RecordFilter
 from dalme_api.resources.records import RecordSerializer
-from dalme_app.models import Collection, CollectionMembership, Record
+from dalme_app.models import Collection, CollectionMembership
+from ida.models import Record
 
 from .serializers import CollectionSerializer
 

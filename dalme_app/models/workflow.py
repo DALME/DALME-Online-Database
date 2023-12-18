@@ -34,7 +34,7 @@ class Workflow(ScopedBase, models.Model):
         (PARSING, 'parsing'),
     )
 
-    record = models.OneToOneField('Record', on_delete=models.CASCADE, related_name='workflow', primary_key=True)
+    record = models.OneToOneField('ida.Record', on_delete=models.CASCADE, related_name='workflow', primary_key=True)
     wf_status = models.IntegerField(choices=WORKFLOW_STATUS, default=2)
     stage = models.IntegerField(choices=PROCESSING_STAGES, default=1)
     last_modified = models.DateTimeField(null=True, blank=True)
@@ -74,7 +74,7 @@ class WorkLog(ScopedBase, models.Model):
     """Model workflow log data."""
 
     id = models.AutoField(primary_key=True, unique=True, db_index=True)  # noqa: A003
-    record = models.ForeignKey('Workflow', db_index=True, on_delete=models.CASCADE, related_name='work_log')
+    record = models.ForeignKey('dalme_app.Workflow', db_index=True, on_delete=models.CASCADE, related_name='work_log')
     event = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE, default=get_current_user)

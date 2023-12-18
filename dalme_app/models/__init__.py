@@ -10,7 +10,6 @@ from .attribute import (
     AttributeValueStr,
     AttributeValueTxt,
 )
-from .record import Folio, Record, RecordGroup
 from .resourcespace import (
     rs_api_query,
     rs_collection,
@@ -44,13 +43,10 @@ __all__ = [
     'Collection',
     'CollectionMembership',
     'Comment',
-    'Folio',
     'Location',
     'Object',
     'ObjectAttribute',
     'Permission',
-    'Record',
-    'RecordGroup',
     'RightsPolicy',
     'SavedSearch',
     'ScopedBase',
