@@ -8,12 +8,12 @@ from django.core.paginator import InvalidPage
 from django.http import JsonResponse
 from django.views import View
 
-from dalme_app.models import rs_resource
 from dalme_app.utils import Search, SearchContext
 from dalme_public.filters import RecordFilter, _map_record_types, locale_choices
 from dalme_public.models import Collection, Corpus
 from dalme_public.serializers import PublicRecordSerializer
 from ida.models import Record
+from ida.models.resourcespace import rs_resource
 
 
 class DALMEPagination(pagination.PageNumberPagination):

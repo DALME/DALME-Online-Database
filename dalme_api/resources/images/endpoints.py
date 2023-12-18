@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_app.models import rs_api_query, rs_resource
+from ida.models.resourcespace import rs_api_query, rs_resource
 
 from .serializers import RSImageSerializer
 

@@ -96,7 +96,7 @@ class rs_resource(models.Model):  # noqa: N801
     field51 = models.CharField(max_length=200, blank=True, default=None)
     field79 = models.CharField(max_length=200, blank=True, default=None)
     modified = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    collections = models.ManyToManyField('rs_collection', through='rs_collection_resource')
+    collections = models.ManyToManyField('ida.rs_collection', through='ida.rs_collection_resource')
 
     class Meta:
         managed = False
@@ -121,14 +121,14 @@ class rs_resource(models.Model):  # noqa: N801
 class rs_resource_data(models.Model):  # noqa: N801
     django_id = models.IntegerField(primary_key=True, db_column='django_id')
     resource = models.ForeignKey(
-        'rs_resource',
+        'ida.rs_resource',
         db_column='resource',
         to_field='ref',
         on_delete=models.CASCADE,
         related_name='resource_data',
     )
     resource_type_field = models.ForeignKey(
-        'rs_resource_type_field',
+        'ida.rs_resource_type_field',
         db_column='resource_type_field',
         to_field='ref',
         on_delete=models.CASCADE,
@@ -193,14 +193,14 @@ class rs_collection_resource(models.Model):  # noqa: N801
     """Django model representation of existing RS table."""
 
     collection = models.ForeignKey(
-        'rs_collection',
+        'ida.rs_collection',
         db_column='collection',
         to_field='ref',
         on_delete=models.CASCADE,
         related_name='resources_list',
     )
     resource = models.ForeignKey(
-        'rs_resource',
+        'ida.rs_resource',
         db_column='resource',
         to_field='ref',
         on_delete=models.CASCADE,
