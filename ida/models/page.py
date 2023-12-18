@@ -8,7 +8,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from dalme_app.models.resourcespace import rs_api_query
+from ida.models.resourcespace import rs_api_query
 from ida.models.templates import dalmeUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')

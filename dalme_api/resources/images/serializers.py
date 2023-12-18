@@ -1,7 +1,7 @@
 """Serializers for image data."""
 from rest_framework import serializers
 
-from dalme_app.models import rs_collection, rs_resource
+from ida.models.resourcespace import rs_collection, rs_resource
 
 
 class RSCollectionsSerializer(serializers.ModelSerializer):
