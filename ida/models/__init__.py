@@ -1,5 +1,6 @@
 """Interface for the ida.models module."""
 from .agent import Agent, Organization, Person
+from .attribute_type import AttributeType
 from .concept import Concept
 from .content import ContentAttributes, ContentTypeExtended
 from .entity_phrase import EntityPhrase
@@ -32,6 +33,7 @@ from .wordform import Wordform
 __all__ = [
     'Agent',
     'AttributeReference',
+    'AttributeType',
     'Concept',
     'ContentAttributes',
     'ContentTypeExtended',

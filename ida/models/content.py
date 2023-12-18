@@ -14,7 +14,7 @@ class ContentTypeExtended(ContentType):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     is_abstract = models.BooleanField(default=True)
-    attribute_types = models.ManyToManyField('dalme_app.AttributeType', through='ida.ContentAttributes')
+    attribute_types = models.ManyToManyField('ida.AttributeType', through='ida.ContentAttributes')
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     can_view = models.BooleanField(default=True)
     can_edit = models.BooleanField(default=False)
@@ -39,7 +39,7 @@ class ContentAttributes(dalmeIntid):
         related_name='attributes_list',
     )
     attribute_type = models.ForeignKey(
-        'dalme_app.AttributeType',
+        'ida.AttributeType',
         db_index=True,
         on_delete=models.CASCADE,
         related_name='contenttypes',

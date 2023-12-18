@@ -22,7 +22,7 @@ class Attribute(dalmeUuid):
     object_id = models.CharField(max_length=36, db_index=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     attribute_type = models.ForeignKey(
-        'AttributeType',
+        'ida.AttributeType',
         db_index=True,
         on_delete=models.CASCADE,
         db_column='attribute_type',
