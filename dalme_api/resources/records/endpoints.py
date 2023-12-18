@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from dalme_api.access_policies import RecordAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from dalme_api.filters import RecordFilter
-from dalme_app.models import Record
+from ida.models import Record
 
 from .serializers import RecordSerializer
 

@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from dalme_api.access_policies import BaseAccessPolicy
-from dalme_app.models import Record
+from ida.models import Record
 
 
 class PublicAccessPolicy(BaseAccessPolicy):

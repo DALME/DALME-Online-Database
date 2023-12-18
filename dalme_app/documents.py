@@ -9,7 +9,7 @@ from elasticsearch_dsl import Join as dsl_Join
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
-from dalme_app.models import Folio, Record
+from ida.models import Folio, Record
 
 
 class JoinField(fields.DEDField, dsl_Join):

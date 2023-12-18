@@ -5,7 +5,8 @@ from dalme_api.resources.pages import PageSerializer
 from dalme_api.resources.transcriptions import TranscriptionSerializer
 from dalme_api.resources.users import UserSerializer
 from dalme_api.resources.workflows import WorkflowSerializer
-from dalme_app.models import Folio, Record, Workflow
+from dalme_app.models import Workflow
+from ida.models import Folio, Record
 
 
 def translate_workflow_string(data):

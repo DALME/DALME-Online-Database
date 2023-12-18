@@ -1,8 +1,9 @@
 """Serializers for dalme_public."""
 from rest_framework import serializers
 
-from dalme_app.models import Attribute, Collection, CollectionMembership, Record
+from dalme_app.models import Attribute, Collection, CollectionMembership
 from dalme_app.utils import DalmeDate
+from ida.models import Record
 
 
 class PublicAttributeSerializer(serializers.ModelSerializer):
