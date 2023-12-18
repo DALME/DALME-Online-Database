@@ -3,8 +3,7 @@ from rest_framework.filters import OrderingFilter
 
 from django.db.models import OuterRef, Subquery
 
-from dalme_app.models import Attribute
-from ida.models import AttributeType
+from ida.models import Attribute, AttributeType
 
 
 class DalmeOrderingFilter(OrderingFilter):

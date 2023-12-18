@@ -26,7 +26,7 @@ class Collection(ScopedBase, dalmeUuid, dalmeOwned):
         limit_choices_to={'properties__type': 3},
         null=True,
     )
-    attributes = GenericRelation('Attribute', related_query_name='collection')
+    attributes = GenericRelation('ida.Attribute', related_query_name='collection')
     permissions = GenericRelation('ida.Permission', related_query_name='collection')
     comments = GenericRelation('dalme_app.Comment')
 

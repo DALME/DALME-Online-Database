@@ -53,7 +53,7 @@ class LanguageReference(dalmeIntid):
     is_dialect = models.BooleanField(default=False)
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     as_attribute_value = GenericRelation(
-        'dalme_app.AttributeValueFkey',
+        'ida.AttributeValueFkey',
         content_type_field='target_content_type',
         object_id_field='target_id',
         related_query_name='language',
@@ -79,7 +79,7 @@ class LocaleReference(dalmeIntid):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     as_attribute_value = GenericRelation(
-        'dalme_app.AttributeValueFkey',
+        'ida.AttributeValueFkey',
         content_type_field='target_content_type',
         object_id_field='target_id',
         related_query_name='locale',
