@@ -1,15 +1,4 @@
 """Interface for the dalme_app.models module."""
-from .attribute import (
-    Attribute,
-    AttributeValueBool,
-    AttributeValueDate,
-    AttributeValueDec,
-    AttributeValueFkey,
-    AttributeValueInt,
-    AttributeValueJson,
-    AttributeValueStr,
-    AttributeValueTxt,
-)
 from .resourcespace import (
     rs_api_query,
     rs_collection,
@@ -31,15 +20,6 @@ from .workflow import Workflow, WorkLog  # isort: skip
 
 __all__ = [
     'Attachment',
-    'Attribute',
-    'AttributeValueBool',
-    'AttributeValueDate',
-    'AttributeValueDec',
-    'AttributeValueFkey',
-    'AttributeValueInt',
-    'AttributeValueJson',
-    'AttributeValueStr',
-    'AttributeValueTxt',
     'Collection',
     'CollectionMembership',
     'Comment',

@@ -11,8 +11,6 @@ class Migration(migrations.Migration):
         ('dalme_app', '0003_rename_and_create_models'),
     ]
     operations = [
-        # Change fields
-        # Agent
         migrations.AlterField(
             model_name='agent',
             name='old_user',
@@ -23,7 +21,6 @@ class Migration(migrations.Migration):
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
-        # Attribute
         migrations.AlterField(
             model_name='attribute',
             name='attribute_type',
@@ -34,7 +31,6 @@ class Migration(migrations.Migration):
                 to='dalme_app.attributetype',
             ),
         ),
-        # AttributeType
         migrations.AlterField(
             model_name='attributetype',
             name='same_as',
@@ -44,14 +40,12 @@ class Migration(migrations.Migration):
                 to='dalme_app.attributetype',
             ),
         ),
-        # Attachment
         migrations.AlterField(
             model_name='attachment',
             name='type',
             field=models.CharField(blank=True, default='', max_length=255),
             preserve_default=False,
         ),
-        # Folio
         migrations.AlterField(
             model_name='folio',
             name='source',
@@ -80,7 +74,6 @@ class Migration(migrations.Migration):
                 to='dalme_app.transcription',
             ),
         ),
-        # GroupProperties
         migrations.AlterField(
             model_name='groupproperties',
             name='type',
@@ -88,7 +81,6 @@ class Migration(migrations.Migration):
                 choices=[(1, 'Admin'), (2, 'DAM'), (3, 'Team'), (4, 'Knowledge Base'), (5, 'Website')],
             ),
         ),
-        # Record
         migrations.AlterField(
             model_name='record',
             name='pages',
@@ -98,7 +90,6 @@ class Migration(migrations.Migration):
                 to='dalme_app.page',
             ),
         ),
-        # Relationship
         migrations.AlterField(
             model_name='relationship',
             name='source_content_type',
@@ -143,13 +134,11 @@ class Migration(migrations.Migration):
             ),
             preserve_default=False,
         ),
-        # Scope
         migrations.RenameField(
             model_name='scope',
             old_name='type',
             new_name='scope_type',
         ),
-        # Task
         migrations.AlterField(
             model_name='task',
             name='workset',
@@ -159,13 +148,11 @@ class Migration(migrations.Migration):
                 to='dalme_app.collection',
             ),
         ),
-        # TaskList
         migrations.RenameField(
             model_name='tasklist',
             old_name='group',
             new_name='team_link',
         ),
-        # Workflow
         migrations.AlterField(
             model_name='workflow',
             name='source',

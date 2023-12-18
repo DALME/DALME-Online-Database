@@ -9,8 +9,7 @@ from rest_framework.utils import html
 from django.db import models
 
 from dalme_api.dynamic_serializer import DynamicSerializer
-from dalme_app.models import Attribute
-from ida.models import AttributeType, ContentAttributes, ContentTypeExtended
+from ida.models import Attribute, AttributeType, ContentAttributes, ContentTypeExtended
 
 
 class AttributeTypeSerializer(serializers.ModelSerializer):

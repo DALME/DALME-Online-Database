@@ -23,7 +23,7 @@ class Location(dalmeUuid):
     )
 
     location_type = models.IntegerField(choices=LOCATION_TYPES)
-    attributes = GenericRelation('dalme_app.Attribute')
+    attributes = GenericRelation('ida.Attribute')
     comments = GenericRelation('dalme_app.Comment')
     tags = GenericRelation('dalme_app.Tag')
 

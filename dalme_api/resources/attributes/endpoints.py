@@ -11,8 +11,7 @@ from django.db.models import Q
 from dalme_api.access_policies import BaseAccessPolicy, GeneralAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from dalme_api.filters import ContentTypeFilter
-from dalme_app.models import Attribute
-from ida.models import AttributeType, ContentAttributes, ContentTypeExtended
+from ida.models import Attribute, AttributeType, ContentAttributes, ContentTypeExtended
 
 from .serializers import (
     AttributeSerializer,

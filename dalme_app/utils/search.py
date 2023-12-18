@@ -13,7 +13,8 @@ from django.utils.functional import cached_property
 
 from dalme_app.documents import FullRecord, PublicRecord
 from dalme_app.forms import SearchForm
-from dalme_app.models import Attribute, Collection
+from dalme_app.models import Collection
+from ida.models import Attribute
 
 
 class Search:

@@ -12,7 +12,7 @@ class Place(dalmeUuid):
     """Stores place information."""
 
     name = models.CharField(max_length=255)
-    attributes = GenericRelation('dalme_app.Attribute')
+    attributes = GenericRelation('ida.Attribute')
     instances = GenericRelation('ida.EntityPhrase')
     location = models.ForeignKey('ida.Location', on_delete=models.SET_NULL, null=True)
     comments = GenericRelation('dalme_app.Comment')
