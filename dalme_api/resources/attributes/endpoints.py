@@ -10,9 +10,9 @@ from django.db.models import Q
 
 from dalme_api.access_policies import BaseAccessPolicy, GeneralAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_api.filters import ContentTypeFilter
 from ida.models import Attribute, AttributeType, ContentAttributes, ContentTypeExtended
 
+from .filters import ContentTypeFilter
 from .serializers import (
     AttributeSerializer,
     AttributeTypeSerializer,

@@ -4,9 +4,9 @@ from rest_framework.response import Response
 
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_api.filters import TaskFilter, TasklistFilter
 from dalme_app.models import Task, TaskList
 
+from .filters import TaskFilter, TasklistFilter
 from .serializers import TaskListSerializer, TaskSerializer
 
 
