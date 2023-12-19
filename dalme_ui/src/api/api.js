@@ -9,6 +9,7 @@ const API = () => {
   const apiError = ref(null);
   const redirected = ref(null);
   const error = ref(false);
+  const responseURL = ref(null);
 
   const fetchAPI = (request) => {
     loading.value = true;
@@ -22,6 +23,7 @@ const API = () => {
         redirected.value = false;
         apiError.value = !success.value;
         data.value = response.data;
+        responseURL.value = response.request.responseURL;
       })
       .catch((e) => {
         error.value = e;
@@ -35,6 +37,7 @@ const API = () => {
     fetchAPI,
     loading,
     redirected,
+    responseURL,
     status,
     success,
   };

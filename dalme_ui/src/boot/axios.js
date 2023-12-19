@@ -1,48 +1,42 @@
-import { boot } from "quasar/wrappers";
+// Initialize the axios fetcher.
 import axios from "axios";
-import { tokenRefreshUrl } from "../api/config";
+import { boot } from "quasar/wrappers";
+import { isNil } from "ramda";
+
 import { useAuthStore } from "stores/auth";
 
 const fetcher = axios.create();
-fetcher.defaults.headers.post["Content-Type"] = "application/json";
 fetcher.defaults.xsrfCookieName = "csrftoken";
 fetcher.defaults.xsrfHeaderName = "X-CSRFToken";
 
 export default boot(({ store }) => {
+  fetcher.interceptors.request.use(
+    (config) => {
+      const { accessToken } = useAuthStore();
+      if (!isNil(accessToken)) {
+        config.headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+      return config;
+    },
+    (error) => {
+      Promise.reject(error);
+    },
+  );
   fetcher.interceptors.response.use(
-    // status code in the 2xx range
+    // Status code in the 2xx range.
     (response) => {
       return response;
     },
-    // status code outside the 2xx range
+
+    // Status code outside the 2xx range.
     async (error) => {
-      const authStore = useAuthStore(store);
-      const originalConfig = error.config;
+      const auth = useAuthStore(store);
 
-      if (error.response.status === 401 && !originalConfig._isRetry) {
-        try {
-          originalConfig._isRetry = true;
-          const retryRequest = new Promise((resolve) => {
-            authStore.requestQueue.push(() => {
-              resolve(fetcher(originalConfig));
-            });
-          });
-
-          if (!authStore.isRefreshing) {
-            authStore.isRefreshing = true;
-            const refresh = await axios.post(tokenRefreshUrl);
-            if (!refresh.status === 200) {
-              authStore.reauthenticate = true;
-            }
-            authStore.isRefreshing = false;
-            authStore.processQueue();
-          }
-
-          return retryRequest;
-        } catch (refreshError) {
-          authStore.reauthenticate = true;
-          return Promise.reject(refreshError);
-        }
+      if (error.response.status === 401) {
+        return new Promise((resolve) => {
+          auth.queue.push(() => resolve(fetcher(error.config)));
+          auth.send({ type: "REFRESH" });
+        });
       } else {
         return Promise.reject(error);
       }

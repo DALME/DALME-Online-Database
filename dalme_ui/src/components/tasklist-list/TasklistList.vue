@@ -183,7 +183,8 @@ export default defineComponent({
     }
 
     const handleCreate = () => {
-      send("SPAWN_FORM", {
+      send({
+        type: "SPAWN_FORM",
         cuid: cuid(),
         key: null,
         kind: "taskList",
@@ -198,15 +199,16 @@ export default defineComponent({
       const indexed = editingIndex.value[key];
       if (!isNil(indexed)) {
         const { send: actorSend } = useActor(modals.value[indexed.cuid].actor);
-        send("SET_FOCUS", { value: indexed.cuid });
-        actorSend("SHOW");
+        send({ type: "SET_FOCUS", value: indexed.cuid });
+        actorSend({ type: "SHOW" });
       } else {
         const { data, success, fetchAPI } = apiInterface();
         const { edit: editSchema } = forms.taskList;
         await fetchAPI(requests.tasks.getTaskList(id));
         if (success.value) {
           await editSchema.validate(data.value, { stripUnknown: true }).then((value) => {
-            send("SPAWN_FORM", {
+            send({
+              type: "SPAWN_FORM",
               cuid: cuid(),
               kind: "taskList",
               mode: "update",

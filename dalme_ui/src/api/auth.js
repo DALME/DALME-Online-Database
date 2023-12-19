@@ -1,6 +1,18 @@
-import { CSRFUrl, loginUrl, logoutUrl, tokenRefreshUrl } from "./config";
+import { authUrl, CSRFUrl } from "./config";
 
 const auth = {
+  authorize(params) {
+    return {
+      url: `${authUrl}/authorize/?${params.toString()}`,
+      method: "GET",
+    };
+  },
+  authUser() {
+    return {
+      url: `${authUrl}/userinfo/`,
+      method: "GET",
+    };
+  },
   CSRF() {
     return {
       url: CSRFUrl,
@@ -9,21 +21,31 @@ const auth = {
   },
   login({ username, password }) {
     return {
-      url: loginUrl,
+      url: `${authUrl}/login/`,
       method: "POST",
       data: { username, password },
     };
   },
   logout() {
     return {
-      url: logoutUrl,
-      method: "POST",
+      url: `${authUrl}/logout/`,
+      method: "GET",
     };
   },
-  refreshToken() {
+  oAuthLogout() {
     return {
-      url: tokenRefreshUrl,
+      url: `${authUrl}/logout/`,
+      method: "GET",
+    };
+  },
+  token(params) {
+    const headers = new Headers();
+    headers.append("cache-control", "no-cache");
+    return {
+      url: `${authUrl}/token/`,
       method: "POST",
+      headers,
+      data: params,
     };
   },
 };

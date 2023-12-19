@@ -55,6 +55,7 @@ export default defineComponent({
     value: {
       type: Boolean,
       required: true,
+      default: false,
     },
     size: {
       type: String,

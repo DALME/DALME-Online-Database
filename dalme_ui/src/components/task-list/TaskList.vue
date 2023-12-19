@@ -134,12 +134,11 @@ import {
 } from "ramda";
 import { defineComponent, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
 import { requests } from "@/api";
 import { DataTable, DetailPopover, TagWidget, TasklistList } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { taskListsSchema, tasksSchema } from "@/schemas";
-import { useAPI, usePagination, useEditing } from "@/use";
+import { useAPI, usePagination, useEditing, useStores } from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
@@ -162,7 +161,7 @@ export default defineComponent({
     if (!props.embedded) useMeta({ title: "Tasks" });
     const $route = useRoute();
     const $router = useRouter();
-    const $authStore = useAuthStore();
+    const { auth } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
     const { postSubmitRefreshWatcher } = useEditing();
@@ -173,7 +172,7 @@ export default defineComponent({
     const noData = props.embedded ? "No assigned tasks" : "No tasks found";
     const title = props.embedded ? "My Tasks" : "Tasks";
 
-    // TODO: Move to local useTaskFilter hook.
+    // TODO: Move to local useTaskFilter hook and test.
     const filterTasks = (query, taskLists) => {
       let filter = query.filter.split(",");
 
@@ -243,7 +242,7 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       const request = props.embedded
-        ? requests.tasks.getUserTasks($authStore.userId)
+        ? requests.tasks.getUserTasks(auth.user.userId)
         : requests.tasks.getTasks(query);
       await fetchAPI(request);
       if (success.value)
@@ -299,7 +298,7 @@ export default defineComponent({
       context,
       columns,
       filteredRows,
-      filterList,
+      filterList: filterList(auth.user.userId),
       formatDate,
       fetchTaskLists,
       loading,
@@ -314,7 +313,7 @@ export default defineComponent({
       pagination,
       rows,
       search,
-      sortList,
+      sortList: sortList(),
       title,
       visibleColumns,
     };

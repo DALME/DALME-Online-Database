@@ -1,5 +1,6 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE='dalme.settings'
+DJANGO_CONFIGURATION='Development'
 addopts = "--strict-markers"
 markers = [
   "integration: marks integration tests",

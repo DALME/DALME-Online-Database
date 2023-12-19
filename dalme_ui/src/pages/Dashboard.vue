@@ -1,27 +1,28 @@
 <template>
   <PageContainer>
-    <!-- <TaskList :embedded="true" />
-    <SetList :embedded="true" />
-    <TicketList :embedded="true" /> -->
+    <template v-if="false">
+      <TaskList :embedded="true" />
+      <SetList :embedded="true" />
+      <TicketList :embedded="true" />
+    </template>
   </PageContainer>
 </template>
 
 <script>
 import { useMeta } from "quasar";
 import { defineComponent } from "vue";
-import { PageContainer } from "@/components";
+import { PageContainer, SetList, TaskList, TicketList } from "@/components";
 
 export default defineComponent({
   name: "DashBoard",
   components: {
     PageContainer,
-    // TaskList,
-    // TicketList,
-    // SetList,
+    SetList,
+    TaskList,
+    TicketList,
   },
   setup() {
     useMeta({ title: "Dashboard" });
-    // throw new Error("Parameter is not a number!");
   },
 });
 </script>

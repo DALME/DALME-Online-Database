@@ -141,7 +141,7 @@ export default defineComponent({
     // };
 
     return {
-      isAdmin: auth.isAdmin,
+      isAdmin: auth.user.isAdmin,
       title,
       tm,
     };

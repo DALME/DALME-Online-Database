@@ -198,14 +198,10 @@ export default defineComponent({
       const indexed = editingIndex.value[key];
       if (!isNil(indexed)) {
         const { send: actorSend } = useActor(modals.value[indexed.cuid].actor);
-        send("SET_FOCUS", { value: indexed.cuid });
-        actorSend("SHOW");
+        send({ type: "SET_FOCUS", value: indexed.cuid });
+        actorSend({ type: "SHOW" });
       } else {
-        send("SPAWN_FOLIO", {
-          cuid: cuid(),
-          key,
-          metadata: { damId },
-        });
+        send({ type: "SPAWN_FOLIO", cuid: cuid(), key, metadata: { damId } });
       }
     };
 

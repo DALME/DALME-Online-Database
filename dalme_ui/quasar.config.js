@@ -90,16 +90,16 @@ module.exports = configure(function (ctx) {
           supported: { bigint: true },
           ...viteConf.optimizeDeps.esbuildOptions,
         };
+        viteConf.resolve.alias = {
+          "@": path.resolve(__dirname, "./src"),
+          ...viteConf.resolve.alias,
+        };
         if (ctx.dev) {
           viteConf.server.headers = {
             "Content-Security-Policy": getDevCSP(),
             ...viteConf.server.headers,
           };
         }
-        viteConf.resolve.alias = {
-          "@": path.resolve(__dirname, "./src"),
-          ...viteConf.resolve.alias,
-        };
       },
 
       // viteVuePluginOptions: {},

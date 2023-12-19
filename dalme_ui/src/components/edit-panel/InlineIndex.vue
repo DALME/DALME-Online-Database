@@ -59,7 +59,7 @@ export default defineComponent({
     const isFocus = computed(() => focus.value === "inline");
     const { inlineIndexShow } = useStores();
     const fromUnixTs = (unixTs) => DateTime.fromMillis(unixTs).toISO();
-    const handleFocus = () => send("SET_FOCUS", { value: "inline" });
+    const handleFocus = () => send({ type: "SET_FOCUS", value: "inline" });
 
     watch(
       () => diffs.value,

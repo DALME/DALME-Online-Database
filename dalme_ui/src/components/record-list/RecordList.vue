@@ -236,6 +236,7 @@ export default defineComponent({
   },
   setup() {
     const $route = useRoute();
+    const { auth } = useStores();
     const { currentPageIcon } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
@@ -306,7 +307,7 @@ export default defineComponent({
       columns,
       currentPageIcon,
       getLocale,
-      filterList,
+      filterList: filterList(auth.user.userId),
       loading,
       noData,
       onChangeSearch,
@@ -319,7 +320,7 @@ export default defineComponent({
       renderDate,
       rows,
       search,
-      sortList,
+      sortList: sortList(),
       title,
       visibleColumns,
     };

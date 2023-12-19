@@ -56,7 +56,7 @@ export default defineComponent({
       }
     });
 
-    const handleFocus = () => send("SET_FOCUS", { value: "inline" });
+    const handleFocus = () => send({ type: "SET_FOCUS", value: "inline" });
 
     watch(folioList, () => {
       folioIndexShow.value = notNully(folioList.value);

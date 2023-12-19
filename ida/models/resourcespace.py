@@ -1,11 +1,11 @@
 """Model resourcespace data."""
 import hashlib
 import json
-import os
 from urllib.parse import urlencode
 
 import requests
 
+from django.conf import settings
 from django.db import models
 from django.db.models import options
 
@@ -14,9 +14,9 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 def rs_api_query(**kwargs):
     """Query the ResourceSpace API at dam.dalme.org."""
-    endpoint = 'https://dam.dalme.org/api/?'
-    user = os.environ['DAM_API_USER']
-    key = os.environ['DAM_API_KEY']
+    endpoint = settings.DAM_API_ENDPOINT
+    user = settings.DAM_API_USER
+    key = settings.DAM_API_KEY
 
     query_params = {
         'function': kwargs.get('function', 'search_get_previews'),

@@ -150,6 +150,11 @@ variable "min_healthy_percent" {
   type        = number
 }
 
+variable "oauth_client_id" {
+  description = "Public identifier for the OAuth application."
+  type        = string
+}
+
 variable "opensearch_endpoint" {
   description = "Domain-specific endpoint to submit OpenSearch requests."
   type        = string
@@ -208,6 +213,11 @@ variable "service_desired_count" {
 variable "scheduled_tasks" {
   description = "Data for scheduled tasks."
   type = object({
+    cleartokens = object({
+      assign_public_ip    = bool,
+      is_enabled          = bool,
+      schedule_expression = string,
+    }),
     publish = object({
       assign_public_ip    = bool,
       is_enabled          = bool,

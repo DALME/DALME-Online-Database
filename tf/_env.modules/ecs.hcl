@@ -22,17 +22,23 @@ terraform {
 }
 
 locals {
-  env            = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  region_env     = read_terragrunt_config(find_in_parent_folders("region.hcl"))
-  admins         = local.env.locals.admins
-  aws_account    = local.env.locals.aws_account
-  aws_region     = local.region_env.locals.aws_region
-  environment    = local.env.locals.environment
-  ports          = local.env.locals.ports
-  service        = local.env.locals.service
-  tenant_domains = local.env.locals.tenant_domains
-  allowed_hosts  = local.tenant_domains
+  env             = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  region_env      = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  admins          = local.env.locals.admins
+  aws_account     = local.env.locals.aws_account
+  aws_region      = local.region_env.locals.aws_region
+  environment     = local.env.locals.environment
+  oauth_client_id = local.env.locals.oauth_client_id
+  ports           = local.env.locals.ports
+  service         = local.env.locals.service
+  tenant_domains  = local.env.locals.tenant_domains
+  allowed_hosts   = local.tenant_domains
   scheduled_tasks = {
+    cleartokens = {
+      assign_public_ip    = true,
+      is_enabled          = true,
+      schedule_expression = "cron(0 2 * * ? *)", # Everyday at 2am.
+    },
     publish = {
       assign_public_ip    = true,
       is_enabled          = true,
@@ -178,6 +184,7 @@ inputs = {
   memory_target_value          = 80
   min_capacity                 = 1
   min_healthy_percent          = 100
+  oauth_client_id              = local.oauth_client_id
   opensearch_endpoint          = dependency.opensearch.outputs.endpoint
   opensearch_username          = dependency.opensearch.outputs.master_user_name
   postgres_password_secret_arn = dependency.postgres.outputs.master_user_secret_arn

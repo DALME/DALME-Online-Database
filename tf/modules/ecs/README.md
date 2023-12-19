@@ -23,7 +23,9 @@ No modules.
 | [aws_appautoscaling_policy.ecs_policy_cpu](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/appautoscaling_policy) | resource |
 | [aws_appautoscaling_policy.ecs_policy_memory](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/appautoscaling_policy) | resource |
 | [aws_appautoscaling_target.ecs_target](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/appautoscaling_target) | resource |
+| [aws_cloudwatch_event_rule.cleartokens](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/cloudwatch_event_rule) | resource |
 | [aws_cloudwatch_event_rule.publish](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.cleartokens](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_event_target.publish](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/cloudwatch_event_target) | resource |
 | [aws_cloudwatch_log_group.proxy_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/cloudwatch_log_group) | resource |
 | [aws_cloudwatch_log_group.web_log_group](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/cloudwatch_log_group) | resource |
@@ -32,6 +34,7 @@ No modules.
 | [aws_ecs_cluster.main](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/ecs_cluster) | resource |
 | [aws_ecs_cluster_capacity_providers.main](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/ecs_cluster_capacity_providers) | resource |
 | [aws_ecs_service.main](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/ecs_service) | resource |
+| [aws_ecs_task_definition.cleartokens](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/ecs_task_definition) | resource |
 | [aws_ecs_task_definition.main](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/ecs_task_definition) | resource |
 | [aws_ecs_task_definition.publish](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/ecs_task_definition) | resource |
 | [aws_iam_policy.cloudwatch_scheduled_task_policy](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_policy) | resource |
@@ -46,6 +49,7 @@ No modules.
 | [aws_iam_role_policy_attachment.ecs_task_execution_role](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ecs_task_role](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.sfn_execution](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_sfn_state_machine.cleartokens](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/sfn_state_machine) | resource |
 | [aws_sfn_state_machine.publish](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/sfn_state_machine) | resource |
 | [aws_sns_topic.ecs_scheduled_task_failure](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/sns_topic) | resource |
 | [aws_sns_topic_subscription.ecs_scheduled_task_failure](https://registry.terraform.io/providers/hashicorp/aws/5.14.0/docs/resources/sns_topic_subscription) | resource |
@@ -92,6 +96,7 @@ No modules.
 | <a name="input_memory_target_value"></a> [memory\_target\_value](#input\_memory\_target\_value) | Target value for the memory metric. | `number` | n/a | yes |
 | <a name="input_min_capacity"></a> [min\_capacity](#input\_min\_capacity) | Minimum number of scaling targets. | `number` | n/a | yes |
 | <a name="input_min_healthy_percent"></a> [min\_healthy\_percent](#input\_min\_healthy\_percent) | The lower limit of running tasks that must remain healthy in a service | `number` | n/a | yes |
+| <a name="input_oauth_client_id"></a> [oauth\_client\_id](#input\_oauth\_client\_id) | Public identifier for the OAuth application. | `string` | n/a | yes |
 | <a name="input_opensearch_endpoint"></a> [opensearch\_endpoint](#input\_opensearch\_endpoint) | Domain-specific endpoint to submit OpenSearch requests. | `string` | n/a | yes |
 | <a name="input_opensearch_username"></a> [opensearch\_username](#input\_opensearch\_username) | Login username for the OpenSearch service.. | `string` | n/a | yes |
 | <a name="input_postgres_password_secret_arn"></a> [postgres\_password\_secret\_arn](#input\_postgres\_password\_secret\_arn) | The ARN of the self-managed postgres password secret. | `string` | n/a | yes |
@@ -99,7 +104,7 @@ No modules.
 | <a name="input_registry"></a> [registry](#input\_registry) | The ECR registry containing task images. | `string` | n/a | yes |
 | <a name="input_repository_arns"></a> [repository\_arns](#input\_repository\_arns) | Identifers for the container repositories. | `list(string)` | n/a | yes |
 | <a name="input_scaling_policy_type"></a> [scaling\_policy\_type](#input\_scaling\_policy\_type) | Which method to use when scaling the cluster. | `string` | n/a | yes |
-| <a name="input_scheduled_tasks"></a> [scheduled\_tasks](#input\_scheduled\_tasks) | Data for scheduled tasks. | <pre>object({<br>    publish = object({<br>      assign_public_ip    = bool,<br>      is_enabled          = bool,<br>      schedule_expression = string,<br>    }),<br>  })</pre> | n/a | yes |
+| <a name="input_scheduled_tasks"></a> [scheduled\_tasks](#input\_scheduled\_tasks) | Data for scheduled tasks. | <pre>object({<br>    cleartokens = object({<br>      assign_public_ip    = bool,<br>      is_enabled          = bool,<br>      schedule_expression = string,<br>    }),<br>    publish = object({<br>      assign_public_ip    = bool,<br>      is_enabled          = bool,<br>      schedule_expression = string,<br>    }),<br>  })</pre> | n/a | yes |
 | <a name="input_secrets"></a> [secrets](#input\_secrets) | A list of secrets as name/valueFrom 'Secret' objects. | `map(map(string))` | n/a | yes |
 | <a name="input_secrets_arns"></a> [secrets\_arns](#input\_secrets\_arns) | Identifers for managed secrets. | `list(string)` | n/a | yes |
 | <a name="input_service"></a> [service](#input\_service) | The service of the project/stack. | `string` | n/a | yes |

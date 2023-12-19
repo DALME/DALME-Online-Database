@@ -41,10 +41,10 @@
 
       <q-separator v-if="comments.length > 0" class="comment-thread-divider" />
 
-      <q-item class="comment-box" :class="auth.userId == op ? 'op-post' : ''">
-        <q-item-section v-if="auth.userId == op" avatar>
+      <q-item class="comment-box" :class="auth.user.userId == op ? 'op-post' : ''">
+        <q-item-section v-if="auth.user.userId == op" avatar>
           <q-avatar size="40px">
-            <img v-if="notNully(auth.avatar)" :src="auth.avatar" />
+            <img v-if="notNully(auth.user.avatar)" :src="auth.avatar" />
             <q-icon v-else size="38px" name="mdi-account-circle" />
           </q-avatar>
         </q-item-section>
@@ -57,12 +57,12 @@
             submit-label="Comment"
             @on-save-text="onSubmit"
             :dark="dark"
-            :right="auth.userId != op"
+            :right="auth.user.userId != op"
           />
         </q-item-section>
-        <q-item-section v-if="auth.userId != op" side>
+        <q-item-section v-if="auth.user.userId != op" side>
           <q-avatar size="40px">
-            <img v-if="notNully(auth.avatar)" :src="auth.avatar" />
+            <img v-if="notNully(auth.user.avatar)" :src="auth.avatar" />
             <q-icon v-else size="38px" name="mdi-account-circle" />
           </q-avatar>
         </q-item-section>

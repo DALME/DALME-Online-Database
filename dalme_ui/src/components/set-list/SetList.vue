@@ -153,9 +153,9 @@ export default defineComponent({
   },
   setup(props, context) {
     const $route = useRoute();
+    const { auth } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
-    const { userId } = useStores();
     const columns = ref([]);
     const rows = ref([]);
     const setType = ref("");
@@ -173,8 +173,9 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       const setTypeConstant = setMap[setTypeAPI.value];
+      // TODO: These set requests no longer exist.
       const request = props.embedded
-        ? requests.sets.getUserWorksets(userId.value)
+        ? requests.sets.getUserWorksets(auth.user.userId)
         : requests.sets.getSetsByType(setTypeConstant, query);
       const schema = setListSchema(setType.value);
       await fetchAPI(request);
@@ -247,7 +248,7 @@ export default defineComponent({
     return {
       context,
       columns,
-      filterList,
+      filterList: filterList(auth.user.userId),
       formatDate,
       loading,
       noData,
@@ -260,7 +261,7 @@ export default defineComponent({
       pagination,
       rows,
       search,
-      sortList,
+      sortList: sortList(),
       title,
       visibleColumns,
     };

@@ -38,7 +38,7 @@ endif
 .PHONY: web.manage
 
 web.open:
-	open https://localhost:8000/
+	open https://dalme.localhost:8000/
 .PHONY: web.open
 
 web.python:
@@ -59,7 +59,6 @@ web.sync: web.install web.build
 web.test:
 	docker compose run --rm \
 		-e DEBUG='' \
-		-e DJANGO_CONFIGURATION='Development' \
 		$(PROJECT).web \
 		pytest -s \
 		--cov=. \
@@ -70,7 +69,6 @@ web.test:
 
 web.test.i:
 	docker compose run --rm \
-		-e DJANGO_CONFIGURATION='Development' \
 		$(PROJECT).web \
 		pytest -svv \
 		-m 'integration' \
@@ -81,7 +79,6 @@ web.test.i:
 
 web.test.p:
 	docker compose run --rm \
-		-e DJANGO_CONFIGURATION='Development' \
 		$(PROJECT).web \
 		pytest -svv \
 		-m 'property' \
@@ -93,7 +90,6 @@ web.test.p:
 
 web.test.u:
 	docker compose run --rm \
-		-e DJANGO_CONFIGURATION='Development' \
 		$(PROJECT).web \
 		pytest -svv \
 		-m 'unit' \
@@ -104,7 +100,6 @@ web.test.u:
 
 web.test.watch:
 	docker compose run --rm \
-		-e DJANGO_CONFIGURATION='Development' \
 		$(PROJECT).web \
 		ptw . $(args)
 .PHONY: web.test.watch
@@ -114,7 +109,7 @@ web.help:
 	@echo "  web.collectstatic      bundle static files for all apps and tenants"
 	@echo "  web.install            install the web requirements into the local venv"
 	@echo "  web.manage             call django management commands"
-	@echo "  web.open               view the site in your browser."
+	@echo "  web.open               view the site in your browser"
 	@echo "  web.python             shell into python on the web container"
 	@echo "  web.shell              shell into the web container"
 	@echo "  web.sync               install the web requirements and rebuild the service"

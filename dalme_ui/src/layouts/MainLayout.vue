@@ -1,22 +1,20 @@
 <template>
-  <LoginModal v-if="showLogin" />
-  <q-layout
-    id="layout"
-    view="lHr lpR lFr"
-    :class="!reauthenticate && showLogin ? 'login-background' : null"
-  >
-    <NavBar v-if="reauthenticate || !showLogin" />
-    <EditPanel v-if="reauthenticate || !showLogin" />
-    <AppDrawer />
-    <UserDrawer />
-    <q-page-container v-if="reauthenticate || !showLogin">
-      <router-view />
-    </q-page-container>
+  <LoginModal />
+  <q-layout id="layout" view="lHr lpR lFr" :class="{ 'login-background': showMap }">
+    <template v-if="render">
+      <NavBar />
+      <EditPanel />
+      <AppDrawer />
+      <UserDrawer />
+      <q-page-container>
+        <router-view />
+      </q-page-container>
+    </template>
   </q-layout>
 </template>
 
 <script>
-import { defineComponent, provide, ref, onMounted } from "vue";
+import { computed, defineComponent, provide, ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { find, isNotNil, propEq } from "ramda";
 import { EditPanel, LoginModal, NavBar, UserDrawer, AppDrawer } from "@/components";
@@ -39,18 +37,19 @@ export default defineComponent({
   },
   setup() {
     const { initEventHandler } = provideEventHandling(); // eslint-disable-line
-    const { auth, ui, hasCredentials, reauthenticate, userDrawerOpen, appDrawerOpen } =
-      provideStores();
+    const { auth, ui, userDrawerOpen, appDrawerOpen } = provideStores();
     const $route = useRoute();
-    const showLogin = ref(!hasCredentials.value || reauthenticate.value);
     const userDrawerEl = ref(null);
+
+    const render = computed(() => auth.authorized || auth.reauthenticate);
+    const showMap = computed(() => auth.authenticate);
 
     const prefSubscription = (action) => {
       let unsubscribe = () => {};
       if (action === "subscribe") {
         unsubscribe = auth.$subscribe(
           (mutation) => {
-            auth.updatePreferences(auth.userId, $route.name, mutation);
+            auth.updatePreferences($route.name, mutation);
           },
           { detached: true },
         );
@@ -71,7 +70,6 @@ export default defineComponent({
     provideEditing();
     provideTransport();
 
-    provide("showLogin", showLogin);
     provide("prefSubscription", prefSubscription);
     provide("userDrawerEl", userDrawerEl);
 
@@ -81,15 +79,16 @@ export default defineComponent({
         auth.logout();
       }
 
-      if (!showLogin.value) prefSubscription("subscribe");
+      if (auth.authorized) prefSubscription("subscribe");
       ui.resizeListener();
 
       document.addEventListener("click", outsideDrawerClick);
     });
 
     return {
-      showLogin,
-      reauthenticate,
+      auth,
+      render,
+      showMap,
     };
   },
 });

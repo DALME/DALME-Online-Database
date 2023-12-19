@@ -5,10 +5,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 
+from ida import urls as ida_urls
+
 from . import resources
 from .csrf import csrf
 
 router = routers.DefaultRouter()
+
 router.register(r'agents', resources.Agents, basename='agents')
 router.register(r'attachments', resources.Attachments, basename='attachments')
 router.register(r'attribute_types', resources.AttributeTypes, basename='attribute_types')
@@ -38,9 +41,9 @@ router.register(r'users', resources.Users, basename='users')
 router.register(r'workflow', resources.Workflows, basename='workflow')
 
 urlpatterns = [
+    path('', include(ida_urls)),
     path('', include((router.urls, 'dalme_api'), namespace='api_endpoint')),
     path('csrf/', csrf),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # path('jwt/', include('dj_rest_auth.urls')),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]

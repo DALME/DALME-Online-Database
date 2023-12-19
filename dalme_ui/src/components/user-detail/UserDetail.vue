@@ -136,7 +136,7 @@ export default defineComponent({
     const user = ref(null);
     const username = $route.params.username;
     const tab = ref("general");
-    const showPrefs = computed(() => username === $authStore.username);
+    const showPrefs = computed(() => username === $authStore.user.username);
 
     useMeta({ title: `User | ${username}` });
 

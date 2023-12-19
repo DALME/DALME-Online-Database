@@ -81,23 +81,27 @@ export default defineComponent({
 
     const request = computed(() => {
       if (props.userCollectionsOnly) {
-        return requests.collections.getUserCollections(auth.userId, limit.value);
+        return requests.collections.getUserCollections(auth.user.userId, limit.value);
       } else if (props.teamCollectionsOnly) {
-        return requests.collections.getTeamCollections(auth.userId, limit.value);
+        return requests.collections.getTeamCollections(auth.user.userId, limit.value);
       } else {
         return requests.collections.getCollections();
       }
     });
 
     const fetchData = async () => {
-      await fetchAPI(request.value);
-      if (success.value)
-        await collectionsSchema.validate(data.value.data, { stripUnknown: false }).then((value) => {
-          collections.value = value;
-          totalCount.value = data.value.count;
-          currentCount.value = data.value.filtered;
-          loading.value = false;
-        });
+      if (auth.authorized) {
+        await fetchAPI(request.value);
+        if (success.value)
+          await collectionsSchema
+            .validate(data.value.data, { stripUnknown: false })
+            .then((value) => {
+              collections.value = value;
+              totalCount.value = data.value.count;
+              currentCount.value = data.value.filtered;
+              loading.value = false;
+            });
+      }
     };
 
     onMounted(async () => await fetchData());

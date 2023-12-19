@@ -68,11 +68,11 @@ export default defineComponent({
           const request = formRequest.value(value);
           await fetchAPI(request);
           if (success.value & [200, 201].includes(status.value)) {
-            actorSend("RESOLVE");
+            actorSend({ type: "RESOLVE" });
             postSubmitRefresh.value = true;
-            send("DESTROY_MODAL", { cuid: props.cuid });
+            send({ type: "DESTROY_MODAL", cuid: props.cuid });
           } else {
-            actorSend("REJECT");
+            actorSend({ type: "REJECT" });
           }
         });
     };

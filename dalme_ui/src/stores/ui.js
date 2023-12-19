@@ -76,7 +76,7 @@ export const useUiStore = defineStore(
       currentSection.value = "";
       currentSubsection.value = "";
       breadcrumbTail.value = [];
-      currentPageIcon.value = false;
+      currentPageIcon.value = "";
       globalLoading.value = false;
       isFullscreen.value = false;
       userDrawerOpen.value = false;
@@ -115,8 +115,8 @@ export const useUiStore = defineStore(
     const setPageState = async (target) => {
       previousPath.value = currentPath.value;
       currentPath.value = target.fullPath;
-      currentSection.value = target.meta.navPath[0];
-      currentSubsection.value = target.meta.navPath[1];
+      currentSection.value = target.meta.navPath ? target.meta.navPath[0] : undefined;
+      currentSubsection.value = target.meta.navPath ? target.meta.navPath[1] : undefined;
       currentPageIcon.value = target.meta.pageIcon
         ? target.meta.pageIcon
         : target.meta.icon || "mdi-layers";

@@ -62,32 +62,32 @@ const tasks = {
       data: { action: S(action).underscore().s },
     };
   },
-  getUserTasklists(userId) {
+  getUserTaskLists(userId) {
     return {
       url: `${apiUrl}/tasklists/?user=${userId}`,
       method: "GET",
     };
   },
-  getTasklists() {
+  getTaskLists() {
     return {
       url: `${apiUrl}/tasklists/`,
       method: "GET",
     };
   },
-  getTasklist(id) {
+  getTaskList(id) {
     return {
       url: `${apiUrl}/tasklists/${id}`,
       method: "GET",
     };
   },
-  createTasklist(data) {
+  createTaskList(data) {
     return {
       url: `${apiUrl}/tasklists/`,
       method: "POST",
       data: data,
     };
   },
-  deleteTasklist(id) {
+  deleteTaskList(id) {
     return {
       url: `${apiUrl}/tasklists/${id}`,
       method: "DELETE",

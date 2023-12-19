@@ -225,7 +225,7 @@ jobs:
       - name: Test
         run: >
           docker run --rm ${{ env.APP }}.ui:${{ env.CI_TAG }}
-          yarn --cwd test:unit:ci
+          yarn test:unit:ci
 
   integrate_docs:
     name: 'Integrate Docs'

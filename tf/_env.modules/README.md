@@ -1,5 +1,6 @@
-# TF Environment Common
+# Terragrunt Modules
 
-This directory holds terraform config and variables that are shared across all
-environment subtrees. The terragrunt preprocessor takes each file and merges
-its values into the relevant modules.
+This directory contains Terragrunt `.hcl` definitions that instantiate our
+reusable Terraform modules. That is to say, the actual module entrypoints where
+values are provided to the modules for provisioning. Thinking in terms of the
+dependency tree, these files represent the terminating nodes.

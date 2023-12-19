@@ -12,6 +12,7 @@ locals {
   environment        = "staging"
   gha_oidc_role_name = "gha-oidc-role"
   lock_table         = "terraform-locks"
+  oauth_client_id    = "zzr1i8b3d4xqi3jb4lkro39r.ida.staging"
   ports = {
     alb        = 80
     mysql      = 3306

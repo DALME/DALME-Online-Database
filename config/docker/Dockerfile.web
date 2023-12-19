@@ -41,8 +41,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONBREAKPOINT ipdb.set_trace
 WORKDIR /opt/web
-RUN mkdir /opt/web/www
 COPY ./config/env.web.dev ./.env
+RUN mkdir /opt/web/www
+COPY ./config/oidc.key ./oidc.key
 COPY ./tenants ./tenants
 COPY ./static ./static
 COPY ./manage.py ./
@@ -73,8 +74,12 @@ ENV POSTGRES_DB=$POSTGRES_DB \
     POSTGRES_HOST=$POSTGRES_HOST \
     POSTGRES_PORT=$POSTGRES_PORT
 ENV LOG_LEVEL ERROR
+ENV OAUTH_CLIENT_ID oauth.ida.development
+ENV OAUTH_CLIENT_SECRET django-insecure-development-environment-oauth-client-secret
+ENV OIDC_RSA_PRIVATE_KEY /opt/web/oidc.key
 WORKDIR /opt/web
 RUN mkdir /opt/web/www
+RUN openssl genrsa -out /opt/web/oidc.key 4096
 COPY ./ida ./ida
 COPY ./dalme ./dalme
 COPY ./dalme_api ./dalme_api

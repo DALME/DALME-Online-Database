@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 import { unpackPseudoAttributes } from "@/components/forms/attributes-field/normalize";
-import { userAttributeSchema } from "./common";
+import { userAttributeSchema } from "./users";
 
 export const setOptionsSchema = yup.array().of(
   yup
