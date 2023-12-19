@@ -31,7 +31,8 @@ class Command(BaseCommand):
             username = os.environ['ADMIN_USERNAME']
             password = os.environ['ADMIN_PASSWORD']
         except KeyError:
-            logger.exception('Missing admin user credentials in environment')
+            msg = 'Missing admin user credentials in environment'
+            logger.exception(msg)
             raise
 
         try:

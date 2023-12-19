@@ -1,25 +1,477 @@
+// Define the auth store machine interface.
+import { encode as base64encode } from "base64-arraybuffer";
+import * as changeKeys from "change-case/keys";
+import cryptoRandomString from "crypto-random-string";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { API as apiInterface, publicUrl, requests } from "@/api";
-import { notNully } from "@/utils";
+import { Notify } from "quasar";
+import { has, isNil } from "ramda";
+import { computed, ref, watch } from "vue";
+import { assign, fromCallback, fromPromise, setup } from "xstate";
+import { useSelector } from "@xstate/vue";
+import * as yup from "yup";
+
+import { API as apiInterface, requests } from "@/api";
 import notifier from "@/notifier";
+import { router as $router } from "@/router";
+import { groupSchema } from "@/schemas";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
+import { useStoreMachine } from "@/use";
+import { notNully } from "@/utils";
+
+const AUTHORIZATION_CALLBACK_URL = "api/oauth/authorize/callback/";
+const CODE_CHALLENGE_METHOD = "S256";
+const CODE_VERIFIER_LENGTH = 128;
+const RESPONSE_TYPE = "code";
+
+const userInfoSchema = yup
+  .object()
+  .shape({
+    userId: yup.number().required(),
+    username: yup.string().required(),
+    fullName: yup.string().nullable(),
+    email: yup.string().email().required(),
+    avatar: yup.string().default(null).nullable(),
+    tenant: yup.number().required(),
+    isAdmin: yup.boolean().required(),
+    groups: yup.array().of(groupSchema).default(null).nullable(),
+  })
+  .camelCase()
+  .transform((data) => {
+    return {
+      ...data,
+      userId: data.sub,
+    };
+  });
+
+// To protect against vulnerabilities we don't keep the access token in the
+// machine context as it would then be persisted in localstorage. Instead we
+// just keep it in app memory lasting the duration of the tab/window lifetime.
+// Then, when the machine is rehydrated, if the app finds itself in the
+// 'yes.authorized' state but without an accessToken ready-to-hand, it can
+// request a new access token using the long duration refresh token which is
+// stored safely in an HTTP only cookie.
+const accessToken = ref(null);
+
+// Define utilities.
+const getClientId = () => import.meta.env.VITE_OAUTH_CLIENT_ID;
+
+const getCodeVerifier = () => cryptoRandomString({ length: CODE_VERIFIER_LENGTH });
+
+const getCodeChallenge = async (codeVerifier) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(codeVerifier);
+  const digest = await window.crypto.subtle.digest("SHA-256", data);
+  const base64digest = base64encode(digest);
+  return base64digest.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+};
+
+const getRedirectURI = () => `${window.location.origin}/${AUTHORIZATION_CALLBACK_URL}`;
+
+const setCSRFToken = async () => {
+  const { fetchAPI } = apiInterface();
+  await fetchAPI(requests.auth.CSRF());
+};
+
+// Define actor actions.
+const checkTokens = fromCallback(({ input, sendBack }) => {
+  if (isNil(accessToken.value) && !isNil(input.idToken)) {
+    sendBack({ type: "REFRESH" });
+  }
+});
+
+const fetchAuthorization = fromPromise(async ({ input: { clientId, codeChallenge } }) => {
+  const body = {
+    clientId,
+    codeChallenge,
+    responseType: RESPONSE_TYPE,
+    codeChallengeMethod: CODE_CHALLENGE_METHOD,
+    redirectUri: getRedirectURI(),
+  };
+  const params = new URLSearchParams(changeKeys.snakeCase(body));
+  const { fetchAPI, responseURL, success } = apiInterface();
+  await fetchAPI(requests.auth.authorize(params));
+
+  if (success.value) {
+    const url = new URL(responseURL.value);
+    return url.searchParams.get("code");
+  } else {
+    throw new Error("Failed to authorize");
+  }
+});
+
+const fetchTokens = fromPromise(
+  async ({ input: { authorizationCode, clientId, codeVerifier } }) => {
+    const body = {
+      clientId,
+      codeVerifier,
+      code: authorizationCode,
+      grantType: "authorization_code",
+      redirectUri: getRedirectURI(),
+      scope: "openid",
+    };
+    const params = new URLSearchParams(changeKeys.snakeCase(body));
+    const { data, fetchAPI, success } = apiInterface();
+    await fetchAPI(requests.auth.token(params));
+
+    if (success.value) {
+      const payload = changeKeys.camelCase(data.value);
+      accessToken.value = payload.accessToken;
+      delete payload.accessToken;
+      return payload;
+    } else {
+      throw new Error("Unable to retrieve OAuth credentials");
+    }
+  },
+);
+
+const fetchUser = fromPromise(async () => {
+  const { data, fetchAPI, success } = apiInterface();
+  await fetchAPI(requests.auth.authUser());
+
+  if (success.value) {
+    await userInfoSchema.validate(data.value).then((value) => {
+      data.value = value;
+    });
+    return data.value;
+  } else {
+    throw new Error("Unable to fetch user data");
+  }
+});
+
+const fetchRefresh = fromCallback(async ({ input: { clientId }, sendBack }) => {
+  const body = {
+    clientId,
+    grantType: "refresh_token",
+  };
+  const params = new URLSearchParams(changeKeys.snakeCase(body));
+  const { data, fetchAPI, success } = apiInterface();
+  await fetchAPI(requests.auth.token(params));
+
+  if (success.value) {
+    const payload = changeKeys.camelCase(data.value);
+    accessToken.value = payload.accessToken;
+    sendBack({ type: "REFRESHED" });
+  } else {
+    sendBack({ type: "FAILED", error: { message: "Unable to refresh token" } });
+  }
+});
+
+const fetchLogout = fromPromise(async ({ input: { idToken } }) => {
+  const body = {
+    id_token_hint: idToken,
+  };
+  const params = new URLSearchParams(changeKeys.snakeCase(body));
+  const { fetchAPI, success } = apiInterface();
+  await fetchAPI(requests.auth.logout(params));
+
+  if (!success.value) {
+    throw new Error("Unable to logout");
+  }
+});
+
+const generateChallenge = fromPromise(async () => {
+  const codeVerifier = getCodeVerifier();
+  const codeChallenge = await getCodeChallenge(codeVerifier);
+  return {
+    codeVerifier,
+    codeChallenge,
+  };
+});
+
+const logoutReset = () => {
+  accessToken.value = null;
+  assign({
+    clientId: () => null,
+    error: () => null,
+    idToken: () => null,
+    refreshToken: () => null,
+    scope: () => null,
+    user: () => null,
+  });
+};
+
+const logoutRedirect = () => {
+  $router.push({ name: "Home" });
+};
+
+const redirect500 = () => {
+  $router.push({ name: "HTTP 500" });
+};
+
+// Define machines
+
+// PKCE/OIDC authentication flow machine.
+const pkceFlow = {
+  id: "no",
+  initial: "mode",
+  invoke: {
+    src: "generateChallenge",
+    onDone: {
+      actions: assign({
+        clientId: () => getClientId(),
+        codeVerifier: ({ event }) => event.output.codeVerifier,
+        codeChallenge: ({ event }) => event.output.codeChallenge,
+      }),
+    },
+    onError: {
+      target: "fatal", // TODO: Render a ui 500 page as we can't proceed.
+      actions: assign({ error: ({ event }) => event.error.message }),
+    },
+  },
+  states: {
+    mode: {
+      always: [
+        {
+          guard: ({ context }) => !isNil(context.idToken),
+          target: "reauthenticate",
+        },
+        {
+          target: "authenticate",
+        },
+      ],
+    },
+    authenticate: {
+      on: {
+        LOGIN: {
+          target: "authorize",
+        },
+        LOGIN_FAILED: {
+          target: "#no",
+        },
+      },
+    },
+    reauthenticate: {
+      on: {
+        LOGIN: {
+          target: "authorize",
+        },
+        LOGIN_FAILED: {
+          target: "#no",
+        },
+      },
+    },
+    authorize: {
+      invoke: {
+        src: "fetchAuthorization",
+        input: ({ context }) => ({
+          clientId: context.clientId,
+          codeChallenge: context.codeChallenge,
+        }),
+        onDone: {
+          target: "tokenize",
+          actions: assign({ authorizationCode: ({ event }) => event.output }),
+        },
+        onError: {
+          target: "#no",
+          actions: assign({ error: ({ event }) => event.error.message }),
+        },
+      },
+    },
+    tokenize: {
+      invoke: {
+        src: "fetchTokens",
+        input: ({ context }) => ({
+          authorizationCode: context.authorizationCode,
+          clientId: context.clientId,
+          codeVerifier: context.codeVerifier,
+        }),
+        onDone: {
+          target: "#yes",
+          actions: [
+            assign({
+              authorizationCode: () => null,
+              idToken: ({ event }) => event.output.idToken,
+            }),
+          ],
+        },
+        onError: {
+          target: "#no",
+          actions: assign({ error: ({ event }) => event.error.message }),
+        },
+      },
+    },
+  },
+};
+
+// Authorization code flow machine.
+const authFlow = {
+  id: "yes",
+  initial: "authorized",
+  invoke: {
+    id: "getUserData",
+    src: "fetchUser",
+    onDone: {
+      target: "yes.authorized",
+      actions: assign({ user: ({ event }) => event.output }),
+    },
+    onError: {
+      target: "#no",
+      actions: assign({ error: ({ event }) => event.error.message }),
+    },
+  },
+  states: {
+    authorized: {
+      invoke: {
+        src: "checkTokens",
+        input: ({ context }) => ({ idToken: context.idToken }),
+      },
+      on: {
+        EXPIRE: {
+          target: "expire",
+        },
+        LOGOUT: {
+          target: "logout",
+        },
+        REFRESH: {
+          target: "refresh",
+        },
+      },
+    },
+    refresh: {
+      invoke: {
+        src: "fetchRefresh",
+        input: ({ context }) => ({ clientId: context.clientId }),
+      },
+      on: {
+        REFRESHED: {
+          target: "authorized",
+        },
+        FAILED: {
+          target: "expire",
+          actions: assign({ error: ({ event }) => event.error.message }),
+        },
+      },
+    },
+    expire: {
+      invoke: {
+        src: "fetchLogout",
+        input: ({ context }) => ({ idToken: context.idToken }),
+        onDone: {
+          target: "#no.reauthenticate",
+          actions: ["logoutReset"],
+        },
+        onError: {
+          target: "authorized",
+          actions: assign({ error: ({ event }) => event.error.message }),
+        },
+      },
+    },
+    logout: {
+      invoke: {
+        src: "fetchLogout",
+        input: ({ context }) => ({ idToken: context.idToken }),
+        onDone: {
+          target: "#no.authenticate",
+          actions: ["logoutReset", "logoutRedirect"],
+        },
+        onError: {
+          target: "authorized",
+          actions: assign({ error: ({ event }) => event.error.message }),
+        },
+      },
+    },
+  },
+};
+
+// OAuth 2.0 with PKCE enchancement machine.
+export const oAuthMachine = setup({
+  actions: {
+    logoutRedirect,
+    logoutReset,
+    redirect500,
+  },
+  actors: {
+    checkTokens,
+    fetchAuthorization,
+    fetchLogout,
+    fetchRefresh,
+    fetchTokens,
+    fetchUser,
+    generateChallenge,
+  },
+}).createMachine({
+  id: "oauth",
+  initial: "no",
+  context: {
+    authorizationCode: null,
+    clientId: null,
+    codeChallenge: null,
+    codeVerifier: null,
+    error: null,
+    idToken: null,
+    scope: null,
+    user: null,
+  },
+  states: {
+    no: pkceFlow,
+    yes: authFlow,
+    fatal: {
+      entry: ["redirect500"],
+    },
+  },
+});
 
 export const useAuthStore = defineStore(
-  "auth",
+  oAuthMachine.id,
   () => {
-    // stores
+    const { actor, persistable, send, state } = useStoreMachine(oAuthMachine);
+
+    const user = useSelector(actor, ({ context: { user } }) => user);
+    // TODO: This doesn't seem to work and I don't know why!
+    const error = useSelector(actor, ({ context: { error } }) => error);
+
+    const currentState = computed(() => state.value.value);
+    const authorized = computed(() => has("yes")(currentState.value) && !isNil(user.value));
+    const unauthorized = computed(() => !authorized.value);
+    const authenticate = computed(
+      () => unauthorized.value && currentState.value.no === "authenticate",
+    );
+    const reauthenticate = computed(
+      () => unauthorized.value && currentState.value.no === "reauthenticate",
+    );
+
+    const queue = ref([]);
+    const processQueue = async () => {
+      await queue.value.forEach((callback) => callback());
+      queue.value = [];
+    };
+
+    watch(
+      () => currentState.value,
+      (oldState, newState) => {
+        const refreshed = () => oldState.yes === "refresh" && newState.yes === "authorized";
+        if (authorized.value && refreshed()) {
+          processQueue();
+        }
+      },
+    );
+
+    const logout = () => {
+      actor.send({ type: "LOGOUT" });
+      ui.$reset();
+      views.$reset();
+    };
+
+    watch(
+      () => error.value,
+      (_, newValue) => {
+        if (!isNil(newValue)) {
+          Notify.create({
+            color: "red",
+            message: newValue,
+            position: "top-right",
+            icon: "speaker_notes",
+          });
+        }
+      },
+    );
+
+    // TODO: Decomplect these.
     const ui = useUiStore();
     const views = useViewStore();
 
-    // state
-    const userId = ref(null);
-    const username = ref("");
-    const fullName = ref("");
-    const email = ref("");
-    const avatar = ref("");
-    const isAdmin = ref(false);
+    // TODO: Preferences logic tp be broken out to preferences machine/store.
     const preferences = ref({
       general: {
         tooltipsOn: true,
@@ -28,119 +480,84 @@ export const useAuthStore = defineStore(
       sourceEditor: {},
       lists: {},
     });
-    const groups = ref([]);
-    const reauthenticate = ref(false);
-    const isRefreshing = ref(false);
-    const requestQueue = ref([]);
 
-    // getters
-    const hasCredentials = computed(() => notNully(userId.value));
-
-    // actions
-    const $reset = () => {
-      userId.value = null;
-      username.value = "";
-      fullName.value = "";
-      email.value = "";
-      avatar.value = "";
-      isAdmin.value = false;
-      preferences.value = {
-        general: {
-          tooltipsOn: true,
-          sidebarCollapsed: false,
-        },
-        sourceEditor: {},
-        lists: {},
-      };
-      groups.value = [];
-      reauthenticate.value = false;
-      isRefreshing.value = false;
-      requestQueue.value = [];
-    };
-
-    const login = async (data) => {
-      userId.value = data.id;
-      username.value = data.username;
-      fullName.value = data.fullName;
-      email.value = data.email;
-      avatar.value = data.avatar;
-      isAdmin.value = data.isAdmin;
-      reauthenticate.value = false;
-      isRefreshing.value = false;
-      groups.value = data.groups;
-      if (notNully(data.preferences)) {
-        preferences.value = data.preferences;
-      }
-    };
-
-    const setCSRFToken = async () => {
-      const { fetchAPI } = apiInterface();
-      await fetchAPI(requests.auth.CSRF());
-    };
-
-    const logout = async () => {
-      ui.$reset();
-      views.$reset();
-      $reset();
-      const { fetchAPI, success, redirected } = apiInterface();
-      await fetchAPI(requests.auth.logout());
-      if (success.value) {
-        if (redirected) {
-          window.location.href = publicUrl;
-        }
-      }
-    };
-
-    const processQueue = async () => {
-      await requestQueue.value.forEach((callback) => callback());
-      requestQueue.value = [];
-    };
-
-    const updatePreferences = async (id, route, mutation) => {
-      const { newValue, key, target } = mutation.events;
-      const useKey = Array.isArray(target) ? route : key;
-      const section = getSectionfromKey(useKey);
-      const useValue = Array.isArray(target) ? preferences.value[section][useKey] : newValue;
-      const { fetchAPI, success } = apiInterface();
-      if (notNully(section)) {
-        await fetchAPI(requests.users.updateUserPreferences(id, section, useKey, useValue));
-        if (!success.value) {
-          notifier.users.prefUpdateFailed();
-        }
-      }
-    };
-
-    const getSectionfromKey = (key) => {
-      for (const section of Object.keys(preferences.value)) {
-        if (Object.keys(preferences.value[section]).indexOf(key) > -1) {
+    const getSectionFromKey = (key, preferences) => {
+      for (const section of Object.keys(preferences)) {
+        if (Object.keys(preferences[section]).indexOf(key) > -1) {
           return section;
         }
       }
       return null;
     };
 
+    const updatePreferences = async (route, mutation) => {
+      const { newValue, key, target } = mutation.events;
+      const useKey = Array.isArray(target) ? route : key;
+      const section = getSectionFromKey(useKey, preferences.value);
+      const useValue = Array.isArray(target) ? preferences.value[section][useKey] : newValue;
+      if (notNully(section)) {
+        const { fetchAPI, success } = apiInterface();
+        await fetchAPI(
+          requests.users.updateUserPreferences(user.value.userId, section, useKey, useValue),
+        );
+        if (!success.value) {
+          notifier.users.prefUpdateFailed();
+        }
+      }
+    };
+
     return {
-      userId,
-      username,
-      fullName,
-      email,
-      avatar,
-      isAdmin,
-      preferences,
-      groups,
-      reauthenticate,
-      isRefreshing,
-      requestQueue,
-      hasCredentials,
-      login,
+      accessToken,
+      actor,
+      authenticate,
+      authorized,
       logout,
-      processQueue,
-      updatePreferences,
+      persistable,
+      reauthenticate,
+      send,
       setCSRFToken,
-      $reset,
+      state,
+      unauthorized,
+      user,
+
+      // TODO: Refresh sub flow/machine?
+      processQueue,
+      queue,
+
+      // TODO: Move to independent preferences machine/store.
+      updatePreferences,
+      preferences,
+      sourceEditor: preferences.value.sourceEditor,
     };
   },
   {
-    persist: true,
+    persist: { paths: ["persistable"] },
   },
 );
+
+// Inline tests.
+if (import.meta.vitest) {
+  const { it, expect, vi } = import.meta.vitest;
+
+  vi.stubEnv("VITE_OAUTH_CLIENT_ID", "oauth.ida.development");
+
+  it("reads the OAUTH_CLIENT_ID from the environment", () => {
+    expect(getClientId()).toBe("oauth.ida.development");
+  });
+
+  it("generates a random code verifier of a given length", () => {
+    const value = getCodeVerifier();
+    expect(value.length).toBe(CODE_VERIFIER_LENGTH);
+  });
+
+  it("generates a code challenge from a code verifier", async () => {
+    const codeVerifier = "some-random-code-verifier";
+    const value = await getCodeChallenge(codeVerifier);
+    expect(value).toBe("Vu-F4aVqACp3hX7guN0m-fwYkIiVNUGPgev5hraCRBk");
+  });
+
+  it("reads the OAuth redirect uri", () => {
+    const value = getRedirectURI();
+    expect(value).toBe("http://localhost:3000/api/oauth/authorize/callback/");
+  });
+}

@@ -1,11 +1,18 @@
 import { defineConfig } from "vitest/config";
+import path from "path";
 import vue from "@vitejs/plugin-vue";
 import { quasar, transformAssetUrls } from "@quasar/vite-plugin";
 import jsconfigPaths from "vite-jsconfig-paths";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    "import.meta.vitest": "undefined",
+  },
   test: {
+    // define: {
+    //   "import.meta.vitest": "undefined",
+    // },
     environment: "happy-dom",
     setupFiles: "test/vitest/setup-file.js",
     include: [
@@ -14,6 +21,8 @@ export default defineConfig({
       "src/**/*.vitest.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
       "test/vitest/__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
     ],
+    // Necessary for inline tests.
+    includeSource: ["src/**/*.{js,ts}"],
   },
   plugins: [
     vue({
@@ -24,4 +33,9 @@ export default defineConfig({
     }),
     jsconfigPaths(),
   ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
 });

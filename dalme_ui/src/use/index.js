@@ -6,3 +6,4 @@ export { useDynamicForm } from "./dynamic-form";
 export { provideEditing, useEditing } from "./editing";
 export { usePagination } from "./pagination";
 export { provideTransport, useTransport } from "./transport";
+export { useStoreMachine } from "./xstore";

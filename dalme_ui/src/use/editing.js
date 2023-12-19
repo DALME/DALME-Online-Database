@@ -1,19 +1,19 @@
 import {
   any,
-  pipe,
   filter as rFilter,
   indexBy,
   isEmpty,
   isNil,
+  keys,
   map as rMap,
   omit,
+  pipe,
   prop,
-  keys,
   values,
 } from "ramda";
 import { computed, inject, provide, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
-import { assign, createMachine, send, spawn } from "xstate";
+import { assign, sendTo, setup, spawnChild } from "xstate";
 import { useActor, useMachine, useSelector } from "@xstate/vue";
 import { default as notifier } from "@/notifier";
 
@@ -22,262 +22,246 @@ const EditingSymbol = Symbol();
 
 export const provideEditing = () => {
   const createFormMachine = (cuid, key, kind, mode, initialData) =>
-    createMachine(
-      {
-        predictableActionArguments: true,
-        id: cuid,
-        initial: "editing",
-        context: {
-          key,
-          kind,
-          mode,
-          initialData,
-          validated: false, // TODO: This should be a state!
-          visible: true,
-        },
-        on: {
-          SAVE: { target: "saving" },
-          HIDE: { actions: "hide", internal: true },
-          SHOW: { actions: "show", internal: true },
-          VALIDATE: { actions: "validate", internal: true },
-        },
-        states: {
-          editing: {},
-          saving: {
-            on: {
-              RESOLVE: { actions: "notifySuccess", target: "complete" },
-              REJECT: { actions: "notifyFailure", target: "editing" },
-            },
-          },
-          complete: {
-            type: "final",
-          },
-        },
+    setup({
+      actions: {
+        hide: assign({ visible: false }),
+        show: assign({ visible: true }),
+        notifyFailure: ({ context }) => notifier.CRUD.failure(`Could not save ${context.kind}`),
+        notifySuccess: ({ context }) => notifier.CRUD.success(`${context.kind} saved`),
+        validate: assign({
+          validated: ({ event }) => (event.validated ? true : false),
+        }),
       },
-      {
-        actions: {
-          hide: assign({ visible: false }),
-          show: assign({ visible: true }),
-          notifyFailure: (context) => notifier.CRUD.failure(`Could not save ${context.kind}`),
-          notifySuccess: (context) => notifier.CRUD.success(`${context.kind} saved`),
-          validate: assign({
-            validated: (_, event) => (event.validated ? true : false),
-          }),
-        },
-      },
-    );
-
-  const createFolioMachine = (cuid, key, metadata) =>
-    createMachine(
-      {
-        predictableActionArguments: true,
-        id: cuid,
-        initial: "render",
-        context: { kind: "Folio", mode: "View", key, metadata, visible: true },
-        on: {
-          HIDE: { actions: "hide", internal: true },
-          SHOW: { actions: "show", internal: true },
-        },
-        states: {
-          render: {},
-        },
-      },
-      {
-        actions: {
-          hide: assign({ visible: false }),
-          show: assign({ visible: true }),
-        },
-      },
-    );
-
-  const createInlineMachine = () =>
-    createMachine(
-      {
-        predictableActionArguments: true,
-        id: "inline",
-        initial: "editing",
-        on: {
-          SAVE: { target: "saving" },
-        },
-        states: {
-          editing: {},
-          saving: {
-            on: {
-              RESOLVE: { actions: "notifySuccess", target: "complete" },
-              REJECT: { actions: "notifyFailure", target: "editing" },
-            },
-          },
-          complete: {
-            type: "final", // No need for gc, done in Table.vue itself.
-          },
-        },
-      },
-      {
-        actions: {
-          debug: () => {},
-          notifyFailure: () => notifier.CRUD.failure("Couldn't save inline edits"),
-          notifySuccess: () => notifier.CRUD.success("Inline edits saved"),
-        },
-      },
-    );
-
-  const editingMachine = createMachine(
-    {
-      predictableActionArguments: true,
-      id: "editing",
-      initial: "normal",
+    }).createMachine({
+      id: cuid,
+      initial: "editing",
       context: {
-        detail: false,
-        focus: null, // focus  : null || "inline" || cuid
-        modals: {}, // modals : { cuid: { kind: 'form' || 'folio', actor } }
-        inline: null, // inline : null || actor
-        maxModals: MAX_MODALS,
+        key,
+        kind,
+        mode,
+        initialData,
+        validated: false, // TODO: This should be a state!
+        visible: true,
       },
       on: {
-        DESTROY_MODAL: { target: "destroyModal" },
-        DESTROY_INLINE: { target: "destroyInline" },
-        RESET: { target: "reset" },
-        SAVE_FOCUS: { actions: "saveFocus", internal: true, cond: "saveable" },
-        SET_IS_DETAIL_PAGE: { actions: "setIsDetailPage", internal: true },
-        SET_FOCUS: { actions: "setFocus", internal: true },
-        SPAWN_FOLIO: {
-          target: "editing",
-          actions: "spawnFolio",
-          cond: "canSpawn",
-        },
-        SPAWN_FORM: {
-          target: "editing",
-          actions: "spawnForm",
-          cond: "canSpawn",
-        },
-        SPAWN_INLINE: {
-          target: "editing",
-          actions: "spawnInline",
-          cond: "noInline",
-        },
+        SAVE: { target: "saving" },
+        HIDE: { actions: "hide", internal: true },
+        SHOW: { actions: "show", internal: true },
+        VALIDATE: { actions: "validate", internal: true },
       },
       states: {
-        normal: {},
         editing: {},
-        destroyModal: {
-          entry: ["gcModal"],
-          always: [{ target: "editing", cond: "hasModals" }, { target: "normal" }],
+        saving: {
+          on: {
+            RESOLVE: { actions: "notifySuccess", target: "complete" },
+            REJECT: { actions: "notifyFailure", target: "editing" },
+          },
         },
-        destroyInline: {
-          entry: ["gcInline"],
-          always: [{ target: "editing", cond: "hasModals" }, { target: "normal" }],
-        },
-        reset: {
-          entry: ["gcModals"],
-          always: [{ target: "normal" }],
+        complete: {
+          type: "final",
         },
       },
-    },
-    {
+    });
+
+  const createFolioMachine = (cuid, key, metadata) =>
+    setup({
       actions: {
-        gcInline: assign({
-          focus: (context) => (context.focus === "inline" ? null : context.focus),
-          inline: null,
-        }),
-        gcModal: assign({
-          focus: (context, event) => (context.focus === event.cuid ? null : context.focus),
-          modals: (context, event) => {
-            const { actor } = context.modals[event.cuid];
-            actor.stop();
-            return omit([event.cuid], context.modals);
-          },
-        }),
-        gcModals: assign({
-          modals: (context) => {
-            rMap(({ actor }) => actor.stop(), values(context.modals));
-            return {};
-          },
-        }),
-        setIsDetailPage: assign({
-          detail: (_, event) => event.value,
-        }),
-        setFocus: assign({
-          focus: (_, event) => event.value,
-        }),
-        saveFocus: send(
-          { type: "SAVE" },
-          {
-            to: (context) =>
-              context.focus === "inline" ? context.inline : context.modals[context.focus].actor,
-          },
-        ),
-        spawnFolio: assign({
-          focus: (_, event) => event.cuid,
-          modals: (context, event) => {
-            return {
-              [event.cuid]: {
-                kind: "folio",
-                actor: spawn(createFolioMachine(event.cuid, event.key, event.metadata), {
-                  sync: true,
-                }),
-              },
-              ...context.modals,
-            };
-          },
-        }),
-        spawnForm: assign({
-          focus: (_, event) => event.cuid,
-          modals: (context, event) => {
-            return {
-              [event.cuid]: {
-                kind: "form",
-                actor: spawn(
-                  createFormMachine(
-                    event.cuid,
-                    event.key,
-                    event.kind,
-                    event.mode,
-                    event.initialData,
-                  ),
-                  { sync: true },
-                ),
-              },
-              ...context.modals,
-            };
-          },
-        }),
-        spawnInline: assign({
-          focus: "inline",
-          inline: () => spawn(createInlineMachine()),
-        }),
+        hide: assign({ visible: false }),
+        show: assign({ visible: true }),
       },
-      guards: {
-        saveable: (context) => {
-          if (isNil(context.focus)) {
-            return false;
-          }
-          if (context.focus === "inline") {
-            return true;
-          }
-          return context.modals[context.focus].kind === "form";
+    }).createMachine({
+      id: cuid,
+      initial: "render",
+      context: {
+        kind: "Folio",
+        mode: "View",
+        key,
+        metadata,
+        visible: true,
+      },
+      on: {
+        HIDE: { actions: "hide", internal: true },
+        SHOW: { actions: "show", internal: true },
+      },
+      states: {
+        render: {},
+      },
+    });
+
+  const createInlineMachine = () =>
+    setup({
+      actions: {
+        debug: () => {},
+        notifyFailure: () => notifier.CRUD.failure("Couldn't save inline edits"),
+        notifySuccess: () => notifier.CRUD.success("Inline edits saved"),
+      },
+    }).createMachine({
+      id: "inline",
+      initial: "editing",
+      on: {
+        SAVE: { target: "saving" },
+      },
+      states: {
+        editing: {},
+        saving: {
+          on: {
+            RESOLVE: { actions: "notifySuccess", target: "complete" },
+            REJECT: { actions: "notifyFailure", target: "editing" },
+          },
         },
-        canSpawn: (context) => keys(context.modals).length < context.maxModals,
-        hasModals: (context) => keys(context.modals).length > 0,
-        noInline: (context) => isNil(context.inline),
+        complete: {
+          type: "final", // No need for gc, done in Table.vue itself.
+        },
+      },
+    });
+
+  const editingMachine = setup({
+    actions: {
+      gcInline: assign({
+        focus: ({ context }) => (context.focus === "inline" ? null : context.focus),
+        inline: null,
+      }),
+      gcModal: assign({
+        focus: ({ context, event }) => (context.focus === event.cuid ? null : context.focus),
+        modals: ({ context, event }) => {
+          const { actor } = context.modals[event.cuid];
+          actor.stop();
+          return omit([event.cuid], context.modals);
+        },
+      }),
+      gcModals: assign({
+        modals: ({ context }) => {
+          rMap(({ actor }) => actor.stop(), values(context.modals));
+          return {};
+        },
+      }),
+      setIsDetailPage: assign({
+        detail: ({ event }) => event.value,
+      }),
+      setFocus: assign({
+        focus: ({ event }) => event.value,
+      }),
+      saveFocus: sendTo(
+        { type: "SAVE" },
+        {
+          to: ({ context }) =>
+            context.focus === "inline" ? context.inline : context.modals[context.focus].actor,
+        },
+      ),
+      spawnFolio: assign({
+        focus: ({ event }) => event.cuid,
+        modals: ({ context, event }) => {
+          return {
+            [event.cuid]: {
+              kind: "folio",
+              actor: spawnChild(createFolioMachine(event.cuid, event.key, event.metadata), {
+                sync: true,
+              }),
+            },
+            ...context.modals,
+          };
+        },
+      }),
+      spawnForm: assign({
+        focus: ({ event }) => event.cuid,
+        modals: ({ context, event }) => {
+          return {
+            [event.cuid]: {
+              kind: "form",
+              actor: spawnChild(
+                createFormMachine(event.cuid, event.key, event.kind, event.mode, event.initialData),
+                { sync: true },
+              ),
+            },
+            ...context.modals,
+          };
+        },
+      }),
+      spawnInline: assign({
+        focus: "inline",
+        inline: () => spawnChild(createInlineMachine()),
+      }),
+    },
+    guards: {
+      saveable: ({ context }) => {
+        if (isNil(context.focus)) {
+          return false;
+        }
+        if (context.focus === "inline") {
+          return true;
+        }
+        return context.modals[context.focus].kind === "form";
+      },
+      canSpawn: ({ context }) => keys(context.modals).length < context.maxModals,
+      hasModals: ({ context }) => keys(context.modals).length > 0,
+      noInline: ({ context }) => isNil(context.inline),
+    },
+  }).createMachine({
+    id: "editing",
+    initial: "normal",
+    context: {
+      detail: false,
+      focus: null, // focus  : null || "inline" || cuid
+      modals: {}, // modals : { cuid: { kind: 'form' || 'folio', actor } }
+      inline: null, // inline : null || actor
+      maxModals: MAX_MODALS,
+    },
+    on: {
+      DESTROY_MODAL: { target: ".destroyModal" },
+      DESTROY_INLINE: { target: ".destroyInline" },
+      RESET: { target: ".reset" },
+      SAVE_FOCUS: { actions: "saveFocus", internal: true, guard: "saveable" },
+      SET_IS_DETAIL_PAGE: { actions: "setIsDetailPage", internal: true },
+      SET_FOCUS: { actions: "setFocus", internal: true },
+      SPAWN_FOLIO: {
+        target: ".editing",
+        actions: "spawnFolio",
+        guard: "canSpawn",
+      },
+      SPAWN_FORM: {
+        target: ".editing",
+        actions: "spawnForm",
+        guard: "canSpawn",
+      },
+      SPAWN_INLINE: {
+        target: ".editing",
+        actions: "spawnInline",
+        guard: "noInline",
       },
     },
-  );
+    states: {
+      normal: {},
+      editing: {},
+      destroyModal: {
+        entry: ["gcModal"],
+        always: [{ target: "editing", guard: "hasModals" }, { target: "normal" }],
+      },
+      destroyInline: {
+        entry: ["gcInline"],
+        always: [{ target: "editing", guard: "hasModals" }, { target: "normal" }],
+      },
+      reset: {
+        entry: ["gcModals"],
+        always: [{ target: "normal" }],
+      },
+    },
+  });
 
   // Main interface.
   const machine = useMachine(editingMachine);
-  const { service } = machine;
+  const { actorRef } = machine;
 
   // Convenience getters lensing into the machine context.
-  const focus = useSelector(service, (state) => state.context.focus);
-  const modals = useSelector(service, (state) => state.context.modals);
-  const folios = useSelector(service, (state) =>
+  const focus = useSelector(actorRef, (state) => state.context.focus);
+  const modals = useSelector(actorRef, (state) => state.context.modals);
+  const folios = useSelector(actorRef, (state) =>
     rFilter(({ kind }) => kind === "folio", state.context.modals),
   );
-  const forms = useSelector(service, (state) =>
+  const forms = useSelector(actorRef, (state) =>
     rFilter(({ kind }) => kind === "form", state.context.modals),
   );
-  const inline = useSelector(service, (state) => state.context.inline);
-  const isDetail = useSelector(service, (state) => state.context.detail);
+  const inline = useSelector(actorRef, (state) => state.context.inline);
+  const isDetail = useSelector(actorRef, (state) => state.context.detail);
 
   // Reactive values.
   const mouseoverSubmit = ref(false);
@@ -290,13 +274,13 @@ export const provideEditing = () => {
   const hideAll = () => {
     for (const { actor } of values(modals.value)) {
       const { send } = useActor(actor);
-      send("HIDE");
+      send({ type: "HIDE" });
     }
   };
   const showAll = () => {
     for (const { actor } of values(modals.value)) {
       const { send } = useActor(actor);
-      send("SHOW");
+      send({ type: "SHOW" });
     }
   };
 
@@ -386,9 +370,9 @@ export const provideEditing = () => {
   // the refactored future and just call this there, once.
   const resource = ref(null);
   const editingDetailRouteGuard = () => {
-    machine.send("SET_IS_DETAIL_PAGE", { value: true });
+    machine.send({ type: "SET_IS_DETAIL_PAGE", value: true });
     onBeforeRouteLeave(() => {
-      machine.send("SET_IS_DETAIL_PAGE", { value: false });
+      machine.send({ type: "SET_IS_DETAIL_PAGE", value: false });
     });
   };
 

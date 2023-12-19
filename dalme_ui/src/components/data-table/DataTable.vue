@@ -407,11 +407,11 @@ export default defineComponent({
       const request = props.updateRequest(objDiffs);
       await fetchAPI(request);
       if (success.value && status.value == 201) {
-        actorSend.value("RESOLVE");
+        actorSend.value({ type: "RESOLVE" });
         resetTransport();
         await props.fetchData();
       } else {
-        actorSend.value("REJECT");
+        actorSend.value({ type: "REJECT" });
       }
     };
 
@@ -455,14 +455,14 @@ export default defineComponent({
       () => diffCount.value,
       (count, prevCount) => {
         if (prevCount === 0 && count === 1) {
-          send("SPAWN_INLINE");
+          send({ type: "SPAWN_INLINE" });
           const actor = useActor(inline.value);
           actorSend.value = actor.send;
           formSubmitWatcher(actor.state, handleSubmit);
           showEditing.value(); // Open the edit panel.
         }
         if (prevCount === 1 && count === 0) {
-          send("DESTROY_INLINE");
+          send({ type: "DESTROY_INLINE" });
         }
       },
     );

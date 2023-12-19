@@ -21,21 +21,28 @@ services:
       dockerfile: ./config/docker/Dockerfile.web
       target: "development"
     environment:
-      ENV_FILE: .env
+      ENV_FILE: /opt/web/.env
       LOG_LEVEL: ERROR
+      OAUTH_CLIENT_ID: 'oauth.ida.development'
+      OAUTH_CLIENT_SECRET: 'django-insecure-development-environment-oauth-client-secret'
+      OIDC_RSA_PRIVATE_KEY: /opt/web/oidc.key
       POSTGRES_DB: dalme
       POSTGRES_HOST: dalme.db
       POSTGRES_PASSWORD: dalme
       POSTGRES_USER: dalme
+      DAM_DB_NAME: resourcespace
+      DAM_DB_HOST: rs.db
+      DAM_DB_PASSWORD: dalme
+      DAM_DB_USER: dalme
     depends_on:
       - dalme.db
     networks:
       - app-network
     volumes:
+      - ./ida:/opt/web/ida
       - ./dalme:/opt/web/dalme
       - ./dalme_api:/opt/web/dalme_api
       - ./dalme_app:/opt/web/dalme_app
-      - ./ida:/opt/web/ida
       - ./dalme_purl:/opt/web/dalme_purl
       - ./dalme_public:/opt/web/dalme_public
       - ./templates:/opt/web/templates
@@ -57,6 +64,7 @@ services:
       target: "development"
     environment:
       NODE_ENV: development
+      VITE_OAUTH_CLIENT_ID: oauth.ida.development
     volumes:
       - ./dalme_ui/src:/opt/ui/src
     networks:

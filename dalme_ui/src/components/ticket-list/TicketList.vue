@@ -260,9 +260,9 @@ export default defineComponent({
   setup(props, context) {
     if (!props.embedded) useMeta({ title: "Issue Tickets" });
     const $route = useRoute();
+    const { auth } = useStores();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
-    const { userId } = useStores();
     const { ticketTagColours } = useConstants();
     const { postSubmitRefreshWatcher } = useEditing();
     const columns = ref([]);
@@ -277,7 +277,7 @@ export default defineComponent({
 
     const fetchData = async (query) => {
       const request = props.embedded
-        ? requests.tickets.getUserTickets(userId.value)
+        ? requests.tickets.getUserTickets(auth.user.userId)
         : requests.tickets.getTickets(query);
       await fetchAPI(request);
       if (success.value)
@@ -350,7 +350,7 @@ export default defineComponent({
       context,
       cleanTags,
       columns,
-      filterList,
+      filterList: filterList(auth.user.userId),
       formatDate,
       loading,
       noData,
@@ -367,7 +367,7 @@ export default defineComponent({
       setAuthor,
       setAssignee,
       search,
-      sortList,
+      sortList: sortList(),
       tagsFilter,
       ticketTagColours,
       tagList: Object.keys(ticketTagColours),

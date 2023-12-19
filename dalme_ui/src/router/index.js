@@ -49,7 +49,7 @@ router.beforeResolve(async (to) => {
   const views = useViewStore();
   await ui.setPageState(to);
   ui.setUiState(to);
-  views.setViewState(to);
+  views.setViewState(views, to);
 });
 
 export default router;

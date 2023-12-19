@@ -162,13 +162,7 @@ export default defineComponent({
 
     const handleClick = (kind) => {
       cFab.value.hide();
-      send("SPAWN_FORM", {
-        cuid: cuid(),
-        key: null,
-        kind,
-        mode,
-        initialData: {},
-      });
+      send({ type: "SPAWN_FORM", cuid: cuid(), key: null, kind, mode, initialData: {} });
     };
 
     return {

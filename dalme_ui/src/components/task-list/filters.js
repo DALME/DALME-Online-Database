@@ -1,7 +1,4 @@
-import { useAuthStore } from "@/stores/auth";
-const $authStore = useAuthStore();
-
-export const filterList = {
+export const filterList = (userId) => ({
   preset: [
     {
       field: "completed",
@@ -15,18 +12,18 @@ export const filterList = {
     },
     {
       field: "creation_user",
-      value: $authStore.userId,
+      value: userId,
       label: "Tasks you created",
     },
     {
       field: "assigned_to",
-      value: $authStore.userId,
+      value: userId,
       label: "Tasks assigned to you",
     },
   ],
-};
+});
 
-export const sortList = [
+export const sortList = () => [
   {
     label: "Newest",
     value: {

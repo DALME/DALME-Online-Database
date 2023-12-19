@@ -80,13 +80,13 @@ export default defineComponent({
       mouseoverSubmit,
       recenter,
       showAll,
-      machine: { send, service },
+      machine: { send, actorRef },
     } = useEditing();
     const { windowIndexShow } = useStores();
     const handleFocus = (cuid) => {
       const { send: actorSend } = useActor(modals.value[cuid].actor);
-      send("SET_FOCUS", { value: cuid });
-      actorSend("SHOW");
+      send({ type: "SET_FOCUS", value: cuid });
+      actorSend({ type: "SHOW" });
     };
 
     const handleRecenter = (cuid) => {
@@ -98,7 +98,8 @@ export default defineComponent({
     const disableHideAll = ref(null);
     const disableShowAll = ref(null);
 
-    service.onTransition(({ context: { modals } }) => {
+    actorRef.subscribe((snapshot) => {
+      const modals = snapshot.context.modals;
       windowIndexShow.value = keys(modals).length > 0;
       // TODO: I'm sure all this can be optimized to only traverse once.
       actors.value = rMap(({ actor }) => useActor(actor).state, modals);

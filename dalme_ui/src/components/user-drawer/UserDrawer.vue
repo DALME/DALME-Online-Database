@@ -9,13 +9,13 @@
         <q-item dense class="no-shrink">
           <q-item-section avatar>
             <q-avatar size="40px" class="greyscale-50">
-              <img v-if="notNully(auth.avatar)" :src="auth.avatar" />
+              <img v-if="notNully(auth.user.avatar)" :src="auth.user.avatar" />
               <q-icon v-else size="40px" name="mdi-account-circle" />
             </q-avatar>
           </q-item-section>
           <q-item-section>
-            <q-item-label class="text-weight-bold">{{ auth.fullName }}</q-item-label>
-            <q-item-label caption>{{ auth.username }}</q-item-label>
+            <q-item-label class="text-weight-bold">{{ auth.user.fullName }}</q-item-label>
+            <q-item-label caption>{{ auth.user.username }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-btn
@@ -31,7 +31,7 @@
         </q-item>
         <q-separator spaced />
         <q-item
-          :to="{ name: 'User', params: { username: auth.username } }"
+          :to="{ name: 'User', params: { username: auth.user.username } }"
           dense
           clickable
           v-close-popup
@@ -42,7 +42,7 @@
           <q-item-section>Your profile</q-item-section>
         </q-item>
         <q-item
-          :to="{ name: 'User', params: { username: auth.username } }"
+          :to="{ name: 'User', params: { username: auth.user.username } }"
           dense
           clickable
           v-close-popup

@@ -144,7 +144,7 @@ export default defineComponent({
       return pages;
     };
 
-    views.mergeValues({
+    views.mergeValues(views, {
       folios: getFolios(),
       currentFolioRef: 0,
       folioDrawerMini: true,

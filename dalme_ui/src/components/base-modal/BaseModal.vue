@@ -99,8 +99,8 @@ export default defineComponent({
       onEnd: () => useStorage(positionKey, { x, y }, localStorage),
     });
 
-    const handleFocus = () => send("SET_FOCUS", { value: props.cuid });
-    const handleMinimize = () => actorSend("HIDE");
+    const handleFocus = () => send({ type: "SET_FOCUS", value: props.cuid });
+    const handleMinimize = () => actorSend({ type: "HIDE" });
     const confirm = () => {
       let message = `Do you want to close the window <br />\
         <span class="text-weight-medium">${modalTitle.value}</span>?`;
@@ -124,7 +124,7 @@ export default defineComponent({
           colourScheme: valid.value ? "warning" : "edit-mode",
         },
       }).onOk(() => {
-        send("DESTROY_MODAL", { cuid: props.cuid });
+        send({ type: "DESTROY_MODAL", cuid: props.cuid });
       });
     };
 

@@ -117,7 +117,6 @@ import { requests } from "@/api";
 import { OpaqueSpinner } from "@/components";
 import { setDetailSchema } from "@/schemas";
 import { useAPI, useEditing } from "@/use";
-import { useNavStore } from "@/stores/navigation";
 import SetMembers from "./SetMembers.vue";
 
 export default defineComponent({
@@ -131,7 +130,6 @@ export default defineComponent({
     const id = ref($route.params.id);
     const { apiInterface } = useAPI();
     const { editingDetailRouteGuard, resource } = useEditing();
-    const $navStore = useNavStore();
     const { loading, success, data, fetchAPI } = apiInterface();
     const set = ref({});
     const hasMembers = computed(
@@ -149,7 +147,6 @@ export default defineComponent({
         await setDetailSchema.validate(data.value, { stripUnknown: true }).then((value) => {
           resource.value = value.setType.name.toLowerCase();
           set.value = value;
-          $navStore.currentSubsection = value.setType.name + "s";
           loading.value = false;
         });
     };

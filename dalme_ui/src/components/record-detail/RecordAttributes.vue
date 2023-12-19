@@ -222,8 +222,6 @@ export default defineComponent({
       ),
     );
 
-    console.log(record.value);
-
     return {
       attributes,
       getAttributeLabel,

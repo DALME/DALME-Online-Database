@@ -1,5 +1,6 @@
 """Interface for the ida.models module."""
 from .agent import Agent, Organization, Person
+from .application import Application
 from .attribute import (
     Attribute,
     AttributeValueBool,
@@ -39,11 +40,12 @@ from .tenant import Domain, Tenant
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
-from .user import User
+from .user import Profile, User
 from .wordform import Wordform
 
 __all__ = [
     'Agent',
+    'Application',
     'Attribute',
     'AttributeReference',
     'AttributeType',
@@ -75,6 +77,7 @@ __all__ = [
     'Permission',
     'Person',
     'Place',
+    'Profile',
     'PublicRegister',
     'Publication',
     'Record',

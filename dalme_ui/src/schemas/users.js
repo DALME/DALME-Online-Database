@@ -37,7 +37,7 @@ export const usersAsOptionsSchema = yup.array().of(
       caption: yup.string().required(),
     })
     .transform((value) => ({
-      // TODO: Only necessary because JHHR doesn't have a user.profile.
+      // TODO: Only necessary because jhrr doesn't have a user.profile.
       label: value.fullName || `${value.firstName} ${value.lastName}`,
       value: value.id,
       caption: value.username,

@@ -1,5 +1,6 @@
 bibtexparser==1.4.0
 boto3==1.26.135
+cuid2==2.0.0
 dj-database-url==2.0.0
 Django==4.2.2
 django-configurations==2.4.1

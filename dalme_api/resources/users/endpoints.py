@@ -1,4 +1,5 @@
 """API endpoint for managing users."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -23,8 +24,12 @@ class UserAccessPolicy(BaseAccessPolicy):
 class Users(DALMEBaseViewSet):
     """API endpoint for managing users."""
 
+    permission_classes = [
+        UserAccessPolicy,
+        TokenHasReadWriteScope,
+    ]
+
     lookup_url_kwarg = 'pk'
-    permission_classes = (UserAccessPolicy,)
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter

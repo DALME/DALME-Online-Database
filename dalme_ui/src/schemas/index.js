@@ -1,3 +1,4 @@
+// NOTE: Don't sort these, or imports will break.
 export * from "./common";
 export * from "./preferences";
 export * from "./groups";
@@ -6,7 +7,6 @@ export * from "./agents";
 export * from "./attributes";
 export * from "./archival-files";
 export * from "./archives";
-export * from "./auth";
 export * from "./bibliographies";
 export * from "./collections";
 export * from "./comments";
@@ -22,6 +22,7 @@ export * from "./places";
 export * from "./workflow";
 export * from "./records";
 export * from "./rights";
+export * from "./sets";
 export * from "./tickets";
 export * from "./transcriptions";
 export * from "./worksets";

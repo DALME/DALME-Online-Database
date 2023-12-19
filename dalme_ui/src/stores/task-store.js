@@ -77,7 +77,7 @@ export const useTaskStore = defineStore("taskStore", () => {
 
   // getters
   const _isStale = computed(() => Date.now() - timestamp.value > 86400000);
-  const isLoaded = computed(() => timestamp.value != null && auth.userId);
+  const isLoaded = computed(() => timestamp.value != null && auth.user.userId);
 
   // actions
   const $reset = () => {
@@ -107,10 +107,11 @@ export const useTaskStore = defineStore("taskStore", () => {
   };
 
   const getRequest = (type, limit, offset, query) => {
-    if (type == "assigned") return requests.tasks.getAssignedTasks(auth.userId, limit, offset);
-    if (type == "completed") return requests.tasks.getCompletedTasks(auth.userId, limit, offset);
-    if (type == "created") return requests.tasks.getCreatedTasks(auth.userId, limit, offset);
-    if (type == "user") return requests.tasks.getUserTasks(auth.userId, limit, offset);
+    if (type == "assigned") return requests.tasks.getAssignedTasks(auth.user.userId, limit, offset);
+    if (type == "completed")
+      return requests.tasks.getCompletedTasks(auth.user.userId, limit, offset);
+    if (type == "created") return requests.tasks.getCreatedTasks(auth.user.userId, limit, offset);
+    if (type == "user") return requests.tasks.getUserTasks(auth.user.userId, limit, offset);
     return requests.tasks.getTasks(query, limit, offset);
   };
 
@@ -118,31 +119,35 @@ export const useTaskStore = defineStore("taskStore", () => {
     return new Promise((resolve) => {
       const { success, data, fetchAPI } = apiInterface();
       loading.value = true;
-      fetchAPI(getRequest(type, limit, offset, query)).then(() => {
-        if (success.value) {
-          tasksSchema.validate(data.value.data, { stripUnknown: true }).then((validatedData) => {
-            timestamp.value = Date.now();
-            if (!isLoaded.value) {
-              meta.value = {
-                all: data.value.totalTasks,
-                user: data.value.count,
-                created: data.value.totalCreated,
-                assigned: data.value.totalAssigned,
-                completed: data.value.totalCompleted,
-              };
-            }
-            validatedData.forEach((x) => tasks.value.push(new Task(x, auth.userId, auth.groups)));
-            loading.value = false;
-            return resolve();
-          });
-        }
-      });
+      if (auth.authorized) {
+        fetchAPI(getRequest(type, limit, offset, query)).then(() => {
+          if (success.value) {
+            tasksSchema.validate(data.value.data, { stripUnknown: true }).then((validatedData) => {
+              timestamp.value = Date.now();
+              if (!isLoaded.value) {
+                meta.value = {
+                  all: data.value.totalTasks,
+                  user: data.value.count,
+                  created: data.value.totalCreated,
+                  assigned: data.value.totalAssigned,
+                  completed: data.value.totalCompleted,
+                };
+              }
+              validatedData.forEach((x) =>
+                tasks.value.push(new Task(x, auth.user.userId, auth.user.groups)),
+              );
+            });
+          }
+        });
+      }
+      loading.value = false;
+      return resolve();
     });
   };
 
   const getTaskbyId = (id) => {
     const result = rFilter((x) => x.id == id, tasks.value);
-    //TODO: should check the server too
+    // TODO: Should check the server too.
     return result.length ? result[0] : null;
   };
 

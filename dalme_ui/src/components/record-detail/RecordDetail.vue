@@ -23,20 +23,20 @@
               <div class="row detail-row-subheading text-grey-8">
                 <template v-if="!ui.globalLoading">
                   <span>Created</span>
-                  {{ formatDate(record.created.timestamp) }} by
+                  {{ formatDate(record.creationTimestamp) }} by
                   <DetailPopover
                     :userData="{
-                      username: record.created.username,
-                      fullName: record.created.user,
+                      username: record.creationUser.username,
+                      fullName: record.creationUser.fullName,
                     }"
                     :showAvatar="false"
                   />
                   <span>, last modified</span>
-                  {{ formatDate(record.modified.timestamp) }} by
+                  {{ formatDate(record.modificationTimestamp) }} by
                   <DetailPopover
                     :userData="{
-                      username: record.modified.username,
-                      fullName: record.modified.user,
+                      username: record.modificationUser.username,
+                      fullName: record.modificationUser.fullName,
                     }"
                     :showAvatar="false"
                   />
@@ -116,14 +116,14 @@
             <div class="row q-mr-sm">
               <BooleanWidget
                 v-if="resource === 'record'"
-                :value="!record.workflow.isPublic"
+                :value="record && !record.workflow.isPublic"
                 :onlyTrue="true"
                 trueIcon="public"
                 trueColour="light-green-7"
               />
               <BooleanWidget
                 v-if="resource === 'record'"
-                :value="!record.workflow.helpFlag"
+                :value="record && !record.workflow.helpFlag"
                 :onlyTrue="true"
                 trueIcon="flag"
                 trueColour="red-4"
@@ -178,7 +178,7 @@
 
 <script>
 import { useMeta } from "quasar";
-import { computed, defineComponent, provide, ref, watch, onBeforeUnmount, onUnmounted } from "vue";
+import { computed, defineComponent, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { requests } from "@/api";
 import { useAPI, useEditing, useStores } from "@/use";
@@ -297,13 +297,6 @@ export default defineComponent({
     );
 
     editingDetailRouteGuard();
-
-    onBeforeUnmount(() => {
-      console.log("recordDetail beforeUnmount");
-    });
-    onUnmounted(() => {
-      console.log("recordDetail unmounted");
-    });
 
     return {
       commentCount,

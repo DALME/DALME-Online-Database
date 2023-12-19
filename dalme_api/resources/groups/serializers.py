@@ -21,6 +21,13 @@ class GroupSerializer(DynamicSerializer, WritableNestedModelSerializer):
         source='properties.description',
         required=False,
     )
+    # TODO: Reactivate when Group/Tenant issues are resolved.
+    # tenant = serializers.PrimaryKeyRelatedField(
+    #     allow_null=True,
+    #     many=False,
+    #     read_only=True,
+    #     source='properties.tenant',
+    # )
 
     class Meta:
         model = Group

@@ -25,6 +25,11 @@ infra.log:
 	docker compose logs --follow
 .PHONY: infra.log
 
+infra.oidc.key:
+	if [ ! -f $(CONFIG)/oidc.key ]; \
+		then openssl genrsa -out $(CONFIG)/oidc.key 4096; fi;
+.PHONY: infra.oidc.key
+
 infra.pg.check:
 	@command -v 'postgres' >/dev/null 2>&1
 .PHONY: infra.pg.check
@@ -65,6 +70,7 @@ infra.stop:
 infra.help:
 	@echo "  infra.build            build the containers"
 	@echo "  infra.log              tail the container logs"
+	@echo "  infra.oidc.key         generate a private key for signing oauth/oidc tokens"
 	@echo "  infra.rebuild          rebuild the containers"
 	@echo "  infra.start            spin up the container network"
 	@echo "  infra.stop             stop the container network"

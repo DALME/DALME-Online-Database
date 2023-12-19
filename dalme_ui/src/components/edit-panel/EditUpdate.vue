@@ -46,7 +46,8 @@ export default defineComponent({
     const underEdit = computed(() => !isNil(editingIndex.value[key.value]));
 
     const spawnForm = (initialData) =>
-      send("SPAWN_FORM", {
+      send({
+        type: "SPAWN_FORM",
         cuid: cuid(),
         key: key.value,
         kind: resource.value,
@@ -59,8 +60,8 @@ export default defineComponent({
       const indexed = editingIndex.value[key.value];
       if (underEdit.value) {
         const { send: actorSend } = useActor(modals.value[indexed.cuid].actor);
-        send("SET_FOCUS", { value: indexed.cuid });
-        actorSend("SHOW");
+        send({ type: "SET_FOCUS", value: indexed.cuid });
+        actorSend({ type: "SHOW" });
       } else {
         loading.value = true;
         const {

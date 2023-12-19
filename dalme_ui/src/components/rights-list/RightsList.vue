@@ -149,7 +149,7 @@ import { requests } from "@/api";
 import { BooleanWidget, DetailPopover, TagWidget, DataTable } from "@/components";
 import { formatDate, getColumns, getDefaults } from "@/utils";
 import { rightsListSchema } from "@/schemas";
-import { useAPI, useConstants, usePagination } from "@/use";
+import { useAPI, useConstants, usePagination, useStores } from "@/use";
 import { columnMap } from "./columns";
 import { filterList, sortList } from "./filters";
 
@@ -163,6 +163,7 @@ export default defineComponent({
   },
   setup() {
     const $route = useRoute();
+    const { auth } = useStores();
     const { rightsIconById, rightsColoursById } = useConstants();
     const { apiInterface } = useAPI();
     const { loading, success, data, fetchAPI } = apiInterface();
@@ -208,7 +209,7 @@ export default defineComponent({
 
     return {
       columns,
-      filterList,
+      filterList: filterList(auth.user.userId),
       formatDate,
       getStatusIcon,
       getStatusColours,
@@ -224,7 +225,7 @@ export default defineComponent({
       pagination,
       rows,
       search,
-      sortList,
+      sortList: sortList(),
       title,
       visibleColumns,
     };

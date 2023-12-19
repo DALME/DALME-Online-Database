@@ -57,3 +57,4 @@ __pycache__/
 # Miscellaneous
 .infracost/
 apply-perms.temp
+*.diff

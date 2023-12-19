@@ -44,7 +44,7 @@ export default defineComponent({
     const handleSubmit = () => {
       // Button will always disabled if state is invalid, but just in case.
       if (valid.value) {
-        send("SAVE_FOCUS");
+        send({ type: "SAVE_FOCUS" });
       }
     };
 

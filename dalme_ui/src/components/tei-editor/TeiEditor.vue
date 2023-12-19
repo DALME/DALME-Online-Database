@@ -131,7 +131,7 @@
 </template>
 
 <script>
-import { filter as rFilter, isEmpty, prop, sortBy } from "ramda";
+import { filter as rFilter, isEmpty, isNil, prop, sortBy } from "ramda";
 import {
   computed,
   defineComponent,
@@ -373,7 +373,9 @@ export default defineComponent({
 
     watch([editorHeight, editorWidth], async () => {
       await nextTick();
-      editor.resize();
+      if (!isNil(editor)) {
+        editor.resize();
+      }
     });
 
     watch(

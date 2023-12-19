@@ -37,7 +37,7 @@ class Page(dalmeUuid):
     @property
     def thumbnail_url(self):
         """Return the thumbnail's url for the image associated with the page (if any)."""
-        rs_resource = apps.get_model(app_label='dalme_app', model_name='rs_resource')
+        rs_resource = apps.get_model(app_label='ida', model_name='rs_resource')
         try:
             thumbnail = rs_resource.objects.get(ref=self.dam_id).get_image_url('thm')
         except (KeyError, ValueError):

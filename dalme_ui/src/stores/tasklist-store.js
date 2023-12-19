@@ -41,8 +41,8 @@ export const useTasklistStore = defineStore("tasklistStore", () => {
   };
 
   const getRequest = (type, limit, offset = 0, query = null) => {
-    if (type == "user") return requests.tasks.getUserTasklists(auth.userId);
-    return requests.tasks.getTasklists(query, limit, offset);
+    if (type == "user") return requests.tasks.getUserTaskLists(auth.user.userId);
+    return requests.tasks.getTaskLists(query, limit, offset);
   };
 
   const fetchData = (request) => {

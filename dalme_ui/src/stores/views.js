@@ -75,23 +75,24 @@ export const useViewStore = defineStore(
       return null;
     };
 
-    const setViewState = (target) => {
+    const setViewState = (store, target) => {
       if (!ui.isSameRoute) {
         view.value = {};
         if (!(isEmpty(target.meta) || target.meta.resetStateOnLoad)) {
           const viewState = retrieveViewState(target.fullPath);
           if ("viewDefaults" in target.meta) view.value = target.meta.viewDefaults;
-          if (viewState) mergeValues(viewState.state);
+          if (viewState) mergeValues(store, viewState.state);
         }
       }
     };
 
-    const mergeValues = (values) => {
-      let partial = mergeDeepLeft(this.$state, { view: values });
-      this.$patch(partial);
+    const mergeValues = (store, values) => {
+      let partial = mergeDeepLeft(store.$state, { view: values });
+      store.$patch(partial);
     };
 
     return {
+      mergeValues,
       view,
       stored,
       showEditFolioBtn,

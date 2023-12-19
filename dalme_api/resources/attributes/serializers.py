@@ -131,7 +131,7 @@ class AttributeSerializer(DynamicSerializer, WritableNestedModelSerializer):
             elif data_type == 'FKEY':
                 model_name = self.instance.value._meta.model.__name__  # noqa: SLF001
                 serializer_class_name = f'{model_name}Serializer'
-                srs = __import__('dalme_api.serializers', fromlist=[serializer_class_name])  # noqa: F841
+                srs = __import__('dalme_api.resources', fromlist=[serializer_class_name])  # noqa: F841
                 serializer_class = eval(f'srs.{serializer_class_name}')  # noqa: PGH001
                 self.fields['value'] = serializer_class(self.instance.value, field_set='attribute')
 

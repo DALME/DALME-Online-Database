@@ -11,7 +11,7 @@ from pathlib import Path
 
 import elasticsearch
 import structlog
-from configurations import Configuration, pristinemethod, values
+from configurations import Configuration, pristinemethod
 
 
 @dataclasses.dataclass
@@ -38,6 +38,8 @@ class Base(Configuration):
             *cls.SHARED_APPS,
             *[app for app in cls.TENANT_APPS if app not in cls.SHARED_APPS],
         ]
+
+    IS_DEV = os.environ['ENV'] in {'development', 'ci'}
 
     BASE_DIR = Path(__file__).resolve().parent.parent
     PROJECT_ROOT = BASE_DIR / 'dalme'
@@ -94,7 +96,7 @@ class Base(Configuration):
         'maintenance_mode',
         'captcha',
         'corsheaders',
-        # 'oauth2_provider',
+        'oauth2_provider',
         'dalme_app.application.DalmeConfig',
         'dalme_api.application.DalmeAPIConfig',
         'dalme_purl.application.DalmePURLConfig',
@@ -266,14 +268,32 @@ class Base(Configuration):
         {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
         {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
     ]
+    OAUTH2_PROVIDER_APPLICATION_MODEL = 'ida.Application'
+    OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', 3600)  # 1 hour.
+    OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get('OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', 3600 * 24 * 14)  # 14 days
+
+    @property
+    def OAUTH_CLIENT_ID(self):  # noqa: N802
+        return os.environ['OAUTH_CLIENT_ID']
+
+    @property
+    def OAUTH_CLIENT_SECRET(self):  # noqa: N802
+        return os.environ['OAUTH_CLIENT_SECRET']
 
     REST_FRAMEWORK = {
-        'DEFAULT_PAGINATION_CLASS': 'dalme_api.paginators.DALMELimitOffsetPagination',
-        'PAGE_SIZE': 10,
         'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework.authentication.TokenAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+            'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         ],
-        'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+        'DEFAULT_FILTER_BACKENDS': [
+            'django_filters.rest_framework.DjangoFilterBackend',
+            'rest_framework.filters.SearchFilter',
+            'dalme_api.filter_backends.DalmeOrderingFilter',
+        ],
+        'DEFAULT_PAGINATION_CLASS': 'dalme_api.paginators.DALMELimitOffsetPagination',
+        'DEFAULT_PARSER_CLASSES': [
+            'djangorestframework_camel_case.parser.CamelCaseJSONParser',
+        ],
         'DEFAULT_PERMISSION_CLASSES': [
             'rest_framework.permissions.IsAuthenticated',
         ],
@@ -281,17 +301,11 @@ class Base(Configuration):
             'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
             'rest_framework.renderers.BrowsableAPIRenderer',
         ],
-        'DEFAULT_PARSER_CLASSES': [
-            'djangorestframework_camel_case.parser.CamelCaseJSONParser',
-        ],
-        'DEFAULT_FILTER_BACKENDS': [
-            'django_filters.rest_framework.DjangoFilterBackend',
-            'rest_framework.filters.SearchFilter',
-            'dalme_api.filter_backends.DalmeOrderingFilter',
-        ],
+        'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
         'JSON_UNDERSCOREIZE': {
             'no_underscore_before_number': True,
         },
+        'PAGE_SIZE': 10,
     }
 
     # Elasticsearch
@@ -322,11 +336,12 @@ class Base(Configuration):
         `SomeEnum()` it'll throw an exception) django-configurations barfs when
         we set a bare enum as a setting because it tries to call it without an
         argument when it parses and checks the settings. This seems to be a
-        bug, it doesn't look like they have even considered that anyone would
-        use an enum as a setting at this point. This being the case we can just
-        wrap TENANTS in `pristinemethod` here which means that it doesn't
-        undergo the `callable` check (which is skipped for `pristinemethod`)
-        which would otherwise break startup.
+        bug. It doesn't look like the authors have even considered that anyone
+        would use an enum as a setting at this point, as they are a relatively
+        new language feature. This all being the case, we can just wrap TENANTS
+        in `pristinemethod` here which means that it doesn't undergo the
+        `callable` check (which is skipped for `pristinemethod`) which would
+        otherwise break startup.
 
         The expense is that we actually have to call `settings.TENANTS()` in
         the app whenever we need it. We could just make TENANTS a dict to avoid
@@ -384,7 +399,7 @@ class Development(Base, Configuration):
     SECURE_SSL_REDIRECT = False
 
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    SECRET_KEY = 'django-insecure-development-environment-secret-key'
+    SECRET_KEY = 'django-development-environment-insecure-secret-key'
 
     @property
     def MEDIA_ROOT(self):  # noqa: N802
@@ -408,13 +423,37 @@ class Development(Base, Configuration):
         },
         'dam': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': values.Value('DAM_DB_NAME', environ_prefix=None),
-            'USER': values.Value('DAM_DB_USER', environ_prefix=None),
-            'PASSWORD': values.Value('DAM_DB_PASSWORD', environ_prefix=None),
-            'HOST': values.Value('DAM_DB_HOST', environ_prefix=None),
-            'PORT': os.environ.get('DAM_DB_PORT', 3306),
+            'NAME': os.environ['DAM_DB_NAME'],
+            'USER': os.environ['DAM_DB_USER'],
+            'PASSWORD': os.environ['DAM_DB_PASSWORD'],
+            'HOST': os.environ['DAM_DB_HOST'],
+            'PORT': os.environ.get('DAM_PORT', 3306),
         },
     }
+
+    DAM_API_ENDPOINT = 'https://dam.dalme.org/api/?'
+    DAM_API_USER = os.environ.get('DAM_API_USER')
+    DAM_API_KEY = os.environ.get('DAM_API_KEY')
+
+    @property
+    def OAUTH2_PROVIDER(self):  # noqa: N802
+        """Configure OAuth and OIDC."""
+        with open(os.environ['OIDC_RSA_PRIVATE_KEY']) as f:
+            return {
+                'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
+                'ALLOWED_REDIRECT_URI_SCHEMES': ['http', 'https'],
+                'OAUTH2_VALIDATOR_CLASS': 'ida.auth.IDAOAuth2Validator',
+                'OIDC_ENABLED': True,
+                'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
+                'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,
+                'OIDC_RSA_PRIVATE_KEY': f.read(),
+                'SCOPES': {
+                    'read': 'Read scope',
+                    'write': 'Write scope',
+                    'groups': 'Auth groups scopes',
+                    'openid': 'OpenID Connect scope',
+                },
+            }
 
     # https://docs.djangoproject.com/en/4.2/ref/settings/#storages
     STORAGES = {
@@ -507,15 +546,15 @@ class Production(Base, Configuration):
                 'USER': os.environ['POSTGRES_USER'],
                 'PASSWORD': os.environ['POSTGRES_PASSWORD'],
                 'HOST': os.environ['POSTGRES_HOST'],
-                'PORT': 5432,
+                'PORT': os.environ.get('POSTGRES_PORT', 5432),
             },
             'dam': {
                 'ENGINE': 'django.db.backends.mysql',
-                'NAME': os.environ.get('DAM_DB_NAME'),
-                'USER': os.environ.get('DAM_DB_USER'),
-                'PASSWORD': os.environ.get('DAM_DB_PASSWORD'),
-                'HOST': os.environ.get('DAM_DB_HOST'),
-                'PORT': 3306,
+                'NAME': os.environ['DAM_DB_NAME'],
+                'USER': os.environ['DAM_DB_USER'],
+                'PASSWORD': os.environ['DAM_DB_PASSWORD'],
+                'HOST': os.environ['DAM_DB_HOST'],
+                'PORT': os.environ.get('DAM_PORT', 3306),
             },
         }
 
@@ -533,6 +572,25 @@ class Production(Base, Configuration):
                 'verify_certs': True,
                 'connection_class': elasticsearch.RequestsHttpConnection,
                 'timeout': 360,
+            },
+        }
+
+    @property
+    def OAUTH2_PROVIDER(self):  # noqa: N802
+        """Configure OAuth and OIDC."""
+        return {
+            'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
+            'ALLOWED_REDIRECT_URI_SCHEMES': ['https'],
+            'OAUTH2_VALIDATOR_CLASS': 'ida.auth.IDAOAuth2Validator',
+            'OIDC_ENABLED': True,
+            'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,
+            'OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT': False,
+            'OIDC_RSA_PRIVATE_KEY': os.environ['OIDC_RSA_PRIVATE_KEY'],
+            'SCOPES': {
+                'read': 'Read scope',
+                'write': 'Write scope',
+                'groups': 'Auth groups scopes',
+                'openid': 'OpenID Connect scope',
             },
         }
 

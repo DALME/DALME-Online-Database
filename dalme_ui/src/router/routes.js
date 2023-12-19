@@ -2,6 +2,7 @@ import { useTasks } from "@/stores/tasks";
 
 const routes = [
   {
+    name: "Home",
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -321,6 +322,12 @@ const routes = [
     ],
   },
   {
+    name: "HTTP 500",
+    path: "/500",
+    component: () => import("pages/Error500.vue"),
+  },
+  {
+    name: "HTTP 404",
     path: "/:catchAll(.*)*",
     component: () => import("pages/Error404.vue"),
   },
