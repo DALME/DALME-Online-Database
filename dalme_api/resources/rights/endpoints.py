@@ -1,9 +1,9 @@
 """API endpoint for managing rights."""
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_api.filters import RightsPolicyFilter
 from ida.models import RightsPolicy
 
+from .filters import RightsPolicyFilter
 from .serializers import RightsPolicySerializer
 
 

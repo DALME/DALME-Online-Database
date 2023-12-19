@@ -7,9 +7,9 @@ from rest_framework.response import Response
 
 from dalme_api.access_policies import RecordAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_api.filters import RecordFilter
 from ida.models import Record
 
+from .filters import RecordFilter
 from .serializers import RecordSerializer
 
 with pathlib.Path('static/snippets/iiif_manifest.json').open() as fp:

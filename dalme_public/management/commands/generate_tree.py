@@ -9,7 +9,6 @@ from wagtail.rich_text import RichText
 
 from django.core.management.base import BaseCommand
 
-from dalme_app.models import Record
 from dalme_public.models import (
     Collection,
     Collections,
@@ -22,6 +21,7 @@ from dalme_public.models import (
     Home,
     Section,
 )
+from ida.models import Record
 
 logger = structlog.get_logger(__name__)
 

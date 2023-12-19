@@ -9,8 +9,8 @@ from django.http import HttpRequest
 
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
-from dalme_api.filters import UserFilter
 
+from .filters import UserFilter
 from .serializers import UserSerializer
 
 
