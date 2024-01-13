@@ -230,5 +230,13 @@
   {
     "label": "unclear",
     "group": "Other"
+  },
+  {
+    "label": "Pharmacopeia-Functional",
+    "group": "Pharmacopeia"
+  },
+  {
+    "label": "Pharmacopeia-Reference",
+    "group": "Pharmacopeia"
   }
 ]

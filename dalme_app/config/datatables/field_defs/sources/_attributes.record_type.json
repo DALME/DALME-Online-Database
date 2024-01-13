@@ -6,36 +6,46 @@
     "placeholder": "Select type",
     "valueField": "label",
     "labelField": "label",
-    "searchField": ["label"],
+    "searchField": [
+      "label"
+    ],
     "preload": "focus",
     "optgroups": [
       {
-        "value": "Inventory",
-        "label": "Inventory"
-      },
-      {
-        "value": "Guardianship",
-        "label": "Guardianship"
-      },
-      {
-        "value": "Seizure",
-        "label": "Seizure"
-      },
-      {
-        "value": "Testament",
-        "label": "Testament"
-      },
-      {
-        "value": "Sales",
-        "label": "Sales"
+        "value": "Account Book",
+        "label": "Account Book"
       },
       {
         "value": "Estimates",
         "label": "Estimates"
       },
       {
+        "value": "Guardianship",
+        "label": "Guardianship"
+      },
+      {
+        "value": "Inventory",
+        "label": "Inventory"
+      },
+      {
+        "value": "Pharmacopeia",
+        "label": "Pharmacopeia"
+      },
+      {
+        "value": "Sales",
+        "label": "Sales"
+      },
+      {
+        "value": "Seizure",
+        "label": "Seizure"
+      },
+      {
         "value": "Tariffs",
         "label": "Tariffs"
+      },
+      {
+        "value": "Testament",
+        "label": "Testament"
       },
       {
         "value": "Other",
