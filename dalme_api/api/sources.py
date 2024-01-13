@@ -13,20 +13,39 @@ class Sources(DALMEBaseViewSet):
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
     filterset_class = SourceFilter
-    search_fields = ['type__name', 'name', 'short_name', 'owner__profile__full_name', 'primary_dataset__name', 'attributes__value_STR']
-    ordering_fields = ['name', 'short_name', 'owner', 'primary_dataset', 'no_records', 'is_private', 'attributes.authority',
-                       'attributes.format', 'attributes.locale', 'attributes.country', 'attributes.default_rights',
-                       'attributes.archival_series', 'attributes.archival_number', 'attributes.date', 'attributes.start_date',
-                       'attributes.end_date', 'attributes.support', 'attributes.named_persons', 'attributes.description']
+    search_fields = [
+        'type__name',
+        'name',
+        'short_name',
+        'owner__profile__full_name',
+        'primary_dataset__name',
+        'attributes__value_STR',
+        'sets__set_id__name',
+    ]
+    ordering_fields = [
+        'name',
+        'short_name',
+        'owner',
+        'primary_dataset',
+        'no_records',
+        'is_private',
+        'attributes.authority',
+        'attributes.format',
+        'attributes.locale',
+        'attributes.country',
+        'attributes.default_rights',
+        'attributes.archival_series',
+        'attributes.archival_number',
+        'attributes.date',
+        'attributes.start_date',
+        'attributes.end_date',
+        'attributes.support',
+        'attributes.named_persons',
+        'attributes.description',
+    ]
     ordering_aggregates = {
-        'no_records': {
-            'function': 'Count',
-            'expression': 'children'
-        },
-        'no_folios': {
-            'function': 'Count',
-            'expression': 'pages'
-        }
+        'no_records': {'function': 'Count', 'expression': 'children'},
+        'no_folios': {'function': 'Count', 'expression': 'pages'},
     }
     ordering = ['name']
 
@@ -93,9 +112,48 @@ class Sources(DALMEBaseViewSet):
         serializer_class = self.serializer_class
         fields = {
             'archives': ['id', 'type', 'name', 'short_name', 'is_private', 'no_records', 'attributes', 'sets'],
-            'archival_files': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'primary_dataset', 'owner', 'no_records', 'attributes', 'sets'],
-            'records': ['id', 'type', 'name', 'short_name', 'parent', 'has_inventory', 'pages', 'sets', 'is_private', 'owner', 'no_folios', 'workflow', 'attributes', 'credits'],
-            'bibliography': ['id', 'type', 'name', 'short_name', 'parent', 'is_private', 'owner', 'attributes', 'sets', 'no_records', 'primary_dataset']
+            'archival_files': [
+                'id',
+                'type',
+                'name',
+                'short_name',
+                'parent',
+                'is_private',
+                'primary_dataset',
+                'owner',
+                'no_records',
+                'attributes',
+                'sets',
+            ],
+            'records': [
+                'id',
+                'type',
+                'name',
+                'short_name',
+                'parent',
+                'has_inventory',
+                'pages',
+                'sets',
+                'is_private',
+                'owner',
+                'no_folios',
+                'workflow',
+                'attributes',
+                'credits',
+            ],
+            'bibliography': [
+                'id',
+                'type',
+                'name',
+                'short_name',
+                'parent',
+                'is_private',
+                'owner',
+                'attributes',
+                'sets',
+                'no_records',
+                'primary_dataset',
+            ],
         }
 
         if self.request.GET.get('format') == 'select':
@@ -111,7 +169,7 @@ class Sources(DALMEBaseViewSet):
                 'archives': Q(type=19),
                 'archival_files': Q(type=12),
                 'records': Q(type=13),
-                'bibliography': Q(type__in=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+                'bibliography': Q(type__in=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
             }
             queryset = Source.objects.filter(query[self.request.GET['class']])
         else:
