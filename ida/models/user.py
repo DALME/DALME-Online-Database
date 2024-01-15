@@ -35,7 +35,7 @@ def get_default_preferences(camelize=True):
 
 
 class User(AbstractUser):
-    """Override the default User model."""
+    """Override the default auth User model."""
 
     def save(self, *args, **kwargs):
         """Override the save method to populate additional user data.
