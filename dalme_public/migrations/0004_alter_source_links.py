@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        # ('dalme_app', '0015_create_options'),
         ('dalme_public', '0003_sets_to_collections'),
     ]
 
