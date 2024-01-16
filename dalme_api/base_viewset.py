@@ -1,5 +1,7 @@
 """Define base functionality for API viewsets."""
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication
 from rest_framework import viewsets
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -7,10 +9,27 @@ from rest_framework.response import Response
 class DALMEBaseViewSet(viewsets.ModelViewSet):
     """Generic viewset. Should be subclassed for specific API endpoints."""
 
-    permission_classes = ()
+    permission_classes = []
+    oauth_permission_classes = []
+    authentication_classes = []  # This is dynamic, see `initialize_request`.
     queryset = None
     serializer_class = None
     context = None
+
+    def initialize_request(self, request, *args, **kwargs):
+        """Override to switch between session or OAuth authentication systems."""
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+        authentication = OAuth2Authentication if is_ajax else SessionAuthentication
+        self.authentication_classes.append(authentication)
+
+        if is_ajax and self.oauth_permission_classes:
+            self.permission_classes = [
+                *self.oauth_permission_classes,
+                *self.permission_classes,
+            ]
+
+        return super().initialize_request(request, *args, **kwargs)
 
     @property
     def options_view(self):

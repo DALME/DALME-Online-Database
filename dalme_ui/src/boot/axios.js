@@ -6,8 +6,10 @@ import { isNil } from "ramda";
 import { useAuthStore } from "stores/auth";
 
 const fetcher = axios.create();
+
 fetcher.defaults.xsrfCookieName = "csrftoken";
 fetcher.defaults.xsrfHeaderName = "X-CSRFToken";
+fetcher.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 export default boot(({ store }) => {
   fetcher.interceptors.request.use(

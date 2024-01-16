@@ -1,6 +1,7 @@
 """API endpoint for managing collections."""
 import json
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -23,7 +24,9 @@ class CollectionAccessPolicy(BaseAccessPolicy):
 class Collections(DALMEBaseViewSet):
     """API endpoint for managing collections."""
 
-    permission_classes = (CollectionAccessPolicy,)
+    permission_classes = [CollectionAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
     filterset_class = CollectionFilter

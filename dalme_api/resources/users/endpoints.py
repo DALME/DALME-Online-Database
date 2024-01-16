@@ -24,10 +24,8 @@ class UserAccessPolicy(BaseAccessPolicy):
 class Users(DALMEBaseViewSet):
     """API endpoint for managing users."""
 
-    permission_classes = [
-        UserAccessPolicy,
-        TokenHasReadWriteScope,
-    ]
+    permission_classes = [UserAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
 
     lookup_url_kwarg = 'pk'
     queryset = get_user_model().objects.all()
