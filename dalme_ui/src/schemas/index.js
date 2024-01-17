@@ -1,5 +1,6 @@
 // NOTE: Don't sort these, or imports will break.
 export * from "./common";
+export * from "./tenants";
 export * from "./preferences";
 export * from "./groups";
 export * from "./users";

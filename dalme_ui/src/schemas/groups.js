@@ -1,10 +1,11 @@
 import * as yup from "yup";
+import { tenantSchema } from "@/schemas";
 
 export const groupSchema = yup.object().shape({
   id: yup.number().required(),
   name: yup.string().required(),
   description: yup.string().required(),
-  tenant: yup.number().nullable().default(null),
+  tenant: tenantSchema,
 });
 
 export const groupAttributeSchema = yup.object().shape({

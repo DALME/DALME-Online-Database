@@ -13,7 +13,7 @@ import * as yup from "yup";
 import { API as apiInterface, requests } from "@/api";
 import notifier from "@/notifier";
 import { router as $router } from "@/router";
-import { groupSchema } from "@/schemas";
+import { groupSchema, tenantSchema } from "@/schemas";
 import { useUiStore } from "@/stores/ui";
 import { useViewStore } from "@/stores/views";
 import { useStoreMachine } from "@/use";
@@ -32,9 +32,9 @@ const userInfoSchema = yup
     fullName: yup.string().nullable(),
     email: yup.string().email().required(),
     avatar: yup.string().default(null).nullable(),
-    tenant: yup.number().required(),
     isAdmin: yup.boolean().required(),
     groups: yup.array().of(groupSchema).default(null).nullable(),
+    tenant: tenantSchema,
   })
   .camelCase()
   .transform((data) => {
