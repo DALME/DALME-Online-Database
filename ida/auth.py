@@ -11,7 +11,6 @@ from django.contrib.auth import authenticate, login
 
 from dalme_api.access_policies import BaseAccessPolicy
 
-from .models import Profile
 from .tenant import get_current_tenant
 
 
@@ -74,25 +73,22 @@ class IDAOAuth2Validator(OAuth2Validator):
     def get_userinfo_claims(self, request):
         """Enhance the default OIDC claims payload."""
         claims = super().get_userinfo_claims(request)
-
-        # TODO: Users should *always* have a profile, we can remove this when
-        # we've fixed that issue with a data migration.
-        try:
-            profile_image = request.user.profile.profile_image
-            full_name = request.user.profile.full_name
-        except Profile.DoesNotExist:
-            profile_image = None
-            full_name = f'{request.user.first_name} {request.user.last_name}'
+        full_name = request.user.profile.full_name
+        profile_image = request.user.profile.profile_image
+        tenant = get_current_tenant()
 
         claims.update(
             {
+                'avatar': profile_image,
+                'email': request.user.email,
                 'username': request.user.username,
                 'full_name': full_name,
-                'email': request.user.email,
-                'avatar': profile_image,
-                'tenant': get_current_tenant().pk,
                 'is_admin': request.user.is_staff,
-                # TODO: Groups, when multitenanted correctly...
+                # TODO: groups: when multitenanted correctly...
+                'tenant': {
+                    'id': tenant.pk,
+                    'name': tenant.name,
+                },
             }
         )
 
