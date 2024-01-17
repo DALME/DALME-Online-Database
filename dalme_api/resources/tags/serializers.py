@@ -1,6 +1,7 @@
 """Serializers for tag data."""
 from rest_framework import serializers
 
+from dalme_api.resources.tenants import TenantSerializer
 from dalme_app.models import Tag
 
 
@@ -12,14 +13,16 @@ class TagSerializer(serializers.ModelSerializer):
         source='get_tag_type_display',
         required=False,
     )
+    tenant = TenantSerializer(required=True)
 
     class Meta:
         model = Tag
         fields = [
-            'tag_type',
             'tag',
             'tag_group',
+            'tag_type',
             'tag_type_name',
+            'tenant',
         ]
         extra_kwargs = {
             'tag_type': {

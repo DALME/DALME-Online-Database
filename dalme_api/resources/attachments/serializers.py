@@ -13,8 +13,8 @@ class AttachmentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Attachment
         fields = [
+            'tenant',
             'filename',
             'source',
             'filetype',
-            'tenant',
         ]

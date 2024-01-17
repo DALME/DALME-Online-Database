@@ -4,6 +4,7 @@ from rest_framework import serializers
 from dalme_api.resources.attachments import AttachmentSerializer
 from dalme_api.resources.collections import CollectionSerializer
 from dalme_api.resources.groups import GroupSerializer
+from dalme_api.resources.tenants import TenantSerializer
 from dalme_api.resources.users import UserSerializer
 from dalme_app.models import Task, TaskList
 
@@ -11,15 +12,17 @@ from dalme_app.models import Task, TaskList
 class TaskListSerializer(serializers.ModelSerializer):
     """Serializer for task lists."""
 
-    team_link = GroupSerializer(field_set='attribute', required=False)
-    owner = UserSerializer(field_set='attribute')
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
+    owner = UserSerializer(field_set='attribute')
+    team_link = GroupSerializer(field_set='attribute', required=False)
+    tenant = TenantSerializer(required=True)
 
     class Meta:
         model = TaskList
         fields = [
             'id',
+            'tenant',
             'name',
             'description',
             'slug',
@@ -43,11 +46,13 @@ class TaskSerializer(serializers.ModelSerializer):
     resources = CollectionSerializer(many=True, field_set='attribute', required=False)
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
+    tenant = TenantSerializer(required=True)
 
     class Meta:
         model = Task
         fields = [
             'id',
+            'tenant',
             'title',
             'task_list',
             'description',
