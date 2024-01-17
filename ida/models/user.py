@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import options
+from django.db.models import Q, options
 from django.urls import reverse
 
 from ida.tenant import get_current_tenant
@@ -36,6 +36,18 @@ def get_default_preferences(camelize=True):
 
 class User(AbstractUser):
     """Override the default auth User model."""
+
+    @property
+    def groups_scoped(self):
+        """Return the union of a user's tenant and IDA/unscoped groups.
+
+        Note, this method will throw a RuntimeError if called outside of the
+        request/response cycle.
+
+        """
+        tenant = get_current_tenant()
+        q = Q(properties__tenant__pk=tenant.pk) | Q(properties__tenant__pk__isnull=True)
+        return self.groups.filter(q)
 
     def save(self, *args, **kwargs):
         """Override the save method to populate additional user data.

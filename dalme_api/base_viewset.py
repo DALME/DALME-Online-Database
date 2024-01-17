@@ -9,9 +9,11 @@ from rest_framework.response import Response
 class DALMEBaseViewSet(viewsets.ModelViewSet):
     """Generic viewset. Should be subclassed for specific API endpoints."""
 
+    authentication_classes = None  # This is dynamic, see `initialize_request`.
+
     permission_classes = []
     oauth_permission_classes = []
-    authentication_classes = []  # This is dynamic, see `initialize_request`.
+
     queryset = None
     serializer_class = None
     context = None
@@ -21,7 +23,7 @@ class DALMEBaseViewSet(viewsets.ModelViewSet):
         is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
         authentication = OAuth2Authentication if is_ajax else SessionAuthentication
-        self.authentication_classes.append(authentication)
+        self.authentication_classes = [authentication]  # Should only ever be one or the other.
 
         if is_ajax and self.oauth_permission_classes:
             self.permission_classes = [

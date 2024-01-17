@@ -437,7 +437,7 @@ class Development(Base, Configuration):
         with open(os.environ['OIDC_RSA_PRIVATE_KEY']) as f:
             return {
                 'ACCESS_TOKEN_EXPIRE_SECONDS': self.OAUTH2_ACCESS_TOKEN_EXPIRY,
-                'ALLOWED_REDIRECT_URI_SCHEMES': ['http', 'https'],
+                'ALLOWED_REDIRECT_URI_SCHEMES': ['http'],
                 'OAUTH2_VALIDATOR_CLASS': 'ida.auth.IDAOAuth2Validator',
                 'OIDC_ENABLED': True,
                 'OIDC_RP_INITIATED_LOGOUT_ENABLED': True,

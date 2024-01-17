@@ -36,7 +36,7 @@ class GroupProperties(models.Model):
     description = models.CharField(max_length=255)
 
     def __str__(self):
-        suffix = self.group.properties.tenant.name if self.tenant else 'GLOBAL'
+        suffix = self.group.properties.tenant.name if self.tenant else 'IDA'
         return f'{self.group.name} ({suffix})'
 
     def save(self, *args, **kwargs):
