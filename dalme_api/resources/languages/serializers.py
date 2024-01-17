@@ -8,8 +8,22 @@ class LanguageReferenceSerializer(DynamicSerializer):
 
     class Meta:
         model = LanguageReference
-        fields = ('id', 'glottocode', 'iso6393', 'name', 'is_dialect', 'parent')
+        fields = [
+            'id',
+            'glottocode',
+            'iso6393',
+            'name',
+            'is_dialect',
+            'parent',
+        ]
         field_sets = {
-            'option': ['id', 'name'],
-            'attribute': ['id', 'name', 'iso6393'],
+            'option': [
+                'id',
+                'name',
+            ],
+            'attribute': [
+                'id',
+                'name',
+                'iso6393',
+            ],
         }

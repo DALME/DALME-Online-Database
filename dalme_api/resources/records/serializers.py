@@ -66,7 +66,12 @@ class RecordFolioSerializer(DynamicSerializer):
 
     class Meta:
         model = Folio
-        fields = ('id', 'page', 'transcription', 'page_data')
+        fields = [
+            'id',
+            'page',
+            'transcription',
+            'page_data',
+        ]
 
 
 class RecordSerializer(DynamicSerializer):

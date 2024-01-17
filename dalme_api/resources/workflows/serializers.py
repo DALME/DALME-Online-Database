@@ -12,7 +12,12 @@ class WorklogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkLog
-        fields = ('id', 'event', 'timestamp', 'user')
+        fields = [
+            'id',
+            'event',
+            'timestamp',
+            'user',
+        ]
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
@@ -23,7 +28,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workflow
-        fields = (
+        fields = [
             'help_flag',
             'is_public',
             'last_modified',
@@ -37,5 +42,9 @@ class WorkflowSerializer(serializers.ModelSerializer):
             'parsing_done',
             'review_done',
             'work_log',
-        )
-        extra_kwargs = {'last_user': {'required': False}}
+        ]
+        extra_kwargs = {
+            'last_user': {
+                'required': False,
+            }
+        }

@@ -11,7 +11,10 @@ class PublicAttributeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attribute
-        fields = ('name', 'value')
+        fields = [
+            'name',
+            'value',
+        ]
 
     def to_representation(self, instance):
         """Transform outgoing data."""
@@ -40,7 +43,10 @@ class PublicCollectionMembershipSerializer(serializers.ModelSerializer):
     class Meta:
         list_serializer_class = PublicFilteredCollectionsSerializer
         model = CollectionMembership
-        fields = ('collection_id', 'name')
+        fields = [
+            'collection_id',
+            'name',
+        ]
 
 
 class PublicRecordSerializer(serializers.ModelSerializer):
@@ -57,7 +63,7 @@ class PublicRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Record
-        fields = (
+        fields = [
             'id',
             'name',
             'short_name',
@@ -71,7 +77,7 @@ class PublicRecordSerializer(serializers.ModelSerializer):
             'has_images',
             'has_transcriptions',
             'get_credit_line',
-        )
+        ]
 
     def to_representation(self, instance):
         """Transform outgoing data."""

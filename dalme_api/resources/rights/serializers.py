@@ -17,7 +17,7 @@ class RightsPolicySerializer(DynamicSerializer):
 
     class Meta:
         model = RightsPolicy
-        fields = (
+        fields = [
             'id',
             'name',
             'rights_holder',
@@ -33,7 +33,7 @@ class RightsPolicySerializer(DynamicSerializer):
             'modification_user',
             'modification_timestamp',
             'comment_count',
-        )
+        ]
         field_sets = {
             'attribute': [
                 'id',
@@ -47,9 +47,15 @@ class RightsPolicySerializer(DynamicSerializer):
             ],
         }
         extra_kwargs = {
-            'rights_notice': {'required': False},
-            'licence': {'required': False},
-            'attachments': {'required': False},
+            'rights_notice': {
+                'required': False,
+            },
+            'licence': {
+                'required': False,
+            },
+            'attachments': {
+                'required': False,
+            },
         }
 
     def get_comment_count(self, obj):

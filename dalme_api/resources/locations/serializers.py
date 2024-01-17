@@ -16,7 +16,7 @@ class LocationSerializer(DynamicSerializer):
 
     class Meta:
         model = Location
-        fields = (
+        fields = [
             'id',
             'location_type',
             'attributes',
@@ -26,8 +26,16 @@ class LocationSerializer(DynamicSerializer):
             'creation_user',
             'modification_timestamp',
             'modification_user',
-        )
+        ]
         field_sets = {
-            'option': ['id', 'location_type', 'attributes'],
-            'attribute': ['id', 'location_type', 'attributes'],
+            'option': [
+                'id',
+                'location_type',
+                'attributes',
+            ],
+            'attribute': [
+                'id',
+                'location_type',
+                'attributes',
+            ],
         }

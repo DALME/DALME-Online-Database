@@ -13,10 +13,19 @@ class AgentSerializer(DynamicSerializer, WritableNestedModelSerializer):
 
     class Meta:
         model = Agent
-        fields = ('id', 'agent_type', 'name', 'user')
+        fields = [
+            'id',
+            'agent_type',
+            'name',
+            'user',
+        ]
         extra_kwargs = {
-            'notes': {'required': False},
-            'user': {'required': False},
+            'notes': {
+                'required': False,
+            },
+            'user': {
+                'required': False,
+            },
         }
 
     # def to_internal_value(self, data):

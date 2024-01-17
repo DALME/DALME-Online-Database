@@ -26,7 +26,7 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = (
+        fields = [
             'id',
             'assigned_to',
             'subject',
@@ -42,9 +42,11 @@ class TicketSerializer(serializers.ModelSerializer):
             'creation_timestamp',
             'modification_user',
             'modification_timestamp',
-        )
+        ]
         extra_kwargs = {
-            'tags': {'required': False},
+            'tags': {
+                'required': False,
+            },
         }
 
     def to_internal_value(self, data):
@@ -77,7 +79,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = (
+        fields = [
             'id',
             'subject',
             'description',
@@ -94,9 +96,11 @@ class TicketDetailSerializer(serializers.ModelSerializer):
             'modification_user',
             'modification_timestamp',
             'assigned_to',
-        )
+        ]
         extra_kwargs = {
-            'tags': {'required': False},
+            'tags': {
+                'required': False,
+            },
         }
 
     def to_internal_value(self, data):

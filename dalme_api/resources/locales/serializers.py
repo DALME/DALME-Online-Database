@@ -11,8 +11,24 @@ class LocaleReferenceSerializer(DynamicSerializer):
 
     class Meta:
         model = LocaleReference
-        fields = ('id', 'name', 'administrative_region', 'country', 'latitude', 'longitude')
+        fields = [
+            'id',
+            'name',
+            'administrative_region',
+            'country',
+            'latitude',
+            'longitude',
+        ]
         field_sets = {
-            'option': ['id', 'name', 'country'],
-            'attribute': ['id', 'name', 'administrative_region', 'country'],
+            'option': [
+                'id',
+                'name',
+                'country',
+            ],
+            'attribute': [
+                'id',
+                'name',
+                'administrative_region',
+                'country',
+            ],
         }

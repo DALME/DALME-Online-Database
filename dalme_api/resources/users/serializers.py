@@ -18,7 +18,7 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = (
+        fields = [
             'id',
             'last_login',
             'is_superuser',
@@ -34,14 +34,29 @@ class UserSerializer(DynamicSerializer, WritableNestedModelSerializer):
             'password',
             'avatar',
             'preferences',
-        )
+        ]
         field_sets = {
-            'attribute': ['id', 'username', 'full_name', 'avatar', 'email'],
-            'option': ['id', 'username', 'full_name'],
+            'attribute': [
+                'id',
+                'username',
+                'full_name',
+                'avatar',
+                'email',
+            ],
+            'option': [
+                'id',
+                'username',
+                'full_name',
+            ],
         }
         extra_kwargs = {
-            'username': {'validators': []},
-            'password': {'write_only': True, 'required': False},
+            'username': {
+                'validators': [],
+            },
+            'password': {
+                'write_only': True,
+                'required': False,
+            },
         }
 
     # def to_internal_value(self, data):
