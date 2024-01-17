@@ -9,7 +9,14 @@ class RSCollectionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = rs_collection
-        fields = ('ref', 'name', 'user', 'theme', 'theme2', 'theme3')
+        fields = [
+            'ref',
+            'name',
+            'user',
+            'theme',
+            'theme2',
+            'theme3',
+        ]
 
     def to_representation(self, instance):
         """Transform outgoing data."""
@@ -24,7 +31,7 @@ class RSImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = rs_resource
-        fields = (
+        fields = [
             'ref',
             'has_image',
             'creation_date',
@@ -34,7 +41,7 @@ class RSImageSerializer(serializers.ModelSerializer):
             'field3',
             'field51',
             'field79',
-        )
+        ]
 
 
 class ImageUrlSerializer(serializers.ModelSerializer):
@@ -45,7 +52,10 @@ class ImageUrlSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = rs_resource
-        fields = ['dam_id', 'title']
+        fields = [
+            'dam_id',
+            'title',
+        ]
 
     def to_representation(self, instance):
         """Transform outgoing data."""
@@ -62,4 +72,7 @@ class ImageOptionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = rs_resource
-        fields = ['dam_id', 'title']
+        fields = [
+            'dam_id',
+            'title',
+        ]

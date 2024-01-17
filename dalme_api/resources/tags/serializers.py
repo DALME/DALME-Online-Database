@@ -15,5 +15,14 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ('tag_type', 'tag', 'tag_group', 'tag_type_name')
-        extra_kwargs = {'tag_type': {'required': False}}
+        fields = [
+            'tag_type',
+            'tag',
+            'tag_group',
+            'tag_type_name',
+        ]
+        extra_kwargs = {
+            'tag_type': {
+                'required': False,
+            },
+        }

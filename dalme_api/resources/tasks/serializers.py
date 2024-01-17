@@ -18,7 +18,7 @@ class TaskListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskList
-        fields = (
+        fields = [
             'id',
             'name',
             'description',
@@ -30,7 +30,7 @@ class TaskListSerializer(serializers.ModelSerializer):
             'creation_timestamp',
             'modification_user',
             'modification_timestamp',
-        )
+        ]
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -46,7 +46,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = (
+        fields = [
             'id',
             'title',
             'task_list',
@@ -65,8 +65,12 @@ class TaskSerializer(serializers.ModelSerializer):
             'creation_user',
             'modification_user',
             'modification_timestamp',
-        )
+        ]
         extra_kwargs = {
-            'overdue': {'required': False},
-            'comment_count': {'required': False},
+            'overdue': {
+                'required': False,
+            },
+            'comment_count': {
+                'required': False,
+            },
         }

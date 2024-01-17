@@ -15,8 +15,22 @@ class PlaceSerializer(DynamicSerializer):
 
     class Meta:
         model = Place
-        fields = ('id', 'name', 'attributes', 'location', 'comment_count', 'tags')
+        fields = [
+            'id',
+            'name',
+            'attributes',
+            'location',
+            'comment_count',
+            'tags',
+        ]
         field_sets = {
-            'option': ['id', 'name'],
-            'attribute': ['id', 'name', 'location'],
+            'option': [
+                'id',
+                'name',
+            ],
+            'attribute': [
+                'id',
+                'name',
+                'location',
+            ],
         }

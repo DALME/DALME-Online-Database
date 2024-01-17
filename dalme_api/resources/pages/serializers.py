@@ -8,7 +8,14 @@ class PageSerializer(DynamicSerializer):
 
     class Meta:
         model = Page
-        fields = ('id', 'name', 'order', 'dam_id', 'thumbnail_url', 'manifest_url')
+        fields = [
+            'id',
+            'name',
+            'order',
+            'dam_id',
+            'thumbnail_url',
+            'manifest_url',
+        ]
         field_sets = {
             'option': ['id', 'name', 'order', 'thumbnail_url'],
             'attribute': ['id', 'name', 'dam_id'],

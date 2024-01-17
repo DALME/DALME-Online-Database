@@ -30,9 +30,31 @@ class GroupSerializer(DynamicSerializer, WritableNestedModelSerializer):
 
     class Meta:
         model = Group
-        fields = ('id', 'name', 'group_type', 'description', 'tenant')
+        fields = [
+            'id',
+            'name',
+            'group_type',
+            'description',
+            'tenant',
+        ]
         field_sets = {
-            'option': ['id', 'name', 'group_type', 'description', 'tenant'],
-            'attribute': ['id', 'name', 'group_type', 'description', 'tenant'],
+            'option': [
+                'id',
+                'name',
+                'group_type',
+                'description',
+                'tenant',
+            ],
+            'attribute': [
+                'id',
+                'name',
+                'group_type',
+                'description',
+                'tenant',
+            ],
         }
-        extra_kwargs = {'name': {'required': False}}
+        extra_kwargs = {
+            'name': {
+                'required': False,
+            },
+        }

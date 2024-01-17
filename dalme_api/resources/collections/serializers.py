@@ -44,8 +44,10 @@ class CollectionMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CollectionMembership
-        fields = ('content_object',)
         list_serializer_class = CollectionMemberList
+        fields = [
+            'content_object',
+        ]
 
 
 class CollectionSerializer(DynamicSerializer):
@@ -62,7 +64,7 @@ class CollectionSerializer(DynamicSerializer):
 
     class Meta:
         model = Collection
-        fields = (
+        fields = [
             'id',
             'name',
             'attributes',
@@ -78,9 +80,14 @@ class CollectionSerializer(DynamicSerializer):
             # 'members',
             'member_count',
             'comment_count',
-        )
+        ]
         field_sets = {
-            'option': ['id', 'name', 'is_published', 'is_private'],
+            'option': [
+                'id',
+                'name',
+                'is_published',
+                'is_private',
+            ],
             'attribute': [
                 'id',
                 'name',

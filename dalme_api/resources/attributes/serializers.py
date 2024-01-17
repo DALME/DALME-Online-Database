@@ -17,7 +17,16 @@ class AttributeTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AttributeType
-        fields = ('id', 'name', 'label', 'description', 'data_type', 'source', 'options', 'same_as')
+        fields = [
+            'id',
+            'name',
+            'label',
+            'description',
+            'data_type',
+            'source',
+            'options',
+            'same_as',
+        ]
 
 
 class AttributeListSerializer(serializers.ListSerializer):
@@ -102,7 +111,15 @@ class AttributeSerializer(DynamicSerializer, WritableNestedModelSerializer):
 
     class Meta:
         model = Attribute
-        fields = ('id', 'name', 'label', 'description', 'value', 'attribute_type', 'data_type')
+        fields = [
+            'id',
+            'name',
+            'label',
+            'description',
+            'value',
+            'attribute_type',
+            'data_type',
+        ]
 
     def __init__(self, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
@@ -164,7 +181,7 @@ class ContentTypeSerializer(DynamicSerializer):
 
     class Meta:
         model = ContentTypeExtended
-        fields = (
+        fields = [
             'id',
             'name',
             'description',
@@ -176,11 +193,21 @@ class ContentTypeSerializer(DynamicSerializer):
             'can_delete',
             'can_add',
             'can_remove',
-        )
+        ]
         field_sets = {
-            'attribute': ['id', 'name', 'short_name', 'is_abstract', 'description'],
+            'attribute': [
+                'id',
+                'name',
+                'short_name',
+                'is_abstract',
+                'description',
+            ],
         }
-        extra_kwargs = {'name': {'validators': []}}
+        extra_kwargs = {
+            'name': {
+                'validators': [],
+            },
+        }
 
 
 class ContentAttributesSerializer(DynamicSerializer):
@@ -191,14 +218,14 @@ class ContentAttributesSerializer(DynamicSerializer):
 
     class Meta:
         model = ContentAttributes
-        fields = (
+        fields = [
             'id',
             'content_type',
             'attribute_type',
             'order',
             'required',
             'unique',
-        )
+        ]
 
 
 class OptionsSerializer(serializers.Serializer):
@@ -210,7 +237,12 @@ class OptionsSerializer(serializers.Serializer):
     detail = serializers.CharField(required=False)
 
     class Meta:
-        fields = ['label', 'value', 'group', 'detail']
+        fields = [
+            'label',
+            'value',
+            'group',
+            'detail',
+        ]
 
     def __init__(self, *args, **kwargs):
         self.concordance = kwargs.pop('concordance', None)

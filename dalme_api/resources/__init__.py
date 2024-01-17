@@ -19,6 +19,7 @@ from .records import Records, RecordSerializer
 from .rights import Rights, RightsPolicySerializer
 from .session import Session
 from .tasks import TaskLists, TaskListSerializer, Tasks, TaskSerializer
+from .tenants import TenantSerializer
 from .tickets import TicketDetailSerializer, Tickets, TicketSerializer
 from .transcriptions import Transcriptions, TranscriptionSerializer
 from .users import Users, UserSerializer
@@ -69,6 +70,7 @@ __all__ = [
     'TaskLists',
     'TaskSerializer',
     'Tasks',
+    'TenantSerializer',
     'TicketDetailSerializer',
     'TicketSerializer',
     'Tickets',
