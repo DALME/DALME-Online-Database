@@ -4,6 +4,7 @@ export const groupSchema = yup.object().shape({
   id: yup.number().required(),
   name: yup.string().required(),
   description: yup.string().required(),
+  tenant: yup.number().nullable().default(null),
 });
 
 export const groupAttributeSchema = yup.object().shape({

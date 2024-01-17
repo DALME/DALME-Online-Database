@@ -92,7 +92,7 @@ class BaseAccessPolicy(AccessPolicy):
         if not self.permissions:
             permissions = {}
             user = request.user
-            user_groups = user.groups.all()
+            user_groups = user.groups_scoped
             group_ids = [g.id for g in user_groups]
             ct_group = ContentType.objects.get_for_model(user_groups[0])
             ct_user = ContentType.objects.get_for_model(user)
