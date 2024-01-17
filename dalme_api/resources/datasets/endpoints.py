@@ -1,5 +1,6 @@
 """API endpoint for managing datasets."""
 import numpy as np
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -16,7 +17,8 @@ class PublicAccessPolicy(BaseAccessPolicy):
 class Datasets(viewsets.GenericViewSet):
     """API endpoint for generating and retrieving DALME datasets."""
 
-    permission_classes = (PublicAccessPolicy,)
+    permission_classes = [PublicAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
 
     def retrieve(self, request, pk=None, fmt=None):  # noqa: ARG002
         """Return requested dataset."""

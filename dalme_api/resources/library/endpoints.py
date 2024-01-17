@@ -1,6 +1,7 @@
 """API endpoint for accessing DALME Zotero Library."""
 import json
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from pyzotero import zotero
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -19,7 +20,8 @@ class LibraryAccessPolicy(BaseAccessPolicy):
 class Library(viewsets.ViewSet):
     """API endpoint for accessing DALME Zotero Library."""
 
-    permission_classes = (LibraryAccessPolicy,)
+    permission_classes = [LibraryAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
 
     def list(self, request, *args, **kwargs):  # noqa: A003, ARG002
         """Return list of bibliographic sources."""

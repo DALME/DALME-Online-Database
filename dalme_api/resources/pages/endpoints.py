@@ -2,6 +2,7 @@
 import json
 import pathlib
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -28,7 +29,9 @@ class PageAccessPolicy(BaseAccessPolicy):
 class Pages(DALMEBaseViewSet):
     """API endpoint for managing pages."""
 
-    permission_classes = (PageAccessPolicy,)
+    permission_classes = [PageAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Page.objects.all()
     serializer_class = PageSerializer
 

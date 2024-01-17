@@ -2,6 +2,7 @@
 import json
 from json import JSONDecodeError
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -27,7 +28,9 @@ class ImageAccessPolicy(BaseAccessPolicy):
 class Images(DALMEBaseViewSet):
     """API endpoint for managing DAM images."""
 
-    permission_classes = (ImageAccessPolicy,)
+    permission_classes = [ImageAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = rs_resource.objects.filter(resource_type=1, archive=0, ref__gte=0)
     serializer_class = RSImageSerializer
     search_fields = ['ref', 'title', 'country', 'field12', 'field8', 'field3', 'field51', 'field79']

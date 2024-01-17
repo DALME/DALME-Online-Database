@@ -1,4 +1,6 @@
 """API endpoint for managing locales."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from ida.models import LocaleReference
@@ -15,7 +17,9 @@ class LocaleAccessPolicy(BaseAccessPolicy):
 class Locales(DALMEBaseViewSet):
     """API endpoint for managing locales."""
 
-    permission_classes = (LocaleAccessPolicy,)
+    permission_classes = [LocaleAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = LocaleReference.objects.all()
     serializer_class = LocaleReferenceSerializer
     filterset_fields = ['id', 'name', 'administrative_region', 'country__name']

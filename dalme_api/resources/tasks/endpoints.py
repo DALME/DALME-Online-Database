@@ -1,4 +1,5 @@
 """API endpoint for managing tasks and task lists."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -25,7 +26,9 @@ class TaskListAccessPolicy(BaseAccessPolicy):
 class Tasks(DALMEBaseViewSet):
     """API endpoint for managing tasks."""
 
-    permission_classes = (TaskAccessPolicy,)
+    permission_classes = [TaskAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     filterset_class = TaskFilter
@@ -67,7 +70,9 @@ class Tasks(DALMEBaseViewSet):
 class TaskLists(DALMEBaseViewSet):
     """API endpoint for managing tasks lists."""
 
-    permission_classes = (TaskListAccessPolicy,)
+    permission_classes = [TaskListAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = TaskList.objects.all()
     serializer_class = TaskListSerializer
     filterset_class = TasklistFilter

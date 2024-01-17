@@ -2,6 +2,7 @@
 import json
 import pathlib
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -19,7 +20,9 @@ with pathlib.Path('static/snippets/iiif_manifest.json').open() as fp:
 class Records(DALMEBaseViewSet):
     """API endpoint for managing records."""
 
-    permission_classes = (RecordAccessPolicy,)
+    permission_classes = [RecordAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
     filterset_class = RecordFilter
