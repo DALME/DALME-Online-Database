@@ -6,6 +6,7 @@ from django.db import models
 from dalme_api.dynamic_serializer import DynamicSerializer
 from dalme_api.resources.attributes import AttributeSerializer
 from dalme_api.resources.groups import GroupSerializer
+from dalme_api.resources.tenants import TenantSerializer
 from dalme_api.resources.users import UserSerializer
 from dalme_app.models import Collection, CollectionMembership
 
@@ -42,10 +43,13 @@ class CollectionMemberList(serializers.ListSerializer):
 class CollectionMemberSerializer(serializers.ModelSerializer):
     """Serializer for mixed content type collection members."""
 
+    tenant = TenantSerializer(required=True)
+
     class Meta:
         model = CollectionMembership
         list_serializer_class = CollectionMemberList
         fields = [
+            'tenant',
             'content_object',
         ]
 
@@ -61,11 +65,13 @@ class CollectionSerializer(DynamicSerializer):
     creation_user = UserSerializer(field_set='attribute', required=False)
     modification_user = UserSerializer(field_set='attribute', required=False)
     is_private = serializers.BooleanField()
+    tenant = TenantSerializer(required=True)
 
     class Meta:
         model = Collection
         fields = [
             'id',
+            'tenant',
             'name',
             'attributes',
             'use_as_workset',

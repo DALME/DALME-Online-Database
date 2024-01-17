@@ -1,6 +1,7 @@
 """Serializers for workflow data."""
 from rest_framework import serializers
 
+from dalme_api.resources.tenants import TenantSerializer
 from dalme_api.resources.users import UserSerializer
 from dalme_app.models import Workflow, WorkLog
 
@@ -8,12 +9,14 @@ from dalme_app.models import Workflow, WorkLog
 class WorklogSerializer(serializers.ModelSerializer):
     """Basic serializer for work logs."""
 
+    tenant = TenantSerializer(required=True)
     user = UserSerializer(field_set='attribute', required=False)
 
     class Meta:
         model = WorkLog
         fields = [
             'id',
+            'tenant',
             'event',
             'timestamp',
             'user',
@@ -25,10 +28,12 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
     last_user = UserSerializer(field_set='attribute', required=False)
     work_log = WorklogSerializer(many=True, read_only=True, required=False)
+    tenant = TenantSerializer(required=True)
 
     class Meta:
         model = Workflow
         fields = [
+            'tenant',
             'help_flag',
             'is_public',
             'last_modified',

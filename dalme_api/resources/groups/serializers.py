@@ -5,6 +5,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import Group
 
 from dalme_api.dynamic_serializer import DynamicSerializer
+from dalme_api.resources.tenants import TenantSerializer
 from ida.models import GroupProperties
 
 
@@ -21,21 +22,16 @@ class GroupSerializer(DynamicSerializer, WritableNestedModelSerializer):
         source='properties.description',
         required=False,
     )
-    tenant = serializers.PrimaryKeyRelatedField(
-        allow_null=True,
-        many=False,
-        read_only=True,
-        source='properties.tenant',
-    )
+    tenant = TenantSerializer(allow_null=True, source='properties.tenant')
 
     class Meta:
         model = Group
         fields = [
             'id',
+            'tenant',
             'name',
             'group_type',
             'description',
-            'tenant',
         ]
         field_sets = {
             'option': [
