@@ -10,11 +10,10 @@ markers = [
 
 [tool.coverage.run]
 omit = [
-  "*manage.py*",
-  "*migrations*",
-  "*venv*",
-  "*tests*",
+  "*/migrations/*",
   "dalme_app/management/commands/custom_createcachetable.py",
+  "manage.py*",
+  "tests/*",
 ]
 
 # https://github.com/charliermarsh/ruff#configuration
