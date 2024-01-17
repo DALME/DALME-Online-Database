@@ -61,7 +61,7 @@ class User(AbstractUser):
         created = self._state.adding
         super().save(*args, **kwargs)
         if created:
-            Profile.objects.create(user=self)
+            Profile.objects.create(user=self, full_name=f'{self.first_name} {self.last_name}')
             tenant = get_current_tenant()
             if bool(tenant):  # This just checks the proxy is actually bound to a value.
                 tenant.members.add(self)

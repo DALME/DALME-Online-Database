@@ -101,8 +101,6 @@ import {
   nextTick,
   provide,
   ref,
-  onBeforeUnmount,
-  onUnmounted,
   // watch,
 } from "vue";
 import { useEventHandling, useStores } from "@/use";
@@ -238,7 +236,6 @@ export default defineComponent({
             currentFolioData.value.editOn = true;
           });
         } else {
-          console.log("save and stuff");
           currentFolioData.value.editOn = false;
         }
         resolve();
@@ -265,13 +262,6 @@ export default defineComponent({
     provide("editorDimensions", { editorHeight, editorWidth });
     provide("viewerDimensions", { viewerHeight, viewerWidth });
     provide("folioDrawerOpen", drawer);
-
-    onBeforeUnmount(() => {
-      console.log("editor beforeUnmount");
-    });
-    onUnmounted(() => {
-      console.log("editor unmounted");
-    });
 
     return {
       notNully,
