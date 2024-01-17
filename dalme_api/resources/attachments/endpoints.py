@@ -1,4 +1,5 @@
 """API endpoint for managing attachments."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -18,7 +19,9 @@ class AttachmentAccessPolicy(BaseAccessPolicy):
 class Attachments(viewsets.ModelViewSet):
     """API endpoint for managing attachments."""
 
-    permission_classes = (AttachmentAccessPolicy,)
+    permission_classes = [AttachmentAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     parser_classes = (MultiPartParser, FormParser, FileUploadParser)
     queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer

@@ -14,7 +14,7 @@ class Groups(DALMEBaseViewSet):
 
     permission_classes = [GeneralAccessPolicy]
     oauth_permission_classes = [TokenHasScope]
-    required_scopes = ['groups']
+    required_scopes = ['read', 'write', 'groups']
 
     filterset_fields = [
         'id',

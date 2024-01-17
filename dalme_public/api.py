@@ -113,7 +113,7 @@ class RecordList(ListAPIView):
     serializer_class = PublicRecordSerializer
     pagination_class = DALMEPagination
     filterset_class = RecordFilter
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def list(self, request, *args, **kwargs):  # noqa: A003, ARG002
         """Return list of records."""
@@ -189,7 +189,7 @@ class RecordDetail(RetrieveAPIView):
     queryset = Record.objects.all()
     serializer_class = PublicRecordSerializer
     lookup_url_kwarg = 'pk'
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class FilterChoices(View):

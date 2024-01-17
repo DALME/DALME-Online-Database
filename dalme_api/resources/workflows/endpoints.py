@@ -1,4 +1,5 @@
 """API endpoint for managing workflows."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -24,7 +25,9 @@ class WorkflowAccessPolicy(BaseAccessPolicy):
 class Workflows(viewsets.ModelViewSet):
     """API endpoint for managing the project's workflow."""
 
-    permission_classes = (WorkflowAccessPolicy,)
+    permission_classes = [WorkflowAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Workflow.objects.all()
     serializer_class = WorkflowSerializer
 

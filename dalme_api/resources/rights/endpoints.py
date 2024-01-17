@@ -1,4 +1,6 @@
 """API endpoint for managing rights."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from ida.models import RightsPolicy
@@ -16,7 +18,9 @@ class RightsAccessPolicy(BaseAccessPolicy):
 class Rights(DALMEBaseViewSet):
     """API endpoint for managing rights policies."""
 
-    permission_classes = (RightsAccessPolicy,)
+    permission_classes = [RightsAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = RightsPolicy.objects.all()
     serializer_class = RightsPolicySerializer
     filterset_class = RightsPolicyFilter

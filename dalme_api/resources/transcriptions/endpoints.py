@@ -1,4 +1,5 @@
 """API endpoint for managing transcriptions."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -22,7 +23,9 @@ class TranscriptionAccessPolicy(BaseAccessPolicy):
 class Transcriptions(viewsets.ModelViewSet):
     """API endpoint for managing transcriptions."""
 
-    permission_classes = (TranscriptionAccessPolicy,)
+    permission_classes = [TranscriptionAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Transcription.objects.all()
     serializer_class = TranscriptionSerializer
 

@@ -1,5 +1,5 @@
 """API endpoint for managing attributes."""
-from rest_framework import serializers
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -18,6 +18,7 @@ from .serializers import (
     AttributeTypeSerializer,
     ContentAttributesSerializer,
     ContentTypeSerializer,
+    OptionsSerializer,
 )
 
 
@@ -30,40 +31,20 @@ class AttributeAccessPolicy(BaseAccessPolicy):
 class ContentTypes(DALMEBaseViewSet):
     """API endpoint for managing ContentTypes."""
 
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = [GeneralAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = ContentTypeExtended.objects.all()
     serializer_class = ContentTypeSerializer
     filterset_class = ContentTypeFilter
 
 
-class OptionsSerializer(serializers.Serializer):
-    """Serializer for UI options."""
-
-    label = serializers.CharField()
-    value = serializers.CharField()
-    group = serializers.CharField(required=False)
-    detail = serializers.CharField(required=False)
-
-    class Meta:
-        fields = ['label', 'value', 'group', 'detail']
-
-    def __init__(self, *args, **kwargs):
-        self.concordance = kwargs.pop('concordance', None)
-        super().__init__(*args, **kwargs)
-
-    def get_fields(self):
-        """Alter fields based on concordance."""
-        fields = super().get_fields()
-        if self.concordance:
-            for key, value in self.concordance.items():
-                fields[key] = serializers.CharField(source=value)
-        return fields
-
-
 class AttributeTypes(DALMEBaseViewSet):
     """API endpoint for managing attribute types."""
 
-    permission_classes = (GeneralAccessPolicy,)
+    permission_classes = [GeneralAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = AttributeType.objects.all()
     serializer_class = AttributeTypeSerializer
 
@@ -91,7 +72,9 @@ class AttributeTypes(DALMEBaseViewSet):
 class Attributes(DALMEBaseViewSet):
     """API endpoint for managing attributes and options."""
 
-    permission_classes = (AttributeAccessPolicy,)
+    permission_classes = [AttributeAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Attribute.objects.all().order_by('attribute_type')
     serializer_class = AttributeSerializer
 

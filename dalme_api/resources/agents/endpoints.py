@@ -1,4 +1,6 @@
 """API endpoint for managing agents."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from ida.models import Agent
@@ -15,7 +17,9 @@ class AgentAccessPolicy(BaseAccessPolicy):
 class Agents(DALMEBaseViewSet):
     """API endpoint for managing agents."""
 
-    permission_classes = (AgentAccessPolicy,)
+    permission_classes = [AgentAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Agent.objects.all()
     serializer_class = AgentSerializer
     filterset_fields = ['id', 'agent_type']

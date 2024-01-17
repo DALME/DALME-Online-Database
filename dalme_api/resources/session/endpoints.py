@@ -1,4 +1,5 @@
 """API endpoint for managing user sessions."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,7 +11,8 @@ from dalme_api.resources.users import UserSerializer
 class Session(viewsets.ViewSet):
     """API endpoint for managing user sessions."""
 
-    permission_classes = (SessionAccessPolicy,)
+    permission_classes = [SessionAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
 
     def retrieve(self, request, pk=None):  # noqa: ARG002
         """Return session."""

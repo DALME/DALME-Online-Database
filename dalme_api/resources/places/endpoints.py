@@ -1,4 +1,6 @@
 """API endpoint for managing places."""
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+
 from dalme_api.access_policies import BaseAccessPolicy
 from dalme_api.base_viewset import DALMEBaseViewSet
 from ida.models import Place
@@ -15,7 +17,9 @@ class PlaceAccessPolicy(BaseAccessPolicy):
 class Places(DALMEBaseViewSet):
     """API endpoint for managing places."""
 
-    permission_classes = (PlaceAccessPolicy,)
+    permission_classes = [PlaceAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
     filterset_fields = ['id']

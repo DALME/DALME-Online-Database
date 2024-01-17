@@ -1,6 +1,7 @@
 """API endpoint for managing comments."""
 import contextlib
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -21,7 +22,9 @@ class CommentAccessPolicy(BaseAccessPolicy):
 class Comments(viewsets.ModelViewSet):
     """API endpoint for managing comments."""
 
-    permission_classes = (CommentAccessPolicy,)
+    permission_classes = [CommentAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 

@@ -1,6 +1,7 @@
 """API endpoint for managing issue tickets."""
 from datetime import datetime
 
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -23,7 +24,9 @@ class TicketAccessPolicy(BaseAccessPolicy):
 class Tickets(DALMEBaseViewSet):
     """API endpoint for managing issue tickets."""
 
-    permission_classes = (TicketAccessPolicy,)
+    permission_classes = [TicketAccessPolicy]
+    oauth_permission_classes = [TokenHasReadWriteScope]
+
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     filterset_class = TicketFilter
