@@ -2,13 +2,18 @@
 # This file is automatically pulled in in the root terragrunt.hcl configuration
 # and fed forward to the child modules.
 locals {
+  service = "dalme"
+
+  # AWS data.
+  aws_account = 800895234148
   account_ids = [
     "arn:aws:iam::800895234148:user/deploy",
   ]
   admins = [
     "ops@ocp.systems",
   ]
-  aws_account        = 800895234148
+
+  # Environment data.
   environment        = "staging"
   gha_oidc_role_name = "gha-oidc-role"
   lock_table         = "terraform-locks"
@@ -22,7 +27,6 @@ locals {
     ssl        = 443
     web        = 8080
   }
-  service = "dalme"
   tenant_domains = [
     # IMPORTANT: DALME must come first.
     "dalme.ocp.systems",

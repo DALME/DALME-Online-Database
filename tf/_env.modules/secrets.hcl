@@ -38,7 +38,15 @@ inputs = {
   environment     = local.environment
   keeper          = 1
   recovery_window = local.environment == "production" ? 7 : 0
-  secrets         = ["ADMIN_PASSWORD", "OAUTH_CLIENT_SECRET", "OPENSEARCH_PASSWORD", "DJANGO_SECRET_KEY"]
-  service         = local.service
-  static_secrets  = ["ADMIN_PASSWORD"]
+  # Only append to this list or existing secrets will be replaced as the
+  # indexes are shuffled around.
+  # TODO: There is probably a better/immutable way to do this...
+  secrets = [
+    "ADMIN_PASSWORD",
+    "OPENSEARCH_PASSWORD",
+    "DJANGO_SECRET_KEY",
+    "OAUTH_CLIENT_SECRET",
+  ]
+  service        = local.service
+  static_secrets = ["ADMIN_PASSWORD"]
 }
