@@ -31,7 +31,12 @@ class Comments(viewsets.ModelViewSet):
     def get_queryset(self, *args, **kwargs):  # noqa: ARG002
         """Return generic queryset or queryset for specific model/object."""
         if self.request.GET.get('model') is not None and self.request.GET.get('object') is not None:
-            model = apps.get_model(app_label='dalme_app', model_name=self.request.GET['model'])
+            # TODO: Should find a more dynamic way to do this...
+            try:
+                model = apps.get_model(app_label='dalme_app', model_name=self.request.GET['model'])
+            except LookupError:
+                model = apps.get_model(app_label='ida', model_name=self.request.GET['model'])
+
             obj_pk = self.request.GET['object']
 
             if isinstance(obj_pk, str):
@@ -50,7 +55,12 @@ class Comments(viewsets.ModelViewSet):
                 return Response({'error': f'Parameter "{para}" must be supplied.'}, 400)
 
         try:
-            model = apps.get_model(app_label='dalme_app', model_name=request.data['model'])
+            # TODO: Should find a more dynamic way to do this...
+            try:
+                model = apps.get_model(app_label='dalme_app', model_name=request.data['model'])
+            except LookupError:
+                model = apps.get_model(app_label='ida', model_name=request.data['model'])
+
             obj_pk = request.data['object']
             body = request.data['body']
 

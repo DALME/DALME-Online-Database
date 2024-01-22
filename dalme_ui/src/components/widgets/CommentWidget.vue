@@ -122,15 +122,6 @@ export default defineComponent({
       return props.dark ? (clss += " dark") : clss;
     };
 
-    const fetchData = async () => {
-      await fetchAPI(requests.comments.getComments(model, id.value));
-      if (success.value)
-        await commentsSchema.validate(data.value, { stripUnknown: true }).then((value) => {
-          comments.value = value.data;
-          loading.value = false;
-        });
-    };
-
     const onSubmit = async (text) => {
       submitting.value = true;
       const payload = { model, body: text, object: id.value };
@@ -151,9 +142,20 @@ export default defineComponent({
       submitting.value = false;
     };
 
+    const fetchData = async () => {
+      await fetchAPI(requests.comments.getComments(model, id.value));
+      if (success.value)
+        await commentsSchema.validate(data.value, { stripUnknown: true }).then((value) => {
+          comments.value = value.data;
+          if (props.author || value.count > 0) {
+            op.value = props.author || value.data[0].creationUser.id;
+          }
+          loading.value = false;
+        });
+    };
+
     onMounted(async () => {
       await fetchData();
-      op.value = props.author ? props.author : comments.value[0].creationUser.id;
     });
 
     watch(
