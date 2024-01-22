@@ -979,13 +979,16 @@ function formatColumns() {
 
 function formatLeaders() {
   $('tei-metamark[function=leader]:not([rend=ellipsis])').each(function(index, el) {
+    if (!$(el).nextAll(':not(span)').length) {
+      $(el).next().after($('<tei-lb></tei-lb>'))
+    }
     let prev_array = [];
     let next_array = [];
     let prevSibs = $(this).prevUntil('tei-lb');
     let prevChild = $(this).prevUntil('*:has(tei-lb)');
     let nextSibs = $(this).nextUntil('tei-lb');
     let nextChild = $(this).nextUntil('*:has(tei-lb)');
-    
+
     if (prevChild.length < prevSibs.length) {
       let prev_el = prevChild.length ? prevChild : this;
       prev_array = $.merge(prevChild, $(prev_el).prev().children().nextUntil('tei-lb'));

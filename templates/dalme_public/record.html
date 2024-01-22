@@ -804,6 +804,9 @@
           },
           formatLeaders() {
             $('tei-metamark[function=leader]:not([rend=ellipsis])').each(function(index, el) {
+              if (!$(el).nextAll(':not(span)').length) {
+                $(el).next().after($('<tei-lb></tei-lb>'))
+              }
               let prev_array = [];
               let next_array = [];
               let prevSibs = $(this).prevUntil('tei-lb');

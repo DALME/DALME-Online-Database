@@ -1528,6 +1528,7 @@ h4.featured-group-key {
   padding: 0.1rem 0.5rem;
   width: fit-content;
   margin-left: 0.3rem;
+  white-space: nowrap;
 }
 .at-a-glance .lang-lozenge:not(:first-child) {
   margin-top: 0.3rem;
