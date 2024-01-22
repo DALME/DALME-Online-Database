@@ -212,6 +212,7 @@ const pkceFlow = {
         clientId: () => getClientId(),
         codeVerifier: ({ event }) => event.output.codeVerifier,
         codeChallenge: ({ event }) => event.output.codeChallenge,
+        error: () => null,
       }),
     },
     onError: {
@@ -418,7 +419,6 @@ export const useAuthStore = defineStore(
     const { actor, persistable, send, state } = useStoreMachine(oAuthMachine);
 
     const user = useSelector(actor, ({ context: { user } }) => user);
-    // TODO: This doesn't seem to work and I don't know why!
     const error = useSelector(actor, ({ context: { error } }) => error);
 
     const currentState = computed(() => state.value.value);
@@ -437,6 +437,12 @@ export const useAuthStore = defineStore(
       queue.value = [];
     };
 
+    const logout = () => {
+      actor.send({ type: "LOGOUT" });
+      ui.$reset();
+      views.$reset();
+    };
+
     watch(
       () => currentState.value,
       (oldState, newState) => {
@@ -447,15 +453,9 @@ export const useAuthStore = defineStore(
       },
     );
 
-    const logout = () => {
-      actor.send({ type: "LOGOUT" });
-      ui.$reset();
-      views.$reset();
-    };
-
     watch(
       () => error.value,
-      (_, newValue) => {
+      (newValue) => {
         if (!isNil(newValue)) {
           Notify.create({
             color: "red",

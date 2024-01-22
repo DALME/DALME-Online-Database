@@ -65,6 +65,7 @@ services:
     environment:
       NODE_ENV: development
       VITE_OAUTH_CLIENT_ID: oauth.ida.development
+      VITE_INSPECT_ACTORS: "true"
     volumes:
       - ./dalme_ui/src:/opt/ui/src
     networks:

@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 
 from dalme_api.access_policies import BaseAccessPolicy
+from dalme_api.resources.groups import GroupSerializer
 
 from .tenant import get_current_tenant
 
@@ -84,7 +85,7 @@ class IDAOAuth2Validator(OAuth2Validator):
                 'username': request.user.username,
                 'full_name': full_name,
                 'is_admin': request.user.is_staff,
-                # TODO: groups: when multitenanted correctly...
+                'groups': GroupSerializer(request.user.groups_scoped, many=True).data,
                 'tenant': {
                     'id': tenant.pk,
                     'name': tenant.name,
