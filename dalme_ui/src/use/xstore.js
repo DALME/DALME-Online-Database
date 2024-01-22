@@ -3,6 +3,11 @@ import { markRaw, shallowRef } from "vue";
 import { createActor } from "xstate";
 import { useStorage } from "@vueuse/core";
 
+const inspect =
+  process.env.NODE_ENV === "development" && import.meta.env.VITE_INSPECT_ACTORS === "true"
+    ? (event) => console.log(event)
+    : null;
+
 const rehydrate = (machine) => {
   const cached = useStorage(machine.id).value;
   return cached === undefined || cached === "undefined" ? false : JSON.parse(cached);
@@ -10,9 +15,10 @@ const rehydrate = (machine) => {
 
 export const useStoreMachine = (machine) => {
   const rehydrated = rehydrate(machine);
-  const actor = !rehydrated
-    ? createActor(machine)
-    : createActor(machine, { snapshot: rehydrated.persistable });
+  const actor = createActor(machine, {
+    inspect,
+    snapshot: !rehydrated ? null : rehydrated.persistable,
+  });
 
   actor.start();
 
