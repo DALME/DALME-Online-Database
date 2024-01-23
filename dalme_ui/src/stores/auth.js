@@ -191,10 +191,6 @@ const logoutReset = () => {
   });
 };
 
-const logoutRedirect = () => {
-  $router.push({ name: "Home" });
-};
-
 const redirect500 = () => {
   $router.push({ name: "HTTP 500" });
 };
@@ -364,7 +360,7 @@ const authFlow = {
         input: ({ context }) => ({ idToken: context.idToken }),
         onDone: {
           target: "#no.authenticate",
-          actions: ["logoutReset", "logoutRedirect"],
+          actions: ["logoutReset"],
         },
         onError: {
           target: "authorized",
@@ -378,7 +374,6 @@ const authFlow = {
 // OAuth 2.0 with PKCE enchancement machine.
 export const oAuthMachine = setup({
   actions: {
-    logoutRedirect,
     logoutReset,
     redirect500,
   },
