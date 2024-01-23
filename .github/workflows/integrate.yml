@@ -28,7 +28,6 @@ env:
   SKIP_UI: |
     ruff,ruff-format,tf-fmt,tf-hclfmt,tf-lint,tf-validate,tf-docs,tfsec,docs
   TF_ROOT: ./tf
-  USE_INFRACOST_APP: true
 
 permissions:
   contents: read

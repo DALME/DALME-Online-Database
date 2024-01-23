@@ -12,4 +12,7 @@ class Application(AbstractApplication):
 
     """
 
+    class Meta:
+        verbose_name = 'OAuth Application'
+
     logo = models.ImageField(blank=True, null=True)

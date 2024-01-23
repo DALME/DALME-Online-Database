@@ -39,8 +39,8 @@ inputs = {
   keeper          = 1
   recovery_window = local.environment == "production" ? 7 : 0
   # Only append to this list or existing secrets will be replaced as the
-  # indexes are shuffled around.
-  # TODO: There is probably a better/immutable way to do this...
+  # indexes are shuffled around. Is there a better more immutable way to do
+  # this that is order insensitive and that tf can handle without recreation?
   secrets = [
     "ADMIN_PASSWORD",
     "OPENSEARCH_PASSWORD",

@@ -8,6 +8,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.models import Group
 from django.shortcuts import redirect
 from django.urls import include, path, re_path, reverse
 
@@ -20,6 +21,8 @@ from dalme_public.views import (
     saved_search,
 )
 from dalme_purl import urls as purl_urls
+
+admin.site.unregister(Group)
 
 
 def to_dalme_login(_request):

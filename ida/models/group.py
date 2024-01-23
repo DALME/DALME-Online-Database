@@ -3,6 +3,8 @@ from django.db import models
 
 from ida.tenant import get_current_tenant
 
+DESCRIPTION_MAX_LENGTH = 255
+
 
 class GroupProperties(models.Model):
     """One-to-one extension of group model.
@@ -33,7 +35,7 @@ class GroupProperties(models.Model):
     tenant = models.ForeignKey('ida.Tenant', on_delete=models.PROTECT, null=True)
     group = models.OneToOneField('auth.Group', on_delete=models.CASCADE, related_name='properties')
     group_type = models.IntegerField(choices=GROUP_TYPES)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=DESCRIPTION_MAX_LENGTH)
 
     def __str__(self):
         suffix = self.group.properties.tenant.name if self.tenant else 'IDA'
