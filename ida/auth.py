@@ -127,17 +127,18 @@ class OAuthToken(TokenView):
 
         response = super().post(request, *args, **kwargs)
 
-        data = json.loads(response.content.decode('utf-8'))
-        refresh_token = data.pop('refresh_token')
-        response.content = json.dumps(data).encode('utf-8')
+        if response.status_code == status.HTTP_200_OK:
+            data = json.loads(response.content.decode('utf-8'))
+            refresh_token = data.pop('refresh_token')
+            response.content = json.dumps(data).encode('utf-8')
 
-        response.set_cookie(
-            'refresh_token',
-            refresh_token,
-            max_age=settings.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY,
-            httponly=True,
-            samesite='Lax',
-            secure=not settings.IS_DEV,
-        )
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                max_age=settings.OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY,
+                httponly=True,
+                samesite='Lax',
+                secure=not settings.IS_DEV,
+            )
 
         return response
