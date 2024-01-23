@@ -71,6 +71,10 @@ class TenantAdmin(TenantAdminMixin, admin.ModelAdmin):
 
     list_display = ('id', 'name', 'schema_name')
 
+    def has_delete_permission(self, request, obj=None):  # noqa: ARG002
+        """Don't allow deletion of Tenants from the admin."""
+        return False
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
