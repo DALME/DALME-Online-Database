@@ -39,9 +39,7 @@ class Command(BaseCommand):
         domains = [tenant.value.domain for tenant in settings.TENANTS()]
         domains = [f'http://{domain}:8000' if settings.IS_DEV else f'https://{domain}' for domain in domains]
         redirect_uris = [f'{domain}/{self.CALLBACK_URL}' for domain in domains]
-
-        if isinstance(redirect_uris, list):
-            redirect_uris = ' '.join(redirect_uris)
+        post_logout_redirect_uris = [f'{domain}/' for domain in domains]
 
         try:
             application = Application.objects.get(client_id=client_id)
@@ -49,7 +47,8 @@ class Command(BaseCommand):
             kwargs = {
                 'client_id': client_id,
                 'client_secret': client_secret,
-                'redirect_uris': redirect_uris,
+                'redirect_uris': ' '.join(redirect_uris),
+                'post_logout_redirect_uris': ' '.join(post_logout_redirect_uris),
                 **options,
                 **self.DEFAULTS,
             }
@@ -64,6 +63,12 @@ class Command(BaseCommand):
                 output = out.getvalue()
 
                 if self.success in output:
+                    # The command doesn't seem to handle setting the
+                    # 'allowed_origins' field so let's do it ourselves here.
+                    application = Application.objects.get(client_id=client_id)
+                    application.allowed_origins = ' '.join(domains)
+                    application.save()
+
                     logger.info('Created oauth application with client_id: %s', client_id=client_id)
                 else:
                     logger.error(output)  # noqa: TRY400
