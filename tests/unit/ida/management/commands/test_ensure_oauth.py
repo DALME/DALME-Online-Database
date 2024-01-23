@@ -34,6 +34,7 @@ def test_ensure_oauth_create_appliaction_some_failure(mock_logger, mock_applicat
             algorithm='RS256',
             name='IDA',
             redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://globalpharmacopeias.localhost:8000/api/oauth/authorize/callback/',
+            post_logout_redirect_uris='http://dalme.localhost:8000/ http://globalpharmacopeias.localhost:8000/',
             skip_authorization=True,
         )
     ]
@@ -48,13 +49,15 @@ def test_ensure_oauth_create_appliaction_some_failure(mock_logger, mock_applicat
 @mock.patch('ida.management.commands.ensure_oauth.Application')
 @mock.patch('ida.management.commands.ensure_oauth.logger')
 def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, mock_io):
+    mock_oauth_application = mock.MagicMock(spec=Application)
     mock_application.DoesNotExist = Application.DoesNotExist
-    mock_application.objects.get.side_effect = Application.DoesNotExist('Some error')
+    mock_application.objects.get.side_effect = [Application.DoesNotExist('Some error'), mock_oauth_application]
     mock_io.return_value.__enter__.return_value.getvalue.return_value = 'New application IDA created successfully'
 
     EnsureOAuth().handle()
 
     assert mock_application.mock_calls == [
+        mock.call.objects.get(client_id='oauth.ida.development'),
         mock.call.objects.get(client_id='oauth.ida.development'),
     ]
     assert mock_call_command.mock_calls == [
@@ -68,8 +71,16 @@ def test_ensure_oauth_create(mock_logger, mock_application, mock_call_command, m
             algorithm='RS256',
             name='IDA',
             redirect_uris='http://dalme.localhost:8000/api/oauth/authorize/callback/ http://globalpharmacopeias.localhost:8000/api/oauth/authorize/callback/',
+            post_logout_redirect_uris='http://dalme.localhost:8000/ http://globalpharmacopeias.localhost:8000/',
             skip_authorization=True,
         )
+    ]
+    assert (
+        mock_oauth_application.allowed_origins
+        == 'http://dalme.localhost:8000 http://globalpharmacopeias.localhost:8000'
+    )
+    assert mock_oauth_application.mock_calls == [
+        mock.call.save(),
     ]
     assert mock_logger.mock_calls == [
         mock.call.info('Created oauth application with client_id: %s', client_id='oauth.ida.development')
