@@ -14,7 +14,6 @@ IDA
    source/introduction
    source/multitenancy
    source/auth
-   source/db
    source/state-machines
 
 Indices
