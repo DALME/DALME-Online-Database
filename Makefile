@@ -29,7 +29,7 @@ confirm:
 dev: infra.start infra.log
 .PHONY: dev
 
-init: infra.env web.init ui.init infra.hooks.install infra.build
+init: infra.oidc.key infra.env web.init ui.init infra.hooks.install infra.build
 .PHONY: init
 
 sync: web.sync ui.sync docs.sync infra.hooks.update
