@@ -153,8 +153,3 @@ resource "aws_lb_listener" "https" {
     Name = "${var.service}-alb-listener-https-${var.environment}"
   }
 }
-
-# resource "aws_lb_listener_certificate" "example" {
-#   listener_arn    = "${aws_lb_listener.front_end.arn}"
-#   certificate_arn = "${aws_acm_certificate.example.arn}"
-# }

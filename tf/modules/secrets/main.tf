@@ -43,6 +43,10 @@ resource "aws_secretsmanager_secret" "secrets" {
   name                    = "${var.service}-secret-${var.environment}-${element(var.secrets, count.index)}"
   kms_key_id              = aws_kms_key.main.arn
   recovery_window_in_days = var.recovery_window
+
+  tags = {
+    Name = "${var.service}-secret-${var.environment}-${element(var.secrets, count.index)}"
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "secrets_values" {

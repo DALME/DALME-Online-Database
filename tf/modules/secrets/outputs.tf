@@ -29,7 +29,7 @@ output "secrets" {
 }
 
 output "opensearch_password" {
-  description = "The opensearch master user password ARN."
+  description = "The opensearch master user password."
   value       = lookup(local.secret_values, "OPENSEARCH_PASSWORD").secret_string
   sensitive   = true
 }

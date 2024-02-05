@@ -22,15 +22,14 @@ terraform {
 }
 
 locals {
-  env            = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  region_env     = read_terragrunt_config(find_in_parent_folders("region.hcl"))
-  account_ids    = local.env.locals.account_ids
-  aws_account    = local.env.locals.aws_account
-  aws_region     = local.region_env.locals.aws_region
-  environment    = local.env.locals.environment
-  ports          = local.env.locals.ports
-  service        = local.env.locals.service
-  tenant_domains = local.env.locals.tenant_domains
+  env         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  region_env  = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  account_ids = local.env.locals.account_ids
+  aws_account = local.env.locals.aws_account
+  aws_region  = local.region_env.locals.aws_region
+  environment = local.env.locals.environment
+  ports       = local.env.locals.ports
+  service     = local.env.locals.service
 }
 
 inputs = {

@@ -67,7 +67,7 @@ No modules.
 | <a name="input_security_group_ids"></a> [security\_group\_ids](#input\_security\_group\_ids) | Security groups for the cluster. | `list(string)` | n/a | yes |
 | <a name="input_security_options_enabled"></a> [security\_options\_enabled](#input\_security\_options\_enabled) | Whether or not fine-grained access control in enabled. | `bool` | n/a | yes |
 | <a name="input_service"></a> [service](#input\_service) | The service of the project/stack. | `string` | n/a | yes |
-| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | Private subnets for the cluster to occupy. | `list(string)` | n/a | yes |
+| <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | Private subnets for the cluster to occupy. | `list(any)` | n/a | yes |
 | <a name="input_tenant_domains"></a> [tenant\_domains](#input\_tenant\_domains) | The origin(s) of the service. | `list(string)` | n/a | yes |
 | <a name="input_zone_awareness_enabled"></a> [zone\_awareness\_enabled](#input\_zone\_awareness\_enabled) | If the cluster occupies multiple availability zones. | `bool` | n/a | yes |
 
