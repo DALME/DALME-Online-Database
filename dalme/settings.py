@@ -269,7 +269,7 @@ class Base(Configuration):
         {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
     ]
     OAUTH2_PROVIDER_APPLICATION_MODEL = 'ida.Application'
-    OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', 3600)  # 1 hour.
+    OAUTH2_ACCESS_TOKEN_EXPIRY = os.environ.get('OAUTH2_ACCESS_TOKEN_EXPIRY', 3600)  # 1 hour
     OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY = os.environ.get('OAUTH2_REFRESH_TOKEN_COOKIE_EXPIRY', 3600 * 24 * 14)  # 14 days
 
     @property
@@ -350,9 +350,9 @@ class Base(Configuration):
           - https://docs.python.org/3/howto/enum.html
           - https://github.com/jazzband/django-configurations/blob/cad6dcb7f00c26702e5c5305901712409b94c848/configurations/importer.py#L163
 
-        For adding Tenants to an existing environment update the tenant data
-        provided in the environment and use the mangement command
-        'ensure_tenants'. This doesn't need to be done manually, the  command
+        For adding Tenants to an existing deployment update the tenant data
+        provided in the environment and run the mangement command
+        'ensure_tenants'. This doesn't need to be done manually, the command
         runs idempotently on each deployment of the app to the ECS service.
 
         """
@@ -373,6 +373,19 @@ class Development(Base, Configuration):
 
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
+
+    _TENANTS = {
+        'DALME': {
+            'domain': 'dalme.localhost',
+            'name': 'DALME',
+            'schema_name': 'dalme',
+        },
+        'GLOBALPHARMACOPEIAS': {
+            'domain': 'globalpharmacopeias.localhost',
+            'name': 'Global Pharmacopeias',
+            'schema_name': 'globalpharmacopeias',
+        },
+    }
 
     ALLOWED_HOSTS = [
         'dalme.localhost',
@@ -467,19 +480,6 @@ class Development(Base, Configuration):
     ELASTICSEARCH_DSL = {
         'default': {
             'hosts': os.environ.get('ELASTICSEARCH_ENDPOINT', 'dalme.es:9200'),
-        },
-    }
-
-    _TENANTS = {
-        'DALME': {
-            'domain': 'dalme.localhost',
-            'name': 'DALME',
-            'schema_name': 'dalme',
-        },
-        'GLOBALPHARMACOPEIAS': {
-            'domain': 'globalpharmacopeias.localhost',
-            'name': 'Global Pharmacopeias',
-            'schema_name': 'globalpharmacopeias',
         },
     }
 

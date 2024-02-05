@@ -47,7 +47,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_kms_key_arn"></a> [kms\_key\_arn](#output\_kms\_key\_arn) | ARN for the project KMS encryption key. |
-| <a name="output_opensearch_password"></a> [opensearch\_password](#output\_opensearch\_password) | The opensearch master user password ARN. |
+| <a name="output_opensearch_password"></a> [opensearch\_password](#output\_opensearch\_password) | The opensearch master user password. |
 | <a name="output_secrets"></a> [secrets](#output\_secrets) | A map of secrets from name to name/value 'Secret' objects. |
 | <a name="output_secrets_arns"></a> [secrets\_arns](#output\_secrets\_arns) | AWS identifiers for the registered secrets. |
 <!-- END_TF_DOCS -->

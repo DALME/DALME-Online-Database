@@ -117,7 +117,7 @@ variable "service" {
 
 variable "subnet_ids" {
   description = "Private subnets for the cluster to occupy."
-  type        = list(string)
+  type        = list(any)
 }
 
 variable "tenant_domains" {

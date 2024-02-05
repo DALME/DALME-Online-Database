@@ -1,4 +1,4 @@
-# IAM roles and permissions for the clodufront module.
+# IAM roles and permissions for the cloudfront module.
 
 data "aws_iam_policy_document" "oac_assets" {
   statement {

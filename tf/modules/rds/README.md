@@ -29,7 +29,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_allocated_storage"></a> [allocated\_storage](#input\_allocated\_storage) | The amount of storage for the db instance. | `number` | n/a | yes |
 | <a name="input_backup_retention_period"></a> [backup\_retention\_period](#input\_backup\_retention\_period) | How long to store db backups. | `number` | n/a | yes |
-| <a name="input_db_name"></a> [db\_name](#input\_db\_name) | The name of the db db instance. | `string` | n/a | yes |
+| <a name="input_db_name"></a> [db\_name](#input\_db\_name) | The name of the db instance. | `string` | n/a | yes |
 | <a name="input_db_subnet_group_name"></a> [db\_subnet\_group\_name](#input\_db\_subnet\_group\_name) | The subnet hosting the rds instance. | `string` | n/a | yes |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | Whether or not deletion protection is activated for the db instance. | `string` | n/a | yes |
 | <a name="input_engine"></a> [engine](#input\_engine) | What type of database is the db instance. | `string` | n/a | yes |

@@ -206,3 +206,37 @@ resource "aws_autoscaling_group" "jump_host" {
     create_before_destroy = true
   }
 }
+
+resource "aws_security_group" "jump_host" {
+  description = "Security group for the ec2 jump host."
+  name        = "${var.service}-security-group-jump-host-${var.environment}"
+  vpc_id      = aws_vpc.main.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "${var.service}-security-group-jump-host-${var.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "jump_host_egress_https" {
+  description       = "Allow connections to HTTPS for outbound SSM connections."
+  security_group_id = aws_security_group.jump_host.id
+  type              = "egress"
+  from_port         = var.security_groups.ssl_port
+  to_port           = var.security_groups.ssl_port
+  protocol          = var.security_groups.protocol
+  cidr_blocks       = [var.security_groups.cidr_blocks]
+}
+
+resource "aws_security_group_rule" "egress_jump_postgres" {
+  description       = "Allow connections to postgres from the jump host."
+  security_group_id = aws_security_group.jump_host.id
+  type              = "egress"
+  protocol          = var.security_groups.protocol
+  from_port         = var.security_groups.postgres_port
+  to_port           = var.security_groups.postgres_port
+  cidr_blocks       = [var.security_groups.cidr_blocks]
+}

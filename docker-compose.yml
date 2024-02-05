@@ -23,8 +23,8 @@ services:
     environment:
       ENV_FILE: /opt/web/.env
       LOG_LEVEL: ERROR
-      OAUTH_CLIENT_ID: 'oauth.ida.development'
-      OAUTH_CLIENT_SECRET: 'django-insecure-development-environment-oauth-client-secret'
+      OAUTH_CLIENT_ID: oauth.ida.development
+      OAUTH_CLIENT_SECRET: django-insecure-development-environment-oauth-client-secret
       OIDC_RSA_PRIVATE_KEY: /opt/web/oidc.key
       POSTGRES_DB: dalme
       POSTGRES_HOST: dalme.db
@@ -64,8 +64,8 @@ services:
       target: "development"
     environment:
       NODE_ENV: development
-      VITE_OAUTH_CLIENT_ID: oauth.ida.development
       VITE_INSPECT_ACTORS: "true"
+      VITE_OAUTH_CLIENT_ID: oauth.ida.development
     volumes:
       - ./dalme_ui/src:/opt/ui/src
     networks:

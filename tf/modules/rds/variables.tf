@@ -11,7 +11,7 @@ variable "backup_retention_period" {
 }
 
 variable "db_name" {
-  description = "The name of the db db instance."
+  description = "The name of the db instance."
   type        = string
 }
 
