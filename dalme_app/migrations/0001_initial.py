@@ -2167,7 +2167,7 @@ class Migration(migrations.Migration):
                 ('creation_timestamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modification_timestamp', models.DateTimeField(auto_now=True, null=True)),
                 ('object_id', models.UUIDField(db_index=True, null=True)),
-                ('value_STR', models.CharField(blank=True, default=None, max_length=255, null=True)),
+                ('value_str', models.CharField(blank=True, default=None, max_length=255, null=True)),
                 ('value_DATE_d', models.IntegerField(blank=True, null=True)),
                 ('value_DATE_m', models.IntegerField(blank=True, null=True)),
                 ('value_DATE_y', models.IntegerField(blank=True, null=True)),
@@ -2214,7 +2214,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                'unique_together': {('object_id', 'attribute_type', 'value_STR')},
+                'unique_together': {('object_id', 'attribute_type', 'value_str')},
             },
         ),
     ]

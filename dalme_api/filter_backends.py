@@ -30,7 +30,7 @@ class DalmeOrderingFilter(OrderingFilter):
                         _ordering += [f'{flt}_y', f'{flt}_m', f'{flt}_d']
 
                     else:
-                        queryset = queryset.annotate(**{cf: Subquery(attributes.values('value_STR'))})
+                        queryset = queryset.annotate(**{cf: Subquery(attributes.values('value_str'))})
                         _ordering.append(flt)
 
                 elif cf in ordering_aggregates:

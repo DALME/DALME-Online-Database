@@ -20,15 +20,15 @@ BOOLEAN_CHOICES = [('true', 'Yes'), ('false', 'No')]
 
 
 def _map_record_types():
-    # We have to filter over 'value_STR' rather than, say, 'pk' because of the
+    # We have to filter over 'value_str' rather than, say, 'pk' because of the
     # sideways denormalization scheme: there is no unique, one-to-one mapping
-    # between Attributes with the same 'value_STR'. Compare:
+    # between Attributes with the same 'value_str'. Compare:
     #
     #     attrs = Attribute.objects.filter(
     #         attribute_type__short_name='record_type'
     #     )
-    #     set([x.value_STR for x in attrs])
-    #     set([(x.pk, x.value_STR) for x in attrs])
+    #     set([x.value_str for x in attrs])
+    #     set([(x.pk, x.value_str) for x in attrs])
     #
     # So, let's eliminate the duplicates and index the choices first before
     # sorting them for the frontend widget, that way we can reaccess them by

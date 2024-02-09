@@ -132,7 +132,7 @@ class RecordSerializer(DynamicSerializer):
 #                         'id': agent.id,
 #                         'name': agent.content_object.standard_name,
 #                         'type': agent.content_object.get_type_display(),
-#                         'legal_persona': lp.first().value_STR if lp.exists() else 'Unknown',
+#                         'legal_persona': lp.first().value_str if lp.exists() else 'Unknown',
 #                     },
 #                 )
 #             ret['agents'] = agents

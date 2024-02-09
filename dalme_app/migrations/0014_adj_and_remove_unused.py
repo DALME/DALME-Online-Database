@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_STR',
+            name='value_str',
         ),
         migrations.RemoveField(
             model_name='attribute',

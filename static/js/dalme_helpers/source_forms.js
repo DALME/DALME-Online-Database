@@ -112,14 +112,14 @@ function populate_biblio_fields() {
 //         var default_attributes = [
 //           {
 //             "attribute_type": 28,
-//             "value_STR": "",
+//             "value_str": "",
 //             "attribute_name": "Record type (record_type)",
 //             "data_type": "STR",
-//             "options_list": "list(set(list(Attribute.objects.filter(attribute_type=28).values_list('value_STR', flat=True))))"
+//             "options_list": "list(set(list(Attribute.objects.filter(attribute_type=28).values_list('value_str', flat=True))))"
 //           },
 //           {
 //             "attribute_type": 29,
-//             "value_STR": "",
+//             "value_str": "",
 //             "attribute_name": "Record type phrase (record_type_phrase)",
 //             "data_type": "STR",
 //             "options_list": ""
@@ -129,7 +129,7 @@ function populate_biblio_fields() {
 //         default_attributes.push(
 //           {
 //             "attribute_type": 37,
-//             "value_STR": person_text,
+//             "value_str": person_text,
 //             "attribute_name": "Named persons",
 //             "data_type": "STR",
 //             "options_list": ""
@@ -171,7 +171,7 @@ function populate_biblio_fields() {
 //           default_attributes.push(
 //             {
 //               "attribute_type": 36,
-//               "value_STR": source_fields.city,
+//               "value_str": source_fields.city,
 //               "attribute_name": "City",
 //               "data_type": "STR",
 //               "options_list": "[{'label': i.name, 'value': i.name} for i in City.objects.all()]"

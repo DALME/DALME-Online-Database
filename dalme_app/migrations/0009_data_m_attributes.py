@@ -67,7 +67,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
                 month=att.value_DATE_m,
                 year=att.value_DATE_y,
                 date=att.value_DATE,
-                text=att.value_STR,
+                text=att.value_str,
                 creation_user=att.creation_user,
                 modification_user=att.modification_user,
                 creation_timestamp=att.creation_timestamp,
@@ -150,7 +150,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
         elif dtype == 'STR':
             new_val = AttributeValueStr(
                 attribute_ptr=att,
-                value=att.value_STR,
+                value=att.value_str,
                 creation_user=att.creation_user,
                 modification_user=att.modification_user,
                 creation_timestamp=att.creation_timestamp,
