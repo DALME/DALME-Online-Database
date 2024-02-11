@@ -362,10 +362,27 @@ jobs:
         with:
           context: .
           file: config/docker/Dockerfile.deploy
+          load: false
+          push: false
+          cache-from: |
+            type=gha,scope=terraform.tfupdate
+            type=gha,scope=terraform.tfdocs
+            type=gha,scope=terraform.terragrunt
+            type=gha,scope=terraform.iamlive
+            type=gha,scope=terraform.base
+          cache-to: |
+            type=gha,scope=terraform.tfupdate,mode=max
+          target: tfupdate
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: config/docker/Dockerfile.deploy
           load: true
           push: false
           cache-from: |
             type=gha,scope=terraform.tf
+            type=gha,scope=terraform.tfupdate
             type=gha,scope=terraform.tfdocs
             type=gha,scope=terraform.terragrunt
             type=gha,scope=terraform.iamlive
