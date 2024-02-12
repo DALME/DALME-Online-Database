@@ -29,6 +29,7 @@ else
 		$(PROJECT).db \
 		pg_restore \
 		--clean \
+		--if-exists \
 		--verbose \
 		--dbname=$(PROJECT) \
 		--username=$(PROJECT) \
