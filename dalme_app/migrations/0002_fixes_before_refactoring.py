@@ -68,24 +68,24 @@ class Migration(migrations.Migration):
         # the next commands are necessary because when migrating from MySQL to Postgres
         # certain constraints were created as indices and Postgres doesn't look for indices
         # when altering constraints, so we drop the index and recreate it as a constraint proper
-        # migrations.RunSQL('DROP INDEX idx_16430_dalme_app_attribute_object_id_attribute_type_c83849ec;'),
+        migrations.RunSQL('DROP INDEX idx_21581_dalme_app_attribute_object_id_attribute_type_c83849ec;'),
         migrations.RunSQL(
-            'ALTER TABLE public.dalme_app_attribute ADD CONSTRAINT idx_16430_dalme_app_attribute_object_id_attribute_type_c83849ec UNIQUE(object_id, attribute_type, "value_str");',
+            'ALTER TABLE public.dalme_app_attribute ADD CONSTRAINT idx_21581_dalme_app_attribute_object_id_attribute_type_c83849ec UNIQUE(object_id, attribute_type, value_str);',
         ),
-        # migrations.RunSQL('DROP INDEX idx_16554_dalme_app_set_x_content_content_type_id_object_i_8838;'),
+        migrations.RunSQL('DROP INDEX idx_21710_dalme_app_set_x_content_content_type_id_object_i_8838;'),
         migrations.RunSQL(
-            'ALTER TABLE public.dalme_app_set_x_content ADD CONSTRAINT idx_16554_dalme_app_set_x_content_content_type_id_object_i_8838 UNIQUE(content_type_id, object_id, set_id_id);',
+            'ALTER TABLE public.dalme_app_set_x_content ADD CONSTRAINT idx_21710_dalme_app_set_x_content_content_type_id_object_i_8838 UNIQUE(content_type_id, object_id, set_id_id);',
         ),
-        # migrations.RunSQL('DROP INDEX idx_16558_dalme_app_source_type_name_37ac523f_uniq;'),
+        migrations.RunSQL('DROP INDEX idx_21714_dalme_app_source_type_name_37ac523f_uniq;'),
         migrations.RunSQL(
-            'ALTER TABLE public.dalme_app_source ADD CONSTRAINT idx_16558_dalme_app_source_type_name_37ac523f_uniq UNIQUE(type, name);',
+            'ALTER TABLE public.dalme_app_source ADD CONSTRAINT idx_21714_dalme_app_source_type_name_37ac523f_uniq UNIQUE(type, name);',
         ),
-        # migrations.RunSQL('DROP INDEX idx_16561_dalme_app_source_credit_source_id_agent_id_type_2bd09;'),
+        migrations.RunSQL('DROP INDEX idx_21717_dalme_app_source_credit_source_id_agent_id_type_2bd09;'),
         migrations.RunSQL(
-            'ALTER TABLE public.dalme_app_source_credit ADD CONSTRAINT idx_16561_dalme_app_source_credit_source_id_agent_id_type_2bd09 UNIQUE(source_id, agent_id, type);',
+            'ALTER TABLE public.dalme_app_source_credit ADD CONSTRAINT idx_21717_dalme_app_source_credit_source_id_agent_id_type_2bd09 UNIQUE(source_id, agent_id, type);',
         ),
-        # migrations.RunSQL('DROP INDEX idx_16580_dalme_app_tasklist_group_id_slug_82602101_uniq;'),
+        migrations.RunSQL('DROP INDEX idx_21736_dalme_app_tasklist_group_id_slug_82602101_uniq;'),
         migrations.RunSQL(
-            'ALTER TABLE public.dalme_app_tasklist ADD CONSTRAINT idx_16580_dalme_app_tasklist_group_id_slug_82602101_uniq UNIQUE(group_id, slug);',
+            'ALTER TABLE public.dalme_app_tasklist ADD CONSTRAINT idx_21736_dalme_app_tasklist_group_id_slug_82602101_uniq UNIQUE(group_id, slug);',
         ),
     ]
