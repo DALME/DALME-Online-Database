@@ -1,6 +1,6 @@
 services:
   dalme.dns:
-    image: strm/dnsmasq
+    image: dockurr/dnsmasq
     container_name: dalme.dns
     networks:
       - app-network
@@ -65,7 +65,7 @@ services:
       - "3000"
 
   dalme.db:
-    image: postgres:15
+    image: postgres
     container_name: dalme.db
     environment:
       POSTGRES_DB: dalme
@@ -75,7 +75,6 @@ services:
     volumes:
       - ./sql/dumps:/opt/db/dumps
       - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./sql/postgresql:/docker-entrypoint-initdb.d
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
@@ -87,7 +86,7 @@ services:
   dalme.proxy:
     image: nginx:mainline
     container_name: dalme.proxy
-    command: [nginx-debug, "-g", "daemon off;"]
+    command: [ nginx-debug, "-g", "daemon off;" ]
     depends_on:
       - dalme.web
     volumes:
@@ -154,16 +153,16 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
     volumes:
-     - pgadmin-data:/var/lib/pgadmin
+      - pgadmin-data:/var/lib/pgadmin
     networks:
       - app-network
     ports:
       - "5050:80"
 
   rs.db:
-    image: mysql:8.0.19
+    image: mysql:8.2.0-oracle
     container_name: rs.db
-    platform: linux/amd64
+    platform: linux/arm64
     environment:
       MYSQL_DATABASE: resourcespace
       MYSQL_ROOT_PASSWORD: root
@@ -188,6 +187,7 @@ volumes:
   rsdata:
   ipython-data:
   pgadmin-data:
+
 
 networks:
   app-network:
