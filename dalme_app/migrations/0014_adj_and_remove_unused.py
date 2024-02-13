@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_DEC',
+            name='value_dec',
         ),
         migrations.RemoveField(
             model_name='attribute',

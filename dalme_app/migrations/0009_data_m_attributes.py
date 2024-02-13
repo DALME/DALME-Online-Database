@@ -80,7 +80,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
         elif dtype == 'DEC':
             new_val = AttributeValueDec(
                 attribute_ptr=att,
-                value=att.value_DEC,
+                value=att.value_dec,
                 creation_user=att.creation_user,
                 modification_user=att.modification_user,
                 creation_timestamp=att.creation_timestamp,
@@ -130,7 +130,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
             stats[dtype]['count'] += 1
 
         elif dtype in {'FK-UUID', 'FK-INT'}:
-            _id = att.value_json['id'] if dtype == 'FK-UUID' else int(att.value_JSON['id'])
+            _id = att.value_json['id'] if dtype == 'FK-UUID' else int(att.value_json['id'])
             obj_class = att.value_json['class'].lower()
             obj_ct = ContentType.objects.get(app_label='dalme_app', model=obj_class.lower())
 

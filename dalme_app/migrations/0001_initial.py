@@ -2173,7 +2173,7 @@ class Migration(migrations.Migration):
                 ('value_date_y', models.IntegerField(blank=True, null=True)),
                 ('value_date', models.DateField(blank=True, null=True)),
                 ('value_int', models.IntegerField(blank=True, null=True)),
-                ('value_DEC', models.DecimalField(blank=True, decimal_places=2, max_digits=9, null=True)),
+                ('value_dec', models.DecimalField(blank=True, decimal_places=2, max_digits=9, null=True)),
                 ('value_txt', models.TextField(blank=True, default=None, null=True)),
                 ('value_json', models.JSONField(null=True)),
                 (
