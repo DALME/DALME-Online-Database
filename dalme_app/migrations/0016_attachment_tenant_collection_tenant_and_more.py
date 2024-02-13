@@ -36,8 +36,21 @@ BEGIN
         RAISE;
     END;
 
-    -- Clone the (empty) table back to the public schema, symmetry is restored.
-    EXECUTE format('CREATE TABLE public.%I (like dalme.%I including all)', tb, tb);
+    BEGIN
+        -- Clone the (empty) table back to the public schema, symmetry is restored.
+        EXECUTE format('CREATE TABLE public.%I (like dalme.%I including all)', tb, tb);
+
+    -- Catch if the revision table has been removed.
+    EXCEPTION
+      WHEN SQLSTATE '42P01' THEN
+        BEGIN
+          IF tb = 'wagtailcore_revision' THEN
+            CONTINUE;
+          END IF;
+        END;
+      WHEN OTHERS THEN
+        RAISE;
+    END;
 
   END LOOP;
 END $$;
