@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    atomic = False
     dependencies = [
         ('dalme_app', '0013_data_m_local_values'),
     ]
