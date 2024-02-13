@@ -142,9 +142,9 @@ function populate_biblio_fields() {
 //               {
 //                 "attribute_type": 26,
 //                 "attribute_name": "Start date",
-//                 "value_DATE_d": d_array.day,
-//                 "value_DATE_m": d_array.month,
-//                 "value_DATE_y": d_array.year,
+//                 "value_date_d": d_array.day,
+//                 "value_date_m": d_array.month,
+//                 "value_date_y": d_array.year,
 //                 "data_type": "DATE",
 //                 "options_list": ""
 //               },
@@ -158,9 +158,9 @@ function populate_biblio_fields() {
 //                 {
 //                   "attribute_type": 25,
 //                   "attribute_name": "End date",
-//                   "value_DATE_d": d_array.day,
-//                   "value_DATE_m": d_array.month,
-//                   "value_DATE_y": d_array.year,
+//                   "value_date_d": d_array.day,
+//                   "value_date_m": d_array.month,
+//                   "value_date_y": d_array.year,
 //                   "data_type": "DATE",
 //                   "options_list": ""
 //                 },

@@ -63,10 +63,10 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
         if dtype == 'DATE':
             new_val = AttributeValueDate(
                 attribute_ptr=att,
-                day=att.value_DATE_d,
-                month=att.value_DATE_m,
-                year=att.value_DATE_y,
-                date=att.value_DATE,
+                day=att.value_date_d,
+                month=att.value_date_m,
+                year=att.value_date_y,
+                date=att.value_date,
                 text=att.value_str,
                 creation_user=att.creation_user,
                 modification_user=att.modification_user,
@@ -93,7 +93,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
         elif dtype == 'INT':
             new_val = AttributeValueInt(
                 attribute_ptr=att,
-                value=att.value_INT,
+                value=att.value_int,
                 creation_user=att.creation_user,
                 modification_user=att.modification_user,
                 creation_timestamp=att.creation_timestamp,
@@ -106,7 +106,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
         elif dtype == 'JSON':
             new_val = AttributeValueJson(
                 attribute_ptr=att,
-                value=att.value_JSON,
+                value=att.value_json,
                 creation_user=att.creation_user,
                 modification_user=att.modification_user,
                 creation_timestamp=att.creation_timestamp,
@@ -119,7 +119,7 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
         elif dtype == 'TXT':
             new_val = AttributeValueTxt(
                 attribute_ptr=att,
-                value=att.value_TXT,
+                value=att.value_txt,
                 creation_user=att.creation_user,
                 modification_user=att.modification_user,
                 creation_timestamp=att.creation_timestamp,
@@ -130,8 +130,8 @@ def migrate_attributes(apps, schema_editor):  # noqa: PLR0915, C901, PLR0912
             stats[dtype]['count'] += 1
 
         elif dtype in {'FK-UUID', 'FK-INT'}:
-            _id = att.value_JSON['id'] if dtype == 'FK-UUID' else int(att.value_JSON['id'])
-            obj_class = att.value_JSON['class'].lower()
+            _id = att.value_json['id'] if dtype == 'FK-UUID' else int(att.value_JSON['id'])
+            obj_class = att.value_json['class'].lower()
             obj_ct = ContentType.objects.get(app_label='dalme_app', model=obj_class.lower())
 
             new_val = AttributeValueFkey(

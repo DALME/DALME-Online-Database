@@ -83,7 +83,7 @@ def sets_to_collections(apps, schema_editor):
                 content_type=new_col_ct,
                 object_id=new_collection.id,
                 attribute_type=AttributeType.objects.get(short_name='description'),
-                value_TXT=target.description,
+                value_txt=target.description,
                 creation_user=user_obj,
                 modification_user=user_obj,
             )
@@ -95,7 +95,7 @@ def sets_to_collections(apps, schema_editor):
                 content_type=new_col_ct,
                 object_id=new_collection.id,
                 attribute_type=AttributeType.objects.get(short_name='collection_metadata'),
-                value_JSON={target.stat_title: target.stat_text},
+                value_json={target.stat_title: target.stat_text},
                 creation_user=user_obj,
                 modification_user=user_obj,
             )
@@ -110,7 +110,7 @@ def sets_to_collections(apps, schema_editor):
                 content_type=new_col_ct,
                 object_id=new_collection.id,
                 attribute_type=AttributeType.objects.get(short_name='workset_progress'),
-                value_JSON=workset_progress,
+                value_json=workset_progress,
                 creation_user=user_obj,
                 modification_user=user_obj,
             )

@@ -65,7 +65,7 @@ services:
       - "3000"
 
   dalme.db:
-    image: postgres:15
+    image: postgres:16
     container_name: dalme.db
     environment:
       POSTGRES_DB: dalme
@@ -154,14 +154,14 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
     volumes:
-     - pgadmin-data:/var/lib/pgadmin
+      - pgadmin-data:/var/lib/pgadmin
     networks:
       - app-network
     ports:
       - "5050:80"
 
   rs.db:
-    image: mysql:8.0.19
+    image: mysql:8.2.0-oracle
     container_name: rs.db
     platform: linux/amd64
     environment:

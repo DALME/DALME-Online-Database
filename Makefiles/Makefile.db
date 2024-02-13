@@ -30,6 +30,7 @@ else
 		pg_restore \
 		--clean \
 		--verbose \
+		--if-exists \
 		--dbname=$(PROJECT) \
 		--username=$(PROJECT) \
 		$(DUMPS)/$(dump)

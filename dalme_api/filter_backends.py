@@ -23,9 +23,9 @@ class DalmeOrderingFilter(OrderingFilter):
                     attributes = Attribute.objects.filter(object_id=OuterRef('pk'), attribute_type=att_type)
                     if att_type.data_type == 'DATE':
                         queryset = (
-                            queryset.annotate(**{cf + '_d': Subquery(attributes.values('value_DATE_d'))})
-                            .annotate(**{cf + '_m': Subquery(attributes.values('value_DATE_m'))})
-                            .annotate(**{cf + '_y': Subquery(attributes.values('value_DATE_y'))})
+                            queryset.annotate(**{cf + '_d': Subquery(attributes.values('value_date_d'))})
+                            .annotate(**{cf + '_m': Subquery(attributes.values('value_date_m'))})
+                            .annotate(**{cf + '_y': Subquery(attributes.values('value_date_y'))})
                         )
                         _ordering += [f'{flt}_y', f'{flt}_m', f'{flt}_d']
 

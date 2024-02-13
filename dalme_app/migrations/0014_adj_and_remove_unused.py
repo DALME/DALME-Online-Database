@@ -22,19 +22,19 @@ class Migration(migrations.Migration):
         # Attribute
         migrations.RemoveField(
             model_name='attribute',
-            name='value_DATE',
+            name='value_date',
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_DATE_d',
+            name='value_date_d',
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_DATE_m',
+            name='value_date_m',
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_DATE_y',
+            name='value_date_y',
         ),
         migrations.RemoveField(
             model_name='attribute',
@@ -42,11 +42,11 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_INT',
+            name='value_int',
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_JSON',
+            name='value_json',
         ),
         migrations.RemoveField(
             model_name='attribute',
@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='attribute',
-            name='value_TXT',
+            name='value_txt',
         ),
         # AttributeType
         migrations.RemoveField(

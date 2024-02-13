@@ -42,6 +42,7 @@ from dalme_public.blocks import (
     DocumentBlock,
     ExternalResourceBlock,
     FooterPageChooserBlock,
+    FootnotesPlaceMarker,
     InlineImageBlock,
     MainImageBlock,
     PersonBlock,
@@ -318,6 +319,7 @@ class DALMEPage(Page):
             ('html', blocks.RawHTMLBlock()),
             ('subsection', SubsectionBlock()),
             ('subsection_end_marker', SubsectionEndMarkerBlock()),
+            ('footnotes_placemarker', FootnotesPlaceMarker()),
         ],
         null=True,
         use_json_field=True,
@@ -869,8 +871,9 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             raise Http404
 
         source = qs.first()
+        as_preview = self.preview if hasattr(self, 'preview') else False
 
-        if not source.workflow.is_public:
+        if not source.workflow.is_public and not as_preview:
             raise Http404
 
         pages = (
@@ -902,6 +905,8 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             from_search = True
 
         data = PublicRecordSerializer(source).data
+        purl = f'https://purl.dalme.org/{source.id}/' if as_preview else source.get_purl()
+
         context.update(
             {
                 'header_image': viewer_snippet.header_image,
@@ -910,7 +915,7 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
                 'from_search': from_search,
                 'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),
                 'render_mode': request.session.get('public-render-mode', 'scholarly'),
-                'purl': source.get_purl(),
+                'purl': purl,
                 'title': self.smart_truncate(data['name'], length=35),
                 'data': {
                     'folios': list(pages),
@@ -928,6 +933,11 @@ class SearchEnabled(RoutablePageMixin, DALMEPage):
             'dalme_public/record.html',
             context,
         )
+
+    def relative_url(self, current_site, request=None):
+        if hasattr(request, 'is_dummy') and request.is_dummy:
+            return '/'
+        return self.get_url(request=request, current_site=current_site)
 
 
 class Collections(SearchEnabled):
@@ -987,7 +997,10 @@ class Collection(SearchEnabled):
         default=True,
         help_text='Check this box to show the "Cite" menu for this page.',
     )
-
+    preview = models.BooleanField(
+        default=False,
+        help_text='Check this box to set this collection to Preview mode only. It will be made public but not added to the search or map. Only people with the link will be able to access it.',
+    )
     parent_page_types = ['dalme_public.Collections']
     subpage_types = ['dalme_public.Flat']
 
@@ -997,6 +1010,7 @@ class Collection(SearchEnabled):
         FieldPanel('header_image'),
         FieldPanel('header_position'),
         FieldPanel('citable'),
+        FieldPanel('preview'),
         FieldPanel('body'),
     ]
 
@@ -1010,18 +1024,22 @@ class Collection(SearchEnabled):
 
     @property
     def stats(self):
-        stats_dict = {
-            'records': self.source_set.member_count(published=True),
-            'languages': self.source_set.get_languages(published=True),
-            'coverage': self.source_set.get_time_coverage(published=True),
-        }
-        stats = self.source_set.attributes.filter(attribute_type__name='collection_metadata')
-        if len(stats) > 0:
-            ((key, value),) = stats[0].value.items()
-            stats_dict['other'] = {
-                'label': key,
-                'text': value,
+        if self.preview:
+            stats_dict = {
+                'records': self.source_set.member_count,
+                'languages': self.source_set.get_languages(),
+                'coverage': self.source_set.get_time_coverage(),
             }
+        else:
+            stats_dict = {
+                'records': self.source_set.get_public_member_count(),
+                'languages': self.source_set.get_public_languages(),
+                'coverage': self.source_set.get_public_time_coverage(),
+            }
+
+        if self.source_set.stat_title is not None:
+            stats_dict['other'] = {'label': self.source_set.stat_title, 'text': self.source_set.stat_text}
+
         return stats_dict
 
     @property
