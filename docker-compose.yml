@@ -75,7 +75,6 @@ services:
     volumes:
       - ./sql/dumps:/opt/db/dumps
       - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./sql/postgresql:/docker-entrypoint-initdb.d
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
