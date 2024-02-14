@@ -5,18 +5,8 @@ from django.db import migrations, models
 
 def scope_group_properties(apps, schema_editor):
     """Scope Group Properties to tenants."""
-    Group = apps.get_model('auth', 'Group')  # noqa: N806
     GroupProperties = apps.get_model('ida', 'GroupProperties')  # noqa: N806
     Tenant = apps.get_model('ida', 'Tenant')  # noqa: N806
-
-    # Fix a missing Group.properties field, not sure how that has occurred.
-    group = Group.objects.get(pk=37)
-    GroupProperties.objects.create(
-        tenant=None,
-        group=group,
-        group_type=1,
-        description='Group housing site content moderators',
-    )
 
     unscoped = {'DAM Editors', 'DAM Users', 'Developers' 'Super Administrators'}
     dalme = Tenant.objects.get(name='DALME')
