@@ -3,61 +3,6 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-MOVE_SCHEMA = """
-BEGIN;
-
-DO $$
-  DECLARE
-  tb text;
-BEGIN
-  FOR tb IN
-    SELECT table_name
-    FROM information_schema.tables
-    WHERE table_schema = 'dalme' AND table_name <> 'django_migrations'
-    LOOP
-
-    -- Drop the existing (empty) table from the dalme schema so we can replace it.
-    EXECUTE format('DROP TABLE dalme.%I CASCADE;', tb);
-
-    BEGIN
-      -- Move the table from the public schema to the dalme schema.
-      EXECUTE format('ALTER TABLE public.%I SET SCHEMA dalme;', tb);
-
-    -- Handle edge cases.
-    EXCEPTION
-      WHEN SQLSTATE '42P01' THEN
-        BEGIN
-          -- The editorspick table can be disregarded if it's there.
-          IF tb = 'wagtailsearch_editorspick' THEN
-            CONTINUE;
-          END IF;
-        END;
-      WHEN OTHERS THEN
-        RAISE;
-    END;
-
-    BEGIN
-        -- Clone the (empty) table back to the public schema, symmetry is restored.
-        EXECUTE format('CREATE TABLE public.%I (like dalme.%I including all)', tb, tb);
-
-    -- Catch if the revision table has been removed.
-    EXCEPTION
-      WHEN SQLSTATE '42P01' THEN
-        BEGIN
-          IF tb = 'wagtailcore_revision' THEN
-            CONTINUE;
-          END IF;
-        END;
-      WHEN OTHERS THEN
-        RAISE;
-    END;
-
-  END LOOP;
-END $$;
-
-COMMIT;
-"""
-
 
 def create_tenants(apps, schema_editor):
     """Create rows for Tenants as registered in the settings."""
@@ -102,13 +47,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Create tenant records. Must come first (so the schema exists for the
-        # MOVE_SCHEMA stage.
         migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE;'),
         migrations.RunPython(create_tenants),
         migrations.RunSQL('SET CONSTRAINTS ALL DEFERRED;'),
-        # Move all TENANT_APPS tables from the 'public' to the 'dalme' db schema.
-        migrations.RunSQL(MOVE_SCHEMA),
         migrations.AddField(
             model_name='attachment',
             name='tenant',
