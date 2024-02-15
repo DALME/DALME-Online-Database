@@ -1,6 +1,6 @@
 services:
   dalme.dns:
-    image: strm/dnsmasq
+    image: dockurr/dnsmasq
     container_name: dalme.dns
     networks:
       - app-network
