@@ -171,7 +171,6 @@ services:
   rs.db:
     image: mysql:8.2.0-oracle
     container_name: rs.db
-    platform: linux/amd64
     environment:
       MYSQL_DATABASE: resourcespace
       MYSQL_ROOT_PASSWORD: root
