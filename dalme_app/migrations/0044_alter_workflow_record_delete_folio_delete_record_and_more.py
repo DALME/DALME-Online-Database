@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('dalme_public', '0005_alter_essay_source_alter_featuredinventory_source_and_more'),
+        ('dalme_public', '0001_initial'),
         ('dalme_app', '0043_remove_folio_creation_user_and_more'),
         ('ida', '0029_folio_recordgroup_record_folio_record_and_more'),
     ]
