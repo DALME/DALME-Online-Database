@@ -12,7 +12,7 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 class EntityPhrase(dalmeUuid):
     """Stores entity-phrase information."""
 
-    transcription_id = models.ForeignKey(
+    transcription = models.ForeignKey(
         'ida.Transcription',
         to_field='id',
         db_index=True,

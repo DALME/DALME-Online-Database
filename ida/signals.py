@@ -21,7 +21,7 @@ def page_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
 
 
 @receiver(models.signals.post_save, sender=Record)
-def source_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
+def record_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
     """Run after save method on Record objects."""
     # Create workflow record if this is a new source.
     if created:
@@ -47,7 +47,7 @@ def source_post_save(sender, instance, created, **kwargs):  # noqa: ARG001
 
 
 @receiver(models.signals.pre_delete, sender=Record)
-def source_pre_delete(sender, instance, **kwargs):  # noqa: ARG001
+def record_pre_delete(sender, instance, **kwargs):  # noqa: ARG001
     """Run before delete method on Record objects."""
     if instance.pages:
         for page in instance.pages.all():

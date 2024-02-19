@@ -32,7 +32,7 @@ class Tag(ScopedBase, dalmeUuid):
 
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES)
     tag = models.CharField(max_length=55, blank=True)
-    tag_group = models.CharField(max_length=255, blank=True)
+    tag_group = models.CharField(max_length=255, blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=55, blank=True, db_index=True)

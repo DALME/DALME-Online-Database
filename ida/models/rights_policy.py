@@ -28,7 +28,7 @@ class RightsPolicy(dalmeUuid):
     rights_status = models.IntegerField(choices=RIGHTS_STATUS, default=5)
     rights = models.TextField(blank=True)
     rights_notice = models.JSONField(null=True)
-    licence = models.TextField(blank=True)
+    licence = models.TextField(blank=True, null=True)
     rights_holder = models.CharField(max_length=255, blank=True)
     notice_display = models.BooleanField(default=False)
     public_display = models.BooleanField(default=True)

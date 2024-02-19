@@ -33,7 +33,7 @@ from .reference import (
     LanguageReference,
     LocaleReference,
 )
-from .relationship import Relationship
+from .relationship import Relationship, RelationshipType
 from .rights_policy import RightsPolicy
 from .scope import Scope, ScopeType
 from .tenant import Domain, Tenant
@@ -83,6 +83,7 @@ __all__ = [
     'Record',
     'RecordGroup',
     'Relationship',
+    'RelationshipType',
     'RightsPolicy',
     'Scope',
     'ScopeType',

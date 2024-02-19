@@ -483,6 +483,13 @@ class Development(Base, Configuration):
         },
     }
 
+    if os.environ.get('DATA_MIGRATION'):
+        WAGTAILSEARCH_BACKENDS = {
+            'default': {
+                'AUTO_UPDATE': False,
+            }
+        }
+
 
 class CI(Development, Configuration):
     """Continuous integration pipeline settings."""

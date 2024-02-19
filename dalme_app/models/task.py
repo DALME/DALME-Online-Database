@@ -21,22 +21,22 @@ class Task(ScopedBase, dalmeIntid):
     """Stores information about tasks."""
 
     title = models.CharField(max_length=140)
-    task_list = models.ForeignKey('TaskList', on_delete=models.CASCADE, related_name='tasks')
+    task_list = models.ForeignKey('dalme_app.TaskList', on_delete=models.CASCADE, related_name='tasks')
     description = models.TextField(blank=True)
     priority = models.PositiveIntegerField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
     completed = models.BooleanField(default=False)
     completed_date = models.DateTimeField(blank=True, null=True)
     url = models.CharField(max_length=255, blank=True)
-    comments = GenericRelation('Comment', related_query_name='tasks')
+    comments = GenericRelation('dalme_app.Comment', related_query_name='tasks')
     completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
         on_delete=models.CASCADE,
         related_name='completed_tasks',
     )
-    files = models.ManyToManyField('Attachment', blank=True, related_name='tasks')
-    resources = models.ManyToManyField('Collection', blank=True, related_name='tasks')
+    files = models.ManyToManyField('dalme_app.Attachment', blank=True, related_name='tasks')
+    resources = models.ManyToManyField('dalme_app.Collection', blank=True, related_name='tasks')
     assignees = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='task_assignations')
 
     class Meta:

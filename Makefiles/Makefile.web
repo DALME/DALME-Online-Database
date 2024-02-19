@@ -37,6 +37,13 @@ else
 endif
 .PHONY: web.manage
 
+web.migrate_data:
+	docker compose exec \
+		-e DATA_MIGRATION=1 \
+		$(PROJECT).web \
+		python manage.py migrate_data
+.PHONY: web.manage
+
 web.open:
 	open https://dalme.localhost:8000/
 .PHONY: web.open

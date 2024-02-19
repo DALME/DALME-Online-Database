@@ -45,4 +45,4 @@ class Person(Agent):
     )
 
     def __str__(self):
-        return self.standard_name
+        return self.name

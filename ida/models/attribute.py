@@ -25,7 +25,6 @@ class Attribute(dalmeUuid):
         'ida.AttributeType',
         db_index=True,
         on_delete=models.CASCADE,
-        db_column='attribute_type',
         related_name='attributes',
     )
 
@@ -109,10 +108,13 @@ class AttributeValueDate(Attribute):
             'text': self.text,
         }
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # noqa: C901, PLR0912
         """Override save method to format date."""
         if self.date:
-            date = parse(self.date)
+            try:
+                date = parse(self.date)
+            except TypeError:
+                date = self.date
             self.day = date.day
             self.month = date.month
             self.year = date.year

@@ -21,12 +21,10 @@ class Ticket(dalmeIntid):
     )
 
     subject = models.CharField(max_length=140)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     status = models.IntegerField(choices=STATUS, default=0)
-    tags = GenericRelation('dalme_app.Tag')
-    url = models.CharField(max_length=255, blank=True)
+    url = models.CharField(max_length=255, blank=True, null=True)
     files = models.ManyToManyField('dalme_app.Attachment', blank=True, related_name='tickets')
-    comments = GenericRelation('dalme_app.Comment')
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         blank=True,
@@ -36,6 +34,8 @@ class Ticket(dalmeIntid):
     )
     closing_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     closing_date = models.DateTimeField(null=True, blank=True)
+    tags = GenericRelation('dalme_app.Tag')
+    comments = GenericRelation('dalme_app.Comment')
 
     class Meta:
         ordering = ['status', 'creation_timestamp']

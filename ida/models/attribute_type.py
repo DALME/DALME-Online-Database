@@ -24,7 +24,7 @@ class AttributeType(dalmeIntid):
     description = models.TextField()
     data_type = models.CharField(max_length=15, choices=DATA_TYPES)
     is_local = models.BooleanField(default=False)
-    source = models.CharField(max_length=255, blank=True)
+    source = models.CharField(max_length=255, blank=True, null=True)
     same_as = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     options = models.ForeignKey('ida.OptionsList', on_delete=models.SET_NULL, null=True)
 
