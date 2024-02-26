@@ -1,6 +1,8 @@
 env
 devEnv
 venv
+.venv
+.venv/bin/
 *.pyc
 staticfiles
 media
