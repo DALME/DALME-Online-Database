@@ -2095,6 +2095,7 @@ tei-metamark[function="leader"] {
   flex-grow: 1;
   margin-top: auto;
   margin-bottom: 9px;
+  min-width: 30px;
 }
 tei-metamark[function="leader"]::before {
   background-size: 50px 1px;
@@ -2120,6 +2121,11 @@ tei-metamark[function="hr"] {
 }
 .tei-leader-line {
   display: flex;
+}
+.tei-leader-line div:first-of-type {
+  display: flex;
+  flex-direction: row-reverse;
+  white-space: pre-wrap;
 }
 tei-metamark[function="hhr"] + tei-lb,
 tei-metamark[function="hr"] + tei-lb,
@@ -2393,6 +2399,9 @@ tei-hi[rend=right] {
 }
 tei-hi[rend=center] {
   justify-content: center;
+}
+tei-hi[rend=center] div:first-of-type {
+  text-align: center;
 }
 tei-hi[rend=right] {
   justify-content: end;

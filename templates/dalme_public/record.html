@@ -827,9 +827,11 @@
               }
               const wrapper = $('<div class="tei-leader-line"></div>');
               const post = $('<div></div>');
+              const pre = $('<div></div>');
               const anchor = $(next_array[next_array.length - 1]).next();
               post.append(next_array);
-              wrapper.append(prev_array);
+              pre.append(prev_array);
+              wrapper.append(pre);
               wrapper.append($(this));
               wrapper.append(post);
               wrapper.insertBefore(anchor);
