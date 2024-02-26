@@ -1,6 +1,5 @@
 services:
   dalme.web:
-    # platform: linux/amd64
     image: "web:eb"
     container_name: dalme.eb
     build:
@@ -30,8 +29,7 @@ services:
     tty: true
 
   dalme.db:
-    platform: linux/amd64
-    image: mysql:8.0.19
+    image: mysql:8.2.0-oracle
     container_name: dalme.db
     environment:
       MYSQL_ROOT_PASSWORD: root
