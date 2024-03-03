@@ -1,4 +1,5 @@
 """Extend the default OAuth application model."""
+
 from oauth2_provider.models import AbstractApplication
 
 from django.db import models

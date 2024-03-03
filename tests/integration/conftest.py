@@ -1,4 +1,5 @@
 """Configure pytest for the tests.integration module."""
+
 import pytest
 
 

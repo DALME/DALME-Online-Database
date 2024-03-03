@@ -3,6 +3,7 @@
 Adapted from: https://github.com/dduong42/s3manifestcollectstatic
 
 """
+
 import builtins
 import functools
 import json
@@ -31,7 +32,7 @@ MANIFEST_PATH = 'staticfiles.json'
 class Command(BaseCommand):
     """Define the collectstatic_tenants command."""
 
-    help = 'Collect staticfiles for all registered tenants.'  # noqa: A003
+    help = 'Collect staticfiles for all registered tenants.'
 
     @property
     def is_dev(self):

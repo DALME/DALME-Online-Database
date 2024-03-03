@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE='dalme.settings'
-DJANGO_CONFIGURATION='Development'
+DJANGO_SETTINGS_MODULE = 'ida.settings'
+DJANGO_CONFIGURATION = 'Development'
 addopts = "--strict-markers"
 markers = [
   "integration: marks integration tests",
@@ -11,7 +11,7 @@ markers = [
 [tool.coverage.run]
 omit = [
   "*/migrations/*",
-  "dalme_app/management/commands/custom_createcachetable.py",
+  "ida/management/commands/custom_createcachetable.py",
   "manage.py*",
   "tests/*",
 ]
@@ -19,7 +19,6 @@ omit = [
 # https://github.com/charliermarsh/ruff#configuration
 [tool.ruff]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-extend-exclude = ["dalme_app/scripts"]
 ignore = [
   "COM812",  # Recommended disable by the rust format.
   "D101",

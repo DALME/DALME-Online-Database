@@ -1,18 +1,19 @@
 """Model record data."""
+
 from wagtail.search import index
 
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import options
-from django.urls import reverse
+from django.db.models import Q, options
 
-from ida.models.templates import dalmeIntid, dalmeOwned, dalmeUuid
+from ida.models.templates import IDAIntid, IDAOwned, IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class RecordGroup(dalmeUuid, dalmeOwned):
+class RecordGroup(IDAUuid, IDAOwned):
     """Stores information about archival units."""
 
     name = models.CharField(max_length=255)
@@ -23,8 +24,8 @@ class RecordGroup(dalmeUuid, dalmeOwned):
     attributes = GenericRelation('ida.Attribute', related_query_name='record_group')
     children = GenericRelation('ida.Record', related_query_name='record_group')
     permissions = GenericRelation('ida.Permission', related_query_name='record_group')
-    tags = GenericRelation('dalme_app.Tag')
-    comments = GenericRelation('dalme_app.Comment')
+    tags = GenericRelation('ida.Tag')
+    comments = GenericRelation('ida.Comment')
 
     @property
     def comment_count(self):
@@ -44,7 +45,7 @@ class RecordGroup(dalmeUuid, dalmeOwned):
         return self.children.count()
 
 
-class Record(index.Indexed, dalmeUuid, dalmeOwned):
+class Record(index.Indexed, IDAUuid, IDAOwned):
     """Stores information about records."""
 
     name = models.CharField(max_length=255)
@@ -53,10 +54,10 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     parent_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     parent_id = models.CharField(max_length=36, db_index=True, null=True)
     attributes = GenericRelation('ida.Attribute', related_query_name='record')
-    pages = models.ManyToManyField('ida.Page', db_index=True, through='ida.Folio')
-    tags = GenericRelation('dalme_app.Tag')
-    comments = GenericRelation('dalme_app.Comment')
-    collections = GenericRelation('dalme_app.CollectionMembership', related_query_name='record')
+    pages = models.ManyToManyField('ida.Page', db_index=True, through='ida.PageNode')
+    tags = GenericRelation('ida.Tag')
+    comments = GenericRelation('ida.Comment')
+    collections = GenericRelation('ida.CollectionMembership', related_query_name='record')
     permissions = GenericRelation('ida.Permission', related_query_name='record')
     relationships_as_source = GenericRelation(
         'ida.Relationship',
@@ -76,7 +77,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
 
     def get_absolute_url(self):
         """Return absolute url for record."""
-        return reverse('source_detail', kwargs={'pk': self.pk})
+        return f'{settings.API_ABSOLUTE_URL}/records/{self.pk}/'
 
     @property
     def is_published(self):
@@ -101,7 +102,7 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     def get_related_resources(self, content_type):
         """Return list of resources of type:content_type associated with the record, if any."""
         res_list = []
-        for page in self.folios.all().select_related('transcription'):
+        for page in self.pagenodes.all().select_related('transcription'):
             if page.transcription:
                 res_list.append(page.transcription.entity_phrases.filter(content_type=content_type))
 
@@ -132,12 +133,14 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
     @property
     def has_transcriptions(self):
         """Return boolean indicating whether the record has associated transcriptions."""
-        return self.folios.all().select_related('transcription').exists()
+        return self.pagenodes.all().select_related('transcription').exists()
 
     @property
     def no_transcriptions(self):
         """Return count of transcriptions associated with the record, if any."""
-        return self.folios.exclude(transcription__count_ignore=True).count() if self.has_transcriptions else 0
+        return len(
+            [t for t in self.pagenodes.all() if t.transcription is not None and t.transcription.count_transcription]
+        )
 
     @property
     def no_folios(self):
@@ -146,15 +149,20 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
 
     def get_purl(self):
         """Return the record's permanent url."""
+        # TODO: generalize and use a variable to compose url
         return f'https://purl.dalme.org/{self.id}/' if self.workflow.is_public else None
 
     def get_credits(self):
         """Return credits for record as list of dicts."""
         return [
-            {'name': r.source.name, 'credit': r.scopes.parameters.credit}
+            {'name': r.source.name, 'credit': r.scopes.first().parameters['credit']}
             for r in self.relationships_as_target.filter(
-                rel_type__short_name='authorship',
-                scopes__parameters__credit__in=['editor', 'corrections', 'contributor'],
+                Q(rel_type__short_name='authorship')
+                & (
+                    Q(scopes__parameters__credit='editor')
+                    | Q(scopes__parameters__credit='contributor')
+                    | Q(scopes__parameters__credit='corrections')
+                )
             )
         ]
 
@@ -169,14 +177,15 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
             return f'{", ".join(p_list[:-1])}, and {p_list[-1]}'
 
         try:
-            editors = [i.name for i in self.get_credits() if i.credit == 'editor']
-            corrections = [i.name for i in self.get_credits() if i.credit == 'corrections']
-            contributors = [i.name for i in self.get_credits() if i.credit == 'contributors']
+            editors = [i['name'] for i in self.get_credits() if i['credit'] == 'editor']
+            corrections = [i['name'] for i in self.get_credits() if i['credit'] == 'corrections']
+            contributors = [i['name'] for i in self.get_credits() if i['credit'] == 'contributor']
 
             if not editors:
                 try:
                     editors = [self.owner.agent.first().standard_name]
                 except:  # noqa: E722
+                    # TODO: generalize to include other projects
                     editors = ['the DALME Team']
 
             ed_str = get_people_string(editors)
@@ -192,10 +201,11 @@ class Record(index.Indexed, dalmeUuid, dalmeOwned):
             return {'credit_line': cline, 'authors': editors, 'contributors': corrections + contributors}
 
         except:  # noqa: E722
+            # TODO: generalize to include other projects
             return {'credit_line': 'Edited by the DALME Team.', 'authors': ['The DALME Team'], 'contributors': []}
 
 
-class Folio(dalmeIntid):
+class PageNode(IDAIntid):
     """Links records, pages, and transcriptions."""
 
     record = models.ForeignKey(
@@ -203,7 +213,7 @@ class Folio(dalmeIntid):
         to_field='id',
         db_index=True,
         on_delete=models.CASCADE,
-        related_name='folios',
+        related_name='pagenodes',
     )
     page = models.ForeignKey(
         'ida.Page',
@@ -218,23 +228,5 @@ class Folio(dalmeIntid):
         db_index=True,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='folios',
+        related_name='pagenodes',
     )
-
-    @property
-    def page_data(self):
-        """Return a dictionary with aggregated folio/page information."""
-        return {
-            'id': self.page.id,
-            'name': self.page.name,
-            'dam_id': self.page.dam_id,
-            'order': self.page.order,
-            'transcription_id': self.transcription.id if self.transcription else None,
-            'has_image': self.page is not None,
-            'has_transcription': self.transcription is not None,
-            'transcription_text': self.transcription.transcription if self.transcription is not None else None,
-            'transcription_version': self.transcription.version if self.transcription is not None else None,
-            'transcription_author': self.transcription.author if self.transcription is not None else None,
-            'thumbnail_url': self.page.thumbnail_url,
-            'manifest_url': self.page.manifest_url,
-        }

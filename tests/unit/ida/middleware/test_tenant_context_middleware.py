@@ -1,4 +1,5 @@
 """Test the ida.middleware.tenant_context_middleware module."""
+
 from unittest import mock
 
 import pytest

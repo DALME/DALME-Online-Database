@@ -1,4 +1,5 @@
 """Migrate auth data."""
+
 from django.contrib.auth.models import Group
 from django.db import connection, transaction
 
@@ -41,7 +42,7 @@ class Stage(BaseStage):
                 self.logger.info('Created %s User instances', User.objects.count())
 
                 self.logger.info('Migrating user profiles')
-                profiles = cursor.execute('SELECT id, full_name, user_id FROM restore.dalme_app_profile;')
+                profiles = cursor.execute('SELECT id, full_name, user_id FROM restore.core_profile;')
                 profiles = self.map_rows(cursor)
                 profile_objs = [Profile(**row) for row in profiles]
                 Profile.objects.bulk_create(profile_objs)
@@ -64,7 +65,7 @@ class Stage(BaseStage):
 
                 self.logger.info('Migrating group properties')
                 group_properties = cursor.execute(
-                    'SELECT id, type AS group_type, description, group_id FROM restore.dalme_app_groupproperties;'
+                    'SELECT id, type AS group_type, description, group_id FROM restore.core_groupproperties;'
                 )
                 group_properties = self.map_rows(cursor)
                 group_property_objs = [GroupProperties(**row) for row in group_properties]

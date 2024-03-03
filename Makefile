@@ -1,12 +1,12 @@
-# DALME project Makefile
+# IDA project Makefile
 .DEFAULT_GOAL := help
 
-export PROJECT := dalme
+export PROJECT := ida
 export ROOT := $(CURDIR)
 export CONFIG := $(ROOT)/config
-export DOCS := $(ROOT)/dalme_docs
+export DOCS := $(ROOT)/docs
 export TF := $(ROOT)/tf
-export UI := $(ROOT)/dalme_ui
+export UI := $(ROOT)/ui
 
 export ENVIRONMENT := staging
 

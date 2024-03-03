@@ -1,6 +1,8 @@
 """Interface for the ida.models module."""
+
 from .agent import Agent, Organization, Person
 from .application import Application
+from .attachment import Attachment
 from .attribute import (
     Attribute,
     AttributeValueBool,
@@ -13,6 +15,8 @@ from .attribute import (
     AttributeValueTxt,
 )
 from .attribute_type import AttributeType
+from .collection import Collection, CollectionMembership
+from .comment import Comment
 from .concept import Concept
 from .content import ContentAttributes, ContentTypeExtended
 from .entity_phrase import EntityPhrase
@@ -20,13 +24,13 @@ from .group import GroupProperties
 from .headword import Headword
 from .location import Location
 from .object import Object, ObjectAttribute
-from .options_list import OptionsList
+from .options_list import OptionsList, OptionsValue
 from .page import Page
 from .permission import Permission
 from .place import Place
 from .public_register import PublicRegister
 from .publication import Publication
-from .record import Folio, Record, RecordGroup
+from .record import PageNode, Record, RecordGroup
 from .reference import (
     AttributeReference,
     CountryReference,
@@ -34,18 +38,32 @@ from .reference import (
     LocaleReference,
 )
 from .relationship import Relationship, RelationshipType
+from .resourcespace import (
+    rs_collection,
+    rs_collection_resource,
+    rs_resource,
+    rs_resource_data,
+    rs_resource_type_field,
+    rs_user,
+)
 from .rights_policy import RightsPolicy
+from .saved_search import SavedSearch
 from .scope import Scope, ScopeType
+from .tag import Tag
+from .task import Task, TaskList
 from .tenant import Domain, Tenant
+from .tenant_scoped import ScopedBase
 from .ticket import Ticket
 from .token import Token
 from .transcription import Transcription
 from .user import Profile, User
 from .wordform import Wordform
+from .workflow import Workflow, WorkLog
 
 __all__ = [
     'Agent',
     'Application',
+    'Attachment',
     'Attribute',
     'AttributeReference',
     'AttributeType',
@@ -57,13 +75,16 @@ __all__ = [
     'AttributeValueJson',
     'AttributeValueStr',
     'AttributeValueTxt',
+    'Collection',
+    'CollectionMembership',
+    'Comment',
     'Concept',
     'ContentAttributes',
     'ContentTypeExtended',
     'CountryReference',
     'Domain',
     'EntityPhrase',
-    'Folio',
+    'PageNode',
     'GroupProperties',
     'Headword',
     'LanguageReference',
@@ -72,6 +93,7 @@ __all__ = [
     'Object',
     'ObjectAttribute',
     'OptionsList',
+    'OptionsValue',
     'Organization',
     'Page',
     'Permission',
@@ -85,12 +107,25 @@ __all__ = [
     'Relationship',
     'RelationshipType',
     'RightsPolicy',
+    'rs_collection',
+    'rs_collection_resource',
+    'rs_resource',
+    'rs_resource_data',
+    'rs_resource_type_field',
+    'rs_user',
+    'SavedSearch',
     'Scope',
+    'ScopedBase',
     'ScopeType',
+    'Tag',
+    'Task',
+    'TaskList',
     'Tenant',
     'Ticket',
     'Token',
     'Transcription',
     'User',
     'Wordform',
+    'WorkLog',
+    'Workflow',
 ]

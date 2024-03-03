@@ -1,15 +1,16 @@
 """Model permission data."""
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeUuid
+from ida.models.templates import IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Permission(dalmeUuid):
+class Permission(IDAUuid):
     """Stores object-level permissions information."""
 
     principal = GenericForeignKey('principal_type', 'principal_id')

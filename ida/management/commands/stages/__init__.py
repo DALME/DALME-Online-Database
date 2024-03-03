@@ -1,4 +1,5 @@
 """Interface for the migrate_data management command."""
+
 from .attribute_types import Stage as AttributeTypesStage
 from .attributes import Stage as AttributesStage
 from .auth import Stage as AuthStage

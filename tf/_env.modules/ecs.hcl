@@ -171,7 +171,7 @@ inputs = {
   environment                  = local.environment
   fargate_cpu                  = 256
   fargate_memory               = 1024
-  gunicorn_config              = "dalme.gunicorn"
+  gunicorn_config              = "ida.gunicorn"
   health_check_grace_period    = 60
   image                        = local.service
   kms_key_arn                  = dependency.secrets.outputs.kms_key_arn
@@ -211,5 +211,5 @@ inputs = {
   worker                       = "gthread"
   worker_tmp                   = "/dev/shm"
   workers                      = 3
-  wsgi                         = "dalme.wsgi:application"
+  wsgi                         = "ida.wsgi:application"
 }

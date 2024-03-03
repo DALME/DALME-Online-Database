@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APP: dalme
+  APP: ida
   CI_TAG: dev
   MYSQL_DB: test_db
   MYSQL_USER: root
@@ -44,7 +44,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: dalme
+          POSTGRES_DB: ida
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_INITDB_ARGS: --no-sync

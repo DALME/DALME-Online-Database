@@ -1,4 +1,5 @@
 """Test the ida.middleware.healthcheck_middleware module."""
+
 from http import HTTPStatus
 from unittest import mock
 

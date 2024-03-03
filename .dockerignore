@@ -6,7 +6,6 @@
 .DS_Store
 .ebignore
 env
-docs
 db.cnf
 *.md
 README.md

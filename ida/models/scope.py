@@ -1,13 +1,14 @@
 """Model relationship scope data."""
+
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeIntid, dalmeUuid
+from ida.models.templates import IDAIntid, IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class ScopeType(dalmeIntid):
+class ScopeType(IDAIntid):
     """Stores scope type definitions."""
 
     name = models.CharField(max_length=255)
@@ -22,7 +23,7 @@ class ScopeType(dalmeIntid):
         return self.name
 
 
-class Scope(dalmeUuid):
+class Scope(IDAUuid):
     """Stores information about scopes."""
 
     scope_type = models.ForeignKey(

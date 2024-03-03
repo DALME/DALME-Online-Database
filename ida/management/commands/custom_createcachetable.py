@@ -4,6 +4,7 @@
 - https://github.com/bernardopires/django-tenant-schemas/issues/348
 
 """
+
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
@@ -18,7 +19,7 @@ from django.db import (
 
 
 class Command(BaseCommand):
-    help = 'Creates the tables needed to use the SQL cache backend.'  # noqa: A003
+    help = 'Creates the tables needed to use the SQL cache backend.'
 
     requires_system_checks = []
 
@@ -119,10 +120,13 @@ class Command(BaseCommand):
                 self.stdout.write(statement)
             return
 
-        with transaction.atomic(
-            using=database,
-            savepoint=connection.features.can_rollback_ddl,
-        ), connection.cursor() as curs:
+        with (
+            transaction.atomic(
+                using=database,
+                savepoint=connection.features.can_rollback_ddl,
+            ),
+            connection.cursor() as curs,
+        ):
             try:
                 curs.execute(full_statement)
             except DatabaseError as e:

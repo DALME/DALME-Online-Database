@@ -1,4 +1,5 @@
 """Model resourcespace data."""
+
 import hashlib
 import json
 from urllib.parse import urlencode
@@ -275,7 +276,7 @@ class rs_resource_type_field(models.Model):  # noqa: N801
     ref = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50, blank=True)
     title = models.CharField(max_length=400, blank=True)
-    type = models.IntegerField(null=True)  # noqa: A003
+    type = models.IntegerField(null=True)
     order_by = models.IntegerField(default='0')
     keywords_index = models.IntegerField(default='0')
     partial_index = models.IntegerField(default='0')

@@ -1,4 +1,5 @@
 """Migrate rank 1 (one dependency other than auth) models."""
+
 from django.db import connection, transaction
 
 from ida.models import (
@@ -38,7 +39,7 @@ class Stage(BaseStage):
         if Headword.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating headwords')
-                cursor.execute('SELECT * FROM restore.dalme_app_headword;')
+                cursor.execute('SELECT * FROM restore.core_headword;')
                 rows = self.map_rows(cursor)
 
                 objs = []
@@ -58,7 +59,7 @@ class Stage(BaseStage):
         if Object.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating objects')
-                cursor.execute('SELECT * FROM restore.dalme_app_object;')
+                cursor.execute('SELECT * FROM restore.core_object;')
                 rows = self.map_rows(cursor)
                 objs = [Object(**row) for row in rows]
                 Object.objects.bulk_create(objs)
@@ -72,7 +73,7 @@ class Stage(BaseStage):
         if RightsPolicy.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating rights policies')
-                cursor.execute('SELECT * FROM restore.dalme_app_rightspolicy;')
+                cursor.execute('SELECT * FROM restore.core_rightspolicy;')
                 rows = self.map_rows(cursor)
                 objs = [RightsPolicy(**row) for row in rows]
                 RightsPolicy.objects.bulk_create(objs)
@@ -86,7 +87,7 @@ class Stage(BaseStage):
         if Scope.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating scopes')
-                cursor.execute('SELECT * FROM restore.dalme_app_scope;')
+                cursor.execute('SELECT * FROM restore.core_scope;')
                 rows = self.map_rows(cursor)
                 objs = [Scope(**row) for row in rows]
                 Scope.objects.bulk_create(objs)
@@ -100,7 +101,7 @@ class Stage(BaseStage):
         if LocaleReference.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating locale references')
-                cursor.execute('SELECT * FROM restore.dalme_app_localereference;')
+                cursor.execute('SELECT * FROM restore.core_localereference;')
                 rows = self.map_rows(cursor)
                 objs = [LocaleReference(**row) for row in rows]
                 LocaleReference.objects.bulk_create(objs)
@@ -114,7 +115,7 @@ class Stage(BaseStage):
         if Wordform.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating wordforms')
-                cursor.execute('SELECT * FROM restore.dalme_app_wordform;')
+                cursor.execute('SELECT * FROM restore.core_wordform;')
                 rows = self.map_rows(cursor)
 
                 objs = []
@@ -135,7 +136,7 @@ class Stage(BaseStage):
         This has a generic foreign key but the only content types it points to
         are 'agent' and 'place' so we are ok to key the rows at this point.
 
-        dalme=# select distinct ct.id, ct.model from restore.dalme_app_entity_phrase e inner join restore.django_content_type ct on e.content_type_id = ct.id;
+        dalme=# select distinct ct.id, ct.model from restore.core_entity_phrase e inner join restore.django_content_type ct on e.content_type_id = ct.id;
         -[ RECORD 1 ]
         id    | 115
         model | place
@@ -147,7 +148,7 @@ class Stage(BaseStage):
         if EntityPhrase.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating entity phrases')
-                cursor.execute('SELECT * FROM restore.dalme_app_entity_phrase;')
+                cursor.execute('SELECT * FROM restore.core_entity_phrase;')
                 rows = self.map_rows(cursor)
 
                 objs = []
@@ -170,13 +171,13 @@ class Stage(BaseStage):
     def migrate_ticket(self):
         """Copy ticket data.
 
-        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/dalme_app/migrations/0008_data_m_misc.py#L67
+        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0008_data_m_misc.py#L67
 
         """
         if Ticket.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating tickets')
-                cursor.execute('SELECT * FROM restore.dalme_app_ticket;')
+                cursor.execute('SELECT * FROM restore.core_ticket;')
                 rows = self.map_rows(cursor)
 
                 for row in rows:

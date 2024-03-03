@@ -1,4 +1,5 @@
 """Utility management command for ecs to create a superuser at deploy-time."""
+
 import os
 
 import structlog
@@ -15,7 +16,7 @@ User = get_user_model()
 class Command(BaseCommand):
     """Define the ensure_superuser command."""
 
-    help = 'Create a superuser non-interactively.'  # noqa: A003
+    help = 'Create a superuser non-interactively.'
 
     def handle(self, *args, **options):  # noqa: ARG002
         """Create a superuser using credentials from the environment.

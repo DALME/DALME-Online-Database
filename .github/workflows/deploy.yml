@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APP: dalme
+  APP: ida
   ROLE: gha-oidc-role
   ACCOUNT: ${{ github.repository_owner == 'DALME' && 701541878387 || 800895234148 }}
   ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
@@ -426,8 +426,8 @@ jobs:
         uses: tj-actions/changed-files@v39
         with:
           since_last_remote_commit: true
-          files: dalme_docs/**/*.{md,py,rst,txt}
-          files_ignore: dalme_docs/README.md
+          files: docs/**/*.{md,py,rst,txt}
+          files_ignore: docs/README.md
 
   deploy_docs:
     name: 'Deploy Docs'

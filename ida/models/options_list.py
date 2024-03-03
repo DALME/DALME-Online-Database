@@ -1,13 +1,15 @@
 """Model option list data."""
+
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeIntid
+from ida.models.templates import IDABasic, IDAIntid
+from ida.models.tenant_scoped import ScopedBase
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class OptionsList(dalmeIntid):
+class OptionsList(IDAIntid):
     """Stores lists of attribute value options. Payload format as follows.
 
     `db_records`: {
@@ -36,4 +38,10 @@ class OptionsList(dalmeIntid):
     name = models.CharField(max_length=255)
     payload_type = models.CharField(max_length=15, choices=PAYLOAD_TYPES)
     description = models.TextField()
+
+
+class OptionsValue(ScopedBase, IDABasic):
+    """Stores tenanted static lists of values."""
+
+    op_list = models.ForeignKey(OptionsList, on_delete=models.CASCADE, related_name='values')
     payload = models.JSONField()

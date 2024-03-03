@@ -1,4 +1,5 @@
 """Model public register data."""
+
 from django_currentuser.middleware import get_current_user
 
 from django.conf import settings

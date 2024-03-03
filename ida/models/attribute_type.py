@@ -1,10 +1,11 @@
 """Model attribute type data."""
+
 from django.db import models
 
-from ida.models.templates import dalmeIntid
+from ida.models.templates import IDAIntid
 
 
-class AttributeType(dalmeIntid):
+class AttributeType(IDAIntid):
     """Stores attribute definitions."""
 
     DATA_TYPES = (

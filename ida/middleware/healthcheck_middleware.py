@@ -1,4 +1,5 @@
 """Define the health check middleware."""
+
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
 from django.http import JsonResponse

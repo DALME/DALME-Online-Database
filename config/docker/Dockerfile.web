@@ -28,7 +28,8 @@ RUN apt-get update && \
     libmariadbd-dev \
     libpq-dev \
     vim \
-    xmlsec1 && \
+    xmlsec1 \
+    graphviz && \
     apt-get clean
 COPY --from=dev-reqs /opt/build/wheels ./wheels
 RUN pip install --user --no-cache-dir --upgrade pip
@@ -81,11 +82,9 @@ WORKDIR /opt/web
 RUN mkdir /opt/web/www
 RUN openssl genrsa -out /opt/web/oidc.key 4096
 COPY ./ida ./ida
-COPY ./dalme ./dalme
-COPY ./dalme_api ./dalme_api
-COPY ./dalme_app ./dalme_app
-COPY ./dalme_public ./dalme_public
-COPY ./dalme_purl ./dalme_purl
+COPY ./api ./api
+COPY ./public ./public
+COPY ./purl ./purl
 COPY ./templates ./templates
 COPY ./tenants ./tenants
 COPY ./static ./static
@@ -121,11 +120,9 @@ ENV PYTHONUNBUFFERED 1
 ENV LANG=en_US.UTF-8
 WORKDIR /opt/web
 COPY ./ida ./ida
-COPY ./dalme ./dalme
-COPY ./dalme_api ./dalme_api
-COPY ./dalme_app ./dalme_app
-COPY ./dalme_public ./dalme_public
-COPY ./dalme_purl ./dalme_purl
+COPY ./api ./api
+COPY ./public ./public
+COPY ./purl ./purl
 COPY ./templates ./templates
 COPY ./tenants ./tenants
 COPY ./static ./static

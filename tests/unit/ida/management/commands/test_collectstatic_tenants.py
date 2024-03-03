@@ -1,4 +1,5 @@
 """Test the ida.management.commands.collectstatic_tenants module."""
+
 import argparse
 import json
 import os

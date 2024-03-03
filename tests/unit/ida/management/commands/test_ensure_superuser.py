@@ -1,4 +1,5 @@
 """Test the ida.management.commands.ensure_superuser module."""
+
 import os
 from unittest import mock
 

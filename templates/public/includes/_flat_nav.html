@@ -1,0 +1,14 @@
+{% load public_tags wagtailcore_tags %}
+
+{% get_flat_nav as nav %}
+<nav class="secondary flat-nav">
+  <ul class="u-flex">
+    {% for tab in nav %}
+      <li>
+        <a href="{% pageurl tab %}" {% if tab == page or tab == page.get_parent.specific %}class="active"{% endif %}>
+          {{ tab.title_switch|title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

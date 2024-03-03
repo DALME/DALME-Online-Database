@@ -1,4 +1,5 @@
 """Test the ida.middleware.tenant_middleware module."""
+
 from unittest import mock
 
 from django.core.exceptions import DisallowedHost

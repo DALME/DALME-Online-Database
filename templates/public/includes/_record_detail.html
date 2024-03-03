@@ -1,0 +1,32 @@
+{% load public_tags wagtailroutablepage_tags %}
+
+{% get_source_details as source_data %}
+{% if source_data.source or source_data.source_set %}
+  <div class="record-detail u-flex">
+    {% if source_data.source %}
+      <h3 class="u-small-caps-heading">RECORD</h3>
+      <div>
+        <a href="{{ source_data.url }}">
+          {{ source_data.name }}
+          {% if source_data.date %}
+            <span>| {{ source_data.date }}</span>
+          {% endif %}
+          {% if source_data.language %}
+            <span>| {{ source_data.language }}</span>
+          {% endif %}
+          {% if source_data.locale %}
+            <span>| {{ source_data.locale }}</span>
+          {% endif %}
+        </a>
+      </div>
+    {% endif %}
+    {% if source_data.source_set %}
+    <h3 class="u-small-caps-heading mt-4">COLLECTION</h3>
+    <div>
+      <a href="{{ source_data.collection_url }}">
+        {{ source_data.source_set.name }}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+{% endif %}

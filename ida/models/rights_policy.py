@@ -1,14 +1,15 @@
 """Model rights policy data."""
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeUuid
+from ida.models.templates import IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class RightsPolicy(dalmeUuid):
+class RightsPolicy(IDAUuid):
     """Stores information about rights concerning archival images."""
 
     COPYRIGHTED = 1
@@ -32,8 +33,8 @@ class RightsPolicy(dalmeUuid):
     rights_holder = models.CharField(max_length=255, blank=True)
     notice_display = models.BooleanField(default=False)
     public_display = models.BooleanField(default=True)
-    attachments = models.ForeignKey('dalme_app.Attachment', blank=True, null=True, on_delete=models.SET_NULL)
-    comments = GenericRelation('dalme_app.Comment')
+    attachments = models.ForeignKey('ida.Attachment', blank=True, null=True, on_delete=models.SET_NULL)
+    comments = GenericRelation('ida.Comment')
 
     class Meta:
         ordering = ['name']

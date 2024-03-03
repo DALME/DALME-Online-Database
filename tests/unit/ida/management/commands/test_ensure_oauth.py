@@ -1,4 +1,5 @@
 """Test the ida.management.commands.ensure_oauth module."""
+
 import io
 from unittest import mock
 

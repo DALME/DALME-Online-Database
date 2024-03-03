@@ -1,4 +1,5 @@
 """Define auth URLs for the IDA."""
+
 from oauth2_provider import urls
 from oauth2_provider import views as oauth2_views
 

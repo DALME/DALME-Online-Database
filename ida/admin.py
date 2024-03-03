@@ -1,4 +1,5 @@
 """Register models with the Django admin for the IDA."""
+
 from django_tenants.admin import TenantAdminMixin
 
 from django import forms

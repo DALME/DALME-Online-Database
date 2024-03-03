@@ -1,4 +1,5 @@
 """Test the ida.management.commands.ensure_tenants module."""
+
 import json
 import os
 from unittest import mock

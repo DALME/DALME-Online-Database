@@ -1,4 +1,5 @@
 """Management command to ensure all app tenants exist for a deployment."""
+
 import structlog
 
 from django.conf import settings
@@ -13,7 +14,7 @@ logger = structlog.get_logger(__name__)
 class Command(BaseCommand):
     """Define the ensure_tenants command."""
 
-    help = 'Create application tenant records.'  # noqa: A003
+    help = 'Create application tenant records.'
 
     def handle(self, *args, **options):  # noqa: ARG002
         """Create application tenant records."""

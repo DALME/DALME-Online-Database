@@ -69,7 +69,7 @@ db.migrations.make:
 db.migrations.empty:
 ifndef app
 	$(error Target app not specified. \
-		Usage: make db.migrations.empty app='dalme_app')
+		Usage: make db.migrations.empty app='core')
 else
 	docker compose run --rm \
 		$(PROJECT).web \

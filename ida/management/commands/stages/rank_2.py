@@ -1,4 +1,5 @@
 """Migrate rank 2 (two dependencies other than auth) models."""
+
 from django.db import connection, transaction
 
 from ida.models import ObjectAttribute, Token
@@ -23,7 +24,7 @@ class Stage(BaseStage):
         if ObjectAttribute.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating object attributes')
-                cursor.execute('SELECT * FROM restore.dalme_app_object;')
+                cursor.execute('SELECT * FROM restore.core_object;')
                 rows = self.map_rows(cursor)
                 objs = [ObjectAttribute(**row) for row in rows]
                 ObjectAttribute.objects.bulk_create(objs)
@@ -37,7 +38,7 @@ class Stage(BaseStage):
         if Token.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating tokens')
-                cursor.execute('SELECT * FROM restore.dalme_app_token;')
+                cursor.execute('SELECT * FROM restore.core_token;')
                 rows = self.map_rows(cursor)
 
                 objs = []

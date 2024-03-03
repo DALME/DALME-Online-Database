@@ -1,4 +1,5 @@
 """Configure pytest for the tests.unit module."""
+
 from unittest import mock
 
 import pytest

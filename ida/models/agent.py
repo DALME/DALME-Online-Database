@@ -1,15 +1,16 @@
 """Model agent data."""
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeUuid
+from ida.models.templates import IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Agent(dalmeUuid):
+class Agent(IDAUuid):
     """Stores information about agents."""
 
     PERSON = 1
@@ -23,8 +24,8 @@ class Agent(dalmeUuid):
     agent_type = models.IntegerField(choices=AGENT_TYPES)
     attributes = GenericRelation('ida.Attribute')
     instances = GenericRelation('ida.EntityPhrase')
-    comments = GenericRelation('dalme_app.Comment')
-    tags = GenericRelation('dalme_app.Tag')
+    comments = GenericRelation('ida.Comment')
+    tags = GenericRelation('ida.Tag')
 
 
 class Organization(Agent):

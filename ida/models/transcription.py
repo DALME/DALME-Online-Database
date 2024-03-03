@@ -1,15 +1,16 @@
 """Model transcription data."""
+
 import lxml.etree as et
 
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeUuid, get_current_username
+from ida.models.templates import IDAUuid, get_current_username
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Transcription(dalmeUuid):
+class Transcription(IDAUuid):
     """Stores information about transcriptions."""
 
     transcription = models.TextField(blank=True)
@@ -19,16 +20,6 @@ class Transcription(dalmeUuid):
 
     def __str__(self):
         return str(self.id)
-
-    def save(self, *args, **kwargs):
-        """Save record."""
-        # Set count_ignore flag.
-        xml_parser = et.XMLParser(recover=True)
-        tree = et.fromstring(f'<xml>{self.transcription}</xml>', xml_parser)
-        tags = len(tree)
-        if tags == 1 and tree[0].tag in ['quote', 'gap', 'mute'] or tags == 0:
-            self.count_ignore = len(' '.join(t for t in tree.xpath('text()'))) == 0
-        super().save(*args, **kwargs)
 
     @property
     def text_blob(self):
@@ -46,3 +37,13 @@ class Transcription(dalmeUuid):
     def tei(self):
         """Return TEI version of transcription with proper doctype."""
         return f'<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><body>{self.transcription}</body></text></TEI>'
+
+    @property
+    def count_transcription(self):
+        xml_parser = et.XMLParser(recover=True)
+        tree = et.fromstring('<xml>' + self.transcription + '</xml>', xml_parser)
+        tags = len(tree)
+
+        if tags == 1 and tree[0].tag in ['quote', 'gap', 'mute'] or tags == 0:
+            return len(' '.join(t for t in tree.xpath('text()'))) != 0
+        return True

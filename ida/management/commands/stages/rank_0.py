@@ -1,15 +1,19 @@
 """Migrate rank 0 (no dependencies other than auth) models."""
+
 from django.db import connection, transaction
 
-from dalme_app.models import Attachment, SavedSearch, TaskList
 from ida.models import (
     Agent,
+    Attachment,
     AttributeReference,
     Concept,
     CountryReference,
     LanguageReference,
+    Organization,
     Page,
     Person,
+    SavedSearch,
+    TaskList,
     Tenant,
     Transcription,
 )
@@ -29,7 +33,6 @@ class Stage(BaseStage):
         self.migrate_concept()
         self.migrate_transcription()
         self.migrate_agent()
-        self.migrate_person()
         self.migrate_attachment()
         self.migrate_saved_search()
         self.migrate_tasklist()
@@ -45,7 +48,7 @@ class Stage(BaseStage):
         if Page.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating pages')
-                cursor.execute('SELECT * FROM restore.dalme_app_page;')
+                cursor.execute('SELECT * FROM restore.core_page;')
                 rows = self.map_rows(cursor)
                 objs = [Page(**row) for row in rows]
                 Page.objects.bulk_create(objs)
@@ -59,7 +62,7 @@ class Stage(BaseStage):
         if Concept.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating concepts')
-                cursor.execute('SELECT * FROM restore.dalme_app_concept;')
+                cursor.execute('SELECT * FROM restore.core_concept;')
                 rows = self.map_rows(cursor)
                 objs = [Concept(**row) for row in rows]
                 Concept.objects.bulk_create(objs)
@@ -75,7 +78,7 @@ class Stage(BaseStage):
         if Transcription.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating transcriptions')
-                cursor.execute('SELECT * FROM restore.dalme_app_transcription;')
+                cursor.execute('SELECT * FROM restore.core_transcription;')
                 rows = self.map_rows(cursor)
 
                 objs = []
@@ -94,14 +97,14 @@ class Stage(BaseStage):
         """Copy agent data."""
         if Agent.objects.count() == 0:
             with connection.cursor() as cursor:
-                self.logger.info('Migrating agents')
-                cursor.execute('SELECT * FROM restore.dalme_app_agent ORDER BY creation_timestamp;')
+                # migrate people
+                self.logger.info('Migrating agents: person')
+                cursor.execute('SELECT * FROM restore.core_agent WHERE type = 1 ORDER BY creation_timestamp;')
                 rows = self.map_rows(cursor)
 
                 seen = set()
-                objs = []
                 for row in rows:
-                    user_id = row.pop('user_id')
+                    user_id = row['user_id']
                     if user_id in seen:
                         self.logger.info('Skipping Agent duplicate for user_id: %s', user_id)
                         continue
@@ -111,48 +114,26 @@ class Stage(BaseStage):
 
                     row.pop('notes')
                     row.update({'agent_type': row.pop('type'), 'name': row.pop('standard_name')})
-                    objs.append(Agent(**row))
-
-                self.logger.info('Created %s Agent instances', Agent.objects.count())
-        else:
-            self.logger.info('Agent data already exists')
-
-    @transaction.atomic
-    def migrate_person(self):
-        """Split person records out of existing agents.
-
-        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/dalme_app/migrations/0010_data_m_basic_types.py#L5
-
-        """
-        if Person.objects.count() == 0:
-            self.logger.info('Migrating people')
-            with connection.cursor() as cursor:
-                self.logger.info('Migrating people (from agents)')
-                cursor.execute('SELECT * FROM restore.dalme_app_agent WHERE type = 1 ORDER BY creation_timestamp;')
-                rows = self.map_rows(cursor)
-
-                seen = set()
-                for row in rows:
-                    user_id = row['user_id']
-                    if user_id in seen:
-                        self.logger.info('Skipping Person duplicate with user_id: %s', user_id)
-                        continue
-
-                    if user_id is not None:
-                        seen.add(user_id)
-
-                    row.pop('id')
-                    row.pop('notes')
-                    row.update({'agent_type': row.pop('type'), 'name': row.pop('standard_name')})
-                    # Note, we can't bulk create a multitable-inherited model
-                    # so here we'll just save each one individually.
                     Person.objects.create(**row)
 
                 self.logger.info('Created %s Person instances', Person.objects.count())
-        else:
-            self.logger.info('Person data already exists')
+                # migrate orgs
+                self.logger.info('Migrating agents: organization')
+                cursor.execute('SELECT * FROM restore.core_agent WHERE type = 2 ORDER BY creation_timestamp;')
+                rows = self.map_rows(cursor)
 
-    # These dalme_app models also need to be scoped to the DALME tenant so we
+                for row in rows:
+                    row.pop('user_id')
+                    row.pop('notes')
+                    row.update({'agent_type': row.pop('type'), 'name': row.pop('standard_name')})
+                    Organization.objects.create(**row)
+
+                self.logger.info('Created %s Organization instances', Organization.objects.count())
+
+        else:
+            self.logger.info('Agent data already exists')
+
+    # These core models also need to be scoped to the DALME tenant so we
     # can do that as we proceed.
     @transaction.atomic
     def migrate_attachment(self):
@@ -161,7 +142,7 @@ class Stage(BaseStage):
             with connection.cursor() as cursor:
                 self.logger.info('Migrating attachments')
                 tenant_id = Tenant.objects.get(name='DALME').id
-                cursor.execute('SELECT * FROM restore.dalme_app_attachment;')
+                cursor.execute('SELECT * FROM restore.core_attachment;')
                 rows = self.map_rows(cursor)
 
                 objs = []
@@ -184,7 +165,7 @@ class Stage(BaseStage):
             with connection.cursor() as cursor:
                 self.logger.info('Migrating saved searches')
                 tenant_id = Tenant.objects.get(name='DALME').id
-                cursor.execute('SELECT * FROM restore.dalme_app_savedsearch;')
+                cursor.execute('SELECT * FROM restore.core_savedsearch;')
                 rows = self.map_rows(cursor)
                 objs = [SavedSearch(**{**row, 'tenant_id': tenant_id}) for row in rows]
                 SavedSearch.objects.bulk_create(objs)
@@ -199,7 +180,7 @@ class Stage(BaseStage):
             with connection.cursor() as cursor:
                 self.logger.info('Migrating task lists')
                 tenant_id = Tenant.objects.get(name='DALME').id
-                cursor.execute('SELECT * FROM restore.dalme_app_tasklist;')
+                cursor.execute('SELECT * FROM restore.core_tasklist;')
                 rows = self.map_rows(cursor)
 
                 objs = []
@@ -218,7 +199,7 @@ class Stage(BaseStage):
         if AttributeReference.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating attribute references')
-                cursor.execute('SELECT * FROM restore.dalme_app_attributereference;')
+                cursor.execute('SELECT * FROM restore.core_attributereference;')
                 rows = self.map_rows(cursor)
                 objs = [AttributeReference(**row) for row in rows]
                 AttributeReference.objects.bulk_create(objs)
@@ -232,7 +213,7 @@ class Stage(BaseStage):
         if CountryReference.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating country references')
-                cursor.execute('SELECT * FROM restore.dalme_app_countryreference;')
+                cursor.execute('SELECT * FROM restore.core_countryreference;')
                 rows = self.map_rows(cursor)
                 objs = [CountryReference(**row) for row in rows]
                 CountryReference.objects.bulk_create(objs)
@@ -244,13 +225,13 @@ class Stage(BaseStage):
     def migrate_language_reference(self):
         """Copy language reference data.
 
-        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/dalme_app/migrations/0010_data_m_basic_types.py#L5
+        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0010_data_m_basic_types.py#L5
 
         """
         if LanguageReference.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating language references')
-                cursor.execute('SELECT * FROM restore.dalme_app_languagereference;')
+                cursor.execute('SELECT * FROM restore.core_languagereference;')
                 rows = self.map_rows(cursor)
 
                 objs = []

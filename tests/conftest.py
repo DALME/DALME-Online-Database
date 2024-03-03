@@ -1,4 +1,5 @@
 """Configure fixtures for the tests module."""
+
 import pytest
 
 

@@ -1,5 +1,5 @@
 """Migrate the attribute types."""
-from django.contrib.auth import get_user_model
+
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
@@ -8,6 +8,7 @@ from ida.models import (
     ContentAttributes,
     ContentTypeExtended,
     OptionsList,
+    Tenant,
 )
 
 from .base import BaseStage
@@ -160,7 +161,7 @@ CT_DATA = {
     },
     'collection': {
         'name': 'Collection',
-        'app_label': 'dalme_app',
+        'app_label': 'ida',
         'description': 'A collection of items.',
         'atypes': [
             'id',
@@ -388,10 +389,21 @@ class Stage(BaseStage):
     @transaction.atomic
     def apply(self):
         """Execute the stage."""
+        self.update_attribute_types_sequence()
         self.migrate_attribute_types()
-        self.migrate_collections_attribute_types()
         self.migrate_contenttype_extended()
         self.migrate_options_list()
+
+    @transaction.atomic
+    def update_attribute_types_sequence(self):
+        """Update AttributeType sequence start to account for manually inserted rows."""
+        if AttributeType.objects.count() == 0:
+            with connection.cursor() as cursor:
+                self.logger.info('Updating AttributeType sequence start')
+                cursor.execute(
+                    'ALTER TABLE IF EXISTS public.ida_attributetype\
+                        ALTER COLUMN id RESTART SET START 154;',
+                )
 
     @transaction.atomic
     def migrate_attribute_types(self):
@@ -399,7 +411,7 @@ class Stage(BaseStage):
         if AttributeType.objects.count() == 0:
             with connection.cursor() as cursor:
                 self.logger.info('Migrating attribute types')
-                cursor.execute('SELECT * FROM restore.dalme_app_attribute_type;')
+                cursor.execute('SELECT * FROM restore.core_attribute_type;')
                 rows = self.map_rows(cursor)
 
                 objs = []
@@ -413,7 +425,7 @@ class Stage(BaseStage):
                             'name': RENAMES.get(short_name, short_name),
                             'is_local': short_name in TO_LOCAL,
                             'same_as_id': row.pop('same_as'),
-                        }
+                        },
                     )
 
                     if short_name in TO_FKEY:
@@ -433,45 +445,10 @@ class Stage(BaseStage):
             self.logger.info('AttributeType data already exists')
 
     @transaction.atomic
-    def migrate_collections_attribute_types(self):
-        """Create attribute types for collections.
-
-        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/dalme_app/migrations/0007_data_m_collections.py#L5
-
-        """
-        if AttributeType.objects.filter(name__in=['collection_metadata', 'workset_progress']).exists():
-            self.logger.info('Creating collection attribute types')
-
-            User = get_user_model()  # noqa: N806
-            user_obj = User.objects.get(pk=1)
-
-            AttributeType.objects.create(
-                name='collection_metadata',
-                label='Collection metadata',
-                description='A series of key-value pairs defining metadata values associated with a collection.',
-                data_type='JSON',
-                source='DALME',
-                creation_user=user_obj,
-                modification_user=user_obj,
-            )
-            AttributeType.objects.create(
-                name='workset_progress',
-                label='Workset Progress Tracking',
-                description='Data attribute for tracking progress in a workset-type collection.',
-                data_type='JSON',
-                source='DALME',
-                creation_user=user_obj,
-                modification_user=user_obj,
-            )
-            self.logger.info("Created attribute types for 'collection_metadata' and 'workset_progress'")
-        else:
-            self.logger.info('Collection AttributeType data already exists')
-
-    @transaction.atomic
     def migrate_contenttype_extended(self):
         """Copy extended content type data.
 
-        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/dalme_app/migrations/0011_data_m_contenttypes.py#L274
+        https://github.com/ocp/DALME-Online-Database/blob/bc4ff5979e14d14c8cd8a9a9d2f1052512c5388d/core/migrations/0011_data_m_contenttypes.py#L274
 
         """
         if ContentTypeExtended.objects.count() == 0:
@@ -516,17 +493,37 @@ class Stage(BaseStage):
         """Generate options list data."""
         if OptionsList.objects.count() == 0:
             self.logger.info('Migrating options lists')
+            dalme_tenant = Tenant.objects.get(name='DALME').id
+            gp_tenant = Tenant.objects.get(name='Global Pharmacopeias').id
 
             auth_list = OptionsList.objects.create(
                 name='record authority',
                 payload_type='static_list',
                 description='List of authority sources for records.',
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            auth_list.values.create(
+                tenant_id=dalme_tenant,
                 payload=[
                     {'label': 'Chancery', 'value': 'Chancery'},
                     {'label': 'Church', 'value': 'Church'},
                     {'label': 'Court', 'value': 'Court'},
                     {'label': 'Notary', 'value': 'Notary'},
                 ],
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            auth_list.values.create(
+                tenant_id=dalme_tenant,
+                payload=[
+                    {'label': 'Chancery', 'value': 'Chancery'},
+                    {'label': 'Church', 'value': 'Church'},
+                    {'label': 'Court', 'value': 'Court'},
+                    {'label': 'Notary', 'value': 'Notary'},
+                ],
+                creation_user_id=1,
+                modification_user_id=1,
             )
             authority = AttributeType.objects.get(name='authority')
             authority.options = auth_list
@@ -536,11 +533,16 @@ class Stage(BaseStage):
                 name='record format',
                 payload_type='static_list',
                 description='List of formats for records.',
+            )
+            format_list.values.create(
+                tenant_id=dalme_tenant,
                 payload=[
                     {'label': 'Charter', 'value': 'Charter'},
                     {'label': 'Register - demi-quarto', 'value': 'Register - demi-quarto'},
                     {'label': 'Register - quarto', 'value': 'Register - quarto'},
                 ],
+                creation_user_id=1,
+                modification_user_id=1,
             )
             att_format = AttributeType.objects.get(name='format')
             att_format.options = format_list
@@ -550,6 +552,11 @@ class Stage(BaseStage):
                 name='record types',
                 payload_type='static_list',
                 description='List of record types.',
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            record_type_list.values.create(
+                tenant_id=dalme_tenant,
                 payload=[
                     {'label': 'Inventory-Comanda', 'value': 'Inventory-Comanda', 'group': 'Inventory'},
                     {
@@ -642,6 +649,17 @@ class Stage(BaseStage):
                     {'label': 'Renvoi', 'value': 'Renvoi', 'group': 'Other'},
                     {'label': 'unclear', 'value': 'unclear', 'group': 'Other'},
                 ],
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            record_type_list.values.create(
+                tenant_id=gp_tenant,
+                payload=[
+                    {'label': 'Pharmacopeia-Functional', 'value': 'Pharmacopeia-Functional', 'group': 'Pharmacopeia'},
+                    {'label': 'Pharmacopeia-Reference', 'value': 'Pharmacopeia-Reference', 'group': 'Pharmacopeia'},
+                ],
+                creation_user_id=1,
+                modification_user_id=1,
             )
             record_type = AttributeType.objects.get(name='record_type')
             record_type.options = record_type_list
@@ -651,12 +669,30 @@ class Stage(BaseStage):
                 name='record support',
                 payload_type='static_list',
                 description='List of support types for records.',
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            support_list.values.create(
+                tenant_id=dalme_tenant,
                 payload=[
                     {'label': 'Hybrid', 'value': 'Hybrid'},
                     {'label': 'Paper', 'value': 'Paper'},
                     {'label': 'Parchment', 'value': 'Parchment'},
                     {'label': 'Vellum', 'value': 'Vellum'},
                 ],
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            support_list.values.create(
+                tenant_id=gp_tenant,
+                payload=[
+                    {'label': 'Hybrid', 'value': 'Hybrid'},
+                    {'label': 'Paper', 'value': 'Paper'},
+                    {'label': 'Parchment', 'value': 'Parchment'},
+                    {'label': 'Vellum', 'value': 'Vellum'},
+                ],
+                creation_user_id=1,
+                modification_user_id=1,
             )
             support = AttributeType.objects.get(name='support')
             support.options = support_list
@@ -666,12 +702,30 @@ class Stage(BaseStage):
                 name='rights status',
                 payload_type='static_list',
                 description='List of valid status values for rights policies.',
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            rights_status_list.values.create(
+                tenant_id=dalme_tenant,
                 payload=[
                     {'label': 'Copyrighted', 'value': 'Copyrighted'},
                     {'label': 'Orphaned', 'value': 'Orphaned'},
                     {'label': 'Owned', 'value': 'Owned'},
                     {'label': 'Public Domain', 'value': 'Public Domain'},
                 ],
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            rights_status_list.values.create(
+                tenant_id=gp_tenant,
+                payload=[
+                    {'label': 'Copyrighted', 'value': 'Copyrighted'},
+                    {'label': 'Orphaned', 'value': 'Orphaned'},
+                    {'label': 'Owned', 'value': 'Owned'},
+                    {'label': 'Public Domain', 'value': 'Public Domain'},
+                ],
+                creation_user_id=1,
+                modification_user_id=1,
             )
             rights_status = AttributeType.objects.get(name='rights_status')
             rights_status.options = rights_status_list
@@ -681,6 +735,11 @@ class Stage(BaseStage):
                 name='full user list',
                 payload_type='db_records',
                 description='Full list of active system users.',
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            user_list.values.create(
+                tenant_id=dalme_tenant,
                 payload={
                     'app': 'auth',
                     'model': 'User',
@@ -691,6 +750,23 @@ class Stage(BaseStage):
                         'detail': 'username',
                     },
                 },
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            user_list.values.create(
+                tenant_id=gp_tenant,
+                payload={
+                    'app': 'auth',
+                    'model': 'User',
+                    'filters': {'is_active': True},
+                    'concordance': {
+                        'label': 'profile.full_name',
+                        'value': 'id',
+                        'detail': 'username',
+                    },
+                },
+                creation_user_id=1,
+                modification_user_id=1,
             )
             owner = AttributeType.objects.get(name='owner')
             owner.options = user_list
@@ -700,11 +776,28 @@ class Stage(BaseStage):
                 name='rights status list',
                 payload_type='field_choices',
                 description='List of possible status values for rights policies.',
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            rights_status_list.values.create(
+                tenant_id=dalme_tenant,
                 payload={
-                    'app': 'dalme_app',
+                    'app': 'ida',
                     'model': 'RightsPolicy',
                     'choices': 'RIGHTS_STATUS',
                 },
+                creation_user_id=1,
+                modification_user_id=1,
+            )
+            rights_status_list.values.create(
+                tenant_id=gp_tenant,
+                payload={
+                    'app': 'ida',
+                    'model': 'RightsPolicy',
+                    'choices': 'RIGHTS_STATUS',
+                },
+                creation_user_id=1,
+                modification_user_id=1,
             )
             rights_status = AttributeType.objects.get(name='rights_status')
             rights_status.options = rights_status_list

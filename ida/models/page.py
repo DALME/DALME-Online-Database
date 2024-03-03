@@ -1,4 +1,5 @@
 """Model page data."""
+
 import json
 
 import requests
@@ -8,20 +9,21 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
+from ida.models import AttributeType
 from ida.models.resourcespace import rs_api_query
-from ida.models.templates import dalmeUuid
+from ida.models.templates import IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Page(dalmeUuid):
+class Page(IDAUuid):
     """Stores page information."""
 
     name = models.CharField(max_length=55)
     dam_id = models.IntegerField(db_index=True, null=True)
     order = models.IntegerField(db_index=True)
     canvas = models.TextField(blank=True, null=True)
-    tags = GenericRelation('dalme_app.Tag')
+    tags = GenericRelation('ida.Tag')
 
     class Meta:
         ordering = ['order']
@@ -32,6 +34,7 @@ class Page(dalmeUuid):
     @property
     def manifest_url(self):
         """Return IIIF manifest for the page."""
+        # TODO: generalize and use a variable to compose url
         return f'https://dam.dalme.org/loris/{self.dam_id}/info.json'
 
     @property
@@ -45,21 +48,40 @@ class Page(dalmeUuid):
 
         return thumbnail
 
+    @property
+    def transcription(self):
+        """Return transcription page associated with the page (if any)."""
+        folio_model = apps.get_model(app_label='ida', model_name='pagenode')
+        folio = folio_model.objects.filter(page=self)
+        return folio.first().transcription if folio.exists() else None
+
+    @property
+    def has_image(self):
+        """Return boolean indicating if there is an image associated with the page."""
+        return bool(self.dam_id)
+
+    @property
+    def has_transcription(self):
+        """Return boolean indicating if there is a transcription associated with the page."""
+        return bool(self.transcription)
+
     def get_rights(self):
         """Return the rights information for the image associated with the page (if any)."""
         try:
             record = self.records.first().record
-            parent_rights = record.parent.attributes.filter(attribute_type=144)
+            rights_atype = AttributeType.objects.get(name='default_rights')
+            parent_rights = record.parent.attributes.filter(attribute_type=rights_atype.id)
 
             if not parent_rights.exists():
-                parent_rights = record.parent.parent.attributes.filter(attribute_type=144)
+                parent_rights = record.parent.parent.attributes.filter(attribute_type=rights_atype.id)
 
             if parent_rights.exists():
+                rights = parent_rights.first()
                 return {
-                    'show_image': parent_rights.value.public_display,
-                    'status': parent_rights.value.get_rights_status_display(),
-                    'display_notice': parent_rights.value.notice_display,
-                    'notice': parent_rights.value.rights_notice,
+                    'show_image': rights.value.public_display,
+                    'status': rights.value.get_rights_status_display(),
+                    'display_notice': rights.value.notice_display,
+                    'notice': rights.value.rights_notice,
                 }
             else:  # noqa: RET505
                 return None
@@ -86,7 +108,7 @@ class Page(dalmeUuid):
                 folio = page_meta_obj[0]['field79']
             elif isinstance(page_meta_obj, dict):
                 folio = page_meta_obj['field79']
-
+            # TODO: generalize and use a variable to compose url
             canvas = requests.get(f'https://dam.dalme.org/iiif/{self.dam_id}/canvas/{folio}')
             canvas_dict = json.loads(canvas.text)
             canvas_dict['page_id'] = str(self.id)

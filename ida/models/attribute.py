@@ -1,4 +1,5 @@
 """Model attribute data."""
+
 import calendar
 import datetime
 
@@ -10,12 +11,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeUuid
+from ida.models.templates import IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Attribute(dalmeUuid):
+class Attribute(IDAUuid):
     """Stores attribute data."""
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)

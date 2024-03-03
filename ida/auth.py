@@ -1,4 +1,5 @@
 """API endpoints for managing authentication and authorization."""
+
 import json
 
 from oauth2_provider.oauth2_validators import OAuth2Validator
@@ -9,8 +10,8 @@ from rest_framework.response import Response
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 
-from dalme_api.access_policies import BaseAccessPolicy
-from dalme_api.resources.groups import GroupSerializer
+from api.access_policies import BaseAccessPolicy
+from api.resources.groups import GroupSerializer
 
 from .tenant import get_current_tenant
 
@@ -18,7 +19,7 @@ from .tenant import get_current_tenant
 class AuthAccessPolicy(BaseAccessPolicy):
     """Access policies for authorization and authentication."""
 
-    id = 'auth-policy'  # noqa: A003
+    id = 'auth-policy'
 
 
 class LoginSerializer(serializers.Serializer):

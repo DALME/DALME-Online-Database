@@ -1,4 +1,5 @@
 """Management command to ensure an oauth application is registered."""
+
 import io
 
 import structlog
@@ -24,7 +25,7 @@ class Command(BaseCommand):
         'skip_authorization': True,
     }
 
-    help = 'Create an oauth application.'  # noqa: A003
+    help = 'Create an oauth application.'
 
     @property
     def success(self):

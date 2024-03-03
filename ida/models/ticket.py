@@ -1,16 +1,17 @@
 """Model ticket data."""
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 from django.urls import reverse
 
-from ida.models.templates import dalmeIntid
+from ida.models.templates import IDAIntid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class Ticket(dalmeIntid):
+class Ticket(IDAIntid):
     """Stores information about tickets."""
 
     OPEN = 0
@@ -24,7 +25,7 @@ class Ticket(dalmeIntid):
     description = models.TextField(blank=True, null=True)
     status = models.IntegerField(choices=STATUS, default=0)
     url = models.CharField(max_length=255, blank=True, null=True)
-    files = models.ManyToManyField('dalme_app.Attachment', blank=True, related_name='tickets')
+    files = models.ManyToManyField('ida.Attachment', blank=True, related_name='tickets')
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         blank=True,
@@ -34,8 +35,8 @@ class Ticket(dalmeIntid):
     )
     closing_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     closing_date = models.DateTimeField(null=True, blank=True)
-    tags = GenericRelation('dalme_app.Tag')
-    comments = GenericRelation('dalme_app.Comment')
+    tags = GenericRelation('ida.Tag')
+    comments = GenericRelation('ida.Comment')
 
     class Meta:
         ordering = ['status', 'creation_timestamp']

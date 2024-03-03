@@ -1,4 +1,5 @@
 """Define the tenant context middleware."""
+
 import contextvars
 
 from werkzeug.local import LocalProxy
@@ -15,7 +16,7 @@ class TenantContextMiddleware:
 
     We also override any settings that need to be dynamic over tenants.
 
-    The contextvar is just a convenience to we can always access the tenant in
+    The contextvar is just a convenience so we can always access the tenant in
     places without always having to thread through a value from the request.
 
     Must be run after the django-tenants TenantMainMiddleware so the tenant

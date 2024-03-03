@@ -1,0 +1,359 @@
+.Draftail-Editor .DraftEditor-root {
+  font-family: "PT Serif", "Times New Roman", serif !important;
+}
+.p_date_scheduled {
+  color: #ab803f;
+  font-weight: 700;
+}
+.p_date_live {
+  color: #528a52;
+  font-weight: 700;
+}
+td.status.features > .status-tag {
+  font-weight: 700;
+}
+td.status.features.scheduled > .status-tag {
+  border: 1px solid #ab803f;
+  color: #ab803f;
+  background-color: #f9ecd8;
+}
+td.status.features.live > .status-tag {
+  color: #528a52;
+  border: 1px solid #528a52;
+  background-color: #eaf3ea;
+}
+.listing td, .listing th {
+  padding: .5em .5rem;
+}
+table.listing tbody td.title {
+  display: flex;
+  position: relative;
+  padding: 0;
+  height: 40px;
+  align-items: center;
+}
+table.listing tbody td.title ul.actions {
+  position: absolute;
+  right: 0;
+  margin-top: 0;
+}
+table.listing tbody td {
+  vertical-align: middle;
+}
+input[type=checkbox]:before {
+  top: 5px;
+}
+.listing .children a:before {
+  font-size: 2rem;
+}
+td.ord .handle {
+  margin-top: 0;
+}
+.human-readable-date {
+  white-space: nowrap;
+}
+.checkbox_input div.field-content input {
+  display: inline-block;
+}
+input[type=checkbox] {
+  height: 20px;
+}
+.object-layout table thead tr {
+  height: 40px;
+}
+
+
+/* BOOTSTRAP-MARKDOWN */
+
+.bs-markdown-container * {
+  box-sizing: border-box;
+}
+
+/* Toolbar */
+
+.bs-markdown-container .btn-group-vertical > .btn-group:after,
+.bs-markdown-container .btn-group-vertical > .btn-group:before,
+.bs-markdown-container .btn-toolbar:after,
+.bs-markdown-container .btn-toolbar:before {
+  display: table;
+  content: " ";
+}
+
+.bs-markdown-container .btn-group-vertical > .btn-group:after,
+.bs-markdown-container .btn-toolbar:after {
+  clear: both;
+  display: table;
+  content: " ";
+}
+
+.bs-markdown-container .btn-toolbar > .btn,
+.bs-markdown-container .btn-toolbar > .btn-group,
+.bs-markdown-container .btn-toolbar > .input-group {
+  margin-left: 5px;
+}
+
+.bs-markdown-container .btn-toolbar .btn,
+.bs-markdown-container .btn-toolbar .btn-group,
+.bs-markdown-container .btn-toolbar .input-group {
+  float: left;
+}
+
+.bs-markdown-container .btn-group,
+.bs-markdown-container .btn-group-vertical {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.bs-markdown-container button,
+.bs-markdown-container textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.bs-markdown-container .btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.bs-markdown-container .btn-group-vertical > .btn,
+.bs-markdown-container .btn-group > .btn {
+  position: relative;
+  float: left;
+}
+
+.bs-markdown-container .btn-group .btn+.btn,
+.bs-markdown-container .btn-group .btn+.btn-group,
+.bs-markdown-container .btn-group .btn-group+.btn,
+.bs-markdown-container .btn-group .btn-group+.btn-group {
+  margin-left: -1px;
+}
+
+.bs-markdown-container .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.bs-markdown-container .btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-radius: 0;
+}
+
+.bs-markdown-container .btn-group > .btn:last-child:not(:first-child),
+.bs-markdown-container .btn-group > .dropdown-toggle:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.bs-markdown-container .btn-group > .btn:first-child {
+  margin-left: 0;
+}
+
+.bs-markdown-container .btn-default,
+.bs-markdown-container .btn-primary {
+  color: #333;
+  background-color: #fff;
+  border-color: #e6e6e6;
+}
+
+.bs-markdown-container .btn-default:hover,
+.bs-markdown-container .btn-primary:hover {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
+}
+
+.btn.disabled,
+.btn[disabled] {
+  cursor: not-allowed;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  opacity: .65;
+}
+
+.btn-default.disabled.focus,
+.btn-default.disabled:focus,
+.btn-default.disabled:hover,
+.btn-default[disabled].focus,
+.btn-default[disabled]:focus,
+.btn-default[disabled]:hover {
+  background-color: #fff;
+  border-color: #e6e6e6;
+}
+
+.bs-markdown-container .btn-group-sm > .btn,
+.bs-markdown-container .btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+.bs-markdown-container .btn-group-vertical > .btn.active,
+.bs-markdown-container .btn-group-vertical > .btn:active,
+.bs-markdown-container .btn-group-vertical > .btn:focus,
+.bs-markdown-container .btn-group-vertical > .btn:hover,
+.bs-markdown-container .btn-group > .btn.active,
+.bs-markdown-container .btn-group > .btn:active,
+.bs-markdown-container .btn-group > .btn:focus,
+.bs-markdown-container .btn-group > .btn:hover {
+  z-index: 2;
+}
+
+.bs-markdown-container .hidden {
+  display: none!important;
+}
+
+/* Editor */
+
+.bs-markdown-container textarea {
+  overflow: auto;
+}
+
+.bs-markdown-container textarea {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.bs-markdown-container a {
+  background-color: transparent;
+}
+
+/* Adjustments */
+
+.bs-markdown-container .md-header {
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom: none;
+  padding: 5px;
+}
+.bs-markdown-container .btn-toolbar > .btn-group:first-child {
+  margin-left: 0;
+}
+.bs-markdown-container .md-editor .md-fullscreen-controls {
+  display: none;
+}
+.bs-markdown-container .btn-toolbar > .btn-group:last-child {
+  float: right;
+}
+.bs-markdown-container .md-preview {
+  overflow: auto;
+  appearance: none;
+  box-sizing: border-box;
+  border-radius: 6px;
+  width: 100%;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  border: 1px solid #e6e6e6;
+  padding: .9em 1.2em;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+/* bibliography chooser */
+
+.bibliography-chooser .selectize-input,
+.bibliography-chooser .selectize-input input,
+.biblio-modal-box .selectize-input,
+.biblio-modal-box .selectize-input input {
+  line-height: 30px;
+  font-size: 1.1em;
+  font-weight: 300;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  background-color: #fafafa;
+}
+.bibliography-chooser .selectize-input,
+.biblio-modal-box .selectize-input {
+  border-radius: 6px;
+  padding: 8px 8px 8px 18px;
+}
+.bibliography-chooser .selectize-control.single .selectize-input,
+.bibliography-chooser .selectize-dropdown.single,
+.biblio-modal-box .selectize-control.single .selectize-input,
+.biblio-modal-box .selectize-dropdown.single {
+  border-color: #e6e6e6;
+}
+.bibliography-chooser .selectize-dropdown-content,
+.biblio-modal-box .selectize-dropdown-content {
+  padding: 1rem;
+  font-size: .8rem;
+  font-weight: 500;
+  line-height: 18px;
+}
+.bibliography-chooser .csl-bib-body,
+.biblio-modal-box .csl-bib-body {
+  margin-bottom: .5rem;
+}
+
+/* Footnote editor biblio modal */
+
+.biblio-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+.biblio-modal-box {
+  background-color: #fefefe;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+}
+.biblio-modal-button-container {
+  align-self: flex-end;
+  margin-top: 10px;
+}
+.biblio-modal-button-container button {
+  font-size: .95em;
+  height: 3em;
+  border-radius: 3px;
+  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
+  width: auto;
+  font-weight: 400;
+  vertical-align: middle;
+  display: inline-block;
+  background-color: rgb(0, 125, 126);
+  border: 1px solid rgb(0, 125, 126);
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  -webkit-font-smoothing: auto;
+}
+.biblio-modal-button-container button:hover {
+  background-color: rgb(0, 103, 106);
+  color: #fff;
+  border-color: transparent;
+}

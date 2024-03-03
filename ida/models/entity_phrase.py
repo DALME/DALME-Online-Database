@@ -1,15 +1,16 @@
 """Model entity phrase data."""
+
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeUuid
+from ida.models.templates import IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class EntityPhrase(dalmeUuid):
+class EntityPhrase(IDAUuid):
     """Stores entity-phrase information."""
 
     transcription = models.ForeignKey(

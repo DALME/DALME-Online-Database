@@ -1,4 +1,5 @@
 """Model group data."""
+
 from django.db import models
 
 from ida.tenant import get_current_tenant

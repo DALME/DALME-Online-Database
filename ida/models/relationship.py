@@ -1,4 +1,5 @@
 """Model relationship data."""
+
 from django.contrib.contenttypes.fields import (
     GenericForeignKey,
 )
@@ -6,12 +7,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeIntid, dalmeUuid
+from ida.models.templates import IDAIntid, IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class RelationshipType(dalmeIntid):
+class RelationshipType(IDAIntid):
     """Stores relationship type definitions."""
 
     name = models.CharField(max_length=255)
@@ -27,7 +28,7 @@ class RelationshipType(dalmeIntid):
         return self.name
 
 
-class Relationship(dalmeUuid):
+class Relationship(IDAUuid):
     """Stores information about relationships between resources."""
 
     source = GenericForeignKey('source_content_type', 'source_object_id')

@@ -1,14 +1,15 @@
 """Model reference data."""
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
 
-from ida.models.templates import dalmeIntid, dalmeUuid
+from ida.models.templates import IDAIntid, IDAUuid
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
-class AttributeReference(dalmeUuid):
+class AttributeReference(IDAUuid):
     """Stores information about the provenance of attribute definitions."""
 
     name = models.CharField(max_length=255)
@@ -19,7 +20,7 @@ class AttributeReference(dalmeUuid):
     term_type = models.CharField(max_length=55, blank=True)
 
 
-class CountryReference(dalmeIntid):
+class CountryReference(IDAIntid):
     """Stores country information."""
 
     name = models.CharField(max_length=255, unique=True)
@@ -38,7 +39,7 @@ class CountryReference(dalmeIntid):
         return f'/countries/{self.id}'
 
 
-class LanguageReference(dalmeIntid):
+class LanguageReference(IDAIntid):
     """Stores information about languages and dialects."""
 
     glottocode = models.CharField(max_length=25, unique=True)
@@ -70,7 +71,7 @@ class LanguageReference(dalmeIntid):
         return f'/languages/{self.id}'
 
 
-class LocaleReference(dalmeIntid):
+class LocaleReference(IDAIntid):
     """Stores information about geographic locales."""
 
     name = models.CharField(max_length=255)

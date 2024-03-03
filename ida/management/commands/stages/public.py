@@ -1,8 +1,11 @@
-"""Migrate dalme_public CMS data."""
-from wagtail.models import Page, Revision
+"""Migrate public CMS data."""
+
+from django_tenants.utils import schema_context
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
+
+from ida.models import Profile, User
 
 from .base import BaseStage
 
@@ -20,15 +23,16 @@ class Stage(BaseStage):
         """Execute the stage."""
         self.clone_schema()
         self.migrate_schema()
-        self.migrate_revision()
         self.drop_schema()
+        self.fix_contentypes()
+        self.transfer_avatars()
 
     @transaction.atomic
     def clone_schema(self):
         """Clone the restore schema giving us data we can safely mutate."""
         with connection.cursor() as cursor:
             self.logger.info("Cloning the '%s' schema", SOURCE_SCHEMA)
-            cursor.execute('SELECT clone_schema(%s, %s);', [SOURCE_SCHEMA, CLONED_SCHEMA])
+            cursor.execute("SELECT clone_schema(%s, %s, 'DATA');", [SOURCE_SCHEMA, CLONED_SCHEMA])
 
     @transaction.atomic
     def migrate_schema(self):
@@ -41,7 +45,7 @@ class Stage(BaseStage):
               FOR tb IN
                 SELECT table_name
                 FROM information_schema.tables
-                WHERE table_schema = 'public'
+                WHERE table_schema = 'cloned'
                 AND table_name IN
                 (SELECT table_name FROM information_schema.tables WHERE table_schema = 'dalme')
                 AND table_name <> 'django_admin_log'
@@ -49,7 +53,6 @@ class Stage(BaseStage):
                 AND table_name <> 'django_migrations'
                 AND table_name <> 'django_session'
                 -- Note, we DO want to move 'django_site' as that's used by Wagtail.
-                AND table_name <> 'wagtailcore_revision'
               LOOP
                 -- Remove any existing data from the DALME schema per table.
                 EXECUTE format('DROP TABLE dalme.%I CASCADE;', tb);
@@ -64,48 +67,82 @@ class Stage(BaseStage):
             cursor.execute(move_cms)
 
     @transaction.atomic
-    def clone_migrate_revision(self):
-        """Migrate pagerevision data to the revision table."""
-
-        def revision_mapper(cursor, page_revision):
-            """Remap page revision data to revision data."""
-            page_content_type = ContentType.objects.get_for_model(Page)
-
-            page_id = page_revision.pop('page_id')
-            content = page_revision.pop('content_json')
-
-            cursor.execute('SELECT * from public.wagtailcore_page WHERE id = %s', [page_id])
-            row = cursor.fetchone()
-            columns = [col[0] for col in cursor.description]
-            data = dict(zip(columns, row))  # noqa: B905
-
-            content_type_id = self.map_content_type(data['content_type_id'], id_only=True)
-
-            return {
-                'base_content_type': page_content_type,
-                'content_type_id': content_type_id,
-                'object_id': page_id,
-                'content': content,
-                **page_revision,
-            }
-
-        with connection.cursor() as cursor:
-            self.logger.info('Migrating page revision data')
-            cursor.execute('SELECT * from public.wagtailcore_pagerevision;')
-
-            columns = [col[0] for col in cursor.description]
-            page_revisions = [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
-            revisions = [revision_mapper(cursor, page_revision) for page_revision in page_revisions]
-
-            connection.set_schema('dalme', True)
-            Revision.objects.bulk_create([Revision(**revision) for revision in revisions], batch_size=1000)
-
-            # TODO: We can now truncate/drop the stale pagerevision table from
-            # the 'public' schema.
-
-    @transaction.atomic
     def drop_schema(self):
         """Drop the cloned schema restoring original symmetry."""
         with connection.cursor() as cursor:
             self.logger.info("Dropping the '%s' schema", CLONED_SCHEMA)
-            cursor.execute('DROP SCHEMA %s;', [CLONED_SCHEMA])
+            cursor.execute('DROP SCHEMA cloned CASCADE')
+            # TODO: we should also drop the restore schema once we're sure everything is fine
+
+    @transaction.atomic
+    def fix_contentypes(self):
+        """Replace references to contentypes with new values."""
+        with schema_context('dalme'):
+            self.logger.info('Replacing stale content type references')
+            from wagtail.models import Page, PageLogEntry, Revision, Task, TaskState, WorkflowState
+
+            page_type = ContentType.objects.get(app_label='wagtailcore', model='page')
+
+            # fix page revisions
+            self.logger.info('Processing page revisions')
+            for rev in Revision.objects.all():
+                new_ct = self.map_content_type(rev.content_type_id, id_only=True)
+                rev.content_type_id = new_ct
+                rev.base_content_type_id = page_type
+                rev.content['content_type'] = new_ct
+                rev.save(update_fields=['content_type_id', 'base_content_type_id', 'content'])
+
+            # fix pages
+            self.logger.info('Processing pages')
+            for page in Page.objects.all():
+                new_ct = self.map_content_type(page.content_type_id, id_only=True)
+                page.content_type_id = new_ct
+                page.save(update_fields=['content_type_id'])
+
+            # fix page log entries
+            self.logger.info('Processing page logs')
+            for entry in PageLogEntry.objects.all():
+                # there are constraints for page_id and user_id, so that if either has been deleted
+                # save() will fail validation, so we need to check before trying to update
+                if Page.objects.filter(pk=entry.page_id).exists() and User.objects.filter(pk=entry.user_id).exists():
+                    new_ct = self.map_content_type(entry.content_type_id, id_only=True)
+                    entry.content_type_id = new_ct
+                    entry.save(update_fields=['content_type_id'])
+                else:
+                    entry.delete()
+
+            # fix tasks
+            self.logger.info('Processing tasks')
+            for task in Task.objects.all():
+                new_ct = self.map_content_type(task.content_type_id, id_only=True)
+                task.content_type_id = new_ct
+                task.save(update_fields=['content_type_id'])
+
+            # fix task states
+            self.logger.info('Processing task states')
+            for ts in TaskState.objects.all():
+                new_ct = self.map_content_type(ts.content_type_id, id_only=True)
+                ts.content_type_id = new_ct
+                ts.save(update_fields=['content_type_id'])
+
+            # fix workflow states
+            self.logger.info('Processing workflow states')
+            for ws in WorkflowState.objects.all():
+                new_ct = self.map_content_type(ws.content_type_id, id_only=True)
+                new_base_ct = self.map_content_type(ws.base_content_type_id, id_only=True)
+                ws.content_type_id = new_ct
+                ws.base_content_type_id = new_base_ct
+                ws.save(update_fields=['content_type_id', 'base_content_type_id'])
+
+    @transaction.atomic
+    def transfer_avatars(self):
+        """Transfer avatar field from wagtail to profile."""
+        with connection.cursor() as cursor:
+            self.logger.info('Transfering avatars')
+            cursor.execute('SELECT * FROM restore.wagtailusers_userprofile;')
+            rows = self.map_rows(cursor)
+            for row in rows:
+                if row['avatar']:
+                    profile = Profile.objects.get(user=row['user_id'])
+                    profile.avatar = row['avatar']
+                    profile.save(update_fields=['avatar'])

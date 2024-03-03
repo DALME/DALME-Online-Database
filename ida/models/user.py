@@ -1,9 +1,9 @@
 """Model user and profile data."""
+
 import humps
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Q, options
 from django.urls import reverse
@@ -77,6 +77,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     full_name = models.CharField(max_length=50, blank=True)
+    avatar = models.CharField(blank=True, default='')
     preferences = models.JSONField(default=get_default_preferences)
 
     def __str__(self):
@@ -89,8 +90,4 @@ class Profile(models.Model):
     @property
     def profile_image(self):
         """Return url to avatar image."""
-        try:
-            avatar = self.user.wagtail_userprofile.avatar
-        except ObjectDoesNotExist:
-            return None
-        return settings.MEDIA_URL + str(avatar) if avatar else None
+        return settings.MEDIA_URL + str(self.avatar) if self.avatar else None

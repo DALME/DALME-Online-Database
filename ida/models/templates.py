@@ -4,6 +4,8 @@ These mixins and utilities are used to more easily associate common data points
 with system data models; things like timestamps and unique IDs.
 
 """
+
+import os
 import uuid
 
 from django_currentuser.middleware import get_current_user
@@ -17,7 +19,7 @@ def get_current_username():
     return get_current_user().username
 
 
-class dalmeBasic(models.Model):  # noqa: N801
+class IDABasic(models.Model):
     """Model template with timestamps, but no pre-defined ID or Owner."""
 
     creation_user = models.ForeignKey(
@@ -46,25 +48,25 @@ class dalmeBasic(models.Model):  # noqa: N801
         return self.__class__.__name__
 
 
-class dalmeUuid(dalmeBasic):  # noqa: N801
+class IDAUuid(IDABasic):
     """Model template with a unique ID assigned by `uuid.uuid4`, resulting in a long, random identifier."""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)  # noqa: A003
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
 
     class Meta:
         abstract = True
 
 
-class dalmeIntid(dalmeBasic):  # noqa: N801
+class IDAIntid(IDABasic):
     """Model template with a unique ID assigned as a sequential integer."""
 
-    id = models.AutoField(primary_key=True, unique=True, db_index=True)  # noqa: A003
+    id = models.AutoField(primary_key=True, unique=True, db_index=True)
 
     class Meta:
         abstract = True
 
 
-class dalmeOwned(dalmeBasic):  # noqa: N801
+class IDAOwned(IDABasic):
     """Model template with an owner field."""
 
     owner = models.ForeignKey(
@@ -86,7 +88,7 @@ class dalmeOwned(dalmeBasic):  # noqa: N801
             'update_fields': None,
         }
 
-        if self._state.adding is True:
+        if self._state.adding is True and not os.environ.get('DATA_MIGRATION'):
             self.owner = get_current_user()
 
         for key, value in defaults.items():
