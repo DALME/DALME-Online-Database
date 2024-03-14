@@ -2196,7 +2196,6 @@ tei-quote > span + tei-rs {
 }
 tei-quote > span + tei-rs::before {
   font-style: unset !important;
-  margin-right: 0 !important;
 }
 tei-quote:not(:first-child) {
   margin-top: 1rem;
@@ -2231,6 +2230,9 @@ tei-quote[prev]:before {
 tei-quote span {
   display: contents;
   text-wrap: nowrap;
+}
+tei-quote span:only-of-type {
+  text-wrap: wrap !important;
 }
 tei-quote tei-lb:first-of-type {
   display: none;
