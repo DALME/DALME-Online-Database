@@ -831,15 +831,18 @@ tei-handNotes {
   /* Empty Rule Set */
 }
 tei-handShift {
-  padding: 0px 5px;
+  padding-right: 2px;
   font-family: "Font Awesome 5 Free";
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   color: #a0a0a0;
-  position: relative;
-  left: -25px;
   display: inline-block;
-  margin-right: -22px;
+  vertical-align: super;
+}
+tei-lb + tei-handShift {
+  position: relative;
+  left: -14px;
+  margin-right: -14px;
 }
 tei-handShift::before {
   content: "\f256";
@@ -2180,11 +2183,20 @@ tei-quote {
   border-bottom: 1px dotted #d4d4d4;
   padding: 1rem 1rem 1.3rem 1rem;
   display: flex;
+  flex-wrap: wrap;
   width: 100%;
   font-family: 'Lora';
-  white-space: normal;
+  white-space: pre-wrap;
   justify-content: center;
   line-height: 1.5;
+  align-items: baseline;
+}
+tei-quote > span + tei-rs {
+  margin-left: 2px;
+}
+tei-quote > span + tei-rs::before {
+  font-style: unset !important;
+  margin-right: 0 !important;
 }
 tei-quote:not(:first-child) {
   margin-top: 1rem;
@@ -2192,7 +2204,7 @@ tei-quote:not(:first-child) {
 tei-quote:not(:last-child) {
   margin-bottom: -1rem;
 }
-tei-quote span:before {
+tei-quote > span:first-of-type::before {
   content: "\201c\00a0";
   font-family: 'Lora', 'PT Serif', serif;
   font-size: 35px;
@@ -2201,7 +2213,7 @@ tei-quote span:before {
   display: contents;
   line-height: 0.8;
 }
-tei-quote span:after {
+tei-quote > span:last-of-type::after {
   content: "\00a0\201e";
   font-family: 'Lora', 'PT Serif', serif;
   font-size: 35px;
@@ -2218,6 +2230,7 @@ tei-quote[prev]:before {
 }
 tei-quote span {
   display: contents;
+  text-wrap: nowrap;
 }
 tei-quote tei-lb:first-of-type {
   display: none;
@@ -2225,6 +2238,7 @@ tei-quote tei-lb:first-of-type {
 tei-quote span ~ tei-lb:last-of-type {
   display: none;
 }
+
 tei-expan {
   color: #888888;
   font-style: italic;
