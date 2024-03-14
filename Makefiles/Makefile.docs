@@ -1,0 +1,44 @@
+# ; -*- mode: makefile ;-*-
+# vi: set ft=make :
+
+docs.build:
+	docker compose up -d --no-deps --build $(PROJECT).docs
+.PHONY: docs.build
+
+docs.clean:
+	docker compose run --rm -T \
+		$(PROJECT).docs \
+		rm -rf /opt/docs/_build
+.PHONY: docs.clean
+
+docs.init: docs.build
+.PHONY: docs.init
+
+docs.render: docs.clean
+	docker compose run --rm -T \
+		$(PROJECT).docs \
+		sphinx-build -b html -nW /opt/docs /opt/docs/_build/html
+.PHONY: docs.render
+
+docs.shell:
+	docker compose run --rm \
+		$(PROJECT).docs \
+		bash
+.PHONY: docs.shell
+
+docs.sync: docs.build
+.PHONY: docs.sync
+
+docs.write:
+	open http://localhost:8002
+.PHONY: docs.write
+
+docs.help:
+	@echo "  docs.build             rebuild the docs service"
+	@echo "  docs.init              initialize the docs service"
+	@echo "  docs.render            output the documentation as html"
+	@echo "  docs.shell             shell into the docs container"
+	@echo "  docs.sync              compile the docs requirements file and rebuild the service"
+	@echo "  docs.write             run the documentation live-reload server"
+	@echo ""
+.PHONY: docs.help

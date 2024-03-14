@@ -6,9 +6,7 @@
 .DS_Store
 .ebignore
 env
-docs
 db.cnf
 *.md
-pytest.ini
 README.md
 node_modules

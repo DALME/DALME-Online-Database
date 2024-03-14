@@ -1,0 +1,164 @@
+{% extends "public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags static %}
+
+{% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
+
+{% block header_extra %}
+  {% include "public/includes/_simple_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "public/includes/_collections_filter.html" %}
+  {% if page.citable %}
+    <div id="cite-container" class="mt-5" v-cloak>
+      {% include "public/includes/_cite_menu.html" %}
+      {% include "public/includes/_cite_popup.html" %}
+    </div>
+  {% endif %}
+  {% include "public/includes/_at_a_glance.html" with stats=page.stats %}
+{% endblock %}
+
+{% block main_column %}
+  <div class="content">
+    <section>
+      {% for block in page.body %}
+        <div class="block-{{ block.block_type }}">
+          {% include_block block %}
+        </div>
+      {% endfor %}
+    </section>
+  </div>
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  {{ page.url|json_script:"page-url" }}
+  {{ page.pk|json_script:"page-pk" }}
+  {{ page.stats.coverage|json_script:"histogram-stats" }}
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script>
+    $(document).ready(function() {
+      const pageData = {
+        url: JSON.parse(document.getElementById('page-url').textContent),
+        pk: JSON.parse(document.getElementById('page-pk').textContent),
+      }
+      const getData = () => JSON.parse(
+        document.getElementById('histogram-stats').textContent
+      );
+      const data = Object.entries(getData())
+        .map(entry => ({ year: entry[0], count: entry[1] }));
+
+      const renderHistogram = (nodeId, w, h, fill, title = '', bottom = 0) => {
+        const margin = { top: 0, right: 0, bottom: bottom, left: 0 },
+            width = w - margin.left - margin.right,
+            height = h - margin.top - margin.bottom;
+        const translation = 'translate(' + margin.left + ',' + margin.top + ')';
+        const svg = d3.select(nodeId)
+          .append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+          .append('g')
+            .attr('transform', translation);
+        svg.append('text')
+          .attr('x', 0)
+          .attr('y', 10)
+          .style('font-size', '12px')
+          .style('fill', '#a8a8a8')
+          .text(title);
+
+        const x = d3.scaleBand()
+          .range([ 0, width ])
+          .domain(data.map(function(d) { return d.year; }))
+          .padding(0.2);
+        svg.append('g')
+          .attr('transform', 'translate(0,' + h + ')')
+          .style('font', '8px Open Sans')
+          .call(d3.axisBottom(x))
+          .selectAll('text')
+            .attr('y', 0)
+            .attr('x', 9)
+            .attr('dy', '.35em')
+            .attr('transform', 'translate(0,10)rotate(-90)')
+            .style('text-anchor', 'start')
+            .style('fill', '#a8a8a8')
+
+        const y = d3.scaleLinear()
+          .domain([0, Math.max(...data.map(entry => entry.count))])
+          .range([ height, 0]);
+        svg.append('g')
+          .call(d3.axisLeft(y));
+
+        const collectionURL = `${pageData.url}records/?collection=${pageData.pk}`;
+        if ($('body').find('#popup-histogram').length) {
+          svg.selectAll('histogram')
+            .data(data)
+            .enter()
+            .append('a')
+              .attr('xlink:href', function(d) {
+                return `${collectionURL}&date_range=${d.year}%2C${d.year}`
+              })
+              .append('rect')
+                .attr('x', function(d) { return x(d.year); })
+                .attr('y', function(d) { return y(d.count); })
+                .attr('width', x.bandwidth())
+                .attr('height', function(d) { return height - y(d.count); })
+                .attr('fill', fill)
+        } else {
+          svg.selectAll('histogram')
+            .data(data)
+            .enter()
+            .append('rect')
+              .attr('x', function(d) { return x(d.year); })
+              .attr('y', function(d) { return y(d.count); })
+              .attr('width', x.bandwidth())
+              .attr('height', function(d) { return height - y(d.count); })
+              .attr('fill', fill)
+        }
+      };
+
+      $('body').on('click', '#histogram', function() {
+        const popup = $('body').find('#popup-histogram');
+        if (!popup.length) {
+          const node = '<div id="popup-histogram" class="popup-histogram"></div>';
+          $(window).width() >= 600
+            ? $('#histogram').append(node)
+            : $('#histogram').after(node);
+          renderHistogram('#popup-histogram', 400, 150, '#56c1fe', '', 20);
+        } else {
+          popup.remove();
+        }
+      });
+
+      $('body').on('mouseenter', '.popup-histogram a rect', function() {
+        const link = $(this).closest('a');
+        const year = link.attr('href').split('%2C').pop();
+        d3.select('.popup-histogram > svg > g')
+          .insert('text')
+          .text(year)
+          .attr('id', 'year-zoom')
+          .attr('x', 0)
+          .attr('y', 40)
+          .attr('style', 'font-size: 24px; fill: rgb(168, 168, 168); z-index: 2;');
+      });
+
+      $('body').on('mouseleave', '.popup-histogram a rect', function() {
+        if ($('#year-zoom').length) {
+          $('#year-zoom').remove();
+        }
+      })
+
+      renderHistogram('#histogram', 150, 40, '#d0e7ff');
+
+      if (window.location.hash) {
+        const anchor = $(`a[href='${window.location.hash}']`)
+        $('html').animate({
+          scrollTop: anchor.offset().top - 20
+        }, 800);
+        anchor.parent().addClass('highlight');
+        if (anchor.next().hasClass('fa-caret-left')) {
+          anchor.parent().click();
+        }
+      }
+    });
+  </script>
+{% endblock %}

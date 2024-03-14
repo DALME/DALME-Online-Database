@@ -1,0 +1,4 @@
+nameserver 127.0.0.1
+domain localhost
+search_order 100
+timeout 5

@@ -1,0 +1,40 @@
+"""Model attribute type data."""
+
+from django.db import models
+
+from ida.models.templates import IDAIntid
+
+
+class AttributeType(IDAIntid):
+    """Stores attribute definitions."""
+
+    DATA_TYPES = (
+        ('BOOL', 'BOOL (boolean)'),
+        ('DATE', 'DATE (date)'),
+        ('DEC', 'DEC (decimal)'),
+        ('FKEY', 'FKEY (foreign key)'),
+        ('INT', 'INT (integer)'),
+        ('JSON', 'JSON (data)'),
+        ('RREL', 'RREL (reverse relation)'),
+        ('STR', 'STR (string)'),
+        ('TXT', 'TXT (text)'),
+    )
+
+    name = models.CharField(max_length=55, unique=True)
+    label = models.CharField(max_length=255)
+    description = models.TextField()
+    data_type = models.CharField(max_length=15, choices=DATA_TYPES)
+    is_local = models.BooleanField(default=False)
+    source = models.CharField(max_length=255, blank=True, null=True)
+    same_as = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    options = models.ForeignKey('ida.OptionsList', on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return self.name
+
+    def get_options(self):
+        """Return options for attribute type."""
+        return self.options

@@ -1,7 +1,0 @@
-[
-  {
-    "action": ["list"],
-    "principal": ["authenticated"],
-    "effect": "allow"
-  }
-]

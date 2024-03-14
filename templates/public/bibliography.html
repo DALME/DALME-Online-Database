@@ -1,0 +1,122 @@
+{% extends "public/layouts/__left_side_column.html" %}
+{% load wagtailcore_tags static %}
+
+{% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
+
+{% block banner %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% block header_extra %}
+  {% include "public/includes/_flat_header.html" %}
+{% endblock %}
+
+{% block left_side_column %}
+  {% include "public/includes/_flat_nav.html" %}
+  {% include "public/includes/_features_nav.html" %}
+{% endblock %}
+
+{% block main_column %}
+  <div id="bibliography-app" class="content">
+    {{ page.body }}
+  </div>
+{% endblock %}
+
+{% block js_foot %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'js/common_utilities.js' %}"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/citation-js@0.4.10/build/citation.min.js" integrity="sha256-vqUHuIyFzuc0osFFLRQk5hhFPLGHSnc4jvAtp9lZYvo=" crossorigin="anonymous"></script>
+  <script>
+    Vue.component('beat-loader', VueSpinner.BeatLoader);
+    const bibliography_app = new Vue({
+      el: '#bibliography-app',
+      delimiters: ['${', '}'],
+      created() {
+        this.cite = require('citation-js');
+        this.config = this.cite.plugins.config.get('@csl');
+        this.loadTemplate();
+        const that = this;
+        $('.bibliography-container').each(function() {
+          that.$set(that.collections, $(this).data('collection'), null)
+        });
+        this.fetchData().then(() => this.formatBibliography());
+      },
+      data: {
+        loading: true,
+        config: null,
+        format: 'html',
+        template: 'dalme',
+        output_format: 'bibliography',
+        lang: 'en-US',
+        collections: {},
+        csldata: {}
+      },
+      methods: {
+        loadTemplate() {
+          const that = this;
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (xhttp.readyState == 4 && xhttp.status == 200 && xhttp.responseXML !== null) {
+              let xml_data = new XMLSerializer().serializeToString(xhttp.responseXML);
+              that.config.templates.add('dalme', xml_data);
+            }
+          };
+          xhttp.open("GET", '/static/citation_styles/dalme_bibliography.csl', true);
+          xhttp.send();
+        },
+        async fetchData() {
+          const keys = Object.keys(this.collections);
+          await Promise.all(keys.map(this.createBibliography));
+        },
+        createBibliography(key) {
+          const that = this;
+          return new Promise(async function (resolve, reject) {
+            await fetch(`/api/library/?collection=${key}&content=csljson&format=json`)
+              .then(response => response.json())
+              .then(data => {
+                let citation = new that.cite();
+                for (let i = 0, len = data.length; i < len; ++i) {
+                  citation.add(data[i]);
+                }
+                that.collections[key] = citation.format(that.output_format, {
+                  format: that.format,
+                  template: that.template,
+                  lang: that.lang
+                });
+                resolve()
+              });
+          });
+        },
+        formatBibliography() {
+          $('.csl-entry').each(function() {
+            const key = $(this).data('csl-entry-id').split('/');
+            let last_node = $(this).contents().last()[0].textContent;
+            let url = last_node.match(/{([^}]+)}/);
+            if (url) {
+              last_node = last_node.replace(` ${url[0]}.`, '');
+              $(this).contents().last()[0].textContent = last_node;
+              $(this).html(`<a href="${url[1]}" target="_blank"><span>${$(this).html()}</a>`)
+            }
+            $(this).html(`<a href="#${key['1']}"></a><span>${$(this).html()}</span>`);
+          });
+          if (window.location.hash) {
+            const anchor = $(`a[href='${window.location.hash}']`)
+            $('html').animate({
+              scrollTop: anchor.offset().top - 20
+            }, 800);
+            anchor.next().addClass('highlight');
+          }
+        }
+      }
+    });
+    </script>
+{% endblock%}
