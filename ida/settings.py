@@ -372,6 +372,7 @@ class Development(Base, Configuration):
 
     DEBUG = True
     DOTENV = os.environ.get('ENV_FILE')
+    REWRITE_STATIC_URLS = True
 
     _TENANTS = {
         'DALME': {

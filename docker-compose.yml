@@ -45,6 +45,7 @@ services:
       - ./public:/opt/web/public
       - ./templates:/opt/web/templates
       - ./media/media:/opt/web/www/media
+      - assets:/opt/web/www/static
       - ./tests:/opt/web/tests
       - ./pyproject.toml:/opt/web/pyproject.toml
       - ipython-data:/root/.ipython/profile_default
