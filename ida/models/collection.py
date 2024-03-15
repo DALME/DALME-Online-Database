@@ -101,7 +101,8 @@ class CollectionMembership(ScopedBase, IDABasic):
     content_object = GenericForeignKey('content_type', 'object_id')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.CharField(max_length=36, db_index=True)
+    order = models.IntegerField(null=True)
 
     class Meta:
         unique_together = ('content_type', 'object_id', 'collection')
-        ordering = ['collection', 'id']
+        ordering = ['order', 'collection', 'id']
