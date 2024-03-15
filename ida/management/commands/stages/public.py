@@ -23,9 +23,11 @@ class Stage(BaseStage):
         """Execute the stage."""
         self.clone_schema()
         self.migrate_schema()
-        self.drop_schema()
+        self.drop_cloned_schema()
         self.fix_contentypes()
         self.transfer_avatars()
+        self.transfer_snippets()
+        self.drop_restore_schema()
 
     @transaction.atomic
     def clone_schema(self):
@@ -52,6 +54,11 @@ class Stage(BaseStage):
                 AND table_name <> 'django_content_types'
                 AND table_name <> 'django_migrations'
                 AND table_name <> 'django_session'
+                AND table_name <> 'public_recordbrowser'
+                AND table_name <> 'public_recordviewer'
+                AND table_name <> 'public_footer'
+                AND table_name <> 'public_searchpage'
+                AND table_name <> 'public_explorepage'
                 -- Note, we DO want to move 'django_site' as that's used by Wagtail.
               LOOP
                 -- Remove any existing data from the DALME schema per table.
@@ -67,12 +74,11 @@ class Stage(BaseStage):
             cursor.execute(move_cms)
 
     @transaction.atomic
-    def drop_schema(self):
+    def drop_cloned_schema(self):
         """Drop the cloned schema restoring original symmetry."""
         with connection.cursor() as cursor:
             self.logger.info("Dropping the '%s' schema", CLONED_SCHEMA)
             cursor.execute('DROP SCHEMA cloned CASCADE')
-            # TODO: we should also drop the restore schema once we're sure everything is fine
 
     @transaction.atomic
     def fix_contentypes(self):
@@ -146,3 +152,86 @@ class Stage(BaseStage):
                     profile = Profile.objects.get(user=row['user_id'])
                     profile.avatar = row['avatar']
                     profile.save(update_fields=['avatar'])
+
+    @transaction.atomic
+    def transfer_snippets(self):
+        """Transfer snippet data to settings table."""
+        data = {}
+
+        with connection.cursor() as cursor:
+            self.logger.info('Transfering snippet data')
+            # footer
+            cursor.execute('SELECT * FROM restore.public_footer;')
+            row = next(self.map_rows(cursor))
+            data.update(
+                {
+                    'footer_links': row['pages'],
+                    'footer_social': row['social'],
+                }
+            )
+            # searchpage
+            cursor.execute('SELECT * FROM restore.public_searchpage;')
+            row = next(self.map_rows(cursor))
+            data.update(
+                {
+                    'search_help_content': row['help_content'],
+                    'search_header_image': row['header_image_id'],
+                    'search_header_position': row['header_position'],
+                }
+            )
+            # explorepage
+            cursor.execute('SELECT * FROM restore.public_explorepage;')
+            row = next(self.map_rows(cursor))
+            data.update(
+                {
+                    'explore_text_before': row['text_before'],
+                    'explore_text_after': row['text_after'],
+                    'explore_header_image': row['header_image_id'],
+                    'explore_header_position': row['header_position'],
+                }
+            )
+            # recordbrowser
+            cursor.execute('SELECT * FROM restore.public_recordbrowser;')
+            row = next(self.map_rows(cursor))
+            data.update(
+                {
+                    'browser_header_image': row['header_image_id'],
+                    'browser_header_position': row['header_position'],
+                }
+            )
+            # recordviewer
+            cursor.execute('SELECT * FROM restore.public_recordviewer;')
+            row = next(self.map_rows(cursor))
+            data.update(
+                {
+                    'viewer_header_image': row['header_image_id'],
+                    'viewer_header_position': row['header_position'],
+                }
+            )
+
+            with schema_context('dalme'):
+                from public.models import BaseImage, Settings
+
+                data.update(
+                    {
+                        'search_header_image': BaseImage.objects.get(pk=data['search_header_image']),
+                        'explore_header_image': BaseImage.objects.get(pk=data['explore_header_image']),
+                        'browser_header_image': BaseImage.objects.get(pk=data['browser_header_image']),
+                        'viewer_header_image': BaseImage.objects.get(pk=data['viewer_header_image']),
+                    }
+                )
+
+                Settings.objects.create(
+                    name='DALME',
+                    tagline='The Documentary Archaeology of Late Medieval Europe',
+                    logo='images/dalme_logo.svg',
+                    copyright_line='The Documentary Archaeology of Late Medieval Europe',
+                    **data,
+                )
+
+    @transaction.atomic
+    def drop_restore_schema(self):
+        """Drop the restore schema."""
+        with connection.cursor() as cursor:
+            self.logger.info("Dropping the '%s' schema", SOURCE_SCHEMA)
+            cursor.execute('DROP SCHEMA restore CASCADE')
