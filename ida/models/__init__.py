@@ -28,6 +28,7 @@ from .options_list import OptionsList, OptionsValue
 from .page import Page
 from .permission import Permission
 from .place import Place
+from .project import Project
 from .public_register import PublicRegister
 from .publication import Publication
 from .record import PageNode, Record, RecordGroup
@@ -100,6 +101,7 @@ __all__ = [
     'Person',
     'Place',
     'Profile',
+    'Project',
     'PublicRegister',
     'Publication',
     'Record',
