@@ -1,5 +1,5 @@
 {% extends "public/layouts/__left_side_column.html" %}
-{% load static public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+{% load static js_translate dd_record_name get_highlights wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}{{ block.super }} &ndash; Search{% endblock %}
 
@@ -209,8 +209,7 @@
           switch>
           <small>Show/hide tooltips</small>
         </b-form-checkbox>
-        {% search_help as search_help %}
-        {{ search_help.help_content }}
+        {{ settings.public.Settings.search_help_content }}
       </div>
     </b-form>
     <div class="search-results" v-if="hasResults">

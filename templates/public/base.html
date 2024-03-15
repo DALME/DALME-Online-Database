@@ -1,4 +1,4 @@
-{% load static public_tags wagtailimages_tags wagtailuserbar wagtailcore_tags %}
+{% load static get_header_image_styles get_citation_data wagtailimages_tags wagtailuserbar wagtailcore_tags %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 
@@ -58,8 +58,34 @@
     </main>
 
     <footer class="u-flex" id="footer-app">
-      {% footer %}
+      {% if settings.public.Settings.footer_links %}
+        <nav class="footer">
+          <ul>
+            {% for block in settings.public.Settings.footer_links %}
+              {{ block }}
+            {% endfor %}
+          </ul>
+        </nav>
+      {% endif %}
+
+      <div class="copyright">
+        {% if settings.public.Settings.copyright %}
+          Copyright &copy; {% now "Y" %} {{ settings.public.Settings.copyright }}
+        {% else %}
+          Copyright &copy; {% now "Y" %} Initiative for Documentary Archaeology
+        {% endif %}
+      </div>
+
+      {% if settings.public.Settings.social %}
+        <div class="social">
+          {% for block in settings.public.Settings.social %}
+            {{ block }}
+          {% endfor %}
+        </div>
+      {% endif %}
     </footer>
+
+
 
     <!-- LIGHTBOX MODAL -->
     <div class="modal fade" id="lightbox" tabindex="-1" role="dialog" aria-hidden="true">

@@ -20,16 +20,15 @@
 {% endblock %}
 
 {% block main_column %}
-  {% explore_map_text as map_text %}
   <div class="content">
-    {% if map_text.text_before %}
-      {{ map_text.text_before }}
+    {% if settings.public.Settings.explore_text_before %}
+      {{ settings.public.Settings.explore_text_before }}
     {% endif %}
     <div id="map_container" style="height:50vh;" class="mt-2 mb-3 d-flex">
       <i class="fas fa-cog fa-spin fa-5x m-auto loader"></i>
     </div>
-    {% if map_text.text_after %}
-      {{ map_text.text_after }}
+    {% if settings.public.Settings.explore_text_after %}
+      {{ settings.public.Settings.explore_text_after }}
     {% endif %}
   </div>
 {% endblock %}
