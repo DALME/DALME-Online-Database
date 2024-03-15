@@ -111,6 +111,7 @@ class Base(Configuration):
         'wagtail.contrib.redirects',
         'wagtail.contrib.routable_page',
         'wagtail.contrib.styleguide',
+        'wagtail.contrib.settings',
         'wagtail.embeds',
         'wagtail.sites',
         'wagtail.users',
@@ -159,9 +160,8 @@ class Base(Configuration):
                         'django.template.context_processors.request',
                         'django.contrib.auth.context_processors.auth',
                         'django.contrib.messages.context_processors.messages',
-                        'public.context_processors.year',
-                        'public.context_processors.project',
                         'django.template.context_processors.request',
+                        'wagtail.contrib.settings.context_processors.settings',
                     ],
                     'debug': self.DEBUG,
                     'loaders': [
@@ -312,7 +312,7 @@ class Base(Configuration):
     # Wagtail
     SITE_ID = 1
     WAGTAILADMIN_BASE_URL = 'cms/'
-    WAGTAILIMAGES_IMAGE_MODEL = 'public.IDAImage'
+    WAGTAILIMAGES_IMAGE_MODEL = 'public.BaseImage'
 
     # Zotero
     ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
