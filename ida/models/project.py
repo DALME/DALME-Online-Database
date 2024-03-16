@@ -30,7 +30,7 @@ class Project(IDAIntid):
         blank=True,
         help_text='Name of the collection, in the Zotero library, that contains publications to be listed as sources in the IDA UI.',
     )
-    tenant = models.ForeignKey(Tenant, on_delete=models.PROTECT, null=True)
+    tenant = models.OneToOneField(Tenant, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return f'{self.name} ({self.id})'
