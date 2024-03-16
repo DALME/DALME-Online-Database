@@ -4,10 +4,7 @@ from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import PasswordResetForm
-from django.http import HttpRequest
 
 from api.access_policies import BaseAccessPolicy
 from api.base_viewset import IDABaseViewSet
@@ -53,27 +50,6 @@ class Users(IDABaseViewSet):
         if lookup is not None and not lookup.isdigit():
             self.lookup_field = 'username'
         return super().get_object()
-
-    @action(detail=True, methods=['post'])
-    def reset_password(self, request, *args, **kwargs):  # noqa: ARG002
-        """Reset user password."""
-        obj = self.get_object()
-        try:
-            form = PasswordResetForm({'email': obj.email})
-            assert form.is_valid()
-            request = HttpRequest()
-            request.META['SERVER_NAME'] = 'db.dalme.org'
-            request.META['SERVER_PORT'] = '443'
-            form.save(
-                request=request,
-                use_https=settings.USE_HTTPS,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                email_template_name='registration/password_reset_email.html',
-            )
-            return Response({'data': 'Email sent'}, 201)
-
-        except Exception as e:  # noqa: BLE001
-            return Response({'error': str(e)}, 400)
 
     def update(self, request, *args, **kwargs):  # noqa: ARG002
         """Update user record."""
