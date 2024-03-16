@@ -13,6 +13,7 @@ from .featured_object_page import FeaturedObject
 from .featured_page import FeaturedPage
 from .features_page import Features
 from .flat_page import Flat
+from .gradients import Gradient
 from .home_page import Home
 from .record_chooser import RecordChooser
 from .search_enabled_page import SearchEnabled
@@ -35,6 +36,7 @@ __all__ = [
     'FeaturedPage',
     'Features',
     'Flat',
+    'Gradient',
     'Home',
     'RecordChooser',
     'SearchEnabled',

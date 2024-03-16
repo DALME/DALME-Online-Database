@@ -5,7 +5,7 @@ from django import template
 register = template.Library()
 
 
-@register.simple_tag()
+@register.simple_tag
 def render_image(record):
     image = record.get('image')
     resize_rule = record.get('resize_rule')

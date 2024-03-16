@@ -2,6 +2,7 @@
 
 from django_tenants.utils import schema_context
 
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
@@ -27,6 +28,7 @@ class Stage(BaseStage):
         self.fix_contentypes()
         self.transfer_avatars()
         self.transfer_snippets()
+        self.transfer_gradients()
         self.drop_restore_schema()
 
     @transaction.atomic
@@ -228,6 +230,74 @@ class Stage(BaseStage):
                     copyright_line='The Documentary Archaeology of Late Medieval Europe',
                     **data,
                 )
+
+    @transaction.atomic
+    def transfer_gradients(self):
+        """Transfer gradient values and link page records."""
+        gradients = [
+            {
+                'colour_1': '#064e8c80',
+                'colour_2': '#114a2880',
+                'angle': '125',
+                'description': 'Homepage header',
+                'model': 'home',
+            },
+            {
+                'colour_1': '#5386a0b3',
+                'colour_2': '#3f6544e6',
+                'angle': '125',
+                'description': 'Project section headers',
+                'model': 'section',
+                'page_title': 'Project',
+            },
+            {
+                'colour_1': '#63623ab3',
+                'colour_2': '#8a4747e6',
+                'angle': '125',
+                'description': 'Features section headers',
+                'model': 'features',
+            },
+            {
+                'colour_1': '#5f516fb3',
+                'colour_2': '#173e65e6',
+                'angle': '125',
+                'description': 'Collections section headers',
+                'model': 'collections',
+            },
+            {
+                'colour_1': '#69663f99',
+                'colour_2': '#926a10e6',
+                'angle': '125',
+                'description': 'About section headers',
+                'model': 'section',
+                'page_title': 'About',
+            },
+        ]
+        self.logger.info('Transfering gradient data')
+        with schema_context('dalme'):
+            from public.models import Gradient
+
+            for entry in gradients:
+                target_model = apps.get_model(app_label='public', model_name=entry.pop('model'))
+                page_title = entry.pop('page_title', None)
+
+                # create entry in gradients table
+                gradient_obj = Gradient.objects.create(**entry)
+
+                # get page object
+                page = target_model.objects.filter(title=page_title) if page_title else target_model.objects.all()
+
+                if not page.exists():
+                    self.logger.info('ERROR processing "%s": page does not exist.', entry['description'])
+                    continue
+                if page.count() > 1:
+                    self.logger.info('ERROR processing "%s": query returns multiple pages.', entry['description'])
+                    continue
+
+                # add gradient reference
+                page = page.first()
+                page.gradient = gradient_obj
+                page.save(update_fields=['gradient'])
 
     @transaction.atomic
     def drop_restore_schema(self):

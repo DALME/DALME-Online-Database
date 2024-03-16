@@ -14,16 +14,17 @@ from public.models.featured_essay_page import Essay
 from public.models.featured_inventory_page import FeaturedInventory
 from public.models.featured_object_page import FeaturedObject
 
-HEADER_POSITION = (
-    ('top', 'Top'),
-    ('center', 'Center'),
-    ('bottom', 'Bottom'),
-)
-
 
 class Home(BasePage):
     template = 'home.html'
 
+    gradient = models.ForeignKey(
+        'public.Gradient',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
     learn_more_page = models.ForeignKey(
         'wagtailcore.Page',
         null=True,
@@ -43,6 +44,7 @@ class Home(BasePage):
     content_panels = [
         *BasePage.content_panels,
         FieldPanel('header_image'),
+        FieldPanel('gradient'),
         FieldPanel('learn_more_page'),
         FieldPanel('banners'),
         FieldPanel('body'),

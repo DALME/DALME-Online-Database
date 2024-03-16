@@ -16,6 +16,13 @@ class Collections(SearchEnabled):
         default=True,
         help_text='Check this box to show the "Cite" menu for this page.',
     )
+    gradient = models.ForeignKey(
+        'public.Gradient',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
 
     parent_page_types = ['public.Home']
     subpage_types = [
@@ -27,6 +34,7 @@ class Collections(SearchEnabled):
         *BasePage.content_panels,
         FieldPanel('header_image'),
         FieldPanel('header_position'),
+        FieldPanel('gradient'),
         FieldPanel('short_title'),
         FieldPanel('citable'),
         FieldPanel('body'),

@@ -2,14 +2,28 @@
 
 from wagtail.admin.panels import FieldPanel
 
+from django.db import models
+
 from public.models.base_page import BasePage
 
 
 class Section(BasePage):
+    gradient = models.ForeignKey(
+        'public.Gradient',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+
     parent_page_types = ['public.Home']
     subpage_types = [
         'public.Flat',
         'public.Bibliography',
     ]
 
-    content_panels = [*BasePage.content_panels, FieldPanel('short_title')]
+    content_panels = [
+        *BasePage.content_panels,
+        FieldPanel('short_title'),
+        FieldPanel('gradient'),
+    ]
