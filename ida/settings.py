@@ -58,8 +58,6 @@ class Base(Configuration):
     USE_TZ = True
     WSGI_APPLICATION = 'ida.wsgi.application'
 
-    API_ABSOLUTE_URL = 'http://ida.localhost' if IS_DEV else 'https://documentaryarchaeology.net/api'
-
     CORS_ALLOW_CREDENTIALS = True
     CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
     CSRF_COOKIE_HTTPONLY = False
@@ -318,6 +316,15 @@ class Base(Configuration):
     ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
     ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
 
+    # reference urls
+    BASE_URL = 'http://ida.localhost:8000' if IS_DEV else 'https://documentaryarchaeology.net'
+    DAM_URL = 'https://dam.dalme.org'
+    URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
+    URL_PORT = ':8000' if IS_DEV else ''
+
+    # list of settings values to make available in templates
+    INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'DAM_URL', 'PUBLIC_URL', 'WAGTAILADMIN_BASE_URL']
+
     @pristinemethod
     def TENANTS(self):  # noqa: N802
         """Enumerate registered app tenants.
@@ -443,7 +450,6 @@ class Development(Base, Configuration):
         },
     }
 
-    DAM_API_ENDPOINT = 'https://dam.dalme.org/api/?'
     DAM_API_USER = os.environ.get('DAM_API_USER')
     DAM_API_KEY = os.environ.get('DAM_API_KEY')
 
@@ -635,6 +641,7 @@ class Production(Base, Configuration):
     EMAIL_USE_TLS = True
     EMAIL_USE_SSL = False
     EMAIL_PORT = 587
+    # TODO: tenantize?
     DEFAULT_FROM_EMAIL = 'DALME <mail@dalme.org>'
 
     SHOW_PUBLIC_IF_NO_TENANT_FOUND = False

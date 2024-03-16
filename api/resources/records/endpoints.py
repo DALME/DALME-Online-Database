@@ -7,6 +7,8 @@ from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.conf import settings
+
 from api.access_policies import RecordAccessPolicy
 from api.base_viewset import IDABaseViewSet
 from ida.models import Record
@@ -55,8 +57,8 @@ class Records(IDABaseViewSet):
             result['@id'] = record.get_absolute_url()
             result['label'] = record.name
             result['description'][0]['@value'] = f'Manifest for {record.name}'
-            result['thumbnail']['@id'] = f'https://dam.dalme.org/loris/{dam_id_list[0]}/full/thm/0/default.jpg'
-            result['thumbnail']['service']['@id'] = f'https://dam.dalme.org/loris/{dam_id_list[0]}'
+            result['thumbnail']['@id'] = f'{settings.DAM_URL}/loris/{dam_id_list[0]}/full/thm/0/default.jpg'
+            result['thumbnail']['service']['@id'] = f'{settings.DAM_URL}/loris/{dam_id_list[0]}'
             result['sequences']['@id'] = record.id
             result['sequences']['canvases'] = [json.loads(page.get_canvas()) for page in pages]
             return Response(result, 201)

@@ -5,6 +5,7 @@ import json
 import requests
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import options
@@ -34,8 +35,7 @@ class Page(IDAUuid):
     @property
     def manifest_url(self):
         """Return IIIF manifest for the page."""
-        # TODO: generalize and use a variable to compose url
-        return f'https://dam.dalme.org/loris/{self.dam_id}/info.json'
+        return f'{settings.DAM_URL}/loris/{self.dam_id}/info.json'
 
     @property
     def thumbnail_url(self):
@@ -108,8 +108,7 @@ class Page(IDAUuid):
                 folio = page_meta_obj[0]['field79']
             elif isinstance(page_meta_obj, dict):
                 folio = page_meta_obj['field79']
-            # TODO: generalize and use a variable to compose url
-            canvas = requests.get(f'https://dam.dalme.org/iiif/{self.dam_id}/canvas/{folio}')
+            canvas = requests.get(f'{settings.DAM_URL}/iiif/{self.dam_id}/canvas/{folio}')
             canvas_dict = json.loads(canvas.text)
             canvas_dict['page_id'] = str(self.id)
             self.canvas = json.dumps(canvas_dict)

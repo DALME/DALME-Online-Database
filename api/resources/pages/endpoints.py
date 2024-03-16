@@ -7,6 +7,8 @@ import pathlib
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.conf import settings
+
 from api.access_policies import BaseAccessPolicy, RecordAccessPolicy
 from api.base_viewset import IDABaseViewSet
 from ida.models import Page
@@ -59,8 +61,8 @@ class Pages(IDABaseViewSet):
             result['@id'] = page.get_absolute_url()
             result['label'] = page.name
             result['description'][0]['@value'] = f'Manifest for {page.name}'
-            result['thumbnail']['@id'] = f'https://dam.dalme.org/loris/{page.dam_id}/full/thm/0/default.jpg'
-            result['thumbnail']['service']['@id'] = f'https://dam.dalme.org/loris/{page.dam_id}'
+            result['thumbnail']['@id'] = f'{settings.DAM_URL}/loris/{page.dam_id}/full/thm/0/default.jpg'
+            result['thumbnail']['service']['@id'] = f'{settings.DAM_URL}/loris/{page.dam_id}'
             result['sequences'][0]['@id'] = page.id
             result['sequences'][0]['canvases'] = [json.loads(page.get_canvas())]
             return Response(result, 201)

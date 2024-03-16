@@ -14,8 +14,8 @@ options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 
 
 def rs_api_query(**kwargs):
-    """Query the ResourceSpace API at dam.dalme.org."""
-    endpoint = settings.DAM_API_ENDPOINT
+    """Query the DAM's ResourceSpace API."""
+    endpoint = f'{settings.DAM_URL}/api/?'
     user = settings.DAM_API_USER
     key = settings.DAM_API_KEY
 

@@ -37,6 +37,7 @@ class TenantContextMiddleware:
         settings.CSRF_COOKIE_DOMAIN = f'.{domain}'
         settings.SESSION_COOKIE_DOMAIN = f'.{domain}'
         settings.WAGTAIL_SITE_NAME = request.tenant.name
+        settings.PUBLIC_URL = f'{settings.URL_PROTOCOL}{domain}{settings.URL_PORT}'
 
         token = _tenant.set(request.tenant)
 

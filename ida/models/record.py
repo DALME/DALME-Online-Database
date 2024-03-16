@@ -77,7 +77,7 @@ class Record(index.Indexed, IDAUuid, IDAOwned):
 
     def get_absolute_url(self):
         """Return absolute url for record."""
-        return f'{settings.API_ABSOLUTE_URL}/records/{self.pk}/'
+        return f'{settings.BASE_URL}/api/records/{self.pk}/'
 
     @property
     def is_published(self):
@@ -149,8 +149,7 @@ class Record(index.Indexed, IDAUuid, IDAOwned):
 
     def get_purl(self):
         """Return the record's permanent url."""
-        # TODO: generalize and use a variable to compose url
-        return f'https://purl.dalme.org/{self.id}/' if self.workflow.is_public else None
+        return f'{settings.BASE_URL}/purl/{self.id}/' if self.workflow.is_public else None
 
     def get_credits(self):
         """Return credits for record as list of dicts."""

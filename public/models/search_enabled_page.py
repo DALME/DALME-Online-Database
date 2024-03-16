@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -168,8 +169,7 @@ class SearchEnabled(RoutablePageMixin, BasePage):
             from_search = True
 
         data = RecordSerializer(source).data
-        # TODO: generalize URL
-        purl = f'https://purl.dalme.org/{source.id}/' if as_preview else source.get_purl()
+        purl = f'{settings.BASE_URL}/purl/{source.id}/' if as_preview else source.get_purl()
 
         context.update(
             {

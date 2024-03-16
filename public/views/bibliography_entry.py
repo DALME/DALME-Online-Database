@@ -3,9 +3,9 @@
 from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.admin.views import chooser
 
-from public.forms import (
-    BibliographyLinkChooserForm,
-)
+from django.conf import settings
+
+from public.forms import BibliographyLinkChooserForm
 
 
 def biblio_entry(request):
@@ -22,11 +22,10 @@ def biblio_entry(request):
         )
 
         if form.is_valid():
-            # TODO: generalize url
             result = {
                 'id': form.cleaned_data['id'],
                 'parentId': 'biblio_entry',
-                'url': 'https://dalme.org/project/bibliography/#' + form.cleaned_data['id'] + '/',
+                'url': f'{settings.PUBLIC_URL}/project/bibliography/#{form.cleaned_data["id"]}/',
                 'title': form.cleaned_data['link_text'].strip() or form.cleaned_data['id'],
                 'prefer_this_title_as_link_text': ('link_text' in form.changed_data),
             }
