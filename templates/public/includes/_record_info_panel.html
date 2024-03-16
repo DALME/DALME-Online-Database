@@ -1,3 +1,5 @@
+{% load get_credit_line %}
+
 <div class="description">
   {% if data.description %}
     {{ data.description }}
@@ -27,5 +29,5 @@
 </ul>
 <hr/>
 <div class="u-type-sans mt-2 credits">
-  {{ data.get_credit_line.credit_line }}
+  {{ get_credit_line }}
 </div>

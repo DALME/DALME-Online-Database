@@ -151,8 +151,8 @@ class Record(index.Indexed, IDAUuid, IDAOwned):
         """Return the record's permanent url."""
         return f'{settings.BASE_URL}/purl/{self.id}/' if self.workflow.is_public else None
 
-    def get_credits(self):
-        """Return credits for record as list of dicts."""
+    def get_credit_data(self):
+        """Return credit data for record as list of dicts."""
         return [
             {'name': r.source.name, 'credit': r.scopes.first().parameters['credit']}
             for r in self.relationships_as_target.filter(
@@ -165,43 +165,22 @@ class Record(index.Indexed, IDAUuid, IDAOwned):
             )
         ]
 
-    def get_credit_line(self):
-        """Return credit line for the record, if applicable."""
-
-        def get_people_string(p_list):
-            if len(p_list) == 1:
-                return f'{p_list[0]}'
-            if len(p_list) == 2:  # noqa: PLR2004
-                return f'{p_list[0]} and {p_list[1]}'
-            return f'{", ".join(p_list[:-1])}, and {p_list[-1]}'
-
+    def get_credits(self):
+        """Return credits for the record, if applicable."""
         try:
-            editors = [i['name'] for i in self.get_credits() if i['credit'] == 'editor']
-            corrections = [i['name'] for i in self.get_credits() if i['credit'] == 'corrections']
-            contributors = [i['name'] for i in self.get_credits() if i['credit'] == 'contributor']
-
-            if not editors:
-                try:
-                    editors = [self.owner.agent.first().standard_name]
-                except:  # noqa: E722
-                    # TODO: generalize to include other projects
-                    editors = ['the DALME Team']
-
-            ed_str = get_people_string(editors)
-            cor_str = get_people_string(corrections) if corrections else False
-            cont_str = get_people_string(contributors) if contributors else False
-
-            cline = f'Edited by {ed_str}'
-            cline = cline + f', with corrections by {cor_str}' if corrections else cline
-            cline = cline + f', and contributions by {cont_str}' if corrections and contributors else cline
-            cline = cline + f', with contributions by {cont_str}' if contributors and not corrections else cline
-            cline = cline + '.'
-
-            return {'credit_line': cline, 'authors': editors, 'contributors': corrections + contributors}
-
+            c_data = self.get_credit_data()
+            editors = [i['name'] for i in c_data if i['credit'] == 'editor']
+            corrections = [i['name'] for i in c_data if i['credit'] == 'corrections']
+            contributors = [i['name'] for i in c_data if i['credit'] == 'contributor']
         except:  # noqa: E722
-            # TODO: generalize to include other projects
-            return {'credit_line': 'Edited by the DALME Team.', 'authors': ['The DALME Team'], 'contributors': []}
+            editors, corrections, contributors = [], [], []
+
+        if not editors:
+            try:  # noqa: SIM105
+                editors = [self.owner.agent.first().standard_name]
+            except:  # noqa: E722
+                pass
+        return (editors, corrections, contributors)
 
 
 class PageNode(IDAIntid):

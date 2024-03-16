@@ -137,7 +137,7 @@ class PublicRecord(PublicRecordBase):
 
     def prepare_credits(self, instance):
         """Prepare document credits for indexing."""
-        return instance.get_credits()
+        return instance.get_credit_data()
 
     def prepare_geo_location(self, instance):
         """Prepare document location info for indexing."""

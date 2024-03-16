@@ -35,7 +35,6 @@ class RecordSerializer(serializers.ModelSerializer):
             'attributes',
             'has_images',
             'has_transcriptions',
-            'get_credit_line',
         ]
 
     def to_representation(self, instance):

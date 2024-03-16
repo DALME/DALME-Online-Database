@@ -12,7 +12,7 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def get_citation_data(context):
+def get_citation_data(context):  # noqa: C901, PLR0912
     today = datetime.now(tz=timezone.get_current_timezone()).date()
     accessed = today
     page = context['page']
@@ -66,9 +66,13 @@ def get_citation_data(context):
         if record:
             title = context['data']['name'].strip()
             purl = context['purl']
-            authors = context['data']['get_credit_line']['authors']
-            contributors = context['data']['get_credit_line']['contributors']
-
+            authors, corrections, contributors = context['data']['get_credits']
+            contributors = contributors + corrections
+            if not authors:
+                try:
+                    authors = [f"The {context.get('request').tenant.project.name} Team"]
+                except:  # noqa: E722
+                    authors = 'The IDA Team'
             coins_list += [('rft.atitle', title), ('rft.identifier', purl)]
             for author in authors:
                 coins_list.append(('rft.au', author))
