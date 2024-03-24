@@ -1,5 +1,5 @@
 {% extends "public/layouts/left_side_column.html" %}
-{% load static public_tags wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
+{% load static wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block title %}Explore &mdash; {{ block.super }}{% endblock %}
 
@@ -16,7 +16,7 @@
 
 {% block left_side_column %}
   {% include "public/includes/collections_filter.html" %}
-  {% include "public/includes/featuresnav.html" %}
+  {% include "public/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}

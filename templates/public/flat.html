@@ -23,7 +23,7 @@
   {% if page.get_parent.title == 'Collections' %}
     {% include "public/includes/collections_filter.html" %}
   {% else %}
-    {% include "public/includes/flatnav.html" %}
+    {% include "public/includes/flat_nav.html" %}
   {% endif %}
   {% if page.citable %}
     <div id="cite-container" class="mt-5" v-cloak>
@@ -31,7 +31,7 @@
       {% include "public/includes/cite_popup.html" %}
     </div>
   {% endif %}
-  {% include "public/includes/featuresnav.html" %}
+  {% include "public/includes/features_nav.html" %}
 {% endblock %}
 
 {% block main_column %}
