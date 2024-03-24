@@ -10,4 +10,4 @@ class SponsorBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'user'
-        template = 'public/blocks/_sponsor.html'
+        template = 'public/blocks/sponsor.html'

@@ -52,8 +52,8 @@ class Collections(SearchEnabled):
 
         context.update(
             {
-                'header_image': Settings.explore_header_image,
-                'header_position': Settings.explore_header_position,
+                'header_image': Settings.objects.first().explore_header_image,
+                'header_position': Settings.objects.first().explore_header_position,
                 'explore': True,
             },
         )

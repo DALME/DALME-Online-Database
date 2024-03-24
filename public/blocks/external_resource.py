@@ -11,4 +11,4 @@ class ExternalResourceBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'link'
-        template = 'public/blocks/_external_resource.html'
+        template = 'public/blocks/external_resource.html'

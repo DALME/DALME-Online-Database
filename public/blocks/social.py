@@ -10,4 +10,4 @@ class SocialBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'group'
-        template = 'public/blocks/_social.html'
+        template = 'public/blocks/social.html'

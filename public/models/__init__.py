@@ -1,5 +1,7 @@
 """Interface for the public.models module."""
 
+from public.extensions.gradients.models import Gradient
+
 from .base_image import BaseImage, CustomRendition
 from .base_page import BasePage
 from .bibliography_page import Bibliography
@@ -13,7 +15,6 @@ from .featured_object_page import FeaturedObject
 from .featured_page import FeaturedPage
 from .features_page import Features
 from .flat_page import Flat
-from .gradients import Gradient
 from .home_page import Home
 from .record_chooser import RecordChooser
 from .search_enabled_page import SearchEnabled

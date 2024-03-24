@@ -8,7 +8,7 @@ from ida.models import Record
 @register_model_chooser
 class RecordChooser(Chooser):
     model = Record
-    modal_template = 'public/includes/_source_chooser_modal.html'
+    modal_template = 'public/includes/source_chooser_modal.html'
     search_fields = []
 
     def get_queryset(self, request):

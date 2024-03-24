@@ -24,4 +24,4 @@ class DocumentBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'doc-full'
-        template = 'public/blocks/_document.html'
+        template = 'public/blocks/document.html'

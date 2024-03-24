@@ -1,8 +1,8 @@
-"""Form for bibliography chooser."""
+"""Form for reference chooser."""
 
 from django import forms
 
 
-class BibliographyLinkChooserForm(forms.Form):
+class ReferenceLinkChooserForm(forms.Form):
     id = forms.CharField(required=True, label='Entry')
     link_text = forms.CharField(required=False)

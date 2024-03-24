@@ -11,12 +11,13 @@ class Gradient(models.Model):
     description = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return self.css
+        return self.gradient_as_html()
 
     @property
     def css(self):
-        return f'linear-gradient({self.angle}deg, {self.colour_1} 0%, {self.colour_2} 100%)'
+        return f'linear-gradient({self.angle!s}deg, {self.colour_1} 0%, {self.colour_2} 100%)'
 
-    @property
-    def view(self):
-        return f'<div style="background: {self!s}; width: 100%;"></div>'
+    def gradient_as_html(self):
+        return f'<div class="gradient-cell"><div style="background: {self.css}"></div></div>'
+
+    gradient_as_html.short_description = 'Gradient'

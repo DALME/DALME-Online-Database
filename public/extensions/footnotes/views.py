@@ -3,12 +3,10 @@
 from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.admin.views import chooser
 
-from public.forms import (
-    FootnoteChooserForm,
-)
+from .forms import FootnoteChooserForm
 
 
-def enter_footnote(request):
+def footnote(request):
     initial_data = {
         'note_id': request.GET.get('note_id', ''),
         'text': request.GET.get('text', ''),

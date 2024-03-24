@@ -13,4 +13,4 @@ class PersonBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'user'
-        template = 'public/blocks/_person.html'
+        template = 'public/blocks/person.html'

@@ -21,6 +21,12 @@ def validate_dimensions(value):
         raise ValidationError(msg) from err
 
 
+class MainImageBlock(ImageChooserBlock):
+    class Meta:
+        icon = 'image'
+        template = 'public/blocks/main_image.html'
+
+
 class InlineImageBlock(blocks.StructBlock):
     image = ImageChooserBlock()
     image_id = blocks.CharBlock(required=False, help_text='Can be used as an anchor to link to the image.')
@@ -58,4 +64,4 @@ class InlineImageBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'image'
-        template = 'public/blocks/_inline_image.html'
+        template = 'public/blocks/inline_image.html'

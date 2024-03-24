@@ -1,7 +1,7 @@
 """Model wagtail settings data."""
 
 from wagtail import blocks
-from wagtail.admin.panels import FieldPanel, ObjectList, TabbedInterface
+from wagtail.admin.panels import FieldPanel, FieldRowPanel, ObjectList, TabbedInterface
 from wagtail.contrib.settings.models import BaseGenericSetting, register_setting
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.fields import StreamField
@@ -157,8 +157,12 @@ class Settings(BaseGenericSetting):
     ]
     search_tab_panel = [
         FieldPanel('search_help_content'),
-        FieldPanel('search_header_image'),
-        FieldPanel('search_header_position'),
+        FieldRowPanel(
+            [
+                FieldPanel('search_header_image'),
+                FieldPanel('search_header_position'),
+            ]
+        ),
     ]
     explore_tab_panel = [
         FieldPanel('explore_text_before'),

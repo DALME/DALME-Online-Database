@@ -1,12 +1,24 @@
-"""Enable footnotes."""
+"""Hooks for footnotes extension."""
 
 import wagtail.admin.rich_text.editors.draftail.features as draftail_features
-from wagtail import hooks
 
-from public.handlers import FootnoteElementHandler, footnote_decorator
+from django.urls import reverse
+from django.utils.html import format_html
+
+from .handlers import FootnoteElementHandler, footnote_decorator
 
 
-@hooks.register('register_rich_text_features')
+def add_footnotes_js_to_editor():
+    return format_html(
+        """
+            <script type="text/javascript">
+                window.chooserUrls.footnoteEntry = '{}';
+            </script>
+            """,
+        reverse('footnote_chooser:choose'),
+    )
+
+
 def enable_footnotes(features):
     features.default_features.append('footnote')
     feature_name = 'footnote'
@@ -27,7 +39,7 @@ def enable_footnotes(features):
         feature_name,
         draftail_features.EntityFeature(
             control,
-            js=['js/public_footnote.js'],
+            js=['js/extensions/footnote-chooser-modal.js'],
             css={'all': ['css/public_footnote.css']},
         ),
     )

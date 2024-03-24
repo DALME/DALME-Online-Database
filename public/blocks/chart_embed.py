@@ -15,4 +15,4 @@ class ChartEmbedBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'image'
-        template = 'public/blocks/_chart_embed.html'
+        template = 'public/blocks/chart_embed.html'

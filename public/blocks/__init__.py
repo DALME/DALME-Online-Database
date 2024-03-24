@@ -1,24 +1,23 @@
 """Interface for the public.blocks module."""
 
+from public.extensions.bibliography import BibliographyChooserBlock
+from public.extensions.footnotes import FootnotesPlaceMarker
+
 from .announcement_banner import AnnouncementBannerBlock
-from .bibliography import BibliographyBlock
 from .carousel import CarouselBlock
 from .chart_embed import ChartEmbedBlock
 from .document import DocumentBlock
 from .external_resource import ExternalResourceBlock
 from .footer_page_chooser import FooterPageChooserBlock
-from .footnotes_place_marker import FootnotesPlaceMarker
-from .inline_image import InlineImageBlock
-from .main_image import MainImageBlock
+from .image import InlineImageBlock, MainImageBlock
 from .person import PersonBlock
 from .social import SocialBlock
 from .sponsor import SponsorBlock
-from .subsection import SubsectionBlock
-from .subsection_end_marker import SubsectionEndMarkerBlock
+from .subsection import SubsectionBlock, SubsectionEndMarkerBlock
 
 __all__ = [
     'AnnouncementBannerBlock',
-    'BibliographyBlock',
+    'BibliographyChooserBlock',
     'CarouselBlock',
     'ChartEmbedBlock',
     'DocumentBlock',

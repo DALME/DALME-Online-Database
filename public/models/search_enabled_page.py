@@ -37,8 +37,8 @@ class SearchEnabled(RoutablePageMixin, BasePage):
 
         context.update(
             {
-                'header_image': Settings.search_header_image,
-                'header_position': Settings.search_header_position,
+                'header_image': Settings.objects.first().search_header_image,
+                'header_position': Settings.objects.first().search_header_position,
                 'query': False,
                 'advanced': False,
                 'form': search_formset(form_kwargs={'fields': search_context.fields}),
@@ -113,8 +113,8 @@ class SearchEnabled(RoutablePageMixin, BasePage):
 
         context.update(
             {
-                'header_image': Settings.browser_header_image,
-                'header_position': Settings.browser_header_position,
+                'header_image': Settings.objects.first().browser_header_image,
+                'header_position': Settings.objects.first().browser_header_position,
                 'records': True,
                 'browse_mode': request.session.get('public-browse-mode', 'wide'),
             },
@@ -173,8 +173,8 @@ class SearchEnabled(RoutablePageMixin, BasePage):
 
         context.update(
             {
-                'header_image': Settings.viewer_header_image,
-                'header_position': Settings.viewer_header_position,
+                'header_image': Settings.objects.first().viewer_header_image,
+                'header_position': Settings.objects.first().viewer_header_position,
                 'record': True,
                 'from_search': from_search,
                 'viewer_mode': request.session.get('public-viewer-mode', 'vertical-split'),

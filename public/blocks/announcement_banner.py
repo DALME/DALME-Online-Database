@@ -13,4 +13,4 @@ class AnnouncementBannerBlock(blocks.StructBlock):
 
     class Meta:
         icon = 'media'
-        template = 'public/blocks/_announcement_banner.html'
+        template = 'public/blocks/announcement_banner.html'

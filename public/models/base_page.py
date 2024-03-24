@@ -9,7 +9,7 @@ from wagtail.models import Page
 from django.db import models
 
 from public.blocks import (
-    BibliographyBlock,
+    BibliographyChooserBlock,
     CarouselBlock,
     ChartEmbedBlock,
     DocumentBlock,
@@ -57,7 +57,7 @@ class BasePage(Page):
             ('heading', blocks.CharBlock()),
             ('pullquote', blocks.RichTextBlock(icon='openquote')),
             ('page', blocks.PageChooserBlock()),
-            ('bibliography', BibliographyBlock()),
+            ('bibliography', BibliographyChooserBlock()),
             ('document', DocumentBlock()),
             ('person', PersonBlock()),
             ('external_resource', ExternalResourceBlock()),
