@@ -313,13 +313,17 @@ class Base(Configuration):
     WAGTAILIMAGES_IMAGE_MODEL = 'public.BaseImage'
 
     # reference urls
-    BASE_URL = 'http://ida.localhost:8000' if IS_DEV else 'https://documentaryarchaeology.net'
+    BASE_URL = 'http://dalme.localhost:8000'
+    # should be: (after we figure out ida domain)
+    # BASE_URL = 'http://ida.localhost:8000' if IS_DEV else 'https://documentaryarchaeology.net'
+
+    API_URL = f'{BASE_URL}/api'
     DAM_URL = 'https://dam.dalme.org'
     URL_PROTOCOL = 'http://' if IS_DEV else 'https://'
     URL_PORT = ':8000' if IS_DEV else ''
 
     # list of settings values to make available in templates
-    INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'DAM_URL', 'PUBLIC_URL', 'WAGTAILADMIN_BASE_URL']
+    INCLUDE_IN_TEMPLATETAG = ['BASE_URL', 'API_URL', 'DAM_URL', 'PUBLIC_URL', 'WAGTAILADMIN_BASE_URL']
 
     @pristinemethod
     def TENANTS(self):  # noqa: N802
