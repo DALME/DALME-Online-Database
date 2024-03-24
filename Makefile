@@ -38,6 +38,21 @@ sync: web.sync ui.sync docs.sync infra.hooks.update
 test: web.test # ui.test
 .PHONY: test
 
+bootstrap:
+ifndef dump
+	$(error No local dump specified to restore. \
+		Usage: make bootstrap dump='dalme-20231025-T1698276955.dump')
+else
+	make db.migrate
+	make web.manage args='ensure_tenants'
+	make db.load dump='$(dump)'
+	make web.migrate_data
+	make web.manage args='ensure_oauth'
+	make web.manage args='tenant_command update_index --schema=dalme'
+	make web.collectstatic
+endif
+.PHONY: bootstrap
+
 help:
 	@echo "usage: make [option]"
 	@echo "Makefile for running development tasks. Requires gmake."
