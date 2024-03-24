@@ -1,4 +1,4 @@
-{% extends "public/layouts/__left_side_column.html" %}
+{% extends "public/layouts/left_side_column.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
@@ -16,29 +16,29 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "public/includes/_flat_header.html" %}
+  {% include "public/includes/flat_header.html" %}
 {% endblock %}
 
 {% block left_side_column %}
   {% if page.get_parent.title == 'Collections' %}
-    {% include "public/includes/_collections_filter.html" %}
+    {% include "public/includes/collections_filter.html" %}
   {% else %}
-    {% include "public/includes/_flat_nav.html" %}
+    {% include "public/includes/flatnav.html" %}
   {% endif %}
   {% if page.citable %}
     <div id="cite-container" class="mt-5" v-cloak>
-      {% include "public/includes/_cite_menu.html" %}
-      {% include "public/includes/_cite_popup.html" %}
+      {% include "public/includes/cite_menu.html" %}
+      {% include "public/includes/cite_popup.html" %}
     </div>
   {% endif %}
-  {% include "public/includes/_features_nav.html" %}
+  {% include "public/includes/featuresnav.html" %}
 {% endblock %}
 
 {% block main_column %}
   <div class="content">
     {{ page.body }}
     {% if page.show_contact_form %}
-      {% include "public/includes/_contact_form.html" %}
+      {% include "public/includes/contact_form.html" %}
     {% endif %}
   </div>
 {% endblock %}
@@ -46,7 +46,7 @@
 {% block js_foot %}
   {{ block.super }}
   {% if page.title == 'Open Access' %}
-    {% include "public/includes/_repo_badges.html" %}
+    {% include "public/includes/repo_badges.html" %}
   {% endif %}
   <script>
     $(document).ready(function() {

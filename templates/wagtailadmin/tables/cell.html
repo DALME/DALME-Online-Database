@@ -1,0 +1,9 @@
+<td {% if column.classname %}class="{{ column.classname }}"{% endif %}>
+    {% if value is not None %}
+        {% if "as_html" in column.name %}
+            {{ value|safe }}
+        {% else %}
+            {{ value }}
+        {% endif %}
+    {% endif %}
+</td>

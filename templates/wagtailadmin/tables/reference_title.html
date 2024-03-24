@@ -1,0 +1,20 @@
+{% load wagtailadmin_tags %}
+
+<td class="{% if column.classname %}{{ column.classname }} {% endif %}title {{ column.name }}">
+    <div class="{% if 'as_html' in column.name %}flex-grow{% endif %} title-wrapper duck">
+        {% fragment as title %}
+            {{value}} {{title}}
+        {% endfragment %}
+    </div>
+    {% block title %}
+        <a id="{{ link_id }}" {% include "wagtailadmin/shared/attrs.html" with attrs=link_attrs %}></a>
+        <script>window.format_reference('{{ link_id }}', {{ value|safe }});</script>
+    {% endblock %}
+    {% if buttons %}
+        <ul class="actions">
+            {% block buttons %}
+                {% include "wagtailadmin/shared/buttons.html" %}
+            {% endblock %}
+        </ul>
+    {% endif %}
+</td>

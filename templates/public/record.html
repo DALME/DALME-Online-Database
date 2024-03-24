@@ -1,4 +1,4 @@
-{% extends "public/layouts/__single_column.html" %}
+{% extends "public/layouts/single_column.html" %}
 {% load get_citation_data static %}
 
 {% block title %}{{ block.super }} &ndash; {{ title }}{% endblock %}
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block header_extra %}
-  {% include "public/includes/_breadcrumbs.html" %}
+  {% include "public/includes/breadcrumbs.html" %}
 {% endblock %}
 
 {% block main_column %}
@@ -126,7 +126,7 @@
             triggers="manual">
             Citation panel.
           </b-popover>
-          {% include "public/includes/_cite_popup.html" %}
+          {% include "public/includes/cite_popup.html" %}
         </div>
         <li
           id="help_toggle"
@@ -241,7 +241,7 @@
   <div class="folios u-flex viewer" :class="viewerMode">
     <section class="folio">
       <div class="record-info" v-if="showInfoPanel" v-on-clickaway="toggleInfoPanel">
-        {% include "public/includes/_record_info_panel.html" %}
+        {% include "public/includes/record_info_panel.html" %}
       </div>
       <div id="diva_viewer">
         <beat-loader v-show="loading && transcriptionId" color="#aaa"></beat-loader>
