@@ -312,10 +312,6 @@ class Base(Configuration):
     WAGTAILADMIN_BASE_URL = 'cms/'
     WAGTAILIMAGES_IMAGE_MODEL = 'public.BaseImage'
 
-    # Zotero
-    ZOTERO_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
-    ZOTERO_LIBRARY_ID = os.environ.get('ZOTERO_LIBRARY_ID', '')
-
     # reference urls
     BASE_URL = 'http://ida.localhost:8000' if IS_DEV else 'https://documentaryarchaeology.net'
     DAM_URL = 'https://dam.dalme.org'

@@ -28,7 +28,7 @@ from .options_list import OptionsList, OptionsValue
 from .page import Page
 from .permission import Permission
 from .place import Place
-from .project import Project
+from .project import Project, ZoteroCollection
 from .public_register import PublicRegister
 from .publication import Publication
 from .record import PageNode, Record, RecordGroup
@@ -130,4 +130,5 @@ __all__ = [
     'Wordform',
     'WorkLog',
     'Workflow',
+    'ZoteroCollection',
 ]
