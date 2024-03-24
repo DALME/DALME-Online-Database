@@ -1,12 +1,13 @@
 """Migrate public CMS data."""
 
+import json
+
 from django_tenants.utils import schema_context
 
 from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
 from django.db import connection, transaction
 
-from ida.models import Profile, User
+from ida.models import Profile
 
 from .base import BaseStage
 
@@ -23,9 +24,10 @@ class Stage(BaseStage):
     def apply(self):
         """Execute the stage."""
         self.clone_schema()
-        self.migrate_schema()
+        self.move_django_site()
         self.drop_cloned_schema()
-        self.fix_contentypes()
+        self.migrate_wagtail_tables()
+        self.migrate_public_tables()
         self.transfer_avatars()
         self.transfer_snippets()
         self.transfer_gradients()
@@ -39,41 +41,13 @@ class Stage(BaseStage):
             cursor.execute("SELECT clone_schema(%s, %s, 'DATA');", [SOURCE_SCHEMA, CLONED_SCHEMA])
 
     @transaction.atomic
-    def migrate_schema(self):
-        """Migrate existing CMS tables to the DALME schema."""
-        move_cms = """
-            DO $$
-              DECLARE
-              tb text;
-            BEGIN
-              FOR tb IN
-                SELECT table_name
-                FROM information_schema.tables
-                WHERE table_schema = 'cloned'
-                AND table_name IN
-                (SELECT table_name FROM information_schema.tables WHERE table_schema = 'dalme')
-                AND table_name <> 'django_admin_log'
-                AND table_name <> 'django_content_types'
-                AND table_name <> 'django_migrations'
-                AND table_name <> 'django_session'
-                AND table_name <> 'public_recordbrowser'
-                AND table_name <> 'public_recordviewer'
-                AND table_name <> 'public_footer'
-                AND table_name <> 'public_searchpage'
-                AND table_name <> 'public_explorepage'
-                -- Note, we DO want to move 'django_site' as that's used by Wagtail.
-              LOOP
-                -- Remove any existing data from the DALME schema per table.
-                EXECUTE format('DROP TABLE dalme.%I CASCADE;', tb);
-
-                -- Move the table from the cloned schema to the DALME schema.
-                EXECUTE format('ALTER TABLE cloned.%I SET SCHEMA dalme;', tb);
-              END LOOP;
-            END $$;
-        """
+    def move_django_site(self):
+        """Migrate django.site table to the DALME schema (it's used by Wagtail)."""
+        # TODO: this table is not created by regular migrations, hence it's missing in the
+        # global pharmacopeias schema. Is it really necessary for Wagtail?
         with connection.cursor() as cursor:
-            self.logger.info('Migrating CMS data')
-            cursor.execute(move_cms)
+            self.logger.info('Moving django_site table')
+            cursor.execute('ALTER TABLE cloned.django_site SET SCHEMA dalme;')
 
     @transaction.atomic
     def drop_cloned_schema(self):
@@ -83,64 +57,145 @@ class Stage(BaseStage):
             cursor.execute('DROP SCHEMA cloned CASCADE')
 
     @transaction.atomic
-    def fix_contentypes(self):
-        """Replace references to contentypes with new values."""
-        with schema_context('dalme'):
-            self.logger.info('Replacing stale content type references')
-            from wagtail.models import Page, PageLogEntry, Revision, Task, TaskState, WorkflowState
+    def migrate_wagtail_tables(self):  # noqa: C901
+        """Migrate existing CMS tables to the DALME schema (BUT NOT INDEXES)."""
+        app_labels = [
+            'taggit',
+            'wagtailadmin',
+            'wagtailcore',
+            'wagtaildocs',
+            'wagtailembeds',
+            'wagtailforms',
+            'wagtailimages',
+            'wagtailredirects',
+            'wagtailusers',
+        ]
+        reset = [
+            'wagtailcore_collection',
+            'wagtailcore_groupapprovaltask',
+            'wagtailcore_groupapprovaltask_groups',
+            'wagtailcore_groupcollectionpermission',
+            'wagtailcore_grouppagepermission',
+            'wagtailcore_locale',
+            'wagtailcore_page',
+            'wagtailcore_site',
+            'wagtailcore_task',
+            'wagtailcore_workflow',
+            'wagtailcore_workflowpage',
+            'wagtailcore_workflowtask',
+        ]
+        no_bulk = ['wagtailcore_groupapprovaltask']
 
-            page_type = ContentType.objects.get(app_label='wagtailcore', model='page')
+        def get_json_fields(model):
+            json_fields = []
+            for field in model._meta.get_fields():  # noqa: SLF001
+                try:
+                    if field.get_internal_type() == 'JSONField':
+                        json_fields.append(field.name)
+                except AttributeError:  # it's a GenericForeignKey
+                    continue
+            return json_fields
 
-            # fix page revisions
-            self.logger.info('Processing page revisions')
-            for rev in Revision.objects.all():
-                new_ct = self.map_content_type(rev.content_type_id, id_only=True)
-                rev.content_type_id = new_ct
-                rev.base_content_type_id = page_type
-                rev.content['content_type'] = new_ct
-                rev.save(update_fields=['content_type_id', 'base_content_type_id', 'content'])
+        # delete existing records
+        with connection.cursor() as cursor:
+            self.logger.info('Deleting existing records in dalme schema')
+            for table in reset:
+                cursor.execute(f'TRUNCATE dalme.{table} RESTART IDENTITY CASCADE;')
 
-            # fix pages
-            self.logger.info('Processing pages')
-            for page in Page.objects.all():
-                new_ct = self.map_content_type(page.content_type_id, id_only=True)
-                page.content_type_id = new_ct
-                page.save(update_fields=['content_type_id'])
+        for label in app_labels:
+            self.logger.info('Processing "%s" models', label)
+            app_config = apps.get_app_config(label)
+            if app_config.models_module is not None:
+                for model in app_config.get_models():
+                    model_name = model.__name__.lower()
+                    qualified_name = f'{label}_{model_name}'
+                    self.logger.info('Copying "%s"', qualified_name)
+                    use_bulk = qualified_name not in no_bulk
+                    json_fields = get_json_fields(model)
 
-            # fix page log entries
-            self.logger.info('Processing page logs')
-            for entry in PageLogEntry.objects.all():
-                # there are constraints for page_id and user_id, so that if either has been deleted
-                # save() will fail validation, so we need to check before trying to update
-                if Page.objects.filter(pk=entry.page_id).exists() and User.objects.filter(pk=entry.user_id).exists():
-                    new_ct = self.map_content_type(entry.content_type_id, id_only=True)
-                    entry.content_type_id = new_ct
-                    entry.save(update_fields=['content_type_id'])
-                else:
-                    entry.delete()
+                    with connection.cursor() as cursor:
+                        cursor.execute(f'SELECT * FROM restore.{qualified_name};')
+                        rows = self.map_rows(cursor)
 
-            # fix tasks
-            self.logger.info('Processing tasks')
-            for task in Task.objects.all():
-                new_ct = self.map_content_type(task.content_type_id, id_only=True)
-                task.content_type_id = new_ct
-                task.save(update_fields=['content_type_id'])
+                    with schema_context('dalme'):
+                        target_model = apps.get_model(app_label=label, model_name=model_name)
+                        objs = []
+                        for row in rows:
+                            for field_name in ['content_type_id', 'base_content_type_id']:
+                                if row.get(field_name):
+                                    new_ct = self.map_content_type(row[field_name], id_only=True)
+                                    row[field_name] = new_ct
 
-            # fix task states
-            self.logger.info('Processing task states')
-            for ts in TaskState.objects.all():
-                new_ct = self.map_content_type(ts.content_type_id, id_only=True)
-                ts.content_type_id = new_ct
-                ts.save(update_fields=['content_type_id'])
+                                    if model_name == 'revision' and field_name == 'content_type_id':
+                                        content = json.loads(row['content'])
+                                        content['content_type'] = new_ct
+                                        row['content'] = json.dumps(content)
 
-            # fix workflow states
-            self.logger.info('Processing workflow states')
-            for ws in WorkflowState.objects.all():
-                new_ct = self.map_content_type(ws.content_type_id, id_only=True)
-                new_base_ct = self.map_content_type(ws.base_content_type_id, id_only=True)
-                ws.content_type_id = new_ct
-                ws.base_content_type_id = new_base_ct
-                ws.save(update_fields=['content_type_id', 'base_content_type_id'])
+                            if row.get('permission_id'):
+                                row['permission_id'] = self.map_permissions(row['permission_id'])
+
+                            if json_fields:
+                                for field in json_fields:
+                                    row[field] = json.loads(row[field])
+                            if use_bulk:
+                                objs.append(target_model(**row))
+                            else:
+                                target_model.objects.create(**row)
+
+                        if use_bulk:
+                            target_model.objects.bulk_create(objs)
+
+    @transaction.atomic
+    def migrate_public_tables(self):
+        """Migrate existing Public tables to the DALME schema (BUT NOT INDEXES)."""
+        # we need to do these tables differently, i.e. by inserting data directly in SQL
+        # becasue the constraints on foreign keys won't allow use of the ORM, for example
+        # because all page types are subclassed from the wagtail Page model which we already
+        # populated
+        models = [
+            'baseimage',
+            'customrendition',
+            'home',
+            'section',
+            'flat',
+            'features',
+            'bibliography',
+            'collections',
+            'collection',
+            'corpus',
+            'corpus_collections',
+            'essay',
+            'featuredinventory',
+            'featuredobject',
+        ]
+
+        def get_value(value, field_type):
+            if value is None:
+                return 'null'
+            if field_type == 'JSONField':
+                return f'$${value}$$::jsonb'
+            if field_type in ['AutoField', 'BigAutoField', 'BigIntegerField', 'IntegerField']:
+                return value if isinstance(value, int) else int(value)
+            return f'$${value}$$'
+
+        self.logger.info('Processing "public" models')
+        for model_name in models:
+            model = apps.get_model(app_label='public', model_name=model_name)
+            with connection.cursor() as cursor:
+                self.logger.info('Copying "%s"', model_name)
+                cursor.execute(f'SELECT * FROM restore.public_{model_name};')
+                rows = self.map_rows(cursor)
+
+                for row in rows:
+                    columns = []
+                    values = ''
+                    for idx, (field, value) in enumerate(row.items()):
+                        columns.append(f'{field}')
+                        values += f'{get_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
+                        if idx < len(row) - 1:
+                            values += ', '
+                    sql = f"INSERT INTO dalme.public_{model_name} ({', '.join(columns)}) VALUES ({values});"
+                    cursor.execute(sql)
 
     @transaction.atomic
     def transfer_avatars(self):

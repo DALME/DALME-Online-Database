@@ -18,6 +18,7 @@ from .stages import (
     AuthStage,
     CollectionsStage,
     FinalizeStage,
+    PostFixes,
     PublicStage,
     RankOneStage,
     RankTwoStage,
@@ -38,6 +39,7 @@ STAGES = [
     CollectionsStage,
     FinalizeStage,
     PublicStage,
+    PostFixes,
 ]
 
 

@@ -5,6 +5,7 @@ from .attributes import Stage as AttributesStage
 from .auth import Stage as AuthStage
 from .collections import Stage as CollectionsStage
 from .finalize import Stage as FinalizeStage
+from .post_fixes import Stage as PostFixes
 from .public import Stage as PublicStage
 from .rank_0 import Stage as RankZeroStage
 from .rank_1 import Stage as RankOneStage
@@ -17,6 +18,7 @@ __all__ = [
     'AuthStage',
     'CollectionsStage',
     'FinalizeStage',
+    'PostFixes',
     'PublicStage',
     'RankOneStage',
     'RankTwoStage',

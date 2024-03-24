@@ -5,6 +5,7 @@ import functools
 
 import structlog
 
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
 
@@ -45,6 +46,7 @@ ALTERED_MODEL_MAP = {
     ('core', 'attachment'): 'ida.attachment',
     ('core', 'savedsearch'): 'ida.savedsearch',
     ('core', 'tag'): 'ida.tag',
+    ('public', 'dalmeimage'): 'public.baseimage',
 }
 
 SOURCES_MODEL_MAP = {
@@ -93,7 +95,7 @@ class BaseStage(abc.ABC):
                 if (ct['app_label'], ct['model']) in ALTERED_MODEL_MAP:
                     # Let's just update these on the fly to the new values and
                     # it reduces the overall complexity of the transformation.
-                    app_label, model = ALTERED_MODEL_MAP[('core', ct['model'])].split('.')
+                    app_label, model = ALTERED_MODEL_MAP[(ct['app_label'], ct['model'])].split('.')
                 else:
                     app_label, model = (ct['app_label'], ct['model'])
 
@@ -102,6 +104,14 @@ class BaseStage(abc.ABC):
                 index[ct_id] = (app_label, model)
 
             return index
+
+    @functools.cached_property
+    def old_permissions_index(self):
+        """Index the permissions from the data being migrated."""
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT * FROM restore.auth_permission')
+            rows = self.map_rows(cursor)
+        return {row['id']: (row['codename'], row['content_type_id']) for row in rows}
 
     @functools.cached_property
     def new_content_types_index(self):
@@ -132,3 +142,9 @@ class BaseStage(abc.ABC):
         if id_only:
             return self.new_content_types_index[key]['id']
         return self.new_content_types_index[key]
+
+    def map_permissions(self, old_id):
+        auth_permission = apps.get_model(app_label='auth', model_name='permission')
+        codename, old_ctype = self.old_permissions_index[old_id]
+        target_ctype = self.map_content_type(old_ctype, id_only=True)
+        return auth_permission.objects.get(codename=codename, content_type_id=target_ctype).id
