@@ -32,6 +32,9 @@ table.listing tbody td.title {
   height: 40px;
   align-items: center;
 }
+table.listing tbody td.title.gradient_as_html {
+  padding-inline-start: 0.5rem !important;
+}
 table.listing tbody td.title ul.actions {
   position: absolute;
   right: 0;
@@ -273,8 +276,8 @@ input[type=checkbox] {
 }
 /* bibliography chooser */
 
-.bibliography-chooser .selectize-input,
-.bibliography-chooser .selectize-input input,
+.reference-chooser .selectize-input,
+.reference-chooser .selectize-input input,
 .biblio-modal-box .selectize-input,
 .biblio-modal-box .selectize-input input {
   line-height: 30px;
@@ -284,25 +287,25 @@ input[type=checkbox] {
   box-shadow: none;
   background-color: #fafafa;
 }
-.bibliography-chooser .selectize-input,
+.reference-chooser .selectize-input,
 .biblio-modal-box .selectize-input {
   border-radius: 6px;
   padding: 8px 8px 8px 18px;
 }
-.bibliography-chooser .selectize-control.single .selectize-input,
-.bibliography-chooser .selectize-dropdown.single,
+.reference-chooser .selectize-control.single .selectize-input,
+.reference-chooser .selectize-dropdown.single,
 .biblio-modal-box .selectize-control.single .selectize-input,
 .biblio-modal-box .selectize-dropdown.single {
   border-color: #e6e6e6;
 }
-.bibliography-chooser .selectize-dropdown-content,
+.reference-chooser .selectize-dropdown-content,
 .biblio-modal-box .selectize-dropdown-content {
   padding: 1rem;
   font-size: .8rem;
   font-weight: 500;
   line-height: 18px;
 }
-.bibliography-chooser .csl-bib-body,
+.reference-chooser .csl-bib-body,
 .biblio-modal-box .csl-bib-body {
   margin-bottom: .5rem;
 }
@@ -356,4 +359,40 @@ input[type=checkbox] {
   background-color: rgb(0, 103, 106);
   color: #fff;
   border-color: transparent;
+}
+
+/* temp fix for bug in admin menus */
+.tippy-box {
+  white-space: nowrap !important;
+}
+
+.gradient-cell {
+  border: 1px solid var(--w-color-border-field-default);
+  border-radius: 0.1875rem;
+  background: var(--w-color-surface-header);
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.gradient-cell > div:first-of-type {
+  height: 15px;
+  min-width: 200px;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+
+
+.chooser-gradient-preview {
+  align-items: center;
+  background-color: var(--w-color-border-button-small-outline-default);
+  border-radius: 0.1875rem;
+  color: var(--w-color-text-button);
+  display: grid;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.chooser-gradient-preview > .gradient-cell {
+  margin-right: 0 !important;
 }
