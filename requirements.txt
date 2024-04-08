@@ -35,6 +35,8 @@ requests==2.31.0
 requests-aws4auth==1.2.3
 stringcase==1.2.0
 urllib3==1.26.18
+wagtail==6.0.2
+wagtailcodeblock==1.29.0.2
 wagtail-font-awesome-svg==1.0.1
 wagtail-modelchooser==4.0.1
 Wand===0.6.13
