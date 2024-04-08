@@ -1,8 +1,18 @@
 """Form for footnote chooser."""
 
-from django import forms
+from wagtail.admin.forms.models import WagtailAdminModelForm
+
+from django.forms import HiddenInput
+
+from .models import Footnote
 
 
-class FootnoteChooserForm(forms.Form):
-    note_id = forms.CharField(widget=forms.HiddenInput())
-    text = forms.CharField(widget=forms.Textarea)
+class FootnoteChooserForm(WagtailAdminModelForm):
+    class Meta:
+        model = Footnote
+        fields = ['id', 'page', 'text']
+        widgets = {
+            'id': HiddenInput(),
+            'page': HiddenInput(),
+        }
+        labels = {'text': 'Footnote text'}

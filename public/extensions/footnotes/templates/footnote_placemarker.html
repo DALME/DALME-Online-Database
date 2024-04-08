@@ -1,0 +1,26 @@
+<div id="footnote-container">
+    <div class="footnote_list"></div>
+</div>
+<script>
+    const fn_sources = document.querySelectorAll(".footnote_callout");
+    if (fn_sources.length) {
+      const footnotes = document.createElement("ol");
+      fn_sources.forEach((fn_source, index) => {
+        fn_source.innerText = index + 1;
+        const callback = document.createElement("a");
+        callback.href = `#${fn_source.id}`;
+        callback.classList.add('footnote_back_link');
+        callback.title = `Jump back to footnote ${index + 1} in the text.`;
+        callback.innerText = "↩︎";
+        const content = document.createElement("p");
+        content.innerText = "Footnote test text."
+        const footnote = document.createElement("li");
+        footnote.id = `fn_${fn_source.id}`;
+        footnote.appendChild(callback);
+        footnote.appendChild(content);
+        footnotes.appendChild(footnote);
+      });
+      const container = document.getElementById("footnote-container").querySelector(".footnote_list");
+      container.appendChild(footnotes);
+    }
+</script>

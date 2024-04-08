@@ -1,0 +1,58 @@
+/* footnotes front end css */
+#footnote-container {
+    text-align: left;
+}
+.footnote_list {
+    font-size: .85em;
+}
+.footnote_list hr {
+    margin-left: 0;
+    margin-bottom: 2em;
+    margin-top: 4em;
+    width: 15em;
+    border-style: solid;
+    border-width: 1px 0 0 0;
+}
+.footnote_list ol {
+    display: block;
+    padding-left: 1.25em;
+    margin: 0 0 2em 1em;
+    list-style-type: decimal;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+.footnote_list li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+    list-style-type: decimal;
+    padding-left: 5px;
+}
+.footnote_list p {
+    margin: 0 0 1.6em 0;
+    padding: 0 !important;
+    font-size: inherit;
+}
+.content p > a.footnote_callout {
+    font-weight: 700;
+    color: #989898;
+}
+.content p > a.footnote_back_link {
+    border: 0;
+    padding: 3px 4px 2px 4px;
+    vertical-align: -.2em;
+    font-size: 1.2em;
+    line-height: 0px;
+    color: #989898;
+}
+.content p > a.footnote_back_link:hover,
+.content p > a.footnote_callout:hover {
+    color: #084094;
+    text-decoration: none;
+    border-bottom: none;
+}
+.footnote_list blockquote {
+    margin: 1rem 1rem 1rem 1rem;
+    font-family: "PT Serif", "Times New Roman", serif;
+}

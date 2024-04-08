@@ -1,0 +1,32 @@
+{% load i18n l10n wagtailadmin_tags %}
+{% include "wagtailadmin/shared/header.html" with title="Enter footnote" icon="list-ol" %}
+
+<div class="base-modal footnote-modal {{ page.id }}">
+  <div class="base-modal-box">
+    <form action="{% url 'footnote_chooser' %}" method="post" novalidate>
+      {% csrf_token %}
+      {% if panel %}
+          {{ panel.render_form_content }}
+      {% else %}
+          {% block hidden_fields %}
+              {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+          {% endblock %}
+
+          <ul class="fields">
+              {% block visible_fields %}
+                  {% for field in form.visible_fields %}
+                      <li>{% formattedfield field %}</li>
+                  {% endfor %}
+              {% endblock %}
+          </ul>
+      {% endif %}
+
+      {% block actions %}
+        <div class="base-modal-buttons">
+          <button class="button footnote-modal-insert" type="submit">Save</button>
+          <button class="button footnote-modal-cancel" type="button">Cancel</button>
+        </div>
+      {% endblock %}
+    </form>
+  </div>
+</div>

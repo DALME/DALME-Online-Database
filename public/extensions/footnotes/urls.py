@@ -2,8 +2,8 @@
 
 from django.urls import path
 
-from .views import footnote
+from .views import FootnoteChooser
 
 urlpatterns = [
-    path('footnote/', footnote, name='footnote_chooser'),
+    path('footnote/', FootnoteChooser.as_view(), name='footnote_chooser'),
 ]
