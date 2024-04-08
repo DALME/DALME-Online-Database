@@ -5,5 +5,5 @@ from wagtail import blocks
 
 class CarouselBlock(blocks.ListBlock):
     class Meta:
-        icon = 'cogs'
+        icon = 'photo-film'
         template = 'public/blocks/carousel.html'

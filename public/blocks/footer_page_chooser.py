@@ -8,5 +8,5 @@ class FooterPageChooserBlock(blocks.StructBlock):
     page = blocks.PageChooserBlock()
 
     class Meta:
-        icon = 'doc-full'
+        icon = 'link'
         template = 'public/blocks/footer_page.html'

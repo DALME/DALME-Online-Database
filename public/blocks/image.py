@@ -23,7 +23,7 @@ def validate_dimensions(value):
 
 class MainImageBlock(ImageChooserBlock):
     class Meta:
-        icon = 'image'
+        icon = 'panorama'
         template = 'public/blocks/main_image.html'
 
 
@@ -63,5 +63,5 @@ class InlineImageBlock(blocks.StructBlock):
     )
 
     class Meta:
-        icon = 'image'
+        icon = 'images'
         template = 'public/blocks/inline_image.html'

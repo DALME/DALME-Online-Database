@@ -12,5 +12,5 @@ class PersonBlock(blocks.StructBlock):
     photo = ImageChooserBlock(required=False)
 
     class Meta:
-        icon = 'user'
+        icon = 'person'
         template = 'public/blocks/person.html'

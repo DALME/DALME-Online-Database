@@ -9,5 +9,5 @@ class SocialBlock(blocks.StructBlock):
     css_class = blocks.CharBlock(required=False)
 
     class Meta:
-        icon = 'group'
+        icon = 'square-share-nodes'
         template = 'public/blocks/social.html'

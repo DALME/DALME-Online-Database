@@ -9,5 +9,5 @@ class SponsorBlock(blocks.StructBlock):
     url = blocks.URLBlock()
 
     class Meta:
-        icon = 'user'
+        icon = 'hand-holding-heart'
         template = 'public/blocks/sponsor.html'

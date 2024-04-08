@@ -12,5 +12,5 @@ class AnnouncementBannerBlock(blocks.StructBlock):
     end_date = blocks.DateBlock()
 
     class Meta:
-        icon = 'media'
+        icon = 'bullhorn'
         template = 'public/blocks/announcement_banner.html'
