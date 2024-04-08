@@ -20,7 +20,7 @@
 
 {% block main_column %}
   <div class="content">
-    {{ page.body }}
+    {% include_block page.body %}
     {% if corpora %}
       <div id="corpora" class="corpora-container u-flex">
         {% for corpus, collections in corpora %}

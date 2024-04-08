@@ -33,10 +33,7 @@ class BaseAccessPolicy(AccessPolicy):
 
                 action_string = f" ({action.replace('bulk_', '')})" if action is not None else ''
 
-                self.message = 'You do not have permission to perform the requested action{} on {}.'.format(
-                    action_string,
-                    self.fail_target_string,
-                )
+                self.message = f'You do not have permission to perform the requested action {action_string} on {self.fail_target_string}.'
         return result
 
     def _get_invoked_action(self, view):

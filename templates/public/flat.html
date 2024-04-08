@@ -36,7 +36,7 @@
 
 {% block main_column %}
   <div class="content">
-    {{ page.body }}
+    {% include_block page.body %}
     {% if page.show_contact_form %}
       {% include "public/includes/contact_form.html" %}
     {% endif %}

@@ -25,7 +25,7 @@
     <div class="u-flex">
       <div class="statement home-parchment" style="background-image: url('{% static "images/home_bg.jpg"%}')">
         <img src="{% static 'images/dalme_logo.svg' %}" alt="DALME logo">
-        {{ page.body }}
+        {% include_block page.body %}
       </div>
       <div class="home-register" style="background-image: url('{% static "images/home_reg.jpg"%}')"></div>
     </div>
