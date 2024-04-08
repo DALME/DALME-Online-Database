@@ -3,6 +3,7 @@
 from django import forms
 
 
-class ReferenceLinkChooserForm(forms.Form):
-    id = forms.CharField(required=True, label='Entry')
-    link_text = forms.CharField(required=False)
+class ReferenceChooserForm(forms.Form):
+    id = forms.CharField(required=True, label='Reference', widget=forms.Select())
+    biblio = forms.ChoiceField(required=True, label='Show in')
+    reference = forms.CharField(required=True, widget=forms.HiddenInput())

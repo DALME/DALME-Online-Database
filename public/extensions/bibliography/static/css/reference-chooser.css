@@ -1,0 +1,86 @@
+/* bibliography chooser */
+
+
+.reference-modal .base-modal-box {
+  min-width: 500px;
+}
+
+.reference-modal .csl-bib-body {
+  margin-bottom: .5rem;
+}
+
+.reference-modal .select2-container .select2-selection--single {
+  height: 44px;
+}
+
+.reference-modal .select2-container--default .select2-selection--single {
+  border: 1px solid var(--w-color-border-field-default);
+  background-color: var(--w-color-surface-field);
+  color: var(--w-color-text-context);
+  font-size: 1.1875rem;
+  font-weight: 400;
+  line-height: 2.2;
+  border-radius: .3125rem;
+  max-width: 100%;
+  min-height: 2.625rem;
+  padding: 0 1.25rem;
+  padding-inline-end: 2.625rem;
+}
+
+.reference-modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 2.2;
+}
+.reference-modal .select2-container .select2-selection--single .select2-selection__rendered {
+  padding: 0;
+}
+
+.reference-modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 42px;
+  width: 42px;
+}
+
+.reference-modal .select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border: none;
+  left: unset;
+  margin: 0;
+  top: unset;
+  background-image: linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%), linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%);
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position-x: calc(100% - 1.5rem), calc(100% - 1.125rem);
+  background-position-y: 1.125rem, 1.125rem;
+  background-repeat: no-repeat;
+  background-size: .375rem .375rem, .375rem .375rem;
+}
+
+.reference-modal .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+  border: none;
+  background-image: linear-gradient(-45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%), linear-gradient(45deg, #0000 50%, var(--w-color-text-label) 33%, var(--w-color-text-label) 66%, #0000 66%);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: #797777;
+}
+
+.select2-results__option {
+  padding: 10px 20px;
+  border-bottom: 1px dotted #c9c8c8;
+}
+
+.select2-results__option > .csl-bib-body {
+  font-size: 14px;
+}
+
+.select2-search--dropdown .select2-search__field {
+  padding: 6px 18px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+  min-height: 0;
+  line-height: 1.5;
+}
+.tooltip-entity-reference-icon {
+  height: .8em !important;
+}

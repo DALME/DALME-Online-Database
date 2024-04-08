@@ -1,9 +1,9 @@
 """URLs for bibliography extension."""
 
-# from django.urls import path
+from django.urls import path
 
-# from .views import reference
+from .views import ReferenceChooser
 
-# urlpatterns = [
-#     path('choose-reference/', reference, name='wagtailadmin_choose_reference'),
-# ]
+urlpatterns = [
+    path('reference/', ReferenceChooser.as_view(), name='reference_chooser'),
+]
