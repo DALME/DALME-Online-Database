@@ -1,0 +1,32 @@
+{% load i18n l10n wagtailadmin_tags %}
+{% include "wagtailadmin/shared/header.html" with title="Choose a saved search" icon="magnifying-glass-location" %}
+
+<div class="base-modal saved-search-modal">
+  <div class="base-modal-box">
+    <form action="{% url 'saved_search_chooser' %}" method="post" novalidate>
+      {% csrf_token %}
+      {% if panel %}
+          {{ panel.render_form_content }}
+      {% else %}
+          {% block hidden_fields %}
+              {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+          {% endblock %}
+
+          <ul class="fields">
+              {% block visible_fields %}
+                  {% for field in form.visible_fields %}
+                      <li>{% formattedfield field %}</li>
+                  {% endfor %}
+              {% endblock %}
+          </ul>
+      {% endif %}
+
+      {% block actions %}
+        <div class="base-modal-buttons">
+          <button class="button saved-search-modal-insert" type="submit">Insert</button>
+          <button class="button saved-search-modal-cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      {% endblock %}
+    </form>
+  </div>
+</div>

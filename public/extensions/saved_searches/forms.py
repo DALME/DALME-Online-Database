@@ -5,9 +5,9 @@ from django import forms
 from ida.models import SavedSearch
 
 
-class SavedSearchLinkChooserForm(forms.Form):
+class SavedSearchChooserForm(forms.Form):
     id = forms.ChoiceField(required=True, choices=[], label='Saved search')
-    link_text = forms.CharField(required=False)
+    name = forms.CharField(required=True, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         search_list = [(i.id, i.name) for i in SavedSearch.objects.all()]

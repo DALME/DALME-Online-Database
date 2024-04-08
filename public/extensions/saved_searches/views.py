@@ -1,49 +1,51 @@
-"""View for saved search modal."""
+"""View for saved search."""
 
 from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.admin.views import chooser
 
-from .forms import SavedSearchLinkChooserForm
+from django.views.generic.edit import BaseFormView
+
+from .forms import SavedSearchChooserForm
 
 
-def saved_search(request):
-    initial_data = {
-        'link_text': request.GET.get('link_text', ''),
-        'id': request.GET.get('id', ''),
-    }
+class SavedSearchChooser(BaseFormView):
+    template_name = 'saved_search_chooser_modal.html'
+    form_class = SavedSearchChooserForm
+    prefix = 'saved_search'
 
-    if request.method == 'POST':
-        form = SavedSearchLinkChooserForm(
-            request.POST,
-            initial=initial_data,
-            prefix='saved-search-chooser',
-        )
+    def post(self, _request):
+        return self.render_to_response(None)
 
+    def get_initial(self):
+        return {
+            'id': self.request.GET.get('id', ''),
+            'name': self.request.GET.get('name', ''),
+        }
+
+    def get_template(self, form):
+        return None if form.is_valid() else self.template_name
+
+    def get_template_vars(self, form):
+        return None if form.is_valid() else chooser.shared_context(self.request, {'form': form})
+
+    def get_json_data(self, form):
+        json_data = {'step': 'saved_search_chosen' if form.is_valid() else 'enter_saved_search'}
         if form.is_valid():
-            result = {
-                'id': form.cleaned_data['id'],
-                'parentId': 'saved_search',
-                'url': '/collections/search/' + form.cleaned_data['id'] + '/',
-                'title': form.cleaned_data['link_text'].strip() or form.cleaned_data['id'],
-                'prefer_this_title_as_link_text': ('link_text' in form.changed_data),
-            }
-            return render_modal_workflow(
-                request,
-                None,
-                None,
-                None,
-                json_data={'step': 'saved_search_chosen', 'result': result},
+            json_data.update(
+                {
+                    'result': {
+                        'id': form.cleaned_data['id'],
+                        'name': form.cleaned_data['name'],
+                    }
+                }
             )
-    else:
-        form = SavedSearchLinkChooserForm(
-            initial=initial_data,
-            prefix='saved-search-chooser',
-        )
+        return json_data
 
-    return render_modal_workflow(
-        request,
-        'wagtailadmin/chooser/saved_search_link.html',
-        None,
-        chooser.shared_context(request, {'form': form}),
-        json_data={'step': 'saved_search'},
-    )
+    def render_to_response(self, _context):
+        form = self.get_form()
+        return render_modal_workflow(
+            request=self.request,
+            html_template=self.get_template(form),
+            template_vars=self.get_template_vars(form),
+            json_data=self.get_json_data(form),
+        )

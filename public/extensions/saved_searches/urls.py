@@ -2,8 +2,8 @@
 
 from django.urls import path
 
-from .views import saved_search
+from .views import SavedSearchChooser
 
 urlpatterns = [
-    path('choose-saved-search/', saved_search, name='wagtailadmin_choose_saved_search'),
+    path('savedsearch/', SavedSearchChooser.as_view(), name='saved_search_chooser'),
 ]
