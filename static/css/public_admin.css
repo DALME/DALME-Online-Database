@@ -1,6 +1,104 @@
 .Draftail-Editor .DraftEditor-root {
   font-family: "PT Serif", "Times New Roman", serif !important;
 }
+
+.modal-content {
+  width: unset !important;
+  padding-bottom: 0;
+}
+
+.modal-dialog {
+  margin-right: auto !important;
+  margin-left: auto !important;
+  width: fit-content !important;
+  max-width: 80%;
+}
+
+.base-modal-box {
+  padding: 0 55px;
+  display: flex;
+  flex-direction: column;
+}
+
+.base-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.base-modal-buttons .button+.button {
+  margin-inline-start: 5px;
+}
+
+.modal-content {
+  box-shadow: 0px 0px 15px 0px #00000069;
+}
+
+#footnote-dialogue {
+  bottom: 0;
+  inset-inline-end: 0;
+  inset-inline-start: 0;
+  overflow: auto;
+  overflow-y: scroll;
+  position: fixed;
+  top: 0;
+  z-index: 500;
+}
+
+.footnote-modal-body {
+  overflow: hidden;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+/* code block extension */
+.code-block textarea {
+  font-size: 14px;
+}
+
+pre[class*=language-]:after, 
+pre[class*=language-]:before {
+  box-shadow: none !important;
+}
+
+/* Temporary fixes for bugs */
+.modal-body .w-header > .row {
+  padding-top: .625rem !important;
+}
+
+.modal-content .close.button {
+  height: 2rem !important;
+  width: 2rem !important;
+  top: .38rem !important;
+  align-items: center;
+  background-color: initial;
+  color: var(--w-color-text-button);
+  display: inline-flex;
+  inset-inline-end: .75rem;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+}
+
+.tippy-box {
+  white-space: nowrap !important;
+  max-width: unset !important;
+}
+
+.TooltipText {
+  margin-inline-end: 1.5rem;
+}
+
+.w-combobox,
+.w-combobox__optgroup {
+  width: unset !important;
+}
+
+
+/* OLDER DEFINITIONS */
+
 .p_date_scheduled {
   color: #ab803f;
   font-weight: 700;
@@ -274,125 +372,7 @@ input[type=checkbox] {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-/* bibliography chooser */
-
-.reference-chooser .selectize-input,
-.reference-chooser .selectize-input input,
-.biblio-modal-box .selectize-input,
-.biblio-modal-box .selectize-input input {
-  line-height: 30px;
-  font-size: 1.1em;
-  font-weight: 300;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  background-color: #fafafa;
-}
-.reference-chooser .selectize-input,
-.biblio-modal-box .selectize-input {
-  border-radius: 6px;
-  padding: 8px 8px 8px 18px;
-}
-.reference-chooser .selectize-control.single .selectize-input,
-.reference-chooser .selectize-dropdown.single,
-.biblio-modal-box .selectize-control.single .selectize-input,
-.biblio-modal-box .selectize-dropdown.single {
-  border-color: #e6e6e6;
-}
-.reference-chooser .selectize-dropdown-content,
-.biblio-modal-box .selectize-dropdown-content {
-  padding: 1rem;
-  font-size: .8rem;
-  font-weight: 500;
-  line-height: 18px;
-}
-.reference-chooser .csl-bib-body,
-.biblio-modal-box .csl-bib-body {
-  margin-bottom: .5rem;
-}
-
-/* Footnote editor biblio modal */
-
-.biblio-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 99;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
-}
-.biblio-modal-box {
-  background-color: #fefefe;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 500px;
-  display: flex;
-  flex-direction: column;
-}
-.biblio-modal-button-container {
-  align-self: flex-end;
-  margin-top: 10px;
-}
-.biblio-modal-button-container button {
-  font-size: .95em;
-  height: 3em;
-  border-radius: 3px;
-  font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
-  width: auto;
-  font-weight: 400;
-  vertical-align: middle;
-  display: inline-block;
-  background-color: rgb(0, 125, 126);
-  border: 1px solid rgb(0, 125, 126);
-  color: #fff;
-  text-decoration: none;
-  text-transform: uppercase;
-  white-space: nowrap;
-  position: relative;
-  overflow: hidden;
-  box-sizing: border-box;
-  -webkit-font-smoothing: auto;
-}
-.biblio-modal-button-container button:hover {
-  background-color: rgb(0, 103, 106);
-  color: #fff;
-  border-color: transparent;
-}
-
-/* temp fix for bug in admin menus */
-.tippy-box {
-  white-space: nowrap !important;
-}
-
-.gradient-cell {
-  border: 1px solid var(--w-color-border-field-default);
-  border-radius: 0.1875rem;
-  background: var(--w-color-surface-header);
-  margin-right: 10px;
-  padding: 5px;
-}
-
-.gradient-cell > div:first-of-type {
-  height: 15px;
-  min-width: 200px;
-}
-.flex-grow {
-  flex-grow: 1;
-}
 
 
-.chooser-gradient-preview {
-  align-items: center;
-  background-color: var(--w-color-border-button-small-outline-default);
-  border-radius: 0.1875rem;
-  color: var(--w-color-text-button);
-  display: grid;
-  flex-shrink: 0;
-  justify-content: center;
-}
 
-.chooser-gradient-preview > .gradient-cell {
-  margin-right: 0 !important;
-}
+
