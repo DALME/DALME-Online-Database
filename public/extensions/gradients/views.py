@@ -2,7 +2,7 @@
 
 from wagtail.admin.admin_url_finder import AdminURLFinder
 from wagtail.admin.panels import FieldPanel, FieldRowPanel
-from wagtail.admin.ui.tables import TitleColumn, UpdatedAtColumn
+from wagtail.admin.ui.tables import Column, TitleColumn, UpdatedAtColumn
 from wagtail.admin.views.generic.chooser import (
     ChooseView,
     ChosenResponseMixin,
@@ -18,9 +18,8 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic.base import View
 
-from public.extensions.colour_picker import ColourPickerWidget
-
 from .models import Gradient
+from .widgets import ColourPickerWidget
 
 
 class GradientChooseView(ChooseView):
@@ -36,7 +35,8 @@ class GradientChooseView(ChooseView):
                     )
                 ),
                 link_attrs={'data-chooser-modal-choice': True},
-            )
+            ),
+            Column('description', label='Description'),
         ]
 
 
@@ -59,7 +59,7 @@ class GradientChosenView(ChosenViewMixin, GradientChosenResponseMixin, View):
 class AdminGradientChooser(BaseChooser):
     model = Gradient
     chooser_modal_url_name = 'gradient_chooser:choose'
-    template_name = 'public/extensions/gradients/gradient_chooser.html'
+    template_name = 'gradient_chooser.html'
     js_constructor = 'GradientChooser'
 
     def get_value_data_from_instance(self, instance):
@@ -94,15 +94,16 @@ class AdminGradientChooser(BaseChooser):
             js=[
                 *base_media._js,  # noqa: SLF001
                 'wagtailadmin/js/chooser-modal.js',
-                'js/extensions/gradient-chooser-modal.js',
-            ]
+                'js/gradient-chooser-modal.js',
+            ],
+            css={'all': ['css/gradient-chooser.css']},
         )
 
 
 class GradientChooserViewSet(ChooserViewSet):
     model = Gradient
     name = 'gradient_chooser'
-    icon = 'draft'
+    icon = 'swatchbook'
     choose_one_text = 'Choose a gradient'
     base_widget_class = AdminGradientChooser
     choose_view_class = GradientChooseView
@@ -112,7 +113,7 @@ class GradientChooserViewSet(ChooserViewSet):
 class GradientViewSet(ModelViewSet):
     model = Gradient
     add_to_reference_index = False
-    icon = 'draft'
+    icon = 'swatchbook'
     menu_label = 'Gradients'
     menu_name = 'gradients'
     menu_order = 900
@@ -120,6 +121,9 @@ class GradientViewSet(ModelViewSet):
     list_display = ['id', 'gradient_as_html', 'description', UpdatedAtColumn()]
     columns = ['Id', 'Gradient', 'Description', 'Updated']
     chooser_viewset_class = GradientChooserViewSet
+    list_filter = ['description']
+    search_fields = ['description']
+    search_backend_name = False
 
     panels = [
         FieldRowPanel(

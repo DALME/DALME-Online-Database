@@ -1,0 +1,11 @@
+{% extends "wagtailadmin/widgets/chooser.html" %}
+{% load wagtailadmin_tags i18n %}
+
+{% block chosen_icon %}
+    <div class="chooser-gradient-preview" data-chooser-gradient role="presentation">
+        {% if gradient %}{{ gradient|safe }}{% endif %}
+    </div>
+{% endblock chosen_icon %}
+{% block chosen_state_view %}
+    <div class="chooser__title" data-chooser-title id="{{ title_id }}">{{ description }}</div>
+{% endblock %}
