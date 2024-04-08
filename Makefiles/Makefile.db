@@ -30,6 +30,16 @@ db.dump:
 		-f $(DUMPS)/$(PROJECT)-$$(date -u +"%Y%m%d-T%s").dump
 .PHONY: db.dump
 
+db.dump_sql:
+	docker compose exec \
+		$(PROJECT).db \
+		pg_dump \
+		-Fp -s \
+		--dbname $(PROJECT) \
+		--username $(PROJECT) \
+		-f $(DUMPS)/$(PROJECT)-$$(date -u +"%Y%m%d-T%s").dump
+.PHONY: db.dump
+
 db.load: db.create_restore_schema
 ifndef dump
 	$(error No local dump specified to restore. \
