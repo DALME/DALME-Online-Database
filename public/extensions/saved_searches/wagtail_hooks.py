@@ -1,9 +1,12 @@
 """Hooks for saved searches extension."""
 
+from wagtail import hooks
+
 from django.urls import reverse
 from django.utils.html import format_html
 
 
+@hooks.register('insert_editor_js')
 def add_savedsearch_js_to_editor():
     return (
         format_html(
