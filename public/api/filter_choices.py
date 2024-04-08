@@ -1,6 +1,7 @@
 """API endpoint for returning filter options."""
 
 from django.http import JsonResponse
+from django.urls import path
 from django.views import View
 
 from public.filters import locale_choices, map_record_types
@@ -9,6 +10,10 @@ from public.models import Collection, Corpus
 
 class FilterChoices(View):
     """API endpoint for returning filter options."""
+
+    @classmethod
+    def get_urlpatterns(cls):
+        return [path('', cls.as_view(), name='choices')]
 
     def corpus_choices(self):
         """Return options for `corpus`."""

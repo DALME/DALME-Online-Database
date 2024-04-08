@@ -1,8 +1,10 @@
-"""API endpoints for public resources."""
+"""Records API endpoint."""
 
-from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from wagtail.api.v2.views import BaseAPIViewSet
+
+from django.urls import path
 
 from ida.models import Record
 from ida.utils import Search, SearchContext
@@ -11,20 +13,30 @@ from public.pagination import PublicPagination
 from public.serializers import RecordSerializer
 
 
-class RecordList(ListAPIView):
-    """API endpoint for record lists."""
-
+class RecordsAPIViewSet(BaseAPIViewSet):
+    base_serializer_class = RecordSerializer
+    name = 'records'
     model = Record
     queryset = Record.objects.filter(workflow__is_public=True)
-    serializer_class = RecordSerializer
+    lookup_url_kwarg = 'pk'
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = PublicPagination
     filterset_class = RecordFilter
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    meta_fields = []
 
-    def list(self, request, *args, **kwargs):  # noqa: ARG002
-        """Return list of records."""
+    def get_serializer_class(self):
+        return self.base_serializer_class
+
+    @classmethod
+    def get_urlpatterns(cls):
+        return [
+            path('', cls.as_view({'get': 'listing_view'}), name='listing'),
+            path('<uuid:pk>/', cls.as_view({'get': 'detail_view'}), name='detail'),
+            path('find/', cls.as_view({'get': 'find_view'}), name='find'),
+        ]
+
+    def listing_view(self, request):  # noqa: ARG002
         queryset = self.get_queryset()
-
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -33,8 +45,12 @@ class RecordList(ListAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def get_queryset(self, *args, **kwargs):
-        """Return the filtered queryset."""
+    def detail_view(self, request, pk):  # noqa: ARG002
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def get_queryset(self):
         qs = []
         if self.request.GET.get('search'):
             search_context = SearchContext(public=True)
@@ -49,7 +65,7 @@ class RecordList(ListAPIView):
             qs = search_obj.results
 
         else:
-            qs = super().get_queryset(*args, **kwargs).order_by('name')
+            qs = self.queryset.order_by('name')
             qs = qs.prefetch_related(
                 'attributes',
                 'attributes__attribute_type',

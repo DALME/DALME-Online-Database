@@ -1,6 +1,7 @@
 """API endpoint for returning thumbnails."""
 
 from django.http import JsonResponse
+from django.urls import path
 from django.views import View
 
 from ida.models.resourcespace import rs_resource
@@ -8,6 +9,10 @@ from ida.models.resourcespace import rs_resource
 
 class Thumbnail(View):
     """API endpoint for returning thumbnails."""
+
+    @classmethod
+    def get_urlpatterns(cls):
+        return [path('', cls.as_view(), name='thumbnails')]
 
     def get_data(self):
         """Get the thumbnail's URL."""
