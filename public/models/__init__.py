@@ -1,5 +1,6 @@
 """Interface for the public.models module."""
 
+from public.extensions.footnotes.models import Footnote
 from public.extensions.gradients.models import Gradient
 
 from .base_image import BaseImage, CustomRendition
@@ -36,6 +37,7 @@ __all__ = [
     'FeaturedObject',
     'FeaturedPage',
     'Features',
+    'Footnote',
     'Flat',
     'Gradient',
     'Home',

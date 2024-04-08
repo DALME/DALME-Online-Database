@@ -6,6 +6,7 @@ from wagtail.contrib.routable_page.models import route
 from django.db import models
 from django.template.response import TemplateResponse
 
+from public.extensions.gradients.models import Gradient
 from public.models.base_page import BasePage
 from public.models.search_enabled_page import SearchEnabled
 from public.models.settings import Settings
@@ -17,7 +18,7 @@ class Collections(SearchEnabled):
         help_text='Check this box to show the "Cite" menu for this page.',
     )
     gradient = models.ForeignKey(
-        'public.Gradient',
+        Gradient,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

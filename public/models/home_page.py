@@ -9,6 +9,7 @@ from public.blocks import (
     AnnouncementBannerBlock,
     SponsorBlock,
 )
+from public.extensions.gradients.models import Gradient
 from public.models.base_page import BasePage
 from public.models.featured_essay_page import Essay
 from public.models.featured_inventory_page import FeaturedInventory
@@ -19,7 +20,7 @@ class Home(BasePage):
     template = 'home.html'
 
     gradient = models.ForeignKey(
-        'public.Gradient',
+        Gradient,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

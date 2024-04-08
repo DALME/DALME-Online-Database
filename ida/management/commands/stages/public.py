@@ -330,7 +330,7 @@ class Stage(BaseStage):
         ]
         self.logger.info('Transfering gradient data')
         with schema_context('dalme'):
-            from public.models import Gradient
+            from public.extensions.gradients.models import Gradient
 
             for entry in gradients:
                 target_model = apps.get_model(app_label='public', model_name=entry.pop('model'))

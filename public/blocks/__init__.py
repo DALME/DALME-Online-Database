@@ -1,8 +1,5 @@
 """Interface for the public.blocks module."""
 
-from public.extensions.bibliography import BibliographyChooserBlock
-from public.extensions.footnotes import FootnotesPlaceMarker
-
 from .announcement_banner import AnnouncementBannerBlock
 from .carousel import CarouselBlock
 from .chart_embed import ChartEmbedBlock

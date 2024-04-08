@@ -5,12 +5,13 @@ from wagtail.admin.panels import FieldPanel
 from django.db import models
 from django.db.models.functions import Coalesce
 
+from public.extensions.gradients.models import Gradient
 from public.models.base_page import BasePage
 
 
 class Features(BasePage):
     gradient = models.ForeignKey(
-        'public.Gradient',
+        Gradient,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

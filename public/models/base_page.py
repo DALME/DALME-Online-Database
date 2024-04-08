@@ -1,28 +1,84 @@
 """Model base page data."""
 
 from wagtail import blocks
+from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
+from wagtailcodeblock.blocks import CodeBlock
 
 from django.db import models
 
 from public.blocks import (
-    BibliographyChooserBlock,
     CarouselBlock,
     ChartEmbedBlock,
     DocumentBlock,
     ExternalResourceBlock,
-    FootnotesPlaceMarker,
     InlineImageBlock,
     MainImageBlock,
     PersonBlock,
     SubsectionBlock,
     SubsectionEndMarkerBlock,
 )
+from public.extensions.bibliography.blocks import BibliographyChooserBlock
+from public.extensions.footnotes.blocks import FootnotesPlaceMarker
 from public.models.base_image import BaseImage
 from public.models.common import HEADER_POSITION
+
+DEFAULT_TABLE_OPTIONS = {
+    'minSpareRows': 0,
+    'startRows': 3,
+    'startCols': 3,
+    'colHeaders': False,
+    'rowHeaders': False,
+    'contextMenu': [
+        'row_above',
+        'row_below',
+        '---------',
+        'col_left',
+        'col_right',
+        '---------',
+        'remove_row',
+        'remove_col',
+        '---------',
+        'undo',
+        'redo',
+        '---------',
+        'copy',
+        'cut',
+        '---------',
+        'alignment',
+    ],
+    'editor': 'text',
+    'stretchH': 'all',
+    'height': 108,
+    'renderer': 'text',
+    'autoColumnSize': False,
+}
+
+
+DEFAULT_BLOCKS = [
+    ('bibliography', BibliographyChooserBlock()),
+    ('carousel', CarouselBlock(ImageChooserBlock())),
+    ('chart_embed', ChartEmbedBlock()),
+    ('code', CodeBlock()),
+    ('document', DocumentBlock()),
+    ('embed', EmbedBlock(icon='media')),
+    ('external_resource', ExternalResourceBlock()),
+    ('footnotes_placemarker', FootnotesPlaceMarker()),
+    ('heading', blocks.CharBlock()),
+    ('html', blocks.RawHTMLBlock()),
+    ('inline_image', InlineImageBlock()),
+    ('main_image', MainImageBlock()),
+    ('page', blocks.PageChooserBlock()),
+    ('person', PersonBlock()),
+    ('pullquote', blocks.RichTextBlock(icon='openquote')),
+    ('subsection', SubsectionBlock()),
+    ('subsection_end_marker', SubsectionEndMarkerBlock()),
+    ('table', TableBlock(table_options=DEFAULT_TABLE_OPTIONS)),
+    ('text', blocks.RichTextBlock()),
+]
 
 
 class BasePage(Page):
@@ -47,28 +103,7 @@ class BasePage(Page):
         help_text='An optional short title that will be displayed in certain space constrained contexts.',
     )
 
-    body = StreamField(
-        [
-            ('main_image', MainImageBlock()),
-            ('carousel', CarouselBlock(ImageChooserBlock())),
-            ('chart_embed', ChartEmbedBlock()),
-            ('inline_image', InlineImageBlock()),
-            ('text', blocks.RichTextBlock()),
-            ('heading', blocks.CharBlock()),
-            ('pullquote', blocks.RichTextBlock(icon='openquote')),
-            ('page', blocks.PageChooserBlock()),
-            ('bibliography', BibliographyChooserBlock()),
-            ('document', DocumentBlock()),
-            ('person', PersonBlock()),
-            ('external_resource', ExternalResourceBlock()),
-            ('embed', EmbedBlock(icon='media')),
-            ('html', blocks.RawHTMLBlock()),
-            ('subsection', SubsectionBlock()),
-            ('subsection_end_marker', SubsectionEndMarkerBlock()),
-            ('footnotes_placemarker', FootnotesPlaceMarker()),
-        ],
-        null=True,
-    )
+    body = StreamField(DEFAULT_BLOCKS, null=True)
 
     class Meta:
         abstract = True
