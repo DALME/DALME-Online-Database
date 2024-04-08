@@ -82,7 +82,7 @@ class Base(Configuration):
 
     SHARED_APPS = [
         'django_tenants',
-        'ida.apps.IDAConfig',  # App containing the Tenant model.
+        'ida',  # App containing the Tenant model.
         'django.contrib.contenttypes',
         # NOTE: The above must be present for django-tenants to function.
         'django.contrib.admin',
@@ -98,17 +98,16 @@ class Base(Configuration):
         'django_recaptcha',
         'corsheaders',
         'oauth2_provider',
-        'api.application.APIConfig',
-        'purl.application.PURLConfig',
+        'api',
+        'purl',
     ]
     TENANT_APPS = [
         'django_filters',
-        'modelcluster',
-        'taggit',
         'wagtail.contrib.forms',
         'wagtail.contrib.redirects',
         'wagtail.contrib.routable_page',
         'wagtail.contrib.styleguide',
+        'wagtail.contrib.table_block',
         'wagtail.contrib.settings',
         'wagtail.embeds',
         'wagtail.sites',
@@ -118,9 +117,17 @@ class Base(Configuration):
         'wagtail.images',
         'wagtail.search',
         'wagtail.admin',
+        'wagtail.api.v2',
         'wagtail',
+        'modelcluster',
+        'taggit',
         'wagtailmodelchooser',
-        'public.application.PublicConfig',
+        'wagtailfontawesomesvg',
+        'wagtailcodeblock',
+        'public.extensions.bibliography',
+        'public.extensions.footnotes',
+        'public.extensions.gradients',
+        'public',
     ]
 
     MIDDLEWARE = [
