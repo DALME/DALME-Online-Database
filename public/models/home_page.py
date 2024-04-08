@@ -1,14 +1,18 @@
 """Model home page data."""
 
-from wagtail.admin.panels import FieldPanel
+from datetime import datetime
+
+from wagtail.admin.panels import FieldPanel, FieldRowPanel
 from wagtail.fields import StreamField
 
 from django.db import models
+from django.utils import timezone
 
 from public.blocks import (
     AnnouncementBannerBlock,
     SponsorBlock,
 )
+from public.extensions.announcements.models import Announcement
 from public.extensions.gradients.models import Gradient
 from public.models.base_page import BasePage
 from public.models.featured_essay_page import Essay
@@ -25,6 +29,7 @@ class Home(BasePage):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
+        help_text='The gradient to be used over the header image.',
     )
     learn_more_page = models.ForeignKey(
         'wagtailcore.Page',
@@ -32,7 +37,9 @@ class Home(BasePage):
         blank=True,
         on_delete=models.SET_NULL,
         related_name='+',
+        help_text='The page that should open when "Learn more..." is selected.',
     )
+
     sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
     banners = StreamField([('banners', AnnouncementBannerBlock())], null=True)
 
@@ -44,8 +51,13 @@ class Home(BasePage):
 
     content_panels = [
         *BasePage.content_panels,
-        FieldPanel('header_image'),
-        FieldPanel('gradient'),
+        FieldRowPanel(
+            [
+                FieldPanel('header_image'),
+                FieldPanel('gradient'),
+            ],
+            heading='Header',
+        ),
         FieldPanel('learn_more_page'),
         FieldPanel('banners'),
         FieldPanel('body'),
@@ -62,5 +74,11 @@ class Home(BasePage):
         context['featured_object'] = objects.last()
         context['featured_inventory'] = inventories.last()
         context['essay'] = essays.last()
+
+        today = datetime.now(tz=timezone.get_current_timezone()).date()
+        context['announcements'] = Announcement.objects.filter(
+            start_date__lte=today,
+            end_date__gte=today,
+        ).order_by('start_date')
 
         return context

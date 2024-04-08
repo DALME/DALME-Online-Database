@@ -1,6 +1,10 @@
 {% extends "public/layouts/single_column.html" %}
 {% load wagtailcore_tags wagtailimages_tags static %}
 
+{% block extra_styles %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/announcements.css' %}" />
+{% endblock %}
+
 {% block header_extra %}
   <div class="title u-flex u-type-serif">
     <h1 class="small">The</h1>
@@ -10,10 +14,13 @@
       <a class="u-lozenge" href="{% pageurl page.learn_more_page %}">LEARN MORE</a>
     {% endif %}
   </div>
-  {% if page.banners %}
-    {% for banner in page.banners %}
-      {{ banner }}
-    {% endfor %}
+
+  {% if announcements %}
+    <div class="announcement-container">
+      {% for announcement in announcements %}
+        {% include "announcement.html" with value=announcement %}
+      {% endfor %}
+    </div>
   {% endif %}
 {% endblock %}
 

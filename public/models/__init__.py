@@ -1,5 +1,6 @@
 """Interface for the public.models module."""
 
+from public.extensions.announcements.models import Announcement
 from public.extensions.footnotes.models import Footnote
 from public.extensions.gradients.models import Gradient
 
@@ -23,6 +24,7 @@ from .section_page import Section
 from .settings import Settings
 
 __all__ = [
+    'Announcement',
     'BaseImage',
     'CustomRendition',
     'BasePage',
