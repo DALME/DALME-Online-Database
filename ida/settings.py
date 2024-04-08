@@ -124,6 +124,7 @@ class Base(Configuration):
         'wagtailmodelchooser',
         'wagtailfontawesomesvg',
         'wagtailcodeblock',
+        'public.extensions.team',
         'public.extensions.bibliography',
         'public.extensions.footnotes',
         'public.extensions.gradients',

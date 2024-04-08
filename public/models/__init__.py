@@ -3,6 +3,7 @@
 from public.extensions.announcements.models import Announcement
 from public.extensions.footnotes.models import Footnote
 from public.extensions.gradients.models import Gradient
+from public.extensions.team.models import TeamMember, TeamRole
 
 from .base_image import BaseImage, CustomRendition
 from .base_page import BasePage
@@ -47,4 +48,6 @@ __all__ = [
     'SearchEnabled',
     'Section',
     'Settings',
+    'TeamMember',
+    'TeamRole',
 ]

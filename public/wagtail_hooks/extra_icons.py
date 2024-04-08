@@ -26,4 +26,7 @@ def register_extra_icons(icons):
         'wagtailfontawesomesvg/solid/list-ol.svg',
         'wagtailfontawesomesvg/regular/bookmark.svg',
         'wagtailfontawesomesvg/solid/magnifying-glass-location.svg',
+        'wagtailfontawesomesvg/solid/people-group.svg',
+        'wagtailfontawesomesvg/solid/user-tag.svg',
+        'wagtailfontawesomesvg/solid/user.svg',
     ]
