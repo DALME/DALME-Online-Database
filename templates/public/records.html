@@ -329,8 +329,6 @@
   {{ block.super }}
   {% get_breadcrumbs_nav as breadcrumb %}
   {{ breadcrumb | json_script:"breadcrumb_data" }}
-  <script type="text/javascript" src="{% static 'js/common_utilities.js' %}"></script>
-  <!--script type="text/javascript" src="{% static 'js/lodash-debounce.js' %}"></script-->
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js" integrity="sha256-ur/YlHMU96MxHEsy3fHGszZHas7NzH4RQlD4tDVvFhw=" crossorigin="anonymous"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-slider-component@latest/dist/vue-slider-component.umd.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue-spinner@1.0.4/dist/vue-spinner.min.js"></script>
@@ -512,7 +510,7 @@
         },
         setMode(e) {
           let mode = e.currentTarget.id;
-          update_session({ 'public-browse-mode': mode });
+          window.CustomUtils.updateSession({ 'public-browse-mode': mode });
           let target_size = mode == 'detail' ? 'scr' : 'thm';
           this.mode = mode;
           if (mode == 'detail' && target_size != this.thumbSize) {

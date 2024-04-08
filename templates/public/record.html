@@ -301,7 +301,6 @@
 {% block js_foot %}
   {{ block.super }}
   <script type="text/javascript" src="{% static 'js/CETEI.js' %}"></script>
-  <script type="text/javascript" src="{% static 'js/common_utilities.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/ResizeSensor.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/cetei_functions.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js" integrity="sha256-ur/YlHMU96MxHEsy3fHGszZHas7NzH4RQlD4tDVvFhw=" crossorigin="anonymous"></script>
@@ -561,7 +560,7 @@
             this.handleHelpPlacement = split == 'vertical-split' ? 'left' : 'bottom';
             this.updateViewer();
             $('section.transcription').scrollTop(0);
-            update_session({ 'public-viewer-mode': split });
+            window.CustomUtils.updateSession({ 'public-viewer-mode': split });
           },
           updateViewer(divaHeight=false) {
             if (divaHeight) this.divaHeight = divaHeight;
@@ -722,7 +721,7 @@
           },
           changeRenderMode(mode) {
             this.renderMode = mode;
-            update_session({ 'public-render-mode': mode });
+            window.CustomUtils.updateSession({ 'public-render-mode': mode });
             this.softWrap = mode == 'basic' ? true : false;
             setTimeout(() => this.toggleTeiContainers(), 0);
           },

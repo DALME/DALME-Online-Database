@@ -280,7 +280,6 @@
 {% endblock %}
 {% block js_foot %}
   {{ block.super }}
-  <script type="text/javascript" src="{% static 'js/common_utilities.js' %}"></script>
   {{ search_context|json_script:"search_context" }}
   <script id="clauses" type="application/json">
     [{% for set in form %}
@@ -406,7 +405,7 @@
           this.isPaginated = false;
           let payload = {};
           payload[this.searchContext['session_var']] = false;
-          update_session(payload);
+          window.CustomUtils.updateSession(payload);
         },
         performSearch() {
           this.$refs.search_form.submit();

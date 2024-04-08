@@ -29,8 +29,7 @@
       integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-vue.min.css' %}" />
     <script async defer data-domain="dalme.org" src="https://plausible.io/js/plausible.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/snarkdown@2.0.0/dist/snarkdown.umd.js"
-      integrity="sha256-QqCCWG2y306e9DZ9VbcdrkacMAz1nubFmYCkac3I3AM=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/footnote-frontend.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/public_base.css' %}" />
   {% endblock %}
 </head>
@@ -115,7 +114,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js"
         integrity="sha512-hDWGyh+Iy4Mr9AHOzUP2+Y0iVPn/BwxxaoSleEjH/i1o4EVTF/sh0/A1Syii8PWOae+uPr+T/KHwynoebSuAhw=="
         crossorigin="anonymous"></script>
-      <script type="text/javascript" src="{% static 'js/common_utilities.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/wagtailUtils.js' %}"></script>
 
       <script>
         $(document).ready(function () {
