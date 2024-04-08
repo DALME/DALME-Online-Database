@@ -13,7 +13,7 @@ from django.contrib.auth import authenticate, login
 from api.access_policies import BaseAccessPolicy
 from api.resources.groups import GroupSerializer
 
-from .tenant import get_current_tenant
+from .context import get_current_tenant
 
 
 class AuthAccessPolicy(BaseAccessPolicy):

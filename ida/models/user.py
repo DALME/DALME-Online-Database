@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models import Q, options
 from django.urls import reverse
 
-from ida.tenant import get_current_tenant
+from ida.context import get_current_tenant
 
 options.DEFAULT_NAMES = (*options.DEFAULT_NAMES, 'in_db')
 

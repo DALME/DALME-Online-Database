@@ -2,7 +2,7 @@
 
 from django.db import models
 
-from ida.tenant import get_current_tenant
+from ida.context import get_current_tenant
 
 DESCRIPTION_MAX_LENGTH = 255
 

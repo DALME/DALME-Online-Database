@@ -5,7 +5,7 @@ from storages.backends.s3boto3 import S3Boto3Storage, S3ManifestStaticStorage
 
 from django.db import connection
 
-from ida.tenant import get_current_tenant
+from ida.context import get_current_tenant
 
 logger = structlog.get_logger(__name__)
 

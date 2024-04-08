@@ -7,9 +7,9 @@ from werkzeug.local import LocalProxy
 
 from django.core.exceptions import DisallowedHost
 
+from ida.context import get_current_tenant
 from ida.middleware.tenant_context_middleware import TenantContextMiddleware
 from ida.models import Tenant
-from ida.tenant import get_current_tenant
 
 
 def test_get_current_tenant_fails_when_not_set(mock_get_current_tenant):

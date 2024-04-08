@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from api.access_policies import BaseAccessPolicy
-from ida.tenant import get_current_tenant
+from ida.context import get_current_tenant
 
 
 class LibraryAccessPolicy(BaseAccessPolicy):

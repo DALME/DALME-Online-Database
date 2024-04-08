@@ -15,7 +15,7 @@ import os
 from django.conf import settings
 from django.db import models
 
-from ida.tenant import get_current_tenant
+from ida.context import get_current_tenant
 
 
 class ScopedQueryset(models.QuerySet):
