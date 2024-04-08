@@ -8,7 +8,7 @@ class ReferenceSource extends window.React.Component {
   }
 
   componentDidMount() {
-      const { onClose, editorState, entity, entityType } = this.props;
+      const { onClose, entity } = this.props;
       const url = window.chooserUrls.referenceChooser;
       $(document.body).on("hidden.bs.modal", this.onClose);
       const urlParams = {}
@@ -60,7 +60,7 @@ class ReferenceSource extends window.React.Component {
   }
 
   onChosen(data) {
-    const { editorState, entity, entityKey, entityType, onComplete } = this.props;
+    const { editorState, entityType, onComplete } = this.props;
     const content = editorState.getCurrentContent();
     const selection = editorState.getSelection();
 
