@@ -24,17 +24,7 @@ db.dump:
 	docker compose exec \
 		$(PROJECT).db \
 		pg_dump \
-		-Fc \
-		--dbname $(PROJECT) \
-		--username $(PROJECT) \
-		-f $(DUMPS)/$(PROJECT)-$$(date -u +"%Y%m%d-T%s").dump
-.PHONY: db.dump
-
-db.dump_sql:
-	docker compose exec \
-		$(PROJECT).db \
-		pg_dump \
-		-Fp -s \
+		-Fc $(args) \
 		--dbname $(PROJECT) \
 		--username $(PROJECT) \
 		-f $(DUMPS)/$(PROJECT)-$$(date -u +"%Y%m%d-T%s").dump
