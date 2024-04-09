@@ -1,6 +1,21 @@
 # ; -*- mode: makefile ;-*-
 # vi: set ft=make :
 
+infra.bootstrap:
+ifndef dump
+	$(error No local dump specified to restore. \
+		Usage: make bootstrap dump='dalme-20231025-T1698276955.dump')
+else
+	@$(MAKE) db.migrate
+	@$(MAKE) web.manage args='ensure_tenants'
+	@$(MAKE) db.load dump='$(dump)'
+	@$(MAKE) web.migrate_data
+	@$(MAKE) web.manage args='ensure_oauth'
+	@$(MAKE) web.manage args='tenant_command update_index --schema=dalme'
+	@$(MAKE) web.collectstatic
+endif
+.PHONY: infra.bootstrap
+
 infra.build:
 	docker compose up -d --build
 .PHONY: infra.build
@@ -68,6 +83,7 @@ infra.stop:
 .PHONY: infra.stop
 
 infra.help:
+	@echo "  infra.bootstrap        ready the development environment"
 	@echo "  infra.build            build the containers"
 	@echo "  infra.log              tail the container logs"
 	@echo "  infra.oidc.key         generate a private key for signing oauth/oidc tokens"

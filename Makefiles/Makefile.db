@@ -16,7 +16,7 @@ db.create_restore_schema:
 db.drop: confirm
 	@$(MAKE) infra.stop
 	docker rm -f $$(docker ps -a -q)
-	docker volume rm $(PROJECT)_$(DB_VOLUME)
+	docker volume rm $(DB_VOLUME)
 	@$(MAKE) infra.start
 .PHONY: db.drop
 
