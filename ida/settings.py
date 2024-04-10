@@ -416,6 +416,7 @@ class Development(Base, Configuration):
         'http://ida.localhost:8000',
         'http://dalme.localhost:8000',
         'http://globalpharmacopeias.localhost:8000',
+        'http://localhost:8888',
     ]
 
     CSRF_COOKIE_SECURE = False
@@ -423,6 +424,7 @@ class Development(Base, Configuration):
         'http://ida.localhost:8000',
         'http://dalme.localhost:8000',
         'http://globalpharmacopeias.localhost:8000',
+        'http://localhost:8888',
     ]
     SESSION_COOKIE_SECURE = False
     SECURE_SSL_REDIRECT = False
@@ -501,6 +503,29 @@ class Development(Base, Configuration):
             'hosts': os.environ.get('ELASTICSEARCH_ENDPOINT', 'ida.es:9200'),
         },
     }
+
+    # Jupyter notebook setup
+    SHELL_PLUS = 'ipython'
+    SHELL_PLUS_PRINT_SQL = True
+    NOTEBOOK_ARGUMENTS = [
+        '--ip',
+        '0.0.0.0',
+        '--port',
+        '8888',
+        '--allow-root',
+        '--no-browser',
+    ]
+    IPYTHON_ARGUMENTS = [
+        '--ext',
+        'django_extensions.management.notebook_extension',
+        '--debug',
+    ]
+    IPYTHON_KERNEL_DISPLAY_NAME = 'Django Shell-Plus'
+    SHELL_PLUS_POST_IMPORTS = [  # extra things to import in notebook
+        ('module1.submodule', ('func1', 'func2', 'class1', 'etc')),
+        ('module2.submodule', ('func1', 'func2', 'class1', 'etc')),
+    ]
+    os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
 
 
 class CI(Development, Configuration):

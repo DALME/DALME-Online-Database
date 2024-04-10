@@ -60,6 +60,12 @@ web.shell:
 		bash
 .PHONY: web.shell
 
+web.notebook:
+	docker compose exec \
+		$(PROJECT).web \
+		python manage.py shell_plus --notebook
+.PHONY: web.notebook
+
 web.sync: web.install web.build
 .PHONY: web.sync
 

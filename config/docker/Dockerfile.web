@@ -29,10 +29,12 @@ RUN apt-get update && \
     libpq-dev \
     vim \
     xmlsec1 \
+    gcc \
+    python3-dev \
     graphviz && \
     apt-get clean
 COPY --from=dev-reqs /opt/build/wheels ./wheels
-RUN pip install --user --no-cache-dir --upgrade pip
+# RUN pip install --user --no-cache-dir --upgrade pip
 RUN pip install --no-cache ./wheels/*
 
 ### TARGET: development

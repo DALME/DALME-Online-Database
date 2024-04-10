@@ -48,12 +48,14 @@ services:
       - assets:/opt/web/www/static
       - ./tests:/opt/web/tests
       - ./pyproject.toml:/opt/web/pyproject.toml
-      - ipython-data:/root/.ipython/profile_default
+      - ./notebooks:/opt/web/notebooks
+      - ./notebooks/ipython:/root/.ipython/profile_default
     restart: unless-stopped
     stdin_open: true
     tty: true
     expose:
       - "8001"
+      - "8888"
 
   ida.ui:
     image: ida.ui:dev
@@ -106,6 +108,7 @@ services:
       - app-network
     ports:
       - "8000:80"
+      - "8888:8888"
 
   ida.es:
     image: elasticsearch:7.8.0
@@ -194,7 +197,6 @@ volumes:
   esdata:
   pgdata:
   rsdata:
-  ipython-data:
   pgadmin-data:
 
 
