@@ -31,11 +31,11 @@ class Project(IDAIntid):
         return f'{self.name} ({self.id})'
 
 
-class ZoteroCollection(IDAIntid):
+class ZoteroCollection(models.Model):
     """Stores information about Zotero collections associated with a project."""
 
+    id = models.CharField(primary_key=True, max_length=25, help_text='Zotero ID of the collection.')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='zoter_collections')
-    zotero_id = models.CharField(max_length=25, help_text='Zotero ID of the collection.')
     label = models.CharField(max_length=255, help_text='Label for the collection.')
     has_biblio_sources = models.BooleanField(
         default=False,
@@ -44,4 +44,4 @@ class ZoteroCollection(IDAIntid):
     )
 
     def __str__(self):
-        return f'{self.label} ({self.zotero_id})'
+        return f'{self.label} ({self.id})'

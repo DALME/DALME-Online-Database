@@ -51,13 +51,13 @@ class BiblioViewSet(ModelViewSet):
     menu_name = 'biblio'
     menu_order = 900
     add_to_admin_menu = True
-    list_display = ['zotero_id', 'label', 'has_biblio_sources', UpdatedAtColumn()]
+    list_display = ['id', 'label', 'has_biblio_sources', UpdatedAtColumn()]
     chooser_viewset_class = BiblioChooserViewSet
 
     panels = [
         FieldRowPanel(
             [
-                FieldPanel('zotero_id'),
+                FieldPanel('id'),
                 FieldPanel('has_biblio_sources'),
             ],
         ),
