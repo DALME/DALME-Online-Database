@@ -1,5 +1,7 @@
 """Model footnote data."""
 
+import uuid
+
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
 from wagtail.fields import RichTextField
@@ -9,7 +11,7 @@ from django.db.models import UUIDField
 
 
 class Footnote(ClusterableModel):
-    id = UUIDField(primary_key=True)
+    id = UUIDField(primary_key=True, default=uuid.uuid4, editable=True)
     page = ParentalKey(Page, related_name='footnotes')
     text = RichTextField(
         features=[
