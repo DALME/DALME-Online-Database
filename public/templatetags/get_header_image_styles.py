@@ -17,7 +17,7 @@ def get_header_image_styles(context, header_image, header_position):
         else:
             section = page.get_ancestors().filter(content_type_id__in=get_gradient_pages())
             if section.exists():
-                gradient = section.first().specific_deferred.gradient.css
+                gradient = section.last().specific_deferred.gradient.css
     except AttributeError:
         pass
 
