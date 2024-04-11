@@ -17,8 +17,8 @@ from .stages import (
     AttributeTypesStage,
     AuthStage,
     CollectionsStage,
+    ContentFixes,
     FinalizeStage,
-    PostFixes,
     PublicStage,
     RankOneStage,
     RankTwoStage,
@@ -39,7 +39,7 @@ STAGES = [
     CollectionsStage,
     FinalizeStage,
     PublicStage,
-    PostFixes,
+    ContentFixes,
 ]
 
 

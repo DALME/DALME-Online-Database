@@ -131,6 +131,30 @@ class BaseStage(abc.ABC):
         columns = [col[0] for col in cursor.description]
         return (dict(zip(columns, row, strict=True)) for row in cursor.fetchall())
 
+    @staticmethod
+    def get_fields_by_type(model, field_types, as_map=False):
+        # Wagtail subclasses Django fields without redefining the method
+        # or declaring the __name__ attribute
+        # so for certain types we need to use the field's class instead
+        # of calling field.get_internal_type()
+        filter_by_class = ['RichTextField']
+
+        if not isinstance(field_types, list):
+            field_types = [field_types]
+
+        target_types = [t for t in field_types if t not in filter_by_class]
+        target_classes = [t for t in field_types if t in filter_by_class]
+
+        fields = []
+        for field in model._meta.get_fields():  # noqa: SLF001
+            try:
+                field_cls_name = str(field.__class__)[8:-2].split('.')[-1]
+                if field.get_internal_type() in target_types or field_cls_name in target_classes:
+                    fields.append((field.name, field.get_internal_type()))
+            except AttributeError:  # it's a GenericForeignKey
+                continue
+        return fields if as_map else [i[0] for i in fields]
+
     def map_content_type(self, old_id, id_only=False):
         """Map an old content type to a new content type."""
         if not old_id:

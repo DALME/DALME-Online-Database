@@ -3,6 +3,7 @@
 import json
 
 from django_tenants.utils import schema_context
+from wagtail.log_actions import log
 
 from django.apps import apps
 from django.db import connection, transaction
@@ -86,16 +87,6 @@ class Stage(BaseStage):
         ]
         no_bulk = ['wagtailcore_groupapprovaltask']
 
-        def get_json_fields(model):
-            json_fields = []
-            for field in model._meta.get_fields():  # noqa: SLF001
-                try:
-                    if field.get_internal_type() == 'JSONField':
-                        json_fields.append(field.name)
-                except AttributeError:  # it's a GenericForeignKey
-                    continue
-            return json_fields
-
         # delete existing records
         with connection.cursor() as cursor:
             self.logger.info('Deleting existing records in dalme schema')
@@ -111,7 +102,7 @@ class Stage(BaseStage):
                     qualified_name = f'{label}_{model_name}'
                     self.logger.info('Copying "%s"', qualified_name)
                     use_bulk = qualified_name not in no_bulk
-                    json_fields = get_json_fields(model)
+                    json_fields = self.get_fields_by_type(model, 'JSONField')
 
                     with connection.cursor() as cursor:
                         cursor.execute(f'SELECT * FROM restore.{qualified_name};')
@@ -149,7 +140,7 @@ class Stage(BaseStage):
     def migrate_public_tables(self):
         """Migrate existing Public tables to the DALME schema (BUT NOT INDEXES)."""
         # we need to do these tables differently, i.e. by inserting data directly in SQL
-        # becasue the constraints on foreign keys won't allow use of the ORM, for example
+        # because the constraints on foreign keys won't allow use of the ORM, for example
         # because all page types are subclassed from the wagtail Page model which we already
         # populated
         models = [
@@ -338,6 +329,7 @@ class Stage(BaseStage):
 
                 # create entry in gradients table
                 gradient_obj = Gradient.objects.create(**entry)
+                log(instance=gradient_obj, action='wagtail.create')
 
                 # get page object
                 page = target_model.objects.filter(title=page_title) if page_title else target_model.objects.all()
