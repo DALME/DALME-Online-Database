@@ -1,6 +1,5 @@
 {% extends "public/layouts/left_side_column.html" %}
 {% load wagtailcore_tags settings_val static %}
-{% settings_val 'API_URL' as api_url %}
 
 {% block title %}{{ block.super }} &ndash; {{ page.title_switch }}{% endblock %}
 
@@ -70,7 +69,7 @@
               that.config.templates.add('dalme', xml_data);
             }
           };
-          xhttp.open("GET", '/static/citation_styles/dalme_bibliography.csl', true);
+          xhttp.open("GET", "{% static 'citation_styles/dalme_bibliography.csl' %}", true);
           xhttp.send();
         },
         async fetchData() {
@@ -80,25 +79,28 @@
         createBibliography(key) {
           const that = this;
           return new Promise(async function (resolve, reject) {
-            await fetch(`{{ api_url }}/library/?collection=${key}&content=csljson&format=json`)
+            await fetch(`{% settings_val 'API_URL' %}/library/?collection=${key}&content=csljson&format=json`)
               .then(response => response.json())
               .then(data => {
                 let citation = new that.cite();
-                for (let i = 0, len = data.length; i < len; ++i) {
-                  citation.add(data[i]);
+                for (entry of data) {
+                  entry.id = entry.id.split('/')[1];
+                  citation.add(entry);
                 }
-                that.collections[key] = citation.format(that.output_format, {
-                  format: that.format,
-                  template: that.template,
-                  lang: that.lang
-                });
+                that.collections[key] = citation.format(
+                  that.output_format, {
+                    format: that.format,
+                    template: that.template,
+                    lang: that.lang
+                  }
+                );
                 resolve()
               });
           });
         },
         formatBibliography() {
           $('.csl-entry').each(function() {
-            const key = $(this).data('csl-entry-id').split('/');
+            const key = $(this).data('csl-entry-id');
             let last_node = $(this).contents().last()[0].textContent;
             let url = last_node.match(/{([^}]+)}/);
             if (url) {
@@ -106,7 +108,7 @@
               $(this).contents().last()[0].textContent = last_node;
               $(this).html(`<a href="${url[1]}" target="_blank"><span>${$(this).html()}</a>`)
             }
-            $(this).html(`<a href="#${key['1']}"></a><span>${$(this).html()}</span>`);
+            $(this).html(`<a href="#${key}"></a><span>${$(this).html()}</span>`);
           });
           if (window.location.hash) {
             const anchor = $(`a[href='${window.location.hash}']`)
