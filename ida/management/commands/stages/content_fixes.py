@@ -293,6 +293,17 @@ class Stage(BaseStage):
     @transaction.atomic
     def fix_biblio_page(self):
         """Fix collection block references in bibliography page."""
+        with schema_context('dalme'):
+            from public.models import Bibliography
+
+            biblio_page = Bibliography.objects.first()
+            body = biblio_page.body.get_prep_value()
+            for block in body:
+                if block.get('type') == 'bibliography':
+                    block['value'] = block['value']['collection']
+
+            biblio_page.body = body
+            biblio_page.save(update_fields=['body'])
 
     @transaction.atomic
     def migrate_people(self):
