@@ -3,6 +3,7 @@
 import json
 import os
 import re
+import uuid
 from functools import cached_property
 
 import markdown
@@ -22,7 +23,7 @@ from ida.models import (
 
 from .base import BaseStage
 
-REFERENCE_HREF = re.compile(r'(?:(?:http|https)://dalme.org)?/project/bibliography/#([A-Z0-9]{8})')
+REFERENCE_HREF = re.compile(r'(?:(?:http|https)://dalme.org)?/?/project/bibliography/#([A-Z0-9]{8})')
 
 REF_CITATIONS = {
     '6YDI5HL6': '(Smith, 2020)',
@@ -168,7 +169,7 @@ class Stage(BaseStage):
         if references:
             soup = self.convert_references(soup)
 
-        return str(soup.body.findChildren(recursive=False))
+        return ''.join(str(b) for b in soup.body.findChildren(recursive=False))
 
     def convert_references(self, soup):
         for ref in soup.find_all('a', href=REFERENCE_HREF):
@@ -205,7 +206,7 @@ class Stage(BaseStage):
                 with schema_context('dalme'):
                     from public.models import Footnote
 
-                    new_footnote = Footnote.objects.create(page=page, text=fn_content)
+                    new_footnote = Footnote.objects.create(id=uuid.uuid4(), page=page, text=fn_content)
 
                 fn.name = 'a'
                 fn['data-footnote'] = new_footnote.id
@@ -293,7 +294,6 @@ class Stage(BaseStage):
                         for field_name, field_type in target_fields:
                             field_value = getattr(instance, field_name, None)
                             if field_value:
-                                # self.logger.info('Field "%s (%s)"', field_name, field_type)
                                 updated_fields.append(field_name)
                                 setattr(
                                     instance,
