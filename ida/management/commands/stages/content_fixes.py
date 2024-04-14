@@ -15,6 +15,7 @@ from django.db import connection, transaction
 
 from ida.models import (
     Project,
+    SavedSearch,
     Tenant,
     ZoteroCollection,
 )
@@ -211,7 +212,19 @@ class Stage(BaseStage):
                 fn['linktype'] = 'footnote'
                 del fn['data-note_id']
 
-        return str(soup.body.findChildren(recursive=False))
+        # saved searches
+        # source format: <a id="01d5187e-2752-466e-9e7d-64e51051facd" linktype="saved_search">storage</a>
+        # target format: <a id="01d5187e-2752-466e-9e7d-64e51051facd" data-saved-search="pansier" linktype="saved_search">dissemination</a>
+        saved_searches = soup.find_all('a', attrs={'linktype': 'saved_search'})
+        if saved_searches:
+            for ss in saved_searches:
+                try:
+                    search_obj = SavedSearch.objects.get(pk=ss['id'])
+                    ss['data-saved-search'] = search_obj.name
+                except:  # noqa: E722
+                    self.logger.info('Failed to migrate saved search entity in page %s', page.id)
+
+        return ''.join(str(b) for b in soup.body.findChildren(recursive=False))
 
     def process_content_field(self, field_value, field_type, obj):
         if field_type == 'JSONField':
