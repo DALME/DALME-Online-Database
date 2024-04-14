@@ -63,6 +63,7 @@ class Stage(BaseStage):
         self.create_project_and_library_entries()
         self.content_conversions()
         self.fix_biblio_page()
+        self.migrate_people()
 
     @transaction.atomic
     def adjust_id_columns(self):
@@ -292,3 +293,36 @@ class Stage(BaseStage):
     @transaction.atomic
     def fix_biblio_page(self):
         """Fix collection block references in bibliography page."""
+
+    @transaction.atomic
+    def migrate_people(self):
+        """Convert people blocks to TeamMember entities."""
+        with schema_context('dalme'):
+            from wagtail.models import Page
+
+            from public.extensions.team.models import TeamMember, TeamRole
+
+            roles = {
+                'Project Team': TeamRole.objects.create(role='Core Team'),
+                'Contributors': TeamRole.objects.create(role='Contributor'),
+                'Advisory Board': TeamRole.objects.create(role='Advisory Board'),
+            }
+
+            people_page = Page.objects.get(title='People').specific
+            current_role = None
+
+            for block in people_page.body:
+                if block.block_type == 'subsection':
+                    block_value = block.block.get_prep_value(block.value)
+                    current_role = roles.get(block_value.get('subsection'))
+
+                elif block.block_type == 'person':
+                    block_value = block.block.get_prep_value(block.value)
+                    tm = TeamMember.objects.create(
+                        name=block_value.get('name'),
+                        title=block_value.get('job'),
+                        affiliation=block_value.get('institution'),
+                        url=block_value.get('url'),
+                        photo_id=block_value.get('photo'),
+                    )
+                    tm.roles.add(current_role)
