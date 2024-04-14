@@ -6,4 +6,5 @@ from .views import FootnoteChooser
 
 urlpatterns = [
     path('footnote/', FootnoteChooser.as_view(), name='footnote_chooser'),
+    path('footnote/<uuid:pk>/', FootnoteChooser.as_view()),
 ]

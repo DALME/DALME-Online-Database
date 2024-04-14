@@ -3,45 +3,63 @@
 from wagtail.admin.modal_workflow import render_modal_workflow
 from wagtail.admin.views import chooser
 
-from django.utils.functional import cached_property
-from django.views.generic.edit import BaseFormView
+from django.views.generic.edit import BaseFormView, ModelFormMixin
 
-from .forms import FootnoteChooserForm
+from .forms import FootnoteForm
+from .models import Footnote
 
 
-class FootnoteChooser(BaseFormView):
+class FootnoteChooser(BaseFormView, ModelFormMixin):
     template_name = 'footnote_chooser_modal.html'
-    form_class = FootnoteChooserForm
+    model = Footnote
+    form_class = FootnoteForm
     prefix = 'footnote'
 
-    @cached_property
-    def in_edit_mode(self):
-        return self.request.GET.get('mode') == 'edit'
+    @property
+    def edit_mode(self):
+        return hasattr(self, 'object')
+
+    def get_object(self, pk):
+        if pk:
+            queryset = Footnote.objects.filter(pk=pk)
+            if queryset.exists() and queryset.count() == 1:
+                return queryset.get()
+        return None
 
     def get(self, _request):
+        if self.request.GET.get('pk'):
+            self.object = self.get_object(self.request.GET.get('pk'))
+
         return self.render_to_response(
             html_template=self.template_name,
             template_vars=self.get_template_vars(),
             json_data={'step': 'enter_footnote'},
         )
 
-    def post(self, _request):
+    def post(self, _request, pk=None):
+        self.object = self.get_object(pk)
         html_template = self.template_name
         template_vars = self.get_template_vars()
         json_data = {'step': 'enter_footnote'}
         form = self.get_form()
         if form.is_valid():
-            form.save()
+            self.object = form.save(edit_mode=self.edit_mode)
             html_template = None
             template_vars = None
+            result = {
+                'id': form.cleaned_data['id'],
+                'text': form.cleaned_data['text'],
+            }
+
+            if form.cleaned_data.get('page'):
+                result['page'] = form.cleaned_data['page'].id
+
             json_data = {
                 'step': 'footnote_entered',
-                'result': {
-                    'id': form.cleaned_data['id'],
-                    'page': form.cleaned_data['page'].id,
-                    'text': form.cleaned_data['text'],
-                },
+                'result': result,
             }
+        else:
+            json_data['error'] = form.errors.as_json()
 
         return self.render_to_response(
             html_template=html_template,
@@ -50,18 +68,16 @@ class FootnoteChooser(BaseFormView):
         )
 
     def get_initial(self):
-        return {
-            'id': self.request.GET.get('id', ''),
-            'page': self.request.GET.get('page', ''),
-            'text': self.request.GET.get('text', ''),
-        }
+        if not self.edit_mode:
+            return {'id': self.request.GET.get('id', '')}
+        return None
 
     def get_template_vars(self):
         return chooser.shared_context(
             self.request,
             {
                 'form': self.get_form(),
-                'title': 'Update footnote' if self.in_edit_mode else 'Insert footnote',
+                'title': 'Edit Footnote' if self.edit_mode else 'New Footnote',
             },
         )
 

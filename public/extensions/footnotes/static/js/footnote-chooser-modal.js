@@ -7,22 +7,22 @@ class FootnoteSource extends window.React.Component {
     }
 
     componentDidMount() {
-        const { onClose, editorState, entity, entityType } = this.props;
+        const { onClose, entity } = this.props;
         const url = window.chooserUrls.footnoteEntry;
         const urlParams = {};
 
         if (entity) {
-          urlParams.id = entity.getData().id;
-          urlParams.page = entity.getData().page;
-          urlParams.text = entity.getData().text;
-          urlParams.mode = "edit";
+          urlParams.pk = entity.getData().id;
         } else {
           urlParams.id = window.CustomUtils.getUUID();
         }
 
         const dialogue = $(
-          '<div id="footnote-dialogue" tabindex="-1" role="dialog" aria-hidden="true">\n  <div class="modal-dialog">\n    <div class="modal-content">\n      <button type="button" class="button close button--icon text-replace footnote-modal-cancel">' +
-          '<svg class="icon icon-cross" aria-hidden="true"><use href="#icon-cross"></use></svg>' + 'Close' + '</button>\n      <div class="modal-body" data-w-dialog-target></div>\n    </div> </div></div>',
+          '<div id="footnote-dialogue" tabindex="-1" role="dialog" aria-hidden="true">\
+            <div class="modal-dialog"><div class="modal-content">\
+                <button type="button" class="button close button--icon text-replace footnote-modal-cancel">\
+                  <svg class="icon icon-cross" aria-hidden="true"><use href="#icon-cross"></use></svg>Close</button>\
+              <div class="modal-body" data-w-dialog-target></div></div></div></div>'
         );
         const modalBg = $('<div class="modal-backdrop fade in"></div>');
 
@@ -37,8 +37,8 @@ class FootnoteSource extends window.React.Component {
           dialogue.remove();
           modalBg.remove();
           $(document.body).removeClass("footnote-modal-body");
-          document.querySelectorAll("[data-draftail-editor]")
-          .forEach((e) => e.classList.remove("Draftail-Editor--readonly"))
+          document.querySelector(".Draftail-Editor").classList.remove("Draftail-Editor--readonly");
+          document.querySelector(".public-DraftEditor-content").contentEditable = true;
           this.onClose;
         }
 
@@ -54,10 +54,10 @@ class FootnoteSource extends window.React.Component {
               eval(document.getElementById("id_footnote-text").nextElementSibling.innerHTML);
 
               openDialogue();
-              // TODO: there has to be a better way to get the page id!
+
               $("form", modal.body).on("submit", function() {
-                $("#id_footnote-page").val(window.location.pathname.split('/')[3]);
-                modal.postForm(this.action, $(this).serialize());
+                const action = entity ? `${this.action}${entity.getData().id}/` : this.action;
+                modal.postForm(action, $(this).serialize());
                 return false;
               });
           },
@@ -122,6 +122,7 @@ class FootnoteSource extends window.React.Component {
       }
 
       const nextState = window.DraftJS.EditorState.push(editorState, finalContentState, finalChangeType);
+      this.workflow.close();
       onComplete(nextState);
     }
 

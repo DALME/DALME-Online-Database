@@ -7,23 +7,25 @@ from public.extensions.footnotes.models import Footnote
 
 
 class FootnoteElementHandler(InlineEntityElementHandler):
+    """Convert database HTML to ContentState as a REFERENCE entity, with the right data."""
+
     mutability = 'IMMUTABLE'
 
     def get_attribute_data(self, attrs):
         instance = Footnote.objects.get(id=attrs['data-footnote'])
         return {
             'id': attrs['data-footnote'],
-            'page': instance.page.id,
             'text': instance.text,
             'linktype': 'footnote',
         }
 
 
 def footnote_decorator(props):
+    """Convert ContentState REFERENCE entities into database HTML."""
     return DOM.create_element(
         'a',
         {
-            'data-footnote': props['id'],
+            'data-footnote': props.get('id'),
             'linktype': 'footnote',
         },
         props['children'],

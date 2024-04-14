@@ -6,6 +6,8 @@ from django.conf import settings
 
 
 class ReferenceLinkHandler(LinkHandler):
+    """Translate the content of rich text tags into front-end HTML."""
+
     identifier = 'reference'
 
     @classmethod
