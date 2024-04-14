@@ -16,9 +16,9 @@ FROM python:3.11-slim-bookworm as install
 COPY --from=reqs /opt/build/wheels ./wheels
 RUN pip install --user --no-cache-dir --upgrade pip
 RUN pip install --no-cache ./wheels/*
-COPY --from=node:18-bookworm-slim /usr/local/include/node /usr/local/include/node
-COPY --from=node:18-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
-COPY --from=node:18-bookworm-slim /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:20-bookworm-slim /usr/local/include/node /usr/local/include/node
+COPY --from=node:20-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=node:20-bookworm-slim /usr/local/bin/node /usr/local/bin/node
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 RUN npm install -g typedoc
 ENV PATH="${PATH}:/usr/local/lib/node_modules"
