@@ -22,6 +22,7 @@ class Section(BasePage):
         'public.Flat',
         'public.Bibliography',
     ]
+    page_description = 'Defines a menu section. Can have a gradient (used by child pages), but no other content.'
 
     content_panels = [
         *BasePage.content_panels,

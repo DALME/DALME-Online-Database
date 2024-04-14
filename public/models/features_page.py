@@ -24,6 +24,7 @@ class Features(BasePage):
         'public.FeaturedInventory',
         'public.Essay',
     ]
+    page_description = 'The "Features" landing page.'
 
     content_panels = [
         *BasePage.content_panels,

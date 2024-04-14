@@ -29,6 +29,7 @@ class FeaturedInventory(FeaturedPage):
 
     parent_page_types = ['public.Features']
     subpage_types = []
+    page_description = 'A page suitable for short essays built around an inventory. Can link to records or collections.'
     template = 'public/feature.html'
 
     content_panels = [

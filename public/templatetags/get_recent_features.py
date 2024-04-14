@@ -17,7 +17,7 @@ register = template.Library()
 def get_recent_features(context):
     feature_type = context.get('feature_type')
     if feature_type == 'Essay':
-        title = 'Mini Essays'
+        title = 'Essays'
         objs = Essay.objects.live().specific().order_by('-last_published_at')[:24]
     elif feature_type == 'Inventory':
         title = 'Inventories'

@@ -35,6 +35,7 @@ class Flat(BasePage):
         'public.Collections',
     ]
     subpage_types = ['public.Flat']
+    page_description = 'A generic page for all kinds of content. Can be cited and show a contact form.'
 
     content_panels = [
         *BasePage.content_panels,

@@ -30,6 +30,7 @@ class Essay(FeaturedPage):
 
     parent_page_types = ['public.Features']
     subpage_types = []
+    page_description = 'A page suitable for short to medium essays. Can link to records or collections.'
     template = 'public/feature.html'
 
     content_panels = [
@@ -45,5 +46,5 @@ class Essay(FeaturedPage):
     ]
 
     class Meta:
-        verbose_name = 'Mini Essay'
-        verbose_name_plural = 'Mini Essays'
+        verbose_name = 'Essay'
+        verbose_name_plural = 'Essays'

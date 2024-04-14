@@ -30,6 +30,7 @@ class Collections(SearchEnabled):
         'public.Collection',
         'public.Flat',
     ]
+    page_description = 'The "Collections" landing page.'
 
     content_panels = [
         *BasePage.content_panels,

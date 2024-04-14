@@ -28,6 +28,7 @@ class Collection(SearchEnabled):
     )
     parent_page_types = ['public.Collections']
     subpage_types = ['public.Flat']
+    page_description = 'Provides a landing page for a collection of records.'
 
     content_panels = [
         *BasePage.content_panels,
