@@ -43,7 +43,7 @@ class Footnote(models.Model):
             self._state.adding = False
             return super().save(update_fields=['page'], force_update=True)
 
-        if kwargs.pop('edit_mode'):
+        if kwargs.pop('edit_mode', False):
             self._state.adding = False
 
         return super().save(*args, **kwargs)
