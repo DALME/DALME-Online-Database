@@ -212,13 +212,18 @@ class Stage(BaseStage):
         # footnotes
         footnotes = soup.find_all('span', attrs={'data-footnote': True})
         if footnotes:
-            for fn in footnotes:
+            for idx, fn in enumerate(footnotes, start=1):
                 # format: <a data-footnote="c847f9da-3780-4085-9426-73e7a0228b3d" linktype="footnote">✱</a>
                 fn_content = self.markdown_to_html(fn['data-footnote'])
                 with schema_context('dalme'):
                     from public.models import Footnote
 
-                    new_footnote = Footnote.objects.create(id=uuid.uuid4(), page=page, text=fn_content)
+                    new_footnote = Footnote.objects.create(
+                        id=uuid.uuid4(),
+                        page=page,
+                        text=fn_content,
+                        sort_order=idx,
+                    )
 
                 fn.name = 'a'
                 fn['data-footnote'] = new_footnote.id
@@ -308,9 +313,7 @@ class Stage(BaseStage):
                             if field_value:
                                 updated_fields.append(field_name)
                                 setattr(
-                                    instance,
-                                    field_name,
-                                    self.process_content_field(field_value, field_type, instance),
+                                    instance, field_name, self.process_content_field(field_value, field_type, instance)
                                 )
 
                         instance.save(update_fields=updated_fields)
