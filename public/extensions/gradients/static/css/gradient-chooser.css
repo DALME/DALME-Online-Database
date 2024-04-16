@@ -6,10 +6,10 @@
     padding: 5px;
   }
 
-  .gradient-cell > div:first-of-type {
-    height: 15px;
-    min-width: 200px;
-  }
+.gradient-cell > div:first-of-type {
+  height: 15px;
+  min-width: 200px;
+}
 
 .chooser-gradient-preview {
     align-items: center;
@@ -21,6 +21,6 @@
     justify-content: center;
   }
 
-  .chooser-gradient-preview > .gradient-cell {
-    margin-right: 0 !important;
-  }
+.chooser-gradient-preview > .gradient-cell {
+  margin-right: 0 !important;
+}

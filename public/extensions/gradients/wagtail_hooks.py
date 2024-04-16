@@ -2,6 +2,7 @@
 
 from wagtail import hooks
 
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import format_html
 
@@ -21,3 +22,8 @@ def add_gradients_js_to_editor():
             """,
         reverse('gradient_chooser:choose'),
     )
+
+
+@hooks.register('insert_global_admin_css')
+def extra_admin_css():
+    return format_html('<link rel="stylesheet" href="{}">', static('css/gradient-chooser.css'))
