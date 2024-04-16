@@ -50,6 +50,17 @@ REF_CITATIONS = {
     'ZZXGLVMZ': '(Rigaud, 1996)',
     'ZUMTQ5B9': '(Reitzel, 1980)',
     '2RUWVY7B': '(Howell, 1996)',
+    'SNB4JFJ9': '(Braun, 1907)',
+    'SBBLYP96': '(Davril, Thibodeau, & Guyot, 1995)',
+    'TNEXXNIQ': '(Braun, 1937)',
+    'UCVN8LWL': '(Miller, 2014)',
+    'TQVX23W6': '(Berthod, 2001)',
+    'QZNHF7Q3': '(Piponnier, 1989)',
+    'Q62RN9ND': '(Fircks, 2018)',
+    'TBIJ9DYD': '(Deregnaucourt, 1981)',
+    'J9BYMBP2': '(Deregnaucourt, 1982)',
+    'Y44RIA8Q': '(Mane & Piponnier, 1992)',
+    'XL9F9RTZ': '(Carroll-Clark, 2005)',
 }
 
 
