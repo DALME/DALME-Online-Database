@@ -91,7 +91,7 @@ class Stage(BaseStage):
         with connection.cursor() as cursor:
             self.logger.info('Deleting existing records in dalme schema')
             for table in reset:
-                cursor.execute(f'TRUNCATE dalme.{table} RESTART IDENTITY CASCADE;')
+                cursor.execute('TRUNCATE dalme.%s RESTART IDENTITY CASCADE;', [table])
 
         for label in app_labels:
             self.logger.info('Processing "%s" models', label)
@@ -105,7 +105,7 @@ class Stage(BaseStage):
                     json_fields = self.get_fields_by_type(model, 'JSONField')
 
                     with connection.cursor() as cursor:
-                        cursor.execute(f'SELECT * FROM restore.{qualified_name};')
+                        cursor.execute('SELECT * FROM restore.%s;', [qualified_name])
                         rows = self.map_rows(cursor)
 
                     with schema_context('dalme'):
@@ -175,7 +175,7 @@ class Stage(BaseStage):
             model = apps.get_model(app_label='public', model_name=model_name)
             with connection.cursor() as cursor:
                 self.logger.info('Copying "%s"', model_name)
-                cursor.execute(f'SELECT * FROM restore.public_{model_name};')
+                cursor.execute('SELECT * FROM restore.public_%s;', [model_name])
                 rows = self.map_rows(cursor)
 
                 for row in rows:
@@ -189,8 +189,10 @@ class Stage(BaseStage):
                             values += f'{get_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
                             if idx < len(row) - 1:
                                 values += ', '
-                    sql = f"INSERT INTO dalme.public_{model_name} ({', '.join(columns)}) VALUES ({values});"
-                    cursor.execute(sql)
+
+                    cursor.execute(
+                        'INSERT INTO dalme.public_%s (%s) VALUES (%s);', [model_name, ', '.join(columns), values]
+                    )
 
         if banners_raw:
             banner_data = json.loads(banners_raw)

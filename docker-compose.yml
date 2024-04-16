@@ -45,11 +45,11 @@ services:
       - ./public:/opt/web/public
       - ./templates:/opt/web/templates
       - ./media/media:/opt/web/www/media
-      - assets:/opt/web/www/static
       - ./tests:/opt/web/tests
       - ./pyproject.toml:/opt/web/pyproject.toml
       - ./notebooks:/opt/web/notebooks
       - ./notebooks/ipython:/root/.ipython/profile_default
+      - assets:/opt/web/www/static
     restart: unless-stopped
     stdin_open: true
     tty: true
