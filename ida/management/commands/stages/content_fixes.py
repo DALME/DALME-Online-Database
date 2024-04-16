@@ -75,6 +75,7 @@ class Stage(BaseStage):
         self.adjust_id_columns()
         self.create_project_and_library_entries()
         self.content_conversions()
+        self.update_footnote_state()
         self.fix_biblio_page()
         self.migrate_people()
 
@@ -313,6 +314,30 @@ class Stage(BaseStage):
                                 )
 
                         instance.save(update_fields=updated_fields)
+
+    @transaction.atomic
+    def update_footnote_state(self):
+        """Update footnote state fields for pages."""
+        targets = [
+            'collection',
+            'collections',
+            'essay',
+            'featuredinventory',
+            'featuredobject',
+            'features',
+            'flat',
+        ]
+
+        for model_name in targets:
+            qualified_name = f'public_{model_name}'
+            self.logger.info('Processing "%s"', qualified_name)
+            with schema_context('dalme'):
+                model = apps.get_model(app_label='public', model_name=model_name)
+                for instance in model.objects.all():
+                    raw_content = str(instance.body.raw_data)
+                    instance.has_footnotes = 'data-footnote=' in raw_content
+                    instance.has_placemarker = 'footnotes_placemarker' in raw_content
+                    instance.save(update_fields=['has_footnotes', 'has_placemarker'])
 
     @transaction.atomic
     def fix_biblio_page(self):
