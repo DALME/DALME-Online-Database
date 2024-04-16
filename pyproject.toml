@@ -18,6 +18,14 @@ omit = [
 
 # https://github.com/charliermarsh/ruff#configuration
 [tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+
+[tool.ruff.lint]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 ignore = [
   "COM812",  # Recommended disable by the rust format.
@@ -39,7 +47,6 @@ ignore = [
   "TD003",
 ]
 ignore-init-module-imports = true
-line-length = 120
 select = [
   "A",
   "ARG",
@@ -86,22 +93,17 @@ select = [
   "UP",
   "W",
 ]
-target-version = "py311"
 # This will warn but not autofix defined rules. For example, I've turned off
 # autofixing of unused variables here (F841) because there are moments during
 # refactoring when, if you temporarily remove a lone reference to a variable,
 # autofix clobbers the chunk of code that is bound to that variable!
 unfixable = ["F841"]
 
-[tool.ruff.format]
-quote-style = "single"
-indent-style = "space"
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "*migrations*" = ["ARG001", "D100"]
 "tests/*" = ["B018", "INP001"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 section-order = [
   "future",
   "standard-library",
@@ -111,5 +113,5 @@ section-order = [
   "local-folder",
 ]
 
-[tool.ruff.isort.sections]
+[tool.ruff.lint.isort.sections]
 django = ["django"]
