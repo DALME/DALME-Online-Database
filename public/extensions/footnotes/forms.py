@@ -14,8 +14,3 @@ class FootnoteForm(forms.ModelForm):
             'page': forms.HiddenInput(),
         }
         labels = {'text': 'Footnote text'}
-
-    def save(self, edit_mode=False):
-        self.instance.save(edit_mode=edit_mode)
-        self._save_m2m()
-        return self.instance

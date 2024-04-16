@@ -20,7 +20,6 @@ __all__ = [
     'DocumentBlock',
     'ExternalResourceBlock',
     'FooterPageChooserBlock',
-    'FootnotesPlaceMarker',
     'InlineImageBlock',
     'MainImageBlock',
     'PersonBlock',

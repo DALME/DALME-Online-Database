@@ -190,7 +190,7 @@ class FootnoteDecorator extends window.draftail.TooltipEntity {
         direction: "top",
       }, [summary, editButton, removeButton]);
 
-      return window.React.createElement("a", {
+      return (window.React.createElement("a", {
         role: "button",
         onMouseUp: this.openTooltip,
         className: `TooltipEntity id_${data.id}`,
@@ -208,7 +208,7 @@ class FootnoteDecorator extends window.draftail.TooltipEntity {
           closeOnType: true,
           closeOnResize: true,
         }, tooltip))
-      ]);
+      ]));
     }
 }
 

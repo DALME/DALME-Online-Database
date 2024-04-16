@@ -10,7 +10,7 @@ from .models import Footnote
 
 
 class FootnoteChooser(BaseFormView, ModelFormMixin):
-    template_name = 'footnote_chooser_modal.html'
+    template_name = 'footnote_modal.html'
     model = Footnote
     form_class = FootnoteForm
     prefix = 'footnote'
@@ -21,7 +21,7 @@ class FootnoteChooser(BaseFormView, ModelFormMixin):
 
     def get_object(self, pk):
         if pk:
-            queryset = Footnote.objects.filter(pk=pk)
+            queryset = self.model.objects.filter(pk=pk)
             if queryset.exists() and queryset.count() == 1:
                 return queryset.get()
         return None
@@ -43,7 +43,7 @@ class FootnoteChooser(BaseFormView, ModelFormMixin):
         json_data = {'step': 'enter_footnote'}
         form = self.get_form()
         if form.is_valid():
-            self.object = form.save(edit_mode=self.edit_mode)
+            self.object = form.save()
             html_template = None
             template_vars = None
             result = {

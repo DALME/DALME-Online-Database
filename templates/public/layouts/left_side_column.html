@@ -8,7 +8,9 @@
 
     <div class="main-column u-flex">
       {% block main_column %}{% endblock %}
+      {% if page.has_footnotes and not page.has_placemarker %}
+        {% include "footnote_container.html" with footnotes=page.footnote_list %}
+      {% endif %}
     </div>
   </article>
-
 {% endblock %}

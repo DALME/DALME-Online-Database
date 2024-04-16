@@ -129,41 +129,6 @@
             }
           });
 
-          // Format footnotes
-          const fn_sources = $('[data-footnote]');
-          if (fn_sources.length) {
-            const footnotes = $('<ol>');
-            $.each(fn_sources, function (index, value) {
-              const fn_source = $(value);
-              const number = index + 1;
-              const content = fn_source.attr('data-footnote');
-              const id = fn_source.attr('data-note_id');
-
-              const callout = $('<sup>', { id: `fn_${number}` });
-              $('<a>', { href: `#${id}`, class: 'footnote_callout' }).text(number).appendTo(callout);
-
-              const footnote = $('<li>', { id: id });
-              const fn_text = $('<p>').html(window.snarkdown(content));
-              $('<a>', {
-                href: `#fn_${number}`,
-                class: 'footnote_back_link',
-                title: `Jump back to footnote ${number} in the text.`
-              }).text('↩︎').appendTo(fn_text);
-              footnote.append(fn_text);
-              footnotes.append(footnote);
-              fn_source.replaceWith(callout);
-            });
-            const footnote_section = $('<div>', { class: 'footnote_list' });
-            footnote_section.append('<hr>');
-            footnote_section.append(footnotes);
-            const fnContainer = $('#footnote-container');
-            if (fnContainer.length) {
-              fnContainer.append(footnote_section);
-            } else {
-              $('.content').append(footnote_section);
-            }
-          }
-
           // Subsections initialize.
           function initSubsection(subsection, isMinor) {
             const subContainer = $('<div/>').attr({ class: 'subsection-container' });

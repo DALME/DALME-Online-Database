@@ -2,11 +2,13 @@
 
 from wagtail.rich_text import LinkHandler
 
+from public.extensions.footnotes.models import Footnote
+
 
 class FootnoteLinkHandler(LinkHandler):
     identifier = 'footnote'
 
     @classmethod
     def expand_db_attributes(cls, attrs):
-        fn_id = attrs['data-footnote']
-        return f'<a href="#fn_{fn_id}" class="footnote_callout" id="{fn_id}">'
+        instance = Footnote.objects.get(pk=attrs['data-footnote'])
+        return f'<a href="#fn_{instance.id}" class="footnote_callout" id="{instance.id}" data-index="{instance.sort_order}">'
