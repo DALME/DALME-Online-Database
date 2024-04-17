@@ -9,7 +9,7 @@ else
 	@$(MAKE) db.migrate
 	@$(MAKE) web.manage args='ensure_tenants'
 	@$(MAKE) db.load dump='$(dump)'
-	@$(MAKE) web.migrate_data
+	@$(MAKE) -e web.migrate_data
 	@$(MAKE) web.manage args='ensure_oauth'
 	@$(MAKE) web.manage args='tenant_command update_index --schema=dalme'
 	@$(MAKE) web.collectstatic

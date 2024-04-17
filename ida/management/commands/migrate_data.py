@@ -50,9 +50,11 @@ class Command(BaseCommand):
         """Run the migration pipeline."""
         for cls in STAGES:
             stage = cls()
-            logger.info('------------------------------------------------------')
-            logger.info('Applying migration stage: %s', stage.name)
-            logger.info('------------------------------------------------------')
+            label = f'Applying migration stage: {stage.name}'
+            separator = '-' * len(label)
+            logger.info(separator)
+            logger.info(label)
+            logger.info(separator)
             stage.apply()
 
     def handle(self, *args, **options):  # noqa: ARG002
