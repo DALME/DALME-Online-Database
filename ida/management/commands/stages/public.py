@@ -3,6 +3,7 @@
 import json
 
 from django_tenants.utils import schema_context
+from psycopg import sql
 from wagtail.log_actions import log
 
 from django.apps import apps
@@ -91,7 +92,7 @@ class Stage(BaseStage):
         with connection.cursor() as cursor:
             self.logger.info('Deleting existing records in dalme schema')
             for table in reset:
-                cursor.execute('TRUNCATE dalme.%s RESTART IDENTITY CASCADE;', [table])
+                cursor.execute(sql.SQL('TRUNCATE "dalme".{} RESTART IDENTITY CASCADE;').format(sql.Identifier(table)))
 
         for label in app_labels:
             self.logger.info('Processing "%s" models', label)
@@ -105,7 +106,7 @@ class Stage(BaseStage):
                     json_fields = self.get_fields_by_type(model, 'JSONField')
 
                     with connection.cursor() as cursor:
-                        cursor.execute('SELECT * FROM restore.%s;', [qualified_name])
+                        cursor.execute(sql.SQL('SELECT * FROM "restore".{};').format(sql.Identifier(qualified_name)))
                         rows = self.map_rows(cursor)
 
                     with schema_context('dalme'):
@@ -172,26 +173,25 @@ class Stage(BaseStage):
 
         self.logger.info('Processing "public" models')
         for model_name in models:
-            model = apps.get_model(app_label='public', model_name=model_name)
             with connection.cursor() as cursor:
                 self.logger.info('Copying "%s"', model_name)
-                cursor.execute('SELECT * FROM restore.public_%s;', [model_name])
+                cursor.execute(sql.SQL('SELECT * FROM "restore".{};').format(sql.Identifier(f'public_{model_name}')))
                 rows = self.map_rows(cursor)
 
                 for row in rows:
                     columns = []
-                    values = ''
-                    for idx, (field, value) in enumerate(row.items()):
-                        if model_name == 'home' and field == 'banners':
-                            banners_raw = value
-                        else:
-                            columns.append(f'{field}')
-                            values += f'{get_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
-                            if idx < len(row) - 1:
-                                values += ', '
+                    values = {}
+                    for field, value in row.items():
+                        columns.append(field)
+                        values[field] = value
 
                     cursor.execute(
-                        'INSERT INTO dalme.public_%s (%s) VALUES (%s);', [model_name, ', '.join(columns), values]
+                        sql.SQL('INSERT INTO "dalme".{} ({}) VALUES ({});').format(
+                            sql.Identifier(f'public_{model_name}'),
+                            sql.SQL(', ').join(sql.Identifier(column) for column in columns),
+                            sql.SQL(', ').join(sql.Placeholder(column) for column in columns),
+                        ),
+                        values,
                     )
 
         if banners_raw:
