@@ -1,10 +1,5 @@
 """Interface for the public.models module."""
 
-from public.extensions.announcements.models import Announcement
-from public.extensions.footnotes.models import Footnote
-from public.extensions.gradients.models import Gradient
-from public.extensions.team.models import TeamMember, TeamRole
-
 from .base_image import BaseImage, CustomRendition
 from .base_page import BasePage
 from .bibliography_page import Bibliography
@@ -25,7 +20,6 @@ from .section_page import Section
 from .settings import Settings
 
 __all__ = [
-    'Announcement',
     'BaseImage',
     'CustomRendition',
     'BasePage',
@@ -40,14 +34,10 @@ __all__ = [
     'FeaturedObject',
     'FeaturedPage',
     'Features',
-    'Footnote',
     'Flat',
-    'Gradient',
     'Home',
     'RecordChooser',
     'SearchEnabled',
     'Section',
     'Settings',
-    'TeamMember',
-    'TeamRole',
 ]

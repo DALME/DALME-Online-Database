@@ -1,6 +1,5 @@
 """Interface for the public.blocks module."""
 
-from .announcement_banner import AnnouncementBannerBlock
 from .carousel import CarouselBlock
 from .chart_embed import ChartEmbedBlock
 from .document import DocumentBlock
@@ -13,7 +12,6 @@ from .sponsor import SponsorBlock
 from .subsection import SubsectionBlock, SubsectionEndMarkerBlock
 
 __all__ = [
-    'AnnouncementBannerBlock',
     'BibliographyChooserBlock',
     'CarouselBlock',
     'ChartEmbedBlock',
