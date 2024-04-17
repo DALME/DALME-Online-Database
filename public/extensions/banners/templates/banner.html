@@ -1,15 +1,15 @@
 {% load wagtailcore_tags %}
 
-<div class="announcement-box">
-  <div class="announcement-content {{ value.color }}">
-    <div class="announcement-title">
+<div class="banner-box">
+  <div class="banner-content {{ value.color }}">
+    <div class="banner-title">
       {% if value.url %}
         <a href="{{ value.url }}" target="_blank">{{ value.title }}</a>
       {% else %}
         {{ value.title }}
       {% endif %}
     </div>
-    <div class="announcement-info">
+    <div class="banner-info">
       {{ value.info|safe }}
       {% if value.page %}
         <a href="{% pageurl value.page %}"> Learn more...</a>

@@ -2,7 +2,7 @@
 {% load wagtailcore_tags wagtailimages_tags static %}
 
 {% block extra_styles %}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/announcements.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'css/banners.css' %}" />
 {% endblock %}
 
 {% block header_extra %}
@@ -15,10 +15,10 @@
     {% endif %}
   </div>
 
-  {% if announcements %}
-    <div class="announcement-container">
-      {% for announcement in announcements %}
-        {% include "announcement.html" with value=announcement %}
+  {% if banners %}
+    <div class="banners-container">
+      {% for banner in banners %}
+        {% include "banner.html" with value=banner %}
       {% endfor %}
     </div>
   {% endif %}

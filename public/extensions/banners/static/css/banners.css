@@ -1,4 +1,4 @@
-.announcement-container {
+.banner-container {
   background-color: #ffffff99;
   backdrop-filter: blur(5px);
   font-family: "Open Sans", 'Helvetica', 'Arial', sans-serif;
@@ -9,44 +9,44 @@
   text-shadow: 0px 0px 3px rgb(255 255 255 / 47%);
 }
 
-.announcement-box {
+.banner-box {
   width: 1068px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.announcement-content {
+.banner-content {
   padding: 0 59px;
 }
 
-.announcement-content:first-of-type {
+.banner-content:first-of-type {
   padding-top: 1.5rem;
 }
 
-.announcement-content:last-of-type {
+.banner-content:last-of-type {
   padding-bottom: 3rem;
 }
 
-.announcement-content.green {
+.banner-content.green {
   background: linear-gradient(180deg, #25542157, transparent);
   color: #174e17;
 }
 
-.announcement-container a {
+.banner-container a {
   color: inherit;
   text-shadow: inherit;
 }
 
-.announcement-container a:hover {
+.banner-container a:hover {
   color: inherit;
   text-shadow: 0px 0px 3px rgb(130 124 124 / 47%);
 }
 
-.announcement-info {
+.banner-info {
   color: #373737;
 }
 
-.announcement-title {
+.banner-title {
   font-weight: 800;
   font-size: 18px;
   margin-bottom: .3rem;

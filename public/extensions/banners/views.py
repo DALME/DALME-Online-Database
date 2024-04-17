@@ -1,17 +1,17 @@
-"""Views for announcements."""
+"""Views for banners."""
 
 from wagtail.admin.panels import FieldPanel, FieldRowPanel
 from wagtail.admin.ui.tables import UpdatedAtColumn
 from wagtail.admin.viewsets.model import ModelViewSet
 
-from .models import Announcement
+from .models import Banner
 
 
-class AnnouncementsViewSet(ModelViewSet):
-    model = Announcement
+class BannersViewSet(ModelViewSet):
+    model = Banner
     icon = 'bullhorn'
-    menu_label = 'Announcements'
-    menu_name = 'announcements'
+    menu_label = 'Banners'
+    menu_name = 'banners'
     menu_order = 900
     add_to_admin_menu = True
     list_display = ['id', 'title', 'start_date', 'end_date', UpdatedAtColumn()]

@@ -128,7 +128,7 @@ class Base(Configuration):
         'public.extensions.bibliography',
         'public.extensions.footnotes',
         'public.extensions.gradients',
-        'public.extensions.announcements',
+        'public.extensions.banners',
         'public.extensions.saved_searches',
         'public',
     ]

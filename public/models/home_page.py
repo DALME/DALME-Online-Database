@@ -8,11 +8,8 @@ from wagtail.fields import StreamField
 from django.db import models
 from django.utils import timezone
 
-from public.blocks import (
-    AnnouncementBannerBlock,
-    SponsorBlock,
-)
-from public.extensions.announcements.models import Announcement
+from public.blocks import SponsorBlock
+from public.extensions.banners.models import Banner
 from public.extensions.gradients.models import Gradient
 from public.models.base_page import BasePage
 from public.models.featured_essay_page import Essay
@@ -41,7 +38,6 @@ class Home(BasePage):
     )
 
     sponsors = StreamField([('sponsors', SponsorBlock())], null=True)
-    banners = StreamField([('banners', AnnouncementBannerBlock())], null=True)
 
     subpage_types = [
         'public.Section',
@@ -59,7 +55,6 @@ class Home(BasePage):
             heading='Header',
         ),
         FieldPanel('learn_more_page'),
-        FieldPanel('banners'),
         FieldPanel('body'),
         FieldPanel('sponsors'),
     ]
@@ -76,7 +71,7 @@ class Home(BasePage):
         context['essay'] = essays.last()
 
         today = datetime.now(tz=timezone.get_current_timezone()).date()
-        context['announcements'] = Announcement.objects.filter(
+        context['banners'] = Banner.objects.filter(
             start_date__lte=today,
             end_date__gte=today,
         ).order_by('start_date')

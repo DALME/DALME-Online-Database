@@ -1,4 +1,4 @@
-"""Model announcement data."""
+"""Model banners data."""
 
 from wagtail.fields import RichTextField
 from wagtail.models import Page
@@ -6,6 +6,7 @@ from wagtail.models import Page
 from django.db import models
 
 COLOUR_CHOICES = {
+    'default': 'Default',
     'blue': 'Blue',
     'green': 'Green',
     'orange': 'Orange',
@@ -14,9 +15,9 @@ COLOUR_CHOICES = {
 }
 
 
-class Announcement(models.Model):
+class Banner(models.Model):
     id = models.AutoField(primary_key=True, unique=True, db_index=True)
-    title = models.CharField(max_length=255, help_text='The title of the announcement.')
+    title = models.CharField(max_length=255, help_text='The title of the banner.')
     show_title = models.BooleanField(default=True, verbose_name='Show?')
     info = RichTextField(
         features=[
@@ -31,20 +32,20 @@ class Announcement(models.Model):
             'blockquote',
             'reference',
         ],
-        help_text='The main content of the announcement.',
+        help_text='The main content of the banner.',
     )
     page = models.ForeignKey(
         Page,
         on_delete=models.SET_NULL,
-        related_name='announcement',
+        related_name='banner',
         null=True,
-        help_text='If selected, a "Learn more..." button linking to a page will be included in the announcement.',
+        help_text='If selected, a "Learn more..." button linking to a page will be included in the banner.',
     )
     url = models.URLField(
         blank=True,
-        help_text='If included a link to the URL will be added to the title of the announcement.',
+        help_text='If included a link to the URL will be added to the title of the banner.',
     )
-    color = models.CharField(max_length=10, choices=COLOUR_CHOICES)
+    color = models.CharField(max_length=10, default='default', choices=COLOUR_CHOICES)
     start_date = models.DateField()
     end_date = models.DateField()
 
