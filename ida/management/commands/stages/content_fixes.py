@@ -157,7 +157,9 @@ class Stage(BaseStage):
         for collection in collections:
             collection.update(project=new_project)
             z_col = ZoteroCollection.objects.create(**collection)
-            log(instance=z_col, action='wagtail.create')
+
+            with schema_context('dalme'):
+                log(instance=z_col, action='wagtail.create')
 
         # GP
         self.logger.info('Creating project and library entries for GP')
@@ -216,7 +218,7 @@ class Stage(BaseStage):
                 # format: <a data-footnote="c847f9da-3780-4085-9426-73e7a0228b3d" linktype="footnote">✱</a>
                 fn_content = self.markdown_to_html(fn['data-footnote'])
                 with schema_context('dalme'):
-                    from public.models import Footnote
+                    from public.extensions.footnotes.models import Footnote
 
                     new_footnote = Footnote.objects.create(
                         id=uuid.uuid4(),
@@ -366,9 +368,22 @@ class Stage(BaseStage):
             from public.extensions.team.models import TeamMember, TeamRole
 
             roles = {
-                'Project Team': TeamRole.objects.create(role='Core Team'),
-                'Contributors': TeamRole.objects.create(role='Contributor'),
-                'Advisory Board': TeamRole.objects.create(role='Advisory Board'),
+                'PI': TeamRole.objects.create(
+                    role='PI',
+                    description='DALME Principal Investigator.',
+                ),
+                'Project Team': TeamRole.objects.create(
+                    role='Core',
+                    description='Member of the core project team.',
+                ),
+                'Contributors': TeamRole.objects.create(
+                    role='Contributor',
+                    description='Occasional contributor to the project.',
+                ),
+                'Advisory Board': TeamRole.objects.create(
+                    role='Board',
+                    description='Member of the DALME Advisory Board.',
+                ),
             }
 
             people_page = Page.objects.get(title='People').specific
