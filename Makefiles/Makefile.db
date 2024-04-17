@@ -13,10 +13,12 @@ db.create_restore_schema:
 		-c 'CREATE SCHEMA IF NOT EXISTS $(RESTORE_SCHEMA)'
 .PHONY: db.create_restore_schema
 
+# TODO: The db volume prefix comes automatically from the directory so
+# eventually this will need to become ida_$(DB_VOLUME) probably.
 db.drop: confirm
 	@$(MAKE) infra.stop
 	docker rm -f $$(docker ps -a -q)
-	docker volume rm $(DB_VOLUME)
+	docker volume rm dalme_$(DB_VOLUME)
 	@$(MAKE) infra.start
 .PHONY: db.drop
 
