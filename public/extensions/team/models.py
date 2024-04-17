@@ -31,7 +31,7 @@ class TeamMember(models.Model):
         help_text='Associated user record, if any.',
     )
     name = models.CharField(max_length=255, help_text='Name as it should appear on the front end.')
-    roles = models.ManyToManyField(TeamRole, help_text='Project role(s).')
+    roles = models.ManyToManyField(TeamRole, blank=True, help_text='Project role(s).')
     title = models.CharField(max_length=255, blank=True, help_text='Professional title(s).')
     affiliation = models.CharField(max_length=255, blank=True, help_text='Institutional affiliation.')
     biography = RichTextField(
@@ -47,6 +47,7 @@ class TeamMember(models.Model):
             'blockquote',
             'reference',
         ],
+        blank=True,
         help_text='Short biographical sketch.',
     )
     url = models.URLField(

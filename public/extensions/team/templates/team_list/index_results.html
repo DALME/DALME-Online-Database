@@ -1,0 +1,58 @@
+{% load wagtailadmin_tags wagtailimages_tags i18n %}
+
+{% block before_results %}{% endblock %}
+{% if object_list %}
+    {% block results %}
+        <table{% include "wagtailadmin/shared/attrs.html" with attrs=table.attrs %}>
+            {% with caption=table.get_caption %}
+                {% if caption %}
+                    <caption class="w-sr-only">{{ caption }}</caption>
+                {% endif %}
+            {% endwith %}
+            {% if table.has_column_widths %}
+                {% for column in table.columns.values %}
+                    <col {% if column.width %}width="{{ column.width }}"{% endif %} />
+                {% endfor %}
+            {% endif %}
+            <thead>
+                <tr {% if table.header_row_classname %}class="{{ table.header_row_classname }}"{% endif %}>
+                    {% for column in table.columns.values %}
+                        {% component column.header %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in table.rows %}
+                    <tr{% include "wagtailadmin/shared/attrs.html" with attrs=row.attrs %}>
+                        {% for cell in row.values %}
+                            {% if cell.column.name == 'photo' %}
+                                <td {% if column.classname %}class="{{ column.classname }}"{% endif %}>
+                                    <div class="image">
+                                        {% if cell.instance.photo %}
+                                            {% image cell.instance.photo fill-100x100 class="show-transparency" alt="" %}
+                                        {% else %}
+                                            {% icon name="user" classname="user_placeholder" title="no_photo" %}
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            {% else %}
+                                {% component cell %}
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}
+    {% block pagination %}
+        {% if is_paginated %}
+            <div class="nice-padding">
+                {% include "wagtailadmin/shared/pagination_nav.html" with items=page_obj linkurl=index_url %}
+            </div>
+        {% endif %}
+    {% endblock %}
+{% else %}
+    <div class="nice-padding w-mt-8">
+        {% block no_results_message %}<p>{% trans "There are no results." %}</p>{% endblock %}
+    </div>
+{% endif %}
