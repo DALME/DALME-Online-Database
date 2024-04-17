@@ -24,3 +24,7 @@
 .chooser-gradient-preview > .gradient-cell {
   margin-right: 0 !important;
 }
+
+table.listing tbody td.title.gradient_as_html {
+  padding-inline-start: 0.5rem !important;
+}
