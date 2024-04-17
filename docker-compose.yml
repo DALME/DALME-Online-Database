@@ -49,7 +49,6 @@ services:
       - ./pyproject.toml:/opt/web/pyproject.toml
       - ./notebooks:/opt/web/notebooks
       - ./notebooks/ipython:/root/.ipython/profile_default
-      - assets:/opt/web/www/static
     restart: unless-stopped
     stdin_open: true
     tty: true

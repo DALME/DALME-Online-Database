@@ -38,7 +38,6 @@ urlpatterns = [
     # path('choose-reroute/<slug:route>/', reroute_chooser, name='wagtailadmin_chooser_page_reroute_child'),
     re_path(r'^((?:[\w\-:]+/)*)$', views.serve, name='wagtail_serve'),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
-    *static(settings.STATIC_URL, document_root=settings.STATIC_ROOT),
 ]
 
 
