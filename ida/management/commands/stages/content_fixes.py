@@ -149,8 +149,8 @@ class Stage(BaseStage):
         new_project = Project.objects.create(
             name='DALME',
             description='The Documentary Archaeology of Late Medieval Europe',
-            zotero_library_id=int(os.environ.get('ZOTERO_LIBRARY_ID')),
-            zotero_api_key=os.environ.get('ZOTERO_API_KEY'),
+            zotero_library_id=int(os.environ['ZOTERO_LIBRARY_ID']),
+            zotero_api_key=os.environ['ZOTERO_API_KEY'],
             tenant=tenant,
         )
 
@@ -167,8 +167,8 @@ class Stage(BaseStage):
         new_project = Project.objects.create(
             name='GP',
             description='Global Pharmacopeias',
-            zotero_library_id=int(os.environ.get('ZOTERO_LIBRARY_ID_GP')),
-            zotero_api_key=os.environ.get('ZOTERO_API_KEY_GP'),
+            zotero_library_id=int(os.environ['ZOTERO_LIBRARY_ID_GP']),
+            zotero_api_key=os.environ['ZOTERO_API_KEY_GP'],
             tenant=tenant,
         )
 
