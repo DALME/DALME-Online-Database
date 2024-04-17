@@ -59,7 +59,7 @@ class Stage(BaseStage):
 
     @transaction.atomic
     def migrate_wagtail_tables(self):  # noqa: C901
-        """Migrate existing CMS tables to the DALME schema (BUT NOT INDEXES)."""
+        """Migrate existing CMS tables to the DALME schema (BUT NOT INDICES)."""
         app_labels = [
             'taggit',
             'wagtailadmin',
@@ -137,8 +137,8 @@ class Stage(BaseStage):
                             target_model.objects.bulk_create(objs)
 
     @transaction.atomic
-    def migrate_public_tables(self):
-        """Migrate existing Public tables to the DALME schema (BUT NOT INDEXES)."""
+    def migrate_public_tables(self):  # noqa: C901
+        """Migrate existing Public tables to the DALME schema (BUT NOT INDICES)."""
         # we need to do these tables differently, i.e. by inserting data directly in SQL
         # because the constraints on foreign keys won't allow use of the ORM, for example
         # because all page types are subclassed from the wagtail Page model which we already
@@ -159,6 +159,7 @@ class Stage(BaseStage):
             'featuredinventory',
             'featuredobject',
         ]
+        banners_raw = None
 
         def get_value(value, field_type):
             if value is None:
@@ -181,12 +182,27 @@ class Stage(BaseStage):
                     columns = []
                     values = ''
                     for idx, (field, value) in enumerate(row.items()):
-                        columns.append(f'{field}')
-                        values += f'{get_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
-                        if idx < len(row) - 1:
-                            values += ', '
+                        if model_name == 'home' and field == 'banners':
+                            banners_raw = value
+                        else:
+                            columns.append(f'{field}')
+                            values += f'{get_value(value, model._meta.get_field(field).get_internal_type())}'  # noqa: SLF001
+                            if idx < len(row) - 1:
+                                values += ', '
                     sql = f"INSERT INTO dalme.public_{model_name} ({', '.join(columns)}) VALUES ({values});"
                     cursor.execute(sql)
+
+        if banners_raw:
+            banner_data = json.loads(banners_raw)
+            with schema_context('dalme'):
+                from public.extensions.banners.models import Banner
+
+                for banner in banner_data:
+                    value = banner.get('value')
+                    if value:
+                        value.pop('page')
+                        value['show_title'] = True
+                        Banner.objects.create(**value)
 
     @transaction.atomic
     def transfer_avatars(self):
