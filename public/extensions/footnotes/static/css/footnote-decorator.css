@@ -9,14 +9,15 @@ button[name="FOOTNOTE"] > svg > path:nth-child(1) {
 }
 .footnoteTooltipText {
   margin-right: 10px;
-  display: flex;
-  align-items: center;
+  width: max-content;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 24px;
+  display: inline-block;
+  height: 100%;
 }
 .Tooltip {
   display: flex;
-}
-.Tooltip__button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }

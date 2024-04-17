@@ -37,8 +37,8 @@ class FootnoteSource extends window.React.Component {
           dialogue.remove();
           modalBg.remove();
           $(document.body).removeClass("footnote-modal-body");
-          document.querySelector(".Draftail-Editor").classList.remove("Draftail-Editor--readonly");
-          document.querySelector(".public-DraftEditor-content").contentEditable = true;
+          document.querySelectorAll(".Draftail-Editor").forEach((el) => el.classList.remove("Draftail-Editor--readonly"));
+          document.querySelectorAll(".public-DraftEditor-content").forEach((el) => el.contentEditable = true);
           this.onClose;
         }
 

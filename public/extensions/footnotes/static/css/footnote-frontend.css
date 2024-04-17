@@ -17,6 +17,14 @@
 .footnote-entry {
     margin-bottom: 0.5rem;
 }
+.footnote-entry a {
+    color: #084094;
+    text-decoration: none;
+}
+.footnote-entry a:hover {
+    color: #084094;
+    border-bottom: 1px dotted #084094;
+}
 .footnote_list ol {
     display: block;
     padding-left: 1.25em;
@@ -37,6 +45,7 @@
     margin: 0 0 0.5rem 0;
     padding: 0 !important;
     font-size: inherit;
+    line-height: 1.5;
 }
 .footnote-entry :nth-last-child(2) {
     display: inline;
@@ -65,4 +74,11 @@ a.footnote_callout:hover {
 .footnote_list blockquote {
     margin: 1rem 2rem;
     font-family: "PT Serif", "Times New Roman", serif;
+    line-height: 1.8;
+}
+.footnote_list blockquote:before {
+    content: "\301D";
+}
+.footnote_list blockquote:after {
+    content: "\301E";
 }
