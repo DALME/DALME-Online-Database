@@ -43,8 +43,9 @@ services:
       - ./api:/opt/web/api
       - ./purl:/opt/web/purl
       - ./public:/opt/web/public
+      - ./static:/opt/web/static
+      - ./tenants:/opt/web/tenants
       - ./templates:/opt/web/templates
-      - ./media/media:/opt/web/www/media
       - ./tests:/opt/web/tests
       - ./pyproject.toml:/opt/web/pyproject.toml
       - ./notebooks:/opt/web/notebooks

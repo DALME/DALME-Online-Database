@@ -63,6 +63,6 @@ def enable_footnotes(features):
 
 @hooks.register('before_serve_page')
 def add_footnotes(page, _request, _serve_args, _serve_kwargs):
-    if page.has_footnotes:
+    if getattr(page, 'has_footnotes', False):
         page.footnote_list = page.footnotes.all()
     return page
