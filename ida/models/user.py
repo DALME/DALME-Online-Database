@@ -59,12 +59,16 @@ class User(AbstractUser):
         """
         # Capture this here before it mutates during super().save().
         created = self._state.adding
-        super().save(*args, **kwargs)
         if created:
-            Profile.objects.create(user=self, full_name=f'{self.first_name} {self.last_name}')
+            self.profile = Profile(full_name=f'{self.first_name} {self.last_name}')
+            super().save(*args, **kwargs)
+
+            # Add the new user to the current tenant.
             tenant = get_current_tenant()
             if bool(tenant):  # This just checks the proxy is actually bound to a value.
                 tenant.members.add(self)
+        else:
+            super().save(*args, **kwargs)
 
 
 class Profile(models.Model):
