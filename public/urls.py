@@ -46,9 +46,9 @@ cmsurls = [
 
 
 urlpatterns = [
+    path('api/public/', api_router.urls, name='public_api_endpoints'),
     path('cms/login/', to_ida_login, name='wagtailadmin_login'),
     path('cms/logout/', to_ida_logout, name='wagtailadmin_logout'),
     path('cms/', include(cmsurls)),
     path('documents/', include(wagtaildocs_urls)),
-    path('api/public/', api_router.urls, name='public_api_endpoints'),
 ]

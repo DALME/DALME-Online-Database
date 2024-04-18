@@ -50,7 +50,7 @@ COPY ./config/oidc.key ./oidc.key
 COPY ./tenants ./tenants
 COPY ./static ./static
 COPY ./manage.py ./
-CMD ["python", "manage.py", "runserver_plus", "0.0.0.0:8001"]
+CMD ["python", "manage.py", "runserver_plus", "--nostatic", "0.0.0.0:8001"]
 
 ### TARGET: ci
 FROM install-dev as ci
