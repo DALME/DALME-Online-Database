@@ -45,7 +45,7 @@ web.migrate_data:
 .PHONY: web.manage
 
 web.open:
-	open http://ida.localhost:8000/
+	open http://dalme.localhost:8000/
 .PHONY: web.open
 
 web.python:

@@ -404,7 +404,6 @@ class Development(Base, Configuration):
     }
 
     ALLOWED_HOSTS = [
-        'ida.localhost',
         'dalme.localhost',
         'globalpharmacopeias.localhost',
     ]
