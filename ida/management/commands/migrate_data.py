@@ -51,7 +51,7 @@ class Command(BaseCommand):
         for cls in STAGES:
             stage = cls()
             label = f'Applying migration stage: {stage.name}'
-            separator = '-' * len(label)
+            separator = '-' * (len(label) + 2)
             logger.info(separator)
             logger.info(label)
             logger.info(separator)
